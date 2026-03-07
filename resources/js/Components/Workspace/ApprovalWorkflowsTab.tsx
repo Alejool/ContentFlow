@@ -1,4 +1,7 @@
 import Button from "@/Components/common/Modern/Button";
+import Input from "@/Components/common/Modern/Input";
+import Select from "@/Components/common/Modern/Select";
+import ConfirmDialog from "@/Components/common/ui/ConfirmDialog";
 import axios from "axios";
 import {
   AlertCircle,
@@ -39,12 +42,14 @@ interface ApprovalWorkflowsTabProps {
   workspace: any;
   roles: any[];
   canManageWorkspace: boolean;
+  hasAdvancedAccess?: boolean;
 }
 
 export default function ApprovalWorkflowsTab({
   workspace,
   roles: initialRoles,
   canManageWorkspace,
+  hasAdvancedAccess = false,
 }: ApprovalWorkflowsTabProps) {
   const { t } = useTranslation();
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
@@ -55,6 +60,8 @@ export default function ApprovalWorkflowsTab({
 
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showCreateRoleModal, setShowCreateRoleModal] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [workflowToDelete, setWorkflowToDelete] = useState<number | null>(null);
 
   const fetchWorkflows = async () => {
     if (!workspace?.id) return;
@@ -67,8 +74,8 @@ export default function ApprovalWorkflowsTab({
       setWorkflows(response.data.data || []);
     } catch (error: any) {
       const message =
-        error.response?.data?.message || error.message || "Error desconocido";
-      toast.error(`Error al cargar los flujos: ${message}`);
+        error.response?.data?.message || error.message || t("common.unknown");
+      toast.error(`${t("common.approvals.errors.fetch")}: ${message}`);
     } finally {
       setIsLoading(false);
     }
@@ -86,9 +93,15 @@ export default function ApprovalWorkflowsTab({
   const handleCreate = () => {
     setEditingWorkflow({
       id: 0,
-      name: "Nuevo Flujo de Aprobación",
+      name: t("common.approvals.createFlow"),
       is_active: true,
-      steps: [{ name: "Primer Nivel", role_id: roles[0]?.id, step_order: 1 }],
+      steps: [
+        {
+          name: `${t("common.approvals.level")} 1`,
+          role_id: roles[0]?.id,
+          step_order: 1,
+        },
+      ],
     });
     setIsEditing(true);
   };
@@ -102,7 +115,7 @@ export default function ApprovalWorkflowsTab({
           route("api.v1.workspaces.approval-workflows.store", workspace.id),
           editingWorkflow,
         );
-        toast.success("Flujo creado con éxito");
+        toast.success(t("common.approvals.success.created"));
       } else {
         await axios.put(
           route("api.v1.workspaces.approval-workflows.update", {
@@ -111,39 +124,54 @@ export default function ApprovalWorkflowsTab({
           }),
           editingWorkflow,
         );
-        toast.success("Flujo actualizado con éxito");
+        toast.success(t("common.approvals.success.updated"));
       }
       setIsEditing(false);
       fetchWorkflows();
     } catch (error: any) {
       toast.error(
-        "Error al guardar el flujo: " +
+        `${t("common.approvals.errors.save")}: ` +
           (error.response?.data?.message || error.message),
       );
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm("¿Estás seguro de que quieres eliminar este flujo?")) return;
+  const handleDelete = (id: number) => {
+    setWorkflowToDelete(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!workflowToDelete) return;
     try {
       await axios.delete(
         route("api.v1.workspaces.approval-workflows.destroy", {
           idOrSlug: workspace.id,
-          workflow: id,
+          workflow: workflowToDelete,
         }),
       );
-      toast.success("Flujo eliminado");
+      toast.success(t("common.approvals.success.deleted"));
       fetchWorkflows();
-    } catch (error) {
-      toast.error("Error al eliminar el flujo");
+    } catch (error: any) {
+      toast.error(
+        `${t("common.approvals.errors.delete")}: ` +
+          (error.response?.data?.message || error.message),
+      );
+    } finally {
+      setIsDeleteModalOpen(false);
+      setWorkflowToDelete(null);
     }
   };
 
   const addStep = () => {
+    if (!hasAdvancedAccess) {
+      toast.error(t("common.approvals.errors.multiLevelEnterprise"));
+      return;
+    }
     if (!editingWorkflow) return;
     const newSteps = [...editingWorkflow.steps];
     newSteps.push({
-      name: `Nivel ${newSteps.length + 1}`,
+      name: `${t("common.approvals.level")} ${newSteps.length + 1}`,
       role_id: roles[0]?.id,
       step_order: newSteps.length + 1,
     });
@@ -176,61 +204,115 @@ export default function ApprovalWorkflowsTab({
         <div className="p-6 border-b border-gray-200 dark:border-neutral-800 flex items-center justify-between bg-gray-50 dark:bg-neutral-800/50">
           <div>
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-              {editingWorkflow.id === 0 ? "Crear Flujo" : "Editar Flujo"}
+              {editingWorkflow.id === 0
+                ? t("common.approvals.createFlow")
+                : t("common.approvals.editFlow")}
             </h3>
             <p className="text-sm text-gray-500">
-              Configura la secuencia de aprobaciones.
+              {t("common.approvals.configureSequence")}
             </p>
           </div>
           <div className="flex gap-2">
-            <Button variant="ghost" onClick={() => setIsEditing(false)}>
-              <X className="w-4 h-4 mr-2" /> Cancelar
+            <Button
+              variant="ghost"
+              icon={X}
+              buttonStyle="outline"
+              onClick={() => setIsEditing(false)}
+            >
+              {t("common.cancel")}
             </Button>
-            <Button variant="primary" onClick={handleSave}>
-              <Save className="w-4 h-4 mr-2" /> Guardar Cambios
+            <Button
+              variant="primary"
+              icon={Save}
+              buttonStyle="solid"
+              onClick={handleSave}
+            >
+              {t("common.save_changes")}
             </Button>
           </div>
         </div>
 
         <div className="p-6 space-y-6">
-          <div>
-            <label className="block text-sm font-bold text-gray-700 dark:text-neutral-300 mb-2">
-              Nombre del Flujo
-            </label>
-            <input
-              type="text"
-              className="w-full bg-white dark:bg-neutral-950 border border-gray-300 dark:border-neutral-700 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary-500"
-              value={editingWorkflow.name}
-              onChange={(e) =>
-                setEditingWorkflow({ ...editingWorkflow, name: e.target.value })
-              }
-            />
-          </div>
+          <Input
+            id="workflow-name"
+            label={t("common.approvals.workflowName")}
+            value={editingWorkflow.name}
+            onChange={(e: any) =>
+              setEditingWorkflow({ ...editingWorkflow, name: e.target.value })
+            }
+            placeholder={t("common.approvals.workflowName")}
+          />
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h4 className="font-bold text-gray-900 dark:text-white">
-                Niveles de Aprobación
+                {t("common.approvals.approvalLevels")}
               </h4>
               <div className="flex gap-2">
                 <Button
-                  size="sm"
+                  size="md"
                   variant="ghost"
+                  buttonStyle="outline"
                   onClick={() => setShowCreateRoleModal(true)}
                   className="text-primary-600"
+                  icon={Shield}
                 >
-                  <Shield className="w-4 h-4 mr-1" /> Nuevo Rol
+                  {t("common.approvals.newRole")}
                 </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={addStep}
-                  className="text-primary-600"
-                >
-                  <Plus className="w-4 h-4 mr-1" /> Añadir Nivel
-                </Button>
+                {hasAdvancedAccess ? (
+                  <Button
+                    size="md"
+                    variant="ghost"
+                    buttonStyle="outline"
+                    onClick={addStep}
+                    className="text-primary-600"
+                    icon={Plus}
+                  >
+                    {t("common.approvals.addLevel")}
+                  </Button>
+                ) : (
+                  <Button
+                    size="md"
+                    variant="ghost"
+                    buttonStyle="outline"
+                    className="text-gray-400 cursor-not-allowed opacity-50"
+                    icon={Plus}
+                    disabled
+                  >
+                    {t("common.approvals.addLevel")}
+                  </Button>
+                )}
               </div>
             </div>
+
+            {!hasAdvancedAccess && (
+              <div className="bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm animate-in fade-in slide-in-from-top-2 duration-500">
+                <div className="flex items-start gap-4">
+                  <div className="p-2 bg-primary-100 dark:bg-primary-900/40 rounded-full shrink-0">
+                    <Shield className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-primary-900 dark:text-primary-300">
+                      {t("approvals.locked.title") ||
+                        "Flujos de aprobación multi-nivel"}
+                    </p>
+                    <p className="text-xs text-primary-700 dark:text-primary-400 mt-1 leading-relaxed max-w-xl">
+                      {t("approvals.locked.description") ||
+                        "Tu plan actual permite aprobaciones de un nivel. Mejora tu plan para crear flujos de aprobación avanzados y multi-nivel con responsables jerárquicos."}
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  size="sm"
+                  variant="primary"
+                  buttonStyle="solid"
+                  onClick={() => (window.location.href = route("pricing"))}
+                  className="shrink-0 whitespace-nowrap shadow-md shadow-primary-500/20"
+                >
+                  {t("common.upgradePlan") || "Mejorar Plan"}
+                </Button>
+              </div>
+            )}
 
             <div className="space-y-3">
               {editingWorkflow.steps.map((step, index) => (
@@ -242,11 +324,14 @@ export default function ApprovalWorkflowsTab({
                     <div className="h-8 w-8 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 flex items-center justify-center font-bold text-sm shrink-0">
                       {index + 1}
                     </div>
-                    <input
-                      type="text"
-                      className="bg-transparent border-b border-gray-300 dark:border-neutral-700 focus:border-primary-500 outline-none px-1 py-0.5 text-sm font-medium flex-1"
+                    <Input
+                      id={`step-name-${index}`}
                       value={step.name}
-                      onChange={(e) => {
+                      variant="outlined"
+                      sizeType="md"
+                      className="bg-transparent border-none focus:ring-0 px-0"
+                      containerClassName="flex-1"
+                      onChange={(e: any) => {
                         const newSteps = [...editingWorkflow.steps];
                         newSteps[index].name = e.target.value;
                         setEditingWorkflow({
@@ -259,61 +344,58 @@ export default function ApprovalWorkflowsTab({
 
                   <div className="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto">
                     <div className="flex items-center gap-2 w-full sm:w-auto">
-                      <select
-                        className="w-full sm:w-48 bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded-md p-1.5 text-sm outline-none focus:ring-2 focus:ring-primary-500"
+                      <Select
+                        id={`step-role-${index}`}
+                        options={[
+                          { value: "", label: t("common.approvals.anyRole") },
+                          ...roles.map((r) => ({ value: r.id, label: r.name })),
+                        ]}
                         value={step.role_id || ""}
-                        onChange={(e) => {
+                        size="md"
+                        containerClassName="w-full sm:w-48"
+                        onChange={(val: any) => {
                           const newSteps = [...editingWorkflow.steps];
-                          newSteps[index].role_id = e.target.value
-                            ? parseInt(e.target.value)
-                            : null;
-                          newSteps[index].user_id = null; // Clear user if role selected
+                          newSteps[index].role_id = val ? parseInt(val) : null;
+                          newSteps[index].user_id = null;
                           setEditingWorkflow({
                             ...editingWorkflow,
                             steps: newSteps,
                           });
                         }}
-                      >
-                        <option value="">Cualquier Rol</option>
-                        {roles.map((r) => (
-                          <option key={r.id} value={r.id}>
-                            {r.name}
-                          </option>
-                        ))}
-                      </select>
+                      />
                       <span className="text-gray-400 text-xs text-center px-1">
-                        O
+                        {t("common.approvals.or")}
                       </span>
-                      <select
-                        className="w-full sm:w-48 bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded-md p-1.5 text-sm outline-none focus:ring-2 focus:ring-primary-500"
+                      <Select
+                        id={`step-user-${index}`}
+                        options={[
+                          { value: "", label: t("common.approvals.anyUser") },
+                          ...(workspace.users?.map((u: any) => ({
+                            value: u.id,
+                            label: u.name,
+                          })) || []),
+                        ]}
                         value={step.user_id || ""}
-                        onChange={(e) => {
+                        size="md"
+                        containerClassName="w-full sm:w-48"
+                        onChange={(val: any) => {
                           const newSteps = [...editingWorkflow.steps];
-                          newSteps[index].user_id = e.target.value
-                            ? parseInt(e.target.value)
-                            : null;
-                          newSteps[index].role_id = null; // Clear role if user selected
+                          newSteps[index].user_id = val ? parseInt(val) : null;
+                          newSteps[index].role_id = null;
                           setEditingWorkflow({
                             ...editingWorkflow,
                             steps: newSteps,
                           });
                         }}
-                      >
-                        <option value="">Cualquier Usuario</option>
-                        {workspace.users?.map((u: any) => (
-                          <option key={u.id} value={u.id}>
-                            {u.name}
-                          </option>
-                        ))}
-                      </select>
+                      />
                     </div>
 
                     <Button
-                      size="sm"
+                      size="md"
                       variant="ghost"
                       onClick={() => removeStep(index)}
                       className="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 shrink-0"
-                      title="Eliminar nivel"
+                      title={t("common.approvals.deleteLevel")}
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -339,28 +421,33 @@ export default function ApprovalWorkflowsTab({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-            Flujos de Aprobación
+            {t("common.approvals.title")}
           </h3>
           <p className="text-sm text-gray-500">
-            Define rutas de revisión secuenciales para tus publicaciones.
+            {t("common.approvals.subtitle")}
           </p>
         </div>
         {canManageWorkspace && (
           <div className="flex gap-2">
             <Button
               variant="ghost"
+              buttonStyle="outline"
               className="text-primary-600"
               onClick={() => setShowInviteModal(true)}
+              icon={UserPlus}
             >
-              <UserPlus className="w-4 h-4 mr-2" /> Invitar
+              {t("common.approvals.invite")}
             </Button>
-            <Button
-              variant="primary"
-              buttonStyle="solid"
-              onClick={handleCreate}
-            >
-              <Plus className="w-5 h-5 mr-2" /> Crear Flujo
-            </Button>
+            {workflows.length === 0 || hasAdvancedAccess ? (
+              <Button
+                variant="primary"
+                buttonStyle="solid"
+                onClick={handleCreate}
+                icon={Plus}
+              >
+                {t("common.approvals.createWorkflow")}
+              </Button>
+            ) : null}
           </div>
         )}
       </div>
@@ -371,12 +458,10 @@ export default function ApprovalWorkflowsTab({
             <CheckCircle className="w-8 h-8 text-primary-600" />
           </div>
           <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-            No hay flujos personalizados
+            {t("common.approvals.noWorkflowsTitle")}
           </h4>
           <p className="text-gray-500 max-w-sm mx-auto mb-6">
-            Todas las publicaciones usarán el flujo básico de una sola firma
-            hasta que definas uno nuevo. Define una cadena de mando para
-            revisiones más estrictas.
+            {t("common.approvals.noWorkflowsDesc")}
           </p>
           <Button
             variant="primary"
@@ -385,7 +470,7 @@ export default function ApprovalWorkflowsTab({
             className="shadow-lg shadow-primary-500/20"
             icon={Plus}
           >
-            Configurar mi primer flujo multi-nivel
+            {t("common.approvals.configureFirstWorkflow")}
           </Button>
         </div>
       ) : (
@@ -405,7 +490,8 @@ export default function ApprovalWorkflowsTab({
                       {workflow.name}
                     </h4>
                     <p className="text-xs text-gray-500">
-                      {workflow.steps.length} niveles configurados
+                      {workflow.steps.length}{" "}
+                      {t("common.approvals.levelsConfigured")}
                     </p>
                   </div>
                 </div>
@@ -413,6 +499,7 @@ export default function ApprovalWorkflowsTab({
                   <Button
                     size="sm"
                     variant="ghost"
+                    buttonStyle="outline"
                     onClick={() => handleEdit(workflow)}
                   >
                     <Edit2 className="w-4 h-4" />
@@ -420,6 +507,7 @@ export default function ApprovalWorkflowsTab({
                   <Button
                     size="sm"
                     variant="ghost"
+                    buttonStyle="outline"
                     className="text-red-500"
                     onClick={() => handleDelete(workflow.id)}
                   >
@@ -453,9 +541,7 @@ export default function ApprovalWorkflowsTab({
       <div className="p-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg flex gap-3">
         <AlertCircle className="w-5 h-5 text-orange-600 shrink-0 mt-0.5" />
         <p className="text-sm text-orange-800 dark:text-orange-300">
-          <strong>Nota:</strong> Solo puede haber un flujo activo a la vez por
-          workspace. El sistema usará el primer flujo activo que encuentre para
-          todas las nuevas publicaciones que requieran aprobación.
+          {t("common.approvals.activeWorkflowNote")}
         </p>
       </div>
 
@@ -467,6 +553,17 @@ export default function ApprovalWorkflowsTab({
         }}
         workspace={workspace}
         roles={roles}
+      />
+
+      <ConfirmDialog
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        title={t("common.deleteConfirmTitle")}
+        message={t("common.approvals.confirmDelete")}
+        confirmText={t("common.delete")}
+        cancelText={t("common.cancel")}
+        type="danger"
       />
     </div>
   );

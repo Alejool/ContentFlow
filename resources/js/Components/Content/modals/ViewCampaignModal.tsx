@@ -1,8 +1,7 @@
 import CampaignMediaCarousel from "@/Components/Campaigns/CampaignMediaCarousel";
-import ReelsCarousel from "@/Components/Content/ReelsCarousel";
 import ActivityList from "@/Components/Content/ActivityList";
-import ApprovalHistory from "@/Components/Content/ApprovalHistory";
 import ApprovalHistorySection from "@/Components/Content/Publication/common/edit/ApprovalHistorySection";
+import ReelsCarousel from "@/Components/Content/ReelsCarousel";
 import { Campaign } from "@/types/Campaign";
 import { Publication } from "@/types/Publication";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
@@ -48,6 +47,14 @@ export default function ViewCampaignModal({
   };
 
   const isActuallyPublication = isPublication(item);
+
+  const planId =
+    auth.current_workspace?.subscription?.plan?.toLowerCase() ||
+    auth.current_workspace?.plan?.toLowerCase() ||
+    "demo";
+  const canAccessApprovals = ["demo", "professional", "enterprise"].includes(
+    planId,
+  );
 
   const title = (item as any).title || (item as any).name || "Untitled";
   const desc = item.description || "No description provided.";
@@ -128,7 +135,7 @@ export default function ViewCampaignModal({
                       <FileText className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                     </div>
                     <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                      {t('reels.section.title')} ({reels.length})
+                      {t("reels.section.title")} ({reels.length})
                     </h3>
                   </div>
                   <ReelsCarousel reels={reels} />
@@ -224,11 +231,15 @@ export default function ViewCampaignModal({
               {isActuallyPublication && (
                 <div className="mt-8 border-b border-gray-200 dark:border-neutral-700 mb-6">
                   <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-                    {["overview", "activity", "approvals"].map((tab) => (
-                      <button
-                        key={tab}
-                        onClick={() => setActiveTab(tab)}
-                        className={`
+                    {["overview", "activity", "approvals"]
+                      .filter(
+                        (tab) => tab !== "approvals" || canAccessApprovals,
+                      )
+                      .map((tab) => (
+                        <button
+                          key={tab}
+                          onClick={() => setActiveTab(tab)}
+                          className={`
                           whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm capitalize
                           ${
                             activeTab === tab
@@ -236,10 +247,10 @@ export default function ViewCampaignModal({
                               : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
                           }
                         `}
-                      >
-                        {t(`common.tabs.${tab}`, tab)}
-                      </button>
-                    ))}
+                        >
+                          {t(`common.tabs.${tab}`, tab)}
+                        </button>
+                      ))}
                   </nav>
                 </div>
               )}
@@ -275,14 +286,22 @@ export default function ViewCampaignModal({
                             className={`text-sm text-gray-900 dark:text-white ${
                               !hashtagsExpanded ? "line-clamp-2" : ""
                             } break-words cursor-pointer hover:text-primary-600 dark:hover:text-primary-400 transition-colors`}
-                            onClick={() => setHashtagsExpanded(!hashtagsExpanded)}
-                            title={hashtagsExpanded ? "Click para contraer" : "Click para expandir"}
+                            onClick={() =>
+                              setHashtagsExpanded(!hashtagsExpanded)
+                            }
+                            title={
+                              hashtagsExpanded
+                                ? "Click para contraer"
+                                : "Click para expandir"
+                            }
                           >
                             {(item as any).hashtags}
                           </div>
                           {(item as any).hashtags.length > 100 && (
                             <button
-                              onClick={() => setHashtagsExpanded(!hashtagsExpanded)}
+                              onClick={() =>
+                                setHashtagsExpanded(!hashtagsExpanded)
+                              }
                               className="text-xs text-primary-600 dark:text-primary-400 hover:underline mt-2"
                             >
                               {hashtagsExpanded ? "Ver menos" : "Ver más"}

@@ -24,10 +24,21 @@ class WorkspaceApprovalWorkflowController extends Controller
     })->firstOrFail();
   }
 
+  protected function checkFeature(Workspace $workspace)
+  {
+    $plan = $workspace->subscription?->plan ?? 'free';
+    $feature = config("plans.{$plan}.features.approval_workflows", false);
+
+    if (!$feature) {
+      abort(403, 'This feature is not available for your plan.');
+    }
+  }
+
   public function index(Request $request, $idOrSlug)
   {
     try {
       $workspace = $this->getWorkspace($idOrSlug);
+      $this->checkFeature($workspace);
 
       $workflows = ApprovalWorkflow::where('workspace_id', $workspace->id)
         ->with(['steps.role', 'steps.user'])
@@ -42,6 +53,7 @@ class WorkspaceApprovalWorkflowController extends Controller
   public function store(Request $request, $idOrSlug)
   {
     $workspace = $this->getWorkspace($idOrSlug);
+    $this->checkFeature($workspace);
 
     $request->validate([
       'name' => 'required|string|max:255',
@@ -50,6 +62,13 @@ class WorkspaceApprovalWorkflowController extends Controller
       'steps.*.user_id' => 'nullable|exists:users,id',
       'steps.*.name' => 'nullable|string|max:255',
     ]);
+
+    // Enforce tiered limits
+    $plan = $workspace->subscription?->plan ?? 'free';
+    $hasAdvanced = config("plans.{$plan}.features.approval_workflows") === 'advanced';
+    if (!$hasAdvanced && count($request->steps) > 1) {
+      return $this->errorResponse('Your current plan only allows single-level approvals. Please upgrade to Enterprise for multi-level workflows.', 403);
+    }
 
     return DB::transaction(function () use ($request, $workspace) {
       $workflow = ApprovalWorkflow::create([
@@ -75,6 +94,7 @@ class WorkspaceApprovalWorkflowController extends Controller
   public function update(Request $request, $idOrSlug, ApprovalWorkflow $workflow)
   {
     $workspace = $this->getWorkspace($idOrSlug);
+    $this->checkFeature($workspace);
 
     if ($workflow->workspace_id !== $workspace->id) {
       return $this->errorResponse('Unauthorized', 403);
@@ -85,6 +105,15 @@ class WorkspaceApprovalWorkflowController extends Controller
       'steps' => 'sometimes|array|min:1',
       'is_active' => 'sometimes|boolean',
     ]);
+
+    // Enforce tiered limits
+    if ($request->has('steps')) {
+      $plan = $workspace->subscription?->plan ?? 'free';
+      $hasAdvanced = config("plans.{$plan}.features.approval_workflows") === 'advanced';
+      if (!$hasAdvanced && count($request->steps) > 1) {
+        return $this->errorResponse('Your current plan only allows single-level approvals. Please upgrade to Enterprise for multi-level workflows.', 403);
+      }
+    }
 
     return DB::transaction(function () use ($request, $workflow) {
       if ($request->has('name')) {
@@ -116,6 +145,7 @@ class WorkspaceApprovalWorkflowController extends Controller
   public function destroy($idOrSlug, ApprovalWorkflow $workflow)
   {
     $workspace = $this->getWorkspace($idOrSlug);
+    $this->checkFeature($workspace);
 
     if ($workflow->workspace_id !== $workspace->id) {
       return $this->errorResponse('Unauthorized', 403);
