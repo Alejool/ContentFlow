@@ -1,6 +1,7 @@
-import { Head, router } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { CheckCircle, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 
 interface SuccessProps {
@@ -13,14 +14,13 @@ interface SuccessProps {
 }
 
 export default function Success({ session }: SuccessProps) {
-  const amount = (session.amount_total / 100).toFixed(2);
+  const { t } = useTranslation();
   const [isUpdating, setIsUpdating] = useState(true);
   const [attempts, setAttempts] = useState(0);
   const maxAttempts = 10; // Intentar durante 20 segundos (10 intentos x 2 segundos)
 
   useEffect(() => {
     let pollInterval: NodeJS.Timeout;
-    let redirectTimer: NodeJS.Timeout;
 
     const checkSubscriptionUpdate = async () => {
       try {
@@ -34,14 +34,6 @@ export default function Success({ session }: SuccessProps) {
           
           // Disparar evento para actualizar UI
           window.dispatchEvent(new Event('subscription-plan-changed'));
-          
-          // Redirigir después de 2 segundos
-          redirectTimer = setTimeout(() => {
-            router.visit('/dashboard', {
-              preserveState: false,
-              preserveScroll: false,
-            });
-          }, 2000);
           
           return true;
         }
@@ -71,14 +63,8 @@ export default function Success({ session }: SuccessProps) {
             clearInterval(pollInterval);
             
             if (!isUpdated) {
-              // Si después de todos los intentos no se actualizó, redirigir de todos modos
+              // Si después de todos los intentos no se actualizó, marcar como completado de todos modos
               setIsUpdating(false);
-              redirectTimer = setTimeout(() => {
-                router.visit('/dashboard', {
-                  preserveState: false,
-                  preserveScroll: false,
-                });
-              }, 2000);
             }
           }
         }, 2000);
@@ -90,13 +76,12 @@ export default function Success({ session }: SuccessProps) {
 
     return () => {
       if (pollInterval) clearInterval(pollInterval);
-      if (redirectTimer) clearTimeout(redirectTimer);
     };
   }, [attempts]);
 
   return (
     <>
-      <Head title="Pago Exitoso" />
+      <Head title={t('checkout.success.title', 'Pago Exitoso')} />
       
       <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
@@ -105,13 +90,13 @@ export default function Success({ session }: SuccessProps) {
           </div>
           
           <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            ¡Pago Exitoso!
+            {t('checkout.success.title', '¡Pago Exitoso!')}
           </h1>
           
           <p className="text-gray-600 mb-8">
             {isUpdating 
-              ? 'Estamos activando tu suscripción...'
-              : 'Tu suscripción ha sido activada correctamente.'
+              ? t('checkout.success.activating', 'Estamos activando tu suscripción...')
+              : t('checkout.success.activated', 'Tu suscripción ha sido activada correctamente.')
             }
           </p>
 
@@ -119,7 +104,7 @@ export default function Success({ session }: SuccessProps) {
             <div className="mb-6">
               <div className="inline-flex items-center gap-2 text-sm text-blue-600">
                 <Loader2 className="animate-spin h-4 w-4" />
-                Actualizando tu cuenta...
+                {t('checkout.success.updating', 'Actualizando tu cuenta...')}
               </div>
             </div>
           )}
@@ -129,16 +114,15 @@ export default function Success({ session }: SuccessProps) {
               href="/dashboard"
               className="block w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors"
             >
-              Ir al Dashboard
+              {t('checkout.success.goToDashboard', 'Ir al Dashboard')}
             </a>
           </div>
 
-          <p className="text-xs text-gray-400 mt-4">
-            {isUpdating 
-              ? 'Por favor espera mientras activamos tu suscripción...'
-              : 'Serás redirigido automáticamente en unos segundos'
-            }
-          </p>
+          {isUpdating && (
+            <p className="text-xs text-gray-400 mt-4">
+              {t('checkout.success.pleaseWait', 'Por favor espera mientras activamos tu suscripción...')}
+            </p>
+          )}
         </div>
       </div>
     </>

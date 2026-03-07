@@ -24,16 +24,6 @@ export default function Success({ auth, plan, amount, currency }: Props) {
     setTimeout(() => {
       router.reload({ only: ['auth', 'onboarding'] });
     }, 1000);
-
-    // Auto-redirect to dashboard after 5 seconds to continue onboarding
-    const redirectTimer = setTimeout(() => {
-      router.visit('/dashboard', {
-        preserveState: false,
-        preserveScroll: false,
-      });
-    }, 5000);
-
-    return () => clearTimeout(redirectTimer);
   }, []);
 
   const planNames: Record<string, string> = {
@@ -46,7 +36,7 @@ export default function Success({ auth, plan, amount, currency }: Props) {
     <AuthenticatedLayout user={auth.user}>
       <Head title={t('subscription.success.title')} />
 
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-primary-50/30 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 py-16 dark:text-white ">
+      <div className="min-h-screen  to-primary-50/30 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 py-16 dark:text-white ">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Success Icon */}
           <div className="text-center mb-8">
@@ -171,13 +161,6 @@ export default function Success({ auth, plan, amount, currency }: Props) {
                 {t('subscription.success.viewBilling')}
               </Button>
             </Link>
-          </div>
-
-          {/* Auto-redirect notice */}
-          <div className="mt-8 text-center">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              {t('subscription.success.autoRedirect', 'Serás redirigido al dashboard en unos segundos...')}
-            </p>
           </div>
 
           {/* Support Info */}

@@ -502,9 +502,9 @@ export default function CalendarIndex({ auth }: { auth: any }) {
         onUndo={async () => {
           const success = await undoBulkOperation();
           if (success) {
-            toast.success('Operación deshecha exitosamente');
+            toast.success(t('calendar.bulkActions.undoSuccess'));
           } else {
-            toast.error('Error al deshacer operación');
+            toast.error(t('calendar.bulkActions.undoError'));
           }
         }}
         canUndo={canUndo && isUndoAvailable()}

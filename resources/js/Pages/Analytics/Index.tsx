@@ -254,19 +254,15 @@ export default function Index({ stats, period }: AnalyticsProps) {
           <>
             {detailedPlatforms.length > 0 && (
               <div className="mb-8">
-                <div className="rounded-lg p-6 mb-4 transition-colors duration-300 bg-white shadow-lg border border-gray-100 dark:bg-neutral-800/50 dark:backdrop-blur-sm dark:border-neutral-700/50">
+                <div className="rounded-lg p-6 transition-colors duration-300 bg-white shadow-lg border border-gray-100 dark:bg-neutral-800/50 dark:backdrop-blur-sm dark:border-neutral-700/50">
                   <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                    {t(
-                      "analytics.charts.detailedPlatforms",
-                      "Análisis Detallado por Plataforma",
-                    )}
+                    {t("analytics.charts.detailedPlatforms")}
                   </h2>
                   <p
-                    className={`text-sm mt-1 ${isDark ? "text-gray-400" : "text-gray-600"}`}
+                    className={`text-sm mb-5 ${isDark ? "text-gray-400" : "text-gray-600"}`}
                   >
-                    Métricas diarias actualizadas por cron jobs
+                    {t("analytics.advanced.daily_metrics")}
                   </p>
-                </div>
                 <Suspense
                   fallback={
                     <Skeleton className="h-[400px] w-full rounded-lg" />
@@ -277,36 +273,35 @@ export default function Index({ stats, period }: AnalyticsProps) {
                     theme={theme}
                   />
                 </Suspense>
+                </div>
+                {detailedPublications.length > 0 && (
+                  <div className="my-8">
+                    <div className="rounded-lg p-6 mb-4 transition-colors duration-300 bg-white shadow-lg dark:bg-neutral-800/50 dark:backdrop-blur-sm dark:border-neutral-700/50">
+                      <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                        {t("analytics.charts.detailedPublications")}
+                      </h2>
+                      <p
+                        className={`text-sm mt-1 ${isDark ? "text-gray-400" : "text-gray-600"}`}
+                      >
+                        {t("analytics.advanced.platform_breakdown")}
+                      </p>
+           
+                    <Suspense
+                      fallback={
+                        <Skeleton className="h-[400px] w-full rounded-lg" />
+                      }
+                    >
+                      <DetailedPublicationPerformance
+                        publications={detailedPublications}
+                        theme={theme}
+                      />
+                    </Suspense>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
-            {detailedPublications.length > 0 && (
-              <div className="mb-8">
-                <div className="rounded-lg p-6 mb-4 transition-colors duration-300 bg-white shadow-lg border border-gray-100 dark:bg-neutral-800/50 dark:backdrop-blur-sm dark:border-neutral-700/50">
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                    {t(
-                      "analytics.charts.detailedPublications",
-                      "Rendimiento Detallado de Publicaciones",
-                    )}
-                  </h2>
-                  <p
-                    className={`text-sm mt-1 ${isDark ? "text-gray-400" : "text-gray-600"}`}
-                  >
-                    Desglose por plataforma y evolución diaria
-                  </p>
-                </div>
-                <Suspense
-                  fallback={
-                    <Skeleton className="h-[400px] w-full rounded-lg" />
-                  }
-                >
-                  <DetailedPublicationPerformance
-                    publications={detailedPublications}
-                    theme={theme}
-                  />
-                </Suspense>
-              </div>
-            )}
           </>
         ) : (
           // Upgrade prompt for basic plans
@@ -316,19 +311,16 @@ export default function Index({ stats, period }: AnalyticsProps) {
                 <LockKeyhole className="w-8 h-8 text-primary-600 dark:text-primary-400" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white text-center">
-                {t("analytics.advanced.locked_title", "Analytics Avanzados")}
+                {t("analytics.advanced.locked_title")}
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400 text-center max-w-md">
-                {t(
-                  "analytics.advanced.locked_description",
-                  "Obtén análisis detallado por plataforma, rendimiento de publicaciones y reportes exportables con los planes Professional y Enterprise.",
-                )}
+                {t("analytics.advanced.locked_description")}
               </p>
               <button
                 onClick={() => router.visit("/pricing")}
                 className="mt-2 px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-semibold text-sm transition-colors shadow-md"
               >
-                {t("analytics.advanced.upgrade_cta", "Actualizar Plan")}
+                {t("analytics.advanced.upgrade_cta")}
               </button>
             </div>
             {/* Blurred dummy content */}
