@@ -11,6 +11,7 @@ import KeyboardShortcutsModal from "@/Components/common/ui/KeyboardShortcutsModa
 import { OnboardingProvider } from "@/Contexts/OnboardingContext";
 import { useCompletionNotifications } from "@/Hooks/useCompletionNotifications";
 import { useWorkspaceLocks } from "@/Hooks/usePublicationLock";
+import { useSidebarState } from "@/Hooks/useSidebarState";
 import { useTheme } from "@/Hooks/useTheme";
 import { initNotificationRealtime } from "@/Services/notificationRealtime";
 import {
@@ -58,7 +59,7 @@ export default function AuthenticatedLayout({
 
   const [showingNavigationDropdown, setShowingNavigationDropdown] =
     useState<boolean>(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useSidebarState(true);
   const [showShortcutsModal, setShowShortcutsModal] = useState<boolean>(false);
 
   const { theme, actualTheme } = useTheme();
