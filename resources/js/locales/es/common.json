@@ -310,6 +310,21 @@
       "thu": "J",
       "fri": "V",
       "sat": "S"
+    },
+    "videoTypes": {
+      "reel": "Reel",
+      "short": "Short",
+      "standard": "Video estándar",
+      "feed": "Feed",
+      "story": "Historia",
+      "video": "Video",
+      "tweet": "Tweet",
+      "post": "Publicación"
+    },
+    "messages": {
+      "checkingSubscription": "Verificando suscripción...",
+      "loadingPlans": "Cargando planes...",
+      "generationInProgress": "Ya hay una generación en proceso. Por favor espera."
     }
   }
 }

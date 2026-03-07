@@ -398,6 +398,7 @@
       "emptyState": {
         "title": "No publications found",
         "description": "Create a publication to start publishing content.",
+        "searchEmpty": "No publications found matching the search.",
         "button": "Add Publication"
       },
       "lockedBy": "Locked by:",

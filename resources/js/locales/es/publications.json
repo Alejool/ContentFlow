@@ -446,6 +446,7 @@
       "emptyState": {
         "title": "No se encontraron publicaciones",
         "description": "Crea una publicación para comenzar a publicar contenido.",
+        "searchEmpty": "No se encontraron publicaciones que coincidan con la búsqueda.",
         "button": "Agregar publicación"
       },
       "lockedBy": "Bloqueado por:",

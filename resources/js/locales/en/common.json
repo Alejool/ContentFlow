@@ -302,6 +302,21 @@
       "thu": "T",
       "fri": "F",
       "sat": "S"
+    },
+    "videoTypes": {
+      "reel": "Reel",
+      "short": "Short",
+      "standard": "Standard video",
+      "feed": "Feed",
+      "story": "Story",
+      "video": "Video",
+      "tweet": "Tweet",
+      "post": "Post"
+    },
+    "messages": {
+      "checkingSubscription": "Checking subscription...",
+      "loadingPlans": "Loading plans...",
+      "generationInProgress": "A generation is already in progress. Please wait."
     }
   }
 }
