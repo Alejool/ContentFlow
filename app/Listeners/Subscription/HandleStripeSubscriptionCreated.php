@@ -118,6 +118,17 @@ class HandleStripeSubscriptionCreated
         // Invalidate user subscription cache
         cache()->forget("user_subscription_{$user->id}");
 
+        // Sincronizar facturas inmediatamente en segundo plano
+        if ($workspaceId) {
+            \Illuminate\Support\Facades\Artisan::call('stripe:sync-invoices', [
+                'workspace_id' => $workspaceId
+            ]);
+            
+            Log::info('Invoice sync command executed after checkout', [
+                'workspace_id' => $workspaceId,
+            ]);
+        }
+
         Log::info('Subscription activated via Stripe checkout', [
             'user_id' => $userId,
             'plan' => $plan,
@@ -363,6 +374,16 @@ class HandleStripeSubscriptionCreated
 
         // Sincronizar la factura a la base de datos local
         $this->syncInvoiceToDatabase($workspace, $invoice);
+
+        // Sincronizar todas las facturas del workspace
+        \Illuminate\Support\Facades\Artisan::call('stripe:sync-invoices', [
+            'workspace_id' => $workspace->id
+        ]);
+
+        Log::info('Invoice sync command executed after payment succeeded', [
+            'workspace_id' => $workspace->id,
+            'invoice_id' => $invoice['id'] ?? null,
+        ]);
 
         $subscription = $workspace->subscription;
 
