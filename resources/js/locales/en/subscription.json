@@ -21,7 +21,22 @@
       "choosePlan": "Choose a Plan",
       "manageBilling": "Manage Billing",
       "freePlanNote": "You are on the free plan. To access the billing portal, you need to subscribe to a paid plan.",
-      "viewPlans": "View available plans"
+      "viewPlans": "View available plans",
+      "cancelSubscription": "Cancel Subscription",
+      "cancelConfirm": "Are you sure you want to cancel your subscription? You will have access until the end of the current billing period.",
+      "cancelSuccess": "Subscription cancelled successfully. You will have access until the end of the billing period.",
+      "cancelError": "Could not cancel subscription. Please try again later.",
+      "portalError": "Could not access billing portal. Please try again later.",
+      "activeSubscriptionNote": "You have an active subscription. You can change to any paid plan from the Pricing page. To change to Free, first cancel your subscription.",
+      "exportToExcel": "Export to Excel",
+      "loadingPortal": "Opening billing portal...",
+      "cancelWarningTitle": "Important",
+      "cancelDetails": "When you cancel your subscription:",
+      "cancelPoint1": "You will keep access until the end of the paid period",
+      "cancelPoint2": "No more automatic charges will be made",
+      "cancelPoint3": "You can reactivate your subscription at any time",
+      "cancelling": "Cancelling...",
+      "confirmCancel": "Yes, cancel subscription"
     },
     "usage": {
       "title": "Usage & Billing",

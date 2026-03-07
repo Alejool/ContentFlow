@@ -21,7 +21,22 @@
       "choosePlan": "Elegir un Plan",
       "manageBilling": "Gestionar Facturación",
       "freePlanNote": "Estás en el plan gratuito. Para acceder al portal de facturación, necesitas suscribirte a un plan de pago.",
-      "viewPlans": "Ver planes disponibles"
+      "viewPlans": "Ver planes disponibles",
+      "cancelSubscription": "Cancelar Suscripción",
+      "cancelConfirm": "¿Estás seguro de que deseas cancelar tu suscripción? Tendrás acceso hasta el final del período de facturación actual.",
+      "cancelSuccess": "Suscripción cancelada exitosamente. Tendrás acceso hasta el final del período de facturación.",
+      "cancelError": "No se pudo cancelar la suscripción. Por favor, intenta más tarde.",
+      "portalError": "No se pudo acceder al portal de facturación. Por favor, intenta más tarde.",
+      "activeSubscriptionNote": "Tienes una suscripción activa. Puedes cambiar a cualquier plan de pago desde la página de Pricing. Para cambiar a Free, primero cancela tu suscripción.",
+      "exportToExcel": "Exportar a Excel",
+      "loadingPortal": "Abriendo portal de facturación...",
+      "cancelWarningTitle": "Importante",
+      "cancelDetails": "Al cancelar tu suscripción:",
+      "cancelPoint1": "Mantendrás acceso hasta el final del período pagado",
+      "cancelPoint2": "No se realizarán más cobros automáticos",
+      "cancelPoint3": "Podrás reactivar tu suscripción en cualquier momento",
+      "cancelling": "Cancelando...",
+      "confirmCancel": "Sí, cancelar suscripción"
     },
     "usage": {
       "title": "Uso y Facturación",
