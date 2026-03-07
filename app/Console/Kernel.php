@@ -91,5 +91,11 @@ class Kernel extends ConsoleKernel
       ->hourly()
       ->withoutOverlapping()
       ->runInBackground();
+
+    // Sincronizar facturas de Stripe cada hora
+    $schedule->command('stripe:sync-invoices')
+      ->hourly()
+      ->withoutOverlapping()
+      ->runInBackground();
   }
 }

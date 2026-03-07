@@ -79,143 +79,34 @@ class UsageMetricsController extends Controller
             $perPage = min(max((int)$perPage, 5), 25); // Limitar entre 5 y 25
             $currentPage = $request->input('page', 1);
 
-            // Intentar obtener facturas reales de Stripe si hay suscripción activa
-            if ($subscription && $subscription->stripe_id && str_starts_with($subscription->stripe_id, 'sub_')) {
-                try {
-                    // Obtener facturas de Stripe usando Laravel Cashier
-                    $stripeInvoices = $workspace->invoices();
-                    
-                    $allInvoices = collect($stripeInvoices)->map(function ($invoice) {
-                        // Obtener información del plan desde las líneas de la factura
-                        $planName = 'N/A';
-                        $description = 'Suscripción';
-                        
-                        try {
-                            $stripeInvoice = $invoice->asStripeInvoice();
-                            if ($stripeInvoice->lines && $stripeInvoice->lines->data) {
-                                $firstLine = $stripeInvoice->lines->data[0] ?? null;
-                                if ($firstLine) {
-                                    $description = $firstLine->description ?? 'Suscripción';
-                                    // Extraer nombre del plan de la descripción
-                                    if ($firstLine->price && $firstLine->price->metadata) {
-                                        $planName = $firstLine->price->metadata['plan_name'] ?? $planName;
-                                    }
-                                }
-                            }
-                        } catch (\Exception $e) {
-                            \Log::warning('Could not extract plan info from invoice', [
-                                'invoice_id' => $invoice->id,
-                                'error' => $e->getMessage()
-                            ]);
-                        }
-                        
-                        return [
-                            'id' => $invoice->id,
-                            'date' => $invoice->date()->toDateTimeString(),
-                            'total' => $invoice->total() / 100,
-                            'status' => $invoice->status,
-                            'invoice_pdf' => $invoice->invoice_pdf ?? null,
-                            'hosted_invoice_url' => $invoice->hosted_invoice_url ?? null,
-                            'plan_name' => $planName,
-                            'description' => $description,
-                            'currency' => strtoupper($invoice->currency ?? 'usd'),
-                        ];
-                    });
-                    
-                    // Paginar manualmente
-                    $total = $allInvoices->count();
-                    $invoices = [
-                        'data' => $allInvoices->forPage($currentPage, $perPage)->values()->toArray(),
-                        'current_page' => $currentPage,
-                        'per_page' => $perPage,
-                        'total' => $total,
-                        'last_page' => ceil($total / $perPage),
-                        'from' => (($currentPage - 1) * $perPage) + 1,
-                        'to' => min($currentPage * $perPage, $total),
+            // Obtener facturas de la base de datos local (sincronizadas desde Stripe)
+            $query = \App\Models\Subscription\StripeInvoice::where('workspace_id', $workspace->id)
+                ->orderBy('invoice_date', 'desc');
+            
+            $paginatedInvoices = $query->paginate($perPage, ['*'], 'page', $currentPage);
+            
+            $invoices = [
+                'data' => $paginatedInvoices->map(function ($invoice) {
+                    return [
+                        'id' => $invoice->stripe_invoice_id,
+                        'date' => $invoice->invoice_date->toDateTimeString(),
+                        'total' => (float) $invoice->total,
+                        'status' => $invoice->status,
+                        'invoice_pdf' => $invoice->invoice_pdf,
+                        'hosted_invoice_url' => $invoice->hosted_invoice_url,
+                        'plan_name' => $invoice->plan_name,
+                        'description' => $invoice->description,
+                        'currency' => $invoice->currency,
                     ];
+                })->toArray(),
+                'current_page' => $paginatedInvoices->currentPage(),
+                'per_page' => $paginatedInvoices->perPage(),
+                'total' => $paginatedInvoices->total(),
+                'last_page' => $paginatedInvoices->lastPage(),
+                'from' => $paginatedInvoices->firstItem(),
+                'to' => $paginatedInvoices->lastItem(),
+            ];
 
-                    // Obtener próxima factura de Stripe
-                    try {
-                        $upcomingStripeInvoice = $workspace->upcomingInvoice();
-                        if ($upcomingStripeInvoice) {
-                            $upcomingInvoice = [
-                                'date' => $upcomingStripeInvoice->date()->toDateTimeString(),
-                                'total' => $upcomingStripeInvoice->total() / 100,
-                            ];
-                        }
-                    } catch (\Exception $e) {
-                        \Log::warning('Could not fetch upcoming invoice from Stripe', [
-                            'workspace_id' => $workspace->id,
-                            'error' => $e->getMessage()
-                        ]);
-                    }
-                } catch (\Exception $e) {
-                    \Log::warning('Could not fetch invoices from Stripe', [
-                        'workspace_id' => $workspace->id,
-                        'error' => $e->getMessage()
-                    ]);
-                    
-                    // Fallback: usar historial de suscripciones con paginación
-                    $query = $user->subscriptionHistory()
-                        ->whereNotNull('ended_at')
-                        ->where('price', '>', 0)
-                        ->orderBy('ended_at', 'desc');
-                    
-                    $paginatedHistory = $query->paginate($perPage, ['*'], 'page', $currentPage);
-                    
-                    $invoices = [
-                        'data' => $paginatedHistory->map(function ($history) {
-                            return [
-                                'id' => $history->id,
-                                'date' => $history->ended_at->toDateTimeString(),
-                                'total' => $history->price,
-                                'status' => 'paid',
-                                'invoice_pdf' => null,
-                                'hosted_invoice_url' => null,
-                                'plan_name' => ucfirst($history->plan_name),
-                                'description' => 'Suscripción ' . ucfirst($history->plan_name),
-                                'currency' => 'USD',
-                            ];
-                        })->toArray(),
-                        'current_page' => $paginatedHistory->currentPage(),
-                        'per_page' => $paginatedHistory->perPage(),
-                        'total' => $paginatedHistory->total(),
-                        'last_page' => $paginatedHistory->lastPage(),
-                        'from' => $paginatedHistory->firstItem(),
-                        'to' => $paginatedHistory->lastItem(),
-                    ];
-                }
-            } else {
-                // Si no hay suscripción de Stripe, usar historial de suscripciones con paginación
-                $query = $user->subscriptionHistory()
-                    ->whereNotNull('ended_at')
-                    ->where('price', '>', 0)
-                    ->orderBy('ended_at', 'desc');
-                
-                $paginatedHistory = $query->paginate($perPage, ['*'], 'page', $currentPage);
-                
-                $invoices = [
-                    'data' => $paginatedHistory->map(function ($history) {
-                        return [
-                            'id' => $history->id,
-                            'date' => $history->ended_at->toDateTimeString(),
-                            'total' => $history->price,
-                            'status' => 'paid',
-                            'invoice_pdf' => null,
-                            'hosted_invoice_url' => null,
-                            'plan_name' => ucfirst($history->plan_name),
-                            'description' => 'Suscripción ' . ucfirst($history->plan_name),
-                            'currency' => 'USD',
-                        ];
-                    })->toArray(),
-                    'current_page' => $paginatedHistory->currentPage(),
-                    'per_page' => $paginatedHistory->perPage(),
-                    'total' => $paginatedHistory->total(),
-                    'last_page' => $paginatedHistory->lastPage(),
-                    'from' => $paginatedHistory->firstItem(),
-                    'to' => $paginatedHistory->lastItem(),
-                ];
-            }
 
             // Si no hay próxima factura de Stripe, calcular desde historial activo
             if (!$upcomingInvoice && $activeHistory && $activeHistory->price > 0) {
@@ -382,7 +273,8 @@ class UsageMetricsController extends Controller
 
 
     /**
-     * Exportar historial de facturas a Excel
+     * Exportar historial de facturas a Excel (CSV)
+     * Solo exporta facturas de Stripe
      */
     public function exportInvoices(Request $request)
     {
@@ -394,76 +286,36 @@ class UsageMetricsController extends Controller
         }
 
         $subscription = $workspace->subscription;
-        $invoices = [];
 
-        // Obtener todas las facturas (sin paginación para exportar)
-        if ($subscription && $subscription->stripe_id && str_starts_with($subscription->stripe_id, 'sub_')) {
-            try {
-                $stripeInvoices = $workspace->invoices();
-                
-                $invoices = collect($stripeInvoices)->map(function ($invoice) {
-                    $planName = 'N/A';
-                    $description = 'Suscripción';
-                    
-                    try {
-                        $stripeInvoice = $invoice->asStripeInvoice();
-                        if ($stripeInvoice->lines && $stripeInvoice->lines->data) {
-                            $firstLine = $stripeInvoice->lines->data[0] ?? null;
-                            if ($firstLine) {
-                                $description = $firstLine->description ?? 'Suscripción';
-                            }
-                        }
-                    } catch (\Exception $e) {
-                        // Ignorar errores
-                    }
-                    
-                    return [
-                        'date' => $invoice->date()->format('Y-m-d'),
-                        'plan_name' => $planName,
-                        'description' => $description,
-                        'total' => $invoice->total() / 100,
-                        'currency' => strtoupper($invoice->currency ?? 'usd'),
-                        'status' => ucfirst($invoice->status),
-                    ];
-                })->toArray();
-            } catch (\Exception $e) {
-                // Fallback al historial
-                $invoices = $user->subscriptionHistory()
-                    ->whereNotNull('ended_at')
-                    ->where('price', '>', 0)
-                    ->orderBy('ended_at', 'desc')
-                    ->get()
-                    ->map(function ($history) {
-                        return [
-                            'date' => $history->ended_at->format('Y-m-d'),
-                            'plan_name' => ucfirst($history->plan_name),
-                            'description' => 'Suscripción ' . ucfirst($history->plan_name),
-                            'total' => $history->price,
-                            'currency' => 'USD',
-                            'status' => 'Pagado',
-                        ];
-                    })->toArray();
-            }
-        } else {
-            $invoices = $user->subscriptionHistory()
-                ->whereNotNull('ended_at')
-                ->where('price', '>', 0)
-                ->orderBy('ended_at', 'desc')
-                ->get()
-                ->map(function ($history) {
-                    return [
-                        'date' => $history->ended_at->format('Y-m-d'),
-                        'plan_name' => ucfirst($history->plan_name),
-                        'description' => 'Suscripción ' . ucfirst($history->plan_name),
-                        'total' => $history->price,
-                        'currency' => 'USD',
-                        'status' => 'Pagado',
-                    ];
-                })->toArray();
+        // Obtener facturas de la base de datos local
+        $invoices = \App\Models\Subscription\StripeInvoice::where('workspace_id', $workspace->id)
+            ->orderBy('invoice_date', 'desc')
+            ->get()
+            ->map(function ($invoice) {
+                return [
+                    'invoice_number' => $invoice->invoice_number ?? $invoice->stripe_invoice_id,
+                    'date' => $invoice->invoice_date->format('Y-m-d'),
+                    'plan_name' => $invoice->plan_name,
+                    'description' => $invoice->description,
+                    'subtotal' => (float) $invoice->subtotal,
+                    'tax' => (float) $invoice->tax,
+                    'total' => (float) $invoice->total,
+                    'currency' => $invoice->currency,
+                    'status' => ucfirst($invoice->status),
+                    'pdf_url' => $invoice->invoice_pdf ?? '',
+                    'hosted_url' => $invoice->hosted_invoice_url ?? '',
+                ];
+            })->toArray();
+
+        // Si no hay facturas, retornar error
+        if (empty($invoices)) {
+            return response()->json([
+                'error' => 'No hay facturas disponibles para exportar.'
+            ], 404);
         }
 
-        // Crear CSV (más simple que Excel y no requiere librerías adicionales)
-        $filename = 'facturas_' . date('Y-m-d') . '.csv';
+        // Crear CSV con formato mejorado
+        $filename = 'facturas_stripe_' . $workspace->id . '_' . date('Y-m-d_His') . '.csv';
         
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',
@@ -473,26 +325,54 @@ class UsageMetricsController extends Controller
             'Expires' => '0',
         ];
 
-        $callback = function() use ($invoices) {
+        $callback = function() use ($invoices, $workspace) {
             $file = fopen('php://output', 'w');
             
             // BOM para UTF-8
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
             
+            // Información del workspace
+            fputcsv($file, ['Historial de Facturas - ' . $workspace->name], ';');
+            fputcsv($file, ['Exportado el: ' . date('Y-m-d H:i:s')], ';');
+            fputcsv($file, [''], ';'); // Línea en blanco
+            
             // Encabezados
-            fputcsv($file, ['Fecha', 'Plan', 'Descripción', 'Monto', 'Moneda', 'Estado'], ';');
+            fputcsv($file, [
+                'Número de Factura',
+                'Fecha',
+                'Plan',
+                'Descripción',
+                'Subtotal',
+                'Impuestos',
+                'Total',
+                'Moneda',
+                'Estado',
+                'URL PDF',
+                'URL Factura'
+            ], ';');
             
             // Datos
             foreach ($invoices as $invoice) {
                 fputcsv($file, [
+                    $invoice['invoice_number'],
                     $invoice['date'],
                     $invoice['plan_name'],
                     $invoice['description'],
+                    number_format($invoice['subtotal'], 2, ',', '.'),
+                    number_format($invoice['tax'], 2, ',', '.'),
                     number_format($invoice['total'], 2, ',', '.'),
                     $invoice['currency'],
                     $invoice['status'],
+                    $invoice['pdf_url'],
+                    $invoice['hosted_url'],
                 ], ';');
             }
+            
+            // Resumen al final
+            fputcsv($file, [''], ';'); // Línea en blanco
+            $totalAmount = array_sum(array_column($invoices, 'total'));
+            fputcsv($file, ['Total General:', '', '', '', '', '', number_format($totalAmount, 2, ',', '.'), $invoices[0]['currency'] ?? 'USD'], ';');
+            fputcsv($file, ['Total de Facturas:', count($invoices)], ';');
             
             fclose($file);
         };

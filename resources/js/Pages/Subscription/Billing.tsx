@@ -365,17 +365,7 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
                         {t('subscription.billing.changePlan', 'Cambiar Plan')}
                       </Button>
                     </div>
-                    {subscription.stripe_status === 'active' && (
-                      <Button 
-                        variant="ghost"
-                        buttonStyle="outline"
-                        className="w-full" 
-                        icon={AlertCircle}
-                        size='md'
-                        onClick={() => setShowCancelModal(true)}>
-                        {t('subscription.billing.cancelSubscription', 'Cancelar Suscripción')}
-                      </Button>
-                    )}
+                   
                   </div>
                 )}
               </div>
@@ -498,8 +488,11 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
               {invoicesList.length === 0 ? (
                 <div className="text-center py-12">
                   <DollarSign className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-gray-600 dark:text-gray-400 mb-2">
                     {t('subscription.billing.noInvoices', 'No hay facturas disponibles')}
+                  </p>
+                  <p className="text-sm text-gray-500 dark:text-gray-500">
+                    {t('subscription.billing.noInvoicesDescription', 'Las facturas de Stripe aparecerán aquí una vez que tengas una suscripción activa')}
                   </p>
                 </div>
               ) : (
@@ -539,22 +532,29 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Button
-                            size="md"
-                            icon={Download}
-                            variant="secondary"
-                            buttonStyle="outline"
-                            onClick={() => {
-                              // Priorizar hosted_invoice_url de Stripe, luego invoice_pdf
-                              const url = invoice.hosted_invoice_url || invoice.invoice_pdf;
-                              if (url) {
-                                window.open(url, '_blank');
-                              }
-                            }}
-                            disabled={!invoice.hosted_invoice_url && !invoice.invoice_pdf}
-                          >
-                            {t('subscription.billing.download', 'Descargar')}
-                          </Button>
+                          {(invoice.hosted_invoice_url || invoice.invoice_pdf) && (
+                            <Button
+                              size="md"
+                              icon={Download}
+                              variant="secondary"
+                              buttonStyle="outline"
+                              onClick={() => {
+                                // Priorizar hosted_invoice_url de Stripe (página web), luego invoice_pdf (PDF directo)
+                                const url = invoice.hosted_invoice_url || invoice.invoice_pdf;
+                                if (url) {
+                                  window.open(url, '_blank');
+                                }
+                              }}
+                              title={t('subscription.billing.downloadInvoice', 'Descargar factura de Stripe')}
+                            >
+                              {t('subscription.billing.download', 'Descargar')}
+                            </Button>
+                          )}
+                          {!invoice.hosted_invoice_url && !invoice.invoice_pdf && (
+                            <span className="text-xs text-gray-400 dark:text-gray-500">
+                              {t('subscription.billing.noDownload', 'No disponible')}
+                            </span>
+                          )}
                         </div>
                       </div>
                     ))}

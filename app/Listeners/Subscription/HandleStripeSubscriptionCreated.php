@@ -361,6 +361,9 @@ class HandleStripeSubscriptionCreated
             return;
         }
 
+        // Sincronizar la factura a la base de datos local
+        $this->syncInvoiceToDatabase($workspace, $invoice);
+
         $subscription = $workspace->subscription;
 
         if (!$subscription) {
@@ -379,6 +382,66 @@ class HandleStripeSubscriptionCreated
                 'workspace_id' => $workspace->id,
                 'subscription_id' => $subscription->id,
                 'invoice_id' => $invoice['id'],
+            ]);
+        }
+    }
+
+    /**
+     * Sincronizar factura de Stripe a la base de datos local
+     */
+    private function syncInvoiceToDatabase(\App\Models\Workspace\Workspace $workspace, array $invoiceData): void
+    {
+        try {
+            // Extraer información del plan
+            $planName = 'N/A';
+            $description = 'Suscripción';
+            
+            if (isset($invoiceData['lines']['data'][0])) {
+                $firstLine = $invoiceData['lines']['data'][0];
+                $description = $firstLine['description'] ?? 'Suscripción';
+                
+                if (isset($firstLine['price']['metadata']['plan_name'])) {
+                    $planName = $firstLine['price']['metadata']['plan_name'];
+                } elseif (isset($firstLine['plan']['nickname'])) {
+                    $planName = $firstLine['plan']['nickname'];
+                } elseif (isset($firstLine['price']['nickname'])) {
+                    $planName = $firstLine['price']['nickname'];
+                }
+            }
+
+            \App\Models\Subscription\StripeInvoice::updateOrCreate(
+                [
+                    'stripe_invoice_id' => $invoiceData['id'],
+                ],
+                [
+                    'workspace_id' => $workspace->id,
+                    'stripe_customer_id' => $invoiceData['customer'],
+                    'stripe_subscription_id' => $invoiceData['subscription'] ?? null,
+                    'invoice_number' => $invoiceData['number'] ?? null,
+                    'status' => $invoiceData['status'],
+                    'subtotal' => ($invoiceData['subtotal'] ?? 0) / 100,
+                    'tax' => ($invoiceData['tax'] ?? 0) / 100,
+                    'total' => $invoiceData['total'] / 100,
+                    'currency' => strtoupper($invoiceData['currency'] ?? 'usd'),
+                    'plan_name' => $planName,
+                    'description' => $description,
+                    'invoice_pdf' => $invoiceData['invoice_pdf'] ?? null,
+                    'hosted_invoice_url' => $invoiceData['hosted_invoice_url'] ?? null,
+                    'invoice_date' => date('Y-m-d H:i:s', $invoiceData['created']),
+                    'period_start' => isset($invoiceData['period_start']) ? date('Y-m-d H:i:s', $invoiceData['period_start']) : null,
+                    'period_end' => isset($invoiceData['period_end']) ? date('Y-m-d H:i:s', $invoiceData['period_end']) : null,
+                ]
+            );
+
+            Log::info('Invoice synced to database', [
+                'workspace_id' => $workspace->id,
+                'invoice_id' => $invoiceData['id'],
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error syncing invoice to database', [
+                'workspace_id' => $workspace->id,
+                'invoice_id' => $invoiceData['id'] ?? 'unknown',
+                'error' => $e->getMessage(),
             ]);
         }
     }
