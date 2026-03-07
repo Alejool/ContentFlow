@@ -181,10 +181,48 @@
       "entries": "entradas",
       "info": "Mostrando {{from}} a {{to}} de {{total}} resultados"
     },
-    "tabs": {
-        "overview": "Resumen",
-        "activity": "Actividad",
-        "approvals": "Aprobaciones"
+    "approvals": {
+      "tabs": {
+        "pending": "Pendientes",
+        "history": "Historial"
+      },
+      "locked": {
+        "title": "Aprobaciones básicas habilitadas",
+        "description": "Actualmente tienes acceso a aprobaciones básicas. Para configurar flujos de aprobación multi-nivel, sube de plan."
+      },
+      "title": "Flujos de Aprobación",
+      "subtitle": "Define rutas de revisión secuenciales para tus publicaciones.",
+      "invite": "Invitar",
+      "createWorkflow": "Crear Flujo",
+      "noWorkflowsTitle": "No hay flujos personalizados",
+      "noWorkflowsDesc": "Todas las publicaciones usarán el flujo básico de una sola firma hasta que definas uno nuevo. Define una cadena de mando para revisiones más estrictas.",
+      "configureFirstWorkflow": "Configurar mi primer flujo",
+      "levelsConfigured": "niveles configurados",
+      "activeWorkflowNote": "Nota: Solo puede haber un flujo activo a la vez por workspace. El sistema usará el primer flujo activo que encuentre para todas las nuevas publicaciones que requieran aprobación.",
+      "createFlow": "Crear Flujo",
+      "editFlow": "Editar Flujo",
+      "configureSequence": "Configura la secuencia de aprobaciones.",
+      "workflowName": "Nombre del Flujo",
+      "approvalLevels": "Niveles de Aprobación",
+      "newRole": "Nuevo Rol",
+      "addLevel": "Añadir Nivel",
+      "level": "Nivel",
+      "anyRole": "Cualquier Rol",
+      "or": "O",
+      "anyUser": "Cualquier Usuario",
+      "deleteLevel": "Eliminar nivel",
+      "errors": {
+        "fetch": "Error al cargar los flujos",
+        "save": "Error al guardar el flujo",
+        "delete": "Error al eliminar el flujo",
+        "multiLevelEnterprise": "El flujo multi-nivel es exclusivo para planes Enterprise o Demo."
+      },
+      "success": {
+        "created": "Flujo creado con éxito",
+        "updated": "Flujo actualizado con éxito",
+        "deleted": "Flujo eliminado"
+      },
+      "confirmDelete": "¿Estás seguro de que quieres eliminar este flujo?"
     },
     "upload": {
       "progress": "Progreso de carga",

@@ -173,6 +173,49 @@
       "entries": "entries",
       "info": "Showing {{from}} to {{to}} of {{total}} results"
     },
+    "approvals": {
+      "tabs": {
+        "pending": "Pending",
+        "history": "History"
+      },
+      "locked": {
+        "title": "Basic approvals enabled",
+        "description": "You currently have access to basic approvals. To set up multi-level approval workflows, please upgrade your plan."
+      },
+      "title": "Approval Workflows",
+      "subtitle": "Define sequential review routes for your publications.",
+      "invite": "Invite",
+      "createWorkflow": "Create Workflow",
+      "noWorkflowsTitle": "No custom workflows",
+      "noWorkflowsDesc": "All publications will use the basic single-signature workflow until you define a new one. Define a chain of command for stricter reviews.",
+      "configureFirstWorkflow": "Configure my first workflow",
+      "levelsConfigured": "levels configured",
+      "activeWorkflowNote": "Note: There can only be one active workflow at a time per workspace. The system will use the first active workflow it finds for all new publications requiring approval.",
+      "createFlow": "Create Workflow",
+      "editFlow": "Edit Workflow",
+      "configureSequence": "Configure the approval sequence.",
+      "workflowName": "Workflow Name",
+      "approvalLevels": "Approval Levels",
+      "newRole": "New Role",
+      "addLevel": "Add Level",
+      "level": "Level",
+      "anyRole": "Any Role",
+      "or": "OR",
+      "anyUser": "Any User",
+      "deleteLevel": "Delete level",
+      "errors": {
+        "fetch": "Error loading workflows",
+        "save": "Error saving workflow",
+        "delete": "Error deleting workflow",
+        "multiLevelEnterprise": "Multi-level workflow is exclusive for Enterprise or Demo plans."
+      },
+      "success": {
+        "created": "Workflow created successfully",
+        "updated": "Workflow updated successfully",
+        "deleted": "Workflow deleted"
+      },
+      "confirmDelete": "Are you sure you want to delete this workflow?"
+    },
     "upload": {
       "progress": "Upload progress",
       "percentage": "{{percentage}}% complete",

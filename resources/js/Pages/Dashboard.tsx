@@ -19,7 +19,7 @@ import {
   Users,
   X,
 } from "lucide-react";
-import { Suspense, lazy, useEffect, useState, useCallback } from "react";
+import { Suspense, lazy, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 // Custom hook to fetch publication stats (avoids fetch in useEffect warning)
@@ -29,7 +29,7 @@ const useFetchPublicationStats = (shouldFetch: boolean) => {
 
   const fetchStats = useCallback(() => {
     if (!shouldFetch) return;
-    
+
     axios
       .get(route("api.v1.publications.stats"))
       .then((res) => setData(res.data || {}))
@@ -88,10 +88,14 @@ export default function Dashboard({
   const { t } = useTranslation();
   const { actualTheme: theme } = useTheme();
   const [showBanner, setShowBanner] = useState(true);
-  
+
   // Use custom hook for fetching stats - always call hooks unconditionally
   const shouldFetch = !stats.publicationStats;
-  const { data: fetchedStats, loading: loadingPubStats, refetch: refetchStats } = useFetchPublicationStats(shouldFetch);
+  const {
+    data: fetchedStats,
+    loading: loadingPubStats,
+    refetch: refetchStats,
+  } = useFetchPublicationStats(shouldFetch);
   const pubStats = stats.publicationStats || fetchedStats;
   const [sending, setSending] = useState(false);
   const [successMessage, setSuccessMessage] = useState(
@@ -109,7 +113,7 @@ export default function Dashboard({
       channel.stopListening(".PublicationStatusUpdated");
     };
   }, [auth?.user?.id, refetchStats]);
-  
+
   // Early return if auth or user is not available (after all hooks)
   if (!auth || !auth.user) {
     return null;
@@ -176,7 +180,7 @@ export default function Dashboard({
                     : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
                 }`}
               >
-                {days} {t("common.days", "Days")}
+                {days} {t("common.units.days", "Days")}
               </button>
             ))}
           </div>
@@ -319,7 +323,9 @@ export default function Dashboard({
               key={status.key}
               className="p-3 sm:p-4 rounded-lg border flex flex-col items-center text-center transition-all bg-white border-gray-100 shadow-sm dark:bg-neutral-800/50 dark:border-neutral-700"
             >
-              <div className={`p-1.5 sm:p-2 rounded-full mb-1.5 sm:mb-2 bg-${status.color === "sky" ? "sky" : status.color}-50 dark:bg-${status.color === "sky" ? "sky" : status.color}-900/20`}>
+              <div
+                className={`p-1.5 sm:p-2 rounded-full mb-1.5 sm:mb-2 bg-${status.color === "sky" ? "sky" : status.color}-50 dark:bg-${status.color === "sky" ? "sky" : status.color}-900/20`}
+              >
                 <status.icon
                   className={`w-3 h-3 sm:w-4 sm:h-4 text-${
                     status.color === "sky" ? "sky" : status.color
@@ -413,7 +419,9 @@ export default function Dashboard({
               href={action.href}
               className="group relative overflow-hidden rounded-lg p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white border border-gray-100 shadow-sm hover:border-gray-200 dark:bg-neutral-800/40 dark:backdrop-blur-md dark:border-neutral-700/50 dark:hover:bg-neutral-800/60"
             >
-              <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110 bg-${action.color}-50 text-${action.color}-600 dark:bg-${action.color}-900/20 dark:text-${action.color}-400`}>
+              <div
+                className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110 bg-${action.color}-50 text-${action.color}-600 dark:bg-${action.color}-900/20 dark:text-${action.color}-400`}
+              >
                 <action.icon className="w-6 h-6" />
               </div>
               <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white">
@@ -424,7 +432,9 @@ export default function Dashboard({
               </p>
 
               {/* Subtle hover indicator */}
-              <div className={`absolute bottom-0 left-0 h-1 transition-all duration-300 bg-${action.color}-500 w-0 group-hover:w-full dark:bg-${action.color}-500/50`} />
+              <div
+                className={`absolute bottom-0 left-0 h-1 transition-all duration-300 bg-${action.color}-500 w-0 group-hover:w-full dark:bg-${action.color}-500/50`}
+              />
             </Link>
           ))}
         </div>

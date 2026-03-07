@@ -315,7 +315,7 @@ export default function GeneralSettingsTab({
               </p>
             </div>
             <Button
-              variant="danger"
+              variant="primary"
               onClick={() => setShowDeleteConfirm(true)}
               icon={Trash2}
             >
