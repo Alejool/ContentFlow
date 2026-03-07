@@ -189,11 +189,11 @@ export default function PublishPreviewModal({
 
   const formatType = (type: string): string => {
     const types: Record<string, string> = {
-      reel: 'Reel',
-      short: 'Short',
-      standard: 'Video estándar',
-      feed: 'Feed',
-      story: 'Historia',
+      reel: t('common.videoTypes.reel'),
+      short: t('common.videoTypes.short'),
+      standard: t('common.videoTypes.standard'),
+      feed: t('common.videoTypes.feed'),
+      story: t('common.videoTypes.story'),
     };
     return types[type] || type;
   };

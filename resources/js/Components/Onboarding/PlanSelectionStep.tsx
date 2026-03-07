@@ -130,7 +130,7 @@ export default function PlanSelectionStep({
             {t("planSelection.title")}
           </h3>
           <p className="text-gray-600 dark:text-gray-400">
-            {checkingSubscription ? 'Verificando suscripción...' : 'Cargando planes...'}
+            {checkingSubscription ? t('common.messages.checkingSubscription') : t('common.messages.loadingPlans')}
           </p>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface Quality {
   resolution?: string;
@@ -37,6 +38,7 @@ export default function PlatformConfigCard({
   editable = true,
   onUpdate,
 }: PlatformConfigCardProps) {
+  const { t } = useTranslation();
   const [selectedType, setSelectedType] = useState(config.type);
   const [settingsExpanded, setSettingsExpanded] = useState(false);
 
@@ -76,14 +78,14 @@ export default function PlatformConfigCard({
 
   const formatType = (type: string): string => {
     const types: Record<string, string> = {
-      feed: 'Feed',
-      reel: 'Reel',
-      story: 'Historia',
-      short: 'Short',
-      standard: 'Video estándar',
-      video: 'Video',
-      tweet: 'Tweet',
-      post: 'Publicación',
+      feed: t('common.videoTypes.feed'),
+      reel: t('common.videoTypes.reel'),
+      story: t('common.videoTypes.story'),
+      short: t('common.videoTypes.short'),
+      standard: t('common.videoTypes.standard'),
+      video: t('common.videoTypes.video'),
+      tweet: t('common.videoTypes.tweet'),
+      post: t('common.videoTypes.post'),
     };
     return types[type] || type;
   };
@@ -93,7 +95,7 @@ export default function PlatformConfigCard({
   };
 
   const formatSettingValue = (value: any): string => {
-    if (typeof value === 'boolean') return value ? 'Sí' : 'No';
+    if (typeof value === 'boolean') return value ? t('common.yes') : t('common.no');
     if (typeof value === 'object') return JSON.stringify(value);
     return String(value);
   };

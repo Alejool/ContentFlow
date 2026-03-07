@@ -548,7 +548,7 @@ export default function DetailedPublicationPerformance({
             <div
               className={`w-full text-center py-12 ${isDark ? "text-gray-400" : "text-gray-500"}`}
             >
-              No se encontraron publicaciones que coincidan con la búsqueda.
+              {t("publications.table.emptyState.searchEmpty")}
             </div>
           )}
         </div>

@@ -101,7 +101,7 @@ export default function ReelsSection({
 
     // Prevent multiple clicks
     if (generating) {
-      toast.error('Ya hay una generación en proceso. Por favor espera.');
+      toast.error(t('common.messages.generationInProgress'));
       return;
     }
 
