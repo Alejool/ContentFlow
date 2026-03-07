@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ContentFlow API Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 48px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            font-size: 32px;
+            color: #1a202c;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #718096;
+            margin-bottom: 40px;
+        }
+
+        .language-selector {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .lang-btn {
+            padding: 15px 30px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            font-weight: 600;
+            color: #4a5568;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .lang-btn:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .lang-btn.active {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .flag {
+            font-size: 24px;
+        }
+
+        .download-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .download-card {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 30px 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .download-card:hover {
+            border-color: #667eea;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+        }
+
+        .download-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .download-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .download-desc {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 20px;
+        }
+
+        .download-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .info-box {
+            background: #edf2f7;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 40px;
+            text-align: left;
+        }
+
+        .info-box h3 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .info-box p {
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .info-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .info-box li {
+            color: #4a5568;
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+        }
+
+        .info-box li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .auto-detect {
+            background: #e6fffa;
+            border: 1px solid #81e6d9;
+            color: #234e52;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .language-selector {
+                flex-direction: column;
+            }
+
+            .download-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">ContentFlow</div>
+        <h1 id="main-title">API Documentation</h1>
+        <p class="subtitle" id="subtitle">Enterprise v1.0 - Authentication & Tokens</p>
+
+        <div class="auto-detect" id="auto-detect">
+            🌐 <span id="detect-message">Detecting your language...</span>
+        </div>
+
+        <div class="language-selector">
+            <button class="lang-btn" id="btn-en" onclick="setLanguage('en')">
+                <span class="flag">🇺🇸</span>
+                <span>English</span>
+            </button>
+            <button class="lang-btn" id="btn-es" onclick="setLanguage('es')">
+                <span class="flag">🇪🇸</span>
+                <span>Español</span>
+            </button>
+        </div>
+
+        <div class="download-section">
+            <div class="download-card" onclick="downloadMarkdown()">
+                <div class="download-icon">📄</div>
+                <div class="download-title" id="md-title">Markdown</div>
+                <div class="download-desc" id="md-desc">Complete documentation in Markdown format</div>
+                <a href="#" class="download-btn" id="md-btn">Download .md</a>
+            </div>
+
+            <div class="download-card" onclick="downloadJSON()">
+                <div class="download-icon">📋</div>
+                <div class="download-title" id="json-title">OpenAPI JSON</div>
+                <div class="download-desc" id="json-desc">API specification in OpenAPI 3.0 format</div>
+                <a href="#" class="download-btn" id="json-btn">Download .json</a>
+            </div>
+
+            <div class="download-card" onclick="viewOnline()">
+                <div class="download-icon">🌐</div>
+                <div class="download-title" id="online-title">View Online</div>
+                <div class="download-desc" id="online-desc">Read the documentation in your browser</div>
+                <a href="#" class="download-btn" id="online-btn">Open</a>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <h3 id="info-title">📚 What's included?</h3>
+            <ul id="info-list">
+                <li>Complete authentication flow with access and refresh tokens</li>
+                <li>Step-by-step examples in cURL, JavaScript, and Python</li>
+                <li>Error handling and best practices</li>
+                <li>Token rotation and security guidelines</li>
+                <li>OpenAPI specification for API clients</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+            en: {
+                mainTitle: 'API Documentation',
+                subtitle: 'Enterprise v1.0 - Authentication & Tokens',
+                detectMessage: 'Language detected: English 🇺🇸',
+                mdTitle: 'Markdown',
+                mdDesc: 'Complete documentation in Markdown format',
+                mdBtn: 'Download .md',
+                jsonTitle: 'OpenAPI JSON',
+                jsonDesc: 'API specification in OpenAPI 3.0 format',
+                jsonBtn: 'Download .json',
+                onlineTitle: 'View Online',
+                onlineDesc: 'Read the documentation in your browser',
+                onlineBtn: 'Open',
+                infoTitle: '📚 What\'s included?',
+                infoList: [
+                    'Complete authentication flow with access and refresh tokens',
+                    'Step-by-step examples in cURL, JavaScript, and Python',
+                    'Error handling and best practices',
+                    'Token rotation and security guidelines',
+                    'OpenAPI specification for API clients'
+                ]
+            },
+            es: {
+                mainTitle: 'Documentación de la API',
+                subtitle: 'Enterprise v1.0 - Autenticación y Tokens',
+                detectMessage: 'Idioma detectado: Español 🇪🇸',
+                mdTitle: 'Markdown',
+                mdDesc: 'Documentación completa en formato Markdown',
+                mdBtn: 'Descargar .md',
+                jsonTitle: 'OpenAPI JSON',
+                jsonDesc: 'Especificación de la API en formato OpenAPI 3.0',
+                jsonBtn: 'Descargar .json',
+                onlineTitle: 'Ver en Línea',
+                onlineDesc: 'Lee la documentación en tu navegador',
+                onlineBtn: 'Abrir',
+                infoTitle: '📚 ¿Qué incluye?',
+                infoList: [
+                    'Flujo completo de autenticación con access y refresh tokens',
+                    'Ejemplos paso a paso en cURL, JavaScript y Python',
+                    'Manejo de errores y mejores prácticas',
+                    'Rotación de tokens y guías de seguridad',
+                    'Especificación OpenAPI para clientes de API'
+                ]
+            }
+        };
+
+        let currentLang = 'en';
+
+        // Auto-detect browser language
+        function detectLanguage() {
+            const browserLang = navigator.language || navigator.userLanguage;
+            const lang = browserLang.toLowerCase().startsWith('es') ? 'es' : 'en';
+            setLanguage(lang);
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            const t = translations[lang];
+
+            // Update text content
+            document.getElementById('main-title').textContent = t.mainTitle;
+            document.getElementById('subtitle').textContent = t.subtitle;
+            document.getElementById('detect-message').textContent = t.detectMessage;
+            document.getElementById('md-title').textContent = t.mdTitle;
+            document.getElementById('md-desc').textContent = t.mdDesc;
+            document.getElementById('md-btn').textContent = t.mdBtn;
+            document.getElementById('json-title').textContent = t.jsonTitle;
+            document.getElementById('json-desc').textContent = t.jsonDesc;
+            document.getElementById('json-btn').textContent = t.jsonBtn;
+            document.getElementById('online-title').textContent = t.onlineTitle;
+            document.getElementById('online-desc').textContent = t.onlineDesc;
+            document.getElementById('online-btn').textContent = t.onlineBtn;
+            document.getElementById('info-title').textContent = t.infoTitle;
+
+            // Update list
+            const list = document.getElementById('info-list');
+            list.innerHTML = t.infoList.map(item => `<li>${item}</li>`).join('');
+
+            // Update active button
+            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+            document.getElementById('btn-es').classList.toggle('active', lang === 'es');
+        }
+
+        function downloadMarkdown() {
+            // Try PHP script first, fallback to direct file
+            const phpUrl = `download.php?format=markdown&lang=${currentLang}`;
+            const fallbackUrl = currentLang === 'es' ? 'API_ENTERPRISE_V1.md' : 'API_ENTERPRISE_V1.en.md';
+            
+            // Check if PHP is available
+            fetch(phpUrl, { method: 'HEAD' })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = phpUrl;
+                    } else {
+                        window.location.href = fallbackUrl;
+                    }
+                })
+                .catch(() => {
+                    window.location.href = fallbackUrl;
+                });
+        }
+
+        function downloadJSON() {
+            // Try PHP script first, fallback to direct file
+            const phpUrl = `download.php?format=openapi&lang=${currentLang}`;
+            const fallbackUrl = currentLang === 'es' ? 'api-auth-openapi.json' : 'api-auth-openapi.en.json';
+            
+            fetch(phpUrl, { method: 'HEAD' })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = phpUrl;
+                    } else {
+                        window.location.href = fallbackUrl;
+                    }
+                })
+                .catch(() => {
+                    window.location.href = fallbackUrl;
+                });
+        }
+
+        function viewOnline() {
+            const filename = currentLang === 'es' ? 'API_ENTERPRISE_V1.md' : 'API_ENTERPRISE_V1.en.md';
+            window.open(filename, '_blank');
+        }
+
+        // Initialize
+        detectLanguage();
+    </script>
+</body>
+</html>

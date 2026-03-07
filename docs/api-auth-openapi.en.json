@@ -1,36 +1,36 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "ContentFlow API - Autenticación",
-    "description": "API de autenticación para ContentFlow Enterprise. Sistema de tokens con access token (24h) y refresh token (30 días) con rotación automática.",
+    "title": "ContentFlow API - Authentication",
+    "description": "Authentication API for ContentFlow Enterprise. Token system with access token (24h) and refresh token (30 days) with automatic rotation.",
     "version": "1.0.0",
     "contact": {
       "name": "ContentFlow API Support",
-      "url": "https://tu-dominio.com/docs"
+      "url": "https://your-domain.com/docs"
     }
   },
   "servers": [
     {
-      "url": "https://tu-dominio.com/api",
-      "description": "Servidor de producción"
+      "url": "https://your-domain.com/api",
+      "description": "Production server"
     },
     {
       "url": "http://localhost/api",
-      "description": "Servidor de desarrollo"
+      "description": "Development server"
     }
   ],
   "tags": [
     {
-      "name": "Autenticación",
-      "description": "Endpoints para gestión de tokens de acceso"
+      "name": "Authentication",
+      "description": "Endpoints for access token management"
     }
   ],
   "paths": {
     "/auth/token": {
       "post": {
-        "tags": ["Autenticación"],
-        "summary": "Generar tokens de acceso",
-        "description": "Obtiene un par de tokens (access + refresh) para autenticación programática. Solo disponible para Owners de workspaces con plan Enterprise.",
+        "tags": ["Authentication"],
+        "summary": "Generate access tokens",
+        "description": "Obtains a pair of tokens (access + refresh) for programmatic authentication. Only available for workspace Owners with Enterprise plan.",
         "operationId": "generateToken",
         "requestBody": {
           "required": true,
@@ -41,18 +41,18 @@
               },
               "examples": {
                 "basic": {
-                  "summary": "Autenticación básica",
+                  "summary": "Basic authentication",
                   "value": {
-                    "email": "owner@empresa.com",
-                    "password": "tu-contraseña-segura",
+                    "email": "owner@company.com",
+                    "password": "your-secure-password",
                     "workspace": "marketing-global"
                   }
                 },
                 "withId": {
-                  "summary": "Usando ID de workspace",
+                  "summary": "Using workspace ID",
                   "value": {
-                    "email": "owner@empresa.com",
-                    "password": "tu-contraseña-segura",
+                    "email": "owner@company.com",
+                    "password": "your-secure-password",
                     "workspace": "12"
                   }
                 }
@@ -62,7 +62,7 @@
         },
         "responses": {
           "201": {
-            "description": "Tokens generados exitosamente",
+            "description": "Tokens generated successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -72,7 +72,7 @@
             }
           },
           "401": {
-            "description": "Credenciales inválidas",
+            "description": "Invalid credentials",
             "content": {
               "application/json": {
                 "schema": {
@@ -86,7 +86,7 @@
             }
           },
           "402": {
-            "description": "Plan no es Enterprise",
+            "description": "Plan is not Enterprise",
             "content": {
               "application/json": {
                 "schema": {
@@ -96,7 +96,7 @@
             }
           },
           "403": {
-            "description": "Usuario no es Owner del workspace",
+            "description": "User is not workspace Owner",
             "content": {
               "application/json": {
                 "schema": {
@@ -110,7 +110,7 @@
             }
           },
           "404": {
-            "description": "Workspace no encontrado",
+            "description": "Workspace not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -128,9 +128,9 @@
     },
     "/auth/token/refresh": {
       "post": {
-        "tags": ["Autenticación"],
-        "summary": "Renovar access token",
-        "description": "Obtiene un nuevo par de tokens usando un refresh token válido. El refresh token anterior queda invalidado (rotación).",
+        "tags": ["Authentication"],
+        "summary": "Refresh access token",
+        "description": "Obtains a new pair of tokens using a valid refresh token. The previous refresh token is invalidated (rotation).",
         "operationId": "refreshToken",
         "requestBody": {
           "required": true,
@@ -148,7 +148,7 @@
         },
         "responses": {
           "200": {
-            "description": "Tokens renovados exitosamente",
+            "description": "Tokens refreshed successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -158,7 +158,7 @@
             }
           },
           "401": {
-            "description": "Refresh token inválido o expirado",
+            "description": "Invalid or expired refresh token",
             "content": {
               "application/json": {
                 "schema": {
@@ -166,21 +166,21 @@
                 },
                 "examples": {
                   "invalid": {
-                    "summary": "Token inválido",
+                    "summary": "Invalid token",
                     "value": {
                       "success": false,
                       "message": "Invalid refresh token."
                     }
                   },
                   "expired": {
-                    "summary": "Token expirado",
+                    "summary": "Expired token",
                     "value": {
                       "success": false,
                       "message": "Refresh token has expired. Please authenticate again."
                     }
                   },
                   "revoked": {
-                    "summary": "Token revocado",
+                    "summary": "Revoked token",
                     "value": {
                       "success": false,
                       "message": "Refresh token not found or already revoked."
@@ -191,7 +191,7 @@
             }
           },
           "402": {
-            "description": "Plan cambió a no-Enterprise",
+            "description": "Plan changed to non-Enterprise",
             "content": {
               "application/json": {
                 "schema": {
@@ -201,7 +201,7 @@
             }
           },
           "403": {
-            "description": "Token no válido para el workspace",
+            "description": "Token not valid for workspace",
             "content": {
               "application/json": {
                 "schema": {
@@ -219,9 +219,9 @@
     },
     "/auth/token/validate": {
       "get": {
-        "tags": ["Autenticación"],
-        "summary": "Validar token activo",
-        "description": "Verifica que el access token sigue siendo válido y devuelve información del usuario y workspace.",
+        "tags": ["Authentication"],
+        "summary": "Validate active token",
+        "description": "Verifies that the access token is still valid and returns user and workspace information.",
         "operationId": "validateToken",
         "security": [
           {
@@ -230,7 +230,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Token válido",
+            "description": "Valid token",
             "content": {
               "application/json": {
                 "schema": {
@@ -240,7 +240,7 @@
             }
           },
           "401": {
-            "description": "Token inválido o expirado",
+            "description": "Invalid or expired token",
             "content": {
               "application/json": {
                 "schema": {
@@ -254,9 +254,9 @@
     },
     "/auth/token/revoke": {
       "post": {
-        "tags": ["Autenticación"],
-        "summary": "Revocar tokens",
-        "description": "Revoca todos los tokens API del usuario. Opcionalmente puede filtrar por workspace.",
+        "tags": ["Authentication"],
+        "summary": "Revoke tokens",
+        "description": "Revokes all user's API tokens. Can optionally filter by workspace.",
         "operationId": "revokeToken",
         "security": [
           {
@@ -267,7 +267,7 @@
           {
             "name": "workspace",
             "in": "query",
-            "description": "Slug o ID del workspace (opcional). Si se omite, revoca todos los tokens.",
+            "description": "Workspace slug or ID (optional). If omitted, revokes all tokens.",
             "required": false,
             "schema": {
               "type": "string"
@@ -277,7 +277,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Tokens revocados exitosamente",
+            "description": "Tokens revoked successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -287,7 +287,7 @@
             }
           },
           "401": {
-            "description": "No autenticado",
+            "description": "Not authenticated",
             "content": {
               "application/json": {
                 "schema": {
@@ -301,13 +301,13 @@
     },
     "/health": {
       "get": {
-        "tags": ["Autenticación"],
+        "tags": ["Authentication"],
         "summary": "Health check",
-        "description": "Verifica que la API está funcionando. No requiere autenticación.",
+        "description": "Verifies that the API is working. No authentication required.",
         "operationId": "healthCheck",
         "responses": {
           "200": {
-            "description": "API funcionando correctamente",
+            "description": "API working correctly",
             "content": {
               "application/json": {
                 "schema": {
@@ -333,19 +333,19 @@
   },
   "x-code-samples": {
     "generateToken": {
-      "curl": "curl -X POST https://tu-dominio.com/api/auth/token \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"email\": \"owner@empresa.com\",\n    \"password\": \"tu-contraseña\",\n    \"workspace\": \"marketing-global\"\n  }'",
-      "javascript": "const response = await fetch('https://tu-dominio.com/api/auth/token', {\n  method: 'POST',\n  headers: { 'Content-Type': 'application/json' },\n  body: JSON.stringify({\n    email: 'owner@empresa.com',\n    password: 'tu-contraseña',\n    workspace: 'marketing-global'\n  })\n});\n\nconst { data } = await response.json();\nconsole.log('Access Token:', data.access_token);",
-      "python": "import requests\n\nresponse = requests.post('https://tu-dominio.com/api/auth/token', json={\n    'email': 'owner@empresa.com',\n    'password': 'tu-contraseña',\n    'workspace': 'marketing-global'\n})\n\ndata = response.json()\naccess_token = data['data']['access_token']"
+      "curl": "curl -X POST https://your-domain.com/api/auth/token \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"email\": \"owner@company.com\",\n    \"password\": \"your-password\",\n    \"workspace\": \"marketing-global\"\n  }'",
+      "javascript": "const response = await fetch('https://your-domain.com/api/auth/token', {\n  method: 'POST',\n  headers: { 'Content-Type': 'application/json' },\n  body: JSON.stringify({\n    email: 'owner@company.com',\n    password: 'your-password',\n    workspace: 'marketing-global'\n  })\n});\n\nconst { data } = await response.json();\nconsole.log('Access Token:', data.access_token);",
+      "python": "import requests\n\nresponse = requests.post('https://your-domain.com/api/auth/token', json={\n    'email': 'owner@company.com',\n    'password': 'your-password',\n    'workspace': 'marketing-global'\n})\n\ndata = response.json()\naccess_token = data['data']['access_token']"
     },
     "refreshToken": {
-      "curl": "curl -X POST https://tu-dominio.com/api/auth/token/refresh \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"refresh_token\": \"2|z9y8x7w6v5u4t3s2r1q0p9o8n7m6l5k4j3i2h1g0\",\n    \"workspace\": \"marketing-global\"\n  }'",
-      "javascript": "async function refreshToken() {\n  const refreshToken = localStorage.getItem('refresh_token');\n  \n  const response = await fetch('https://tu-dominio.com/api/auth/token/refresh', {\n    method: 'POST',\n    headers: { 'Content-Type': 'application/json' },\n    body: JSON.stringify({\n      refresh_token: refreshToken,\n      workspace: 'marketing-global'\n    })\n  });\n\n  const { data } = await response.json();\n  \n  // Actualiza AMBOS tokens\n  localStorage.setItem('access_token', data.access_token);\n  localStorage.setItem('refresh_token', data.refresh_token);\n  \n  return data.access_token;\n}",
-      "python": "import requests\n\nrefresh_token = \"2|z9y8x7w6v5u4t3s2r1q0p9o8n7m6l5k4j3i2h1g0\"\n\nresponse = requests.post('https://tu-dominio.com/api/auth/token/refresh', json={\n    'refresh_token': refresh_token,\n    'workspace': 'marketing-global'\n})\n\ndata = response.json()\nnew_access_token = data['data']['access_token']\nnew_refresh_token = data['data']['refresh_token']"
+      "curl": "curl -X POST https://your-domain.com/api/auth/token/refresh \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"refresh_token\": \"2|z9y8x7w6v5u4t3s2r1q0p9o8n7m6l5k4j3i2h1g0\",\n    \"workspace\": \"marketing-global\"\n  }'",
+      "javascript": "async function refreshToken() {\n  const refreshToken = localStorage.getItem('refresh_token');\n  \n  const response = await fetch('https://your-domain.com/api/auth/token/refresh', {\n    method: 'POST',\n    headers: { 'Content-Type': 'application/json' },\n    body: JSON.stringify({\n      refresh_token: refreshToken,\n      workspace: 'marketing-global'\n    })\n  });\n\n  const { data } = await response.json();\n  \n  // Update BOTH tokens\n  localStorage.setItem('access_token', data.access_token);\n  localStorage.setItem('refresh_token', data.refresh_token);\n  \n  return data.access_token;\n}",
+      "python": "import requests\n\nrefresh_token = \"2|z9y8x7w6v5u4t3s2r1q0p9o8n7m6l5k4j3i2h1g0\"\n\nresponse = requests.post('https://your-domain.com/api/auth/token/refresh', json={\n    'refresh_token': refresh_token,\n    'workspace': 'marketing-global'\n})\n\ndata = response.json()\nnew_access_token = data['data']['access_token']\nnew_refresh_token = data['data']['refresh_token']"
     },
     "useToken": {
-      "curl": "curl -X GET https://tu-dominio.com/api/v1/publications \\\n  -H \"Authorization: Bearer 1|a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0\" \\\n  -H \"Accept: application/json\"",
-      "javascript": "const accessToken = localStorage.getItem('access_token');\n\nconst response = await fetch('https://tu-dominio.com/api/v1/publications', {\n  headers: {\n    'Authorization': `Bearer ${accessToken}`,\n    'Accept': 'application/json'\n  }\n});\n\nconst data = await response.json();",
-      "python": "import requests\n\naccess_token = \"1|a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0\"\n\nheaders = {\n    'Authorization': f'Bearer {access_token}',\n    'Accept': 'application/json'\n}\n\nresponse = requests.get('https://tu-dominio.com/api/v1/publications', headers=headers)\ndata = response.json()"
+      "curl": "curl -X GET https://your-domain.com/api/v1/publications \\\n  -H \"Authorization: Bearer 1|a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0\" \\\n  -H \"Accept: application/json\"",
+      "javascript": "const accessToken = localStorage.getItem('access_token');\n\nconst response = await fetch('https://your-domain.com/api/v1/publications', {\n  headers: {\n    'Authorization': `Bearer ${accessToken}`,\n    'Accept': 'application/json'\n  }\n});\n\nconst data = await response.json();",
+      "python": "import requests\n\naccess_token = \"1|a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0\"\n\nheaders = {\n    'Authorization': f'Bearer {access_token}',\n    'Accept': 'application/json'\n}\n\nresponse = requests.get('https://your-domain.com/api/v1/publications', headers=headers)\ndata = response.json()"
     }
   },
   "components": {
@@ -354,7 +354,7 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "Sanctum",
-        "description": "Access token obtenido de /auth/token o /auth/token/refresh"
+        "description": "Access token obtained from /auth/token or /auth/token/refresh"
       }
     },
     "schemas": {
@@ -365,18 +365,18 @@
           "email": {
             "type": "string",
             "format": "email",
-            "description": "Email del Owner del workspace",
-            "example": "owner@empresa.com"
+            "description": "Email of the workspace Owner",
+            "example": "owner@company.com"
           },
           "password": {
             "type": "string",
             "format": "password",
-            "description": "Contraseña del usuario",
-            "example": "tu-contraseña-segura"
+            "description": "User password",
+            "example": "your-secure-password"
           },
           "workspace": {
             "type": "string",
-            "description": "ID numérico o slug del workspace",
+            "description": "Numeric ID or workspace slug",
             "example": "marketing-global"
           }
         }
@@ -397,12 +397,12 @@
             "properties": {
               "access_token": {
                 "type": "string",
-                "description": "Token de corta duración (24h)",
+                "description": "Short-lived token (24h)",
                 "example": "1|a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0"
               },
               "refresh_token": {
                 "type": "string",
-                "description": "Token de larga duración (30 días)",
+                "description": "Long-lived token (30 days)",
                 "example": "2|z9y8x7w6v5u4t3s2r1q0p9o8n7m6l5k4j3i2h1g0"
               },
               "token_type": {
@@ -411,12 +411,12 @@
               },
               "expires_in": {
                 "type": "integer",
-                "description": "Segundos hasta que expire el access_token",
+                "description": "Seconds until access_token expires",
                 "example": 86400
               },
               "refresh_expires_in": {
                 "type": "integer",
-                "description": "Segundos hasta que expire el refresh_token",
+                "description": "Seconds until refresh_token expires",
                 "example": 2592000
               },
               "workspace": {
@@ -453,7 +453,7 @@
                   },
                   "email": {
                     "type": "string",
-                    "example": "owner@empresa.com"
+                    "example": "owner@company.com"
                   }
                 }
               }
@@ -467,12 +467,12 @@
         "properties": {
           "refresh_token": {
             "type": "string",
-            "description": "Refresh token obtenido previamente",
+            "description": "Previously obtained refresh token",
             "example": "2|z9y8x7w6v5u4t3s2r1q0p9o8n7m6l5k4j3i2h1g0"
           },
           "workspace": {
             "type": "string",
-            "description": "ID numérico o slug del workspace",
+            "description": "Numeric ID or workspace slug",
             "example": "marketing-global"
           }
         }
@@ -493,12 +493,12 @@
             "properties": {
               "access_token": {
                 "type": "string",
-                "description": "Nuevo access token (24h)",
+                "description": "New access token (24h)",
                 "example": "3|n3wAcc3ssT0k3nH3r3..."
               },
               "refresh_token": {
                 "type": "string",
-                "description": "Nuevo refresh token (30 días)",
+                "description": "New refresh token (30 days)",
                 "example": "4|n3wR3fr3shT0k3nH3r3..."
               },
               "token_type": {
@@ -561,7 +561,7 @@
                   },
                   "email": {
                     "type": "string",
-                    "example": "owner@empresa.com"
+                    "example": "owner@company.com"
                   }
                 }
               },
@@ -653,7 +653,7 @@
               },
               "upgrade_url": {
                 "type": "string",
-                "example": "https://tu-dominio.com/pricing"
+                "example": "https://your-domain.com/pricing"
               }
             }
           }
