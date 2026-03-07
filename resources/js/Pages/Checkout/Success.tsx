@@ -108,56 +108,30 @@ export default function Success({ session }: SuccessProps) {
             ¡Pago Exitoso!
           </h1>
           
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 mb-8">
             {isUpdating 
               ? 'Estamos activando tu suscripción...'
               : 'Tu suscripción ha sido activada correctamente.'
             }
           </p>
-          
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <div className="text-sm text-gray-500 mb-2">Monto pagado</div>
-            <div className="text-3xl font-bold text-gray-900">
-              ${amount} {session.currency.toUpperCase()}
-            </div>
-            {session.customer_email && (
-              <div className="text-sm text-gray-500 mt-2">
-                Recibirás un recibo en {session.customer_email}
-              </div>
-            )}
-          </div>
-          
-          <div className="text-xs text-gray-400 mb-6">
-            ID de sesión: {session.id}
-          </div>
 
           {isUpdating && (
-            <div className="mb-4">
+            <div className="mb-6">
               <div className="inline-flex items-center gap-2 text-sm text-blue-600">
                 <Loader2 className="animate-spin h-4 w-4" />
                 Actualizando tu cuenta...
               </div>
-              <div className="text-xs text-gray-400 mt-2">
-                Intento {attempts + 1} de {maxAttempts}
-              </div>
-            </div>
-          )}
-
-          {!isUpdating && (
-            <div className="mb-4">
-              <div className="inline-flex items-center gap-2 text-sm text-green-600">
-                <CheckCircle className="h-4 w-4" />
-                ¡Cuenta actualizada!
-              </div>
             </div>
           )}
           
-          <a
-            href="/dashboard"
-            className="inline-block w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Ir al Dashboard
-          </a>
+          <div className="space-y-3">
+            <a
+              href="/dashboard"
+              className="block w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Ir al Dashboard
+            </a>
+          </div>
 
           <p className="text-xs text-gray-400 mt-4">
             {isUpdating 
