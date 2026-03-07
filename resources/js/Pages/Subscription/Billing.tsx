@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
 import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
+import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
 
 declare function route(name: string, params?: any): string;
 
@@ -68,6 +69,8 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
   const pagination = isPaginated ? (invoices as InvoicesPagination) : null;
 
   const [perPage, setPerPage] = useState(pagination?.per_page || 10);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   // Sincronizar perPage con la paginación del backend
   useEffect(() => {
@@ -124,19 +127,56 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
 
   const handleUpdatePayment = async () => {
     try {
-      // Usar axios que ya tiene configurado el token CSRF
-      const response = await axios.post(route('subscription.billing-portal'));
+      toast.loading(t('subscription.billing.loadingPortal', 'Abriendo portal de facturación...'));
+      
+      const response = await axios.post(route('subscription.billing-portal'), {}, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      toast.dismiss();
       
       if (response.data.url) {
-        // Redirigir a la URL del portal de Stripe
         window.location.href = response.data.url;
       } else if (response.data.error) {
         toast.error(response.data.error);
       }
     } catch (error: any) {
+      toast.dismiss();
       console.error('Error al acceder al portal de facturación:', error);
       const errorMessage = error.response?.data?.error || error.response?.data?.message || t('subscription.billing.portalError', 'No se pudo acceder al portal de facturación');
       toast.error(errorMessage);
+    }
+  };
+
+  const handleCancelSubscription = async () => {
+    setIsCancelling(true);
+    
+    try {
+      const response = await axios.post(route('subscription.cancel-subscription'), {}, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      if (response.data.success) {
+        toast.success(response.data.message || t('subscription.billing.cancelSuccess', 'Suscripción cancelada exitosamente'));
+        setShowCancelModal(false);
+        setTimeout(() => {
+          router.reload();
+        }, 1500);
+      } else if (response.data.error) {
+        toast.error(response.data.error);
+      }
+    } catch (error: any) {
+      console.error('Error al cancelar la suscripción:', error);
+      const errorMessage = error.response?.data?.error || error.response?.data?.message || t('subscription.billing.cancelError', 'No se pudo cancelar la suscripción');
+      toast.error(errorMessage);
+    } finally {
+      setIsCancelling(false);
     }
   };
 
@@ -306,23 +346,36 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
                 </div>
 
                 {subscription.plan !== 'free' && subscription.plan !== 'demo' && (
-                  <div className="flex gap-3">
-                    <Button  
-                    className="flex-1" 
-                    icon={CreditCard}
-                    size='md'
-                    onClick={handleUpdatePayment}>
-                      {t('subscription.billing.updatePayment', 'Actualizar Método de Pago')}
-                    </Button>
-                    <Button 
-                    variant="ghost"
-                    buttonStyle="outline"
-                    className="flex-1" 
-                    icon={TrendingUp}
-                    size='md'
-                    onClick={() => router.visit('/pricing')}>
-                      {t('subscription.billing.changePlan', 'Cambiar Plan')}
-                    </Button>
+                  <div className="flex flex-col gap-3">
+                    <div className="flex gap-3">
+                      <Button  
+                        className="flex-1" 
+                        icon={CreditCard}
+                        size='md'
+                        onClick={handleUpdatePayment}>
+                        {t('subscription.billing.updatePayment', 'Actualizar Método de Pago')}
+                      </Button>
+                      <Button 
+                        variant="ghost"
+                        buttonStyle="outline"
+                        className="flex-1" 
+                        icon={TrendingUp}
+                        size='md'
+                        onClick={() => router.visit('/pricing')}>
+                        {t('subscription.billing.changePlan', 'Cambiar Plan')}
+                      </Button>
+                    </div>
+                    {subscription.stripe_status === 'active' && (
+                      <Button 
+                        variant="ghost"
+                        buttonStyle="outline"
+                        className="w-full" 
+                        icon={AlertCircle}
+                        size='md'
+                        onClick={() => setShowCancelModal(true)}>
+                        {t('subscription.billing.cancelSubscription', 'Cancelar Suscripción')}
+                      </Button>
+                    )}
                   </div>
                 )}
               </div>
@@ -525,6 +578,63 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
           </Card>
         </div>
       </div>
+
+      {/* Modal de Confirmación de Cancelación */}
+      <DynamicModal
+        isOpen={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        title={t('subscription.billing.cancelSubscription', 'Cancelar Suscripción')}
+        size="lg"
+      >
+        <div className="space-y-4">
+          <div className="flex items-start gap-3 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+            <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm text-yellow-800 dark:text-yellow-200 font-medium mb-1">
+                {t('subscription.billing.cancelWarningTitle', 'Importante')}
+              </p>
+              <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                {t('subscription.billing.cancelConfirm', '¿Estás seguro de que deseas cancelar tu suscripción? Tendrás acceso hasta el final del período de facturación actual.')}
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {t('subscription.billing.cancelDetails', 'Al cancelar tu suscripción:')}
+            </p>
+            <ul className="list-disc list-inside space-y-1 text-sm text-gray-600 dark:text-gray-400 ml-2">
+              <li>{t('subscription.billing.cancelPoint1', 'Mantendrás acceso hasta el final del período pagado')}</li>
+              <li>{t('subscription.billing.cancelPoint2', 'No se realizarán más cobros automáticos')}</li>
+              <li>{t('subscription.billing.cancelPoint3', 'Podrás reactivar tu suscripción en cualquier momento')}</li>
+            </ul>
+          </div>
+
+          <div className="flex gap-3 pt-4 justify-end">
+            <Button
+              variant="secondary"
+              buttonStyle="outline"
+              size="lg"
+              onClick={() => setShowCancelModal(false)}
+              disabled={isCancelling}
+              
+            >
+              {t('common.cancel', 'Cancelar')}
+            </Button>
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={handleCancelSubscription}
+              disabled={isCancelling}
+              icon={isCancelling ? undefined : AlertCircle}
+            >
+              {isCancelling 
+                ? t('subscription.billing.cancelling', 'Cancelando...') 
+                : t('subscription.billing.confirmCancel', 'Sí, cancelar suscripción')}
+            </Button>
+          </div>
+        </div>
+      </DynamicModal>
     </AuthenticatedLayout>
   );
 }

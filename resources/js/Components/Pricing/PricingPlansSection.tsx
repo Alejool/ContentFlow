@@ -1,8 +1,17 @@
 import PlanGrid from "@/Components/Pricing/PlanGrid";
+import { DynamicModal } from "@/Components/common/Modern/DynamicModal";
 import { Badge } from "@/Components/ui/badge";
 import { usePricing } from "@/Hooks/usePricing";
 import { cn } from "@/lib/utils";
-import { Sparkles } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle,
+  Info,
+  RefreshCw,
+  Sparkles,
+  XCircle,
+  Zap,
+} from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
@@ -37,6 +46,40 @@ interface PricingPlansSectionProps {
   activePlans?: string[];
 }
 
+const MODAL_META = {
+  error: {
+    icon: XCircle,
+    iconClass: "text-red-500",
+    bgClass: "bg-red-100 dark:bg-red-900/30",
+    actionClass: "bg-red-600 hover:bg-red-700 text-white",
+  },
+  warning: {
+    icon: AlertTriangle,
+    iconClass: "text-amber-500",
+    bgClass: "bg-amber-100 dark:bg-amber-900/30",
+    actionClass: "bg-amber-500 hover:bg-amber-600 text-white",
+  },
+  info: {
+    icon: Info,
+    iconClass: "text-blue-500",
+    bgClass: "bg-blue-100 dark:bg-blue-900/30",
+    actionClass: "bg-blue-600 hover:bg-blue-700 text-white",
+  },
+  confirm: {
+    icon: Info,
+    iconClass: "text-primary-500",
+    bgClass: "bg-primary-100 dark:bg-primary-900/30",
+    actionClass: "bg-primary-600 hover:bg-primary-700 text-white",
+  },
+} as const;
+
+const getPlanName = (id: string, plans: Plan[]) =>
+  plans.find((p) => p.id === id)?.name ??
+  id.charAt(0).toUpperCase() + id.slice(1);
+
+const getPlanPrice = (id: string, plans: Plan[]) =>
+  plans.find((p) => p.id === id)?.price ?? 0;
+
 export default function PricingPlansSection({
   plans,
   currentPlan,
@@ -60,32 +103,21 @@ export default function PricingPlansSection({
     setBillingCycle,
     handleSelectPlan,
     checkActiveSubscription,
-  } = usePricing({
-    isAuthenticated,
-    currentPlan,
-    workspaceId,
-  });
+    modal,
+    closeModal,
+  } = usePricing({ isAuthenticated, currentPlan, workspaceId });
 
   const [hasActiveSubscription, setHasActiveSubscription] = React.useState(
     propHasActiveSubscription || false,
   );
 
-  React.useEffect(() => {
-    console.log("PricingPlansSection - Initial state:", {
-      isAuthenticated,
-      currentPlan,
-      propHasActiveSubscription,
-      hasActiveSubscription,
-    });
+  // Definir effectiveActivePlans PRIMERO antes de usarlo
+  const effectiveActivePlans =
+    activePlans.length > 0 ? activePlans : propActivePlans || [];
 
+  React.useEffect(() => {
     if (isAuthenticated && propHasActiveSubscription === undefined) {
-      checkActiveSubscription().then((result) => {
-        console.log(
-          "PricingPlansSection - checkActiveSubscription result:",
-          result,
-        );
-        setHasActiveSubscription(result);
-      });
+      checkActiveSubscription().then(setHasActiveSubscription);
     } else if (propHasActiveSubscription !== undefined) {
       setHasActiveSubscription(propHasActiveSubscription);
     }
@@ -93,14 +125,62 @@ export default function PricingPlansSection({
 
   const handlePlanSelect = async (planId: string) => {
     await handleSelectPlan(planId);
-    if (onPlanSelected) {
-      onPlanSelected(planId);
-    }
+    if (onPlanSelected) onPlanSelected(planId);
   };
 
+  // Función para las tarjetas de planes: SIEMPRE ir a checkout de Stripe
+  const handlePlanCardSelect = async (planId: string) => {
+    await handleSelectPlan(planId, true); // forceCheckout = true
+    if (onPlanSelected) onPlanSelected(planId);
+  };
+  
+  // CRITICAL: Determinar si tiene plan de pago activo
+  // Esto bloquea Free/Demo cuando tienes Starter, Professional o Enterprise activo
+  const hasPaidPlanActive = React.useMemo(() => {
+    const paidPlans = ['starter', 'professional', 'enterprise'];
+    
+    // Verificar si el plan actual es de pago
+    const currentIsPaid = currentPlan && paidPlans.includes(currentPlan);
+    
+    // Verificar si tiene planes de pago en activePlans
+    const hasActivePaidPlan = effectiveActivePlans.some(id => paidPlans.includes(id));
+    
+    // Verificar si tiene suscripciones activas de pago
+    const hasActivePaidSubscription = activeSubscriptions.some(
+      sub => paidPlans.includes(sub.plan) && sub.status === 'active'
+    );
+    
+    return currentIsPaid || hasActivePaidPlan || hasActivePaidSubscription;
+  }, [currentPlan, effectiveActivePlans, activeSubscriptions]);
+
+  // DEBUG: Ver qué datos llegan
+  React.useEffect(() => {
+    console.log('🔍 DEBUG Pricing Data:', {
+      currentPlan,
+      effectiveActivePlans,
+      expiredPlans,
+      activeSubscriptions,
+    });
+  }, [currentPlan, effectiveActivePlans, expiredPlans, activeSubscriptions]);
+
+  // Plans purchased + still active (not current) → can switch for free
+  const switchablePlans = effectiveActivePlans.filter(
+    (id) =>
+      id !== currentPlan &&
+      ["starter", "professional", "enterprise"].includes(id),
+  );
+  // Plans purchased but now expired → need Stripe renewal
+  const renewablePlans = expiredPlans.filter(
+    (id) => ["starter", "professional", "enterprise"].includes(id),
+  );
+
+  const meta =
+    MODAL_META[modal.type as keyof typeof MODAL_META] ?? MODAL_META.info;
+  const ModalIcon = meta.icon;
+
   return (
-    <div className="space-y-16">
-      {/* Header */}
+    <div className="space-y-12">
+      {/* ── Header ─────────────────────────────────────────────────────────── */}
       {showHeader && (
         <div className="text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 rounded-full text-sm font-medium mb-6">
@@ -116,48 +196,46 @@ export default function PricingPlansSection({
             {t("pricing.subtitle")}
           </p>
 
-          {/* Mensaje para owner con suscripción activa */}
-          {/* Mensaje para owner con suscripción activa */}
+          {/* ── Active subscription banner ─────────────────────────────────── */}
           {isOwner &&
             (hasActiveSubscription || activeSubscriptions.length > 0) && (
               <div className="mb-8 max-w-3xl mx-auto">
-                <div className="p-6 bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-sm">
+                <div className="p-6 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-lg shadow-sm">
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0">
-                      <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center shadow-inner">
-                        <Sparkles className="h-5 w-5 text-white" />
+                      <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shadow-inner">
+                        <Info className="h-5 w-5 text-white" />
                       </div>
                     </div>
                     <div className="flex-1 text-left">
-                      <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-1">
+                      <h3 className="text-lg font-bold text-blue-900 dark:text-blue-100 mb-2">
                         {t(
                           "pricing.activeSubscription.title",
-                          "Suscripciones Activas",
+                          "Ya tienes una suscripción activa",
                         )}
                       </h3>
-                      <div className="space-y-2 mb-4">
+                      <div className="space-y-2 mb-3">
                         {activeSubscriptions.length > 0 ? (
                           activeSubscriptions.map((sub, index) => (
                             <div
                               key={index}
-                              className="bg-white dark:bg-neutral-900 p-3 rounded-lg border border-neutral-200 dark:border-neutral-800 flex justify-between items-center"
+                              className="bg-white dark:bg-blue-950/50 p-3 rounded-lg border border-blue-200 dark:border-blue-800 flex justify-between items-center"
                             >
                               <div>
-                                <p className="font-semibold text-neutral-900 dark:text-white">
-                                  {sub.name}
+                                <p className="font-semibold text-blue-900 dark:text-blue-100">
+                                  {t("pricing.currentPlanLabel")}: {sub.name}
                                 </p>
-                                <p className="text-xs text-neutral-500 dark:text-neutral-500">
+                                <p className="text-xs text-blue-700 dark:text-blue-300">
                                   {sub.cancel_at_period_end
-                                    ? `Finaliza el ${new Date(sub.ends_at).toLocaleDateString()}`
-                                    : "Renovación automática"}
+                                    ? t("pricing.endsOn", {
+                                        date: new Date(
+                                          sub.ends_at,
+                                        ).toLocaleDateString(),
+                                      })
+                                    : t("pricing.autoRenewal")}
                                 </p>
                               </div>
                               <Badge
-                                variant={
-                                  sub.status === "active"
-                                    ? "default"
-                                    : "secondary"
-                                }
                                 className={cn(
                                   sub.status === "active"
                                     ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
@@ -165,33 +243,34 @@ export default function PricingPlansSection({
                                 )}
                               >
                                 {sub.status === "active"
-                                  ? "Activa"
+                                  ? t("pricing.statusActive")
                                   : sub.status}
                               </Badge>
                             </div>
                           ))
                         ) : (
-                          <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                            {t(
-                              "pricing.activeSubscription.currentPlan",
-                              "Plan actual:",
-                            )}{" "}
-                            <span className="font-bold text-primary-600 lowercase capitalize">
+                          <p className="text-sm text-blue-800 dark:text-blue-200">
+                            <span className="font-bold">
+                              {t("pricing.currentPlanLabel")}:{" "}
+                            </span>
+                            <span className="font-bold text-blue-600 dark:text-blue-400 capitalize">
                               {currentPlan}
                             </span>
                           </p>
                         )}
                       </div>
-                      <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
-                        {t(
-                          "pricing.activeSubscription.changeDescription",
-                          "Puedes cambiar a cualquier plan a continuación. El cambio se aplicará inmediatamente y se ajustará tu facturación de forma prorrateada.",
-                        )}
-                      </p>
+                      <div className="bg-blue-100 dark:bg-blue-900/40 p-4 rounded-lg mb-4 border border-blue-200 dark:border-blue-800">
+                        <p className="text-sm text-blue-900 dark:text-blue-100 leading-relaxed">
+                          {t(
+                            "pricing.activeSubscription.prorationExplanation",
+                            "Puedes cambiar a cualquier plan disponible. El cambio se aplicará inmediatamente y la facturación se ajustará automáticamente de forma prorrateada según el tiempo restante de tu suscripción.",
+                          )}
+                        </p>
+                      </div>
                       <div className="flex flex-wrap gap-3">
                         <a
                           href={route("subscription.billing")}
-                          className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white hover:bg-primary-700 rounded-lg text-sm font-semibold transition-colors shadow-sm"
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg text-sm font-semibold transition-colors shadow-sm"
                         >
                           {t(
                             "pricing.activeSubscription.manageBilling",
@@ -205,9 +284,10 @@ export default function PricingPlansSection({
               </div>
             )}
 
-          {/* Billing Toggle */}
+          {
+          /* ── Billing toggle ──────────────────────────────────────────────── */}
           {showBillingToggle && (
-            <div className="inline-flex items-center gap-2 bg-white dark:bg-neutral-800 p-1.5 rounded-xl shadow-lg border border-gray-200 dark:border-neutral-700">
+            <div className="inline-flex items-center gap-2 bg-white dark:bg-neutral-800 p-1.5 rounded-lg shadow-lg border border-gray-200 dark:border-neutral-700">
               <button
                 onClick={() => setBillingCycle("monthly")}
                 className={cn(
@@ -219,42 +299,177 @@ export default function PricingPlansSection({
               >
                 {t("pricing.monthly")}
               </button>
-              {/* <button
-                onClick={() => setBillingCycle('yearly')}
-                className={cn(
-                  'px-6 py-2.5 rounded-lg font-medium transition-all duration-200 flex items-center gap-2',
-                  billingCycle === 'yearly'
-                    ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-md'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+            </div>
+          )}
+
+          {/* ── My Plans Panel ──────────────────────────────────────────────── */}
+          {isAuthenticated && isOwner && currentPlan && (
+            <div className="mt-6 max-w-2xl mx-auto text-left">
+              <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-md overflow-hidden">
+                {/* Header row */}
+                <div className="flex items-center gap-3 px-5 py-4 bg-primary-600">
+                  <Zap className="w-5 h-5 text-white flex-shrink-0" />
+                  <div className="flex-1">
+                    <p className="text-xs font-semibold text-primary-200 uppercase tracking-wider">
+                      {t("pricing.activePlanNow")}
+                    </p>
+                    <p className="text-lg font-bold text-white capitalize leading-tight">
+                      {getPlanName(currentPlan, plans)}
+                      <span className="ml-2 text-sm font-normal text-primary-200">
+                        ${getPlanPrice(currentPlan, plans)}/
+                        {t("pricing.billing.month")}
+                      </span>
+                    </p>
+                  </div>
+                  <CheckCircle className="w-6 h-6 text-primary-200" />
+                </div>
+
+                {/* Switchable plans (purchased + time available, use for free) */}
+                {switchablePlans.length > 0 && (
+                  <div className="px-5 py-4 border-t border-neutral-100 dark:border-neutral-800">
+                    <p className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-3">
+                      {t("pricing.purchasedPlansAvailable", "Planes comprados — cambiar sin pago")}
+                    </p>
+                    <div className="flex flex-col gap-2">
+                      {switchablePlans.map((id) => (
+                        <div
+                          key={id}
+                          className="flex items-center justify-between p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800"
+                        >
+                          <div className="flex items-center gap-2">
+                            <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0" />
+                            <div>
+                              <p className="text-sm font-semibold text-green-800 dark:text-green-300 capitalize">
+                                {getPlanName(id, plans)}
+                              </p>
+                              <p className="text-xs text-green-600 dark:text-green-500">
+                                {t("pricing.timeAvailable", "Tiempo disponible")} · $
+                                {getPlanPrice(id, plans)}/
+                                {t("pricing.billing.month")}
+                              </p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => handlePlanSelect(id)}
+                            disabled={!!isLoading}
+                            className="px-4 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-lg transition-colors disabled:opacity-50 flex-shrink-0"
+                          >
+                            {isLoading === id
+                              ? t("pricing.changing")
+                              : t("pricing.use")}
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 )}
-              >
-                {t('pricing.yearly')}
-                <Badge className="bg-green-500 text-white border-0 text-xs">
-                  {t('pricing.yearlyDiscount')}
-                </Badge>
-              </button> */}
+
+                {/* Renewable plans (expired, need Stripe) */}
+                {renewablePlans.length > 0 && (
+                  <div className="px-5 py-4 border-t border-neutral-100 dark:border-neutral-800">
+                    <p className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-3">
+                      {t("pricing.expiredPlans")}
+                    </p>
+                    <div className="flex flex-col gap-2">
+                      {renewablePlans.map((id) => (
+                        <div
+                          key={id}
+                          className="flex items-center justify-between p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800"
+                        >
+                          <div className="flex items-center gap-2">
+                            <RefreshCw className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+                            <div>
+                              <p className="text-sm font-semibold text-amber-800 dark:text-amber-300 capitalize">
+                                {getPlanName(id, plans)}
+                              </p>
+                              <p className="text-xs text-amber-600 dark:text-amber-500">
+                                {t("pricing.expired")} · ${getPlanPrice(id, plans)}/
+                                {t("pricing.billing.month")}
+                              </p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => handlePlanSelect(id)}
+                            disabled={!!isLoading}
+                            className="px-4 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-lg transition-colors disabled:opacity-50 flex-shrink-0"
+                          >
+                            {isLoading === id ? "..." : t("pricing.renew")}
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
       )}
 
-      {/* Plans Grid */}
+      {/* ── Plan cards ─────────────────────────────────────────────────────── */}
       <PlanGrid
         plans={plans}
         currentPlan={currentPlan || undefined}
         isLoading={isLoading ?? undefined}
-        onSelectPlan={handlePlanSelect}
+        onSelectPlan={handlePlanCardSelect}
         billingCycle={billingCycle}
         showCurrentBadge={isAuthenticated}
         variant={variant}
-        hasActiveSubscription={hasActiveSubscription}
-        activePlans={
-          activePlans.length > 0 ? activePlans : propActivePlans || []
-        }
+        hasActiveSubscription={hasPaidPlanActive}
+        activePlans={effectiveActivePlans}
         activeSubscriptions={activeSubscriptions}
         expiredPlans={expiredPlans}
         isOwner={isOwner}
       />
+
+      {/* ── Error / Warning Modal (no success modal — redirect is used instead) */}
+      <DynamicModal
+        isOpen={modal.open}
+        onClose={closeModal}
+        title={modal.title}
+        size="md"
+      >
+        <div className="flex flex-col items-center text-center gap-4">
+          <div
+            className={cn(
+              "w-14 h-14 rounded-full flex items-center justify-center",
+              meta.bgClass,
+            )}
+          >
+            <ModalIcon className={cn("w-7 h-7", meta.iconClass)} />
+          </div>
+          <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+            {modal.message}
+          </p>
+          <div className="flex gap-3 justify-center mt-2 w-full">
+            {modal.actionLabel && modal.onAction && (
+              <button
+                onClick={() => {
+                  closeModal();
+                  modal.onAction?.();
+                }}
+                className={cn(
+                  "flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors shadow-sm",
+                  meta.actionClass,
+                )}
+              >
+                {modal.actionLabel}
+              </button>
+            )}
+            <button
+              onClick={closeModal}
+              className={cn(
+                "px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors border",
+                "bg-white dark:bg-neutral-800 text-gray-700 dark:text-gray-200",
+                "border-gray-200 dark:border-neutral-700 hover:bg-gray-50 dark:hover:bg-neutral-700",
+                !modal.actionLabel && "flex-1",
+              )}
+            >
+              {modal.closeLabel ?? t("pricing.close")}
+            </button>
+          </div>
+        </div>
+      </DynamicModal>
     </div>
   );
 }

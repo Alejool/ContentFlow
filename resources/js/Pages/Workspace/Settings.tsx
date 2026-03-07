@@ -101,10 +101,13 @@ export default function WorkspaceSettings({
 
   const canManageWorkspace = isOwner || userRole === "admin";
 
+  const planId =
+    current_workspace.subscription?.plan?.toLowerCase() ||
+    current_workspace.plan?.toLowerCase() ||
+    "demo";
+
   const isEnterprise =
-    current_workspace.features?.white_label ||
-    current_workspace.subscription?.plan === "enterprise" ||
-    current_workspace.plan === "enterprise";
+    planId === "enterprise" || current_workspace.features?.white_label;
 
   const tabs = [
     {
@@ -134,7 +137,14 @@ export default function WorkspaceSettings({
     },
   ];
 
-  if (canManageWorkspace) {
+  const hasBasicApprovalAccess = [
+    "demo",
+    "professional",
+    "enterprise",
+  ].includes(planId);
+  const hasAdvancedApprovalAccess = ["enterprise"].includes(planId);
+
+  if (canManageWorkspace && hasBasicApprovalAccess) {
     tabs.splice(4, 0, {
       id: "approvals",
       label: "Aprobaciones",
@@ -215,11 +225,21 @@ export default function WorkspaceSettings({
           />
         );
       case "approvals":
+        if (!canManageWorkspace || !hasBasicApprovalAccess) {
+          return (
+            <OverviewTab
+              workspace={current_workspace}
+              auth={auth}
+              onTabChange={(tab: any) => setActiveTab(tab)}
+            />
+          );
+        }
         return (
           <ApprovalWorkflowsTab
             workspace={current_workspace}
             roles={roles}
             canManageWorkspace={canManageWorkspace}
+            hasAdvancedAccess={hasAdvancedApprovalAccess}
           />
         );
       case "support":

@@ -1,12 +1,31 @@
 import { usePricingStore } from "@/stores/pricingStore";
-import { router } from "@inertiajs/react";
-import { useState } from "react";
+import { router, usePage } from "@inertiajs/react";
+import { useCallback, useEffect, useState } from "react";
 
 interface UsePricingOptions {
   isAuthenticated: boolean;
   currentPlan?: string;
   workspaceId?: number;
 }
+
+export type ModalType = "error" | "info" | "warning" | "confirm";
+
+export interface PricingModal {
+  open: boolean;
+  type: ModalType;
+  title: string;
+  message: string;
+  actionLabel?: string;
+  onAction?: () => void;
+  closeLabel?: string;
+}
+
+const MODAL_CLOSED: PricingModal = {
+  open: false,
+  type: "info",
+  title: "",
+  message: "",
+};
 
 export function usePricing({
   isAuthenticated,
@@ -17,71 +36,162 @@ export function usePricing({
   const [activePlans, setActivePlans] = useState<string[]>([]);
   const [activeSubscriptions, setActiveSubscriptions] = useState<any[]>([]);
   const [expiredPlans, setExpiredPlans] = useState<string[]>([]);
+  const [modal, setModal] = useState<PricingModal>(MODAL_CLOSED);
   const { billingCycle, setBillingCycle } = usePricingStore();
+  
+  // Get auth from Inertia page props
+  const { auth } = usePage<any>().props;
 
-  const handleSelectPlan = async (planId: string) => {
-    // Si no está autenticado, redirigir a registro con el plan seleccionado
-    if (!isAuthenticated) {
-      router.visit("/register", {
-        data: { plan: planId },
-        method: "get",
+  // Listen for real-time subscription updates via broadcasting
+  useEffect(() => {
+    if (!isAuthenticated || !auth?.user?.id || !window.Echo) {
+      return;
+    }
+
+    const channel = window.Echo.channel(`user.${auth.user.id}`);
+
+    channel.listen('.subscription.updated', (event: any) => {
+      console.log('Subscription updated via broadcast', event);
+
+      // Refresh subscription data
+      checkActiveSubscription().then(() => {
+        // Reload Inertia props to update UI with new subscription data
+        router.reload({ only: ['auth', 'subscription', 'currentPlan'] });
       });
+    });
+
+    return () => {
+      channel.stopListening('.subscription.updated');
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, auth?.user?.id]);
+
+  const closeModal = useCallback(() => setModal(MODAL_CLOSED), []);
+
+  const showModal = useCallback(
+    (
+      type: ModalType,
+      title: string,
+      message: string,
+      opts?: Pick<PricingModal, "actionLabel" | "onAction" | "closeLabel">,
+    ) => setModal({ open: true, type, title, message, ...opts }),
+    [],
+  );
+
+  const redirectToDashboard = () => {
+    // A full page reload is best here since auth props (like current_plan) are server-generated
+    // and this ensures all global layouts (like the profile dropdown) reflect the new plan correctly
+    window.location.href = "/dashboard";
+  };
+
+  const handleSelectPlan = async (planId: string, forceCheckout: boolean = false) => {
+    if (!isAuthenticated) {
+      router.visit("/register", { data: { plan: planId }, method: "get" });
       return;
     }
 
-    // Si es el plan actual, no hacer nada
-    if (planId === currentPlan) {
-      return;
-    }
+    if (planId === currentPlan) return;
 
-    // Para planes gratuitos (free/demo), verificar primero si hay suscripción activa
+    // ── Free / Demo ──────────────────────────────────────────────────────
     if (planId === "free" || planId === "demo") {
-      setIsLoading(planId);
-
-      // Verificar si hay suscripción activa de pago
-      const hasActiveSubscription = await checkActiveSubscription();
-
-      // BLOQUEAR cambio a Free o Demo si hay suscripción activa de pago
-      if (hasActiveSubscription && (planId === "free" || planId === "demo")) {
-        const planName = planId === "free" ? "Free" : "Demo";
-        alert(
-          `No puedes cambiar a plan ${planName} mientras tengas una suscripción activa de pago. Por favor, cancela tu suscripción primero desde la página de Facturación y espera a que termine el período de facturación.`,
+      const PAID = ["starter", "professional", "enterprise"];
+      const hasActivePaid =
+        activePlans.some((id) => PAID.includes(id)) ||
+        activeSubscriptions.some(
+          (s) => PAID.includes(s.plan) && s.status === "active",
         );
-        setIsLoading(null);
-        setTimeout(() => {
-          router.visit("/subscription/billing");
-        }, 1500);
+
+      if (hasActivePaid) {
+        showModal(
+          "warning",
+          "Cambio bloqueado",
+          "No puedes cambiar a un plan gratuito mientras tengas una suscripción de pago activa.\nPrimero debes cancelar tu suscripción actual.",
+          {
+            actionLabel: "Ir a Facturación",
+            onAction: () => router.visit("/subscription/billing"),
+            closeLabel: "Cerrar",
+          },
+        );
         return;
       }
 
-      // Si no hay suscripción activa, permitir activación
+      setIsLoading(planId);
       router.post(
         "/api/v1/subscription/activate-free-plan",
         { plan: planId },
         {
           onSuccess: () => {
             window.dispatchEvent(new CustomEvent("subscription-plan-changed"));
-
-            setTimeout(() => {
-              router.visit("/dashboard", {
-                preserveState: false,
-                preserveScroll: false,
-              });
-            }, 500);
+            redirectToDashboard();
           },
-          onError: (errors) => {
-            console.error("Error activating plan:", errors);
-            alert("Error al activar el plan. Por favor, intenta de nuevo.");
+          onError: () => {
+            showModal(
+              "error",
+              "Error al activar plan",
+              "No se pudo activar el plan. Por favor, inténtalo de nuevo.",
+            );
           },
-          onFinish: () => {
-            setIsLoading(null);
-          },
+          onFinish: () => setIsLoading(null),
         },
       );
       return;
     }
 
-    // Para planes de pago, intentar cambiar directamente
+    // ── Paid plans ───────────────────────────────────────────────────────
+    // Si forceCheckout es true, SIEMPRE ir a Stripe checkout (desde las tarjetas)
+    if (forceCheckout) {
+      setIsLoading(planId);
+      try {
+        const checkoutResponse = await fetch("/api/v1/subscription/checkout", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            "X-CSRF-TOKEN":
+              document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content") || "",
+          },
+          body: JSON.stringify({ plan: planId, workspace_id: workspaceId }),
+        });
+
+        const checkoutData = await checkoutResponse.json();
+        setIsLoading(null);
+
+        if (!checkoutResponse.ok) {
+          showModal(
+            "error",
+            "Error al procesar el pago",
+            checkoutData.error === "Invalid plan configuration"
+              ? "Este plan requiere configuración de Stripe. Contacta al administrador."
+              : checkoutData.message ||
+                  checkoutData.error ||
+                  "Error al procesar el pago.",
+          );
+          return;
+        }
+
+        if (checkoutData.url) {
+          window.location.href = checkoutData.url;
+        } else {
+          showModal(
+            "error",
+            "Error al crear sesión de pago",
+            "No se pudo crear la sesión de pago.",
+          );
+        }
+      } catch {
+        setIsLoading(null);
+        showModal(
+          "error",
+          "Error de conexión",
+          "No se pudo conectar con el servidor.",
+        );
+      }
+      return;
+    }
+
+    // Si NO es forceCheckout, intentar cambio automático (desde la tabla)
     setIsLoading(planId);
     try {
       const changeResponse = await fetch("/api/v1/subscription/change-plan", {
@@ -99,44 +209,56 @@ export function usePricing({
 
       const changeData = await changeResponse.json();
 
-      // Si el cambio fue exitoso (tiene suscripción activa)
+      // ── Success → reload data and redirect ─────────────────────────
       if (changeResponse.ok && changeData.success) {
-        const message = changeData.is_downgrade
-          ? "Tu plan cambiará al final del período de facturación actual."
-          : changeData.had_active_subscription
-            ? "Plan actualizado exitosamente. Tu suscripción activa ha sido modificada."
-            : "Plan cambiado exitosamente.";
-
-        alert(message);
+        console.log('Plan change successful:', changeData);
+        
+        // Refresh subscription data
+        await checkActiveSubscription();
+        
+        // Dispatch event
         window.dispatchEvent(new CustomEvent("subscription-plan-changed"));
-
-        setTimeout(() => {
-          router.visit("/dashboard", {
-            preserveState: false,
-            preserveScroll: false,
-          });
-        }, 500);
+        
+        // If backend indicates reload is needed, do a full page reload
+        if (changeData.requires_reload) {
+          // Full page reload to ensure all data is fresh
+          window.location.href = "/dashboard";
+          return;
+        }
+        
+        // Otherwise just redirect
+        setTimeout(redirectToDashboard, 300);
         return;
       }
 
-      // Si es un error 403 (downgrade no permitido)
+      setIsLoading(null);
+
+      // ── 403 — cancellation required ──────────────────────────────────
       if (changeResponse.status === 403 && changeData.requires_cancellation) {
-        alert(
+        showModal(
+          "warning",
+          "Cancelación requerida",
           changeData.message ||
-            "No puedes cambiar manualmente a plan Free mientras tengas una suscripción activa. Por favor, cancela tu suscripción primero.",
+            "No puedes cambiar manualmente a ese plan mientras tengas una suscripción activa.",
+          {
+            actionLabel: "Ir a Facturación",
+            onAction: () => router.visit("/subscription/billing"),
+            closeLabel: "Entendido",
+          },
         );
-        setIsLoading(null);
-
-        // Redirigir a la página de facturación para que pueda cancelar
-        setTimeout(() => {
-          router.visit("/subscription/billing");
-        }, 1500);
         return;
       }
 
-      // Si necesita checkout (código 402), crear sesión de pago
+      // ── 402 — need Stripe portal or checkout ─────────────────────────
+      if (changeResponse.status === 402 && changeData.requires_portal) {
+        setIsLoading(planId);
+        window.location.href = changeData.url;
+        return;
+      }
+
       if (changeResponse.status === 402 && changeData.requires_checkout) {
-        const response = await fetch("/api/v1/subscription/checkout", {
+        setIsLoading(planId); // keep spinner while redirecting to Stripe
+        const checkoutResponse = await fetch("/api/v1/subscription/checkout", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -149,61 +271,57 @@ export function usePricing({
           body: JSON.stringify({ plan: planId, workspace_id: workspaceId }),
         });
 
-        const data = await response.json();
+        const checkoutData = await checkoutResponse.json();
+        setIsLoading(null);
 
-        if (!response.ok) {
-          if (data.error === "Invalid plan configuration") {
-            alert(
-              "Este plan requiere configuración de Stripe. Por favor, contacta al administrador o prueba el plan Demo gratuito.",
-            );
-          } else {
-            alert(
-              data.message ||
-                data.error ||
-                "Error al procesar el pago. Por favor, intenta de nuevo.",
-            );
-          }
-          setIsLoading(null);
+        if (!checkoutResponse.ok) {
+          showModal(
+            "error",
+            "Error al procesar el pago",
+            checkoutData.error === "Invalid plan configuration"
+              ? "Este plan requiere configuración de Stripe. Contacta al administrador."
+              : checkoutData.message ||
+                  checkoutData.error ||
+                  "Error al procesar el pago.",
+          );
           return;
         }
 
-        if (data.url) {
-          window.location.href = data.url;
+        if (checkoutData.url) {
+          window.location.href = checkoutData.url;
         } else {
-          alert(
-            "No se pudo crear la sesión de pago. Por favor, intenta de nuevo.",
+          showModal(
+            "error",
+            "Error al crear sesión de pago",
+            "No se pudo crear la sesión de pago.",
           );
-          setIsLoading(null);
         }
         return;
       }
 
-      // Otros errores
-      alert(
-        changeData.message ||
-          changeData.error ||
-          "Error al cambiar el plan. Por favor, intenta de nuevo.",
+      showModal(
+        "error",
+        "Error al cambiar el plan",
+        changeData.message || changeData.error || "Error inesperado.",
       );
+    } catch {
       setIsLoading(null);
-    } catch (error) {
-      console.error("Error:", error);
-      alert(
-        "Error de conexión. Por favor, verifica tu conexión e intenta de nuevo.",
+      showModal(
+        "error",
+        "Error de conexión",
+        "No se pudo conectar con el servidor.",
       );
-      setIsLoading(null);
     }
   };
 
-  // Nueva función para verificar si hay suscripción activa
   const checkActiveSubscription = async (): Promise<boolean> => {
     try {
       const url = new URL(
         "/api/v1/subscription/check-active",
         window.location.origin,
       );
-      if (workspaceId) {
+      if (workspaceId)
         url.searchParams.append("workspace_id", workspaceId.toString());
-      }
 
       const response = await fetch(url.toString(), {
         method: "GET",
@@ -218,30 +336,20 @@ export function usePricing({
 
       if (response.ok) {
         const data = await response.json();
-        console.log("checkActiveSubscription response:", data);
-        if (data.active_plans) {
-          setActivePlans(data.active_plans);
-        }
-        if (data.active_subscriptions) {
+        if (data.active_plans) setActivePlans(data.active_plans);
+        if (data.active_subscriptions)
           setActiveSubscriptions(data.active_subscriptions);
-        }
-        if (data.expired_plans) {
-          setExpiredPlans(data.expired_plans);
-        }
+        if (data.expired_plans) setExpiredPlans(data.expired_plans);
         return data.has_active_subscription || false;
       }
-    } catch (error) {
-      console.error("Error checking subscription:", error);
+    } catch (err) {
+      console.error("Error checking subscription:", err);
     }
     return false;
   };
 
-  const formatPrice = (price: number) => {
-    if (billingCycle === "yearly") {
-      return Math.floor(price * 12 * 0.8); // 20% descuento anual
-    }
-    return price;
-  };
+  const formatPrice = (price: number) =>
+    billingCycle === "yearly" ? Math.floor(price * 12 * 0.8) : price;
 
   const isPlanCurrent = (planId: string) => currentPlan === planId;
 
@@ -256,5 +364,7 @@ export function usePricing({
     formatPrice,
     isPlanCurrent,
     checkActiveSubscription,
+    modal,
+    closeModal,
   };
 }

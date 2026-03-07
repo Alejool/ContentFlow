@@ -157,7 +157,7 @@ export default function Dashboard({
           min-h-screen transition-colors duration-300 `}
       >
         <div
-          data-theme-color={auth.user.theme_color}
+          data-theme-color={auth.user?.theme_color || 'orange'}
           className="rounded-lg p-8 mb-8 shadow-sm transition-colors duration-300 flex flex-col md:flex-row items-center justify-between gap-6 bg-gradient-to-r from-white/90 to-white/95 border border-white/70 dark:bg-gradient-to-r dark:from-neutral-800 dark:to-neutral-900 dark:border-neutral-700"
         >
           <div>

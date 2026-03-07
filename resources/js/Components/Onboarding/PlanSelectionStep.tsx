@@ -55,30 +55,37 @@ export default function PlanSelectionStep({
         }
 
         // Check if user has an active subscription
-        const response = await axios.get('/api/v1/subscription/current-usage');
-        const currentPlan = response.data?.data?.plan;
-        
-        // If user has an active paid plan, update onboarding and complete this step
-        if (currentPlan && currentPlan !== 'free' && currentPlan !== 'demo') {
-          console.log('User has active plan, updating onboarding:', currentPlan);
+        try {
+          const response = await axios.get('/api/v1/subscription/current-usage');
+          const currentPlan = response.data?.data?.plan;
           
-          // Update onboarding state on backend
-          try {
-            await axios.post('/api/v1/onboarding/plan/select', {
-              plan_id: currentPlan
-            });
-          } catch (error) {
-            console.error('Error updating onboarding state:', error);
+          // If user has an active paid plan, update onboarding and complete this step
+          if (currentPlan && currentPlan !== 'free' && currentPlan !== 'demo') {
+            console.log('User has active plan, updating onboarding:', currentPlan);
+            
+            // Update onboarding state on backend
+            try {
+              await axios.post('/api/v1/onboarding/plan/select', {
+                plan_id: currentPlan
+              });
+            } catch (error) {
+              console.error('Error updating onboarding state:', error);
+            }
+            
+            // Complete this step
+            setTimeout(() => {
+              onComplete(currentPlan);
+            }, 500);
+            return;
           }
-          
-          // Complete this step
-          setTimeout(() => {
-            onComplete(currentPlan);
-          }, 500);
-          return;
+        } catch (error) {
+          // 404 means no active subscription, which is expected during onboarding
+          if (error.response?.status !== 404) {
+            console.error('Error checking subscription:', error);
+          }
         }
       } catch (error) {
-        console.error('Error checking subscription:', error);
+        console.error('Error checking onboarding state:', error);
       } finally {
         setCheckingSubscription(false);
       }

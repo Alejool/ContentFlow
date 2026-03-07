@@ -50,6 +50,8 @@ interface PlanCardProps {
   variant?: "default" | "compact";
   hasActiveSubscription?: boolean;
   activePlans?: string[];
+  activeSubscriptions?: any[];
+  expiredPlans?: string[];
   isOwner?: boolean;
 }
 
@@ -63,6 +65,8 @@ export default function PlanCard({
   variant = "default",
   hasActiveSubscription = false,
   activePlans = [],
+  activeSubscriptions = [],
+  expiredPlans = [],
   isOwner = true,
 }: PlanCardProps) {
   const { t } = useTranslation();
@@ -196,43 +200,105 @@ export default function PlanCard({
   const isDemoPlan = plan.id === "demo";
   // Bloquear cambio a Free o Demo si hay suscripción activa de pago
   const isPlanActive = activePlans.includes(plan.id) || isCurrentPlan;
+  const isPlanExpired = (expiredPlans || []).includes(plan.id);
   const isDowngradeBlocked =
     hasActiveSubscription && (isFreePlan || isDemoPlan) && !isCurrentPlan;
 
-  // Determinar el texto del botón
-  const getButtonText = () => {
+  // Determinar si el usuario puede cambiar gratis a este plan
+  const canSwitchFree = isPlanActive && !isCurrentPlan;
+
+  // NUEVO: Función para determinar configuración del botón según estado del plan
+  const getButtonConfig = () => {
     if (isCurrentPlan) {
-      return t("pricing.currentPlan", "Plan Actual");
+      return {
+        label: t("pricing.currentPlan", "Plan Actual"),
+        disabled: true,
+        variant: "current" as const,
+      };
     }
 
+    // IMPORTANTE: Las tarjetas de planes SIEMPRE redirigen a comprar/renovar
+    // Solo la tabla de "Planes comprados" permite usar sin pagar
+    
     if (isDowngradeBlocked) {
-      return t(
-        "pricing.cancelRequired",
-        "Cancela tu suscripción de pago primero",
-      );
+      return {
+        label: t(
+          "pricing.cancelRequired",
+          "Debes cancelar tu suscripción actual para cambiar a este plan.",
+        ),
+        disabled: true,
+        variant: "blocked" as const,
+      };
     }
 
     if (!plan.enabled && plan.requires_stripe) {
-      return t("pricing.comingSoon", "Próximamente");
+      return {
+        label: t("pricing.comingSoon", "Próximamente"),
+        disabled: true,
+        variant: "disabled" as const,
+      };
     }
 
-    if (plan.price === 0) {
-      return t("pricing.startFree", "Comenzar Gratis");
+    if (isFreePlan || isDemoPlan) {
+      return {
+        label: t("pricing.selectPlan", "Seleccionar plan"),
+        disabled: false,
+        variant: "free" as const,
+      };
     }
 
-    // Si es un plan activo pero no el actual
-    if (isPlanActive && !isCurrentPlan) {
-      return t("pricing.changeToPlan", "Cambiar a este plan");
-    }
-
-    // Si tiene suscripción activa pero este plan NO es activo, es un upgrade/downgrade (cambiar en Stripe)
-    if (hasActiveSubscription && (plan.requires_stripe || plan.price > 0)) {
-      return t("pricing.changeToPlan", "Cambiar a este plan");
-    }
-
-    // Si el plan ya expiró o no es activo, es una compra/selección
-    return t("pricing.selectPlan", "Seleccionar Plan");
+    // Para planes de pago, siempre mostrar "Seleccionar plan" (comprar/renovar)
+    return {
+      label: t("pricing.selectPlan", "Seleccionar plan"),
+      disabled: false,
+      variant: "paid" as const,
+    };
   };
+
+  const buttonConfig = getButtonConfig();
+
+  // Determinar el texto del botón (mantener compatibilidad)
+  const getButtonText = () => {
+    return buttonConfig.label;
+  };
+
+  const getPlanStatus = () => {
+    if (isCurrentPlan) {
+      return {
+        label: t("pricing.status.active", "Activo"),
+        variant: "default" as const,
+        className:
+          "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-green-200 dark:border-green-800",
+      };
+    }
+    if (isPlanActive && !isCurrentPlan) {
+      return {
+        label: t("pricing.status.purchased", "Comprado"),
+        variant: "default" as const,
+        className:
+          "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-green-200 dark:border-green-800",
+      };
+    }
+    if (isPlanExpired) {
+      return {
+        label: t("pricing.status.expired", "Expirado"),
+        variant: "secondary" as const,
+        className:
+          "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800",
+      };
+    }
+    if (activePlans.length > 0 && !isPlanActive && isPaidPlan) {
+      return {
+        label: t("pricing.status.available", "Disponible"),
+        variant: "outline" as const,
+        className:
+          "border-primary-200 dark:border-primary-800 text-primary-600",
+      };
+    }
+    return null;
+  };
+
+  const status = getPlanStatus();
 
   if (variant === "compact") {
     return (
@@ -287,16 +353,29 @@ export default function PlanCard({
         <Button
           onClick={() => onSelectPlan(plan.id)}
           disabled={
-            isCurrentPlan ||
+            buttonConfig.disabled ||
             isLoading ||
-            (!plan.enabled && plan.requires_stripe) ||
-            isDowngradeBlocked
+            (!plan.enabled && plan.requires_stripe)
           }
-          variant={isPopular ? "primary" : "ghost"}
-          buttonStyle={isPopular ? "solid" : "outline"}
+          variant={
+            buttonConfig.variant === "free"
+              ? "primary"
+              : isPopular
+                ? "primary"
+                : "ghost"
+          }
+          buttonStyle={
+            buttonConfig.variant === "current" || buttonConfig.variant === "blocked"
+              ? "outline"
+              : "solid"
+          }
           fullWidth
           size="md"
           loading={isLoading}
+          className={cn(
+            buttonConfig.variant === "current" && "opacity-60 cursor-not-allowed",
+            buttonConfig.variant === "blocked" && "opacity-60 cursor-not-allowed",
+          )}
         >
           {getButtonText()}
         </Button>
@@ -334,9 +413,20 @@ export default function PlanCard({
         )}
 
         {isCurrentPlan && showCurrentBadge && (
-          <div className="absolute -top-4 right-4">
+          <div className="absolute -top-4 right-4 z-20">
             <Badge className="bg-green-500 text-white border-0 shadow-md">
               {t("pricing.currentPlan", "Plan Actual")}
+            </Badge>
+          </div>
+        )}
+
+        {!isCurrentPlan && status && (
+          <div className="absolute -top-4 right-4 z-20">
+            <Badge
+              variant={status.variant}
+              className={cn("shadow-md border", status.className)}
+            >
+              {status.label}
             </Badge>
           </div>
         )}
@@ -395,8 +485,10 @@ export default function PlanCard({
             {plan.price > 0 && (
               <div className="mt-2 flex items-center gap-2 flex-wrap">
                 <span className="text-xs text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded-full font-semibold">
-                  Anual: ${annualMonthlyPrice}/mes — ahorras ${annualSavings}
-                  /año
+                  {t("pricing.annualPricing", {
+                    price: annualMonthlyPrice,
+                    savings: annualSavings,
+                  })}
                 </span>
               </div>
             )}
@@ -485,30 +577,40 @@ export default function PlanCard({
           <Button
             onClick={() => onSelectPlan(plan.id)}
             disabled={
-              isCurrentPlan ||
+              buttonConfig.disabled ||
               isLoading ||
-              (!plan.enabled && plan.requires_stripe) ||
-              isDowngradeBlocked
+              (!plan.enabled && plan.requires_stripe)
             }
-            variant={isPopular ? "primary" : "ghost"}
-            buttonStyle={isPopular ? "solid" : "outline"}
+            variant={
+              buttonConfig.variant === "free"
+                ? "primary"
+                : isPopular
+                  ? "primary"
+                  : "ghost"
+            }
+            buttonStyle={
+              buttonConfig.variant === "current" || buttonConfig.variant === "blocked"
+                ? "gradient"
+                : isPopular
+                  ? "solid"
+                  : "outline"
+            }
             size="lg"
             fullWidth
             loading={isLoading}
             loadingText={t("pricing.processing")}
             icon={
-              !isCurrentPlan &&
-              !plan.enabled &&
-              plan.requires_stripe &&
-              !isDowngradeBlocked
-                ? undefined
-                : ArrowRight
+              !buttonConfig.disabled &&
+              buttonConfig.variant !== "current" &&
+              buttonConfig.variant !== "blocked"
+                ? ArrowRight
+                : undefined
             }
             iconPosition="right"
             className={cn(
               "group transition-all",
-              ((!plan.enabled && plan.requires_stripe) || isDowngradeBlocked) &&
-                "opacity-60 grayscale cursor-not-allowed",
+              buttonConfig.variant === "current" && "opacity-60 cursor-not-allowed",
+              buttonConfig.variant === "blocked" && "opacity-60 cursor-not-allowed",
             )}
           >
             {getButtonText()}

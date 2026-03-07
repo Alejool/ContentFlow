@@ -44,6 +44,8 @@ export default function PlanGrid({
   variant = "default",
   hasActiveSubscription = false,
   activePlans = [],
+  activeSubscriptions = [],
+  expiredPlans = [],
   isOwner = true,
 }: PlanGridProps) {
   const { t } = useTranslation();
@@ -76,6 +78,8 @@ export default function PlanGrid({
               variant={variant}
               hasActiveSubscription={hasActiveSubscription}
               activePlans={activePlans}
+              activeSubscriptions={activeSubscriptions}
+              expiredPlans={expiredPlans}
               isOwner={isOwner}
             />
           );
