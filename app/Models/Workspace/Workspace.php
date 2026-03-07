@@ -236,8 +236,31 @@ class Workspace extends Model
      */
     public function getPlanName(): string
     {
+        // Primero usar la suscripción manual si está activa
         $subscription = $this->subscription;
-        return $subscription?->plan ?? 'demo';
+        if ($subscription && $subscription->isActive()) {
+            return $subscription->plan;
+        }
+
+        // Si no, revisar en Cashier (Stripe)
+        $stripeSub = $this->subscriptions()->where('stripe_status', 'active')->first();
+        if ($stripeSub) {
+            // Intentar recuperar el plan desde el stripe_price_id
+            $plans = config('plans');
+            foreach ($plans as $key => $config) {
+                if (($config['stripe_price_id'] ?? null) === $stripeSub->stripe_price) {
+                    return $key; // Ej: 'starter'
+                }
+            }
+        }
+
+        // En último caso, fallback as owner request
+        $owner = $this->owner();
+        if ($owner && $owner->current_plan) {
+            return $owner->current_plan;
+        }
+
+        return 'free'; // O default
     }
 
     /**

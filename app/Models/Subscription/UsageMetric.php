@@ -10,6 +10,7 @@ class UsageMetric extends Model
 {
     protected $fillable = [
         'workspace_id',
+        'plan_id',
         'metric_type',
         'current_usage',
         'limit',

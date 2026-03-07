@@ -5,6 +5,7 @@ namespace App\Listeners\Subscription;
 use Laravel\Cashier\Events\WebhookReceived;
 use App\Services\SubscriptionTrackingService;
 use Illuminate\Support\Facades\Log;
+use App\Events\Subscription\SubscriptionUpdated;
 
 class HandleStripeSubscriptionCreated
 {
@@ -29,9 +30,9 @@ class HandleStripeSubscriptionCreated
         }
 
         try {
-            match($event->payload['type']) {
+            match ($event->payload['type']) {
                 'checkout.session.completed' => $this->handleCheckoutCompleted($event->payload),
-                'customer.subscription.created', 
+                'customer.subscription.created',
                 'customer.subscription.updated' => $this->handleSubscriptionChange($event->payload),
                 'customer.subscription.deleted' => $this->handleSubscriptionDeleted($event->payload),
                 'invoice.payment_failed' => $this->handlePaymentFailed($event->payload),
@@ -51,7 +52,7 @@ class HandleStripeSubscriptionCreated
     {
         $session = $payload['data']['object'];
         $metadata = $session['metadata'] ?? [];
-        
+
         $userId = $metadata['user_id'] ?? null;
         $workspaceId = $metadata['workspace_id'] ?? null;
         $plan = $metadata['plan'] ?? null;
@@ -65,7 +66,7 @@ class HandleStripeSubscriptionCreated
         }
 
         $user = \App\Models\User::find($userId);
-        
+
         if (!$user) {
             Log::error('User not found for checkout session', ['user_id' => $userId]);
             return;
@@ -108,6 +109,15 @@ class HandleStripeSubscriptionCreated
             ]);
         }
 
+        // Set the new plan as the user's current plan
+        $user->update(['current_plan' => $plan]);
+
+        // Emit event for real-time UI updates
+        broadcast(new SubscriptionUpdated($user, $plan))->toOthers();
+        
+        // Invalidate user subscription cache
+        cache()->forget("user_subscription_{$user->id}");
+
         Log::info('Subscription activated via Stripe checkout', [
             'user_id' => $userId,
             'plan' => $plan,
@@ -119,7 +129,7 @@ class HandleStripeSubscriptionCreated
     {
         $subscription = $payload['data']['object'];
         $metadata = $subscription['metadata'] ?? [];
-        
+
         $userId = $metadata['user_id'] ?? null;
         $workspaceId = $metadata['workspace_id'] ?? null;
         $plan = $metadata['plan'] ?? null;
@@ -127,20 +137,20 @@ class HandleStripeSubscriptionCreated
         if (!$userId || !$plan) {
             // Try to find user by Stripe customer ID
             $customerId = $subscription['customer'] ?? null;
-            
+
             if (!$customerId) {
                 return;
             }
 
             // Find workspace by Stripe customer ID
             $workspace = \App\Models\Workspace\Workspace::where('stripe_id', $customerId)->first();
-            
+
             if (!$workspace) {
                 return;
             }
 
             $user = $workspace->owner();
-            
+
             if (!$user) {
                 return;
             }
@@ -148,13 +158,13 @@ class HandleStripeSubscriptionCreated
             // Try to determine plan from price ID
             $priceId = $subscription['items']['data'][0]['price']['id'] ?? null;
             $plan = $this->getPlanFromPriceId($priceId);
-            
+
             if (!$plan) {
                 return;
             }
         } else {
             $user = \App\Models\User::find($userId);
-            
+
             if (!$user) {
                 return;
             }
@@ -171,6 +181,17 @@ class HandleStripeSubscriptionCreated
 
         // Get plan configuration
         $planConfig = config("plans.{$plan}");
+
+        // For newly created subscriptions, set it as the user's current plan
+        if ($payload['type'] === 'customer.subscription.created') {
+            $user->update(['current_plan' => $plan]);
+            
+            // Emit event for real-time UI updates
+            broadcast(new SubscriptionUpdated($user, $plan))->toOthers();
+            
+            // Invalidate user subscription cache
+            cache()->forget("user_subscription_{$user->id}");
+        }
 
         // Record plan change
         $this->trackingService->recordPlanChange(
@@ -202,7 +223,7 @@ class HandleStripeSubscriptionCreated
         }
 
         $plans = config('plans');
-        
+
         foreach ($plans as $planKey => $planConfig) {
             if (($planConfig['stripe_price_id'] ?? null) === $priceId) {
                 return $planKey;
@@ -219,14 +240,14 @@ class HandleStripeSubscriptionCreated
     {
         $subscription = $payload['data']['object'];
         $customerId = $subscription['customer'] ?? null;
-        
+
         if (!$customerId) {
             return;
         }
 
         // Encontrar workspace por Stripe customer ID
         $workspace = \App\Models\Workspace\Workspace::where('stripe_id', $customerId)->first();
-        
+
         if (!$workspace) {
             Log::warning('Workspace not found for subscription deletion', [
                 'stripe_customer_id' => $customerId,
@@ -235,7 +256,7 @@ class HandleStripeSubscriptionCreated
         }
 
         $user = $workspace->owner();
-        
+
         if (!$user) {
             Log::error('Owner not found for workspace', [
                 'workspace_id' => $workspace->id,
@@ -266,6 +287,12 @@ class HandleStripeSubscriptionCreated
             ]);
         }
 
+        // Emit event for real-time UI updates
+        broadcast(new SubscriptionUpdated($user, 'free'))->toOthers();
+        
+        // Invalidate user subscription cache
+        cache()->forget("user_subscription_{$user->id}");
+
         Log::info('Subscription expired, moved to free plan', [
             'workspace_id' => $workspace->id,
             'user_id' => $user->id,
@@ -280,26 +307,26 @@ class HandleStripeSubscriptionCreated
     {
         $invoice = $payload['data']['object'];
         $customerId = $invoice['customer'] ?? null;
-        
+
         if (!$customerId) {
             return;
         }
 
         $workspace = \App\Models\Workspace\Workspace::where('stripe_id', $customerId)->first();
-        
+
         if (!$workspace) {
             return;
         }
 
         $subscription = $workspace->subscription;
-        
+
         if (!$subscription) {
             return;
         }
 
         // Iniciar período de gracia de 7 días
         $gracePeriodEnd = now()->addDays(7);
-        
+
         $subscription->update([
             'status' => 'past_due',
             'stripe_status' => 'past_due',
@@ -323,19 +350,19 @@ class HandleStripeSubscriptionCreated
     {
         $invoice = $payload['data']['object'];
         $customerId = $invoice['customer'] ?? null;
-        
+
         if (!$customerId) {
             return;
         }
 
         $workspace = \App\Models\Workspace\Workspace::where('stripe_id', $customerId)->first();
-        
+
         if (!$workspace) {
             return;
         }
 
         $subscription = $workspace->subscription;
-        
+
         if (!$subscription) {
             return;
         }

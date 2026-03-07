@@ -73,11 +73,20 @@ class SubscriptionTrackingService
                 $reason,
                 $metadata
             ) {
-                // End the current active subscription history
-                $this->endCurrentSubscriptionHistory($user, $reason);
+                // Desactivar el historial de suscripción actual (pero NO cambiar ended_at)
+                // El ended_at se establece al crear y representa cuándo expira el tiempo comprado
+                $this->deactivateCurrentSubscriptionHistory($user, $reason);
 
                 // Determine change type
                 $changeType = $this->determineChangeType($previousPlan, $newPlan);
+
+                // Calcular ended_at basado en el billing_cycle
+                $endedAt = null;
+                if ($billingCycle === 'monthly') {
+                    $endedAt = now()->addMonth();
+                } elseif ($billingCycle === 'yearly') {
+                    $endedAt = now()->addYear();
+                }
 
                 // Create new subscription history entry
                 $history = SubscriptionHistory::create([
@@ -91,6 +100,7 @@ class SubscriptionTrackingService
                     'previous_plan' => $previousPlan,
                     'reason' => $reason ?? 'user_initiated',
                     'started_at' => now(),
+                    'ended_at' => $endedAt, // Fecha de expiración del tiempo comprado
                     'is_active' => true,
                     'metadata' => $metadata,
                 ]);
@@ -123,15 +133,26 @@ class SubscriptionTrackingService
         }
 
     /**
-     * End the current active subscription history.
+     * Desactivar el historial de suscripción actual sin modificar ended_at.
+     * El ended_at representa cuándo expira el tiempo comprado, no cuándo dejaste de usarlo.
      */
-    protected function endCurrentSubscriptionHistory(User $user, ?string $reason = null): void
+    protected function deactivateCurrentSubscriptionHistory(User $user, ?string $reason = null): void
     {
         SubscriptionHistory::where('user_id', $user->id)
             ->where('is_active', true)
-            ->each(function ($history) use ($reason) {
-                $history->end($reason);
-            });
+            ->update([
+                'is_active' => false,
+                'reason' => $reason ?? 'plan_changed',
+            ]);
+    }
+
+    /**
+     * End the current active subscription history.
+     * @deprecated Use deactivateCurrentSubscriptionHistory instead
+     */
+    protected function endCurrentSubscriptionHistory(User $user, ?string $reason = null): void
+    {
+        $this->deactivateCurrentSubscriptionHistory($user, $reason);
     }
 
     /**

@@ -62,8 +62,11 @@ class WorkspaceUsageService
         $limits = $workspace->getPlanLimits();
         $limit = $limits[$metricType] ?? 0;
 
+        $plan = $workspace->getPlanName();
+
         return $workspace->usageMetrics()->create([
             'metric_type' => $metricType,
+            'plan_id' => $plan,
             'current_usage' => 0,
             'limit' => $limit,
             'period_start' => now()->startOfMonth(),
@@ -84,9 +87,12 @@ class WorkspaceUsageService
             'ai_requests_per_month',
         ];
 
+        $plan = $workspace->getPlanName();
+
         foreach ($monthlyMetrics as $metric) {
             $workspace->usageMetrics()->create([
                 'metric_type' => $metric,
+                'plan_id' => $plan,
                 'current_usage' => 0,
                 'limit' => $limits[$metric] ?? 0,
                 'period_start' => now()->startOfMonth(),
