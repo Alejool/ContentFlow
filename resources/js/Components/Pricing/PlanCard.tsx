@@ -49,6 +49,7 @@ interface PlanCardProps {
   showCurrentBadge?: boolean;
   variant?: "default" | "compact";
   hasActiveSubscription?: boolean;
+  activePlans?: string[];
   isOwner?: boolean;
 }
 
@@ -61,6 +62,7 @@ export default function PlanCard({
   showCurrentBadge = true,
   variant = "default",
   hasActiveSubscription = false,
+  activePlans = [],
   isOwner = true,
 }: PlanCardProps) {
   const { t } = useTranslation();
@@ -193,6 +195,7 @@ export default function PlanCard({
   const isFreePlan = plan.id === "free";
   const isDemoPlan = plan.id === "demo";
   // Bloquear cambio a Free o Demo si hay suscripción activa de pago
+  const isPlanActive = activePlans.includes(plan.id) || isCurrentPlan;
   const isDowngradeBlocked =
     hasActiveSubscription && (isFreePlan || isDemoPlan) && !isCurrentPlan;
 
@@ -217,12 +220,17 @@ export default function PlanCard({
       return t("pricing.startFree", "Comenzar Gratis");
     }
 
-    // Si tiene suscripción activa y es un plan de pago, es un cambio de plan
-    if (hasActiveSubscription && plan.requires_stripe) {
+    // Si es un plan activo pero no el actual
+    if (isPlanActive && !isCurrentPlan) {
       return t("pricing.changeToPlan", "Cambiar a este plan");
     }
 
-    // Si no tiene suscripción activa, es una compra nueva
+    // Si tiene suscripción activa pero este plan NO es activo, es un upgrade/downgrade (cambiar en Stripe)
+    if (hasActiveSubscription && (plan.requires_stripe || plan.price > 0)) {
+      return t("pricing.changeToPlan", "Cambiar a este plan");
+    }
+
+    // Si el plan ya expiró o no es activo, es una compra/selección
     return t("pricing.selectPlan", "Seleccionar Plan");
   };
 
@@ -458,7 +466,22 @@ export default function PlanCard({
           )}
         </CardContent>
 
-        <CardFooter className="relative pt-6">
+        <CardFooter className="flex flex-col gap-2 pt-6">
+          <div>
+            {isDowngradeBlocked && (
+              <p className="text-xs text-center text-amber-600 dark:text-amber-400 mt-2">
+                {t(
+                  "pricing.cancelSubscriptionFirst",
+                  "Para cambiar a un plan gratuito, cancela tu suscripción de pago actual y espera a que termine el período de facturación.",
+                )}
+              </p>
+            )}
+            {!plan.enabled && plan.requires_stripe && (
+              <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-2">
+                {t("pricing.paymentSetup", "Configuración de pagos en proceso")}
+              </p>
+            )}
+          </div>
           <Button
             onClick={() => onSelectPlan(plan.id)}
             disabled={
@@ -490,21 +513,6 @@ export default function PlanCard({
           >
             {getButtonText()}
           </Button>
-
-          {isDowngradeBlocked && (
-            <p className="text-xs text-center text-amber-600 dark:text-amber-400 mt-2">
-              {t(
-                "pricing.cancelSubscriptionFirst",
-                "Para cambiar a un plan gratuito, cancela tu suscripción de pago actual y espera a que termine el período de facturación.",
-              )}
-            </p>
-          )}
-
-          {!plan.enabled && plan.requires_stripe && (
-            <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-2">
-              {t("pricing.paymentSetup", "Configuración de pagos en proceso")}
-            </p>
-          )}
         </CardFooter>
       </Card>
     </div>

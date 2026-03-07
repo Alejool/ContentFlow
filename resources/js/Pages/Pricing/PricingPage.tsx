@@ -1,9 +1,15 @@
-import { Head } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Check, ArrowRight, Infinity, Shield } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import PricingPlansSection from '@/Components/Pricing/PricingPlansSection';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import PricingPlansSection from "@/Components/Pricing/PricingPlansSection";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/Components/ui/card";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import { Head } from "@inertiajs/react";
+import { ArrowRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface Plan {
   id: string;
@@ -27,20 +33,27 @@ interface Props {
   auth: any;
   plans: Plan[];
   currentPlan?: string;
+  workspaceId?: number;
 }
 
-export default function PricingPage({ auth, plans, currentPlan }: Props) {
+export default function PricingPage({
+  auth,
+  plans,
+  currentPlan,
+  workspaceId,
+}: Props) {
   const { t } = useTranslation();
 
   // Determinar si el usuario es owner del workspace actual
   const currentWorkspace = auth?.current_workspace;
-  const isOwner = currentWorkspace &&
+  const isOwner =
+    currentWorkspace &&
     (Number(currentWorkspace.created_by) === Number(auth.user?.id) ||
-     currentWorkspace.user_role_slug === 'owner');
+      currentWorkspace.user_role_slug === "owner");
 
   return (
     <AuthenticatedLayout user={auth.user}>
-      <Head title={t('pricing.title')} />
+      <Head title={t("pricing.title")} />
 
       <div className="relative min-h-screen bg-gradient-to-br from-gray-50 via-white to-orange-50/30 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 py-16 overflow-hidden dark:text-white">
         {/* Decorative background elements */}
@@ -64,10 +77,10 @@ export default function PricingPage({ auth, plans, currentPlan }: Props) {
             <Card className="">
               <CardHeader className="text-center pb-6">
                 <CardTitle className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3">
-                  {t('pricing.faq', '¿Tienes preguntas?')}
+                  {t("pricing.faq", "¿Tienes preguntas?")}
                 </CardTitle>
                 <CardDescription className="text-lg text-gray-600 dark:text-gray-400">
-                  {t('pricing.faqSubtitle', 'Estamos aquí para ayudarte')}
+                  {t("pricing.faqSubtitle", "Estamos aquí para ayudarte")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="text-center pb-8">

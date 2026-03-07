@@ -63,7 +63,7 @@ class SubscriptionController extends Controller
 
             return response()->json(['url' => $checkout->url]);
         } catch (\Exception $e) {
-            \Log::error('Failed to create checkout session', [
+            Log::error('Failed to create checkout session', [
                 'workspace_id' => $workspace->id,
                 'user_id' => $user->id,
                 'plan' => $request->plan,
@@ -141,7 +141,7 @@ class SubscriptionController extends Controller
             ]
         );
 
-        \Log::info('Subscription created via Stripe', [
+        Log::info('Subscription created via Stripe', [
             'user_id' => $userId,
             'workspace_id' => $workspaceId,
             'plan' => $plan,
@@ -299,7 +299,7 @@ class SubscriptionController extends Controller
                 ]);
             }
 
-            \Log::info('Subscription canceled at period end', [
+            Log::info('Subscription canceled at period end', [
                 'workspace_id' => $workspace->id,
                 'user_id' => $user->id,
                 'ends_at' => $periodEnd,
@@ -311,7 +311,7 @@ class SubscriptionController extends Controller
                 'days_remaining' => now()->diffInDays($periodEnd),
             ]);
         } catch (\Exception $e) {
-            \Log::error('Failed to cancel subscription', [
+            Log::error('Failed to cancel subscription', [
                 'workspace_id' => $workspace->id,
                 'user_id' => $user->id,
                 'error' => $e->getMessage(),
@@ -357,7 +357,7 @@ class SubscriptionController extends Controller
 
             return back()->with('success', __('Plan activado exitosamente'));
         } catch (\Exception $e) {
-            \Log::error('Failed to activate free plan', [
+            Log::error('Failed to activate free plan', [
                 'user_id' => $user->id,
                 'plan' => $plan,
                 'error' => $e->getMessage()
@@ -438,7 +438,7 @@ class SubscriptionController extends Controller
                     $hasActiveStripeSubscription = false;
                 }
 
-                \Log::info('Checking subscription for plan change', [
+                Log::info('Checking subscription for plan change', [
                     'user_id' => $user->id,
                     'workspace_id' => $workspace->id,
                     'new_plan' => $newPlan,
@@ -447,7 +447,7 @@ class SubscriptionController extends Controller
                     'subscription_id' => $cashierSubscription?->stripe_id
                 ]);
             } catch (\Exception $e) {
-                \Log::warning('Error checking Stripe subscription', [
+                Log::warning('Error checking Stripe subscription', [
                     'workspace_id' => $workspace->id,
                     'error' => $e->getMessage()
                 ]);
@@ -492,7 +492,7 @@ class SubscriptionController extends Controller
                             ]);
                         }
 
-                        \Log::info('Downgrade scheduled for end of period', [
+                        Log::info('Downgrade scheduled for end of period', [
                             'workspace_id' => $workspace->id,
                             'current_plan' => $previousPlan,
                             'pending_plan' => $newPlan,
@@ -511,7 +511,7 @@ class SubscriptionController extends Controller
                         // UPGRADE: Aplicar inmediatamente con prorrateo
                         $cashierSubscription->swap($planConfig['stripe_price_id']);
 
-                        \Log::info('Plan upgraded immediately in Stripe', [
+                        Log::info('Plan upgraded immediately in Stripe', [
                             'workspace_id' => $workspace->id,
                             'old_plan' => $previousPlan,
                             'new_plan' => $newPlan,
@@ -519,7 +519,7 @@ class SubscriptionController extends Controller
                         ]);
                     }
                 } catch (\Exception $e) {
-                    \Log::error('Failed to change plan in Stripe', [
+                    Log::error('Failed to change plan in Stripe', [
                         'workspace_id' => $workspace->id,
                         'error' => $e->getMessage()
                     ]);
@@ -566,7 +566,7 @@ class SubscriptionController extends Controller
                 'is_upgrade' => $isUpgrade,
             ]);
         } catch (\Exception $e) {
-            \Log::error('Failed to change plan', [
+            Log::error('Failed to change plan', [
                 'user_id' => $user->id,
                 'new_plan' => $newPlan,
                 'error' => $e->getMessage(),
@@ -650,7 +650,44 @@ class SubscriptionController extends Controller
             // El workspace tiene suscripción activa si tiene Stripe activo O plan manual de pago
             $hasActiveSubscription = $hasActiveStripeSubscription || $isWorkspacePaidPlan || $hasActiveManualSubscription;
 
-            \Log::info('Checking active subscription (workspace-aware)', [
+            // 4. Obtener TODAS las suscripciones activas (para listar)
+            $activeSubscriptions = $workspace->subscriptions()
+                ->whereIn('stripe_status', ['active', 'trailing', 'past_due'])
+                ->get();
+
+            $activePlansDetail = $activeSubscriptions->map(function ($sub) {
+                return [
+                    'id' => $sub->id,
+                    'plan' => $sub->plan,
+                    'name' => config("plans.{$sub->plan}.name", ucfirst($sub->plan)),
+                    'status' => $sub->stripe_status,
+                    'ends_at' => $sub->ends_at ? $sub->ends_at->toIso8601String() : null,
+                    'cancel_at_period_end' => (bool)$sub->cancel_at_period_end,
+                ];
+            })->toArray();
+
+            // Si tiene plan manual de pago pero no está en Stripe, agregarlo
+            if ($isWorkspacePaidPlan && empty(array_filter($activePlansDetail, fn($p) => $p['plan'] === $workspacePlan))) {
+                $activePlansDetail[] = [
+                    'id' => 'manual',
+                    'plan' => $workspacePlan,
+                    'name' => config("plans.{$workspacePlan}.name", ucfirst($workspacePlan)),
+                    'status' => 'active',
+                    'ends_at' => null,
+                    'cancel_at_period_end' => false,
+                ];
+            }
+
+            // 5. Obtener planes EXPIRADOS (históricamente comprados pero no activos ahora)
+            // Esto lo sacamos del historial de suscripciones del usuario
+            $expiredPlans = $user->subscriptionHistory()
+                ->where('is_active', false)
+                ->whereNotIn('plan_name', array_column($activePlansDetail, 'plan'))
+                ->distinct()
+                ->pluck('plan_name')
+                ->toArray();
+
+            Log::info('Checking active subscription (workspace-aware)', [
                 'user_id' => $user->id,
                 'workspace_id' => $workspace->id,
                 'has_stripe' => $hasActiveStripeSubscription,
@@ -658,14 +695,19 @@ class SubscriptionController extends Controller
                 'is_paid_plan' => $isWorkspacePaidPlan,
                 'has_manual' => $hasActiveManualSubscription,
                 'result' => $hasActiveSubscription,
+                'active_plans_count' => count($activePlansDetail),
+                'expired_plans_count' => count($expiredPlans),
             ]);
 
             return response()->json([
                 'has_active_subscription' => $hasActiveSubscription,
                 'current_plan' => $workspacePlan,
+                'active_plans' => array_column($activePlansDetail, 'plan'),
+                'active_subscriptions' => $activePlansDetail,
+                'expired_plans' => $expiredPlans,
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error checking active subscription', [
+            Log::error('Error checking active subscription', [
                 'user_id' => $user->id,
                 'error' => $e->getMessage()
             ]);

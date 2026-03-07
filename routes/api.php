@@ -58,7 +58,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     require __DIR__ . '/api/v1/calendar.php';
     require __DIR__ . '/api/v1/localization.php';
     require __DIR__ . '/api/v1/onboarding.php';
-    require __DIR__ . '/api/v1/subscription.php';
     Route::prefix('uploads')->name('uploads.')->group(function () {
       require __DIR__ . '/api/v1/uploads.php';
     });
@@ -66,5 +65,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
       require __DIR__ . '/api/v1/progress.php';
     });
     require __DIR__ . '/api/v1/reels.php';
+  });
+
+  // Rutas que NO requieren un plan específico para ser accedidas (Upgrade/Check active)
+  Route::prefix('v1')->name('api.v1.')->group(function () {
+    require __DIR__ . '/api/v1/subscription.php';
   });
 });

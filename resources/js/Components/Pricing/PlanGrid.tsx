@@ -1,5 +1,5 @@
-import { useTranslation } from 'react-i18next';
-import PlanCard from '@/Components/Pricing/PlanCard';
+import PlanCard from "@/Components/Pricing/PlanCard";
+import { useTranslation } from "react-i18next";
 
 interface Plan {
   id: string;
@@ -24,10 +24,13 @@ interface PlanGridProps {
   currentPlan?: string;
   isLoading?: string | boolean;
   onSelectPlan: (planId: string) => void;
-  billingCycle?: 'monthly' | 'yearly';
+  billingCycle?: "monthly" | "yearly";
   showCurrentBadge?: boolean;
-  variant?: 'default' | 'compact';
+  variant?: "default" | "compact";
   hasActiveSubscription?: boolean;
+  activePlans?: string[];
+  activeSubscriptions?: any[];
+  expiredPlans?: string[];
   isOwner?: boolean;
 }
 
@@ -36,10 +39,11 @@ export default function PlanGrid({
   currentPlan,
   isLoading,
   onSelectPlan,
-  billingCycle = 'monthly',
+  billingCycle = "monthly",
   showCurrentBadge = true,
-  variant = 'default',
+  variant = "default",
   hasActiveSubscription = false,
+  activePlans = [],
   isOwner = true,
 }: PlanGridProps) {
   const { t } = useTranslation();
@@ -71,6 +75,7 @@ export default function PlanGrid({
               showCurrentBadge={showCurrentBadge}
               variant={variant}
               hasActiveSubscription={hasActiveSubscription}
+              activePlans={activePlans}
               isOwner={isOwner}
             />
           );
