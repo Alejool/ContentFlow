@@ -165,7 +165,7 @@ export default function ApiSettingsTab({
       setTokenToRevoke(null);
       fetchTokens();
     } catch {
-      toast.error("Error al revocar el token");
+      toast.error(t("workspace.api.table.revoke_error"));
     } finally {
       setRevoking(false);
     }
@@ -329,24 +329,26 @@ export default function ApiSettingsTab({
               <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 flex gap-3">
                 <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
                 <div className="text-sm text-blue-800 dark:text-blue-300">
-                  <p className="font-semibold mb-1">¿Cómo usar tu Token API?</p>
-                  <p className="mb-2">
-                    Envía el token en el encabezado <code>Authorization</code>{" "}
-                    como un <strong>Bearer token</strong>. Los tokens del
-                    dashboard <strong>no expiran automáticamente</strong> —
-                    duran hasta que decidas revocarlos manualmente.
+                  <p className="font-semibold mb-1">
+                    {t("workspace.api.usage_info.title")}
                   </p>
+                  <p
+                    className="mb-2"
+                    dangerouslySetInnerHTML={{
+                      __html: t("workspace.api.usage_info.description"),
+                    }}
+                  />
                   <div className="bg-white/50 dark:bg-black/20 p-2 rounded border border-blue-200/50 dark:border-blue-800/50 font-mono text-xs overflow-x-auto">
                     curl -X GET "https://tu-dominio.com/api/v1/endpoint" \<br />
                     &nbsp;&nbsp;-H "Authorization: Bearer TU_TOKEN_API" \<br />
                     &nbsp;&nbsp;-H "Accept: application/json"
                   </div>
-                  <p className="mt-2 text-xs text-blue-600 dark:text-blue-400">
-                    ¿Necesitas tokens de corta duración con refresh automático?
-                    Usa el endpoint programático{" "}
-                    <code>POST /api/auth/token</code> — ver documentación
-                    descargable.
-                  </p>
+                  <p
+                    className="mt-2 text-xs text-blue-600 dark:text-blue-400"
+                    dangerouslySetInnerHTML={{
+                      __html: t("workspace.api.usage_info.refresh_token_help"),
+                    }}
+                  />
                 </div>
               </div>
 
@@ -354,21 +356,21 @@ export default function ApiSettingsTab({
               <div className="flex flex-wrap gap-3 text-xs">
                 <span className="flex items-center gap-1.5 text-neutral-500 dark:text-neutral-400">
                   <span className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 font-medium">
-                    Dashboard
+                    {t("workspace.api.token_types.dashboard")}
                   </span>
-                  — Creado desde el panel, sin expiración
+                  — {t("workspace.api.token_types.dashboard_description")}
                 </span>
                 <span className="flex items-center gap-1.5 text-neutral-500 dark:text-neutral-400">
                   <span className="px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-medium">
-                    API · Access
+                    {t("workspace.api.token_types.api_access")}
                   </span>
-                  — 24h, requiere refresh
+                  — {t("workspace.api.token_types.api_access_description")}
                 </span>
                 <span className="flex items-center gap-1.5 text-neutral-500 dark:text-neutral-400">
                   <span className="px-1.5 py-0.5 rounded bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 font-medium">
-                    API · Refresh
+                    {t("workspace.api.token_types.api_refresh")}
                   </span>
-                  — 30 días, para renovar access tokens
+                  — {t("workspace.api.token_types.api_refresh_description")}
                 </span>
               </div>
 
@@ -382,7 +384,7 @@ export default function ApiSettingsTab({
                   <RefreshCw
                     className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`}
                   />
-                  Actualizar lista
+                  {t("workspace.api.table.refresh_list")}
                 </button>
               </div>
 
@@ -393,22 +395,22 @@ export default function ApiSettingsTab({
                     <thead className="bg-neutral-50 dark:bg-neutral-900/50">
                       <tr>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
-                          Nombre
+                          {t("workspace.api.table.name")}
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
-                          Tipo
+                          {t("workspace.api.table.type")}
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
-                          Último uso
+                          {t("workspace.api.table.last_used")}
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
-                          Expira / Estado
+                          {t("workspace.api.table.expires_status")}
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
-                          Creado
+                          {t("workspace.api.table.created")}
                         </th>
                         <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
-                          Acciones
+                          {t("workspace.api.table.actions")}
                         </th>
                       </tr>
                     </thead>
@@ -449,7 +451,7 @@ export default function ApiSettingsTab({
                                       timeStyle: "short",
                                     },
                                   )
-                                : "Nunca"}
+                                : t("workspace.api.table.never_used")}
                             </td>
 
                             {/* Expiry */}
@@ -471,7 +473,7 @@ export default function ApiSettingsTab({
                                 <button
                                   onClick={() => handleRevokeToken(token.id)}
                                   className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-1.5 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                                  title="Revocar Token"
+                                  title={t("workspace.api.table.revoke_token")}
                                 >
                                   <Trash2 className="h-4 w-4" />
                                 </button>
@@ -514,11 +516,10 @@ export default function ApiSettingsTab({
             </div>
             <div>
               <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">
-                Documentación de la API
+                {t("workspace.api.documentation.title")}
               </h3>
               <p className="mt-1 text-sm text-gray-500 dark:text-neutral-400">
-                Descarga la referencia completa de la API Enterprise para
-                integrar ContentFlow en tus sistemas.
+                {t("workspace.api.documentation.description")}
               </p>
             </div>
           </div>
@@ -540,16 +541,15 @@ export default function ApiSettingsTab({
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
                   <h4 className="font-semibold text-gray-900 dark:text-white text-sm">
-                    Guía Completa Enterprise
+                    {t("workspace.api.documentation.enterprise_guide_title")}
                   </h4>
                   <Download className="h-4 w-4 text-indigo-500 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
                 <p className="text-xs text-gray-500 dark:text-neutral-400 mt-1">
-                  Referencia en Markdown con todos los endpoints, ejemplos de
-                  request/response y lógica de negocio.
+                  {t("workspace.api.documentation.enterprise_guide_description")}
                 </p>
                 <span className="inline-flex items-center mt-2 px-2 py-0.5 rounded text-xs font-medium bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300">
-                  .md · ~700 líneas
+                  {t("workspace.api.documentation.enterprise_guide_badge")}
                 </span>
               </div>
             </a>
@@ -570,25 +570,22 @@ export default function ApiSettingsTab({
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
                   <h4 className="font-semibold text-gray-900 dark:text-white text-sm">
-                    Definición OpenAPI 3.0
+                    {t("workspace.api.documentation.openapi_title")}
                   </h4>
                   <Download className="h-4 w-4 text-emerald-500 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
                 <p className="text-xs text-gray-500 dark:text-neutral-400 mt-1">
-                  Schema JSON importable directamente en Postman, Insomnia o
-                  cualquier cliente API.
+                  {t("workspace.api.documentation.openapi_description")}
                 </p>
                 <span className="inline-flex items-center mt-2 px-2 py-0.5 rounded text-xs font-medium bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300">
-                  .json · OpenAPI 3.0
+                  {t("workspace.api.documentation.openapi_badge")}
                 </span>
               </div>
             </a>
           </div>
 
           <p className="mt-4 text-xs text-gray-400 dark:text-neutral-500">
-            Para convertir el Markdown a PDF: abre el archivo en VS Code →
-            instala la extensión <strong>"Markdown PDF"</strong> → clic derecho
-            → Export (pdf).
+            {t("workspace.api.documentation.pdf_conversion_help")}
           </p>
         </div>
       </div>
