@@ -33,6 +33,7 @@ class ScheduledPost extends Model
         'account_name',
         'platform',
         'workspace_id',
+        'is_recurring_instance',
     ];
 
     protected $casts = [
@@ -42,6 +43,7 @@ class ScheduledPost extends Model
         'campaign_id' => 'integer',
         'workspace_id' => 'integer',
         'scheduled_at' => 'datetime',
+        'is_recurring_instance' => 'boolean',
     ];
 
     public function user(): BelongsTo
