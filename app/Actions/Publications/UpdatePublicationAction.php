@@ -115,6 +115,15 @@ class UpdatePublicationAction
 
       $isRecurring = isset($data['is_recurring']) ? filter_var($data['is_recurring'], FILTER_VALIDATE_BOOLEAN) : $publication->is_recurring;
 
+      // IMPORTANT: Capture original values BEFORE updating the publication
+      // This is needed to detect changes in recurrence settings later
+      $oldIsRecurring = $publication->is_recurring;
+      $oldScheduledAt = $publication->scheduled_at;
+      $oldRecurrenceType = $publication->recurrence_type;
+      $oldRecurrenceInterval = $publication->recurrence_interval;
+      $oldRecurrenceDays = $publication->recurrence_days;
+      $oldRecurrenceEndDate = $publication->recurrence_end_date;
+
       $updateData = [
         'title' => $data['title'],
         'description' => $data['description'],
@@ -126,10 +135,52 @@ class UpdatePublicationAction
         'scheduled_at' => $data['scheduled_at'] ?? $publication->scheduled_at,
         'is_recurring' => $isRecurring,
         'recurrence_type' => $isRecurring ? ($data['recurrence_type'] ?? $publication->recurrence_type) : null,
-        'recurrence_interval' => $isRecurring ? ($data['recurrence_interval'] ?? $publication->recurrence_interval) : null,
+        'recurrence_interval' => $isRecurring ? (int)($data['recurrence_interval'] ?? $publication->recurrence_interval) : null,
         'recurrence_days' => $isRecurring ? (array_key_exists('recurrence_days', $data) ? $data['recurrence_days'] : []) : null,
         'recurrence_end_date' => $isRecurring ? ($data['recurrence_end_date'] ?? $publication->recurrence_end_date) : null,
+        'recurrence_accounts' => $isRecurring ? ($data['recurrence_accounts'] ?? $publication->recurrence_accounts) : null,
       ];
+      
+      // CRITICAL: If we have individual account schedules, update the publication's scheduled_at
+      // to the earliest date among all accounts. This ensures the publication shows the correct date.
+      $accountSchedules = $data['social_account_schedules'] ?? $data['account_schedules'] ?? [];
+      
+      Log::info('UpdatePublicationAction: Checking account schedules', [
+        'publication_id' => $publication->id,
+        'has_social_account_schedules' => isset($data['social_account_schedules']),
+        'has_account_schedules' => isset($data['account_schedules']),
+        'account_schedules' => $accountSchedules,
+        'is_array' => is_array($accountSchedules),
+        'is_empty' => empty($accountSchedules),
+      ]);
+      
+      if (!empty($accountSchedules) && is_array($accountSchedules)) {
+        $earliestDate = null;
+        foreach ($accountSchedules as $accountId => $scheduleDate) {
+          if (!empty($scheduleDate)) {
+            $date = \Carbon\Carbon::parse($scheduleDate);
+            if ($earliestDate === null || $date->lt($earliestDate)) {
+              $earliestDate = $date;
+            }
+          }
+        }
+        
+        if ($earliestDate !== null) {
+          $updateData['scheduled_at'] = $earliestDate->toIso8601String();
+          Log::info('UpdatePublicationAction: Using earliest account schedule as scheduled_at', [
+            'publication_id' => $publication->id,
+            'earliest_date' => $earliestDate->toIso8601String(),
+            'account_schedules' => $accountSchedules,
+          ]);
+        }
+      }
+
+      Log::info('UpdatePublicationAction: About to update publication', [
+        'publication_id' => $publication->id,
+        'old_scheduled_at' => $publication->scheduled_at,
+        'new_scheduled_at' => $updateData['scheduled_at'],
+        'data_scheduled_at' => $data['scheduled_at'] ?? 'NOT SET',
+      ]);
 
       // Add approval fields if they were cleared due to content changes
       if (isset($data['approved_by'])) {
@@ -153,6 +204,11 @@ class UpdatePublicationAction
       }
 
       $publication->update($updateData);
+
+      Log::info('UpdatePublicationAction: Publication updated', [
+        'publication_id' => $publication->id,
+        'scheduled_at_after_update' => $publication->fresh()->scheduled_at,
+      ]);
 
       if (isset($data['campaign_id'])) {
         if (empty($data['campaign_id'])) {
@@ -210,7 +266,8 @@ class UpdatePublicationAction
         $socialAccounts = [];
         $shouldSyncSchedules = true;
       }
-      // Check if social_accounts key exists (even if empty array)
+      // ONLY sync if social_accounts key exists in the request
+      // This means the user explicitly interacted with the social accounts selector
       elseif (array_key_exists('social_accounts', $data)) {
         // Handle case where social_accounts might be sent as JSON string or array
         $socialAccounts = $data['social_accounts'] ?? [];
@@ -236,17 +293,97 @@ class UpdatePublicationAction
           }
         ));
 
+        // Always sync when social_accounts is explicitly sent
         $shouldSyncSchedules = true;
       }
+      // If social_accounts is NOT in the request, don't touch schedules at all
 
       // Sync schedules if needed
       if ($shouldSyncSchedules) {
+        // Detect if we need to recalculate all scheduled posts
+        $forceRecalculate = false;
+        
+        // Use the captured original values (before update)
+        
+        // CASE 1: Recurrence was DISABLED (was true, now false)
+        if ($oldIsRecurring && !$isRecurring) {
+          // First, count how many posts we have before deletion
+          $countBefore = \App\Models\Social\ScheduledPost::where('publication_id', $publication->id)
+            ->where('status', 'pending')
+            ->count();
+          
+          Log::info('Recurrence disabled, deleting ALL scheduled posts', [
+            'publication_id' => $publication->id,
+            'title' => $publication->title,
+            'old_is_recurring' => $oldIsRecurring,
+            'new_is_recurring' => $isRecurring,
+            'pending_posts_count' => $countBefore
+          ]);
+          
+          // Delete ALL pending scheduled posts
+          $deletedCount = \App\Models\Social\ScheduledPost::where('publication_id', $publication->id)
+            ->where('status', 'pending')
+            ->delete();
+          
+          // Verify deletion
+          $countAfter = \App\Models\Social\ScheduledPost::where('publication_id', $publication->id)
+            ->where('status', 'pending')
+            ->count();
+          
+          Log::info('Deleted all scheduled posts after disabling recurrence', [
+            'publication_id' => $publication->id,
+            'count_before' => $countBefore,
+            'deleted_count' => $deletedCount,
+            'count_after' => $countAfter,
+            'success' => $countAfter === 0
+          ]);
+          
+          // Don't create any new posts - calendar should be clean
+          $shouldSyncSchedules = false;
+        }
+        // CASE 2: Recurrence was ENABLED (was false, now true)
+        elseif (!$oldIsRecurring && $isRecurring) {
+          Log::info('Recurrence enabled, will create recurring posts', [
+            'publication_id' => $publication->id
+          ]);
+          $forceRecalculate = true;
+        }
+        // CASE 3: Recurrence settings CHANGED (was recurring, still recurring, but settings changed)
+        elseif ($isRecurring && $oldIsRecurring) {
+          if (
+            $oldRecurrenceType != $updateData['recurrence_type'] ||
+            $oldRecurrenceInterval != $updateData['recurrence_interval'] ||
+            json_encode($oldRecurrenceDays) != json_encode($updateData['recurrence_days']) ||
+            $oldRecurrenceEndDate != $updateData['recurrence_end_date']
+          ) {
+            Log::info('Recurrence settings changed, recalculating posts', [
+              'publication_id' => $publication->id,
+              'old_type' => $oldRecurrenceType,
+              'new_type' => $updateData['recurrence_type']
+            ]);
+            $forceRecalculate = true;
+          }
+        }
+        
+        // CASE 4: Scheduled date CHANGED (for both recurring and non-recurring)
+        if ($oldScheduledAt != $updateData['scheduled_at']) {
+          Log::info('Scheduled date changed, recalculating posts', [
+            'publication_id' => $publication->id,
+            'old_date' => $oldScheduledAt,
+            'new_date' => $updateData['scheduled_at']
+          ]);
+          $forceRecalculate = true;
+        }
 
-        $this->schedulingService->syncSchedules(
-          $publication,
-          $socialAccounts,
-          $data['social_account_schedules'] ?? $data['account_schedules'] ?? []
-        );
+        // Only sync schedules if we haven't disabled recurrence
+        if ($shouldSyncSchedules) {
+          $this->schedulingService->syncSchedules(
+            $publication,
+            $socialAccounts,
+            $data['social_account_schedules'] ?? $data['account_schedules'] ?? [],
+            $forceRecalculate
+          );
+        }
       }
 
       // Broadcast update to other users in the workspace

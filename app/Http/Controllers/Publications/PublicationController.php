@@ -330,6 +330,13 @@ class PublicationController extends Controller
 
     try {
       $data = $request->validated();
+      
+      Log::info('PublicationController@update: Data received', [
+        'publication_id' => $publication->id,
+        'scheduled_at_received' => $data['scheduled_at'] ?? 'NOT SET',
+        'current_db_scheduled_at' => $publication->scheduled_at,
+        'social_account_schedules' => $data['social_account_schedules'] ?? $data['account_schedules'] ?? 'NOT SET',
+      ]);
 
       // RBAC ENDFORCEMENT: Check for publish permission
       if (!Auth::user()->hasPermission('publish', $publication->workspace_id)) {
@@ -348,12 +355,28 @@ class PublicationController extends Controller
       // Normalize scheduled_at to UTC using client's timezone header
       if (!empty($data['scheduled_at'])) {
         try {
+          Log::info('PublicationController: Normalizing scheduled_at', [
+            'original' => $data['scheduled_at'],
+            'timezone_header' => $request->header('X-User-Timezone'),
+          ]);
+          
           $tz = $request->header('X-User-Timezone');
           $dt = $tz ? Carbon::parse($data['scheduled_at'], $tz)->setTimezone('UTC') : Carbon::parse($data['scheduled_at'])->setTimezone('UTC');
           $data['scheduled_at'] = $dt->toIso8601String();
+          
+          Log::info('PublicationController: Normalized scheduled_at', [
+            'normalized' => $data['scheduled_at'],
+          ]);
         } catch (\Exception $e) {
+          Log::error('PublicationController: Error normalizing scheduled_at', [
+            'error' => $e->getMessage(),
+          ]);
           // leave as-is
         }
+      } else {
+        Log::info('PublicationController: scheduled_at is empty', [
+          'scheduled_at' => $data['scheduled_at'] ?? 'NOT SET',
+        ]);
       }
 
       // Handle media: can be File objects OR metadata arrays from S3 Direct Upload

@@ -40,9 +40,10 @@ class CreatePublicationAction
         'scheduled_at' => $data['scheduled_at'] ?? null,
         'is_recurring' => $data['is_recurring'] ?? false,
         'recurrence_type' => $data['recurrence_type'] ?? null,
-        'recurrence_interval' => $data['recurrence_interval'] ?? null,
+        'recurrence_interval' => isset($data['recurrence_interval']) ? (int)$data['recurrence_interval'] : null,
         'recurrence_days' => $data['recurrence_days'] ?? null,
         'recurrence_end_date' => $data['recurrence_end_date'] ?? null,
+        'recurrence_accounts' => $data['recurrence_accounts'] ?? null,
         'platform_settings' => is_string($data['platform_settings'] ?? null)
           ? json_decode($data['platform_settings'], true)
           : ($data['platform_settings'] ?? Auth::user()->global_platform_settings),
