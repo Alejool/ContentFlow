@@ -338,10 +338,24 @@ class UpdatePublicationAction
       $socialAccounts = [];
       $shouldSyncSchedules = false;
 
+      // Log what we received
+      Log::info('UpdatePublicationAction: Processing social accounts', [
+        'publication_id' => $publication->id,
+        'has_clear_flag' => array_key_exists('clear_social_accounts', $data),
+        'clear_flag_value' => $data['clear_social_accounts'] ?? 'NOT SET',
+        'has_social_accounts_key' => array_key_exists('social_accounts', $data),
+        'social_accounts_raw' => $data['social_accounts'] ?? 'NOT SET',
+        'social_accounts_type' => array_key_exists('social_accounts', $data) ? gettype($data['social_accounts']) : 'KEY NOT EXISTS',
+      ]);
+
       // Check if we should clear all social accounts
       if (array_key_exists('clear_social_accounts', $data) && !empty($data['clear_social_accounts'])) {
         $socialAccounts = [];
         $shouldSyncSchedules = true;
+        
+        Log::info('UpdatePublicationAction: Clear flag detected, will delete all scheduled posts', [
+          'publication_id' => $publication->id,
+        ]);
       }
       // ONLY sync if social_accounts key exists in the request
       // This means the user explicitly interacted with the social accounts selector
@@ -372,8 +386,19 @@ class UpdatePublicationAction
 
         // Always sync when social_accounts is explicitly sent
         $shouldSyncSchedules = true;
+        
+        Log::info('UpdatePublicationAction: Social accounts processed', [
+          'publication_id' => $publication->id,
+          'processed_accounts' => $socialAccounts,
+          'count' => count($socialAccounts),
+        ]);
       }
       // If social_accounts is NOT in the request, don't touch schedules at all
+      else {
+        Log::info('UpdatePublicationAction: social_accounts key not in request, skipping sync', [
+          'publication_id' => $publication->id,
+        ]);
+      }
 
       // Sync schedules if needed
       if ($shouldSyncSchedules) {
