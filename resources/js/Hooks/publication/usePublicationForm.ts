@@ -195,7 +195,27 @@ export const usePublicationForm = ({
         lock_content: !!publication.social_post_logs?.some(
           (l) => l.status === "published" || l.status === "publishing",
         ),
-        use_global_schedule: !!publication.scheduled_at,
+        // Determine if using global schedule:
+        // - If there are account-specific schedules (scheduled_posts with different dates), use_global_schedule = false
+        // - If all scheduled_posts have the same date as publication.scheduled_at, use_global_schedule = true
+        // - If no scheduled_posts exist but scheduled_at exists, use_global_schedule = true
+        use_global_schedule: (() => {
+          if (!publication.scheduled_at) return false;
+          
+          const scheduledPosts = publication.scheduled_posts || [];
+          if (scheduledPosts.length === 0) return !!publication.scheduled_at;
+          
+          // Check if all scheduled posts have the same date as the global scheduled_at
+          const allSameAsGlobal = scheduledPosts.every((post: any) => {
+            if (post.status !== 'pending') return true; // Ignore non-pending posts
+            const postDate = new Date(post.scheduled_at).getTime();
+            const globalDate = new Date(publication.scheduled_at).getTime();
+            // Allow 1 minute difference for rounding
+            return Math.abs(postDate - globalDate) < 60000;
+          });
+          
+          return allSameAsGlobal;
+        })(),
         is_recurring: !!publication.is_recurring,
         // Load from recurrenceSettings if available, fallback to old fields
         recurrence_type: publication.recurrence_settings?.recurrence_type || publication.recurrence_type || "daily",

@@ -24,6 +24,9 @@ export interface PublishPublicationState {
   existingThumbnails: Record<number, { url: string; id: number }>;
   isLoadingThumbnails: boolean;
   retryInfo: Record<number, { retry_count: number; is_retrying: boolean; retry_status: string }>;
+  
+  getRecurringPosts: (publicationId: number, accountId: number) => any[];
+  getPublishedRecurringPosts: (publicationId: number, accountId: number) => any[];
 }
 
 export interface UsePublishPublicationReturn extends PublishPublicationState {
@@ -191,6 +194,12 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
       ? scheduledPlatformsCache[currentPublicationId] || []
       : [];
   }, [scheduledPlatformsCache, currentPublicationId]);
+  
+  const recurringPostsCache = usePublicationStore((s) => s.recurringPosts);
+  const publishedRecurringPostsCache = usePublicationStore((s) => s.publishedRecurringPosts);
+  
+  const getRecurringPosts = usePublicationStore((s) => s.getRecurringPosts);
+  const getPublishedRecurringPosts = usePublicationStore((s) => s.getPublishedRecurringPosts);
 
   const removedPlatforms = useMemo(() => {
     return currentPublicationId
@@ -602,6 +611,9 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     existingThumbnails,
     isLoadingThumbnails,
     retryInfo,
+    
+    getRecurringPosts,
+    getPublishedRecurringPosts,
 
     fetchPublishedPlatforms,
     loadExistingThumbnails,

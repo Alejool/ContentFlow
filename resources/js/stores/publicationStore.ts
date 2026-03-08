@@ -12,6 +12,8 @@ interface PublicationState {
   publishingPlatforms: Record<number, number[]>;
   scheduledPlatforms: Record<number, number[]>;
   removedPlatforms: Record<number, number[]>;
+  recurringPosts: Record<number, Record<number, any[]>>; // publicationId -> accountId -> posts[]
+  publishedRecurringPosts: Record<number, Record<number, any[]>>; // publicationId -> accountId -> posts[]
   retryInfo: Record<
     number,
     Record<
@@ -107,6 +109,8 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
   publishingPlatforms: {},
   scheduledPlatforms: {},
   removedPlatforms: {},
+  recurringPosts: {},
+  publishedRecurringPosts: {},
   retryInfo: {},
 
   isLoading: false,
@@ -234,6 +238,8 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
           ? Object.values(response.data.scheduled_platforms)
           : [];
       const retry_info = response.data.retry_info ?? {};
+      const recurring_posts = response.data.recurring_posts ?? {};
+      const published_recurring_posts = response.data.published_recurring_posts ?? {};
 
       set((state) => ({
         publishedPlatforms: {
@@ -259,6 +265,14 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
         retryInfo: {
           ...state.retryInfo,
           [publicationId]: retry_info,
+        },
+        recurringPosts: {
+          ...state.recurringPosts,
+          [publicationId]: recurring_posts,
+        },
+        publishedRecurringPosts: {
+          ...state.publishedRecurringPosts,
+          [publicationId]: published_recurring_posts,
         },
       }));
 
@@ -516,6 +530,12 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
   getScheduledPlatforms: (id) => get().scheduledPlatforms[id] ?? [],
 
+  getRecurringPosts: (publicationId: number, accountId: number) => 
+    get().recurringPosts[publicationId]?.[accountId] ?? [],
+  
+  getPublishedRecurringPosts: (publicationId: number, accountId: number) =>
+    get().publishedRecurringPosts[publicationId]?.[accountId] ?? [],
+
   getRetryInfo: (publicationId, platformId) => {
     const info = get().retryInfo[publicationId];
     return info?.[platformId] ?? null;
@@ -556,6 +576,8 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       publishingPlatforms: {},
       scheduledPlatforms: {},
       removedPlatforms: {},
+      recurringPosts: {},
+      publishedRecurringPosts: {},
       retryInfo: {},
       // Keep currentPublication if user is editing something
       // This prevents losing data if modal is open
@@ -571,6 +593,8 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       failedPlatforms: {},
       publishingPlatforms: {},
       scheduledPlatforms: {},
+      recurringPosts: {},
+      publishedRecurringPosts: {},
       retryInfo: {},
       isLoading: false,
       error: null,
