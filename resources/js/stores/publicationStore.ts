@@ -190,8 +190,15 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
     set({ error: null });
     try {
+      console.log('[publicationStore] Fetching publication by ID:', id);
       const response = await axios.get(route("api.v1.publications.show", id));
       const publication = response.data.publication;
+      
+      console.log('[publicationStore] Received publication:', {
+        id: publication.id,
+        scheduled_at: publication.scheduled_at,
+        title: publication.title
+      });
 
       set((state) => ({
         publications: state.publications.map((p) =>

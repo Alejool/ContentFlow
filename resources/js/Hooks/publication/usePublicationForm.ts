@@ -139,6 +139,7 @@ export const usePublicationForm = ({
       recurrence_interval: 1,
       recurrence_days: [],
       recurrence_end_date: null,
+      recurrence_accounts: [],
     },
   });
 
@@ -173,6 +174,14 @@ export const usePublicationForm = ({
     if (isOpen && publication) {
       const isInitialLoad = !isDataReady;
 
+      console.log('[usePublicationForm] Loading publication data:', {
+        id: publication.id,
+        scheduled_at: publication.scheduled_at,
+        isInitialLoad,
+        isDataReady,
+        isOpen
+      });
+
       const resetData = {
         title: publication.title || "",
         description: publication.description || "",
@@ -196,21 +205,44 @@ export const usePublicationForm = ({
         ),
         use_global_schedule: !!publication.scheduled_at,
         is_recurring: !!publication.is_recurring,
-        recurrence_type: publication.recurrence_type || "daily",
-        recurrence_interval: publication.recurrence_interval || 1,
-        recurrence_days: (publication.recurrence_days || []).map((d: any) =>
+        // Load from recurrenceSettings if available, fallback to old fields
+        recurrence_type: publication.recurrence_settings?.recurrence_type || publication.recurrence_type || "daily",
+        recurrence_interval: publication.recurrence_settings?.recurrence_interval || publication.recurrence_interval || 1,
+        recurrence_days: (publication.recurrence_settings?.recurrence_days || publication.recurrence_days || []).map((d: any) =>
           parseInt(d),
         ),
-        recurrence_end_date: publication.recurrence_end_date || null,
+        recurrence_end_date: publication.recurrence_settings?.recurrence_end_date || publication.recurrence_end_date || null,
+        // IMPORTANT: Keep null as null (means all accounts), don't convert to empty array
+        recurrence_accounts: (() => {
+          // ALWAYS use recurrence_settings if it exists, ignore old field
+          const accounts = publication.recurrence_settings 
+            ? publication.recurrence_settings.recurrence_accounts 
+            : publication.recurrence_accounts;
+          console.log('🔍 [usePublicationForm] PHASE 1 - Loading recurrence_accounts from BD:', {
+            hasRecurrenceSettings: !!publication.recurrence_settings,
+            fromSettings: publication.recurrence_settings?.recurrence_accounts,
+            fromPublication: publication.recurrence_accounts,
+            final: accounts,
+            isNull: accounts === null,
+            isUndefined: accounts === undefined,
+            type: typeof accounts
+          });
+          if (accounts === null || accounts === undefined) {
+            console.log('✅ [usePublicationForm] recurrence_accounts is null/undefined, converting to [] (all accounts)');
+            return []; // Empty array in form means "all accounts"
+          }
+          const converted = accounts.map((id: any) => typeof id === 'string' ? parseInt(id) : id);
+          console.log('✅ [usePublicationForm] recurrence_accounts converted:', converted);
+          return converted;
+        })(),
       };
 
+      // Always reset with fresh data when modal opens
+      // This ensures we always show the latest data from the database
+      reset(resetData as any, { keepDirtyValues: false });
+      
       if (isInitialLoad) {
-        reset(resetData as any);
         setIsDataReady(false); // Trigger Phase 2 re-processing safely
-      } else {
-        // LIVE SYNC: Only update fields that the user hasn't touched
-        reset(resetData as any, { keepDirtyValues: true });
-        // NOTE: We don't set isDataReady(false) here to avoid flickering the modal
       }
 
       // Sync platform settings (complex JSON, not in reset)
@@ -234,12 +266,13 @@ export const usePublicationForm = ({
         recurrence_interval: 1,
         recurrence_days: [],
         recurrence_end_date: null,
+        recurrence_accounts: [],
       });
       setPlatformSettings({});
       clearMedia();
       setIsDataReady(true);
     }
-  }, [isOpen, publication, reset]);
+  }, [isOpen, publication?.id, publication?.scheduled_at, reset]);
 
   // Phase 1.5: Real-time Lock & Update Listener (Global sync is handled by useWorkspaceLocks)
   useEffect(() => {
@@ -307,12 +340,17 @@ export const usePublicationForm = ({
 
         // LIVE SYNC PROTECTION: Only update social accounts if untouched
         if (!getFieldState("social_accounts").isDirty) {
+          console.log('[usePublicationForm] Phase 2: Setting social_accounts from scheduled_posts:', pendingSocialAccounts);
           setValue("social_accounts", pendingSocialAccounts, {
             shouldValidate: false,
           });
+        } else {
+          console.log('[usePublicationForm] Phase 2: Skipping social_accounts update (field is dirty)');
         }
 
         // Process account schedules
+        // IMPORTANT: Only load ORIGINAL posts (is_recurring_instance = false)
+        // Recurring instances should not be shown in the schedule configuration
         const initialAccountSchedules: Record<number, string> = {};
         const scheds =
           publication.scheduled_posts || (publication as any).scheduledPosts;
@@ -321,16 +359,25 @@ export const usePublicationForm = ({
             if (
               sp.social_account_id &&
               sp.scheduled_at &&
-              !calculatedPublished.has(sp.social_account_id)
+              !calculatedPublished.has(sp.social_account_id) &&
+              sp.is_recurring_instance === false  // Only load original posts
             ) {
               initialAccountSchedules[sp.social_account_id] = sp.scheduled_at;
             }
           });
         }
+        
+        console.log('[usePublicationForm] Loading account schedules from scheduled_posts:', initialAccountSchedules);
+        
         setAccountSchedules((prev) => {
-          // Merge? No, use server state as base but maybe keep some?
-          // For now, simple update. User-changed schedules are hard to track without custom isDirty
-          return initialAccountSchedules;
+          // Only update if this is the initial load or if the user hasn't made changes
+          // Check if prev is empty (initial load) or if we're reopening the modal
+          const isEmpty = Object.keys(prev).length === 0;
+          if (isEmpty) {
+            return initialAccountSchedules;
+          }
+          // Keep user changes
+          return prev;
         });
 
         // Process media files (ALWAYS refesh media files from store)
@@ -664,7 +711,7 @@ export const usePublicationForm = ({
     reset();
     clearMedia();
     setRemovedMediaIds([]);
-    setAccountSchedules({});
+    setAccountSchedules({});  // Clear account schedules
     setImageError(null);
     onClose();
   };
@@ -702,12 +749,12 @@ export const usePublicationForm = ({
     if (data.social_accounts && data.social_accounts.length > 0) {
       const hasGlobalSchedule = !!data.scheduled_at;
 
-      // For already-published recurring posts, the backend uses each account's
-      // social_post_log.published_at as the recurrence base — no manual date needed.
-      const isPublishedRecurring =
-        data.is_recurring && publication?.status === "published";
+      // Skip schedule validation for already-published posts
+      // Published posts don't need new schedule dates
+      const isAlreadyPublished = publication?.status === "published";
 
-      if (!isPublishedRecurring) {
+      // Only validate schedule for non-published posts (draft, scheduled, failed, etc.)
+      if (!isAlreadyPublished) {
         const allAccountsHaveSchedule = data.social_accounts.every(
           (id) => accountSchedules[id] || hasGlobalSchedule,
         );
@@ -777,6 +824,13 @@ export const usePublicationForm = ({
 
       formData.append("status", finalStatus);
       formData.append("scheduled_at", data.scheduled_at || "");
+      
+      console.log('[usePublicationForm] Submitting with scheduled_at:', {
+        from_form_data: data.scheduled_at,
+        current_publication_scheduled_at: publication?.scheduled_at,
+        form_is_dirty: isDirty,
+      });
+      
       formData.append("social_accounts_sync", "true");
 
       // Always send social_accounts - even if empty
@@ -784,9 +838,11 @@ export const usePublicationForm = ({
         formData.append("clear_social_accounts", "1");
         formData.append("social_accounts", JSON.stringify([]));
       } else {
+        console.log('[usePublicationForm] Sending account schedules:', accountSchedules);
         socialAccounts.forEach((id, index) => {
           formData.append(`social_accounts[${index}]`, id.toString());
           if (id && accountSchedules[id]) {
+            console.log(`[usePublicationForm] Account ${id} schedule:`, accountSchedules[id]);
             formData.append(
               `social_account_schedules[${id}]`,
               accountSchedules[id],
@@ -810,6 +866,15 @@ export const usePublicationForm = ({
         }
         if (data.recurrence_end_date) {
           formData.append("recurrence_end_date", data.recurrence_end_date);
+        }
+        // Add recurrence_accounts
+        if (data.recurrence_accounts && data.recurrence_accounts.length > 0) {
+          console.log('[usePublicationForm] Sending recurrence_accounts:', data.recurrence_accounts);
+          data.recurrence_accounts.forEach((accountId, i) => {
+            formData.append(`recurrence_accounts[]`, accountId.toString());
+          });
+        } else {
+          console.log('[usePublicationForm] No recurrence_accounts to send (will apply to all selected accounts)');
         }
       } else {
         formData.append("is_recurring", "0");
@@ -908,21 +973,37 @@ export const usePublicationForm = ({
 
         // Force refresh the publication to ensure we have the latest data
         if (result) {
-          await usePublicationStore
+          console.log('[usePublicationForm] Fetching fresh data after update...');
+          const freshPublication = await usePublicationStore
             .getState()
             .fetchPublicationById(publication.id);
+          console.log('[usePublicationForm] Fresh publication fetched:', {
+            id: freshPublication?.id,
+            scheduled_at: freshPublication?.scheduled_at
+          });
         }
       } else {
         result = await createPublication(formData);
       }
 
       if (result) {
+        console.log('[usePublicationForm] Update successful, result:', {
+          id: result.id,
+          scheduled_at: result.scheduled_at,
+          title: result.title
+        });
+        
         toast.success(
           publication
             ? t("publications.messages.updateSuccess")
             : t("publications.messages.createSuccess"),
           { id: publication ? `pub-update-${publication.id}` : "pub-create" },
         );
+        
+        // Reset dirty state after successful save so next time modal opens with fresh data
+        if (publication) {
+          reset(undefined, { keepValues: true, keepDirty: false });
+        }
       }
 
       // 2. LINK PENDING UPLOADS (Moving this to background, non-awaited for UI snappiness)
