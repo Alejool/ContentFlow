@@ -79,11 +79,52 @@ start-queue.bat
 
 rebuild.bat
 makefile.dev
-DOCKER-DEV.md
 
-INICIO-RAPIDO.md
+# ============================================
+# DOCUMENTACIÓN INTERNA Y ARCHIVOS SENSIBLES
+# ============================================
+
+# Ignorar TODOS los archivos .md en la raíz EXCEPTO los públicos
 *.md
 
-.kiro
+# Permitir solo documentación pública
+!README.md
+!README.es.md
+!LICENSE.md
+!CONTRIBUTING.md
+!CHANGELOG.md
 
+# Permitir toda la documentación en docs/ (ya organizada y revisada)
+!docs/
+!docs/**/*.md
+!docs/**/*.json
+!docs/**/*.html
+!docs/**/*.php
+
+# ============================================
+# ARCHIVOS DE DESARROLLO Y CONFIGURACIÓN
+# ============================================
+
+# Archivos de configuración de Kiro (IDE)
+.kiro/
+
+# Lock files
 bun.lock
+
+# Scripts de desarrollo local
+*.bat
+*.sh
+!docker-switch.sh
+!docker-switch.bat
+
+# ============================================
+# ARCHIVOS TEMPORALES Y GENERADOS
+# ============================================
+
+# Archivos temporales
+$null
+*.tmp
+*.temp
+
+# Carpetas temporales
+/md/
