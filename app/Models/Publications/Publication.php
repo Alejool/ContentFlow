@@ -102,6 +102,7 @@ class Publication extends Model
     'recurrence_interval',
     'recurrence_days',
     'recurrence_end_date',
+    'recurrence_accounts',
   ];
 
   protected $appends = ['platform_status_summary', 'media_locked_by', 'approval_lock'];
@@ -126,6 +127,7 @@ class Publication extends Model
     'recurrence_interval' => 'integer',
     'recurrence_days' => 'array',
     'recurrence_end_date' => 'date',
+    'recurrence_accounts' => 'array',
   ];
 
   public function scopeDraft($query)

@@ -32,6 +32,13 @@ class StorePublicationRequest extends FormRequest
         'recurrence_days' => array_map('intval', $days)
       ]);
     }
+
+    if ($this->has('recurrence_accounts') && is_string($this->recurrence_accounts)) {
+      $accounts = array_filter(explode(',', $this->recurrence_accounts), 'strlen');
+      $this->merge([
+        'recurrence_accounts' => array_map('intval', $accounts)
+      ]);
+    }
   }
 
   public function rules(): array
@@ -126,7 +133,19 @@ class StorePublicationRequest extends FormRequest
       'recurrence_interval' => 'nullable|integer|min:1',
       'recurrence_days' => 'nullable|array',
       'recurrence_days.*' => 'integer|min:0|max:6',
-      'recurrence_end_date' => 'nullable|date|after_or_equal:now',
+      'recurrence_end_date' => [
+        'nullable',
+        'date',
+        'after_or_equal:now',
+        function ($attribute, $value, $fail) {
+          // If is_recurring is true, end date is REQUIRED
+          if ($this->boolean('is_recurring') && !$value) {
+            $fail(__('publications.modal.validation.recurrenceEndDateRequired') ?? 'End date is required for recurring publications');
+          }
+        }
+      ],
+      'recurrence_accounts' => 'nullable|array',
+      'recurrence_accounts.*' => 'integer|exists:social_accounts,id',
     ];
   }
 }
