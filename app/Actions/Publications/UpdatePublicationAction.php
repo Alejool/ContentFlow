@@ -139,6 +139,19 @@ class UpdatePublicationAction
       
       // Handle recurrence settings in separate table
       if ($isRecurring) {
+        \Log::info('UpdatePublicationAction: Processing recurrence settings', [
+          'publication_id' => $publication->id,
+          'recurrence_end_date_from_data' => $data['recurrence_end_date'] ?? 'NOT SET',
+          'recurrence_end_date_from_settings' => $publication->recurrenceSettings?->recurrence_end_date ?? 'NOT SET',
+          'all_recurrence_data' => [
+            'type' => $data['recurrence_type'] ?? 'NOT SET',
+            'interval' => $data['recurrence_interval'] ?? 'NOT SET',
+            'days' => $data['recurrence_days'] ?? 'NOT SET',
+            'end_date' => $data['recurrence_end_date'] ?? 'NOT SET',
+            'accounts' => $data['recurrence_accounts'] ?? 'NOT SET',
+          ]
+        ]);
+        
         $recurrenceData = [
           'recurrence_type' => $data['recurrence_type'] ?? $publication->recurrenceSettings?->recurrence_type ?? 'daily',
           'recurrence_interval' => (int)($data['recurrence_interval'] ?? $publication->recurrenceSettings?->recurrence_interval ?? 1),
@@ -147,14 +160,29 @@ class UpdatePublicationAction
           'recurrence_accounts' => $data['recurrence_accounts'] ?? $publication->recurrenceSettings?->recurrence_accounts ?? null,
         ];
         
+        \Log::info('UpdatePublicationAction: Final recurrence data to save', [
+          'publication_id' => $publication->id,
+          'recurrence_data' => $recurrenceData,
+        ]);
+        
         // Update or create recurrence settings
         $publication->recurrenceSettings()->updateOrCreate(
           ['publication_id' => $publication->id],
           $recurrenceData
         );
+        
+        // CRITICAL: Immediately unload the relationship so it gets reloaded fresh next time
+        $publication->unsetRelation('recurrenceSettings');
+        
+        \Log::info('UpdatePublicationAction: Recurrence settings saved and relation unset', [
+          'publication_id' => $publication->id,
+        ]);
       } else {
         // Delete recurrence settings if recurrence is disabled
         $publication->recurrenceSettings()->delete();
+        
+        // CRITICAL: Unload the relationship after deletion
+        $publication->unsetRelation('recurrenceSettings');
         
         // IMPORTANT: Also delete all recurring instance posts (keep only originals)
         $deletedRecurringPosts = \App\Models\Social\ScheduledPost::where('publication_id', $publication->id)
@@ -169,19 +197,15 @@ class UpdatePublicationAction
         ]);
       }
       
-      // CRITICAL: For recurring publications, NEVER change scheduled_at after creation
-      // The scheduled_at is the BASE DATE and must remain invariable
-      // Only update scheduled_at if:
-      // 1. Publication is NOT recurring, OR
-      // 2. We explicitly received a new scheduled_at in the request
+      // CRITICAL: Handle scheduled_at properly for both recurring and non-recurring publications
+      // For recurring: scheduled_at is the BASE DATE for recurrence calculations
+      // For non-recurring: scheduled_at is the actual publish date
       
-      $shouldUpdateScheduledAt = false;
-      
-      // If we have account schedules in the request, use the earliest
-      // BUT ONLY for non-recurring publications
       $accountSchedules = $data['social_account_schedules'] ?? $data['account_schedules'] ?? [];
       
-      if (!empty($accountSchedules) && is_array($accountSchedules) && !$isRecurring) {
+      // PRIORITY 1: If we have account schedules, use the earliest as scheduled_at
+      // This applies to BOTH recurring and non-recurring publications
+      if (!empty($accountSchedules) && is_array($accountSchedules)) {
         $earliestDate = null;
         foreach ($accountSchedules as $accountId => $scheduleDate) {
           if (!empty($scheduleDate)) {
@@ -194,24 +218,15 @@ class UpdatePublicationAction
         
         if ($earliestDate !== null) {
           $updateData['scheduled_at'] = $earliestDate->toIso8601String();
-          $shouldUpdateScheduledAt = true;
           Log::info('UpdatePublicationAction: Using earliest account schedule as scheduled_at', [
             'publication_id' => $publication->id,
             'earliest_date' => $earliestDate->toIso8601String(),
-            'is_recurring' => false,
+            'is_recurring' => $isRecurring,
+            'account_schedules_count' => count($accountSchedules),
           ]);
         }
       }
-      // For recurring publications with account schedules, keep the base date
-      elseif (!empty($accountSchedules) && is_array($accountSchedules) && $isRecurring) {
-        Log::info('UpdatePublicationAction: Ignoring account schedules for recurring publication', [
-          'publication_id' => $publication->id,
-          'scheduled_at' => $publication->scheduled_at,
-          'reason' => 'Recurring publications must keep their base date invariable',
-        ]);
-      }
-      // If no account schedules and no scheduled_at in request, try to infer from scheduled_posts
-      // ALWAYS use the earliest ORIGINAL post (is_recurring_instance = false) as the base date
+      // PRIORITY 2: If no account schedules but scheduled_at is empty, try to infer from scheduled_posts
       elseif (empty($updateData['scheduled_at']) || $updateData['scheduled_at'] === null) {
         $earliestScheduledPost = \App\Models\Social\ScheduledPost::where('publication_id', $publication->id)
           ->where('status', 'pending')
@@ -221,7 +236,6 @@ class UpdatePublicationAction
         
         if ($earliestScheduledPost) {
           $updateData['scheduled_at'] = $earliestScheduledPost->scheduled_at->toIso8601String();
-          $shouldUpdateScheduledAt = true;
           Log::info('UpdatePublicationAction: Using earliest original scheduled post as scheduled_at', [
             'publication_id' => $publication->id,
             'earliest_date' => $updateData['scheduled_at'],
@@ -229,12 +243,12 @@ class UpdatePublicationAction
           ]);
         }
       }
-      // For recurring publications, keep the existing scheduled_at (base date)
-      elseif ($isRecurring && !empty($publication->scheduled_at)) {
-        Log::info('UpdatePublicationAction: Preserving base date for recurring publication', [
+      // PRIORITY 3: Keep existing scheduled_at if nothing else is provided
+      else {
+        Log::info('UpdatePublicationAction: Keeping existing scheduled_at', [
           'publication_id' => $publication->id,
-          'scheduled_at' => $publication->scheduled_at,
-          'reason' => 'Recurring publications must keep their base date invariable',
+          'scheduled_at' => $updateData['scheduled_at'],
+          'is_recurring' => $isRecurring,
         ]);
       }
 
@@ -422,7 +436,10 @@ class UpdatePublicationAction
         }
         // CASE 3: Recurrence settings CHANGED (was recurring, still recurring, but settings changed)
         elseif ($isRecurring && $oldIsRecurring) {
-          $newSettings = $publication->fresh()->recurrenceSettings;
+          // CRITICAL: Unload the relationship first to force fresh load
+          $publication->unsetRelation('recurrenceSettings');
+          $newSettings = $publication->recurrenceSettings;
+          
           if (
             $oldRecurrenceType != ($newSettings?->recurrence_type ?? 'daily') ||
             $oldRecurrenceInterval != ($newSettings?->recurrence_interval ?? 1) ||
@@ -432,7 +449,9 @@ class UpdatePublicationAction
             Log::info('Recurrence settings changed, recalculating posts', [
               'publication_id' => $publication->id,
               'old_type' => $oldRecurrenceType,
-              'new_type' => $newSettings?->recurrence_type
+              'new_type' => $newSettings?->recurrence_type,
+              'old_end_date' => $oldRecurrenceEndDate,
+              'new_end_date' => $newSettings?->recurrence_end_date,
             ]);
             $forceRecalculate = true;
           }
@@ -450,6 +469,18 @@ class UpdatePublicationAction
 
         // Only sync schedules if we haven't disabled recurrence
         if ($shouldSyncSchedules) {
+          // CRITICAL: Force complete refresh from database
+          // 1. Unload the recurrenceSettings relationship to clear any cached data
+          $publication->unsetRelation('recurrenceSettings');
+          // 2. Refresh the entire model from database
+          $publication->refresh();
+          
+          \Log::info('UpdatePublicationAction: About to sync schedules with fresh data', [
+            'publication_id' => $publication->id,
+            'recurrence_end_date' => $publication->recurrenceSettings?->recurrence_end_date ?? 'NULL',
+            'is_recurring' => $publication->is_recurring,
+          ]);
+          
           $this->schedulingService->syncSchedules(
             $publication,
             $socialAccounts,

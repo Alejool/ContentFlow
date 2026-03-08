@@ -1066,13 +1066,6 @@ class PublicationController extends Controller
 
     $publication = Publication::where('workspace_id', Auth::user()->current_workspace_id)->findOrFail($id);
 
-    $scheduledAccountIds = ScheduledPost::where('publication_id', $publication->id)
-      ->where('status', 'pending')
-      ->pluck('social_account_id')
-      ->unique()
-      ->values()
-      ->toArray();
-
     // Get current active social accounts for this workspace
     $activeAccountIds = SocialAccount::where('workspace_id', Auth::user()->current_workspace_id)
       ->whereNull('deleted_at')
@@ -1093,9 +1086,6 @@ class PublicationController extends Controller
     $retryInfo = [];
 
     foreach ($latestLogs as $log) {
-      if (in_array($log->social_account_id, $scheduledAccountIds))
-        continue;
-
       // Skip logs for accounts that no longer exist or are disconnected
       // UNLESS the status is 'published', 'success', or 'removed_on_platform' (we want to show these as "removed_platforms")
       if (!in_array($log->social_account_id, $activeAccountIds)) {
@@ -1124,6 +1114,66 @@ class PublicationController extends Controller
       }
     }
 
+    // Get accounts that are already published or successfully posted
+    $publishedAccountIds = array_merge(
+      $statusGroups['published'],
+      $statusGroups['removed_platforms']
+    );
+
+    // Get scheduled account IDs - ONLY original posts, not recurring instances
+    // Exclude accounts that are already published (based on social_post_logs)
+    $scheduledAccountIds = ScheduledPost::where('publication_id', $publication->id)
+      ->where('status', 'pending')
+      ->where('is_recurring_instance', false) // Only original posts
+      ->whereNotIn('social_account_id', $publishedAccountIds) // Exclude already published
+      ->pluck('social_account_id')
+      ->unique()
+      ->values()
+      ->toArray();
+    
+    // Get recurring posts grouped by account (for display in UI)
+    $recurringPosts = ScheduledPost::where('publication_id', $publication->id)
+      ->where('is_recurring_instance', true)
+      ->orderBy('social_account_id')
+      ->orderBy('scheduled_at')
+      ->get()
+      ->groupBy('social_account_id')
+      ->map(function ($posts) {
+        return $posts->map(function ($post) {
+          return [
+            'id' => $post->id,
+            'scheduled_at' => $post->scheduled_at,
+            'status' => $post->status,
+            'social_account_id' => $post->social_account_id,
+          ];
+        });
+      })
+      ->toArray();
+    
+    // Get published recurring posts (with links from social_post_logs)
+    $publishedRecurringPosts = SocialPostLog::where('publication_id', $publication->id)
+      ->where('status', 'published')
+      ->whereIn('scheduled_post_id', function ($query) use ($publication) {
+        $query->select('id')
+          ->from('scheduled_posts')
+          ->where('publication_id', $publication->id)
+          ->where('is_recurring_instance', true);
+      })
+      ->get()
+      ->groupBy('social_account_id')
+      ->map(function ($logs) {
+        return $logs->map(function ($log) {
+          return [
+            'id' => $log->id,
+            'published_at' => $log->published_at,
+            'post_url' => $log->post_url,
+            'social_account_id' => $log->social_account_id,
+            'scheduled_post_id' => $log->scheduled_post_id,
+          ];
+        });
+      })
+      ->toArray();
+
     return response()->json([
       'published_platforms' => array_values(array_unique($statusGroups['published'])),
       'failed_platforms' => array_values(array_unique($statusGroups['failed'])),
@@ -1131,6 +1181,8 @@ class PublicationController extends Controller
       'removed_platforms' => array_values(array_unique($statusGroups['removed_platforms'])),
       'scheduled_platforms' => $scheduledAccountIds,
       'retry_info' => $retryInfo,
+      'recurring_posts' => $recurringPosts,
+      'published_recurring_posts' => $publishedRecurringPosts,
     ]);
   }
 
