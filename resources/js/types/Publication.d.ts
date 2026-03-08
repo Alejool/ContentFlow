@@ -111,6 +111,7 @@ export type Publication = {
   recurrence_interval?: number;
   recurrence_days?: number[];
   recurrence_end_date?: string;
+  recurrence_accounts?: number[];
 };
 
 export type ApprovalLog = {

@@ -83,6 +83,7 @@ export const publicationSchema = (t: any) =>
         return val;
       }, z.array(z.number()).optional().default([])),
       recurrence_end_date: z.string().optional().nullable(),
+      recurrence_accounts: z.array(z.number()).optional().default([]),
     })
     .refine(
       (data) => {
@@ -112,6 +113,21 @@ export const publicationSchema = (t: any) =>
           t("publications.modal.validation.recurrenceDaysRequired") ||
           "Please select at least one day for weekly recurrence",
         path: ["recurrence_days"],
+      },
+    )
+    .refine(
+      (data) => {
+        // If it's recurring, end date is REQUIRED
+        if (data.is_recurring) {
+          return !!data.recurrence_end_date;
+        }
+        return true;
+      },
+      {
+        message:
+          t("publications.modal.validation.recurrenceEndDateRequired") ||
+          "End date is required for recurring publications",
+        path: ["recurrence_end_date"],
       },
     );
 
