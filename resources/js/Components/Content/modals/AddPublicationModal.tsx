@@ -435,7 +435,6 @@ export default function AddPublicationModal({
                   selectedAccounts={selectedSocialAccounts}
                   socialAccounts={socialAccounts}
                   accountSchedules={accountSchedules}
-                  i18n={i18n}
                 />
               </div>
 

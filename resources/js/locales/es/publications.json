@@ -116,6 +116,7 @@
         "title": "Agregar publicación",
         "titleField": "título",
         "subtitle": "Crear una publicación",
+        "contentSection": "Contenido",
         "name": "Nombre",
         "description": "descripción",
         "image": "Imagen",
