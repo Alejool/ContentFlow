@@ -15,18 +15,21 @@ class SchedulingService
   {
     $globalSchedule = $publication->scheduled_at;
 
-    // If forceRecalculate is true, delete all pending scheduled posts for these accounts
+    // If forceRecalculate is true, delete ONLY recurring instance posts (not originals)
     // This happens when recurrence settings or scheduled_at changes
+    // IMPORTANT: Never delete original posts (is_recurring_instance = false)
     if ($forceRecalculate) {
       $deletedCount = ScheduledPost::where('publication_id', $publication->id)
         ->where('status', 'pending')
+        ->where('is_recurring_instance', true) // Only delete recurring instances
         ->whereIn('social_account_id', $accountIds)
         ->delete();
       
-      \Log::info('Force recalculate: deleted pending posts', [
+      \Log::info('Force recalculate: deleted recurring instance posts', [
         'publication_id' => $publication->id,
         'account_ids' => $accountIds,
-        'deleted_count' => $deletedCount
+        'deleted_count' => $deletedCount,
+        'kept_originals' => 'Original posts (is_recurring_instance = false) were preserved'
       ]);
     }
 
@@ -58,7 +61,8 @@ class SchedulingService
     // Determine which accounts should have recurrence
     // If recurrence_accounts is null or empty, all selected accounts get recurrence
     // Otherwise, only accounts in recurrence_accounts array get recurrence
-    $recurrenceAccountIds = $publication->recurrence_accounts;
+    $settings = $publication->recurrenceSettings;
+    $recurrenceAccountIds = $settings ? $settings->recurrence_accounts : $publication->recurrence_accounts;
     $accountsWithRecurrence = [];
     
     if ($publication->is_recurring) {
@@ -76,6 +80,14 @@ class SchedulingService
       
       // Check if this account should have recurrence
       $shouldHaveRecurrence = in_array($accountId, $accountsWithRecurrence);
+      
+      \Log::info('SchedulingService: Processing account', [
+        'publication_id' => $publication->id,
+        'account_id' => $accountId,
+        'is_recurring' => $publication->is_recurring,
+        'should_have_recurrence' => $shouldHaveRecurrence,
+        'accounts_with_recurrence' => $accountsWithRecurrence,
+      ]);
 
       // Determine the effective base date for THIS account (most specific wins):
       // 1. Per-account schedule override from frontend (most specific)
@@ -102,6 +114,14 @@ class SchedulingService
         // Calculate recurrence dates using this account's specific base date
         $specificDates = $this->calculateRecurrenceDatesFromBase($publication, $accountBase);
         
+        \Log::info('SchedulingService: Calculating recurrence dates', [
+          'publication_id' => $publication->id,
+          'account_id' => $accountId,
+          'should_have_recurrence' => $shouldHaveRecurrence,
+          'base_date' => $accountBase,
+          'calculated_dates_count' => count($specificDates),
+        ]);
+        
         // IMPORTANT: For the base date, check if it's in the future
         // If the base date is in the past, don't include it (start from today)
         $baseDateCarbon = Carbon::parse($accountBase);
@@ -110,25 +130,79 @@ class SchedulingService
         // Only add base date if it's in the future (with 5-min grace period)
         if ($baseDateCarbon->greaterThanOrEqualTo($now->subMinutes(5))) {
           array_unshift($specificDates, $accountBase);
+          \Log::info('SchedulingService: Added base date to beginning', [
+            'base_date' => $accountBase,
+            'total_dates' => count($specificDates),
+          ]);
         }
         // If base date is in the past and no future dates calculated, start from today
         elseif (empty($specificDates)) {
           // Recalculate from today instead of the old base date
           $specificDates = $this->calculateRecurrenceDatesFromBase($publication, now());
+          \Log::info('SchedulingService: Base date in past, recalculated from today', [
+            'recalculated_dates_count' => count($specificDates),
+          ]);
         }
       } else {
         // Not recurring: use the single effective date for this account
         $specificDates = [$accountBase];
+        
+        \Log::info('SchedulingService: Not recurring, using single date', [
+          'publication_id' => $publication->id,
+          'account_id' => $accountId,
+          'should_have_recurrence' => $shouldHaveRecurrence,
+          'date' => $accountBase,
+        ]);
       }
 
-      foreach ($specificDates as $scheduledAt) {
+      foreach ($specificDates as $index => $scheduledAt) {
         if (!$scheduledAt) {
           continue;
         }
 
-        // When forceRecalculate is true, always create new posts (old ones were deleted)
+        // Determine if this is a recurring instance
+        // The first date (index 0) is the original/base date (not a recurring instance)
+        // All subsequent dates are recurring instances
+        $isRecurringInstance = $shouldHaveRecurrence && $index > 0;
+        
+        \Log::info('SchedulingService: Creating scheduled post', [
+          'publication_id' => $publication->id,
+          'account_id' => $accountId,
+          'scheduled_at' => $scheduledAt,
+          'index' => $index,
+          'should_have_recurrence' => $shouldHaveRecurrence,
+          'is_recurring_instance' => $isRecurringInstance,
+        ]);
+
+        // When forceRecalculate is true, we deleted recurring instances but kept originals
+        // So we need to check if an original post exists before creating
         if ($forceRecalculate) {
-          ScheduledPost::create([
+          // Check if this is the original post (index 0) and if it already exists
+          if ($index === 0) {
+            $existingOriginal = ScheduledPost::where('publication_id', $publication->id)
+              ->where('social_account_id', $accountId)
+              ->where('is_recurring_instance', false)
+              ->where('status', 'pending')
+              ->first();
+            
+            if ($existingOriginal) {
+              // Update the existing original post
+              $existingOriginal->update([
+                'scheduled_at' => $scheduledAt,
+                'account_name' => $socialAccount ? $socialAccount->account_name : 'Unknown',
+                'platform' => $socialAccount ? $socialAccount->platform : 'unknown',
+              ]);
+              
+              \Log::info('SchedulingService: Updated existing original post', [
+                'post_id' => $existingOriginal->id,
+                'scheduled_at' => $scheduledAt,
+              ]);
+              continue; // Skip to next iteration
+            }
+          }
+          
+          // Create new post (either recurring instance or new original)
+          $createdPost = ScheduledPost::create([
             'publication_id' => $publication->id,
             'social_account_id' => $accountId,
             'status' => 'pending',
@@ -137,6 +211,14 @@ class SchedulingService
             'scheduled_at' => $scheduledAt,
             'account_name' => $socialAccount ? $socialAccount->account_name : 'Unknown',
             'platform' => $socialAccount ? $socialAccount->platform : 'unknown',
+            'is_recurring_instance' => $isRecurringInstance,
+          ]);
+          
+          \Log::info('SchedulingService: Created new post', [
+            'post_id' => $createdPost->id,
+            'scheduled_at' => $scheduledAt,
+            'is_recurring_instance' => $isRecurringInstance,
+            'index' => $index,
           ]);
         } else {
           // Normal flow: check if post exists before creating
@@ -150,6 +232,7 @@ class SchedulingService
             $existingPost->update([
               'account_name' => $socialAccount ? $socialAccount->account_name : 'Unknown',
               'platform' => $socialAccount ? $socialAccount->platform : 'unknown',
+              'is_recurring_instance' => $isRecurringInstance,
             ]);
           } else {
             ScheduledPost::create([
@@ -161,6 +244,7 @@ class SchedulingService
               'scheduled_at' => $scheduledAt,
               'account_name' => $socialAccount ? $socialAccount->account_name : 'Unknown',
               'platform' => $socialAccount ? $socialAccount->platform : 'unknown',
+              'is_recurring_instance' => $isRecurringInstance,
             ]);
           }
         }
@@ -249,10 +333,26 @@ class SchedulingService
       return [];
     }
 
+    // Get recurrence settings from the relationship
+    $settings = $publication->recurrenceSettings;
+    
+    if (!$settings) {
+      // Fallback to old fields if settings don't exist yet
+      $recurrenceType = $publication->recurrence_type;
+      $recurrenceInterval = $publication->recurrence_interval;
+      $recurrenceDays = $publication->recurrence_days;
+      $recurrenceEndDate = $publication->recurrence_end_date;
+    } else {
+      $recurrenceType = $settings->recurrence_type;
+      $recurrenceInterval = $settings->recurrence_interval;
+      $recurrenceDays = $settings->recurrence_days;
+      $recurrenceEndDate = $settings->recurrence_end_date;
+    }
+
     $dates = [];
     $startDate = Carbon::parse($baseDate);
-    $endDate = $publication->recurrence_end_date ? Carbon::parse($publication->recurrence_end_date) : null;
-    $interval = max(1, (int)($publication->recurrence_interval ?? 1));
+    $endDate = $recurrenceEndDate ? Carbon::parse($recurrenceEndDate)->endOfDay() : null;
+    $interval = max(1, (int)($recurrenceInterval ?? 1));
     $now = now();
 
     // Default limit: 3 months if no end date
@@ -288,16 +388,16 @@ class SchedulingService
         break;
       }
 
-      switch ($publication->recurrence_type) {
+      switch ($recurrenceType) {
         case 'daily':
           $currentDate->addDays((int)$interval);
           break;
         case 'weekly':
-          if (!empty($publication->recurrence_days)) {
+          if (!empty($recurrenceDays)) {
             $currentDay = $currentDate->dayOfWeek;
             $nextDay = null;
 
-            $sortedDays = array_map('intval', $publication->recurrence_days);
+            $sortedDays = array_map('intval', $recurrenceDays);
             sort($sortedDays);
 
             foreach ($sortedDays as $day) {

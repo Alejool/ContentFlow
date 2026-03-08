@@ -112,6 +112,17 @@ export type Publication = {
   recurrence_days?: number[];
   recurrence_end_date?: string;
   recurrence_accounts?: number[];
+  recurrence_settings?: {
+    id: number;
+    publication_id: number;
+    recurrence_type: "daily" | "weekly" | "monthly" | "yearly";
+    recurrence_interval: number;
+    recurrence_days: number[] | null;
+    recurrence_end_date: string | null;
+    recurrence_accounts: number[] | null;
+    created_at: string;
+    updated_at: string;
+  };
 };
 
 export type ApprovalLog = {

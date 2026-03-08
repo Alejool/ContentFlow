@@ -80,7 +80,7 @@ class PublicationController extends Controller
         ->with([
           'mediaFiles' => fn($q) => $q->select('media_files.id', 'media_files.file_path', 'media_files.file_type', 'media_files.file_name', 'media_files.size', 'media_files.mime_type'),
           'mediaFiles.thumbnail' => fn($q) => $q->select('id', 'media_file_id', 'file_path', 'file_name', 'derivative_type'),
-          'scheduled_posts' => fn($q) => $q->select('id', 'publication_id', 'social_account_id', 'status', 'scheduled_at'),
+          'scheduled_posts' => fn($q) => $q->select('id', 'publication_id', 'social_account_id', 'status', 'scheduled_at', 'is_recurring_instance'),
           'scheduled_posts.socialAccount' => fn($q) => $q->select('id', 'platform', 'account_name'),
           'socialPostLogs' => fn($q) => $q->select('id', 'publication_id', 'social_account_id', 'platform', 'status', 'post_url'),
           'campaigns' => fn($q) => $q->select('campaigns.id', 'campaigns.name', 'campaigns.status'),
@@ -88,7 +88,8 @@ class PublicationController extends Controller
           'publisher' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url'),
           'rejector' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url'),
           'approvalLogs' => fn($q) => $q->latest('requested_at')->with(['requester:id,name,photo_url', 'reviewer:id,name,photo_url']),
-          'activities' => fn($q) => $q->orderBy('created_at', 'desc')->with('user:id,name,photo_url')
+          'activities' => fn($q) => $q->orderBy('created_at', 'desc')->with('user:id,name,photo_url'),
+          'recurrenceSettings', // Load recurrence settings
         ]);
 
       if ($request->has('status') && $request->status !== 'all') {
@@ -256,7 +257,7 @@ class PublicationController extends Controller
       'mediaFiles' => fn($q) => $q->select('media_files.id', 'media_files.file_path', 'media_files.file_type', 'media_files.file_name', 'media_files.size', 'media_files.mime_type'),
       'mediaFiles.thumbnail' => fn($q) => $q->select('id', 'media_file_id', 'file_path', 'file_name', 'derivative_type'),
       'mediaFiles.derivatives' => fn($q) => $q->select('id', 'media_file_id', 'file_path', 'file_name', 'derivative_type', 'size', 'width', 'height'),
-      'scheduled_posts' => fn($q) => $q->select('id', 'publication_id', 'social_account_id', 'status', 'scheduled_at'),
+      'scheduled_posts' => fn($q) => $q->select('id', 'publication_id', 'social_account_id', 'status', 'scheduled_at', 'is_recurring_instance'),
       'scheduled_posts.socialAccount' => fn($q) => $q->select('id', 'platform', 'account_name'),
       'socialPostLogs' => fn($q) => $q->select('id', 'publication_id', 'social_account_id', 'platform', 'status', 'post_url', 'published_at', 'error_message'),
       'socialPostLogs.socialAccount' => fn($q) => $q->select('id', 'platform', 'account_name'),
@@ -265,7 +266,15 @@ class PublicationController extends Controller
       'rejector' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url'),
       'rejector' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url'),
       'approvalLogs' => fn($q) => $q->latest('requested_at')->with(['requester:id,name,photo_url', 'reviewer:id,name,photo_url']),
-      'activities' => fn($q) => $q->orderBy('created_at', 'desc')->with('user:id,name,photo_url')
+      'activities' => fn($q) => $q->orderBy('created_at', 'desc')->with('user:id,name,photo_url'),
+      'recurrenceSettings', // Load recurrence settings
+    ]);
+
+    // Debug: Log if recurrenceSettings is loaded
+    \Log::info('Publication show - recurrenceSettings loaded', [
+      'publication_id' => $publication->id,
+      'has_recurrence_settings' => $publication->relationLoaded('recurrenceSettings'),
+      'recurrence_settings_data' => $publication->recurrenceSettings?->toArray(),
     ]);
 
     // Check for media lock

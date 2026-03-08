@@ -553,4 +553,12 @@ class Publication extends Model
   {
     return $this->hasMany(ExternalCalendarEvent::class);
   }
+
+  /**
+   * Get the recurrence settings for this publication.
+   */
+  public function recurrenceSettings(): \Illuminate\Database\Eloquent\Relations\HasOne
+  {
+    return $this->hasOne(PublicationRecurrenceSetting::class);
+  }
 }
