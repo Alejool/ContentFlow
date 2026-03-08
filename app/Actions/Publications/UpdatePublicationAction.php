@@ -370,39 +370,48 @@ class UpdatePublicationAction
         
         // CASE 1: Recurrence was DISABLED (was true, now false)
         if ($oldIsRecurring && !$isRecurring) {
-          // First, count how many posts we have before deletion
-          $countBefore = \App\Models\Social\ScheduledPost::where('publication_id', $publication->id)
+          // Count recurring instances before deletion
+          $countRecurringBefore = \App\Models\Social\ScheduledPost::where('publication_id', $publication->id)
             ->where('status', 'pending')
+            ->where('is_recurring_instance', true)
             ->count();
           
-          Log::info('Recurrence disabled, deleting ALL scheduled posts', [
+          Log::info('Recurrence disabled, deleting ONLY recurring instance posts', [
             'publication_id' => $publication->id,
             'title' => $publication->title,
             'old_is_recurring' => $oldIsRecurring,
             'new_is_recurring' => $isRecurring,
-            'pending_posts_count' => $countBefore
+            'recurring_instances_count' => $countRecurringBefore
           ]);
           
-          // Delete ALL pending scheduled posts
+          // Delete ONLY recurring instance posts (keep originals)
           $deletedCount = \App\Models\Social\ScheduledPost::where('publication_id', $publication->id)
             ->where('status', 'pending')
+            ->where('is_recurring_instance', true)
             ->delete();
           
           // Verify deletion
-          $countAfter = \App\Models\Social\ScheduledPost::where('publication_id', $publication->id)
+          $countRecurringAfter = \App\Models\Social\ScheduledPost::where('publication_id', $publication->id)
             ->where('status', 'pending')
+            ->where('is_recurring_instance', true)
             ->count();
           
-          Log::info('Deleted all scheduled posts after disabling recurrence', [
+          $countOriginalsAfter = \App\Models\Social\ScheduledPost::where('publication_id', $publication->id)
+            ->where('status', 'pending')
+            ->where('is_recurring_instance', false)
+            ->count();
+          
+          Log::info('Deleted recurring instances after disabling recurrence', [
             'publication_id' => $publication->id,
-            'count_before' => $countBefore,
+            'recurring_before' => $countRecurringBefore,
             'deleted_count' => $deletedCount,
-            'count_after' => $countAfter,
-            'success' => $countAfter === 0
+            'recurring_after' => $countRecurringAfter,
+            'originals_preserved' => $countOriginalsAfter,
+            'success' => $countRecurringAfter === 0
           ]);
           
-          // Don't create any new posts - calendar should be clean
-          $shouldSyncSchedules = false;
+          // Don't recalculate - we want to keep the original scheduled posts
+          $forceRecalculate = false;
         }
         // CASE 2: Recurrence was ENABLED (was false, now true)
         elseif (!$oldIsRecurring && $isRecurring) {
