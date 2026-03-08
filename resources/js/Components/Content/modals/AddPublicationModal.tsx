@@ -260,6 +260,10 @@ export default function AddPublicationModal({
     control,
     name: "recurrence_end_date",
   });
+  const recurrence_accounts = useWatch({
+    control,
+    name: "recurrence_accounts",
+  });
 
   const watched = useMemo(
     () => ({
@@ -276,6 +280,7 @@ export default function AddPublicationModal({
       recurrence_interval,
       recurrence_days,
       recurrence_end_date,
+      recurrence_accounts,
     }),
     [
       selectedSocialAccounts,
@@ -291,6 +296,7 @@ export default function AddPublicationModal({
       recurrence_interval,
       recurrence_days,
       recurrence_end_date,
+      recurrence_accounts,
     ],
   );
 
@@ -365,16 +371,31 @@ export default function AddPublicationModal({
                   accountSchedules={accountSchedules}
                   t={t}
                   onAccountToggle={handleAccountToggle}
-                  onScheduleChange={(id, date) =>
-                    setAccountSchedules((prev) => ({ ...prev, [id]: date }))
-                  }
-                  onScheduleRemove={(id) =>
+                  onScheduleChange={(id, date) => {
+                    console.log('[AddPublicationModal] Account schedule changed:', { id, date });
+                    setAccountSchedules((prev) => ({ ...prev, [id]: date }));
+                    
+                    // Si se establece una fecha individual diferente a la global, desactivar el schedule global
+                    if (watched.use_global_schedule && date !== watched.scheduled_at) {
+                      console.log('[AddPublicationModal] Disabling global schedule due to individual date change');
+                      setValue("use_global_schedule", false, { shouldDirty: true });
+                    }
+                  }}
+                  onScheduleRemove={(id) => {
                     setAccountSchedules((prev) => {
                       const n = { ...prev };
                       delete n[id];
                       return n;
-                    })
-                  }
+                    });
+                    
+                    // Si se elimina una fecha individual y no hay más fechas individuales,
+                    // podríamos reactivar el global schedule si existe
+                    const remainingSchedules = Object.keys(accountSchedules).filter(key => parseInt(key) !== id);
+                    if (remainingSchedules.length === 0 && watched.scheduled_at && !watched.use_global_schedule) {
+                      console.log('[AddPublicationModal] Re-enabling global schedule after removing all individual dates');
+                      setValue("use_global_schedule", true, { shouldDirty: true });
+                    }
+                  }}
                   onPlatformSettingsClick={(platform) =>
                     setActivePlatformSettings(platform)
                   }
@@ -391,6 +412,10 @@ export default function AddPublicationModal({
                   onGlobalScheduleToggle={(val) =>
                     setValue("use_global_schedule", val)
                   }
+                  onClearAccountSchedules={() => {
+                    console.log('[AddPublicationModal] Clearing all account schedules');
+                    setAccountSchedules({});
+                  }}
                   error={errors.scheduled_at?.message as string}
                   hasRecurrenceAccess={hasRecurrenceAccess}
                   isRecurring={watched.is_recurring}
@@ -398,6 +423,7 @@ export default function AddPublicationModal({
                   recurrenceInterval={watched.recurrence_interval}
                   recurrenceDays={watched.recurrence_days}
                   recurrenceEndDate={watched.recurrence_end_date ?? undefined}
+                  recurrenceAccounts={watched.recurrence_accounts}
                   recurrenceDaysError={
                     errors.recurrence_days?.message as string
                   }
@@ -406,6 +432,10 @@ export default function AddPublicationModal({
                       setValue(key as any, val, { shouldValidate: true });
                     });
                   }}
+                  selectedAccounts={selectedSocialAccounts}
+                  socialAccounts={socialAccounts}
+                  accountSchedules={accountSchedules}
+                  i18n={i18n}
                 />
               </div>
 

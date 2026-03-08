@@ -58,6 +58,15 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
       ? (publications.find((p) => p.id === selectedItem.id) as Publication) ||
         (selectedItem as Publication)
       : null;
+  
+  // Debug log to track publication updates
+  if (currentPub && isEditModalOpen) {
+    console.log('[ModalManager] Current publication:', {
+      id: currentPub.id,
+      scheduled_at: currentPub.scheduled_at,
+      title: currentPub.title
+    });
+  }
 
   // Determine which Add Modal to show
   // Prefer addType from store, fallback to activeTab logic

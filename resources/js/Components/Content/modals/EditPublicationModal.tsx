@@ -221,6 +221,10 @@ const EditPublicationModal = ({
     control,
     name: "recurrence_end_date",
   });
+  const recurrence_accounts = useWatch({
+    control,
+    name: "recurrence_accounts",
+  });
 
   const watched = useMemo(
     () => ({
@@ -237,6 +241,7 @@ const EditPublicationModal = ({
       recurrence_interval,
       recurrence_days,
       recurrence_end_date,
+      recurrence_accounts,
     }),
     [
       selectedSocialAccounts,
@@ -252,6 +257,7 @@ const EditPublicationModal = ({
       recurrence_interval,
       recurrence_days,
       recurrence_end_date,
+      recurrence_accounts,
     ],
   );
 
@@ -290,6 +296,26 @@ const EditPublicationModal = ({
       fetchPublishedPlatformsFromStore(publication.id);
     }
   }, [isOpen, publication?.id, fetchPublishedPlatformsFromStore]);
+
+  // Auto-detect if we should use global schedule or individual schedules
+  // If there are different dates for different accounts, disable global schedule
+  useEffect(() => {
+    if (!isOpen || !publication) return;
+    
+    // Check if all account schedules are the same
+    const scheduleValues = Object.values(accountSchedules);
+    if (scheduleValues.length > 1) {
+      const allSame = scheduleValues.every(date => date === scheduleValues[0]);
+      
+      // If dates are different and global schedule is enabled, disable it
+      if (!allSame && useGlobalSchedule) {
+        console.log('[EditPublicationModal] Detected different account schedules, disabling global schedule');
+        setValue("use_global_schedule", false, { shouldDirty: false });
+      }
+      // If dates are all the same and global schedule is disabled, we could enable it
+      // but let's not do that automatically to avoid confusion
+    }
+  }, [isOpen, publication, accountSchedules, useGlobalSchedule, setValue]);
 
   const publishedAccountIds = useMemo(() => {
     const fromStore = publishedPlatforms[publication?.id ?? 0] || [];
@@ -719,16 +745,31 @@ const EditPublicationModal = ({
                     accountSchedules={accountSchedules}
                     t={t}
                     onAccountToggle={handleAccountToggle}
-                    onScheduleChange={(id, date) =>
-                      setAccountSchedules((prev) => ({ ...prev, [id]: date }))
-                    }
-                    onScheduleRemove={(id) =>
+                    onScheduleChange={(id, date) => {
+                      console.log('[EditPublicationModal] Account schedule changed:', { id, date });
+                      setAccountSchedules((prev) => ({ ...prev, [id]: date }));
+                      
+                      // Si se establece una fecha individual diferente a la global, desactivar el schedule global
+                      if (useGlobalSchedule && date !== scheduledAt) {
+                        console.log('[EditPublicationModal] Disabling global schedule due to individual date change');
+                        setValue("use_global_schedule", false, { shouldDirty: true });
+                      }
+                    }}
+                    onScheduleRemove={(id) => {
                       setAccountSchedules((prev) => {
                         const n = { ...prev };
                         delete n[id];
                         return n;
-                      })
-                    }
+                      });
+                      
+                      // Si se elimina una fecha individual y no hay más fechas individuales,
+                      // podríamos reactivar el global schedule si existe
+                      const remainingSchedules = Object.keys(accountSchedules).filter(key => parseInt(key) !== id);
+                      if (remainingSchedules.length === 0 && scheduledAt && !useGlobalSchedule) {
+                        console.log('[EditPublicationModal] Re-enabling global schedule after removing all individual dates');
+                        setValue("use_global_schedule", true, { shouldDirty: true });
+                      }
+                    }}
                     onPlatformSettingsClick={(platform) =>
                       setActivePlatformSettings(platform)
                     }
@@ -749,13 +790,22 @@ const EditPublicationModal = ({
                     <ScheduleSection
                       scheduledAt={watched.scheduled_at ?? undefined}
                       t={t}
-                      onScheduleChange={(date) =>
-                        setValue("scheduled_at", date)
-                      }
+                      onScheduleChange={(date) => {
+                        console.log('[EditPublicationModal] Schedule changed:', date);
+                        setValue("scheduled_at", date, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                          shouldTouch: true
+                        });
+                      }}
                       useGlobalSchedule={watched.use_global_schedule}
                       onGlobalScheduleToggle={(val) =>
                         setValue("use_global_schedule", val)
                       }
+                      onClearAccountSchedules={() => {
+                        console.log('[EditPublicationModal] Clearing all account schedules');
+                        setAccountSchedules({});
+                      }}
                       error={errors.scheduled_at?.message as string}
                       disabled={isContentSectionDisabled || !allowConfiguration}
                       hasRecurrenceAccess={hasRecurrenceAccess}
@@ -767,9 +817,14 @@ const EditPublicationModal = ({
                       recurrenceEndDate={
                         watched.recurrence_end_date ?? undefined
                       }
+                      recurrenceAccounts={watched.recurrence_accounts}
                       onRecurrenceChange={handleRecurrenceChange}
                       i18n={i18n}
                       publishDate={publication?.publish_date}
+                      selectedAccounts={selectedSocialAccounts}
+                      socialAccounts={socialAccounts}
+                      accountSchedules={accountSchedules}
+                      existingScheduledPosts={publication?.scheduled_posts || []}
                     />
                   </div>
                 </div>
