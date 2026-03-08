@@ -92,23 +92,45 @@ class SchedulingService
       // Determine the effective base date for THIS account (most specific wins):
       // 1. Per-account schedule override from frontend (most specific)
       // 2. The account's own published_at from its social_post_log (exact publish time)
-      // 3. The original scheduled_at from the ScheduledPost marked as 'posted'
-      // 4. The publication's global scheduled_at
-      // 5. The publication's published_at / publish_date
+      // 3. The original scheduled_at from the ScheduledPost marked as 'posted' or 'pending'
+      // IMPORTANT: DO NOT use publication's global scheduled_at - each account has its own date
       
       $accountLog = $publishedLogs[$accountId] ?? null;
       $accountLogDate = $accountLog?->published_at ?? null;
 
       $postedSchedule = $postedSchedules[$accountId] ?? null;
       $postedScheduleDate = $postedSchedule?->scheduled_at ?? null;
+      
+      // Also check for pending scheduled posts (not yet published)
+      $pendingSchedule = ScheduledPost::where('publication_id', $publication->id)
+        ->where('social_account_id', $accountId)
+        ->where('status', 'pending')
+        ->where('is_recurring_instance', false) // Only original posts
+        ->orderBy('scheduled_at', 'asc')
+        ->first();
+      $pendingScheduleDate = $pendingSchedule?->scheduled_at ?? null;
 
       $accountScheduleDate = isset($accountSchedules[$accountId]) ? $accountSchedules[$accountId] : null;
 
-      $accountBase = $accountScheduleDate  // Use account-specific schedule first
+      // Priority order (DO NOT use global scheduled_at):
+      // 1. Account-specific schedule from request
+      // 2. Published date from log
+      // 3. Posted schedule date
+      // 4. Pending schedule date
+      $accountBase = $accountScheduleDate
         ?? $accountLogDate
         ?? $postedScheduleDate
-        ?? $globalSchedule
-        ?? $publicationFallback;
+        ?? $pendingScheduleDate;
+      
+      \Log::info('SchedulingService: Determined base date for account', [
+        'publication_id' => $publication->id,
+        'account_id' => $accountId,
+        'account_schedule_date' => $accountScheduleDate,
+        'account_log_date' => $accountLogDate,
+        'posted_schedule_date' => $postedScheduleDate,
+        'pending_schedule_date' => $pendingScheduleDate,
+        'final_base_date' => $accountBase,
+      ]);
 
       if ($shouldHaveRecurrence && $accountBase) {
         // Calculate recurrence dates using this account's specific base date
@@ -123,14 +145,31 @@ class SchedulingService
         ]);
         
         // IMPORTANT: For the base date, check if it's in the future
-        // If the base date is in the past, don't include it (start from today)
+        // If the base date is in the past, don't include it (already published)
+        // Only create scheduled posts for FUTURE recurrence dates
         $baseDateCarbon = Carbon::parse($accountBase);
         $now = now();
         
-        // Only add base date if it's in the future (with 5-min grace period)
-        if ($baseDateCarbon->greaterThanOrEqualTo($now->subMinutes(5))) {
+        // CRITICAL: If this account was already published (has a published log),
+        // DO NOT create a scheduled post for the base date - it's already done!
+        // Only create scheduled posts for the FUTURE recurrence dates
+        $wasAlreadyPublished = isset($publishedLogs[$accountId]);
+        
+        if ($wasAlreadyPublished) {
+          \Log::info('SchedulingService: Account already published, skipping base date', [
+            'publication_id' => $publication->id,
+            'account_id' => $accountId,
+            'base_date' => $accountBase,
+            'published_at' => $accountLog?->published_at,
+            'future_dates_count' => count($specificDates),
+          ]);
+          // Don't add base date - it was already published
+          // $specificDates already contains only future dates from calculateRecurrenceDatesFromBase
+        }
+        // Only add base date if it's in the future AND not already published
+        elseif ($baseDateCarbon->greaterThanOrEqualTo($now->subMinutes(5))) {
           array_unshift($specificDates, $accountBase);
-          \Log::info('SchedulingService: Added base date to beginning', [
+          \Log::info('SchedulingService: Added base date to beginning (not yet published)', [
             'base_date' => $accountBase,
             'total_dates' => count($specificDates),
           ]);
@@ -161,9 +200,10 @@ class SchedulingService
         }
 
         // Determine if this is a recurring instance
-        // The first date (index 0) is the original/base date (not a recurring instance)
+        // CRITICAL: If the account was already published, ALL new scheduled posts are recurring instances
+        // Otherwise: The first date (index 0) is the original/base date (not a recurring instance)
         // All subsequent dates are recurring instances
-        $isRecurringInstance = $shouldHaveRecurrence && $index > 0;
+        $isRecurringInstance = $shouldHaveRecurrence && ($wasAlreadyPublished || $index > 0);
         
         \Log::info('SchedulingService: Creating scheduled post', [
           'publication_id' => $publication->id,
@@ -177,8 +217,10 @@ class SchedulingService
         // When forceRecalculate is true, we deleted recurring instances but kept originals
         // So we need to check if an original post exists before creating
         if ($forceRecalculate) {
-          // Check if this is the original post (index 0) and if it already exists
-          if ($index === 0) {
+          // CRITICAL: If account was already published, don't look for or update "original" posts
+          // All scheduled posts for published accounts should be recurring instances
+          if (!$wasAlreadyPublished && $index === 0) {
+            // Only check for existing original if NOT published yet
             $existingOriginal = ScheduledPost::where('publication_id', $publication->id)
               ->where('social_account_id', $accountId)
               ->where('is_recurring_instance', false)
@@ -219,6 +261,7 @@ class SchedulingService
             'scheduled_at' => $scheduledAt,
             'is_recurring_instance' => $isRecurringInstance,
             'index' => $index,
+            'was_already_published' => $wasAlreadyPublished,
           ]);
         } else {
           // Normal flow: check if post exists before creating
@@ -229,10 +272,21 @@ class SchedulingService
             ->first();
 
           if ($existingPost) {
+            // CRITICAL: If account was already published, force is_recurring_instance to true
+            // even if the existing post has it as false
+            $finalIsRecurringInstance = $wasAlreadyPublished ? true : $isRecurringInstance;
+            
             $existingPost->update([
               'account_name' => $socialAccount ? $socialAccount->account_name : 'Unknown',
               'platform' => $socialAccount ? $socialAccount->platform : 'unknown',
-              'is_recurring_instance' => $isRecurringInstance,
+              'is_recurring_instance' => $finalIsRecurringInstance,
+            ]);
+            
+            \Log::info('SchedulingService: Updated existing post', [
+              'post_id' => $existingPost->id,
+              'scheduled_at' => $scheduledAt,
+              'was_already_published' => $wasAlreadyPublished,
+              'is_recurring_instance' => $finalIsRecurringInstance,
             ]);
           } else {
             ScheduledPost::create([
@@ -245,6 +299,12 @@ class SchedulingService
               'account_name' => $socialAccount ? $socialAccount->account_name : 'Unknown',
               'platform' => $socialAccount ? $socialAccount->platform : 'unknown',
               'is_recurring_instance' => $isRecurringInstance,
+            ]);
+            
+            \Log::info('SchedulingService: Created new post', [
+              'scheduled_at' => $scheduledAt,
+              'is_recurring_instance' => $isRecurringInstance,
+              'was_already_published' => $wasAlreadyPublished,
             ]);
           }
         }
@@ -260,6 +320,33 @@ class SchedulingService
         ->whereNotIn('social_account_id', $accountIds)
         ->delete();
     }
+    
+    // CRITICAL: If recurrence is enabled and we have an end date, remove any recurring posts
+    // that are scheduled AFTER the end date (this handles when user reduces the end date)
+    if ($publication->is_recurring) {
+      $settings = $publication->recurrenceSettings;
+      $recurrenceEndDate = $settings ? $settings->recurrence_end_date : $publication->recurrence_end_date;
+      
+      if ($recurrenceEndDate) {
+        $endDateCarbon = Carbon::parse($recurrenceEndDate)->endOfDay();
+        
+        $deletedOutOfRange = ScheduledPost::where('publication_id', $publication->id)
+          ->where('status', 'pending')
+          ->where('is_recurring_instance', true)
+          ->whereIn('social_account_id', $accountIds)
+          ->where('scheduled_at', '>', $endDateCarbon)
+          ->delete();
+        
+        if ($deletedOutOfRange > 0) {
+          \Log::info('Deleted recurring posts outside new end date range', [
+            'publication_id' => $publication->id,
+            'end_date' => $recurrenceEndDate,
+            'deleted_count' => $deletedOutOfRange,
+          ]);
+        }
+      }
+    }
+    
     // If accountIds is explicitly empty AND we want to clear (check if this is intentional)
     // We don't automatically delete - let syncSchedules handle this logic
   }
@@ -349,6 +436,14 @@ class SchedulingService
       $recurrenceEndDate = $settings->recurrence_end_date;
     }
 
+    \Log::info('calculateRecurrenceDatesFromBase: Starting calculation', [
+      'publication_id' => $publication->id,
+      'base_date' => $baseDate,
+      'recurrence_type' => $recurrenceType,
+      'recurrence_interval' => $recurrenceInterval,
+      'recurrence_end_date' => $recurrenceEndDate,
+    ]);
+
     $dates = [];
     $startDate = Carbon::parse($baseDate);
     $endDate = $recurrenceEndDate ? Carbon::parse($recurrenceEndDate)->endOfDay() : null;
@@ -359,6 +454,12 @@ class SchedulingService
     if (!$endDate) {
       $endDate = now()->addMonths(3);
     }
+
+    \Log::info('calculateRecurrenceDatesFromBase: Date range', [
+      'start_date' => $startDate->toIso8601String(),
+      'end_date' => $endDate->toIso8601String(),
+      'interval' => $interval,
+    ]);
 
     $currentDate = clone $startDate;
 
@@ -375,6 +476,16 @@ class SchedulingService
         if ($currentDate->greaterThanOrEqualTo($now->copy()->subMinutes(5))) {
           $dates[] = $currentDate->toIso8601String();
           $addedCount++;
+          \Log::info('calculateRecurrenceDatesFromBase: Added date', [
+            'date' => $currentDate->toIso8601String(),
+            'count' => $count,
+            'added_count' => $addedCount,
+          ]);
+        } else {
+          \Log::info('calculateRecurrenceDatesFromBase: Skipped past date', [
+            'date' => $currentDate->toIso8601String(),
+            'now' => $now->toIso8601String(),
+          ]);
         }
       }
 
@@ -424,7 +535,18 @@ class SchedulingService
           $currentDate->addYears((int)$interval);
           break;
       }
+      
+      \Log::info('calculateRecurrenceDatesFromBase: After increment', [
+        'new_date' => $currentDate->toIso8601String(),
+        'end_date' => $endDate->toIso8601String(),
+        'is_within_range' => $currentDate->lessThanOrEqualTo($endDate),
+      ]);
     }
+
+    \Log::info('calculateRecurrenceDatesFromBase: Finished', [
+      'total_dates' => count($dates),
+      'dates' => $dates,
+    ]);
 
     return $dates;
   }
