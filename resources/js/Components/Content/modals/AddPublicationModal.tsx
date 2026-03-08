@@ -330,8 +330,20 @@ export default function AddPublicationModal({
             className="space-y-6 p-6"
           >
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* ========================================
+                  COLUMNA IZQUIERDA: MEDIA Y REDES SOCIALES
+                  ======================================== */}
               <div className="space-y-6">
-                <MediaUploadSection
+                {/* ==================== SECCIÓN: ARCHIVOS MULTIMEDIA ==================== */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700">
+                    <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
+                      {t("publications.modal.add.mediaSection") || "Archivos Multimedia"}
+                    </h3>
+                  </div>
+
+                  <MediaUploadSection
                   mediaPreviews={stabilizedMediaPreviews}
                   thumbnails={thumbnails}
                   imageError={imageError}
@@ -362,8 +374,18 @@ export default function AddPublicationModal({
                   uploadProgress={uploadProgress}
                   uploadErrors={uploadErrors}
                 />
+                </div>
 
-                <SocialAccountsSection
+                {/* ==================== SECCIÓN: REDES SOCIALES ==================== */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700">
+                    <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
+                      {t("publications.modal.add.socialAccountsSection") || "Redes Sociales"}
+                    </h3>
+                  </div>
+
+                  <SocialAccountsSection
                   publishingAccountIds={publishingAccountIds}
                   publishedAccountIds={publishedAccountIds}
                   socialAccounts={socialAccounts as any}
@@ -374,8 +396,8 @@ export default function AddPublicationModal({
                   onScheduleChange={(id, date) => {
                     setAccountSchedules((prev) => ({ ...prev, [id]: date }));
                     
-                    // Si se establece una fecha individual diferente a la global, desactivar el schedule global
                     if (watched.use_global_schedule && date !== watched.scheduled_at) {
+                      setValue("use_global_schedule", false, { shouldDirty: true });
                     }
                   }}
                   onScheduleRemove={(id) => {
@@ -384,13 +406,6 @@ export default function AddPublicationModal({
                       delete n[id];
                       return n;
                     });
-                    
-                    // Si se elimina una fecha individual y no hay más fechas individuales,
-                    // podríamos reactivar el global schedule si existe
-                    const remainingSchedules = Object.keys(accountSchedules).filter(key => parseInt(key) !== id);
-                    if (remainingSchedules.length === 0 && watched.scheduled_at && !watched.use_global_schedule) {
-                     
-                    }
                   }}
                   onPlatformSettingsClick={(platform) =>
                     setActivePlatformSettings(platform)
@@ -399,16 +414,23 @@ export default function AddPublicationModal({
                   error={errors.social_accounts?.message as string}
                   socialPostLogs={publication?.social_post_logs}
                 />
+                </div>
 
-                <ScheduleSection
+                {/* ==================== SECCIÓN: PROGRAMACIÓN Y RECURRENCIA ==================== */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700">
+                    <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
+                      {t("publications.modal.add.scheduleSection") || "Programación"}
+                    </h3>
+                  </div>
+
+                  <ScheduleSection
                   scheduledAt={watched.scheduled_at ?? undefined}
                   t={t}
                   onScheduleChange={(date) => {
-                    // Si la fecha está vacía y se está intentando establecer una fecha,
-                    // usar la fecha proporcionada o establecer una por defecto
                     let finalDate = date;
                     if (!date && !watched.scheduled_at) {
-                      // Si no hay fecha y se está activando el schedule, establecer una por defecto
                       const defaultDate = new Date();
                       defaultDate.setMinutes(defaultDate.getMinutes() + 2);
                       finalDate = defaultDate.toISOString();
@@ -421,7 +443,7 @@ export default function AddPublicationModal({
                     setValue("use_global_schedule", val)
                   }
                   onClearAccountSchedules={() => {
-                   
+                    setAccountSchedules({});
                   }}
                   error={errors.scheduled_at?.message as string}
                   hasRecurrenceAccess={hasRecurrenceAccess}
@@ -447,14 +469,23 @@ export default function AddPublicationModal({
                   socialAccounts={socialAccounts}
                   accountSchedules={accountSchedules}
                 />
+                </div>
               </div>
 
+              {/* ========================================
+                  COLUMNA DERECHA: CONTENIDO DE LA PUBLICACIÓN
+                  ======================================== */}
               <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {t("publications.modal.add.contentSection") || "Contenido"}
-                  </h3>
-                  <AiFieldSuggester
+                {/* ==================== SECCIÓN: CONTENIDO ==================== */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between pb-2 border-b border-gray-200 dark:border-neutral-700">
+                    <div className="flex items-center gap-2">
+                      <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
+                        {t("publications.modal.add.contentSection") || "Contenido"}
+                      </h3>
+                    </div>
+                    <AiFieldSuggester
                     type="publication"
                     fields={{
                       title: watched.title,
@@ -478,9 +509,9 @@ export default function AddPublicationModal({
                       }
                     }}
                   />
-                </div>
+                  </div>
 
-                <Input
+                  <Input
                   id="content-add-publication-title"
                   label={t("publications.modal.add.titleField")}
                   type="text"
@@ -556,34 +587,45 @@ export default function AddPublicationModal({
                       : 0
                   }/10 hashtags`}
                 />
+                </div>
 
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    {t("publications.modal.edit.campaigns") ||
-                      "Add to Campaign"}
-                  </label>
-                  <div className="border border-gray-200 dark:border-neutral-700 rounded-lg p-3 bg-gray-50 dark:bg-black/20">
-                    <CampaignSelector
-                      campaigns={campaigns || []}
-                      selectedId={
-                        watched.campaign_id
-                          ? parseInt(watched.campaign_id.toString())
-                          : null
-                      }
-                      loading={false}
-                      t={t}
-                      onSelectCampaign={(id) => {
-                        setValue("campaign_id", id?.toString() ?? "", {
-                          shouldValidate: true,
-                        });
-                      }}
-                    />
+                {/* ==================== SECCIÓN: CAMPAÑA ==================== */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700">
+                    <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
+                      {t("publications.modal.add.campaignSection") || "Campaña"}
+                    </h3>
                   </div>
-                  {errors.campaign_id?.message && (
-                    <p className="text-xs text-red-500 mt-1">
-                      {errors.campaign_id.message as string}
-                    </p>
-                  )}
+
+                  <div className="space-y-2">
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      {t("publications.modal.edit.campaigns") ||
+                        "Add to Campaign"}
+                    </label>
+                    <div className="border border-gray-200 dark:border-neutral-700 rounded-lg p-3 bg-gray-50 dark:bg-black/20">
+                      <CampaignSelector
+                        campaigns={campaigns || []}
+                        selectedId={
+                          watched.campaign_id
+                            ? parseInt(watched.campaign_id.toString())
+                            : null
+                        }
+                        loading={false}
+                        t={t}
+                        onSelectCampaign={(id) => {
+                          setValue("campaign_id", id?.toString() ?? "", {
+                            shouldValidate: true,
+                          });
+                        }}
+                      />
+                    </div>
+                    {errors.campaign_id?.message && (
+                      <p className="text-xs text-red-500 mt-1">
+                        {errors.campaign_id.message as string}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

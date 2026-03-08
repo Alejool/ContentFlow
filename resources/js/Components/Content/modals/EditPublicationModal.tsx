@@ -23,7 +23,7 @@ import { useUploadQueue } from "@/stores/uploadQueueStore";
 import { Publication } from "@/types/Publication";
 import { usePage } from "@inertiajs/react";
 import axios from "axios";
-import { AlertCircle, Lock, Save } from "lucide-react";
+import { AlertCircle, Lock, Save, ChevronDown } from "lucide-react";
 import { memo, useEffect, useMemo, useState } from "react";
 import { useWatch } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -80,6 +80,7 @@ const EditPublicationModal = ({
   const [isTimelineExpanded, setIsTimelineExpanded] = useState(false);
   const [isApprovalHistoryExpanded, setIsApprovalHistoryExpanded] =
     useState(false);
+  const [isYouTubeThumbnailExpanded, setIsYouTubeThumbnailExpanded] = useState(true);
 
   // Integrate focus trap for modal accessibility
   // Requirements: 5.5
@@ -501,16 +502,29 @@ const EditPublicationModal = ({
             className="space-y-8"
           >
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
-              {/* Left Column: Media & Content */}
+              {/* ========================================
+                  COLUMNA IZQUIERDA: MEDIA Y CONTENIDO
+                  ======================================== */}
               <div className="space-y-6">
-                {/* Media Section */}
-                <div>
+                {/* ==================== ALERTAS Y NOTIFICACIONES ==================== */}
+                <div className="space-y-3">
+                 
+                {/* ==================== SECCIÓN: ARCHIVOS MULTIMEDIA ==================== */}
+                <div className="space-y-4">
+                  <div className="flex items-start gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700">
+                    <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
+                      {t("publications.modal.edit.mediaSection") || "Archivos Multimedia"}
+                    </h3>
+                  </div>
+
+                   {/* Alerta: Bloqueado por otro usuario */}
                   {!isLockedByMe &&
                     isLockedByOther &&
                     !hasPublishedPlatform &&
                     allowConfiguration &&
                     publication?.status !== "pending_review" && (
-                      <div className="p-4 mb-6 rounded-lg border border-amber-500 bg-amber-50 dark:bg-amber-900/20 flex gap-3 text-sm text-amber-700 dark:text-amber-300 animate-in shake duration-500">
+                      <div className="p-4 rounded-lg border border-amber-500 bg-amber-50 dark:bg-amber-900/20 flex gap-3 text-sm text-amber-700 dark:text-amber-300 animate-in shake duration-500">
                         <AlertCircle className="w-5 h-5 shrink-0 text-amber-500" />
                         <div>
                           <p className="font-semibold mb-1">
@@ -566,19 +580,21 @@ const EditPublicationModal = ({
                       </div>
                     )}
 
+                  {/* Alerta: Eres el editor actual */}
                   {isLockedByMe && activeUsers.length > 1 && (
-                    <div className="p-3 mb-6 rounded-lg border border-blue-500 bg-blue-50 dark:bg-blue-900/20 flex gap-2 text-xs text-blue-700 dark:text-blue-300">
+                    <div className="p-3 rounded-lg border border-blue-500 bg-blue-50 dark:bg-blue-900/20 flex gap-2 text-xs text-blue-700 dark:text-blue-300">
                       <Lock className="w-4 h-4 shrink-0" />
                       <p>
-                        <strong>Eres el editor actual.</strong> Hay{" "}
-                        {activeUsers.length - 1} usuario(s) en espera para
-                        cuando termines.
+                        <strong>{t("publications.modal.edit.locking.youAreEditor") || "Eres el editor actual."}</strong>{" "}
+                        {t("publications.modal.edit.locking.usersWaiting", { count: activeUsers.length - 1 }) || 
+                          `Hay ${activeUsers.length - 1} usuario(s) en espera para cuando termines.`}
                       </p>
                     </div>
                   )}
 
+                  {/* Alerta: Pendiente de revisión */}
                   {publication?.status === "pending_review" && (
-                    <div className="p-4 mb-6 rounded-lg border border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 flex gap-3 text-sm animate-in fade-in slide-in-from-top-4">
+                    <div className="p-4 rounded-lg border border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 flex gap-3 text-sm animate-in fade-in slide-in-from-top-4">
                       <AlertCircle className="w-5 h-5 shrink-0 text-yellow-500" />
                       <div>
                         <p className="font-semibold mb-1">
@@ -595,9 +611,10 @@ const EditPublicationModal = ({
                     </div>
                   )}
 
+                  {/* Alerta: Publicación aprobada */}
                   {publication?.status === "approved" &&
                     !hasPublishedPlatform && (
-                      <div className="p-4 mb-6 rounded-lg border border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 flex gap-3 text-sm animate-in fade-in slide-in-from-top-4">
+                      <div className="p-4 rounded-lg border border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 flex gap-3 text-sm animate-in fade-in slide-in-from-top-4">
                         <AlertCircle className="w-5 h-5 shrink-0 text-blue-500" />
                         <div>
                           <p className="font-semibold mb-1">
@@ -614,8 +631,9 @@ const EditPublicationModal = ({
                       </div>
                     )}
 
+                  {/* Alerta: Publicación parcialmente publicada */}
                   {hasPublishedPlatform && (
-                    <div className="p-4 mb-6 rounded-lg border border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 flex gap-3 text-sm animate-in fade-in slide-in-from-top-4">
+                    <div className="p-4 rounded-lg border border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 flex gap-3 text-sm animate-in fade-in slide-in-from-top-4">
                       <AlertCircle className="w-5 h-5 shrink-0 text-blue-500" />
                       <div>
                         <p className="font-semibold mb-1">
@@ -629,6 +647,7 @@ const EditPublicationModal = ({
                       </div>
                     </div>
                   )}
+                </div>
 
                   {!isDataReady ? (
                     <MediaUploadSkeleton />
@@ -673,58 +692,18 @@ const EditPublicationModal = ({
                       allMediaFiles={publication?.media_files || []}
                     />
                   )}
-                  {hasYouTubeAccount && (
-                    <div className="mt-6">
-                      <YouTubeThumbnailUploader
-                        videoId={
-                          mediaFiles.find((m) => m.type === "video")?.id || 0
-                        }
-                        videoPreviewUrl={
-                          mediaFiles.find((m) => m.type === "video")?.url
-                        }
-                        videoFileName={
-                          publication?.media_files?.find(
-                            (m) =>
-                              m.file_type === "video" ||
-                              m.mime_type?.startsWith("video/"),
-                          )?.file_name
-                        }
-                        existingThumbnail={(() => {
-                          const video = mediaFiles.find(
-                            (m) => m.type === "video",
-                          );
-                          return video?.thumbnailUrl
-                            ? { url: video.thumbnailUrl, id: video.id || 0 }
-                            : null;
-                        })()}
-                        onThumbnailChange={(
-                          videoId: number,
-                          file: File | null,
-                        ) => {
-                          const video = mediaFiles.find(
-                            (m) => m.type === "video",
-                          );
-                          if (video) {
-                            if (file) {
-                              setThumbnail(video.tempId, file);
-                            } else {
-                              clearThumbnail(video.tempId);
-                            }
-                          }
-                        }}
-                        onThumbnailDelete={() => {
-                          const video = mediaFiles.find(
-                            (m) => m.type === "video",
-                          );
-                          if (video) clearThumbnail(video.tempId);
-                        }}
-                      />
-                    </div>
-                  )}
                 </div>
 
-                {/* Content Section */}
-                <ContentSection
+                {/* ==================== SECCIÓN: CONTENIDO DE LA PUBLICACIÓN ==================== */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700">
+                    <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
+                      {t("publications.modal.edit.contentSection") || "Contenido"}
+                    </h3>
+                  </div>
+
+                  <ContentSection
                   register={register}
                   setValue={setValue}
                   errors={errors}
@@ -735,10 +714,17 @@ const EditPublicationModal = ({
                   onHashtagChange={handleHashtagChange}
                   disabled={hasPublishedPlatform || isContentSectionDisabled}
                 />
+                </div>
 
-                {/* Comments Section */}
+                {/* ==================== SECCIÓN: COMENTARIOS INTERNOS ==================== */}
                 {publication?.id && (
-                  <div className="pt-6 border-t border-gray-200 dark:border-neutral-700">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700 pt-6">
+                      <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
+                        {t("publications.modal.edit.commentsSection") || "Comentarios Internos"}
+                      </h3>
+                    </div>
                     <CommentsSection
                       publicationId={publication.id}
                       currentUser={auth.user}
@@ -747,11 +733,21 @@ const EditPublicationModal = ({
                 )}
               </div>
 
-              {/* Right Column: Social, Schedule, Preview, History */}
+              {/* ========================================
+                  COLUMNA DERECHA: REDES, PROGRAMACIÓN Y VISTA PREVIA
+                  ======================================== */}
               <div className="space-y-6">
+                {/* ==================== SECCIÓN: CUENTAS DE REDES SOCIALES ==================== */}
                 <div
-                  className={`transition-opacity duration-200 ${!allowConfiguration || isContentSectionDisabled ? "opacity-50 pointer-events-none grayscale-[0.5]" : ""}`}
+                  className={`space-y-4 transition-opacity duration-200 ${!allowConfiguration || isContentSectionDisabled ? "opacity-50 pointer-events-none grayscale-[0.5]" : ""}`}
                 >
+                  <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700">
+                    <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
+                      {t("publications.modal.edit.socialAccountsSection") || "Redes Sociales"}
+                    </h3>
+                  </div>
+
                   <SocialAccountsSection
                     socialAccounts={socialAccounts as any}
                     selectedAccounts={watched.social_accounts || []}
@@ -759,12 +755,9 @@ const EditPublicationModal = ({
                     t={t}
                     onAccountToggle={handleAccountToggle}
                     onScheduleChange={(id, date) => {
-
                       setAccountSchedules((prev) => ({ ...prev, [id]: date }));
                       
-                      // Si se establece una fecha individual diferente a la global, desactivar el schedule global
                       if (useGlobalSchedule && date !== scheduledAt) {
-                       
                         setValue("use_global_schedule", false, { shouldDirty: true });
                       }
                     }}
@@ -775,11 +768,8 @@ const EditPublicationModal = ({
                         return n;
                       });
                       
-                      // Si se elimina una fecha individual y no hay más fechas individuales,
-                      // podríamos reactivar el global schedule si existe
                       const remainingSchedules = Object.keys(accountSchedules).filter(key => parseInt(key) !== id);
                       if (remainingSchedules.length === 0 && scheduledAt && !useGlobalSchedule) {
-            
                         setValue("use_global_schedule", true, { shouldDirty: true });
                       }
                     }}
@@ -797,18 +787,42 @@ const EditPublicationModal = ({
                     mediaFiles={mediaFiles}
                     disabled={isContentSectionDisabled || !allowConfiguration}
                     socialPostLogs={publication?.social_post_logs}
+                    onThumbnailChange={(videoId, file) => {
+                      const video = mediaFiles.find((m) => m.type === "video");
+                      if (video) {
+                        if (file) {
+                          setThumbnail(video.tempId, file);
+                        } else {
+                          clearThumbnail(video.tempId);
+                        }
+                      }
+                    }}
+                    onThumbnailDelete={(videoId) => {
+                      const video = mediaFiles.find((m) => m.type === "video");
+                      if (video) clearThumbnail(video.tempId);
+                    }}
+                    thumbnails={thumbnails}
+                    publication={publication}
                   />
+                </div>
 
-                  <div className="mt-8">
-                    <ScheduleSection
+                {/* ==================== SECCIÓN: PROGRAMACIÓN Y RECURRENCIA ==================== */}
+                <div
+                  className={`space-y-4 transition-opacity duration-200 ${!allowConfiguration || isContentSectionDisabled ? "opacity-50 pointer-events-none grayscale-[0.5]" : ""}`}
+                >
+                  <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700">
+                    <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
+                      {t("publications.modal.edit.scheduleSection") || "Programación"}
+                    </h3>
+                  </div>
+
+                  <ScheduleSection
                       scheduledAt={watched.scheduled_at ?? undefined}
                       t={t}
                       onScheduleChange={(date) => {
-                        // Si la fecha está vacía y se está intentando establecer una fecha,
-                        // usar la fecha proporcionada o establecer una por defecto
                         let finalDate = date;
                         if (!date && !watched.scheduled_at) {
-                          // Si no hay fecha y se está activando el schedule, establecer una por defecto
                           const defaultDate = new Date();
                           defaultDate.setMinutes(defaultDate.getMinutes() + 2);
                           finalDate = defaultDate.toISOString();
@@ -825,7 +839,6 @@ const EditPublicationModal = ({
                         setValue("use_global_schedule", val)
                       }
                       onClearAccountSchedules={() => {
-                
                         setAccountSchedules({});
                       }}
                       error={errors.scheduled_at?.message as string}
@@ -852,11 +865,15 @@ const EditPublicationModal = ({
                   </div>
                 </div>
 
-                {/* Live Preview */}
-                <div
-                  className="pt-6 border-t border-gray-200 dark:border-neutral-700"
-                  data-testid="live-preview-section"
-                >
+                {/* ==================== SECCIÓN: VISTA PREVIA EN VIVO ==================== */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700 pt-6">
+                    <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
+                      {t("publications.modal.edit.previewSection") || "Vista Previa"}
+                    </h3>
+                  </div>
+
                   <LivePreviewSection
                     content={previewContent}
                     mediaUrls={stabilizedMediaPreviews.map((m) => m.url)}
@@ -883,31 +900,41 @@ const EditPublicationModal = ({
                   />
                 </div>
 
-                {/* History & Timeline */}
-                <div className="pt-6 border-t border-gray-200 dark:border-neutral-700 space-y-6">
-                  {publication?.approval_logs &&
-                    publication.approval_logs.length > 0 && (
-                      <ApprovalHistoryCompacto
-                        logs={publication.approval_logs}
-                        isExpanded={isApprovalHistoryExpanded}
-                        onToggle={() =>
-                          setIsApprovalHistoryExpanded(
-                            !isApprovalHistoryExpanded,
-                          )
-                        }
-                      />
-                    )}
+                {/* ==================== SECCIÓN: HISTORIAL Y ACTIVIDAD ==================== */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700 pt-6">
+                    <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
+                      {t("publications.modal.edit.historySection") || "Historial"}
+                    </h3>
+                  </div>
 
-                  {publication?.activities &&
-                    publication.activities.length > 0 && (
-                      <TimelineCompacto
-                        activities={publication.activities}
-                        isExpanded={isTimelineExpanded}
-                        onToggle={() =>
-                          setIsTimelineExpanded(!isTimelineExpanded)
-                        }
-                      />
-                    )}
+                  <div className="space-y-4">
+                  <div className="space-y-4">
+                    {publication?.approval_logs &&
+                      publication.approval_logs.length > 0 && (
+                        <ApprovalHistoryCompacto
+                          logs={publication.approval_logs}
+                          isExpanded={isApprovalHistoryExpanded}
+                          onToggle={() =>
+                            setIsApprovalHistoryExpanded(
+                              !isApprovalHistoryExpanded,
+                            )
+                          }
+                        />
+                      )}
+
+                    {publication?.activities &&
+                      publication.activities.length > 0 && (
+                        <TimelineCompacto
+                          activities={publication.activities}
+                          isExpanded={isTimelineExpanded}
+                          onToggle={() =>
+                            setIsTimelineExpanded(!isTimelineExpanded)
+                          }
+                        />
+                      )}
+                  </div>
                 </div>
               </div>
             </div>

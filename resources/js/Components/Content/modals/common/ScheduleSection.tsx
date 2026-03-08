@@ -564,7 +564,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
         )}
       </div> */}
 
-      <div className="pt-4 border-t border-gray-100 dark:border-neutral-800">
+      <div className="">
         <Label htmlFor="recurrence" icon={Clock} size="lg" className="mb-2">
           {t("publications.modal.schedule.recurrence.title") ||
             "Repetir publicación (Recurrencia)"}
@@ -1085,6 +1085,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                                       );
                                     })}
                                   </div>
+                                  
                                 </div>
                               </div>
                             );

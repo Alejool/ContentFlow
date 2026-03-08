@@ -1,8 +1,9 @@
 import Button from "@/Components/common/Modern/Button";
 import DatePickerModern from "@/Components/common/Modern/DatePicker";
+import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
 import { validateVideoDuration } from "@/Utils/validationUtils";
 import { parseISO } from "date-fns";
-import { AlertTriangle, Check, Clock, Settings, Target, X } from "lucide-react";
+import { AlertTriangle, Check, Clock, Settings, Target, X, ChevronDown } from "lucide-react";
 import React, { memo, useMemo, useState } from "react";
 import { formatDateTimeStyled } from "@/Utils/dateHelpers";
 
@@ -43,6 +44,11 @@ interface SocialAccountsSectionProps {
   mediaFiles?: any[];
   disabled?: boolean;
   socialPostLogs?: SocialPostLog[];
+  // YouTube thumbnail props
+  onThumbnailChange?: (videoId: number, file: File | null) => void;
+  onThumbnailDelete?: (videoId: number) => void;
+  thumbnails?: Record<string, { file?: File; url?: string }>;
+  publication?: any;
 }
 
 const VisualCheckbox = memo(
@@ -216,6 +222,13 @@ interface SocialAccountItemProps {
   durationError?: string;
   videoMetadata?: Record<string, any>;
   mediaFiles?: any[];
+  // YouTube thumbnail props
+  onThumbnailChange?: (videoId: number, file: File | null) => void;
+  onThumbnailDelete?: (videoId: number) => void;
+  thumbnails?: Record<string, { file?: File; url?: string }>;
+  publication?: any;
+  isYouTubeThumbnailExpanded?: boolean;
+  setIsYouTubeThumbnailExpanded?: (expanded: boolean) => void;
 }
 
 const SocialAccountItem = memo(
@@ -241,6 +254,12 @@ const SocialAccountItem = memo(
     durationError,
     videoMetadata = {},
     mediaFiles = [],
+    onThumbnailChange,
+    onThumbnailDelete,
+    thumbnails,
+    publication,
+    isYouTubeThumbnailExpanded = true,
+    setIsYouTubeThumbnailExpanded,
   }: SocialAccountItemProps) => {
     const isInternalDisabled =
       isPublished || isPublishing || isUnpublishing || disabled;
@@ -270,29 +289,30 @@ const SocialAccountItem = memo(
     }, [mediaFiles, videoMetadata, account.platform, isCheckedActually]);
 
     return (
-      <div
-        className={`relative flex items-start p-3 rounded-lg border transition-all min-h-[80px] ${
-          isInternalDisabled ? "opacity-80 cursor-default" : ""
-        } ${
-          isFailed || durationError
-            ? "border-red-500 bg-red-50 dark:bg-red-900/20 shadow-sm"
-            : isUnpublishing
-              ? "border-amber-500 bg-amber-50 dark:bg-amber-900/20 shadow-sm"
-              : isCheckedActually
-                ? `border-primary-500 bg-primary-50 dark:bg-primary-900/20 shadow-sm`
-                : "border-gray-200 dark:border-neutral-600 hover:bg-gray-50 dark:hover:bg-neutral-700/5"
-        }`}
-      >
-        <div className="flex items-center gap-3 flex-1">
-          <VisualCheckbox
-            isChecked={!!isCheckedActually}
-            onToggle={(e) => {
-              e?.stopPropagation();
-              if (!isInternalDisabled) onToggle();
-            }}
-          />
+      <>
+        <div
+          className={`relative flex items-start p-3 rounded-lg border transition-all min-h-[80px] ${
+            isInternalDisabled ? "opacity-80 cursor-default" : ""
+          } ${
+            isFailed || durationError
+              ? "border-red-500 bg-red-50 dark:bg-red-900/20 shadow-sm"
+              : isUnpublishing
+                ? "border-amber-500 bg-amber-50 dark:bg-amber-900/20 shadow-sm"
+                : isCheckedActually
+                  ? `border-primary-500 bg-primary-50 dark:bg-primary-900/20 shadow-sm`
+                  : "border-gray-200 dark:border-neutral-600 hover:bg-gray-50 dark:hover:bg-neutral-700/5"
+          }`}
+        >
+          <div className="flex items-center gap-3 flex-1">
+            <VisualCheckbox
+              isChecked={!!isCheckedActually}
+              onToggle={(e) => {
+                e?.stopPropagation();
+                if (!isInternalDisabled) onToggle();
+              }}
+            />
 
-          <div className="flex flex-col flex-1">
+            <div className="flex flex-col flex-1">
             <div className="flex items-center gap-2">
               <span className="font-medium text-sm">{account.platform}</span>
               {account.isDisconnected && (
@@ -482,8 +502,58 @@ const SocialAccountItem = memo(
           )}
         </div>
       </div>
-    );
-  },
+
+      {/* YouTube Thumbnail Section - Fuera del card, justo debajo */}
+      {isCheckedActually && 
+       account.platform.toLowerCase() === "youtube" && 
+       mediaFiles && 
+       mediaFiles.some(m => m.type === "video") && 
+       onThumbnailChange && 
+       onThumbnailDelete && (
+        <div className="">
+          <button
+            type="button"
+            onClick={() => setIsYouTubeThumbnailExpanded && setIsYouTubeThumbnailExpanded(!isYouTubeThumbnailExpanded)}
+            className="flex items-center justify-between w-full px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors bg-gray-50 dark:bg-neutral-800/50 rounded-lg border border-gray-200 dark:border-neutral-700"
+          >
+            <span>YouTube Thumbnail</span>
+            <ChevronDown 
+              className={`w-4 h-4 transition-transform duration-200 ${isYouTubeThumbnailExpanded ? 'rotate-180' : ''}`}
+            />
+          </button>
+          
+          {isYouTubeThumbnailExpanded && (
+            <div className="p-4 rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 animate-in fade-in slide-in-from-top-2 duration-200">
+              <YouTubeThumbnailUploader
+                videoId={mediaFiles.find((m) => m.type === "video")?.id || 0}
+                videoPreviewUrl={mediaFiles.find((m) => m.type === "video")?.url}
+                videoFileName={
+                  publication?.media_files?.find(
+                    (m) =>
+                      m.file_type === "video" ||
+                      m.mime_type?.startsWith("video/"),
+                  )?.file_name
+                }
+                existingThumbnail={(() => {
+                  const video = mediaFiles.find((m) => m.type === "video");
+                  return video?.thumbnailUrl
+                    ? { url: video.thumbnailUrl, id: video.id || 0 }
+                    : null;
+                })()}
+                onThumbnailChange={(videoId: number, file: File | null) => {
+                  onThumbnailChange(videoId, file);
+                }}
+                onThumbnailDelete={(videoId: number) => {
+                  onThumbnailDelete(videoId);
+                }}
+              />
+            </div>
+          )}
+        </div>
+      )}
+    </>
+  );
+},
 );
 
 const SocialAccountsSection = memo(
@@ -508,8 +578,13 @@ const SocialAccountsSection = memo(
     mediaFiles = [],
     disabled = false,
     socialPostLogs = [],
+    onThumbnailChange,
+    onThumbnailDelete,
+    thumbnails,
+    publication,
   }: SocialAccountsSectionProps) => {
     const [activePopover, setActivePopover] = useState<number | null>(null);
+    const [isYouTubeThumbnailExpanded, setIsYouTubeThumbnailExpanded] = useState(true);
 
     // Merge connected accounts with disconnected accounts from social_post_logs
     const allAccounts = useMemo(() => {
@@ -657,6 +732,12 @@ const SocialAccountsSection = memo(
                 durationError={durationErrors[account.id]}
                 videoMetadata={videoMetadata}
                 mediaFiles={mediaFiles}
+                onThumbnailChange={onThumbnailChange}
+                onThumbnailDelete={onThumbnailDelete}
+                thumbnails={thumbnails}
+                publication={publication}
+                isYouTubeThumbnailExpanded={isYouTubeThumbnailExpanded}
+                setIsYouTubeThumbnailExpanded={setIsYouTubeThumbnailExpanded}
               />
             );
           })}
