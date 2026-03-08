@@ -315,13 +315,33 @@ class SchedulingService
     }
 
     // Cleanup: Remove pending schedules for accounts that are no longer selected
-    // ONLY if accountIds were explicitly provided (not empty on purpose to keep existing)
-    if (!empty($accountIds)) {
+    // This handles both:
+    // 1. When specific accounts are deselected (accountIds has some values but not all)
+    // 2. When ALL accounts are deselected (accountIds is empty)
+    if (empty($accountIds)) {
+      // Delete ALL pending schedules when no accounts are selected
+      $deletedCount = ScheduledPost::where('publication_id', $publication->id)
+        ->where('status', 'pending')
+        ->delete();
+      
+      \Log::info('Deleted all pending scheduled posts (no accounts selected)', [
+        'publication_id' => $publication->id,
+        'deleted_count' => $deletedCount,
+      ]);
+    } else {
       // Remove schedules for accounts that are no longer in the list
-      ScheduledPost::where('publication_id', $publication->id)
+      $deletedCount = ScheduledPost::where('publication_id', $publication->id)
         ->where('status', 'pending')
         ->whereNotIn('social_account_id', $accountIds)
         ->delete();
+      
+      if ($deletedCount > 0) {
+        \Log::info('Deleted scheduled posts for deselected accounts', [
+          'publication_id' => $publication->id,
+          'deleted_count' => $deletedCount,
+          'remaining_accounts' => $accountIds,
+        ]);
+      }
     }
     
     // CRITICAL: If recurrence is enabled and we have an end date, remove any recurring posts
@@ -356,21 +376,18 @@ class SchedulingService
 
   public function syncSchedules(Publication $publication, array $accountIds, array $accountSchedules = [], bool $forceRecalculate = false): void
   {
-    // If accountIds is empty but there are existing scheduled posts,
-    // get the accounts from existing posts to avoid accidental deletion
-    if (empty($accountIds)) {
-      $existingAccounts = ScheduledPost::where('publication_id', $publication->id)
-        ->where('status', 'pending')
-        ->distinct()
-        ->pluck('social_account_id')
-        ->toArray();
-      
-      // If there are existing posts and no accounts provided, keep existing accounts
-      if (!empty($existingAccounts)) {
-        $accountIds = $existingAccounts;
-      }
-    }
-
+    // REMOVED: The logic that prevented deletion when accountIds is empty
+    // The frontend explicitly sends clear_social_accounts flag when user deselects all accounts
+    // We should trust that signal and allow the deletion to proceed
+    
+    \Log::info('SchedulingService::syncSchedules called', [
+      'publication_id' => $publication->id,
+      'accountIds' => $accountIds,
+      'accountIds_count' => count($accountIds),
+      'accountIds_empty' => empty($accountIds),
+      'forceRecalculate' => $forceRecalculate,
+    ]);
+    
     $this->scheduleForAccounts($publication, $accountIds, $accountSchedules, $forceRecalculate);
 
     // Refresh to get updated scheduled_posts count
