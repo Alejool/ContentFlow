@@ -51,8 +51,6 @@ export function usePricing({
     const channel = window.Echo.channel(`user.${auth.user.id}`);
 
     channel.listen('.subscription.updated', (event: any) => {
-      console.log('Subscription updated via broadcast', event);
-
       // Refresh subscription data
       checkActiveSubscription().then(() => {
         // Reload Inertia props to update UI with new subscription data
@@ -211,8 +209,7 @@ export function usePricing({
 
       // ── Success → reload data and redirect ─────────────────────────
       if (changeResponse.ok && changeData.success) {
-        console.log('Plan change successful:', changeData);
-        
+
         // Refresh subscription data
         await checkActiveSubscription();
         

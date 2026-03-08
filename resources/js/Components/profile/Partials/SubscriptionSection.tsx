@@ -79,14 +79,6 @@ export default function SubscriptionSection({
     subscription?.plan_id?.toLowerCase() === "enterprise" ||
     globalWorkspace?.plan?.toLowerCase() === "enterprise";
 
-  // Debugging subscription data
-  console.log("Subscription data in SubscriptionSection:", {
-    subscription_exists: !!subscription,
-    plan_id: subscription?.plan_id,
-    globalPlan: globalWorkspace?.plan,
-    hasWhiteLabel,
-  });
-
   const getPlanIcon = (planId: string) => {
     switch (planId) {
       case "free":

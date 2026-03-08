@@ -42,7 +42,7 @@ interface ScheduleSectionProps {
   publishDate?: string;
   accountSchedules?: Record<number, string>;
   selectedAccounts?: number[];
-  socialAccounts?: Array<{ id: number; account_name: string; platform: string }>;
+  socialAccounts?: Array<{ id: number; account_name?: string; platform: string }>;
   existingScheduledPosts?: Array<{ social_account_id: number; scheduled_at: string; status: string }>;
 }
 
@@ -87,60 +87,28 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
   // Each account can have its own scheduled date
   // Only calculate for accounts that are in recurrenceAccounts (or all if empty/null)
   const nextDatesByAccount = useMemo(() => {
-    console.log('🔄 Recalculating nextDatesByAccount', {
-      isRecurring,
-      selectedAccounts,
-      selectedAccountsLength: selectedAccounts?.length,
-      scheduledAt,
-      accountSchedules,
-      accountSchedulesKeys: Object.keys(accountSchedules),
-      recurrenceType,
-      recurrenceInterval,
-      recurrenceDays,
-      recurrenceDaysLength: recurrenceDays?.length,
-      recurrenceEndDate,
-      recurrenceAccounts,
-      recurrenceAccountsLength: recurrenceAccounts?.length,
-      useGlobalSchedule,
-      existingScheduledPosts: existingScheduledPosts.length
-    });
 
     if (!isRecurring) {
-      console.log('❌ Skipping: not recurring (isRecurring is false or undefined)');
       return {};
     }
 
     if (selectedAccounts.length === 0) {
-      console.log('❌ Skipping: no accounts selected (selectedAccounts is empty)');
       return {};
     }
 
     // Check if we have the minimum required data
     if (!recurrenceType) {
-      console.log('❌ Skipping: recurrenceType is missing');
       return {};
     }
 
     if (!recurrenceInterval || recurrenceInterval < 1) {
-      console.log('❌ Skipping: recurrenceInterval is invalid', recurrenceInterval);
       return {};
     }
 
     // For weekly recurrence, we need days
     if (recurrenceType === 'weekly' && (!recurrenceDays || recurrenceDays.length === 0)) {
-      console.log('❌ Skipping: weekly recurrence but no days selected', {
-        recurrenceType,
-        recurrenceDays,
-        recurrenceDaysLength: recurrenceDays?.length
-      });
       return {};
     }
-
-    console.log('✅ Validation passed, proceeding with calculation', {
-      recurrenceType,
-      recurrenceDays,
-      recurrenceDaysLength: recurrenceDays?.length
-    });
 
     const result: Record<number, Date[]> = {};
     
@@ -156,12 +124,6 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
       ? selectedAccounts.filter(id => recurrenceAccountsNumbers.includes(id))
       : selectedAccounts; // ALL accounts if empty/null
 
-    console.log('📋 Accounts with recurrence:', accountsWithRecurrence);
-    console.log('📋 recurrenceAccounts (original):', recurrenceAccounts);
-    console.log('📋 recurrenceAccountsNumbers:', recurrenceAccountsNumbers);
-    console.log('📋 selectedAccounts:', selectedAccounts);
-    console.log('📋 Logic: recurrenceAccounts is', recurrenceAccounts === null ? 'null' : recurrenceAccounts === undefined ? 'undefined' : `array with ${recurrenceAccounts.length} items`, '→ applying to', accountsWithRecurrence.length === selectedAccounts.length ? 'ALL accounts' : 'specific accounts');
-
     accountsWithRecurrence.forEach((accountId) => {
       // Check if we should use existing dates from BD or calculate new ones
       // Use existing dates ONLY if:
@@ -170,25 +132,17 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
       
       // For now, ALWAYS calculate to show preview when user changes config
       // The backend will handle saving the correct dates
-      console.log(`🔢 Calculating dates for account ${accountId}`);
       
       // Use account-specific schedule if available, otherwise use global schedule
       const baseDate = accountSchedules[accountId] || scheduledAt;
       
-      console.log(`📅 Account ${accountId} baseDate:`, baseDate, 'type:', typeof baseDate);
-      console.log(`📅 Account ${accountId} accountSchedules[${accountId}]:`, accountSchedules[accountId]);
-      console.log(`📅 Account ${accountId} scheduledAt:`, scheduledAt);
-      console.log(`📅 Account ${accountId} useGlobalSchedule:`, useGlobalSchedule);
-      
       // Skip if no date is available for this account
       if (!baseDate) {
-        console.log(`⚠️ No baseDate for account ${accountId}`);
         return;
       }
 
       // For weekly recurrence, skip if no days are selected
       if (recurrenceType === "weekly" && (!recurrenceDays || recurrenceDays.length === 0)) {
-        console.log(`⚠️ Weekly recurrence but no days selected for account ${accountId}`);
         return;
       }
 
@@ -198,24 +152,25 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
       const maxCount = 5;
       let currentDate: Date;
       
+      // Skip if no date is available for this account
+      if (!baseDate) {
+        return;
+      }
+      
       try {
         // Handle different date formats
         if (typeof baseDate === 'string') {
           currentDate = parseISO(baseDate);
-        } else if (baseDate instanceof Date) {
-          currentDate = baseDate;
         } else {
-          console.error(`❌ Invalid baseDate format for account ${accountId}:`, baseDate);
-          return;
+          // At this point, baseDate must be a Date since it's not undefined and not a string
+          currentDate = baseDate as Date;
         }
         
         // Validate the parsed date
         if (isNaN(currentDate.getTime())) {
-          console.error(`❌ Invalid date for account ${accountId}:`, baseDate);
           return;
         }
       } catch (error) {
-        console.error(`❌ Error parsing date for account ${accountId}:`, error, baseDate);
         return;
       }
 
@@ -233,12 +188,6 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
             let nextDayMatch = null;
             const sortedDays = [...recurrenceDaysNumbers].sort((a, b) => a - b);
 
-            console.log(`📅 Weekly calculation - Finding next day:`, {
-              currentDate: currentDate.toISOString(),
-              currentDay,
-              sortedDays,
-              recurrenceDaysNumbers
-            });
 
             // Find the next occurrence of any selected day
             for (const day of sortedDays) {
@@ -251,7 +200,6 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
             if (nextDayMatch !== null) {
               // Found a day later in the same week
               const daysToAdd = nextDayMatch - currentDay;
-              console.log(`✅ Found next day in same week: ${nextDayMatch}, adding ${daysToAdd} days`);
               currentDate = addDays(currentDate, daysToAdd);
             } else {
               // No day found in current week, go to next week and find first selected day
@@ -259,15 +207,9 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
               // Calculate days until next week's first selected day
               const daysUntilNextWeek = 7 - currentDay; // Days until next Sunday (day 0)
               const daysToAdd = daysUntilNextWeek + firstDayOfCycle + (interval - 1) * 7;
-              console.log(`🔄 No day found in same week, going to next cycle:`, {
-                firstDayOfCycle,
-                daysUntilNextWeek,
-                daysToAdd,
-                calculation: `${daysUntilNextWeek} + ${firstDayOfCycle} + ${(interval - 1) * 7}`
-              });
               currentDate = addDays(currentDate, daysToAdd);
             }
-            console.log(`📅 Next date calculated: ${currentDate.toISOString()}`);
+           
           } else {
             currentDate = addWeeks(currentDate, interval);
           }
@@ -284,26 +226,17 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
 
       // Calculate recurring dates (show preview even without end date)
       let iterations = 0;
-      console.log(`🔁 Starting calculation for account ${accountId}:`, {
-        currentDate: currentDate.toISOString(),
-        endDate: endDate?.toISOString(),
-        maxCount,
-        recurrenceType,
-        interval,
-        recurrenceDaysNumbers
-      });
+ 
       
       while (dates.length < maxCount && iterations < 50) {
         iterations++;
 
         // If there's an end date and we've passed it, stop
         if (endDate && currentDate > endDate) {
-          console.log(`⏹️ Stopped: currentDate (${currentDate.toISOString()}) > endDate (${endDate.toISOString()})`);
+      
           break;
         }
         
-        console.log(`➕ Adding date ${dates.length + 1}:`, currentDate.toISOString());
-        dates.push(new Date(currentDate));
 
         if (dates.length >= maxCount) break;
 
@@ -351,10 +284,8 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
       }
 
       result[accountId] = dates;
-      console.log(`✅ Account ${accountId} calculated ${dates.length} dates:`, dates);
     });
 
-    console.log('📊 Final result:', result);
     return result;
   }, [
     isRecurring,
@@ -389,11 +320,10 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                 
                 // Si se activa el global schedule, limpiar las fechas individuales
                 if (isChecked) {
-                  console.log('[ScheduleSection] Global schedule enabled, clearing individual account schedules');
+    
                   onClearAccountSchedules?.();
                 } else {
-                  // Si se desactiva, limpiar la fecha global
-                  console.log('[ScheduleSection] Global schedule disabled, clearing global date');
+                
                   onScheduleChange("");
                 }
               }
@@ -789,13 +719,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                             const newDays = recurrenceDays.includes(day.value)
                               ? recurrenceDays.filter((d) => d !== day.value)
                               : [...recurrenceDays, day.value];
-                            console.log('[ScheduleSection] Day clicked:', {
-                              dayValue: day.value,
-                              dayLabel: day.label,
-                              currentDays: recurrenceDays,
-                              newDays,
-                              action: recurrenceDays.includes(day.value) ? 'remove' : 'add'
-                            });
+                           
                             onRecurrenceChange?.({ recurrence_days: newDays });
                           }}
                           disabled={disabled}
@@ -853,7 +777,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
 
                 {/* Next Dates Preview - Always show when recurring is enabled */}
                 {isRecurring && (
-                  <div className="mt-4 p-4 bg-primary-50/30 dark:bg-primary-900/10 rounded-lg border border-primary-100/50 dark:border-primary-800/30">
+                  <div className="mt-4 p-4 bg-primary-50/70 dark:bg-primary-900/20 rounded-lg border border-primary-100/50 dark:border-primary-800/30">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2 text-primary-700 dark:text-primary-400">
                         <CalendarIcon className="w-4 h-4" />

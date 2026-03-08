@@ -174,14 +174,6 @@ export const usePublicationForm = ({
     if (isOpen && publication) {
       const isInitialLoad = !isDataReady;
 
-      console.log('[usePublicationForm] Loading publication data:', {
-        id: publication.id,
-        scheduled_at: publication.scheduled_at,
-        isInitialLoad,
-        isDataReady,
-        isOpen
-      });
-
       const resetData = {
         title: publication.title || "",
         description: publication.description || "",
@@ -218,21 +210,10 @@ export const usePublicationForm = ({
           const accounts = publication.recurrence_settings 
             ? publication.recurrence_settings.recurrence_accounts 
             : publication.recurrence_accounts;
-          console.log('🔍 [usePublicationForm] PHASE 1 - Loading recurrence_accounts from BD:', {
-            hasRecurrenceSettings: !!publication.recurrence_settings,
-            fromSettings: publication.recurrence_settings?.recurrence_accounts,
-            fromPublication: publication.recurrence_accounts,
-            final: accounts,
-            isNull: accounts === null,
-            isUndefined: accounts === undefined,
-            type: typeof accounts
-          });
           if (accounts === null || accounts === undefined) {
-            console.log('✅ [usePublicationForm] recurrence_accounts is null/undefined, converting to [] (all accounts)');
             return []; // Empty array in form means "all accounts"
           }
           const converted = accounts.map((id: any) => typeof id === 'string' ? parseInt(id) : id);
-          console.log('✅ [usePublicationForm] recurrence_accounts converted:', converted);
           return converted;
         })(),
       };
@@ -340,12 +321,12 @@ export const usePublicationForm = ({
 
         // LIVE SYNC PROTECTION: Only update social accounts if untouched
         if (!getFieldState("social_accounts").isDirty) {
-          console.log('[usePublicationForm] Phase 2: Setting social_accounts from scheduled_posts:', pendingSocialAccounts);
+
           setValue("social_accounts", pendingSocialAccounts, {
             shouldValidate: false,
           });
         } else {
-          console.log('[usePublicationForm] Phase 2: Skipping social_accounts update (field is dirty)');
+         
         }
 
         // Process account schedules
@@ -366,8 +347,6 @@ export const usePublicationForm = ({
             }
           });
         }
-        
-        console.log('[usePublicationForm] Loading account schedules from scheduled_posts:', initialAccountSchedules);
         
         setAccountSchedules((prev) => {
           // Only update if this is the initial load or if the user hasn't made changes
@@ -825,12 +804,6 @@ export const usePublicationForm = ({
       formData.append("status", finalStatus);
       formData.append("scheduled_at", data.scheduled_at || "");
       
-      console.log('[usePublicationForm] Submitting with scheduled_at:', {
-        from_form_data: data.scheduled_at,
-        current_publication_scheduled_at: publication?.scheduled_at,
-        form_is_dirty: isDirty,
-      });
-      
       formData.append("social_accounts_sync", "true");
 
       // Always send social_accounts - even if empty
@@ -838,11 +811,9 @@ export const usePublicationForm = ({
         formData.append("clear_social_accounts", "1");
         formData.append("social_accounts", JSON.stringify([]));
       } else {
-        console.log('[usePublicationForm] Sending account schedules:', accountSchedules);
         socialAccounts.forEach((id, index) => {
           formData.append(`social_accounts[${index}]`, id.toString());
           if (id && accountSchedules[id]) {
-            console.log(`[usePublicationForm] Account ${id} schedule:`, accountSchedules[id]);
             formData.append(
               `social_account_schedules[${id}]`,
               accountSchedules[id],
@@ -869,12 +840,10 @@ export const usePublicationForm = ({
         }
         // Add recurrence_accounts
         if (data.recurrence_accounts && data.recurrence_accounts.length > 0) {
-          console.log('[usePublicationForm] Sending recurrence_accounts:', data.recurrence_accounts);
           data.recurrence_accounts.forEach((accountId, i) => {
             formData.append(`recurrence_accounts[]`, accountId.toString());
           });
         } else {
-          console.log('[usePublicationForm] No recurrence_accounts to send (will apply to all selected accounts)');
         }
       } else {
         formData.append("is_recurring", "0");
@@ -973,26 +942,15 @@ export const usePublicationForm = ({
 
         // Force refresh the publication to ensure we have the latest data
         if (result) {
-          console.log('[usePublicationForm] Fetching fresh data after update...');
           const freshPublication = await usePublicationStore
             .getState()
             .fetchPublicationById(publication.id);
-          console.log('[usePublicationForm] Fresh publication fetched:', {
-            id: freshPublication?.id,
-            scheduled_at: freshPublication?.scheduled_at
-          });
         }
       } else {
         result = await createPublication(formData);
       }
 
       if (result) {
-        console.log('[usePublicationForm] Update successful, result:', {
-          id: result.id,
-          scheduled_at: result.scheduled_at,
-          title: result.title
-        });
-        
         toast.success(
           publication
             ? t("publications.messages.updateSuccess")

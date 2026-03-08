@@ -61,11 +61,6 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
   
   // Debug log to track publication updates
   if (currentPub && isEditModalOpen) {
-    console.log('[ModalManager] Current publication:', {
-      id: currentPub.id,
-      scheduled_at: currentPub.scheduled_at,
-      title: currentPub.title
-    });
   }
 
   // Determine which Add Modal to show

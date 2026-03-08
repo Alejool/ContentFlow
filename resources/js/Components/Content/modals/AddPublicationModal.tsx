@@ -372,13 +372,10 @@ export default function AddPublicationModal({
                   t={t}
                   onAccountToggle={handleAccountToggle}
                   onScheduleChange={(id, date) => {
-                    console.log('[AddPublicationModal] Account schedule changed:', { id, date });
                     setAccountSchedules((prev) => ({ ...prev, [id]: date }));
                     
                     // Si se establece una fecha individual diferente a la global, desactivar el schedule global
                     if (watched.use_global_schedule && date !== watched.scheduled_at) {
-                      console.log('[AddPublicationModal] Disabling global schedule due to individual date change');
-                      setValue("use_global_schedule", false, { shouldDirty: true });
                     }
                   }}
                   onScheduleRemove={(id) => {
@@ -392,8 +389,7 @@ export default function AddPublicationModal({
                     // podríamos reactivar el global schedule si existe
                     const remainingSchedules = Object.keys(accountSchedules).filter(key => parseInt(key) !== id);
                     if (remainingSchedules.length === 0 && watched.scheduled_at && !watched.use_global_schedule) {
-                      console.log('[AddPublicationModal] Re-enabling global schedule after removing all individual dates');
-                      setValue("use_global_schedule", true, { shouldDirty: true });
+                     
                     }
                   }}
                   onPlatformSettingsClick={(platform) =>
@@ -413,8 +409,7 @@ export default function AddPublicationModal({
                     setValue("use_global_schedule", val)
                   }
                   onClearAccountSchedules={() => {
-                    console.log('[AddPublicationModal] Clearing all account schedules');
-                    setAccountSchedules({});
+                   
                   }}
                   error={errors.scheduled_at?.message as string}
                   hasRecurrenceAccess={hasRecurrenceAccess}

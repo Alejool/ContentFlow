@@ -47,7 +47,6 @@ export default function PlanSelectionStep({
         
         // If plan is already selected in onboarding, complete this step
         if (onboardingState?.planSelected && onboardingState?.selectedPlan) {
-          console.log('Plan already selected in onboarding:', onboardingState.selectedPlan);
           setTimeout(() => {
             onComplete(onboardingState.selectedPlan);
           }, 500);
@@ -61,7 +60,6 @@ export default function PlanSelectionStep({
           
           // If user has an active paid plan, update onboarding and complete this step
           if (currentPlan && currentPlan !== 'free' && currentPlan !== 'demo') {
-            console.log('User has active plan, updating onboarding:', currentPlan);
             
             // Update onboarding state on backend
             try {

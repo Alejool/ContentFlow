@@ -309,7 +309,6 @@ const EditPublicationModal = ({
       
       // If dates are different and global schedule is enabled, disable it
       if (!allSame && useGlobalSchedule) {
-        console.log('[EditPublicationModal] Detected different account schedules, disabling global schedule');
         setValue("use_global_schedule", false, { shouldDirty: false });
       }
       // If dates are all the same and global schedule is disabled, we could enable it
@@ -746,12 +745,12 @@ const EditPublicationModal = ({
                     t={t}
                     onAccountToggle={handleAccountToggle}
                     onScheduleChange={(id, date) => {
-                      console.log('[EditPublicationModal] Account schedule changed:', { id, date });
+
                       setAccountSchedules((prev) => ({ ...prev, [id]: date }));
                       
                       // Si se establece una fecha individual diferente a la global, desactivar el schedule global
                       if (useGlobalSchedule && date !== scheduledAt) {
-                        console.log('[EditPublicationModal] Disabling global schedule due to individual date change');
+                       
                         setValue("use_global_schedule", false, { shouldDirty: true });
                       }
                     }}
@@ -766,7 +765,7 @@ const EditPublicationModal = ({
                       // podríamos reactivar el global schedule si existe
                       const remainingSchedules = Object.keys(accountSchedules).filter(key => parseInt(key) !== id);
                       if (remainingSchedules.length === 0 && scheduledAt && !useGlobalSchedule) {
-                        console.log('[EditPublicationModal] Re-enabling global schedule after removing all individual dates');
+            
                         setValue("use_global_schedule", true, { shouldDirty: true });
                       }
                     }}
@@ -791,7 +790,7 @@ const EditPublicationModal = ({
                       scheduledAt={watched.scheduled_at ?? undefined}
                       t={t}
                       onScheduleChange={(date) => {
-                        console.log('[EditPublicationModal] Schedule changed:', date);
+                       
                         setValue("scheduled_at", date, {
                           shouldDirty: true,
                           shouldValidate: true,
@@ -803,7 +802,7 @@ const EditPublicationModal = ({
                         setValue("use_global_schedule", val)
                       }
                       onClearAccountSchedules={() => {
-                        console.log('[EditPublicationModal] Clearing all account schedules');
+                
                         setAccountSchedules({});
                       }}
                       error={errors.scheduled_at?.message as string}
@@ -824,7 +823,6 @@ const EditPublicationModal = ({
                       selectedAccounts={selectedSocialAccounts}
                       socialAccounts={socialAccounts}
                       accountSchedules={accountSchedules}
-                      existingScheduledPosts={publication?.scheduled_posts || []}
                     />
                   </div>
                 </div>
