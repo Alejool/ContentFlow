@@ -48,6 +48,7 @@ class HandleInertiaRequests extends Middleware
           'email' => $user->email,
           'email_verified_at' => $user->email_verified_at,
           'locale' => $user->locale ?? 'es',
+          'timezone' => $user->timezone ?? 'UTC',
           'created_at' => $user->created_at,
           'photo_url' => $user->photo_url,
           'theme' => $user->theme,
@@ -84,6 +85,10 @@ class HandleInertiaRequests extends Middleware
                 $ws->user_role = $isOwner ? 'Owner' : ($role ? $role->name : 'Member');
                 $ws->user_role_slug = $isOwner ? 'owner' : ($role ? $role->slug : 'member');
                 $ws->role = (object)['name' => $ws->user_role, 'slug' => $ws->user_role_slug];
+                
+                // ✅ AGREGAR TIMEZONE DEL WORKSPACE
+                $ws->timezone = $ws->timezone ?? 'UTC';
+                
                 return $ws;
               });
           } catch (\Exception $e) {
@@ -162,6 +167,9 @@ class HandleInertiaRequests extends Middleware
 
               $currentWorkspace->plan = $currentWorkspace->getPlanName();
               $currentWorkspace->features = $currentWorkspace->getPlanFeatures();
+              
+              // ✅ AGREGAR TIMEZONE DEL WORKSPACE
+              $currentWorkspace->timezone = $currentWorkspace->timezone ?? 'UTC';
             }
 
             return $currentWorkspace;

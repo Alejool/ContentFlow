@@ -3,6 +3,8 @@
 use App\Http\Controllers\Profile\ProfileController;
 use App\Http\Controllers\Locale\LocaleController;
 use App\Http\Controllers\Theme\ThemeController;
+use App\Http\Controllers\Api\UserTimezoneController;
+use App\Http\Controllers\Api\WorkspaceTimezoneController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -16,4 +18,12 @@ Route::middleware('auth:sanctum')->group(function () {
   });
 
   Route::patch('/locale', [LocaleController::class, 'update'])->name('locale.update');
+  
+  // User timezone routes
+  Route::get('/timezone', [UserTimezoneController::class, 'show'])->name('timezone.show');
+  Route::patch('/timezone', [UserTimezoneController::class, 'update'])->name('timezone.update');
+  
+  // Workspace timezone routes
+  Route::get('/workspace/timezone', [WorkspaceTimezoneController::class, 'show'])->name('workspace.timezone.show');
+  Route::patch('/workspace/timezone', [WorkspaceTimezoneController::class, 'update'])->name('workspace.timezone.update');
 });

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
+import { formatDateTimeString } from "@/Utils/dateHelpers";
 
 interface Props {
   publication: Publication & { media_files: MediaFile[] };
@@ -168,7 +169,7 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
                   <Calendar className="w-3.5 h-3.5 text-orange-500" />
                   <span>
                     Programado:{" "}
-                    {new Date(publication.scheduled_at).toLocaleString()}
+                    {formatDateTimeString(publication.scheduled_at)}
                   </span>
                 </div>
               )}

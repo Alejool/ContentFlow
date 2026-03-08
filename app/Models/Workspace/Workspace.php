@@ -30,6 +30,7 @@ class Workspace extends Model
         'name',
         'slug',
         'description',
+        'timezone',
         'created_by',
         'public',
         'allow_public_invites',

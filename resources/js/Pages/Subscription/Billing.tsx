@@ -12,6 +12,7 @@ import { toast } from 'react-hot-toast';
 import axios from 'axios';
 import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
 import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
+import { formatDateString } from '@/Utils/dateHelpers';
 
 declare function route(name: string, params?: any): string;
 
@@ -108,8 +109,7 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
   }, [flash]);
 
   const formatDate = (dateString: string) => {
-    const locale = i18n.language === 'es' ? 'es-ES' : 'en-US';
-    return new Date(dateString).toLocaleDateString(locale, {
+    return formatDateString(dateString, {
       year: 'numeric',
       month: 'long',
       day: 'numeric',

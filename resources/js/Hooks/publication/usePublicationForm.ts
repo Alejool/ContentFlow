@@ -812,9 +812,20 @@ export const usePublicationForm = ({
         "scheduled",
         "rejected",
       ];
+      
+      // Si el status es "scheduled" pero no hay fecha programada, establecer una por defecto
+      let scheduledAtValue = data.scheduled_at;
+      if (currentStatus === "scheduled" && !scheduledAtValue) {
+        const defaultDate = new Date();
+        defaultDate.setMinutes(defaultDate.getMinutes() + 2); // 2 minutos en el futuro
+        scheduledAtValue = defaultDate.toISOString();
+        // Actualizar el formulario con la fecha por defecto
+        setValue("scheduled_at", scheduledAtValue, { shouldDirty: true });
+      }
+      
       const finalStatus =
         socialAccounts.length === 0 &&
-        !data.scheduled_at &&
+        !scheduledAtValue &&
         currentStatus !== "published"
           ? "draft"
           : validStatuses.includes(currentStatus)
@@ -822,7 +833,7 @@ export const usePublicationForm = ({
             : "draft";
 
       formData.append("status", finalStatus);
-      formData.append("scheduled_at", data.scheduled_at || "");
+      formData.append("scheduled_at", scheduledAtValue || "");
       
       formData.append("social_accounts_sync", "true");
 

@@ -19,6 +19,7 @@ import {
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { formatDateTimeString } from "@/Utils/dateHelpers";
 
 interface Campaign {
   id: number;
@@ -248,7 +249,7 @@ const CalendarConnectionCard = ({
             {connection.lastSync && (
               <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
                 {t("calendar.external.lastSync")}:{" "}
-                {new Date(connection.lastSync).toLocaleString()}
+                {formatDateTimeString(connection.lastSync)}
               </p>
             )}
           </div>

@@ -363,11 +363,11 @@ export default function Select<T extends FieldValues>({
 
   const getSearchInputStyles = () => {
     const base = `
-      w-full px-4 py-3 focus:outline-none bg-transparent
+      w-full px-4 py-3 focus:outline-none
       ${currentSize.search}
     `;
 
-    return `${base} text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 border-b border-gray-200 dark:border-neutral-700 focus:border-primary-500`;
+    return `${base} bg-white dark:bg-neutral-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border-b border-gray-200 dark:border-neutral-700 focus:border-primary-500`;
   };
 
   const getMessageStyles = (type: "error" | "success") => {
@@ -637,9 +637,9 @@ export default function Select<T extends FieldValues>({
               }
             >
               {searchable && (
-                <div className="sticky top-0 bg-inherit border-b border-inherit">
+                <div className="sticky top-0 bg-white dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-700 z-10">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
                     <input
                       ref={inputRef}
                       type="text"

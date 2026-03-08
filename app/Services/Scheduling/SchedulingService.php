@@ -132,6 +132,10 @@ class SchedulingService
         'final_base_date' => $accountBase,
       ]);
 
+      // CRITICAL: Check if this account was already published
+      // This must be defined BEFORE any conditional blocks that use it
+      $wasAlreadyPublished = isset($publishedLogs[$accountId]);
+
       if ($shouldHaveRecurrence && $accountBase) {
         // Calculate recurrence dates using this account's specific base date
         $specificDates = $this->calculateRecurrenceDatesFromBase($publication, $accountBase);
@@ -153,7 +157,6 @@ class SchedulingService
         // CRITICAL: If this account was already published (has a published log),
         // DO NOT create a scheduled post for the base date - it's already done!
         // Only create scheduled posts for the FUTURE recurrence dates
-        $wasAlreadyPublished = isset($publishedLogs[$accountId]);
         
         if ($wasAlreadyPublished) {
           \Log::info('SchedulingService: Account already published, skipping base date', [

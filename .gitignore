@@ -85,3 +85,5 @@ INICIO-RAPIDO.md
 *.md
 
 .kiro
+
+bun.lock

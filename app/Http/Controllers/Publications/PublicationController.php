@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Publications;
 
 use App\Http\Controllers\Controller;
 use App\Traits\ApiResponse;
+use App\Traits\HasTimezone;
 use Illuminate\Http\Request;
 use App\Models\Publications\Publication;
 use Illuminate\Support\Facades\Auth;
@@ -41,7 +42,7 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class PublicationController extends Controller
 {
-  use ApiResponse;
+  use ApiResponse, HasTimezone;
 
   public function index(Request $request)
   {
@@ -179,7 +180,7 @@ class PublicationController extends Controller
 
     try {
       $data = $request->validated();
-      // Normalize scheduled_at to UTC using client's timezone header
+      // Normalize scheduled_at to UTC using user's timezone
       if (!empty($data['scheduled_at'])) {
         if (!Auth::user()->hasPermission('publish', $workspaceId)) {
           // User cannot schedule, so we ignore the scheduled_at date and force draft
@@ -187,9 +188,7 @@ class PublicationController extends Controller
           $data['status'] = 'draft';
         } else {
           try {
-            $tz = $request->header('X-User-Timezone');
-            $dt = $tz ? Carbon::parse($data['scheduled_at'], $tz)->setTimezone('UTC') : Carbon::parse($data['scheduled_at'])->setTimezone('UTC');
-            $data['scheduled_at'] = $dt->toIso8601String();
+            $data['scheduled_at'] = $this->toUTC($data['scheduled_at'])->toIso8601String();
           } catch (\Exception $e) {
             // If parsing fails, keep original value and let deeper validation handle it
           }
@@ -361,17 +360,15 @@ class PublicationController extends Controller
         }
       }
 
-      // Normalize scheduled_at to UTC using client's timezone header
+      // Normalize scheduled_at to UTC using user's timezone
       if (!empty($data['scheduled_at'])) {
         try {
           Log::info('PublicationController: Normalizing scheduled_at', [
             'original' => $data['scheduled_at'],
-            'timezone_header' => $request->header('X-User-Timezone'),
+            'user_timezone' => $this->getUserTimezone(),
           ]);
           
-          $tz = $request->header('X-User-Timezone');
-          $dt = $tz ? Carbon::parse($data['scheduled_at'], $tz)->setTimezone('UTC') : Carbon::parse($data['scheduled_at'])->setTimezone('UTC');
-          $data['scheduled_at'] = $dt->toIso8601String();
+          $data['scheduled_at'] = $this->toUTC($data['scheduled_at'])->toIso8601String();
           
           Log::info('PublicationController: Normalized scheduled_at', [
             'normalized' => $data['scheduled_at'],

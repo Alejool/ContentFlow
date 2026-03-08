@@ -17,6 +17,7 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { formatDateString, formatTimeString } from "@/Utils/dateHelpers";
 
 interface NotificationsSettingsTabProps {
   workspace: any;
@@ -184,16 +185,13 @@ export default function NotificationsSettingsTab({
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900 dark:text-white font-medium">
-                      {new Date(log.created_at).toLocaleDateString([], {
+                      {formatDateString(log.created_at, {
                         month: "short",
                         day: "numeric",
                       })}
                     </div>
                     <div className="text-xs text-gray-500 dark:text-neutral-500">
-                      {new Date(log.created_at).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                      {formatTimeString(log.created_at)}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">

@@ -4,6 +4,7 @@ import axios from "axios";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { useTimezoneStore } from "@/stores/timezoneStore";
 
 interface LoginFormData {
   email: string;
@@ -14,6 +15,7 @@ interface LoginFormData {
 
 export const useAuth = () => {
   const { t } = useTranslation();
+  const { loadTimezones } = useTimezoneStore();
   const [generalError, setGeneralError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [successMessage, setSuccessMessage] = useState<string>("");
@@ -62,8 +64,15 @@ export const useAuth = () => {
 
       if (loginResponse.data.success) {
         setSuccessMessage(t("auth.login.success"));
+        
+        // ✅ CARGAR TIMEZONES DESPUÉS DEL LOGIN
+        await loadTimezones();
+        
         window.location.href = loginResponse.data.redirect || "/dashboard";
       } else {
+        // ✅ CARGAR TIMEZONES TAMBIÉN EN ESTE CASO
+        await loadTimezones();
+        
         window.location.href = "/dashboard";
       }
     } catch (err: any) {

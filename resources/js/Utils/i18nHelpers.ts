@@ -1,4 +1,12 @@
 import i18n from "i18next";
+import { useTimezoneStore } from "@/stores/timezoneStore";
+
+/**
+ * Obtiene el timezone del workspace
+ */
+const getWorkspaceTimezone = (): string => {
+  return useTimezoneStore.getState().effectiveTimezone();
+};
 
 /**
  * Configuración de formatos de fecha/hora por idioma
@@ -60,7 +68,7 @@ export const dateTimeFormats: Record<string, Intl.DateTimeFormatOptions> = {
 };
 
 /**
- * Formatea una fecha según el idioma actual
+ * Formatea una fecha según el idioma actual y timezone del workspace
  */
 export const formatDate = (
   date: Date | string | number,
@@ -72,10 +80,12 @@ export const formatDate = (
     : date;
   
   const currentLocale = locale || i18n.language || "es";
+  const timezone = getWorkspaceTimezone();
   
-  return new Intl.DateTimeFormat(currentLocale, dateTimeFormats[format]).format(
-    dateObj
-  );
+  return new Intl.DateTimeFormat(currentLocale, {
+    ...dateTimeFormats[format],
+    timeZone: timezone,
+  }).format(dateObj);
 };
 
 /**

@@ -1,6 +1,7 @@
 import Button from "@/Components/common/Modern/Button";
 import Input from "@/Components/common/Modern/Input";
 import ConfirmDialog from "@/Components/common/ui/ConfirmDialog";
+import { WorkspaceTimezoneSettings } from "@/Components/Workspace/WorkspaceTimezoneSettings";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { router, usePage } from "@inertiajs/react";
 import {
@@ -286,6 +287,9 @@ export default function GeneralSettingsTab({
           </div>
         </form>
       </div>
+
+      {/* Timezone Settings */}
+      <WorkspaceTimezoneSettings canManage={isOwner} />
 
       {isOwner && (
         <div className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-lg shadow-sm p-6">

@@ -11,6 +11,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { formatDateTimeStyled } from "@/Utils/dateHelpers";
 
 interface PublicationStatusTimelineProps {
   currentStatus: string;
@@ -352,18 +353,12 @@ const PublicationStatusTimeline = ({
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                     {step.key === "approved" && approvedAt && (
                       <span>
-                        {new Date(approvedAt).toLocaleString([], {
-                          dateStyle: "short",
-                          timeStyle: "short",
-                        })}
+                        {formatDateTimeStyled(approvedAt, "short", "short")}
                       </span>
                     )}
                     {step.key === "published" && publishedAt && (
                       <span>
-                        {new Date(publishedAt).toLocaleString([], {
-                          dateStyle: "short",
-                          timeStyle: "short",
-                        })}
+                        {formatDateTimeStyled(publishedAt, "short", "short")}
                       </span>
                     )}
                   </p>
@@ -376,10 +371,7 @@ const PublicationStatusTimeline = ({
                       <Clock className="w-3 h-3" />
                       <span>
                         {t("publications.scheduled_for") || "Programado para"}:{" "}
-                        {new Date(scheduledAt).toLocaleString([], {
-                          dateStyle: "short",
-                          timeStyle: "short",
-                        })}
+                        {formatDateTimeStyled(scheduledAt, "short", "short")}
                       </span>
                     </p>
                   )}

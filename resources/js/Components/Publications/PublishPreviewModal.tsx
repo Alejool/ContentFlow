@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import Modal from '@/Components/common/ui/Modal';
 import PlatformConfigCard from './PlatformConfigCard';
 import { Publication } from '@/types/Publication';
+import { DateTimePicker } from '@/Components/common/DateTimePicker';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import { formatDateString } from '@/Utils/dateHelpers';
 
 interface MediaInfo {
   duration?: number;
@@ -199,13 +201,12 @@ export default function PublishPreviewModal({
   };
 
   const formatScheduledDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    return date.toLocaleString('es-ES', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+    return formatDateString(dateString, {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -372,12 +373,11 @@ export default function PublishPreviewModal({
 
                     {isScheduled && (
                       <div className="ml-7">
-                        <input
-                          type="datetime-local"
+                        <DateTimePicker
                           value={scheduledAt}
-                          onChange={(e) => setScheduledAt(e.target.value)}
+                          onChange={(value) => setScheduledAt(value || '')}
                           min={minDateTime()}
-                          className="w-full max-w-xs px-3 py-2.5 border border-gray-300 dark:border-neutral-600 rounded-md text-sm bg-white dark:bg-neutral-900 text-gray-900 dark:text-gray-100"
+                          required
                         />
                       </div>
                     )}

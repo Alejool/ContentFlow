@@ -2,6 +2,7 @@ import { useTheme } from "@/Hooks/useTheme";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { AlertTriangle, Calendar, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { formatDateTimeString } from "@/Utils/dateHelpers";
 
 interface DisconnectWarningModalProps {
   isOpen: boolean;
@@ -135,7 +136,7 @@ export default function DisconnectWarningModal({
                                       );
                                     const dateObj = new Date(dateToShow);
                                     return !isNaN(dateObj.getTime())
-                                      ? dateObj.toLocaleString()
+                                      ? formatDateTimeString(dateToShow)
                                       : t("common.invalidDate") ||
                                           "Fecha inválida";
                                   })()}

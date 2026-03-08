@@ -15,6 +15,8 @@ import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FieldValues, UseFormRegister } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { useTimezoneStore } from "@/stores/timezoneStore";
+import { toLocalDate, toUTC } from "@/Utils/timezoneUtils";
 
 registerLocale("es", es);
 registerLocale("en", enUS);
@@ -83,6 +85,10 @@ interface DatePickerProps<T extends FieldValues> {
   containerClassName?: string;
   activeColor?: string;
   id?: string;
+  
+  // UTC/Timezone handling
+  useUTC?: boolean; // If true, converts between UTC and local timezone
+  showTimezone?: boolean; // If true, shows timezone label
 }
 
 const CustomTimeSelector = ({
@@ -288,12 +294,39 @@ const DatePickerModern = <T extends FieldValues>({
   containerClassName = "",
   activeColor = "primary-500",
   id,
+  useUTC = false,
+  showTimezone = false,
 }: DatePickerProps<T>) => {
   const { i18n } = useTranslation();
+  const { timezoneLabel } = useTimezoneStore();
   const [isOpen, setIsOpen] = useState(false);
+  const [localDate, setLocalDate] = useState<Date | null>(null);
 
   const currentLocale = i18n.language.startsWith("es") ? "es" : "en";
   const defaultDateFormat = showTimeSelect ? "Pp" : "P";
+
+  // Convert UTC date from backend to local date for display
+  useEffect(() => {
+    if (useUTC && selected) {
+      // If selected is a Date object, convert it to local
+      const local = toLocalDate(selected.toISOString());
+      setLocalDate(local);
+    } else {
+      setLocalDate(selected);
+    }
+  }, [selected, useUTC]);
+
+  // Handle date change and convert to UTC if needed
+  const handleDateChange = (date: Date | null) => {
+    if (useUTC && date) {
+      // Convert local date to UTC string, then back to Date for consistency
+      const utcString = toUTC(date);
+      const utcDate = new Date(utcString);
+      onChange(utcDate);
+    } else {
+      onChange(date);
+    }
+  };
 
   const CustomInput = forwardRef<HTMLInputElement, any>(
     (
@@ -334,6 +367,12 @@ const DatePickerModern = <T extends FieldValues>({
 
   return (
     <div className={`relative ${containerClassName}`}>
+      {showTimezone && useUTC && (
+        <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 mb-1">
+          <Clock className="w-3 h-3" />
+          {timezoneLabel()}
+        </div>
+      )}
       <style>{`
           .react-datepicker-wrapper {
             width: 100%;
@@ -930,15 +969,18 @@ const DatePickerModern = <T extends FieldValues>({
       <DatePicker
         id={id}
         name={name}
-        selected={selected}
+        selected={useUTC ? localDate : selected}
         onChange={(date) => {
           if (date && showTimeSelect) {
-            if (selected) {
+            if (useUTC ? localDate : selected) {
               const newDate = new Date(date);
-              newDate.setHours(selected.getHours());
-              newDate.setMinutes(selected.getMinutes());
-              newDate.setSeconds(selected.getSeconds());
-              onChange(newDate);
+              const currentDate = useUTC ? localDate : selected;
+              if (currentDate) {
+                newDate.setHours(currentDate.getHours());
+                newDate.setMinutes(currentDate.getMinutes());
+                newDate.setSeconds(currentDate.getSeconds());
+              }
+              handleDateChange(newDate);
             } else {
               // If no previous date, set to current time
               const newDate = new Date(date);
@@ -946,10 +988,10 @@ const DatePickerModern = <T extends FieldValues>({
               newDate.setHours(now.getHours());
               newDate.setMinutes(now.getMinutes());
               newDate.setSeconds(0);
-              onChange(newDate);
+              handleDateChange(newDate);
             }
           } else {
-            onChange(date);
+            handleDateChange(date);
           }
           if (!showTimeSelect) {
             setIsOpen(false);
@@ -1081,61 +1123,69 @@ const DatePickerModern = <T extends FieldValues>({
         className="w-full"
         calendarContainer={useMemo(
           () =>
-            ({ children }: { children: ReactNode }) => (
-              <div
-                className="react-datepicker-container"
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  position: "relative",
-                }}
-              >
-                <div style={{ flex: 1 }}>{children}</div>
-                {showTimeSelect && (
-                  <CustomTimeSelector
-                    date={selected || new Date()}
-                    onChange={onChange}
-                    currentLocale={currentLocale}
-                    activeColor={activeColor}
-                  />
-                )}
-                <div className="react-datepicker__footer">
-                  <div className="react-datepicker__footer-selected">
-                    <Calendar className="w-4 h-4 flex-shrink-0" />
-                    <span>
-                      {selected
-                        ? showTimeSelect
-                          ? selected.toLocaleString(currentLocale, {
-                              dateStyle: "medium",
-                              timeStyle: "short",
-                            })
-                          : selected.toLocaleDateString(currentLocale, {
-                              dateStyle: "medium",
-                            })
-                        : currentLocale === "es"
-                          ? "Sin fecha seleccionada"
-                          : "No date selected"}
-                    </span>
-                  </div>
-                  {isClearable && selected && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onChange(null);
-                        setIsOpen(false);
-                      }}
-                      className="react-datepicker__footer-clear"
-                      title={currentLocale === "es" ? "Limpiar" : "Clear"}
-                    >
-                      <X className="w-4 h-4" />
-                      {currentLocale === "es" ? "Limpiar" : "Clear"}
-                    </button>
+            ({ children }: { children: ReactNode }) => {
+              const displayDate = useUTC ? localDate : selected;
+              return (
+                <div
+                  className="react-datepicker-container"
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    position: "relative",
+                  }}
+                >
+                  <div style={{ flex: 1 }}>{children}</div>
+                  {showTimeSelect && (
+                    <CustomTimeSelector
+                      date={displayDate || new Date()}
+                      onChange={handleDateChange}
+                      currentLocale={currentLocale}
+                      activeColor={activeColor}
+                    />
                   )}
+                  <div className="react-datepicker__footer">
+                    <div className="react-datepicker__footer-selected">
+                      <Calendar className="w-4 h-4 flex-shrink-0" />
+                      <span>
+                        {displayDate
+                          ? showTimeSelect
+                            ? displayDate.toLocaleString(currentLocale, {
+                                dateStyle: "medium",
+                                timeStyle: "short",
+                              })
+                            : displayDate.toLocaleDateString(currentLocale, {
+                                dateStyle: "medium",
+                              })
+                          : currentLocale === "es"
+                            ? "Sin fecha seleccionada"
+                            : "No date selected"}
+                      </span>
+                      {showTimezone && useUTC && (
+                        <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
+                          ({timezoneLabel()})
+                        </span>
+                      )}
+                    </div>
+                    {isClearable && displayDate && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDateChange(null);
+                          setIsOpen(false);
+                        }}
+                        className="react-datepicker__footer-clear"
+                        title={currentLocale === "es" ? "Limpiar" : "Clear"}
+                      >
+                        <X className="w-4 h-4" />
+                        {currentLocale === "es" ? "Limpiar" : "Clear"}
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ),
-          [selected, onChange, currentLocale, showTimeSelect, isClearable],
+              );
+            },
+          [selected, localDate, useUTC, handleDateChange, currentLocale, showTimeSelect, isClearable, showTimezone, timezoneLabel],
         )}
       />
     </div>

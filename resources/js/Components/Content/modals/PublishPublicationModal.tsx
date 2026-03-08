@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { formatDateTimeStyled } from "@/Utils/dateHelpers";
 
 // Helper component for recurring posts section
 const RecurringPostsSection = ({ 
@@ -64,10 +65,7 @@ const RecurringPostsSection = ({
             <div className="flex items-center gap-2">
               <Clock className="w-3 h-3 text-blue-600 dark:text-blue-400" />
               <span className="text-gray-700 dark:text-gray-300">
-                {new Date(post.scheduled_at).toLocaleString([], {
-                  dateStyle: "short",
-                  timeStyle: "short",
-                })}
+                {formatDateTimeStyled(post.scheduled_at, "short", "short")}
               </span>
             </div>
             <span className="text-blue-600 dark:text-blue-400 font-medium">
@@ -81,10 +79,7 @@ const RecurringPostsSection = ({
             <div className="flex items-center gap-2">
               <CheckCircle className="w-3 h-3 text-green-600 dark:text-green-400" />
               <span className="text-gray-700 dark:text-gray-300">
-                {new Date(post.published_at).toLocaleString([], {
-                  dateStyle: "short",
-                  timeStyle: "short",
-                })}
+                {formatDateTimeStyled(post.published_at, "short", "short")}
               </span>
             </div>
             {post.post_url ? (
@@ -888,12 +883,11 @@ export default function PublishPublicationModal({
                                   );
                                 return schedPost?.scheduled_at ? (
                                   <span className="text-[10px] text-gray-600 dark:text-gray-400 bg-white dark:bg-neutral-800 px-2 py-0.5 rounded-full shadow-sm">
-                                    {new Date(
+                                    {formatDateTimeStyled(
                                       schedPost.scheduled_at,
-                                    ).toLocaleString([], {
-                                      dateStyle: "short",
-                                      timeStyle: "short",
-                                    })}
+                                      "short",
+                                      "short"
+                                    )}
                                   </span>
                                 ) : null;
                               })()}

@@ -467,14 +467,14 @@
       "pendingAdminReview": "Pendiente de revisión"
     },
     "messages": {
-      "addSuccess": "publicación agregada eéxitosamente!",
-      "createSuccess": "publicación creada eéxitosamente!",
+      "addSuccess": "publicación agregada éxitosamente!",
+      "createSuccess": "publicación creada éxitosamente!",
       "duplicateSuccess": "publicación duplicada con éxito!",
       "addError": "Error al agregar publicación",
-      "updateSuccess": "publicación actualizada eéxitosamente!",
+      "updateSuccess": "publicación actualizada éxitosamente!",
       "updateError": "Error al actualizar publicación",
       "mediaAttached": "Archivo multimedia adjuntado con éxito a '{{title}}' (Carga en segundo plano)",
-      "deleteSuccess": "publicación eliminada eéxitosamente!",
+      "deleteSuccess": "publicación eliminada éxitosamente!",
       "deleteError": "Error al eliminar publicación",
       "cancelSuccess": "Publicación cancelada exitosamente",
       "fetchError": "Error al cargar Campañas",

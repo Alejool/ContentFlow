@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { formatDateString } from "@/Utils/dateHelpers";
 
 interface ViewCampaignModalProps {
   isOpen: boolean;
@@ -84,7 +85,7 @@ export default function ViewCampaignModal({
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return "Not set";
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return formatDateString(dateString, {
       year: "numeric",
       month: "long",
       day: "numeric",

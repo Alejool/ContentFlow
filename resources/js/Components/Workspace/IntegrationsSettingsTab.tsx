@@ -24,6 +24,7 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import ActivityLogSkeleton from "./ActivityLogSkeleton";
+import { formatDateString, formatTimeString } from "@/Utils/dateHelpers";
 
 interface IntegrationsSettingsTabProps {
   workspace: any;
@@ -168,15 +169,18 @@ export default function IntegrationsSettingsTab({
     toast.success(t("workspace.secret_generated"));
   };
 
-  const handleFilterChange = (key: string, value: string) => {
+  const handleFilterChange = (key: string, value: string | string[]) => {
+    // Convert array to string if needed (take first value or empty string)
+    const stringValue = Array.isArray(value) ? (value[0] || "") : value;
+    
     if (key === "channel") {
-      setChannelFilter(value);
-      fetchActivity(1, activityData?.per_page || 5, value, statusFilter);
+      setChannelFilter(stringValue);
+      fetchActivity(1, activityData?.per_page || 5, stringValue, statusFilter);
     } else if (key === "status") {
-      setStatusFilter(value);
-      fetchActivity(1, activityData?.per_page || 5, channelFilter, value);
+      setStatusFilter(stringValue);
+      fetchActivity(1, activityData?.per_page || 5, channelFilter, stringValue);
     } else if (key === "search") {
-      setSearchFilter(value);
+      setSearchFilter(stringValue);
     }
   };
   const fetchActivity = useCallback(
@@ -368,15 +372,11 @@ export default function IntegrationsSettingsTab({
                   buttonStyle="outline"
                   onClick={() => setShowAdvanced(!showAdvanced)}
                   className="gap-2"
+                  icon={ChevronRight}
                 >
                   {showAdvanced
                     ? t("common.hide_advanced")
                     : t("common.show_advanced")}
-                  <ChevronRight
-                    className={`h-4 w-4 transition-transform ${
-                      showAdvanced ? "rotate-90" : ""
-                    }`}
-                  />
                 </Button>
               )}
             </div>
@@ -420,7 +420,7 @@ export default function IntegrationsSettingsTab({
           {showAdvanced && canManageWorkspace && (
             <div className="bg-gradient-to-br from-neutral-50 to-white dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-lg p-6">
               <div className="flex items-center gap-3 mb-6">
-                <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
+                <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-primary-400 to-primary-500 flex items-center justify-center">
                   <ShieldCheck className="h-5 w-5 text-white" />
                 </div>
                 <div>
@@ -455,8 +455,8 @@ export default function IntegrationsSettingsTab({
                       onClick={generateSecret}
                       disabled={!canManageWorkspace}
                       className="gap-2"
+                      icon={Key}
                     >
-                      <Key className="h-4 w-4" />
                       {t("common.generate")}
                     </Button>
                   </div>
@@ -556,16 +556,13 @@ export default function IntegrationsSettingsTab({
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900 dark:text-white font-medium">
-                          {new Date(log.created_at).toLocaleDateString([], {
+                          {formatDateString(log.created_at, {
                             month: "short",
                             day: "numeric",
                           })}
                         </div>
                         <div className="text-xs text-gray-500 dark:text-neutral-500">
-                          {new Date(log.created_at).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
+                          {formatTimeString(log.created_at)}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">

@@ -23,6 +23,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { formatDateString, formatDateTimeStyled } from "@/Utils/dateHelpers";
 
 interface ApiSettingsTabProps {
   workspace: any;
@@ -193,7 +194,7 @@ export default function ApiSettingsTab({
       return (
         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-400">
           <XCircle className="w-3 h-3" />
-          Expirado — {date.toLocaleDateString()}
+          Expirado — {formatDateString(date)}
         </span>
       );
     }
@@ -205,7 +206,7 @@ export default function ApiSettingsTab({
     return (
       <span className="inline-flex items-center gap-1 text-xs text-amber-700 dark:text-amber-300">
         <Clock className="w-3 h-3" />
-        {date.toLocaleDateString()} ({relative})
+        {formatDateString(date)} ({relative})
       </span>
     );
   };
@@ -444,13 +445,7 @@ export default function ApiSettingsTab({
                             {/* Last used */}
                             <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-neutral-400">
                               {token.last_used_at
-                                ? new Date(token.last_used_at).toLocaleString(
-                                    "es",
-                                    {
-                                      dateStyle: "short",
-                                      timeStyle: "short",
-                                    },
-                                  )
+                                ? formatDateTimeStyled(token.last_used_at, "short", "short")
                                 : t("workspace.api.table.never_used")}
                             </td>
 
@@ -461,10 +456,7 @@ export default function ApiSettingsTab({
 
                             {/* Created at */}
                             <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-neutral-400">
-                              {new Date(token.created_at).toLocaleString("es", {
-                                dateStyle: "short",
-                                timeStyle: "short",
-                              })}
+                              {formatDateTimeStyled(token.created_at, "short", "short")}
                             </td>
 
                             {/* Actions */}

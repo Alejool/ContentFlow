@@ -1,5 +1,6 @@
 import DatePickerModern from "@/Components/common/Modern/DatePicker";
 import Label from "@/Components/common/Modern/Label";
+import { useTimezoneStore } from "@/stores/timezoneStore";
 import {
   addDays,
   addMonths,
@@ -1040,18 +1041,29 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                                   </div>
                                   <div className="space-y-1.5">
                                     {dates.slice(0, 5).map((date: Date, idx: number) => {
-                                      // Format date in UTC to avoid timezone shifts
-                                      const dayName = new Intl.DateTimeFormat(i18n?.language === "es" ? "es" : "en", {
+                                      // Format date in workspace timezone
+                                      const timezone = useTimezoneStore.getState().effectiveTimezone();
+                                      const locale = i18n?.language === "es" ? "es-ES" : "en-US";
+                                      
+                                      const dayName = new Intl.DateTimeFormat(locale, {
                                         weekday: 'long',
-                                        timeZone: 'UTC'
+                                        timeZone: timezone
                                       }).format(date);
-                                      const dayNumber = date.getUTCDate();
-                                      const monthName = new Intl.DateTimeFormat(i18n?.language === "es" ? "es" : "en", {
+                                      const dayNumber = new Intl.DateTimeFormat(locale, {
+                                        day: 'numeric',
+                                        timeZone: timezone
+                                      }).format(date);
+                                      const monthName = new Intl.DateTimeFormat(locale, {
                                         month: 'long',
-                                        timeZone: 'UTC'
+                                        timeZone: timezone
                                       }).format(date);
-                                      const hours = String(date.getUTCHours()).padStart(2, '0');
-                                      const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+                                      const timeStr = new Intl.DateTimeFormat(locale, {
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                        hour12: false,
+                                        timeZone: timezone
+                                      }).format(date);
+                                      const [hours, minutes] = timeStr.split(':');
                                       
                                       return (
                                         <div

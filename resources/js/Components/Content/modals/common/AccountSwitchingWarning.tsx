@@ -1,4 +1,5 @@
 import { AlertTriangle, Info } from "lucide-react";
+import { formatDateTimeString } from "@/Utils/dateHelpers";
 
 interface PlatformStatus {
   platform: string;
@@ -77,7 +78,7 @@ export default function AccountSwitchingWarning({
                     {status.published_at && (
                       <p className="mt-1">
                         {t("publish.publishedAt") || "Publicado el"}:{" "}
-                        {new Date(status.published_at).toLocaleString()}
+                        {formatDateTimeString(status.published_at)}
                       </p>
                     )}
                     {status.url && (

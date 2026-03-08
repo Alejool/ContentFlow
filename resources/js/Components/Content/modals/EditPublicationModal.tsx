@@ -804,8 +804,17 @@ const EditPublicationModal = ({
                       scheduledAt={watched.scheduled_at ?? undefined}
                       t={t}
                       onScheduleChange={(date) => {
-                       
-                        setValue("scheduled_at", date, {
+                        // Si la fecha está vacía y se está intentando establecer una fecha,
+                        // usar la fecha proporcionada o establecer una por defecto
+                        let finalDate = date;
+                        if (!date && !watched.scheduled_at) {
+                          // Si no hay fecha y se está activando el schedule, establecer una por defecto
+                          const defaultDate = new Date();
+                          defaultDate.setMinutes(defaultDate.getMinutes() + 2);
+                          finalDate = defaultDate.toISOString();
+                        }
+                        
+                        setValue("scheduled_at", finalDate, {
                           shouldDirty: true,
                           shouldValidate: true,
                           shouldTouch: true

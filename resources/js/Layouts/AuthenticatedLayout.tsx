@@ -8,6 +8,7 @@ import SearchButton from "@/Components/Layout/SearchButton";
 import Sidebar from "@/Components/Layout/Sidebar";
 import { ResumeUploadsPrompt } from "@/Components/Upload/ResumeUploadsPrompt";
 import KeyboardShortcutsModal from "@/Components/common/ui/KeyboardShortcutsModal";
+import { TimezoneInitializer } from "@/Components/common/TimezoneInitializer";
 import { OnboardingProvider } from "@/Contexts/OnboardingContext";
 import { useCompletionNotifications } from "@/Hooks/useCompletionNotifications";
 import { useWorkspaceLocks } from "@/Hooks/usePublicationLock";
@@ -180,6 +181,9 @@ export default function AuthenticatedLayout({
 
   return (
     <OnboardingProvider>
+      {/* ✅ Inicializar timezone desde Inertia props */}
+      <TimezoneInitializer />
+      
       <div className="h-screen flex flex-col overflow-hidden w-full max-w-full">
         <div
           className="relative flex-1 min-h-0 flex

@@ -4,6 +4,7 @@ import { validateVideoDuration } from "@/Utils/validationUtils";
 import { parseISO } from "date-fns";
 import { AlertTriangle, Check, Clock, Settings, Target, X } from "lucide-react";
 import React, { memo, useMemo, useState } from "react";
+import { formatDateTimeStyled } from "@/Utils/dateHelpers";
 
 interface SocialAccount {
   id: number;
@@ -111,6 +112,14 @@ const SchedulePopoverContent = memo(
             } else {
               // Clearing the date removes the per-account override → falls back to global schedule
               onScheduleRemove();
+            }
+          }}
+          onCalendarOpen={() => {
+            // Si no hay fecha personalizada, establecer una por defecto al abrir el calendario
+            if (!customSchedule) {
+              const defaultDate = new Date();
+              defaultDate.setMinutes(defaultDate.getMinutes() + 2);
+              onScheduleChange(defaultDate.toISOString());
             }
           }}
           showTimeSelect
@@ -340,12 +349,11 @@ const SocialAccountItem = memo(
                     }`}
                   >
                     <Clock className="w-3 h-3" />
-                    {parseISO(
+                    {formatDateTimeStyled(
                       customSchedule || globalSchedule || "",
-                    ).toLocaleString([], {
-                      dateStyle: "short",
-                      timeStyle: "short",
-                    })}
+                      "short",
+                      "short"
+                    )}
                     {!customSchedule && globalSchedule && (
                       <span className="text-[10px] opacity-70">(Global)</span>
                     )}

@@ -21,6 +21,7 @@ import {
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { formatDateString } from "@/Utils/dateHelpers";
 
 interface ContentCardProps {
   item: any;
@@ -406,8 +407,11 @@ export default function ContentCard({
               <div className="flex items-center gap-2">
                 <Calendar className="w-3.5 h-3.5 text-gray-400" />
                 <span className="text-xs text-gray-600 dark:text-gray-300">
-                  {format(new Date(item.scheduled_at), "d MMM, HH:mm", {
-                    locale,
+                  {formatDateString(item.scheduled_at, {
+                    day: "numeric",
+                    month: "short",
+                    hour: "2-digit",
+                    minute: "2-digit",
                   })}
                 </span>
               </div>
@@ -416,8 +420,10 @@ export default function ContentCard({
                 <div className="flex items-center gap-2">
                   <Clock className="w-3.5 h-3.5 text-gray-400" />
                   <span className="text-xs text-gray-600 dark:text-gray-300">
-                    {format(new Date(item.created_at), "d MMM yyyy", {
-                      locale,
+                    {formatDateString(item.created_at, {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
                     })}
                   </span>
                 </div>

@@ -1,9 +1,11 @@
 import { parseISO } from "date-fns";
+import { useTimezoneStore } from "@/stores/timezoneStore";
 
-// Small helper to format UTC ISO timestamps into the user's timezone (browser-detected)
-const getUserTimezone = () =>
-  (window as any).USER_TIMEZONE ||
-  Intl.DateTimeFormat().resolvedOptions().timeZone;
+// Small helper to format UTC ISO timestamps into the workspace timezone
+const getWorkspaceTimezone = () => {
+  return useTimezoneStore.getState().effectiveTimezone();
+};
+
 const getUserLocale = () =>
   (window as any).APP_LOCALE ||
   document.documentElement.lang ||
@@ -13,7 +15,7 @@ export function formatTime(iso?: string | null) {
   if (!iso) return "";
   try {
     const date = parseISO(iso);
-    const tz = getUserTimezone();
+    const tz = getWorkspaceTimezone();
     const locale = getUserLocale();
     return date.toLocaleString(locale || undefined, {
       hour: "2-digit",
@@ -30,7 +32,7 @@ export function formatDate(iso?: string | null) {
   if (!iso) return "";
   try {
     const date = parseISO(iso);
-    const tz = getUserTimezone();
+    const tz = getWorkspaceTimezone();
     const locale = getUserLocale();
     return date.toLocaleString(locale || undefined, {
       year: "numeric",
@@ -47,7 +49,7 @@ export function formatDateTime(iso?: string | null) {
   if (!iso) return "";
   try {
     const date = parseISO(iso);
-    const tz = getUserTimezone();
+    const tz = getWorkspaceTimezone();
     const locale = getUserLocale();
     return date.toLocaleString(locale || undefined, {
       year: "numeric",

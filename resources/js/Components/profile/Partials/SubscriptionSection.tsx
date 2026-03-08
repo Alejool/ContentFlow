@@ -23,6 +23,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { formatDateString } from "@/Utils/dateHelpers";
 
 interface Invoice {
   id: string;
@@ -142,7 +143,7 @@ export default function SubscriptionSection({
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return "";
-    return new Date(dateString).toLocaleDateString("es-ES", {
+    return formatDateString(dateString, {
       year: "numeric",
       month: "long",
       day: "numeric",

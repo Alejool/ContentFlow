@@ -28,13 +28,14 @@ use App\Models\Calendar\ExternalCalendarConnection;
 use App\Models\Calendar\BulkOperationHistory;
 use App\Models\SubscriptionHistory;
 use App\Models\SubscriptionUsageTracking;
+use App\Traits\HasTimezone;
 
 class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPassword, HasLocalePreference
 {
   use AuthenticatableTrait;
   use MustVerifyEmailTrait;
   use CanResetPasswordTrait;
-  use HasApiTokens, HasFactory, Notifiable;
+  use HasApiTokens, HasFactory, Notifiable, HasTimezone;
 
   protected $fillable = [
     'name',
@@ -49,6 +50,7 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
     'plan_started_at',
     'plan_renews_at',
     'locale',
+    'timezone',
     'theme',
     'theme_color',
     'global_platform_settings',

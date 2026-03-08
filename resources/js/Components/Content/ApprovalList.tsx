@@ -12,6 +12,7 @@ import { Check, Clock, Eye, Layers, User, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { formatTimeString, formatDateTimeString } from "@/Utils/dateHelpers";
 
 interface ApprovalListProps {
   publications: Publication[];
@@ -63,13 +64,14 @@ function ApprovalPublicationItem({
             )}
             <span
               className="text-xs text-gray-500 flex items-center gap-1.5"
-              title={format(new Date(pub.updated_at), "PPP HH:mm", {
-                locale,
+              title={formatDateTimeString(pub.updated_at, {
+                dateStyle: "long",
+                timeStyle: "short",
               })}
             >
               <Clock className="w-3.5 h-3.5" />
               <span>
-                {format(new Date(pub.updated_at), "HH:mm")} (
+                {formatTimeString(pub.updated_at)} (
                 {formatDistanceToNow(new Date(pub.updated_at), {
                   addSuffix: true,
                   locale,

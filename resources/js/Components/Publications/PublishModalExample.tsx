@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Modal from '@/Components/common/ui/Modal';
 import ContentValidationPanel from './ContentValidationPanel';
 import { Publication, SocialAccount } from '@/types/Publication';
+import { DateTimePicker } from '@/Components/common/DateTimePicker';
 import axios from 'axios';
 
 interface ValidationResult {
@@ -214,11 +215,10 @@ export default function PublishModalExample({
 
               {schedulePost && (
                 <div className="ml-7">
-                  <input
-                    type="datetime-local"
+                  <DateTimePicker
                     value={scheduledAt}
-                    onChange={(e) => setScheduledAt(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-neutral-600 rounded-md text-sm bg-white dark:bg-neutral-800 text-gray-900 dark:text-gray-100"
+                    onChange={(value) => setScheduledAt(value || '')}
+                    required
                   />
                 </div>
               )}
