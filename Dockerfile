@@ -6,6 +6,7 @@ FROM php:8.4-alpine AS production
 RUN apk add --no-cache \
     bash \
     curl \
+    wget \
     git \
     unzip \
     icu-dev \
