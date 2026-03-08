@@ -1,5 +1,6 @@
 import Button from "@/Components/common/Modern/Button";
 import { router, useForm } from "@inertiajs/react";
+import axios from "axios";
 import { Image as ImageIcon, Palette, ShieldCheck, Upload } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
@@ -34,12 +35,12 @@ export default function WhiteLabelSettingsTab({
     setData("primary_color", workspace.white_label_primary_color || "#4f46e5");
   }, [workspace]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!canManageWorkspace) return;
 
     post(route("workspaces.white-label.update", workspace.slug), {
-      onSuccess: (page) => {
+      onSuccess: async (page) => {
         toast.success(
           t("workspace.white_label.update_success") ||
             "Branding updated successfully",
@@ -68,6 +69,17 @@ export default function WhiteLabelSettingsTab({
           ) as HTMLImageElement;
           if (logoImg) {
             logoImg.src = currentWorkspace.white_label_logo_url;
+          }
+        }
+
+        // Apply the branding color to the user's theme
+        if (data.primary_color) {
+          try {
+            await axios.patch(route("api.v1.profile.theme.update"), {
+              theme_color: data.primary_color,
+            });
+          } catch (error) {
+            console.error("Error updating user theme:", error);
           }
         }
 
