@@ -188,13 +188,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
       
       // Skip if no date is available for this account
       if (!baseDate) {
-        console.log(`[ScheduleSection] No base date for account ${accountId}`, {
-          hasAccountSchedule: !!accountSchedules[accountId],
-          hasGlobalSchedule: !!scheduledAt,
-          hasExistingPosts: existingScheduledPosts?.length || 0,
-          accountSchedules,
-          scheduledAt,
-        });
+      
         return;
       }
 
@@ -234,12 +228,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
       // Convert recurrenceDays to numbers for comparison
       const recurrenceDaysNumbers = recurrenceDays ? recurrenceDays.map(d => typeof d === 'string' ? parseInt(d) : d) : [];
 
-      console.log('[ScheduleSection] Before calculating first recurrence', {
-        currentDate: currentDate.toISOString(),
-        currentDateFormatted: formatUTCDate(currentDate),
-        recurrenceType,
-        interval,
-      });
+     
 
       // Calculate the FIRST recurrence date after the base date
       // IMPORTANT: If base date's day is in the selected days, use it as first recurrence
@@ -253,18 +242,13 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
             const currentDay = currentDate.getUTCDay();
             const sortedDays = [...recurrenceDaysNumbers].sort((a, b) => a - b);
 
-            console.log('[ScheduleSection] Weekly calculation', {
-              currentDay,
-              sortedDays,
-              currentDayName: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][currentDay],
-              isCurrentDaySelected: sortedDays.includes(currentDay),
-            });
+           
 
             // Check if current day is one of the selected days
             if (sortedDays.includes(currentDay)) {
               // Current day IS selected, so use it as the first recurrence
               // Don't add any days - the loop will use this date
-              console.log('[ScheduleSection] Current day is selected, using it as first recurrence');
+            
             } else {
               // Current day is NOT selected, find the next selected day
               let nextDayMatch = null;
@@ -321,11 +305,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
         // Compare only the date part (YYYY-MM-DD) in UTC, ignoring time
         if (endDateString) {
           const currentDateString = formatUTCDate(currentDate);
-          console.log('[ScheduleSection] Checking date', {
-            currentDateString,
-            endDateString,
-            exceeds: currentDateString > endDateString,
-          });
+         
           if (currentDateString > endDateString) {
             break;
           }
@@ -333,11 +313,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
         
         // Add the current date to the array
         dates.push(new Date(currentDate));
-        console.log('[ScheduleSection] Added date', {
-          date: currentDate.toISOString(),
-          formatted: formatUTCDate(currentDate),
-          totalDates: dates.length,
-        });
+       
 
         if (dates.length >= maxCount) break;
 
