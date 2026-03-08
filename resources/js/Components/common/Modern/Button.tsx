@@ -16,7 +16,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     | "success"
     | "ghost"
     | "warning";
-  buttonStyle?: "solid" | "outline" | "gradient" | "ghost";
+  buttonStyle?: "solid" | "outline" | "gradient" | "ghost" | "icon";
   size?: "xs" | "sm" | "md" | "lg" | "xl";
   loading?: boolean;
   loadingText?: string;
@@ -152,6 +152,15 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const getStyleClasses = () => {
       switch (buttonStyle) {
+        case "icon":
+          return `
+            ${colors.text}
+            bg-transparent
+            border-0
+            hover:bg-transparent
+            p-0
+            shadow-none
+          `;
         case "gradient":
           return `
             ${colors.text}
@@ -231,21 +240,23 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       focus:outline-none focus:ring-2 focus:ring-offset-2
       active:scale-[0.98]
       ${fullWidth ? "w-full" : ""}
-      ${sizeClasses[size]}
+      ${buttonStyle !== "icon" ? sizeClasses[size] : ""}
       ${getStyleClasses()}
       ${
-        variant === "primary" && buttonStyle !== "outline"
+        variant === "primary" && buttonStyle !== "outline" && buttonStyle !== "icon"
           ? "hover:shadow-primary-500/25 shadow-xl hover:shadow-2xl"
           : ""
       }
-      ${roundedClasses[rounded]}
-      ${shadowClasses[shadow]}
+      ${buttonStyle !== "icon" ? roundedClasses[rounded] : ""}
+      ${buttonStyle !== "icon" ? shadowClasses[shadow] : ""}
       ${animationClasses[animation]}
-      ${colors.focusRing}
+      ${buttonStyle !== "icon" ? colors.focusRing : ""}
       ${
-        currentTheme === "dark"
+        currentTheme === "dark" && buttonStyle !== "icon"
           ? "focus:ring-offset-gray-900"
-          : "focus:ring-offset-white"
+          : buttonStyle !== "icon"
+          ? "focus:ring-offset-white"
+          : ""
       }
     `;
 

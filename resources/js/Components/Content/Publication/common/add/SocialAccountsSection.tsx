@@ -1,3 +1,4 @@
+import Button from "@/Components/common/Modern/Button";
 import DatePickerModern from "@/Components/common/Modern/DatePicker";
 import { validateVideoDuration } from "@/Utils/validationUtils";
 import { parseISO } from "date-fns";
@@ -90,9 +91,16 @@ const SchedulePopoverContent = memo(
           <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
             Schedule for {account.platform}
           </h4>
-          <button type="button" onClick={onClose}>
-            <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-          </button>
+          <Button
+            variant="ghost"
+            size="xs"
+            buttonStyle="icon"
+            onClick={onClose}
+            icon={X}
+            className="!p-1"
+          >
+            {""}
+          </Button>
         </div>
 
         <DatePickerModern
@@ -115,13 +123,13 @@ const SchedulePopoverContent = memo(
         />
 
         <div className="flex justify-end gap-2 mt-4">
-          <button
-            type="button"
+          <Button
+            variant="primary"
+            size="sm"
             onClick={onClose}
-            className="text-xs bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors font-medium shadow-sm"
           >
             Done
-          </button>
+          </Button>
         </div>
       </>
     );
@@ -343,17 +351,20 @@ const SocialAccountItem = memo(
                     )}
                   </span>
                   {customSchedule && (
-                    <button
-                      type="button"
+                    <Button
+                      variant="ghost"
+                      size="xs"
+                      buttonStyle="icon"
                       onClick={(e) => {
                         e.stopPropagation();
                         onScheduleRemove();
                       }}
-                      className="p-1 rounded-full hover:bg-primary-100 dark:hover:bg-primary-900/40 text-primary-500 transition-colors"
+                      icon={X}
+                      className="!p-1 text-primary-500 hover:text-primary-600"
                       title={t("common.remove") || "Eliminar programación"}
                     >
-                      <X className="w-3 h-3" />
-                    </button>
+                      {""}
+                    </Button>
                   )}
                 </div>
               )}
@@ -382,16 +393,17 @@ const SocialAccountItem = memo(
                   {account.platform}
                 </div>
                 {onCancel && (
-                  <button
-                    type="button"
+                  <Button
+                    variant="danger"
+                    size="xs"
                     onClick={(e) => {
                       e.stopPropagation();
                       onCancel();
                     }}
-                    className="px-2 py-0.5 rounded bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-700 dark:text-red-400 font-bold uppercase transition-colors"
+                    className="uppercase"
                   >
                     {t("common.cancel") || "Cancelar"}
-                  </button>
+                  </Button>
                 )}
               </div>
             )}
@@ -416,7 +428,7 @@ const SocialAccountItem = memo(
                 {durationError}
               </div>
             )}
-            {complianceInfo && complianceInfo.allValid && !durationError && (
+            {/* {complianceInfo && complianceInfo.allValid && !durationError && (
               <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-emerald-600 dark:text-emerald-400 animate-in slide-in-from-top-1">
                 <Check className="w-3 h-3" />
                 {t("publications.validation.videoComplies", {
@@ -424,7 +436,7 @@ const SocialAccountItem = memo(
                   defaultValue: `Cumple con la duración para ${account.platform}`,
                 })}
               </div>
-            )}
+            )} */}
           </div>
         </div>
 
@@ -445,17 +457,20 @@ const SocialAccountItem = memo(
           )}
 
           {isCheckedActually && (
-            <button
-              type="button"
+            <Button
+              variant="ghost"
+              size="xs"
+              buttonStyle="icon"
               onClick={(e) => {
                 e.stopPropagation();
                 onPlatformSettingsClick();
               }}
-              className="p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400 transition-colors"
+              icon={Settings}
+              className="!p-1.5 text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400"
               title={t("platformSettings.configure") || "Configurar red"}
             >
-              <Settings className="w-4 h-4" />
-            </button>
+              {""}
+            </Button>
           )}
         </div>
       </div>
@@ -518,19 +533,6 @@ const SocialAccountsSection = memo(
       return [...connectedAccounts, ...uniqueDisconnected];
     }, [socialAccounts, socialPostLogs]);
 
-    const selectedPlatforms = useMemo(() => {
-      return Array.from(
-        new Set(
-          selectedAccounts
-            .map((id) => {
-              const account = allAccounts.find((a) => a.id === id);
-              return account?.platform;
-            })
-            .filter(Boolean),
-        ),
-      );
-    }, [selectedAccounts, allAccounts]);
-
     return (
       <div className="space-y-4">
         {/* Banner informativo si ya está publicada en algunas cuentas */}
@@ -582,22 +584,23 @@ const SocialAccountsSection = memo(
         )}
 
         <div className="flex items-center justify-between">
-          <label className="text-sm font-semibold flex items-center gap-2">
+          <label className="font-semibold flex items-center gap-2">
             <Target className="w-4 h-4" />
             {t("manageContent.configureNetworks") ||
               "Configura tus redes sociales"}
           </label>
           <div className="flex items-center gap-2">
             {selectedAccounts.length > 1 && (
-              <button
-                type="button"
+              <Button
+                variant="primary"
+                size="sm"
                 onClick={() => onPlatformSettingsClick("all")}
-                className="text-xs px-3 py-1.5 rounded-lg bg-primary-500 hover:bg-primary-600 text-white font-medium transition-colors flex items-center gap-1.5"
+                icon={Settings}
+                iconPosition="left"
                 title={t("platformSettings.configureAll") || "Configurar todas"}
               >
-                <Settings className="w-3.5 h-3.5" />
                 {t("platformSettings.configureAll") || "Configurar todas"}
-              </button>
+              </Button>
             )}
             {error && (
               <span className="text-xs text-primary-500 font-medium animate-pulse">
