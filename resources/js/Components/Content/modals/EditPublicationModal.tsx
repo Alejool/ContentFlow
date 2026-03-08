@@ -823,6 +823,7 @@ const EditPublicationModal = ({
                       selectedAccounts={selectedSocialAccounts}
                       socialAccounts={socialAccounts}
                       accountSchedules={accountSchedules}
+                      existingScheduledPosts={publication?.scheduled_posts}
                     />
                   </div>
                 </div>
