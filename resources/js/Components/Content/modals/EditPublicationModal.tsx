@@ -131,12 +131,22 @@ const EditPublicationModal = ({
   } = usePublicationForm({
     publication,
     onClose,
-    onSubmitSuccess: (success) => {
-      if (success) {
+    onSubmitSuccess: async (success) => {
+      if (success && publication?.id) {
         try {
-          useCalendarStore.getState().fetchEvents();
+          // Force refresh the publication data from backend
+          await usePublicationStore.getState().fetchPublicationById(publication.id);
+          
+          // Refresh published platforms to update the publish modal
+          await fetchPublishedPlatformsFromStore(publication.id);
+          
+          // Small delay to ensure backend has processed everything
+          await new Promise(resolve => setTimeout(resolve, 100));
+          
+          // Refresh calendar events
+          await useCalendarStore.getState().fetchEvents();
         } catch (e) {
-          // Store might not be initialized if not on calendar page
+          console.error('Error refreshing data after update:', e);
         }
       }
       onSubmit(success);
@@ -415,7 +425,11 @@ const EditPublicationModal = ({
 
   const handleRecurrenceChange = (data: any) => {
     Object.entries(data).forEach(([key, val]) => {
-      setValue(key as any, val, { shouldValidate: true });
+      setValue(key as any, val, { 
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true
+      });
     });
   };
 
@@ -824,6 +838,7 @@ const EditPublicationModal = ({
                       socialAccounts={socialAccounts}
                       accountSchedules={accountSchedules}
                       existingScheduledPosts={publication?.scheduled_posts}
+                      socialPostLogs={publication?.social_post_logs}
                     />
                   </div>
                 </div>

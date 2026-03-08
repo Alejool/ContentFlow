@@ -24,6 +24,91 @@ import {
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
+// Helper component for recurring posts section
+const RecurringPostsSection = ({ 
+  publication, 
+  accountId, 
+  getRecurringPosts, 
+  getPublishedRecurringPosts,
+  t 
+}: {
+  publication: Publication;
+  accountId: number;
+  getRecurringPosts: (pubId: number, accId: number) => any[];
+  getPublishedRecurringPosts: (pubId: number, accId: number) => any[];
+  t: any;
+}) => {
+  const recurringScheduled = getRecurringPosts(publication.id, accountId);
+  const recurringPublished = getPublishedRecurringPosts(publication.id, accountId);
+  
+  // Eliminar duplicados basados en el ID
+  const uniqueScheduled = Array.from(new Map(recurringScheduled.map((post: any) => [post.id, post])).values());
+  const uniquePublished = Array.from(new Map(recurringPublished.map((post: any) => [post.id, post])).values());
+  
+  const hasRecurring = uniqueScheduled.length > 0 || uniquePublished.length > 0;
+  
+  if (!hasRecurring) return null;
+  
+  return (
+    <div className="mt-3 p-3 bg-gray-50 dark:bg-neutral-800/50 rounded-lg border border-gray-200 dark:border-neutral-700">
+      <div className="flex items-center gap-2 mb-2">
+        <Clock className="w-3.5 h-3.5 text-primary-600 dark:text-primary-400" />
+        <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+          {t("publications.modal.publish.recurringPosts") || "Publicaciones Recurrentes"}
+        </span>
+      </div>
+      
+      <div className="space-y-1.5 max-h-[200px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-neutral-600 scrollbar-track-transparent">
+        {uniqueScheduled.map((post: any) => (
+          <div key={post.id} className="flex items-center justify-between text-xs p-2 bg-white dark:bg-neutral-900 rounded border border-blue-200 dark:border-blue-800">
+            <div className="flex items-center gap-2">
+              <Clock className="w-3 h-3 text-blue-600 dark:text-blue-400" />
+              <span className="text-gray-700 dark:text-gray-300">
+                {new Date(post.scheduled_at).toLocaleString([], {
+                  dateStyle: "short",
+                  timeStyle: "short",
+                })}
+              </span>
+            </div>
+            <span className="text-blue-600 dark:text-blue-400 font-medium">
+              {t("publications.status.scheduled") || "Programado"}
+            </span>
+          </div>
+        ))}
+        
+        {uniquePublished.map((post: any) => (
+          <div key={post.id} className="flex items-center justify-between text-xs p-2 bg-white dark:bg-neutral-900 rounded border border-green-200 dark:border-green-800">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="w-3 h-3 text-green-600 dark:text-green-400" />
+              <span className="text-gray-700 dark:text-gray-300">
+                {new Date(post.published_at).toLocaleString([], {
+                  dateStyle: "short",
+                  timeStyle: "short",
+                })}
+              </span>
+            </div>
+            {post.post_url ? (
+              <a
+                href={post.post_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-green-600 dark:text-green-400 hover:underline font-medium flex items-center gap-1"
+              >
+                {t("publications.modal.publish.viewPost") || "Ver"}
+                <Share2 className="w-3 h-3" />
+              </a>
+            ) : (
+              <span className="text-green-600 dark:text-green-400 font-medium">
+                {t("publications.status.published") || "Publicado"}
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 interface PublishPublicationModalProps {
   isOpen: boolean;
   onClose: (id?: number) => void;
@@ -61,6 +146,8 @@ export default function PublishPublicationModal({
     existingThumbnails,
     isLoadingThumbnails,
     retryInfo,
+    getRecurringPosts,
+    getPublishedRecurringPosts,
     fetchPublishedPlatforms,
     loadExistingThumbnails,
     handleUnpublish,
@@ -850,6 +937,16 @@ export default function PublishPublicationModal({
                           >
                             <X className="w-4 h-4" />
                           </button>
+                        )}
+                        
+                        {publication && getRecurringPosts && getPublishedRecurringPosts && (
+                          <RecurringPostsSection
+                            publication={publication}
+                            accountId={account.id}
+                            getRecurringPosts={getRecurringPosts}
+                            getPublishedRecurringPosts={getPublishedRecurringPosts}
+                            t={t}
+                          />
                         )}
                       </div>
                     );

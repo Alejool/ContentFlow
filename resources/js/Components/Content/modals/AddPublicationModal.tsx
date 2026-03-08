@@ -424,7 +424,11 @@ export default function AddPublicationModal({
                   }
                   onRecurrenceChange={(data) => {
                     Object.entries(data).forEach(([key, val]) => {
-                      setValue(key as any, val, { shouldValidate: true });
+                      setValue(key as any, val, { 
+                        shouldValidate: true,
+                        shouldDirty: true,
+                        shouldTouch: true
+                      });
                     });
                   }}
                   selectedAccounts={selectedSocialAccounts}

@@ -42,7 +42,18 @@ interface ScheduleSectionProps {
   accountSchedules?: Record<number, string>;
   selectedAccounts?: number[];
   socialAccounts?: Array<{ id: number; account_name?: string; platform: string }>;
-  existingScheduledPosts?: Array<{ social_account_id: number; scheduled_at: string; status: string }>;
+  existingScheduledPosts?: Array<{ 
+    social_account_id: number; 
+    scheduled_at: string; 
+    published_at?: string;
+    status: string;
+  }>;
+  socialPostLogs?: Array<{
+    social_account_id: number;
+    status: string;
+    published_at?: string;
+    created_at?: string;
+  }>;
 }
 
 const ScheduleSection: React.FC<ScheduleSectionProps> = ({
@@ -69,16 +80,28 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
   selectedAccounts = [],
   socialAccounts = [],
   existingScheduledPosts = [],
+  socialPostLogs = [],
 }) => {
   const [carouselIndex, setCarouselIndex] = useState(0);
   
   // Helper function to parse date strings in UTC
-  // Handles both YYYY-MM-DD and full ISO format (YYYY-MM-DDTHH:mm:ss.sssZ)
+  // Handles multiple formats:
+  // - YYYY-MM-DD (date only)
+  // - YYYY-MM-DD HH:mm:ss (datetime without timezone - assumes UTC)
+  // - ISO format with timezone (YYYY-MM-DDTHH:mm:ss.sssZ)
   const parseUTCDate = (dateString: string): Date => {
     // If it's just a date (YYYY-MM-DD), append UTC time
     if (dateString.length === 10 && !dateString.includes('T')) {
       return new Date(dateString + 'T00:00:00.000Z');
     }
+    
+    // If it's datetime without timezone (YYYY-MM-DD HH:mm:ss), convert to UTC
+    // This format comes from Laravel's published_at field
+    if (dateString.includes(' ') && !dateString.includes('T')) {
+      // Replace space with 'T' and append 'Z' to indicate UTC
+      return new Date(dateString.replace(' ', 'T') + 'Z');
+    }
+    
     // Otherwise, parse as ISO (already includes timezone info)
     return parseISO(dateString);
   };
@@ -127,12 +150,68 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
   // Calculate recurrence dates PER ACCOUNT
   // Each account can have its own scheduled date
   // Only calculate for accounts that are in recurrenceAccounts (or all if empty/null)
+  // Get all available accounts (selected + published + from logs)
+  // This allows recurrence on already published posts
+  const allAvailableAccounts = useMemo(() => {
+    const accounts = new Set<number>(selectedAccounts);
+    
+    // Add accounts from existing scheduled/published posts
+    if (existingScheduledPosts && existingScheduledPosts.length > 0) {
+      existingScheduledPosts.forEach(post => {
+        if (post.status === 'published' || post.status === 'pending') {
+          accounts.add(post.social_account_id);
+        }
+      });
+    }
+    
+    // Add accounts from social post logs (for posts published directly without scheduling)
+    if (socialPostLogs && socialPostLogs.length > 0) {
+      socialPostLogs.forEach(log => {
+        if (log.status === 'published' && log.social_account_id) {
+          accounts.add(log.social_account_id);
+        }
+      });
+    }
+    
+    return Array.from(accounts);
+  }, [selectedAccounts, existingScheduledPosts, socialPostLogs]);
+
+  // Helper to check if we have any dates available (scheduled or published)
+  const hasAnyDates = useMemo(() => {
+    // Check if we have global schedule
+    if (scheduledAt) return true;
+    
+    // Check if we have account-specific schedules
+    if (Object.keys(accountSchedules).length > 0) return true;
+    
+    // Check if we have existing published posts with dates
+    if (existingScheduledPosts && existingScheduledPosts.length > 0) {
+      const hasScheduledDates = existingScheduledPosts.some(post => 
+        allAvailableAccounts.includes(post.social_account_id) &&
+        (post.status === 'published' || post.status === 'pending') &&
+        (post.published_at || post.scheduled_at)
+      );
+      if (hasScheduledDates) return true;
+    }
+    
+    // Check if we have social post logs with published dates
+    if (socialPostLogs && socialPostLogs.length > 0) {
+      return socialPostLogs.some(log =>
+        allAvailableAccounts.includes(log.social_account_id) &&
+        log.status === 'published' &&
+        log.published_at
+      );
+    }
+    
+    return false;
+  }, [scheduledAt, accountSchedules, existingScheduledPosts, socialPostLogs, allAvailableAccounts]);
+
   const nextDatesByAccount = useMemo(() => {
     if (!isRecurring) {
       return {};
     }
 
-    if (selectedAccounts.length === 0) {
+    if (allAvailableAccounts.length === 0) {
       return {};
     }
 
@@ -156,39 +235,61 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
     
     // Determine which accounts should have recurrence
     // Convert recurrenceAccounts to numbers for comparison
-    // IMPORTANT: null or empty array means ALL selected accounts get recurrence
+    // IMPORTANT: null or empty array means ALL available accounts get recurrence
     const recurrenceAccountsNumbers = recurrenceAccounts && recurrenceAccounts.length > 0
       ? recurrenceAccounts.map(id => typeof id === 'string' ? parseInt(id) : id)
       : [];
     
-    // If recurrenceAccounts is null/empty, ALL selected accounts get recurrence
+    // If recurrenceAccounts is null/empty, ALL available accounts get recurrence
     const accountsWithRecurrence = recurrenceAccountsNumbers.length > 0
-      ? selectedAccounts.filter(id => recurrenceAccountsNumbers.includes(id))
-      : selectedAccounts; // ALL accounts if empty/null
+      ? allAvailableAccounts.filter(id => recurrenceAccountsNumbers.includes(id))
+      : allAvailableAccounts; // ALL accounts if empty/null
 
     accountsWithRecurrence.forEach((accountId) => {
       // Determine the base date for this account
       // Priority order:
       // 1. Account-specific schedule (user is actively configuring)
-      // 2. Global schedule (user set a date for all accounts)
-      // 3. Existing scheduled post for this account (when editing existing publication)
+      // 2. Published date from social_post_logs (if already published)
+      // 3. Existing scheduled post for this account (pending or published)
+      // 4. Global scheduledAt (fallback for new publications)
       
-      let baseDate = accountSchedules[accountId] || scheduledAt;
+      let baseDate = accountSchedules[accountId];
+      
+      // If no account-specific schedule, check social_post_logs first (most accurate for published posts)
+      if (!baseDate && socialPostLogs && socialPostLogs.length > 0) {
+        const publishedLog = socialPostLogs.find(
+          (log) => log.social_account_id === accountId && log.status === 'published'
+        );
+        if (publishedLog?.published_at) {
+          baseDate = publishedLog.published_at;
+        }
+      }
       
       // If still no date, try to get it from existingScheduledPosts
       // This handles the case when editing an existing publication
       if (!baseDate && existingScheduledPosts && existingScheduledPosts.length > 0) {
         const existingPost = existingScheduledPosts.find(
-          (post) => post.social_account_id === accountId && post.status === 'pending'
+          (post) => post.social_account_id === accountId && 
+          (post.status === 'pending' || post.status === 'published')
         );
-        if (existingPost?.scheduled_at) {
-          baseDate = existingPost.scheduled_at;
+        // For published posts, use published_at; for pending, use scheduled_at
+        if (existingPost) {
+          baseDate = existingPost.status === 'published' 
+            ? existingPost.published_at 
+            : existingPost.scheduled_at;
         }
+      }
+      
+      // FALLBACK: Use global scheduledAt if no account-specific date is found
+      // This is critical for new publications where user sets a global date
+      if (!baseDate && scheduledAt) {
+        baseDate = scheduledAt;
+        console.log(`[ScheduleSection] Using global scheduledAt as fallback for account ${accountId}:`, scheduledAt);
       }
       
       // Skip if no date is available for this account
       if (!baseDate) {
-      
+        console.warn(`[ScheduleSection] No base date found for account ${accountId}, skipping recurrence calculation`);
         return;
       }
 
@@ -368,7 +469,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
     return result;
   }, [
     isRecurring,
-    selectedAccounts,
+    allAvailableAccounts,
     accountSchedules,
     scheduledAt,
     recurrenceType,
@@ -378,11 +479,12 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
     recurrenceAccounts,
     useGlobalSchedule,
     existingScheduledPosts,
+    socialPostLogs,
   ]);
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      {/* <div className="flex items-center justify-between">
         <Label htmlFor="scheduled_at" icon={Clock} size="lg" className="mb-0">
           {t("publications.modal.schedule.title") || "Date for all networks"}
         </Label>
@@ -399,10 +501,9 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                 
                 // Si se activa el global schedule, limpiar las fechas individuales
                 if (isChecked) {
-    
                   onClearAccountSchedules?.();
                 } else {
-                
+                  // Si se desactiva, limpiar la fecha global
                   onScheduleChange("");
                 }
               }
@@ -460,7 +561,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
         {error && (
           <p className="mt-1 text-xs text-red-500 dark:text-red-400">{error}</p>
         )}
-      </div>
+      </div> */}
 
       <div className="pt-4 border-t border-gray-100 dark:border-neutral-800">
         <Label htmlFor="recurrence" icon={Clock} size="lg" className="mb-2">
@@ -538,7 +639,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
             {isRecurring && (
               <div className="space-y-4 p-4 bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 rounded-lg shadow-sm">
                 {/* Selector de redes con recurrencia - Solo si hay más de una red */}
-                {selectedAccounts.length > 1 ? (
+                {allAvailableAccounts.length > 1 ? (
                   <div className="space-y-3 pb-4 border-b border-gray-100 dark:border-neutral-800">
                     <div>
                       <Label size="sm">
@@ -556,12 +657,14 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                       <label className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-neutral-800/50 cursor-pointer transition-colors border border-gray-200 dark:border-neutral-700">
                         <input
                           type="checkbox"
-                          checked={!recurrenceAccounts || recurrenceAccounts.length === 0}
+                          checked={!recurrenceAccounts || recurrenceAccounts.length === 0 || recurrenceAccounts.length === allAvailableAccounts.length}
                           onChange={(e) => {
                             if (e.target.checked) {
+                              // Set to empty array to indicate "all accounts"
                               onRecurrenceChange?.({ recurrence_accounts: [] });
                             } else {
-                              onRecurrenceChange?.({ recurrence_accounts: [selectedAccounts[0]] });
+                              // Uncheck "all", select only the first account
+                              onRecurrenceChange?.({ recurrence_accounts: [allAvailableAccounts[0]] });
                             }
                           }}
                           className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
@@ -573,7 +676,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                           </span>
                           <div className="flex flex-wrap gap-1.5 mt-1.5">
                             {socialAccounts
-                              .filter(acc => selectedAccounts.includes(acc.id))
+                              .filter(acc => allAvailableAccounts.includes(acc.id))
                               .map((account) => {
                                 const platformColors: Record<string, { bg: string; text: string; border: string }> = {
                                   youtube: { bg: 'bg-red-50 dark:bg-red-900/20', text: 'text-red-700 dark:text-red-400', border: 'border-red-200 dark:border-red-800' },
@@ -607,7 +710,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                             Selección personalizada:
                           </p>
                           {socialAccounts
-                            .filter(acc => selectedAccounts.includes(acc.id))
+                            .filter(acc => allAvailableAccounts.includes(acc.id))
                             .map((account) => {
                               const platformColors: Record<string, { bg: string; text: string; border: string; hover: string }> = {
                                 youtube: { bg: 'bg-red-50 dark:bg-red-900/20', text: 'text-red-700 dark:text-red-400', border: 'border-red-200 dark:border-red-800', hover: 'hover:bg-red-100 dark:hover:bg-red-900/30' },
@@ -634,13 +737,13 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                                       
                                       if (e.target.checked) {
                                         newAccounts = [...currentAccounts, account.id];
-                                        if (newAccounts.length === selectedAccounts.length) {
+                                        if (newAccounts.length === allAvailableAccounts.length) {
                                           newAccounts = [];
                                         }
                                       } else {
                                         newAccounts = currentAccounts.filter(id => id !== account.id);
                                         if (newAccounts.length === 0) {
-                                          const otherAccount = selectedAccounts.find(id => id !== account.id);
+                                          const otherAccount = allAvailableAccounts.find(id => id !== account.id);
                                           if (otherAccount) {
                                             newAccounts = [otherAccount];
                                           }
@@ -980,14 +1083,14 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                       <div className="text-center py-6">
                         <AlertCircle className="w-8 h-8 text-amber-500 dark:text-amber-400 mx-auto mb-2" />
                         <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          {!scheduledAt && Object.keys(accountSchedules).length === 0
+                          {!hasAnyDates
                             ? "Configura una fecha para ver el preview"
                             : recurrenceType === "weekly" && (!recurrenceDays || recurrenceDays.length === 0)
                               ? "Selecciona al menos un día de la semana"
                               : "Configura los parámetros de recurrencia"}
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {!scheduledAt && Object.keys(accountSchedules).length === 0
+                          {!hasAnyDates
                             ? "Activa la 'Programación Global' arriba o configura fechas individuales por red social"
                             : recurrenceType === "weekly" && (!recurrenceDays || recurrenceDays.length === 0)
                               ? "Marca los días en los que quieres que se repita la publicación"
