@@ -168,7 +168,8 @@
     "modal": {
       "subtitle": "Set up a new space for your team to collaborate",
       "name_label": "Workspace Name",
-      "description_hint": "A good description helps members understand the purpose of the space"
+      "description_hint": "A good description helps members understand the purpose of the space",
+      "footer_note": "You can customize settings and invite members after creating the workspace"
     },
     "settings_title": "Workspace Settings",
     "manage_general_settings": "Configure your workspace's basic information and visibility",

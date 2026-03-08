@@ -138,15 +138,19 @@
           "title": "Repeat publication (Recurrence)",
           "locked_title": "Recurrence locked",
           "locked_desc": "Upgrade your plan to schedule automatic repetitions (every X days/weeks) for your publications.",
-          "coming_soon": "Recurrence configuration options...",
           "enable": "Enable recurrence",
           "frequency": "Frequency",
           "interval": "Every",
-          "ends": "Ends on",
-          "ends_placeholder": "Optional: End date",
           "days": "Repeat on days",
+          "ends": "End date",
+          "ends_placeholder": "Select when recurrence ends",
+          "end_date_required": "End date is required for recurring publications",
           "preview_title": "Upcoming publication dates",
-          "preview_note": "These dates are based on your recurrence settings and start date."
+          "preview_note": "These dates are estimated and will be reflected in the calendar when saved.",
+          "select_accounts": "Networks with recurrence",
+          "select_accounts_desc": "Select which networks will publish recurrently. The others will only publish once.",
+          "all_accounts": "Apply to all",
+          "single_account_note": "This network will publish recurrently according to the configuration."
         }
       },
       "edit": {
@@ -345,6 +349,8 @@
         "scheduledAtRequired": "Scheduled date is required when you select social networks",
         "socialAccountsRequired": "Please select at least one social media account",
         "singleVideo": "You can only upload one video per publication.",
+        "recurrenceDaysRequired": "Please select at least one day for weekly recurrence",
+        "recurrence_days": "Invalid recurrence days",
         "scheduledMinDifference": "The date must be at least 1 minute after the current time"
       },
       "processing": {
