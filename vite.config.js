@@ -72,84 +72,76 @@ export default defineConfig({
             },
             workbox: {
                 globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
-                // Clean up old caches
                 cleanupOutdatedCaches: true,
-                // Skip waiting and claim clients immediately
                 skipWaiting: true,
                 clientsClaim: true,
-                // Runtime caching strategies
                 runtimeCaching: [
-                    // Cache-first for static assets with hash (immutable)
                     {
                         urlPattern: /\/_next\/static\/.*/i,
                         handler: 'CacheFirst',
                         options: {
                             cacheName: 'static-assets-cache',
                             expiration: {
-                                maxEntries: 150, // Reduced from 200
-                                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
+                                maxEntries: 150,
+                                maxAgeSeconds: 60 * 60 * 24 * 365
                             },
                             cacheableResponse: {
                                 statuses: [0, 200]
                             }
                         }
                     },
-                    // Network-first for API calls with shorter timeout
                     {
                         urlPattern: /^https?:\/\/.*\/api\/.*/i,
                         handler: 'NetworkFirst',
                         options: {
                             cacheName: 'api-cache',
-                            networkTimeoutSeconds: 5, // Reduced from 10
+                            networkTimeoutSeconds: 5,
                             expiration: {
-                                maxEntries: 30, // Reduced from 50
-                                maxAgeSeconds: 60 * 60 * 12 // 12 hours (reduced from 24)
+                                maxEntries: 30,
+                                maxAgeSeconds: 60 * 60 * 12
                             },
                             cacheableResponse: {
                                 statuses: [0, 200]
                             }
                         }
                     },
-                    // Stale-while-revalidate for images with optimized limits
                     {
                         urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/,
                         handler: 'StaleWhileRevalidate',
                         options: {
                             cacheName: 'image-cache',
                             expiration: {
-                                maxEntries: 60, // Reduced from 100
-                                maxAgeSeconds: 60 * 60 * 24 * 7 // 7 days (reduced from 30)
+                                maxEntries: 60,
+                                maxAgeSeconds: 60 * 60 * 24 * 7
                             },
                             cacheableResponse: {
                                 statuses: [0, 200]
                             }
                         }
                     },
-                    // Cache fonts with longer expiration
                     {
                         urlPattern: /\.(?:woff|woff2|ttf|otf|eot)$/,
                         handler: 'CacheFirst',
                         options: {
                             cacheName: 'font-cache',
                             expiration: {
-                                maxEntries: 20, // Reduced from 30
-                                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
+                                maxEntries: 20,
+                                maxAgeSeconds: 60 * 60 * 24 * 365
                             },
                             cacheableResponse: {
                                 statuses: [0, 200]
                             }
                         }
                     },
-                    // Network-first for dynamic content with shorter cache
                     {
                         urlPattern: /\/(publications|reels|calendar)\/.*/i,
                         handler: 'NetworkFirst',
                         options: {
                             cacheName: 'dynamic-content-cache',
-                            networkTimeoutSeconds: 3, // Reduced from 5
+                            networkTimeoutSeconds: 3,
                             expiration: {
-                                maxEntries: 30, // Reduced from 50
-                                maxAgeSeconds: 60 * 30 // 30 minutes (reduced from 1 hour)
+                                maxEntries: 30,
+                                maxAgeSeconds: 60 * 30
                             },
                             cacheableResponse: {
                                 statuses: [0, 200]
@@ -159,7 +151,7 @@ export default defineConfig({
                 ]
             },
             devOptions: {
-                enabled: false // Disable in development for faster builds
+                enabled: false
             }
         })
     ],
