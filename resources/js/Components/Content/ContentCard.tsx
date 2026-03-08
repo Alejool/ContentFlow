@@ -401,7 +401,7 @@ export default function ContentCard({
             </div>
           )}
 
-          <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-700">
+          <div className="flex items-center justify-between pt-2">
             {item.scheduled_at ? (
               <div className="flex items-center gap-2">
                 <Calendar className="w-3.5 h-3.5 text-gray-400" />
