@@ -183,6 +183,48 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Métodos de Pago Disponibles
+    |--------------------------------------------------------------------------
+    |
+    | Define qué métodos de pago están disponibles en el sistema.
+    | Solo los métodos listados aquí podrán ser habilitados en system_settings.
+    |
+    */
+    'available_methods' => [
+        'stripe' => [
+            'name' => 'Stripe',
+            'description' => 'Tarjetas de crédito/débito internacionales',
+            'countries' => ['US', 'CA', 'GB', 'AU', 'NZ', 'IE', 'FR', 'DE', 'ES', 'IT', 'NL', 'BE', 'AT', 'CH', 'SE', 'NO', 'DK', 'FI', 'PT', 'PL', 'CZ', 'GR', 'RO', 'BG', 'HU', 'SK', 'SI', 'HR', 'LT', 'LV', 'EE', 'CY', 'MT', 'LU', 'JP', 'SG', 'HK', 'MY', 'TH', 'ID', 'PH', 'IN', 'AE', 'SA', 'IL', 'ZA'],
+            'enabled_by_default' => true,
+        ],
+        'wompi' => [
+            'name' => 'Wompi',
+            'description' => 'PSE, Nequi, tarjetas (Colombia)',
+            'countries' => ['CO'],
+            'enabled_by_default' => true,
+        ],
+        'mercadopago' => [
+            'name' => 'Mercado Pago',
+            'description' => 'Pagos en América Latina',
+            'countries' => ['MX', 'AR', 'BR', 'CL', 'CO', 'PE'],
+            'enabled_by_default' => true,
+        ],
+        'payu' => [
+            'name' => 'PayU',
+            'description' => 'Pagos en Latinoamérica',
+            'countries' => ['CO', 'MX', 'PE', 'PA', 'AR', 'BR', 'CL'],
+            'enabled_by_default' => true,
+        ],
+        'epayco' => [
+            'name' => 'ePayco',
+            'description' => 'Pagos en Colombia',
+            'countries' => ['CO'],
+            'enabled_by_default' => false,
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Webhooks
     |--------------------------------------------------------------------------
     |
