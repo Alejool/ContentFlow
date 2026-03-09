@@ -203,9 +203,15 @@ class Publication extends Model
    */
   public function canBePublished(bool $hasPublishPermission = false): bool
   {
-    // Never allow publishing if pending review, publishing, or retrying
-    if (in_array($this->status, ['pending_review', 'publishing', 'retrying'])) {
+    // Never allow publishing if pending review
+    if ($this->status === 'pending_review') {
       return false;
+    }
+
+    // Allow publishing to different platforms even if currently publishing/retrying
+    // The controller will check for platform-specific conflicts
+    if (in_array($this->status, ['publishing', 'retrying'])) {
+      return true;
     }
 
     // If user has publish permission, allow any status except blocked ones

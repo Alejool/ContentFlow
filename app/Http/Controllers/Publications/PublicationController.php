@@ -449,21 +449,47 @@ class PublicationController extends Controller
         );
       }
 
-      // If publishing or retrying, show specific message
+      // If publishing or retrying, check if it's for the SAME platforms
       if (in_array($publication->status, ['publishing', 'retrying'])) {
+        $requestedPlatforms = $request->input('platforms', []);
+        
+        // Get platforms currently being published
+        $publishingPlatforms = \App\Models\SocialPostLog::where('publication_id', $publication->id)
+          ->whereIn('status', ['pending', 'publishing'])
+          ->whereIn('id', function ($query) use ($publication) {
+            $query->selectRaw('MAX(id)')
+              ->from('social_post_logs')
+              ->where('publication_id', $publication->id)
+              ->groupBy('social_account_id');
+          })
+          ->pluck('social_account_id')
+          ->toArray();
+        
+        // Check if any requested platform is currently being published
+        $conflictingPlatforms = array_intersect($requestedPlatforms, $publishingPlatforms);
+        
+        if (!empty($conflictingPlatforms)) {
+          return $this->errorResponse(
+            __('publications.errors.already_publishing'),
+            422,
+            [
+              'current_status' => $publication->status,
+              'conflicting_platforms' => $conflictingPlatforms
+            ]
+          );
+        }
+        
+        // If no conflicts, allow publishing to other platforms
+      }
+
+      // Check if needs approval (but not if already publishing/retrying to different platforms)
+      if (!in_array($publication->status, ['publishing', 'retrying'])) {
         return $this->errorResponse(
-          __('publications.errors.already_publishing'),
+          __('publications.errors.not_approved'),
           422,
           ['current_status' => $publication->status]
         );
       }
-
-      // Otherwise, needs approval
-      return $this->errorResponse(
-        __('publications.errors.not_approved'),
-        422,
-        ['current_status' => $publication->status]
-      );
     }
 
     try {

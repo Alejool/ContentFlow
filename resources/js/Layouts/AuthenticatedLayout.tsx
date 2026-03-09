@@ -9,6 +9,7 @@ import Sidebar from "@/Components/Layout/Sidebar";
 import { ResumeUploadsPrompt } from "@/Components/Upload/ResumeUploadsPrompt";
 import KeyboardShortcutsModal from "@/Components/common/ui/KeyboardShortcutsModal";
 import { TimezoneInitializer } from "@/Components/common/TimezoneInitializer";
+import MaintenanceBanner from "@/Components/MaintenanceBanner";
 import { OnboardingProvider } from "@/Contexts/OnboardingContext";
 import { useCompletionNotifications } from "@/Hooks/useCompletionNotifications";
 import { useWorkspaceLocks } from "@/Hooks/usePublicationLock";
@@ -183,6 +184,11 @@ export default function AuthenticatedLayout({
     <OnboardingProvider>
       {/* ✅ Inicializar timezone desde Inertia props */}
       <TimezoneInitializer />
+      
+      {/* Banner de mantenimiento para super admins */}
+      {props.maintenanceMode && props.maintenanceBanner && (
+        <MaintenanceBanner message={props.maintenanceBanner as string} />
+      )}
       
       <div className="h-screen flex flex-col overflow-hidden w-full max-w-full">
         <div

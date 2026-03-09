@@ -26,6 +26,19 @@ class UnpublishPublicationAction
 
       if ($remaining === 0) {
         $publication->update(['status' => 'draft']);
+        
+        // Eliminar automáticamente las publicaciones recurrentes programadas
+        $deletedRecurringPosts = $publication->scheduled_posts()
+          ->where('status', 'pending')
+          ->where('is_recurring_instance', true)
+          ->delete();
+        
+        if ($deletedRecurringPosts > 0) {
+          \Log::info('UnpublishPublicationAction: Deleted recurring scheduled posts', [
+            'publication_id' => $publication->id,
+            'deleted_count' => $deletedRecurringPosts
+          ]);
+        }
       }
 
       event(new PublicationUpdated($publication));
