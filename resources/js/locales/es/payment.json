@@ -1,0 +1,18 @@
+{
+  "payment": {
+    "paymentMethod": "Método de pago",
+    "selectPaymentMethod": "Selecciona un método de pago",
+    "noPaymentMethods": "No hay métodos de pago disponibles",
+    "loadingMethods": "Cargando métodos de pago...",
+    "stripe": "Tarjeta de crédito/débito",
+    "mercadopago": "Mercado Pago",
+    "epayco": "ePayco",
+    "payu": "PayU",
+    "wompi": "Wompi",
+    "processing": "Procesando pago...",
+    "success": "Pago exitoso",
+    "failed": "Pago fallido",
+    "cancelled": "Pago cancelado",
+    "selectToContine": "Selecciona un método de pago para continuar"
+  }
+}

@@ -17,6 +17,7 @@ import nav from "./nav.json";
 import notifications from "./notifications.json";
 import onboarding from "./onboarding.json";
 import pagination from "./pagination.json";
+import payment from "./payment.json";
 import platformSettings from "./platformSettings.json";
 import profile from "./profile.json";
 import publications from "./publications.json";
@@ -43,6 +44,7 @@ export default {
   ...workspace,
   ...pricing,
   ...subscription,
+  ...payment,
   ...profile,
   ...platformSettings,
   ...approvals,

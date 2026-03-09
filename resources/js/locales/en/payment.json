@@ -1,0 +1,18 @@
+{
+  "payment": {
+    "paymentMethod": "Payment method",
+    "selectPaymentMethod": "Select a payment method",
+    "noPaymentMethods": "No payment methods available",
+    "loadingMethods": "Loading payment methods...",
+    "stripe": "Credit/Debit card",
+    "mercadopago": "Mercado Pago",
+    "epayco": "ePayco",
+    "payu": "PayU",
+    "wompi": "Wompi",
+    "processing": "Processing payment...",
+    "success": "Payment successful",
+    "failed": "Payment failed",
+    "cancelled": "Payment cancelled",
+    "selectToContine": "Select a payment method to continue"
+  }
+}
