@@ -3,6 +3,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 
 interface UsageData {
+  team_members: any;
   period: {
     year: number;
     month: number;

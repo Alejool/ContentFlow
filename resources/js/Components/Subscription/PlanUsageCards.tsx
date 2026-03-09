@@ -71,13 +71,17 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
       key: 'team_members',
       label: t('subscription.addons.teamMembers', 'Miembros del Equipo'),
       icon: Users,
-      percentage: 0,
-      used: 0,
-      limit: '∞',
-      remaining: '∞',
+      percentage: usage.team_members?.limit && usage.team_members.limit > 0 
+        ? (usage.team_members.used / usage.team_members.limit * 100) 
+        : 0,
+      used: usage.team_members?.used || 0,
+      limit: usage.team_members?.limit === -1 || !usage.team_members?.limit ? '∞' : usage.team_members.limit,
+      remaining: usage.team_members?.limit === -1 || !usage.team_members?.limit 
+        ? '∞' 
+        : usage.team_members.limit - usage.team_members.used,
       show: true,
-      canBuy: false,
-      upgradeUrl: '/pricing',
+      canBuy: true,
+      addonType: 'team_members',
     },
   ];
 
