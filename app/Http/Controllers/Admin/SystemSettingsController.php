@@ -78,10 +78,28 @@ class SystemSettingsController extends Controller
      */
     public function index()
     {
+        // Obtener métodos de pago disponibles desde config
+        $availableMethods = config('payment.available_methods', []);
+        $availableMethodKeys = array_keys($availableMethods);
+        
         $settings = SystemSetting::with('updatedBy:id,name')
             ->orderBy('category')
             ->orderBy('label')
             ->get()
+            ->filter(function ($setting) use ($availableMethodKeys) {
+                // Si es un método de pago, filtrar solo los que están en available_methods
+                if ($setting->category === 'payment_methods') {
+                    // Extraer el nombre del método del key (payment.stripe.enabled -> stripe)
+                    preg_match('/payment\.([^.]+)\.enabled/', $setting->key, $matches);
+                    $methodName = $matches[1] ?? null;
+                    
+                    // Solo incluir si está en available_methods
+                    return $methodName && in_array($methodName, $availableMethodKeys);
+                }
+                
+                // Para otras categorías, incluir todos
+                return true;
+            })
             ->groupBy('category')
             ->map(function ($categorySettings) {
                 return $categorySettings->map(function ($setting) {

@@ -30,29 +30,81 @@ class UnifiedPaymentController extends Controller
         // Detectar país del usuario
         $countryCode = $this->countryDetection->detectCountry($user, $ipAddress);
 
-        // Obtener gateways disponibles para ese país
-        $gateways = PaymentGatewayFactory::getGatewaysForCountry($countryCode);
+        // Obtener métodos de pago habilitados en system_settings para este país
+        $enabledMethods = \App\Services\PaymentMethodService::getAvailableMethods($countryCode);
 
-        $gatewayList = [];
-        foreach ($gateways as $name => $gateway) {
-            $gatewayList[] = [
-                'name' => $name,
-                'display_name' => $this->getGatewayDisplayName($name),
-                'logo' => $this->getGatewayLogo($name),
-                'available' => $gateway->isAvailable(),
-            ];
+        // Si no hay métodos habilitados, retornar lista vacía
+        if (empty($enabledMethods)) {
+            Log::warning('No payment methods enabled for country', [
+                'country' => $countryCode,
+                'user_id' => $user?->id,
+            ]);
+
+            return response()->json([
+                'country' => $countryCode,
+                'currency' => $this->countryDetection->getCurrencyForCountry($countryCode),
+                'exchange_rate' => 1,
+                'gateways' => [],
+                'default_gateway' => null,
+            ]);
         }
+
+        // Obtener instancias de gateways solo para los métodos habilitados
+        $gatewayList = [];
+        foreach ($enabledMethods as $methodKey => $methodConfig) {
+            try {
+                $gateway = PaymentGatewayFactory::make($methodKey);
+                
+                // Verificar que el gateway tenga credenciales configuradas
+                if ($gateway->isAvailable()) {
+                    $gatewayList[] = [
+                        'name' => $methodKey,
+                        'display_name' => $this->getGatewayDisplayName($methodKey),
+                        'logo' => $this->getGatewayLogo($methodKey),
+                        'available' => true,
+                    ];
+                } else {
+                    Log::info("Gateway {$methodKey} is enabled in system but credentials are missing", [
+                        'country' => $countryCode,
+                    ]);
+                }
+            } catch (\Exception $e) {
+                Log::warning("Failed to instantiate gateway {$methodKey}", [
+                    'error' => $e->getMessage(),
+                    'country' => $countryCode,
+                ]);
+            }
+        }
+
+        // Ordenar gateways según prioridad configurada
+        $gatewayPriority = config('payment.gateway_priority', []);
+        usort($gatewayList, function ($a, $b) use ($gatewayPriority) {
+            $priorityA = array_search($a['name'], $gatewayPriority);
+            $priorityB = array_search($b['name'], $gatewayPriority);
+            
+            // Si no está en la lista de prioridad, ponerlo al final
+            $priorityA = $priorityA === false ? 999 : $priorityA;
+            $priorityB = $priorityB === false ? 999 : $priorityB;
+            
+            return $priorityA <=> $priorityB;
+        });
 
         // Información de moneda y precios
         $currency = $this->countryDetection->getCurrencyForCountry($countryCode);
         $exchangeRate = $this->countryDetection->getExchangeRate($currency);
+
+        Log::info('Available gateways for user', [
+            'country' => $countryCode,
+            'gateways' => array_column($gatewayList, 'name'),
+            'user_id' => $user?->id,
+        ]);
 
         return response()->json([
             'country' => $countryCode,
             'currency' => $currency,
             'exchange_rate' => $exchangeRate,
             'gateways' => $gatewayList,
-            'default_gateway' => $gatewayList[0]['name'] ?? 'stripe',
+            'default_gateway' => $gatewayList[0]['name'] ?? null,
         ]);
     }
 
