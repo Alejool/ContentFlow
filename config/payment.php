@@ -13,6 +13,23 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Orden de Prioridad de Gateways
+    |--------------------------------------------------------------------------
+    |
+    | Define el orden en que se muestran y seleccionan los gateways.
+    | Cuando hay selección automática, se usa el primero disponible según este orden.
+    |
+    */
+    'gateway_priority' => [
+        'mercadopago',  // 1. Mercado Pago (preferido en LATAM)
+        'stripe',       // 2. Stripe (internacional)
+        'payu',         // 3. PayU
+        'wompi',        // 4. Wompi
+        'epayco',       // 5. ePayco
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Gateway por País (Principal)
     |--------------------------------------------------------------------------
     |
@@ -197,12 +214,12 @@ return [
             'countries' => ['US', 'CA', 'GB', 'AU', 'NZ', 'IE', 'FR', 'DE', 'ES', 'IT', 'NL', 'BE', 'AT', 'CH', 'SE', 'NO', 'DK', 'FI', 'PT', 'PL', 'CZ', 'GR', 'RO', 'BG', 'HU', 'SK', 'SI', 'HR', 'LT', 'LV', 'EE', 'CY', 'MT', 'LU', 'JP', 'SG', 'HK', 'MY', 'TH', 'ID', 'PH', 'IN', 'AE', 'SA', 'IL', 'ZA'],
             'enabled_by_default' => true,
         ],
-        'wompi' => [
-            'name' => 'Wompi',
-            'description' => 'PSE, Nequi, tarjetas (Colombia)',
-            'countries' => ['CO'],
-            'enabled_by_default' => true,
-        ],
+        // 'wompi' => [
+        //     'name' => 'Wompi',
+        //     'description' => 'PSE, Nequi, tarjetas (Colombia)',
+        //     'countries' => ['CO'],
+        //     'enabled_by_default' => true,
+        // ],
         'mercadopago' => [
             'name' => 'Mercado Pago',
             'description' => 'Pagos en América Latina',
@@ -215,12 +232,12 @@ return [
             'countries' => ['CO', 'MX', 'PE', 'PA', 'AR', 'BR', 'CL'],
             'enabled_by_default' => true,
         ],
-        'epayco' => [
-            'name' => 'ePayco',
-            'description' => 'Pagos en Colombia',
-            'countries' => ['CO'],
-            'enabled_by_default' => false,
-        ],
+        // 'epayco' => [
+        //     'name' => 'ePayco',
+        //     'description' => 'Pagos en Colombia',
+        //     'countries' => ['CO'],
+        //     'enabled_by_default' => false,
+        // ],
     ],
 
     /*
