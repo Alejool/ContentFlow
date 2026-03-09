@@ -48,11 +48,32 @@ Route::middleware('guest')->group(function () {
 
   Route::get(
     '/',
-    fn() =>
-    Inertia::render('Welcome', [
-      'canLogin' => Route::has('login'),
-      'canRegister' => Route::has('register'),
-    ])
+    function () {
+      $systemConfig = app(\App\Services\SystemConfigService::class);
+      $availablePlans = $systemConfig->getAvailablePlans();
+      
+      // Formatear planes para el frontend
+      $plans = collect($availablePlans)
+        ->map(function ($plan, $key) {
+          return [
+            'id' => $key,
+            'name' => $plan['name'],
+            'price' => $plan['price'],
+            'description' => $plan['description'] ?? '',
+            'limits' => $plan['limits'],
+            'features' => $plan['features'] ?? [],
+            'popular' => $plan['popular'] ?? ($key === 'professional'),
+          ];
+        })
+        ->values()
+        ->toArray();
+      
+      return Inertia::render('Welcome', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+        'plans' => $plans,
+      ]);
+    }
   )->name('welcome');
 
   Route::get('/privacy', fn() => Inertia::render('PrivacyPolicy'))->name('privacy');

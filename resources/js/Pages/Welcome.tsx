@@ -27,17 +27,32 @@ interface AuthProps {
   } | null;
 }
 
+interface Plan {
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+  limits: {
+    publications_per_month: number;
+    social_accounts: number;
+    storage_gb: number;
+  };
+  features: Record<string, any>;
+  popular?: boolean;
+}
+
 interface WelcomeProps {
   auth: AuthProps;
   canLogin: boolean;
   canRegister: boolean;
+  plans: Plan[];
 }
 
 const SUPPORTED_NETWORKS = Object.values(SOCIAL_PLATFORMS).filter(
   (platform) => platform.active,
 );
 
-export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
+export default function Welcome({ auth, canLogin, canRegister, plans = [] }: WelcomeProps) {
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
   const pricingSectionRef = useRef<HTMLDivElement>(null);
@@ -280,163 +295,96 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
                   {t("welcome.pricingSubtitle") || "Desde planes gratuitos hasta soluciones empresariales"}
                 </p>
 
-                <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                  {/* Free Plan */}
-                  <Link
-                    href={canRegister ? "/register?plan=free" : canLogin ? "/pricing" : "/register"}
-                    className="relative rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 hover:border-primary-500 transition-all hover:shadow-lg cursor-pointer"
-                  >
-                    <div className="text-center">
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                        {t("pricing.plans.free.name") || "Free"}
-                      </h3>
-                      <div className="mt-4">
-                        <span className="text-4xl font-bold text-gray-900 dark:text-white">$0</span>
-                        <span className="text-gray-600 dark:text-gray-400">
-                          {t("pricing.perMonth") || "/mes"}
-                        </span>
-                      </div>
-                      <ul className="mt-6 space-y-3 text-sm text-left">
-                        <li className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
-                          <span className="text-gray-700 dark:text-gray-300">
-                            {t("pricing.features.publications3")}
-                          </span>
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
-                          <span className="text-gray-700 dark:text-gray-300">
-                            {t("pricing.features.socialAccounts2")}
-                          </span>
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
-                          <span className="text-gray-700 dark:text-gray-300">
-                            {t("pricing.features.storage1")}
-                          </span>
-                        </li>
-                      </ul>
-                    </div>
-                  </Link>
+                <div className={`mt-10 grid gap-6 ${plans.length === 1 ? 'grid-cols-1 max-w-md mx-auto' : plans.length === 2 ? 'sm:grid-cols-2 max-w-3xl mx-auto' : plans.length === 3 ? 'sm:grid-cols-2 lg:grid-cols-3' : 'sm:grid-cols-2 lg:grid-cols-4'}`}>
+                  {plans.map((plan) => {
+                    const isPopular = plan.popular;
+                    const planColors = {
+                      free: 'green',
+                      demo: 'gray',
+                      starter: 'blue',
+                      growth: 'indigo',
+                      professional: 'yellow',
+                      enterprise: 'purple',
+                    };
+                    const color = planColors[plan.id as keyof typeof planColors] || 'gray';
+                    
+                    // Formatear límites con traducciones
+                    const getPublicationsText = () => {
+                      if (plan.limits.publications_per_month === -1) {
+                        return t("pricing.features.publicationsUnlimited") || "Publicaciones ilimitadas";
+                      }
+                      const count = plan.limits.publications_per_month;
+                      return `${count} ${t("common.publicationsPerMonth") || "publicaciones/mes"}`;
+                    };
 
-                  {/* Starter Plan */}
-                  <Link
-                    href={canRegister ? "/register?plan=starter" : canLogin ? "/pricing" : "/register"}
-                    className="relative rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 hover:border-primary-500 transition-all hover:shadow-lg cursor-pointer"
-                  >
-                    <div className="text-center">
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                        {t("pricing.plans.starter.name") || "Starter"}
-                      </h3>
-                      <div className="mt-4">
-                        <span className="text-4xl font-bold text-gray-900 dark:text-white">$19</span>
-                        <span className="text-gray-600 dark:text-gray-400">
-                          {t("pricing.perMonth") || "/mes"}
-                        </span>
-                      </div>
-                      <ul className="mt-6 space-y-3 text-sm text-left">
-                        <li className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
-                          <span className="text-gray-700 dark:text-gray-300">
-                            {t("pricing.features.publications50")}
-                          </span>
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
-                          <span className="text-gray-700 dark:text-gray-300">
-                            {t("pricing.features.socialAccounts10")}
-                          </span>
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
-                          <span className="text-gray-700 dark:text-gray-300">
-                            {t("pricing.features.storage10")}
-                          </span>
-                        </li>
-                      </ul>
-                    </div>
-                  </Link>
+                    const getSocialAccountsText = () => {
+                      if (plan.limits.social_accounts === -1) {
+                        return t("pricing.features.socialAccountsUnlimited") || "Cuentas sociales ilimitadas";
+                      }
+                      const count = plan.limits.social_accounts;
+                      return `${count} ${count === 1 ? (t("common.socialAccount") || "red social") : (t("common.socialAccounts") || "redes sociales")}`;
+                    };
 
-                  {/* Professional Plan - Popular */}
-                  <Link
-                    href={canRegister ? "/register?plan=professional" : canLogin ? "/pricing" : "/register"}
-                    className="relative rounded-lg border-2 border-primary-500 bg-white dark:bg-gray-800 p-6 shadow-lg transform scale-105 hover:shadow-xl transition-all cursor-pointer"
-                  >
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary-500 text-white">
-                        {t("pricing.mostPopular") || "Más Popular"}
-                      </span>
-                    </div>
-                    <div className="text-center">
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                        {t("pricing.plans.professional.name") || "Professional"}
-                      </h3>
-                      <div className="mt-4">
-                        <span className="text-4xl font-bold text-gray-900 dark:text-white">$49</span>
-                        <span className="text-gray-600 dark:text-gray-400">
-                          {t("pricing.perMonth") || "/mes"}
-                        </span>
-                      </div>
-                      <ul className="mt-6 space-y-3 text-sm text-left">
-                        <li className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-yellow-500"></div>
-                          <span className="text-gray-700 dark:text-gray-300">
-                            {t("pricing.features.publications200")}
-                          </span>
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-yellow-500"></div>
-                          <span className="text-gray-700 dark:text-gray-300">
-                            {t("pricing.features.socialAccounts50")}
-                          </span>
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-yellow-500"></div>
-                          <span className="text-gray-700 dark:text-gray-300">
-                            {t("pricing.features.storage100")}
-                          </span>
-                        </li>
-                      </ul>
-                    </div>
-                  </Link>
-
-                  {/* Enterprise Plan */}
-                  <Link
-                    href={canRegister ? "/register?plan=enterprise" : canLogin ? "/pricing" : "/register"}
-                    className="relative rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 hover:border-primary-500 transition-all hover:shadow-lg cursor-pointer"
-                  >
-                    <div className="text-center">
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                        {t("pricing.plans.enterprise.name") || "Enterprise"}
-                      </h3>
-                      <div className="mt-4">
-                        <span className="text-4xl font-bold text-gray-900 dark:text-white">$199</span>
-                        <span className="text-gray-600 dark:text-gray-400">
-                          {t("pricing.perMonth") || "/mes"}
-                        </span>
-                      </div>
-                      <ul className="mt-6 space-y-3 text-sm text-left">
-                        <li className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-purple-500"></div>
-                          <span className="text-gray-700 dark:text-gray-300">
-                            {t("pricing.features.publicationsUnlimited")}
-                          </span>
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-purple-500"></div>
-                          <span className="text-gray-700 dark:text-gray-300">
-                            {t("pricing.features.socialAccountsUnlimited")}
-                          </span>
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-purple-500"></div>
-                          <span className="text-gray-700 dark:text-gray-300">
-                            {t("pricing.features.storage1TB")}
-                          </span>
-                        </li>
-                      </ul>
-                    </div>
-                  </Link>
+                    const getStorageText = () => {
+                      if (plan.limits.storage_gb >= 1000) {
+                        return `${plan.limits.storage_gb / 1000}TB ${t("common.storage") || "almacenamiento"}`;
+                      }
+                      return `${plan.limits.storage_gb}GB ${t("common.storage") || "almacenamiento"}`;
+                    };
+                    
+                    return (
+                      <Link
+                        key={plan.id}
+                        href={canRegister ? `/register?plan=${plan.id}` : canLogin ? "/pricing" : "/register"}
+                        className={`relative rounded-lg border-2 ${
+                          isPopular 
+                            ? 'border-primary-500 shadow-lg transform scale-105 hover:shadow-xl' 
+                            : 'border-gray-200 dark:border-gray-700 hover:border-primary-500 hover:shadow-lg'
+                        } bg-white dark:bg-gray-800 p-6 transition-all cursor-pointer`}
+                      >
+                        {isPopular && (
+                          <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary-500 text-white">
+                              {t("pricing.mostPopular") || "Más Popular"}
+                            </span>
+                          </div>
+                        )}
+                        <div className="text-center">
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                            {t(`pricing.plans.${plan.id}.name`) || plan.name}
+                          </h3>
+                          <div className="mt-4">
+                            <span className="text-4xl font-bold text-gray-900 dark:text-white">
+                              ${plan.price}
+                            </span>
+                            <span className="text-gray-600 dark:text-gray-400">
+                              {t("pricing.perMonth") || "/mes"}
+                            </span>
+                          </div>
+                          <ul className="mt-6 space-y-3 text-sm text-left">
+                            <li className="flex items-center gap-2">
+                              <div className={`w-1.5 h-1.5 rounded-full bg-${color}-500`}></div>
+                              <span className="text-gray-700 dark:text-gray-300">
+                                {getPublicationsText()}
+                              </span>
+                            </li>
+                            <li className="flex items-center gap-2">
+                              <div className={`w-1.5 h-1.5 rounded-full bg-${color}-500`}></div>
+                              <span className="text-gray-700 dark:text-gray-300">
+                                {getSocialAccountsText()}
+                              </span>
+                            </li>
+                            <li className="flex items-center gap-2">
+                              <div className={`w-1.5 h-1.5 rounded-full bg-${color}-500`}></div>
+                              <span className="text-gray-700 dark:text-gray-300">
+                                {getStorageText()}
+                              </span>
+                            </li>
+                          </ul>
+                        </div>
+                      </Link>
+                    );
+                  })}
                 </div>
 
                 <div className="mt-8 text-center">
