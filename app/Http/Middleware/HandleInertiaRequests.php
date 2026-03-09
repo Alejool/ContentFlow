@@ -13,6 +13,8 @@ use App\Models\PublicationTemplate;
 
 use App\Services\AIService;
 use App\Services\OnboardingService;
+use App\Services\SystemConfigService;
+use App\Services\PlanFilterService;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -187,6 +189,69 @@ class HandleInertiaRequests extends Middleware
         'location' => $request->url(),
       ],
       'ai_enabled' => fn() => app(AIService::class)->isAiEnabled(),
+
+      // System configuration - shared globally
+      'systemFeatures' => function () {
+        try {
+          $systemConfig = app(SystemConfigService::class);
+          return [
+            'ai' => $systemConfig->isFeatureEnabled('ai'),
+            'analytics' => $systemConfig->isFeatureEnabled('analytics'),
+            'reels' => $systemConfig->isFeatureEnabled('reels'),
+            'approval_workflows' => $systemConfig->isFeatureEnabled('approval_workflows'),
+            'calendar_sync' => $systemConfig->isFeatureEnabled('calendar_sync'),
+            'bulk_operations' => $systemConfig->isFeatureEnabled('bulk_operations'),
+            'white_label' => $systemConfig->isFeatureEnabled('white_label'),
+          ];
+        } catch (\Exception $e) {
+          Log::error('Inertia System Features Share Error: ' . $e->getMessage());
+          return [
+            'ai' => true,
+            'analytics' => true,
+            'reels' => true,
+            'approval_workflows' => true,
+            'calendar_sync' => true,
+            'bulk_operations' => true,
+            'white_label' => true,
+          ];
+        }
+      },
+
+      'systemAddons' => function () {
+        try {
+          $systemConfig = app(SystemConfigService::class);
+          return [
+            'ai_credits' => $systemConfig->isAddonAvailable('ai_credits'),
+            'storage' => $systemConfig->isAddonAvailable('storage'),
+            'team_members' => $systemConfig->isAddonAvailable('team_members'),
+            'publications' => $systemConfig->isAddonAvailable('publications'),
+          ];
+        } catch (\Exception $e) {
+          Log::error('Inertia System Addons Share Error: ' . $e->getMessage());
+          return [
+            'ai_credits' => true,
+            'storage' => true,
+            'team_members' => true,
+            'publications' => true,
+          ];
+        }
+      },
+
+      'visibleUsageMetrics' => function () {
+        try {
+          $planFilter = app(PlanFilterService::class);
+          return $planFilter->getVisibleUsageMetrics();
+        } catch (\Exception $e) {
+          Log::error('Inertia Visible Usage Metrics Share Error: ' . $e->getMessage());
+          return [
+            'publications' => true,
+            'social_accounts' => true,
+            'storage' => true,
+            'ai_requests' => true,
+            'team_members' => true,
+          ];
+        }
+      },
 
       // Onboarding data
       'onboarding' => function () use ($request) {
