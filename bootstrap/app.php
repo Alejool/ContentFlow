@@ -19,6 +19,8 @@ use App\Http\Middleware\Require2FA;
 use App\Http\Middleware\CheckSubscriptionLimits;
 use App\Http\Middleware\CheckFeatureAccess;
 use App\Http\Middleware\ThrottleByPlan;
+use App\Http\Middleware\CheckGranularLimits;
+use App\Http\Middleware\ApiRateLimiter;
 use App\Http\Middleware\CheckWorkspaceLimit;
 use App\Http\Middleware\CheckWorkspaceOwner;
 use Illuminate\Routing\Middleware\CacheResponse;
@@ -61,6 +63,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'subscription.limits' => CheckSubscriptionLimits::class,
             'feature.access' => CheckFeatureAccess::class,
             'throttle.plan' => ThrottleByPlan::class,
+            'granular.limit' => CheckGranularLimits::class,
+            'api.rate.limit' => ApiRateLimiter::class,
             'workspace.limit' => CheckWorkspaceLimit::class,
             'workspace.owner' => CheckWorkspaceOwner::class,
             'api.plan' => CheckApiWorkspacePlan::class,

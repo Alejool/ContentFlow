@@ -23,7 +23,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/{publication}/approve', [PublicationController::class, 'approve'])->name('approve')->whereNumber('publication');
     Route::get('/{publication}/published-platforms', [PublicationController::class, 'getPublishedPlatforms'])->name('published-platforms')->whereNumber('publication');
     Route::post('/{publication}/validate', [PublicationController::class, 'validateContent'])->name('validate')->whereNumber('publication');
-    Route::post('/{publication}/preview', [PublicationPreviewController::class, 'preview'])->name('preview')->whereNumber('publication');
+    Route::get('/{publication}/preview', [PublicationPreviewController::class, 'show'])->name('preview')->whereNumber('publication');
+    Route::get('/{publication}/preview/multi', [PublicationPreviewController::class, 'multiPlatform'])->name('preview.multi')->whereNumber('publication');
     Route::post('/{publication}/auto-optimize', [PublicationPreviewController::class, 'autoOptimize'])->name('auto-optimize')->whereNumber('publication');
     Route::put('/{publication}/platform-config/{accountId}', [PublicationPreviewController::class, 'updatePlatformConfig'])->name('platform-config.update')->whereNumber('publication')->whereNumber('accountId');
     Route::get('/{publication}/saved-configurations', [PublicationPreviewController::class, 'getSavedConfigurations'])->name('saved-configurations')->whereNumber('publication');

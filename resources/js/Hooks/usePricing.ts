@@ -92,7 +92,7 @@ export function usePricing({
 
     // ── Free / Demo ──────────────────────────────────────────────────────
     if (planId === "free" || planId === "demo") {
-      const PAID = ["starter", "professional", "enterprise"];
+      const PAID = ["starter", "growth", "professional", "enterprise"];
       const hasActivePaid =
         activePlans.some((id) => PAID.includes(id)) ||
         activeSubscriptions.some(

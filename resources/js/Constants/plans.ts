@@ -111,6 +111,33 @@ export const PLAN_CONFIG = {
   },
 
   // ========================================
+  // PLAN GROWTH - Para equipos en crecimiento
+  // ========================================
+  growth: {
+    enabled: true,
+    price: 35,
+    billingCycle: "monthly" as const,
+    popular: false,
+    requiresStripe: true,
+    features: [
+      "publications100",
+      "socialAccounts5",
+      "storage50",
+      "aiRequests300",
+      "teamMembers5",
+      "advancedAnalytics",
+      "advancedScheduling",
+      "schedulingRecurrence",
+      "optimalTimes",
+      "calendarSync",
+      "discordChannels2",
+      "approvalWorkflowsBasic",
+      "historyDays60",
+      "emailSupport",
+    ],
+  },
+
+  // ========================================
   // PLAN PROFESSIONAL - Más popular
   // ========================================
   professional: {

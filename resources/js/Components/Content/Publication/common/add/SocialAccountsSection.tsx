@@ -693,7 +693,7 @@ const SocialAccountsSection = memo(
           </div>
         </div>
 
-        <div className="grid gap-3">
+        <div className="flex flex-col gap-2">
           {allAccounts.map((account) => {
             const isChecked = selectedAccounts.includes(account.id);
             const customSchedule = accountSchedules[account.id];

@@ -142,7 +142,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
     { label: t("common.days.sun") || "D", value: 0 },
     { label: t("common.days.mon") || "L", value: 1 },
     { label: t("common.days.tue") || "M", value: 2 },
-    { label: t("common.days.wed") || "X", value: 3 },
+    { label: t("common.days.wed") || "M", value: 3 },
     { label: t("common.days.thu") || "J", value: 4 },
     { label: t("common.days.fri") || "V", value: 5 },
     { label: t("common.days.sat") || "S", value: 6 },

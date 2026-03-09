@@ -121,7 +121,7 @@ class SubscriptionLimitController extends Controller
     public function checkDowngrade(Request $request): JsonResponse
     {
         $request->validate([
-            'plan' => 'required|string|in:free,starter,professional,enterprise',
+            'plan' => 'required|string|in:free,starter,growth,professional,enterprise',
         ]);
 
         $workspace = $request->user()->currentWorkspace ?? $request->user()->workspaces()->first();

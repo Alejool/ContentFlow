@@ -45,7 +45,7 @@ export default function AdvancedPagination({
     return pages;
   };
 
-  const perPageOptions = [5, 10, 15, 20, 25];
+  const perPageOptions = [8, 12, 16, 24, 28];
   const selectOptions = perPageOptions.map((opt) => ({
     value: opt,
     label: opt.toString(),

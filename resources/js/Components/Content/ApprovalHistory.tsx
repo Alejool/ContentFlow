@@ -47,7 +47,7 @@ export default function ApprovalHistory({
   const [logs, setLogs] = useState<ApprovalLogItem[]>(initialLogs || []);
   const [isLoading, setIsLoading] = useState(!initialLogs);
   const [currentPage, setCurrentPage] = useState(1);
-  const [perPage, setPerPage] = useState(10);
+  const [perPage, setPerPage] = useState(12);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [filters, setFilters] = useState({
@@ -247,7 +247,7 @@ export default function ApprovalHistory({
         currentPage={currentPage}
         lastPage={totalPages}
         total={totalItems}
-        perPage={perPage}
+        perPage={perPage || 12}
         onPageChange={setCurrentPage}
         onPerPageChange={(val) => {
           setPerPage(val);

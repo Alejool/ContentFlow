@@ -198,12 +198,6 @@ export const LivePreviewSection = ({
 
   return (
     <div className={`space-y-4 ${className || ""}`}>
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-          {t("publications.modal.preview.title") || "Live Preview"}
-        </h3>
-      </div>
-
       <div className="flex p-1 space-x-1 bg-gray-100 dark:bg-neutral-800 rounded-lg">
         {tabs.map((tab) => {
           const Icon = tab.icon;

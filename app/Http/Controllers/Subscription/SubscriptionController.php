@@ -23,7 +23,7 @@ class SubscriptionController extends Controller
     public function createCheckoutSession(Request $request): JsonResponse
     {
         $request->validate([
-            'plan' => 'required|in:starter,professional,enterprise',
+            'plan' => 'required|in:starter,growth,professional,enterprise',
         ]);
 
         $user = $request->user();
@@ -43,7 +43,17 @@ class SubscriptionController extends Controller
 
         $plan = config("plans.{$request->plan}");
 
-        if (!$plan['stripe_price_id']) {
+        Log::info('Creating checkout session', [
+            'plan_id' => $request->plan,
+            'plan_config' => $plan,
+            'stripe_price_id' => $plan['stripe_price_id'] ?? 'NOT SET',
+        ]);
+
+        if (!$plan || empty($plan['stripe_price_id'])) {
+            Log::error('Invalid plan configuration', [
+                'plan_id' => $request->plan,
+                'plan_config' => $plan,
+            ]);
             return response()->json(['error' => 'Invalid plan configuration'], 400);
         }
 
@@ -354,7 +364,7 @@ class SubscriptionController extends Controller
             $hasActiveManualSubscription =
                 $workspace->subscription &&
                 $workspace->subscription->isActive() &&
-                in_array($workspace->subscription->plan, ['starter', 'professional', 'enterprise']);
+                in_array($workspace->subscription->plan, ['starter', 'growth', 'professional', 'enterprise']);
 
             if ($hasActiveStripeSubscription || $hasActiveManualSubscription) {
                 $message = "No puedes cambiar a un plan gratuito mientras tengas una suscripción de pago activa.\nPrimero debes cancelar tu suscripción actual.";
@@ -441,7 +451,7 @@ class SubscriptionController extends Controller
     public function changePlan(Request $request): JsonResponse
     {
         $request->validate([
-            'plan' => 'required|in:free,starter,professional,enterprise',
+            'plan' => 'required|in:free,starter,growth,professional,enterprise',
         ]);
 
         $user = $request->user();
@@ -603,13 +613,13 @@ class SubscriptionController extends Controller
             // SANDBOX MODE: Si no hay suscripciones reales de Stripe pero tiene suscripción activa (manual/demo),
             // permitir cambios entre planes sin verificar Stripe (útil para testing)
             $isSandboxMode = config('app.env') !== 'production';
-            $hasPaidPlan = in_array($previousPlan, ['starter', 'professional', 'enterprise']);
+            $hasPaidPlan = in_array($previousPlan, ['starter', 'growth', 'professional', 'enterprise']);
             
             // También verificar si tiene una suscripción manual activa
             $hasActiveManualSubscription =
                 $workspace->subscription &&
                 $workspace->subscription->isActive() &&
-                in_array($workspace->subscription->plan, ['starter', 'professional', 'enterprise']);
+                in_array($workspace->subscription->plan, ['starter', 'growth', 'professional', 'enterprise']);
             
             if ($isSandboxMode && !$hasActiveStripeSubscription && ($hasPaidPlan || $hasActiveManualSubscription || $hasAnyActiveSubscription) && $newPlan !== 'free' && $newPlan !== 'demo') {
                 Log::info('SANDBOX MODE: Allowing plan change without real Stripe subscription', [
@@ -674,7 +684,7 @@ class SubscriptionController extends Controller
                 $newPlan !== 'demo') {
                 
                 // Verificar que el plan anterior también sea de pago (no free/demo)
-                $isPreviousPlanPaid = in_array($previousPlan, ['starter', 'professional', 'enterprise']);
+                $isPreviousPlanPaid = in_array($previousPlan, ['starter', 'growth', 'professional', 'enterprise']);
                 
                 if ($isPreviousPlanPaid) {
                     try {
@@ -812,6 +822,7 @@ class SubscriptionController extends Controller
             'free' => 0,
             'demo' => 1,
             'starter' => 2,
+            'growth' => 2.5,
             'professional' => 3,
             'enterprise' => 4,
         ];
@@ -831,6 +842,7 @@ class SubscriptionController extends Controller
             'free' => 0,
             'demo' => 1,
             'starter' => 2,
+            'growth' => 2.5,
             'professional' => 3,
             'enterprise' => 4,
         ];
@@ -862,7 +874,7 @@ class SubscriptionController extends Controller
 
             // 2. Obtener el plan del WORKSPACE (sistema personalizado)
             $workspacePlan = $workspace->getPlanName();
-            $isWorkspacePaidPlan = in_array($workspacePlan, ['starter', 'professional', 'enterprise']);
+            $isWorkspacePaidPlan = in_array($workspacePlan, ['starter', 'growth', 'professional', 'enterprise']);
 
             // 3. Verificar si el workspace tiene registro de suscripción manual activa
             $hasActiveManualSubscription = false;

@@ -105,5 +105,10 @@ class Kernel extends ConsoleKernel
       ->at('06:00')
       ->withoutOverlapping()
       ->runInBackground();
+
+    // Enviar reportes programados cada hora
+    $schedule->command('reports:send')
+      ->hourly()
+      ->withoutOverlapping();
   }
 }

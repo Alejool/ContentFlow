@@ -41,7 +41,7 @@ class LimitReachedException extends Exception
      */
     private function getAvailablePlans(string $currentPlan): array
     {
-        $planHierarchy = ['free', 'starter', 'professional', 'enterprise'];
+        $planHierarchy = ['free', 'starter', 'growth', 'professional', 'enterprise'];
         $currentIndex = array_search($currentPlan, $planHierarchy);
         
         if ($currentIndex === false) {

@@ -324,7 +324,7 @@ export default function PerformanceTable({
           currentPage={currentPage}
           lastPage={totalPages}
           total={allPublications.length}
-          perPage={itemsPerPage}
+          perPage={itemsPerPage || 12}
           onPageChange={setCurrentPage}
           onPerPageChange={(newPerPage: number) => {
             setItemsPerPage(newPerPage);

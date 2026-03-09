@@ -30,6 +30,7 @@ use App\Http\Controllers\Publications\ClientPortalController;
 use App\Http\Controllers\StripeCheckoutController;
 use App\Http\Controllers\Subscription\PricingController;
 use App\Http\Controllers\Subscription\UsageMetricsController;
+use App\Http\Controllers\Subscription\AddonsController;
 
 Broadcast::routes();
 
@@ -157,6 +158,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/billing/export', [UsageMetricsController::class, 'exportInvoices'])->name('billing.export');
     Route::get('/success', [PricingController::class, 'success'])->name('success');
     Route::get('/cancel', [PricingController::class, 'cancel'])->name('cancel');
+    
+    // Add-ons routes
+    Route::get('/addons', [AddonsController::class, 'index'])->name('addons');
+    Route::post('/addons/purchase', [AddonsController::class, 'purchase'])->name('addons.purchase');
+    Route::get('/addons/success', fn() => Inertia::render('Subscription/AddonSuccess'))->name('addons.success');
   });
 
 

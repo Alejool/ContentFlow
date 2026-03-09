@@ -87,6 +87,140 @@
       "manageBilling": "Gestionar Facturación",
       "viewPlans": "Ver Todos los Planes"
     },
+    "addons": {
+      "planUsage": "Uso del Plan",
+      "monitorMonthlyUsage": "Monitorea tu consumo mensual",
+      "powerUpWorkspace": "Potencia tu Workspace",
+      "monitorUsage": "Monitorea tu Uso",
+      "highUsageMessage": "Estás usando mucho tu plan. ¡Expande tu capacidad!",
+      "trackUsageMessage": "Mantén el control de tus recursos y expande cuando lo necesites",
+      "publications": "Publicaciones",
+      "aiCredits": "Créditos IA",
+      "socialAccounts": "Cuentas Sociales",
+      "teamMembers": "Miembros del Equipo",
+      "critical": "¡Crítico!",
+      "high": "Muy Alto",
+      "warning": "Alto",
+      "remaining": "restantes",
+      "free": "libres",
+      "noLimits": "Sin límites",
+      "buyMore": "Comprar Más",
+      "upgradePlan": "Actualizar Plan",
+      "packagesFrom": "Paquetes desde $9.99",
+      "upToDiscount": "Hasta 40% de descuento",
+      "instantAvailable": "Disponible al instante",
+      "viewPackages": "Ver Paquetes Disponibles",
+      "noCommitment": "Sin compromisos • Cancela cuando quieras",
+      "storage": "Almacenamiento",
+      "title": "Paquetes Adicionales",
+      "subtitle": "Extiende tu capacidad con créditos de IA, almacenamiento, publicaciones y miembros del equipo",
+      "buyCredits": "Comprar Créditos",
+      "totalSpent": "Total Gastado",
+      "activeAddons": "add-on activo",
+      "activeAddonsPlural": "add-ons activos",
+      "purchaseHistory": "Historial de Compras",
+      "purchaseHistoryDescription": "Tus compras de add-ons y su estado actual",
+      "noPurchases": "No has realizado compras de add-ons aún",
+      "date": "Fecha",
+      "package": "Paquete",
+      "quantity": "Cantidad",
+      "total": "Total",
+      "used": "Usado",
+      "status": "Estado",
+      "actions": "Acciones",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "refund": "Reembolsar",
+      "refundConfirm": "¿Estás seguro de que deseas solicitar un reembolso?",
+      "refundSuccess": "Reembolso procesado",
+      "refundSuccessDescription": "El reembolso ha sido procesado exitosamente",
+      "refundError": "Error al procesar el reembolso",
+      "purchaseError": "Error al iniciar el proceso de compra",
+      "loadingError": "Error al cargar add-ons",
+      "howItWorks": "¿Cómo funcionan los add-ons?",
+      "howItWorksPoint1": "Los add-ons se usan automáticamente cuando excedes el límite de tu plan",
+      "howItWorksPoint2": "Primero se usa el límite de tu plan, luego los add-ons",
+      "howItWorksPoint3": "Los créditos no expiran y se acumulan si compras múltiples paquetes",
+      "howItWorksPoint4": "Puedes solicitar reembolso dentro de los 7 días si no has usado el add-on",
+      "mostPopular": "Más Popular",
+      "save": "Ahorra",
+      "credits": "créditos",
+      "posts": "publicaciones",
+      "members": "miembros",
+      "quantity": "Cantidad",
+      "total": "Total",
+      "buyNow": "Comprar Ahora",
+      "noPackages": "No hay paquetes disponibles en esta categoría",
+      "additionalPackages": "Paquetes Adicionales",
+      "activeAddon": "paquete activo",
+      "expired": "Expirado",
+      "depleted": "Agotado",
+      "lowBalance": "Bajo",
+      "purchasedOn": "Comprado el",
+      "expiresOn": "Expira el",
+      "packages": {
+        "ai_100": {
+          "name": "100 Créditos IA",
+          "description": "Paquete de 100 solicitudes de IA adicionales"
+        },
+        "ai_500": {
+          "name": "500 Créditos IA",
+          "description": "Paquete de 500 solicitudes de IA adicionales"
+        },
+        "ai_1000": {
+          "name": "1,000 Créditos IA",
+          "description": "Paquete de 1,000 solicitudes de IA adicionales"
+        },
+        "ai_5000": {
+          "name": "5,000 Créditos IA",
+          "description": "Paquete de 5,000 solicitudes de IA adicionales"
+        },
+        "storage_10gb": {
+          "name": "10 GB Almacenamiento",
+          "description": "10 GB de almacenamiento adicional"
+        },
+        "storage_50gb": {
+          "name": "50 GB Almacenamiento",
+          "description": "50 GB de almacenamiento adicional"
+        },
+        "storage_100gb": {
+          "name": "100 GB Almacenamiento",
+          "description": "100 GB de almacenamiento adicional"
+        },
+        "storage_500gb": {
+          "name": "500 GB Almacenamiento",
+          "description": "500 GB de almacenamiento adicional"
+        },
+        "posts_50": {
+          "name": "50 Publicaciones",
+          "description": "50 publicaciones adicionales este mes"
+        },
+        "posts_100": {
+          "name": "100 Publicaciones",
+          "description": "100 publicaciones adicionales este mes"
+        },
+        "posts_250": {
+          "name": "250 Publicaciones",
+          "description": "250 publicaciones adicionales este mes"
+        },
+        "posts_500": {
+          "name": "500 Publicaciones",
+          "description": "500 publicaciones adicionales este mes"
+        },
+        "members_5": {
+          "name": "5 Miembros Adicionales",
+          "description": "Agrega 5 miembros más a tu equipo"
+        },
+        "members_10": {
+          "name": "10 Miembros Adicionales",
+          "description": "Agrega 10 miembros más a tu equipo"
+        },
+        "members_25": {
+          "name": "25 Miembros Adicionales",
+          "description": "Agrega 25 miembros más a tu equipo"
+        }
+      }
+    },
     "socialAccounts": "Cuentas Sociales",
     "limitReached": "Has alcanzado el límite de tu plan",
     "downloadAll": "Descargar",

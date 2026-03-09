@@ -64,6 +64,10 @@
         "name": "Starter",
         "description": "Ideal for individual content creators"
       },
+      "growth": {
+        "name": "Growth",
+        "description": "Perfect for growing teams that need advanced features and higher limits"
+      },
       "professional": {
         "name": "Professional",
         "description": "For growing teams and businesses"
@@ -84,6 +88,7 @@
       "socialAccounts1": "1 social network connected",
       "socialAccounts2": "2 social networks connected",
       "socialAccounts3": "3 social networks",
+      "socialAccounts5": "5 social networks",
       "socialAccounts8": "8 social networks",
       "socialAccounts10": "10 social networks",
       "socialAccounts20": "20 social networks",
@@ -96,8 +101,10 @@
       "storage1TB": "1 TB storage",
       "aiRequests10": "10 AI requests/month",
       "aiRequests100": "100 AI requests/month",
+      "aiRequests300": "300 AI requests/month",
       "aiRequests500": "500 AI requests/month",
       "aiRequestsUnlimited": "Unlimited AI requests",
+      "teamMembers5": "5 team members",
       "basicAnalytics": "Basic analytics",
       "advancedAnalytics": "Advanced analytics",
       "advancedScheduling": "Advanced scheduling with recurrence",
@@ -112,6 +119,7 @@
       "customIntegrations": "Custom integrations",
       "slaGuarantee": "SLA guarantee",
       "discordChannels1": "1 Discord channel",
+      "discordChannels2": "2 Discord channels",
       "discordChannels5": "5 Discord channels",
       "discordChannelsUnlimited": "Unlimited Discord channels",
       "basicScheduling": "Basic scheduling (date & time)",
@@ -121,6 +129,7 @@
       "approvalWorkflowsBasic": "Approval workflows (single-level)",
       "approvalWorkflowsAdvanced": "Multi-level approval workflows",
       "historyDays30": "30-day history",
+      "historyDays60": "60-day history",
       "historyDays90": "90-day history",
       "historyDays365": "1-year history"
     },

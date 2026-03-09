@@ -20,6 +20,9 @@ class Subscription extends CashierSubscription
         'status',
         'trial_ends_at',
         'ends_at',
+        'payment_gateway',
+        'payment_id',
+        'purchased_by',
     ];
 
     protected $casts = [
@@ -30,6 +33,11 @@ class Subscription extends CashierSubscription
     public function workspace(): BelongsTo
     {
         return $this->belongsTo(Workspace::class);
+    }
+
+    public function purchaser(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\User::class, 'purchased_by');
     }
 
     public function isActive(): bool

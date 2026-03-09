@@ -5,6 +5,7 @@ import GeneralSettingsTab from "@/Components/Workspace/GeneralSettingsTab";
 import IntegrationsSettingsTab from "@/Components/Workspace/IntegrationsSettingsTab";
 import MembersManagement from "@/Components/Workspace/MembersManagement";
 import OverviewTab from "@/Components/Workspace/OverviewTab";
+import PlanUsageTab from "@/Components/Workspace/PlanUsageTab";
 import RolesManagementTab from "@/Components/Workspace/RolesManagementTab";
 import SettingsTabs from "@/Components/Workspace/SettingsTabs";
 import WhiteLabelSettingsTab from "@/Components/Workspace/WhiteLabelSettingsTab";
@@ -22,6 +23,7 @@ import {
   Shield,
   Sparkles,
   Users,
+  TrendingUp 
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -53,6 +55,7 @@ export default function WorkspaceSettings({
     | "roles"
     | "integrations"
     | "overview"
+    | "usage"
     | "white-label"
     | "api"
     | "support"
@@ -109,11 +112,23 @@ export default function WorkspaceSettings({
   const isEnterprise =
     planId === "enterprise" || current_workspace.features?.white_label;
 
-  const tabs = [
+  const tabs: Array<{
+    id: string;
+    label: string;
+    icon: any;
+    locked?: boolean;
+    planRequired?: string[];
+  }> = [
     {
       id: "overview",
       label: t("workspace.tabs.overview") || "Overview",
       icon: Sparkles,
+      locked: true, // No se puede reorganizar
+    },
+    {
+      id: "usage",
+      label: "Uso del Plan",
+      icon: TrendingUp,
     },
     {
       id: "general",
@@ -144,11 +159,12 @@ export default function WorkspaceSettings({
   ].includes(planId);
   const hasAdvancedApprovalAccess = ["enterprise"].includes(planId);
 
-  if (canManageWorkspace && hasBasicApprovalAccess) {
+  if (canManageWorkspace && hasAdvancedApprovalAccess) {
     tabs.splice(4, 0, {
       id: "approvals",
       label: "Aprobaciones",
       icon: CheckCircle,
+      planRequired: ["enterprise"], // Solo para enterprise
     });
   }
 
@@ -158,16 +174,19 @@ export default function WorkspaceSettings({
         id: "white-label",
         label: t("workspace.tabs.white_label") || "White-label",
         icon: Palette,
+        planRequired: ["enterprise"], // Solo para enterprise
       },
       {
         id: "api",
         label: t("workspace.tabs.api") || "API Access",
         icon: Key,
+        planRequired: ["enterprise"], // Solo para enterprise
       },
       {
         id: "support",
         label: t("workspace.tabs.support") || "Enterprise Support",
         icon: Layout,
+        planRequired: ["enterprise"], // Solo para enterprise
       },
     );
   }
@@ -182,6 +201,8 @@ export default function WorkspaceSettings({
             onTabChange={(tab: any) => setActiveTab(tab)}
           />
         );
+      case "usage":
+        return <PlanUsageTab workspace={current_workspace} />;
       case "general":
         return (
           <GeneralSettingsTab
@@ -266,6 +287,15 @@ export default function WorkspaceSettings({
           tabs={tabs}
           activeTab={activeTab}
           onTabChange={(tab: any) => setActiveTab(tab)}
+          isDraggable={canManageWorkspace} // Solo admins/owners pueden reorganizar
+          currentPlan={planId}
+          onTabOrderChange={(newOrder) => {
+            // Guardar el nuevo orden en localStorage o backend
+            localStorage.setItem(
+              `workspace_${current_workspace.id}_tab_order`,
+              JSON.stringify(newOrder)
+            );
+          }}
         />
 
         {activeTab === "integrations" && !isOwner && (

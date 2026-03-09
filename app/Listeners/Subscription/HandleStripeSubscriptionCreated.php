@@ -53,6 +53,12 @@ class HandleStripeSubscriptionCreated
         $session = $payload['data']['object'];
         $metadata = $session['metadata'] ?? [];
 
+        // Detectar si es un addon o una suscripción
+        if (isset($metadata['addon_sku'])) {
+            $this->handleAddonCheckoutCompleted($session, $metadata);
+            return;
+        }
+
         $userId = $metadata['user_id'] ?? null;
         $workspaceId = $metadata['workspace_id'] ?? null;
         $plan = $metadata['plan'] ?? null;
@@ -132,6 +138,79 @@ class HandleStripeSubscriptionCreated
         Log::info('Subscription activated via Stripe checkout', [
             'user_id' => $userId,
             'plan' => $plan,
+            'session_id' => $session['id'],
+        ]);
+    }
+
+    /**
+     * Manejar checkout completado de addons
+     */
+    private function handleAddonCheckoutCompleted(array $session, array $metadata): void
+    {
+        $workspaceId = $metadata['workspace_id'] ?? null;
+        $addonSku = $metadata['addon_sku'] ?? null;
+        $addonAmount = $metadata['addon_amount'] ?? null;
+        $addonType = $metadata['addon_type'] ?? null;
+
+        if (!$workspaceId || !$addonSku || !$addonAmount) {
+            Log::error('Missing addon metadata in checkout session', [
+                'session_id' => $session['id'],
+                'metadata' => $metadata,
+            ]);
+            return;
+        }
+
+        $workspace = \App\Models\Workspace\Workspace::find($workspaceId);
+
+        if (!$workspace) {
+            Log::error('Workspace not found for addon checkout', [
+                'workspace_id' => $workspaceId,
+            ]);
+            return;
+        }
+
+        // Obtener configuración del addon
+        $addonConfig = \App\Helpers\AddonHelper::findBySku($addonSku);
+
+        if (!$addonConfig) {
+            Log::error('Addon configuration not found', [
+                'sku' => $addonSku,
+                'session_id' => $session['id'],
+            ]);
+            return;
+        }
+
+        // Calcular cantidad total (amount * quantity)
+        $quantity = $metadata['quantity'] ?? 1;
+        $totalAmount = $addonAmount * $quantity;
+
+        // Calcular fecha de expiración si aplica
+        $expiresAt = null;
+        if (isset($addonConfig['expires_days']) && $addonConfig['expires_days'] > 0) {
+            $expiresAt = now()->addDays($addonConfig['expires_days']);
+        }
+
+        // Registrar la compra del addon
+        $workspaceAddon = \App\Models\WorkspaceAddon::create([
+            'workspace_id' => $workspaceId,
+            'addon_sku' => $addonSku,
+            'addon_type' => $addonType ?? 'unknown',
+            'total_amount' => $totalAmount,
+            'used_amount' => 0,
+            'price_paid' => $session['amount_total'] / 100, // Convertir de centavos
+            'currency' => $session['currency'] ?? 'usd',
+            'stripe_session_id' => $session['id'],
+            'stripe_customer_id' => $session['customer'] ?? null,
+            'purchased_at' => now(),
+            'expires_at' => $expiresAt,
+            'is_active' => true,
+        ]);
+
+        Log::info('Addon purchased successfully', [
+            'workspace_id' => $workspaceId,
+            'addon_sku' => $addonSku,
+            'total_amount' => $totalAmount,
+            'price_paid' => $workspaceAddon->price_paid,
             'session_id' => $session['id'],
         ]);
     }

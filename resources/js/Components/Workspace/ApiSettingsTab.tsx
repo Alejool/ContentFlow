@@ -484,7 +484,7 @@ export default function ApiSettingsTab({
                     currentPage={currentPage}
                     lastPage={lastPage}
                     total={totalTokens}
-                    perPage={perPage}
+                    perPage={perPage || 12}
                     onPageChange={(p) => setCurrentPage(p)}
                     onPerPageChange={(pp) => {
                       setPerPage(pp);

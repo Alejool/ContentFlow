@@ -11,6 +11,7 @@ class WorkspaceUsageService
 {
     /**
      * Increment usage for a specific metric.
+     * Uses add-ons when plan limit is exceeded.
      */
     public function incrementUsage(Workspace $workspace, string $metricType, int $amount = 1): void
     {
@@ -20,12 +21,57 @@ class WorkspaceUsageService
             $usage = $this->createUsageMetric($workspace, $metricType);
         }
 
-        $usage->increment('current_usage', $amount);
+        $limits = $workspace->getPlanLimits();
+        $limit = $limits[$metricType] ?? 0;
+        $currentUsage = $usage->current_usage;
+
+        // Si el límite es ilimitado, solo incrementar
+        if ($limit === -1) {
+            $usage->increment('current_usage', $amount);
+            return;
+        }
+
+        // Calcular cuánto se puede usar del plan y cuánto de add-ons
+        $remainingInPlan = max(0, $limit - $currentUsage);
+        $useFromPlan = min($amount, $remainingInPlan);
+        $useFromAddons = $amount - $useFromPlan;
+
+        // Incrementar uso del plan
+        if ($useFromPlan > 0) {
+            $usage->increment('current_usage', $useFromPlan);
+        }
+
+        // Si necesita usar add-ons
+        if ($useFromAddons > 0) {
+            $addonService = app(\App\Services\WorkspaceAddonService::class);
+            
+            // Mapear metricType a addon type
+            $addonTypeMap = [
+                'ai_requests_per_month' => 'ai_credits',
+                'storage_gb' => 'storage',
+            ];
+            
+            $addonType = $addonTypeMap[$metricType] ?? null;
+            
+            if ($addonType) {
+                $used = $addonService->useAddon($workspace, $addonType, $useFromAddons);
+                
+                if (!$used) {
+                    Log::warning('Insufficient addon balance', [
+                        'workspace_id' => $workspace->id,
+                        'metric_type' => $metricType,
+                        'amount_needed' => $useFromAddons,
+                    ]);
+                }
+            }
+        }
 
         Log::info('Usage incremented', [
             'workspace_id' => $workspace->id,
             'metric_type' => $metricType,
             'amount' => $amount,
+            'from_plan' => $useFromPlan,
+            'from_addons' => $useFromAddons,
             'new_usage' => $usage->fresh()->current_usage,
         ]);
     }
@@ -245,6 +291,7 @@ class WorkspaceUsageService
 
     /**
      * Check if workspace can perform action.
+     * Considers both plan limits and addon balance.
      */
     public function canPerformAction(Workspace $workspace, string $limitType): bool
     {
@@ -256,17 +303,39 @@ class WorkspaceUsageService
             return true;
         }
 
-        // Para métricas mensuales
+        // Para métricas mensuales con add-ons
         if (in_array($limitType, ['publications_per_month', 'ai_requests_per_month'])) {
             $usage = $this->getCurrentUsageMetric($workspace, $limitType);
             $current = $usage?->current_usage ?? 0;
-            return $current < $limit;
+            
+            // Si está dentro del límite del plan, permitir
+            if ($current < $limit) {
+                return true;
+            }
+            
+            // Si excede el plan, verificar si tiene add-ons disponibles
+            if ($limitType === 'ai_requests_per_month') {
+                $addonService = app(\App\Services\WorkspaceAddonService::class);
+                return $addonService->hasSufficientBalance($workspace, 'ai_credits', 1);
+            }
+            
+            return false;
         }
 
-        // Para storage
+        // Para storage con add-ons
         if ($limitType === 'storage_gb') {
             $usageGB = $workspace->getStorageUsageGB();
-            return $usageGB < $limit;
+            
+            // Si está dentro del límite del plan, permitir
+            if ($usageGB < $limit) {
+                return true;
+            }
+            
+            // Si excede el plan, verificar si tiene add-ons disponibles
+            $addonService = app(\App\Services\WorkspaceAddonService::class);
+            $addonBalance = $addonService->getAddonBalance($workspace, 'storage');
+            
+            return ($usageGB - $limit) < $addonBalance['remaining'];
         }
 
         // Para social accounts

@@ -119,7 +119,7 @@ export const usePublications = () => {
     const saved = localStorage.getItem(`contentPage_filters_${activeTab}`);
     return saved ? JSON.parse(saved) : {};
   });
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
 
   // Use a ref to prevent loops from effect triggers
   const lastFetchRef = useRef<string>("");

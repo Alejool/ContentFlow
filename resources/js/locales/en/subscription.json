@@ -86,6 +86,140 @@
       "manageBilling": "Manage Billing",
       "viewPlans": "View All Plans"
     },
+    "addons": {
+      "planUsage": "Plan Usage",
+      "monitorMonthlyUsage": "Monitor your monthly consumption",
+      "powerUpWorkspace": "Power Up Your Workspace",
+      "monitorUsage": "Monitor Your Usage",
+      "highUsageMessage": "You're using a lot of your plan. Expand your capacity!",
+      "trackUsageMessage": "Keep control of your resources and expand when you need it",
+      "publications": "Publications",
+      "aiCredits": "AI Credits",
+      "socialAccounts": "Social Accounts",
+      "teamMembers": "Team Members",
+      "critical": "Critical!",
+      "high": "Very High",
+      "warning": "High",
+      "remaining": "remaining",
+      "free": "free",
+      "noLimits": "No limits",
+      "buyMore": "Buy More",
+      "upgradePlan": "Upgrade Plan",
+      "packagesFrom": "Packages from $9.99",
+      "upToDiscount": "Up to 40% discount",
+      "instantAvailable": "Available instantly",
+      "viewPackages": "View Available Packages",
+      "noCommitment": "No commitments • Cancel anytime",
+      "storage": "Storage",
+      "title": "Additional Packages",
+      "subtitle": "Extend your capacity with AI credits, storage, publications, and team members",
+      "buyCredits": "Buy Credits",
+      "totalSpent": "Total Spent",
+      "activeAddons": "active add-on",
+      "activeAddonsPlural": "active add-ons",
+      "purchaseHistory": "Purchase History",
+      "purchaseHistoryDescription": "Your add-on purchases and their current status",
+      "noPurchases": "You haven't made any add-on purchases yet",
+      "date": "Date",
+      "package": "Package",
+      "quantity": "Quantity",
+      "total": "Total",
+      "used": "Used",
+      "status": "Status",
+      "actions": "Actions",
+      "active": "Active",
+      "inactive": "Inactive",
+      "refund": "Refund",
+      "refundConfirm": "Are you sure you want to request a refund?",
+      "refundSuccess": "Refund processed",
+      "refundSuccessDescription": "The refund has been processed successfully",
+      "refundError": "Error processing refund",
+      "purchaseError": "Error starting purchase process",
+      "loadingError": "Error loading add-ons",
+      "howItWorks": "How do add-ons work?",
+      "howItWorksPoint1": "Add-ons are used automatically when you exceed your plan limit",
+      "howItWorksPoint2": "Your plan limit is used first, then add-ons",
+      "howItWorksPoint3": "Credits don't expire and accumulate if you buy multiple packages",
+      "howItWorksPoint4": "You can request a refund within 7 days if you haven't used the add-on",
+      "mostPopular": "Most Popular",
+      "save": "Save",
+      "credits": "credits",
+      "posts": "posts",
+      "members": "members",
+      "quantity": "Quantity",
+      "total": "Total",
+      "buyNow": "Buy Now",
+      "noPackages": "No packages available in this category",
+      "additionalPackages": "Additional Packages",
+      "activeAddon": "active package",
+      "expired": "Expired",
+      "depleted": "Depleted",
+      "lowBalance": "Low",
+      "purchasedOn": "Purchased on",
+      "expiresOn": "Expires on",
+      "packages": {
+        "ai_100": {
+          "name": "100 AI Credits",
+          "description": "Package of 100 additional AI requests"
+        },
+        "ai_500": {
+          "name": "500 AI Credits",
+          "description": "Package of 500 additional AI requests"
+        },
+        "ai_1000": {
+          "name": "1,000 AI Credits",
+          "description": "Package of 1,000 additional AI requests"
+        },
+        "ai_5000": {
+          "name": "5,000 AI Credits",
+          "description": "Package of 5,000 additional AI requests"
+        },
+        "storage_10gb": {
+          "name": "10 GB Storage",
+          "description": "10 GB of additional storage"
+        },
+        "storage_50gb": {
+          "name": "50 GB Storage",
+          "description": "50 GB of additional storage"
+        },
+        "storage_100gb": {
+          "name": "100 GB Storage",
+          "description": "100 GB of additional storage"
+        },
+        "storage_500gb": {
+          "name": "500 GB Storage",
+          "description": "500 GB of additional storage"
+        },
+        "posts_50": {
+          "name": "50 Publications",
+          "description": "50 additional publications this month"
+        },
+        "posts_100": {
+          "name": "100 Publications",
+          "description": "100 additional publications this month"
+        },
+        "posts_250": {
+          "name": "250 Publications",
+          "description": "250 additional publications this month"
+        },
+        "posts_500": {
+          "name": "500 Publications",
+          "description": "500 additional publications this month"
+        },
+        "members_5": {
+          "name": "5 Additional Members",
+          "description": "Add 5 more members to your team"
+        },
+        "members_10": {
+          "name": "10 Additional Members",
+          "description": "Add 10 more members to your team"
+        },
+        "members_25": {
+          "name": "25 Additional Members",
+          "description": "Add 25 more members to your team"
+        }
+      }
+    },
     "socialAccounts": "Social Accounts",
     "limitReached": "You have reached your plan limit",
     "downloadAll": "Download",
@@ -94,7 +228,7 @@
       "heading": "Payment Successful!",
       "message": "Your subscription has been activated successfully",
       "detailsTitle": "Subscription Details",
-      "detailsDescription": "Your plan and payment information",
+      "detailsDescription": "Information about your plan and payment",
       "selectedPlan": "Selected Plan",
       "amountPaid": "Amount Paid",
       "status": "Status",
@@ -103,19 +237,19 @@
       "nextStepsDescription": "Start taking advantage of all your plan features",
       "step1": "Access all your plan features from the dashboard",
       "step2": "Connect your social media accounts",
-      "step3": "Create and schedule your first publication",
+      "step3": "Create and schedule your first post",
       "step4": "Review your invoice in the billing section",
       "goToDashboard": "Go to Dashboard",
       "viewBilling": "View Billing",
       "needHelp": "Need help? Contact us at"
     },
     "cancel": {
-      "title": "Payment Canceled",
-      "heading": "Payment Canceled",
-      "message": "No charges were made to your account",
+      "title": "Payment Cancelled",
+      "heading": "Payment Cancelled",
+      "message": "No charge was made to your account",
       "whatHappened": "What happened?",
-      "processWasCanceled": "The payment process was canceled",
-      "noChargeDescription": "You have canceled the payment process. No charges have been made to your card and your subscription has not been modified.",
+      "processWasCanceled": "The payment process was cancelled",
+      "noChargeDescription": "You have cancelled the payment process. No charge has been made to your card and your subscription has not been modified.",
       "hadProblem": "Did you have a problem?",
       "problemDescription": "If you experienced any issues during the payment process or have questions about our plans, please don't hesitate to contact us.",
       "whatCanYouDo": "What can you do now?",

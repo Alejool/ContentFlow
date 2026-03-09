@@ -146,7 +146,7 @@ const CampaignList = memo(
             currentPage={pagination.current_page}
             lastPage={pagination.last_page}
             total={pagination.total}
-            perPage={pagination.per_page}
+            perPage={pagination.per_page || 12}
             onPageChange={onPageChange}
             onPerPageChange={onPerPageChange || (() => {})}
             t={t}

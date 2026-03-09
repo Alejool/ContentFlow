@@ -64,6 +64,10 @@
         "name": "Starter",
         "description": "Ideal para creadores de contenido individuales"
       },
+      "growth": {
+        "name": "Growth",
+        "description": "Perfecto para equipos en crecimiento que necesitan funciones avanzadas y límites más altos"
+      },
       "professional": {
         "name": "Professional",
         "description": "Para equipos y negocios en crecimiento"
@@ -84,6 +88,7 @@
       "socialAccounts1": "1 red social conectada",
       "socialAccounts2": "2 redes sociales conectadas",
       "socialAccounts3": "3 redes sociales",
+      "socialAccounts5": "5 redes sociales",
       "socialAccounts8": "8 redes sociales",
       "socialAccounts10": "10 redes sociales",
       "socialAccounts20": "20 redes sociales",
@@ -96,8 +101,10 @@
       "storage1TB": "1 TB almacenamiento",
       "aiRequests10": "10 solicitudes IA/mes",
       "aiRequests100": "100 solicitudes IA/mes",
+      "aiRequests300": "300 solicitudes IA/mes",
       "aiRequests500": "500 solicitudes IA/mes",
       "aiRequestsUnlimited": "Solicitudes IA ilimitadas",
+      "teamMembers5": "5 miembros del equipo",
       "basicAnalytics": "Analytics básicos",
       "advancedAnalytics": "Analytics avanzados",
       "advancedScheduling": "Programación avanzada con recurrencia",
@@ -112,6 +119,7 @@
       "customIntegrations": "Integraciones personalizadas",
       "slaGuarantee": "Garantía SLA",
       "discordChannels1": "1 canal de Discord",
+      "discordChannels2": "2 canales de Discord",
       "discordChannels5": "5 canales de Discord",
       "discordChannelsUnlimited": "Canales de Discord ilimitados",
       "basicScheduling": "Programación básica (fecha y hora)",
@@ -121,6 +129,7 @@
       "approvalWorkflowsBasic": "Flujos de aprobación (nivel único)",
       "approvalWorkflowsAdvanced": "Flujos de aprobación multi-nivel",
       "historyDays30": "Historial de 30 días",
+      "historyDays60": "Historial de 60 días",
       "historyDays90": "Historial de 90 días",
       "historyDays365": "Historial de 1 año"
     },

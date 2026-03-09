@@ -148,7 +148,7 @@ export default function ApprovalList({
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const [perPage, setPerPage] = useState(10);
+  const [perPage, setPerPage] = useState(12);
 
   const handleApprove = async (publication: Publication) => {
     try {
@@ -311,7 +311,7 @@ export default function ApprovalList({
             currentPage={currentPage}
             lastPage={totalPages}
             total={totalItems}
-            perPage={perPage}
+            perPage={perPage || 12}
             onPageChange={setCurrentPage}
             onPerPageChange={(val) => {
               setPerPage(val);

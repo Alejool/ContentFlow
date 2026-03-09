@@ -156,6 +156,15 @@ class Workspace extends Model
     }
 
     /**
+     * Get the addons for this workspace.
+     */
+    public function addons()
+    {
+        return $this->hasMany(\App\Models\Subscription\WorkspaceAddon::class);
+    }
+
+
+    /**
      * Get the current usage metric for a specific type.
      */
     public function getUsageMetric(string $metricType): ?UsageMetric

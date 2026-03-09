@@ -173,6 +173,40 @@ return [
         'description' => 'Perfecto para pequeños equipos y emprendedores.',
     ],
 
+    'growth' => [
+        'name' => 'Growth',
+        'price' => 35,
+        'stripe_price_id' => env('STRIPE_GROWTH_PRICE_ID'),
+        'enabled' => true, // ← Cambiar a false para ocultar
+        'billing_cycle' => 'monthly',
+        'limits' => [
+            // Límites por workspace
+            'publications_per_month' => 100,
+            'social_accounts' => 5,
+            'storage_gb' => 50,
+            'ai_requests_per_month' => 300,
+            'team_members' => 5,
+            'discord_channels' => 2,
+            'reels_watermark' => false,
+        ],
+        'features' => [
+            'analytics_type'        => 'advanced',
+            'advanced_scheduling'   => true,
+            'scheduling_recurrence' => true,
+            'queue_publishing'      => false,
+            'optimal_times'         => true,
+            'calendar_sync'         => true,
+            'bulk_operations'       => false,
+            'custom_branding'       => false,
+            'white_label'           => false,
+            'api_access'            => false,
+            'support_type'          => 'email',
+            'approval_workflows'    => false,  // Growth NO tiene aprobaciones
+            'history_days'          => 60,
+        ],
+        'description' => 'Perfect for growing teams that need advanced features and higher limits.',
+    ],
+
     'professional' => [
         'name' => 'Professional',
         'price' => 49,

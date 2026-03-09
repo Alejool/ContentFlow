@@ -12,6 +12,7 @@ import {
   Save,
   Shield,
   Trash2,
+  TrendingUp,
   User,
   UserPlus,
   Users,
@@ -52,6 +53,73 @@ export default function ApprovalWorkflowsTab({
   hasAdvancedAccess = false,
 }: ApprovalWorkflowsTabProps) {
   const { t } = useTranslation();
+  
+  // Verificar que el workspace tenga acceso a aprobaciones
+  const planId = workspace.subscription?.plan?.toLowerCase() || workspace.plan?.toLowerCase() || "demo";
+  const hasBasicApprovalAccess = ["demo", "professional", "enterprise"].includes(planId);
+  
+  // Si no tiene acceso, mostrar mensaje de upgrade
+  if (!hasBasicApprovalAccess) {
+    return (
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-xl p-8 text-center">
+          <div className="mx-auto w-16 h-16 bg-blue-100 dark:bg-blue-900/40 rounded-full flex items-center justify-center mb-4">
+            <Shield className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            {t("approvals.upgrade.title") || "Aprobaciones no disponibles"}
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-2xl mx-auto">
+            {t("approvals.upgrade.description") || 
+              "Las aprobaciones son una funcionalidad premium disponible en los planes Professional y Enterprise. Actualiza tu plan para obtener acceso a flujos de aprobación y control de contenido."}
+          </p>
+          
+          <div className="bg-white dark:bg-neutral-900 rounded-lg p-6 mb-6 max-w-md mx-auto">
+            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+              Con aprobaciones obtienes:
+            </p>
+            <ul className="text-left space-y-2 text-sm text-gray-600 dark:text-gray-400">
+              <li className="flex items-center">
+                <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
+                Flujos de aprobación personalizados
+              </li>
+              <li className="flex items-center">
+                <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
+                Control de contenido antes de publicar
+              </li>
+              <li className="flex items-center">
+                <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
+                Asignación por roles o usuarios
+              </li>
+              <li className="flex items-center">
+                <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
+                Historial de aprobaciones
+              </li>
+            </ul>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Button
+              variant="primary"
+              buttonStyle="solid"
+              onClick={() => (window.location.href = route("pricing"))}
+              icon={TrendingUp}
+            >
+              Ver Planes
+            </Button>
+            <Button
+              variant="secondary"
+              buttonStyle="outline"
+              onClick={() => (window.location.href = route("workspaces.settings", { workspace: workspace.slug, tab: "overview" }))}
+            >
+              Volver a Settings
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
   const [roles, setRoles] = useState(initialRoles);
   const [isLoading, setIsLoading] = useState(true);

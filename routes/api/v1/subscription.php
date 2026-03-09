@@ -5,6 +5,7 @@ use App\Http\Controllers\Subscription\SubscriptionController;
 use App\Http\Controllers\Subscription\PricingController;
 use App\Http\Controllers\Subscription\UsageMetricsController;
 use App\Http\Controllers\Subscription\SubscriptionLimitController;
+use App\Http\Controllers\Subscription\GranularLimitsController;
 use App\Http\Controllers\Api\SubscriptionHistoryController;
 
 // Rutas de suscripción
@@ -35,6 +36,15 @@ Route::prefix('subscription')->name('subscription.')->group(function () {
     Route::get('/limits/usage', [SubscriptionLimitController::class, 'getUsage'])->name('limits.usage');
     Route::get('/limits/check/{limitType}', [SubscriptionLimitController::class, 'checkLimit'])->name('limits.check');
     Route::get('/limits/features', [SubscriptionLimitController::class, 'getFeatures'])->name('limits.features');
+    
+    // Granular limits routes (todos pueden ver)
+    Route::prefix('limits/granular')->name('limits.granular.')->group(function () {
+        Route::get('/', [GranularLimitsController::class, 'index'])->name('index');
+        Route::get('/check/{limitType}', [GranularLimitsController::class, 'checkLimit'])->name('check');
+        Route::get('/workspace-limit', [GranularLimitsController::class, 'checkWorkspaceLimit'])->name('workspace');
+        Route::post('/check-file-upload', [GranularLimitsController::class, 'checkFileUpload'])->name('file-upload');
+        Route::post('/clear-cache', [GranularLimitsController::class, 'clearCache'])->name('clear-cache');
+    });
     
     // Solo owner puede verificar downgrade
     Route::middleware('workspace.owner')->group(function () {

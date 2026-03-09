@@ -300,6 +300,7 @@ const EditPublicationModal = ({
   const hasRecurrenceAccess = ["demo", "professional", "enterprise"].includes(
     planId,
   );
+  const hasAdvancedScheduling = auth.current_workspace?.features?.advanced_scheduling ?? false;
 
   // Fetch published platforms when modal opens
   useEffect(() => {
@@ -716,21 +717,43 @@ const EditPublicationModal = ({
                 />
                 </div>
 
-                {/* ==================== SECCIÓN: COMENTARIOS INTERNOS ==================== */}
-                {publication?.id && (
+                {/* ==================== SECCIÓN: VISTA PREVIA (Solo si tiene advanced_scheduling) ==================== */}
+                {hasRecurrenceAccess && (
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700 pt-6">
                       <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
                       <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
-                        {t("publications.modal.edit.commentsSection") || "Comentarios Internos"}
+                        {t("publications.modal.edit.previewSection") || "Vista Previa"}
                       </h3>
                     </div>
-                    <CommentsSection
-                      publicationId={publication.id}
-                      currentUser={auth.user}
+
+                    <LivePreviewSection
+                      content={previewContent}
+                      mediaUrls={stabilizedMediaPreviews.map((m) => m.url)}
+                      user={{
+                        name: auth.user.name,
+                        username: "username",
+                        avatar: auth.user.photo_url,
+                      }}
+                      title={watched.title}
+                      publishedAt={publication?.published_at}
+                      publishedLinks={publication?.social_post_logs?.reduce(
+                        (acc: Record<string, string>, log: any) => {
+                          if (
+                            log.status === "published" &&
+                            log.post_url &&
+                            log.platform
+                          ) {
+                            acc[log.platform.toLowerCase()] = log.post_url;
+                          }
+                          return acc;
+                        },
+                        {},
+                      )}
                     />
                   </div>
                 )}
+
               </div>
 
               {/* ========================================
@@ -806,99 +829,116 @@ const EditPublicationModal = ({
                   />
                 </div>
 
-                {/* ==================== SECCIÓN: PROGRAMACIÓN Y RECURRENCIA ==================== */}
-                <div
-                  className={`space-y-4 transition-opacity duration-200 ${!allowConfiguration || isContentSectionDisabled ? "opacity-50 pointer-events-none grayscale-[0.5]" : ""}`}
-                >
-                  <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700">
-                    <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
-                      {t("publications.modal.edit.scheduleSection") || "Programación"}
-                    </h3>
-                  </div>
+                {/* ==================== SECCIÓN: PROGRAMACIÓN Y RECURRENCIA (Solo si tiene advanced_scheduling) ==================== */}
+                {hasRecurrenceAccess ? (
+                  <div
+                    className={`space-y-4 transition-opacity duration-200 ${!allowConfiguration || isContentSectionDisabled ? "opacity-50 pointer-events-none grayscale-[0.5]" : ""}`}
+                  >
+                    <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700">
+                      <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
+                        {t("publications.modal.edit.scheduleSection") || "Programación"}
+                      </h3>
+                    </div>
 
-                  <ScheduleSection
-                      scheduledAt={watched.scheduled_at ?? undefined}
-                      t={t}
-                      onScheduleChange={(date) => {
-                        let finalDate = date;
-                        if (!date && !watched.scheduled_at) {
-                          const defaultDate = new Date();
-                          defaultDate.setMinutes(defaultDate.getMinutes() + 2);
-                          finalDate = defaultDate.toISOString();
+                    <ScheduleSection
+                        scheduledAt={watched.scheduled_at ?? undefined}
+                        t={t}
+                        onScheduleChange={(date) => {
+                          let finalDate = date;
+                          if (!date && !watched.scheduled_at) {
+                            const defaultDate = new Date();
+                            defaultDate.setMinutes(defaultDate.getMinutes() + 2);
+                            finalDate = defaultDate.toISOString();
+                          }
+                          
+                          setValue("scheduled_at", finalDate, {
+                            shouldDirty: true,
+                            shouldValidate: true,
+                            shouldTouch: true
+                          });
+                        }}
+                        useGlobalSchedule={watched.use_global_schedule}
+                        onGlobalScheduleToggle={(val) =>
+                          setValue("use_global_schedule", val)
                         }
-                        
-                        setValue("scheduled_at", finalDate, {
-                          shouldDirty: true,
-                          shouldValidate: true,
-                          shouldTouch: true
-                        });
+                        onClearAccountSchedules={() => {
+                          setAccountSchedules({});
+                        }}
+                        error={errors.scheduled_at?.message as string}
+                        disabled={isContentSectionDisabled || !allowConfiguration}
+                        hasRecurrenceAccess={hasRecurrenceAccess}
+                        recurrenceDaysError={errors.recurrence_days?.message}
+                        isRecurring={watched.is_recurring}
+                        recurrenceType={watched.recurrence_type as any}
+                        recurrenceInterval={watched.recurrence_interval}
+                        recurrenceDays={watched.recurrence_days}
+                        recurrenceEndDate={
+                          watched.recurrence_end_date ?? undefined
+                        }
+                        recurrenceAccounts={watched.recurrence_accounts}
+                        onRecurrenceChange={handleRecurrenceChange}
+                        i18n={i18n}
+                        publishDate={publication?.publish_date}
+                        selectedAccounts={selectedSocialAccounts}
+                        socialAccounts={socialAccounts}
+                        accountSchedules={accountSchedules}
+                        existingScheduledPosts={publication?.scheduled_posts}
+                        socialPostLogs={publication?.social_post_logs}
+                      />
+                  </div>
+                ) : (
+                  /* ==================== SECCIÓN: VISTA PREVIA (Reemplaza programación si NO tiene advanced_scheduling) ==================== */
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700">
+                      <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
+                        {t("publications.modal.edit.previewSection") || "Vista Previa"}
+                      </h3>
+                    </div>
+
+                    <LivePreviewSection
+                      content={previewContent}
+                      mediaUrls={stabilizedMediaPreviews.map((m) => m.url)}
+                      user={{
+                        name: auth.user.name,
+                        username: "username",
+                        avatar: auth.user.photo_url,
                       }}
-                      useGlobalSchedule={watched.use_global_schedule}
-                      onGlobalScheduleToggle={(val) =>
-                        setValue("use_global_schedule", val)
-                      }
-                      onClearAccountSchedules={() => {
-                        setAccountSchedules({});
-                      }}
-                      error={errors.scheduled_at?.message as string}
-                      disabled={isContentSectionDisabled || !allowConfiguration}
-                      hasRecurrenceAccess={hasRecurrenceAccess}
-                      recurrenceDaysError={errors.recurrence_days?.message}
-                      isRecurring={watched.is_recurring}
-                      recurrenceType={watched.recurrence_type as any}
-                      recurrenceInterval={watched.recurrence_interval}
-                      recurrenceDays={watched.recurrence_days}
-                      recurrenceEndDate={
-                        watched.recurrence_end_date ?? undefined
-                      }
-                      recurrenceAccounts={watched.recurrence_accounts}
-                      onRecurrenceChange={handleRecurrenceChange}
-                      i18n={i18n}
-                      publishDate={publication?.publish_date}
-                      selectedAccounts={selectedSocialAccounts}
-                      socialAccounts={socialAccounts}
-                      accountSchedules={accountSchedules}
-                      existingScheduledPosts={publication?.scheduled_posts}
-                      socialPostLogs={publication?.social_post_logs}
+                      title={watched.title}
+                      publishedAt={publication?.published_at}
+                      publishedLinks={publication?.social_post_logs?.reduce(
+                        (acc: Record<string, string>, log: any) => {
+                          if (
+                            log.status === "published" &&
+                            log.post_url &&
+                            log.platform
+                          ) {
+                            acc[log.platform.toLowerCase()] = log.post_url;
+                          }
+                          return acc;
+                        },
+                        {},
+                      )}
                     />
                   </div>
-                </div>
+                )}
 
-                {/* ==================== SECCIÓN: VISTA PREVIA EN VIVO ==================== */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700 pt-6">
-                    <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
-                      {t("publications.modal.edit.previewSection") || "Vista Previa"}
-                    </h3>
+                {/* ==================== SECCIÓN: COMENTARIOS INTERNOS ==================== */}
+                {publication?.id && (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700 pt-6">
+                      <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
+                        {t("publications.modal.edit.commentsSection") || "Comentarios Internos"}
+                      </h3>
+                    </div>
+                    <CommentsSection
+                      publicationId={publication.id}
+                      currentUser={auth.user}
+                    />
                   </div>
-
-                  <LivePreviewSection
-                    content={previewContent}
-                    mediaUrls={stabilizedMediaPreviews.map((m) => m.url)}
-                    user={{
-                      name: auth.user.name,
-                      username: "username",
-                      avatar: auth.user.photo_url,
-                    }}
-                    title={watched.title}
-                    publishedAt={publication?.published_at}
-                    publishedLinks={publication?.social_post_logs?.reduce(
-                      (acc: Record<string, string>, log: any) => {
-                        if (
-                          log.status === "published" &&
-                          log.post_url &&
-                          log.platform
-                        ) {
-                          acc[log.platform.toLowerCase()] = log.post_url;
-                        }
-                        return acc;
-                      },
-                      {},
-                    )}
-                  />
-                </div>
+                )}
 
                 {/* ==================== SECCIÓN: HISTORIAL Y ACTIVIDAD ==================== */}
                 <div className="space-y-4">
@@ -935,6 +975,7 @@ const EditPublicationModal = ({
                         />
                       )}
                   </div>
+                </div>
                 </div>
               </div>
             </div>

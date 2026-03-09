@@ -82,7 +82,7 @@ class CampaignController extends Controller
       }
 
       // Using simplePaginate() to avoid COUNT(*) query - only loads current page data
-      $perPage = $request->query('per_page', 10);
+      $perPage = $request->query('per_page', 12);
       $campaigns = $query->orderBy('created_at', 'desc')->paginate($perPage);
 
       // Calculate aggregate stats for each campaign

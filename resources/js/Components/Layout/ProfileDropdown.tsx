@@ -19,6 +19,7 @@ import {
   Palette,
   Sun,
   User,
+  Users,
   Zap,
 } from "lucide-react";
 import { useState } from "react";
@@ -44,14 +45,14 @@ export default function ProfileDropdown({
   const { auth } = (usePage().props as any) || {};
   const { usage, loading: usageLoading } = useSubscriptionUsage();
   const [currentTheme, setCurrentTheme] = useState(
-    user.theme_color || "orange",
+    user?.theme_color || "orange",
   );
 
   // Determinar si el usuario es owner del workspace actual
   const currentWorkspace = auth?.current_workspace;
   const isOwner =
     currentWorkspace &&
-    (Number(currentWorkspace.created_by) === Number(user.id) ||
+    (Number(currentWorkspace.created_by) === Number(user?.id) ||
       currentWorkspace.user_role_slug === "owner");
 
   const brandingColor = currentWorkspace?.white_label_primary_color;
@@ -118,6 +119,7 @@ export default function ProfileDropdown({
     const planNames: Record<string, string> = {
       free: t("pricing.plans.free.name") || "Free",
       starter: t("pricing.plans.starter.name") || "Starter",
+      growth: t("pricing.plans.growth.name") || "Growth",
       professional: t("pricing.plans.professional.name") || "Professional",
       enterprise: t("pricing.plans.enterprise.name") || "Enterprise",
     };
@@ -316,16 +318,90 @@ export default function ProfileDropdown({
                     />
                   </div>
                 </div>
+
+                {/* AI Credits */}
+                {usage.ai_requests && (
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300">
+                        <Zap className="w-3 h-3" />
+                        <span>
+                          {t("subscription.usage.ai_requests", "Créditos IA")}
+                        </span>
+                      </div>
+                      <span className="font-semibold text-xs text-gray-900 dark:text-white">
+                        {usage.ai_requests.used} /{" "}
+                        {usage.ai_requests.limit === -1
+                          ? "∞"
+                          : usage.ai_requests.limit}
+                      </span>
+                    </div>
+                    <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all ${
+                          usage.ai_requests.percentage >= 90
+                            ? "bg-red-500"
+                            : usage.ai_requests.percentage >= 70
+                              ? "bg-yellow-500"
+                              : "bg-primary-500"
+                        }`}
+                        style={{
+                          width: `${Math.min(usage.ai_requests.percentage, 100)}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Team Members */}
+                {usage.team_members && (
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300">
+                        <Users className="w-3 h-3" />
+                        <span>
+                          {t("subscription.usage.team_members", "Miembros")}
+                        </span>
+                      </div>
+                      <span className="font-semibold text-xs text-gray-900 dark:text-white">
+                        {usage.team_members.used} /{" "}
+                        {usage.team_members.limit === -1
+                          ? "∞"
+                          : usage.team_members.limit}
+                      </span>
+                    </div>
+                    <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all ${
+                          usage.team_members.percentage >= 90
+                            ? "bg-red-500"
+                            : usage.team_members.percentage >= 70
+                              ? "bg-yellow-500"
+                              : "bg-primary-500"
+                        }`}
+                        style={{
+                          width: `${Math.min(usage.team_members.percentage, 100)}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
               {usage.limits_reached && (
                 <div className="mt-2 pt-2 border-t border-primary-200 dark:border-primary-800/30">
-                  <p className="text-xs text-red-600 dark:text-red-400 font-medium">
-                    {t(
-                      "subscription.limitReached",
-                      "Has alcanzado el límite de tu plan",
-                    )}
-                  </p>
+                  <Link
+                    href={route("subscription.addons")}
+                    className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white transition-all group"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Zap className="w-4 h-4" />
+                      <span className="text-xs font-semibold">
+                        {t("subscription.addons.buyCredits", "Comprar Créditos")}
+                      </span>
+                    </div>
+                    <ChevronDown className="w-3 h-3 -rotate-90 group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
                 </div>
               )}
             </div>

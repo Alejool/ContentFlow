@@ -147,10 +147,6 @@ export const CommentsSection = ({
 
   return (
     <div className="space-y-4">
-      <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-        {t("publications.modal.comments.title") || "Internal Comments"}
-      </h3>
-
       <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
         {loading && comments.length === 0 ? (
           <div className="text-center text-sm text-gray-500 py-4">
@@ -341,7 +337,7 @@ export const CommentsSection = ({
           type="button"
           onClick={handleSubmit as any}
           disabled={!newComment.trim() || submitting}
-          className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="absolute right-1 top-1 p-1.5 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           <Send className="w-4 h-4" />
         </button>

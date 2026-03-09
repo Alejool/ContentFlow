@@ -135,9 +135,9 @@ export default function PricingPlansSection({
   };
   
   // CRITICAL: Determinar si tiene plan de pago activo
-  // Esto bloquea Free/Demo cuando tienes Starter, Professional o Enterprise activo
+  // Esto bloquea Free/Demo cuando tienes Starter, Growth, Professional o Enterprise activo
   const hasPaidPlanActive = React.useMemo(() => {
-    const paidPlans = ['starter', 'professional', 'enterprise'];
+    const paidPlans = ['starter', 'growth', 'professional', 'enterprise'];
     
     // Verificar si el plan actual es de pago
     const currentIsPaid = currentPlan && paidPlans.includes(currentPlan);
@@ -162,11 +162,11 @@ export default function PricingPlansSection({
   const switchablePlans = effectiveActivePlans.filter(
     (id) =>
       id !== currentPlan &&
-      ["starter", "professional", "enterprise"].includes(id),
+      ["starter", "growth", "professional", "enterprise"].includes(id),
   );
   // Plans purchased but now expired → need Stripe renewal
   const renewablePlans = expiredPlans.filter(
-    (id) => ["starter", "professional", "enterprise"].includes(id),
+    (id) => ["starter", "growth", "professional", "enterprise"].includes(id),
   );
 
   const meta =

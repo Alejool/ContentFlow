@@ -75,4 +75,7 @@ return [
     'publishedSuccess' => '¡Publicación publicada exitosamente!',
     'publishedError' => 'Error al publicar la publicación.',
   ],
+  'messages' => [
+    'cancelError' => 'Error al cancelar la publicación',
+  ],
 ];

@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { Suspense, lazy, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { AddonsPromotionCard } from "@/Components/Dashboard/AddonsPromotionCard";
 
 // Custom hook to fetch publication stats (avoids fetch in useEffect warning)
 const useFetchPublicationStats = (shouldFetch: boolean) => {
@@ -340,6 +341,11 @@ export default function Dashboard({
               </p>
             </div>
           ))}
+        </div>
+
+        {/* Add-ons Promotion Card con Carrusel */}
+        <div className="mb-8">
+          <AddonsPromotionCard showCarousel={true} showPromoBanner={true} />
         </div>
 
         <div className="grid grid-cols-1 gap-6 mb-8">
