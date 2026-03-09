@@ -25,6 +25,8 @@ use App\Http\Middleware\CheckWorkspaceLimit;
 use App\Http\Middleware\CheckWorkspaceOwner;
 use Illuminate\Routing\Middleware\CacheResponse;
 use App\Http\Middleware\CheckApiWorkspacePlan;
+use App\Http\Middleware\CheckMaintenanceMode;
+use App\Http\Middleware\CheckNewRegistrations;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -49,6 +51,8 @@ return Application::configure(basePath: dirname(__DIR__))
             AddLinkHeadersForPreloadedAssets::class,
             SetLocale::class,
             HandleWorkspaceContext::class,
+            CheckMaintenanceMode::class,
+            CheckNewRegistrations::class,
         ]);
         $middleware->api(append: [
             SecurityHeaders::class,
