@@ -34,6 +34,15 @@ interface Props {
   plans: Plan[];
   currentPlan?: string;
   workspaceId?: number;
+  systemFeatures?: {
+    ai?: boolean;
+    analytics?: boolean;
+    reels?: boolean;
+    approval_workflows?: boolean;
+    calendar_sync?: boolean;
+    bulk_operations?: boolean;
+    white_label?: boolean;
+  };
 }
 
 export default function PricingPage({
@@ -41,6 +50,7 @@ export default function PricingPage({
   plans,
   currentPlan,
   workspaceId,
+  systemFeatures = {},
 }: Props) {
   const { t } = useTranslation();
 
@@ -72,6 +82,7 @@ export default function PricingPage({
             showHeader={true}
             variant="default"
             isOwner={isOwner}
+            systemFeatures={systemFeatures}
           />
           <div className="mt-12">
             <Card className="">

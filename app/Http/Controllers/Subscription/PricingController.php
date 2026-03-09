@@ -8,43 +8,47 @@ use Illuminate\Support\Facades\Log;
 use Stripe\StripeClient;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Services\SystemConfigService;
+use App\Services\PlanFilterService;
 
 class PricingController extends Controller
 {
     public function __construct(
-        private \App\Services\PlanManagementService $planManagement
+        private \App\Services\PlanManagementService $planManagement,
+        private SystemConfigService $systemConfig,
+        private \App\Services\PlanFilterService $planFilter
     ) {}
 
     /**
      * Obtener planes habilitados y formateados.
-     * Filtra por enabled en config/plans.php
+     * Filtra por enabled en config/plans.php Y por configuración del sistema
+     * Y filtra límites/características según configuración del sistema
      */
     private function getEnabledPlans(): array
     {
-        $allPlans = config('plans');
+        // Usar el servicio de configuración del sistema para obtener planes disponibles
+        $availablePlans = $this->systemConfig->getAvailablePlans();
 
         // Debug: Log para ver qué planes están configurados
-        \Log::info('All plans from config:', array_keys($allPlans));
+        \Log::info('Available plans from system config:', array_keys($availablePlans));
 
-        $filtered = collect($allPlans)
-            ->filter(function ($plan, $key) {
-                $enabled = ($plan['enabled'] ?? true) === true;
-                \Log::info("Plan {$key}: enabled = " . ($enabled ? 'true' : 'false'));
-                return $enabled;
-            })
+        $filtered = collect($availablePlans)
             ->map(function ($plan, $key) {
                 $isFreePlan = $plan['price'] == 0;
 
+                // Filtrar límites y características según configuración del sistema
+                $filteredPlan = $this->planFilter->filterPlan($plan);
+
                 return [
                     'id' => $key,
-                    'name' => $plan['name'],
-                    'price' => $plan['price'],
-                    'description' => $plan['description'] ?? '',
-                    'features' => $plan['features'] ?? [],
-                    'limits' => $plan['limits'],
-                    'popular' => $plan['popular'] ?? ($key === 'professional'),
-                    'enabled' => true, // Ya filtrados, todos están habilitados
-                    'trial_days' => $plan['trial_days'] ?? null,
+                    'name' => $filteredPlan['name'],
+                    'price' => $filteredPlan['price'],
+                    'description' => $filteredPlan['description'] ?? '',
+                    'features' => $filteredPlan['features'] ?? [],
+                    'limits' => $filteredPlan['limits'],
+                    'popular' => $filteredPlan['popular'] ?? ($key === 'professional'),
+                    'enabled' => true, // Ya filtrados por SystemConfigService
+                    'trial_days' => $filteredPlan['trial_days'] ?? null,
                     'requires_stripe' => !$isFreePlan,
                 ];
             })
@@ -84,6 +88,15 @@ class PricingController extends Controller
         return Inertia::render('Pricing/PricingPage', [
             'plans' => $this->getEnabledPlans(),
             'currentPlan' => $currentPlan,
+            'systemFeatures' => [
+                'ai' => \App\Models\SystemSetting::isFeatureEnabled('ai'),
+                'analytics' => \App\Models\SystemSetting::isFeatureEnabled('analytics'),
+                'reels' => \App\Models\SystemSetting::isFeatureEnabled('reels'),
+                'approval_workflows' => \App\Models\SystemSetting::isFeatureEnabled('approval_workflows'),
+                'calendar_sync' => \App\Models\SystemSetting::isFeatureEnabled('calendar_sync'),
+                'bulk_operations' => \App\Models\SystemSetting::isFeatureEnabled('bulk_operations'),
+                'white_label' => \App\Models\SystemSetting::isFeatureEnabled('white_label'),
+            ],
         ]);
     }
 

@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import { CheckCircle, XCircle, AlertCircle, Info } from 'lucide-react';
@@ -48,13 +48,43 @@ interface Props {
     addons: AddonsConfig;
 }
 
+interface PageProps extends Props {
+    systemAddons: {
+        ai_credits: boolean;
+        storage: boolean;
+        team_members: boolean;
+        publications: boolean;
+    };
+}
+
 export default function Addons({ addons }: Props) {
     const { t } = useTranslation();
+    const { systemAddons } = usePage<PageProps>().props;
     const [notification, setNotification] = useState<{
         type: 'success' | 'error' | 'info';
         message: string;
     } | null>(null);
     const [refreshKey, setRefreshKey] = useState(0);
+
+    // Filtrar addons según configuración del sistema
+    const filteredAddons: AddonsConfig = {
+        ai_credits: {
+            ...addons.ai_credits,
+            enabled: addons.ai_credits.enabled && (systemAddons?.ai_credits !== false),
+        },
+        storage: {
+            ...addons.storage,
+            enabled: addons.storage.enabled && (systemAddons?.storage !== false),
+        },
+        publications: {
+            ...addons.publications,
+            enabled: addons.publications.enabled && (systemAddons?.publications !== false),
+        },
+        team_members: {
+            ...addons.team_members,
+            enabled: addons.team_members.enabled && (systemAddons?.team_members !== false),
+        },
+    };
 
     // Verificar parámetros de URL para mostrar notificaciones
     useEffect(() => {
@@ -188,7 +218,7 @@ export default function Addons({ addons }: Props) {
                     <ActiveAddonsCards showCarousel={true} key={refreshKey} />
 
                     {/* Sección de compra de paquetes */}
-                    <AddonsPurchaseSection addons={addons} />
+                    <AddonsPurchaseSection addons={filteredAddons} />
 
                     {/* Banner informativo global de moneda */}
                     {addons && Object.values(addons).some((category: any) => 

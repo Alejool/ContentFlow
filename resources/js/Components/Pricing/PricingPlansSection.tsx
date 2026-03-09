@@ -44,6 +44,15 @@ interface PricingPlansSectionProps {
   isOwner?: boolean;
   hasActiveSubscription?: boolean;
   activePlans?: string[];
+  systemFeatures?: {
+    ai?: boolean;
+    analytics?: boolean;
+    reels?: boolean;
+    approval_workflows?: boolean;
+    calendar_sync?: boolean;
+    bulk_operations?: boolean;
+    white_label?: boolean;
+  };
 }
 
 const MODAL_META = {
@@ -92,6 +101,7 @@ export default function PricingPlansSection({
   hasActiveSubscription: propHasActiveSubscription,
   activePlans: propActivePlans,
   workspaceId,
+  systemFeatures = {},
 }: PricingPlansSectionProps & { workspaceId?: number }) {
   const { t } = useTranslation();
   const {
@@ -415,6 +425,7 @@ export default function PricingPlansSection({
         activeSubscriptions={activeSubscriptions}
         expiredPlans={expiredPlans}
         isOwner={isOwner}
+        systemFeatures={systemFeatures}
       />
 
       {/* ── Error / Warning Modal (no success modal — redirect is used instead) */}

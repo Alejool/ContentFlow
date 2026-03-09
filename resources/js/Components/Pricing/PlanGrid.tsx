@@ -32,6 +32,15 @@ interface PlanGridProps {
   activeSubscriptions?: any[];
   expiredPlans?: string[];
   isOwner?: boolean;
+  systemFeatures?: {
+    ai?: boolean;
+    analytics?: boolean;
+    reels?: boolean;
+    approval_workflows?: boolean;
+    calendar_sync?: boolean;
+    bulk_operations?: boolean;
+    white_label?: boolean;
+  };
 }
 
 export default function PlanGrid({
@@ -47,6 +56,7 @@ export default function PlanGrid({
   activeSubscriptions = [],
   expiredPlans = [],
   isOwner = true,
+  systemFeatures = {},
 }: PlanGridProps) {
   const { t } = useTranslation();
 
@@ -81,6 +91,7 @@ export default function PlanGrid({
               activeSubscriptions={activeSubscriptions}
               expiredPlans={expiredPlans}
               isOwner={isOwner}
+              systemFeatures={systemFeatures}
             />
           );
         })}

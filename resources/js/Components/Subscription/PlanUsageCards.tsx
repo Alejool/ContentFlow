@@ -1,5 +1,5 @@
 import { Sparkles, Zap, HardDrive, FileText, Share2, Users } from 'lucide-react';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import { useSubscriptionUsage } from '@/Hooks/useSubscriptionUsage';
 import { useState } from 'react';
@@ -10,14 +10,31 @@ interface PlanUsageCardsProps {
   showTitle?: boolean;
 }
 
+interface PageProps {
+  visibleUsageMetrics: {
+    publications: boolean;
+    social_accounts: boolean;
+    storage: boolean;
+    ai_requests: boolean;
+    team_members: boolean;
+  };
+  systemAddons: {
+    ai_credits: boolean;
+    storage: boolean;
+    team_members: boolean;
+    publications: boolean;
+  };
+}
+
 export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanUsageCardsProps) {
   const { t } = useTranslation();
   const { usage, loading } = useSubscriptionUsage();
+  const { visibleUsageMetrics, systemAddons } = usePage<PageProps>().props;
   const [currentSlide, setCurrentSlide] = useState(0);
   
   if (loading || !usage) return null;
   
-  // Preparar métricas para mostrar - TODAS
+  // Preparar métricas para mostrar - FILTRADAS según configuración del sistema
   const metrics = [
     {
       key: 'publications',
@@ -27,8 +44,8 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
       used: usage.publications.used,
       limit: usage.publications.limit,
       remaining: usage.publications.remaining,
-      show: true,
-      canBuy: false,
+      show: visibleUsageMetrics?.publications !== false,
+      canBuy: systemAddons?.publications !== false,
       upgradeUrl: '/pricing',
     },
     {
@@ -39,8 +56,8 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
       used: usage.ai_requests.used,
       limit: usage.ai_requests.limit || '∞',
       remaining: usage.ai_requests.limit ? usage.ai_requests.limit - usage.ai_requests.used : '∞',
-      show: true,
-      canBuy: usage.ai_requests.limit !== null && usage.ai_requests.limit !== -1,
+      show: visibleUsageMetrics?.ai_requests !== false, // Solo mostrar si IA está habilitada
+      canBuy: (usage.ai_requests.limit !== null && usage.ai_requests.limit !== -1) && (systemAddons?.ai_credits !== false),
       addonType: 'ai_credits',
     },
     {
@@ -51,8 +68,8 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
       used: `${usage.storage.used_gb.toFixed(1)} GB`,
       limit: `${usage.storage.limit_gb} GB`,
       remaining: `${(usage.storage.remaining_bytes / 1024 / 1024 / 1024).toFixed(1)} GB`,
-      show: true,
-      canBuy: true,
+      show: visibleUsageMetrics?.storage !== false,
+      canBuy: systemAddons?.storage !== false,
       addonType: 'storage',
     },
     {
@@ -63,7 +80,7 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
       used: usage.social_accounts.used,
       limit: usage.social_accounts.limit === -1 ? '∞' : usage.social_accounts.limit,
       remaining: usage.social_accounts.limit === -1 ? '∞' : usage.social_accounts.limit - usage.social_accounts.used,
-      show: true,
+      show: visibleUsageMetrics?.social_accounts !== false,
       canBuy: false,
       upgradeUrl: '/pricing',
     },
@@ -79,8 +96,8 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
       remaining: usage.team_members?.limit === -1 || !usage.team_members?.limit 
         ? '∞' 
         : usage.team_members.limit - usage.team_members.used,
-      show: true,
-      canBuy: true,
+      show: visibleUsageMetrics?.team_members !== false, // Solo mostrar si addon está habilitado
+      canBuy: systemAddons?.team_members !== false,
       addonType: 'team_members',
     },
   ];

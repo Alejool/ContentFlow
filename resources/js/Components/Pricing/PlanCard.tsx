@@ -53,6 +53,15 @@ interface PlanCardProps {
   activeSubscriptions?: any[];
   expiredPlans?: string[];
   isOwner?: boolean;
+  systemFeatures?: {
+    ai?: boolean;
+    analytics?: boolean;
+    reels?: boolean;
+    approval_workflows?: boolean;
+    calendar_sync?: boolean;
+    bulk_operations?: boolean;
+    white_label?: boolean;
+  };
 }
 
 export default function PlanCard({
@@ -68,6 +77,7 @@ export default function PlanCard({
   activeSubscriptions = [],
   expiredPlans = [],
   isOwner = true,
+  systemFeatures = {},
 }: PlanCardProps) {
   const { t } = useTranslation();
 
@@ -93,7 +103,55 @@ export default function PlanCard({
     const features = PLAN_FEATURES[planId as PlanId];
     if (!features) return [];
 
-    return features.map((featureKey) => t(`pricing.features.${featureKey}`));
+    // Filtrar características según la configuración del sistema
+    const filteredFeatures = features.filter((featureKey) => {
+      // Filtrar características de IA si está deshabilitada
+      if (systemFeatures.ai === false && featureKey.toLowerCase().includes('airequest')) {
+        return false;
+      }
+      
+      // Filtrar características de Analytics si está deshabilitado
+      if (systemFeatures.analytics === false && 
+          (featureKey.toLowerCase().includes('analytics') || 
+           featureKey.toLowerCase().includes('analytic'))) {
+        return false;
+      }
+      
+      // Filtrar características de Reels si está deshabilitado
+      if (systemFeatures.reels === false && featureKey.toLowerCase().includes('reel')) {
+        return false;
+      }
+      
+      // Filtrar características de Approval Workflows si está deshabilitado
+      if (systemFeatures.approval_workflows === false && 
+          featureKey.toLowerCase().includes('approval')) {
+        return false;
+      }
+      
+      // Filtrar características de Calendar Sync si está deshabilitado
+      if (systemFeatures.calendar_sync === false && 
+          featureKey.toLowerCase().includes('calendar')) {
+        return false;
+      }
+      
+      // Filtrar características de Bulk Operations si está deshabilitado
+      if (systemFeatures.bulk_operations === false && 
+          featureKey.toLowerCase().includes('bulk')) {
+        return false;
+      }
+      
+      // Filtrar características de White Label si está deshabilitado
+      if (systemFeatures.white_label === false && 
+          (featureKey.toLowerCase().includes('whitelabel') || 
+           featureKey.toLowerCase().includes('branding') ||
+           featureKey.toLowerCase().includes('custombranding'))) {
+        return false;
+      }
+      
+      return true;
+    });
+
+    return filteredFeatures.map((featureKey) => t(`pricing.features.${featureKey}`));
   };
 
   const getMissingFeatures = (planId: string): string[] => {
