@@ -8,36 +8,18 @@ import Modal from "@/Components/common/ui/Modal";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { useCampaignStore } from "@/stores/campaignStore";
 import { usePublicationStore } from "@/stores/publicationStore";
-import {
-  DndContext,
-  DragEndEvent,
-  KeyboardSensor,
-  PointerSensor,
-  closestCenter,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
-import {
-  SortableContext,
-  arrayMove,
-  horizontalListSortingStrategy,
-  sortableKeyboardCoordinates,
-  useSortable,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 import { Head, usePage } from "@inertiajs/react";
 import {
   Calendar as CalendarIcon,
   CheckCircle,
   FileText,
   Folder,
-  GripHorizontal,
   Plus,
   Shield,
   Target,
   Trash2,
 } from "lucide-react";
-import { useCallback, useEffect, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import { toast } from "react-hot-toast";
 
 import ApprovalHistory from "@/Components/Content/ApprovalHistory";
@@ -46,6 +28,7 @@ import ApprovalStats from "@/Components/Content/ApprovalStats";
 import ContentList from "@/Components/Content/ContentList";
 import ModernCalendar from "@/Components/Content/Partials/ModernCalendar";
 import Button from "@/Components/common/Modern/Button";
+import TabNavigation from "@/Components/common/TabNavigation";
 
 import {
   ContentTab,
@@ -53,85 +36,6 @@ import {
 } from "@/Hooks/publication/usePublications";
 import { useManageContentUIStore } from "@/stores/manageContentUIStore";
 import { useShallow } from "zustand/react/shallow";
-
-interface SortableTabProps {
-  id: string;
-  label: string;
-  hasBadge: boolean;
-  badgeCount: number;
-  activeTab: string;
-  handleTabChange: (id: ContentTab) => void;
-  getTabIcon: (id: string, active: boolean) => React.ReactNode;
-}
-
-const SortableTab = ({
-  id,
-  label,
-  hasBadge,
-  badgeCount,
-  activeTab,
-  handleTabChange,
-  getTabIcon,
-}: SortableTabProps) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    zIndex: isDragging ? 50 : "auto",
-    opacity: isDragging ? 0.5 : 1,
-  };
-
-  const isActive = activeTab === id;
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="flex items-center gap-1 group/tab"
-    >
-      <Button
-        onClick={() => handleTabChange(id as ContentTab)}
-        variant={isActive ? "primary" : "ghost"}
-        buttonStyle={isActive ? "solid" : "ghost"}
-        size="lg"
-        {...attributes}
-        {...listeners}
-        className={`flex items-center justify-center p-0 rounded-lg text-sm font-bold transition-all duration-200 select-none border-0 ${
-          isActive
-            ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
-            : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
-        }`}
-      >
-        <div className="flex items-center justify-center gap-2">
-          <GripHorizontal
-            className={`w-3 h-3 opacity-0 group-hover/tab:opacity-40 transition-opacity cursor-grab active:cursor-grabbing mr-[-4px] ${isActive ? "text-white" : ""}`}
-          />
-          {getTabIcon(id, isActive)}
-          <span>{label}</span>
-          {hasBadge && badgeCount > 0 && (
-            <span
-              className={`ml-1 px-1.5 py-0.5 text-[10px] font-bold rounded-full ${
-                isActive
-                  ? "bg-white/20 text-white"
-                  : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-              }`}
-            >
-              {badgeCount}
-            </span>
-          )}
-        </div>
-      </Button>
-    </div>
-  );
-};
 
 export default function ManageContentPage() {
   const { auth } = usePage<any>().props;
@@ -199,7 +103,7 @@ export default function ManageContentPage() {
     })),
   );
 
-  const [isTabPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
   const [search, setSearch] = useState(() => {
     const saved = localStorage.getItem(`contentPage_search_${activeTab}`);
     return saved || "";
@@ -231,6 +135,14 @@ export default function ManageContentPage() {
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [setActiveTab],
+  );
+
+  // Wrapper para TabNavigation que acepta string y lo convierte a ContentTab
+  const handleTabChangeWrapper = useCallback(
+    (tab: string) => {
+      handleTabChange(tab as ContentTab);
+    },
+    [handleTabChange],
   );
 
   useEffect(() => {
@@ -283,7 +195,7 @@ export default function ManageContentPage() {
 
     const channel = window.Echo.private(`users.${auth.user.id}`);
 
-    const handleStatusUpdate = (event: any) => {
+    const handleStatusUpdate = () => {
       // Refresh the current list when any publication status changes
       handleRefresh();
     };
@@ -374,44 +286,43 @@ export default function ManageContentPage() {
     [publications, openEditModal, fetchPublicationById],
   );
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
+  const pendingApprovals = useMemo(
+    () => publications.filter((p) => p.status === "pending_review").length,
+    [publications]
   );
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (over && active.id !== over.id) {
-      const oldIndex = tabOrder.indexOf(active.id as string);
-      const newIndex = tabOrder.indexOf(over.id as string);
-      setTabOrder(arrayMove(tabOrder, oldIndex, newIndex));
-    }
-  };
-
-  const getTabIcon = (id: string, active: boolean) => {
-    const className = `w-4 h-4 ${active ? "text-white" : "opacity-70"}`;
-    switch (id) {
-      case "publications":
-        return <Folder className={className} />;
-      case "campaigns":
-        return <Target className={className} />;
-      case "calendar":
-        return <CalendarIcon className={className} />;
-      case "logs":
-        return <FileText className={className} />;
-      case "approvals":
-        return <CheckCircle className={className} />;
-      default:
-        return null;
-    }
-  };
+  const tabsConfig = useMemo(
+    () => [
+      {
+        id: "publications",
+        label: t("manageContent.tabs.publications"),
+        icon: Folder,
+      },
+      {
+        id: "campaigns",
+        label: t("manageContent.tabs.campaigns"),
+        icon: Target,
+      },
+      {
+        id: "calendar",
+        label: t("manageContent.tabs.calendar"),
+        icon: CalendarIcon,
+      },
+      {
+        id: "logs",
+        label: t("manageContent.tabs.logs"),
+        icon: FileText,
+      },
+      {
+        id: "approvals",
+        label: t("manageContent.tabs.approvals"),
+        icon: CheckCircle,
+        badge: pendingApprovals,
+        hidden: !permissions.includes("approve"),
+      },
+    ],
+    [t, pendingApprovals, permissions]
+  );
 
   return (
     <AuthenticatedLayout
@@ -488,45 +399,14 @@ export default function ManageContentPage() {
           </div>
 
           <div className="mb-8">
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-            >
-              <div className="inline-flex items-center p-2 rounded-lg bg-white dark:bg-neutral-800 backdrop-blur-sm gap-1 overflow-x-auto max-w-full shadow-sm">
-                <SortableContext
-                  items={tabOrder}
-                  strategy={horizontalListSortingStrategy}
-                >
-                  {tabOrder.map((id) => {
-                    if (id === "approvals" && !permissions.includes("approve"))
-                      return null;
-
-                    const label = t(`manageContent.tabs.${id}`);
-                    const hasBadge = id === "approvals";
-                    const badgeCount =
-                      id === "approvals"
-                        ? publications.filter(
-                            (p) => p.status === "pending_review",
-                          ).length
-                        : 0;
-
-                    return (
-                      <SortableTab
-                        key={id}
-                        id={id}
-                        label={label}
-                        hasBadge={hasBadge}
-                        badgeCount={badgeCount}
-                        activeTab={activeTab}
-                        handleTabChange={handleTabChange}
-                        getTabIcon={getTabIcon}
-                      />
-                    );
-                  })}
-                </SortableContext>
-              </div>
-            </DndContext>
+            <TabNavigation
+              tabs={tabsConfig}
+              activeTab={activeTab}
+              onTabChange={handleTabChangeWrapper}
+              tabOrder={tabOrder}
+              onTabOrderChange={setTabOrder}
+              variant="draggable"
+            />
           </div>
 
           <div className="min-h-[500px]">
