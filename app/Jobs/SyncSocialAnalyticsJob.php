@@ -30,14 +30,14 @@ class SyncSocialAnalyticsJob implements ShouldQueue
       return;
     }
 
-    // Skip inactive accounts
-    if (!$this->account->is_active) {
-      Log::info("Skipping inactive account {$this->account->id} ({$this->account->platform})");
-      return;
-    }
-
     try {
       Log::info("Iniciando sincronización para cuenta {$this->account->id} ({$this->account->platform})");
+
+      // Verificar si la cuenta está activa antes de sincronizar
+      if (!$this->account->is_active) {
+        Log::info("Cuenta {$this->account->id} ({$this->account->platform}) está inactiva, omitiendo sincronización");
+        return;
+      }
 
       // 1. Sincronizar métricas de la cuenta (seguidores, posts, etc.)
       $analyticsService->fetchAccountMetrics($this->account);
@@ -55,15 +55,18 @@ class SyncSocialAnalyticsJob implements ShouldQueue
     } catch (\Exception $e) {
       $errorMessage = $e->getMessage();
       
-      // Don't retry if it's a token/reconnection issue
+      // Si es un error de autenticación/token, solo registrar como info y no reintentar
       if (str_contains($errorMessage, 'reconnection required') || 
-          str_contains($errorMessage, 'No access token available')) {
-        Log::warning("Account {$this->account->id} needs reconnection, skipping retries: {$errorMessage}");
-        $this->account->increment('failure_count');
-        return; // Don't retry, user needs to reconnect
+          str_contains($errorMessage, 'No access token available') ||
+          str_contains($errorMessage, '401 Unauthorized') ||
+          str_contains($errorMessage, 'Invalid OAuth') ||
+          str_contains($errorMessage, 'access_token_invalid')) {
+        Log::info("Cuenta {$this->account->id} ({$this->account->platform}) requiere reconexión, omitiendo reintentos");
+        return; // No reintentar, el usuario necesita reconectar
       }
 
-      Log::error("Error syncing analytics for account {$this->account->id}: {$errorMessage}");
+      // Para otros errores, registrar como error y reintentar
+      Log::error("Error sincronizando analytics para cuenta {$this->account->id}: {$errorMessage}");
       $this->account->increment('failure_count');
       
       if ($this->attempts() < $this->tries) {
