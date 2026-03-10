@@ -47,7 +47,6 @@ export default function ProfileDropdown({
   const [currentTheme, setCurrentTheme] = useState(
     user?.theme_color || "orange",
   );
-  console.log('usage', usage);
 
   // Determinar si el usuario es owner del workspace actual
   const currentWorkspace = auth?.current_workspace;
@@ -270,27 +269,28 @@ export default function ProfileDropdown({
                       </span>
                     </div>
                     <span className="font-semibold text-xs text-gray-900 dark:text-white">
-                      {usage.publications.used} /{" "}
-                      {usage.publications.total_available || usage.publications.limit !== -1
-                        ? usage.publications.limit
-                        : "∞"
+                      {usage.publications.limit === -1 
+                        ? `${usage.publications.used} / ∞`
+                        : `${usage.publications.used} / ${usage.publications.total_available || usage.publications.limit}`
                       }
                     </span>
                   </div>
-                  <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all ${
-                        usage.publications.percentage >= 90
-                          ? "bg-red-500"
-                          : usage.publications.percentage >= 70
-                            ? "bg-yellow-500"
-                            : "bg-primary-500"
-                      }`}
-                      style={{
-                        width: `${Math.min(usage.publications.percentage, 100)}%`,
-                      }}
-                    />
-                  </div>
+                  {usage.publications.limit !== -1 && (
+                    <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all ${
+                          usage.publications.percentage >= 90
+                            ? "bg-red-500"
+                            : usage.publications.percentage >= 70
+                              ? "bg-yellow-500"
+                              : "bg-primary-500"
+                        }`}
+                        style={{
+                          width: `${Math.min(usage.publications.percentage, 100)}%`,
+                        }}
+                      />
+                    </div>
+                  )}
                   {/* Mostrar desglose de addons si existen */}
                   {usage.publications.addon_info && usage.publications.addon_info.total > 0 && (
                     <div className="text-xs text-primary-600 dark:text-primary-400 mt-1">
@@ -310,24 +310,28 @@ export default function ProfileDropdown({
                       </span>
                     </div>
                     <span className="font-semibold text-gray-900 dark:text-white">
-                      {formatBytes(usage.storage.used_bytes)} /{" "}
-                      {usage.storage.total_available_gb || usage.storage.limit_gb} GB
+                      {usage.storage.limit_gb === -1
+                        ? `${formatBytes(usage.storage.used_bytes)} / ∞`
+                        : `${formatBytes(usage.storage.used_bytes)} / ${usage.storage.total_available_gb || usage.storage.limit_gb} GB`
+                      }
                     </span>
                   </div>
-                  <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all ${
-                        usage.storage.percentage >= 90
-                          ? "bg-red-500"
-                          : usage.storage.percentage >= 70
-                            ? "bg-yellow-500"
-                            : "bg-primary-500"
-                      }`}
-                      style={{
-                        width: `${Math.min(usage.storage.percentage, 100)}%`,
-                      }}
-                    />
-                  </div>
+                  {usage.storage.limit_gb !== -1 && (
+                    <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all ${
+                          usage.storage.percentage >= 90
+                            ? "bg-red-500"
+                            : usage.storage.percentage >= 70
+                              ? "bg-yellow-500"
+                              : "bg-primary-500"
+                        }`}
+                        style={{
+                          width: `${Math.min(usage.storage.percentage, 100)}%`,
+                        }}
+                      />
+                    </div>
+                  )}
                   {/* Mostrar desglose de addons si existen */}
                   {usage.storage.addon_info && usage.storage.addon_info.total > 0 && (
                     <div className="text-xs text-primary-600 dark:text-primary-400 mt-1">
