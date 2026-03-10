@@ -13,6 +13,28 @@
     "success": "Payment successful",
     "failed": "Payment failed",
     "cancelled": "Payment cancelled",
-    "selectToContine": "Select a payment method to continue"
+    "selectToContine": "Select a payment method to continue",
+    "addonPurchaseSuccess": {
+      "title": "Purchase Successful!",
+      "subtitle": "Your addon package has been activated successfully",
+      "details": "Purchase Details",
+      "amount": "Amount",
+      "price": "Price",
+      "date": "Date",
+      "sessionId": "Session ID",
+      "nextSteps": "What's Next?",
+      "step1": "Your addon package is now active and ready to use",
+      "step2": "You can view your current usage in the Addon Packages section",
+      "step3": "You will receive a confirmation email with your purchase details",
+      "viewAddons": "View My Packages",
+      "backToDashboard": "Go to Dashboard",
+      "support": "Have any questions? Contact us at",
+      "addonTypes": {
+        "storage": "Storage",
+        "ai_credits": "AI Credits",
+        "publications": "Publications",
+        "team_members": "Team Members"
+      }
+    }
   }
 }

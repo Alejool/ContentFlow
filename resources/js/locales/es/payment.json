@@ -13,6 +13,28 @@
     "success": "Pago exitoso",
     "failed": "Pago fallido",
     "cancelled": "Pago cancelado",
-    "selectToContine": "Selecciona un método de pago para continuar"
+    "selectToContine": "Selecciona un método de pago para continuar",
+    "addonPurchaseSuccess": {
+      "title": "¡Compra Exitosa!",
+      "subtitle": "Tu paquete adicional ha sido activado correctamente",
+      "details": "Detalles de tu Compra",
+      "amount": "Cantidad",
+      "price": "Precio",
+      "date": "Fecha",
+      "sessionId": "ID de Sesión",
+      "nextSteps": "¿Qué sigue?",
+      "step1": "Tu paquete adicional ya está activo y disponible para usar",
+      "step2": "Puedes ver tu uso actual en la sección de Paquetes Adicionales",
+      "step3": "Recibirás un email de confirmación con los detalles de tu compra",
+      "viewAddons": "Ver Mis Paquetes",
+      "backToDashboard": "Ir al Dashboard",
+      "support": "¿Tienes alguna pregunta? Contáctanos en",
+      "addonTypes": {
+        "storage": "Almacenamiento",
+        "ai_credits": "Créditos IA",
+        "publications": "Publicaciones",
+        "team_members": "Miembros del Equipo"
+      }
+    }
   }
 }
