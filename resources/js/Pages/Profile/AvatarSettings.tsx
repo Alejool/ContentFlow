@@ -187,7 +187,7 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
           <div className="flex items-center gap-3">
             <input
               type="file"
-              accept="image/*"
+              accept="image/jpeg,image/jpg,image/png,image/gif"
               onChange={handleFileChange}
               className="hidden"
               id="avatar-upload"

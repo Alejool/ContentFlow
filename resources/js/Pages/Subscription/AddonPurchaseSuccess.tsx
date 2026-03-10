@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import Button from '@/Components/common/Modern/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
+import AddonsSummary from '@/Components/Addons/AddonsSummary';
 
 interface AddonPurchaseData {
     addon_sku: string;
@@ -149,6 +150,18 @@ export default function AddonPurchaseSuccess({ purchase }: Props) {
                                     </div>
                                 </div>
                             </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Addon Usage Summary */}
+                    <Card className="mb-8 shadow-lg border-0 bg-white dark:bg-gray-800">
+                        <CardHeader>
+                            <CardTitle className="text-gray-900 dark:text-white">
+                                {t('payment.addonPurchaseSuccess.addonUsage', 'Estado de tus Addons')}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <AddonsSummary />
                         </CardContent>
                     </Card>
 

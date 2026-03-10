@@ -189,12 +189,9 @@ export default function AuthenticatedLayout({
       {props.maintenanceMode && props.maintenanceBanner ? (
         <MaintenanceBanner message={String(props.maintenanceBanner)} />
       ) : null}
-      
       <div className="h-screen flex flex-col overflow-hidden w-full max-w-full">
         <div
-          className="relative flex-1 min-h-0 flex
-  w-full
-      max-w-full min-w-0 overflow-x-hidden"
+          className="relative flex-1 min-h-0 flex w-full max-w-full min-w-0 overflow-x-hidden"
         >
           <div className="absolute inset-0 bg-white dark:bg-neutral-900" />
 
@@ -219,7 +216,7 @@ export default function AuthenticatedLayout({
             >
               <header
                 className="border-b border-gray-200/50
-                dark:border-neutral-800/50 bg-white/80 dark:bg-black/50
+                dark:border-neutral-800 bg-white/80 dark:bg-black/80
                 backdrop-blur-xl z-40 min-w-0 sticky top-0 flex flex-col"
               >
                 {!route().current("workspaces.*") && (
