@@ -9,6 +9,7 @@ export interface User {
   bio?: string | null;
   email_verified_at: string | null;
   photo_url?: string | null;
+  default_avatar_icon?: string | null;
   avatar?: string | null;
   created_at: string;
   updated_at: string;
