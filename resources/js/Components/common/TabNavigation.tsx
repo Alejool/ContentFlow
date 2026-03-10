@@ -3,10 +3,12 @@ import DraggableTabs, { DraggableTab } from '@/Components/common/DraggableTabs';
 import Button from '@/Components/common/Modern/Button';
 
 export interface Tab {
-    key: string;
+    id?: string;
+    key?: string;
     label: string;
     icon?: LucideIcon;
     enabled?: boolean;
+    hidden?: boolean;
     badge?: string | number;
     locked?: boolean;
     planRequired?: string[];
@@ -20,11 +22,12 @@ interface TabNavigationProps {
     size?: 'sm' | 'md' | 'lg';
     className?: string;
     onTabOrderChange?: (newOrder: string[]) => void;
+    tabOrder?: string[];
     isDraggable?: boolean;
     currentPlan?: string;
 }
 
-export function TabNavigation({
+function TabNavigation({
     tabs,
     activeTab,
     onTabChange,
@@ -32,12 +35,20 @@ export function TabNavigation({
     size = 'md',
     className = '',
     onTabOrderChange,
+    tabOrder,
     isDraggable = false,
     currentPlan = 'demo',
 }: TabNavigationProps) {
+    // Normalizar tabs para soportar tanto 'id' como 'key', y 'hidden' como 'enabled'
+    const normalizedTabs = tabs.map(tab => ({
+        ...tab,
+        key: tab.key || tab.id || '',
+        enabled: tab.enabled !== false && tab.hidden !== true,
+    }));
+
     // Si es draggable o variant es 'draggable', usar DraggableTabs
     if (isDraggable || variant === 'draggable') {
-        const draggableTabs: DraggableTab[] = tabs.map(tab => ({
+        const draggableTabs: DraggableTab[] = normalizedTabs.map(tab => ({
             id: tab.key,
             label: tab.label,
             icon: tab.icon,
@@ -53,6 +64,7 @@ export function TabNavigation({
                 activeTab={activeTab}
                 onTabChange={onTabChange}
                 onTabOrderChange={onTabOrderChange}
+                tabOrder={tabOrder}
                 isDraggable={true}
                 currentPlan={currentPlan}
                 className={className}
@@ -63,7 +75,7 @@ export function TabNavigation({
 
 
     // Modo estático tradicional
-    const enabledTabs = tabs.filter(tab => tab.enabled !== false);
+    const enabledTabs = normalizedTabs.filter(tab => tab.enabled !== false);
 
     const getVariantClasses = (isActive: boolean) => {
         switch (variant) {
@@ -125,3 +137,6 @@ export function TabNavigation({
         </nav>
     );
 }
+
+export { TabNavigation };
+export default TabNavigation;

@@ -17,7 +17,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripHorizontal, LucideIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export interface DraggableTab {
   id: string;
@@ -120,6 +120,7 @@ interface DraggableTabsProps {
   activeTab: string;
   onTabChange: (id: string) => void;
   onTabOrderChange?: (newOrder: string[]) => void;
+  tabOrder?: string[]; // Orden externo de los tabs
   isDraggable?: boolean;
   currentPlan?: string;
   className?: string;
@@ -130,17 +131,47 @@ export default function DraggableTabs({
   activeTab,
   onTabChange,
   onTabOrderChange,
+  tabOrder,
   isDraggable = false,
   currentPlan = "demo",
   className = "",
 }: DraggableTabsProps) {
-  // Estado interno para manejar el orden de los tabs
-  const [orderedTabs, setOrderedTabs] = useState<DraggableTab[]>(initialTabs);
+  // Si hay un tabOrder externo, usarlo para ordenar los tabs
+  const getOrderedTabs = useMemo(() => {
+    return (tabs: DraggableTab[], order?: string[]) => {
+      if (!order || order.length === 0) return tabs;
+      
+      // Crear un mapa de tabs por id
+      const tabMap = new Map(tabs.map(tab => [tab.id, tab]));
+      
+      // Ordenar según el array de orden
+      const ordered = order
+        .map(id => tabMap.get(id))
+        .filter((tab): tab is DraggableTab => tab !== undefined);
+      
+      // Agregar tabs que no están en el orden al final
+      const remainingTabs = tabs.filter(tab => !order.includes(tab.id));
+      
+      return [...ordered, ...remainingTabs];
+    };
+  }, []);
 
-  // Actualizar cuando cambien los tabs externos
+  // Estado interno para manejar el orden de los tabs
+  const [orderedTabs, setOrderedTabs] = useState<DraggableTab[]>(() => 
+    getOrderedTabs(initialTabs, tabOrder)
+  );
+
+  // Actualizar cuando cambien los tabs externos o el orden
   useEffect(() => {
-    setOrderedTabs(initialTabs);
-  }, [initialTabs]);
+    const newOrderedTabs = getOrderedTabs(initialTabs, tabOrder);
+    // Solo actualizar si realmente cambió el orden
+    const currentIds = orderedTabs.map(t => t.id).join(',');
+    const newIds = newOrderedTabs.map(t => t.id).join(',');
+    
+    if (currentIds !== newIds) {
+      setOrderedTabs(newOrderedTabs);
+    }
+  }, [tabOrder, initialTabs, getOrderedTabs, orderedTabs]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -175,12 +206,16 @@ export default function DraggableTabs({
     const newIndex = visibleTabs.findIndex((tab) => tab.id === over.id);
 
     if (oldIndex !== -1 && newIndex !== -1) {
-      const newOrderedTabs = arrayMove(visibleTabs, oldIndex, newIndex);
+      // Reordenar todos los tabs (no solo los visibles)
+      const allTabsOldIndex = orderedTabs.findIndex((tab) => tab.id === active.id);
+      const allTabsNewIndex = orderedTabs.findIndex((tab) => tab.id === over.id);
+      
+      const newOrderedTabs = arrayMove(orderedTabs, allTabsOldIndex, allTabsNewIndex);
       
       // Actualizar estado interno
       setOrderedTabs(newOrderedTabs);
       
-      // Notificar al padre
+      // Notificar al padre con el nuevo orden
       if (onTabOrderChange) {
         const newOrderIds = newOrderedTabs.map((tab) => tab.id);
         onTabOrderChange(newOrderIds);
