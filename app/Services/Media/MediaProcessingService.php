@@ -3,6 +3,7 @@
 namespace App\Services\Media;
 
 use App\Jobs\ProcessBackgroundUpload;
+use App\Services\Storage\S3PathService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -74,9 +75,17 @@ class MediaProcessingService
         throw new \InvalidArgumentException($validationResult->message);
       }
       
-      $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
-      $path = 'publications/' . $filename;
-
+      $user = Auth::user();
+      $extension = $file->getClientOriginalExtension();
+      
+      // Usar el nuevo servicio de rutas organizadas
+      $path = S3PathService::publicationPath(
+        $user->current_workspace_id,
+        $user->id,
+        $extension
+      );
+      
+      $filename = basename($path);
       $fileType = str_starts_with($file->getClientMimeType(), 'video/') ? 'video' : 'image';
       $fileSize = $file->getSize();
       $mimeType = $validationResult->detectedMimeType ?? $file->getClientMimeType();
@@ -148,7 +157,8 @@ class MediaProcessingService
     } else {
       // Synchronous upload (Only for small files sent to backend)
       if ($file instanceof UploadedFile) {
-        $file->storeAs('publications', $filename, 's3');
+        // Subir directamente a la ruta organizada
+        Storage::disk('s3')->put($path, file_get_contents($file->getRealPath()));
       }
     }
 

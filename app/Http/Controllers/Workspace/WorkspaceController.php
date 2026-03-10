@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Workspace;
 
 use App\Traits\ApiResponse;
+use App\Services\Storage\S3PathService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 use App\Notifications\WorkspaceRemovedNotification;
 
@@ -18,7 +20,6 @@ use App\Models\User;
 use App\Models\Logs\WebhookLog;
 use App\Models\Workspace\Workspace;
 use App\Models\Role\Role;
-use Illuminate\Support\Str;
 
 class WorkspaceController extends Controller
 {
@@ -231,70 +232,54 @@ class WorkspaceController extends Controller
       if ($request->hasFile('logo')) {
         $oldLogo = $workspace->white_label_logo_url;
         $file = $request->file('logo');
-        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+        $extension = $file->getClientOriginalExtension();
+        
+        // Usar el nuevo servicio de rutas organizadas
+        $path = S3PathService::workspaceBrandingPath($workspace->id, "logo_{$workspace->id}." . $extension);
 
-        Log::info('Attempting logo storage', ['filename' => $filename, 'disk' => $disk]);
+        Log::info('Attempting logo storage', ['path' => $path, 'disk' => $disk]);
 
-        $path = false;
         try {
-          $path = $file->storeAs('workspace-branding', $filename, [
-            'disk' => $disk,
-            'visibility' => 'public'
-          ]);
-        } catch (\Exception $e) {
-          Log::warning('Logo storage public failed', ['error' => $e->getMessage()]);
-        }
-
-        if (!$path) {
-          Log::info('Retrying logo storage default');
-          $path = $file->storeAs('workspace-branding', $filename, $disk);
-        }
-
-        if ($path) {
+          Storage::disk($disk)->put($path, file_get_contents($file->getRealPath()));
           Log::info('Logo stored successfully', ['path' => $path]);
           $data['white_label_logo_url'] = Storage::disk($disk)->url($path);
 
-          if ($oldLogo && str_contains($oldLogo, 'workspace-branding')) {
-            preg_match('/workspace-branding\/[^\?]+/', $oldLogo, $matches);
-            if (!empty($matches)) {
-              Storage::disk($disk)->delete($matches[0]);
+          if ($oldLogo && str_contains($oldLogo, 'workspaces/')) {
+            $oldPath = parse_url($oldLogo, PHP_URL_PATH);
+            $oldPath = ltrim($oldPath, '/');
+            if (Storage::disk($disk)->exists($oldPath)) {
+              Storage::disk($disk)->delete($oldPath);
             }
           }
+        } catch (\Exception $e) {
+          Log::error('Logo storage failed', ['error' => $e->getMessage()]);
         }
       }
 
       if ($request->hasFile('favicon')) {
         $oldFavicon = $workspace->white_label_favicon_url;
         $file = $request->file('favicon');
-        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+        $extension = $file->getClientOriginalExtension();
 
-        Log::info('Attempting favicon storage', ['filename' => $filename, 'disk' => $disk]);
+        // Usar el nuevo servicio de rutas organizadas
+        $path = S3PathService::workspaceBrandingPath($workspace->id, "favicon_{$workspace->id}." . $extension);
 
-        $path = false;
+        Log::info('Attempting favicon storage', ['path' => $path, 'disk' => $disk]);
+
         try {
-          $path = $file->storeAs('workspace-branding', $filename, [
-            'disk' => $disk,
-            'visibility' => 'public'
-          ]);
-        } catch (\Exception $e) {
-          Log::warning('Favicon storage public failed', ['error' => $e->getMessage()]);
-        }
-
-        if (!$path) {
-          Log::info('Retrying favicon storage default');
-          $path = $file->storeAs('workspace-branding', $filename, $disk);
-        }
-
-        if ($path) {
+          Storage::disk($disk)->put($path, file_get_contents($file->getRealPath()));
           Log::info('Favicon stored successfully', ['path' => $path]);
           $data['white_label_favicon_url'] = Storage::disk($disk)->url($path);
 
-          if ($oldFavicon && str_contains($oldFavicon, 'workspace-branding')) {
-            preg_match('/workspace-branding\/[^\?]+/', $oldFavicon, $matches);
-            if (!empty($matches)) {
-              Storage::disk($disk)->delete($matches[0]);
+          if ($oldFavicon && str_contains($oldFavicon, 'workspaces/')) {
+            $oldPath = parse_url($oldFavicon, PHP_URL_PATH);
+            $oldPath = ltrim($oldPath, '/');
+            if (Storage::disk($disk)->exists($oldPath)) {
+              Storage::disk($disk)->delete($oldPath);
             }
           }
+        } catch (\Exception $e) {
+          Log::error('Favicon storage failed', ['error' => $e->getMessage()]);
         }
       }
 

@@ -84,6 +84,20 @@ export const useS3Upload = () => {
       if (axiosError.response.status === 402) {
         // This is a custom status for limit exceeded
         const data = axiosError.response.data as any;
+        
+        // Provide detailed storage limit message
+        if (data.remaining_bytes !== undefined && data.file_size !== undefined) {
+          const remainingMB = (data.remaining_bytes / (1024 * 1024)).toFixed(2);
+          const fileSizeMB = (data.file_size / (1024 * 1024)).toFixed(2);
+          
+          return t("publications.modal.upload.errors.storageLimitExceeded", {
+            defaultValue: `Storage limit exceeded. File size: ${fileSizeMB}MB, Available: ${remainingMB}MB. ${data.action || 'Upgrade your plan for more storage.'}`,
+            fileSize: fileSizeMB,
+            remaining: remainingMB,
+            action: data.action,
+          });
+        }
+        
         return data.error || t("subscription.usage.atLimit");
       }
       if (axiosError.response.status === 413) {
@@ -298,14 +312,30 @@ export const useS3Upload = () => {
     [addUpload, updateUpload],
   );
 
+  // Helper to calculate pending bytes from queue
+  const calculatePendingBytes = (excludeId?: string): number => {
+    const currentQueue = useUploadQueue.getState().queue;
+    return Object.values(currentQueue)
+      .filter(
+        (item) =>
+          item.id !== excludeId &&
+          (item.status === "uploading" || item.status === "pending")
+      )
+      .reduce((total, item) => total + item.file.size, 0);
+  };
+
   const uploadSingle = async (file: File, id: string, startTime: number) => {
     try {
+      // Calculate pending bytes from other uploads in queue
+      const pendingBytes = calculatePendingBytes(id);
+      
       const { data: signData } = await axios.post(
         route("api.v1.uploads.sign"),
         {
           filename: file.name,
           content_type: file.type,
           file_size: file.size,
+          pending_bytes: pendingBytes,
         },
       );
 
@@ -346,12 +376,16 @@ export const useS3Upload = () => {
 
     // Initialize multipart upload if not resuming
     if (!uploadId || !key) {
+      // Calculate pending bytes from other uploads in queue
+      const pendingBytes = calculatePendingBytes(id);
+      
       const { data: initData } = await axios.post(
         route("api.v1.uploads.multipart.init"),
         {
           filename: file.name,
           content_type: file.type,
           file_size: file.size,
+          pending_bytes: pendingBytes,
         },
       );
 

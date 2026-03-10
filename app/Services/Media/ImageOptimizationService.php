@@ -4,6 +4,7 @@ namespace App\Services\Media;
 
 use App\Models\MediaFiles\MediaFile;
 use App\Models\MediaFiles\MediaDerivative;
+use App\Services\Storage\S3PathService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
@@ -193,8 +194,15 @@ class ImageOptimizationService
      */
     private function generateS3Key(MediaFile $mediaFile, string $sizeName, string $format): string
     {
-        $uuid = pathinfo($mediaFile->getRawOriginal('file_path'), PATHINFO_FILENAME);
-        return "derivatives/optimized/{$uuid}_{$sizeName}.{$format}";
+        // Obtener información del contexto
+        $workspaceId = $mediaFile->workspace_id;
+        $userId = $mediaFile->user_id;
+        $publicationId = $mediaFile->publication_id;
+        
+        $filename = pathinfo($mediaFile->getRawOriginal('file_path'), PATHINFO_FILENAME) . "_{$sizeName}.{$format}";
+        
+        // Usar el nuevo servicio de rutas organizadas
+        return S3PathService::optimizedImagePath($workspaceId, $userId, $publicationId, $filename);
     }
 
     /**

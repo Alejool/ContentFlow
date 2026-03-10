@@ -45,6 +45,7 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
     'provider_id',
     'is_super_admin',
     'photo_url',
+    'default_avatar_icon',
     'email_verified_at',
     'current_plan',
     'plan_started_at',

@@ -3,6 +3,7 @@
 namespace App\Services\Video;
 
 use App\Models\MediaFiles\MediaFile;
+use App\Services\Storage\S3PathService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -423,7 +424,14 @@ class VideoClipGeneratorService
     ]);
 
     $filename = basename($localPath);
-    $s3Path = "reels/{$folder}/" . Str::uuid() . '_' . $filename;
+    
+    // Obtener workspace_id y user_id del contexto actual
+    $user = auth()->user();
+    $workspaceId = $user->current_workspace_id;
+    $userId = $user->id;
+    
+    // Usar el nuevo servicio de rutas organizadas
+    $s3Path = S3PathService::reelPath($workspaceId, $userId, $folder, $filename);
     
     $content = file_get_contents($localPath);
     if (empty($content)) {

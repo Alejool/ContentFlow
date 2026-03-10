@@ -37,8 +37,13 @@ class PlanLimitValidator
   /**
    * Check if workspace can upload a file of a specific size (in bytes).
    * Returns true if current_storage + additional_bytes <= limit.
+   * 
+   * @param Workspace $workspace
+   * @param int $additionalBytes Size of the file to upload
+   * @param int $pendingBytes Optional: Size of files already being uploaded/pending
+   * @return bool
    */
-  public function canUploadSize(Workspace $workspace, int $additionalBytes): bool
+  public function canUploadSize(Workspace $workspace, int $additionalBytes, int $pendingBytes = 0): bool
   {
     $limits     = $this->getPlanLimits($workspace);
     $limitBytes = ($limits['storage_gb'] ?? 0) === -1
@@ -51,7 +56,32 @@ class PlanLimitValidator
 
     $currentBytes = $workspace->mediaFiles()->sum('size');
 
-    return ($currentBytes + $additionalBytes) <= $limitBytes;
+    // Consider current storage + pending uploads + this file
+    return ($currentBytes + $pendingBytes + $additionalBytes) <= $limitBytes;
+  }
+  
+  /**
+   * Get remaining storage space in bytes.
+   * 
+   * @param Workspace $workspace
+   * @param int $pendingBytes Optional: Size of files already being uploaded/pending
+   * @return int Remaining bytes available (-1 for unlimited)
+   */
+  public function getRemainingStorageBytes(Workspace $workspace, int $pendingBytes = 0): int
+  {
+    $limits     = $this->getPlanLimits($workspace);
+    $limitBytes = ($limits['storage_gb'] ?? 0) === -1
+      ? -1
+      : (($limits['storage_gb'] ?? 0) * 1024 * 1024 * 1024);
+
+    if ($limitBytes === -1) {
+      return -1;
+    }
+
+    $currentBytes = $workspace->mediaFiles()->sum('size');
+    $remaining = $limitBytes - $currentBytes - $pendingBytes;
+
+    return max(0, $remaining);
   }
 
   /**

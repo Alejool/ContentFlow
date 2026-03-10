@@ -2,6 +2,7 @@
 
 namespace App\Services\Video;
 
+use App\Services\Storage\S3PathService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use FFMpeg\FFMpeg;
@@ -79,8 +80,9 @@ class VideoProcessingService
 
   /**
    * Generate video thumbnails
+   * Requiere workspace_id, user_id y publication_id en el contexto
    */
-  public function generateThumbnails(string $videoPath, int $count = 3): array
+  public function generateThumbnails(string $videoPath, int $workspaceId, int $userId, int $publicationId, int $count = 3): array
   {
     Log::info('🖼️ Generating thumbnails', ['path' => $videoPath, 'count' => $count]);
 
@@ -98,8 +100,10 @@ class VideoProcessingService
         $frame = $video->frame(TimeCode::fromSeconds($timestamp));
         $frame->save($thumbnailPath);
         
-        // Upload to S3
-        $s3Key = 'thumbnails/' . uniqid('thumb_', true) . '.jpg';
+        // Usar el nuevo servicio de rutas organizadas
+        $filename = uniqid('thumb_', true) . '.jpg';
+        $s3Key = S3PathService::thumbnailPath($workspaceId, $userId, $publicationId, $filename);
+        
         Storage::disk('s3')->put($s3Key, file_get_contents($thumbnailPath));
         
         $thumbnails[] = [

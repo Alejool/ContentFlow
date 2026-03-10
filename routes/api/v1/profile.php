@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->group(function () {
   Route::prefix('profile')->name('profile.')->group(function () {
     Route::patch('/', [ProfileController::class, 'update'])->name('update');
+    Route::post('/avatar', [ProfileController::class, 'uploadAvatar'])->name('avatar.upload');
+    Route::delete('/avatar', [ProfileController::class, 'deleteAvatar'])->name('avatar.delete');
     Route::put('/password', [ProfileController::class, 'changePassword'])->name('change-password');
     Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
     Route::patch('/social-settings', [ProfileController::class, 'updateSocialSettings'])->name('social-settings.update');
