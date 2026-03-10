@@ -210,21 +210,32 @@ export function usePricing({
       // ── Success → reload data and redirect ─────────────────────────
       if (changeResponse.ok && changeData.success) {
 
-        // Refresh subscription data
-        await checkActiveSubscription();
-        
-        // Dispatch event
+        // Dispatch event FIRST
         window.dispatchEvent(new CustomEvent("subscription-plan-changed"));
         
-        // If backend indicates reload is needed, do a full page reload
-        if (changeData.requires_reload) {
-          // Full page reload to ensure all data is fresh
-          window.location.href = "/dashboard";
-          return;
-        }
+        // Wait a bit for WebSocket to propagate
+        await new Promise(resolve => setTimeout(resolve, 500));
         
-        // Otherwise just redirect
-        setTimeout(redirectToDashboard, 300);
+        // Clear any cached subscription data
+        await checkActiveSubscription();
+        
+        // Force Inertia to reload ALL shared data
+        router.reload({
+          preserveScroll: false,
+          preserveState: false,
+          onSuccess: () => {
+            // Show success message after reload
+            showModal(
+              "info",
+              "Plan actualizado",
+              `Tu plan ha sido cambiado exitosamente a ${changeData.plan}.`,
+              {
+                closeLabel: "Entendido",
+              }
+            );
+          }
+        });
+        
         return;
       }
 
