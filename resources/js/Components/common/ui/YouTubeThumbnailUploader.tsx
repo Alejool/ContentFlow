@@ -256,7 +256,7 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/jpg,image/png,image/gif"
         onChange={(e) => {
           const file = e.target.files?.[0];
           if (file) handleFileSelect(file);

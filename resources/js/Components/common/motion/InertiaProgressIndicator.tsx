@@ -20,17 +20,21 @@ export interface InertiaProgressIndicatorProps {
 /**
  * InertiaProgressIndicator component provides visual feedback during page navigation
  * 
- * @param color - Progress bar color (default: '#ad421e')
+ * @param color - Progress bar color (optional, defaults to CSS --primary-600 variable)
  * @param height - Progress bar height in pixels (default: 3)
  * @param showSpinner - Whether to show a loading spinner (default: false)
  * @param respectReducedMotion - Whether to respect reduced motion preferences (default: true)
  * 
  * @example
- * // Add to app.tsx or layout component
- * <InertiaProgressIndicator color="#ad421e" />
+ * // Add to app.tsx or layout component (uses primary color from theme)
+ * <InertiaProgressIndicator />
+ * 
+ * @example
+ * // With custom color
+ * <InertiaProgressIndicator color="#ff0000" />
  */
 export const InertiaProgressIndicator: React.FC<InertiaProgressIndicatorProps> = ({
-  color = '#ad421e',
+  color,
   height = 3,
   showSpinner = false,
   respectReducedMotion = true,
@@ -41,6 +45,9 @@ export const InertiaProgressIndicator: React.FC<InertiaProgressIndicatorProps> =
   
   // Determine if animations should be disabled
   const shouldReduceMotion = respectReducedMotion && prefersReducedMotion;
+  
+  // Use CSS variable for primary color if no color is provided
+  const progressColor = color || getComputedStyle(document.documentElement).getPropertyValue('--primary-600').trim() || '#ad421e';
 
   useEffect(() => {
     // Listen to Inertia navigation events
@@ -165,7 +172,7 @@ export const InertiaProgressIndicator: React.FC<InertiaProgressIndicatorProps> =
               left: 0,
               right: 0,
               height: `${height}px`,
-              backgroundColor: color,
+              backgroundColor: progressColor,
               transformOrigin: 'left',
               zIndex: 9999,
             }}
@@ -193,7 +200,7 @@ export const InertiaProgressIndicator: React.FC<InertiaProgressIndicatorProps> =
                 style={{
                   width: '24px',
                   height: '24px',
-                  border: `3px solid ${color}`,
+                  border: `3px solid ${progressColor}`,
                   borderTopColor: 'transparent',
                   borderRadius: '50%',
                   animation: shouldReduceMotion ? 'none' : 'spin 0.8s linear infinite',
