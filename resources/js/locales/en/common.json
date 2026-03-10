@@ -1,5 +1,6 @@
 {
   "common": {
+    "locale": "en-US",
     "deleteConfirmTitle": "Confirm deletion",
     "deleteConfirm": "Are you sure you want to delete this item? This action cannot be undone.",
     "deleteSuccess": "Item deleted successfully",

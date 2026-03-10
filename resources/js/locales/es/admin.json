@@ -1,0 +1,110 @@
+{
+  "admin": {
+    "navigation": {
+      "title": "Panel de Administración",
+      "subtitle": "Gestión centralizada del sistema",
+      "dashboard": "Dashboard",
+      "system_settings": "Configuración del Sistema",
+      "system_notifications": "Notificaciones del Sistema"
+    },
+    "dashboard": {
+      "title": "Panel de Administración",
+      "subtitle": "Gestión centralizada del sistema",
+      "quick_actions": "Acciones Rápidas",
+      "recent_activity": "Actividad Reciente",
+      "system_status": "Estado del Sistema",
+      "quick_info": "Información Rápida",
+      "access": "Acceder",
+      "metrics": {
+        "total_users": "Usuarios Totales",
+        "active_subscriptions": "Suscripciones Activas",
+        "publications": "Publicaciones",
+        "system_health": "Estado del Sistema",
+        "healthy": "Saludable",
+        "review": "Revisar"
+      },
+      "activity": {
+        "system_started": "Sistema iniciado correctamente",
+        "config_loaded": "Todas las configuraciones cargadas",
+        "cache_optimized": "Caché optimizado"
+      },
+      "info": {
+        "exclusive_access": "Acceso Exclusivo",
+        "exclusive_description": "Solo super administradores pueden ver este panel",
+        "realtime_changes": "Cambios en Tiempo Real",
+        "realtime_description": "Las configuraciones se aplican inmediatamente",
+        "full_audit": "Auditoría Completa",
+        "audit_description": "Todos los cambios quedan registrados"
+      }
+    },
+    "system_settings": {
+      "page_title": "Configuración del Sistema",
+      "page_description": "Gestiona planes, características e integraciones del sistema",
+      "save_changes": "Guardar Cambios",
+      "saving": "Guardando...",
+      "unsaved_changes": "Tienes cambios sin guardar. Haz clic en \"Guardar Cambios\" para aplicarlos.",
+      "warning_title": "Advertencia",
+      "warning_message": "Los cambios en esta configuración afectan a todo el sistema. Deshabilitar un plan o característica puede impactar a usuarios existentes.",
+      "categories": {
+        "plans": "Planes",
+        "addons": "Add-ons",
+        "features": "Características",
+        "integrations": "Integraciones",
+        "payment_methods": "Métodos de Pago",
+        "general": "General"
+      },
+      "descriptions": {
+        "plans": "Habilita o deshabilita planes de suscripción. Los usuarios existentes mantendrán su plan actual.",
+        "addons": "Controla qué tipos de add-ons pueden comprar los usuarios.",
+        "features": "Activa o desactiva características completas del sistema.",
+        "integrations": "Gestiona las integraciones con servicios externos.",
+        "payment_methods": "Habilita o deshabilita métodos de pago disponibles para los usuarios.",
+        "general": "Configuración general del sistema."
+      },
+      "badges": {
+        "high_impact": "Alto Impacto",
+        "medium_impact": "Impacto Medio"
+      },
+      "last_updated": "Última actualización: {{date}} por {{user}}",
+      "info_section": {
+        "title": "Información Importante",
+        "plans_title": "Planes de Suscripción",
+        "plans_description": "Al deshabilitar un plan, este dejará de aparecer en la página de precios, pero los usuarios que ya lo tienen mantendrán su suscripción y acceso a todas las características.",
+        "features_title": "Características",
+        "features_description": "Deshabilitar una característica (como IA) la ocultará y desactivará en todo el sistema, independientemente del plan del usuario. Úsalo con precaución.",
+        "addons_title": "Add-ons",
+        "addons_description": "Los add-ons deshabilitados no estarán disponibles para compra, pero los usuarios que ya los compraron podrán seguir usándolos hasta que se agoten.",
+        "integrations_title": "Integraciones",
+        "integrations_description": "Deshabilitar una integración impedirá nuevas conexiones, pero las conexiones existentes seguirán funcionando hasta que el usuario las desconecte.",
+        "payment_methods_title": "Métodos de Pago",
+        "payment_methods_description": "Al deshabilitar un método de pago, este dejará de aparecer como opción en el checkout. Las suscripciones activas con ese método seguirán funcionando normalmente."
+      }
+    },
+    "system_status": {
+      "title": "Estado",
+      "description": "Configuraciones activas",
+      "maintenance_mode": {
+        "title": "Modo Mantenimiento Activo",
+        "description": "Solo super admins pueden acceder"
+      },
+      "registrations_disabled": {
+        "title": "Registros Deshabilitados",
+        "description": "No se permiten nuevos registros"
+      },
+      "categories": {
+        "plans": "Planes",
+        "addons": "Add-ons",
+        "features": "Características",
+        "integrations": "Integraciones"
+      },
+      "stats": {
+        "active_features": "Características Activas",
+        "available_plans": "Planes Disponibles"
+      }
+    },
+    "system_notifications": {
+      "page_title": "Notificaciones del Sistema",
+      "page_subtitle": "Envía notificaciones globales a todos los usuarios del sistema"
+    }
+  }
+}

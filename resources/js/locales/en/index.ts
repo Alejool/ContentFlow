@@ -1,4 +1,5 @@
 import activity from "./activity.json";
+import admin from "./admin.json";
 import ai from "./ai.json";
 import analytics from "./analytics.json";
 import approvals from "./approvals.json";
@@ -55,6 +56,7 @@ export default {
   ...logs,
   ...auth,
   ...ai,
+  ...admin,
   ...notifications,
   ...manageContent,
   ...media,
