@@ -157,7 +157,7 @@ export default function SystemSettings({ settings, categories }: Props) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex items-center justify-center text-gray-900 dark:text-gray-100 mt-6">
+                <div className="flex items-center justify-between text-gray-900 dark:text-gray-100 ">
                     <div>
                         <h2 className="text-3xl font-bold">{t('admin.system_settings.page_title')}</h2>
                         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
@@ -181,7 +181,7 @@ export default function SystemSettings({ settings, categories }: Props) {
 
             <AdminNavigation currentRoute="/admin/system-settings" />
 
-            <div className="py-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
+            <div className=" bg-gray-50 dark:bg-gray-900 min-h-screen">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     {hasChanges && (
                         <AlertCard
