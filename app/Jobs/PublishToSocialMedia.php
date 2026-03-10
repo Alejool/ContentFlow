@@ -86,11 +86,19 @@ class PublishToSocialMedia implements ShouldQueue
     }
 
     $publication->update(['status' => 'publishing']);
+    
+    // Update all pending logs to publishing status
+    SocialPostLog::where('publication_id', $publication->id)
+      ->whereIn('social_account_id', $this->socialAccountIds)
+      ->where('status', 'pending')
+      ->update(['status' => 'publishing']);
 
     event(new PublicationStatusUpdated(
       userId: $publication->user_id,
       publicationId: $publication->id,
-      status: 'publishing'
+      status: 'publishing',
+      workspaceId: $publication->workspace_id,
+      socialAccountIds: $this->socialAccountIds
     ));
 
     Log::info('Starting background publishing', [
@@ -193,7 +201,9 @@ class PublishToSocialMedia implements ShouldQueue
           event(new PublicationStatusUpdated(
             userId: $publication->user_id,
             publicationId: $publication->id,
-            status: 'retrying'
+            status: 'retrying',
+            workspaceId: $publication->workspace_id,
+            socialAccountIds: $this->socialAccountIds
           ));
           
           throw new \Exception('Partial failure, retrying failed platforms: ' . implode(', ', $failedPlatforms));
@@ -213,7 +223,9 @@ class PublishToSocialMedia implements ShouldQueue
           event(new PublicationStatusUpdated(
             userId: $publication->user_id,
             publicationId: $publication->id,
-            status: 'retrying'
+            status: 'retrying',
+            workspaceId: $publication->workspace_id,
+            socialAccountIds: $this->socialAccountIds
           ));
         }
         
@@ -255,14 +267,18 @@ class PublishToSocialMedia implements ShouldQueue
     event(new PublicationStatusUpdated(
       userId: $publication->user_id,
       publicationId: $publication->id,
-      status: $publication->status
+      status: $publication->status,
+      workspaceId: $publication->workspace_id,
+      socialAccountIds: $this->socialAccountIds
     ));
 
     if ($publication->published_by && $publication->published_by !== $publication->user_id) {
       event(new PublicationStatusUpdated(
         userId: $publication->published_by,
         publicationId: $publication->id,
-        status: $publication->status
+        status: $publication->status,
+        workspaceId: $publication->workspace_id,
+        socialAccountIds: $this->socialAccountIds
       ));
     }
   }
@@ -452,7 +468,7 @@ class PublishToSocialMedia implements ShouldQueue
       try {
         if ($publication->workspace) {
           $publication->workspace->notify(
-            new PublicationResultNotification($log, 'failed', $log->error_message)
+            new \App\Notifications\PublicationResultNotification($log, 'failed', $log->error_message)
           );
         }
       } catch (\Exception $e) {
@@ -466,7 +482,9 @@ class PublishToSocialMedia implements ShouldQueue
     event(new PublicationStatusUpdated(
       userId: $publication->user_id,
       publicationId: $publication->id,
-      status: 'failed'
+      status: 'failed',
+      workspaceId: $publication->workspace_id,
+      socialAccountIds: $this->socialAccountIds
     ));
   }
 }

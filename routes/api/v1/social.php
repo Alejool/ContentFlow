@@ -14,6 +14,7 @@ Route::middleware('auth:sanctum')->group(function () {
   ]);
 
   Route::get('/social-accounts/auth-url/{platform}', [SocialAccountController::class, 'getAuthUrl'])->name('social-accounts.auth-url');
+  Route::get('/social-accounts/{id}/publishing-status', [SocialAccountController::class, 'getPublishingStatus'])->name('social-accounts.publishing-status');
 
   Route::prefix('logs')->name('social-logs.')->group(function () {
     Route::get('/', [SocialPostLogController::class, 'index'])->name('index');

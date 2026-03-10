@@ -215,12 +215,62 @@ class TwitterService extends BaseSocialService
     try {
       return $this->sendTweet($tweetData);
     } catch (ClientException $e) {
-      if ($e->getResponse()->getStatusCode() === 401) {
+      $statusCode = $e->getResponse()->getStatusCode();
+      
+      if ($statusCode === 401) {
         Log::info('Twitter token expired during sendTweet, refreshing...', ['account_id' => $this->socialAccount?->id]);
         $this->refreshToken();
         return $this->sendTweet($tweetData);
       }
-      throw $e;
+      
+      // Extract user-friendly error message from Twitter API response
+      $errorMessage = $this->extractTwitterErrorMessage($e);
+      throw new \Exception($errorMessage);
+    }
+  }
+  
+  private function extractTwitterErrorMessage(ClientException $e): string
+  {
+    try {
+      $responseBody = $e->getResponse()->getBody()->getContents();
+      $errorData = json_decode($responseBody, true);
+      
+      // Twitter API v2 error format
+      if (isset($errorData['detail'])) {
+        $detail = $errorData['detail'];
+        
+        // Map common Twitter errors to user-friendly messages
+        if (str_contains($detail, 'not allowed to post a video longer than')) {
+          return 'Tu cuenta de Twitter no permite publicar videos de más de 2 minutos. Necesitas Twitter Blue o verificación para videos largos.';
+        }
+        
+        if (str_contains($detail, 'media size')) {
+          return 'El video es demasiado grande para Twitter. Tamaño máximo: 512 MB.';
+        }
+        
+        if (str_contains($detail, 'suspended')) {
+          return 'Tu cuenta de Twitter está suspendida. Contacta con el soporte de Twitter.';
+        }
+        
+        if (str_contains($detail, 'rate limit')) {
+          return 'Has excedido el límite de publicaciones de Twitter. Intenta más tarde.';
+        }
+        
+        // Return the original detail if no specific mapping
+        return $detail;
+      }
+      
+      // Twitter API v1.1 error format
+      if (isset($errorData['errors']) && is_array($errorData['errors'])) {
+        $errors = array_map(fn($err) => $err['message'] ?? 'Error desconocido', $errorData['errors']);
+        return implode('. ', $errors);
+      }
+      
+      // Fallback to original exception message
+      return $e->getMessage();
+    } catch (\Exception $parseError) {
+      // If we can't parse the error, return the original exception message
+      return $e->getMessage();
     }
   }
 
@@ -375,11 +425,12 @@ class TwitterService extends BaseSocialService
    */
   private function getAccountInfoFromDb(): array
   {
-    // Ideally we should pass the full account model to the service,
-    // but for now we query or assume we have it.
-    // Since BaseSocialService usually doesn't store the full model, we need to fetch it
-    // using the access token or just hope it was passed.
-    // Assuming we need to fetch the account that owns this access token.
+    // Use the socialAccount property from BaseSocialService if available
+    if ($this->socialAccount) {
+      return $this->socialAccount->toArray();
+    }
+    
+    // Fallback: query by access token
     $account = SocialAccount::where('access_token', $this->accessToken)->first();
     return $account ? $account->toArray() : [];
   }
@@ -396,13 +447,23 @@ class TwitterService extends BaseSocialService
     
     Log::info('Twitter large media upload starting', [
       'file_size_mb' => round($fileSize / 1024 / 1024, 2),
-      'category' => $category
+      'category' => $category,
+      'has_social_account' => $this->socialAccount !== null,
+      'social_account_id' => $this->socialAccount?->id
     ]);
     
     // Check for OAuth 1.0a credentials in metadata
     $accountInfo = $this->getAccountInfoFromDb();
     $oauthToken = $accountInfo['account_metadata']['oauth1_token'] ?? null;
     $oauthSecret = $accountInfo['account_metadata']['secret'] ?? null;
+
+    Log::info('Twitter OAuth credentials check', [
+      'has_account_info' => !empty($accountInfo),
+      'has_metadata' => isset($accountInfo['account_metadata']),
+      'has_oauth1_token' => !empty($oauthToken),
+      'has_secret' => !empty($oauthSecret),
+      'account_id' => $accountInfo['id'] ?? null
+    ]);
 
     if ($oauthToken && $oauthSecret) {
       // Use League\OAuth1 + Guzzle for manual Chunked Upload
@@ -508,19 +569,30 @@ class TwitterService extends BaseSocialService
       }
     }
 
-    // OAuth 2.0 flow
-    $initResponse = $this->client->post('https://upload.twitter.com/1.1/media/upload.json', [
-      'headers' => [
-        'Authorization' => "Bearer {$this->accessToken}",
-      ],
-      'form_params' => [
-        'command' => 'INIT',
-        'total_bytes' => $fileSize,
-        'media_type' => $mimeType,
-        'media_category' => $category,
-      ],
-      'timeout' => 60
-    ]);
+    // OAuth 2.0 flow - Note: Twitter API v1.1 media upload requires OAuth 1.0a for videos
+    if ($category === 'tweet_video') {
+      throw new \Exception('Video uploads require OAuth 1.0a authentication. Please reconnect your Twitter account with proper credentials.');
+    }
+    
+    try {
+      $initResponse = $this->client->post('https://upload.twitter.com/1.1/media/upload.json', [
+        'headers' => [
+          'Authorization' => "Bearer {$this->accessToken}",
+        ],
+        'form_params' => [
+          'command' => 'INIT',
+          'total_bytes' => $fileSize,
+          'media_type' => $mimeType,
+          'media_category' => $category,
+        ],
+        'timeout' => 60
+      ]);
+    } catch (ClientException $e) {
+      if ($e->getResponse()->getStatusCode() === 403) {
+        throw new \Exception('Twitter API returned 403 Forbidden. Video/large media uploads require OAuth 1.0a authentication. Please reconnect your Twitter account.');
+      }
+      throw $e;
+    }
 
     $initData = json_decode($initResponse->getBody(), true);
 
