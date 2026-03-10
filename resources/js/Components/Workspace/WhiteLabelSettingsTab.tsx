@@ -182,7 +182,7 @@ export default function WhiteLabelSettingsTab({
                         <input
                           type="file"
                           className="hidden"
-                          accept="image/*"
+                          accept="image/jpeg,image/jpg,image/png,image/gif"
                           onChange={handleLogoChange}
                         />
                         <div className="flex flex-col items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
@@ -229,7 +229,7 @@ export default function WhiteLabelSettingsTab({
                         <input
                           type="file"
                           className="hidden"
-                          accept="image/*"
+                          accept="image/jpeg,image/jpg,image/png,image/gif"
                           onChange={handleFaviconChange}
                         />
                         <Upload className="w-5 h-5 text-white" />

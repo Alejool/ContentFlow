@@ -20,7 +20,7 @@ export function AddonsPromotionCard({ showCarousel = false, showPromoBanner = tr
   
   // Obtener el addon más barato para mostrar en el banner
   useEffect(() => {
-    fetch('/api/workspace/addons')
+    fetch('/api/v1/addons/')
       .then(res => res.json())
       .then(data => {
         if (data.success && data.data) {
