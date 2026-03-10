@@ -1,67 +1,59 @@
-import React from 'react';
-import { Link } from '@inertiajs/react';
-import { Settings, Bell, Shield } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { router } from '@inertiajs/react';
+import { Settings, Bell, LayoutDashboard } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import SettingsTabs from '@/Components/Workspace/SettingsTabs';
 
 interface AdminNavigationProps {
     currentRoute?: string;
 }
 
 export default function AdminNavigation({ currentRoute }: AdminNavigationProps) {
+    const { t } = useTranslation();
+    
     const navItems = [
         {
-            name: 'Dashboard',
+            id: 'dashboard',
+            label: t('admin.navigation.dashboard'),
             href: '/admin/dashboard',
-            icon: Shield,
-            description: 'Resumen del estado del sistema',
+            icon: LayoutDashboard,
         },
         {
-            name: 'Configuración del Sistema',
+            id: 'system-settings',
+            label: t('admin.navigation.system_settings'),
             href: '/admin/system-settings',
             icon: Settings,
-            description: 'Gestiona planes, características e integraciones',
         },
         {
-            name: 'Notificaciones del Sistema',
+            id: 'system-notifications',
+            label: t('admin.navigation.system_notifications'),
             href: '/admin/system-notifications',
             icon: Bell,
-            description: 'Envía notificaciones a todos los usuarios',
         },
     ];
 
+    const activeTab = navItems.find(item => item.href === currentRoute)?.id || 'dashboard';
+
+    const handleTabChange = (tabId: string) => {
+        const item = navItems.find(nav => nav.id === tabId);
+        if (item) {
+            router.visit(item.href);
+        }
+    };
+
     return (
-        <div className=" border-b border-gray-200">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-16">
-                    <div className="flex items-center space-x-2">
-                        <Shield className="h-6 w-6 " />
-                        <span className="text-lg font-semibold text-dark dark:text-white">
-                            Panel de Administración
-                        </span>
-                    </div>
-                    <nav className="flex space-x-4">
-                        {navItems.map((item) => {
-                            const Icon = item.icon;
-                            const isActive = currentRoute === item.href;
-                            
-                            return (
-                                <Link
-                                    key={item.href}
-                                    href={item.href}
-                                    className={cn(
-                                        'flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors',
-                                        isActive
-                                            ? 'bg-red-100 text-red-700'
-                                            : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                                    )}
-                                >
-                                    <Icon className="h-4 w-4 mr-2" />
-                                    {item.name}
-                                </Link>
-                            );
-                        })}
-                    </nav>
-                </div>
+        <div className="bg-white dark:bg-gray-800 shadow-sm">
+            <div className="">
+                <SettingsTabs
+                    tabs={navItems.map(item => ({
+                        id: item.id,
+                        label: item.label,
+                        icon: item.icon,
+                        enabled: true
+                    }))}
+                    activeTab={activeTab}
+                    onTabChange={handleTabChange}
+                    isDraggable={false}
+                />
             </div>
         </div>
     );

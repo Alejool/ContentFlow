@@ -4,6 +4,7 @@ import Input from "@/Components/common/Modern/Input";
 import Select from "@/Components/common/Modern/Select";
 import Textarea from "@/Components/common/Modern/Textarea";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import AdminNavigation from "@/Components/Admin/AdminNavigation";
 import { Head, useForm } from "@inertiajs/react";
 import {
   AlertTriangle,
@@ -60,15 +61,24 @@ export default function SystemNotifications() {
   return (
     <AuthenticatedLayout
       header={
-        <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-          {t("notifications.admin.page_title")}
-        </h2>
+        <div className="flex items-center justify-center text-gray-900 dark:text-gray-100 text-3xl mt-2">
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+              {t("admin.system_notifications.page_title")}
+            </h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {t("admin.system_notifications.page_subtitle")}
+            </p>
+          </div>
+        </div>
       }
     >
-      <Head title={t("notifications.admin.page_title")} />
+      <Head title={t("admin.system_notifications.page_title")} />
 
-      <div className="py-12">
-        <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
+      <AdminNavigation currentRoute="/admin/system-notifications" />
+
+      <div className="py-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <ModernCard
             title={t("notifications.admin.card_title")}
             description={t("notifications.admin.card_description")}
@@ -94,8 +104,8 @@ export default function SystemNotifications() {
                     id="type"
                     label={t("notifications.admin.form.type")}
                     value={data.type}
-                    onChange={(value: string | number) =>
-                      setData("type", String(value))
+                    onChange={(value: string | number | string[]) =>
+                      setData("type", String(Array.isArray(value) ? value[0] : value))
                     }
                     error={errors.type}
                     options={notificationTypes}

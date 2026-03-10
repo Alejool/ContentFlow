@@ -5,8 +5,9 @@ import AdminNavigation from '@/Components/Admin/AdminNavigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import Button from '@/Components/common/Modern/Button';
 import { Badge } from '@/Components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
-import { Alert, AlertDescription } from '@/Components/ui/alert';
+import Switch from '@/Components/common/Modern/Switch';
+import SettingsTabs from '@/Components/Workspace/SettingsTabs';
+import AlertCard from '@/Components/common/Modern/AlertCard';
 import { 
     Settings, 
     Package, 
@@ -14,13 +15,10 @@ import {
     Puzzle, 
     Globe, 
     Save, 
-    AlertTriangle,
     CheckCircle2,
-    Info,
-    CreditCard,
-    Bell,
-    Send
+    CreditCard
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface Setting {
     id: number;
@@ -48,17 +46,11 @@ interface Props {
 }
 
 export default function SystemSettings({ settings, categories }: Props) {
+    const { t } = useTranslation();
     const [localSettings, setLocalSettings] = useState<SettingsByCategory>(settings);
     const [hasChanges, setHasChanges] = useState(false);
     const [saving, setSaving] = useState(false);
-    const [sendingNotification, setSendingNotification] = useState(false);
-    const [notificationForm, setNotificationForm] = useState({
-        title: '',
-        message: '',
-        description: '',
-        type: 'info' as 'info' | 'success' | 'warning' | 'error',
-        icon: 'Bell'
-    });
+    const [activeTab, setActiveTab] = useState('plans');
 
     const handleToggle = (category: keyof SettingsByCategory, settingId: number, currentValue: boolean) => {
         setLocalSettings(prev => ({
@@ -99,48 +91,29 @@ export default function SystemSettings({ settings, categories }: Props) {
         });
     };
 
-    const handleSendNotification = () => {
-        if (!notificationForm.title || !notificationForm.message) {
-            return;
-        }
-
-        setSendingNotification(true);
-
-        router.post('/admin/system-notifications/send', notificationForm, {
-            onSuccess: () => {
-                setSendingNotification(false);
-                setNotificationForm({
-                    title: '',
-                    message: '',
-                    description: '',
-                    type: 'info',
-                    icon: 'Bell'
-                });
-            },
-            onError: () => {
-                setSendingNotification(false);
-            }
-        });
-    };
-
     const getCategoryIcon = (category: string) => {
         switch (category) {
-            case 'plans': return <Package className="h-5 w-5" />;
-            case 'addons': return <Zap className="h-5 w-5" />;
-            case 'features': return <Puzzle className="h-5 w-5" />;
-            case 'integrations': return <Globe className="h-5 w-5" />;
-            case 'payment_methods': return <CreditCard className="h-5 w-5" />;
-            case 'general': return <Settings className="h-5 w-5" />;
-            default: return <Settings className="h-5 w-5" />;
+            case 'plans': return Package;
+            case 'addons': return Zap;
+            case 'features': return Puzzle;
+            case 'integrations': return Globe;
+            case 'payment_methods': return CreditCard;
+            case 'general': return Settings;
+            default: return Settings;
         }
+    };
+
+    const getCategoryIconElement = (category: string) => {
+        const Icon = getCategoryIcon(category);
+        return <Icon className="h-5 w-5" />;
     };
 
     const getImpactBadge = (key: string) => {
         if (key.includes('ai') || key.includes('maintenance_mode')) {
-            return <Badge variant="destructive" className="ml-2">Alto Impacto</Badge>;
+            return <Badge variant="destructive" className="ml-2 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800">{t('admin.system_settings.badges.high_impact')}</Badge>;
         }
         if (key.includes('plan') || key.includes('new_registrations')) {
-            return <Badge variant="default" className="ml-2">Impacto Medio</Badge>;
+            return <Badge variant="default" className="ml-2 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800">{t('admin.system_settings.badges.medium_impact')}</Badge>;
         }
         return null;
     };
@@ -149,48 +122,46 @@ export default function SystemSettings({ settings, categories }: Props) {
         const isEnabled = setting.value as boolean;
         
         return (
-            <Card key={setting.id} className="mb-4">
-                <CardContent className="pt-6">
-                    <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                            <div className="flex items-center">
-                                <h3 className="text-lg font-semibold">{setting.label}</h3>
-                                {getImpactBadge(setting.key)}
-                            </div>
-                            <p className="text-sm text-muted-foreground mt-1">
-                                {setting.description}
+            <div key={setting.id} className="mb-4 p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                            <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">{setting.label}</h3>
+                            {getImpactBadge(setting.key)}
+                        </div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                            {setting.description}
+                        </p>
+                        {setting.updated_by && (
+                            <p className="text-xs text-gray-500 dark:text-gray-500">
+                                {t('admin.system_settings.last_updated', {
+                                    date: new Date(setting.updated_at).toLocaleString(t('common.locale') || 'es-ES'),
+                                    user: setting.updated_by
+                                })}
                             </p>
-                            {setting.updated_by && (
-                                <p className="text-xs text-muted-foreground mt-2">
-                                    Última actualización: {new Date(setting.updated_at).toLocaleString('es-ES')} por {setting.updated_by}
-                                </p>
-                            )}
-                        </div>
-                        <div className="ml-4">
-                            <label className="relative inline-flex items-center cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    checked={isEnabled}
-                                    onChange={() => handleToggle(category, setting.id, isEnabled)}
-                                    className="sr-only peer"
-                                />
-                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></div>
-                            </label>
-                        </div>
+                        )}
                     </div>
-                </CardContent>
-            </Card>
+                    <div className="flex-shrink-0">
+                        <Switch
+                            id={`setting-${setting.id}`}
+                            label=""
+                            checked={isEnabled}
+                            onChange={() => handleToggle(category, setting.id, isEnabled)}
+                        />
+                    </div>
+                </div>
+            </div>
         );
     };
 
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex items-center justify-between  text-dark dark:text-white">
+                <div className="flex items-center justify-center text-gray-900 dark:text-gray-100 mt-6">
                     <div>
-                        <h2 className="text-2xl font-bold">Configuración del Sistema</h2>
-                        <p className="text-sm text-muted-foreground mt-1">
-                            Gestiona planes, características e integraciones del sistema
+                        <h2 className="text-3xl font-bold">{t('admin.system_settings.page_title')}</h2>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                            {t('admin.system_settings.page_description')}
                         </p>
                     </div>
                     {hasChanges && (
@@ -200,113 +171,106 @@ export default function SystemSettings({ settings, categories }: Props) {
                             icon={Save}
                             iconPosition="left"
                         >
-                            {saving ? 'Guardando...' : 'Guardar Cambios'}
+                            {saving ? t('admin.system_settings.saving') : t('admin.system_settings.save_changes')}
                         </Button>
                     )}
                 </div>
             }
         >
-            <Head title="Configuración del Sistema" />
+            <Head title={t('admin.system_settings.page_title')} />
 
             <AdminNavigation currentRoute="/admin/system-settings" />
 
-            <div className="py-6 text-dark dark:text-white">
+            <div className="py-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     {hasChanges && (
-                        <Alert className="mb-6">
-                            <Info className="h-4 w-4" />
-                            <AlertDescription>
-                                Tienes cambios sin guardar. Haz clic en "Guardar Cambios" para aplicarlos.
-                            </AlertDescription>
-                        </Alert>
+                        <AlertCard
+                            type="info"
+                            message={t('admin.system_settings.unsaved_changes')}
+                            className="mb-6"
+                        />
                     )}
 
-                    <Alert className="mb-6 border-yellow-500 bg-yellow-50">
-                        <AlertTriangle className="h-4 w-4 text-yellow-600" />
-                        <AlertDescription className="text-yellow-800">
-                            <strong>Advertencia:</strong> Los cambios en esta configuración afectan a todo el sistema.
-                            Deshabilitar un plan o característica puede impactar a usuarios existentes.
-                        </AlertDescription>
-                    </Alert>
+                    <AlertCard
+                        type="warning"
+                        title={t('admin.system_settings.warning_title')}
+                        message={t('admin.system_settings.warning_message')}
+                        className="mb-6"
+                    />
 
-                    <Tabs defaultValue="plans" className="space-y-6">
-                        <TabsList className="grid w-full grid-cols-6">
-                            {Object.entries(categories).map(([key, label]) => (
-                                <TabsTrigger key={key} value={key} className="flex items-center gap-2">
-                                    {getCategoryIcon(key)}
-                                    <span className="hidden sm:inline">{label}</span>
-                                </TabsTrigger>
-                            ))}
-                        </TabsList>
+                    <SettingsTabs
+                        tabs={Object.entries(categories).map(([key, label]) => ({
+                            id: key,
+                            label: t(`admin.system_settings.categories.${key}`) || label,
+                            icon: getCategoryIcon(key),
+                            enabled: true
+                        }))}
+                        activeTab={activeTab}
+                        onTabChange={setActiveTab}
+                        isDraggable={false}
+                    />
 
+                    <div className="mt-6">
                         {Object.entries(categories).map(([categoryKey, categoryLabel]) => (
-                            <TabsContent key={categoryKey} value={categoryKey}>
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle className="flex items-center gap-2">
-                                            {getCategoryIcon(categoryKey)}
-                                            {categoryLabel}
-                                        </CardTitle>
-                                        <CardDescription>
-                                            {categoryKey === 'plans' && 'Habilita o deshabilita planes de suscripción. Los usuarios existentes mantendrán su plan actual.'}
-                                            {categoryKey === 'addons' && 'Controla qué tipos de add-ons pueden comprar los usuarios.'}
-                                            {categoryKey === 'features' && 'Activa o desactiva características completas del sistema.'}
-                                            {categoryKey === 'integrations' && 'Gestiona las integraciones con servicios externos.'}
-                                            {categoryKey === 'payment_methods' && 'Habilita o deshabilita métodos de pago disponibles para los usuarios.'}
-                                            {categoryKey === 'general' && 'Configuración general del sistema.'}
-                                        </CardDescription>
-                                    </CardHeader>
-                                    <CardContent>
-                                        {localSettings[categoryKey as keyof SettingsByCategory]?.map(setting => 
-                                            renderSettingCard(categoryKey as keyof SettingsByCategory, setting)
-                                        )}
-                                    </CardContent>
-                                </Card>
-                            </TabsContent>
+                            activeTab === categoryKey && (
+                                <div key={categoryKey}>
+                                    <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                                        <CardHeader className="border-b border-gray-200 dark:border-gray-700">
+                                            <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-gray-100">
+                                                {getCategoryIconElement(categoryKey)}
+                                                {t(`admin.system_settings.categories.${categoryKey}`) || categoryLabel}
+                                            </CardTitle>
+                                            <CardDescription className="text-gray-600 dark:text-gray-400">
+                                                {t(`admin.system_settings.descriptions.${categoryKey}`)}
+                                            </CardDescription>
+                                        </CardHeader>
+                                        <CardContent className="pt-6">
+                                            {localSettings[categoryKey as keyof SettingsByCategory]?.map(setting => 
+                                                renderSettingCard(categoryKey as keyof SettingsByCategory, setting)
+                                            )}
+                                        </CardContent>
+                                    </Card>
+                                </div>
+                            )
                         ))}
-                    </Tabs>
+                    </div>
 
-                    <Card className="mt-6">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <CheckCircle2 className="h-5 w-5 text-green-600" />
-                                Información Importante
+                    <Card className="mt-6 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                        <CardHeader className="border-b border-gray-200 dark:border-gray-700">
+                            <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-gray-100">
+                                <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
+                                {t('admin.system_settings.info_section.title')}
                             </CardTitle>
                         </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div>
-                                <h4 className="font-semibold mb-2">Planes de Suscripción</h4>
-                                <p className="text-sm text-muted-foreground">
-                                    Al deshabilitar un plan, este dejará de aparecer en la página de precios, pero los usuarios
-                                    que ya lo tienen mantendrán su suscripción y acceso a todas las características.
+                        <CardContent className="pt-6 space-y-4">
+                            <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                                <h4 className="font-semibold mb-2 text-gray-900 dark:text-gray-100">{t('admin.system_settings.info_section.plans_title')}</h4>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                    {t('admin.system_settings.info_section.plans_description')}
                                 </p>
                             </div>
-                            <div>
-                                <h4 className="font-semibold mb-2">Características</h4>
-                                <p className="text-sm text-muted-foreground">
-                                    Deshabilitar una característica (como IA) la ocultará y desactivará en todo el sistema,
-                                    independientemente del plan del usuario. Úsalo con precaución.
+                            <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                                <h4 className="font-semibold mb-2 text-gray-900 dark:text-gray-100">{t('admin.system_settings.info_section.features_title')}</h4>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                    {t('admin.system_settings.info_section.features_description')}
                                 </p>
                             </div>
-                            <div>
-                                <h4 className="font-semibold mb-2">Add-ons</h4>
-                                <p className="text-sm text-muted-foreground">
-                                    Los add-ons deshabilitados no estarán disponibles para compra, pero los usuarios que ya
-                                    los compraron podrán seguir usándolos hasta que se agoten.
+                            <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                                <h4 className="font-semibold mb-2 text-gray-900 dark:text-gray-100">{t('admin.system_settings.info_section.addons_title')}</h4>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                    {t('admin.system_settings.info_section.addons_description')}
                                 </p>
                             </div>
-                            <div>
-                                <h4 className="font-semibold mb-2">Integraciones</h4>
-                                <p className="text-sm text-muted-foreground">
-                                    Deshabilitar una integración impedirá nuevas conexiones, pero las conexiones existentes
-                                    seguirán funcionando hasta que el usuario las desconecte.
+                            <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                                <h4 className="font-semibold mb-2 text-gray-900 dark:text-gray-100">{t('admin.system_settings.info_section.integrations_title')}</h4>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                    {t('admin.system_settings.info_section.integrations_description')}
                                 </p>
                             </div>
-                            <div>
-                                <h4 className="font-semibold mb-2">Métodos de Pago</h4>
-                                <p className="text-sm text-muted-foreground">
-                                    Al deshabilitar un método de pago, este dejará de aparecer como opción en el checkout.
-                                    Las suscripciones activas con ese método seguirán funcionando normalmente.
+                            <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                                <h4 className="font-semibold mb-2 text-gray-900 dark:text-gray-100">{t('admin.system_settings.info_section.payment_methods_title')}</h4>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                    {t('admin.system_settings.info_section.payment_methods_description')}
                                 </p>
                             </div>
                         </CardContent>
