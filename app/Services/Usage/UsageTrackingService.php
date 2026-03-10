@@ -79,6 +79,9 @@ class UsageTrackingService
 
             Cache::forget("workspace.{$workspace->id}.usage.{$metricType}");
 
+            // Notify via WebSocket about usage update
+            $this->notifyUsageUpdated($workspace, $metricType);
+
             Log::info("Usage decremented for workspace {$workspace->id}", [
                 'workspace_id' => $workspace->id,
                 'metric_type'  => $metricType,

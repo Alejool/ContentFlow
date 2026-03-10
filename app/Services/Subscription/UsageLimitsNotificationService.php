@@ -21,6 +21,9 @@ class UsageLimitsNotificationService
      */
     public function notifyLimitsUpdated(Workspace $workspace, string $triggerAction = 'usage_updated'): void
     {
+        // Clear all usage caches BEFORE building the data
+        $this->clearAllUsageCaches($workspace);
+        
         $limitsData = $this->buildLimitsData($workspace);
         
         // Broadcast to WebSocket channel
@@ -34,6 +37,36 @@ class UsageLimitsNotificationService
             'trigger_action' => $triggerAction,
             'limits_count' => count($limitsData),
         ]);
+    }
+    
+    /**
+     * Clear all usage-related caches for a workspace.
+     */
+    private function clearAllUsageCaches(Workspace $workspace): void
+    {
+        $workspaceId = $workspace->id;
+        
+        // Clear publication caches
+        Cache::forget("workspace.{$workspaceId}.publications.active_count");
+        Cache::forget("workspace.{$workspaceId}.publications.current_plan_usage");
+        Cache::forget("workspace.{$workspaceId}.publications.monthly_count");
+        
+        // Clear storage caches
+        Cache::forget("workspace.{$workspaceId}.storage.usage_bytes");
+        Cache::forget("workspace.{$workspaceId}.storage.current_plan_usage");
+        
+        // Clear AI requests caches
+        Cache::forget("workspace.{$workspaceId}.ai_requests.monthly_count");
+        Cache::forget("workspace.{$workspaceId}.ai_requests.current_plan_usage");
+        
+        // Clear social accounts cache
+        Cache::forget("workspace.{$workspaceId}.social_accounts.count");
+        
+        // Clear team members cache
+        Cache::forget("workspace.{$workspaceId}.team_members.count");
+        
+        // Clear limits cache
+        Cache::forget("workspace.{$workspaceId}.limits.usage");
     }
 
     /**

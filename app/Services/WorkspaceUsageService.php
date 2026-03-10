@@ -6,6 +6,7 @@ use App\Models\Workspace\Workspace;
 use App\Models\Subscription\UsageMetric;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class WorkspaceUsageService
 {
@@ -94,6 +95,12 @@ class WorkspaceUsageService
 
         if ($usage && $usage->current_usage > 0) {
             $usage->decrement('current_usage', $amount);
+            
+            // Clear cache
+            Cache::forget("workspace.{$workspace->id}.usage.{$metricType}");
+            
+            // Notify via WebSocket about usage update
+            $this->notifyUsageUpdated($workspace, $metricType);
         }
     }
 

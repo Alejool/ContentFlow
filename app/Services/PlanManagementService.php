@@ -90,10 +90,15 @@ class PlanManagementService
                 // Recalcular addons
                 $this->addonUsageService->recalculateAddonUsageForPlanChange($workspace);
                 
+                // Notify via WebSocket about plan change
+                $notificationService = app(\App\Services\Subscription\UsageLimitsNotificationService::class);
+                $notificationService->notifyLimitsUpdated($workspace, 'plan_changed');
+                
                 Log::info('Usage cache cleared and addon usage recalculated for new plan', [
                     'user_id' => $user->id,
                     'workspace_id' => $workspace->id,
                     'new_plan' => $newPlan,
+                    'previous_plan' => $previousPlan,
                 ]);
             }
 

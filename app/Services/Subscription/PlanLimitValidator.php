@@ -502,6 +502,10 @@ class PlanLimitValidator
       "workspace.{$workspace->id}.publications.current_plan_usage", 
       "workspace.{$workspace->id}.ai_requests.current_plan_usage",
       "workspace.{$workspace->id}.posts.monthly_count",
+      "workspace.{$workspace->id}.limits.usage", // Cache usado por UsageLimitsNotificationService
+      "workspace.{$workspace->id}.publications.active_count",
+      "workspace.{$workspace->id}.social_accounts.count",
+      "workspace.{$workspace->id}.team_members.count",
     ];
     
     foreach ($cacheKeys as $key) {
