@@ -30,6 +30,11 @@ Route::get('/webhooks/youtube', [YouTubeWebhookController::class, 'handle']);
 Route::post('/webhooks/stripe/addons', [\App\Http\Controllers\Webhooks\StripeAddonWebhookController::class, 'handle'])
     ->name('webhooks.stripe.addons');
 
+// Simulador de webhook para addons (temporal)
+Route::post('/webhooks/simulate-addon', [\App\Http\Controllers\Api\AddonWebhookSimulator::class, 'simulateWebhook'])
+    ->middleware('auth:sanctum')
+    ->name('webhooks.simulate.addon');
+
 // ============================================================
 // Multi-Gateway Payment System
 // ============================================================

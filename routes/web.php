@@ -133,7 +133,8 @@ Route::middleware('auth')->group(function () {
     // Add-ons routes
     Route::get('/addons', [AddonsController::class, 'index'])->name('addons');
     Route::post('/addons/purchase', [AddonsController::class, 'purchase'])->name('addons.purchase');
-    Route::get('/addons/success', fn() => Inertia::render('Subscription/AddonSuccess'))->name('addons.success');
+    Route::get('/addons/success', [\App\Http\Controllers\Subscription\AddonPurchaseController::class, 'success'])->name('addons.success');
+    Route::get('/addons/cancelled', [\App\Http\Controllers\Subscription\AddonPurchaseController::class, 'cancelled'])->name('addons.cancelled');
   });
 
 

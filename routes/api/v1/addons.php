@@ -26,6 +26,9 @@ Route::prefix('addons')->name('addons.')->group(function () {
     // Get addon purchase history
     Route::get('/history', [ActiveAddonsController::class, 'history'])->name('history');
     
+    // Get detailed addon usage summary with plan information
+    Route::get('/summary', [ActiveAddonsController::class, 'summary'])->name('summary');
+    
     // Get workspace addon balance summary
     Route::get('/balance', [WorkspaceAddonController::class, 'balance'])->name('balance');
     

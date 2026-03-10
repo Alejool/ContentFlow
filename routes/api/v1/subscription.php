@@ -51,3 +51,5 @@ Route::prefix('subscription')->name('subscription.')->group(function () {
         Route::post('/limits/check-downgrade', [SubscriptionLimitController::class, 'checkDowngrade'])->name('limits.check-downgrade');
     });
 });
+    // Force refresh limits via WebSocket
+    Route::post('/limits/refresh', [SubscriptionLimitController::class, 'refreshLimits'])->name('limits.refresh');
