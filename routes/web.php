@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Broadcast;
 use Inertia\Inertia;
 
 
@@ -31,8 +30,6 @@ use App\Http\Controllers\StripeCheckoutController;
 use App\Http\Controllers\Subscription\PricingController;
 use App\Http\Controllers\Subscription\UsageMetricsController;
 use App\Http\Controllers\Subscription\AddonsController;
-
-Broadcast::routes();
 
 Route::get('/portal/{token}', [ClientPortalController::class, 'renderPortal'])->name('portal.view');
 

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 use App\Notifications\WorkspaceRemovedNotification;
@@ -421,6 +422,13 @@ class WorkspaceController extends Controller
 
     $workspace->users()->detach($userId);
 
+    // Clear team members cache
+    Cache::forget("workspace.{$workspace->id}.team_members.count");
+    
+    // Notify via WebSocket about team member removal
+    $notificationService = app(\App\Services\Subscription\UsageLimitsNotificationService::class);
+    $notificationService->notifyLimitsUpdated($workspace, 'team_member_removed');
+
     if ($removedUser && $removedUser->current_workspace_id === (int)$workspace->id) {
       $firstWorkspace = $removedUser->workspaces()->first();
       $removedUser->update(['current_workspace_id' => $firstWorkspace ? $firstWorkspace->id : null]);
@@ -484,6 +492,13 @@ class WorkspaceController extends Controller
 
     // Attach user to workspace with role
     $workspace->users()->attach($user->id, ['role_id' => $validated['role_id']]);
+
+    // Clear team members cache
+    Cache::forget("workspace.{$workspace->id}.team_members.count");
+    
+    // Notify via WebSocket about team member addition
+    $notificationService = app(\App\Services\Subscription\UsageLimitsNotificationService::class);
+    $notificationService->notifyLimitsUpdated($workspace, 'team_member_added');
 
     return response()->json(['success' => true, 'message' => __('messages.workspace.member_added')]);
   }
