@@ -158,10 +158,13 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
 
         <div className="mb-2">
           <div className="text-3xl font-bold text-gray-900 dark:text-white">
-            {metric.limit === '∞' ? metric.used : `${Math.round(metric.percentage)}%`}
+            {metric.limit === '∞' || metric.limit === -1 
+              ? metric.used 
+              : `${Math.round(metric.percentage)}%`
+            }
           </div>
           <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-            {metric.limit === '∞' 
+            {metric.limit === '∞' || metric.limit === -1
               ? t('subscription.usage.unlimited', 'Ilimitado')
               : `${metric.used} / ${metric.total_available || metric.limit}`
             }
@@ -175,7 +178,7 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
           )}
         </div>
 
-        {metric.limit !== '∞' && (
+        {metric.limit !== '∞' && metric.limit !== -1 && (
           <div className="mb-3">
             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
               <div 
@@ -187,7 +190,7 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
         )}
 
         <div className="text-xs text-gray-600 dark:text-gray-400 mb-3">
-          {metric.limit === '∞' 
+          {metric.limit === '∞' || metric.limit === -1
             ? t('subscription.addons.noLimits', 'Sin límites')
             : (
               <>

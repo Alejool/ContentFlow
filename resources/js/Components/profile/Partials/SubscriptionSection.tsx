@@ -167,11 +167,14 @@ function UsageStatsWithAddons({ usage: legacyUsage }: { usage?: any }) {
                 </span>
               </div>
               <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                {metric.used} / {metric.total_available || metric.limit}
+                {metric.limit === '∞' || metric.limit === -1
+                  ? `${metric.used} / ∞`
+                  : `${metric.used} / ${metric.total_available || metric.limit}`
+                }
               </span>
             </div>
             
-            {metric.limit !== '∞' && (
+            {metric.limit !== '∞' && metric.limit !== -1 && (
               <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                 <div
                   className={`h-2 rounded-full transition-all ${getProgressBarColor(metric.percentage)}`}
