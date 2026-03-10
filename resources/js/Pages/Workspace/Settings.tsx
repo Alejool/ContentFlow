@@ -10,10 +10,10 @@ import RolesManagementTab from "@/Components/Workspace/RolesManagementTab";
 import SettingsTabs from "@/Components/Workspace/SettingsTabs";
 import WhiteLabelSettingsTab from "@/Components/Workspace/WhiteLabelSettingsTab";
 import WorkspaceSettingsHeader from "@/Components/Workspace/WorkspaceSettingsHeader";
+import AlertCard from "@/Components/common/Modern/AlertCard";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
 import {
-  AlertCircle,
   CheckCircle,
   Key,
   Layout,
@@ -277,12 +277,14 @@ export default function WorkspaceSettings({
   };
 
   return (
-    <AuthenticatedLayout>
+    <AuthenticatedLayout
+      header={
+          <WorkspaceSettingsHeader workspace={current_workspace} />
+      }
+    >
       <Head title={`${current_workspace.name} - ${t("workspace.settings")}`} />
 
       <div className="max-w-7xl mx-auto py-6 sm:py-10 px-4 sm:px-6 lg:px-8">
-        <WorkspaceSettingsHeader workspace={current_workspace} />
-
         <SettingsTabs
           tabs={tabs}
           activeTab={activeTab}
@@ -299,19 +301,12 @@ export default function WorkspaceSettings({
         />
 
         {activeTab === "integrations" && !isOwner && (
-          <div className="mb-6 p-4 bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-900/10 border border-primary-200 dark:border-primary-800 rounded-lg">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-primary-500 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-primary-800 dark:text-primary-400">
-                  {t("workspace.integrations.owner_permissions_required")}
-                </p>
-                <p className="text-sm text-primary-700 dark:text-primary-300 mt-1">
-                  {t("workspace.integrations.owner_exclusive_description")}
-                </p>
-              </div>
-            </div>
-          </div>
+          <AlertCard
+            type="warning"
+            title={t("workspace.integrations.owner_permissions_required")}
+            message={t("workspace.integrations.owner_exclusive_description")}
+            className="mb-6"
+          />
         )}
 
         <div className="min-h-[500px]">{renderTabContent()}</div>

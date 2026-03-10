@@ -76,16 +76,16 @@ const CreateWorkspaceModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-200"
         onClick={onClose}
       />
       <div className="relative w-full max-w-lg bg-gradient-to-b from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-lg shadow-2xl p-8 animate-in zoom-in-95 duration-300">
         <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <div className="h-12 w-12 bg-gradient-to-br from-primary-600 to-primary-700 rounded-lg flex items-center justify-center shadow-lg">
-              <Building2 className="h-6 w-6 text-white" />
+          <div className="flex items-center gap-2">
+            <div className="h-12 w-12 rounded-lg flex items-center justify-center ">
+              <Building2 className="h-6 w-6 text-dark dark:text-white" />
             </div>
             <div>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -98,9 +98,11 @@ const CreateWorkspaceModal = ({
           </div>
           <Button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-lg transition-colors"
+            className="p-3 transition-colors rounded-full  
+            hover:bg-gray-700
+            dark:hover:bg-gray-700"
             variant="ghost"
-            buttonStyle="outline"
+            buttonStyle="icon"
             icon={X}
           ></Button>
         </div>
@@ -150,12 +152,13 @@ const CreateWorkspaceModal = ({
               loading={isSubmitting}
               fullWidth
               buttonStyle="gradient"
+              icon={X}
             >
               {isSubmitting ? t("common.creating") : t("workspace.create")}
             </Button>
           </div>
 
-          <div className="pt-6 border-t border-gray-100 dark:border-neutral-800">
+          <div>
             <p className="text-xs text-gray-500 dark:text-neutral-500 text-center">
               {t("workspace.modal.footer_note")}
             </p>

@@ -38,7 +38,7 @@ export default function WorkspaceSwitcher({
   if (!current_workspace) return null;
 
   return (
-    <div className="relative px-4 mb-4 z-20" ref={dropdownRef}>
+    <div className="relative px-4 mb-4 z-5" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`

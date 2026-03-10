@@ -481,8 +481,9 @@ export default function IntegrationsSettingsTab({
       ) : (
         <div className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-lg overflow-hidden shadow-sm animate-in fade-in slide-in-from-bottom-2 duration-300">
           <div className="p-6 border-b border-gray-100 dark:border-neutral-800 flex flex-col gap-4">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
+            <div className="flex  items-center justify-between gap-3">
+              <div className="flex">
+              <div className="h-10 mr-2 w-10 rounded-lg bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
                 <Activity className="h-5 w-5 text-primary-500" />
               </div>
               <div>
@@ -493,25 +494,26 @@ export default function IntegrationsSettingsTab({
                   {t("workspace.recent_webhook_activity")}
                 </p>
               </div>
-            </div>
+              </div>
 
-            <div className="flex items-center justify-end">
-              <Button
-                variant="secondary"
-                buttonStyle="outline"
-                size="lg"
-                onClick={() =>
-                  fetchActivity(
-                    activityData?.current_page || 1,
-                    activityData?.per_page || 5,
-                  )
-                }
-                loading={loadingActivity}
-                icon={RefreshCw}
-                className="gap-2"
-              >
-                {t("common.refresh")}
-              </Button>
+              <div >
+                <Button
+                  variant="secondary"
+                  buttonStyle="outline"
+                  size="lg"
+                  onClick={() =>
+                    fetchActivity(
+                      activityData?.current_page || 1,
+                      activityData?.per_page || 5,
+                    )
+                  }
+                  loading={loadingActivity}
+                  icon={RefreshCw}
+                  className="gap-2"
+                >
+                  {t("common.refresh")}
+                </Button>
+              </div>
             </div>
 
             <FilterSection

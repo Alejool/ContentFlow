@@ -1,4 +1,4 @@
-import { Users } from "lucide-react";
+import { UnifiedAvatar } from "@/Components/common/UnifiedAvatar";
 
 interface AvatarStackProps {
   users: any[];
@@ -26,21 +26,16 @@ const AvatarStack = ({
         return (
           <div
             key={user.id}
-            className="relative inline-block h-8 w-8 rounded-full ring-2 ring-white dark:ring-neutral-900 bg-gradient-to-br from-primary-100 to-primary-200 dark:from-neutral-800 dark:to-neutral-700 overflow-hidden cursor-help hover:scale-110 hover:z-10 transition-all duration-200 group"
+            className="relative inline-block ring-2 ring-white dark:ring-neutral-900 rounded-full cursor-help hover:scale-110 hover:z-10 transition-all duration-200 group"
             title={`${user.name} - ${roleName}`}
           >
-            {user.photo_url ? (
-              <img
-                src={user.photo_url}
-                alt={user.name}
-                className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-200"
-              />
-            ) : (
-              <div className="h-full w-full flex items-center justify-center text-[10px] font-bold bg-gradient-to-br from-primary-500 to-primary-600 text-white">
-                {user.name?.charAt(0).toUpperCase() || "?"}
-              </div>
-            )}
-            <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white dark:border-neutral-900 bg-emerald-500"></div>
+            <UnifiedAvatar
+              src={user.photo_url}
+              defaultIcon={user.default_avatar_icon}
+              name={user.name}
+              size="sm"
+              showStatus={true}
+            />
           </div>
         );
       })}

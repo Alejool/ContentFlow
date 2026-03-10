@@ -12,10 +12,10 @@ export default function WorkspaceSettingsHeader({
   const { t } = useTranslation();
 
   return (
-    <div className="mb-8">
-      <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
+    <div className="">
+      <div className="flex flex-col lg:flex-row lg:items-start justify-center gap-6">
         <div className="flex-1">
-          <div className="flex items-center gap-4 mb-4">
+          <div className="flex items-center justify-center gap-4 mb-4">
             <div
               className={`h-14 w-14 ${!workspace.white_label_logo_url ? "bg-gradient-to-br from-primary-500 to-primary-600" : ""} rounded-lg flex items-center justify-center text-white font-bold text-2xl shadow-lg overflow-hidden`}
             >
@@ -54,7 +54,7 @@ export default function WorkspaceSettingsHeader({
               </div>
             </div>
           </div>
-          <p className="text-gray-600 dark:text-gray-400 max-w-3xl">
+          <p className="text-gray-600 flex justify-center text-center dark:text-gray-400">
             {workspace.description || t("workspace.no_description")}
           </p>
         </div>

@@ -1,9 +1,9 @@
 import { DynamicModal } from "@/Components/common/Modern/DynamicModal";
+import AlertCard from "@/Components/common/Modern/AlertCard";
 import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
 import { useForm } from "@inertiajs/react";
 import axios from "axios";
 import {
-  AlertTriangle,
   CheckCircle2,
   Clock,
   Copy,
@@ -19,6 +19,7 @@ import {
   RefreshCw,
   Trash2,
   XCircle,
+  AlertTriangle,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
@@ -583,20 +584,11 @@ export default function ApiSettingsTab({
       </div>
 
       {/* ── Security Notice ───────────────────────────────────── */}
-      <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-900/30 rounded-lg p-4">
-        <div className="flex gap-3">
-          <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5" />
-          <div className="text-sm text-amber-800 dark:text-amber-300">
-            <p className="font-semibold">
-              {t("workspace.api.security_notice") || "Aviso de Seguridad"}
-            </p>
-            <p className="mt-1">
-              {t("workspace.api.security_help") ||
-                "Los tokens API otorgan acceso completo a este workspace. Nunca los compartas ni los incluyas en repositorios públicos."}
-            </p>
-          </div>
-        </div>
-      </div>
+      <AlertCard
+        type="warning"
+        title={t("workspace.api.security_notice") || "Aviso de Seguridad"}
+        message={t("workspace.api.security_help") || "Los tokens API otorgan acceso completo a este workspace. Nunca los compartas ni los incluyas en repositorios públicos."}
+      />
 
       {/* ── Revoke Confirmation Modal ─────────────────────────── */}
       <DynamicModal

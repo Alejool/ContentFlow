@@ -1,10 +1,10 @@
 import Button from "@/Components/common/Modern/Button";
 import Input from "@/Components/common/Modern/Input";
 import Select from "@/Components/common/Modern/Select";
+import AlertCard from "@/Components/common/Modern/AlertCard";
 import ConfirmDialog from "@/Components/common/ui/ConfirmDialog";
 import axios from "axios";
 import {
-  AlertCircle,
   CheckCircle,
   ChevronRight,
   Edit2,
@@ -606,12 +606,11 @@ export default function ApprovalWorkflowsTab({
         </div>
       )}
 
-      <div className="p-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg flex gap-3">
-        <AlertCircle className="w-5 h-5 text-orange-600 shrink-0 mt-0.5" />
-        <p className="text-sm text-orange-800 dark:text-orange-300">
-          {t("common.approvals.activeWorkflowNote")}
-        </p>
-      </div>
+      <AlertCard
+        type="warning"
+        message={t("common.approvals.activeWorkflowNote")}
+        className="mt-4"
+      />
 
       <InviteMemberModal
         isOpen={showInviteModal}
