@@ -74,8 +74,22 @@ class UploadController extends Controller
       ], 400);
     }
 
-    // Check for executable extensions
+    // Block SVG files explicitly (security risk - can contain malicious scripts)
     $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+    if ($extension === 'svg' || $contentType === 'image/svg+xml') {
+      Log::warning('SVG file upload attempt blocked', [
+        'filename' => $filename,
+        'content_type' => $contentType,
+        'ip' => $request->ip(),
+        'user_id' => $request->user()?->id,
+      ]);
+
+      return response()->json([
+        'error' => 'SVG files are not allowed for security reasons'
+      ], 400);
+    }
+
+    // Check for executable extensions
     $executableExtensions = ['exe', 'bat', 'cmd', 'com', 'pif', 'scr', 'vbs', 'js', 'jar', 'sh', 'php', 'py'];
 
     if (in_array($extension, $executableExtensions)) {
