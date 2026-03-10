@@ -66,4 +66,30 @@ class WorkspaceAddon extends Model
     {
         $this->decrement('used_amount', max(0, $amount));
     }
+
+    // Scopes
+    public function scopeOfType($query, string $type)
+    {
+        return $query->where('addon_type', $type);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true)
+                    ->where(function($q) {
+                        $q->whereNull('expires_at')
+                          ->orWhere('expires_at', '>', now());
+                    });
+    }
+
+    // Alias methods for compatibility
+    public function getRemainingAmount(): int
+    {
+        return $this->getAvailable();
+    }
+
+    public function incrementUsage(int $amount = 1): void
+    {
+        $this->incrementUsed($amount);
+    }
 }

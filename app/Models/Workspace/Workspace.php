@@ -160,7 +160,7 @@ class Workspace extends Model
      */
     public function addons()
     {
-        return $this->hasMany(\App\Models\Subscription\WorkspaceAddon::class);
+        return $this->hasMany(\App\Models\WorkspaceAddon::class);
     }
 
 
