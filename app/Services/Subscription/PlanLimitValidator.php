@@ -22,21 +22,22 @@ class PlanLimitValidator
   public function canPerformAction(Workspace $workspace, string $limitType): bool
   {
     $limits = $this->getPlanLimits($workspace);
-    $limit  = $this->getLimit($limits, $limitType);
+    $totalAvailable = $this->getTotalAvailableWithAddons($workspace, $limitType, $limits);
 
     // -1 means unlimited
-    if ($limit === -1) {
+    if ($totalAvailable === -1) {
       return true;
     }
 
     $currentUsage = $this->getCurrentUsage($workspace, $limitType);
 
-    return $currentUsage < $limit;
+    return $currentUsage < $totalAvailable;
   }
 
   /**
    * Check if workspace can upload a file of a specific size (in bytes).
    * Returns true if current_storage + additional_bytes <= limit.
+   * Includes storage addons in the calculation.
    * 
    * @param Workspace $workspace
    * @param int $additionalBytes Size of the file to upload
@@ -54,14 +55,23 @@ class PlanLimitValidator
       return true;
     }
 
+    // Get storage addons balance
+    $addonService = app(\App\Services\WorkspaceAddonService::class);
+    $storageAddons = $addonService->getAddonBalance($workspace, 'storage');
+    $addonStorageBytes = $storageAddons['remaining'] * 1024 * 1024 * 1024; // Convert GB to bytes
+
+    // Total available storage = plan limit + addons
+    $totalLimitBytes = $limitBytes + $addonStorageBytes;
+
     $currentBytes = $workspace->mediaFiles()->sum('size');
 
     // Consider current storage + pending uploads + this file
-    return ($currentBytes + $pendingBytes + $additionalBytes) <= $limitBytes;
+    return ($currentBytes + $pendingBytes + $additionalBytes) <= $totalLimitBytes;
   }
   
   /**
    * Get remaining storage space in bytes.
+   * Includes storage addons in the calculation.
    * 
    * @param Workspace $workspace
    * @param int $pendingBytes Optional: Size of files already being uploaded/pending
@@ -78,8 +88,16 @@ class PlanLimitValidator
       return -1;
     }
 
+    // Get storage addons balance
+    $addonService = app(\App\Services\WorkspaceAddonService::class);
+    $storageAddons = $addonService->getAddonBalance($workspace, 'storage');
+    $addonStorageBytes = $storageAddons['remaining'] * 1024 * 1024 * 1024; // Convert GB to bytes
+
+    // Total available storage = plan limit + addons
+    $totalLimitBytes = $limitBytes + $addonStorageBytes;
+
     $currentBytes = $workspace->mediaFiles()->sum('size');
-    $remaining = $limitBytes - $currentBytes - $pendingBytes;
+    $remaining = $totalLimitBytes - $currentBytes - $pendingBytes;
 
     return max(0, $remaining);
   }
@@ -105,10 +123,10 @@ class PlanLimitValidator
   public function getCurrentUsage(Workspace $workspace, string $limitType): int
   {
     return match ($limitType) {
-      'publications'  => $this->getPublicationsUsage($workspace),
+      'publications'  => $this->getPublicationsUsageForCurrentPlan($workspace),
       'social_accounts' => $this->getSocialAccountsUsage($workspace),
-      'storage'       => $this->getStorageUsageBytes($workspace),
-      'ai_requests'   => $this->getAiRequestsUsage($workspace),
+      'storage'       => $this->getStorageUsageBytesForCurrentPlan($workspace),
+      'ai_requests'   => $this->getAiRequestsUsageForCurrentPlan($workspace),
       'team_members'  => $this->getTeamMembersUsage($workspace),
       'workspaces'    => $this->getWorkspacesUsage($workspace),
       default         => 0,
@@ -120,7 +138,7 @@ class PlanLimitValidator
    */
   public function getLimit(array $limits, string $limitType): int
   {
-    return match ($limitType) {
+    $baseLimit = match ($limitType) {
       'publications'  => $limits['publications_per_month'] ?? 0,
       'social_accounts' => $limits['social_accounts'] ?? 0,
       'storage'       => ($limits['storage_gb'] ?? 0) === -1
@@ -133,6 +151,8 @@ class PlanLimitValidator
       'discord_channels', 'external_integrations' => $limits['discord_channels'] ?? $limits['external_integrations'] ?? 0,
       default         => 0,
     };
+
+    return $baseLimit;
   }
 
   /**
@@ -141,36 +161,74 @@ class PlanLimitValidator
   public function getUsagePercentage(Workspace $workspace, string $limitType): float
   {
     $limits = $this->getPlanLimits($workspace);
-    $limit  = $this->getLimit($limits, $limitType);
+    $totalAvailable = $this->getTotalAvailableWithAddons($workspace, $limitType, $limits);
 
-    if ($limit === -1) {
+    if ($totalAvailable === -1) {
       return 0;
     }
 
-    if ($limit === 0) {
+    if ($totalAvailable === 0) {
       return 100;
     }
 
     $currentUsage = $this->getCurrentUsage($workspace, $limitType);
 
-    return min(100, ($currentUsage / $limit) * 100);
+    return min(100, ($currentUsage / $totalAvailable) * 100);
   }
 
   /**
    * Get remaining usage for a specific limit type.
    */
+  /**
+   * Get total available limit including addons
+   */
+  public function getTotalAvailableWithAddons(Workspace $workspace, string $limitType, array $limits): int
+  {
+    $baseLimit = $this->getLimit($limits, $limitType);
+    
+    if ($baseLimit === -1) {
+      return -1; // Unlimited
+    }
+
+    // Map limit types to addon types
+    $addonTypeMap = [
+      'ai_requests' => 'ai_credits',
+      'storage' => 'storage',
+      'publications' => 'publications',
+      'team_members' => 'team_members',
+    ];
+
+    $addonType = $addonTypeMap[$limitType] ?? null;
+    
+    if (!$addonType) {
+      return $baseLimit;
+    }
+
+    // Get addon balance using WorkspaceAddonService
+    $addonService = app(\App\Services\WorkspaceAddonService::class);
+    $addonBalance = $addonService->getAddonBalance($workspace, $addonType);
+    
+    // For storage, convert GB to bytes if needed
+    $addonAmount = $addonBalance['remaining'];
+    if ($limitType === 'storage' && $addonAmount > 0) {
+      $addonAmount = $addonAmount * 1024 * 1024 * 1024; // Convert GB to bytes
+    }
+
+    return $baseLimit + $addonAmount;
+  }
+
   public function getRemainingUsage(Workspace $workspace, string $limitType): int
   {
     $limits = $this->getPlanLimits($workspace);
-    $limit  = $this->getLimit($limits, $limitType);
+    $totalAvailable = $this->getTotalAvailableWithAddons($workspace, $limitType, $limits);
 
-    if ($limit === -1) {
+    if ($totalAvailable === -1) {
       return -1;
     }
 
     $currentUsage = $this->getCurrentUsage($workspace, $limitType);
 
-    return max(0, $limit - $currentUsage);
+    return max(0, $totalAvailable - $currentUsage);
   }
 
   /**
@@ -327,6 +385,127 @@ class PlanLimitValidator
 
     if (isset($keys[$limitType])) {
       Cache::forget($keys[$limitType]);
+    }
+  }
+
+  /**
+   * Get storage usage in bytes since the current plan started
+   */
+  private function getStorageUsageBytesForCurrentPlan(Workspace $workspace): int
+  {
+    $planStartDate = $this->getCurrentPlanStartDate($workspace);
+    
+    if (!$planStartDate) {
+      // Fallback to total usage if no plan start date
+      return $this->getStorageUsageBytes($workspace);
+    }
+    
+    return Cache::remember(
+      "workspace.{$workspace->id}.storage.current_plan_usage",
+      now()->addMinutes(5),
+      fn() => (int) $workspace->mediaFiles()
+        ->where('created_at', '>=', $planStartDate)
+        ->sum('size')
+    );
+  }
+
+  /**
+   * Get publications usage since the current plan started
+   */
+  private function getPublicationsUsageForCurrentPlan(Workspace $workspace): int
+  {
+    $planStartDate = $this->getCurrentPlanStartDate($workspace);
+    
+    if (!$planStartDate) {
+      // Fallback to monthly count if no plan start date
+      return $this->getPublicationsUsage($workspace);
+    }
+    
+    return Cache::remember(
+      "workspace.{$workspace->id}.publications.current_plan_usage",
+      now()->addMinutes(2),
+      function() use ($workspace, $planStartDate) {
+        // Count published posts since plan started
+        $publishedCount = \App\Models\Social\SocialPostLog::where('workspace_id', $workspace->id)
+          ->whereIn('status', ['published', 'orphaned', 'publishing'])
+          ->where('published_at', '>=', $planStartDate)
+          ->count();
+
+        // Count scheduled posts since plan started (that are still scheduled)
+        $scheduledCount = \App\Models\Social\ScheduledPost::where('workspace_id', $workspace->id)
+          ->where('status', 'scheduled')
+          ->where('created_at', '>=', $planStartDate)
+          ->count();
+
+        return $publishedCount + $scheduledCount;
+      }
+    );
+  }
+
+  /**
+   * Get AI requests usage since the current plan started
+   */
+  private function getAiRequestsUsageForCurrentPlan(Workspace $workspace): int
+  {
+    $planStartDate = $this->getCurrentPlanStartDate($workspace);
+    
+    if (!$planStartDate) {
+      // Fallback to total usage if no plan start date
+      return $this->getAiRequestsUsage($workspace);
+    }
+    
+    return Cache::remember(
+      "workspace.{$workspace->id}.ai_requests.current_plan_usage",
+      now()->addMinutes(5),
+      function() use ($workspace, $planStartDate) {
+        // Sum usage from all metrics since plan started
+        return $workspace->usageMetrics()
+          ->where('metric_type', 'ai_requests')
+          ->where('period_start', '>=', $planStartDate->toDateString())
+          ->sum('current_usage');
+      }
+    );
+  }
+
+  /**
+   * Get the start date of the current plan for a workspace
+   */
+  private function getCurrentPlanStartDate(Workspace $workspace): ?\Carbon\Carbon
+  {
+    // First try to get from user's plan_started_at
+    $user = $workspace->owner();
+    if ($user && $user->plan_started_at) {
+      return $user->plan_started_at;
+    }
+    
+    // Fallback: get from latest subscription history
+    $latestHistory = $user?->subscriptionHistory()
+      ->where('is_active', true)
+      ->orderBy('started_at', 'desc')
+      ->first();
+    
+    if ($latestHistory) {
+      return $latestHistory->started_at;
+    }
+    
+    // Last fallback: use workspace creation date
+    return $workspace->created_at;
+  }
+
+  /**
+   * Reset usage cache when plan changes
+   */
+  public function clearUsageCacheForPlanChange(Workspace $workspace): void
+  {
+    $cacheKeys = [
+      "workspace.{$workspace->id}.storage.current_plan_usage",
+      "workspace.{$workspace->id}.publications.current_plan_usage", 
+      "workspace.{$workspace->id}.ai_requests.current_plan_usage",
+      "workspace.{$workspace->id}.posts.monthly_count",
+    ];
+    
+    foreach ($cacheKeys as $key) {
+      Cache::forget($key);
     }
   }
 }

@@ -48,7 +48,13 @@ class WorkspaceUsageService
             // Mapear metricType a addon type
             $addonTypeMap = [
                 'ai_requests_per_month' => 'ai_credits',
+                'ai_requests' => 'ai_credits',
                 'storage_gb' => 'storage',
+                'storage_bytes' => 'storage',
+                'storage' => 'storage',
+                'publications_per_month' => 'publications',
+                'publications' => 'publications',
+                'team_members' => 'team_members',
             ];
             
             $addonType = $addonTypeMap[$metricType] ?? null;
@@ -74,6 +80,9 @@ class WorkspaceUsageService
             'from_addons' => $useFromAddons,
             'new_usage' => $usage->fresh()->current_usage,
         ]);
+
+        // Notify via WebSocket about usage update
+        $this->notifyUsageUpdated($workspace, $metricType);
     }
 
     /**
@@ -378,5 +387,25 @@ class WorkspaceUsageService
         ];
 
         return $messages[$limitType] ?? "Has alcanzado el límite de tu plan {$plan}. Actualiza para continuar.";
+    }
+
+    /**
+     * Notify workspace about usage updates via WebSocket.
+     */
+    private function notifyUsageUpdated(Workspace $workspace, string $metricType): void
+    {
+        // Map internal metric types to frontend metric types
+        $frontendMetricType = match ($metricType) {
+            'storage_bytes' => 'storage',
+            'publications_per_month' => 'publications',
+            'ai_requests_per_month' => 'ai_requests',
+            'publications' => 'publications',
+            'ai_requests' => 'ai_requests',
+            'storage' => 'storage',
+            default => $metricType,
+        };
+        
+        $notificationService = app(\App\Services\Subscription\UsageLimitsNotificationService::class);
+        $notificationService->notifyLimitsUpdated($workspace, "usage_incremented_{$frontendMetricType}");
     }
 }

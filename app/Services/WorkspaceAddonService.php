@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\Workspace\Workspace;
-use App\Models\Subscription\WorkspaceAddon;
+use App\Models\WorkspaceAddon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -167,7 +167,7 @@ class WorkspaceAddonService
                     'total' => $addon->total_amount,
                     'used' => $addon->used_amount,
                     'remaining' => $addon->getRemainingAmount(),
-                    'percentage_used' => $addon->getUsagePercentage(),
+                    'percentage_used' => $addon->total_amount > 0 ? round(($addon->used_amount / $addon->total_amount) * 100, 2) : 0,
                     'purchased_at' => $addon->purchased_at,
                     'expires_at' => $addon->expires_at,
                 ];

@@ -12,7 +12,9 @@ use Carbon\Carbon;
 class PlanManagementService
 {
     public function __construct(
-        private SubscriptionTrackingService $trackingService
+        private SubscriptionTrackingService $trackingService,
+        private AddonUsageService $addonUsageService,
+        private \App\Services\Subscription\PlanLimitValidator $planLimitValidator
     ) {}
 
     /**
@@ -78,6 +80,22 @@ class PlanManagementService
 
             // 5. Update old system (workspace subscription) for backward compatibility
             $this->updateWorkspaceSubscription($user, $newPlan, $stripeSubscriptionId);
+
+            // 6. Recalcular el uso de addons para el nuevo plan
+            $workspace = $user->currentWorkspace ?? $user->workspaces()->first();
+            if ($workspace) {
+                // Limpiar caché de uso para que se recalcule desde el inicio del nuevo plan
+                $this->planLimitValidator->clearUsageCacheForPlanChange($workspace);
+                
+                // Recalcular addons
+                $this->addonUsageService->recalculateAddonUsageForPlanChange($workspace);
+                
+                Log::info('Usage cache cleared and addon usage recalculated for new plan', [
+                    'user_id' => $user->id,
+                    'workspace_id' => $workspace->id,
+                    'new_plan' => $newPlan,
+                ]);
+            }
 
             Log::info('Plan changed successfully', [
                 'user_id' => $user->id,

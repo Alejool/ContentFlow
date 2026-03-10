@@ -55,6 +55,9 @@ class UsageTrackingService
         // Dispatch events for limit warnings
         $this->checkAndDispatchLimitEvents($workspace, $metricType, $oldUsage, $metric->current_usage, $limit);
 
+        // Notify via WebSocket about usage update
+        $this->notifyUsageUpdated($workspace, $metricType);
+
         Log::info("Usage incremented for workspace {$workspace->id}", [
             'workspace_id' => $workspace->id,
             'metric_type'  => $metricType,
@@ -236,5 +239,25 @@ class UsageTrackingService
         if ($oldPercentage < 100 && $newPercentage >= 100) {
             event(new LimitReached($workspace, $metricType, $newUsage, $limit));
         }
+    }
+
+    /**
+     * Notify workspace about usage updates via WebSocket.
+     */
+    private function notifyUsageUpdated(Workspace $workspace, string $metricType): void
+    {
+        // Map internal metric types to frontend metric types
+        $frontendMetricType = match ($metricType) {
+            'storage_bytes' => 'storage',
+            'publications_per_month' => 'publications',
+            'ai_requests_per_month' => 'ai_requests',
+            'publications' => 'publications',
+            'ai_requests' => 'ai_requests',
+            'storage' => 'storage',
+            default => $metricType,
+        };
+        
+        $notificationService = app(\App\Services\Subscription\UsageLimitsNotificationService::class);
+        $notificationService->notifyLimitsUpdated($workspace, "usage_incremented_{$frontendMetricType}");
     }
 }
