@@ -52,10 +52,12 @@ class ActiveAddonsController extends Controller
             ->groupBy('addon_sku', 'addon_type')
             ->get();
 
+        Log::info('Grouped addons count: ' . $groupedAddons->count());
 
-        Log::info('Grouped addons count: ' . $groupedAddons);
+        // Obtener el uso actual del workspace para calcular el uso real de addons
+        $planLimitValidator = app(\App\Services\Subscription\PlanLimitValidator::class);
 
-        $addons = $groupedAddons->map(function ($addon) {
+        $addons = $groupedAddons->map(function ($addon) use ($workspace, $planLimitValidator) {
             // Buscar configuración del addon
             $config = AddonHelper::findBySku($addon->addon_sku);
             
@@ -63,24 +65,65 @@ class ActiveAddonsController extends Controller
                 return null;
             }
 
-            $remaining = max(0, $addon->total_amount - $addon->total_used);
-            $percentage = $addon->total_amount > 0 
-                ? round(($addon->total_used / $addon->total_amount) * 100) 
+            // Calcular cuánto del addon se está usando
+            $totalAmount = $addon->total_amount;
+            
+            // NUEVA LÓGICA CORRECTA: Los addons solo se consumen DESPUÉS de agotar el plan base
+            // Cada cambio de plan "resetea" el uso del plan, pero los addons mantienen su estado
+            
+            // Obtener límites del plan actual y uso actual
+            $planLimits = $planLimitValidator->getPlanLimits($workspace);
+            $planLimit = $planLimitValidator->getLimit($planLimits, $addon->addon_type);
+            $currentUsage = $planLimitValidator->getCurrentUsage($workspace, $addon->addon_type);
+            
+            Log::info("Addon calculation for {$addon->addon_type}: Plan limit: {$planLimit}, Current usage: {$currentUsage}, Addon total: {$totalAmount}");
+            
+            $actualUsed = 0;
+            $remaining = $totalAmount;
+            
+            // Los addons solo se usan cuando el uso actual EXCEDE el límite del plan
+            if ($planLimit !== -1 && $currentUsage > $planLimit) {
+                // Calcular cuánto se está usando de los addons (solo el exceso)
+                $excessUsage = $currentUsage - $planLimit;
+                
+                // Para storage, convertir bytes a GB para comparar
+                if ($addon->addon_type === 'storage') {
+                    $excessUsageGB = round($excessUsage / (1024 * 1024 * 1024), 2);
+                    $actualUsed = min($excessUsageGB, $totalAmount);
+                } else {
+                    $actualUsed = min($excessUsage, $totalAmount);
+                }
+                
+                $remaining = max(0, $totalAmount - $actualUsed);
+                
+                Log::info("Addon being consumed - Excess usage: {$excessUsage}, Addon used: {$actualUsed}, Remaining: {$remaining}");
+            } else {
+                // Si no se excede el plan, los addons no se están usando
+                $actualUsed = 0;
+                $remaining = $totalAmount;
+                
+                Log::info("Addon not being consumed - Usage within plan limits. Full addon available: {$remaining}");
+            }
+            
+            $percentage = $totalAmount > 0 
+                ? round(($actualUsed / $totalAmount) * 100) 
                 : 0;
 
             return [
                 'sku' => $addon->addon_sku,
                 'name' => $config['name'],
                 'type' => $addon->addon_type,
-                'amount' => $addon->total_amount,
-                'used' => $addon->total_used,
-                'remaining' => $remaining,
-                'percentage' => $percentage,
+                'amount' => (float) $totalAmount,
+                'used' => (float) $actualUsed,
+                'remaining' => (float) $remaining,
+                'percentage' => (float) $percentage,
+                'price' => (float) $addon->total_price, // Add individual price for compatibility
                 'total_price' => (float) $addon->total_price,
-                'purchase_count' => $addon->purchase_count,
+                'purchase_count' => (int) $addon->purchase_count,
                 'first_purchased_at' => \Carbon\Carbon::parse($addon->first_purchased)->toDateString(),
                 'last_purchased_at' => \Carbon\Carbon::parse($addon->last_purchased)->toDateString(),
-                'status' => 'active',
+                'expires_at' => null, // Add expires_at field
+                'status' => $remaining <= 0 ? 'depleted' : ($percentage > 90 ? 'low' : 'active'),
             ];
         })->filter()->values();
 
@@ -88,12 +131,45 @@ class ActiveAddonsController extends Controller
             ->where('is_active', true)
             ->sum('price_paid');
 
-        
         Log::info('Found ' . $addons->count() . ' active addons, total spent: ' . $totalSpent);
 
         return response()->json([
             'addons' => $addons,
             'total_spent' => (float) $totalSpent,
+        ]);
+    }
+
+    /**
+     * Obtener resumen detallado de addons con información del plan
+     */
+    public function summary(Request $request)
+    {
+        $user = Auth::user();
+        $workspace = $user->currentWorkspace;
+
+        if (!$workspace) {
+            return response()->json([
+                'summary' => [],
+                'plan_info' => null,
+            ]);
+        }
+
+        $addonUsageService = app(\App\Services\AddonUsageService::class);
+        $summary = $addonUsageService->getUsageSummary($workspace);
+        
+        // Obtener información del plan actual
+        $planLimitValidator = app(\App\Services\Subscription\PlanLimitValidator::class);
+        $planLimits = $planLimitValidator->getPlanLimits($workspace);
+        
+        $planInfo = [
+            'current_plan' => $user->current_plan,
+            'limits' => $planLimits,
+            'plan_started_at' => $user->plan_started_at?->toISOString(),
+        ];
+
+        return response()->json([
+            'summary' => $summary,
+            'plan_info' => $planInfo,
         ]);
     }
 

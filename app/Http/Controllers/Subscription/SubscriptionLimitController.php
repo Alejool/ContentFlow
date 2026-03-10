@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Subscription;
 use App\Http\Controllers\Controller;
 use App\Services\Subscription\PlanLimitValidator;
 use App\Services\Subscription\PlanMigrationService;
+use App\Services\WorkspaceAddonService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -12,7 +13,9 @@ class SubscriptionLimitController extends Controller
 {
     public function __construct(
         private PlanLimitValidator $validator,
-        private PlanMigrationService $migrationService
+        private PlanMigrationService $migrationService,
+        private WorkspaceAddonService $addonService,
+        private \App\Services\Subscription\UsageLimitsNotificationService $limitsNotificationService
     ) {}
 
     /**
@@ -26,60 +29,8 @@ class SubscriptionLimitController extends Controller
             return response()->json(['error' => 'No workspace selected'], 403);
         }
 
-        $subscription = $workspace->subscription;
-        $limits = $this->validator->getPlanLimits($workspace);
-        $plan = $workspace->getPlanName();
-
-        $usage = [
-            'success' => true,
-            'data' => [
-                'period' => [
-                    'year' => now()->year,
-                    'month' => now()->month,
-                    'start' => now()->startOfMonth()->toDateString(),
-                    'end' => now()->endOfMonth()->toDateString(),
-                ],
-                'plan' => $plan,
-                'limits_reached' => false, // Will be set to true if any metric is at 100%
-            ]
-        ];
-
-        $metricTypes = ['publications', 'social_accounts', 'storage', 'ai_requests', 'team_members'];
-
-        $limitsReached = false;
-
-        foreach ($metricTypes as $metricType) {
-            $currentLimit = $this->validator->getLimit($limits, $metricType);
-            $currentUsageAmount = $this->validator->getCurrentUsage($workspace, $metricType);
-            $percentage = $this->validator->getUsagePercentage($workspace, $metricType);
-
-            if ($percentage >= 100) {
-                $limitsReached = true;
-            }
-
-            if ($metricType === 'storage') {
-                $usage['data'][$metricType] = [
-                    'used_bytes' => $currentUsageAmount,
-                    'used_mb' => round($currentUsageAmount / (1024 * 1024), 2),
-                    'used_gb' => round($currentUsageAmount / (1024 * 1024 * 1024), 2),
-                    'limit_bytes' => $currentLimit,
-                    'limit_gb' => $currentLimit === -1 ? -1 : round($currentLimit / (1024 * 1024 * 1024), 2),
-                    'remaining_bytes' => $this->validator->getRemainingUsage($workspace, $metricType),
-                    'percentage' => $percentage,
-                    'limit_reached' => $percentage >= 100,
-                ];
-            } else {
-                $usage['data'][$metricType] = [
-                    'used' => $currentUsageAmount,
-                    'limit' => $currentLimit,
-                    'remaining' => $this->validator->getRemainingUsage($workspace, $metricType),
-                    'percentage' => $percentage,
-                    'limit_reached' => $percentage >= 100,
-                ];
-            }
-        }
-
-        $usage['data']['limits_reached'] = $limitsReached;
+        // Use cached data to avoid expensive calculations on every request
+        $usage = $this->limitsNotificationService->getCachedLimitsData($workspace);
 
         return response()->json($usage);
     }
@@ -153,6 +104,27 @@ class SubscriptionLimitController extends Controller
         return response()->json([
             'plan' => $plan,
             'features' => $features,
+        ]);
+    }
+
+    /**
+     * Force refresh limits and broadcast via WebSocket.
+     */
+    public function refreshLimits(Request $request): JsonResponse
+    {
+        $workspace = $request->user()->currentWorkspace ?? $request->user()->workspaces()->first();
+
+        if (!$workspace) {
+            return response()->json(['error' => 'No workspace selected'], 403);
+        }
+
+        // Force refresh limits and broadcast
+        $this->limitsNotificationService->notifyLimitsUpdated($workspace, 'manual_refresh');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Limits refreshed and broadcasted successfully',
+            'workspace_id' => $workspace->id,
         ]);
     }
 }

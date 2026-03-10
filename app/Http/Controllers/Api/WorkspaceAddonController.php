@@ -167,8 +167,8 @@ class WorkspaceAddonController extends Controller
                     'quantity' => $quantity,
                 ]],
                 'mode' => 'payment',
-                'success_url' => config('app.frontend_url') . '/workspace/addons/success?session_id={CHECKOUT_SESSION_ID}',
-                'cancel_url' => config('app.frontend_url') . '/workspace/addons',
+                'success_url' => url('/subscription/addons/success') . '?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url' => url('/subscription/addons/cancelled') . '?session_id={CHECKOUT_SESSION_ID}',
                 'client_reference_id' => $workspace->id,
                 'metadata' => [
                     'workspace_id' => $workspace->id,
