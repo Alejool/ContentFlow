@@ -55,7 +55,7 @@ const VideoPreviewItem: React.FC<VideoPreviewItemProps> = ({
             type="file"
             id={`thumbnail-${index}`}
             className="hidden"
-            accept="image/*"
+            accept="image/jpeg,image/jpg,image/png,image/gif"
             onChange={(e) => {
               const file = e.target.files?.[0];
               if (file) onThumbnailChange(file);

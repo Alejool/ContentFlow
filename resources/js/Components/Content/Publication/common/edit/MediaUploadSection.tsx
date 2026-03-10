@@ -214,7 +214,7 @@ const MediaUploadSection = memo(
                 type="file"
                 className="hidden"
                 multiple
-                accept="image/*,video/*"
+                accept="image/jpeg,image/jpg,image/png,image/gif,video/mp4"
                 onChange={(e) => onFileChange(e.target.files)}
               />
             )}
@@ -422,7 +422,7 @@ const VideoPreview = memo(
             type="file"
             id={`edit-thumb-${preview.tempId}`}
             className="hidden"
-            accept="image/*"
+            accept="image/jpeg,image/jpg,image/png,image/gif"
             onChange={(e) => {
               const file = e.target.files?.[0];
               if (file) onSetThumbnail(file);

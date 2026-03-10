@@ -426,7 +426,7 @@ export default function ManageContentPage() {
               </p>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex justify-end gap-2">
               {permissions.includes("manage-content") && (
                 <Dropdown>
                   <Dropdown.Trigger>
