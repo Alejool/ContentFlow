@@ -52,7 +52,8 @@
       "actions": {
         "connect": "Conectar",
         "disconnect": "Desconectar",
-        "processing": "Procesando..."
+        "processing": "Procesando...",
+        "publishing": "Publicando..."
       },
       "apiLimits": "Límites API",
       "limits": {
@@ -104,7 +105,8 @@
         "disconnectError": "Error al desconectar",
         "popupBlocked": "El navegador bloqueó la ventana emergente. Por favor permite ventanas emergentes para este sitio.",
         "urlError": "No se pudo obtener la URL de autenticación",
-        "connectError": "Error al conectar con"
+        "connectError": "Error al conectar con",
+        "cannotDisconnectPublishing": "No puedes desconectar esta cuenta mientras hay publicaciones en proceso"
       },
       "disconnectModal": {
         "title": "Advertencia de desconexión",

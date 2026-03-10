@@ -47,7 +47,8 @@
       "actions": {
         "connect": "Connect",
         "disconnect": "Disconnect",
-        "processing": "Processing..."
+        "processing": "Processing...",
+        "publishing": "Publishing..."
       },
       "apiLimits": "API Limits",
       "limits": {
@@ -121,7 +122,8 @@
         "authError": "Authentication error",
         "unauthorized": "Unauthorized. Please log in again.",
         "loadError": "Could not load connected accounts",
-        "disconnectError": "Error disconnecting"
+        "disconnectError": "Error disconnecting",
+        "cannotDisconnectPublishing": "You cannot disconnect this account while there are publications in progress"
       }
     }
   }
