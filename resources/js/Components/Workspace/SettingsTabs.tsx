@@ -15,6 +15,7 @@ interface SettingsTabsProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   onTabOrderChange?: (newOrder: string[]) => void;
+  tabOrder?: string[];
   isDraggable?: boolean;
   currentPlan?: string;
 }
@@ -24,6 +25,7 @@ export default function SettingsTabs({
   activeTab,
   onTabChange,
   onTabOrderChange,
+  tabOrder,
   isDraggable = false,
   currentPlan = "demo",
 }: SettingsTabsProps) {
@@ -45,6 +47,7 @@ export default function SettingsTabs({
         activeTab={activeTab}
         onTabChange={onTabChange}
         onTabOrderChange={onTabOrderChange}
+        tabOrder={tabOrder}
         isDraggable={isDraggable}
         currentPlan={currentPlan}
         variant="draggable"

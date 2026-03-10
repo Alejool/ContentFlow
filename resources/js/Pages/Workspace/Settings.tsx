@@ -62,6 +62,17 @@ export default function WorkspaceSettings({
     | "approvals"
   >((initialTab as any) || "overview");
 
+  // Cargar el orden de tabs guardado
+  const [tabOrder, setTabOrder] = useState<string[]>(() => {
+    if (typeof window !== "undefined" && current_workspace?.id) {
+      const saved = localStorage.getItem(
+        `workspace_${current_workspace.id}_tab_order`
+      );
+      return saved ? JSON.parse(saved) : [];
+    }
+    return [];
+  });
+
   if (!current_workspace || !roles) {
     return (
       <AuthenticatedLayout>
@@ -291,8 +302,11 @@ export default function WorkspaceSettings({
           onTabChange={(tab: any) => setActiveTab(tab)}
           isDraggable={canManageWorkspace} // Solo admins/owners pueden reorganizar
           currentPlan={planId}
+          tabOrder={tabOrder}
           onTabOrderChange={(newOrder) => {
-            // Guardar el nuevo orden en localStorage o backend
+            // Actualizar estado local
+            setTabOrder(newOrder);
+            // Guardar el nuevo orden en localStorage
             localStorage.setItem(
               `workspace_${current_workspace.id}_tab_order`,
               JSON.stringify(newOrder)
