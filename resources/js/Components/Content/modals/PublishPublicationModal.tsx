@@ -366,8 +366,8 @@ export default function PublishPublicationModal({
             <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-200/50 dark:border-neutral-800/50 sticky top-0 z-20 bg-gradient-to-r from-gray-50 via-white to-gray-50/80 dark:from-neutral-900 dark:via-neutral-900/95 dark:to-neutral-800/90 backdrop-blur-md shadow-sm dark:shadow-neutral-950/20">
               <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
                 <div className="flex items-center gap-2">
-                  <div className="p-1.5 bg-gradient-to-r from-primary-500 to-primary-600 rounded-lg">
-                    <Share2 className="w-5 h-5 text-white" />
+                  <div className="p-1.5 rounded-lg">
+                    <Share2 className="w-5 h-5 text-primary-500" />
                   </div>
                   {t("publications.modal.publish.title")}
                 </div>

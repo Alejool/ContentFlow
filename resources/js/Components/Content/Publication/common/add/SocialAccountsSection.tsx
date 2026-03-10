@@ -222,6 +222,7 @@ interface SocialAccountItemProps {
   durationError?: string;
   videoMetadata?: Record<string, any>;
   mediaFiles?: any[];
+  errorMessage?: string;
   // YouTube thumbnail props
   onThumbnailChange?: (videoId: number, file: File | null) => void;
   onThumbnailDelete?: (videoId: number) => void;
@@ -254,6 +255,7 @@ const SocialAccountItem = memo(
     durationError,
     videoMetadata = {},
     mediaFiles = [],
+    errorMessage,
     onThumbnailChange,
     onThumbnailDelete,
     thumbnails,
@@ -443,11 +445,18 @@ const SocialAccountItem = memo(
               </div>
             )}
             {isFailed && (
-              <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-red-600 dark:text-red-400">
-                <div className="w-3 h-3 rounded-full bg-red-500 flex items-center justify-center">
-                  <X className="w-2 h-2 text-white" />
+              <div className="mt-1 flex flex-col gap-1">
+                <div className="flex items-center gap-1 text-[10px] font-medium text-red-600 dark:text-red-400">
+                  <div className="w-3 h-3 rounded-full bg-red-500 flex items-center justify-center">
+                    <X className="w-2 h-2 text-white" />
+                  </div>
+                  {t("publications.modal.publish.failed") || "Fallido"}
                 </div>
-                {t("publications.modal.publish.failed") || "Fallido"}
+                {errorMessage && (
+                  <div className="text-[10px] text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded border border-red-200 dark:border-red-800">
+                    {errorMessage}
+                  </div>
+                )}
               </div>
             )}
             {durationError && (
@@ -701,6 +710,11 @@ const SocialAccountsSection = memo(
             const isPublishing = publishingAccountIds?.includes(account.id);
             const isFailed = failedAccountIds?.includes(account.id);
             const isIndividualUnpublishing = unpublishing === account.id;
+            
+            // Get error message from social post logs
+            const errorMessage = socialPostLogs
+              ?.find(log => log.social_account_id === account.id && log.status === 'failed')
+              ?.error_message;
 
             return (
               <SocialAccountItem
@@ -732,6 +746,7 @@ const SocialAccountsSection = memo(
                 durationError={durationErrors[account.id]}
                 videoMetadata={videoMetadata}
                 mediaFiles={mediaFiles}
+                errorMessage={errorMessage}
                 onThumbnailChange={onThumbnailChange}
                 onThumbnailDelete={onThumbnailDelete}
                 thumbnails={thumbnails}

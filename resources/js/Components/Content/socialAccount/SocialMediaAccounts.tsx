@@ -4,7 +4,7 @@ import DisconnectBlockerModal from "@/Components/Content/modals/DisconnectBlocke
 import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatforms";
 import { useSocialMediaAuth } from "@/Hooks/useSocialMediaAuth";
 import { getPlatformSchema } from "@/schemas/platformSettings";
-import { Link, router } from "@inertiajs/react";
+import { Link, router, usePage } from "@inertiajs/react";
 import axios from "axios";
 import {
   AlertCircle,
@@ -12,6 +12,7 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
+  Clock,
   ExternalLink,
   Loader2,
   Settings,
@@ -40,6 +41,7 @@ interface Account {
 const SocialMediaAccounts = memo(() => {
   const { t } = useTranslation();
   const { isLoading, connectAccount, disconnectAccount } = useSocialMediaAuth();
+  const { auth } = usePage<any>().props;
   const [activePlatform, setActivePlatform] = useState<string | null>(null);
   const [localSettings, setLocalSettings] = useState<any>({});
 
@@ -218,12 +220,105 @@ const SocialMediaAccounts = memo(() => {
     canDisconnect?: boolean;
   } | null>(null);
 
+  const [accountsWithPublishing, setAccountsWithPublishing] = useState<Set<number>>(new Set());
+
+  // Listen for real-time publication status updates via WebSocket
+  useEffect(() => {
+    if (!window.Echo || !auth?.user?.current_workspace_id) {
+      console.warn('[Publishing Check] Echo not available or no workspace ID');
+      return;
+    }
+
+    const workspaceId = auth.user.current_workspace_id;
+    
+    // Listen to publication status updates
+    const channel = window.Echo.private(`workspace.${workspaceId}`);
+    
+    const handlePublicationStatusUpdate = (event: any) => {
+      console.log('[Publishing Check] Publication status update received:', event);
+      
+      // Check if any of our accounts are affected
+      if (event.social_account_ids && Array.isArray(event.social_account_ids)) {
+        setAccountsWithPublishing(prev => {
+          const newSet = new Set(prev);
+          
+          event.social_account_ids.forEach((accountId: number) => {
+            if (event.status === 'publishing' || event.status === 'retrying') {
+              console.log(`[Publishing Check] Account ${accountId} is now publishing`);
+              newSet.add(accountId);
+            } else if (event.status === 'published' || event.status === 'failed') {
+              console.log(`[Publishing Check] Account ${accountId} finished publishing`);
+              newSet.delete(accountId);
+            }
+          });
+          
+          return newSet;
+        });
+      }
+    };
+
+    channel.listen('.PublicationStatusUpdated', handlePublicationStatusUpdate);
+
+    console.log('[Publishing Check] WebSocket listener registered for workspace:', workspaceId);
+
+    return () => {
+      channel.stopListening('.PublicationStatusUpdated', handlePublicationStatusUpdate);
+    };
+  }, [auth?.user?.current_workspace_id]);
+
+  // Initial check on mount to get current publishing state
+  useEffect(() => {
+    const checkInitialPublishingStatus = async () => {
+      const publishingAccounts = new Set<number>();
+      
+      for (const account of accounts) {
+        if (account.isConnected && account.accountId) {
+          try {
+            const response = await axios.get(`/api/v1/social-accounts/${account.accountId}/publishing-status`, {
+              headers: {
+                "X-CSRF-TOKEN": document
+                  .querySelector('meta[name="csrf-token"]')
+                  ?.getAttribute("content"),
+                Accept: "application/json",
+              },
+              withCredentials: true,
+            });
+            
+            if (response.data?.has_publishing) {
+              publishingAccounts.add(account.accountId as number);
+            }
+          } catch (error: any) {
+            console.error(`[Publishing Check] Error checking ${account.name}:`, error.response?.data || error.message);
+          }
+        }
+      }
+      
+      if (publishingAccounts.size > 0) {
+        console.log('[Publishing Check] Initial accounts with publishing:', Array.from(publishingAccounts));
+        setAccountsWithPublishing(publishingAccounts);
+      }
+    };
+
+    if (accounts.length > 0) {
+      checkInitialPublishingStatus();
+    }
+  }, [accounts]);
+
   const handleConnectionToggle = async (account: Account) => {
     if (blockerModalData?.account?.id === account.id) {
       setBlockerModalData(null);
     }
 
     if (account.isConnected) {
+      // Check if account has publishing posts
+      if (accountsWithPublishing.has(account.accountId as number)) {
+        toast.error(
+          t("manageContent.socialMedia.messages.cannotDisconnectPublishing") ||
+          "No puedes desconectar esta cuenta mientras hay publicaciones en proceso"
+        );
+        return;
+      }
+
       try {
         const result: any = await disconnectSocialMedia(
           account.accountId as number,
@@ -561,22 +656,32 @@ const SocialMediaAccounts = memo(() => {
                   <div className="flex gap-2 w-full">
                     <button
                       onClick={() => handleConnectionToggle(account)}
-                      disabled={isLoading}
+                      disabled={isLoading || (account.isConnected && accountsWithPublishing.has(account.accountId as number))}
                       className={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm flex items-center justify-center gap-2
                         transition-all duration-200 relative overflow-hidden group/btn
                         ${
-                          isLoading
-                            ? "bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-neutral-700/50"
+                          isLoading || (account.isConnected && accountsWithPublishing.has(account.accountId as number))
+                            ? "bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-neutral-700/50 opacity-60"
                             : account.isConnected
                               ? "bg-gradient-to-r from-primary-50 to-primary-50 text-primary-600 border border-primary-200 hover:bg-primary-100 dark:bg-gradient-to-r dark:from-primary-900/10 dark:to-primary-800/10 dark:text-primary-400 dark:border-primary-900/30 dark:hover:bg-primary-900/20"
                               : `bg-gradient-to-r ${account.gradient} text-white shadow-lg hover:shadow-xl hover:scale-[1.02]`
                         }`}
+                      title={
+                        account.isConnected && accountsWithPublishing.has(account.accountId as number)
+                          ? t("manageContent.socialMedia.messages.cannotDisconnectPublishing") || "No puedes desconectar mientras hay publicaciones en proceso"
+                          : undefined
+                      }
                     >
                       <span className="relative z-10 flex items-center gap-2">
                         {isLoading ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
                             {t("manageContent.socialMedia.actions.processing")}
+                          </>
+                        ) : account.isConnected && accountsWithPublishing.has(account.accountId as number) ? (
+                          <>
+                            <Clock className="w-4 h-4 animate-pulse" />
+                            {t("manageContent.socialMedia.actions.publishing") || "Publicando..."}
                           </>
                         ) : account.isConnected ? (
                           <>
@@ -590,7 +695,7 @@ const SocialMediaAccounts = memo(() => {
                           </>
                         )}
                       </span>
-                      {!isLoading && (
+                      {!isLoading && !(account.isConnected && accountsWithPublishing.has(account.accountId as number)) && (
                         <div className="absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent dark:via-white/5"></div>
                       )}
                     </button>
