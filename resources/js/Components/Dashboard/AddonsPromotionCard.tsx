@@ -62,7 +62,7 @@ export function AddonsPromotionCard({ showCarousel = false, showPromoBanner = tr
   return (
     <div className="space-y-4">
       {/* Componente de uso del plan */}
-      <PlanUsageCards showCarousel={showCarousel} showTitle={true} />
+      <PlanUsageCards showCarousel={true} showTitle={true} />
       
       {/* Banner promocional si hay uso alto y está habilitado */}
       {showPromoBanner && hasHighUsage && (

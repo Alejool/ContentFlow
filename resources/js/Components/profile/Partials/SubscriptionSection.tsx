@@ -116,7 +116,7 @@ export default function SubscriptionSection({
     switch (status) {
       case "active":
         return (
-          <Badge variant="default" className="bg-green-500">
+          <Badge variant="default" className="bg-green-500 text-white">
             <CheckCircle className="w-3 h-3 mr-1" />
             {t("subscription.status.active")}
           </Badge>

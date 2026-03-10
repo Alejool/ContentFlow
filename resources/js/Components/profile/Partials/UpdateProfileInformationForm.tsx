@@ -2,6 +2,7 @@ import Button from "@/Components/common/Modern/Button";
 import Input from "@/Components/common/Modern/Input";
 import Textarea from "@/Components/common/Modern/Textarea";
 import ConnectedAccounts from "@/Components/profile/Partials/ConnectedAccounts";
+import AvatarSettings from "@/Pages/Profile/AvatarSettings";
 import { useUser } from "@/Hooks/useUser";
 import { Link } from "@inertiajs/react";
 import {
@@ -76,6 +77,11 @@ export default function UpdateProfileInformation({
   return (
     <div className={className}>
       <form onSubmit={handleSubmit} className="">
+        {/* Sección: Avatar */}
+        <div className="pb-8">
+          <AvatarSettings user={user} />
+        </div>
+
         {/* Sección: Información Personal */}
         <div className="border-t border-gray-100 dark:border-neutral-800 pt-8">
           <div className="flex items-center gap-3 pb-4">

@@ -414,13 +414,10 @@ export default function ManageContentPage() {
   };
 
   return (
-    <AuthenticatedLayout>
-      <Head title={t("manageContent.title")} />
-
-      <div className="w-full max-w-full overflow-x-hidden min-w-0 bg-gray-50/30 dark:bg-neutral-900/10 min-h-screen">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-5 sm:py-8 min-w-0">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 min-w-0">
-            <div className="min-w-0 flex-1 pr-2">
+    <AuthenticatedLayout
+      header={
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4  min-w-0">
+          <div className="min-w-0 flex-1">
               <h1 className="text-xl sm:text-3xl font-extrabold text-gray-900 dark:text-white truncate tracking-tight">
                 {t("manageContent.title")}
               </h1>
@@ -479,7 +476,12 @@ export default function ManageContentPage() {
                 </Dropdown>
               )}
             </div>
-          </div>
+        </div>
+      }>
+      <Head title={t("manageContent.title")} />
+
+      <div className="w-full max-w-full overflow-x-hidden min-w-0 bg-gray-50/30 dark:bg-neutral-900/10 min-h-screen">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-5 sm:py-8 min-w-0">
 
           <div className="mb-8">
             <SocialMediaAccounts />

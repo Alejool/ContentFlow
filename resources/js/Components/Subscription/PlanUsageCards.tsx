@@ -135,7 +135,7 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
     
     return (
       <div 
-        className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-xl p-5 border border-primary-200 dark:border-primary-700/50 shadow-sm hover:shadow-md transition-all min-w-[280px]"
+        className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-xl p-5 border border-primary-200 dark:border-primary-700/50 shadow-sm hover:shadow-md transition-all h-full"
       >
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -256,9 +256,12 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
 
       {showCarousel && visibleMetrics.length > itemsPerSlide ? (
         <div className="relative overflow-hidden">
-          <div className="flex gap-4 transition-transform duration-300 ease-in-out">
-            {getCurrentSlideMetrics().map(metric => (
-              <div key={metric.key}>
+          <div 
+            className="flex gap-4 transition-transform duration-300 ease-in-out"
+            style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+          >
+            {visibleMetrics.map(metric => (
+              <div key={metric.key} className="flex-shrink-0 w-full sm:w-[calc(50%-0.5rem)] lg:w-[calc(25%-0.75rem)]">
                 {renderCard(metric)}
               </div>
             ))}
@@ -272,7 +275,15 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
           />
         </div>
       ) : (
-        <div className={`grid ${visibleMetrics.length === 2 ? 'grid-cols-1 md:grid-cols-2' : visibleMetrics.length === 3 ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4'} gap-4`}>
+        <div className={`grid gap-4 ${
+          visibleMetrics.length === 1 
+            ? 'grid-cols-1' 
+            : visibleMetrics.length === 2 
+            ? 'grid-cols-1 sm:grid-cols-2' 
+            : visibleMetrics.length === 3 
+            ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' 
+            : 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-4'
+        }`}>
           {visibleMetrics.map(metric => (
             <div key={metric.key}>
               {renderCard(metric)}
