@@ -68,8 +68,8 @@ class StripeGateway implements PaymentGatewayInterface
                     'price' => $addonData['stripe_price_id'],
                     'quantity' => $metadata['quantity'] ?? 1,
                 ]],
-                'success_url' => url('/subscription/addons') . '?success=true&session_id={CHECKOUT_SESSION_ID}',
-                'cancel_url' => url('/subscription/addons') . '?canceled=true',
+                'success_url' => url('/subscription/addons/success') . '?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url' => url('/subscription/addons/cancelled') . '?session_id={CHECKOUT_SESSION_ID}',
                 'customer_email' => $user->email,
                 'metadata' => array_merge([
                     'addon_sku' => $addonData['sku'],

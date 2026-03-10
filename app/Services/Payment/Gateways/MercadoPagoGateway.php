@@ -116,8 +116,8 @@ class MercadoPagoGateway implements PaymentGatewayInterface
                     ]
                 ],
                 'back_urls' => [
-                    'success' => url('/subscription/addons') . '?success=true&gateway=mercadopago',
-                    'failure' => url('/subscription/addons') . '?canceled=true&gateway=mercadopago',
+                    'success' => url('/subscription/addons/success') . '?gateway=mercadopago',
+                    'failure' => url('/subscription/addons/cancelled') . '?gateway=mercadopago',
                     'pending' => url('/subscription/addons') . '?pending=true&gateway=mercadopago',
                 ],
                 'auto_return' => 'approved',
