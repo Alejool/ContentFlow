@@ -15,15 +15,19 @@ import {
   CheckCircle,
   CreditCard,
   Crown,
+  FileText,
   HardDrive,
   Key,
   Palette,
+  Share2,
   Sparkles,
   TrendingUp,
+  Users,
   Zap,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { formatDateString } from "@/Utils/dateHelpers";
+import { useSubscriptionUsage } from "@/Hooks/useSubscriptionUsage";
 
 interface Invoice {
   id: string;
@@ -60,6 +64,135 @@ interface SubscriptionSectionProps {
   };
   billingHistory?: Invoice[];
   currentWorkspace?: any;
+}
+
+function UsageStatsWithAddons({ usage: legacyUsage }: { usage?: any }) {
+  const { t } = useTranslation();
+  const { usage, loading } = useSubscriptionUsage();
+  
+  if (loading || !usage) {
+    return (
+      <div className="space-y-4">
+        <div className="animate-pulse">
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-2"></div>
+          <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded mb-1"></div>
+          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+        </div>
+      </div>
+    );
+  }
+
+  const formatBytes = (bytes: number, decimals = 2) => {
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+  };
+
+  const getProgressBarColor = (percentage: number) => {
+    if (percentage >= 90) return "bg-red-500";
+    if (percentage >= 70) return "bg-yellow-500";
+    return "bg-primary-500";
+  };
+
+  const metrics = [
+    {
+      key: 'publications',
+      label: t('subscription.usage.publications', 'Publicaciones'),
+      icon: FileText,
+      used: usage.publications.used,
+      limit: usage.publications.limit,
+      total_available: usage.publications.total_available,
+      percentage: usage.publications.percentage,
+      addon_info: usage.publications.addon_info,
+      show: true,
+    },
+    {
+      key: 'storage',
+      label: t('subscription.usage.storage', 'Almacenamiento'),
+      icon: HardDrive,
+      used: formatBytes(usage.storage.used_bytes),
+      limit: `${usage.storage.limit_gb} GB`,
+      total_available: `${usage.storage.total_available_gb} GB`,
+      percentage: usage.storage.percentage,
+      addon_info: usage.storage.addon_info,
+      show: true,
+    },
+    {
+      key: 'ai_requests',
+      label: t('subscription.addons.aiCredits', 'Créditos IA'),
+      icon: Sparkles,
+      used: usage.ai_requests.used,
+      limit: usage.ai_requests.limit === -1 || usage.ai_requests.limit === null ? '∞' : usage.ai_requests.limit,
+      total_available: usage.ai_requests.total_available === -1 || usage.ai_requests.total_available === null ? '∞' : usage.ai_requests.total_available,
+      percentage: usage.ai_requests.percentage || 0,
+      addon_info: usage.ai_requests.addon_info,
+      show: usage.ai_requests.limit !== null && usage.ai_requests.limit !== -1,
+    },
+    {
+      key: 'social_accounts',
+      label: t('subscription.addons.socialAccounts', 'Cuentas Sociales'),
+      icon: Share2,
+      used: usage.social_accounts.used,
+      limit: usage.social_accounts.limit === -1 ? '∞' : usage.social_accounts.limit,
+      total_available: usage.social_accounts.total_available === -1 ? '∞' : usage.social_accounts.total_available,
+      percentage: usage.social_accounts.percentage,
+      show: true,
+    },
+    {
+      key: 'team_members',
+      label: t('subscription.addons.teamMembers', 'Miembros del Equipo'),
+      icon: Users,
+      used: usage.team_members?.used || 0,
+      limit: usage.team_members?.limit === -1 || !usage.team_members?.limit ? '∞' : usage.team_members.limit,
+      total_available: usage.team_members?.total_available === -1 || !usage.team_members?.total_available ? '∞' : usage.team_members.total_available,
+      percentage: usage.team_members?.percentage || 0,
+      show: usage.team_members?.limit !== undefined,
+    },
+  ].filter(metric => metric.show);
+
+  return (
+    <div className="space-y-4">
+      {metrics.map((metric) => {
+        const Icon = metric.icon;
+        return (
+          <div key={metric.key} className="space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Icon className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {metric.label}
+                </span>
+              </div>
+              <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                {metric.used} / {metric.total_available || metric.limit}
+              </span>
+            </div>
+            
+            {metric.limit !== '∞' && (
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div
+                  className={`h-2 rounded-full transition-all ${getProgressBarColor(metric.percentage)}`}
+                  style={{ width: `${Math.min(metric.percentage, 100)}%` }}
+                />
+              </div>
+            )}
+            
+            {/* Mostrar desglose de addons si existen */}
+            {metric.addon_info && metric.addon_info.total > 0 && (
+              <div className="text-xs text-primary-600 dark:text-primary-400">
+                <span className="font-medium">Plan:</span> {metric.limit} + 
+                <span className="font-medium"> Addons:</span> {metric.addon_info.remaining}/{metric.addon_info.total}
+                {metric.key === 'storage' && ' GB'}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 export default function SubscriptionSection({
@@ -149,71 +282,6 @@ export default function SubscriptionSection({
       day: "numeric",
     });
   };
-
-  const calculatePercentage = (used: number, limit: number) => {
-    if (!limit || limit === 0 || limit === -1) return 0;
-    const usedVal = used || 0;
-    return Math.min((usedVal / limit) * 100, 100);
-  };
-
-  const formatBytes = (bytes: number, decimals = 2) => {
-    if (!bytes || bytes === 0) return "0 Bytes";
-    const k = 1024;
-    const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
-  };
-
-  const formatDisplayValue = (value: number, type: string) => {
-    if (value === undefined || value === null || isNaN(value)) return "0";
-    if (type === "storage_gb") {
-      if (value === -1) return "∞";
-      return value.toLocaleString() + " GB";
-    }
-    if (value === -1) return "∞";
-    return value.toString();
-  };
-
-  const metricsData = usage
-    ? [
-        {
-          type: "publications_per_month",
-          current: usage.publications_used || 0,
-          limit: usage.publications_limit || 0,
-          icon: <Zap className="w-4 h-4" />,
-          name: t("subscription.usage.publications"),
-        },
-        {
-          type: "storage_gb",
-          current: usage.storage_used || 0,
-          limit: usage.storage_limit || 0,
-          icon: <HardDrive className="w-4 h-4" />,
-          name: t("subscription.usage.storage"),
-        },
-        {
-          type: "social_accounts",
-          current: usage.social_accounts_used || 0,
-          limit: usage.social_accounts_limit || 0,
-          icon: <TrendingUp className="w-4 h-4" />,
-          name: t("subscription.usage.social_accounts"),
-        },
-        {
-          type: "team_members",
-          current: usage.team_members_used || 0,
-          limit: usage.team_members_limit || 0,
-          icon: <Crown className="w-4 h-4" />,
-          name: t("subscription.usage.team_members"),
-        },
-        {
-          type: "external_integrations",
-          current: usage.external_integrations_used || 0,
-          limit: usage.external_integrations_limit || 0,
-          icon: <Zap className="w-4 h-4" />,
-          name: t("subscription.usage.external_integrations"),
-        },
-      ].filter((metric) => metric.limit !== 0 || metric.current > 0)
-    : [];
 
   const handleUpgrade = () => {
     router.visit("/pricing");
@@ -386,106 +454,23 @@ export default function SubscriptionSection({
       </Card>
 
       {/* Usage Statistics Card */}
-      {usage && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Zap className="w-5 h-5 text-primary-500" />
-              {t("subscription.usage.planUsage", "Uso del Plan")}
-            </CardTitle>
-            <CardDescription>
-              {t(
-                "subscription.usage.monitorConsumption",
-                "Monitorea tu consumo mensual",
-              )}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {metricsData.map((metric) => {
-                const percentage = calculatePercentage(
-                  metric.current,
-                  metric.limit,
-                );
-                const displayCurrent = formatDisplayValue(
-                  metric.current,
-                  metric.type,
-                );
-                const displayLimit = formatDisplayValue(
-                  metric.limit,
-                  metric.type,
-                );
-
-                const remaining =
-                  metric.limit === -1
-                    ? -1
-                    : Math.max(0, metric.limit - metric.current);
-                const displayRemaining = formatDisplayValue(
-                  remaining,
-                  metric.type,
-                );
-
-                return (
-                  <div
-                    key={metric.type}
-                    className={`p-4 rounded-lg border space-y-3 ${
-                      percentage >= 80
-                        ? "bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800/30"
-                        : "bg-gradient-to-br from-primary-50 to-primary-100/50 dark:from-primary-900/10 dark:to-primary-800/5 border-primary-200/50 dark:border-primary-800/20"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 font-medium">
-                        <div className=" rounded-md ">{metric.icon}</div>
-                        <span>{metric.name}</span>
-                        {percentage >= 80 && percentage < 100 && (
-                          <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/30 px-1.5 py-0.5 rounded-full flex items-center gap-1">
-                            <AlertCircle className="w-2.5 h-2.5" /> 80% usado
-                          </span>
-                        )}
-                        {percentage >= 100 && (
-                          <span className="text-[10px] font-bold text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/30 px-1.5 py-0.5 rounded-full flex items-center gap-1">
-                            <AlertCircle className="w-2.5 h-2.5" /> Límite
-                            alcanzado
-                          </span>
-                        )}
-                      </div>
-                      <span className="font-bold text-gray-900 text-xs dark:text-white">
-                        {displayCurrent} / {displayLimit}
-                      </span>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                        <div
-                          className={`h-full rounded-full transition-all duration-500 ${
-                            percentage >= 90
-                              ? "bg-red-500"
-                              : percentage >= 70
-                                ? "bg-yellow-500"
-                                : "bg-primary-500"
-                          }`}
-                          style={{ width: `${percentage}%` }}
-                        />
-                      </div>
-                      <div className="flex justify-between items-center text-[10px] text-gray-500 dark:text-gray-400">
-                        <span>
-                          {metric.limit === -1
-                            ? t("subscription.usage.unlimited", "Ilimitado")
-                            : `${displayRemaining} ${t("subscription.usage.remaining", "restante")}`}
-                        </span>
-                        <span className="font-semibold">
-                          {Math.round(percentage)}%
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Zap className="w-5 h-5 text-primary-500" />
+            {t("subscription.usage.planUsage", "Uso del Plan")}
+          </CardTitle>
+          <CardDescription>
+            {t(
+              "subscription.usage.monitorConsumption",
+              "Monitorea tu consumo mensual",
+            )}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <UsageStatsWithAddons usage={usage} />
+        </CardContent>
+      </Card>
 
       {/* Enterprise Features (API & White-label) - Checks subscription, global workspace, and plan ID */}
       {hasWhiteLabel && (
