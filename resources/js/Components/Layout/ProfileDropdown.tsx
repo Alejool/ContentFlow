@@ -30,6 +30,7 @@ interface ProfileDropdownProps {
   user: {
     name?: string;
     photo_url?: string;
+    default_avatar_icon?: string;
     email?: string;
     [key: string]: any;
   };
@@ -148,6 +149,7 @@ export default function ProfileDropdown({
             <div className="relative">
               <Avatar
                 src={user?.photo_url}
+                defaultIcon={user?.default_avatar_icon}
                 name={user?.name}
                 size="sm"
                 showStatus
@@ -179,6 +181,7 @@ export default function ProfileDropdown({
               <div className="relative">
                 <Avatar
                   src={user?.photo_url}
+                  defaultIcon={user?.default_avatar_icon}
                   name={user?.name}
                   size="xl"
                   showStatus
@@ -318,74 +321,6 @@ export default function ProfileDropdown({
                     />
                   </div>
                 </div>
-
-                {/* AI Credits */}
-                {usage.ai_requests && (
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300">
-                        <Zap className="w-3 h-3" />
-                        <span>
-                          {t("subscription.usage.ai_requests", "Créditos IA")}
-                        </span>
-                      </div>
-                      <span className="font-semibold text-xs text-gray-900 dark:text-white">
-                        {usage.ai_requests.used} /{" "}
-                        {usage.ai_requests.limit === -1
-                          ? "∞"
-                          : usage.ai_requests.limit}
-                      </span>
-                    </div>
-                    <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all ${
-                          usage.ai_requests.percentage >= 90
-                            ? "bg-red-500"
-                            : usage.ai_requests.percentage >= 70
-                              ? "bg-yellow-500"
-                              : "bg-primary-500"
-                        }`}
-                        style={{
-                          width: `${Math.min(usage.ai_requests.percentage, 100)}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Team Members */}
-                {usage.team_members && (
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300">
-                        <Users className="w-3 h-3" />
-                        <span>
-                          {t("subscription.usage.team_members", "Miembros")}
-                        </span>
-                      </div>
-                      <span className="font-semibold text-xs text-gray-900 dark:text-white">
-                        {usage.team_members.used} /{" "}
-                        {usage.team_members.limit === -1
-                          ? "∞"
-                          : usage.team_members.limit}
-                      </span>
-                    </div>
-                    <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all ${
-                          usage.team_members.percentage >= 90
-                            ? "bg-red-500"
-                            : usage.team_members.percentage >= 70
-                              ? "bg-yellow-500"
-                              : "bg-primary-500"
-                        }`}
-                        style={{
-                          width: `${Math.min(usage.team_members.percentage, 100)}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                )}
               </div>
 
               {usage.limits_reached && (

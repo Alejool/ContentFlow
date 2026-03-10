@@ -186,9 +186,9 @@ export default function AuthenticatedLayout({
       <TimezoneInitializer />
       
       {/* Banner de mantenimiento para super admins */}
-      {props.maintenanceMode && props.maintenanceBanner && (
-        <MaintenanceBanner message={props.maintenanceBanner as string} />
-      )}
+      {props.maintenanceMode && props.maintenanceBanner ? (
+        <MaintenanceBanner message={String(props.maintenanceBanner)} />
+      ) : null}
       
       <div className="h-screen flex flex-col overflow-hidden w-full max-w-full">
         <div
@@ -203,7 +203,7 @@ export default function AuthenticatedLayout({
             setIsSidebarOpen={setIsSidebarOpen}
           />
 
-          <div className="flex-1 flex flex-col min-h-0 min-w-0 max-w-full relative z-10">
+          <div className="flex-1 flex flex-col min-h-0 min-w-0 max-w-full relative z-5">
             <MobileNavbar
               user={user}
               showingNavigationDropdown={showingNavigationDropdown}
@@ -219,7 +219,7 @@ export default function AuthenticatedLayout({
             >
               <header
                 className="border-b border-gray-200/50
-                dark:border-neutral-800/50 bg-white/80 dark:bg-black/80
+                dark:border-neutral-800/50 bg-white/80 dark:bg-black/50
                 backdrop-blur-xl z-40 min-w-0 sticky top-0 flex flex-col"
               >
                 {!route().current("workspaces.*") && (
@@ -248,7 +248,7 @@ export default function AuthenticatedLayout({
                 </div>
 
                 {header && (
-                  <div className="mx-auto w-full max-w-7xl px-4 md:px-6 py-4 border-t border-gray-100 dark:border-neutral-800/50">
+                  <div className="mx-auto w-full max-w-7xl px-4 md:px-6 py-4 ">
                     <div className="min-w-0">{header}</div>
                   </div>
                 )}

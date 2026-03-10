@@ -158,8 +158,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             bg-transparent
             border-0
             hover:bg-transparent
-            p-0
             shadow-none
+            rounded-full
           `;
         case "gradient":
           return `
@@ -235,7 +235,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const baseStyles = `
       font-medium transition-all duration-200
-      flex items-center justify-center gap-2
+      ${buttonStyle !== 'icon'? 'flex' : ''} items-center justify-center gap-2
       disabled:opacity-50 disabled:cursor-not-allowed
       focus:outline-none focus:ring-2 focus:ring-offset-2
       active:scale-[0.98]
@@ -267,13 +267,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const renderIcon = (position: "left" | "right") => {
       if (!icon || iconPosition !== position) return null;
 
-      const isComponent =
-        typeof icon === "function" ||
-        (typeof icon === "object" &&
-          icon !== null &&
-          "$$typeof" in (icon as any));
-
-      if (isComponent && !isValidElement(icon)) {
+      // Si es un componente React (función o clase)
+      if (typeof icon === "function") {
         const IconComponent = icon as ComponentType<any>;
         const iconSize = (
           {
@@ -288,18 +283,33 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         return <IconComponent size={iconSize} className="flex-shrink-0" />;
       }
 
-      return icon;
+      // Si ya es un elemento React válido
+      if (isValidElement(icon)) {
+        return icon;
+      }
+
+      // Si es un objeto con $$typeof (forwardRef, memo, etc)
+      if (typeof icon === "object" && icon !== null && "$$typeof" in icon) {
+        const IconComponent = icon as ComponentType<any>;
+        const iconSize = (
+          {
+            xs: 12,
+            sm: 14,
+            md: 16,
+            lg: 18,
+            xl: 20,
+          } as const
+        )[size];
+
+        return <IconComponent size={iconSize} className="flex-shrink-0" />;
+      }
+
+      // Fallback: intentar renderizar como está
+      return null;
     };
 
-    return (
-      <button
-        ref={ref}
-        type={type}
-        disabled={isActuallyDisabled}
-        onClick={onClick}
-        className={`${baseStyles} ${className}`}
-        {...props}
-      >
+    const content = (
+      <>
         {isActuallyLoading ? (
           <>
             <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -312,6 +322,19 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             {renderIcon("right")}
           </>
         )}
+      </>
+    );
+
+    return (
+      <button
+        ref={ref}
+        type={type}
+        disabled={isActuallyDisabled}
+        onClick={onClick}
+        className={`${baseStyles} ${className}`}
+        {...props}
+      >
+        {content}
       </button>
     );
   },
