@@ -226,6 +226,9 @@ class WorkspaceAddonService
         // Verificar si se debe notificar por saldo bajo
         $this->checkLowBalance($workspace, $type);
 
+        // Notify via WebSocket about addon usage update
+        $this->notifyAddonUsageUpdated($workspace, $type);
+
         return true;
     }
 
@@ -427,5 +430,29 @@ class WorkspaceAddonService
         ]);
 
         return true;
+    }
+
+    /**
+     * Notify workspace about addon usage updates via WebSocket.
+     */
+    private function notifyAddonUsageUpdated(Workspace $workspace, string $addonType): void
+    {
+        // Map addon types to frontend metric types
+        $frontendMetricType = match ($addonType) {
+            'ai_credits' => 'ai_requests',
+            'storage' => 'storage',
+            'publications' => 'publications',
+            'team_members' => 'team_members',
+            default => $addonType,
+        };
+        
+        $notificationService = app(\App\Services\Subscription\UsageLimitsNotificationService::class);
+        $notificationService->notifyLimitsUpdated($workspace, "addon_used_{$frontendMetricType}");
+        
+        Log::info('Addon usage notification sent', [
+            'workspace_id' => $workspace->id,
+            'addon_type' => $addonType,
+            'frontend_metric' => $frontendMetricType,
+        ]);
     }
 }

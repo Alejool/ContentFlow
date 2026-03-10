@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Workspace\Workspace;
 use App\Models\WorkspaceAddon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AddonUsageService
 {

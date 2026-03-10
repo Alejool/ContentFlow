@@ -549,6 +549,16 @@ class SubscriptionController extends Controller
                 
                 // Invalidate cache
                 cache()->forget("user_subscription_{$user->id}");
+                cache()->forget("workspace_{$workspace->id}_limits");
+                cache()->forget("workspace_{$workspace->id}_usage");
+                
+                // Clear usage cache for plan change
+                $planLimitValidator = app(\App\Services\Subscription\PlanLimitValidator::class);
+                $planLimitValidator->clearUsageCacheForPlanChange($workspace);
+                
+                // Notify via WebSocket about plan change
+                $notificationService = app(\App\Services\Subscription\UsageLimitsNotificationService::class);
+                $notificationService->notifyLimitsUpdated($workspace, 'plan_changed');
                 
                 Log::info('Plan change completed successfully', [
                     'user_id' => $user->id,
@@ -649,6 +659,16 @@ class SubscriptionController extends Controller
                 );
                 
                 cache()->forget("user_subscription_{$user->id}");
+                cache()->forget("workspace_{$workspace->id}_limits");
+                cache()->forget("workspace_{$workspace->id}_usage");
+                
+                // Clear usage cache for plan change
+                $planLimitValidator = app(\App\Services\Subscription\PlanLimitValidator::class);
+                $planLimitValidator->clearUsageCacheForPlanChange($workspace);
+                
+                // Notify via WebSocket about plan change
+                $notificationService = app(\App\Services\Subscription\UsageLimitsNotificationService::class);
+                $notificationService->notifyLimitsUpdated($workspace, 'plan_changed');
                 
                 return response()->json([
                     'success' => true,
@@ -721,6 +741,16 @@ class SubscriptionController extends Controller
                         
                         // Invalidate cache
                         cache()->forget("user_subscription_{$user->id}");
+                        cache()->forget("workspace_{$workspace->id}_limits");
+                        cache()->forget("workspace_{$workspace->id}_usage");
+                        
+                        // Clear usage cache for plan change
+                        $planLimitValidator = app(\App\Services\Subscription\PlanLimitValidator::class);
+                        $planLimitValidator->clearUsageCacheForPlanChange($workspace);
+                        
+                        // Notify via WebSocket about plan change
+                        $notificationService = app(\App\Services\Subscription\UsageLimitsNotificationService::class);
+                        $notificationService->notifyLimitsUpdated($workspace, 'plan_changed');
                         
                         Log::info('Stripe swap completed successfully', [
                             'workspace_id' => $workspace->id,
