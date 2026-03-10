@@ -19,7 +19,6 @@ import {
   Palette,
   Sun,
   User,
-  Users,
   Zap,
 } from "lucide-react";
 import { useState } from "react";
@@ -48,6 +47,7 @@ export default function ProfileDropdown({
   const [currentTheme, setCurrentTheme] = useState(
     user?.theme_color || "orange",
   );
+  console.log('usage', usage);
 
   // Determinar si el usuario es owner del workspace actual
   const currentWorkspace = auth?.current_workspace;
@@ -271,9 +271,10 @@ export default function ProfileDropdown({
                     </div>
                     <span className="font-semibold text-xs text-gray-900 dark:text-white">
                       {usage.publications.used} /{" "}
-                      {usage.publications.limit === -1
-                        ? "∞"
-                        : usage.publications.limit}
+                      {usage.publications.total_available || usage.publications.limit !== -1
+                        ? usage.publications.limit
+                        : "∞"
+                      }
                     </span>
                   </div>
                   <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
@@ -290,6 +291,13 @@ export default function ProfileDropdown({
                       }}
                     />
                   </div>
+                  {/* Mostrar desglose de addons si existen */}
+                  {usage.publications.addon_info && usage.publications.addon_info.total > 0 && (
+                    <div className="text-xs text-primary-600 dark:text-primary-400 mt-1">
+                      <span className="font-medium">Plan:</span> {usage.publications.limit} + 
+                      <span className="font-medium"> Addons:</span> {usage.publications.addon_info.remaining}/{usage.publications.addon_info.total}
+                    </div>
+                  )}
                 </div>
 
                 {/* Storage */}
@@ -301,9 +309,9 @@ export default function ProfileDropdown({
                         {t("subscription.usage.storage", "Almacenamiento")}
                       </span>
                     </div>
-                    <span className="font-semibold  text-gray-900 dark:text-white">
+                    <span className="font-semibold text-gray-900 dark:text-white">
                       {formatBytes(usage.storage.used_bytes)} /{" "}
-                      {usage.storage.limit_gb} GB
+                      {usage.storage.total_available_gb || usage.storage.limit_gb} GB
                     </span>
                   </div>
                   <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
@@ -320,6 +328,13 @@ export default function ProfileDropdown({
                       }}
                     />
                   </div>
+                  {/* Mostrar desglose de addons si existen */}
+                  {usage.storage.addon_info && usage.storage.addon_info.total > 0 && (
+                    <div className="text-xs text-primary-600 dark:text-primary-400 mt-1">
+                      <span className="font-medium">Plan:</span> {usage.storage.limit_gb} GB + 
+                      <span className="font-medium"> Addons:</span> {usage.storage.addon_info.remaining}/{usage.storage.addon_info.total} GB
+                    </div>
+                  )}
                 </div>
               </div>
 
