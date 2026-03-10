@@ -4,13 +4,14 @@ import { useTranslation } from 'react-i18next';
 import { useSubscriptionUsage } from '@/Hooks/useSubscriptionUsage';
 import { useState } from 'react';
 import { CarouselPagination, CarouselDots } from '@/Components/common/CarouselPagination';
+import { PageProps as InertiaPageProps } from '@inertiajs/core';
 
 interface PlanUsageCardsProps {
   showCarousel?: boolean;
   showTitle?: boolean;
 }
 
-interface PageProps {
+interface PageProps extends InertiaPageProps {
   visibleUsageMetrics: {
     publications: boolean;
     social_accounts: boolean;
@@ -52,11 +53,13 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
       key: 'ai_requests',
       label: t('subscription.addons.aiCredits', 'Créditos IA'),
       icon: Sparkles,
-      percentage: usage.ai_requests.limit ? (usage.ai_requests.used / usage.ai_requests.limit * 100) : 0,
+      percentage: usage.ai_requests.percentage || 0,
       used: usage.ai_requests.used,
       limit: usage.ai_requests.limit || '∞',
-      remaining: usage.ai_requests.limit ? usage.ai_requests.limit - usage.ai_requests.used : '∞',
-      show: visibleUsageMetrics?.ai_requests !== false, // Solo mostrar si IA está habilitada
+      total_available: usage.ai_requests.total_available || usage.ai_requests.limit || '∞',
+      remaining: usage.ai_requests.remaining || '∞',
+      addon_info: usage.ai_requests.addon_info,
+      show: visibleUsageMetrics?.ai_requests !== false,
       canBuy: (usage.ai_requests.limit !== null && usage.ai_requests.limit !== -1) && (systemAddons?.ai_credits !== false),
       addonType: 'ai_credits',
     },
@@ -67,7 +70,9 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
       percentage: usage.storage.percentage,
       used: `${usage.storage.used_gb.toFixed(1)} GB`,
       limit: `${usage.storage.limit_gb} GB`,
+      total_available: `${usage.storage.total_available_gb} GB`,
       remaining: `${(usage.storage.remaining_bytes / 1024 / 1024 / 1024).toFixed(1)} GB`,
+      addon_info: usage.storage.addon_info,
       show: visibleUsageMetrics?.storage !== false,
       canBuy: systemAddons?.storage !== false,
       addonType: 'storage',
@@ -76,10 +81,11 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
       key: 'social_accounts',
       label: t('subscription.addons.socialAccounts', 'Cuentas Sociales'),
       icon: Share2,
-      percentage: usage.social_accounts.limit > 0 ? (usage.social_accounts.used / usage.social_accounts.limit * 100) : 0,
+      percentage: usage.social_accounts.percentage,
       used: usage.social_accounts.used,
       limit: usage.social_accounts.limit === -1 ? '∞' : usage.social_accounts.limit,
-      remaining: usage.social_accounts.limit === -1 ? '∞' : usage.social_accounts.limit - usage.social_accounts.used,
+      total_available: usage.social_accounts.total_available === -1 ? '∞' : usage.social_accounts.total_available,
+      remaining: usage.social_accounts.remaining === -1 ? '∞' : usage.social_accounts.remaining,
       show: visibleUsageMetrics?.social_accounts !== false,
       canBuy: false,
       upgradeUrl: '/pricing',
@@ -88,15 +94,12 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
       key: 'team_members',
       label: t('subscription.addons.teamMembers', 'Miembros del Equipo'),
       icon: Users,
-      percentage: usage.team_members?.limit && usage.team_members.limit > 0 
-        ? (usage.team_members.used / usage.team_members.limit * 100) 
-        : 0,
+      percentage: usage.team_members?.percentage || 0,
       used: usage.team_members?.used || 0,
       limit: usage.team_members?.limit === -1 || !usage.team_members?.limit ? '∞' : usage.team_members.limit,
-      remaining: usage.team_members?.limit === -1 || !usage.team_members?.limit 
-        ? '∞' 
-        : usage.team_members.limit - usage.team_members.used,
-      show: visibleUsageMetrics?.team_members !== false, // Solo mostrar si addon está habilitado
+      total_available: usage.team_members?.total_available === -1 || !usage.team_members?.total_available ? '∞' : usage.team_members.total_available,
+      remaining: usage.team_members?.remaining === -1 || usage.team_members?.remaining === null ? '∞' : usage.team_members.remaining,
+      show: visibleUsageMetrics?.team_members !== false,
       canBuy: systemAddons?.team_members !== false,
       addonType: 'team_members',
     },
@@ -135,9 +138,9 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
     
     return (
       <div 
-        className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-xl p-5 border border-primary-200 dark:border-primary-700/50 shadow-sm hover:shadow-md transition-all h-full"
+        className="bg-gradient-to-br from-primary-50/80 to-primary-100 dark:from-primary-900/10 dark:to-primary-800/20 rounded-xl p-5 border border-primary-200 dark:border-primary-700/50 shadow-sm hover:shadow-md transition-all h-full"
       >
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-3 relative">
           <div className="flex items-center gap-2">
             <div className="p-2 rounded-lg bg-primary-100 dark:bg-primary-800/50">
               <Icon className="w-4 h-4 text-primary-600 dark:text-primary-400" />
@@ -147,7 +150,7 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
             </span>
           </div>
           {(isCritical || isHigh || isWarning) && (
-            <span className={`text-xs text-white px-2 py-1 rounded-full font-semibold ${getBadgeColor(metric.percentage)}`}>
+            <span className={`absolute text-xs text-white px-2 py-1 -right-5 -top-5 rounded-full font-semibold ${getBadgeColor(metric.percentage)}`}>
               {getBadgeText(metric.percentage)}
             </span>
           )}
@@ -160,9 +163,16 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
           <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
             {metric.limit === '∞' 
               ? t('subscription.usage.unlimited', 'Ilimitado')
-              : `${metric.used} / ${metric.limit}`
+              : `${metric.used} / ${metric.total_available || metric.limit}`
             }
           </div>
+          {/* Mostrar información de addons si existe */}
+          {metric.addon_info && metric.addon_info.total > 0 && (
+            <div className="text-xs text-primary-600 dark:text-primary-400 mt-1">
+              <span className="font-medium">Plan:</span> {metric.limit} + 
+              <span className="font-medium"> Addons:</span> {metric.addon_info.remaining}/{metric.addon_info.total}
+            </div>
+          )}
         </div>
 
         {metric.limit !== '∞' && (
@@ -224,11 +234,6 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
     setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
   };
 
-  const getCurrentSlideMetrics = () => {
-    const start = currentSlide * itemsPerSlide;
-    return visibleMetrics.slice(start, start + itemsPerSlide);
-  };
-
   return (
     <div className="space-y-4">
       {showTitle && (
@@ -257,11 +262,11 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
       {showCarousel && visibleMetrics.length > itemsPerSlide ? (
         <div className="relative overflow-hidden">
           <div 
-            className="flex gap-4 transition-transform duration-300 ease-in-out"
+            className="flex gap-2 transition-transform duration-300 ease-in-out"
             style={{ transform: `translateX(-${currentSlide * 100}%)` }}
           >
             {visibleMetrics.map(metric => (
-              <div key={metric.key} className="flex-shrink-0 w-full sm:w-[calc(50%-0.5rem)] lg:w-[calc(25%-0.75rem)]">
+              <div key={metric.key} className="flex-shrink-0 w-full sm:w-[calc(50%-0.5rem)] lg:w-[calc(25%-0.70rem)]">
                 {renderCard(metric)}
               </div>
             ))}

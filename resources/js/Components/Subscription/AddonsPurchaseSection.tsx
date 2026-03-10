@@ -191,16 +191,16 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
                 }`}
             >
                 {pkg.popular && (
-                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                        <span className="bg-primary-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                    <div className="absolute -top-2 left-3">
+                        <span className="bg-primary-500/90 backdrop-2xl text-white text-xs font-bold px-3 py-2 rounded-full">
                             {t('subscription.addons.mostPopular', 'Más Popular')}
                         </span>
                     </div>
                 )}
 
                 {pkg.savings_percentage > 0 && (
-                    <div className="absolute -top-3 right-4">
-                        <span className="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                    <div className="absolute -top-2 right-3">
+                        <span className="bg-green-500/90 backdrop-2xl text-white text-xs font-bold px-3 py-2 rounded-full">
                             {t('subscription.addons.save', 'Ahorra')} {pkg.savings_percentage}%
                         </span>
                     </div>
@@ -412,7 +412,7 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
                         />
                     </>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
                         {currentPackages.length > 0 ? (
                             currentPackages.map(pkg => (
                                 <div key={pkg.sku}>

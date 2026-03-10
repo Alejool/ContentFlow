@@ -56,8 +56,13 @@ export function ActiveAddonsCards({ showCarousel = true }: ActiveAddonsCardsProp
                     <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                         {addons.length} {addons.length === 1 ? t('subscription.addons.activeAddon', 'paquete activo') : t('subscription.addons.activeAddonsPlural', 'paquetes activos')} • 
                         <span className="font-semibold text-primary-600 dark:text-primary-400 ml-1">
-                            ${totalSpent.toFixed(2)} {t('subscription.addons.totalSpent', 'gastado')}
+                            ${totalSpent.toFixed(2)} {t('subscription.addons.totalSpent', 'Total Gastado')}
                         </span>
+                        {addons.length > 0 && (
+                            <span className="text-gray-500 dark:text-gray-400 ml-2">
+                                • {t('subscription.addons.showingUsage', 'Mostrando uso actual')}
+                            </span>
+                        )}
                     </p>
                 </div>
 
