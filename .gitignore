@@ -1,4 +1,6 @@
-
+# ============================================
+# LARAVEL DEFAULTS
+# ============================================
 /.phpunit.cache
 /bootstrap/ssr
 /node_modules
@@ -8,16 +10,35 @@
 /storage/*.key
 /storage/pail
 /vendor
-.env
-.env.backup
-.env.production
-.phpactor.json
-.phpunit.result.cache
 Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
 /auth.json
+
+# ============================================
+# ARCHIVOS DE ENTORNO Y CONFIGURACIÓN SENSIBLE
+# ============================================
+.env
+.env.backup
+.env.production
+.env.local
+.env.docker
+database.sqlite
+backups/*.sql
+dump.sql
+
+# ============================================
+# LOCK FILES Y DEPENDENCIAS
+# ============================================
+composer.lock
+package-lock.json
+bun.lock
+bun.lockb
+
+# ============================================
+# ARCHIVOS DE CONFIGURACIÓN DE EDITORES/IDEs
+# ============================================
 /.fleet
 /.idea
 /.nova
@@ -25,65 +46,23 @@ yarn-error.log
 /.zed
 /.blueprint
 /.gitattributes
-draft.yaml
-composer.lock
-bun.lockb
-laravel
-package-lock.json
-.env.example
+/.kiro/
+.phpactor.json
 .qodo
+.editorconfig
+jsconfig.json
+tsconfig.json
 
-.env
-.env.production
-.env.local
-database.sqlite
-backups/*.sql
-dump.sql
-
-
-.env.docker
-.env.local
-docker-compose.override.yml
-docker/entrypoint.sh
-docker/entrypoint-dev.sh
-docker/nginx/nginx.conf
-docker/nginx/nginx.conf.dist
-docker/dev.ini
-docker/supervisor
-docker/nginx
-docker/supervisor
-docker/nginx
+# ============================================
+# ARCHIVOS DE TESTING Y CACHE
+# ============================================
+.phpunit.result.cache
 phpunit.xml
 phpunit.xml.dist
-nginx.conf
-nginx.conf.dist
-dev.ini
-supervisor
-nginx
-
-
-
-fix-db-route.php
-debug_owner.php
-debug_accounts.php
-test_relationships.php
-verify_db.php
-
-
-recommendations.md
-test_relationships.php
-test_relationships.php
-verify_db.php
-start-queue.bat
-
-
-rebuild.bat
-makefile.dev
 
 # ============================================
-# DOCUMENTACIÓN INTERNA Y ARCHIVOS SENSIBLES
+# DOCUMENTACIÓN INTERNA
 # ============================================
-
 # Ignorar TODOS los archivos .md en la raíz EXCEPTO los públicos
 *.md
 
@@ -94,7 +73,7 @@ makefile.dev
 !CONTRIBUTING.md
 !CHANGELOG.md
 
-# Permitir toda la documentación en docs/ (ya organizada y revisada)
+# Permitir toda la documentación en docs/
 !docs/
 !docs/**/*.md
 !docs/**/*.json
@@ -102,29 +81,55 @@ makefile.dev
 !docs/**/*.php
 
 # ============================================
-# ARCHIVOS DE DESARROLLO Y CONFIGURACIÓN
+# SCRIPTS DE DESARROLLO LOCAL
 # ============================================
-
-# Archivos de configuración de Kiro (IDE)
-.kiro/
-
-# Lock files
-bun.lock
-
-# Scripts de desarrollo local
 *.bat
 *.sh
 !docker-switch.sh
 !docker-switch.bat
 
 # ============================================
-# ARCHIVOS TEMPORALES Y GENERADOS
+# ARCHIVOS PHP DE PRUEBA/DEBUG
 # ============================================
+fix-db-route.php
+debug_owner.php
+debug_accounts.php
+test_relationships.php
+verify_db.php
+enable-default-payment-methods.php
+test-maintenance-mode.php
+test-payment-cache.php
+test-payment-methods.php
 
-# Archivos temporales
+# ============================================
+# ARCHIVOS TEMPORALES
+# ============================================
 $null
 *.tmp
 *.temp
-
-# Carpetas temporales
 /md/
+draft.yaml
+laravel
+recommendations.md
+makefile.dev
+
+# ============================================
+# DOCKER
+# ============================================
+.dockerignore.dev
+docker-compose.override.yml
+docker/entrypoint.sh
+docker/entrypoint-dev.sh
+docker/nginx/nginx.conf
+docker/nginx/nginx.conf.dist
+docker/dev.ini
+docker/supervisor
+nginx.conf
+nginx.conf.dist
+dev.ini
+supervisor
+
+# ============================================
+# DEPLOYMENT
+# ============================================
+fly.toml
