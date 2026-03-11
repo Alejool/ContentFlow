@@ -134,7 +134,7 @@ export default function WorkspaceSettings({
       id: "overview",
       label: t("workspace.tabs.overview") || "Overview",
       icon: Sparkles,
-      locked: true, // No se puede reorganizar
+      // locked: true,
     },
     {
       id: "usage",

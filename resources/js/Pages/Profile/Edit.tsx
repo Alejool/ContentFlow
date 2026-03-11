@@ -4,6 +4,7 @@ import SubscriptionSection from "@/Components/profile/Partials/SubscriptionSecti
 import UpdatePasswordForm from "@/Components/profile/Partials/UpdatePasswordForm";
 import UpdateProfileInformationForm from "@/Components/profile/Partials/UpdateProfileInformationForm";
 import UpdateThemeForm from "@/Components/profile/Partials/UpdateThemeForm";
+import TabNavigation from "@/Components/common/TabNavigation";
 
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { useUserStore } from "@/stores/userStore";
@@ -60,18 +61,22 @@ export default function Edit({
       currentWorkspace.user_role_slug === "owner");
 
   const tabs = [
-    { id: "profile", name: t("profile.tabs.general") || "General", icon: User },
+    { 
+      key: "profile", 
+      label: t("profile.tabs.general") || "General", 
+      icon: User 
+    },
     {
-      id: "password",
-      name: t("profile.tabs.security") || "Seguridad",
+      key: "password",
+      label: t("profile.tabs.security") || "Seguridad",
       icon: Lock,
       hidden: user.provider !== null,
     },
     {
-      id: "subscription",
-      name: t("profile.tabs.subscription") || "Suscripción y Plan",
+      key: "subscription",
+      label: t("profile.tabs.subscription") || "Suscripción y Plan",
       icon: CreditCard,
-      hidden: !isOwner, // Solo visible para owners
+      hidden: !isOwner,
     },
   ];
 
@@ -88,7 +93,7 @@ export default function Edit({
     const storedTab = localStorage.getItem("profile_active_tab");
     const initialTab = tabParam || storedTab || "profile";
 
-    const validTab = tabs.find((t) => t.id === initialTab && !t.hidden);
+    const validTab = tabs.find((t) => t.key === initialTab && !t.hidden);
     if (validTab) {
       setActiveTab(initialTab);
     }
@@ -120,31 +125,13 @@ export default function Edit({
 
       <div className="w-full max-w-full overflow-x-hidden min-w-0 bg-gray-50/30 dark:bg-neutral-900/10 min-h-screen">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-          {/* Horizontal Menu - Styled like ContentPage */}
-          <div className="mb-8 overflow-x-auto">
-            <div className="inline-flex items-center p-1.5 rounded-lg bg-white dark:bg-neutral-800 backdrop-blur-sm border border-gray-200/60 dark:border-neutral-700/60 gap-1 shadow-sm min-w-max">
-              {tabs
-                .filter((tab) => !tab.hidden)
-                .map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap ${
-                      activeTab === tab.id
-                        ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
-                        : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
-                    }`}
-                  >
-                    <tab.icon
-                      className={`w-4 h-4 ${
-                        activeTab === tab.id ? "text-white" : "opacity-70"
-                      }`}
-                    />
-                    <span>{tab.name}</span>
-                  </button>
-                ))}
-            </div>
-          </div>
+          {/* Horizontal Menu */}
+          <TabNavigation
+            tabs={tabs}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            variant="horizontal"
+          />
 
           {/* Statistics Section */}
           <div className="mb-8">
