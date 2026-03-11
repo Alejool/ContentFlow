@@ -134,8 +134,8 @@ export default function Edit({
           />
 
           {/* Statistics Section */}
-          <div className="mb-8">
-            <div className="rounded-lg border shadow-sm bg-white dark:bg-neutral-900 border-gray-100 dark:border-neutral-800 p-6">
+          <div className="">
+            <div className="rounded-lg py-2 px-6">
               <AccountStatistics status={status} />
             </div>
           </div>

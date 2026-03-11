@@ -372,7 +372,7 @@ const SocialMediaAccounts = memo(() => {
   };
 
   return (
-    <div className="mb-6">
+    <div className="">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className="w-full flex items-center justify-between p-4 rounded-lg border transition-all duration-300 hover:shadow-sm bg-white border-gray-200 hover:border-gray-300 dark:bg-black/70 dark:border-black/50 dark:hover:border-neutral-600"
@@ -392,7 +392,7 @@ const SocialMediaAccounts = memo(() => {
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <Link
             href={route("profile.edit")}
             onClick={(e) => e.stopPropagation()}
@@ -424,76 +424,18 @@ const SocialMediaAccounts = memo(() => {
 
       <div
         className={`transition-all duration-300 overflow-hidden ${
-          isExpanded ? "max-h-[2000px] opacity-100 mt-4" : "max-h-0 opacity-0"
+          isExpanded ? "max-h-[2000px] opacity-100 mt-2" : "max-h-0 opacity-0"
         }`}
       >
         <div className="space-y-8">
-          <div className="rounded-lg p-4 sm:p-8 border transition-colors duration-300 bg-gradient-to-br from-primary-50/80 to-pink-50/80 border-primary-100 dark:from-neutral-900/80 dark:to-neutral-800/80 dark:border-neutral-700/50">
-            <div className="flex items-start gap-4">
-              <div>
-                <h3 className="text-lg font-bold mb-3 text-primary-900 dark:text-gray-100">
-                  {t("manageContent.socialMedia.whyConnect")}
-                </h3>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                  {[
-                    {
-                      icon: Zap,
-                      title: t(
-                        "manageContent.socialMedia.benefits.autoPublish",
-                      ),
-                      color: "text-primary-500",
-                    },
-                    {
-                      icon: BarChart3,
-                      title: t("manageContent.socialMedia.benefits.manageAll"),
-                      color: "text-blue-500",
-                    },
-                    {
-                      icon: Shield,
-                      title: t("manageContent.socialMedia.benefits.control"),
-                      color: "text-green-500",
-                    },
-                  ].map((item, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center gap-3 p-3.5 rounded-lg bg-white/60 border border-primary-100 dark:bg-neutral-800/30 dark:border-neutral-700/30 transition-transform hover:scale-[1.02]"
-                    >
-                      <div className="p-2 rounded-lg bg-white dark:bg-neutral-800 shadow-sm flex-shrink-0">
-                        <item.icon
-                          className={`w-4 h-4 sm:w-5 sm:h-5 ${item.color}`}
-                        />
-                      </div>
-                      <p className="text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 leading-tight">
-                        {item.title}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="text-[10px] sm:text-xs p-3 rounded-lg inline-flex bg-white/60 text-primary-600/80 border border-primary-100 dark:bg-neutral-800/40 dark:text-gray-400 dark:border-neutral-700/40 group">
-                  <div className="flex items-center gap-2">
-                    <AlertCircle className="w-3.5 h-3.5 opacity-70 group-hover:opacity-100 transition-opacity" />
-                    <span className="font-bold uppercase tracking-wider">
-                      {t("common.note")}:
-                    </span>
-                    <span className="font-medium">
-                      {t("manageContent.socialMedia.disclaimer")}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
               {Array.from({ length: 4 }).map((_, index) => (
                 <SocialAccountCardSkeleton key={index} />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
               {accounts.map((account) => (
                 <div
                   key={`${account.platform}-${account.id}`}

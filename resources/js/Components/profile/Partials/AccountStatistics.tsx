@@ -97,7 +97,7 @@ export default function AccountStatistics({
 
   return (
     <div className={className}>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-2 ">
         {statisticsItems.map((item, index) => (
           <div
             key={index}
