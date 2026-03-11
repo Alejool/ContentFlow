@@ -149,13 +149,13 @@ class WorkspaceController extends Controller
 
     if ($request->wantsJson() || $request->is('api/*')) {
       return $this->successResponse([
-        'workspace' => $workspace->load('users'),
+        'workspace' => $workspace->load(['users', 'subscription']),
         'roles' => Role::with('permissions')->get(),
       ]);
     }
 
     return Inertia::render('Workspace/Settings', [
-      'workspace' => $workspace->load('users'),
+      'workspace' => $workspace->load(['users', 'subscription']),
       'roles' => Role::with('permissions')->get(),
     ]);
   }
@@ -629,7 +629,18 @@ class WorkspaceController extends Controller
 
   public function permissions()
   {
-    return $this->successResponse(\App\Models\Permission\Permission::all());
+    $permissions = \App\Models\Permission\Permission::all()->map(function ($permission) {
+      $translationKey = "permissions.{$permission->slug}";
+      
+      return [
+        'id' => $permission->id,
+        'slug' => $permission->slug,
+        'name' => __("{$translationKey}.name", [], app()->getLocale()) ?: $permission->name,
+        'description' => __("{$translationKey}.description", [], app()->getLocale()) ?: $permission->description,
+      ];
+    });
+
+    return $this->successResponse($permissions);
   }
 
   /**

@@ -41,6 +41,8 @@ class Workspace extends Model
         'white_label_favicon_url',
     ];
 
+    protected $appends = ['plan'];
+
     protected static function booted()
     {
         static::creating(function ($workspace) {
@@ -271,6 +273,14 @@ class Workspace extends Model
         }
 
         return 'free'; // O default
+    }
+
+    /**
+     * Get plan attribute accessor for JSON serialization.
+     */
+    public function getPlanAttribute(): string
+    {
+        return $this->getPlanName();
     }
 
     /**
