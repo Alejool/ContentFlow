@@ -12,16 +12,16 @@ class ProcessPendingAddonPayments extends Command
     protected $signature = 'addons:process-pending-payments {--session-id= : Process specific session ID}';
     protected $description = 'Process pending addon payments from Stripe (useful when webhooks are not configured)';
 
-    private StripeClient $stripe;
+    private ?StripeClient $stripe = null;
 
     public function __construct()
     {
         parent::__construct();
-        $this->stripe = new StripeClient(config('services.stripe.secret'));
     }
 
     public function handle()
     {
+        $this->stripe = new StripeClient(config('services.stripe.secret'));
         $sessionId = $this->option('session-id');
 
         if ($sessionId) {
