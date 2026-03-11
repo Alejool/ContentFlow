@@ -178,7 +178,7 @@ services:
     image: node:20-alpine
     container_name: contentflow_vite_dev
     working_dir: /var/www/html
-    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    command: sh -c "npm install --legacy-peer-deps && npm run dev -- --host 0.0.0.0"
     ports:
       - "5173:5173"
     volumes:
