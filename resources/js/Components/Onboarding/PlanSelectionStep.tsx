@@ -153,17 +153,18 @@ export default function PlanSelectionStep({
       <PricingPlansSection
         plans={plans}
         currentPlan={undefined}
+        variant={compact}
         isAuthenticated={true}
         showBillingToggle={true}
         showHeader={false}
-        variant="default"
         onPlanSelected={handlePlanSelected}
       />
 
-      <div className="text-center pt-4">
+      <div className="text-center pt-4 flex justify-end">
         <Button
           onClick={onSkip}
           variant="ghost"
+          buttonStyle="outline"
           size="md"
         >
           {t("planSelection.decideLater")}

@@ -2,6 +2,7 @@ import { useEffect, useState, lazy, Suspense, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useOnboarding } from "@/Contexts/OnboardingContext";
 import { OnboardingErrorBoundary } from "./OnboardingErrorBoundary";
+import { Building2, Gem, Target, Link2, Check } from "lucide-react";
 import type { TourStep, SocialPlatform, PublicationTemplate } from "@/types/onboarding";
 
 // Lazy load onboarding components to reduce initial bundle size
@@ -185,7 +186,7 @@ export default function OnboardingFlow({
         <OnboardingErrorBoundary>
           <Suspense fallback={<OnboardingLoadingFallback />}>
             <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-              <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8">
+              <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8">
                 <BusinessInfoStep
                   onComplete={handleBusinessInfoComplete}
                   onSkip={handleBusinessInfoSkip}
@@ -201,7 +202,7 @@ export default function OnboardingFlow({
         <OnboardingErrorBoundary>
           <Suspense fallback={<OnboardingLoadingFallback />}>
             <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-              <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-2xl w-full max-w-7xl max-h-[90vh] overflow-y-auto p-8">
+              <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-2xl w-full max-w-7xl max-h-[90vh] overflow-y-auto p-8">
                 <PlanSelectionStep
                   onComplete={handlePlanSelect}
                   onSkip={handlePlanSkip}
@@ -263,63 +264,18 @@ function OnboardingProgressIndicator({
   }
 
   const stages = [
-    { id: "businessInfo", label: t('onboarding.progress.stages.businessInfo'), icon: "🏢" },
-    { id: "planSelection", label: t('onboarding.progress.stages.plan'), icon: "💎" },
-    { id: "tour", label: t('onboarding.progress.stages.tour'), icon: "🎯" },
-    { id: "wizard", label: t('onboarding.progress.stages.connect'), icon: "🔗" },
+    { id: "businessInfo", label: t('onboarding.progress.stages.businessInfo'), Icon: Building2 },
+    { id: "planSelection", label: t('onboarding.progress.stages.plan'), Icon: Gem },
+    { id: "tour", label: t('onboarding.progress.stages.tour'), Icon: Target },
+    { id: "wizard", label: t('onboarding.progress.stages.connect'), Icon: Link2 },
   ];
 
   const currentStageIndex = stages.findIndex((s) => s.id === currentStage);
 
   return (
-    <div className="fixed top-4 right-4 z-40 bg-white dark:bg-neutral-800 rounded-lg shadow-lg p-4 max-w-xs">
-      <div className="flex items-center justify-between mb-3">
-        <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
-          {t('onboarding.progress.title')}
-        </h4>
-        <span className="text-xs text-gray-500 dark:text-gray-400">
-          {completionPercentage}%
-        </span>
-      </div>
-
-      {/* Progress Bar */}
-      <div className="w-full bg-gray-200 dark:bg-neutral-700 rounded-full h-2 mb-3">
-        <div
-          className="bg-primary-600 h-2 rounded-full transition-all duration-300"
-          style={{ width: `${completionPercentage}%` }}
-        />
-      </div>
-
-      {/* Stage Indicators */}
-      <div className="flex items-center justify-between">
-        {stages.map((stage, index) => (
-          <div
-            key={stage.id}
-            className="flex flex-col items-center gap-1"
-          >
-            <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm transition-colors ${
-                index < currentStageIndex
-                  ? "bg-green-100 dark:bg-green-900/20 text-green-600"
-                  : index === currentStageIndex
-                  ? "bg-primary-100 dark:bg-primary-900/20 text-primary-600"
-                  : "bg-gray-100 dark:bg-neutral-700 text-gray-400"
-              }`}
-            >
-              {index < currentStageIndex ? "✓" : stage.icon}
-            </div>
-            <span
-              className={`text-xs ${
-                index <= currentStageIndex
-                  ? "text-gray-900 dark:text-white font-medium"
-                  : "text-gray-400"
-              }`}
-            >
-              {stage.label}
-            </span>
-          </div>
-        ))}
-      </div>
+    <div className="fixed top-6 right-6 z-[99] bg-white dark:bg-neutral-800 rounded-lg shadow-2xl border border-gray-200 dark:border-neutral-700 p-6 w-80">
+      {/* Header */}
+      
     </div>
   );
 }
