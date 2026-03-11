@@ -8,11 +8,13 @@ import { getDateFnsLocale } from "@/Utils/dateLocales";
 import { Publication } from "@/types/Publication";
 import axios from "axios";
 import { Locale, format, formatDistanceToNow } from "date-fns";
-import { Check, Clock, Eye, Layers, User, X } from "lucide-react";
+import { Check, Clock, Eye, Layers, User, X, Info } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { formatTimeString, formatDateTimeString } from "@/Utils/dateHelpers";
+import { usePage } from "@inertiajs/react";
+import AlertCard from "@/Components/common/Modern/AlertCard";
 
 interface ApprovalListProps {
   publications: Publication[];
@@ -149,6 +151,10 @@ export default function ApprovalList({
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(12);
+
+  // Check if user has admin permission or is assigned via workflow
+  const { auth } = usePage<any>().props;
+  const hasAdminPermission = auth.current_workspace?.permissions?.includes("approve") || false;
 
   const handleApprove = async (publication: Publication) => {
     try {
@@ -290,6 +296,18 @@ export default function ApprovalList({
 
   return (
     <>
+      {!hasAdminPermission && (
+        <AlertCard
+          type="info"
+          title={t("approvals.workflowAssignment.title") || "Aprobaciones asignadas"}
+          message={
+            t("approvals.workflowAssignment.description") ||
+            "Estás viendo solo el contenido que requiere tu aprobación según tu rol o asignación en el flujo de trabajo. Los administradores pueden ver todo el contenido pendiente."
+          }
+          className="mb-4"
+        />
+      )}
+      
       <div className="flex flex-col">
         <div className="flex-1 overflow-y-auto">
           <VirtualList

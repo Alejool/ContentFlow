@@ -34,6 +34,7 @@ import {
   ContentTab,
   usePublications,
 } from "@/Hooks/publication/usePublications";
+import { useCanApprove } from "@/Hooks/approval/useCanApprove";
 import { useManageContentUIStore } from "@/stores/manageContentUIStore";
 import { useShallow } from "zustand/react/shallow";
 
@@ -44,6 +45,9 @@ export default function ManageContentPage() {
     auth.current_workspace?.subscription?.plan?.toLowerCase() ||
     auth.current_workspace?.plan?.toLowerCase() ||
     "demo";
+
+  // Check if user can approve content (admin permission OR workflow assignment)
+  const { canApprove, reason: approvalReason } = useCanApprove(auth.current_workspace?.id);
 
   const {
     t,
@@ -318,10 +322,10 @@ export default function ManageContentPage() {
         label: t("manageContent.tabs.approvals"),
         icon: CheckCircle,
         badge: pendingApprovals,
-        hidden: !permissions.includes("approve"),
+        hidden: !canApprove, // Show if user can approve (admin OR workflow assignment)
       },
     ],
-    [t, pendingApprovals, permissions]
+    [t, pendingApprovals, canApprove]
   );
 
   return (
@@ -329,10 +333,10 @@ export default function ManageContentPage() {
       header={
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4  min-w-0">
           <div className="min-w-0 flex-1">
-              <h1 className="text-xl sm:text-3xl font-extrabold text-gray-900 dark:text-white truncate tracking-tight">
+              <h1 className="text-xl lg:text-2xl font-extrabold text-gray-900 dark:text-white truncate tracking-tight">
                 {t("manageContent.title")}
               </h1>
-              <p className="text-gray-500 dark:text-gray-400 mt-0.5 sm:mt-2 text-xs sm:text-base lg:text-lg truncate">
+              <p className="text-gray-500 dark:text-gray-400 mt-0.5 text-xs sm:text-base lg:text-lg truncate">
                 {t("manageContent.subtitle")}
               </p>
             </div>
@@ -344,7 +348,7 @@ export default function ManageContentPage() {
                     <Button
                       id="create-publication"
                       variant="primary"
-                      size="lg"
+                      size="md"
                       icon={Plus}
                       className="gap-2 uppercase tracking-wider font-bold text-xs backdrop-3xl"
                     >
@@ -361,7 +365,7 @@ export default function ManageContentPage() {
                         onClick={() => openAddModal("publication")}
                         variant="ghost"
                         buttonStyle="ghost"
-                        size="lg"
+                        size="md"
                         icon={FileText}
                         iconPosition="left"
                         fullWidth
@@ -374,7 +378,7 @@ export default function ManageContentPage() {
                         onClick={() => openAddModal("campaign")}
                         variant="ghost"
                         buttonStyle="ghost"
-                        size="lg"
+                        size="md"
                         icon={Target}
                         iconPosition="left"
                         fullWidth
