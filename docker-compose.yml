@@ -28,7 +28,7 @@ services:
     environment:
       - LARAVEL_OCTANE=1
       - OCTANE_SERVER=swoole
-    command: php artisan octane:start --server=swoole --host=0.0.0.0 --port=8080 --watch
+    command: php artisan octane:start --server=swoole --host=0.0.0.0 --port=8080
     logging:
       driver: "json-file"
       options:
