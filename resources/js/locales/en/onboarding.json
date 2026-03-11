@@ -152,11 +152,13 @@
     "preview": "Preview {{name}} template"
   },
   "progress": {
-    "title": "Getting Started",
+    "title": "Setup Progress",
+    "inProgress": "In progress",
     "stages": {
-      "tour": "Tour",
-      "connect": "Connect",
-      "template": "Template"
+      "businessInfo": "Business Info",
+      "plan": "Plan Selection",
+      "tour": "Guided Tour",
+      "connect": "Connect Accounts"
     }
   },
   "platform": {

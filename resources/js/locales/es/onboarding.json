@@ -152,12 +152,13 @@
     "preview": "Vista previa de plantilla {{name}}"
   },
   "progress": {
-    "title": "20%",
+    "title": "Progreso de Configuración",
+    "inProgress": "En progreso",
     "stages": {
-      "businessInfo": "✓",
-      "plan": "💎",
-      "tour": "🎯",
-      "connect": "🔗"
+      "businessInfo": "Información del Negocio",
+      "plan": "Selección de Plan",
+      "tour": "Tour Guiado",
+      "connect": "Conectar Cuentas"
     }
   },
   "platform": {
