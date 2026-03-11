@@ -438,6 +438,27 @@ class PublicationController extends Controller
       return $this->errorResponse('You do not have permission to manage content.', 403);
     }
 
+    // Validar límites de contenido según estado de verificación de cuentas
+    $platformIds = $request->input('platforms', []);
+    if (!empty($platformIds)) {
+      $limitsService = app(\App\Services\Validation\SocialMediaLimitsService::class);
+      $validation = $limitsService->validatePublication($publication, $platformIds);
+      
+      if (!$validation['can_publish']) {
+        $friendlyMessage = $limitsService->getClientFriendlyMessage($validation);
+        $recommendations = $limitsService->generateRecommendations($publication, $platformIds);
+        
+        return $this->errorResponse(
+          $friendlyMessage,
+          422,
+          [
+            'validation_errors' => $validation['results'],
+            'recommendations' => $recommendations,
+          ]
+        );
+      }
+    }
+
     // Verify publication can be published based on status and permissions
     if (!$publication->canBePublished($hasPublishPermission)) {
       // If pending review, show specific message
@@ -1430,32 +1451,7 @@ class PublicationController extends Controller
     return $this->successResponse(['activities' => $activities]);
   }
 
-  /**
-   * Valida el contenido de una publicación antes de publicar
-   */
-  public function validateContent(Request $request, Publication $publication, ContentValidationService $validationService)
-  {
-    $request->validate([
-      'platform_ids' => 'required|array',
-      'platform_ids.*' => 'integer|exists:social_accounts,id',
-    ]);
 
-    try {
-      $result = $validationService->validatePublication(
-        $publication,
-        $request->input('platform_ids')
-      );
-
-      return $this->successResponse($result->toArray());
-    } catch (\Exception $e) {
-      Log::error('Content validation failed', [
-        'publication_id' => $publication->id,
-        'error' => $e->getMessage()
-      ]);
-
-      return $this->errorResponse('Error al validar el contenido: ' . $e->getMessage(), 500);
-    }
-  }
 
   public function export(Request $request)
   {
@@ -1509,5 +1505,37 @@ class PublicationController extends Controller
       } catch (\Exception $e) {
       }
     }
+  }
+
+  /**
+   * Valida el contenido de una publicación contra las plataformas seleccionadas
+   * antes de publicar (para mostrar advertencias en el frontend)
+   */
+  public function validateContent(Request $request, Publication $publication)
+  {
+    $workspaceId = Auth::user()->current_workspace_id;
+    
+    if (!Auth::user()->hasPermission('manage-content', $workspaceId)) {
+      return $this->errorResponse('You do not have permission to validate content.', 403);
+    }
+
+    $platformIds = $request->input('platforms', []);
+    
+    if (empty($platformIds)) {
+      return $this->errorResponse('No platforms selected for validation.', 422);
+    }
+
+    $limitsService = app(\App\Services\Validation\SocialMediaLimitsService::class);
+    $validation = $limitsService->validatePublication($publication, $platformIds);
+    $recommendations = $limitsService->generateRecommendations($publication, $platformIds);
+
+    return $this->successResponse([
+      'can_publish' => $validation['can_publish'],
+      'validation_results' => $validation['results'],
+      'recommendations' => $recommendations,
+      'message' => $validation['can_publish'] 
+        ? 'El contenido cumple con todos los requisitos' 
+        : $limitsService->getClientFriendlyMessage($validation),
+    ]);
   }
 }
