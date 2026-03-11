@@ -5,12 +5,13 @@ import UpdatePasswordForm from "@/Components/profile/Partials/UpdatePasswordForm
 import UpdateProfileInformationForm from "@/Components/profile/Partials/UpdateProfileInformationForm";
 import UpdateThemeForm from "@/Components/profile/Partials/UpdateThemeForm";
 import TabNavigation from "@/Components/common/TabNavigation";
+import Button from "@/Components/common/Modern/Button";
 
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { useUserStore } from "@/stores/userStore";
 import { Head, usePage } from "@inertiajs/react";
-import { CreditCard, Lock, User } from "lucide-react";
-import { useEffect, useState } from "react";
+import { CreditCard, Lock, User, Save, Palette } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 
 interface EditProps {
@@ -53,6 +54,7 @@ export default function Edit({
   const setUser = useUserStore((state) => state.setUser);
 
   const [activeTab, setActiveTab] = useState("profile");
+  const formRef = useRef<HTMLFormElement | null>(null);
 
   const currentWorkspace = auth?.current_workspace;
   const isOwner =
@@ -103,21 +105,42 @@ export default function Edit({
     localStorage.setItem("profile_active_tab", activeTab);
   }, [activeTab]);
 
+  const handleSaveClick = () => {
+    if (formRef.current && activeTab === "profile") {
+      formRef.current.dispatchEvent(
+        new Event("submit", { cancelable: true, bubbles: true })
+      );
+    }
+  };
+
   return (
     <AuthenticatedLayout
       header={
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-primary-100 dark:bg-primary-900/30">
-            <User className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+        <div className="flex items-center flex-col gap-6 md:flex-row justify-between w-full">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary-100 dark:bg-primary-900/30">
+              <User className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white leading-tight">
+                {t("nav.profile")}
+              </h2>
+              <p className="text-xs text-gray-500 dark:text-neutral-500 font-medium">
+                {t("profile.settings_description")}
+              </p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white leading-tight">
-              {t("nav.profile")}
-            </h2>
-            <p className="text-xs text-gray-500 dark:text-neutral-500 font-medium">
-              {t("profile.settings_description")}
-            </p>
-          </div>
+          
+          {activeTab === "profile" && (
+            <Button
+              onClick={handleSaveClick}
+              icon={Save}
+              size="md"
+              className="shadow-md hover:shadow-lg"
+            >
+              {t("profile.actions.saveChanges")}
+            </Button>
+          )}
         </div>
       }
     >
@@ -147,16 +170,24 @@ export default function Edit({
               }`}
             >
               {activeTab === "profile" && (
-                <div>
+                <div ref={(el) => {
+                  if (el) {
+                    const form = el.querySelector('form');
+                    // @ts-ignore - Asignación directa a ref.current es válida aquí
+                    formRef.current = form;
+                  }
+                }}>
                   <UpdateProfileInformationForm
                     mustVerifyEmail={mustVerifyEmail}
                     user={user}
                     status={status}
                   />
+                </div>
+              )}
 
-                  <div className="mt-10 pt-10 border-t border-gray-100 dark:border-neutral-800/50">
-                    <UpdateThemeForm user={user} workspace={currentWorkspace} />
-                  </div>
+              {activeTab === "theme" && (
+                <div>
+                  <UpdateThemeForm user={user} workspace={currentWorkspace} />
                 </div>
               )}
 

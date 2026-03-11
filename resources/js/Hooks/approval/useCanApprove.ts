@@ -19,12 +19,12 @@ export function useCanApprove(workspaceId?: number) {
       }
 
       try {
-        const response = await axios.get<{ data: CanApproveResponse }>(
+        const response = await axios.get<CanApproveResponse & { success: boolean }>(
           route('api.v1.approvals.can-approve')
         );
         
-        setCanApprove(response.data.data.can_approve);
-        setReason(response.data.data.reason);
+        setCanApprove(response.data.can_approve);
+        setReason(response.data.reason);
       } catch (error) {
         console.error('Error checking approval permission:', error);
         setCanApprove(false);

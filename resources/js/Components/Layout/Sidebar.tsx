@@ -123,7 +123,7 @@ export default function Sidebar({
 
         <div className="mt-3 relative h-full flex flex-col">
           <div
-            className={`flex items-center justify-between p-6 border-b ${classes.borderColor}`}
+            className={`flex items-center gap-4 justify-center p-6 border-b ${classes.borderColor}`}
           >
             <Link
               href="/"
@@ -136,7 +136,7 @@ export default function Sidebar({
               >
                 <img
                   id="sidebar-logo"
-                  src={auth?.current_workspace?.white_label_logo_url || Logo}
+                  src={Logo}
                   alt={`${auth?.current_workspace?.name || "ContentFlow"} logo`}
                   className={
                     auth?.current_workspace?.white_label_logo_url
@@ -197,7 +197,7 @@ export default function Sidebar({
           <WorkspaceSwitcher isSidebarOpen={isSidebarOpen} />
 
           <nav
-            className="flex-1 px-4 py-6 space-y-2"
+            className="flex-1 px-4  space-y-2"
             aria-label="Main navigation"
           >
             {navigationItems.map((item) => {

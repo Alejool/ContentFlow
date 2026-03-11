@@ -136,11 +136,20 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
   // Workspace Relationships
   public function workspaces()
   {
-    return $this->belongsToMany(Workspace::class, 'workspace_user')
+    return $this->belongsToMany(Workspace::class, 'role_user')
       ->using(WorkspaceUser::class)
-      ->withPivot('role_id')
-      ->withTimestamps();
+      ->withPivot('role_id', 'assigned_by', 'assigned_at');
   }
+
+  /**
+   * Get the roles assigned to the user across workspaces
+   */
+  public function roles()
+  {
+    return $this->belongsToMany(Role::class, 'role_user')
+      ->withPivot('workspace_id', 'assigned_by', 'assigned_at');
+  }
+
 
   public function currentWorkspace()
   {

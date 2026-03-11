@@ -14,7 +14,7 @@ class FixUserRolesSeeder extends Seeder
 {
   /**
    * Fix all users without roles in their workspaces.
-   * This seeder ensures every user in workspace_user has a valid role_id.
+   * This seeder ensures every user in role_user has a valid role_id.
    */
   public function run(): void
   {
@@ -36,7 +36,7 @@ class FixUserRolesSeeder extends Seeder
 
     $this->command->info("✓ Roles found: Owner (ID: {$ownerRole->id}), Editor (ID: {$editorRole->id})");
 
-    // 3. Fix all workspace_user records with NULL or invalid role_id
+    // 3. Fix all role_user records with NULL or invalid role_id
     $this->fixWorkspaceUserRoles($ownerRole, $editorRole);
 
     // 4. Ensure all users have at least one workspace
@@ -74,14 +74,14 @@ class FixUserRolesSeeder extends Seeder
   }
 
   /**
-   * Fix workspace_user records with NULL or invalid role_id
+   * Fix role_user records with NULL or invalid role_id
    */
   private function fixWorkspaceUserRoles(Role $ownerRole, Role $editorRole): void
   {
-    $this->command->info('Checking workspace_user records...');
+    $this->command->info('Checking role_user records...');
 
-    // Get all workspace_user records
-    $workspaceUsers = DB::table('workspace_user')->get();
+    // Get all role_user records
+    $workspaceUsers = DB::table('role_user')->get();
     $fixed = 0;
     $alreadyOk = 0;
 
@@ -93,7 +93,7 @@ class FixUserRolesSeeder extends Seeder
 
         if ($workspace && $workspace->created_by === $wu->user_id) {
           // User is workspace creator, assign Owner role
-          DB::table('workspace_user')
+          DB::table('role_user')
             ->where('id', $wu->id)
             ->update(['role_id' => $ownerRole->id]);
 
@@ -101,7 +101,7 @@ class FixUserRolesSeeder extends Seeder
           $fixed++;
         } else {
           // User is not creator, assign Editor role
-          DB::table('workspace_user')
+          DB::table('role_user')
             ->where('id', $wu->id)
             ->update(['role_id' => $editorRole->id]);
 
@@ -114,7 +114,7 @@ class FixUserRolesSeeder extends Seeder
     }
 
     $this->command->info("✓ Fixed {$fixed} records, {$alreadyOk} were already OK");
-    Log::info("Fixed {$fixed} workspace_user records");
+    Log::info("Fixed {$fixed} role_user records");
   }
 
   /**

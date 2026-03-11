@@ -1,6 +1,5 @@
 import Input from "@/Components/common/Modern/Input";
 import Select from "@/Components/common/Modern/Select";
-import { useTheme } from "@/Hooks/useTheme";
 import { useTranslation } from "react-i18next";
 
 interface PollOptionsProps {
@@ -19,7 +18,6 @@ export default function PollOptions({
   onDurationChange,
 }: PollOptionsProps) {
   const { t } = useTranslation();
-  const { theme } = useTheme();
 
   const durationOptions = [
     { value: 30, label: t("platformSettings.twitter.30m") },

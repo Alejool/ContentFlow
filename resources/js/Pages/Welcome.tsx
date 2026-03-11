@@ -233,14 +233,6 @@ export default function Welcome({ auth, canLogin, canRegister, plans = [] }: Wel
                     </Link>
                   ) : null}
                 </div>
-
-                <p className="mt-6 text-sm text-gray-600 dark:text-gray-400 flex items-center justify-center gap-2">
-                  <Shield className="w-4 h-4 text-green-500" />
-                  {t("welcome.noCreditCardRequired") || "No requiere tarjeta de crédito"}
-                  <span className="mx-2">•</span>
-                  <Sparkles className="w-4 h-4 text-purple-500" />
-                  {t("welcome.freePlanForever") || "Plan gratuito para siempre"}
-                </p>
                 <div className="mt-24 py-8 border-y border-gray-200/50 dark:border-white/5 backdrop-blur-sm relative left-[50%] right-[50%] mx-[-50vw] w-screen px-4">
                   <div className="max-w-7xl mx-auto text-center">
                     <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-8">
@@ -450,16 +442,6 @@ export default function Welcome({ auth, canLogin, canRegister, plans = [] }: Wel
                   </div>
 
                   <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                    <div className="flex items-center gap-2">
-                      <Shield className="w-4 h-4 text-green-500" />
-                      <span>{t("welcome.noCreditCardRequired") || "No requiere tarjeta de crédito"}</span>
-                    </div>
-                    <span className="hidden sm:inline">•</span>
-                    <div className="flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-purple-500" />
-                      <span>{t("welcome.freePlanForever") || "Plan gratuito para siempre"}</span>
-                    </div>
-                    <span className="hidden sm:inline">•</span>
                     <div className="flex items-center gap-2">
                       <Zap className="w-4 h-4 text-yellow-500" />
                       <span>{t("welcome.demoAccess") || "Demo de 30 días disponible"}</span>

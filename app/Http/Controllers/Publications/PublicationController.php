@@ -773,7 +773,7 @@ class PublicationController extends Controller
         $canApproveThisStep = true;
       } elseif ($currentStep->role_id) {
         // Find user role in this workspace
-        $userRole = DB::table('workspace_user')
+        $userRole = DB::table('role_user')
           ->where('workspace_id', $publication->workspace_id)
           ->where('user_id', Auth::id())
           ->first();
@@ -786,7 +786,7 @@ class PublicationController extends Controller
       }
 
       if (!$canApproveThisStep) {
-        $userRole = DB::table('workspace_user')
+        $userRole = DB::table('role_user')
           ->where('workspace_id', $publication->workspace_id)
           ->where('user_id', Auth::id())
           ->first();

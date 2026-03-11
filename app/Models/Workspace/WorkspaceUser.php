@@ -22,7 +22,13 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
  */
 class WorkspaceUser extends Pivot
 {
-    protected $table = 'workspace_user';
+    protected $table = 'role_user';
+    
+    /**
+     * Indicates if the model should be timestamped.
+     * The role_user table uses assigned_at instead of created_at/updated_at.
+     */
+    public $timestamps = false;
 
     /**
      * Auto-load the role relationship.

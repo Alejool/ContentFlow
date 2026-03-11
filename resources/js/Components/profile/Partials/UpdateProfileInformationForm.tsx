@@ -1,28 +1,24 @@
 import Button from "@/Components/common/Modern/Button";
 import Input from "@/Components/common/Modern/Input";
 import Textarea from "@/Components/common/Modern/Textarea";
+import PhoneInput from "@/Components/common/Modern/PhoneInput";
 import ConnectedAccounts from "@/Components/profile/Partials/ConnectedAccounts";
 import AvatarSettings from "@/Pages/Profile/AvatarSettings";
 import { useUser } from "@/Hooks/useUser";
 import { Link } from "@inertiajs/react";
 import {
-  AlertTriangle,
   CheckCircle,
   Mail,
   MailWarning,
-  Save,
   Send,
-  ShieldCheck,
-  TriangleAlert,
   User as UserIcon,
 } from "lucide-react";
 import { Controller } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import PhoneInput from "react-phone-number-input";
-import "react-phone-number-input/style.css";
+import type { CountryCode } from "libphonenumber-js";
 
-// List of supported countries (LatAm + US)
-const SUPPORTED_COUNTRIES = [
+// List of supported countries (LatAm + US + España)
+const SUPPORTED_COUNTRIES: CountryCode[] = [
   "AR",
   "BO",
   "BR",
@@ -45,6 +41,7 @@ const SUPPORTED_COUNTRIES = [
   "UY",
   "VE",
   "US",
+  "ES",
 ];
 
 interface UpdateProfileInformationProps {
@@ -69,139 +66,99 @@ export default function UpdateProfileInformation({
     isSubmitting,
     hasChanges,
     user,
-    watchedValues,
-    setValue,
     control,
   } = useUser(initialUser);
 
   return (
     <div className={className}>
       <form onSubmit={handleSubmit} className="">
-        {/* Sección: Avatar */}
-        <div className="pb-8">
-          <AvatarSettings user={user} />
-        </div>
-
-        {/* Sección: Información Personal */}
-        <div className="border-t border-gray-100 dark:border-neutral-800 pt-8">
-          <div className="flex items-center gap-3 pb-4">
-            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              {t("profile.information.sections.personal")}
-            </h3>
+        {/* Layout de dos columnas en md+ */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+          {/* Columna izquierda: Avatar */}
+          <div className="md:col-span-4">
+            <AvatarSettings user={user} />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Input
-              id="name"
-              label={t("profile.information.nameLabel")}
-              placeholder={t("profile.information.namePlaceholder")}
-              register={register}
-              error={errors.name?.message}
-              sizeType="lg"
-              variant="filled"
-              icon={UserIcon}
-              required
-            />
-
-            <div className="relative">
-              <Input
-                id="email"
-                label={t("profile.information.emailLabel")}
-                type="email"
-                register={register}
-                error={errors.email?.message}
-                placeholder={t("profile.information.emailPlaceholder")}
-                sizeType="lg"
-                variant="filled"
-                icon={Mail}
-                disabled
-                required
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="border-t border-gray-100 dark:border-neutral-800 pt-8">
-          <div className="flex items-center gap-3 pb-4">
-            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              {t("profile.information.sections.contact")}
-            </h3>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Columna derecha: Información */}
+          <div className="md:col-span-8 space-y-8">
+            {/* Sección: Información Personal */}
             <div>
-              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t("profile.information.phoneLabel")}
-              </label>
-              <div
-                className={`relative rounded-lg border bg-gray-50 dark:bg-neutral-800/50 border-gray-200 dark:border-neutral-700 hover:border-primary-400 dark:hover:border-primary-600 focus-within:ring-2 focus-within:ring-primary-500/20 focus-within:border-primary-500 ${
-                  errors.phone ? "border-red-500" : ""
-                }`}
-              >
+              <div className="flex items-center gap-3 pb-4">
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  {t("profile.information.sections.personal")}
+                </h3>
+              </div>
+
+              <div className="grid grid-cols-1 gap-6">
+                <Input
+                  id="name"
+                  label={t("profile.information.nameLabel")}
+                  placeholder={t("profile.information.namePlaceholder")}
+                  register={register}
+                  error={errors.name?.message}
+                  sizeType="lg"
+                  variant="filled"
+                  icon={UserIcon}
+                  required
+                />
+
+                <div className="relative">
+                  <Input
+                    id="email"
+                    label={t("profile.information.emailLabel")}
+                    type="email"
+                    register={register}
+                    error={errors.email?.message}
+                    placeholder={t("profile.information.emailPlaceholder")}
+                    sizeType="lg"
+                    variant="filled"
+                    icon={Mail}
+                    disabled
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Sección: Contacto */}
+            <div className="border-t border-gray-100 dark:border-neutral-800 pt-8">
+              <div className="flex items-center gap-3 pb-4">
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  {t("profile.information.sections.contact")}
+                </h3>
+              </div>
+
+              <div className="grid grid-cols-1 gap-6">
                 <Controller
                   name="phone"
                   control={control}
                   render={({ field }) => (
                     <PhoneInput
-                      {...field}
-                      value={field.value || undefined}
-                      international
-                      defaultCountry="CO"
-                      countries={SUPPORTED_COUNTRIES as any}
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      label={t("profile.information.phoneLabel")}
                       placeholder={t("profile.information.phonePlaceholder")}
+                      error={errors.phone?.message}
                       disabled={isSubmitting}
-                      className="modern-phone-input p-3 dark:text-white"
+                      countries={SUPPORTED_COUNTRIES}
+                      defaultCountry="CO"
+                      required={false}
                     />
                   )}
                 />
+
+                <Textarea
+                  id="bio"
+                  label={t("profile.information.bioLabel")}
+                  placeholder={t("profile.information.bioPlaceholder")}
+                  register={register}
+                  name="bio"
+                  error={errors.bio?.message}
+                  rows={5}
+                  variant="filled"
+                />
               </div>
-              {errors.phone && (
-                <div className="mt-2 text-red-600 text-sm flex items-center gap-2">
-                  <TriangleAlert className="w-4 h-4 flex-shrink-0" />
-                  <span>{errors.phone.message}</span>
-                </div>
-              )}
-
-              <style>{`
-                .modern-phone-input {
-                  --PhoneInputCountryFlag-height: 1.25em;
-                  --PhoneInputCountrySelect-marginRight: 0.5em;
-                  --PhoneInputCountrySelectArrow-display: none;
-                  --PhoneInputCountrySelect-width: 3em;
-                  display: flex;
-                  align-items: center;
-                }
-                .modern-phone-input input {
-                  flex: 1;
-                  background: transparent;
-                  border: none;
-                  outline: none;
-                  color: inherit;
-                  font-size: 1rem;
-                  padding: 0 0.5rem;
-                }
-                .dark .modern-phone-input input::placeholder { color: #525252; }
-                .modern-phone-input input::placeholder { color: #a3a3a3; }
-                .PhoneInputCountrySelect {
-                  cursor: pointer;
-                }
-                .PhoneInputCountryIcon--border {
-                  box-shadow: none;
-                  border-radius: 2px;
-                }
-              `}</style>
             </div>
-
-            <Textarea
-              id="bio"
-              label={t("profile.information.bioLabel")}
-              placeholder={t("profile.information.bioPlaceholder")}
-              register={register}
-              name="bio"
-              error={errors.bio?.message}
-              rows={5}
-              variant="filled"
-            />
           </div>
         </div>
 
@@ -250,30 +207,6 @@ export default function UpdateProfileInformation({
             )}
           </div>
         )}
-
-        {/* Botón de Guardar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-8 border-t border-gray-100 dark:border-neutral-800">
-          <div className="hidden sm:block">
-            {hasChanges && !isSubmitting && (
-              <div className="flex items-center gap-2 text-sm font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-4 py-2 rounded-lg border border-amber-200 dark:border-amber-800/50">
-                <AlertTriangle className="w-4 h-4" />
-                {t("profile.messages.unsavedChanges")}
-              </div>
-            )}
-          </div>
-
-          <Button
-            disabled={isSubmitting}
-            icon={Save}
-            loading={isSubmitting}
-            loadingText={t("common.saving")}
-            className="w-full sm:w-auto min-w-[200px] rounded-lg font-medium bg-primary-600 hover:bg-primary-700 text-white"
-            type="submit"
-            size="lg"
-          >
-            {t("profile.actions.saveChanges")}
-          </Button>
-        </div>
       </form>
     </div>
   );

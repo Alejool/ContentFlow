@@ -128,6 +128,7 @@ class Publication extends Model
     'recurrence_days' => 'array',
     'recurrence_end_date' => 'date',
     'recurrence_accounts' => 'array',
+    'submitted_for_approval_at' => 'datetime',
   ];
 
   public function scopeDraft($query)
@@ -163,6 +164,53 @@ class Publication extends Model
   public function scopeScheduled($query)
   {
     return $query->where('status', 'scheduled');
+  }
+
+  // Status constants for new approval workflow
+  public const STATUS_DRAFT = 'draft';
+  public const STATUS_PENDING_REVIEW = 'pending_review';
+  public const STATUS_APPROVED = 'approved';
+  public const STATUS_REJECTED = 'rejected';
+  public const STATUS_PUBLISHED = 'published';
+
+  /**
+   * Check if the publication is in draft status.
+   */
+  public function isDraft(): bool
+  {
+    return $this->status === self::STATUS_DRAFT;
+  }
+
+  /**
+   * Check if the publication is pending review.
+   */
+  public function isPendingReview(): bool
+  {
+    return $this->status === self::STATUS_PENDING_REVIEW;
+  }
+
+  /**
+   * Check if the publication is rejected.
+   */
+  public function isRejected(): bool
+  {
+    return $this->status === 'rejected';
+  }
+
+  /**
+   * Check if the publication is published.
+   */
+  public function isPublished(): bool
+  {
+    return $this->status === self::STATUS_PUBLISHED || $this->status === 'published';
+  }
+
+  /**
+   * Get the current approval level for this publication.
+   */
+  public function getCurrentApprovalLevel(): int
+  {
+    return $this->current_approval_level ?? 0;
   }
 
   public function isApproved(): bool
@@ -387,6 +435,14 @@ class Publication extends Model
   public function approvalLogs(): HasMany
   {
     return $this->hasMany(ApprovalLog::class)->orderBy('requested_at', 'desc');
+  }
+
+  /**
+   * Get the approval actions for this publication (new approval workflow).
+   */
+  public function approvalActions(): HasMany
+  {
+    return $this->hasMany(\App\Models\ApprovalAction::class, 'content_id');
   }
 
   public function currentApprovalStep(): BelongsTo

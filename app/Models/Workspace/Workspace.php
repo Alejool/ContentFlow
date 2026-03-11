@@ -78,10 +78,9 @@ class Workspace extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'workspace_user')
+        return $this->belongsToMany(User::class, 'role_user')
             ->using(WorkspaceUser::class)
-            ->withPivot('role_id')
-            ->withTimestamps();
+            ->withPivot('role_id', 'assigned_by', 'assigned_at');
     }
 
     public function creator()

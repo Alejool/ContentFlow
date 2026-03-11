@@ -37,7 +37,7 @@ class ApprovalController extends Controller
     } else {
       // Check if user is assigned to any approval workflow step
       // Get user's role in workspace
-      $userRole = DB::table('workspace_user')
+      $userRole = DB::table('role_user')
         ->where('workspace_id', $workspaceId)
         ->where('user_id', $userId)
         ->first();
@@ -83,7 +83,7 @@ class ApprovalController extends Controller
     $hasAdminPermission = Auth::user()->hasPermission('approve', $workspaceId);
 
     // Get user's role in workspace
-    $userRole = DB::table('workspace_user')
+    $userRole = DB::table('role_user')
       ->where('workspace_id', $workspaceId)
       ->where('user_id', $userId)
       ->first();

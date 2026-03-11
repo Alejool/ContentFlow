@@ -1,3 +1,4 @@
+import RadioInput from "@/Components/common/Modern/RadioInput";
 import { Check, LucideIcon } from "lucide-react";
 
 interface PlatformCardProps {
@@ -21,8 +22,13 @@ export default function PlatformCard({
   selected = false,
   onSelect,
 }: PlatformCardProps) {
+  const inputId = `platform-card-${value}`;
+
   return (
-    <label className="flex flex-col items-center p-5 border-2 border-gray-200 dark:border-neutral-700 rounded-lg hover:border-primary-500 cursor-pointer transition-all">
+    <label 
+      htmlFor={inputId}
+      className="flex flex-col items-center p-5 border-2 border-gray-200 dark:border-neutral-700 rounded-lg hover:border-primary-500 cursor-pointer transition-all"
+    >
       <div
         className={`w-10 h-10 ${iconBgColor} rounded-lg flex items-center justify-center mb-3`}
       >
@@ -45,12 +51,12 @@ export default function PlatformCard({
       >
         {selected && <Check className="w-3 h-3 text-white" />}
       </div>
-      <input
-        type="radio"
+      <RadioInput
+        id={inputId}
         value={value}
         checked={selected}
         onChange={() => onSelect(value)}
-        className="hidden"
+        aria-label={label}
       />
     </label>
   );

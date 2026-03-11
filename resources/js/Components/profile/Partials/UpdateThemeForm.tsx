@@ -157,9 +157,19 @@ export default function UpdateThemeForm({
         </div>
 
         {hasBrandingAccess ? (
-          <p className="text-sm text-gray-500 dark:text-neutral-500 italic">
-            Configura el branding desde la configuración del workspace.
-          </p>
+          <div className="space-y-3">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Configura el logo y colores personalizados de tu workspace.
+            </p>
+            <Button
+              type="button"
+              onClick={() => router.visit(route("workspace.settings", { tab: "branding" }))}
+              icon={Palette}
+              variant="outline"
+            >
+              Ir a Configuración de Branding
+            </Button>
+          </div>
         ) : (
           <div className="relative rounded-xl border border-amber-200 dark:border-amber-800/30 bg-amber-50/50 dark:bg-amber-900/10 p-5 overflow-hidden">
             {/* Blurred mock */}

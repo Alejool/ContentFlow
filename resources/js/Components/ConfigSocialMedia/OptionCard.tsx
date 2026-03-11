@@ -1,3 +1,4 @@
+import RadioInput from "@/Components/common/Modern/RadioInput";
 import { Check, LucideIcon } from "lucide-react";
 
 interface OptionCardProps {
@@ -21,8 +22,13 @@ export default function OptionCard({
   iconColor = "text-primary-500",
   iconBgColor = "bg-primary-50 dark:bg-primary-900/20",
 }: OptionCardProps) {
+  const inputId = `option-card-${value}`;
+
   return (
-    <label className="flex items-center justify-between p-4 border border-gray-200 dark:border-neutral-700 rounded-lg hover:border-primary-500 cursor-pointer transition-colors">
+    <label 
+      htmlFor={inputId}
+      className="flex items-center justify-between p-4 border border-gray-200 dark:border-neutral-700 rounded-lg hover:border-primary-500 cursor-pointer transition-colors"
+    >
       <div className="flex items-center gap-3">
         <div
           className={`w-8 h-8 ${iconBgColor} rounded-lg flex items-center justify-center`}
@@ -49,12 +55,12 @@ export default function OptionCard({
       >
         {selected && <Check className="w-3 h-3 text-white" />}
       </div>
-      <input
-        type="radio"
+      <RadioInput
+        id={inputId}
         value={value}
         checked={selected}
         onChange={() => onSelect(value)}
-        className="hidden"
+        aria-label={label}
       />
     </label>
   );

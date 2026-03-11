@@ -160,6 +160,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             hover:bg-transparent
             shadow-none
             rounded-full
+            p-3
           `;
         case "gradient":
           return `
@@ -245,7 +246,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       ${
         variant === "primary" && buttonStyle !== "outline" && buttonStyle !== "icon"
           ? "hover:shadow-primary-500/25 shadow-xl hover:shadow-2xl"
-          : ""
+          : "hover:bg-gray-700/10"
       }
       ${buttonStyle !== "icon" ? roundedClasses[rounded] : ""}
       ${buttonStyle !== "icon" ? shadowClasses[shadow] : ""}

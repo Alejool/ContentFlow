@@ -14,8 +14,11 @@ interface AvatarSettingsProps {
 
 export default function AvatarSettings({ user }: AvatarSettingsProps) {
   const { t } = useTranslation();
-  const [previewUrl, setPreviewUrl] = useState<string | null>(user.photo_url || null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(
+    user.photo_url && user.photo_url.trim() !== '' ? user.photo_url : null
+  );
   const [processing, setProcessing] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -34,6 +37,7 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
     }
 
     setProcessing(true);
+    setImageError(false);
 
     try {
       // Mostrar preview local inmediatamente
@@ -56,7 +60,11 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
 
       if (response.data.success) {
         const updatedUser = response.data.user;
-        setPreviewUrl(updatedUser.photo_url || null);
+        const newPhotoUrl = updatedUser.photo_url && updatedUser.photo_url.trim() !== '' 
+          ? updatedUser.photo_url 
+          : null;
+        setPreviewUrl(newPhotoUrl);
+        setImageError(false);
         
         toast.success(
           t("profile.avatar_uploaded", "Foto subida correctamente")
@@ -86,6 +94,7 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
     
     setProcessing(true);
     setPreviewUrl(null);
+    setImageError(false);
 
     try {
       const response = await axios.delete("/api/v1/profile/avatar");
@@ -127,98 +136,84 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-          {t("profile.avatar_settings", "Foto de Perfil")}
-        </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          {t(
-            "profile.avatar_description",
-            "Sube una foto para personalizar tu perfil"
+    <div className="space-y-4">
+      {/* Vista previa del avatar */}
+      <div className="flex flex-col items-center gap-4">
+        <div className="relative">
+          <div className="w-32 h-32 rounded-full overflow-hidden bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white text-3xl font-bold shadow-xl ring-4 ring-primary-100 dark:ring-primary-900/30">
+            {previewUrl && !imageError ? (
+              <img
+                src={previewUrl}
+                alt={user.name}
+                className="w-full h-full object-cover"
+                onError={() => {
+                  setImageError(true);
+                  setPreviewUrl(null);
+                }}
+              />
+            ) : (
+              <span>{getInitials(user.name)}</span>
+            )}
+          </div>
+          {processing && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
+              <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+            </div>
           )}
-        </p>
+        </div>
+        
+        <div className="text-center">
+          <p className="text-xs font-medium text-gray-600 dark:text-gray-400">
+            {previewUrl
+              ? t("profile.using_photo", "Usando foto personalizada")
+              : t("profile.using_initials", "Usando iniciales")}
+          </p>
+          {processing && (
+            <div className="text-xs text-primary-600 dark:text-primary-400 mt-1 font-medium flex items-center justify-center gap-1">
+              <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+              {t("profile.uploading", "Subiendo...")}
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="space-y-6">
-        {/* Vista previa del avatar */}
-        <div className="flex items-center gap-6">
-          <div className="relative">
-            <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
-              {previewUrl ? (
-                <img
-                  src={previewUrl}
-                  alt={user.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <span>{getInitials(user.name)}</span>
-              )}
-            </div>
-            {processing && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
-                <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-              </div>
-            )}
-          </div>
-          <div className="flex-1">
-            <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
-              {t("profile.current_avatar", "Avatar Actual")}
-            </h4>
-            <p className="text-xs text-gray-600 dark:text-gray-400">
-              {previewUrl
-                ? t("profile.using_photo", "Usando foto personalizada")
-                : t("profile.using_initials", "Usando iniciales")}
-            </p>
-            {processing && (
-              <div className="text-xs text-primary-600 dark:text-primary-400 mt-1 font-medium flex items-center gap-1">
-                <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                {t("profile.uploading", "Subiendo...")}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Subir foto */}
-        <div className="space-y-3">
-          <label className="block text-sm font-medium text-gray-900 dark:text-white">
-            {t("profile.upload_photo", "Subir Foto")}
+      {/* Controles de subida */}
+      <div className="space-y-3">
+        <div className="flex flex-col gap-2">
+          <input
+            type="file"
+            accept="image/jpeg,image/jpg,image/png,image/gif"
+            onChange={handleFileChange}
+            className="hidden"
+            id="avatar-upload"
+            disabled={processing}
+          />
+          <label
+            htmlFor="avatar-upload"
+            className={`inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium transition-all duration-200 bg-transparent border-2 border-primary-600 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 ${
+              processing ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+            }`}
+          >
+            <Upload size={16} />
+            {processing ? t("profile.uploading", "Subiendo...") : t("profile.choose_file", "Elegir Archivo")}
           </label>
-          <div className="flex items-center gap-3">
-            <input
-              type="file"
-              accept="image/jpeg,image/jpg,image/png,image/gif"
-              onChange={handleFileChange}
-              className="hidden"
-              id="avatar-upload"
+          {previewUrl && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              icon={X}
+              onClick={handleRemovePhoto}
               disabled={processing}
-            />
-            <label
-              htmlFor="avatar-upload"
-              className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium transition-all duration-200 bg-transparent border-2 border-primary-600 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 ${
-                processing ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
-              }`}
+              className="w-full"
             >
-              <Upload size={14} />
-              {processing ? t("profile.uploading", "Subiendo...") : t("profile.choose_file", "Elegir Archivo")}
-            </label>
-            {previewUrl && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                icon={X}
-                onClick={handleRemovePhoto}
-                disabled={processing}
-              >
-                {t("profile.remove_photo", "Eliminar Foto")}
-              </Button>
-            )}
-          </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            {t("profile.avatar_requirements", "Máximo 2MB. Formatos: JPG, PNG, GIF")}
-          </p>
+              {t("profile.remove_photo", "Eliminar Foto")}
+            </Button>
+          )}
         </div>
+        <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+          {t("profile.avatar_requirements", "Máximo 2MB. Formatos: JPG, PNG, GIF")}
+        </p>
       </div>
     </div>
   );

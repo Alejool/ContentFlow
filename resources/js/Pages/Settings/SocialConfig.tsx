@@ -38,7 +38,7 @@ function PlatformCard({ platform, platformSettings, hasSettings, onOpenSettings,
       className="bg-white dark:bg-neutral-900 rounded-lg border-2 border-gray-200 dark:border-neutral-700 p-6 cursor-pointer hover:border-primary-500 dark:hover:border-primary-600 hover:shadow-lg transition-all flex flex-col h-full"
     >
       <div className="flex items-start gap-4 mb-5">
-        <div className="p-3 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-neutral-800 dark:to-neutral-700 rounded-lg shadow-sm">
+        <div className="p-3 rounded-lg">
           <img
             src={platform.logo}
             alt={platform.name}
@@ -181,25 +181,21 @@ export default function SocialConfig({
   return (
     <AuthenticatedLayout
       header={
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-primary-100 dark:bg-primary-900/30">
-            <Settings2 className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+        <div className="flex items-center flex-col gap-6 md:flex-row justify-between w-full">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary-100 dark:bg-primary-900/30">
+              <Settings2 className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white leading-tight">
+                {t("platformSettings.title")}
+              </h2>
+              <p className="text-xs text-gray-500 dark:text-neutral-500 font-medium">
+                {t("platformSettings.subtitle")}
+              </p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-              {t("platformSettings.title")}
-            </h2>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              {t("platformSettings.subtitle")}
-            </p>
-          </div>
-        </div>
-      }
-    >
-      <Head title={t("platformSettings.title")} />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8 flex justify-end">
+          
           <Button
             onClick={handleSave}
             disabled={isSaving}
@@ -207,28 +203,35 @@ export default function SocialConfig({
             icon={Save}
             loadingText={t("common.saving")}
             className="shadow-md hover:shadow-lg"
-            size="lg"
+            size="md"
           >
             {t("common.save")}
           </Button>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {activePlatforms.map((platform) => {
-            const platformSettings =
-              globalSettings[platform.key.toLowerCase()] || {};
-            const hasSettings = Object.keys(platformSettings).length > 0;
+      }
+    >
+      <Head title={t("platformSettings.title")} />
 
-            return (
-              <PlatformCard
-                key={platform.key}
-                platform={platform}
-                platformSettings={platformSettings}
-                hasSettings={hasSettings}
-                onOpenSettings={handleOpenSettings}
-                t={t}
-              />
-            );
-          })}
+      <div className="w-full max-w-full overflow-x-hidden min-w-0 bg-gray-50/30 dark:bg-neutral-900/10 min-h-screen">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {activePlatforms.map((platform) => {
+              const platformSettings =
+                globalSettings[platform.key.toLowerCase()] || {};
+              const hasSettings = Object.keys(platformSettings).length > 0;
+
+              return (
+                <PlatformCard
+                  key={platform.key}
+                  platform={platform}
+                  platformSettings={platformSettings}
+                  hasSettings={hasSettings}
+                  onOpenSettings={handleOpenSettings}
+                  t={t}
+                />
+              );
+            })}
+          </div>
         </div>
       </div>
 

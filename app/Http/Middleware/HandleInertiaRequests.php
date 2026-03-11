@@ -87,10 +87,7 @@ class HandleInertiaRequests extends Middleware
                 $ws->user_role = $isOwner ? 'Owner' : ($role ? $role->name : 'Member');
                 $ws->user_role_slug = $isOwner ? 'owner' : ($role ? $role->slug : 'member');
                 $ws->role = (object)['name' => $ws->user_role, 'slug' => $ws->user_role_slug];
-                
-                // ✅ AGREGAR TIMEZONE DEL WORKSPACE
                 $ws->timezone = $ws->timezone ?? 'UTC';
-                
                 return $ws;
               });
           } catch (\Exception $e) {
@@ -103,6 +100,13 @@ class HandleInertiaRequests extends Middleware
           try {
             // Force fresh user to avoid stale state in Octane/Swoole
             $user = $request->user() ? $request->user()->fresh() : null;
+            
+            Log::info('Current Workspace Debug', [
+              'user_id' => $user?->id,
+              'current_workspace_id' => $user?->current_workspace_id,
+              'has_user' => !is_null($user)
+            ]);
+            
             if (!$user)
               return null;
 
@@ -115,11 +119,16 @@ class HandleInertiaRequests extends Middleware
                   'users' => function ($query) use ($user) {
                     $query->where('users.id', $user->id)
                       ->select('users.id', 'users.name', 'users.email', 'users.photo_url')
-                      ->withPivot('role_id', 'created_at');
+                      ->withPivot('role_id', 'assigned_by', 'assigned_at', 'created_at', 'updated_at');
                   },
                   'creator:id,name,email'
                 ])
                 ->first();
+                
+              Log::info('Current Workspace Found', [
+                'workspace_id' => $currentWorkspace?->id,
+                'workspace_name' => $currentWorkspace?->name
+              ]);
             }
 
             if (!$currentWorkspace) {
@@ -129,16 +138,26 @@ class HandleInertiaRequests extends Middleware
                   'users' => function ($query) use ($user) {
                     $query->where('users.id', $user->id)
                       ->select('users.id', 'users.name', 'users.email', 'users.photo_url')
-                      ->withPivot('role_id', 'created_at');
+                      ->withPivot('role_id', 'assigned_by', 'assigned_at', 'created_at', 'updated_at');
                   },
                   'creator:id,name,email'
                 ])
                 ->first();
 
+              Log::info('First Workspace Fallback', [
+                'first_workspace_id' => $firstWorkspace?->id,
+                'first_workspace_name' => $firstWorkspace?->name
+              ]);
+
               if ($firstWorkspace) {
                 $currentWorkspace = $firstWorkspace;
                 $user->current_workspace_id = $firstWorkspace->id;
                 $user->save();
+                
+                Log::info('Updated user current_workspace_id', [
+                  'user_id' => $user->id,
+                  'new_current_workspace_id' => $firstWorkspace->id
+                ]);
               }
             }
 
@@ -172,6 +191,17 @@ class HandleInertiaRequests extends Middleware
               
               // ✅ AGREGAR TIMEZONE DEL WORKSPACE
               $currentWorkspace->timezone = $currentWorkspace->timezone ?? 'UTC';
+              
+              Log::info('Current Workspace Final', [
+                'id' => $currentWorkspace->id,
+                'name' => $currentWorkspace->name,
+                'role' => $currentWorkspace->user_role
+              ]);
+            } else {
+              Log::warning('No current workspace found for user', [
+                'user_id' => $user->id,
+                'user_email' => $user->email
+              ]);
             }
 
             return $currentWorkspace;

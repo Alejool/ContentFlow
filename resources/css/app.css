@@ -659,3 +659,42 @@ select {
 .animate-slide-in-right {
   animation: slide-in-right 0.3s ease-out;
 }
+
+@keyframes bounce-subtle {
+  0%, 100% {
+    transform: translateY(0) translateX(-50%);
+  }
+  50% {
+    transform: translateY(-5px) translateX(-50%);
+  }
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 2s ease-in-out infinite;
+}
+
+/* Platform Settings Modal Scrollbar */
+.platform-modal-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.platform-modal-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.platform-modal-scrollbar::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: #e5e5e5;
+}
+
+.dark .platform-modal-scrollbar::-webkit-scrollbar-thumb {
+  background: #333;
+}
+
+.platform-modal-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #d1d5db;
+}
+
+.dark .platform-modal-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #404040;
+}
