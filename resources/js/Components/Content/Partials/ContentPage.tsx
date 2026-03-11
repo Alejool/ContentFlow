@@ -364,12 +364,11 @@ export default function ManageContentPage() {
                       <Button
                         onClick={() => openAddModal("publication")}
                         variant="ghost"
-                        buttonStyle="ghost"
+                        buttonStyle="outline"
                         size="md"
                         icon={FileText}
-                        iconPosition="left"
                         fullWidth
-                        className=""
+                        className="border-none"
                       >
                         {t("manageContent.tabs.publications").toUpperCase()}
                       </Button>
@@ -377,12 +376,11 @@ export default function ManageContentPage() {
                       <Button
                         onClick={() => openAddModal("campaign")}
                         variant="ghost"
-                        buttonStyle="ghost"
+                        buttonStyle="outline"
                         size="md"
                         icon={Target}
-                        iconPosition="left"
                         fullWidth
-                        className=""
+                        className="border-none"
                       >
                         {t("manageContent.tabs.campaigns").toUpperCase()}
                       </Button>
