@@ -18,7 +18,7 @@ interface TabNavigationProps {
     tabs: Tab[];
     activeTab: string;
     onTabChange: (key: string) => void;
-    variant?: 'default' | 'pills' | 'underline' | 'draggable';
+    variant?: 'default' | 'pills' | 'underline' | 'draggable' | 'horizontal';
     size?: 'sm' | 'md' | 'lg';
     className?: string;
     onTabOrderChange?: (newOrder: string[]) => void;
@@ -76,6 +76,50 @@ function TabNavigation({
 
     // Modo estático tradicional
     const enabledTabs = normalizedTabs.filter(tab => tab.enabled !== false);
+
+    // Variante horizontal (styled like ContentPage)
+    if (variant === 'horizontal') {
+        return (
+            <div className={`mb-8 overflow-x-auto ${className}`}>
+                <div className="inline-flex items-center p-1.5 rounded-lg bg-white dark:bg-neutral-800 backdrop-blur-sm border border-gray-200/60 dark:border-neutral-700/60 gap-1 shadow-sm min-w-max">
+                    {enabledTabs.map((tab) => {
+                        const Icon = tab.icon;
+                        const isActive = activeTab === tab.key;
+
+                        return (
+                            <button
+                                key={tab.key}
+                                onClick={() => onTabChange(tab.key)}
+                                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                                    isActive
+                                        ? 'bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50'
+                                        : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50'
+                                }`}
+                            >
+                                {Icon && (
+                                    <Icon
+                                        className={`w-4 h-4 ${
+                                            isActive ? 'text-white' : 'opacity-70'
+                                        }`}
+                                    />
+                                )}
+                                <span>{tab.label}</span>
+                                {tab.badge !== undefined && (
+                                    <span className={`px-2 py-0.5 text-xs font-bold rounded-full ${
+                                        isActive
+                                            ? 'bg-white/20 text-white'
+                                            : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                                    }`}>
+                                        {tab.badge}
+                                    </span>
+                                )}
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+        );
+    }
 
     const getVariantClasses = (isActive: boolean) => {
         switch (variant) {
