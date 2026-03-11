@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import Modal from '@/Components/common/ui/Modal';
 import PlatformConfigCard from './PlatformConfigCard';
+import ValidationLimitsCard from './ValidationLimitsCard';
 import { Publication } from '@/types/Publication';
 import { DateTimePicker } from '@/Components/common/DateTimePicker';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { formatDateString } from '@/Utils/dateHelpers';
+import SocialMediaLimitsService, { ValidationResponse } from '@/Services/SocialMediaLimitsService';
 
 interface MediaInfo {
   duration?: number;
@@ -64,16 +66,20 @@ export default function PublishPreviewModal({
 }: PublishPreviewModalProps) {
   const { t } = useTranslation();
   const [previewData, setPreviewData] = useState<PreviewData | null>(null);
+  const [validationData, setValidationData] = useState<ValidationResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isValidating, setIsValidating] = useState(false);
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [isSimpleMode, setIsSimpleMode] = useState(simpleMode);
   const [isScheduled, setIsScheduled] = useState(false);
   const [scheduledAt, setScheduledAt] = useState('');
+  const [showValidationDetails, setShowValidationDetails] = useState(true);
 
   useEffect(() => {
     if (show && selectedPlatforms.length > 0) {
       loadPreview();
+      loadValidation();
     }
   }, [show, selectedPlatforms]);
 
@@ -81,8 +87,24 @@ export default function PublishPreviewModal({
     if (!show) {
       setIsScheduled(false);
       setScheduledAt('');
+      setValidationData(null);
     }
   }, [show]);
+
+  const loadValidation = async () => {
+    setIsValidating(true);
+    try {
+      const validation = await SocialMediaLimitsService.validatePublication(
+        publication.id,
+        selectedPlatforms
+      );
+      setValidationData(validation);
+    } catch (error) {
+      console.error('Error validating content:', error);
+    } finally {
+      setIsValidating(false);
+    }
+  };
 
   const loadPreview = async () => {
     setIsLoading(true);
@@ -124,6 +146,23 @@ export default function PublishPreviewModal({
   };
 
   const handlePublish = async () => {
+    // Validar límites antes de publicar
+    if (validationData && !validationData.can_publish) {
+      const summary = SocialMediaLimitsService.getValidationSummary(validationData.validation_results);
+      
+      if (summary.compatible === 0) {
+        alert('No se puede publicar en ninguna plataforma seleccionada. Por favor, ajusta el contenido según las recomendaciones.');
+        return;
+      }
+
+      // Si hay plataformas compatibles, preguntar si quiere publicar solo en esas
+      if (summary.compatible > 0 && summary.incompatible > 0) {
+        if (!confirm(`Solo ${summary.compatible} de ${summary.total} plataformas son compatibles. ¿Deseas publicar solo en las plataformas compatibles?`)) {
+          return;
+        }
+      }
+    }
+
     if (isScheduled && !scheduledAt) {
       alert('Por favor selecciona una fecha y hora');
       return;
@@ -154,7 +193,19 @@ export default function PublishPreviewModal({
       onPublished(response.data);
       handleClose();
     } catch (error: any) {
-      alert('Error al publicar: ' + (error.response?.data?.message || 'Error desconocido'));
+      // Manejar errores de validación del backend
+      if (error.response?.status === 422 && error.response?.data?.data?.validation_errors) {
+        const backendValidation = error.response.data.data;
+        setValidationData({
+          can_publish: false,
+          validation_results: backendValidation.validation_errors,
+          recommendations: backendValidation.recommendations || [],
+          message: error.response.data.message,
+        });
+        alert('Error de validación: ' + error.response.data.message);
+      } else {
+        alert('Error al publicar: ' + (error.response?.data?.message || 'Error desconocido'));
+      }
     } finally {
       setIsPublishing(false);
     }
@@ -180,6 +231,7 @@ export default function PublishPreviewModal({
   const handleClose = () => {
     setIsScheduled(false);
     setScheduledAt('');
+    setValidationData(null);
     onClose();
   };
 
@@ -218,7 +270,18 @@ export default function PublishPreviewModal({
 
   const hasCompatiblePlatforms = previewData?.platform_configurations.some((c) => c.is_compatible) || false;
   const hasIncompatiblePlatforms = previewData?.platform_configurations.some((c) => !c.is_compatible) || false;
-  const canPublish = previewData && !isPublishing && (previewData.all_compatible || hasCompatiblePlatforms);
+  
+  // Considerar también la validación de límites
+  const validationSummary = validationData 
+    ? SocialMediaLimitsService.getValidationSummary(validationData.validation_results)
+    : null;
+  
+  const hasValidationErrors = validationSummary && validationSummary.incompatible > 0;
+  const canPublishWithValidation = validationSummary 
+    ? validationSummary.compatible > 0 
+    : true;
+  
+  const canPublish = previewData && !isPublishing && (previewData.all_compatible || hasCompatiblePlatforms) && canPublishWithValidation;
 
   return (
     <Modal show={show} onClose={handleClose} maxWidth="2xl">
@@ -312,6 +375,157 @@ export default function PublishPreviewModal({
                   </div>
                 )}
 
+                {/* Validation Limits Section */}
+                {validationData && (
+                  <div className="mb-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                        <span>🔍</span>
+                        <span>Validación de Límites por Plataforma</span>
+                      </h3>
+                      <button
+                        onClick={() => setShowValidationDetails(!showValidationDetails)}
+                        className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                      >
+                        {showValidationDetails ? 'Ocultar detalles' : 'Mostrar detalles'}
+                      </button>
+                    </div>
+
+                    {/* Validation Summary */}
+                    {(() => {
+                      const summary = SocialMediaLimitsService.getValidationSummary(validationData.validation_results);
+                      return (
+                        <>
+                          <div className="mb-4 p-4 bg-gray-50 dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700">
+                            <div className="grid grid-cols-3 gap-4 text-center">
+                              <div>
+                                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                                  {summary.compatible}
+                                </div>
+                                <div className="text-xs text-gray-600 dark:text-gray-400">
+                                  Compatible{summary.compatible !== 1 ? 's' : ''}
+                                </div>
+                              </div>
+                              <div>
+                                <div className="text-2xl font-bold text-red-600 dark:text-red-400">
+                                  {summary.incompatible}
+                                </div>
+                                <div className="text-xs text-gray-600 dark:text-gray-400">
+                                  Incompatible{summary.incompatible !== 1 ? 's' : ''}
+                                </div>
+                              </div>
+                              <div>
+                                <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
+                                  {summary.withWarnings}
+                                </div>
+                                <div className="text-xs text-gray-600 dark:text-gray-400">
+                                  Con advertencias
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Alert when no compatible platforms */}
+                          {summary.compatible === 0 && (
+                            <div className="mb-4 p-4 bg-red-100 dark:bg-red-900/30 border-2 border-red-300 dark:border-red-700 rounded-lg">
+                              <div className="flex items-start gap-3">
+                                <span className="text-3xl">🚫</span>
+                                <div className="flex-1">
+                                  <h4 className="font-bold text-red-900 dark:text-red-200 text-lg mb-2">
+                                    No se puede publicar
+                                  </h4>
+                                  <p className="text-sm text-red-800 dark:text-red-300 mb-3">
+                                    El contenido no cumple con los requisitos de ninguna de las plataformas seleccionadas.
+                                  </p>
+                                  <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded border border-red-200 dark:border-red-800">
+                                    <p className="text-xs font-semibold text-red-900 dark:text-red-200 mb-1">
+                                      ¿Qué puedes hacer?
+                                    </p>
+                                    <ul className="text-xs text-red-800 dark:text-red-300 space-y-1 list-disc list-inside">
+                                      <li>Revisa los errores específicos de cada plataforma abajo</li>
+                                      <li>Ajusta la duración o tamaño del video según las recomendaciones</li>
+                                      <li>Verifica tus cuentas para desbloquear límites más altos</li>
+                                      <li>Considera publicar en plataformas diferentes</li>
+                                    </ul>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      );
+                    })()}
+
+                    {/* Validation Error Message */}
+                    {!validationData.can_publish && (
+                      <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                        <div className="flex items-start gap-2">
+                          <span className="text-lg">🚫</span>
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-red-900 dark:text-red-300 mb-2">
+                              No se puede publicar en todas las plataformas
+                            </h4>
+                            <p className="text-sm text-red-800 dark:text-red-400 whitespace-pre-line">
+                              {validationData.message}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Recommendations */}
+                    {validationData.recommendations && validationData.recommendations.length > 0 && (
+                      <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                        <div className="flex items-center gap-2 mb-3 font-semibold text-sm text-blue-900 dark:text-blue-300">
+                          <span className="text-lg">💡</span>
+                          <span>Recomendaciones</span>
+                        </div>
+                        <ul className="space-y-2">
+                          {validationData.recommendations.map((recommendation, index) => (
+                            <li key={index} className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
+                              <span className="text-blue-500 dark:text-blue-400 mt-0.5">•</span>
+                              <span>{recommendation}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Optimization Suggestions from Service */}
+                    {(() => {
+                      const suggestions = SocialMediaLimitsService.getOptimizationSuggestions(validationData.validation_results);
+                      return suggestions.length > 0 ? (
+                        <div className="mb-4 p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
+                          <div className="flex items-center gap-2 mb-3 font-semibold text-sm text-purple-900 dark:text-purple-300">
+                            <span className="text-lg">✨</span>
+                            <span>Sugerencias de Optimización</span>
+                          </div>
+                          <ul className="space-y-2">
+                            {suggestions.map((suggestion, index) => (
+                              <li key={index} className="text-sm text-gray-700 dark:text-gray-300">
+                                {suggestion}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ) : null;
+                    })()}
+
+                    {/* Validation Results per Platform */}
+                    {showValidationDetails && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {Object.entries(validationData.validation_results).map(([accountId, result]) => (
+                          <ValidationLimitsCard
+                            key={accountId}
+                            result={result}
+                            showDetails={true}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Optimization Suggestions */}
                 {previewData.optimization_suggestions && previewData.optimization_suggestions.length > 0 && (
                   <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
@@ -396,31 +610,84 @@ export default function PublishPreviewModal({
               </div>
 
               {/* Footer */}
-              <div className="flex justify-end gap-3 p-5 border-t border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800">
-                <button
-                  onClick={handleClose}
-                  className="px-6 py-3 rounded-lg font-semibold text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-neutral-700 border border-gray-300 dark:border-neutral-600 hover:bg-gray-50 dark:hover:bg-neutral-600 transition-colors"
-                >
-                  Cancelar
-                </button>
-
-                {hasIncompatiblePlatforms && hasCompatiblePlatforms && (
-                  <button
-                    onClick={publishCompatibleOnly}
-                    disabled={isPublishing}
-                    className="px-6 py-3 rounded-lg font-semibold text-sm text-yellow-900 dark:text-yellow-100 bg-yellow-400 hover:bg-yellow-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Publicar solo en compatibles
-                  </button>
+              <div className="flex flex-col gap-3 p-5 border-t border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800">
+                {/* Validation Warning in Footer */}
+                {hasValidationErrors && validationSummary && (
+                  <div className={`p-3 border rounded-lg ${
+                    validationSummary.compatible === 0
+                      ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+                      : 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800'
+                  }`}>
+                    <p className={`text-sm font-medium ${
+                      validationSummary.compatible === 0
+                        ? 'text-red-800 dark:text-red-300'
+                        : 'text-yellow-800 dark:text-yellow-300'
+                    }`}>
+                      {validationSummary.compatible === 0 ? (
+                        <>
+                          🚫 No se puede publicar en ninguna plataforma seleccionada.
+                          <span className="block mt-1 text-xs opacity-90">
+                            Ajusta el contenido según las recomendaciones mostradas arriba.
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          ⚠️ {validationSummary.incompatible} plataforma(s) no cumplen los requisitos de contenido.
+                          <span className="ml-1">
+                            Puedes publicar en las {validationSummary.compatible} plataforma(s) compatible(s).
+                          </span>
+                        </>
+                      )}
+                    </p>
+                  </div>
                 )}
 
-                <button
-                  onClick={handlePublish}
-                  disabled={!canPublish || isPublishing}
-                  className="px-6 py-3 rounded-lg font-semibold text-sm text-white bg-gradient-to-r from-green-600 to-green-700 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isPublishing ? '⏳ Publicando...' : isScheduled ? '📅 Programar' : '🚀 Publicar ahora'}
-                </button>
+                <div className="flex justify-end gap-3">
+                  <button
+                    onClick={handleClose}
+                    className="px-6 py-3 rounded-lg font-semibold text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-neutral-700 border border-gray-300 dark:border-neutral-600 hover:bg-gray-50 dark:hover:bg-neutral-600 transition-colors"
+                  >
+                    Cancelar
+                  </button>
+
+                  {hasIncompatiblePlatforms && hasCompatiblePlatforms && (
+                    <button
+                      onClick={publishCompatibleOnly}
+                      disabled={isPublishing || !canPublishWithValidation}
+                      className="px-6 py-3 rounded-lg font-semibold text-sm text-yellow-900 dark:text-yellow-100 bg-yellow-400 hover:bg-yellow-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Publicar solo en compatibles
+                    </button>
+                  )}
+
+                  <button
+                    onClick={handlePublish}
+                    disabled={!canPublish || isPublishing}
+                    className={`px-6 py-3 rounded-lg font-semibold text-sm text-white shadow-md transition-all ${
+                      !canPublish
+                        ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-green-600 to-green-700 hover:shadow-lg hover:-translate-y-0.5'
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                    title={
+                      !canPublishWithValidation
+                        ? 'No hay plataformas compatibles con el contenido'
+                        : !canPublish
+                        ? 'Verifica que el contenido cumpla con los requisitos'
+                        : ''
+                    }
+                  >
+                    {isPublishing 
+                      ? '⏳ Publicando...' 
+                      : !canPublishWithValidation
+                      ? '🚫 No se puede publicar'
+                      : !canPublish
+                      ? '⚠️ Contenido no compatible'
+                      : isScheduled 
+                      ? '📅 Programar' 
+                      : '🚀 Publicar ahora'
+                    }
+                  </button>
+                </div>
               </div>
             </>
           )
