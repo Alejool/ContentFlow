@@ -12,12 +12,11 @@ export default function WorkspaceSettingsHeader({
   const { t } = useTranslation();
 
   return (
-    <div className="">
-      <div className="flex flex-col lg:flex-row lg:items-start justify-center gap-6">
+    <div className="flex flex-col lg:flex-row lg:items-start justify-start gap-6">
         <div className="flex-1">
-          <div className="flex items-center justify-center gap-4 mb-4">
+          <div className="flex items-center justify-start gap-4 ">
             <div
-              className={`h-14 w-14 ${!workspace.white_label_logo_url ? "bg-gradient-to-br from-primary-500 to-primary-600" : ""} rounded-lg flex items-center justify-center text-white font-bold text-2xl shadow-lg overflow-hidden`}
+              className={`h-10 w-10 ${!workspace.white_label_logo_url ? "bg-gradient-to-br from-primary-500 to-primary-600" : ""} rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-lg overflow-hidden`}
             >
               {workspace.white_label_logo_url ? (
                 <img
@@ -30,10 +29,10 @@ export default function WorkspaceSettingsHeader({
               )}
             </div>
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-2xl md:text-xl font-bold text-gray-900 dark:text-white">
                 {workspace.name}
               </h1>
-              <div className="flex items-center gap-3 mt-2">
+              <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
                   {workspace.public ? (
                     <>
@@ -54,13 +53,12 @@ export default function WorkspaceSettingsHeader({
               </div>
             </div>
           </div>
-          <p className="text-gray-600 flex justify-center text-center dark:text-gray-400">
+          <p className="text-gray-600 flex justify-start dark:text-gray-400">
             {workspace.description || t("workspace.no_description")}
           </p>
         </div>
 
         <WorkspaceInfoBadge variant="full" />
-      </div>
     </div>
   );
 }

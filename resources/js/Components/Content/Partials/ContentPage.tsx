@@ -346,7 +346,7 @@ export default function ManageContentPage() {
                       variant="primary"
                       size="lg"
                       icon={Plus}
-                      className="gap-2 uppercase tracking-wider font-bold text-xs"
+                      className="gap-2 uppercase tracking-wider font-bold text-xs backdrop-3xl"
                     >
                       {t("manageContent.createNew").toUpperCase()}
                     </Button>
@@ -354,7 +354,7 @@ export default function ManageContentPage() {
                   <Dropdown.Content
                     align="right"
                     width="auto"
-                    contentClasses="py-1 bg-white dark:bg-neutral-800 shadow-xl rounded-lg min-w-[220px]"
+                    contentClasses="py-1 bg-white/95 dark:bg-neutral-800 shadow-xl rounded-lg min-w-[220px]"
                   >
                     <div className="p-1">
                       <Button
@@ -365,11 +365,11 @@ export default function ManageContentPage() {
                         icon={FileText}
                         iconPosition="left"
                         fullWidth
-                        className="justify-start px-4 py-2 hover:bg-gray-50 dark:hover:bg-neutral-700/50 rounded-lg border-0 transition-all duration-200 uppercase tracking-wider font-bold text-xs"
+                        className=""
                       >
                         {t("manageContent.tabs.publications").toUpperCase()}
                       </Button>
-                      <div className="mx-2 my-1 border-t border-gray-100 dark:border-neutral-700/50" />
+                      <div className="border-t border-gray-100 dark:border-neutral-700/50" />
                       <Button
                         onClick={() => openAddModal("campaign")}
                         variant="ghost"
@@ -378,7 +378,7 @@ export default function ManageContentPage() {
                         icon={Target}
                         iconPosition="left"
                         fullWidth
-                        className="justify-start px-4 py-2 hover:bg-gray-50 dark:hover:bg-neutral-700/50 rounded-lg border-0 transition-all duration-200 uppercase tracking-wider font-bold text-xs"
+                        className=""
                       >
                         {t("manageContent.tabs.campaigns").toUpperCase()}
                       </Button>

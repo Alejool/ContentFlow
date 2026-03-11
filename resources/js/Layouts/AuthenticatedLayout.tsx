@@ -267,7 +267,7 @@ export default function AuthenticatedLayout({
         />
 
         {/* Conditionally render OnboardingFlow for incomplete onboarding */}
-        {shouldShowOnboarding &&
+        {/* {shouldShowOnboarding &&
           tourSteps &&
           availablePlatforms &&
           templates && (
@@ -279,7 +279,7 @@ export default function AuthenticatedLayout({
                 templates={templates}
               />
             </Suspense>
-          )}
+          )} */}
 
         {/* Debug: Show why onboarding is not showing */}
         {!shouldShowOnboarding && user && (
