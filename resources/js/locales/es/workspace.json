@@ -137,7 +137,52 @@
     "roles_management": {
       "title": "Roles y Permisos",
       "description": "Resumen de roles disponibles y sus permisos asociados en ContentFlow.",
-      "no_permissions": "No hay permisos asignados."
+      "no_permissions": "No hay permisos asignados.",
+      "create_role": "Crear Nuevo Rol",
+      "create_role_subtitle": "Define un nuevo rol y sus permisos para el workspace.",
+      "role_name": "Nombre del Rol",
+      "role_name_placeholder": "Ej: Editor Senior",
+      "role_description": "Descripción",
+      "role_description_placeholder": "Describe las responsabilidades de este rol...",
+      "key_permissions_label": "Permisos Clave",
+      "role_created_success": "Rol creado con éxito",
+      "role_created_error": "Error al crear el rol",
+      "name_required": "El nombre es obligatorio",
+      "loading_permissions": "Cargando permisos..."
+    },
+    "permissions": {
+      "publish": {
+        "name": "Publicar",
+        "description": "Permite publicar contenido en redes sociales"
+      },
+      "approve": {
+        "name": "Aprobar",
+        "description": "Permite aprobar contenido para publicación"
+      },
+      "view-analytics": {
+        "name": "Ver Analíticas",
+        "description": "Permite ver las analíticas del workspace"
+      },
+      "manage-accounts": {
+        "name": "Gestionar Cuentas",
+        "description": "Permite agregar/eliminar cuentas sociales"
+      },
+      "manage-team": {
+        "name": "Gestionar Equipo",
+        "description": "Permite invitar/eliminar miembros"
+      },
+      "manage-content": {
+        "name": "Gestionar Contenido",
+        "description": "Permite crear y editar publicaciones"
+      },
+      "manage-campaigns": {
+        "name": "Gestionar Campañas",
+        "description": "Permite crear y editar campañas"
+      },
+      "view-content": {
+        "name": "Ver Contenido",
+        "description": "Permite ver el contenido del workspace (solo lectura)"
+      }
     },
     "messages": {
       "update_success": "Espacio de trabajo creado exitosamente",

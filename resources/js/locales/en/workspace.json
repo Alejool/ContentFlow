@@ -137,7 +137,52 @@
     "roles_management": {
       "title": "Roles & Permissions",
       "description": "Summary of available roles and their associated permissions in ContentFlow.",
-      "no_permissions": "No permissions assigned."
+      "no_permissions": "No permissions assigned.",
+      "create_role": "Create New Role",
+      "create_role_subtitle": "Define a new role and its permissions for the workspace.",
+      "role_name": "Role Name",
+      "role_name_placeholder": "e.g., Senior Editor",
+      "role_description": "Description",
+      "role_description_placeholder": "Describe the responsibilities of this role...",
+      "key_permissions_label": "Key Permissions",
+      "role_created_success": "Role created successfully",
+      "role_created_error": "Error creating role",
+      "name_required": "Name is required",
+      "loading_permissions": "Loading permissions..."
+    },
+    "permissions": {
+      "publish": {
+        "name": "Publish",
+        "description": "Allow publishing content to social media"
+      },
+      "approve": {
+        "name": "Approve",
+        "description": "Allow approving content for publication"
+      },
+      "view-analytics": {
+        "name": "View Analytics",
+        "description": "Allow viewing workspace analytics"
+      },
+      "manage-accounts": {
+        "name": "Manage Accounts",
+        "description": "Allow adding/removing social accounts"
+      },
+      "manage-team": {
+        "name": "Manage Team",
+        "description": "Allow inviting/removing members"
+      },
+      "manage-content": {
+        "name": "Manage Content",
+        "description": "Allow creating and editing publications"
+      },
+      "manage-campaigns": {
+        "name": "Manage Campaigns",
+        "description": "Allow creating and editing campaigns"
+      },
+      "view-content": {
+        "name": "View Content",
+        "description": "Allow viewing workspace content (read-only)"
+      }
     },
     "messages": {
       "update_success": "Workspace created successfully",
