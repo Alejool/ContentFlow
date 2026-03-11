@@ -53,6 +53,15 @@ interface PlanCardProps {
   activeSubscriptions?: any[];
   expiredPlans?: string[];
   isOwner?: boolean;
+  systemFeatures?: {
+    ai?: boolean;
+    analytics?: boolean;
+    reels?: boolean;
+    approval_workflows?: boolean;
+    calendar_sync?: boolean;
+    bulk_operations?: boolean;
+    white_label?: boolean;
+  };
 }
 
 export default function PlanCard({
@@ -68,6 +77,7 @@ export default function PlanCard({
   activeSubscriptions = [],
   expiredPlans = [],
   isOwner = true,
+  systemFeatures = {},
 }: PlanCardProps) {
   const { t } = useTranslation();
 
@@ -302,84 +312,231 @@ export default function PlanCard({
 
   if (variant === "compact") {
     return (
-      <div
+      <Card
         className={cn(
-          "relative p-6 border-2 rounded-xl transition-all",
+          "relative flex flex-col h-full transition-all duration-300 hover:shadow-lg",
           isPopular
-            ? "border-primary-600 shadow-lg"
-            : "border-gray-200 dark:border-neutral-700",
-          isCurrentPlan && "ring-4 ring-primary-200 dark:ring-primary-900/50",
+            ? "border-2 border-primary-600 shadow-xl bg-white dark:bg-neutral-900"
+            : "border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-primary-400 dark:hover:border-primary-800",
+          isCurrentPlan && "ring-2 ring-primary-200 dark:ring-primary-900/50",
         )}
       >
+        {/* Badge superior */}
         {isPopular && (
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-            <span className="px-3 py-1 bg-primary-600 text-white text-xs font-semibold rounded-full">
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20">
+            <div className="bg-primary-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md flex items-center gap-1">
+              <Star className="h-3 w-3 fill-current" />
               {t("pricing.mostPopular")}
-            </span>
+            </div>
           </div>
         )}
 
-        <div className="text-center mb-6">
-          <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-            {getPlanIcon(plan.id)}
+        {plan.id === "demo" && !isPopular && (
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20">
+            <Badge className="bg-purple-500 text-white border-0 shadow-md text-xs">
+              {t("pricing.demoTemporal", "Demo Temporal")}
+            </Badge>
           </div>
-          <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-            {plan.name}
-          </h4>
-          <div className="flex items-baseline justify-center gap-1">
-            <span className="text-3xl font-bold text-gray-900 dark:text-white">
+        )}
+
+        {isCurrentPlan && showCurrentBadge && (
+          <div className="absolute -top-3 right-4 z-20">
+            <Badge className="bg-green-500 text-white border-0 shadow-md text-xs">
+              {t("pricing.currentPlan", "Plan Actual")}
+            </Badge>
+          </div>
+        )}
+
+        {!isCurrentPlan && status && (
+          <div className="absolute -top-3 right-4 z-20">
+            <Badge
+              variant={status.variant}
+              className={cn("shadow-md border text-xs", status.className)}
+            >
+              {status.label}
+            </Badge>
+          </div>
+        )}
+
+        <CardHeader className="pb-4">
+          {/* Icono y nombre */}
+          <div className="flex items-center gap-3 mb-3">
+            <div
+              className={cn(
+                "p-2.5 rounded-lg transition-all",
+                isPopular
+                  ? "bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400"
+                  : plan.id === "demo"
+                    ? "bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400"
+                    : "bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400",
+              )}
+            >
+              {getPlanIcon(plan.id)}
+            </div>
+            <div className="flex-1">
+              <CardTitle className="text-lg font-bold text-gray-900 dark:text-white">
+                {plan.name}
+              </CardTitle>
+              {/* Tagline compacto */}
+              <p className="text-xs text-primary-600 dark:text-primary-400 font-medium mt-0.5">
+                {getPlanTagline(plan.id)}
+              </p>
+            </div>
+          </div>
+
+          {/* Precio */}
+          <div className="flex items-baseline gap-1.5">
+            <span
+              className={cn(
+                "text-3xl font-extrabold",
+                isPopular
+                  ? "text-primary-600 dark:text-primary-400"
+                  : "text-neutral-900 dark:text-white",
+              )}
+            >
               ${displayPrice}
             </span>
-            <span className="text-gray-500 dark:text-gray-400">
+            <span className="text-gray-500 dark:text-gray-400 text-sm">
               /
               {plan.price === 0
                 ? t("planSelection.intervals.forever")
-                : t("planSelection.intervals.month")}
+                : billingCycle === "monthly"
+                  ? t("planSelection.intervals.month")
+                  : t("planSelection.intervals.year")}
             </span>
           </div>
-        </div>
 
-        <ul className="space-y-3 mb-6">
-          {features.slice(0, 6).map((feature, index) => (
-            <li key={index} className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-              <span className="text-sm text-gray-600 dark:text-gray-400">
-                {feature}
+          {/* Ahorro anual compacto */}
+          {plan.price > 0 && billingCycle === "monthly" && (
+            <div className="mt-2">
+              <span className="text-xs text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded-full font-semibold">
+                ${annualMonthlyPrice}/mes anual (ahorra ${annualSavings}/año)
               </span>
-            </li>
-          ))}
-        </ul>
-
-        <Button
-          onClick={() => onSelectPlan(plan.id)}
-          disabled={
-            buttonConfig.disabled ||
-            isLoading ||
-            (!plan.enabled && plan.requires_stripe)
-          }
-          variant={
-            buttonConfig.variant === "free"
-              ? "primary"
-              : isPopular
-                ? "primary"
-                : "ghost"
-          }
-          buttonStyle={
-            buttonConfig.variant === "current" || buttonConfig.variant === "blocked"
-              ? "outline"
-              : "solid"
-          }
-          fullWidth
-          size="md"
-          loading={isLoading}
-          className={cn(
-            buttonConfig.variant === "current" && "opacity-60 cursor-not-allowed",
-            buttonConfig.variant === "blocked" && "opacity-60 cursor-not-allowed",
+            </div>
           )}
-        >
-          {getButtonText()}
-        </Button>
-      </div>
+
+          {/* User count */}
+          {userCount && (
+            <p className="text-xs text-gray-400 dark:text-neutral-500 mt-2">
+              👥 {userCount} equipos
+            </p>
+          )}
+
+          {/* Trial days */}
+          {plan.trial_days && (
+            <p className="text-xs text-purple-600 dark:text-purple-400 mt-2 flex items-center gap-1">
+              <Sparkles className="h-3.5 w-3.5" />
+              {plan.trial_days} {t("pricing.plans.demo.trialDays")}
+            </p>
+          )}
+        </CardHeader>
+
+        <CardContent className="flex-1 pt-0">
+          {/* Features principales */}
+          <ul className="space-y-2.5">
+            {features.slice(0, 6).map((feature, index) => (
+              <li key={index} className="flex items-start gap-2.5">
+                <div
+                  className={cn(
+                    "flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center mt-0.5",
+                    isPopular
+                      ? "bg-primary-100 dark:bg-primary-900/30"
+                      : "bg-green-100 dark:bg-green-900/30",
+                  )}
+                >
+                  <Check
+                    className={cn(
+                      "h-2.5 w-2.5",
+                      isPopular
+                        ? "text-primary-600 dark:text-primary-400"
+                        : "text-green-600 dark:text-green-400",
+                    )}
+                  />
+                </div>
+                <span className="text-sm text-gray-700 dark:text-gray-300 leading-tight">
+                  {feature}
+                </span>
+              </li>
+            ))}
+          </ul>
+
+          {/* Missing features compacto */}
+          {missingFeatures.length > 0 && (
+            <div className="mt-4 pt-4 border-t border-gray-100 dark:border-neutral-800/50">
+              <p className="text-xs font-semibold text-gray-400 dark:text-neutral-500 uppercase tracking-wider mb-2.5">
+                {t("pricing.missingFeatures", "Te estás perdiendo")}
+              </p>
+              <ul className="space-y-2">
+                {missingFeatures.slice(0, 3).map((feature, index) => (
+                  <li key={index} className="flex items-start gap-2">
+                    <Lock className="h-3.5 w-3.5 text-gray-300 dark:text-neutral-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-xs text-gray-400 dark:text-neutral-500 italic leading-tight">
+                      {feature}
+                    </span>
+                  </li>
+                ))}
+                {missingFeatures.length > 3 && (
+                  <li className="text-xs text-gray-400 dark:text-neutral-500 italic pl-5">
+                    +{missingFeatures.length - 3} más...
+                  </li>
+                )}
+              </ul>
+            </div>
+          )}
+        </CardContent>
+
+        <CardFooter className="flex flex-col gap-2 pt-4">
+          {isDowngradeBlocked && (
+            <p className="text-xs text-center text-amber-600 dark:text-amber-400 mb-1">
+              {t(
+                "pricing.cancelSubscriptionFirst",
+                "Cancela tu suscripción actual primero",
+              )}
+            </p>
+          )}
+          {!plan.enabled && plan.requires_stripe && (
+            <p className="text-xs text-center text-gray-500 dark:text-gray-400 mb-1">
+              {t("pricing.paymentSetup", "Configuración en proceso")}
+            </p>
+          )}
+          
+          <Button
+            onClick={() => onSelectPlan(plan.id)}
+            disabled={
+              buttonConfig.disabled ||
+              isLoading ||
+              (!plan.enabled && plan.requires_stripe)
+            }
+            variant={isPopular ? "primary" : "ghost"}
+            buttonStyle={
+              buttonConfig.variant === "current" || buttonConfig.variant === "blocked"
+                ? "outline"
+                : isPopular
+                  ? "solid"
+                  : "outline"
+            }
+            fullWidth
+            size="md"
+            loading={isLoading}
+            loadingText={t("pricing.processing")}
+            icon={
+              !buttonConfig.disabled &&
+              buttonConfig.variant !== "current" &&
+              buttonConfig.variant !== "blocked"
+                ? ArrowRight
+                : undefined
+            }
+            iconPosition="right"
+            className={cn(
+              "group transition-all",
+              buttonConfig.variant === "current" && "opacity-60 cursor-not-allowed",
+              buttonConfig.variant === "blocked" && "opacity-60 cursor-not-allowed",
+            )}
+          >
+            {getButtonText()}
+          </Button>
+        </CardFooter>
+      </Card>
     );
   }
 
@@ -582,9 +739,7 @@ export default function PlanCard({
               (!plan.enabled && plan.requires_stripe)
             }
             variant={
-              buttonConfig.variant === "free"
-                ? "primary"
-                : isPopular
+              isPopular
                   ? "primary"
                   : "ghost"
             }
