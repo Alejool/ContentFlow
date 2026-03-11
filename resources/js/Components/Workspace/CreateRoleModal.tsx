@@ -42,7 +42,7 @@ export default function CreateRoleModal({
       );
       setAllPermissions(response.data.data || []);
     } catch (error) {
-      toast.error("Error al cargar permisos");
+      toast.error(t("workspace.roles_management.role_created_error"));
     } finally {
       setIsLoadingPermissions(false);
     }
@@ -57,7 +57,7 @@ export default function CreateRoleModal({
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name) {
-      toast.error("El nombre es obligatorio");
+      toast.error(t("workspace.roles_management.name_required"));
       return;
     }
 
@@ -71,7 +71,7 @@ export default function CreateRoleModal({
           permissions: selectedPermissions,
         },
       );
-      toast.success("Rol creado con éxito");
+      toast.success(t("workspace.roles_management.role_created_success"));
       onSuccess(response.data.role);
       onClose();
       // Reset form
@@ -79,7 +79,7 @@ export default function CreateRoleModal({
       setDescription("");
       setSelectedPermissions([]);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Error al crear el rol");
+      toast.error(error.response?.data?.message || t("workspace.roles_management.role_created_error"));
     } finally {
       setIsSubmitting(false);
     }
@@ -94,10 +94,10 @@ export default function CreateRoleModal({
           </div>
           <div>
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-              Crear Nuevo Rol
+              {t("workspace.roles_management.create_role")}
             </h2>
             <p className="text-sm text-gray-500">
-              Define un nuevo rol y sus permisos para el workspace.
+              {t("workspace.roles_management.create_role_subtitle")}
             </p>
           </div>
         </div>
@@ -107,19 +107,19 @@ export default function CreateRoleModal({
             <div className="space-y-4">
               <Input
                 id="role_name"
-                label="Nombre del Rol"
-                placeholder="Ej: Editor Senior"
+                label={t("workspace.roles_management.role_name")}
+                placeholder={t("workspace.roles_management.role_name_placeholder")}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
               />
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Descripción
+                  {t("workspace.roles_management.role_description")}
                 </label>
                 <textarea
                   className="w-full bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 rounded-lg p-3 text-sm outline-none focus:ring-2 focus:ring-primary-500"
-                  placeholder="Describe las responsabilidades de este rol..."
+                  placeholder={t("workspace.roles_management.role_description_placeholder")}
                   rows={3}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -129,7 +129,7 @@ export default function CreateRoleModal({
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Permisos Clave
+                {t("workspace.roles_management.key_permissions_label")}
               </label>
               <div className="bg-gray-50 dark:bg-neutral-800/50 border border-gray-200 dark:border-neutral-800 rounded-lg p-3 h-[200px] overflow-y-auto space-y-2">
                 {isLoadingPermissions ? (
@@ -165,10 +165,10 @@ export default function CreateRoleModal({
 
           <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-neutral-800">
             <Button variant="ghost" onClick={onClose} type="button">
-              Cancelar
+              {t("common.cancel")}
             </Button>
             <Button type="submit" loading={isSubmitting} icon={Save}>
-              Crear Rol
+              {t("workspace.roles_management.create_role")}
             </Button>
           </div>
         </form>

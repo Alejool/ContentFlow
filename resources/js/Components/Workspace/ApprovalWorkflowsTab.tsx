@@ -54,8 +54,24 @@ export default function ApprovalWorkflowsTab({
 }: ApprovalWorkflowsTabProps) {
   const { t } = useTranslation();
   
+  // Get plan ID with multiple fallbacks
+  const planId = (
+    workspace.subscription?.plan ||
+    workspace.plan ||
+    "demo"
+  ).toLowerCase();
+  
+  // Debug: Log access level
+  console.log("🔍 ApprovalWorkflowsTab Debug:", {
+    hasAdvancedAccess,
+    planId,
+    subscriptionPlan: workspace.subscription?.plan,
+    subscriptionObject: workspace.subscription,
+    directPlan: workspace.plan,
+    workspaceFeatures: workspace.features,
+  });
+  
   // Verificar que el workspace tenga acceso a aprobaciones
-  const planId = workspace.subscription?.plan?.toLowerCase() || workspace.plan?.toLowerCase() || "demo";
   const hasBasicApprovalAccess = ["demo", "professional", "enterprise"].includes(planId);
   
   // Si no tiene acceso, mostrar mensaje de upgrade

@@ -115,10 +115,21 @@ export default function WorkspaceSettings({
 
   const canManageWorkspace = isOwner || userRole === "admin";
 
-  const planId =
-    current_workspace.subscription?.plan?.toLowerCase() ||
-    current_workspace.plan?.toLowerCase() ||
-    "demo";
+  // Get plan ID with multiple fallbacks
+  const planId = (
+    current_workspace.subscription?.plan ||
+    current_workspace.plan ||
+    "demo"
+  ).toLowerCase();
+
+  // Debug: Log plan information
+  console.log("🔍 Plan Debug Info:", {
+    planId,
+    subscriptionPlan: current_workspace.subscription?.plan,
+    subscriptionObject: current_workspace.subscription,
+    directPlan: current_workspace.plan,
+    features: current_workspace.features,
+  });
 
   const isEnterprise =
     planId === "enterprise" || current_workspace.features?.white_label;
@@ -134,7 +145,7 @@ export default function WorkspaceSettings({
       id: "overview",
       label: t("workspace.tabs.overview") || "Overview",
       icon: Sparkles,
-      // locked: true,
+      locked: true,
     },
     {
       id: "usage",
@@ -170,12 +181,12 @@ export default function WorkspaceSettings({
   ].includes(planId);
   const hasAdvancedApprovalAccess = ["enterprise"].includes(planId);
 
-  if (canManageWorkspace && hasAdvancedApprovalAccess) {
+  if (canManageWorkspace && hasBasicApprovalAccess) {
     tabs.splice(4, 0, {
       id: "approvals",
       label: "Aprobaciones",
       icon: CheckCircle,
-      planRequired: ["enterprise"], // Solo para enterprise
+      planRequired: ["demo", "professional", "enterprise"],
     });
   }
 
@@ -193,12 +204,12 @@ export default function WorkspaceSettings({
         icon: Key,
         planRequired: ["enterprise"], // Solo para enterprise
       },
-      {
-        id: "support",
-        label: t("workspace.tabs.support") || "Enterprise Support",
-        icon: Layout,
-        planRequired: ["enterprise"], // Solo para enterprise
-      },
+      // {
+      //   id: "support",
+      //   label: t("workspace.tabs.support") || "Enterprise Support",
+      //   icon: Layout,
+      //   planRequired: ["enterprise"], // Solo para enterprise
+      // },
     );
   }
 
@@ -274,8 +285,8 @@ export default function WorkspaceSettings({
             hasAdvancedAccess={hasAdvancedApprovalAccess}
           />
         );
-      case "support":
-        return <EnterpriseSupportTab />;
+      // case "support":
+      //   return <EnterpriseSupportTab />;
       default:
         return (
           <OverviewTab

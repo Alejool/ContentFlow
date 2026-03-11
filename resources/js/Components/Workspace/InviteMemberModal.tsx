@@ -155,7 +155,8 @@ export default function InviteMemberModal({
 
           <div className="flex flex-col md:flex-row justify-end gap-3 pt-4">
             <Button
-              variant="secondary"
+              variant="ghost"
+              buttonStyle="outline"
               onClick={onClose}
               type="button"
               disabled={isSubmitting}
