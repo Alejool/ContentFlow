@@ -15,7 +15,61 @@ class ApprovalController extends Controller
   use ApiResponse;
 
   /**
+   * Check if current user can approve content in the workspace
+   * Considers both basic permission and multi-level workflow assignments
+   */
+  public function canApprove(Request $request)
+  {
+    $workspaceId = Auth::user()->current_workspace_id ?? Auth::user()->workspaces()->first()?->id;
+
+    if (!$workspaceId) {
+      return $this->errorResponse('No active workspace found.', 404);
+    }
+
+    $userId = Auth::id();
+    $canApprove = false;
+    $reason = '';
+
+    // Check if user has general 'approve' permission (admin/owner)
+    if (Auth::user()->hasPermission('approve', $workspaceId)) {
+      $canApprove = true;
+      $reason = 'admin_permission';
+    } else {
+      // Check if user is assigned to any approval workflow step
+      // Get user's role in workspace
+      $userRole = DB::table('workspace_user')
+        ->where('workspace_id', $workspaceId)
+        ->where('user_id', $userId)
+        ->first();
+
+      if ($userRole) {
+        // Check if user's role or user_id is in any active workflow step
+        $hasWorkflowAssignment = DB::table('approval_steps')
+          ->join('approval_workflows', 'approval_steps.workflow_id', '=', 'approval_workflows.id')
+          ->where('approval_workflows.workspace_id', $workspaceId)
+          ->where('approval_workflows.is_active', true)
+          ->where(function ($q) use ($userId, $userRole) {
+            $q->where('approval_steps.user_id', $userId)
+              ->orWhere('approval_steps.role_id', $userRole->role_id);
+          })
+          ->exists();
+
+        if ($hasWorkflowAssignment) {
+          $canApprove = true;
+          $reason = 'workflow_assignment';
+        }
+      }
+    }
+
+    return $this->successResponse([
+      'can_approve' => $canApprove,
+      'reason' => $reason,
+    ]);
+  }
+
+  /**
    * Get list of pending approval requests
+   * Now filters by what the user can actually approve
    */
   public function index(Request $request)
   {
@@ -25,19 +79,38 @@ class ApprovalController extends Controller
       return $this->errorResponse('No active workspace found.', 404);
     }
 
-    // Only users with 'approve' permission can access this
-    if (!Auth::user()->hasPermission('approve', $workspaceId)) {
-      return $this->errorResponse('You do not have permission to view approvals.', 403);
-    }
+    $userId = Auth::id();
+    $hasAdminPermission = Auth::user()->hasPermission('approve', $workspaceId);
+
+    // Get user's role in workspace
+    $userRole = DB::table('workspace_user')
+      ->where('workspace_id', $workspaceId)
+      ->where('user_id', $userId)
+      ->first();
 
     $query = Publication::where('workspace_id', $workspaceId)
       ->where('status', 'pending_review')
       ->with([
         'user:id,name,email,photo_url',
         'mediaFiles:media_files.id,media_files.file_path,media_files.file_type',
-        'approvalLogs' => fn($q) => $q->latest('requested_at')->limit(1)->with('requester:id,name,photo_url')
+        'approvalLogs' => fn($q) => $q->latest('requested_at')->limit(1)->with('requester:id,name,photo_url'),
+        'currentApprovalStep.workflow'
       ])
       ->orderBy('updated_at', 'desc');
+
+    // If user doesn't have admin permission, filter by workflow assignments
+    if (!$hasAdminPermission && $userRole) {
+      $query->whereHas('currentApprovalStep', function ($q) use ($userId, $userRole) {
+        $q->where(function ($subQ) use ($userId, $userRole) {
+          $subQ->where('user_id', $userId)
+            ->orWhere('role_id', $userRole->role_id)
+            ->orWhereNull('user_id')->whereNull('role_id'); // Any user can approve
+        });
+      });
+    } elseif (!$hasAdminPermission) {
+      // User has no permission and no role, return empty
+      return $this->successResponse(['publications' => []]);
+    }
 
     $publications = $query->paginate($request->query('per_page', 10));
 
