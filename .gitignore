@@ -35,6 +35,8 @@ composer.lock
 package-lock.json
 bun.lock
 bun.lockb
+_node_modules_old
+node_modules.backup
 
 # ============================================
 # ARCHIVOS DE CONFIGURACIÓN DE EDITORES/IDEs

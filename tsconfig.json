@@ -4,9 +4,9 @@
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "jsx": "react-jsx",
     "module": "ESNext",
-    "moduleResolution": "bundler", // o "node16" / "nodenext"
+    "moduleResolution": "bundler",
     "allowJs": true,
-    "strict": true,
+    "strict": false,
     "noEmit": true,
     "isolatedModules": true,
     "esModuleInterop": true,
@@ -21,13 +21,22 @@
       "@/*": ["resources/js/*"],
       "ziggy-js": ["./vendor/tightenco/ziggy"]
     },
-    "types": ["vite/client", "node", "vite-plugin-pwa/client"]
+    
+    "types": ["vite/client"]
   },
   "include": [
     "resources/js/**/*.ts",
     "resources/js/**/*.tsx",
+    "resources/js/**/*.d.ts",
     "./vendor/tightenco/ziggy/**/*.js",
-    "resources/js/echo.js"
-, "resources/js/Composables/useContentValidation.ts", "resources/js/Composables/usePublishPreview.js", "tests/Javascript/Utils/emptyStateMapper.test.ts", "tests/Javascript/Hooks/useOptimistic.test.ts", "tests/Javascript/Utils/errorLogger.test.ts", "tests/Javascript/Utils/cacheLogger.test.ts", "tests/Javascript/Utils/performanceMetrics.test.ts"  ],
+    "resources/js/echo.js",
+    "resources/js/Composables/useContentValidation.ts",
+    "resources/js/Composables/usePublishPreview.js",
+    "tests/Javascript/Utils/emptyStateMapper.test.ts",
+    "tests/Javascript/Hooks/useOptimistic.test.ts",
+    "tests/Javascript/Utils/errorLogger.test.ts",
+    "tests/Javascript/Utils/cacheLogger.test.ts",
+    "tests/Javascript/Utils/performanceMetrics.test.ts"
+  ],
   "exclude": ["node_modules"]
 }

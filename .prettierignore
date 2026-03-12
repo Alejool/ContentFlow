@@ -1,0 +1,29 @@
+# Dependencias
+node_modules
+vendor
+
+# Build
+dist
+build
+public/build
+public/hot
+
+# Laravel
+storage
+bootstrap/cache
+
+# Docker
+docker
+
+# Logs
+*.log
+
+# Archivos de configuración que no deben formatearse
+composer.lock
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Archivos generados
+*.min.js
+*.min.css
