@@ -6,6 +6,8 @@ use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Publications\Publication;
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
+use App\Services\Publications\ContentTypeValidationService;
+use Illuminate\Contracts\Validation\Validator;
 
 class UpdatePublicationRequest extends FormRequest
 {
@@ -255,6 +257,109 @@ class UpdatePublicationRequest extends FormRequest
       ],
       'recurrence_accounts' => 'nullable|array',
       'recurrence_accounts.*' => 'integer|exists:social_accounts,id',
+      // Content type
+      'content_type' => 'nullable|in:post,reel,story,poll,carousel',
+      // Poll fields
+      'poll_options' => 'nullable|array|min:2|max:4',
+      'poll_options.*' => 'nullable|string|max:25',
+      'poll_duration_hours' => 'nullable|integer|min:1|max:168',
+      // Carousel fields
+      'carousel_items' => 'nullable|array',
+      // Content metadata
+      'content_metadata' => 'nullable|array',
     ];
+  }
+
+  /**
+   * Configure the validator instance.
+   */
+  protected function withValidator(Validator $validator): void
+  {
+    $validator->after(function ($validator) {
+      // Get the publication being updated
+      $publication = $this->route('publication');
+      
+      if (!$publication instanceof Publication) {
+        $publication = Publication::find($publication);
+      }
+
+      if (!$publication) {
+        return;
+      }
+
+      // Check if content type validation is needed
+      $contentTypeChanged = $this->has('content_type') && 
+                           $this->input('content_type') !== $publication->content_type;
+      
+      $platformsChanged = $this->has('social_accounts');
+      
+      $mediaChanged = $this->hasFile('media') || 
+                     !empty($this->input('removed_media_ids'));
+
+      // Only validate if relevant fields changed
+      if (!$contentTypeChanged && !$platformsChanged && !$mediaChanged) {
+        return;
+      }
+
+      // Get content type (use existing if not changed)
+      $contentType = $this->input('content_type', $publication->content_type) ?? 'post';
+      
+      // Get social account IDs (use existing if not changed)
+      $socialAccountIds = $this->has('social_accounts') 
+        ? $this->input('social_accounts', [])
+        : $publication->socialAccounts->pluck('id')->toArray();
+      
+      // Get media files
+      // For updates, we need to consider existing media if not removed
+      $newMediaFiles = collect($this->file('media', []))
+        ->filter(fn($file) => $file instanceof UploadedFile)
+        ->values()
+        ->toArray();
+
+      // Calculate total media count after update
+      $removedMediaIds = $this->input('removed_media_ids', []);
+      $existingMediaCount = $publication->mediaFiles()
+        ->whereNotIn('id', $removedMediaIds)
+        ->count();
+      
+      $totalMediaCount = $existingMediaCount + count($newMediaFiles);
+
+      // For validation purposes, create dummy files array representing total count
+      // We only validate count and type for new files
+      $mediaFilesForValidation = $newMediaFiles;
+
+      // If we have new media files, validate them
+      // If we're changing content type, validate total media count
+      if ($contentTypeChanged || !empty($newMediaFiles)) {
+        $validationService = app(ContentTypeValidationService::class);
+        
+        // Validate cross-platform compatibility
+        if (!empty($socialAccountIds)) {
+          $platforms = \App\Models\SocialAccount::whereIn('id', $socialAccountIds)
+            ->pluck('platform')
+            ->unique()
+            ->toArray();
+
+          $crossPlatformResult = $validationService->validateCrossPlatform($contentType, $platforms);
+          
+          if (!$crossPlatformResult->isValid) {
+            foreach ($crossPlatformResult->errors as $error) {
+              $validator->errors()->add('content_type', $error);
+            }
+          }
+        }
+
+        // Validate media files if new files are being uploaded
+        if (!empty($mediaFilesForValidation)) {
+          $mediaResult = $validationService->validateMediaFiles($contentType, $mediaFilesForValidation);
+          
+          if (!$mediaResult->isValid) {
+            foreach ($mediaResult->errors as $error) {
+              $validator->errors()->add('media', $error);
+            }
+          }
+        }
+      }
+    });
   }
 }

@@ -5,20 +5,39 @@ namespace App\Actions\Publications;
 use App\Models\Publications\Publication;
 use App\Services\Media\MediaProcessingService;
 use App\Services\Scheduling\SchedulingService;
+use App\Services\Publications\ContentTypeValidationService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class CreatePublicationAction
 {
   public function __construct(
     protected MediaProcessingService $mediaService,
-    protected SchedulingService $schedulingService
+    protected SchedulingService $schedulingService,
+    protected ContentTypeValidationService $validationService
   ) {}
 
   public function execute(array $data, array $files = []): Publication
   {
-    return DB::transaction(function () use ($data, $files) {
+    // Default content_type to 'post' if not provided
+    $contentType = $data['content_type'] ?? 'post';
+    
+    // Validate content type before DB transaction
+    $validation = $this->validationService->validateContentType(
+      $contentType,
+      $data['social_accounts'] ?? [],
+      $files
+    );
+    
+    if (!$validation->isValid) {
+      throw ValidationException::withMessages([
+        'content_type' => $validation->errors
+      ]);
+    }
+    
+    return DB::transaction(function () use ($data, $files, $contentType) {
       // Determine status based on scheduled_at
       $status = $data['status'] ?? 'draft';
       if (!empty($data['scheduled_at']) && $status === 'draft') {
@@ -28,6 +47,7 @@ class CreatePublicationAction
       $publication = Publication::create([
         'title' => $data['title'],
         'description' => $data['description'],
+        'content_type' => $contentType,
         'hashtags' => $data['hashtags'] ?? '',
         'goal' => $data['goal'] ?? '',
         'slug' => Str::slug($data['title']),

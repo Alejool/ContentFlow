@@ -64,6 +64,18 @@ export const publicationSchema = (t: any) =>
       campaign_id: z.any().optional().nullable(),
       lock_content: z.boolean().optional(),
       use_global_schedule: z.boolean().optional().default(false),
+      // Content type
+      content_type: z
+        .enum(["post", "reel", "story", "poll", "carousel"])
+        .optional()
+        .default("post"),
+      // Poll fields
+      poll_options: z.array(z.string()).optional().nullable(),
+      poll_duration_hours: z.number().min(1).max(168).optional().nullable(),
+      // Carousel fields
+      carousel_items: z.array(z.any()).optional().nullable(),
+      // Content metadata
+      content_metadata: z.any().optional().nullable(),
       // Recurrence
       is_recurring: z.boolean().optional().default(false),
       recurrence_type: z
@@ -129,6 +141,46 @@ export const publicationSchema = (t: any) =>
           "End date is required for recurring publications",
         path: ["recurrence_end_date"],
       },
-    );
+    )
+    .refine(
+      (data) => {
+        // If content type is poll, poll_options are required
+        if (data.content_type === "poll") {
+          return (
+            data.poll_options &&
+            data.poll_options.length >= 2 &&
+            data.poll_options.length <= 4 &&
+            data.poll_options.every((opt) => opt && opt.trim().length > 0)
+          );
+        }
+        return true;
+      },
+      {
+        message:
+          t("publications.modal.validation.pollOptionsRequired") ||
+          "Poll requires 2-4 non-empty options",
+        path: ["poll_options"],
+      },
+    )
+    .refine(
+      (data) => {
+        // If content type is poll, duration is required
+        if (data.content_type === "poll") {
+          return (
+            data.poll_duration_hours &&
+            data.poll_duration_hours >= 1 &&
+            data.poll_duration_hours <= 168
+          );
+        }
+        return true;
+      },
+      {
+        message:
+          t("publications.modal.validation.pollDurationRequired") ||
+          "Poll duration must be between 1 and 168 hours",
+        path: ["poll_duration_hours"],
+      },
+    )
+
 
 export type PublicationFormData = z.infer<ReturnType<typeof publicationSchema>>;

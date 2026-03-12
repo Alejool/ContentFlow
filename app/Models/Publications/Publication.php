@@ -77,6 +77,7 @@ class Publication extends Model
     'slug',
     'image',
     'status',
+    'content_type',
     'start_date',
     'end_date',
     'publish_date',
@@ -103,6 +104,10 @@ class Publication extends Model
     'recurrence_days',
     'recurrence_end_date',
     'recurrence_accounts',
+    'poll_options',
+    'poll_duration_hours',
+    'carousel_items',
+    'content_metadata',
   ];
 
   protected $appends = ['platform_status_summary', 'media_locked_by', 'approval_lock'];
@@ -128,6 +133,10 @@ class Publication extends Model
     'recurrence_days' => 'array',
     'recurrence_end_date' => 'date',
     'recurrence_accounts' => 'array',
+    'poll_options' => 'array',
+    'poll_duration_hours' => 'integer',
+    'carousel_items' => 'array',
+    'content_metadata' => 'array',
     'submitted_for_approval_at' => 'datetime',
   ];
 
@@ -622,5 +631,102 @@ class Publication extends Model
   public function recurrenceSettings(): \Illuminate\Database\Eloquent\Relations\HasOne
   {
     return $this->hasOne(PublicationRecurrenceSetting::class);
+  }
+
+  /**
+   * Check if this is a post type publication
+   */
+  public function isPost(): bool
+  {
+    return $this->content_type === 'post';
+  }
+
+  /**
+   * Check if this is a reel/short video
+   */
+  public function isReel(): bool
+  {
+    return $this->content_type === 'reel';
+  }
+
+  /**
+   * Check if this is a story
+   */
+  public function isStory(): bool
+  {
+    return $this->content_type === 'story';
+  }
+
+  /**
+   * Check if this is a poll
+   */
+  public function isPoll(): bool
+  {
+    return $this->content_type === 'poll';
+  }
+
+  /**
+   * Check if this is a carousel
+   */
+  public function isCarousel(): bool
+  {
+    return $this->content_type === 'carousel';
+  }
+
+  /**
+   * Get supported content types for a platform
+   */
+  public static function getSupportedContentTypes(string $platform): array
+  {
+    $supportedTypes = [
+      'instagram' => ['post', 'reel', 'story', 'carousel'],
+      'twitter' => ['post', 'poll'],
+      'tiktok' => ['reel'],
+      'youtube' => ['post', 'reel'],
+      'facebook' => ['post', 'story', 'poll'],
+      'linkedin' => ['post', 'carousel'],
+      'pinterest' => ['post', 'carousel'],
+    ];
+
+    return $supportedTypes[strtolower($platform)] ?? ['post'];
+  }
+
+  /**
+   * Get all available content types
+   */
+  public static function getAllContentTypes(): array
+  {
+    return [
+      'post' => [
+        'label' => 'Post',
+        'description' => 'Standard social media post',
+        'icon' => 'FileText',
+        'platforms' => ['instagram', 'twitter', 'facebook', 'linkedin', 'youtube', 'pinterest'],
+      ],
+      'reel' => [
+        'label' => 'Reel/Short',
+        'description' => 'Short vertical video',
+        'icon' => 'Video',
+        'platforms' => ['instagram', 'tiktok', 'youtube'],
+      ],
+      'story' => [
+        'label' => 'Story',
+        'description' => 'Temporary 24h content',
+        'icon' => 'Clock',
+        'platforms' => ['instagram', 'facebook'],
+      ],
+      'poll' => [
+        'label' => 'Poll',
+        'description' => 'Interactive poll/survey',
+        'icon' => 'BarChart3',
+        'platforms' => ['twitter', 'facebook'],
+      ],
+      'carousel' => [
+        'label' => 'Carousel',
+        'description' => 'Multiple images/slides',
+        'icon' => 'Images',
+        'platforms' => ['instagram', 'linkedin', 'pinterest'],
+      ],
+    ];
   }
 }

@@ -7,6 +7,8 @@ use App\Models\Publications\Publication;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\UploadedFile;
 use Carbon\Carbon;
+use App\Services\Publications\ContentTypeValidationService;
+use Illuminate\Contracts\Validation\Validator;
 
 class StorePublicationRequest extends FormRequest
 {
@@ -20,6 +22,13 @@ class StorePublicationRequest extends FormRequest
    */
   protected function prepareForValidation(): void
   {
+    // Default content_type to 'post' if not provided
+    if (!$this->has('content_type') || empty($this->input('content_type'))) {
+      $this->merge([
+        'content_type' => 'post'
+      ]);
+    }
+
     if ($this->has('is_recurring')) {
       $this->merge([
         'is_recurring' => filter_var($this->is_recurring, FILTER_VALIDATE_BOOLEAN)
@@ -146,6 +155,58 @@ class StorePublicationRequest extends FormRequest
       ],
       'recurrence_accounts' => 'nullable|array',
       'recurrence_accounts.*' => 'integer|exists:social_accounts,id',
+      // Content type
+      'content_type' => 'nullable|in:post,reel,story,poll,carousel',
+      // Poll fields
+      'poll_options' => 'nullable|array|min:2|max:4',
+      'poll_options.*' => 'nullable|string|max:25',
+      'poll_duration_hours' => 'nullable|integer|min:1|max:168',
+      // Carousel fields
+      'carousel_items' => 'nullable|array',
+      // Content metadata
+      'content_metadata' => 'nullable|array',
+    ];
+  }
+
+  /**
+   * Configure the validator instance.
+   */
+  protected function withValidator(Validator $validator): void
+  {
+    $validator->after(function ($validator) {
+      // Get content type (already defaulted to 'post' in prepareForValidation)
+      $contentType = $this->input('content_type', 'post');
+      
+      // Get social account IDs
+      $socialAccountIds = $this->input('social_accounts', []);
+      
+      // Get media files (filter only UploadedFile instances)
+      $mediaFiles = collect($this->file('media', []))
+        ->filter(fn($file) => $file instanceof UploadedFile)
+        ->values()
+        ->toArray();
+
+      // Validate content type
+      $validationService = app(ContentTypeValidationService::class);
+      $result = $validationService->validateContentType($contentType, $socialAccountIds, $mediaFiles);
+
+      if (!$result->isValid) {
+        foreach ($result->errors as $error) {
+          $validator->errors()->add('content_type', $error);
+        }
+      }
+    });
+  }
+
+  /**
+   * Get custom error messages for validation rules.
+   */
+  public function messages(): array
+  {
+    return [
+      'content_type.in' => 'The selected content type is invalid. Valid types are: post, reel, story, poll, carousel.',
+      'social_accounts.*.exists' => 'One or more selected social accounts do not exist.',
+      'scheduled_at.date' => __('publications.validation.scheduledInvalid'),
     ];
   }
 }

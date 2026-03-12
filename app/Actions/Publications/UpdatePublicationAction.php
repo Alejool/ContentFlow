@@ -6,19 +6,94 @@ use App\Models\Publications\Publication;
 use App\Events\Publications\PublicationUpdated;
 use App\Services\Media\MediaProcessingService;
 use App\Services\Scheduling\SchedulingService;
+use App\Services\Publications\ContentTypeValidationService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Validation\ValidationException;
 
 class UpdatePublicationAction
 {
   public function __construct(
     protected MediaProcessingService $mediaService,
-    protected SchedulingService $schedulingService
+    protected SchedulingService $schedulingService,
+    protected ContentTypeValidationService $validationService
   ) {}
 
   public function execute(Publication $publication, array $data, array $newFiles = []): Publication
   {
+    // Conditional validation: only validate if content_type, platforms, or media changed
+    $contentType = $data['content_type'] ?? $publication->content_type;
+    $contentTypeChanged = $contentType !== $publication->content_type;
+    $platformsChanged = array_key_exists('social_accounts', $data);
+    $mediaChanged = !empty($newFiles) || !empty($data['removed_media_ids']);
+    
+    // Only validate if content_type is not null and something relevant changed
+    if (!empty($contentType) && ($contentTypeChanged || $platformsChanged || $mediaChanged)) {
+      // Determine which social accounts to validate against
+      $socialAccountIds = [];
+      if ($platformsChanged && isset($data['social_accounts'])) {
+        // Use new social accounts if they're being changed
+        $socialAccounts = $data['social_accounts'];
+        if (is_string($socialAccounts)) {
+          $decoded = json_decode($socialAccounts, true);
+          $socialAccounts = is_array($decoded) ? $decoded : [];
+        }
+        if (is_array($socialAccounts)) {
+          $socialAccountIds = array_values(array_filter(
+            array_map(fn($id) => $id === '' || $id === null ? null : intval($id), $socialAccounts),
+            fn($id) => $id !== null && $id > 0
+          ));
+        }
+      } else {
+        // Use existing social accounts
+        $socialAccountIds = $publication->scheduledPosts()
+          ->where('status', 'pending')
+          ->pluck('social_account_id')
+          ->unique()
+          ->toArray();
+      }
+      
+      // Determine which media files to validate
+      $mediaFiles = $newFiles;
+      if (!$mediaChanged || empty($data['removed_media_ids'])) {
+        // Include existing media files if not being removed
+        $existingMedia = $publication->mediaFiles()
+          ->when(!empty($data['removed_media_ids']), function ($query) use ($data) {
+            return $query->whereNotIn('media_files.id', $data['removed_media_ids']);
+          })
+          ->get();
+        
+        // Convert existing media to a format compatible with validation
+        // For existing media, we create mock UploadedFile objects with the mime type
+        foreach ($existingMedia as $media) {
+          $mockFile = new class($media->mime_type) {
+            private $mimeType;
+            public function __construct($mimeType) {
+              $this->mimeType = $mimeType;
+            }
+            public function getMimeType() {
+              return $this->mimeType;
+            }
+          };
+          $mediaFiles[] = $mockFile;
+        }
+      }
+      
+      // Validate content type
+      $validation = $this->validationService->validateContentType(
+        $contentType,
+        $socialAccountIds,
+        $mediaFiles
+      );
+      
+      if (!$validation->isValid) {
+        throw ValidationException::withMessages([
+          'content_type' => $validation->errors
+        ]);
+      }
+    }
+    
     return DB::transaction(function () use ($publication, $data, $newFiles) {
       // Check if publication is locked for editing
       if ($publication->isLockedForEditing()) {
@@ -128,6 +203,7 @@ class UpdatePublicationAction
       $updateData = [
         'title' => $data['title'],
         'description' => $data['description'],
+        'content_type' => $data['content_type'] ?? $publication->content_type,
         'hashtags' => $data['hashtags'] ?? $publication->hashtags,
         'goal' => $data['goal'] ?? $publication->goal,
         'start_date' => $data['start_date'] ?? $publication->start_date,
