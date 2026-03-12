@@ -3,6 +3,9 @@ import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettin
 import CampaignSelector from "@/Components/Content/Publication/common/CampaignSelector";
 import SocialAccountsSection from "@/Components/Content/Publication/common/add/SocialAccountsSection";
 import MediaUploadSection from "@/Components/Content/Publication/common/edit/MediaUploadSection";
+import ContentTypeSelectorBar from "@/Components/Content/Publication/common/ContentTypeSelectorBar";
+import { ContentType } from "@/Components/Content/Publication/common/ContentTypeIconSelector";
+import PollFields from "@/Components/Content/Publication/common/PollFields";
 import ModalFooter from "@/Components/Content/modals/common/ModalFooter";
 import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
 import PublicationStatusSection from "@/Components/Content/modals/common/PublicationStatusSection";
@@ -11,6 +14,7 @@ import Input from "@/Components/common/Modern/Input";
 import Textarea from "@/Components/common/Modern/Textarea";
 import { useCampaigns } from "@/Hooks/campaign/useCampaigns";
 import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
+import { useContentType } from "@/Hooks/publication/useContentType";
 import { useConfirm } from "@/Hooks/useConfirm";
 import { useS3Upload } from "@/Hooks/useS3Upload";
 import { useAccountsStore } from "@/stores/socialAccountsStore";
@@ -264,6 +268,22 @@ export default function AddPublicationModal({
     control,
     name: "recurrence_accounts",
   });
+  const content_type = useWatch({ control, name: "content_type" }) as ContentType || 'post';
+  const poll_options = useWatch({ control, name: "poll_options" }) || ['', ''];
+  const poll_duration_hours = useWatch({ control, name: "poll_duration_hours" }) || 24;
+
+  // Use content type hook for field visibility
+  const { fieldVisibility } = useContentType(content_type);
+
+  // Get selected platform names for content type filtering
+  const selectedPlatformNames = useMemo(() => {
+    return selectedSocialAccounts
+      .map(id => {
+        const account = socialAccounts.find(a => a.id === id);
+        return account?.platform;
+      })
+      .filter(Boolean) as string[];
+  }, [selectedSocialAccounts, socialAccounts]);
 
   const watched = useMemo(
     () => ({
@@ -323,58 +343,76 @@ export default function AddPublicationModal({
           title="publications.modal.add.title"
           subtitle="publications.modal.add.subtitle"
         />
+        
+        <ContentTypeSelectorBar
+          selectedType={content_type}
+          selectedPlatforms={selectedPlatformNames}
+          onChange={(type) => {
+            setValue("content_type", type, { shouldValidate: true });
+            
+            // Reset type-specific fields when changing type
+            if (type !== 'poll') {
+              setValue("poll_options", null);
+              setValue("poll_duration_hours", null);
+            }
+          }}
+          t={t}
+        />
+
         <main className="flex-1 overflow-y-auto custom-scrollbar">
           <form
             id="add-publication-form"
             onSubmit={handleUploadAndSubmit}
-            className="space-y-6 p-6"
+            className="p-6"
           >
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* ========================================
                   COLUMNA IZQUIERDA: MEDIA Y REDES SOCIALES
                   ======================================== */}
               <div className="space-y-6">
                 {/* ==================== SECCIÓN: ARCHIVOS MULTIMEDIA ==================== */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700">
-                    <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
-                      {t("publications.modal.add.mediaSection") || "Archivos Multimedia"}
-                    </h3>
-                  </div>
+                {fieldVisibility.showMediaSection && (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700">
+                      <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
+                        {t("publications.modal.add.mediaSection") || "Archivos Multimedia"}
+                      </h3>
+                    </div>
 
-                  <MediaUploadSection
-                  mediaPreviews={stabilizedMediaPreviews}
-                  thumbnails={thumbnails}
-                  imageError={imageError}
-                  isDragOver={isDragOver}
-                  t={t}
-                  onFileChange={handleFileChange}
-                  onRemoveMedia={handleRemoveMedia}
-                  onSetThumbnail={(tempId, file) => setThumbnail(tempId, file)}
-                  onClearThumbnail={(tempId) => clearThumbnail(tempId)}
-                  onDragOver={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setIsDragOver(true);
-                  }}
-                  onDragLeave={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setIsDragOver(false);
-                  }}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setIsDragOver(false);
-                    handleFileChange(e.dataTransfer.files);
-                  }}
-                  lockedBy={remoteLock}
-                  onUpdateFile={updateFile}
-                  uploadProgress={uploadProgress}
-                  uploadErrors={uploadErrors}
-                />
-                </div>
+                    <MediaUploadSection
+                    mediaPreviews={stabilizedMediaPreviews}
+                    thumbnails={thumbnails}
+                    imageError={imageError}
+                    isDragOver={isDragOver}
+                    t={t}
+                    onFileChange={handleFileChange}
+                    onRemoveMedia={handleRemoveMedia}
+                    onSetThumbnail={(tempId, file) => setThumbnail(tempId, file)}
+                    onClearThumbnail={(tempId) => clearThumbnail(tempId)}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setIsDragOver(true);
+                    }}
+                    onDragLeave={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setIsDragOver(false);
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setIsDragOver(false);
+                      handleFileChange(e.dataTransfer.files);
+                    }}
+                    lockedBy={remoteLock}
+                    onUpdateFile={updateFile}
+                    uploadProgress={uploadProgress}
+                    uploadErrors={uploadErrors}
+                  />
+                  </div>
+                )}
 
                 {/* ==================== SECCIÓN: REDES SOCIALES ==================== */}
                 <div className="space-y-4">
@@ -476,6 +514,23 @@ export default function AddPublicationModal({
                   COLUMNA DERECHA: CONTENIDO DE LA PUBLICACIÓN
                   ======================================== */}
               <div className="space-y-6">
+                {/* ==================== SECCIÓN: CAMPOS ESPECÍFICOS DE POLL ==================== */}
+                {fieldVisibility.showPollFields && (
+                  <PollFields
+                    options={poll_options}
+                    duration={poll_duration_hours}
+                    onChange={(data) => {
+                      setValue("poll_options", data.options, { shouldValidate: true });
+                      setValue("poll_duration_hours", data.duration, { shouldValidate: true });
+                    }}
+                    t={t}
+                    errors={{
+                      options: errors.poll_options?.message as string,
+                      duration: errors.poll_duration_hours?.message as string,
+                    }}
+                  />
+                )}
+
                 {/* ==================== SECCIÓN: CONTENIDO ==================== */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between pb-2 border-b border-gray-200 dark:border-neutral-700">
@@ -511,20 +566,22 @@ export default function AddPublicationModal({
                   />
                   </div>
 
-                  <Input
-                  id="content-add-publication-title"
-                  label={t("publications.modal.add.titleField")}
-                  type="text"
-                  register={register}
-                  name="title"
-                  placeholder={t("publications.modal.add.placeholders.title")}
-                  error={errors.title?.message as string}
-                  icon={FileText}
-                  variant="filled"
-                  required
-                  sizeType="lg"
-                  hint={`${watched.title?.length || 0}/70 characters`}
-                />
+                  {fieldVisibility.showTitle && (
+                    <Input
+                      id="content-add-publication-title"
+                      label={t("publications.modal.add.titleField")}
+                      type="text"
+                      register={register}
+                      name="title"
+                      placeholder={t("publications.modal.add.placeholders.title")}
+                      error={errors.title?.message as string}
+                      icon={FileText}
+                      variant="filled"
+                      required
+                      sizeType="lg"
+                      hint={`${watched.title?.length || 0}/70 characters`}
+                    />
+                  )}
 
                 <Textarea
                   id="content-add-publication-description"
@@ -538,55 +595,59 @@ export default function AddPublicationModal({
                   icon={FileText}
                   variant="filled"
                   size="lg"
-                  rows={6}
-                  maxLength={700}
-                  required
+                  rows={content_type === 'story' ? 3 : 6}
+                  maxLength={content_type === 'reel' ? 300 : content_type === 'story' ? 150 : content_type === 'poll' ? 280 : 700}
+                  required={fieldVisibility.showDescription}
                   showCharCount
-                  hint="Maximum 700 characters"
+                  hint={`Maximum ${content_type === 'reel' ? 300 : content_type === 'story' ? 150 : content_type === 'poll' ? 280 : 700} characters`}
                 />
 
-                <Input
-                  id="content-add-publication-goal"
-                  label={t("publications.modal.add.goal")}
-                  type="text"
-                  register={register}
-                  name="goal"
-                  placeholder={t("publications.modal.add.placeholders.goal")}
-                  error={errors.goal?.message as string}
-                  icon={Target}
-                  variant="filled"
-                  required
-                  sizeType="lg"
-                  hint={`${watched.goal?.length || 0}/200 characters`}
-                />
+                {fieldVisibility.showGoal && (
+                  <Input
+                    id="content-add-publication-goal"
+                    label={t("publications.modal.add.goal")}
+                    type="text"
+                    register={register}
+                    name="goal"
+                    placeholder={t("publications.modal.add.placeholders.goal")}
+                    error={errors.goal?.message as string}
+                    icon={Target}
+                    variant="filled"
+                    required
+                    sizeType="lg"
+                    hint={`${watched.goal?.length || 0}/200 characters`}
+                  />
+                )}
 
-                <Input
-                  id="content-add-publication-hashtags"
-                  label={t("publications.modal.add.hashtags")}
-                  type="text"
-                  register={register}
-                  name="hashtags"
-                  placeholder={t(
-                    "publications.modal.add.placeholders.hashtags",
-                  )}
-                  error={errors.hashtags?.message as string}
-                  onChange={(e) => handleHashtagChange(e.target.value)}
-                  icon={Hash}
-                  variant="filled"
-                  required
-                  sizeType="lg"
-                  hint={`${
-                    watched.hashtags
-                      ? typeof watched.hashtags === "string"
-                        ? watched.hashtags
-                            .split(" ")
-                            .filter((tag: string) => tag.startsWith("#")).length
-                        : Array.isArray(watched.hashtags)
-                          ? (watched.hashtags as any).length
-                          : 0
-                      : 0
-                  }/10 hashtags`}
-                />
+                {fieldVisibility.showHashtags && (
+                  <Input
+                    id="content-add-publication-hashtags"
+                    label={t("publications.modal.add.hashtags")}
+                    type="text"
+                    register={register}
+                    name="hashtags"
+                    placeholder={t(
+                      "publications.modal.add.placeholders.hashtags",
+                    )}
+                    error={errors.hashtags?.message as string}
+                    onChange={(e) => handleHashtagChange(e.target.value)}
+                    icon={Hash}
+                    variant="filled"
+                    required={content_type === 'post' || content_type === 'reel'}
+                    sizeType="lg"
+                    hint={`${
+                      watched.hashtags
+                        ? typeof watched.hashtags === "string"
+                          ? watched.hashtags
+                              .split(" ")
+                              .filter((tag: string) => tag.startsWith("#")).length
+                          : Array.isArray(watched.hashtags)
+                            ? (watched.hashtags as any).length
+                            : 0
+                        : 0
+                    }/10 hashtags`}
+                  />
+                )}
                 </div>
 
                 {/* ==================== SECCIÓN: CAMPAÑA ==================== */}

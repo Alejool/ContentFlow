@@ -26,10 +26,33 @@ return [
     'recurrenceEndDateRequired' => 'End date is required for recurring publications.',
   ],
   'modal' => [
+    'contentType' => [
+      'label' => 'Content Type',
+      'filteredByPlatforms' => 'Filtered by selected platforms',
+    ],
+    'poll' => [
+      'title' => 'Poll Options',
+      'options' => 'Poll Options (2-4 options)',
+      'optionPlaceholder' => 'Option',
+      'addOption' => 'Add Option',
+      'duration' => 'Poll Duration',
+      'hours' => 'hours',
+      'note' => 'Polls are only supported on Twitter and Facebook. Make sure to select compatible platforms.',
+    ],
+    'live' => [
+      'title' => 'Live Stream Settings',
+      'startTime' => 'Start Time',
+      'duration' => 'Expected Duration',
+      'minutes' => 'minutes',
+      'note' => 'Live streaming is supported on YouTube and Facebook. You\'ll need to configure streaming settings on each platform.',
+    ],
     'validation' => [
       'scheduledMinDifference' => 'The scheduled date must be at least 1 minute after the current time.',
       'recurrenceDaysRequired' => 'Please select at least one day for weekly recurrence.',
       'recurrenceEndDateRequired' => 'End date is required for recurring publications.',
+      'pollOptionsRequired' => 'Poll requires 2-4 non-empty options.',
+      'pollDurationRequired' => 'Poll duration must be between 1 and 168 hours.',
+      'liveStartTimeRequired' => 'Live stream start time is required.',
     ],
     'schedule' => [
       'title' => 'Date for all networks',

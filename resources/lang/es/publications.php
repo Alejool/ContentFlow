@@ -26,10 +26,33 @@ return [
     'recurrenceEndDateRequired' => 'La fecha de fin es obligatoria para publicaciones recurrentes.',
   ],
   'modal' => [
+    'contentType' => [
+      'label' => 'Tipo de Contenido',
+      'filteredByPlatforms' => 'Filtrado por plataformas seleccionadas',
+    ],
+    'poll' => [
+      'title' => 'Opciones de Encuesta',
+      'options' => 'Opciones de la Encuesta (2-4 opciones)',
+      'optionPlaceholder' => 'Opción',
+      'addOption' => 'Agregar Opción',
+      'duration' => 'Duración de la Encuesta',
+      'hours' => 'horas',
+      'note' => 'Las encuestas solo están disponibles en Twitter y Facebook. Asegúrate de seleccionar plataformas compatibles.',
+    ],
+    'live' => [
+      'title' => 'Configuración de Transmisión',
+      'startTime' => 'Hora de Inicio',
+      'duration' => 'Duración Esperada',
+      'minutes' => 'minutos',
+      'note' => 'Las transmisiones en vivo están disponibles en YouTube y Facebook. Necesitarás configurar los ajustes de streaming en cada plataforma.',
+    ],
     'validation' => [
       'scheduledMinDifference' => 'La fecha debe ser al menos 1 minuto después de la actual.',
       'recurrenceDaysRequired' => 'Por favor selecciona al menos un día para la recurrencia semanal.',
       'recurrenceEndDateRequired' => 'La fecha de fin es obligatoria para publicaciones recurrentes.',
+      'pollOptionsRequired' => 'La encuesta requiere entre 2 y 4 opciones no vacías.',
+      'pollDurationRequired' => 'La duración de la encuesta debe estar entre 1 y 168 horas.',
+      'liveStartTimeRequired' => 'La hora de inicio de la transmisión es obligatoria.',
     ],
     'schedule' => [
       'title' => 'Fecha para todas las redes',

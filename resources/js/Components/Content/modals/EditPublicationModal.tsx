@@ -1,6 +1,9 @@
 import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
 import { CommentsSection } from "@/Components/Content/Publication/comments/CommentsSection";
 import ApprovalHistoryCompacto from "@/Components/Content/Publication/common/ApprovalHistoryCompacto";
+import { ContentType } from "@/Components/Content/Publication/common/ContentTypeIconSelector";
+import ContentTypeSelectorBar from "@/Components/Content/Publication/common/ContentTypeSelectorBar";
+import PollFields from "@/Components/Content/Publication/common/PollFields";
 import PublicationStatusTimeline from "@/Components/Content/Publication/common/PublicationStatusTimeline";
 import TimelineCompacto from "@/Components/Content/Publication/common/TimelineCompacto";
 import SocialAccountsSection from "@/Components/Content/Publication/common/add/SocialAccountsSection";
@@ -11,7 +14,7 @@ import MediaUploadSkeleton from "@/Components/Content/Publication/common/edit/Me
 import ModalFooter from "@/Components/Content/modals/common/ModalFooter";
 import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
 import ScheduleSection from "@/Components/Content/modals/common/ScheduleSection";
-import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
+import { useContentType } from "@/Hooks/publication/useContentType";
 import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
 import { useModalFocusTrap } from "@/Hooks/useModalFocusTrap";
 import { usePublicationLock } from "@/Hooks/usePublicationLock";
@@ -23,10 +26,10 @@ import { useUploadQueue } from "@/stores/uploadQueueStore";
 import { Publication } from "@/types/Publication";
 import { usePage } from "@inertiajs/react";
 import axios from "axios";
-import { AlertCircle, Lock, Save, ChevronDown } from "lucide-react";
+import { AlertCircle, Lock, Save } from "lucide-react";
 import { memo, useEffect, useMemo, useState } from "react";
 import { useWatch } from "react-hook-form";
-import toast from "react-hot-toast";
+import toast from "@/Utils/toast";
 import { Trans } from "react-i18next";
 
 const parseUserAgent = (userAgent?: string): string => {
@@ -236,6 +239,22 @@ const EditPublicationModal = ({
     control,
     name: "recurrence_accounts",
   });
+  const content_type = useWatch({ control, name: "content_type" }) as ContentType || 'post';
+  const poll_options = useWatch({ control, name: "poll_options" }) || ['', ''];
+  const poll_duration_hours = useWatch({ control, name: "poll_duration_hours" }) || 24;
+
+  // Use content type hook for field visibility
+  const { fieldVisibility } = useContentType(content_type);
+
+  // Get selected platform names for content type filtering
+  const selectedPlatformNames = useMemo(() => {
+    return selectedSocialAccounts
+      .map((id: number) => {
+        const account = socialAccounts.find(a => a.id === id);
+        return account?.platform;
+      })
+      .filter(Boolean) as string[];
+  }, [selectedSocialAccounts, socialAccounts]);
 
   const watched = useMemo(
     () => ({
@@ -496,30 +515,32 @@ const EditPublicationModal = ({
           }
         />
 
+        <ContentTypeSelectorBar
+          selectedType={content_type}
+          selectedPlatforms={selectedPlatformNames}
+          onChange={(type) => {
+            setValue("content_type", type, { shouldValidate: true });
+            // Reset type-specific fields when changing type
+            if (type !== 'poll') {
+              setValue("poll_options", null);
+              setValue("poll_duration_hours", null);
+            }
+          }}
+          t={t}
+          disabled={hasPublishedPlatform || isContentSectionDisabled}
+        />
+
         <div className="flex-1 overflow-y-auto custom-scrollbar">
           <form
             id="edit-publication-form"
             onSubmit={handleSubmit}
-            className="space-y-8"
           >
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
+            <div className={`grid grid-cols-1 ${fieldVisibility.showMediaSection ? 'lg:grid-cols-12' : 'lg:grid-cols-2'} gap-6 p-6`}>
               {/* ========================================
                   COLUMNA IZQUIERDA: MEDIA Y CONTENIDO
                   ======================================== */}
-              <div className="space-y-6">
-                {/* ==================== ALERTAS Y NOTIFICACIONES ==================== */}
+              <div className={`space-y-6 ${fieldVisibility.showMediaSection ? 'lg:col-span-7' : ''}`}>
                 <div className="space-y-3">
-                 
-                {/* ==================== SECCIÓN: ARCHIVOS MULTIMEDIA ==================== */}
-                <div className="space-y-4">
-                  <div className="flex items-start gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700">
-                    <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
-                      {t("publications.modal.edit.mediaSection") || "Archivos Multimedia"}
-                    </h3>
-                  </div>
-
-                   {/* Alerta: Bloqueado por otro usuario */}
                   {!isLockedByMe &&
                     isLockedByOther &&
                     !hasPublishedPlatform &&
@@ -650,48 +671,50 @@ const EditPublicationModal = ({
                   )}
                 </div>
 
-                  {!isDataReady ? (
-                    <MediaUploadSkeleton />
-                  ) : (
-                    <MediaUploadSection
-                      mediaPreviews={stabilizedMediaPreviews}
-                      thumbnails={thumbnails}
-                      imageError={imageError}
-                      isDragOver={isDragOver}
-                      t={t}
-                      onFileChange={handleFileChange}
-                      onRemoveMedia={handleRemoveMediaWithReels}
-                      onSetThumbnail={(tempId, file) =>
-                        setThumbnail(tempId, file)
-                      }
-                      onClearThumbnail={(tempId) => clearThumbnail(tempId)}
-                      onUpdateFile={updateFile}
-                      onDragOver={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setIsDragOver(true);
-                      }}
-                      onDragLeave={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setIsDragOver(false);
-                      }}
-                      onDrop={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setIsDragOver(false);
-                        handleFileChange(e.dataTransfer.files);
-                      }}
-                      disabled={hasPublishedPlatform || isMediaSectionDisabled}
-                      isAnyMediaProcessing={isAnyMediaProcessing}
-                      uploadProgress={uploadProgress}
-                      uploadStats={uploadStats}
-                      uploadErrors={uploadErrors}
-                      lockedBy={remoteLock}
-                      videoMetadata={videoMetadata}
-                      publicationId={publication?.id}
-                      allMediaFiles={publication?.media_files || []}
-                    />
+                  {fieldVisibility.showMediaSection && (
+                    !isDataReady ? (
+                      <MediaUploadSkeleton />
+                    ) : (
+                      <MediaUploadSection
+                        mediaPreviews={stabilizedMediaPreviews}
+                        thumbnails={thumbnails}
+                        imageError={imageError}
+                        isDragOver={isDragOver}
+                        t={t}
+                        onFileChange={handleFileChange}
+                        onRemoveMedia={handleRemoveMediaWithReels}
+                        onSetThumbnail={(tempId, file) =>
+                          setThumbnail(tempId, file)
+                        }
+                        onClearThumbnail={(tempId) => clearThumbnail(tempId)}
+                        onUpdateFile={updateFile}
+                        onDragOver={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setIsDragOver(true);
+                        }}
+                        onDragLeave={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setIsDragOver(false);
+                        }}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setIsDragOver(false);
+                          handleFileChange(e.dataTransfer.files);
+                        }}
+                        disabled={hasPublishedPlatform || isMediaSectionDisabled}
+                        isAnyMediaProcessing={isAnyMediaProcessing}
+                        uploadProgress={uploadProgress}
+                        uploadStats={uploadStats}
+                        uploadErrors={uploadErrors}
+                        lockedBy={remoteLock}
+                        videoMetadata={videoMetadata}
+                        publicationId={publication?.id}
+                        allMediaFiles={publication?.media_files || []}
+                      />
+                    )
                   )}
                 </div>
 
@@ -714,8 +737,28 @@ const EditPublicationModal = ({
                   publication={publication}
                   onHashtagChange={handleHashtagChange}
                   disabled={hasPublishedPlatform || isContentSectionDisabled}
+                  contentType={content_type}
                 />
                 </div>
+
+                {/* ==================== SECCIÓN: CAMPOS ESPECÍFICOS DE POLL ==================== */}
+                {fieldVisibility.showPollFields && (
+                  <div className="space-y-4">
+                    <PollFields
+                      options={poll_options}
+                      duration={poll_duration_hours}
+                      onChange={(data) => {
+                        setValue("poll_options", data.options, { shouldValidate: true });
+                        setValue("poll_duration_hours", data.duration, { shouldValidate: true });
+                      }}
+                      t={t}
+                      errors={{
+                        options: errors.poll_options?.message as string,
+                        duration: errors.poll_duration_hours?.message as string,
+                      }}
+                    />
+                  </div>
+                )}
 
                 {/* ==================== SECCIÓN: VISTA PREVIA (Solo si tiene advanced_scheduling) ==================== */}
                 {hasRecurrenceAccess && (
@@ -753,13 +796,12 @@ const EditPublicationModal = ({
                     />
                   </div>
                 )}
-
               </div>
 
               {/* ========================================
                   COLUMNA DERECHA: REDES, PROGRAMACIÓN Y VISTA PREVIA
                   ======================================== */}
-              <div className="space-y-6">
+              <div className={`space-y-6 ${fieldVisibility.showMediaSection ? 'lg:col-span-5' : ''}`}>
                 {/* ==================== SECCIÓN: CUENTAS DE REDES SOCIALES ==================== */}
                 <div
                   className={`space-y-4 transition-opacity duration-200 ${!allowConfiguration || isContentSectionDisabled ? "opacity-50 pointer-events-none grayscale-[0.5]" : ""}`}
@@ -810,7 +852,7 @@ const EditPublicationModal = ({
                     mediaFiles={mediaFiles}
                     disabled={isContentSectionDisabled || !allowConfiguration}
                     socialPostLogs={publication?.social_post_logs}
-                    onThumbnailChange={(videoId, file) => {
+                    onThumbnailChange={(_videoId, file) => {
                       const video = mediaFiles.find((m) => m.type === "video");
                       if (video) {
                         if (file) {
@@ -824,7 +866,7 @@ const EditPublicationModal = ({
                       const video = mediaFiles.find((m) => m.type === "video");
                       if (video) clearThumbnail(video.tempId);
                     }}
-                    thumbnails={thumbnails}
+                    thumbnails={thumbnails as any}
                     publication={publication}
                   />
                 </div>
@@ -950,7 +992,6 @@ const EditPublicationModal = ({
                   </div>
 
                   <div className="space-y-4">
-                  <div className="space-y-4">
                     {publication?.approval_logs &&
                       publication.approval_logs.length > 0 && (
                         <ApprovalHistoryCompacto
@@ -976,9 +1017,7 @@ const EditPublicationModal = ({
                       )}
                   </div>
                 </div>
-                </div>
               </div>
-            </div>
           </form>
         </div>
         <ModalFooter

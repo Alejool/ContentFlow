@@ -6,6 +6,21 @@
       "sections": {
         "details": "Content Details"
       },
+      "contentType":{
+        "label": "Content Type",
+        "value": "Video",
+        "filteredByPlatforms": "Filtered by selected platforms"
+      },
+      "poll": {
+        "title": "Poll Options",
+        "options": "Poll Options (2-4 options)",
+        "optionPlaceholder": "Option",
+        "addOption": "Add Option",
+        "duration": "Poll Duration",
+        "hours": "hours",
+        "durationHint": "Twitter: 5min-7days, Facebook: 1-7days",
+        "note": "Polls are only supported on Twitter and Facebook. Make sure to select compatible platforms."
+      },
       "media": {
         "uploadingPending": "Uploading Pending",
         "backgroundUpload": "Saved! Media is uploading in the background."
@@ -103,6 +118,9 @@
           "title": "Drag and drop to sort",
           "subtitle": "Upload your multimedia files here"
         },
+        "recurrence_days": "Recurrence Days",
+        "poll_options": "Poll options",
+        "poll_duration_hours": "Poll duration",
         "placeholders": {
           "title": "Title",
           "description": "Description",
@@ -124,14 +142,19 @@
           "hashtagMax": "Maximum 10 hashtags allowed",
           "scheduledMinDifference": "The date must be at least 1 minute from the current time",
           "scheduledAtRequired": "Schedule date is required if global schedule is enabled",
-          "recurrenceDaysRequired": "Please select at least one day for weekly recurrence",
-          "recurrence_days": "Invalid recurrence days"
+          "recurrenceDaysRequired": "Select at least one day for weekly recurrence",
+          "recurrence_days": "Invalid recurrence days",
+          "durationErrors": "Please fix the duration errors before saving.",
+          "recurrenceEndDateRequired": "End date is required for recurring publications",
+          "pollOptionsRequired": "Polls require at least 2 options",
+          "pollDurationRequired": "Poll duration must be between 1 and 168 hours",
+          "imageRequired": "You must add at least one image or video",
+          "scheduleRequired": "You must schedule a date for all selected networks or set a global date"
         },
         "button": {
           "save": "Save",
           "cancel": "Cancel"
-        },
-        "recurrence_days": "Recurrence Days"
+        }
       },
       "schedule": {
         "title": "Date for all networks",
@@ -363,9 +386,24 @@
         "scheduledAtRequired": "Scheduled date is required when you select social networks",
         "socialAccountsRequired": "Please select at least one social media account",
         "singleVideo": "You can only upload one video per publication.",
-        "recurrenceDaysRequired": "Please select at least one day for weekly recurrence",
+        "scheduledMinDifference": "The date must be at least 1 minute after the current time",
+        "videoTooLong": "Video too long for {{platform}} (max {{max}})",
+        "videoComplies": "Meets duration requirements for {{platform}}",
+        "recurrenceDaysRequired": "Select at least one day for weekly recurrence",
         "recurrence_days": "Invalid recurrence days",
-        "scheduledMinDifference": "The date must be at least 1 minute after the current time"
+        "durationErrors": "Please fix the duration errors before saving.",
+        "pollOptionsRequired": "Polls require at least 2 options",
+        "content_type_not_supported": "Content type ':type' is not supported by :platforms. Please select compatible platforms or change the content type.",
+        "reel_requires_one_video": "Reels require exactly 1 video file",
+        "reel_requires_video_only": "Reels require video files only (no images)",
+        "carousel_requires_multiple": "Carousels require at least 2 media files (maximum 10)",
+        "story_requires_one": "Stories require exactly 1 media file (image or video)",
+        "poll_not_supported": "Polls are only supported on Twitter",
+        "cross_platform_incompatibility": "The selected content type is not supported by all selected platforms",
+        "invalid_media_type": "Invalid media type for the selected content type",
+        "media_required": "Media files are required for this content type",
+        "media_min_count": "At least :min media files are required",
+        "media_max_count": "Maximum :max media files allowed"
       },
       "processing": {
         "cancel_message": "Are you sure you want to cancel this processing job? The work in progress will be stopped."
