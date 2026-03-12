@@ -9,11 +9,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 
 class Role extends Model
 {
     protected $fillable = [
         'name',
+        'slug',
         'display_name',
         'description',
         'approval_participant',
@@ -29,6 +31,20 @@ class Role extends Model
     public const ADMIN = 'admin';
     public const EDITOR = 'editor';
     public const VIEWER = 'viewer';
+
+    /**
+     * Boot the model.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($role) {
+            if (empty($role->slug)) {
+                $role->slug = Str::slug($role->name);
+            }
+        });
+    }
 
     /**
      * Get the permissions that belong to this role.

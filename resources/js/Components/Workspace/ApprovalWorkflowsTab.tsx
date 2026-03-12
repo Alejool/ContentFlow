@@ -285,8 +285,8 @@ export default function ApprovalWorkflowsTab({
   if (isEditing && editingWorkflow) {
     return (
       <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-xl overflow-hidden shadow-sm">
-        <div className="p-6 border-b border-gray-200 dark:border-neutral-800 flex items-center justify-between bg-gray-50 dark:bg-neutral-800/50">
-          <div>
+        <div className="p-6 border-b border-gray-200 dark:border-neutral-800 flex flex-col md:flex-row md:items-center md:justify-between bg-gray-50 dark:bg-neutral-800/50">
+          <div className="mb-6 md:mb-0">
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">
               {editingWorkflow.id === 0
                 ? t("common.approvals.createFlow")
@@ -301,6 +301,7 @@ export default function ApprovalWorkflowsTab({
               variant="ghost"
               icon={X}
               buttonStyle="outline"
+              size="md"
               onClick={() => setIsEditing(false)}
             >
               {t("common.cancel")}
@@ -309,6 +310,7 @@ export default function ApprovalWorkflowsTab({
               variant="primary"
               icon={Save}
               buttonStyle="solid"
+               size="md"
               onClick={handleSave}
             >
               {t("common.save_changes")}

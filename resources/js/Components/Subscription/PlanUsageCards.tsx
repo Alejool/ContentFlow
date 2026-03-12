@@ -1,10 +1,12 @@
 import { Sparkles, Zap, HardDrive, FileText, Share2, Users } from 'lucide-react';
-import { Link, usePage } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import { useSubscriptionUsage } from '@/Hooks/useSubscriptionUsage';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CarouselPagination, CarouselDots } from '@/Components/common/CarouselPagination';
 import { PageProps as InertiaPageProps } from '@inertiajs/core';
+import { UsageCard } from './UsageCard';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface PlanUsageCardsProps {
   showCarousel?: boolean;
@@ -32,11 +34,31 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
   const { usage, loading } = useSubscriptionUsage();
   const { visibleUsageMetrics, systemAddons } = usePage<PageProps>().props;
   const [currentSlide, setCurrentSlide] = useState(0);
-  
-  if (loading || !usage) return null;
+  const [itemsPerSlide, setItemsPerSlide] = useState(4);
+
+  useEffect(() => {
+    const getItemsPerSlide = () => {
+      if (typeof window === 'undefined') return 4;
+      const width = window.innerWidth;
+      if (width < 640) return 1; // mobile
+      if (width < 1024) return 2; // tablet
+      return 4; // desktop
+    };
+
+    const handleResize = () => {
+      setItemsPerSlide(getItemsPerSlide());
+      setCurrentSlide(0); // Reset al cambiar tamaño
+    };
+
+    // Set initial value
+    setItemsPerSlide(getItemsPerSlide());
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
   // Preparar métricas para mostrar - FILTRADAS según configuración del sistema
-  const metrics = [
+  const metrics = !usage ? [] : [
     {
       key: 'publications',
       label: t('subscription.addons.publications', 'Publicaciones'),
@@ -106,127 +128,7 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
   ];
 
   const visibleMetrics = metrics.filter(m => m.show);
-  
-  const getProgressBarColor = (percentage: number) => {
-    if (percentage > 90) return 'bg-red-500';
-    if (percentage > 80) return 'bg-orange-500';
-    if (percentage > 70) return 'bg-yellow-500';
-    return 'bg-primary-500';
-  };
 
-  const getBadgeColor = (percentage: number) => {
-    if (percentage > 90) return 'bg-red-500';
-    if (percentage > 80) return 'bg-orange-500';
-    if (percentage > 70) return 'bg-yellow-500';
-    return '';
-  };
-
-  const getBadgeText = (percentage: number) => {
-    if (percentage > 90) return t('subscription.addons.critical', '¡Crítico!');
-    if (percentage > 80) return t('subscription.addons.high', 'Muy Alto');
-    if (percentage > 70) return t('subscription.addons.warning', 'Alto');
-    return '';
-  };
-
-  const renderCard = (metric: typeof metrics[0]) => {
-    const Icon = metric.icon;
-    const isCritical = metric.percentage > 90;
-    const isHigh = metric.percentage > 80 && metric.percentage <= 90;
-    const isWarning = metric.percentage > 70 && metric.percentage <= 80;
-    const shouldShowBuyButton = metric.canBuy && metric.percentage > 70;
-    const shouldShowUpgradeButton = !metric.canBuy && metric.percentage > 70;
-    
-    return (
-      <div 
-        className="bg-gradient-to-br from-primary-50/80 to-primary-100 dark:from-primary-900/10 dark:to-primary-800/20 rounded-xl p-5 border border-primary-200 dark:border-primary-700/50 shadow-sm hover:shadow-md transition-all h-full"
-      >
-        <div className="flex items-center justify-between mb-3 relative">
-          <div className="flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-primary-100 dark:bg-primary-800/50">
-              <Icon className="w-4 h-4 text-primary-600 dark:text-primary-400" />
-            </div>
-            <span className="text-sm font-semibold text-gray-900 dark:text-white">
-              {metric.label}
-            </span>
-          </div>
-          {(isCritical || isHigh || isWarning) && (
-            <span className={`absolute text-xs text-white px-2 py-1 -right-5 -top-5 rounded-full font-semibold ${getBadgeColor(metric.percentage)}`}>
-              {getBadgeText(metric.percentage)}
-            </span>
-          )}
-        </div>
-
-        <div className="mb-2">
-          <div className="text-3xl font-bold text-gray-900 dark:text-white">
-            {metric.limit === '∞' || metric.limit === -1 
-              ? metric.used 
-              : `${Math.round(metric.percentage)}%`
-            }
-          </div>
-          <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-            {metric.limit === '∞' || metric.limit === -1
-              ? t('subscription.usage.unlimited', 'Ilimitado')
-              : `${metric.used} / ${metric.total_available || metric.limit}`
-            }
-          </div>
-          {/* Mostrar información de addons si existe */}
-          {metric.addon_info && metric.addon_info.total > 0 && (
-            <div className="text-xs text-primary-600 dark:text-primary-400 mt-1">
-              <span className="font-medium">Plan:</span> {metric.limit} + 
-              <span className="font-medium"> Addons:</span> {metric.addon_info.remaining}/{metric.addon_info.total}
-            </div>
-          )}
-        </div>
-
-        {metric.limit !== '∞' && metric.limit !== -1 && (
-          <div className="mb-3">
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-              <div 
-                className={`h-2 rounded-full transition-all ${getProgressBarColor(metric.percentage)}`}
-                style={{ width: `${Math.min(metric.percentage, 100)}%` }}
-              />
-            </div>
-          </div>
-        )}
-
-        <div className="text-xs text-gray-600 dark:text-gray-400 mb-3">
-          {metric.limit === '∞' || metric.limit === -1
-            ? t('subscription.addons.noLimits', 'Sin límites')
-            : (
-              <>
-                <span className="font-semibold text-primary-600 dark:text-primary-400">
-                  {metric.remaining}
-                </span>
-                {' '}{t('subscription.addons.remaining', 'restantes')}
-              </>
-            )
-          }
-        </div>
-
-        {shouldShowBuyButton && (
-          <Link
-            href={`/subscription/addons?tab=${metric.addonType}`}
-            className="block w-full text-center bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 text-white text-sm font-semibold py-2 px-3 rounded-lg transition-colors"
-          >
-            <Sparkles className="w-3 h-3 inline mr-1" />
-            {t('subscription.addons.buyMore', 'Comprar Más')}
-          </Link>
-        )}
-
-        {shouldShowUpgradeButton && (
-          <Link
-            href={metric.upgradeUrl || '/pricing'}
-            className="block w-full text-center bg-gray-600 hover:bg-gray-700 dark:bg-gray-500 dark:hover:bg-gray-600 text-white text-sm font-semibold py-2 px-3 rounded-lg transition-colors"
-          >
-            <Zap className="w-3 h-3 inline mr-1" />
-            {t('subscription.addons.upgradePlan', 'Actualizar Plan')}
-          </Link>
-        )}
-      </div>
-    );
-  };
-
-  const itemsPerSlide = 4;
   const totalSlides = Math.ceil(visibleMetrics.length / itemsPerSlide);
   
   const nextSlide = () => {
@@ -236,6 +138,22 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
   const prevSlide = () => {
     setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
   };
+
+  const goToSlide = (index: number) => {
+    setCurrentSlide(index);
+  };
+
+  // Obtener las métricas del slide actual
+  const getCurrentSlideMetrics = () => {
+    const start = currentSlide * itemsPerSlide;
+    const end = start + itemsPerSlide;
+    return visibleMetrics.slice(start, end);
+  };
+
+  // Si está cargando o no hay datos, no renderizar nada
+  if (loading || !usage) {
+    return null;
+  }
 
   return (
     <div className="space-y-4">
@@ -263,22 +181,50 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
       )}
 
       {showCarousel && visibleMetrics.length > itemsPerSlide ? (
-        <div className="relative overflow-hidden">
-          <div 
-            className="flex gap-2 transition-transform duration-300 ease-in-out"
-            style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-          >
-            {visibleMetrics.map(metric => (
-              <div key={metric.key} className="flex-shrink-0 w-full sm:w-[calc(50%-0.5rem)] lg:w-[calc(25%-0.70rem)]">
-                {renderCard(metric)}
-              </div>
-            ))}
+        <div className="relative">
+          <div className="overflow-hidden">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={currentSlide}
+                initial={{ opacity: 0, x: 100 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -100 }}
+                transition={{ 
+                  duration: 0.3,
+                  ease: "easeInOut"
+                }}
+                className={`grid gap-4 ${
+                  itemsPerSlide === 1 
+                    ? 'grid-cols-1' 
+                    : itemsPerSlide === 2 
+                    ? 'grid-cols-2' 
+                    : 'grid-cols-4'
+                }`}
+              >
+                {getCurrentSlideMetrics().map((metric) => (
+                  <UsageCard
+                    key={metric.key}
+                    label={metric.label}
+                    icon={metric.icon}
+                    percentage={metric.percentage}
+                    used={metric.used}
+                    limit={metric.limit}
+                    total_available={metric.total_available}
+                    remaining={metric.remaining}
+                    addon_info={metric.addon_info}
+                    canBuy={metric.canBuy}
+                    addonType={metric.addonType}
+                    upgradeUrl={metric.upgradeUrl}
+                  />
+                ))}
+              </motion.div>
+            </AnimatePresence>
           </div>
           
           <CarouselDots
             totalSlides={totalSlides}
             currentSlide={currentSlide}
-            onDotClick={(index) => setCurrentSlide(index)}
+            onDotClick={goToSlide}
             className="mt-4"
           />
         </div>
@@ -292,10 +238,32 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
             ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' 
             : 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-4'
         }`}>
-          {visibleMetrics.map(metric => (
-            <div key={metric.key}>
-              {renderCard(metric)}
-            </div>
+          {visibleMetrics.map((metric, index) => (
+            <motion.div
+              key={metric.key}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ 
+                duration: 0.4,
+                delay: index * 0.1,
+                ease: "easeOut"
+              }}
+            >
+              <UsageCard
+                key={metric.key}
+                label={metric.label}
+                icon={metric.icon}
+                percentage={metric.percentage}
+                used={metric.used}
+                limit={metric.limit}
+                total_available={metric.total_available}
+                remaining={metric.remaining}
+                addon_info={metric.addon_info}
+                canBuy={metric.canBuy}
+                addonType={metric.addonType}
+                upgradeUrl={metric.upgradeUrl}
+              />
+            </motion.div>
           ))}
         </div>
       )}

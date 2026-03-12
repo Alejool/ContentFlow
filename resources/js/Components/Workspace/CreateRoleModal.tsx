@@ -1,11 +1,15 @@
 import Button from "@/Components/common/Modern/Button";
 import Input from "@/Components/common/Modern/Input";
+import Textarea from "@/Components/common/Modern/Textarea";
 import Modal from "@/Components/common/ui/Modal";
+import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { CheckSquare, Save, Shield } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { z } from "zod";
 
 interface CreateRoleModalProps {
   isOpen: boolean;
@@ -14,6 +18,15 @@ interface CreateRoleModalProps {
   workspace: any;
 }
 
+const createRoleSchema = z.object({
+  name: z.string().min(1, "Name is required").max(255),
+  description: z.string().optional(),
+  permissions: z.array(z.number()).default([]),
+  approval_participant: z.boolean().default(false),
+});
+
+type CreateRoleFormData = z.infer<typeof createRoleSchema>;
+
 export default function CreateRoleModal({
   isOpen,
   onClose,
@@ -21,18 +34,34 @@ export default function CreateRoleModal({
   workspace,
 }: CreateRoleModalProps) {
   const { t } = useTranslation();
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [selectedPermissions, setSelectedPermissions] = useState<number[]>([]);
   const [allPermissions, setAllPermissions] = useState<any[]>([]);
   const [isLoadingPermissions, setIsLoadingPermissions] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+    watch,
+    setValue,
+  } = useForm<CreateRoleFormData>({
+    resolver: zodResolver(createRoleSchema),
+    defaultValues: {
+      name: "",
+      description: "",
+      permissions: [],
+      approval_participant: false,
+    },
+  });
+
+  const selectedPermissions = watch("permissions");
 
   useEffect(() => {
     if (isOpen) {
       fetchPermissions();
+      reset();
     }
-  }, [isOpen]);
+  }, [isOpen, reset]);
 
   const fetchPermissions = async () => {
     try {
@@ -49,39 +78,28 @@ export default function CreateRoleModal({
   };
 
   const handleTogglePermission = (id: number) => {
-    setSelectedPermissions((prev) =>
-      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id],
-    );
+    const current = selectedPermissions || [];
+    const updated = current.includes(id)
+      ? current.filter((p) => p !== id)
+      : [...current, id];
+    setValue("permissions", updated);
   };
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name) {
-      toast.error(t("workspace.roles_management.name_required"));
-      return;
-    }
-
-    setIsSubmitting(true);
+  const onSubmit = async (data: CreateRoleFormData) => {
     try {
       const response = await axios.post(
         route("api.v1.workspaces.roles.store", workspace.id),
-        {
-          name,
-          description,
-          permissions: selectedPermissions,
-        },
+        data,
       );
       toast.success(t("workspace.roles_management.role_created_success"));
       onSuccess(response.data.role);
       onClose();
-      // Reset form
-      setName("");
-      setDescription("");
-      setSelectedPermissions([]);
+      reset();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || t("workspace.roles_management.role_created_error"));
-    } finally {
-      setIsSubmitting(false);
+      toast.error(
+        error.response?.data?.message ||
+          t("workspace.roles_management.role_created_error"),
+      );
     }
   };
 
@@ -102,28 +120,44 @@ export default function CreateRoleModal({
           </div>
         </div>
 
-        <form onSubmit={onSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-4">
-              <Input
-                id="role_name"
-                label={t("workspace.roles_management.role_name")}
-                placeholder={t("workspace.roles_management.role_name_placeholder")}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t("workspace.roles_management.role_description")}
-                </label>
-                <textarea
-                  className="w-full bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 rounded-lg p-3 text-sm outline-none focus:ring-2 focus:ring-primary-500"
-                  placeholder={t("workspace.roles_management.role_description_placeholder")}
-                  rows={3}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                <Input
+                  id="role_name"
+                  label={t("workspace.roles_management.role_name")}
+                  placeholder={t(
+                    "workspace.roles_management.role_name_placeholder",
+                  )}
+                  {...register("name")}
+                  error={errors.name?.message}
                 />
+              </div>
+              <Textarea
+                id="role_description"
+                label={t("workspace.roles_management.role_description")}
+                placeholder={t(
+                  "workspace.roles_management.role_description_placeholder",
+                )}
+                rows={3}
+                {...register("description")}
+                error={errors.description?.message}
+              />
+              
+              <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-neutral-800/50 rounded-lg border border-gray-200 dark:border-neutral-700">
+                <input
+                  type="checkbox"
+                  id="approval_participant"
+                  {...register("approval_participant")}
+                  className="w-4 h-4 text-primary-600 bg-white dark:bg-neutral-800 border-gray-300 dark:border-neutral-600 rounded focus:ring-2 focus:ring-primary-500"
+                />
+                <label
+                  htmlFor="approval_participant"
+                  className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer"
+                >
+                  {t("workspace.roles_management.can_approve_content") || "Can approve content in workflows"}
+                </label>
               </div>
             </div>
 
@@ -141,14 +175,14 @@ export default function CreateRoleModal({
                     <div
                       key={permission.id}
                       className={`flex items-center gap-2 p-2 rounded-md cursor-pointer transition-colors ${
-                        selectedPermissions.includes(permission.id)
+                        selectedPermissions?.includes(permission.id)
                           ? "bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300"
                           : "hover:bg-white dark:hover:bg-neutral-800"
                       }`}
                       onClick={() => handleTogglePermission(permission.id)}
                     >
                       <CheckSquare
-                        className={`w-4 h-4 ${selectedPermissions.includes(permission.id) ? "opacity-100" : "opacity-30"}`}
+                        className={`w-4 h-4 ${selectedPermissions?.includes(permission.id) ? "opacity-100" : "opacity-30"}`}
                       />
                       <div className="text-xs">
                         <div className="font-bold">{permission.name}</div>

@@ -683,6 +683,7 @@ class WorkspaceController extends Controller
       'description' => 'nullable|string|max:1000',
       'permissions' => 'nullable|array',
       'permissions.*' => 'exists:permissions,id',
+      'approval_participant' => 'nullable|boolean',
     ]);
 
     return DB::transaction(function () use ($validated) {
@@ -690,6 +691,7 @@ class WorkspaceController extends Controller
         'name' => $validated['name'],
         'slug' => Str::slug($validated['name']),
         'description' => $validated['description'] ?? null,
+        'approval_participant' => $validated['approval_participant'] ?? false,
       ]);
 
       if (!empty($validated['permissions'])) {

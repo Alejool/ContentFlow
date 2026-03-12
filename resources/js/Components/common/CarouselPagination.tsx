@@ -21,7 +21,7 @@ export function CarouselPagination({
             <Button
                 onClick={onPrevious}
                 variant="ghost"
-                buttonStyle="outline"
+                buttonStyle="icon"
                 size="sm"
                 className="!p-2"
                 aria-label="Anterior"
@@ -35,7 +35,7 @@ export function CarouselPagination({
             <Button
                 onClick={onNext}
                 variant="ghost"
-                buttonStyle="outline"
+                buttonStyle="icon"
                 size="sm"
                 className="!p-2"
                 aria-label="Siguiente"
