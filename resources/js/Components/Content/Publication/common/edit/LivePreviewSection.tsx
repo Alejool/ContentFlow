@@ -1,17 +1,19 @@
+import { type ContentType } from "@/Components/Content/Publication/common/ContentTypeSelector";
 import { FacebookPreview } from "@/Components/Content/Publication/previews/FacebookPreview";
 import { InstagramPreview } from "@/Components/Content/Publication/previews/InstagramPreview";
 import { LinkedInPreview } from "@/Components/Content/Publication/previews/LinkedInPreview";
 import { TikTokPreview } from "@/Components/Content/Publication/previews/TikTokPreview";
 import { TwitterPreview } from "@/Components/Content/Publication/previews/TwitterPreview";
 import { YouTubePreview } from "@/Components/Content/Publication/previews/YouTubePreview";
+import { REEL_COMPATIBLE_PLATFORMS } from '@/Constants/contentTypes';
 import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatformsConfig";
 import {
-  Facebook,
-  Instagram,
-  Linkedin,
-  Music2,
-  Twitter,
-  Youtube,
+    Facebook,
+    Instagram,
+    Linkedin,
+    Music2,
+    Twitter,
+    Youtube,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -142,6 +144,7 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
   }
 };
 
+
 interface LivePreviewSectionProps {
   content: string;
   mediaUrls: string[];
@@ -155,6 +158,10 @@ interface LivePreviewSectionProps {
   className?: string;
   title?: string;
   publishedAt?: string;
+  contentType?: ContentType; // Nuevo: tipo de contenido para filtrar plataformas
+  selectedPlatforms?: string[]; // Nuevo: plataformas seleccionadas por el usuario
+  pollOptions?: string[]; // Nuevo: opciones de encuesta
+  pollDuration?: number; // Nuevo: duración de encuesta
 }
 
 type Platform =
@@ -173,8 +180,41 @@ export const LivePreviewSection = ({
   className,
   title,
   publishedAt,
+  contentType = 'post',
+  selectedPlatforms = [],
+  pollOptions = [],
+  pollDuration = 24,
 }: LivePreviewSectionProps) => {
   const { t } = useTranslation();
+
+  // Obtener plataformas compatibles con el tipo de contenido
+  const compatiblePlatforms = useMemo(() => {
+    const contentTypes = [
+      {
+        value: 'post',
+        platforms: ['instagram', 'twitter', 'facebook', 'linkedin', 'youtube', 'pinterest'],
+      },
+      {
+        value: 'reel',
+        platforms: [...REEL_COMPATIBLE_PLATFORMS],
+      },
+      {
+        value: 'story',
+        platforms: ['instagram', 'facebook'],
+      },
+      {
+        value: 'poll',
+        platforms: ['twitter'], // Solo Twitter soporta encuestas nativas
+      },
+      {
+        value: 'carousel',
+        platforms: ['instagram', 'facebook', 'linkedin'],
+      },
+    ];
+    
+    const type = contentTypes.find(t => t.value === contentType);
+    return type?.platforms || [];
+  }, [contentType]);
 
   const tabs = useMemo(() => {
     const allTabs: { id: Platform; label: string; icon: any }[] = [
@@ -188,13 +228,29 @@ export const LivePreviewSection = ({
 
     return allTabs.filter((tab) => {
       const config = (SOCIAL_PLATFORMS as any)[tab.id];
-      return config?.active === true;
+      const isActive = config?.active === true;
+      
+      // Filtrar por tipo de contenido
+      const isCompatible = compatiblePlatforms.includes(tab.id);
+      
+      // Si hay plataformas seleccionadas, solo mostrar esas
+      const isSelected = selectedPlatforms.length === 0 || 
+        selectedPlatforms.some(p => p.toLowerCase() === tab.id);
+      
+      return isActive && isCompatible && isSelected;
     });
-  }, []);
+  }, [compatiblePlatforms, selectedPlatforms]);
 
   const [activePlatform, setActivePlatform] = useState<Platform>(
     tabs.length > 0 ? tabs[0].id : "twitter",
   );
+  
+  // Actualizar plataforma activa si ya no es válida
+  useEffect(() => {
+    if (tabs.length > 0 && !tabs.find(t => t.id === activePlatform)) {
+      setActivePlatform(tabs[0].id);
+    }
+  }, [tabs, activePlatform]);
 
   return (
     <div className={`space-y-4 ${className || ""}`}>
@@ -254,7 +310,14 @@ export const LivePreviewSection = ({
         ) : (
           <div className="flex items-center justify-center">
             {activePlatform === "twitter" && (
-              <TwitterPreview content={content} mediaUrls={mediaUrls} user={user} />
+              <TwitterPreview 
+                content={content} 
+                mediaUrls={mediaUrls} 
+                user={user} 
+                contentType={contentType}
+                pollOptions={pollOptions}
+                pollDuration={pollDuration}
+              />
             )}
             {activePlatform === "instagram" && (
               <InstagramPreview
@@ -276,6 +339,9 @@ export const LivePreviewSection = ({
                 mediaUrls={mediaUrls}
                 user={user}
                 publishedAt={publishedAt}
+                contentType={contentType}
+                pollOptions={pollOptions}
+                pollDuration={pollDuration}
               />
             )}
             {activePlatform === "tiktok" && (

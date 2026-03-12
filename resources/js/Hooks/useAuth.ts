@@ -1,10 +1,10 @@
+import { useTimezoneStore } from "@/stores/timezoneStore";
 import { getErrorMessage } from "@/Utils/validation";
 import { useForm } from "@inertiajs/react";
 import axios from "axios";
 import { useState } from "react";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { useTimezoneStore } from "@/stores/timezoneStore";
 
 interface LoginFormData {
   email: string;

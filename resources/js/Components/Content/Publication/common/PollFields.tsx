@@ -1,11 +1,13 @@
-import Input from "@/Components/common/Modern/Input";
 import Button from "@/Components/common/Modern/Button";
-import { Plus, Trash2, HelpCircle } from "lucide-react";
+import Input from "@/Components/common/Modern/Input";
+import { HelpCircle, Plus, Trash2 } from "lucide-react";
 
 interface PollFieldsProps {
   options: string[];
   duration: number;
   onChange: (data: { options: string[]; duration: number }) => void;
+  register?: any; // Add register prop
+  setValue?: any; // Add setValue prop
   t: (key: string) => string;
   errors?: {
     options?: string;
@@ -17,6 +19,8 @@ export default function PollFields({
   options = ['', ''],
   duration = 24,
   onChange,
+  register,
+  setValue,
   t,
   errors = {},
 }: PollFieldsProps) {
@@ -25,11 +29,21 @@ export default function PollFields({
     const newOptions = [...options];
     newOptions[index] = value;
     onChange({ options: newOptions, duration });
+    
+    // Update form values if setValue is available
+    if (setValue) {
+      setValue("poll_options", newOptions, { shouldValidate: true });
+    }
   };
 
   const handleAddOption = () => {
     if (options.length < 4) {
-      onChange({ options: [...options, ''], duration });
+      const newOptions = [...options, ''];
+      onChange({ options: newOptions, duration });
+      
+      if (setValue) {
+        setValue("poll_options", newOptions, { shouldValidate: true });
+      }
     }
   };
 
@@ -37,12 +51,20 @@ export default function PollFields({
     if (options.length > 2) {
       const newOptions = options.filter((_, i) => i !== index);
       onChange({ options: newOptions, duration });
+      
+      if (setValue) {
+        setValue("poll_options", newOptions, { shouldValidate: true });
+      }
     }
   };
 
   const handleDurationChange = (value: string) => {
     const numValue = parseInt(value) || 24;
     onChange({ options, duration: numValue });
+    
+    if (setValue) {
+      setValue("poll_duration_hours", numValue, { shouldValidate: true });
+    }
   };
 
   return (
@@ -76,13 +98,14 @@ export default function PollFields({
             {options.length > 2 && (
               <Button
                 type="button"
-                variant="icon"
-                buttonStyle="outline"
+                buttonStyle="icon"
                 size="md"
                 icon={Trash2}
                 onClick={() => handleRemoveOption(index)}
                 className="shrink-0"
-              />
+              >
+              <> </>
+              </Button>
             )}
           </div>
         ))}
@@ -130,7 +153,7 @@ export default function PollFields({
             <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-10">
               <div className="bg-gray-900 text-white text-xs rounded-lg py-2 px-3 whitespace-nowrap">
-                {t("publications.modal.poll.durationHint") || "Twitter: 5min-7days, Facebook: 1-7days"}
+                {t("publications.modal.poll.durationHint") || "Twitter: 5min-7days"}
               </div>
             </div>
           </div>
@@ -145,7 +168,7 @@ export default function PollFields({
         <p className="text-xs text-blue-700 dark:text-blue-300">
           <strong>{t("common.note") || "Note"}:</strong>{" "}
           {t("publications.modal.poll.note") || 
-            "Polls are only supported on Twitter and Facebook. Make sure to select compatible platforms."}
+            "Las encuestas solo están disponibles en Twitter. Asegúrate de seleccionar plataformas compatibles."}
         </p>
       </div>
     </div>

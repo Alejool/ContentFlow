@@ -77,11 +77,18 @@ class TwitterService extends BaseSocialService
   {
     $pollOptions = array_filter($settings['poll_options'] ?? [], fn($opt) => !empty(trim($opt)));
     if (count($pollOptions) >= 2) {
+      // Handle both minutes (legacy) and hours (new format)
+      $durationHours = $settings['poll_duration_hours'] ?? ($settings['poll_duration'] ?? 1440) / 60;
+      $durationMinutes = (int)($durationHours * 60);
+      
+      // Twitter API limits: 5 minutes to 10080 minutes (7 days)
+      $durationMinutes = max(5, min(10080, $durationMinutes));
+      
       $tweetData = [
         'text' => $content,
         'poll' => [
           'options' => array_values($pollOptions),
-          'duration_minutes' => (int)($settings['poll_duration'] ?? 1440)
+          'duration_minutes' => $durationMinutes
         ]
       ];
       $result = $this->sendTweetWithRetry($tweetData);

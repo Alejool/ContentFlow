@@ -1,11 +1,11 @@
+import Button from "@/Components/common/Modern/Button";
+import Textarea from "@/Components/common/Modern/Textarea";
 import { usePage } from "@inertiajs/react";
 import axios from "axios";
-import { Loader2, Sparkles, Wand2 } from "lucide-react";
+import { Sparkles, Wand2 } from "lucide-react";
 import React, { useMemo, useState } from "react";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import Textarea from "@/Components/common/Modern/Textarea";
-import Button from "@/Components/common/Modern/Button";
 import { z } from "zod";
 
 const aiPromptSchema = (t: any) =>

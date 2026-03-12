@@ -1538,4 +1538,27 @@ class PublicationController extends Controller
         : $limitsService->getClientFriendlyMessage($validation),
     ]);
   }
+  /**
+   * Validate publication for publishing with content type compatibility
+   */
+  public function validatePublish(Request $request, Publication $publication)
+  {
+    $workspaceId = Auth::user()->current_workspace_id;
+
+    if (!Auth::user()->hasPermission('manage-content', $workspaceId)) {
+      return $this->errorResponse('You do not have permission to validate content.', 403);
+    }
+
+    $platformIds = $request->input('platform_ids', []);
+
+    if (empty($platformIds)) {
+      return $this->errorResponse('No platforms selected for validation.', 422);
+    }
+
+    $publishValidationService = app(\App\Services\Validation\PublishValidationService::class);
+    $validation = $publishValidationService->validatePublishRequest($publication, $platformIds);
+
+    return $this->successResponse($validation);
+  }
+
 }

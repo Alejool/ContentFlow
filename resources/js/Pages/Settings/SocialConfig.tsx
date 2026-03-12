@@ -1,14 +1,14 @@
 import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
 import Button from "@/Components/common/Modern/Button";
 import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatformsConfig";
+import { useKeyboardClick } from "@/Hooks/useKeyboardClick";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
+import axios from "axios";
 import { Save, Settings2 } from "lucide-react";
 import { useState } from "react";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import axios from "axios";
-import { useKeyboardClick } from "@/Hooks/useKeyboardClick";
 
 interface SocialConfigProps {
   settings: Record<string, any>;

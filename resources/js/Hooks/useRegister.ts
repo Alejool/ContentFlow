@@ -2,7 +2,7 @@ import { getErrorMessage } from "@/Utils/validation";
 import { useForm } from "@inertiajs/react";
 import axios from "axios";
 import { useState } from "react";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 export const useRegister = () => {

@@ -1,27 +1,26 @@
+import { formatDateString } from "@/Utils/dateHelpers";
 import { getDateFnsLocale } from "@/Utils/dateLocales";
 import { canUserPublishDirectly } from "@/Utils/publicationPermissions";
 import { usePage } from "@inertiajs/react";
-import { format } from "date-fns";
 import {
-  Calendar,
-  CheckCircle,
-  Clock,
-  Copy,
-  Edit,
-  Eye,
-  FileText,
-  Image as ImageIcon,
-  Loader2,
-  Lock,
-  Rocket,
-  Trash2,
-  Users,
-  Video,
+    Calendar,
+    CheckCircle,
+    Clock,
+    Copy,
+    Edit,
+    Eye,
+    FileText,
+    Image as ImageIcon,
+    Loader2,
+    Lock,
+    Rocket,
+    Trash2,
+    Users,
+    Video,
 } from "lucide-react";
 import { useState } from "react";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { formatDateString } from "@/Utils/dateHelpers";
 
 interface ContentCardProps {
   item: any;

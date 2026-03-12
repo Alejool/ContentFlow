@@ -6,20 +6,20 @@ import { canUserPublishDirectly } from "@/Utils/publicationPermissions";
 import { usePage } from "@inertiajs/react";
 import axios from "axios";
 import {
-  Calendar,
-  Clock,
-  Copy,
-  Edit,
-  Eye,
-  Image,
-  Loader2,
-  Lock,
-  Rocket,
-  Trash2,
-  Video,
+    Calendar,
+    Clock,
+    Copy,
+    Edit,
+    Eye,
+    Image,
+    Loader2,
+    Lock,
+    Rocket,
+    Trash2,
+    Video,
 } from "lucide-react";
-import React, { memo, useState, useMemo } from "react";
-import { toast } from "react-hot-toast";
+import React, { memo, useMemo, useState } from "react";
+import toast from "react-hot-toast";
 
 // ... (skipping interface to save tokens if possible, or just targeting the specific blocks)
 

@@ -57,20 +57,6 @@ class PublishToSocialMedia implements ShouldQueue
       return;
     }
 
-    // Log file size for monitoring
-    if ($publication->media_path) {
-      $filePath = storage_path('app/' . $publication->media_path);
-      if (file_exists($filePath)) {
-        $fileSize = filesize($filePath);
-        Log::info('Processing publication with media', [
-          'publication_id' => $publication->id,
-          'file_size_mb' => round($fileSize / 1024 / 1024, 2),
-          'timeout' => $this->timeout,
-          'attempt' => $this->attempts()
-        ]);
-      }
-    }
-
     $socialAccounts = SocialAccount::whereIn('id', $this->socialAccountIds)
       ->get();
 
@@ -84,6 +70,43 @@ class PublishToSocialMedia implements ShouldQueue
       $this->delete();
       return;
     }
+
+    // Validate content type compatibility before publishing
+    $publishValidationService = app(\App\Services\Validation\PublishValidationService::class);
+    $validation = $publishValidationService->validatePublishRequest($publication, $this->socialAccountIds);
+    
+    if (!$validation['can_publish']) {
+      $errorMessage = 'Publishing validation failed: ' . implode(', ', $validation['global_errors'] ?? []);
+      LogHelper::publicationError($errorMessage, [
+        'publication_id' => $publication->id,
+        'validation_errors' => $validation['global_errors'] ?? [],
+        'job_id' => $this->job->uuid()
+      ]);
+      
+      $publication->update(['status' => 'failed']);
+      $this->delete();
+      return;
+    }
+
+    // Filter out incompatible platforms
+    $compatibleAccounts = $socialAccounts->filter(function ($account) use ($validation) {
+      $platformResult = $validation['platform_results'][$account->platform] ?? null;
+      return $platformResult && $platformResult['compatible'];
+    });
+
+    if ($compatibleAccounts->isEmpty()) {
+      LogHelper::publicationError('No compatible platforms found after validation', [
+        'publication_id' => $publication->id,
+        'platform_results' => $validation['platform_results'],
+        'job_id' => $this->job->uuid()
+      ]);
+      $publication->update(['status' => 'failed']);
+      $this->delete();
+      return;
+    }
+
+    // Update social accounts to only compatible ones
+    $socialAccounts = $compatibleAccounts;
 
     $publication->update(['status' => 'publishing']);
     

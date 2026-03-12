@@ -1,8 +1,8 @@
 import PlatformCard from "@/Components/ConfigSocialMedia/PlatformCard";
 import SectionHeader from "@/Components/ConfigSocialMedia/SectionHeader";
 import { Facebook, Video } from "lucide-react";
-import { useTranslation } from "react-i18next";
 import { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 
 interface FacebookSettingsProps {
   settings: any;

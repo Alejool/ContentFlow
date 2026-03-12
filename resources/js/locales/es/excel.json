@@ -1,0 +1,31 @@
+{
+  "excel": {
+    "importPublications": "Importar Publicaciones",
+    "importCampaigns": "Importar Campañas",
+    "downloadTemplateTitle": "Paso 1: Descarga la plantilla",
+    "downloadTemplateDesc": "Descarga la plantilla oficial con el formato correcto y ejemplos.",
+    "downloadTemplate": "Descargar Plantilla",
+    "uploadFileTitle": "Paso 2: Sube tu archivo",
+    "dragDropText": "Arrastra tu archivo aquí",
+    "orClickToSelect": "o haz clic para seleccionar",
+    "selectFile": "Seleccionar Archivo",
+    "supportedFormats": "Formatos: .xlsx, .xls, .csv (Máx. 10MB)",
+    "removeFile": "Quitar archivo",
+    "import": "Importar",
+    "templateDownloaded": "Plantilla descargada correctamente",
+    "downloadError": "Error al descargar la plantilla",
+    "invalidFileType": "Tipo de archivo inválido. Use .xlsx, .xls o .csv",
+    "fileTooLarge": "El archivo es demasiado grande. Máximo 10MB",
+    "noFileSelected": "Por favor selecciona un archivo",
+    "importSuccess": "Importación exitosa",
+    "importPartial": "Importación parcial",
+    "importError": "Error al importar el archivo",
+    "publications": "publicaciones",
+    "campaigns": "campañas",
+    "successful": "Exitosos",
+    "failed": "Fallidos",
+    "total": "Total",
+    "errors": "Errores encontrados",
+    "row": "Fila"
+  }
+}

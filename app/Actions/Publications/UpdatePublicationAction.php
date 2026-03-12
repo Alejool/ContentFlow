@@ -211,6 +211,9 @@ class UpdatePublicationAction
         'status' => $newStatus,
         'scheduled_at' => $data['scheduled_at'] ?? $publication->scheduled_at,
         'is_recurring' => $isRecurring,
+        // Poll fields
+        'poll_options' => $data['poll_options'] ?? $publication->poll_options,
+        'poll_duration_hours' => $data['poll_duration_hours'] ?? $publication->poll_duration_hours,
       ];
       
       // Handle recurrence settings in separate table

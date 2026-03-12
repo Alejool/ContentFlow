@@ -116,7 +116,16 @@ export default function ModalFooter({
             <Button
               type={onPrimarySubmit ? "button" : formId ? "submit" : "button"}
               form={onPrimarySubmit ? undefined : formId}
-              onClick={onPrimarySubmit}
+              onClick={(e) => {
+                console.log('=== Submit button clicked ===');
+                console.log('onPrimarySubmit:', !!onPrimarySubmit);
+                console.log('formId:', formId);
+                console.log('Button type:', onPrimarySubmit ? "button" : formId ? "submit" : "button");
+                console.log('Button form:', onPrimarySubmit ? undefined : formId);
+                if (onPrimarySubmit) {
+                  onPrimarySubmit();
+                }
+              }}
               disabled={isSubmitting}
               loading={isSubmitting}
               variant={submitVariant}

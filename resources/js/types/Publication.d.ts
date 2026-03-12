@@ -10,6 +10,9 @@ export type Publication = {
   goal?: string;
   slug?: string;
   scheduled_at?: string;
+  content_type?: "post" | "reel" | "story" | "poll" | "carousel";
+  poll_options?: string[];
+  poll_duration_hours?: number;
   status?:
     | "draft"
     | "published"

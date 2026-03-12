@@ -1,8 +1,8 @@
 import react from '@vitejs/plugin-react';
 import laravel from 'laravel-vite-plugin';
 import { defineConfig } from 'vite';
-import tsconfigPaths from "vite-tsconfig-paths";
 import { VitePWA } from 'vite-plugin-pwa';
+import tsconfigPaths from "vite-tsconfig-paths";
 
 const host = process.env.VITE_HMR_HOST || 'localhost';
 const certPath = './localhost.pem';
@@ -34,7 +34,7 @@ export default defineConfig({
                 name: 'Social Content Manager',
                 short_name: 'ContentMgr',
                 description: 'Gestión de publicaciones y contenido social',
-                theme_color: '#4F46E5',
+                theme_color: '#c96b2cff',
                 background_color: '#ffffff',
                 display: 'standalone',
                 orientation: 'portrait-primary',
@@ -43,35 +43,36 @@ export default defineConfig({
                 categories: ['productivity', 'social'],
                 icons: [
                     {
-                        src: '/icons/icon-192x192.png',
-                        sizes: '192x192',
-                        type: 'image/png',
+                        src: '/icons/icon.svg',
+                        sizes: 'any',
+                        type: 'image/svg+xml',
                         purpose: 'any maskable'
                     },
                     {
-                        src: '/icons/icon-512x512.png',
-                        sizes: '512x512',
-                        type: 'image/png',
-                        purpose: 'any maskable'
+                        src: '/favicon.ico',
+                        sizes: '32x32',
+                        type: 'image/x-icon'
                     }
                 ],
                 screenshots: [
                     {
-                        src: '/screenshots/desktop.png',
+                        src: '/screenshots/desktop.svg',
                         sizes: '1280x720',
-                        type: 'image/png',
+                        type: 'image/svg+xml',
                         form_factor: 'wide'
                     },
                     {
-                        src: '/screenshots/mobile.png',
+                        src: '/screenshots/mobile.svg',
                         sizes: '750x1334',
-                        type: 'image/png',
+                        type: 'image/svg+xml',
                         form_factor: 'narrow'
                     }
                 ]
             },
             workbox: {
+                globDirectory: 'public/build',
                 globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
+                globIgnores: ['**/node_modules/**/*', 'sw.js', 'workbox-*.js'],
                 cleanupOutdatedCaches: true,
                 skipWaiting: true,
                 clientsClaim: true,
@@ -264,6 +265,12 @@ export default defineConfig({
         sourcemap: !isProduction,
         // CSS code splitting
         cssCodeSplit: true,
+        // Ensure manifest is generated properly
+        manifest: true,
+        // Output directory
+        outDir: 'public/build',
+        // Empty output directory before build
+        emptyOutDir: true,
     },
     server: isProduction ? {} : {
         host: '0.0.0.0',

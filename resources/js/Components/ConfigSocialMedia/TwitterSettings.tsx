@@ -2,8 +2,8 @@ import PlatformCard from "@/Components/ConfigSocialMedia/PlatformCard";
 import PollOptions from "@/Components/ConfigSocialMedia/PollOptions";
 import SectionHeader from "@/Components/ConfigSocialMedia/SectionHeader";
 import { List, PieChart, Twitter } from "lucide-react";
-import { useTranslation } from "react-i18next";
 import { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 
 interface TwitterSettingsProps {
   settings: any;
@@ -41,7 +41,8 @@ export default function TwitterSettings({
   };
 
   const handlePollDurationChange = (duration: number) => {
-    handleChange("poll_duration", duration);
+    // Convert minutes to hours for consistency with backend
+    handleChange("poll_duration_hours", duration / 60);
   };
 
   return (
@@ -82,7 +83,7 @@ export default function TwitterSettings({
       {settings?.type === "poll" && (
         <PollOptions
           pollOptions={settings?.poll_options || []}
-          pollDuration={settings?.poll_duration || 1440}
+          pollDuration={settings?.poll_duration_hours ? settings.poll_duration_hours * 60 : 1440}
           onOptionsChange={handlePollOptionsChange}
           onDurationChange={handlePollDurationChange}
         />

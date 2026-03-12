@@ -1,3 +1,4 @@
+import ExcelImporter from "@/Components/Content/ExcelImporter";
 import LogsList from "@/Components/Content/Logs/LogsList";
 import ModalManager from "@/Components/Content/ModalManager";
 import ModalFooter from "@/Components/Content/modals/common/ModalFooter";
@@ -17,10 +18,10 @@ import {
   Plus,
   Shield,
   Target,
-  Trash2,
+  Trash2
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 import ApprovalHistory from "@/Components/Content/ApprovalHistory";
 import ApprovalList from "@/Components/Content/ApprovalList";
@@ -30,11 +31,11 @@ import ModernCalendar from "@/Components/Content/Partials/ModernCalendar";
 import Button from "@/Components/common/Modern/Button";
 import TabNavigation from "@/Components/common/TabNavigation";
 
+import { useCanApprove } from "@/Hooks/approval/useCanApprove";
 import {
   ContentTab,
   usePublications,
 } from "@/Hooks/publication/usePublications";
-import { useCanApprove } from "@/Hooks/approval/useCanApprove";
 import { useManageContentUIStore } from "@/stores/manageContentUIStore";
 import { useShallow } from "zustand/react/shallow";
 
@@ -227,6 +228,11 @@ export default function ManageContentPage() {
     id: number | null;
   }>({ isOpen: false, id: null });
 
+  const [excelImporter, setExcelImporter] = useState<{
+    isOpen: boolean;
+    type: 'publications' | 'campaigns';
+  }>({ isOpen: false, type: 'publications' });
+
   const handleRefreshWrapped = useCallback(() => {
     handleRefresh();
     setRefreshTrigger((prev) => prev + 1);
@@ -343,50 +349,98 @@ export default function ManageContentPage() {
 
             <div className="flex justify-end gap-2">
               {permissions.includes("manage-content") && (
-                <Dropdown>
-                  <Dropdown.Trigger>
-                    <Button
-                      id="create-publication"
-                      variant="primary"
-                      size="md"
-                      icon={Plus}
-                      className="gap-2 uppercase tracking-wider font-bold text-xs backdrop-3xl"
+                <>
+                  {/* <Dropdown>
+                    <Dropdown.Trigger>
+                      <Button
+                        id="import-excel"
+                        variant="ghost"
+                        buttonStyle="outline"
+                        size="md"
+                        icon={FileSpreadsheet}
+                        className="gap-2 uppercase tracking-wider font-bold text-xs"
+                      >
+                        {t("manageContent.importExcel") || "IMPORTAR EXCEL"}
+                      </Button>
+                    </Dropdown.Trigger>
+                    <Dropdown.Content
+                      align="right"
+                      width="auto"
+                      contentClasses="py-1 bg-white/95 dark:bg-neutral-800 shadow-xl rounded-lg min-w-[220px]"
                     >
-                      {t("manageContent.createNew").toUpperCase()}
-                    </Button>
-                  </Dropdown.Trigger>
-                  <Dropdown.Content
-                    align="right"
-                    width="auto"
-                    contentClasses="py-1 bg-white/95 dark:bg-neutral-800 shadow-xl rounded-lg min-w-[220px]"
-                  >
-                    <div className="p-1">
+                      <div className="p-1">
+                        <Button
+                          onClick={() => setExcelImporter({ isOpen: true, type: 'publications' })}
+                          variant="ghost"
+                          buttonStyle="outline"
+                          size="md"
+                          icon={FileText}
+                          fullWidth
+                          className="border-none"
+                        >
+                          {t("manageContent.tabs.publications").toUpperCase()}
+                        </Button>
+                        <div className="border-t border-gray-100 dark:border-neutral-700/50" />
+                        <Button
+                          onClick={() => setExcelImporter({ isOpen: true, type: 'campaigns' })}
+                          variant="ghost"
+                          buttonStyle="outline"
+                          size="md"
+                          icon={Target}
+                          fullWidth
+                          className="border-none"
+                        >
+                          {t("manageContent.tabs.campaigns").toUpperCase()}
+                        </Button>
+                      </div>
+                    </Dropdown.Content>
+                  </Dropdown> */}
+
+                  <Dropdown>
+                    <Dropdown.Trigger>
                       <Button
-                        onClick={() => openAddModal("publication")}
-                        variant="ghost"
-                        buttonStyle="outline"
+                        id="create-publication"
+                        variant="primary"
                         size="md"
-                        icon={FileText}
-                        fullWidth
-                        className="border-none"
+                        icon={Plus}
+                        className="gap-2 uppercase tracking-wider font-bold text-xs backdrop-3xl"
                       >
-                        {t("manageContent.tabs.publications").toUpperCase()}
+                        {t("manageContent.createNew").toUpperCase()}
                       </Button>
-                      <div className="border-t border-gray-100 dark:border-neutral-700/50" />
-                      <Button
-                        onClick={() => openAddModal("campaign")}
-                        variant="ghost"
-                        buttonStyle="outline"
-                        size="md"
-                        icon={Target}
-                        fullWidth
-                        className="border-none"
-                      >
-                        {t("manageContent.tabs.campaigns").toUpperCase()}
-                      </Button>
-                    </div>
-                  </Dropdown.Content>
-                </Dropdown>
+                    </Dropdown.Trigger>
+                    <Dropdown.Content
+                      align="right"
+                      width="auto"
+                      contentClasses="py-1 bg-white/95 dark:bg-neutral-800 shadow-xl rounded-lg min-w-[220px]"
+                    >
+                      <div className="p-1">
+                        <Button
+                          onClick={() => openAddModal("publication")}
+                          variant="ghost"
+                          buttonStyle="outline"
+                          size="md"
+                          icon={FileText}
+                          fullWidth
+                          className="border-none"
+                        >
+                          {t("manageContent.tabs.publications").toUpperCase()}
+                        </Button>
+                        <div className="border-t border-gray-100 dark:border-neutral-700/50" />
+                        <Button
+                          onClick={() => openAddModal("campaign")}
+                          variant="ghost"
+                          buttonStyle="outline"
+                          size="md"
+                          icon={Target}
+                          fullWidth
+                          className="border-none"
+                        >
+                          {t("manageContent.tabs.campaigns").toUpperCase()}
+                        </Button>
+                      </div>
+                    </Dropdown.Content>
+                  </Dropdown>
+                </>
               )}
             </div>
         </div>
@@ -571,6 +625,14 @@ export default function ManageContentPage() {
       </div>
 
       <ModalManager onRefresh={handleRefreshWrapped} />
+
+      <ExcelImporter
+        type={excelImporter.type}
+        isOpen={excelImporter.isOpen}
+        onClose={() => setExcelImporter({ ...excelImporter, isOpen: false })}
+        onSuccess={handleRefreshWrapped}
+        t={t}
+      />
 
       <Modal
         show={deleteConfirmation.isOpen}

@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
 import Button from '@/Components/common/Modern/Button';
-import { Sparkles, Loader2, CheckCircle2, AlertCircle, ExternalLink } from 'lucide-react';
-import toast from 'react-hot-toast';
 import axios from 'axios';
+import { AlertCircle, CheckCircle2, ExternalLink, Loader2, Sparkles } from 'lucide-react';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 
 interface MediaFile {
@@ -83,8 +83,8 @@ export default function VideoReelButton({
 
   const getPlatformIcon = (platform: string) => {
     const icons: Record<string, string> = {
-      instagram: '📸',
-      tiktok: '🎵',
+      instagram: '',
+      tiktok: '',
       youtube_shorts: '▶️',
     };
     return icons[platform] || '🎬';

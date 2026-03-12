@@ -162,16 +162,6 @@ export default function UpdateProfileInformation({
           </div>
         </div>
 
-        {/* Sección: Conexiones */}
-        <div className="border-t border-gray-100 dark:border-neutral-800 pt-8 mt-8">
-          <div className="flex items-center gap-3 pb-4">
-            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              {t("profile.connectedAccounts.title")}
-            </h3>
-          </div>
-          <ConnectedAccounts />
-        </div>
-
         {mustVerifyEmail && user?.email_verified_at === null && (
           <div className="rounded-lg p-6 shadow-inner bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/30">
             <div className="flex items-center gap-3 font-bold text-amber-800 dark:text-amber-300">

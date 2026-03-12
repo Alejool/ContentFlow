@@ -12,6 +12,9 @@ interface TwitterPreviewProps {
   };
   date?: Date;
   className?: string;
+  contentType?: string;
+  pollOptions?: string[];
+  pollDuration?: number;
 }
 
 export const TwitterPreview = ({
@@ -20,6 +23,9 @@ export const TwitterPreview = ({
   user,
   date = new Date(),
   className = "",
+  contentType = "post",
+  pollOptions = [],
+  pollDuration = 24,
 }: TwitterPreviewProps) => {
   return (
     <div
@@ -52,7 +58,7 @@ export const TwitterPreview = ({
             )}
           </div>
 
-          {mediaUrls.length > 0 && (
+          {mediaUrls.length > 0 && contentType !== 'poll' && (
             <div
               className={`mt-3 grid gap-0.5 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800 ${
                 mediaUrls.length === 1
@@ -83,6 +89,35 @@ export const TwitterPreview = ({
                   )}
                 </div>
               ))}
+            </div>
+          )}
+
+          {contentType === 'poll' && pollOptions.length >= 2 && (
+            <div className="mt-3 border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
+              {pollOptions.filter(option => option.trim()).map((option, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800 last:border-b-0 cursor-pointer transition-colors"
+                >
+                  <div className="flex items-center gap-3 flex-1">
+                    <div className="w-4 h-4 border-2 border-blue-400 rounded-full flex items-center justify-center">
+                      <div className="w-2 h-2 bg-blue-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                    <span className="text-[15px] text-gray-900 dark:text-gray-100">
+                      {option}
+                    </span>
+                  </div>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    0%
+                  </span>
+                </div>
+              ))}
+              <div className="px-3 py-2 bg-gray-50 dark:bg-gray-900/30 text-xs text-gray-500 dark:text-gray-400">
+                {pollDuration < 24 
+                  ? `${pollDuration} hour${pollDuration !== 1 ? 's' : ''} left`
+                  : `${Math.floor(pollDuration / 24)} day${Math.floor(pollDuration / 24) !== 1 ? 's' : ''} left`
+                } · 0 votes
+              </div>
             </div>
           )}
 

@@ -1,20 +1,20 @@
 import ApprovalSuccessModal from "@/Components/Content/modals/ApprovalSuccessModal";
 import RejectionReasonModal from "@/Components/Content/modals/RejectionReasonModal";
+import AlertCard from "@/Components/common/Modern/AlertCard";
 import Button from "@/Components/common/Modern/Button";
 import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
 import EmptyState from "@/Components/common/ui/EmptyState";
 import { VirtualList } from "@/Components/common/ui/VirtualList";
+import { formatDateTimeString, formatTimeString } from "@/Utils/dateHelpers";
 import { getDateFnsLocale } from "@/Utils/dateLocales";
 import { Publication } from "@/types/Publication";
-import axios from "axios";
-import { Locale, format, formatDistanceToNow } from "date-fns";
-import { Check, Clock, Eye, Layers, User, X, Info } from "lucide-react";
-import { useState } from "react";
-import { toast } from "react-hot-toast";
-import { useTranslation } from "react-i18next";
-import { formatTimeString, formatDateTimeString } from "@/Utils/dateHelpers";
 import { usePage } from "@inertiajs/react";
-import AlertCard from "@/Components/common/Modern/AlertCard";
+import axios from "axios";
+import { Locale, formatDistanceToNow } from "date-fns";
+import { Check, Clock, Eye, Layers, User, X } from "lucide-react";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 interface ApprovalListProps {
   publications: Publication[];

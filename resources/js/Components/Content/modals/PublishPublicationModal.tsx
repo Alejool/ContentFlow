@@ -1,14 +1,14 @@
 import Button from "@/Components/common/Modern/Button";
-import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
 import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
 import RejectionReasonModal from "@/Components/Content/modals/RejectionReasonModal";
 import { getPlatformConfig } from "@/Constants/socialPlatforms";
 import { usePublishPublication } from "@/Hooks/publication/usePublishPublication";
 import { useConfirm } from "@/Hooks/useConfirm";
-import { formatDateTime } from "@/Utils/formatDate";
-import { validateVideoDuration } from "@/Utils/validationUtils";
 import { usePublicationStore } from "@/stores/publicationStore";
 import { Publication } from "@/types/Publication";
+import { formatDateTimeStyled } from "@/Utils/dateHelpers";
+import { formatDateTime } from "@/Utils/formatDate";
+import { validateVideoDuration } from "@/Utils/validationUtils";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { usePage } from "@inertiajs/react";
 import {
@@ -16,14 +16,12 @@ import {
   CheckCircle,
   Clock,
   Loader2,
-  Settings as SettingsIcon,
   Share2,
   X,
-  XCircle,
+  XCircle
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { formatDateTimeStyled } from "@/Utils/dateHelpers";
 
 // Helper component for recurring posts section
 const RecurringPostsSection = ({ 
@@ -271,6 +269,48 @@ export default function PublishPublicationModal({
 
   // Early return after all hooks
   if (!publication) return null;
+
+  // Function to get supported content types for each platform
+  const getSupportedContentTypes = (platform: string): string[] => {
+    // Use the shared configuration from constants, but with explicit typing
+    const supportedTypes: string[] = [];
+    
+    // Check reel compatibility using the shared constant
+    if (platform.toLowerCase() === 'instagram') {
+      supportedTypes.push('post', 'reel', 'story', 'carousel');
+    } else if (platform.toLowerCase() === 'twitter') {
+      supportedTypes.push('post', 'poll');
+    } else if (platform.toLowerCase() === 'tiktok') {
+      supportedTypes.push('reel');
+    } else if (platform.toLowerCase() === 'youtube') {
+      supportedTypes.push('post', 'reel');
+    } else if (platform.toLowerCase() === 'facebook') {
+      supportedTypes.push('post', 'story', 'reel'); // Facebook no soporta encuestas nativas
+    } else if (platform.toLowerCase() === 'linkedin') {
+      supportedTypes.push('post', 'carousel');
+    } else if (platform.toLowerCase() === 'pinterest') {
+      supportedTypes.push('post', 'carousel');
+    } else {
+      supportedTypes.push('post');
+    }
+
+    return supportedTypes;
+  };
+
+  // Filter connected accounts based on content type compatibility
+  const getCompatibleAccounts = () => {
+    if (!publication.content_type) return connectedAccounts;
+    
+    return connectedAccounts.filter(account => {
+      const supportedTypes = getSupportedContentTypes(account.platform);
+      return supportedTypes.includes(publication.content_type);
+    });
+  };
+
+  const compatibleAccounts = getCompatibleAccounts();
+  const incompatibleAccounts = connectedAccounts.filter(
+    account => !compatibleAccounts.includes(account)
+  );
 
   const handleUnpublishWithConfirm = async (
     accountId: number,
@@ -588,6 +628,46 @@ export default function PublishPublicationModal({
               );
             })()}
 
+            {/* Banner de cuentas incompatibles */}
+            {incompatibleAccounts.length > 0 && (
+              <div className="mb-6 p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <h4 className="text-sm font-bold text-amber-800 dark:text-amber-200">
+                      {t("publications.modal.publish.incompatibleAccountsBanner.title") || "Cuentas No Compatibles"}
+                    </h4>
+                    <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
+                      {t("publications.modal.publish.incompatibleAccountsBanner.message") ||
+                        `Las siguientes cuentas no son compatibles con el tipo de contenido "${publication.content_type || 'post'}":`}
+                    </p>
+
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {incompatibleAccounts.map(account => (
+                        <span
+                          key={account.id}
+                          className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-amber-100 dark:bg-amber-900/40 text-xs font-medium text-amber-800 dark:text-amber-300"
+                        >
+                          <img
+                            src={getPlatformIcon(account.platform)}
+                            alt={account.platform}
+                            className="w-3.5 h-3.5"
+                          />
+                          <span className="capitalize">{account.platform}</span>
+                          <span className="opacity-75">@{account.account_name}</span>
+                        </span>
+                      ))}
+                    </div>
+
+                    <p className="text-xs text-amber-600 dark:text-amber-400 mt-2 font-medium">
+                      {t("publications.modal.publish.incompatibleAccountsBanner.hint") ||
+                        "Estas cuentas no aparecerán en las opciones de publicación."}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex gap-2">
@@ -607,17 +687,29 @@ export default function PublishPublicationModal({
                 </div>
               </div>
 
-              {connectedAccounts.length === 0 ? (
+              {compatibleAccounts.length === 0 ? (
                 <div className="text-center py-8 rounded-lg bg-gray-50 dark:bg-neutral-900/50">
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {t("publications.modal.publish.noConnectedAccounts")}
-                    <br />
-                    {t("publications.modal.publish.connectAccounts")}
+                    {connectedAccounts.length === 0 
+                      ? (
+                        <>
+                          {t("publications.modal.publish.noConnectedAccounts")}
+                          <br />
+                          {t("publications.modal.publish.connectAccounts")}
+                        </>
+                      ) : (
+                        <>
+                          {t("publications.modal.publish.noCompatibleAccounts") || "No hay cuentas compatibles con este tipo de contenido"}
+                          <br />
+                          {t("publications.modal.publish.changeContentType") || "Cambia el tipo de contenido o conecta cuentas compatibles"}
+                        </>
+                      )
+                    }
                   </p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {connectedAccounts.map((account) => {
+                  {compatibleAccounts.map((account) => {
                     const iconSrc = getPlatformIcon(account.platform);
                     const isSelected = selectedPlatforms.includes(account.id);
                     const isPublished = publishedPlatforms.includes(account.id);
@@ -843,28 +935,7 @@ export default function PublishPublicationModal({
                             </div>
                           )}
 
-                          {/* Action Buttons */}
-                          <div className="absolute top-3 right-3 flex items-center gap-1.5 z-10">
-                            {!isPublished && !isScheduled && !isPublishing && !isUnpublishing && !isRetrying && (
-                              <>
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setActivePlatformSettings(account.platform);
-                                  }}
-                                  className="p-1.5 rounded-md transition-all bg-white/90 dark:bg-neutral-800/90 backdrop-blur-sm hover:bg-white dark:hover:bg-neutral-700 text-gray-600 dark:text-gray-400 shadow-sm border border-gray-200 dark:border-neutral-700"
-                                >
-                                  <SettingsIcon className="w-4 h-4" />
-                                </button>
-                                {isSelected && (
-                                  <div className="p-1.5 rounded-md bg-primary-500 shadow-sm">
-                                    <CheckCircle className="w-4 h-4 text-white" />
-                                  </div>
-                                )}
-                              </>
-                            )}
-                          </div>
+        
                         </div>
 
                         {/* Scheduled Badge - Outside the card */}
@@ -1070,23 +1141,6 @@ export default function PublishPublicationModal({
               ) : null}
             </div>
 
-            <PlatformSettingsModal
-              isOpen={!!activePlatformSettings}
-              onClose={() => setActivePlatformSettings(null)}
-              platform={activePlatformSettings || ""}
-              settings={
-                platformSettings[activePlatformSettings?.toLowerCase() || ""] ||
-                {}
-              }
-              onSettingsChange={(newSettings) => {
-                if (activePlatformSettings) {
-                  setPlatformSettings((prev) => ({
-                    ...prev,
-                    [activePlatformSettings.toLowerCase()]: newSettings,
-                  }));
-                }
-              }}
-            />
 
             {publication && (
               <RejectionReasonModal

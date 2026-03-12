@@ -2,7 +2,7 @@ import { useCampaignStore } from "@/stores/campaignStore";
 import axios from "axios";
 import { Target } from "lucide-react";
 import { useState } from "react";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 import AiFieldSuggester from "@/Components/AiAssistant/AiFieldSuggester";
@@ -15,8 +15,8 @@ import CampaignDateFields from "@/Components/Content/Campaign/common/CampaignDat
 import PublicationSelector from "@/Components/Content/Campaign/common/PublicationSelector";
 
 import { useAddCampaignForm } from "@/Hooks/campaign/useAddCampaignForm";
-import { useModalFocusTrap } from "@/Hooks/useModalFocusTrap";
 import { usePublicationsForCampaign } from "@/Hooks/campaign/usePublicationsForCampaign";
+import { useModalFocusTrap } from "@/Hooks/useModalFocusTrap";
 
 import { DollarSign, FileText } from "lucide-react";
 import ModalFooter from "./common/ModalFooter";

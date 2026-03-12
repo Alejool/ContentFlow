@@ -62,6 +62,9 @@ class CreatePublicationAction
         'platform_settings' => is_string($data['platform_settings'] ?? null)
           ? json_decode($data['platform_settings'], true)
           : ($data['platform_settings'] ?? Auth::user()->global_platform_settings),
+        // Poll fields
+        'poll_options' => $data['poll_options'] ?? null,
+        'poll_duration_hours' => $data['poll_duration_hours'] ?? null,
       ]);
 
       // Create recurrence settings if publication is recurring

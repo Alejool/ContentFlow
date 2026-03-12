@@ -2,7 +2,7 @@ import { useContentManagement } from "@/Hooks/useContentManagement";
 import { Campaign } from "@/types/Campaign";
 import { AlertTriangle, Target } from "lucide-react";
 import { useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 import CampaignDateFields from "@/Components/Content/Campaign/common/CampaignDateFields";
@@ -11,8 +11,8 @@ import PublicationSelector from "@/Components/Content/Campaign/common/Publicatio
 import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
 
 import { useEditCampaignForm } from "@/Hooks/campaign/useEditCampaignForm";
-import { useModalFocusTrap } from "@/Hooks/useModalFocusTrap";
 import { usePublicationsForCampaignEdit } from "@/Hooks/campaign/usePublicationsForCampaignEdit";
+import { useModalFocusTrap } from "@/Hooks/useModalFocusTrap";
 import { usePage } from "@inertiajs/react";
 import ModalFooter from "./common/ModalFooter";
 

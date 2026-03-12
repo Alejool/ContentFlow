@@ -1,11 +1,11 @@
 import AiFieldSuggester from "@/Components/AiAssistant/AiFieldSuggester";
 import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
 import CampaignSelector from "@/Components/Content/Publication/common/CampaignSelector";
+import { ContentType } from "@/Components/Content/Publication/common/ContentTypeIconSelector";
+import ContentTypeSelectorBar from "@/Components/Content/Publication/common/ContentTypeSelectorBar";
+import PollFields from "@/Components/Content/Publication/common/PollFields";
 import SocialAccountsSection from "@/Components/Content/Publication/common/add/SocialAccountsSection";
 import MediaUploadSection from "@/Components/Content/Publication/common/edit/MediaUploadSection";
-import ContentTypeSelectorBar from "@/Components/Content/Publication/common/ContentTypeSelectorBar";
-import { ContentType } from "@/Components/Content/Publication/common/ContentTypeIconSelector";
-import PollFields from "@/Components/Content/Publication/common/PollFields";
 import ModalFooter from "@/Components/Content/modals/common/ModalFooter";
 import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
 import PublicationStatusSection from "@/Components/Content/modals/common/PublicationStatusSection";
@@ -13,8 +13,8 @@ import ScheduleSection from "@/Components/Content/modals/common/ScheduleSection"
 import Input from "@/Components/common/Modern/Input";
 import Textarea from "@/Components/common/Modern/Textarea";
 import { useCampaigns } from "@/Hooks/campaign/useCampaigns";
-import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
 import { useContentType } from "@/Hooks/publication/useContentType";
+import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
 import { useConfirm } from "@/Hooks/useConfirm";
 import { useS3Upload } from "@/Hooks/useS3Upload";
 import { useAccountsStore } from "@/stores/socialAccountsStore";
@@ -23,7 +23,7 @@ import axios from "axios";
 import { FileText, Hash, Save, Target } from "lucide-react";
 import { useMemo } from "react";
 import { useWatch } from "react-hook-form";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 interface AddPublicationModalProps {
   isOpen: boolean;
@@ -357,6 +357,7 @@ export default function AddPublicationModal({
             }
           }}
           t={t}
+          mediaFiles={watched.media_files}
         />
 
         <main className="flex-1 overflow-y-auto custom-scrollbar">
@@ -451,6 +452,7 @@ export default function AddPublicationModal({
                   globalSchedule={watched.scheduled_at ?? undefined}
                   error={errors.social_accounts?.message as string}
                   socialPostLogs={publication?.social_post_logs}
+                  contentType={watched.content_type}
                 />
                 </div>
 

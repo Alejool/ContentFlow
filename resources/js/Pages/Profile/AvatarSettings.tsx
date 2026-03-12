@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { Upload, X } from "lucide-react";
 import Button from "@/Components/common/Modern/Button";
-import { useTranslation } from "react-i18next";
 import axios from "axios";
-import { toast } from "react-hot-toast";
+import { Upload, X } from "lucide-react";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 interface AvatarSettingsProps {
   user: {

@@ -2,7 +2,7 @@ import { Campaign } from "@/types/Campaign";
 import { Publication } from "@/types/Publication";
 import axios, { AxiosResponse } from "axios";
 import { useState } from "react";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 export type ContentItem = Campaign | Publication;

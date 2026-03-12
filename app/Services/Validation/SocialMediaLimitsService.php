@@ -143,10 +143,12 @@ class SocialMediaLimitsService
         
         // Validar contenido multimedia
         $mediaFiles = $publication->mediaFiles;
+        $contentType = $publication->content_type ?? 'post';
         
         if ($mediaFiles->isEmpty()) {
-            // Algunas plataformas requieren media
-            if (in_array($platform, ['youtube', 'tiktok', 'instagram'])) {
+            // Solo validar media requerida para tipos de contenido que la necesitan
+            // Las encuestas (polls) no requieren media
+            if ($contentType !== 'poll' && in_array($platform, ['youtube', 'tiktok', 'instagram'])) {
                 $errors[] = "La plataforma {$platform} requiere al menos un archivo multimedia";
             }
         } else {

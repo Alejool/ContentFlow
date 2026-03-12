@@ -9,7 +9,8 @@
       "contentType":{
         "label": "Content Type",
         "value": "Video",
-        "filteredByPlatforms": "Filtered by selected platforms"
+        "filteredByPlatforms": "Filtered by selected platforms",
+        "locked": "Content type is locked after uploading media"
       },
       "poll": {
         "title": "Poll Options",
@@ -215,6 +216,7 @@
         "accountMissingText": "This publication was posted on an account ({{account}}) that is no longer connected. Editing it will create a new version for your current account(s). Proceed?",
         "selectSocialAccounts": "Select Accounts",
         "lockedBySession": "Locked by Session",
+        "questionField": "Question",
         "dragDrop": {
           "title": "Drag and drop to sort",
           "subtitle": "Upload your multimedia files here"
@@ -281,6 +283,8 @@
         "deselectAll": "Deselect All",
         "noConnectedAccounts": "No accounts found.",
         "connectAccounts": "Please connect your accounts first.",
+        "noCompatibleAccounts": "No accounts compatible with this content type.",
+        "changeContentType": "Change the content type or connect compatible accounts.",
         "published": "Published",
         "viewPost": "View post",
         "loading": "Loading...",
@@ -340,6 +344,11 @@
           "message": "This publication is already published on the following accounts:",
           "hint": "You can publish to additional accounts by selecting them below."
         },
+        "incompatibleAccountsBanner": {
+          "title": "Incompatible Accounts",
+          "message": "The following accounts are not compatible with the content type \"{contentType}\":",
+          "hint": "These accounts will not appear in the publishing options."
+        },
         "publishedInOtherAccountBanner": {
           "title": "Published in Different Account",
           "message": "This publication was published on a {{platform}} account that is no longer connected.",
@@ -356,6 +365,7 @@
         "notAvailable": "Preview not available for this platform"
       },
       "validation": {
+        "mediaRequired": "Media files are required",
         "descRequired": "Description is required",
         "nameRequired": "Name is required",
         "descMin": "Description must be at least 10 characters long",
@@ -373,7 +383,9 @@
         "publishDateRequired": "Publish Date is required",
         "publishedOnRequired": "Published On is required",
         "associatedPublicationsRequired": "Associated Publications is required",
-        "hashtagsRequired": "Hashtags is required",
+        "hashtagsRequired": "Hashtags are required",
+        "questionRequired": "Question is required",
+        "descriptionRequired": "Description is required",
         "schedulePublicationRequired": "Schedule Publication is required",
         "descriptionLength": "Description must be at least 10 characters long",
         "hashtagsLength": "Hashtags must be at least 10 characters long",
@@ -393,6 +405,7 @@
         "recurrence_days": "Invalid recurrence days",
         "durationErrors": "Please fix the duration errors before saving.",
         "pollOptionsRequired": "Polls require at least 2 options",
+        "pollDurationRequired": "Poll duration must be between 1 and 168 hours",
         "content_type_not_supported": "Content type ':type' is not supported by :platforms. Please select compatible platforms or change the content type.",
         "reel_requires_one_video": "Reels require exactly 1 video file",
         "reel_requires_video_only": "Reels require video files only (no images)",

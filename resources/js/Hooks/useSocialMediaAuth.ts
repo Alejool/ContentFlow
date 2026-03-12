@@ -1,6 +1,6 @@
 import { useAccountsStore } from "@/stores/socialAccountsStore";
 import axios from "axios";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 export const useSocialMediaAuth = () => {
   const accounts = useAccountsStore((s) => s.accounts);

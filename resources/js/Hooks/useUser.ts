@@ -5,7 +5,7 @@ import { router } from "@inertiajs/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useForm as useHookForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 export const useUser = (initialUser: any) => {
@@ -165,7 +165,7 @@ export const useUser = (initialUser: any) => {
   const onInvalid = (errors: any) => {
     toast.error(
       t("validation.check_errors") ||
-        "Por favor, revisa los errores en el formulario",
+        "Revisa los errores en el formulario",
     );
 
     // Toast specific high-level errors if they exist

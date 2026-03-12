@@ -204,10 +204,23 @@ class PlatformPublishService
     if ($socialAccount->platform === 'youtube') {
       $metadata['thumbnail_path'] = $this->getYoutubeThumbnailPath($publication);
     }
+    
     $pSettings = $postLog->platform_settings ?? $publication->platform_settings ?? [];
 
     if (is_string($pSettings)) {
       $pSettings = json_decode($pSettings, true) ?? [];
+    }
+
+    // Add poll information to platform settings if this is a poll
+    if ($publication->content_type === 'poll') {
+      $platformKey = $socialAccount->platform;
+      if (!isset($pSettings[$platformKey])) {
+        $pSettings[$platformKey] = [];
+      }
+      
+      $pSettings[$platformKey]['type'] = 'poll';
+      $pSettings[$platformKey]['poll_options'] = $publication->poll_options ?? [];
+      $pSettings[$platformKey]['poll_duration_hours'] = $publication->poll_duration_hours ?? 24;
     }
 
     return new SocialPostDTO(

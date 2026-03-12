@@ -23,6 +23,21 @@ class FacebookService extends BaseSocialService
     $rawPath = $post->mediaPaths[0] ?? null;
 
     try {
+      // Check if this is a poll
+      $platformSettings = $post->platformSettings['facebook'] ?? [];
+      $isPoll = ($platformSettings['type'] ?? '') === 'poll';
+
+      if ($isPoll) {
+        $pollResult = $this->handlePoll($pageId, $content, $platformSettings);
+        if ($pollResult) {
+          return PostResultDTO::success(
+            postId: $pollResult,
+            postUrl: "https://facebook.com/{$pollResult}",
+            rawData: ['platform' => 'facebook', 'type' => 'poll']
+          );
+        }
+      }
+
       if (!empty($rawPath)) {
         $isVideo = str_contains($rawPath, '.mp4') || str_contains($rawPath, '.mov') || str_contains($rawPath, '.avi') || str_contains($rawPath, '.m4v');
 
@@ -537,6 +552,37 @@ class FacebookService extends BaseSocialService
     }
 
     return $result['id'];
+  }
+
+  private function handlePoll($pageId, $content, $settings)
+  {
+    $pollOptions = array_filter($settings['poll_options'] ?? [], fn($opt) => !empty(trim($opt)));
+    
+    if (count($pollOptions) < 2) {
+      throw new \Exception("Facebook polls require at least 2 options");
+    }
+
+    if (count($pollOptions) > 2) {
+      throw new \Exception("Facebook polls support maximum 2 options");
+    }
+
+    // Facebook Graph API doesn't support creating polls through the regular feed endpoint
+    // Facebook polls are only available through Facebook's native interface
+    // We'll create a regular post with poll-like content as a fallback
+    
+    \Log::info("Facebook polls are not supported through Graph API, creating text post with poll options", [
+      'page_id' => $pageId,
+      'poll_options' => $pollOptions
+    ]);
+    
+    // Create a text post that looks like a poll
+    $pollText = $content . "\n\n📊 Poll Options:\n";
+    foreach ($pollOptions as $index => $option) {
+      $pollText .= ($index + 1) . ". " . $option . "\n";
+    }
+    $pollText .= "\n💬 Comment with your choice!";
+    
+    return $this->publishTextPost($pageId, $pollText);
   }
 
   private function uploadPhoto($pageId, $photoUrl, $caption)

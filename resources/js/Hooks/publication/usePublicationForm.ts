@@ -7,7 +7,7 @@ import { useUploadQueue } from "@/stores/uploadQueueStore";
 import { PageProps } from "@/types";
 import { Publication } from "@/types/Publication";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { router, usePage } from "@inertiajs/react";
+import { usePage } from "@inertiajs/react";
 import axios from "axios";
 import { startTransition, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -48,7 +48,11 @@ export const usePublicationForm = ({
     }
   };
 
-  const schema = useMemo(() => publicationSchema(t), [t]);
+  const [currentContentType, setCurrentContentType] = useState<string>(publication?.content_type || 'post');
+  
+  const schema = useMemo(() => {
+    return publicationSchema(t, currentContentType);
+  }, [t, currentContentType]);
 
   const { props } = usePage<PageProps>();
   const user = props.auth.user;
@@ -123,7 +127,8 @@ export const usePublicationForm = ({
 
   const form = useForm<PublicationFormData>({
     resolver: zodResolver(schema),
-    mode: "all",
+    mode: "onBlur",
+    reValidateMode: "onChange",
     defaultValues: {
       title: "",
       description: "",
@@ -134,6 +139,9 @@ export const usePublicationForm = ({
       scheduled_at: null,
       lock_content: false,
       status: "draft",
+      content_type: "post",
+      poll_options: null,
+      poll_duration_hours: null,
       is_recurring: false,
       recurrence_type: "daily",
       recurrence_interval: 1,
@@ -155,6 +163,41 @@ export const usePublicationForm = ({
     control,
   } = form;
   const watched = watch();
+
+  // Update schema when content type changes
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === 'content_type' && value.content_type !== currentContentType) {
+        console.log('Content type changed from', currentContentType, 'to', value.content_type);
+        setCurrentContentType(value.content_type || 'post');
+        
+        // Clear validation errors for fields that are no longer required
+        const newContentType = value.content_type || 'post';
+        const FIELD_VALIDATION_RULES = {
+          post: ['title', 'description', 'goal', 'hashtags'],
+          reel: ['title', 'description', 'hashtags'],
+          story: [], // No required fields for stories
+          poll: ['title', 'poll_options', 'poll_duration_hours'], // Only poll-specific fields
+          carousel: ['title', 'description', 'goal', 'hashtags'],
+        };
+        
+        const newRequiredFields = FIELD_VALIDATION_RULES[newContentType as keyof typeof FIELD_VALIDATION_RULES] || FIELD_VALIDATION_RULES.post;
+        
+        // Clear errors for fields that are no longer required
+        ['hashtags', 'description', 'goal'].forEach(field => {
+          if (!newRequiredFields.includes(field)) {
+            form.clearErrors(field as any);
+          }
+        });
+        
+        // Force re-validation with new schema
+        setTimeout(() => {
+          form.trigger();
+        }, 100);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form, currentContentType]);
 
   // Unified logging for errors
   useEffect(() => {
@@ -182,6 +225,9 @@ export const usePublicationForm = ({
         campaign_id: publication.campaigns?.[0]?.id?.toString() || null,
         social_accounts: getValues("social_accounts") || [], // Phase 2 will refine this
         scheduled_at: publication.scheduled_at || null,
+        content_type: publication.content_type || "post",
+        poll_options: publication.poll_options || null,
+        poll_duration_hours: publication.poll_duration_hours || null,
         status: ((publication as any).status === "published" ||
         (publication as any).status === "scheduled" ||
         (publication as any).status === "publishing" ||
@@ -259,6 +305,9 @@ export const usePublicationForm = ({
         campaign_id: null,
         social_accounts: [] as number[],
         scheduled_at: null,
+        content_type: "post",
+        poll_options: null,
+        poll_duration_hours: null,
         status: "draft",
         use_global_schedule: false,
         lock_content: false,
@@ -616,19 +665,22 @@ export const usePublicationForm = ({
   };
 
   const handleHashtagChange = (value: string) => {
-    const isDeleting = value.length < prevHashtagsRef.current.length;
-    const endsWithSpace = value.endsWith(" ");
+    // Ensure we always work with a string
+    const stringValue = String(value || '');
+    
+    const isDeleting = stringValue.length < prevHashtagsRef.current.length;
+    const endsWithSpace = stringValue.endsWith(" ");
 
-    let formatted = value;
+    let formatted = stringValue;
 
-    if (!isDeleting && endsWithSpace && value.trim().length > 0) {
-      const tags = value.trim().split(/\s+/);
+    if (!isDeleting && endsWithSpace && stringValue.trim().length > 0) {
+      const tags = stringValue.trim().split(/\s+/);
       const processedTags = tags.map((tag) =>
         tag.startsWith("#") ? tag : `#${tag}`,
       );
       formatted = processedTags.join(" ") + " #";
     } else if (!endsWithSpace) {
-      const tags = value.split(/\s+/);
+      const tags = stringValue.split(/\s+/);
       formatted = tags
         .map((tag, index) => {
           if (tag.length === 0) return "";
@@ -638,9 +690,12 @@ export const usePublicationForm = ({
         .join(" ");
     }
 
-    prevHashtagsRef.current = formatted;
-    setValue("hashtags", formatted, {
-      shouldValidate: true,
+    // Ensure formatted is always a string
+    const finalValue = String(formatted || '');
+    
+    prevHashtagsRef.current = finalValue;
+    setValue("hashtags", finalValue, {
+      shouldValidate: false, // Disable validation during typing
       shouldDirty: true,
     });
   };
@@ -755,33 +810,47 @@ export const usePublicationForm = ({
       // Optionally reload or sync store
       usePublicationStore.getState().fetchPublicationById(publication.id);
     } catch (err) {
-      toast.error(
-        t("publications.messages.cancelError") ||
-          "Error al cancelar la publicación",
-      );
+      // toast.error(
+      //   t("publications.messages.cancelError") ||
+      //     "Error al cancelar la publicación",
+      // );
     }
   };
 
   const onFormSubmit = async (data: PublicationFormData) => {
-    if (mediaFiles.length === 0) {
+    console.log('onFormSubmit called with data:', data);
+    console.log('Content type:', data.content_type);
+    console.log('Media files length:', mediaFiles.length);
+    console.log('Social accounts:', data.social_accounts);
+    console.log('Duration errors:', durationErrors);
+    
+    // Skip media validation for polls (they don't require media)
+    if (data.content_type !== "poll" && mediaFiles.length === 0) {
+      console.log('Blocking: Media required for non-poll content');
       setImageError(t("publications.modal.validation.imageRequired"));
       return;
     }
 
     if (data.social_accounts && data.social_accounts.length > 0) {
+      console.log('Validating social accounts schedule...');
       const hasGlobalSchedule = !!data.scheduled_at;
+      console.log('Has global schedule:', hasGlobalSchedule);
 
       // Skip schedule validation for already-published posts
       // Published posts don't need new schedule dates
       const isAlreadyPublished = publication?.status === "published";
+      console.log('Is already published:', isAlreadyPublished);
 
       // Only validate schedule for non-published posts (draft, scheduled, failed, etc.)
       if (!isAlreadyPublished) {
         const allAccountsHaveSchedule = data.social_accounts.every(
           (id) => accountSchedules[id] || hasGlobalSchedule,
         );
+        console.log('All accounts have schedule:', allAccountsHaveSchedule);
+        console.log('Account schedules:', accountSchedules);
 
         if (!allAccountsHaveSchedule && !data.scheduled_at) {
+          console.log('Blocking: Schedule validation failed');
           toast.error(
             t("publications.modal.validation.scheduleRequired") ||
               "Debes programar una fecha para todas las redes seleccionadas o establecer una fecha global.",
@@ -792,12 +861,15 @@ export const usePublicationForm = ({
     }
 
     if (Object.keys(durationErrors).length > 0) {
+      console.log('Blocking: Duration errors exist:', durationErrors);
       toast.error(
         t("publications.validation.durationErrors") ||
           "Por favor, corrige los errores de duración antes de guardar.",
       );
       return;
     }
+    
+    console.log('All validations passed, proceeding with form submission...');
     setIsSubmitting(true);
     try {
       const formData = new FormData();
@@ -805,6 +877,20 @@ export const usePublicationForm = ({
       formData.append("description", data.description || "");
       formData.append("goal", data.goal || "");
       formData.append("hashtags", data.hashtags || "");
+      
+      // Add content type and poll fields
+      formData.append("content_type", data.content_type || "post");
+      
+      if (data.content_type === "poll") {
+        if (data.poll_options && data.poll_options.length > 0) {
+          data.poll_options.forEach((option, index) => {
+            formData.append(`poll_options[${index}]`, option);
+          });
+        }
+        if (data.poll_duration_hours) {
+          formData.append("poll_duration_hours", data.poll_duration_hours.toString());
+        }
+      }
 
       if (data.campaign_id && data.campaign_id !== "") {
         formData.append("campaign_id", data.campaign_id.toString());
@@ -1008,8 +1094,7 @@ export const usePublicationForm = ({
         toast.success(
           publication
             ? t("publications.messages.updateSuccess")
-            : t("publications.messages.createSuccess"),
-          { id: publication ? `pub-update-${publication.id}` : "pub-create" },
+            : t("publications.messages.createSuccess")
         );
         
         // Reset dirty state after successful save so next time modal opens with fresh data
@@ -1100,7 +1185,8 @@ export const usePublicationForm = ({
         }
 
         if (attachedImmediately) {
-          router.reload({ only: ["publications", "publication"] });
+          // Refresh the page to show updated media
+          window.location.reload();
         }
       };
 
@@ -1132,18 +1218,105 @@ export const usePublicationForm = ({
   };
 
   const onInvalidSubmit = (errs: any) => {
-    const errorFields = Object.keys(errs)
-      .map((key) => t(`publications.modal.add.${key}`) || key)
-      .join(", ");
+    console.log('=== onInvalidSubmit called ===');
+    console.log('Form validation errors:', errs);
+    console.log('Current form values:', watched);
+    console.log('Content type:', watched.content_type);
+    console.log('Hashtags value:', watched.hashtags, 'Type:', typeof watched.hashtags);
+    
+    const contentType = watched.content_type || 'post';
+    
+    // Define what fields should be validated for each content type
+    const FIELD_VALIDATION_RULES = {
+      post: ['title', 'description', 'goal', 'hashtags'],
+      reel: ['title', 'description', 'hashtags'],
+      story: [], // No required fields for stories
+      poll: ['title', 'poll_options', 'poll_duration_hours'], // Only poll-specific fields
+      carousel: ['title', 'description', 'goal', 'hashtags'],
+    };
+    
+    const requiredFields = FIELD_VALIDATION_RULES[contentType as keyof typeof FIELD_VALIDATION_RULES] || FIELD_VALIDATION_RULES.post;
+    
+    console.log('Required fields for', contentType, ':', requiredFields);
+    
+    // Content-type specific validation messages
+    const getFieldError = (field: string) => {
+      // Skip validation if field is not required for this content type
+      if (!requiredFields.includes(field)) {
+        console.log('Skipping validation for', field, 'in', contentType);
+        return null;
+      }
+      
+      switch (field) {
+        case 'hashtags':
+          return t("publications.modal.validation.hashtagsRequired") || "Hashtags are required";
+        case 'description':
+          return t("publications.modal.validation.descriptionRequired") || "Description is required";
+        case 'goal':
+          return t("publications.modal.validation.goalRequired") || "Goal is required";
+        case 'title':
+          return contentType === 'poll' 
+            ? t("publications.modal.validation.questionRequired") || "Question is required"
+            : t("publications.modal.validation.titleRequired") || "Title is required";
+        case 'poll_options':
+          return t("publications.modal.validation.pollOptionsRequired") || "Poll options are required";
+        case 'poll_duration_hours':
+          return t("publications.modal.validation.pollDurationRequired") || "Poll duration is required";
+        default:
+          return t(`publications.modal.validation.${field}Required`) || `${field} is required`;
+      }
+    };
 
+    // Filter errors based on content type - only show errors for required fields
+    const relevantErrors = Object.keys(errs)
+      .filter(key => {
+        // Always include poll-specific errors for polls
+        if (contentType === 'poll' && (key === 'poll_options' || key === 'poll_duration_hours')) {
+          return true;
+        }
+        // Skip scheduled_at errors if use_global_schedule is false OR if scheduled_at is empty
+        if (key === 'scheduled_at') {
+          const hasGlobalSchedule = watched.use_global_schedule;
+          const hasScheduledValue = watched.scheduled_at && watched.scheduled_at.trim() !== '';
+          console.log('Scheduled_at validation - global schedule:', hasGlobalSchedule, 'has value:', hasScheduledValue);
+          
+          // Only validate scheduled_at if global schedule is enabled AND there's actually a value
+          if (!hasGlobalSchedule || !hasScheduledValue) {
+            console.log('Skipping scheduled_at validation - global schedule not enabled or no value');
+            return false;
+          }
+        }
+        // Include other required fields
+        return requiredFields.includes(key);
+      })
+      .map(key => getFieldError(key))
+      .filter(error => error !== null);
+
+    console.log('Relevant errors after filtering:', relevantErrors);
+
+    // If there are no relevant errors, call onFormSubmit directly
+    if (relevantErrors.length === 0) {
+      console.log('No relevant validation errors found, proceeding with submission');
+      console.log('About to call onFormSubmit directly');
+      // Call the submit function directly with current form values
+      try {
+        onFormSubmit(watched as PublicationFormData);
+        console.log('onFormSubmit called successfully');
+      } catch (error) {
+        console.error('Error calling onFormSubmit:', error);
+      }
+      return;
+    }
+
+    // Show errors only if there are relevant ones
     toast.error(
-      `${t("common.errors.checkFormErrors")}${
-        errorFields ? `: ${errorFields}` : ""
-      }`,
+      `${t("common.errors.checkFormErrors")}: ${relevantErrors.join(", ")}`
     );
 
-    if (mediaFiles.length === 0) {
-      setImageError(t("publications.modal.validation.imageRequired"));
+    // Content-type specific media validation
+    const mediaRequiredTypes = ['reel', 'story', 'carousel'];
+    if (mediaRequiredTypes.includes(contentType) && mediaFiles.length === 0) {
+      setImageError(t("publications.modal.validation.mediaRequired") || "Media is required for this content type");
     }
   };
 

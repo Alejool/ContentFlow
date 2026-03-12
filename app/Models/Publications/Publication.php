@@ -683,7 +683,7 @@ class Publication extends Model
       'twitter' => ['post', 'poll'],
       'tiktok' => ['reel'],
       'youtube' => ['post', 'reel'],
-      'facebook' => ['post', 'story', 'poll'],
+      'facebook' => ['post', 'story', 'poll', 'reel'], // Added reel for Facebook
       'linkedin' => ['post', 'carousel'],
       'pinterest' => ['post', 'carousel'],
     ];
@@ -707,7 +707,7 @@ class Publication extends Model
         'label' => 'Reel/Short',
         'description' => 'Short vertical video',
         'icon' => 'Video',
-        'platforms' => ['instagram', 'tiktok', 'youtube'],
+        'platforms' => ['instagram', 'tiktok', 'youtube', 'facebook'],
       ],
       'story' => [
         'label' => 'Story',

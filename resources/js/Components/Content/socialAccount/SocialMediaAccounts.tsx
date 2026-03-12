@@ -1,29 +1,26 @@
+import SocialAccountCardSkeleton from "@/Components/common/ui/skeletons/SocialAccountCardSkeleton";
 import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
-import DisconnectWarningModal from "@/Components/Content/modals/DisconnectWarningModal";
 import DisconnectBlockerModal from "@/Components/Content/modals/DisconnectBlockerModal";
+import DisconnectWarningModal from "@/Components/Content/modals/DisconnectWarningModal";
 import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatforms";
 import { useSocialMediaAuth } from "@/Hooks/useSocialMediaAuth";
 import { getPlatformSchema } from "@/schemas/platformSettings";
 import { Link, router, usePage } from "@inertiajs/react";
 import axios from "axios";
 import {
-  AlertCircle,
-  BarChart3,
-  Check,
-  ChevronDown,
-  ChevronUp,
-  Clock,
-  ExternalLink,
-  Loader2,
-  Settings,
-  Shield,
-  X,
-  Zap,
+    BarChart3,
+    Check,
+    ChevronDown,
+    ChevronUp,
+    Clock,
+    ExternalLink,
+    Loader2,
+    Settings,
+    X
 } from "lucide-react";
 import { memo, useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import SocialAccountCardSkeleton from "@/Components/common/ui/skeletons/SocialAccountCardSkeleton";
 
 interface Account {
   id: number; // For connected accounts, this is the DB ID. For unconnected, it might be platform index.

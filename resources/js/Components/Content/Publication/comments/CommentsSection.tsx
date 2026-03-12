@@ -1,10 +1,12 @@
 import { Avatar } from "@/Components/common/Avatar";
+import Button from "@/Components/common/Modern/Button";
+import Input from "@/Components/common/Modern/Input";
 import ConfirmDialog from "@/Components/common/ui/ConfirmDialog";
 import axios from "axios";
 import { format } from "date-fns";
 import { Send, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 interface Comment {
@@ -306,41 +308,50 @@ export const CommentsSection = ({
           </div>
         )}
 
-        <input
-          type="text"
-          value={newComment}
-          onChange={(e) => {
-            const val = e.target.value;
-            setNewComment(val);
+        <div className="relative">
+          <Input
+            id="comment-input"
+            type="text"
+            value={newComment}
+            onChange={(e) => {
+              const val = e.target.value;
+              setNewComment(val);
 
-            const lastAt = val.lastIndexOf("@");
-            if (lastAt !== -1 && (lastAt === 0 || val[lastAt - 1] === " ")) {
-              setShowMentions(true);
-              setMentionFilter(val.substring(lastAt + 1));
-            } else {
-              setShowMentions(false);
+              const lastAt = val.lastIndexOf("@");
+              if (lastAt !== -1 && (lastAt === 0 || val[lastAt - 1] === " ")) {
+                setShowMentions(true);
+                setMentionFilter(val.substring(lastAt + 1));
+              } else {
+                setShowMentions(false);
+              }
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSubmit(e as any);
+              }
+            }}
+            placeholder={
+              t("publications.modal.comments.placeholder") || "Write a comment..."
             }
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              handleSubmit(e as any);
-            }
-          }}
-          placeholder={
-            t("publications.modal.comments.placeholder") || "Write a comment..."
-          }
-          className={`w-full pl-4 pr-10 py-2 text-sm bg-white dark:bg-black border border-gray-200 dark:border-neutral-800 rounded-lg focus:ring-primary-500 focus:border-primary-500 ${replyTo ? "rounded-t-none" : ""}`}
-          disabled={submitting}
-        />
-        <button
-          type="button"
-          onClick={handleSubmit as any}
-          disabled={!newComment.trim() || submitting}
-          className="absolute right-1 top-1 p-1.5 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          <Send className="w-4 h-4" />
-        </button>
+            className={`pr-12 ${replyTo ? "rounded-t-none" : ""}`}
+            disabled={submitting}
+            variant="outlined"
+            sizeType="md"
+          />
+          <Button
+            type="button"
+            onClick={handleSubmit as any}
+            disabled={!newComment.trim() || submitting}
+            variant="primary"
+            buttonStyle="icon"
+            size="sm"
+            icon={Send}
+            className="absolute right-2 top-1/2 -translate-y-1/2"
+          >
+            <span className="sr-only">Send</span>
+          </Button>
+        </div>
       </div>
 
       <ConfirmDialog

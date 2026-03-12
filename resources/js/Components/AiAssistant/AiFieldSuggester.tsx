@@ -1,10 +1,10 @@
+import Button from "@/Components/common/Modern/Button";
 import { usePage } from "@inertiajs/react";
 import axios from "axios";
 import { Sparkles } from "lucide-react";
 import React, { useMemo, useState } from "react";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import Button from "@/Components/common/Modern/Button";
 
 interface AiFieldSuggesterProps {
   fields: Record<string, any>;

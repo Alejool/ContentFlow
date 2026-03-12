@@ -1,13 +1,13 @@
+import FilterSection from "@/Components/Content/common/FilterSection";
 import StatCard from "@/Components/Workspace/StatCard";
 import Button from "@/Components/common/Modern/Button";
 import Input from "@/Components/common/Modern/Input";
-import FilterSection from "@/Components/Content/common/FilterSection";
 import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
+import { formatDateString, formatTimeString } from "@/Utils/dateHelpers";
 import { router } from "@inertiajs/react";
 import axios from "axios";
 import {
   Activity,
-  AlertCircle,
   Bell,
   CheckCircle,
   ChevronRight,
@@ -17,14 +17,13 @@ import {
   Server,
   Share2,
   ShieldCheck,
-  XCircle,
+  XCircle
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import ActivityLogSkeleton from "./ActivityLogSkeleton";
-import { formatDateString, formatTimeString } from "@/Utils/dateHelpers";
 
 interface IntegrationsSettingsTabProps {
   workspace: any;

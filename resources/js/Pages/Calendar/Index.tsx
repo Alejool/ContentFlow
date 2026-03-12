@@ -1,39 +1,31 @@
-import Button from "@/Components/common/Modern/Button";
-import { DynamicModal } from "@/Components/common/Modern/DynamicModal";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { formatTime } from "@/Utils/formatDate";
-import { Head } from "@inertiajs/react";
-import EmptyState from "@/Components/common/EmptyState";
-import { getEmptyStateByKey } from "@/Utils/emptyStateMapper";
-import {
-  eachDayOfInterval,
-  endOfMonth,
-  format,
-  isSameDay,
-  isSameMonth,
-  isToday,
-  parseISO,
-  startOfMonth,
-} from "date-fns";
-import {
-  Calendar as CalendarIcon,
-  Filter,
-  Loader2,
-  Trash2,
-} from "lucide-react";
-import React, { useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
-import { useTranslation } from "react-i18next";
-import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatformsConfig";
-import { CalendarViewSelector } from "@/Components/Calendar/CalendarViewSelector";
 import { CalendarNavigation } from "@/Components/Calendar/CalendarNavigation";
+import { CalendarViewSelector } from "@/Components/Calendar/CalendarViewSelector";
+import { DayView } from "@/Components/Calendar/DayView";
+import { EventDetailsModal } from "@/Components/Calendar/EventDetailsModal";
+import { FilterPanel } from "@/Components/Calendar/FilterPanel";
 import { MonthView } from "@/Components/Calendar/MonthView";
 import { WeekView } from "@/Components/Calendar/WeekView";
-import { DayView } from "@/Components/Calendar/DayView";
-import { FilterPanel } from "@/Components/Calendar/FilterPanel";
-import { EventDetailsModal } from "@/Components/Calendar/EventDetailsModal";
-import { CalendarEvent } from "@/types/calendar";
+import EmptyState from "@/Components/common/EmptyState";
+import Button from "@/Components/common/Modern/Button";
+import { DynamicModal } from "@/Components/common/Modern/DynamicModal";
+import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatformsConfig";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { useCampaignStore } from "@/stores/campaignStore";
+import { CalendarEvent } from "@/types/calendar";
+import { getEmptyStateByKey } from "@/Utils/emptyStateMapper";
+import { Head } from "@inertiajs/react";
+import {
+    eachDayOfInterval,
+    endOfMonth,
+    startOfMonth
+} from "date-fns";
+import {
+    Calendar as CalendarIcon,
+    Filter
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 const PlatformIcon = ({
   platform,
@@ -61,9 +53,9 @@ const PlatformIcon = ({
   return <CalendarIcon className={`text-gray-500 ${className}`} />;
 };
 
+import { BulkActionsBar } from "@/Components/Calendar/BulkActionsBar";
 import { useCalendarStore } from "@/stores/calendarStore";
 import { useShallow } from "zustand/react/shallow";
-import { BulkActionsBar } from "@/Components/Calendar/BulkActionsBar";
 
 export default function CalendarIndex({ auth }: { auth: any }) {
   const { t, i18n } = useTranslation();

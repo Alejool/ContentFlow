@@ -9,20 +9,20 @@ import { transitionTheme } from "@/Utils/themeTransition";
 import { Link, usePage } from "@inertiajs/react";
 import axios from "axios";
 import {
-  Check,
-  ChevronDown,
-  FileText,
-  Globe,
-  HardDrive,
-  LogOut,
-  Moon,
-  Palette,
-  Sun,
-  User,
-  Zap,
+    Check,
+    ChevronDown,
+    FileText,
+    Globe,
+    HardDrive,
+    LogOut,
+    Moon,
+    Palette,
+    Sun,
+    User,
+    Zap,
 } from "lucide-react";
 import { useState } from "react";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 interface ProfileDropdownProps {

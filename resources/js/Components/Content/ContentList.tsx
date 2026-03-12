@@ -177,7 +177,7 @@ export default function ContentList(props: ContentListProps) {
 
           <div className="flex items-center gap-1.5 ml-auto">
             <Button
-              variant="secondary"
+              variant="ghost"
               buttonStyle="outline"
               size="sm"
               onClick={() =>

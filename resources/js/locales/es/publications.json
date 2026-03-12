@@ -9,7 +9,8 @@
       "contentType":{
         "label": "Tipo de contenido",
         "value": "Video",
-        "filteredByPlatforms": "Filtrado por plataformas seleccionadas"
+        "filteredByPlatforms": "Filtrado por plataformas seleccionadas",
+        "locked": "El tipo de contenido está bloqueado después de subir archivos multimedia"
       },
       "poll": {
         "title": "Opciones de Encuesta",
@@ -74,6 +75,7 @@
           "endDate": "12/12/2026"
         },
         "validation": {
+           "mediaRequired": "Archivo es requerido",
           "titleRequired": "El título es obligatorio",
           "titleLength": "El título no puede exceder los 70 caracteres",
           "descMin": "La descripción debe tener al menos 10 caracteres",
@@ -216,6 +218,7 @@
         "accountMissingText": "Esta publicación se public en una cuenta ({{account}}) que ya no está conectada. Al editarla se crear una nueva versión para tu cuenta actual. ¿Continuar?",
         "selectSocialAccounts": "Seleccionar Cuentas",
         "lockedBySession": "Bloqueado por sesión",
+        "questionField": "Pregunta",
         "dragDrop": {
           "title": "Arrastra y suelta para ordenar",
           "subtitle": "Sube tus archivos multimedia aquí"
@@ -265,7 +268,7 @@
       "comments": {
         "title": "Comentarios Internos",
         "placeholder": "Escribe un comentario...",
-        "noComments": "No hay comentarios aún. ¡Inicia la conversacin!",
+        "noComments": "No hay comentarios aún. ¡Inicia la conversación!",
         "loading": "Cargando comentarios...",
         "deleteConfirm": "¿Estás seguro de que quieres eliminar este comentario?",
         "deleteConfirmTitle": "Eliminar Comentario",
@@ -286,6 +289,8 @@
         "deselectAll": "Deseleccionar Todo",
         "noConnectedAccounts": "No se encontraron cuentas sociales conectadas.",
         "connectAccounts": "Por favor, conecta tus cuentas primero.",
+        "noCompatibleAccounts": "No hay cuentas compatibles con este tipo de contenido.",
+        "changeContentType": "Cambia el tipo de contenido o conecta cuentas compatibles.",
         "published": "Publicado",
         "viewPost": "Ver publicación",
         "loading": "Cargando...",
@@ -359,6 +364,11 @@
           "message": "Esta publicación ya está publicada en las siguientes cuentas:",
           "hint": "Puedes publicar en cuentas adicionales seleccionándolas a continuación."
         },
+        "incompatibleAccountsBanner": {
+          "title": "Cuentas No Compatibles",
+          "message": "Las siguientes cuentas no son compatibles con el tipo de contenido \"{contentType}\":",
+          "hint": "Estas cuentas no aparecerán en las opciones de publicación."
+        },
         "publishedInOtherAccountBanner": {
           "title": "Publicado en Cuenta Diferente",
           "message": "Esta publicación fue publicada en una cuenta de {{platform}} que ya no está conectada.",
@@ -393,7 +403,9 @@
         "publishedOnRequired": "Publicado el es requerido",
         "associatedPublicationsRequired": "Publicaciones Asociadas es requerida",
         "descriptionRequired": "descripción es requerida",
-        "hashtagsRequired": "Hashtags es requerido",
+        "hashtagsRequired": "Hashtags son requeridos",
+        "questionRequired": "La pregunta es requerida",
+        "descriptionRequired": "La descripción es requerida",
         "schedulePublicationRequired": "Programar publicación es requerido",
         "nameLength": "Nombre debe tener al menos 10 caracteres",
         "descriptionLength": "descripción debe tener al menos 10 caracteres",
@@ -415,6 +427,7 @@
         "recurrence_days": "Días de repetición no válidos",
         "durationErrors": "Por favor, corrige los errores de duracin antes de guardar.",
         "pollOptionsRequired": "Las encuestas requieren al menos 2 opciones",
+        "pollDurationRequired": "La duración de la encuesta debe estar entre 1 y 168 horas",
         "content_type_not_supported": "El tipo de contenido ':type' no es compatible con :platforms. Por favor, selecciona plataformas compatibles o cambia el tipo de contenido.",
         "reel_requires_one_video": "Los reels requieren exactamente 1 archivo de video",
         "reel_requires_video_only": "Los reels requieren solo archivos de video (sin imágenes)",

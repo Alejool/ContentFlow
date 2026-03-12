@@ -1,6 +1,6 @@
+import { TFunction } from "i18next";
 import { AlertCircle, Lock } from "lucide-react";
 import { Trans } from "react-i18next";
-import { TFunction } from "i18next";
 
 interface LockInfo {
   locked_by?: string;
@@ -146,19 +146,12 @@ export const AlertsSection = ({
 
       {/* Alerta: Publicación parcialmente publicada */}
       {hasPublishedPlatform && (
-        <div className="p-4 rounded-lg border border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 flex gap-3 text-sm animate-in fade-in slide-in-from-top-4">
-          <AlertCircle className="w-5 h-5 shrink-0 text-blue-500" />
-          <div>
-            <p className="font-semibold mb-1">
-              {t("publications.modal.edit.contentLocked") ||
-                "Publication partially live"}
-            </p>
-            <p className="opacity-80">
-              {t("publications.modal.edit.contentLockedHint") ||
-                "This publication is live on some platforms. Changes will apply to pending and future uploads."}
-            </p>
-          </div>
-        </div>
+        <AlertCard
+          type="info"
+          title={t("publications.modal.edit.contentLocked") || "Publication partially live"}
+          message={t("publications.modal.edit.contentLockedHint") || "This publication is live on some platforms. Changes will apply to pending and future uploads."}
+          className="animate-in fade-in slide-in-from-top-4"
+        />
       )}
     </div>
   );

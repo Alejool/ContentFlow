@@ -118,8 +118,60 @@ class UpdatePublicationRequest extends FormRequest
     }
     return [
       'title' => 'required|string|max:255',
-      'description' => 'required|string',
-      'hashtags' => 'nullable|string',
+      'description' => [
+        'string',
+        function ($attribute, $value, $fail) {
+          $contentType = $this->input('content_type', 'post');
+          
+          // For stories, description is optional
+          if ($contentType === 'story') {
+            return;
+          }
+          
+          // For other content types, description is required
+          if (empty($value) || trim($value) === '') {
+            $fail('Description is required for this content type.');
+            return;
+          }
+        }
+      ],
+      'hashtags' => [
+        'nullable',
+        'string',
+        function ($attribute, $value, $fail) {
+          $contentType = $this->input('content_type', 'post');
+          
+          // For polls and stories, hashtags are optional
+          if ($contentType === 'poll' || $contentType === 'story') {
+            return;
+          }
+          
+          // For other content types, hashtags are required
+          if (empty($value) || trim($value) === '') {
+            $fail('Hashtags are required for this content type.');
+            return;
+          }
+          
+          // Simple validation: just check if there's at least one # character
+          if (!str_contains($value, '#')) {
+            $fail('At least one hashtag is required (must start with #).');
+            return;
+          }
+          
+          // Count hashtags (better separation logic)
+          $hashtags = array_filter(
+            preg_split('/[\s,]+/', $value), 
+            function($tag) {
+              $tag = trim($tag);
+              return !empty($tag) && str_starts_with($tag, '#') && strlen($tag) > 1;
+            }
+          );
+          
+          if (count($hashtags) > 10) {
+            $fail('Maximum 10 hashtags allowed.');
+          }
+        }
+      ],
       'goal' => 'nullable|string',
       'start_date' => 'nullable|date',
       'end_date' => 'nullable|date|after_or_equal:start_date',
@@ -319,7 +371,7 @@ class UpdatePublicationRequest extends FormRequest
       // Calculate total media count after update
       $removedMediaIds = $this->input('removed_media_ids', []);
       $existingMediaCount = $publication->mediaFiles()
-        ->whereNotIn('id', $removedMediaIds)
+        ->whereNotIn('media_files.id', $removedMediaIds)
         ->count();
       
       $totalMediaCount = $existingMediaCount + count($newMediaFiles);
@@ -335,7 +387,7 @@ class UpdatePublicationRequest extends FormRequest
         
         // Validate cross-platform compatibility
         if (!empty($socialAccountIds)) {
-          $platforms = \App\Models\SocialAccount::whereIn('id', $socialAccountIds)
+          $platforms = \App\Models\Social\SocialAccount::whereIn('id', $socialAccountIds)
             ->pluck('platform')
             ->unique()
             ->toArray();
@@ -349,14 +401,33 @@ class UpdatePublicationRequest extends FormRequest
           }
         }
 
-        // Validate media files if new files are being uploaded
-        if (!empty($mediaFilesForValidation)) {
-          $mediaResult = $validationService->validateMediaFiles($contentType, $mediaFilesForValidation);
-          
-          if (!$mediaResult->isValid) {
-            foreach ($mediaResult->errors as $error) {
-              $validator->errors()->add('media', $error);
-            }
+        // For media validation, we need to consider the total count after update
+        // Create a representation of all media files that will exist after the update
+        $allMediaFilesAfterUpdate = [];
+        
+        // Add existing media files that won't be removed
+        $existingMediaFiles = $publication->mediaFiles()
+          ->whereNotIn('media_files.id', $removedMediaIds)
+          ->get();
+        
+        foreach ($existingMediaFiles as $mediaFile) {
+          $allMediaFilesAfterUpdate[] = [
+            'mime_type' => $mediaFile->mime_type,
+            'type' => $mediaFile->mime_type,
+          ];
+        }
+        
+        // Add new media files
+        foreach ($newMediaFiles as $file) {
+          $allMediaFilesAfterUpdate[] = $file;
+        }
+
+        // Validate the complete set of media files
+        $mediaResult = $validationService->validateMediaFiles($contentType, $allMediaFilesAfterUpdate);
+        
+        if (!$mediaResult->isValid) {
+          foreach ($mediaResult->errors as $error) {
+            $validator->errors()->add('media', $error);
           }
         }
       }

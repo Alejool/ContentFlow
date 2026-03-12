@@ -1,5 +1,7 @@
 <?php
 
+use App\Constants\ContentTypes;
+
 return [
     /*
     |--------------------------------------------------------------------------
@@ -12,7 +14,7 @@ return [
     */
 
     'post' => [
-        'platforms' => ['instagram', 'twitter', 'facebook', 'linkedin', 'youtube', 'pinterest'],
+        'platforms' => ['instagram', 'twitter', 'facebook', 'linkedin', 'youtube', 'pinterest', 'tiktok'],
         'media' => [
             'required' => false,
             'min_count' => 0,
@@ -22,7 +24,7 @@ return [
     ],
 
     'reel' => [
-        'platforms' => ['instagram', 'tiktok', 'youtube', 'facebook'],
+        'platforms' => ContentTypes::REEL_COMPATIBLE_PLATFORMS,
         'media' => [
             'required' => true,
             'min_count' => 1,
@@ -32,7 +34,7 @@ return [
     ],
 
     'story' => [
-        'platforms' => ['instagram', 'facebook'],
+        'platforms' => ['instagram', 'facebook', 'twitter', 'linkedin', 'youtube', 'pinterest', 'tiktok'],
         'media' => [
             'required' => true,
             'min_count' => 1,
@@ -42,7 +44,7 @@ return [
     ],
 
     'carousel' => [
-        'platforms' => ['instagram', 'facebook', 'linkedin'],
+        'platforms' => ['instagram', 'facebook', 'linkedin', 'twitter', 'youtube', 'pinterest', 'tiktok'],
         'media' => [
             'required' => true,
             'min_count' => 2,
@@ -52,7 +54,7 @@ return [
     ],
 
     'poll' => [
-        'platforms' => ['twitter'],
+        'platforms' => ['twitter', 'facebook', 'instagram', 'linkedin', 'youtube', 'pinterest', 'tiktok'],
         'media' => [
             'required' => false,
             'min_count' => 0,

@@ -2,17 +2,17 @@ import { useTheme } from "@/Hooks/useTheme";
 import { usePage } from "@inertiajs/react";
 import axios from "axios";
 import {
-  Brain,
-  Loader2,
-  Maximize2,
-  Minimize2,
-  Send,
-  Sparkles,
-  X,
-  Zap,
+    Brain,
+    Loader2,
+    Maximize2,
+    Minimize2,
+    Send,
+    Sparkles,
+    X,
+    Zap,
 } from "lucide-react";
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 interface Message {

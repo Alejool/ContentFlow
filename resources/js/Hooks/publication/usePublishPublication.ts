@@ -5,7 +5,7 @@ import { Publication } from "@/types/Publication";
 import { SocialAccount } from "@/types/SocialAccount";
 import axios from "axios";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 /* -------------------------------------------------------------------------- */
 /*                                   TYPES                                    */

@@ -218,8 +218,8 @@ class WorkspaceController extends Controller
     }
 
     $request->validate([
-      'logo' => 'nullable|image|max:2048',
-      'favicon' => 'nullable|image|max:1024',
+      'logo_key' => 'nullable|string',
+      'favicon_key' => 'nullable|string',
       'primary_color' => ['nullable', 'string', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
     ]);
 
@@ -227,80 +227,44 @@ class WorkspaceController extends Controller
       'white_label_primary_color' => $request->primary_color,
     ];
 
-    $disk = config('filesystems.default') === 's3' ? 's3' : 'public';
-
     try {
-      if ($request->hasFile('logo')) {
+      if ($request->logo_key) {
         $oldLogo = $workspace->white_label_logo_url;
-        $file = $request->file('logo');
-        $extension = $file->getClientOriginalExtension();
         
-        // Usar el servicio de rutas organizadas
-        $filename = "logo_{$workspace->id}.{$extension}";
-        $path = S3PathService::workspaceBrandingPath($workspace->id, $filename);
+        // Construir la URL desde la clave S3
+        $disk = config('filesystems.default') === 's3' ? 's3' : 'public';
+        $data['white_label_logo_url'] = Storage::disk($disk)->url($request->logo_key);
 
-        Log::info('Uploading logo to S3', ['path' => $path, 'disk' => $disk]);
+        Log::info('Logo updated from S3 key', ['key' => $request->logo_key, 'url' => $data['white_label_logo_url']]);
 
-        try {
-          // Upload to S3 usando el mismo método que avatares
-          Storage::disk($disk)->put($path, file_get_contents($file->getRealPath()));
-          
-          // Verificar que se subió correctamente
-          if (Storage::disk($disk)->exists($path)) {
-            Log::info('Logo uploaded successfully', ['path' => $path]);
-            $data['white_label_logo_url'] = Storage::disk($disk)->url($path);
-
-            // Delete old logo if exists
-            if ($oldLogo && str_contains($oldLogo, 'workspaces/')) {
-              $oldPath = parse_url($oldLogo, PHP_URL_PATH);
-              $oldPath = ltrim($oldPath, '/');
-              if (Storage::disk($disk)->exists($oldPath)) {
-                Storage::disk($disk)->delete($oldPath);
-                Log::info('Deleted old logo', ['path' => $oldPath]);
-              }
-            }
-          } else {
-            Log::error('Logo upload verification failed - file does not exist', ['path' => $path]);
+        // Delete old logo if exists
+        if ($oldLogo && str_contains($oldLogo, 'workspaces/')) {
+          $oldPath = parse_url($oldLogo, PHP_URL_PATH);
+          $oldPath = ltrim($oldPath, '/');
+          if (Storage::disk($disk)->exists($oldPath)) {
+            Storage::disk($disk)->delete($oldPath);
+            Log::info('Deleted old logo', ['path' => $oldPath]);
           }
-        } catch (\Exception $e) {
-          Log::error('Logo upload failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
         }
       }
 
-      if ($request->hasFile('favicon')) {
+      if ($request->favicon_key) {
         $oldFavicon = $workspace->white_label_favicon_url;
-        $file = $request->file('favicon');
-        $extension = $file->getClientOriginalExtension();
+        
+        // Construir la URL desde la clave S3
+        $disk = config('filesystems.default') === 's3' ? 's3' : 'public';
+        $data['white_label_favicon_url'] = Storage::disk($disk)->url($request->favicon_key);
 
-        // Usar el servicio de rutas organizadas
-        $filename = "favicon_{$workspace->id}.{$extension}";
-        $path = S3PathService::workspaceBrandingPath($workspace->id, $filename);
+        Log::info('Favicon updated from S3 key', ['key' => $request->favicon_key, 'url' => $data['white_label_favicon_url']]);
 
-        Log::info('Uploading favicon to S3', ['path' => $path, 'disk' => $disk]);
-
-        try {
-          // Upload to S3 usando el mismo método que avatares
-          Storage::disk($disk)->put($path, file_get_contents($file->getRealPath()));
-          
-          // Verificar que se subió correctamente
-          if (Storage::disk($disk)->exists($path)) {
-            Log::info('Favicon uploaded successfully', ['path' => $path]);
-            $data['white_label_favicon_url'] = Storage::disk($disk)->url($path);
-
-            // Delete old favicon if exists
-            if ($oldFavicon && str_contains($oldFavicon, 'workspaces/')) {
-              $oldPath = parse_url($oldFavicon, PHP_URL_PATH);
-              $oldPath = ltrim($oldPath, '/');
-              if (Storage::disk($disk)->exists($oldPath)) {
-                Storage::disk($disk)->delete($oldPath);
-                Log::info('Deleted old favicon', ['path' => $oldPath]);
-              }
-            }
-          } else {
-            Log::error('Favicon upload verification failed - file does not exist', ['path' => $path]);
+        // Delete old favicon if exists
+        if ($oldFavicon && str_contains($oldFavicon, 'workspaces/')) {
+          $oldPath = parse_url($oldFavicon, PHP_URL_PATH);
+          $oldPath = ltrim($oldPath, '/');
+          if (Storage::disk($disk)->exists($oldPath)) {
+            Storage::disk($disk)->delete($oldPath);
+            Log::info('Deleted old favicon', ['path' => $oldPath]);
           }
-        } catch (\Exception $e) {
-          Log::error('Favicon upload failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
         }
       }
 

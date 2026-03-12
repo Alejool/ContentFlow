@@ -4,7 +4,7 @@ import { router, useForm } from "@inertiajs/react";
 import axios from "axios";
 import { Check, Crown, Lock, Palette } from "lucide-react";
 import { useState } from "react";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 interface UpdateThemeFormProps {

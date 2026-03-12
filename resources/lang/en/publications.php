@@ -24,6 +24,18 @@ return [
     'scheduledMinDifference' => 'The scheduled date must be at least 1 minute after the current time.',
     'recurrenceDaysRequired' => 'Please select at least one day for weekly recurrence.',
     'recurrenceEndDateRequired' => 'End date is required for recurring publications.',
+    'titleRequired' => 'Title is required.',
+    'titleLength' => 'Title cannot be longer than 70 characters.',
+    'descMin' => 'Description must be at least 10 characters.',
+    'descMax' => 'Description cannot be longer than 700 characters.',
+    'objRequired' => 'Goal must be at least 5 characters.',
+    'objMax' => 'Goal cannot be longer than 200 characters.',
+    'hashtagsRequired' => 'Hashtags are required.',
+    'hashtagValid' => 'Must include at least one valid hashtag (starting with #).',
+    'hashtagMax' => 'You cannot use more than 10 hashtags.',
+    'scheduledAtRequired' => 'Schedule date is required if global schedule is enabled.',
+    'scheduleRequired' => 'You must schedule a date for all selected networks or set a global date.',
+    'imageRequired' => 'At least one image or video is required.',
   ],
   'modal' => [
     'contentType' => [

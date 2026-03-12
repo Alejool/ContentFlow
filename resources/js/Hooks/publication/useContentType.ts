@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
 import { ContentType } from '@/Components/Content/Publication/common/ContentTypeIconSelector';
+import { useMemo } from 'react';
 
 interface ContentTypeConfig {
   requiresVideo: boolean;
@@ -79,13 +79,13 @@ const contentTypeConfigs: Record<ContentType, ContentTypeConfig> = {
     descriptionMaxLength: 280,
     titleRequired: true,
     descriptionRequired: true,
-    hashtagsRequired: false,
+    hashtagsRequired: false, // ✅ Hashtags NO requeridos para polls
     goalRequired: false,
     showMediaSection: false,
     showTitle: true,
     showDescription: true,
     showGoal: false,
-    showHashtags: false,
+    showHashtags: false, // ✅ NUNCA mostrar hashtags para polls
     showPollFields: true,
   },
   carousel: {

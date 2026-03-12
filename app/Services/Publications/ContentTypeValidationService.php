@@ -2,7 +2,7 @@
 
 namespace App\Services\Publications;
 
-use App\Models\SocialAccount;
+use App\Models\Social\SocialAccount;
 use Illuminate\Support\Facades\Config;
 
 class ContentTypeValidationService
@@ -164,7 +164,16 @@ class ContentTypeValidationService
             $invalidFiles = [];
 
             foreach ($mediaFiles as $file) {
-                $mimeType = $file->getMimeType();
+                // Handle both UploadedFile objects and array metadata (S3 direct upload)
+                if (is_array($file)) {
+                    $mimeType = $file['mime_type'] ?? $file['type'] ?? 'unknown';
+                } elseif (is_object($file) && method_exists($file, 'getMimeType')) {
+                    $mimeType = $file->getMimeType();
+                } else {
+                    // Skip validation for unknown file types
+                    continue;
+                }
+                
                 $fileType = $this->getFileTypeFromMime($mimeType);
 
                 if (!in_array($fileType, $allowedTypes)) {

@@ -1,25 +1,25 @@
 import Button from "@/Components/common/Modern/Button";
 import ConfirmDialog from "@/Components/common/ui/ConfirmDialog";
 import {
-  useConnectCalendar,
-  useDisconnectCalendar,
-  useExternalCalendarStatus,
-  useRetrySync,
+    useConnectCalendar,
+    useDisconnectCalendar,
+    useExternalCalendarStatus,
+    useRetrySync,
 } from "@/Hooks/useExternalCalendar";
 import type { ExternalCalendarConnection } from "@/stores/externalCalendarStore";
+import { formatDateTimeString } from "@/Utils/dateHelpers";
 import {
-  AlertCircle,
-  Calendar,
-  CheckCircle2,
-  Loader2,
-  RefreshCw,
-  XCircle,
-  X as XIcon,
+    AlertCircle,
+    Calendar,
+    CheckCircle2,
+    Loader2,
+    RefreshCw,
+    XCircle,
+    X as XIcon,
 } from "lucide-react";
 import { useState } from "react";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { formatDateTimeString } from "@/Utils/dateHelpers";
 
 interface Campaign {
   id: number;

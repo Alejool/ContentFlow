@@ -24,6 +24,18 @@ return [
     'scheduledMinDifference' => 'La fecha debe ser al menos 1 minuto después de la actual.',
     'recurrenceDaysRequired' => 'Por favor selecciona al menos un día para la recurrencia semanal.',
     'recurrenceEndDateRequired' => 'La fecha de fin es obligatoria para publicaciones recurrentes.',
+    'titleRequired' => 'El título es obligatorio.',
+    'titleLength' => 'El título no puede tener más de 70 caracteres.',
+    'descMin' => 'La descripción debe tener al menos 10 caracteres.',
+    'descMax' => 'La descripción no puede tener más de 700 caracteres.',
+    'objRequired' => 'El objetivo debe tener al menos 5 caracteres.',
+    'objMax' => 'El objetivo no puede tener más de 200 caracteres.',
+    'hashtagsRequired' => 'Los hashtags son obligatorios.',
+    'hashtagValid' => 'Debe incluir al menos un hashtag válido (que comience con #).',
+    'hashtagMax' => 'No puedes usar más de 10 hashtags.',
+    'scheduledAtRequired' => 'La fecha de programación es obligatoria si el horario global está habilitado.',
+    'scheduleRequired' => 'Debes programar una fecha para todas las redes seleccionadas o establecer una fecha global.',
+    'imageRequired' => 'Se requiere al menos una imagen o video.',
   ],
   'modal' => [
     'contentType' => [

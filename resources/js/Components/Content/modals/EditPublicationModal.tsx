@@ -14,10 +14,12 @@ import MediaUploadSkeleton from "@/Components/Content/Publication/common/edit/Me
 import ModalFooter from "@/Components/Content/modals/common/ModalFooter";
 import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
 import ScheduleSection from "@/Components/Content/modals/common/ScheduleSection";
+import AlertCard from "@/Components/common/Modern/AlertCard";
 import { useContentType } from "@/Hooks/publication/useContentType";
 import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
 import { useModalFocusTrap } from "@/Hooks/useModalFocusTrap";
 import { usePublicationLock } from "@/Hooks/usePublicationLock";
+import toast from "@/Utils/toast";
 import { useCalendarStore } from "@/stores/calendarStore";
 import { useCampaignStore } from "@/stores/campaignStore";
 import { usePublicationStore } from "@/stores/publicationStore";
@@ -29,7 +31,6 @@ import axios from "axios";
 import { AlertCircle, Lock, Save } from "lucide-react";
 import { memo, useEffect, useMemo, useState } from "react";
 import { useWatch } from "react-hook-form";
-import toast from "@/Utils/toast";
 import { Trans } from "react-i18next";
 
 const parseUserAgent = (userAgent?: string): string => {
@@ -239,12 +240,18 @@ const EditPublicationModal = ({
     control,
     name: "recurrence_accounts",
   });
-  const content_type = useWatch({ control, name: "content_type" }) as ContentType || 'post';
+  const content_type = (useWatch({ control, name: "content_type" }) as ContentType) || 'post';
   const poll_options = useWatch({ control, name: "poll_options" }) || ['', ''];
   const poll_duration_hours = useWatch({ control, name: "poll_duration_hours" }) || 24;
 
   // Use content type hook for field visibility
   const { fieldVisibility } = useContentType(content_type);
+
+  // Force re-render when content_type changes
+  const [forceUpdate, setForceUpdate] = useState(0);
+  useEffect(() => {
+    setForceUpdate(prev => prev + 1);
+  }, [content_type]);
 
   // Get selected platform names for content type filtering
   const selectedPlatformNames = useMemo(() => {
@@ -272,6 +279,7 @@ const EditPublicationModal = ({
       recurrence_days,
       recurrence_end_date,
       recurrence_accounts,
+      content_type,
     }),
     [
       selectedSocialAccounts,
@@ -288,6 +296,7 @@ const EditPublicationModal = ({
       recurrence_days,
       recurrence_end_date,
       recurrence_accounts,
+      content_type,
     ],
   );
 
@@ -514,7 +523,6 @@ const EditPublicationModal = ({
             </div>
           }
         />
-
         <ContentTypeSelectorBar
           selectedType={content_type}
           selectedPlatforms={selectedPlatformNames}
@@ -528,13 +536,32 @@ const EditPublicationModal = ({
           }}
           t={t}
           disabled={hasPublishedPlatform || isContentSectionDisabled}
+          mediaFiles={mediaFiles}
         />
 
         <div className="flex-1 overflow-y-auto custom-scrollbar">
           <form
             id="edit-publication-form"
-            onSubmit={handleSubmit}
+            onSubmit={(e) => {
+              console.log('=== Form submit event triggered ===');
+              console.log('Event:', e);
+              handleSubmit(e);
+            }}
           >
+            {/* Hidden field to register content_type */}
+            <input
+              type="hidden"
+              {...register("content_type")}
+            />
+            <input
+              type="hidden"
+              {...register("poll_options")}
+            />
+            <input
+              type="hidden"
+              {...register("poll_duration_hours")}
+            />
+            
             <div className={`grid grid-cols-1 ${fieldVisibility.showMediaSection ? 'lg:grid-cols-12' : 'lg:grid-cols-2'} gap-6 p-6`}>
               {/* ========================================
                   COLUMNA IZQUIERDA: MEDIA Y CONTENIDO
@@ -653,23 +680,6 @@ const EditPublicationModal = ({
                       </div>
                     )}
 
-                  {/* Alerta: Publicación parcialmente publicada */}
-                  {hasPublishedPlatform && (
-                    <div className="p-4 rounded-lg border border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 flex gap-3 text-sm animate-in fade-in slide-in-from-top-4">
-                      <AlertCircle className="w-5 h-5 shrink-0 text-blue-500" />
-                      <div>
-                        <p className="font-semibold mb-1">
-                          {t("publications.modal.edit.contentLocked") ||
-                            "Publication partially live"}
-                        </p>
-                        <p className="opacity-80">
-                          {t("publications.modal.edit.contentLockedHint") ||
-                            "This publication is live on some platforms. Changes will apply to pending and future uploads."}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
 
                   {fieldVisibility.showMediaSection && (
                     !isDataReady ? (
@@ -727,18 +737,28 @@ const EditPublicationModal = ({
                     </h3>
                   </div>
 
+                  {hasPublishedPlatform && (
+                    <AlertCard
+                      type="info"
+                      title={t("publications.modal.edit.contentLocked") || "Publication partially live"}
+                      message={t("publications.modal.edit.contentLockedHint") || "This publication is live on some platforms. Changes will apply to pending and future uploads."}
+                      className="animate-in fade-in slide-in-from-top-4"
+                    />
+                  )}
+
                   <ContentSection
-                  register={register}
-                  setValue={setValue}
-                  errors={errors}
-                  watched={watched}
-                  t={t}
-                  campaigns={campaigns}
-                  publication={publication}
-                  onHashtagChange={handleHashtagChange}
-                  disabled={hasPublishedPlatform || isContentSectionDisabled}
-                  contentType={content_type}
-                />
+                    key={`content-section-${content_type}-${forceUpdate}`}
+                    register={register}
+                    setValue={setValue}
+                    errors={errors}
+                    watched={watched}
+                    t={t}
+                    campaigns={campaigns}
+                    publication={publication}
+                    onHashtagChange={handleHashtagChange}
+                    disabled={hasPublishedPlatform || isContentSectionDisabled}
+                    contentType={content_type}
+                  />
                 </div>
 
                 {/* ==================== SECCIÓN: CAMPOS ESPECÍFICOS DE POLL ==================== */}
@@ -751,6 +771,8 @@ const EditPublicationModal = ({
                         setValue("poll_options", data.options, { shouldValidate: true });
                         setValue("poll_duration_hours", data.duration, { shouldValidate: true });
                       }}
+                      register={register}
+                      setValue={setValue}
                       t={t}
                       errors={{
                         options: errors.poll_options?.message as string,
@@ -780,6 +802,13 @@ const EditPublicationModal = ({
                       }}
                       title={watched.title}
                       publishedAt={publication?.published_at}
+                      contentType={watched.content_type}
+                      selectedPlatforms={selectedSocialAccounts.map((id: number) => {
+                        const account = socialAccounts.find(a => a.id === id);
+                        return account?.platform.toLowerCase() || '';
+                      }).filter(Boolean)}
+                      pollOptions={poll_options}
+                      pollDuration={poll_duration_hours}
                       publishedLinks={publication?.social_post_logs?.reduce(
                         (acc: Record<string, string>, log: any) => {
                           if (
@@ -852,6 +881,7 @@ const EditPublicationModal = ({
                     mediaFiles={mediaFiles}
                     disabled={isContentSectionDisabled || !allowConfiguration}
                     socialPostLogs={publication?.social_post_logs}
+                    contentType={watched.content_type}
                     onThumbnailChange={(_videoId, file) => {
                       const video = mediaFiles.find((m) => m.type === "video");
                       if (video) {
@@ -949,6 +979,13 @@ const EditPublicationModal = ({
                       }}
                       title={watched.title}
                       publishedAt={publication?.published_at}
+                      contentType={watched.content_type}
+                      selectedPlatforms={selectedSocialAccounts.map((id: number) => {
+                        const account = socialAccounts.find(a => a.id === id);
+                        return account?.platform.toLowerCase() || '';
+                      }).filter(Boolean)}
+                      pollOptions={poll_options}
+                      pollDuration={poll_duration_hours}
                       publishedLinks={publication?.social_post_logs?.reduce(
                         (acc: Record<string, string>, log: any) => {
                           if (
@@ -1018,8 +1055,10 @@ const EditPublicationModal = ({
                   </div>
                 </div>
               </div>
+            </div>
           </form>
         </div>
+
         <ModalFooter
           onClose={handleClose}
           isSubmitting={isSubmitting || isContentSectionDisabled}

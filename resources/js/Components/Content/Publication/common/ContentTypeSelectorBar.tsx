@@ -1,6 +1,7 @@
-import ContentTypeIconSelector, { ContentType } from "./ContentTypeIconSelector";
+import { REEL_COMPATIBLE_PLATFORMS } from '@/Constants/contentTypes';
 import { AlertCircle } from "lucide-react";
 import { useMemo } from "react";
+import ContentTypeIconSelector, { ContentType } from "./ContentTypeIconSelector";
 
 interface ContentTypeSelectorBarProps {
   selectedType: ContentType;
@@ -17,23 +18,23 @@ const CONTENT_TYPE_RULES: Record<ContentType, {
   media: { required: boolean; min_count: number; max_count: number; types: string[] };
 }> = {
   post: {
-    platforms: ['instagram', 'twitter', 'facebook', 'linkedin', 'youtube', 'pinterest'],
+    platforms: ['instagram', 'twitter', 'facebook', 'linkedin', 'youtube', 'pinterest', 'tiktok'],
     media: { required: false, min_count: 0, max_count: 10, types: ['image', 'video'] },
   },
   reel: {
-    platforms: ['instagram', 'tiktok', 'youtube', 'facebook'],
+    platforms: [...REEL_COMPATIBLE_PLATFORMS],
     media: { required: true, min_count: 1, max_count: 1, types: ['video'] },
   },
   story: {
-    platforms: ['instagram', 'facebook'],
+    platforms: ['instagram', 'facebook', 'twitter', 'linkedin', 'youtube', 'pinterest', 'tiktok'],
     media: { required: true, min_count: 1, max_count: 1, types: ['image', 'video'] },
   },
   carousel: {
-    platforms: ['instagram', 'facebook', 'linkedin'],
+    platforms: ['instagram', 'facebook', 'linkedin', 'twitter', 'youtube', 'pinterest', 'tiktok'],
     media: { required: true, min_count: 2, max_count: 10, types: ['image', 'video'] },
   },
   poll: {
-    platforms: ['twitter'],
+    platforms: ['twitter'], // Solo Twitter soporta encuestas nativas
     media: { required: false, min_count: 0, max_count: 4, types: ['image', 'video'] },
   },
 };
@@ -183,7 +184,7 @@ export default function ContentTypeSelectorBar({
   }, [validation, selectedType, t]);
 
   return (
-    <div className="px-6 pt-4 pb-2 border-b border-gray-200 dark:border-neutral-700">
+    <div className="px-6 pt-4 pb-2 border-b border-gray-200 dark:border-neutral-700 bg-gradient-to-r from-gray-50 via-white to-gray-50/80 dark:from-neutral-900 dark:via-neutral-900/95 dark:to-neutral-800/90">
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-center gap-4">
           <div className="flex items-center gap-3">
@@ -193,23 +194,17 @@ export default function ContentTypeSelectorBar({
               onChange={onChange}
               t={t}
               disabled={disabled}
+              mediaFiles={mediaFiles}
             />
           </div>
-          {selectedPlatforms.length > 0 && (
-            <span className="text-xs text-gray-400 dark:text-gray-500 italic">
-              {t("publications.modal.contentType.filteredByPlatforms") || 
-                "Filtered by selected platforms"}
-            </span>
-          )}
+         
         </div>
-
-        {/* Validation Warning */}
-        {validation.hasWarnings && warningMessage && (
-          <div className="flex items-start gap-2 px-3 py-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-            <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-amber-800 dark:text-amber-200">
-              {warningMessage}
-            </p>
+        
+        {/* Lock message when media is uploaded */}
+        {mediaFiles && mediaFiles.length > 0 && (
+          <div className="flex items-center justify-center gap-2 text-xs text-amber-600 dark:text-amber-400">
+            <AlertCircle className="w-3.5 h-3.5" />
+            <span>{t("publications.modal.contentType.locked") || "Content type is locked after uploading media"}</span>
           </div>
         )}
       </div>

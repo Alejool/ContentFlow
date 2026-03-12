@@ -1,9 +1,10 @@
 import Button from "@/Components/common/Modern/Button";
+import { useS3Upload } from "@/Hooks/useS3Upload";
 import { router, useForm } from "@inertiajs/react";
 import axios from "axios";
 import { Image as ImageIcon, Palette, ShieldCheck, Upload } from "lucide-react";
 import { useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 interface WhiteLabelSettingsTabProps {
@@ -22,10 +23,16 @@ export default function WhiteLabelSettingsTab({
   const [faviconPreview, setFaviconPreview] = useState<string | null>(
     workspace.white_label_favicon_url || null,
   );
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [faviconFile, setFaviconFile] = useState<File | null>(null);
+  const [logoTempId, setLogoTempId] = useState<string | null>(null);
+  const [faviconTempId, setFaviconTempId] = useState<string | null>(null);
+
+  const { uploadFile, uploading, progress, errors: uploadErrors } = useS3Upload();
 
   const { data, setData, post, processing, errors } = useForm({
-    logo: null as File | null,
-    favicon: null as File | null,
+    logo_key: null as string | null,
+    favicon_key: null as string | null,
     primary_color: workspace.white_label_primary_color || "#4f46e5",
   });
 
@@ -39,6 +46,16 @@ export default function WhiteLabelSettingsTab({
     e.preventDefault();
     if (!canManageWorkspace) return;
 
+    // Verificar que no hay subidas en progreso
+    const logoUploading = logoTempId && progress[logoTempId] !== undefined && progress[logoTempId] < 100;
+    const faviconUploading = faviconTempId && progress[faviconTempId] !== undefined && progress[faviconTempId] < 100;
+
+    if (logoUploading || faviconUploading) {
+      toast.error("Por favor espera a que terminen de subirse las imágenes");
+      return;
+    }
+
+    // Enviar el formulario con las claves S3 ya establecidas
     post(route("workspaces.white-label.update", workspace.slug), {
       onSuccess: async (page) => {
         toast.success(
@@ -83,6 +100,12 @@ export default function WhiteLabelSettingsTab({
           }
         }
 
+        // Reset file states
+        setLogoFile(null);
+        setFaviconFile(null);
+        setLogoTempId(null);
+        setFaviconTempId(null);
+
         router.reload(); // Still reload to sync everything else
       },
       onError: () => {
@@ -95,23 +118,55 @@ export default function WhiteLabelSettingsTab({
     });
   };
 
-  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setData("logo", file);
+      const tempId = `logo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      setLogoFile(file);
+      setLogoTempId(tempId);
+      
+      // Mostrar preview inmediatamente
       const reader = new FileReader();
       reader.onloadend = () => setLogoPreview(reader.result as string);
       reader.readAsDataURL(file);
+
+      // Iniciar subida inmediatamente
+      try {
+        const result = await uploadFile(file, tempId);
+        if (result?.key) {
+          setData("logo_key", result.key);
+          toast.success("Logo subido correctamente");
+        }
+      } catch (error) {
+        console.error("Error uploading logo:", error);
+        toast.error("Error al subir el logo");
+      }
     }
   };
 
-  const handleFaviconChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFaviconChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setData("favicon", file);
+      const tempId = `favicon-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      setFaviconFile(file);
+      setFaviconTempId(tempId);
+      
+      // Mostrar preview inmediatamente
       const reader = new FileReader();
       reader.onloadend = () => setFaviconPreview(reader.result as string);
       reader.readAsDataURL(file);
+
+      // Iniciar subida inmediatamente
+      try {
+        const result = await uploadFile(file, tempId);
+        if (result?.key) {
+          setData("favicon_key", result.key);
+          toast.success("Favicon subido correctamente");
+        }
+      } catch (error) {
+        console.error("Error uploading favicon:", error);
+        toast.error("Error al subir el favicon");
+      }
     }
   };
 
@@ -177,6 +232,36 @@ export default function WhiteLabelSettingsTab({
                       </div>
                     )}
 
+                    {/* Upload Success Overlay */}
+                    {logoTempId && progress[logoTempId] === 100 && (
+                      <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    )}
+
+                    {/* Upload Progress Overlay */}
+                    {logoTempId && progress[logoTempId] !== undefined && progress[logoTempId] < 100 && (
+                      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center">
+                        <div className="text-center text-white">
+                          <div className="w-16 h-16 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-2"></div>
+                          <div className="text-sm font-medium">{progress[logoTempId]}%</div>
+                          <div className="text-xs opacity-75">Subiendo logo...</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Upload Error Overlay */}
+                    {logoTempId && uploadErrors[logoTempId] && (
+                      <div className="absolute inset-0 bg-red-500/80 backdrop-blur-sm flex items-center justify-center">
+                        <div className="text-center text-white p-4">
+                          <div className="text-sm font-medium mb-1">Error de subida</div>
+                          <div className="text-xs opacity-90">{uploadErrors[logoTempId]}</div>
+                        </div>
+                      </div>
+                    )}
+
                     {canManageWorkspace && (
                       <label className="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center cursor-pointer">
                         <input
@@ -184,6 +269,7 @@ export default function WhiteLabelSettingsTab({
                           className="hidden"
                           accept="image/jpeg,image/jpg,image/png,image/gif"
                           onChange={handleLogoChange}
+                          disabled={uploading}
                         />
                         <div className="flex flex-col items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
                           <Upload className="w-6 h-6 text-white" />
@@ -194,9 +280,14 @@ export default function WhiteLabelSettingsTab({
                       </label>
                     )}
                   </div>
-                  {errors.logo && (
+                  {errors.logo_key && (
                     <p className="text-sm text-red-500 font-medium">
-                      {errors.logo}
+                      {errors.logo_key}
+                    </p>
+                  )}
+                  {logoTempId && uploadErrors[logoTempId] && (
+                    <p className="text-sm text-red-500 font-medium">
+                      {uploadErrors[logoTempId]}
                     </p>
                   )}
                 </div>
@@ -224,6 +315,34 @@ export default function WhiteLabelSettingsTab({
                       <ImageIcon className="w-8 h-8 text-neutral-300 dark:text-neutral-600" />
                     )}
 
+                    {/* Upload Success Overlay */}
+                    {faviconTempId && progress[faviconTempId] === 100 && (
+                      <div className="absolute top-1 right-1 bg-green-500 text-white rounded-full p-1">
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    )}
+
+                    {/* Upload Progress Overlay */}
+                    {faviconTempId && progress[faviconTempId] !== undefined && progress[faviconTempId] < 100 && (
+                      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center">
+                        <div className="text-center text-white">
+                          <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-1"></div>
+                          <div className="text-xs font-medium">{progress[faviconTempId]}%</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Upload Error Overlay */}
+                    {faviconTempId && uploadErrors[faviconTempId] && (
+                      <div className="absolute inset-0 bg-red-500/80 backdrop-blur-sm flex items-center justify-center">
+                        <div className="text-center text-white p-2">
+                          <div className="text-xs font-medium">Error</div>
+                        </div>
+                      </div>
+                    )}
+
                     {canManageWorkspace && (
                       <label className="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center cursor-pointer">
                         <input
@@ -231,14 +350,20 @@ export default function WhiteLabelSettingsTab({
                           className="hidden"
                           accept="image/jpeg,image/jpg,image/png,image/gif"
                           onChange={handleFaviconChange}
+                          disabled={uploading}
                         />
                         <Upload className="w-5 h-5 text-white" />
                       </label>
                     )}
                   </div>
-                  {errors.favicon && (
+                  {errors.favicon_key && (
                     <p className="text-sm text-red-500 font-medium">
-                      {errors.favicon}
+                      {errors.favicon_key}
+                    </p>
+                  )}
+                  {faviconTempId && uploadErrors[faviconTempId] && (
+                    <p className="text-sm text-red-500 font-medium">
+                      {uploadErrors[faviconTempId]}
                     </p>
                   )}
                 </div>
@@ -293,9 +418,9 @@ export default function WhiteLabelSettingsTab({
               <div className="flex justify-end">
                 <Button
                   type="submit"
-                  disabled={!canManageWorkspace}
-                  loading={processing}
-                  loadingText={t("common.saving") || "Guardando..."}
+                  disabled={!canManageWorkspace || uploading}
+                  loading={processing || uploading}
+                  loadingText={uploading ? "Subiendo archivos..." : (t("common.saving") || "Guardando...")}
                   variant="primary"
                   size="lg"
                   rounded="2xl"
