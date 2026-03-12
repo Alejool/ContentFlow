@@ -62,6 +62,9 @@ tsconfig.json
 phpunit.xml
 phpunit.xml.dist
 
+# Vite build artifacts
+.vite/
+
 # ============================================
 # DOCUMENTACIÓN INTERNA
 # ============================================
@@ -114,6 +117,9 @@ draft.yaml
 laravel
 recommendations.md
 makefile.dev
+
+# Test files temporales
+resources/js/test-import.ts
 
 # ============================================
 # DOCKER
