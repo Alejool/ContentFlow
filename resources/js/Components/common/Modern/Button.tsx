@@ -157,7 +157,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             ${colors.text}
             bg-transparent
             border-0
-            hover:bg-transparent
+            text-black 
+            dark:text-white
             shadow-none
             rounded-full
             p-3
@@ -257,7 +258,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           ? "focus:ring-offset-gray-900"
           : buttonStyle !== "icon"
           ? "focus:ring-offset-white"
-          : ""
+          : "!text-black dark:!text-white"
       }
     `;
 
