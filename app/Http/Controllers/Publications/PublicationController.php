@@ -311,9 +311,46 @@ class PublicationController extends Controller
       ];
     }
 
+    // Get approval workflow information
+    $workspace = $publication->workspace;
+    $workflow = $workspace->approvalWorkflow()->with(['levels.role'])->first();
+    $approvalWorkflowInfo = null;
+    
+    if ($workflow && $workflow->is_enabled) {
+      $approvalWorkflowInfo = [
+        'id' => $workflow->id,
+        'name' => $workflow->name ?? 'Flujo de Aprobación',
+        'is_enabled' => true,
+        'is_multi_level' => $workflow->is_multi_level,
+        'current_level' => $publication->current_approval_level ?? 0,
+        'max_level' => $workflow->levels->max('level_number') ?? 1,
+        'levels' => $workflow->levels->map(function($level) {
+          return [
+            'id' => $level->id,
+            'level_number' => $level->level_number,
+            'level_name' => $level->level_name,
+            'role' => $level->role ? [
+              'id' => $level->role->id,
+              'name' => $level->role->name,
+              'slug' => $level->role->slug,
+            ] : null,
+          ];
+        })->toArray(),
+        'status_info' => [
+          'current_status' => $publication->status,
+          'can_submit_for_approval' => in_array($publication->status, ['draft', 'rejected']),
+          'is_pending_review' => $publication->status === 'pending_review',
+          'is_approved' => $publication->status === 'approved',
+          'is_rejected' => $publication->status === 'rejected',
+          'next_action' => $this->getNextApprovalAction($publication, $workflow),
+        ],
+      ];
+    }
+
     // Append to publication object (dynamically)
     $publication->media_locked_by = $mediaLockedBy;
     $publication->approval_lock = $approvalLock;
+    $publication->approval_workflow = $approvalWorkflowInfo;
 
     return $request->wantsJson()
       ? $this->successResponse(['publication' => $publication])
@@ -435,6 +472,12 @@ class PublicationController extends Controller
 
   public function publish(Request $request, Publication $publication, PublishPublicationAction $action)
   {
+    \Log::info('=== PUBLISH METHOD STARTED ===', [
+      'publication_id' => $publication->id,
+      'status' => $publication->status,
+      'user_id' => auth()->id(),
+    ]);
+
     // Check payload size to prevent 413 errors
     $contentLength = $request->header('Content-Length');
     if ($contentLength && $contentLength > 10 * 1024 * 1024) { // 10MB limit for publish request
@@ -447,21 +490,14 @@ class PublicationController extends Controller
     // Check permissions using Policy (respects approval workflow)
     try {
       \Illuminate\Support\Facades\Gate::authorize('publish', $publication);
+      \Log::info('=== GATE AUTHORIZED ===', ['publication_id' => $publication->id]);
     } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
-      // Check if it's because of approval workflow
-      $workflow = $publication->workspace->approvalWorkflow;
-      if ($workflow && $workflow->is_active && $publication->status !== 'approved') {
-        return $this->errorResponse(
-          'This workspace has an approval workflow enabled. Content must be approved before publishing.',
-          403,
-          [
-            'requires_approval' => true,
-            'current_status' => $publication->status,
-            'workflow_enabled' => true,
-          ]
-        );
-      }
-      
+      \Log::warning('=== GATE DENIED ===', [
+        'publication_id' => $publication->id,
+        'error' => $e->getMessage()
+      ]);
+      // If authorization failed, return error
+      // Note: The Policy already handles workflow and owner checks
       return $this->errorResponse('You do not have permission to publish this content.', 403);
     }
 
@@ -486,8 +522,36 @@ class PublicationController extends Controller
       }
     }
 
+    // Check if user is owner (can bypass workflow)
+    $isOwner = false;
+    $role = null;
+    $userRole = auth()->user()->workspaces()
+      ->where('workspaces.id', $publication->workspace_id)
+      ->first();
+    
+    if ($userRole && $userRole->pivot->role_id) {
+      $role = \App\Models\Role\Role::find($userRole->pivot->role_id);
+      $isOwner = $role && $role->slug === \App\Models\Role\Role::OWNER;
+    }
+
+    \Log::info('PublicationController::publish - Checking canBePublished', [
+      'publication_id' => $publication->id,
+      'publication_status' => $publication->status,
+      'isOwner' => $isOwner,
+      'user_id' => auth()->id(),
+      'role_slug' => $role ? $role->slug : 'NULL',
+    ]);
+
     // Verify publication status allows publishing
-    if (!$publication->canBePublished()) {
+    $canPublish = $publication->canBePublished($isOwner);
+    
+    \Log::info('PublicationController::publish - canBePublished result', [
+      'publication_id' => $publication->id,
+      'canPublish' => $canPublish,
+      'isOwner' => $isOwner,
+    ]);
+
+    if (!$canPublish) {
       // If pending review, show specific message
       if ($publication->status === 'pending_review') {
         return $this->errorResponse(
@@ -532,6 +596,13 @@ class PublicationController extends Controller
 
       // Check if needs approval (but not if already publishing/retrying to different platforms)
       if (!in_array($publication->status, ['publishing', 'retrying'])) {
+        \Log::warning('PublicationController::publish - Blocking publication', [
+          'publication_id' => $publication->id,
+          'status' => $publication->status,
+          'isOwner' => $isOwner,
+          'canPublish' => $canPublish,
+        ]);
+        
         return $this->errorResponse(
           __('publications.errors.not_approved'),
           422,
@@ -682,14 +753,21 @@ class PublicationController extends Controller
 
   public function requestReview(Request $request, Publication $publication)
   {
-    if (!Auth::user()->hasPermission('manage-content', $publication->workspace_id)) {
-      return $this->errorResponse('You do not have permission to request review.', 403);
+    // Simple check: user must have publish permission
+    if (!Auth::user()->hasPermission('publish', $publication->workspace_id)) {
+      return $this->errorResponse('You do not have permission to submit content for approval. You need publish permission.', 403);
     }
 
-    // Allow requesting review for draft, failed, or rejected publications
-    $allowedStatuses = ['draft', 'failed', 'rejected'];
-    if (!in_array($publication->status, $allowedStatuses)) {
-      return $this->errorResponse(__('publications.errors.only_draft_failed_rejected_can_request_review'), 422);
+    // Use PublicationFlowService to validate
+    $flowService = app(\App\Services\PublicationFlowService::class);
+    
+    try {
+      $flowService->validateCanRequestReview($publication, Auth::user());
+    } catch (\Exception $e) {
+      return $this->errorResponse($e->getMessage(), 422, [
+        'is_owner' => $flowService->isOwner(Auth::user(), $publication->workspace),
+        'should_use_publish' => $flowService->canPublishDirectly(Auth::user(), $publication->workspace),
+      ]);
     }
 
     // Lock the publication by changing status to pending_review
@@ -1708,5 +1786,78 @@ class PublicationController extends Controller
       'current_type' => $currentType,
       'should_change' => $suggestedType !== $currentType,
     ], 'Content type suggestion generated');
+  }
+
+  /**
+   * Get the publication action available for the current user.
+   * Returns whether the user can 'publish' directly or must 'review'.
+   */
+  public function getPublicationAction(Request $request)
+  {
+    $user = Auth::user();
+    $workspaceId = $user->current_workspace_id;
+    
+    if (!$workspaceId) {
+      return $this->errorResponse('No workspace selected', 400);
+    }
+
+    $workspace = Workspace::find($workspaceId);
+    
+    if (!$workspace) {
+      return $this->errorResponse('Workspace not found', 404);
+    }
+
+    $flowService = app(\App\Services\PublicationFlowService::class);
+    $action = $flowService->getPublicationAction($user, $workspace);
+    $canBypassWorkflow = $flowService->canPublishDirectly($user, $workspace);
+    $isOwner = $flowService->isOwner($user, $workspace);
+    
+    // Get workflow status
+    $workflow = $workspace->approvalWorkflow;
+    $workflowEnabled = $workflow && $workflow->is_enabled;
+
+    return $this->successResponse([
+      'action' => $action, // 'publish' or 'review'
+      'can_bypass_workflow' => $canBypassWorkflow,
+      'is_owner' => $isOwner,
+      'workflow_enabled' => $workflowEnabled,
+      'button_text' => $action === 'publish' ? 'Publicar' : 'Enviar a revisión',
+      'button_text_en' => $action === 'publish' ? 'Publish' : 'Send to Review',
+      'description' => $action === 'publish' 
+        ? 'Puedes publicar contenido directamente sin aprobación'
+        : 'Debes enviar el contenido a revisión antes de publicar',
+    ]);
+  }
+
+
+  /**
+   * Get the next action for the approval workflow
+   */
+  private function getNextApprovalAction(Publication $publication, ApprovalWorkflow $workflow): string
+  {
+    $status = $publication->status;
+    
+    // Si está en draft o rejected, puede enviar a revisión
+    if (in_array($status, ['draft', 'rejected'])) {
+      return 'submit_for_approval';
+    }
+    
+    // Si está en pending_review, está esperando aprobación
+    if ($status === 'pending_review') {
+      $currentLevel = $publication->current_approval_level ?? 1;
+      $maxLevel = $workflow->levels->max('level_number') ?? 1;
+      
+      if ($currentLevel < $maxLevel) {
+        return 'awaiting_level_' . $currentLevel . '_approval';
+      }
+      return 'awaiting_final_approval';
+    }
+    
+    // Si está approved, puede publicar
+    if ($status === 'approved') {
+      return 'ready_to_publish';
+    }
+    
+    return 'unknown';
   }
 }

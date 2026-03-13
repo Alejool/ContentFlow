@@ -23,6 +23,7 @@ use App\Http\Middleware\CheckGranularLimits;
 use App\Http\Middleware\ApiRateLimiter;
 use App\Http\Middleware\CheckWorkspaceLimit;
 use App\Http\Middleware\CheckWorkspaceOwner;
+use App\Http\Middleware\CheckWorkspaceRole;
 use Illuminate\Routing\Middleware\CacheResponse;
 use App\Http\Middleware\CheckApiWorkspacePlan;
 use App\Http\Middleware\CheckMaintenanceMode;
@@ -74,6 +75,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'api.rate.limit' => ApiRateLimiter::class,
             'workspace.limit' => CheckWorkspaceLimit::class,
             'workspace.owner' => CheckWorkspaceOwner::class,
+            'workspace.role' => CheckWorkspaceRole::class,
             'api.plan' => CheckApiWorkspacePlan::class,
         ]);
     })

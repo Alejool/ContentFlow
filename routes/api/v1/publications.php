@@ -14,6 +14,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/', [PublicationController::class, 'index'])->name('index');
     Route::get('/stats', [PublicationController::class, 'stats'])->name('stats');
     Route::get('/export', [PublicationController::class, 'export'])->name('export');
+    Route::get('/action', [PublicationController::class, 'getPublicationAction'])->name('action');
     Route::post('/suggest-content-type', [PublicationController::class, 'suggestContentType'])->name('suggest-content-type');
     Route::post('/', [PublicationController::class, 'store'])->name('store')->middleware('rate.limit');
     Route::get('/{publication}', [PublicationController::class, 'show'])->name('show')->whereNumber('publication');

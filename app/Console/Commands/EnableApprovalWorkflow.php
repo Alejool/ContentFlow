@@ -37,12 +37,14 @@ class EnableApprovalWorkflow extends Command
         
         if ($workflow) {
             $this->warn('Workflow already exists for this workspace');
+            $workflow->is_enabled = true;
             $workflow->is_active = true;
             $workflow->save();
             $this->info('Workflow has been enabled');
         } else {
             $workflow = ApprovalWorkflow::create([
                 'workspace_id' => $workspaceId,
+                'is_enabled' => true,
                 'is_active' => true,
                 'is_multi_level' => false,
             ]);
@@ -52,7 +54,8 @@ class EnableApprovalWorkflow extends Command
         $this->newLine();
         $this->info('Workflow Details:');
         $this->line("  ID: {$workflow->id}");
-        $this->line("  Enabled: " . ($workflow->is_active ? 'YES' : 'NO'));
+        $this->line("  Enabled (is_enabled): " . ($workflow->is_enabled ? 'YES' : 'NO'));
+        $this->line("  Active (is_active): " . ($workflow->is_active ? 'YES' : 'NO'));
         $this->line("  Multi-level: " . ($workflow->is_multi_level ? 'YES' : 'NO'));
         
         $this->newLine();
