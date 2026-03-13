@@ -39,7 +39,7 @@ interface PublicationState {
     per_page: number;
   };
 
-  fetchPublications: (filters?: any, page?: number) => Promise<void>;
+  fetchPublications: (filters?: any, page?: number, useApprovalFilter?: boolean) => Promise<void>;
   fetchPublicationById: (id: number) => Promise<Publication | null>;
   fetchPublishedPlatforms: (publicationId: number) => Promise<{
     published: number[];
@@ -135,7 +135,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
     per_page: 7,
   },
 
-  fetchPublications: async (filters = {}, page = 1) => {
+  fetchPublications: async (filters = {}, page = 1, useApprovalFilter = false) => {
     set({ isLoading: true, error: null });
 
     // CRITICAL: Clear previous page data to prevent memory bloat
@@ -156,7 +156,13 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
         },
         {} as any,
       );
-      const response = await axios.get(route("api.v1.publications.index"), {
+      
+      // Use different endpoint based on approval filter
+      const endpoint = useApprovalFilter 
+        ? route("api.v1.publications.pending-approvals")
+        : route("api.v1.publications.index");
+      
+      const response = await axios.get(endpoint, {
         params: { ...cleanFilters, page },
         paramsSerializer: {
           indexes: null,
@@ -179,12 +185,12 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       const data = response.data.publications;
 
       set({
-        publications: data.data ?? [],
+        publications: data.data ?? data ?? [], // Handle both paginated and non-paginated responses
         pagination: {
-          current_page: data.current_page,
-          last_page: data.last_page,
-          total: data.total,
-          per_page: data.per_page,
+          current_page: data.current_page ?? 1,
+          last_page: data.last_page ?? 1,
+          total: data.total ?? (Array.isArray(data) ? data.length : 0),
+          per_page: data.per_page ?? 12,
         },
         isLoading: false,
       });

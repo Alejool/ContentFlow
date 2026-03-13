@@ -50,8 +50,6 @@ export default function ManageContentPage() {
   // Check if user can approve content (admin permission OR workflow assignment)
   const { canApprove, reason: approvalReason } = useCanApprove(auth.current_workspace?.id);
 
-  console.log('🔍 DEBUG canApprove:', { canApprove, approvalReason, userRole: auth.current_workspace?.user_role_slug, permissions });
-
   const {
     t,
     handleFilterChange,
@@ -304,41 +302,35 @@ export default function ManageContentPage() {
   );
 
   const tabsConfig = useMemo(
-    () => {
-      const config = [
-        {
-          id: "publications",
-          label: t("manageContent.tabs.publications"),
-          icon: Folder,
-        },
-        {
-          id: "campaigns",
-          label: t("manageContent.tabs.campaigns"),
-          icon: Target,
-        },
-        {
-          id: "calendar",
-          label: t("manageContent.tabs.calendar"),
-          icon: CalendarIcon,
-        },
-        {
-          id: "logs",
-          label: t("manageContent.tabs.logs"),
-          icon: FileText,
-        },
-        {
-          id: "approvals",
-          label: t("manageContent.tabs.approvals"),
-          icon: CheckCircle,
-          badge: pendingApprovals,
-          enabled: canApprove,
-        },
-      ];
-      
-      console.log('🔍 tabsConfig generated:', config.find(t => t.id === 'approvals'));
-      
-      return config;
-    },
+    () => [
+      {
+        id: "publications",
+        label: t("manageContent.tabs.publications"),
+        icon: Folder,
+      },
+      {
+        id: "campaigns",
+        label: t("manageContent.tabs.campaigns"),
+        icon: Target,
+      },
+      {
+        id: "calendar",
+        label: t("manageContent.tabs.calendar"),
+        icon: CalendarIcon,
+      },
+      {
+        id: "logs",
+        label: t("manageContent.tabs.logs"),
+        icon: FileText,
+      },
+      {
+        id: "approvals",
+        label: t("manageContent.tabs.approvals"),
+        icon: CheckCircle,
+        badge: pendingApprovals,
+        enabled: canApprove,
+      },
+    ],
     [t, pendingApprovals, canApprove]
   );
 

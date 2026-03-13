@@ -147,7 +147,8 @@ export const usePublications = () => {
           await fetchLogs({ ...filters, per_page: itemsPerPage }, page);
           break;
         case "approvals":
-          await fetchPublications({ ...filters, per_page: itemsPerPage }, page);
+          // Use approval filter to only show publications assigned to the user
+          await fetchPublications({ ...filters, per_page: itemsPerPage }, page, true);
           break;
       }
     },
