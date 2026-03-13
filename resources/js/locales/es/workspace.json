@@ -145,6 +145,7 @@
       "role_description": "Descripción",
       "role_description_placeholder": "Describe las responsabilidades de este rol...",
       "key_permissions_label": "Permisos Clave",
+      "can_approve_content": "Puede aprobar contenido en flujos de trabajo",
       "role_created_success": "Rol creado con éxito",
       "role_created_error": "Error al crear el rol",
       "name_required": "El nombre es obligatorio",

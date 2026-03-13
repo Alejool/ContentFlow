@@ -145,6 +145,7 @@
       "role_description": "Description",
       "role_description_placeholder": "Describe the responsibilities of this role...",
       "key_permissions_label": "Key Permissions",
+      "can_approve_content": "Can approve content in workflows",
       "role_created_success": "Role created successfully",
       "role_created_error": "Error creating role",
       "name_required": "Name is required",
