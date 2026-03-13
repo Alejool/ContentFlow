@@ -11,6 +11,7 @@ use App\Http\Requests\ContentApproval\RejectContentRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 
 class ContentApprovalController extends Controller
 {
@@ -30,6 +31,12 @@ class ContentApprovalController extends Controller
      */
     public function submitForApproval(Publication $content): JsonResponse
     {
+
+      Log::info('Submit for approval attempt', [
+          'user_id' => Auth::id(),
+          'content_id' => $content->id,
+          'content_title' => $content->title,
+        ]);
         try {
             // Authorize using policy
             Gate::authorize('submitForApproval', $content);
@@ -37,11 +44,29 @@ class ContentApprovalController extends Controller
             $user = Auth::user();
             
             $approvalAction = $this->approvalWorkflowService->submitForApproval($content, $user);
-
+            
+            // Refresh content to get updated data
+            $content = $content->fresh(['workspace.approvalWorkflow.levels.role']);
+            
+            // Get current approval level info
+            $workflow = $content->workspace->approvalWorkflow;
+            $currentLevel = $content->current_approval_level;
+            $approvalLevel = $workflow?->getLevelByNumber($currentLevel);
+            
+            // Get approvers for this level
+            $approvers = $approvalLevel ? $approvalLevel->getApprovers() : collect();
+            $approverNames = $approvers->pluck('name')->toArray();
+            
             return $this->successResponse([
                 'message' => 'Content submitted for approval successfully.',
-                'content' => $content->fresh(),
+                'content' => $content,
                 'approval_action' => $approvalAction,
+                'approval_info' => [
+                    'current_level' => $currentLevel,
+                    'level_name' => $approvalLevel?->level_name,
+                    'approvers' => $approverNames,
+                    'approver_count' => count($approverNames),
+                ],
             ], 200);
         } catch (\App\Exceptions\ApprovalWorkflowNotEnabledException $e) {
             return $this->errorResponse('Approval workflow is not enabled for this workspace.', 400);
@@ -191,6 +216,159 @@ class ContentApprovalController extends Controller
         } catch (\Throwable $e) {
             return $this->errorResponse('Failed to retrieve approval history: ' . $e->getMessage(), 500);
         }
+    }
+
+    /**
+     * Get complete approval flow visualization data
+     * 
+     * GET /api/content/{content}/approval-flow
+     * 
+     * Returns workflow configuration, all levels with their status,
+     * actions history per level, and current user permissions.
+     * 
+     * @param Publication $content
+     * @return JsonResponse
+     */
+    public function getApprovalFlow(Publication $content): JsonResponse
+    {
+        try {
+            $workspace = $content->workspace;
+            $workflow = ApprovalWorkflow::with(['levels.role'])
+                ->where('workspace_id', $workspace->id)
+                ->first();
+
+            if (!$workflow || !$workflow->is_enabled) {
+                return $this->errorResponse('Approval workflow is not enabled for this workspace.', 400);
+            }
+
+            $user = Auth::user();
+            $userRole = $this->getUserRole($user, $workspace);
+
+            // Get all approval actions grouped by level
+            $actions = \App\Models\ApprovalAction::where('content_id', $content->id)
+                ->with('user:id,name,email,photo_url')
+                ->orderBy('created_at', 'asc')
+                ->get()
+                ->groupBy('approval_level');
+
+            // Build flow data for each level
+            $flowData = $workflow->levels->map(function ($level) use ($content, $actions, $userRole) {
+                $levelActions = $actions->get($level->level_number, collect());
+                $approvedAction = $levelActions->firstWhere('action_type', \App\Models\ApprovalAction::ACTION_APPROVED);
+                $rejectedAction = $levelActions->firstWhere('action_type', \App\Models\ApprovalAction::ACTION_REJECTED);
+
+                $isCurrentLevel = $content->current_approval_level === $level->level_number;
+                $isPastLevel = $content->current_approval_level > $level->level_number;
+                $isFutureLevel = $content->current_approval_level < $level->level_number;
+                
+                // User can approve only if:
+                // 1. This is the current level
+                // 2. User has the required role for this level (or is Owner)
+                // 3. Content is in pending_review status
+                $canUserApprove = $isCurrentLevel && 
+                    $userRole && 
+                    ($userRole->slug === \App\Models\Role\Role::OWNER || $userRole->id === $level->role_id) &&
+                    $content->status === \App\Models\Publications\Publication::STATUS_PENDING_REVIEW;
+
+                return [
+                    'level_number' => $level->level_number,
+                    'level_name' => $level->level_name,
+                    'role' => [
+                        'id' => $level->role->id,
+                        'name' => $level->role->name,
+                        'display_name' => $level->role->display_name,
+                        'slug' => $level->role->slug,
+                    ],
+                    'is_current_level' => $isCurrentLevel,
+                    'is_past_level' => $isPastLevel,
+                    'is_future_level' => $isFutureLevel,
+                    'approved_action' => $approvedAction ? [
+                        'id' => $approvedAction->id,
+                        'user' => $approvedAction->user,
+                        'comment' => $approvedAction->comment,
+                        'created_at' => $approvedAction->created_at->toIso8601String(),
+                    ] : null,
+                    'rejected_action' => $rejectedAction ? [
+                        'id' => $rejectedAction->id,
+                        'user' => $rejectedAction->user,
+                        'comment' => $rejectedAction->comment,
+                        'created_at' => $rejectedAction->created_at->toIso8601String(),
+                    ] : null,
+                    'can_user_approve' => $canUserApprove,
+                    'status' => $this->getLevelStatus($approvedAction, $rejectedAction, $isCurrentLevel, $isPastLevel),
+                ];
+            });
+
+            return $this->successResponse([
+                'workflow' => [
+                    'id' => $workflow->id,
+                    'is_multi_level' => $workflow->is_multi_level,
+                    'total_levels' => $workflow->levels->count(),
+                ],
+                'flow' => $flowData,
+                'publication_status' => $content->status,
+                'current_level' => $content->current_approval_level,
+                'user_role' => $userRole ? [
+                    'id' => $userRole->id,
+                    'name' => $userRole->name,
+                    'display_name' => $userRole->display_name,
+                    'slug' => $userRole->slug,
+                ] : null,
+            ], 200);
+        } catch (\Throwable $e) {
+            return $this->errorResponse('Failed to retrieve approval flow: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Determine the status of an approval level
+     * 
+     * @param mixed $approvedAction
+     * @param mixed $rejectedAction
+     * @param bool $isCurrentLevel
+     * @param bool $isPastLevel
+     * @return string
+     */
+    private function getLevelStatus($approvedAction, $rejectedAction, bool $isCurrentLevel, bool $isPastLevel): string
+    {
+        if ($approvedAction) {
+            return 'approved';
+        }
+        
+        if ($rejectedAction) {
+            return 'rejected';
+        }
+        
+        if ($isCurrentLevel) {
+            return 'in_review';
+        }
+        
+        if ($isPastLevel) {
+            return 'skipped'; // Should not happen in normal flow
+        }
+        
+        return 'pending';
+    }
+
+    /**
+     * Get user's role in a workspace
+     * 
+     * @param \App\Models\User $user
+     * @param \App\Models\Workspace\Workspace $workspace
+     * @return \App\Models\Role\Role|null
+     */
+    private function getUserRole(\App\Models\User $user, \App\Models\Workspace\Workspace $workspace): ?\App\Models\Role\Role
+    {
+        $rolePivot = \Illuminate\Support\Facades\DB::table('role_user')
+            ->where('user_id', $user->id)
+            ->where('workspace_id', $workspace->id)
+            ->first();
+
+        if (!$rolePivot) {
+            return null;
+        }
+
+        return \App\Models\Role\Role::find($rolePivot->role_id);
     }
 
     /**
