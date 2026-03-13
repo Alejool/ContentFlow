@@ -43,7 +43,10 @@
     "status": {
       "pending": "Pendiente",
       "approved": "Aprobado",
-      "rejected": "Rechazado"
+      "rejected": "Rechazado",
+      "draft": "Borrador",
+      "pending_review": "En Revisión",
+      "ready_to_submit": "Listo para Enviar"
     },
     "historyTable": {
       "publication": "Publicación",
@@ -65,8 +68,21 @@
       "history": "Historial"
     },
     "locked": {
-    "title": "Aprobaciones básicas habilitadas",
-    "description": "Tu plan actual permite aprobaciones de un nivel. Mejora tu plan para crear flujos de aprobación avanzados y multi-nivel."
-  }
+      "title": "Aprobaciones básicas habilitadas",
+      "description": "Tu plan actual permite aprobaciones de un nivel. Mejora tu plan para crear flujos de aprobación avanzados y multi-nivel."
+    },
+    "workflow_progress": "Progreso del Flujo",
+    "progress": "Progreso",
+    "in_progress": "En Proceso",
+    "rejected_here": "Rechazado Aquí",
+    "rejected_at_level": "Rechazado en el nivel {{level}}",
+    "approver_role": "Rol Aprobador",
+    "approved_ready_to_publish": "¡Aprobado! Listo para publicar",
+    "next_action": {
+      "submit_for_approval": "Envía esta publicación a revisión para comenzar el proceso de aprobación",
+      "awaiting_level_approval": "Esperando aprobación de {{role}} ({{level}})",
+      "awaiting_final_approval": "Esperando aprobación final de {{role}}",
+      "ready_to_publish": "La publicación ha sido aprobada y está lista para publicarse"
+    }
   }
 }

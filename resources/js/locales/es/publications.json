@@ -501,7 +501,15 @@
       "close": "Cerrar",
       "save": "Guardar cambios",
       "approve": "Aprobar",
-      "reject": "Rechazar"
+      "reject": "Rechazar",
+      "publish": "Publicar",
+      "view": "Ver",
+      "viewDetails": "Ver Detalles",
+      "duplicate": "Duplicar",
+      "request": "Solicitar",
+      "sendForReview": "Enviar a Revisión",
+      "sending": "Enviando...",
+      "inReview": "En Revisión"
     },
     "table": {
       "name": "Nombre",
@@ -516,6 +524,13 @@
       "noMedia": "Sin multimedia",
       "loading": "Cargando...",
       "linkedAccount": "Cuentas Asociadas",
+      "untitled": "Sin título",
+      "noDescription": "Sin descripción",
+      "platforms": "Plataformas",
+      "linkedAccounts": "Cuentas vinculadas",
+      "createdBy": "Creado por",
+      "manualEvent": "Evento Manual",
+      "socialNetworkEvent": "Evento de Red Social",
       "emptyState": {
         "title": "No se encontraron publicaciones",
         "description": "Crea una publicación para comenzar a publicar contenido.",
@@ -529,7 +544,9 @@
       "publishingOnBy": "Publicando en {{platform}} por {{user}}",
       "publishingOnMultipleBy": "Publicando en {{count}} redes por {{user}}",
       "rejectedBy": "Rechazado por",
-      "pendingAdminReview": "Pendiente de revisión"
+      "pendingAdminReview": "Pendiente de revisión",
+      "editingBy": "Editando:",
+      "untitled": "Sin título"
     },
     "messages": {
       "addSuccess": "publicación agregada éxitosamente!",

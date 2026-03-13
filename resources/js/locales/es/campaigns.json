@@ -4,6 +4,8 @@
     "subtitle": "Analiza el impacto y rendimiento de tus campañas y publicaciones.",
     "noPublications": "No hay publicaciones asociadas",
     "scheduledPosts": "Publicaciones Programadas",
+    "inCampaigns": "En {{count}} campaña",
+    "inCampaigns_plural": "En {{count}} campañas",
     "create": "Crear Campaña",
     "table": {
       "name": "Nombre",
