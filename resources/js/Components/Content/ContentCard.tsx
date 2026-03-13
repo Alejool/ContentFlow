@@ -1,8 +1,18 @@
+import Button from "@/Components/common/Modern/Button";
 import SimpleContentTypeBadge from "@/Components/Content/common/SimpleContentTypeBadge";
+import { usePublicationActions } from "@/Hooks/publication/usePublicationActions";
 import { formatDateString } from "@/Utils/dateHelpers";
-import { getDateFnsLocale } from "@/Utils/dateLocales";
-import { canUserPublishDirectly } from "@/Utils/publicationPermissions";
-import { usePage } from "@inertiajs/react";
+import {
+  countMediaFiles,
+  getLockedByFirstName,
+  getLockedByName,
+  getMediaUrl,
+  getStatusColors,
+  hasMedia,
+  isProcessing,
+  isVideoMedia,
+  prepareMediaForPreview
+} from "@/Utils/publicationHelpers";
 import {
   Calendar,
   CheckCircle,
@@ -15,12 +25,12 @@ import {
   Loader2,
   Lock,
   Rocket,
+  Send,
   Trash2,
   Users,
-  Video,
+  Video
 } from "lucide-react";
 import { useState } from "react";
-import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 interface ContentCardProps {
@@ -59,39 +69,47 @@ export default function ContentCard({
   remoteLock,
   onPreviewMedia,
 }: ContentCardProps) {
-  const { auth } = usePage<any>().props;
-  const currentUserId = auth.user?.id;
-  
   const { t } = useTranslation();
-  const { i18n } = useTranslation();
-  const locale = getDateFnsLocale(i18n.language);
-  const canManageContent = permissions?.includes("manage-content");
+  
+  // Hook centralizado - SIN lógica en el componente
+  const {
+    loadingStates,
+    canManageContent,
+    shouldShowSendToReview,
+    shouldShowPublish,
+    handleSubmitForApproval,
+    handlePublish,
+    handleEdit,
+    handleDelete,
+    handleDuplicate,
+    handleViewDetails,
+  } = usePublicationActions({
+    onEdit,
+    onDelete,
+    onPublish,
+    onViewDetails,
+    onDuplicate,
+    permissions,
+  });
+
+  const [imageError, setImageError] = useState(false);
   
   // Early return after all hooks
   if (!item) {
     return null;
   }
-  
-  // Verificar si el usuario puede publicar directamente
-  const canPublish = canUserPublishDirectly(item, currentUserId, permissions || []) || permissions?.includes("publish");
 
-  const statusColors = {
-    published:
-      "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-    draft: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400",
-    scheduled:
-      "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
-    failed: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
-    pending_review:
-      "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
-    approved:
-      "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
-    rejected: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
-    publishing:
-      "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
-  };
+  // Usar helpers centralizados - NO lógica
+  const itemHasMedia = hasMedia(item);
+  const isVideo = isVideoMedia(item);
+  const itemIsProcessing = isProcessing(item);
+  const mediaUrl = getMediaUrl(item);
+  const statusColors = getStatusColors(item.status);
+  const lockedByName = getLockedByName(remoteLock);
+  const lockedByFirstName = getLockedByFirstName(remoteLock);
+  const isLoading = loadingStates[item.id];
+  const mediaCount = countMediaFiles(item);
 
-  const statusKey = (item.status || "draft") as keyof typeof statusColors;
   const StatusIcon =
     {
       published: CheckCircle,
@@ -102,28 +120,7 @@ export default function ContentCard({
       approved: CheckCircle,
       rejected: Clock,
       publishing: Clock,
-    }[statusKey] || Edit;
-
-  // Check if there are media files
-  // Check if there are media files
-  const hasMedia = item.media_files && item.media_files.length > 0;
-  const firstMedia = hasMedia ? item.media_files[0] : null;
-  const isVideo = firstMedia?.file_type?.includes("video");
-  const isProcessing = firstMedia?.status === "processing";
-
-  // URL logic:
-  // 1. If it's a video and processing, we don't have a thumbnail yet.
-  // 2. If it's a video and completed, we should have a thumbnail. If not, fallback to file_path checks?
-  // 3. If it's an image, file_path is the image.
-
-  let mediaUrl = firstMedia?.thumbnail?.file_path || item.thumbnail;
-
-  // If no thumbnail, and it's an image, use the file path
-  if (!mediaUrl && firstMedia?.file_type === "image") {
-    mediaUrl = firstMedia.file_path;
-  }
-  // If it's a video and we don't have a thumbnail, we can't show the video as an image.
-  // Unless we want to try to show a generic video placeholder if processing.
+    }[(item.status || "draft")] || Edit;
 
   // Get platform icons for publication
   const getPlatformIcons = () => {
@@ -151,52 +148,22 @@ export default function ContentCard({
     );
   };
 
-  const getLockUserName = () => {
-    if (!remoteLock) return "";
-    return remoteLock.user_name || (remoteLock as any).user?.name || "Usuario";
-  };
-
-  const lockedByName = getLockUserName();
-  const lockedByFirstName = lockedByName.split(" ")[0];
-
-  const [imageError, setImageError] = useState(false);
-
   const handleCardClick = (e: React.MouseEvent) => {
     // If user is selecting text, don't trigger click
     if (window.getSelection()?.toString()) return;
 
-    // Trigger view details or edit
+    // Trigger view details or edit - USA EL HANDLER DEL HOOK
     if (onViewDetails) {
-      onViewDetails(item);
+      handleViewDetails(item);
     } else if (onEdit) {
-      onEdit(item);
+      handleEdit(item, remoteLock);
     }
   };
 
   const handleMediaClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (onPreviewMedia && hasMedia && !isProcessing) {
-      const allMedia = item.media_files.map((media: any) => {
-        const isV = media.file_type?.includes("video");
-        let mUrl = media.thumbnail?.file_path || media.file_path;
-
-        if (!mUrl && media.file_type === "image") {
-          mUrl = media.file_path;
-        }
-
-        return {
-          url: isV
-            ? media.file_path.startsWith("http")
-              ? media.file_path
-              : `/storage/${media.file_path}`
-            : mUrl.startsWith("http")
-              ? mUrl
-              : `/storage/${mUrl}`,
-          type: (isV ? "video" : "image") as "image" | "video",
-          title: item.title,
-        };
-      });
-
+    if (onPreviewMedia && itemHasMedia && !itemIsProcessing) {
+      const allMedia = prepareMediaForPreview(item);
       onPreviewMedia(allMedia, 0);
     }
   };
@@ -206,19 +173,19 @@ export default function ContentCard({
       className="group bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col h-full cursor-pointer"
       onClick={handleCardClick}
     >
-      {(hasMedia || isProcessing) && (
+      {(itemHasMedia || itemIsProcessing) && (
         <div
           className="relative h-40 bg-gray-100 dark:bg-gray-700 overflow-hidden cursor-zoom-in"
           onClick={handleMediaClick}
         >
           <div className="relative w-full h-full">
-            {isProcessing ? (
+            {itemIsProcessing ? (
               <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-800 animate-pulse">
                 <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900/30 mb-2 flex items-center justify-center text-blue-600 dark:text-blue-400">
                   <Clock className="w-6 h-6 animate-spin" />
                 </div>
                 <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                  Procesando media...
+                  {t("common.processing")}...
                 </span>
               </div>
             ) : !imageError && mediaUrl ? (
@@ -240,12 +207,12 @@ export default function ContentCard({
                     )}
                   </div>
                   <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {isVideo ? "Video" : "Imagen"}
+                    {isVideo ? t("common.videoTypes.video") : t("common.videoTypes.post")}
                   </span>
                 </div>
               </div>
             )}
-            {!isProcessing && isVideo && (
+            {!itemIsProcessing && isVideo && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/20 transition-colors">
                 <div className="bg-white/90 dark:bg-gray-900/90 p-2.5 rounded-full shadow-lg backdrop-blur-sm">
                   <Video className="w-5 h-5 text-primary-600 dark:text-primary-400" />
@@ -278,7 +245,7 @@ export default function ContentCard({
           <div className="absolute top-3 right-3 z-10 flex flex-col gap-2 items-end">
             {/* Status Badge */}
             <span
-              className={`px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 shadow-sm backdrop-blur-md border border-white/20 ${statusColors[statusKey] || statusColors.draft}`}
+              className={`px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 shadow-sm backdrop-blur-md border border-white/20 ${statusColors}`}
             >
               <StatusIcon className="w-3 h-3" />
               <span className="capitalize">
@@ -302,7 +269,7 @@ export default function ContentCard({
         </div>
       )}
 
-      {!hasMedia && (
+      {!itemHasMedia && (
         <div className="p-4 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
@@ -329,7 +296,7 @@ export default function ContentCard({
             </div>
 
             <span
-              className={`px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 ${statusColors[statusKey] || statusColors.draft}`}
+              className={`px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 ${statusColors}`}
             >
               <StatusIcon className="w-3 h-3" />
               <span className="capitalize">
@@ -341,13 +308,13 @@ export default function ContentCard({
           </div>
 
           <h3 className="font-bold text-gray-900 dark:text-white text-base line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-            {item.title ? item.title : (item.name ?? "Sin título")}
+            {item.title ? item.title : (item.name ?? t("publications.table.untitled"))}
           </h3>
         </div>
       )}
 
-      <div className={`${hasMedia ? "p-4" : "px-4 pb-4"} flex-1 flex flex-col`}>
-        {hasMedia && (
+      <div className={`${itemHasMedia ? "p-4" : "px-4 pb-4"} flex-1 flex flex-col`}>
+        {itemHasMedia && (
           <h3 className="font-bold text-gray-900 dark:text-white text-base line-clamp-2 mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
             {item.title ? item.title : (item.name ?? "Sin título")}
           </h3>
@@ -357,7 +324,7 @@ export default function ContentCard({
           <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2 break-words">
             {item.description ||
               item.content?.substring(0, 120) ||
-              "Sin descripción"}
+              t("publications.table.description")}
             {!item.description && (item.content?.length || 0) > 120 && "..."}
           </p>
         </div>
@@ -402,7 +369,7 @@ export default function ContentCard({
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-gray-500 dark:text-gray-400">
-                    Plataformas:
+                    {t("publications.modal.publish.platforms")}:
                   </span>
                   {getPlatformIcons()}
                 </div>
@@ -453,7 +420,7 @@ export default function ContentCard({
               )
             )}
 
-            {type === "publication" && hasMedia && (
+            {type === "publication" && itemHasMedia && (
               <div className="flex items-center gap-1">
                 {isVideo ? (
                   <Video className="w-3.5 h-3.5 text-gray-400" />
@@ -461,8 +428,8 @@ export default function ContentCard({
                   <ImageIcon className="w-3.5 h-3.5 text-gray-400" />
                 )}
                 <span className="text-xs text-gray-500 dark:text-gray-400">
-                  {item.media_files.length}{" "}
-                  {item.media_files.length === 1 ? "archivo" : "archivos"}
+                  {mediaCount.total}{" "}
+                  {mediaCount.total === 1 ? t("common.item") : t("common.files")}
                 </span>
               </div>
             )}
@@ -474,141 +441,143 @@ export default function ContentCard({
         <div className="flex items-center gap-2">
           {type === "publication" && canManageContent && (
             <>
-              {canPublish ? (
-                <button
+              {shouldShowPublish(item) ? (
+                <Button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onPublish?.(item);
+                    handlePublish(item);
                   }}
-                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg transition-all shadow-sm shadow-orange-200 dark:shadow-none text-sm font-semibold"
-                  title="Publicar ahora"
+                  disabled={isLoading?.publishing}
+                  loading={isLoading?.publishing}
+                  variant="primary"
+                  size="sm"
+                  icon={Rocket}
+                  className="flex-1"
                 >
-                  <Rocket className="w-4 h-4" />
-                  <span className="hidden sm:inline">Publicar</span>
-                </button>
-              ) : !canPublish &&
-                !item.approved_at &&
-                ["draft", "failed", "rejected"].includes(
-                  item.status || "draft",
-                ) ? (
-                <button
+                  <span className="hidden sm:inline">{t("publications.button.publish")}</span>
+                </Button>
+              ) : shouldShowSendToReview(item) ? (
+                <Button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onPublish?.(item);
+                    handleSubmitForApproval(item);
                   }}
-                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors text-sm font-semibold shadow-sm"
-                  title="Solicitar aprobación"
+                  disabled={isLoading?.submitting}
+                  loading={isLoading?.submitting}
+                  variant="primary"
+                  size="sm"
+                  icon={Send}
+                  className="flex-1"
                 >
-                  <Clock className="w-4 h-4" />
-                  <span className="hidden sm:inline">Solicitar</span>
-                </button>
+                  <span className="hidden sm:inline">
+                    {isLoading?.submitting ? t("publications.button.sending") : t("publications.button.sendForReview")}
+                  </span>
+                </Button>
+              ) : item.status === "pending_review" ? (
+                <Button
+                  disabled
+                  variant="warning"
+                  size="sm"
+                  icon={Clock}
+                  className="flex-1"
+                >
+                  <span className="hidden sm:inline">{t("publications.button.inReview")}</span>
+                </Button>
               ) : item.status === "published" ? (
-                <button
+                <Button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onViewDetails?.(item);
+                    handleViewDetails(item);
                   }}
-                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-white hover:bg-orange-50 text-gray-700 hover:text-orange-700 border border-gray-200 hover:border-orange-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg transition-all text-sm font-semibold shadow-sm"
-                  title="Ver detalles"
+                  variant="ghost"
+                  size="sm"
+                  icon={Eye}
+                  className="flex-1"
                 >
-                  <Eye className="w-4 h-4" />
-                  <span className="hidden sm:inline">Ver</span>
-                </button>
+                  <span className="hidden sm:inline">{t("publications.button.view")}</span>
+                </Button>
               ) : (
-                <button
+                <Button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onViewDetails?.(item);
+                    handleViewDetails(item);
                   }}
-                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-white hover:bg-orange-50 text-gray-700 hover:text-orange-700 border border-gray-200 hover:border-orange-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg transition-all text-sm font-semibold shadow-sm"
-                  title="Ver detalles"
+                  variant="ghost"
+                  size="sm"
+                  icon={Eye}
+                  className="flex-1"
                 >
-                  <Eye className="w-4 h-4" />
-                  <span className="hidden sm:inline">Ver</span>
-                </button>
+                  <span className="sr-only">{t("publications.button.view")}</span>
+                </Button>
               )}
             </>
           )}
 
           {(!canManageContent || type === "campaign") && (
-            <button
+            <Button
               onClick={(e) => {
                 e.stopPropagation();
-                onViewDetails?.(item);
+                handleViewDetails(item);
               }}
-              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-white hover:bg-orange-50 text-gray-700 hover:text-orange-700 border border-gray-200 hover:border-orange-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg transition-all text-sm font-semibold shadow-sm"
-              title="Ver detalles"
+              variant="ghost"
+              size="sm"
+              icon={Eye}
+              className="flex-1"
             >
-              <Eye className="w-4 h-4" />
-              Detalles
-            </button>
+              <span className="sr-only">{t("publications.button.view")}</span>
+            </Button>
           )}
 
           {canManageContent && (
-            <button
+            <Button
               onClick={(e) => {
                 e.stopPropagation();
-                if (remoteLock) {
-                  toast.error(
-                    `${t("publications.table.lockedBy") || "Editando por"} ${lockedByName}`,
-                  );
-                  return;
-                }
-                onEdit(item);
+                handleEdit(item, remoteLock);
               }}
-              className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-colors shadow-sm ${
-                remoteLock
-                  ? "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed dark:bg-gray-800 dark:border-gray-700 dark:text-gray-600"
-                  : "bg-white hover:bg-orange-50 text-gray-500 hover:text-orange-600 border border-gray-200 hover:border-orange-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700"
-              }`}
+              variant={remoteLock ? "ghost" : "secondary"}
+              buttonStyle="icon"
+              size="sm"
+              icon={remoteLock ? Lock : Edit}
               disabled={!!remoteLock}
-              title={
-                remoteLock
-                  ? `${t("publications.table.lockedBy") || "Editando por"} ${lockedByName}`
-                  : "Editar"
-              }
             >
-              {remoteLock ? (
-                <>
-                  <Lock className="w-4 h-4" />
-                  <span className="text-xs font-medium">
-                    {lockedByFirstName}
-                  </span>
-                </>
-              ) : (
-                <Edit className="w-4 h-4" />
-              )}
-            </button>
+              <span className="sr-only">{t("common.edit")}</span>
+            </Button>
           )}
 
           {canManageContent && (
-            <button
+            <Button
               onClick={(e) => {
                 e.stopPropagation();
                 if (item?.id) {
-                  onDuplicate?.(item.id);
+                  handleDuplicate(item.id);
                 }
               }}
-              className="flex items-center justify-center px-3 py-2 bg-white hover:bg-primary-50 text-gray-400 hover:text-primary-600 border border-gray-200 hover:border-primary-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 rounded-lg transition-colors shadow-sm"
-              title="Duplicar"
+              variant="secondary"
+              buttonStyle="icon"
+              size="sm"
+              icon={Copy}
             >
-              <Copy className="w-4 h-4" />
-            </button>
+              <span className="sr-only">{t("publications.button.duplicate")}</span>
+            </Button>
           )}
 
           {canManageContent && (
-            <button
+            <Button
               onClick={(e) => {
                 e.stopPropagation();
                 if (item?.id) {
-                  onDelete(item.id);
+                  handleDelete(item, (item as any).type === "user_event");
                 }
               }}
-              className="flex items-center justify-center px-3 py-2 bg-white hover:bg-red-50 text-gray-400 hover:text-red-600 border border-gray-200 hover:border-red-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 rounded-lg transition-colors shadow-sm"
-              title="Eliminar"
+              variant="danger"
+              buttonStyle="icon"
+              size="sm"
+              icon={Trash2}
+              disabled={isLoading?.deleting}
+              loading={isLoading?.deleting}
             >
-              <Trash2 className="w-4 h-4" />
-            </button>
+              <span className="sr-only">{t("common.delete")}</span>
+            </Button>
           )}
         </div>
       </div>

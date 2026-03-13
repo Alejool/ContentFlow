@@ -1,18 +1,24 @@
+import Button from "@/Components/common/Modern/Button";
+import SimpleContentTypeBadge from "@/Components/Content/common/SimpleContentTypeBadge";
 import PublicationThumbnail from "@/Components/Content/Publication/PublicationThumbnail";
 import SocialAccountsDisplay from "@/Components/Content/Publication/SocialAccountsDisplay";
-import SimpleContentTypeBadge from "@/Components/Content/common/SimpleContentTypeBadge";
 import { Publication } from "@/types/Publication";
+import { router, usePage } from "@inertiajs/react";
+import axios from "axios";
 import {
-    Copy,
-    Edit,
-    Eye,
-    Folder,
-    Image,
-    Rocket,
-    Trash2,
-    Video,
+  Clock,
+  Copy,
+  Edit,
+  Eye,
+  Folder,
+  Image,
+  Rocket,
+  Send,
+  Trash2,
+  Video
 } from "lucide-react";
-import { memo } from "react";
+import { memo, useState } from "react";
+import toast from "react-hot-toast";
 
 interface PublicationMobileGridProps {
   items: Publication[];
@@ -26,6 +32,7 @@ interface PublicationMobileGridProps {
   onViewDetails?: (item: Publication) => void;
   onDuplicate?: (id: number) => void;
   canManage: boolean;
+  permissions?: string[];
 }
 
 const PublicationMobileGrid = memo(
@@ -41,7 +48,48 @@ const PublicationMobileGrid = memo(
     onViewDetails,
     onDuplicate,
     canManage,
+    permissions,
   }: PublicationMobileGridProps) => {
+    const { auth } = usePage<any>().props;
+    const currentUserId = auth.user?.id;
+    const currentWorkspace = auth.current_workspace;
+    
+    const [isSubmittingForApproval, setIsSubmittingForApproval] = useState<Record<number, boolean>>({});
+    
+    // Verificar permisos usando la misma lógica que ContentCard
+    const canManageContent = permissions?.includes("publish");
+    
+    // Verificar si hay workflow habilitado
+    const hasWorkflow = currentWorkspace?.approval_workflow?.is_enabled === true;
+    
+    // Verificar si el usuario es Owner (puede saltarse el workflow)
+    const isOwner = currentWorkspace?.user_role_slug === 'owner';
+    
+    // Función para enviar a revisión
+    const handleSubmitForApproval = async (item: Publication, e: React.MouseEvent) => {
+      e.stopPropagation();
+      
+      try {
+        setIsSubmittingForApproval(prev => ({ ...prev, [item.id]: true }));
+        
+        await axios.post(`/api/v1/content/${item.id}/submit-for-approval`);
+        
+        toast.success("Enviado a revisión exitosamente");
+        
+        // Recargar la página para actualizar el estado
+        router.reload({ only: ['publications'] });
+        
+      } catch (error: any) {
+        console.error("Error submitting for approval:", error);
+        toast.error(
+          error.response?.data?.message || 
+          "Error al enviar a revisión"
+        );
+      } finally {
+        setIsSubmittingForApproval(prev => ({ ...prev, [item.id]: false }));
+      }
+    };
+    
     const countMediaFiles = (pub: Publication) => {
       if (
         !pub.media_files ||
@@ -64,6 +112,8 @@ const PublicationMobileGrid = memo(
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 px-1 pb-10">
         {items.map((item) => {
           const mediaCount = countMediaFiles(item);
+          const isSubmitting = isSubmittingForApproval[item.id] || false;
+          
           return (
             <div
               key={item.id}
@@ -132,59 +182,135 @@ const PublicationMobileGrid = memo(
 
               {/* Action Bar */}
               <div className="px-5 py-4 bg-gray-50/50 dark:bg-neutral-800/20 backdrop-blur-sm flex gap-3 mt-auto border-t border-gray-50 dark:border-neutral-800">
-                {!canManage ? (
-                  <button
+                {!canManageContent ? (
+                  <Button
                     onClick={(e) => {
                       e.stopPropagation();
                       onViewDetails?.(item);
                     }}
-                    className="w-full py-2.5 rounded-lg bg-gray-100 dark:bg-neutral-800 text-gray-700 dark:text-gray-300 font-bold text-xs flex items-center justify-center gap-2 border border-gray-200 dark:border-neutral-700 hover:bg-gray-200 dark:hover:bg-neutral-700 transition-all active:scale-95"
+                    variant="ghost"
+                    buttonStyle="solid"
+                    size="sm"
+                    fullWidth
+                    icon={Eye}
                   >
-                    <Eye className="w-3.5 h-3.5" />
-                    {t("common.viewDetails") || "View Details"}
-                  </button>
+                    Ver Detalles
+                  </Button>
                 ) : (
                   <>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onPublish(item);
-                      }}
-                      className="flex-[2] py-2.5 rounded-lg bg-emerald-600 dark:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 hover:bg-emerald-700 dark:hover:bg-emerald-600 transition-all active:scale-95"
-                    >
-                      <Rocket className="w-3.5 h-3.5" />
-                      {t("publications.button.publish") || "Publish"}
-                    </button>
-                    <button
+                    {/* Si es Owner, puede publicar directamente sin workflow */}
+                    {isOwner && ["draft", "rejected", "approved"].includes(item.status || "draft") ? (
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onPublish(item);
+                        }}
+                        variant="success"
+                        buttonStyle="gradient"
+                        size="sm"
+                        className="flex-[2]"
+                        icon={Rocket}
+                      >
+                        {t("publications.button.publish") || "Publicar"}
+                      </Button>
+                    ) : hasWorkflow && !isOwner && ["draft", "rejected"].includes(item.status || "draft") ? (
+                      /* Si hay workflow y NO es Owner, mostrar "Enviar a Revisión" */
+                      <Button
+                        onClick={(e) => handleSubmitForApproval(item, e)}
+                        disabled={isSubmitting}
+                        loading={isSubmitting}
+                        loadingText={t("publications.button.submitting") || "Enviando..."}
+                        variant="primary"
+                        buttonStyle="gradient"
+                        size="sm"
+                        className="flex-[2]"
+                        icon={Send}
+                      >
+                        {t("publications.button.submitForReview") || "Enviar a Revisión"}
+                      </Button>
+                    ) : hasWorkflow && item.status === "pending_review" ? (
+                      /* Si está en revisión, mostrar botón disabled */
+                      <Button
+                        disabled
+                        variant="warning"
+                        buttonStyle="solid"
+                        size="sm"
+                        className="flex-[2]"
+                        icon={Clock}
+                      >
+                        {t("publications.status.pending_review") || "En Revisión"}
+                      </Button>
+                    ) : hasWorkflow && item.status === "approved" ? (
+                      /* Si está aprobado, mostrar botón de publicar */
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onPublish(item);
+                        }}
+                        variant="success"
+                        buttonStyle="gradient"
+                        size="sm"
+                        className="flex-[2]"
+                        icon={Rocket}
+                      >
+                        {t("publications.button.publish") || "Publicar"}
+                      </Button>
+                    ) : (
+                      /* Sin workflow, botón normal de publicar */
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onPublish(item);
+                        }}
+                        variant="success"
+                        buttonStyle="gradient"
+                        size="sm"
+                        className="flex-[2]"
+                        icon={Rocket}
+                      >
+                        {t("publications.button.publish") || "Publicar"}
+                      </Button>
+                    )}
+                    
+                    <Button
                       onClick={(e) => {
                         e.stopPropagation();
                         onEditRequest ? onEditRequest(item) : onEdit(item);
                       }}
-                      className="flex-1 py-2.5 rounded-lg bg-white dark:bg-neutral-800 text-gray-700 dark:text-gray-300 font-bold text-xs flex items-center justify-center gap-2 border border-gray-200 dark:border-neutral-700 hover:bg-gray-50 dark:hover:bg-neutral-700 transition-all active:scale-95"
+                      variant="ghost"
+                      buttonStyle="outline"
+                      size="sm"
+                      className="flex-1"
+                      icon={Edit}
                     >
-                      <Edit className="w-3.5 h-3.5" />
-                      {t("common.edit")}
-                    </button>
+                      Editar
+                    </Button>
 
-                    <button
+                    <Button
                       onClick={(e) => {
                         e.stopPropagation();
                         onDuplicate?.(item.id);
                       }}
-                      className="p-2.5 rounded-lg bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400 border border-purple-100 dark:border-purple-900/30 hover:bg-purple-100 transition-all active:scale-95"
-                      title="Duplicar"
+                      variant="secondary"
+                      buttonStyle="icon"
+                      size="sm"
+                      icon={Copy}
                     >
-                      <Copy className="w-4 h-4" />
-                    </button>
-                    <button
+                      Duplicar
+                    </Button>
+                    
+                    <Button
                       onClick={(e) => {
                         e.stopPropagation();
                         onDelete(item.id);
                       }}
-                      className="p-2.5 rounded-lg bg-rose-50 text-rose-500 dark:bg-rose-900/20 dark:text-rose-400 border border-rose-100 dark:border-rose-900/30 hover:bg-rose-100 transition-all active:scale-90"
+                      variant="danger"
+                      buttonStyle="icon"
+                      size="sm"
+                      icon={Trash2}
                     >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                      Eliminar
+                    </Button>
                   </>
                 )}
               </div>

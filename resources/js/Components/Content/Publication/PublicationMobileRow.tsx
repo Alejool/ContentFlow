@@ -1,28 +1,35 @@
+import Button from "@/Components/common/Modern/Button";
 import SimpleContentTypeBadge from "@/Components/Content/common/SimpleContentTypeBadge";
 import SocialAccountsDisplay from "@/Components/Content/Publication/SocialAccountsDisplay";
+import { usePublicationActions } from "@/Hooks/publication/usePublicationActions";
 import { Publication } from "@/types/Publication";
-import { formatDateTime } from "@/Utils/formatDate";
-import { canUserPublishDirectly } from "@/Utils/publicationPermissions";
-import { usePage } from "@inertiajs/react";
-import axios from "axios";
 import {
-    Calendar,
-    CheckCircle,
-    Clock,
-    Copy,
-    Edit,
-    Eye,
-    Image as ImageIcon,
-    Loader2,
-    Lock,
-    MoreVertical,
-    Rocket,
-    Trash2,
-    Users,
-    Video,
-    XCircle,
+  countMediaFiles,
+  formatPublicationDate,
+  getLockedByName,
+  getMediaUrl,
+  hasMedia,
+  isVideoMedia,
+  prepareMediaForPreview
+} from "@/Utils/publicationHelpers";
+import {
+  Calendar,
+  CheckCircle,
+  Clock,
+  Copy,
+  Edit,
+  Eye,
+  Image as ImageIcon,
+  Loader2,
+  Lock,
+  MoreVertical,
+  Rocket,
+  Trash2,
+  Users,
+  Video,
+  XCircle,
 } from "lucide-react";
-import React, { memo, useCallback, useState } from "react";
+import React, { memo, useState } from "react";
 import toast from "react-hot-toast";
 
 interface PublicationMobileRowProps {
@@ -61,50 +68,35 @@ const PublicationMobileRow = memo(
     onDelete,
     onPublish,
     onEditRequest,
-    onViewDetails,
+    onViewDetails, 
     onDuplicate,
     remoteLocks = {},
     permissions,
     onPreviewMedia,
   }: PublicationMobileRowProps) => {
-    const { auth } = usePage<any>().props;
-    const currentUserId = auth.user?.id;
+    // Usar el hook centralizado
+    const {
+      loadingStates,
+      canManageContent,
+      shouldShowSendToReview,
+      shouldShowPublish,
+      handleSubmitForApproval,
+      handlePublish,
+      handleDuplicate,
+      handleViewDetails,
+      handleDelete,
+    } = usePublicationActions({
+      onEdit,
+      onDelete,
+      onPublish,
+      onViewDetails,
+      onDuplicate,
+      onEditRequest,
+      permissions,
+    });
     
     const [expandedRow, setExpandedRow] = useState<number | null>(null);
-    const [loadingStates, setLoadingStates] = useState<
-      Record<
-        number,
-        { publishing?: boolean; editing?: boolean; deleting?: boolean }
-      >
-    >({});
-
-    const countMediaFiles = useCallback((pub: Publication) => {
-      if (
-        !pub.media_files ||
-        !Array.isArray(pub.media_files) ||
-        pub.media_files.length === 0
-      ) {
-        return { images: 0, videos: 0, total: 0 };
-      }
-      let images = 0;
-      let videos = 0;
-      pub.media_files.forEach((f) => {
-        if (!f || !f.file_type) return;
-        if (f.file_type.includes("image")) images++;
-        else if (f.file_type.includes("video")) videos++;
-      });
-      return { images, videos, total: pub.media_files.length };
-    }, []);
-
-    // Check for media to show inline
-    const hasMedia = (item: Publication) => {
-      return item.media_files && item.media_files.length > 0;
-    };
-
-    const getFirstMedia = (item: Publication) => {
-      if (!hasMedia(item)) return null;
-      return item.media_files?.[0];
-    };
+    const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
 
     const toggleExpand = (id: number) => {
       setExpandedRow((prev) => (prev === id ? null : id));
@@ -143,15 +135,8 @@ const PublicationMobileRow = memo(
     };
 
     const formatDate = (dateString?: string) => {
-      if (!dateString) return "";
-      try {
-        return formatDateTime(dateString);
-      } catch {
-        return "";
-      }
+      return formatPublicationDate(dateString);
     };
-
-    const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
 
     const handleImageError = (id: number) => {
       setImageErrors((prev) => ({ ...prev, [id]: true }));
@@ -163,18 +148,11 @@ const PublicationMobileRow = memo(
           const mediaCount = countMediaFiles(item);
           const isExpanded = expandedRow === item.id;
           const isLoading = loadingStates[item.id];
-          const firstMedia = getFirstMedia(item);
-          const isVideo = firstMedia?.file_type?.includes("video");
-          const mediaUrl =
-            firstMedia?.thumbnail?.file_path || firstMedia?.file_path;
+          const isVideo = isVideoMedia(item);
+          const mediaUrl = getMediaUrl(item);
           const hasImageError = imageErrors[item.id];
           const lock = remoteLocks[item.id];
-          const lockedByName = lock
-            ? lock.user_name || (lock as any).user?.name || "Usuario"
-            : "";
-          
-          // Verificar si el usuario puede publicar directamente este item
-          const canPublish = canUserPublishDirectly(item, currentUserId, permissions || []);
+          const lockedByName = getLockedByName(lock);
 
           return (
             <div
@@ -202,36 +180,10 @@ const PublicationMobileRow = memo(
                     e.stopPropagation();
                     // Trigger preview
                     if (hasMedia(item) && onPreviewMedia) {
-                      const allMedia = (item.media_files || []).map(
-                        (media: any) => {
-                          const isV = media.file_type?.includes("video");
-                          let mUrl =
-                            media.thumbnail?.file_path || media.file_path;
-
-                          if (!mUrl && media.file_type === "image") {
-                            mUrl = media.file_path;
-                          }
-
-                          return {
-                            url: isV
-                              ? media.file_path.startsWith("http")
-                                ? media.file_path
-                                : `/storage/${media.file_path}`
-                              : mUrl.startsWith("http")
-                                ? mUrl
-                                : `/storage/${mUrl}`,
-                            type: (isV ? "video" : "image") as
-                              | "image"
-                              | "video",
-                            title: item.title,
-                          };
-                        },
-                      );
-
+                      const allMedia = prepareMediaForPreview(item);
                       onPreviewMedia(allMedia, 0);
                     } else {
-                      // If no media or preview handler, specific fallback logic or just toggle row?
-                      // Let's toggle row if not previewable
+                      // If no media or preview handler, toggle row
                       if (!hasMedia(item)) toggleExpand(item.id);
                     }
                   }}
@@ -287,70 +239,40 @@ const PublicationMobileRow = memo(
                         {item.title || t("publications.table.untitled")}
                       </h3>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 break-words line-clamp-2">
-                        {item.description || "Sin descripción"}
+                        {item.description || t("publications.table.noDescription")}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
                       {(item as any).type === "user_event" &&
-                        permissions?.includes("manage-content") && (
-                          <button
+                        canManageContent && (
+                          <Button
                             onClick={async (e) => {
                               e.stopPropagation();
-                              setLoadingStates((prev) => ({
-                                ...prev,
-                                [item.id]: { ...prev[item.id], deleting: true },
-                              }));
-                              try {
-                                if (
-                                  confirm(
-                                    t(
-                                      "calendar.userEvents.modal.messages.confirmDelete",
-                                    ) ||
-                                      "¿Estás seguro de que deseas eliminar este evento?",
-                                  )
-                                ) {
-                                  await axios.delete(
-                                    `/api/v1/calendar/user-events/${item.id}`,
-                                  );
-                                  toast.success(
-                                    t(
-                                      "calendar.userEvents.modal.messages.successDelete",
-                                    ) || "Evento eliminado",
-                                  );
-                                  onDelete(item.id);
-                                }
-                              } catch (error) {
-                                toast.error("Error al eliminar");
-                              } finally {
-                                setLoadingStates((prev) => ({
-                                  ...prev,
-                                  [item.id]: {
-                                    ...prev[item.id],
-                                    deleting: false,
-                                  },
-                                }));
-                              }
+                              await handleDelete(item, true);
                             }}
                             disabled={isLoading?.deleting}
-                            className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg dark:hover:bg-red-900/20 disabled:opacity-50 transition-all"
-                            title="Eliminar evento"
+                            loading={isLoading?.deleting}
+                            variant="danger"
+                            buttonStyle="icon"
+                            size="sm"
+                            icon={Trash2}
                           >
-                            {isLoading?.deleting ? (
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                            ) : (
-                              <Trash2 className="w-4 h-4" />
-                            )}
-                          </button>
+                            <span className="sr-only">{t("common.delete")}</span>
+                          </Button>
                         )}
-                      <button
+                      <Button
                         onClick={(e) => {
                           e.stopPropagation();
                           toggleExpand(item.id);
                         }}
-                        className={`p-1 transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`}
+                        variant="ghost"
+                        buttonStyle="icon"
+                        size="sm"
+                        icon={MoreVertical}
+                        className={`transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`}
                       >
-                        <MoreVertical className="w-4 h-4 text-gray-400" />
-                      </button>
+                        <span className="sr-only">{t("common.more")}</span>
+                      </Button>
                     </div>
                   </div>
 
@@ -359,7 +281,7 @@ const PublicationMobileRow = memo(
                     <div className="flex items-center gap-1.5 mb-2">
                       <Users className="w-3 h-3 text-gray-400" />
                       <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400 italic">
-                        Creado por: {item.user.name}
+                        {t("publications.table.createdBy")}: {item.user.name}
                       </span>
                     </div>
                   )}
@@ -417,8 +339,8 @@ const PublicationMobileRow = memo(
                         <Calendar className="w-3.5 h-3.5" />
                         <span className="font-medium">
                           {(item as any).type === "user_event"
-                            ? "Evento Manual"
-                            : "Evento Red Social"}
+                            ? t("publications.table.manualEvent")
+                            : t("publications.table.socialNetworkEvent")}
                         </span>
                       </div>
                     )}
@@ -435,7 +357,7 @@ const PublicationMobileRow = memo(
                         </span>
                       </div>
                       <span className="text-xs font-semibold text-amber-700 dark:text-amber-400">
-                        Editando: {lockedByName}
+                        {t("publications.table.editingBy")} {lockedByName}
                       </span>
                     </div>
                   )}
@@ -456,89 +378,68 @@ const PublicationMobileRow = memo(
               {/* Quick actions bar */}
               <div className="px-4 pb-4 flex items-center gap-2">
                 {/* View Details button - Always visible */}
-                <button
+                <Button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onViewDetails?.(item);
+                    handleViewDetails(item);
                   }}
-                  className="flex-1 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium text-xs flex items-center justify-center gap-2 transition-colors"
-                  title="Ver detalles"
+                  variant="ghost"
+                  size="sm"
+                  icon={Eye}
+                  className="flex-1"
                 >
-                  <Eye className="w-4 h-4" />
-                  Ver
-                </button>
+                  {t("publications.button.view")}
+                </Button>
 
                 {/* Duplicate button */}
-                {permissions?.includes("manage-content") && (
-                  <button
+                {canManageContent && (
+                  <Button
                     onClick={(e) => {
                       e.stopPropagation();
-                      onDuplicate?.(item.id);
+                      handleDuplicate(item.id);
                     }}
-                    disabled={
-                      isLoading?.publishing ||
-                      isLoading?.editing ||
-                      isLoading?.deleting
-                    }
-                    className="flex-1 py-2 rounded-lg bg-purple-50 hover:bg-purple-100 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 font-medium text-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
-                    title="Duplicar"
+                    disabled={isLoading?.duplicating}
+                    loading={isLoading?.duplicating}
+                    variant="secondary"
+                    size="sm"
+                    icon={Copy}
+                    className="flex-1"
                   >
-                    <Copy className="w-4 h-4" />
-                    Duplicar
-                  </button>
+                    {t("publications.button.duplicate")}
+                  </Button>
                 )}
 
                 {/* Publish/Request button */}
-                {(canPublish || permissions?.includes("publish")) &&
-                permissions?.includes("manage-content") ? (
-                  <button
+                {shouldShowPublish(item) && canManageContent ? (
+                  <Button
                     onClick={async (e) => {
                       e.stopPropagation();
-                      setLoadingStates((prev) => ({
-                        ...prev,
-                        [item.id]: { ...prev[item.id], publishing: true },
-                      }));
-                      try {
-                        await onPublish(item);
-                      } finally {
-                        setLoadingStates((prev) => ({
-                          ...prev,
-                          [item.id]: { ...prev[item.id], publishing: false },
-                        }));
-                      }
+                      await handlePublish(item);
                     }}
-                    disabled={
-                      isLoading?.publishing ||
-                      isLoading?.editing ||
-                      isLoading?.deleting
-                    }
-                    className="flex-1 py-2 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium text-xs flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
-                    title="Publicar"
+                    disabled={isLoading?.publishing}
+                    loading={isLoading?.publishing}
+                    variant="success"
+                    size="sm"
+                    icon={Rocket}
+                    className="flex-1"
                   >
-                    {isLoading?.publishing ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Rocket className="w-4 h-4" />
-                    )}
-                    Publicar
-                  </button>
-                ) : permissions?.includes("manage-content") &&
-                  !permissions?.includes("publish") &&
-                  !item.approved_at &&
-                  ["draft", "failed", "rejected"].includes(
-                    item.status || "draft",
-                  ) ? (
-                  <button
+                    {t("publications.button.publish")}
+                  </Button>
+                ) : shouldShowSendToReview(item) && canManageContent ? (
+                  <Button
                     onClick={(e) => {
                       e.stopPropagation();
-                      onPublish?.(item);
+                      handleSubmitForApproval(item);
                     }}
-                    className="flex-1 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-medium text-xs flex items-center justify-center gap-2 transition-colors shadow-sm"
-                    title="Solicitar aprobación"
+                    disabled={isLoading?.submitting}
+                    loading={isLoading?.submitting}
+                    variant="warning"
+                    size="sm"
+                    icon={Clock}
+                    className="flex-1"
                   >
-                    <Clock className="w-4 h-4" />
-                    Solicitar
-                  </button>
+                    {t("publications.button.request")}
+                  </Button>
                 ) : null}
               </div>
 
@@ -570,7 +471,7 @@ const PublicationMobileRow = memo(
                               {item.user.name}
                             </p>
                             <p className="text-xs text-gray-500 dark:text-gray-400">
-                              Usuario
+                              {t("common.creator")}
                             </p>
                           </div>
                         </div>
@@ -583,7 +484,7 @@ const PublicationMobileRow = memo(
                         Object.keys(item.platform_settings).length > 0 && (
                           <div>
                             <h4 className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2">
-                              Plataformas:
+                              {t("publications.table.platforms")}:
                             </h4>
                             <div className="flex flex-wrap gap-1.5">
                               {Object.keys(item.platform_settings).map(
@@ -609,10 +510,9 @@ const PublicationMobileRow = memo(
                           </div>
                           <div>
                             <p className="text-sm font-medium text-gray-900 dark:text-white">
-                              En {item.campaigns.length}{" "}
-                              {item.campaigns.length === 1
-                                ? "campaña"
-                                : "campañas"}
+                              {item.campaigns.length === 1 
+                                ? t("campaigns.inCampaigns").replace("{{count}}", String(item.campaigns.length))
+                                : t("campaigns.inCampaigns_plural").replace("{{count}}", String(item.campaigns.length))}
                             </p>
                           </div>
                         </div>
@@ -621,7 +521,7 @@ const PublicationMobileRow = memo(
                       {/* Accounts */}
                       <div>
                         <h4 className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2">
-                          Cuentas vinculadas:
+                          {t("publications.table.linkedAccounts")}:
                         </h4>
                         <SocialAccountsDisplay
                           publication={item}
@@ -635,44 +535,34 @@ const PublicationMobileRow = memo(
                     {/* Expanded actions */}
                     <div className="flex items-center gap-2">
                       {/* View Button (Expanded) */}
-                      <button
+                      <Button
                         onClick={(e) => {
                           e.stopPropagation();
                           onViewDetails?.(item);
                         }}
-                        className="flex-1 py-2.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 font-medium text-xs flex items-center justify-center gap-2 transition-colors active:scale-95"
-                        title="Ver detalles completos"
+                        variant="ghost"
+                        size="sm"
+                        icon={Eye}
+                        className="flex-1"
                       >
-                        <Eye className="w-4 h-4" />
-                        Ver Detalles
-                      </button>
+                        {t("publications.button.viewDetails")}
+                      </Button>
 
                       {/* Edit button */}
-                      {permissions?.includes("manage-content") && (
-                        <button
-                          onClick={async (e) => {
+                      {canManageContent && (
+                        <Button
+                          onClick={(e) => {
                             e.stopPropagation();
                             if (remoteLocks[item.id]) {
-                              toast.error(
+                              (toast.error as any)(
                                 `${t("publications.table.lockedBy") || "Editando por"} ${lockedByName}`,
                               );
                               return;
                             }
-                            setLoadingStates((prev) => ({
-                              ...prev,
-                              [item.id]: { ...prev[item.id], editing: true },
-                            }));
-                            try {
-                              if (onEditRequest) {
-                                await onEditRequest(item);
-                              } else {
-                                await onEdit(item);
-                              }
-                            } finally {
-                              setLoadingStates((prev) => ({
-                                ...prev,
-                                [item.id]: { ...prev[item.id], editing: false },
-                              }));
+                            if (onEditRequest) {
+                              onEditRequest(item);
+                            } else {
+                              onEdit(item);
                             }
                           }}
                           disabled={
@@ -681,100 +571,42 @@ const PublicationMobileRow = memo(
                             isLoading?.deleting ||
                             !!remoteLocks[item.id]
                           }
-                          className={`flex-1 py-2.5 rounded-lg font-medium text-xs flex items-center justify-center gap-2 transition-colors active:scale-95 ${
-                            remoteLocks[item.id]
-                              ? "bg-gray-200 text-gray-400 dark:bg-gray-800 dark:text-gray-500 cursor-not-allowed border border-gray-300 dark:border-gray-700"
-                              : "bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30"
-                          } disabled:opacity-70`}
-                          title={
-                            remoteLocks[item.id]
-                              ? `Editando por ${lockedByName}`
-                              : (item.status as string) === "processing"
-                                ? "Procesando..."
-                                : "Editar"
-                          }
+                          loading={isLoading?.editing}
+                          variant={remoteLocks[item.id] ? "ghost" : "primary"}
+                          size="sm"
+                          icon={remoteLocks[item.id] ? Lock : (item.status as string) === "processing" ? Loader2 : Edit}
+                          className="flex-1"
                         >
-                          {isLoading?.editing ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : remoteLocks[item.id] ? (
-                            <Lock className="w-4 h-4" />
-                          ) : (item.status as string) === "processing" ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <Edit className="w-4 h-4" />
-                          )}
                           {remoteLocks[item.id] ||
                           (item.status as string) === "processing"
                             ? (item.status as string) === "processing"
-                              ? "Procesando"
-                              : "Bloqueado"
+                              ? t("common.processing")
+                              : t("publications.table.lockedBy").replace(":", "")
                             : t("common.edit")}
-                        </button>
+                        </Button>
                       )}
 
                       {/* Delete button */}
                       {permissions?.includes("publish") &&
-                        permissions?.includes("manage-content") && (
-                          <button
+                        canManageContent && (
+                          <Button
                             onClick={async (e) => {
                               e.stopPropagation();
-                              setLoadingStates((prev) => ({
-                                ...prev,
-                                [item.id]: {
-                                  ...prev[item.id],
-                                  deleting: true,
-                                },
-                              }));
-                              try {
-                                if ((item as any).type === "user_event") {
-                                  if (
-                                    confirm(
-                                      t(
-                                        "calendar.userEvents.modal.messages.confirmDelete",
-                                      ) ||
-                                        "¿Estás seguro de que deseas eliminar este evento?",
-                                    )
-                                  ) {
-                                    await axios.delete(
-                                      `/api/v1/calendar/user-events/${item.id}`,
-                                    );
-                                    toast.success(
-                                      t(
-                                        "calendar.userEvents.modal.messages.successDelete",
-                                      ) || "Evento eliminado",
-                                    );
-                                    onDelete(item.id);
-                                  }
-                                } else {
-                                  await onDelete(item.id);
-                                }
-                              } catch (error) {
-                                toast.error("Error al eliminar");
-                              } finally {
-                                setLoadingStates((prev) => ({
-                                  ...prev,
-                                  [item.id]: {
-                                    ...prev[item.id],
-                                    deleting: false,
-                                  },
-                                }));
-                              }
+                              await handleDelete(item, (item as any).type === "user_event");
                             }}
                             disabled={
                               isLoading?.publishing ||
                               isLoading?.editing ||
                               isLoading?.deleting
                             }
-                            className="flex-1 py-2.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30 font-medium text-xs flex items-center justify-center gap-2 transition-colors active:scale-95 disabled:opacity-50"
-                            title="Eliminar"
+                            loading={isLoading?.deleting}
+                            variant="danger"
+                            size="sm"
+                            icon={Trash2}
+                            className="flex-1"
                           >
-                            {isLoading?.deleting ? (
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                            ) : (
-                              <Trash2 className="w-4 h-4" />
-                            )}
-                            Eliminar
-                          </button>
+                            {t("common.delete")}
+                          </Button>
                         )}
                     </div>
                   </div>

@@ -1,25 +1,25 @@
+import Button from "@/Components/common/Modern/Button";
 import SimpleContentTypeBadge from "@/Components/Content/common/SimpleContentTypeBadge";
 import PublicationThumbnail from "@/Components/Content/Publication/PublicationThumbnail";
 import SocialAccountsDisplay from "@/Components/Content/Publication/SocialAccountsDisplay";
+import { usePublicationActions } from "@/Hooks/publication/usePublicationActions";
 import { usePublicationStore } from "@/stores/publicationStore";
 import { Publication } from "@/types/Publication";
-import { canUserPublishDirectly } from "@/Utils/publicationPermissions";
-import { usePage } from "@inertiajs/react";
-import axios from "axios";
+import { countMediaFiles, getLockedByName } from "@/Utils/publicationHelpers";
 import {
-    Calendar,
-    Clock,
-    Copy,
-    Edit,
-    Eye,
-    Image,
-    Loader2,
-    Lock,
-    Rocket,
-    Trash2,
-    Video,
+  Calendar,
+  Clock,
+  Copy,
+  Edit,
+  Eye,
+  Image,
+  Lock,
+  Rocket,
+  Send,
+  Trash2,
+  Video
 } from "lucide-react";
-import React, { memo, useMemo, useState } from "react";
+import React, { memo, useMemo } from "react";
 import toast from "react-hot-toast";
 
 // ... (skipping interface to save tokens if possible, or just targeting the specific blocks)
@@ -73,36 +73,38 @@ const PublicationRow = memo(
     permissions,
     onPreviewMedia,
   }: PublicationRowProps) => {
-    const { auth } = usePage<any>().props;
-    const currentUserId = auth.user?.id;
-    
-    const [isPublishing, setIsPublishing] = useState(false);
-    const [isEditing, setIsEditing] = useState(false);
-    const [isDeleting, setIsDeleting] = useState(false);
+    const {
+      loadingStates,
+      canManageContent,
+      shouldShowSendToReview,
+      shouldShowPublish,
+      handleSubmitForApproval,
+      handlePublish,
+      handleDuplicate,
+      handleViewDetails,
+      handleDelete,
+      isOwner,
+      hasWorkflow,
+    } = usePublicationActions({
+      onEdit,
+      onDelete,
+      onPublish,
+      onViewDetails,
+      onDuplicate,
+      onEditRequest,
+      permissions,
+    });
 
     const publishingPlatforms = useMemo(() => {
       return usePublicationStore.getState().getPublishingPlatforms(item.id);
     }, [item.id]);
-    
-    // Verificar si el usuario puede publicar directamente
-    const canPublish = canUserPublishDirectly(item, currentUserId, permissions || []);
 
     const mediaCount = React.useMemo(() => {
-      if (!item.media_files || item.media_files.length === 0) {
-        return { images: 0, videos: 0, total: 0 };
-      }
-      const images = item.media_files.filter(
-        (f) => f && f.file_type && f.file_type.includes("image"),
-      ).length;
-      const videos = item.media_files.filter(
-        (f) => f && f.file_type && f.file_type.includes("video"),
-      ).length;
-      return { images, videos, total: item.media_files.length };
-    }, [item.media_files]);
+      return countMediaFiles(item);
+    }, [item]);
 
-    const lockedByName = remoteLock
-      ? remoteLock.user_name || (remoteLock as any).user?.name || "Usuario"
-      : "";
+    const lockedByName = getLockedByName(remoteLock);
+    const isLoading = loadingStates[item.id];
 
     return (
       <>
@@ -167,7 +169,7 @@ const PublicationRow = memo(
               </div>
               
               <p className="text-xs mt-0.5 truncate text-gray-500 dark:text-gray-400">
-                {item.description || "Sin descripción"}
+                {item.description || t("publications.table.noDescription")}
               </p>
               {item.platform_settings &&
                 typeof item.platform_settings === "object" &&
@@ -222,7 +224,7 @@ const PublicationRow = memo(
                     </span>
                   </div>
                   <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-tight">
-                    Editando: {lockedByName}
+                    {t("publications.table.editingBy")} {lockedByName}
                   </span>
                 </div>
               )}
@@ -279,13 +281,13 @@ const PublicationRow = memo(
                     <Calendar className="w-3 h-3 text-primary-500" />
                     <span className="text-[10px] font-bold text-primary-500 uppercase tracking-tight">
                       {(item as any).type === "user_event"
-                        ? "Evento Manual"
-                        : "Evento de Red Social"}
+                        ? t("publications.table.manualEvent")
+                        : t("publications.table.socialNetworkEvent")}
                     </span>
                   </div>
                   {(item as any).type === "user_event" && item.user && (
                     <span className="text-[9px] font-medium text-gray-500 dark:text-gray-400 italic ml-4">
-                      Creado por: {item.user.name}
+                      {t("publications.table.createdBy")}: {item.user.name}
                     </span>
                   )}
                 </div>
@@ -373,193 +375,132 @@ const PublicationRow = memo(
         </td>
         <td className="px-2 py-4 text-right">
           <div className="flex items-center justify-end gap-1">
-            {(canPublish || permissions?.includes("publish")) &&
-            permissions?.includes("manage-content") ? (
-              <button
-                onClick={async (e) => {
-                  e.stopPropagation();
-                  setIsPublishing(true);
-                  try {
-                    await onPublish(item);
-                  } finally {
-                    setIsPublishing(false);
-                  }
-                }}
-                disabled={isPublishing || isEditing || isDeleting}
-                className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg dark:hover:bg-emerald-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                title={
-                  item.status === "approved"
-                    ? "Publicar"
-                    : "Publicar / Gestionar"
-                }
-              >
-                {isPublishing ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Rocket className="w-4 h-4" />
-                )}
-              </button>
-            ) : permissions?.includes("manage-content") &&
-              !permissions?.includes("publish") &&
-              !item.approved_at &&
-              ["draft", "failed", "rejected"].includes(
-                item.status || "draft",
-              ) ? (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onPublish(item);
-                }} // This modal handles status updates/request review
-                className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg dark:hover:bg-amber-900/20 transition-all"
-                title="Solicitar Aprobación"
-              >
-                <Clock className="w-4 h-4" />
-              </button>
-            ) : null}
-
-            {/* View Details button - Always visible for all users */}
-            {!permissions?.includes("manage-content") && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onViewDetails?.(item);
-                }}
-                className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 transition-colors"
-                title="Ver Detalles"
-              >
-                <Eye className="w-4 h-4" />
-              </button>
+            {/* Lógica de botones basada en permisos y roles */}
+            {canManageContent && (
+              <>
+                {shouldShowPublish(item) ? (
+                  <Button
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      await handlePublish(item);
+                    }}
+                    disabled={isLoading?.publishing || isLoading?.editing || isLoading?.deleting}
+                    loading={isLoading?.publishing}
+                    variant="success"
+                    buttonStyle="icon"
+                    size="sm"
+                    icon={Rocket}
+                  >
+                    <span className="sr-only">{t("publications.button.publish")}</span>
+                  </Button>
+                ) : shouldShowSendToReview(item) ? (
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSubmitForApproval(item);
+                    }}
+                    disabled={isLoading?.submitting}
+                    loading={isLoading?.submitting}
+                    variant="primary"
+                    buttonStyle="icon"
+                    size="sm"
+                    icon={Send}
+                  >
+                    <span className="sr-only">{t("publications.button.sendForReview")}</span>
+                  </Button>
+                ) : item.status === "pending_review" ? (
+                  <Button
+                    disabled
+                    variant="warning"
+                    buttonStyle="icon"
+                    size="sm"
+                    icon={Clock}
+                  >
+                    <span className="sr-only">{t("publications.button.inReview")}</span>
+                  </Button>
+                ) : null}
+              </>
             )}
-            {item.status === "published" &&
-              permissions?.includes("manage-content") && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onViewDetails?.(item);
-                  }}
-                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 transition-colors"
-                  title="Ver Detalles"
-                >
-                  <Eye className="w-4 h-4" />
-                </button>
-              )}
-            {permissions?.includes("manage-content") && (
-              <button
-                onClick={async (e) => {
+
+            {/* View Details button */}
+            {(!canManageContent || item.status === "published") && (
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleViewDetails(item);
+                }}
+                variant="ghost"
+                buttonStyle="icon"
+                size="sm"
+                icon={Eye}
+              >
+                <span className="sr-only">{t("publications.button.view")}</span>
+              </Button>
+            )}
+
+            {/* Edit button */}
+            {canManageContent && (
+              <Button
+                onClick={(e) => {
                   e.stopPropagation();
                   if (remoteLock) {
-                    toast.error(
+                    (toast.error as any)(
                       `${t("publications.table.lockedBy") || "Editando por"} ${lockedByName}`,
                     );
                     return;
                   }
-                  setIsEditing(true);
-                  try {
-                    if (onEditRequest) {
-                      await onEditRequest(item);
-                    } else {
-                      await onEdit(item);
-                    }
-                  } finally {
-                    setIsEditing(false);
+                  if (onEditRequest) {
+                    onEditRequest(item);
+                  } else {
+                    onEdit(item);
                   }
                 }}
-                disabled={
-                  isPublishing || isEditing || isDeleting || !!remoteLock
-                }
-                className={`flex items-center gap-1.5 p-1.5 px-2.5 ${
-                  item.status === "published"
-                    ? "text-amber-500"
-                    : remoteLock
-                      ? "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed dark:bg-gray-800 dark:border-gray-700 dark:text-gray-600"
-                      : "text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                } rounded-lg disabled:opacity-70 transition-all`}
-                data-testid={`edit-publication-${item.id}`}
-                title={
-                  remoteLock
-                    ? `${t("publications.table.lockedBy") || "Editando por"} ${lockedByName}`
-                    : item.status === "published"
-                      ? "Editar (Despublicar primero)"
-                      : "Editar"
-                }
+                disabled={isLoading?.publishing || isLoading?.editing || isLoading?.deleting || !!remoteLock}
+                loading={isLoading?.editing}
+                variant={item.status === "published" ? "warning" : "primary"}
+                buttonStyle="icon"
+                size="sm"
+                icon={remoteLock ? Lock : Edit}
               >
-                {isEditing ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : remoteLock ? (
-                  <Lock className="w-3.5 h-3.5" />
-                ) : (item.status as string) === "processing" ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Edit className="w-4 h-4" />
-                )}
-                {(remoteLock || (item.status as string) === "processing") && (
-                  <span className="text-xs font-medium">
-                    {(item.status as string) === "processing"
-                      ? "Procesando"
-                      : "Bloqueado"}
-                  </span>
-                )}
-              </button>
+                <span className="sr-only">{t("common.edit")}</span>
+              </Button>
             )}
+
             {/* Duplicate button */}
-            {permissions?.includes("manage-content") && onDuplicate && (
-              <button
+            {canManageContent && onDuplicate && (
+              <Button
                 onClick={(e) => {
                   e.stopPropagation();
-                  onDuplicate(item.id);
+                  handleDuplicate(item.id);
                 }}
-                disabled={isPublishing || isEditing || isDeleting}
-                className="p-1.5 text-purple-500 hover:bg-purple-50 rounded-lg dark:hover:bg-purple-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                title="Duplicate"
+                disabled={isLoading?.publishing || isLoading?.editing || isLoading?.deleting}
+                loading={isLoading?.duplicating}
+                variant="secondary"
+                buttonStyle="icon"
+                size="sm"
+                icon={Copy}
               >
-                <Copy className="w-4 h-4" />
-              </button>
+                <span className="sr-only">{t("publications.button.duplicate")}</span>
+              </Button>
             )}
-            {/* Delete button - Only for Owner/Admin or users with manage-content */}
-            {permissions?.includes("manage-content") && (
-              <button
+
+            {/* Delete button */}
+            {canManageContent && (
+              <Button
                 onClick={async (e) => {
                   e.stopPropagation();
-                  setIsDeleting(true);
-                  try {
-                    if ((item as any).type === "user_event") {
-                      if (
-                        confirm(
-                          t(
-                            "calendar.userEvents.modal.messages.confirmDelete",
-                          ) ||
-                            "¿Estás seguro de que deseas eliminar este evento?",
-                        )
-                      ) {
-                        await axios.delete(
-                          `/api/v1/calendar/user-events/${item.id}`,
-                        );
-                        toast.success(
-                          t(
-                            "calendar.userEvents.modal.messages.successDelete",
-                          ) || "Evento eliminado",
-                        );
-                        onDelete(item.id); // Triggers refresh
-                      }
-                    } else {
-                      await onDelete(item.id);
-                    }
-                  } catch (error) {
-                    toast.error("Error al eliminar");
-                  } finally {
-                    setIsDeleting(false);
-                  }
+                  const isUserEvent = (item as any).type === "user_event";
+                  await handleDelete(item, isUserEvent);
                 }}
-                disabled={isPublishing || isEditing || isDeleting}
-                className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg dark:hover:bg-red-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                title="Eliminar"
+                disabled={isLoading?.publishing || isLoading?.editing || isLoading?.deleting}
+                loading={isLoading?.deleting}
+                variant="danger"
+                buttonStyle="icon"
+                size="sm"
+                icon={Trash2}
               >
-                {isDeleting ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Trash2 className="w-4 h-4" />
-                )}
-              </button>
+                <span className="sr-only">{t("common.delete")}</span>
+              </Button>
             )}
           </div>
         </td>
