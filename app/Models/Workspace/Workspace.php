@@ -109,6 +109,14 @@ class Workspace extends Model
     }
 
     /**
+     * Get the approval workflow for this workspace.
+     */
+    public function approvalWorkflow()
+    {
+        return $this->hasOne(\App\Models\ApprovalWorkflow::class, 'workspace_id');
+    }
+
+    /**
      * Route notifications for the Slack channel.
      */
     public function routeNotificationForSlack()

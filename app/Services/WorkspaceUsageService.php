@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Models\Workspace\Workspace;
 use App\Models\Subscription\UsageMetric;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
+use App\Helpers\LogHelper;
 use Illuminate\Support\Facades\Cache;
 
 class WorkspaceUsageService
@@ -64,7 +64,7 @@ class WorkspaceUsageService
                 $used = $addonService->useAddon($workspace, $addonType, $useFromAddons);
                 
                 if (!$used) {
-                    Log::warning('Insufficient addon balance', [
+                    LogHelper::billingError('addon.insufficient_balance', 'Insufficient addon balance', [
                         'workspace_id' => $workspace->id,
                         'metric_type' => $metricType,
                         'amount_needed' => $useFromAddons,
@@ -73,7 +73,7 @@ class WorkspaceUsageService
             }
         }
 
-        Log::info('Usage incremented', [
+        LogHelper::billing('usage.incremented', [
             'workspace_id' => $workspace->id,
             'metric_type' => $metricType,
             'amount' => $amount,
@@ -162,7 +162,7 @@ class WorkspaceUsageService
             ]);
         }
 
-        Log::info('Monthly usage reset', [
+        LogHelper::billing('usage.monthly_reset', [
             'workspace_id' => $workspace->id,
             'workspace_name' => $workspace->name,
         ]);

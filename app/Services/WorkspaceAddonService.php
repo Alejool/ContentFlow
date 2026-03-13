@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Workspace\Workspace;
 use App\Models\WorkspaceAddon;
-use Illuminate\Support\Facades\Log;
+use App\Helpers\LogHelper;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -127,7 +127,7 @@ class WorkspaceAddonService
             'is_active' => true,
         ]);
 
-        Log::info('Addon purchased', [
+        LogHelper::billing('addon.purchased', [
             'workspace_id' => $workspace->id,
             'addon_id' => $addon->id,
             'sku' => $sku,
@@ -202,7 +202,7 @@ class WorkspaceAddonService
                 $addon->incrementUsage($toUse);
                 $remainingToUse -= $toUse;
 
-                Log::info('Addon usage', [
+                LogHelper::billing('addon.usage', [
                     'workspace_id' => $workspace->id,
                     'addon_id' => $addon->id,
                     'type' => $type,
@@ -214,7 +214,7 @@ class WorkspaceAddonService
 
         // Si no se pudo usar todo el monto, retornar false
         if ($remainingToUse > 0) {
-            Log::warning('Insufficient addon balance', [
+            LogHelper::billingError('addon.insufficient_balance', 'Insufficient addon balance', [
                 'workspace_id' => $workspace->id,
                 'type' => $type,
                 'requested' => $amount,
@@ -299,7 +299,7 @@ class WorkspaceAddonService
 
         if ($percentageRemaining <= $threshold && $percentageRemaining > 0) {
             // TODO: Disparar evento o notificación
-            Log::info('Low addon balance detected', [
+            LogHelper::billing('addon.low_balance_detected', [
                 'workspace_id' => $workspace->id,
                 'type' => $type,
                 'remaining' => $balance['remaining'],
@@ -319,7 +319,7 @@ class WorkspaceAddonService
             ->where('expires_at', '<', now())
             ->update(['is_active' => false]);
 
-        Log::info('Expired addons deactivated', ['count' => $count]);
+        LogHelper::billing('addon.expired_deactivated', ['count' => $count]);
 
         return $count;
     }
@@ -422,7 +422,7 @@ class WorkspaceAddonService
 
         $addon->deactivate();
 
-        Log::info('Addon refunded', [
+        LogHelper::billing('addon.refunded', [
             'addon_id' => $addon->id,
             'workspace_id' => $addon->workspace_id,
             'sku' => $addon->addon_sku,
@@ -449,7 +449,7 @@ class WorkspaceAddonService
         $notificationService = app(\App\Services\Subscription\UsageLimitsNotificationService::class);
         $notificationService->notifyLimitsUpdated($workspace, "addon_used_{$frontendMetricType}");
         
-        Log::info('Addon usage notification sent', [
+        LogHelper::billing('addon.usage_notification_sent', [
             'workspace_id' => $workspace->id,
             'addon_type' => $addonType,
             'frontend_metric' => $frontendMetricType,
