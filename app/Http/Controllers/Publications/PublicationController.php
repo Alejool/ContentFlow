@@ -1861,3 +1861,101 @@ class PublicationController extends Controller
     return 'unknown';
   }
 }
+
+  /**
+   * Get publications pending approval for the current user
+   * Filters based on workflow assignment - only shows publications at the user's approval level
+   * 
+   * @param Request $request
+   * @return \Illuminate\Http\JsonResponse
+   */
+  public function pendingApprovals(Request $request)
+  {
+    /** @var User $user */
+    $user = Auth::user();
+    $workspaceId = $user->current_workspace_id ?? $user->workspaces()->first()?->id;
+
+    if (!$workspaceId) {
+      return $this->errorResponse('No active workspace found.', 404);
+    }
+
+    $workspace = Workspace::find($workspaceId);
+    if (!$workspace) {
+      return $this->errorResponse('Workspace not found.', 404);
+    }
+
+    // Get user's role in the workspace
+    $userRole = $user->workspaces()
+      ->where('workspaces.id', $workspaceId)
+      ->first()
+      ?->pivot
+      ?->role;
+
+    // Check if user is owner or admin - they can see ALL pending approvals
+    $isOwner = $workspace->user_id === $user->id;
+    $isAdmin = $userRole && in_array($userRole->slug, ['owner', 'admin']);
+
+    // Get the active approval workflow
+    $workflow = $workspace->approvalWorkflow()->with('levels.role')->where('is_enabled', true)->first();
+
+    // Base query for pending review publications
+    $query = Publication::where('workspace_id', $workspaceId)
+      ->where('status', 'pending_review')
+      ->with([
+        'mediaFiles' => fn($q) => $q->select('media_files.id', 'media_files.file_path', 'media_files.file_type', 'media_files.file_name'),
+        'user' => fn($q) => $q->select('users.id', 'users.name', 'users.email', 'users.photo_url'),
+        'current_approval_step' => fn($q) => $q->with(['role', 'workflow']),
+        'approvalLogs' => fn($q) => $q->latest('requested_at')->with(['requester:id,name', 'reviewer:id,name']),
+      ]);
+
+    // If there's NO workflow OR user is owner/admin, show ALL pending publications
+    if (!$workflow || $isOwner || $isAdmin) {
+      $publications = $query->orderBy('updated_at', 'desc')->get();
+      
+      return $this->successResponse([
+        'publications' => $publications,
+        'filter_type' => $isOwner || $isAdmin ? 'admin_all' : 'no_workflow',
+        'user_role' => $userRole?->slug ?? 'member',
+      ]);
+    }
+
+    // If there IS a workflow, filter by user's assigned level
+    // Only show publications where the current_approval_level_id matches a level assigned to the user's role
+    $userRoleId = $userRole?->id;
+    
+    if (!$userRoleId) {
+      // User has no role, can't approve anything
+      return $this->successResponse([
+        'publications' => [],
+        'filter_type' => 'no_role',
+        'user_role' => null,
+      ]);
+    }
+
+    // Get approval levels assigned to the user's role
+    $assignedLevelIds = $workflow->levels()
+      ->where('role_id', $userRoleId)
+      ->pluck('id')
+      ->toArray();
+
+    if (empty($assignedLevelIds)) {
+      // User's role is not assigned to any approval level
+      return $this->successResponse([
+        'publications' => [],
+        'filter_type' => 'not_assigned',
+        'user_role' => $userRole->slug,
+      ]);
+    }
+
+    // Filter publications where current_approval_level_id matches user's assigned levels
+    $query->whereIn('current_approval_level_id', $assignedLevelIds);
+
+    $publications = $query->orderBy('updated_at', 'desc')->get();
+
+    return $this->successResponse([
+      'publications' => $publications,
+      'filter_type' => 'workflow_filtered',
+      'user_role' => $userRole->slug,
+      'assigned_levels' => $assignedLevelIds,
+    ]);
+  }

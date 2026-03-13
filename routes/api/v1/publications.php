@@ -12,6 +12,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
   Route::prefix('publications')->name('publications.')->group(function () {
     Route::get('/', [PublicationController::class, 'index'])->name('index');
+    Route::get('/pending-approvals', [PublicationController::class, 'pendingApprovals'])->name('pending-approvals');
     Route::get('/stats', [PublicationController::class, 'stats'])->name('stats');
     Route::get('/export', [PublicationController::class, 'export'])->name('export');
     Route::get('/action', [PublicationController::class, 'getPublicationAction'])->name('action');
