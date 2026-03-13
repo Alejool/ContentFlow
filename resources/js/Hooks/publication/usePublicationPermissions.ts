@@ -1,63 +1,135 @@
-import { useMemo } from "react";
 import { Publication } from "@/types/Publication";
+import { usePage } from "@inertiajs/react";
+import { useMemo } from "react";
 
-interface UsePublicationPermissionsProps {
-  publication: Publication | null;
-  auth: any;
-  isLockedByOther: boolean;
-  isAnyMediaProcessing: boolean;
-}
+/**
+ * Hook centralizado para manejar todos los permisos relacionados con publicaciones
+ */
+export function usePublicationPermissions(permissions: string[] = []) {
+  const { auth } = usePage<any>().props;
+  const currentUserId = auth.user?.id;
+  const currentWorkspace = auth.current_workspace;
 
-export const usePublicationPermissions = ({
-  publication,
-  auth,
-  isLockedByOther,
-  isAnyMediaProcessing,
-}: UsePublicationPermissionsProps) => {
-  const canManage = auth.current_workspace?.permissions?.includes("manage-content");
-  const canPublish = auth.current_workspace?.permissions?.includes("publish");
-  const isPendingReview = publication?.status === "pending_review";
-  const isOwner = publication?.user_id === auth.user.id;
+  // Permisos básicos
+  const canManageContent = useMemo(
+    () => permissions.includes("manage-content") || permissions.includes("publish"),
+    [permissions]
+  );
 
-  const isApprovedStatus =
-    publication?.status === "approved" || publication?.status === "scheduled";
+  const canPublish = useMemo(
+    () => permissions.includes("publish"),
+    [permissions]
+  );
 
-  const hasPublishedPlatform = useMemo(() => {
-    return publication?.social_post_logs?.some(
-      (log: any) => log.status === "published",
+  const canDelete = useMemo(
+    () => permissions.includes("publish"),
+    [permissions]
+  );
+
+  const canEdit = useMemo(
+    () => canManageContent,
+    [canManageContent]
+  );
+
+  const canDuplicate = useMemo(
+    () => canManageContent,
+    [canManageContent]
+  );
+
+  const canView = useMemo(
+    () => true, // Todos pueden ver
+    []
+  );
+
+  // Información del workspace
+  const hasWorkflow = useMemo(
+    () => currentWorkspace?.approval_workflow?.is_enabled === true,
+    [currentWorkspace]
+  );
+
+  const isOwner = useMemo(
+    () => currentWorkspace?.user_role_slug === "owner",
+    [currentWorkspace]
+  );
+
+  // Verificar si puede publicar directamente una publicación específica
+  const canPublishDirectly = (item: Publication) => {
+    if (!item || !currentUserId) return false;
+
+    // Si es Owner, puede publicar siempre
+    if (isOwner) return true;
+
+    // Si tiene permiso "publish", puede publicar siempre
+    if (canPublish) return true;
+
+    // Verificar si tiene aprobación activa
+    const hasActiveApproval = item.approval_logs?.some(
+      (log: any) =>
+        log.requested_by === currentUserId &&
+        log.action === "approved" &&
+        log.reviewed_at !== null
     );
-  }, [publication]);
 
-  // Partial locking:
-  // - Global lock: only if another user has the lock
-  const isLockedByOtherEditor = isLockedByOther;
+    if (!hasActiveApproval) return false;
 
-  // - Media section lock: if another user has lock OR media is processing OR pending review
-  const isMediaSectionDisabled =
-    isLockedByOtherEditor ||
-    isAnyMediaProcessing ||
-    !canManage ||
-    isPendingReview;
+    // Verificar estado válido
+    const canPublishStates = ["approved", "failed", "publishing", "published", "scheduled"];
+    return canPublishStates.includes(item.status || "");
+  };
 
-  // - Content/Settings section lock: ONLY if another user has lock OR pending review
-  const isContentSectionDisabled =
-    isLockedByOtherEditor || !canManage || isPendingReview;
+  // Verificar si debe mostrar botón de enviar a revisión
+  const shouldShowSendToReview = (item: Publication) => {
+    if (!hasWorkflow || isOwner) return false;
+    if (canPublish) return false;
+    if (canPublishDirectly(item)) return false;
+    return ["draft", "rejected"].includes(item.status || "draft");
+  };
 
-  // Configuration allowed:
-  // 1. Admin/Owner (canPublish): Always allowed
-  // 2. Editor (!canPublish): Allowed if publication is Approved (regardless of ownership)
-  const allowConfiguration = canPublish || isApprovedStatus;
+  // Verificar si debe mostrar botón de publicar
+  const shouldShowPublish = (item: Publication) => {
+    if (isOwner && ["draft", "rejected", "publishing", "approved", "failed" ,"published", "scheduled", "retrying"].includes(item.status || "draft")) {
+      return true;
+    }
+    if (hasWorkflow && item.status === "approved") {
+      return true;
+    }
+    if (!hasWorkflow && canPublishDirectly(item)) {
+      return true;
+    }
+    return false;
+  };
+
+  // Verificar si puede editar una publicación específica
+  const canEditItem = (item: Publication, remoteLock?: any) => {
+    if (!canEdit) return false;
+    if (remoteLock) return false;
+    return true;
+  };
+
+  // Verificar si puede eliminar una publicación específica
+  const canDeleteItem = (item: Publication) => {
+    return canDelete;
+  };
 
   return {
-    canManage,
+    // Permisos básicos
+    canManageContent,
     canPublish,
-    isPendingReview,
+    canDelete,
+    canEdit,
+    canDuplicate,
+    canView,
+
+    // Información del workspace
+    hasWorkflow,
     isOwner,
-    isApprovedStatus,
-    hasPublishedPlatform,
-    isLockedByOtherEditor,
-    isMediaSectionDisabled,
-    isContentSectionDisabled,
-    allowConfiguration,
+    currentUserId,
+
+    // Verificaciones específicas por item
+    canPublishDirectly,
+    shouldShowSendToReview,
+    shouldShowPublish,
+    canEditItem,
+    canDeleteItem,
   };
-};
+}
