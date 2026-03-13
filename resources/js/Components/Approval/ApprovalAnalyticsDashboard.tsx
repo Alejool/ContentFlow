@@ -4,17 +4,18 @@ import PieChart from "@/Components/Statistics/PieChart";
 import { useTheme } from "@/Hooks/useTheme";
 import axios from "axios";
 import {
-  AlertCircle,
-  BarChart3,
-  Clock,
-  Download,
-  FileText,
-  TrendingUp,
-  Users,
+    AlertCircle,
+    BarChart3,
+    Clock,
+    Download,
+    FileText,
+    TrendingUp,
+    Users,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { route } from "ziggy-js";
 
 interface AnalyticsData {
   average_approval_times: Record<number, number>;
@@ -75,7 +76,7 @@ export default function ApprovalAnalyticsDashboard({
     try {
       setIsLoading(true);
       const response = await axios.get(
-        route("api.workspaces.approval-analytics", workspace.id),
+        route("api.v1.workspaces.approval-analytics.index", { idOrSlug: workspace.id }),
       );
       setAnalytics(response.data.data);
     } catch (error: any) {
@@ -89,7 +90,7 @@ export default function ApprovalAnalyticsDashboard({
     try {
       setIsExporting(true);
       const response = await axios.get(
-        route("api.workspaces.approval-analytics.export", workspace.id),
+        route("api.v1.workspaces.approval-analytics.export", { idOrSlug: workspace.id }),
         {
           params: { format },
           responseType: "blob",

@@ -319,8 +319,6 @@ export default function ContentApprovalStatus({
               value={rejectionReason}
               onChange={(e: any) => setRejectionReason(e.target.value)}
               placeholder={t("approval.explain_rejection")}
-              multiline
-              rows={4}
               required
             />
 

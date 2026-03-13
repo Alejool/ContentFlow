@@ -4,21 +4,17 @@ import Input from "@/Components/common/Modern/Input";
 import Select from "@/Components/common/Modern/Select";
 import axios from "axios";
 import {
-  AlertTriangle,
-  ChevronRight,
-  Plus,
-  Save,
-  Settings,
-  Trash2
+    AlertTriangle,
+    ChevronRight,
+    Plus,
+    Save,
+    Settings,
+    Trash2
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-
-// @ts-ignore
-declare global {
-  function route(name: string, params?: any): string;
-}
+import { route } from "ziggy-js";
 
 interface ApprovalLevel {
   id?: number;
@@ -119,7 +115,7 @@ export default function ApprovalWorkflowConfiguration({
     try {
       setIsLoading(true);
       const response = await axios.get(
-        route("api.workspaces.approval-workflow", workspace.id)
+        route("api.v1.workspaces.approval-workflow.show", { idOrSlug: workspace.id })
       );
       if (response.data.data) {
         setWorkflow(response.data.data);
@@ -142,8 +138,8 @@ export default function ApprovalWorkflowConfiguration({
     try {
       setIsSaving(true);
       const endpoint = workflow.is_enabled
-        ? route("api.workspaces.approval-workflow.disable", workspace.id)
-        : route("api.workspaces.approval-workflow.enable", workspace.id);
+        ? route("api.v1.workspaces.approval-workflow.disable", { idOrSlug: workspace.id })
+        : route("api.v1.workspaces.approval-workflow.enable", { idOrSlug: workspace.id });
 
       await axios.post(endpoint);
       
@@ -293,7 +289,7 @@ export default function ApprovalWorkflowConfiguration({
       console.log('🔍 Sending payload:', payload); // Debug log
       
       await axios.put(
-        route("api.workspaces.approval-workflow.configure", workspace.id),
+        route("api.v1.workspaces.approval-workflow.configure", { idOrSlug: workspace.id }),
         payload
       );
       

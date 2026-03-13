@@ -605,12 +605,12 @@ export default function ApprovalWorkflowsTab({
 
                     <Button
                       size="md"
-                      variant="ghost"
+                      buttonStyle="icon"
                       onClick={() => removeStep(index)}
                       className="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 shrink-0"
                       title={t("common.approvals.deleteLevel")}
+                      icon={Trash2}
                     >
-                      <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
