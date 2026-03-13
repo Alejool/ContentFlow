@@ -81,6 +81,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('progress')->name('progress.')->group(function () {
       require __DIR__ . '/api/v1/progress.php';
     });
+    Route::prefix('processing')->name('processing.')->group(function () {
+      require __DIR__ . '/api/v1/processing.php';
+    });
     require __DIR__ . '/api/v1/reels.php';
     require __DIR__ . '/api/v1/excel-import.php';
   });
