@@ -1,7 +1,7 @@
+import AlertCard from "@/Components/common/Modern/AlertCard";
 import Button from "@/Components/common/Modern/Button";
 import Input from "@/Components/common/Modern/Input";
 import Select from "@/Components/common/Modern/Select";
-import AlertCard from "@/Components/common/Modern/AlertCard";
 import ConfirmDialog from "@/Components/common/ui/ConfirmDialog";
 import axios from "axios";
 import {
@@ -23,6 +23,11 @@ import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import CreateRoleModal from "./CreateRoleModal";
 import InviteMemberModal from "./InviteMemberModal";
+
+// @ts-ignore
+declare global {
+  function route(name: string, params?: any): string;
+}
 
 interface ApprovalStep {
   id?: number;
@@ -147,6 +152,42 @@ export default function ApprovalWorkflowsTab({
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [workflowToDelete, setWorkflowToDelete] = useState<number | null>(null);
 
+  // Filter roles that have "approve" permission
+  const rolesWithApprovePermission = roles.filter((role: any) => {
+    return role.permissions?.some((permission: any) => 
+      permission.name === 'approve' || permission.slug === 'approve'
+    );
+  });
+
+  // Filter users that have "approve" permission (either through their role or direct permission)
+  const usersWithApprovePermission = (workspace.users || []).filter((user: any) => {
+    // Check if user's role has approve permission
+    const userRole = roles.find((role: any) => role.id === user.pivot?.role_id);
+    if (userRole?.permissions?.some((permission: any) => 
+      permission.name === 'approve' || permission.slug === 'approve'
+    )) {
+      return true;
+    }
+    
+    // Check if user has direct approve permission
+    if (user.permissions?.some((permission: any) => 
+      permission.name === 'approve' || permission.slug === 'approve'
+    )) {
+      return true;
+    }
+    
+    return false;
+  });
+
+  console.log('🔍 Filtrado de permisos:', {
+    totalRoles: roles.length,
+    rolesConApprove: rolesWithApprovePermission.length,
+    totalUsuarios: workspace.users?.length || 0,
+    usuariosConApprove: usersWithApprovePermission.length,
+    rolesConApprove_lista: rolesWithApprovePermission.map((r: any) => r.name),
+    usuariosConApprove_lista: usersWithApprovePermission.map((u: any) => u.name)
+  });
+
   const fetchWorkflows = async () => {
     if (!workspace?.id) return;
     try {
@@ -182,7 +223,8 @@ export default function ApprovalWorkflowsTab({
       steps: [
         {
           name: `${t("common.approvals.level")} 1`,
-          role_id: roles[0]?.id,
+          role_id: roles[0]?.id || null,
+          user_id: null,
           step_order: 1,
         },
       ],
@@ -193,11 +235,53 @@ export default function ApprovalWorkflowsTab({
   const handleSave = async () => {
     if (!editingWorkflow) return;
 
+    // Validation: Check for duplicate roles
+    const roleIds = editingWorkflow.steps.map(s => s.role_id).filter(id => id !== null && id !== undefined);
+    const uniqueRoleIds = new Set(roleIds);
+    if (roleIds.length !== uniqueRoleIds.size) {
+      toast.error("No puedes asignar el mismo rol a múltiples niveles");
+      return;
+    }
+
+    // Validation: Check for duplicate users
+    const userIds = editingWorkflow.steps.map(s => s.user_id).filter(id => id !== null && id !== undefined);
+    const uniqueUserIds = new Set(userIds);
+    if (userIds.length !== uniqueUserIds.size) {
+      toast.error("No puedes asignar el mismo usuario a múltiples niveles");
+      return;
+    }
+
+    // Validation: Each step must have either role_id or user_id
+    const invalidSteps = editingWorkflow.steps.filter(s => !s.role_id && !s.user_id);
+    if (invalidSteps.length > 0) {
+      toast.error("Cada nivel debe tener asignado un rol o usuario");
+      return;
+    }
+
     try {
+      // Prepare steps ensuring all fields are present
+      const preparedSteps = editingWorkflow.steps.map(step => ({
+        name: step.name,
+        role_id: step.role_id || null,
+        user_id: step.user_id || null,
+        step_order: step.step_order,
+        ...(step.id ? { id: step.id } : {})
+      }));
+
+      // Automatically set is_multi_level based on number of steps
+      const workflowToSave = {
+        name: editingWorkflow.name,
+        is_active: editingWorkflow.is_active,
+        is_multi_level: editingWorkflow.steps.length > 1,
+        steps: preparedSteps
+      };
+
+      console.log('📤 Enviando workflow:', workflowToSave);
+
       if (editingWorkflow.id === 0) {
         await axios.post(
           route("api.v1.workspaces.approval-workflows.store", workspace.id),
-          editingWorkflow,
+          workflowToSave,
         );
         toast.success(t("common.approvals.success.created"));
       } else {
@@ -206,13 +290,14 @@ export default function ApprovalWorkflowsTab({
             idOrSlug: workspace.id,
             workflow: editingWorkflow.id,
           }),
-          editingWorkflow,
+          workflowToSave,
         );
         toast.success(t("common.approvals.success.updated"));
       }
       setIsEditing(false);
       fetchWorkflows();
     } catch (error: any) {
+      console.error('❌ Error guardando workflow:', error.response?.data || error);
       toast.error(
         `${t("common.approvals.errors.save")}: ` +
           (error.response?.data?.message || error.message),
@@ -256,7 +341,8 @@ export default function ApprovalWorkflowsTab({
     const newSteps = [...editingWorkflow.steps];
     newSteps.push({
       name: `${t("common.approvals.level")} ${newSteps.length + 1}`,
-      role_id: roles[0]?.id,
+      role_id: null,
+      user_id: null,
       step_order: newSteps.length + 1,
     });
     setEditingWorkflow({ ...editingWorkflow, steps: newSteps });
@@ -400,6 +486,23 @@ export default function ApprovalWorkflowsTab({
               </div>
             )}
 
+            {(rolesWithApprovePermission.length === 0 && usersWithApprovePermission.length === 0) && (
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <Shield className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-sm font-semibold text-yellow-900 dark:text-yellow-300">
+                      No hay roles o usuarios con permiso de aprobación
+                    </p>
+                    <p className="text-xs text-yellow-700 dark:text-yellow-400 mt-1">
+                      Para crear un flujo de aprobación, primero debes asignar el permiso "Aprobar" a al menos un rol o usuario. 
+                      Puedes crear un nuevo rol con este permiso usando el botón "Crear Nuevo Rol" arriba.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="space-y-3">
               {editingWorkflow.steps.map((step, index) => (
                 <div
@@ -434,15 +537,28 @@ export default function ApprovalWorkflowsTab({
                         id={`step-role-${index}`}
                         options={[
                           { value: "", label: t("common.approvals.anyRole") },
-                          ...roles.map((r) => ({ value: r.id, label: r.name })),
+                          ...rolesWithApprovePermission
+                            .filter((r) => {
+                              // Allow current selection or roles not selected in other steps
+                              const selectedRoleIds = editingWorkflow.steps
+                                .filter((_, i) => i !== index) // Exclude current step
+                                .map(s => s.role_id)
+                                .filter(id => id !== null && id !== undefined);
+                              return step.role_id === r.id || !selectedRoleIds.includes(r.id);
+                            })
+                            .map((r) => ({ value: String(r.id), label: r.name })),
                         ]}
-                        value={step.role_id || ""}
+                        value={step.role_id !== null && step.role_id !== undefined ? String(step.role_id) : ""}
                         size="md"
                         containerClassName="w-full sm:w-48"
                         onChange={(val: any) => {
                           const newSteps = [...editingWorkflow.steps];
-                          newSteps[index].role_id = val ? parseInt(val) : null;
-                          newSteps[index].user_id = null;
+                          if (val === "" || val === null || val === undefined) {
+                            newSteps[index].role_id = null;
+                          } else {
+                            newSteps[index].role_id = parseInt(val);
+                            newSteps[index].user_id = null; // Clear user when role is selected
+                          }
                           setEditingWorkflow({
                             ...editingWorkflow,
                             steps: newSteps,
@@ -456,18 +572,29 @@ export default function ApprovalWorkflowsTab({
                         id={`step-user-${index}`}
                         options={[
                           { value: "", label: t("common.approvals.anyUser") },
-                          ...(workspace.users?.map((u: any) => ({
-                            value: u.id,
+                          ...usersWithApprovePermission.filter((u: any) => {
+                            // Allow current selection or users not selected in other steps
+                            const selectedUserIds = editingWorkflow.steps
+                              .filter((_, i) => i !== index) // Exclude current step
+                              .map(s => s.user_id)
+                              .filter(id => id !== null && id !== undefined);
+                            return step.user_id === u.id || !selectedUserIds.includes(u.id);
+                          }).map((u: any) => ({
+                            value: String(u.id),
                             label: u.name,
-                          })) || []),
+                          })),
                         ]}
-                        value={step.user_id || ""}
+                        value={step.user_id !== null && step.user_id !== undefined ? String(step.user_id) : ""}
                         size="md"
                         containerClassName="w-full sm:w-48"
                         onChange={(val: any) => {
                           const newSteps = [...editingWorkflow.steps];
-                          newSteps[index].user_id = val ? parseInt(val) : null;
-                          newSteps[index].role_id = null;
+                          if (val === "" || val === null || val === undefined) {
+                            newSteps[index].user_id = null;
+                          } else {
+                            newSteps[index].user_id = parseInt(val);
+                            newSteps[index].role_id = null; // Clear role when user is selected
+                          }
                           setEditingWorkflow({
                             ...editingWorkflow,
                             steps: newSteps,

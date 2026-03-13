@@ -1,7 +1,7 @@
+import AlertCard from "@/Components/common/Modern/AlertCard";
 import Button from "@/Components/common/Modern/Button";
 import Input from "@/Components/common/Modern/Input";
 import Select from "@/Components/common/Modern/Select";
-import AlertCard from "@/Components/common/Modern/AlertCard";
 import axios from "axios";
 import {
   AlertTriangle,
@@ -9,12 +9,16 @@ import {
   Plus,
   Save,
   Settings,
-  Trash2,
-  X,
+  Trash2
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+
+// @ts-ignore
+declare global {
+  function route(name: string, params?: any): string;
+}
 
 interface ApprovalLevel {
   id?: number;
@@ -43,6 +47,8 @@ interface ApprovalWorkflowConfigurationProps {
   roles: Role[];
   canManageWorkflow: boolean;
   hasPendingContent?: boolean;
+  hasBasicAccess?: boolean;
+  hasAdvancedAccess?: boolean;
 }
 
 export default function ApprovalWorkflowConfiguration({
@@ -50,8 +56,38 @@ export default function ApprovalWorkflowConfiguration({
   roles,
   canManageWorkflow,
   hasPendingContent = false,
+  hasBasicAccess = true,
+  hasAdvancedAccess = true,
 }: ApprovalWorkflowConfigurationProps) {
   const { t } = useTranslation();
+
+  // Check if workspace has access to approval workflows
+  if (!hasBasicAccess) {
+    return (
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-xl p-8 text-center">
+          <div className="mx-auto w-16 h-16 bg-blue-100 dark:bg-blue-900/40 rounded-full flex items-center justify-center mb-4">
+            <Settings className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            {t("approvals.upgrade.title") || "Aprobaciones no disponibles"}
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-2xl mx-auto">
+            {t("approvals.upgrade.description") || 
+              "Las aprobaciones son una funcionalidad premium disponible en los planes Professional y Enterprise. Actualiza tu plan para obtener acceso a flujos de aprobación y control de contenido."}
+          </p>
+          <Button
+            variant="primary"
+            buttonStyle="solid"
+            onClick={() => (window.location.href = route("pricing"))}
+          >
+            Ver Planes
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   const [workflow, setWorkflow] = useState<ApprovalWorkflow>({
     workspace_id: workspace.id,
     is_enabled: false,
@@ -62,7 +98,18 @@ export default function ApprovalWorkflowConfiguration({
   const [isSaving, setIsSaving] = useState(false);
 
   // Filter roles that can participate in approvals
-  const approvalRoles = roles.filter((r) => r.approval_participant);
+  const approvalRoles = roles.filter((r) => r.approval_participant === true || r.approval_participant === 1);
+  
+  // If no approval roles found, use all roles as fallback (for development/testing)
+  const availableRoles = approvalRoles.length > 0 ? approvalRoles : roles;
+  
+  // Debug logging
+  console.log('🔍 ApprovalWorkflow Debug:', {
+    totalRoles: roles.length,
+    approvalRoles: approvalRoles.length,
+    availableRoles: availableRoles.length,
+    roles: roles.map(r => ({ id: r.id, name: r.name, approval_participant: r.approval_participant }))
+  });
 
   useEffect(() => {
     fetchWorkflow();
@@ -123,7 +170,7 @@ export default function ApprovalWorkflowConfiguration({
       ...workflow,
       is_multi_level: !workflow.is_multi_level,
       levels: !workflow.is_multi_level && workflow.levels.length === 0
-        ? [{ level_number: 1, level_name: t("approval.level_1"), role_id: approvalRoles[0]?.id || 0 }]
+        ? [{ level_number: 1, level_name: t("approval.level_1"), role_id: availableRoles[0]?.id || 0 }]
         : workflow.levels,
     });
   };
@@ -134,10 +181,15 @@ export default function ApprovalWorkflowConfiguration({
       return;
     }
 
+    if (!hasAdvancedAccess && workflow.levels.length >= 1) {
+      toast.error(t("approval.errors.multi_level_requires_enterprise"));
+      return;
+    }
+
     const newLevel: ApprovalLevel = {
       level_number: workflow.levels.length + 1,
       level_name: t("approval.level_n", { n: workflow.levels.length + 1 }),
-      role_id: approvalRoles[0]?.id || 0,
+      role_id: availableRoles[0]?.id || 0,
     };
 
     setWorkflow({
@@ -170,6 +222,26 @@ export default function ApprovalWorkflowConfiguration({
     setWorkflow({ ...workflow, levels: newLevels });
   };
 
+  // Check for duplicate roles in real-time
+  const getDuplicateRoles = () => {
+    if (!workflow.is_multi_level) return new Set();
+    
+    const roleIds = workflow.levels.map(l => l.role_id);
+    const duplicates = new Set();
+    const seen = new Set();
+    
+    roleIds.forEach(roleId => {
+      if (seen.has(roleId)) {
+        duplicates.add(roleId);
+      }
+      seen.add(roleId);
+    });
+    
+    return duplicates;
+  };
+
+  const duplicateRoles = getDuplicateRoles();
+
   const handleSave = async () => {
     if (!canManageWorkflow) {
       toast.error(t("approval.errors.insufficient_permissions"));
@@ -190,18 +262,45 @@ export default function ApprovalWorkflowConfiguration({
         toast.error(t("approval.errors.duplicate_roles"));
         return;
       }
+
+      // Check for invalid role selections (role_id = 0 or null)
+      const invalidRoles = workflow.levels.filter(l => !l.role_id || l.role_id === 0);
+      if (invalidRoles.length > 0) {
+        toast.error(t("approval.errors.invalid_role_selection"));
+        return;
+      }
     }
 
     try {
       setIsSaving(true);
+      
+      // Transform the data to match backend expectations
+      const payload = {
+        is_multi_level: workflow.is_multi_level,
+        levels: workflow.is_multi_level ? workflow.levels.map(level => {
+          const role = roles.find(r => r.id === level.role_id);
+          if (!role) {
+            throw new Error(`Role with ID ${level.role_id} not found`);
+          }
+          return {
+            level_number: level.level_number,
+            level_name: level.level_name,
+            role_name: role.name
+          };
+        }) : []
+      };
+
+      console.log('🔍 Sending payload:', payload); // Debug log
+      
       await axios.put(
         route("api.workspaces.approval-workflow.configure", workspace.id),
-        workflow
+        payload
       );
       
       toast.success(t("approval.success.configured"));
       fetchWorkflow();
     } catch (error: any) {
+      console.error('❌ Save error:', error.response?.data); // Debug log
       toast.error(error.response?.data?.message || t("approval.errors.save_failed"));
     } finally {
       setIsSaving(false);
@@ -240,7 +339,7 @@ export default function ApprovalWorkflowConfiguration({
               variant="primary"
               buttonStyle="solid"
               onClick={handleSave}
-              disabled={isSaving}
+              disabled={isSaving || duplicateRoles.size > 0}
               icon={Save}
             >
               {t("common.save_changes")}
@@ -329,7 +428,7 @@ export default function ApprovalWorkflowConfiguration({
               variant="ghost"
               buttonStyle="outline"
               onClick={handleAddLevel}
-              disabled={!canManageWorkflow || hasPendingContent || workflow.levels.length >= 5}
+              disabled={!canManageWorkflow || hasPendingContent || workflow.levels.length >= 5 || (!hasAdvancedAccess && workflow.levels.length >= 1)}
               icon={Plus}
               size="sm"
             >
@@ -359,15 +458,29 @@ export default function ApprovalWorkflowConfiguration({
 
                   <Select
                     id={`level-role-${index}`}
-                    options={approvalRoles.map((r) => ({
-                      value: r.id.toString(),
-                      label: r.display_name,
-                    }))}
+                    options={availableRoles
+                      .filter((r) => {
+                        // Allow current selection or roles not selected in other levels
+                        const selectedRoleIds = workflow.levels
+                          .filter((_, i) => i !== index) // Exclude current level
+                          .map(l => l.role_id);
+                        return r.id === level.role_id || !selectedRoleIds.includes(r.id);
+                      })
+                      .map((r) => ({
+                        value: r.id.toString(),
+                        label: r.display_name,
+                      }))}
                     value={level.role_id.toString()}
                     onChange={(value) => handleLevelChange(index, "role_id", parseInt(value))}
                     disabled={!canManageWorkflow || hasPendingContent}
-                    containerClassName="w-48"
+                    containerClassName={`w-48 ${duplicateRoles.has(level.role_id) ? 'border-red-500' : ''}`}
                   />
+                  
+                  {duplicateRoles.has(level.role_id) && (
+                    <div className="text-red-500 text-xs mt-1">
+                      {t("approval.errors.duplicate_role_selected")}
+                    </div>
+                  )}
                 </div>
 
                 {workflow.levels.length > 1 && (

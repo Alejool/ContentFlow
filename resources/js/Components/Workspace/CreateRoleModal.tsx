@@ -145,20 +145,6 @@ export default function CreateRoleModal({
                 error={errors.description?.message}
               />
               
-              <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-neutral-800/50 rounded-lg border border-gray-200 dark:border-neutral-700">
-                <input
-                  type="checkbox"
-                  id="approval_participant"
-                  {...register("approval_participant")}
-                  className="w-4 h-4 text-primary-600 bg-white dark:bg-neutral-800 border-gray-300 dark:border-neutral-600 rounded focus:ring-2 focus:ring-primary-500"
-                />
-                <label
-                  htmlFor="approval_participant"
-                  className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer"
-                >
-                  {t("workspace.roles_management.can_approve_content") || "Can approve content in workflows"}
-                </label>
-              </div>
             </div>
 
             <div>

@@ -275,11 +275,11 @@ export default function PublishPublicationModal({
   // Function to translate content type to human readable format
   const getContentTypeLabel = (contentType: string) => {
     const labels: Record<string, string> = {
-      'post': t('publications.contentTypes.post') || 'Publicación',
-      'reel': t('publications.contentTypes.reel') || 'Reel',
-      'story': t('publications.contentTypes.story') || 'Historia',
-      'poll': t('publications.contentTypes.poll') || 'Encuesta',
-      'carousel': t('publications.contentTypes.carousel') || 'Carrusel'
+      'post': 'Publicación',
+      'reel': 'Reel',
+      'story': 'Historia',
+      'poll': 'Encuesta',
+      'carousel': 'Carrusel'
     };
     return labels[contentType] || contentType;
   };
@@ -639,10 +639,7 @@ export default function PublishPublicationModal({
                       {t("publications.modal.publish.incompatibleAccountsBanner.title") || "Cuentas No Compatibles"}
                     </h4>
                     <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
-                      {t("publications.modal.publish.incompatibleAccountsBanner.message", {
-                        contentType: getContentTypeLabel(publication.content_type || 'post')
-                      }) ||
-                        `Las siguientes cuentas no son compatibles con el tipo de contenido "${getContentTypeLabel(publication.content_type || 'post')}":`}
+                      {`Las siguientes cuentas no son compatibles con el tipo de contenido "${getContentTypeLabel(publication.content_type || 'post')}":` }
                     </p>
 
                     <div className="mt-2 flex flex-wrap gap-2">
