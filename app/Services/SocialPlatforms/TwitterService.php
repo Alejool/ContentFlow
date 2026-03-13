@@ -2,7 +2,7 @@
 
 namespace App\Services\SocialPlatforms;
 
-use Illuminate\Support\Facades\Log;
+use App\Helpers\LogHelper;
 use GuzzleHttp\Exception\ClientException;
 use League\OAuth1\Client\Server\Twitter;
 use League\OAuth1\Client\Credentials\TokenCredentials;
@@ -225,7 +225,7 @@ class TwitterService extends BaseSocialService
       $statusCode = $e->getResponse()->getStatusCode();
       
       if ($statusCode === 401) {
-        Log::info('Twitter token expired during sendTweet, refreshing...', ['account_id' => $this->socialAccount?->id]);
+        LogHelper::social('twitter.token_expired_refreshing', ['account_id' => $this->socialAccount?->id]);
         $this->refreshToken();
         return $this->sendTweet($tweetData);
       }
@@ -318,7 +318,7 @@ class TwitterService extends BaseSocialService
     $oauthToken = $accountInfo['account_metadata']['oauth1_token'] ?? null;
     $oauthSecret = $accountInfo['account_metadata']['secret'] ?? null;
 
-    Log::info('TwitterService Debug: Checking V1 Creds', [
+    LogHelper::social('twitter.v1_creds_check', [
       'has_token' => !empty($oauthToken),
       'has_secret' => !empty($oauthSecret),
       'token_preview' => substr($oauthToken ?? '', 0, 5) . '...',
@@ -387,7 +387,7 @@ class TwitterService extends BaseSocialService
           throw new \Exception('Twitter V1 Error Raw: ' . $body);
         } catch (\Throwable $e) {
           $lastException = $e;
-          Log::warning('Twitter V1 upload attempt ' . ($attempts + 1) . ' failed: ' . $e->getMessage());
+          LogHelper::social('twitter.v1_upload_retry', ['attempt' => ($attempts + 1), 'error' => $e->getMessage()]);
           $attempts++;
           sleep(2);
         }
@@ -415,7 +415,7 @@ class TwitterService extends BaseSocialService
       ],
     ]);
 
-    Log::info('Twitter v2 Media Upload Response', ['body' => (string)$response->getBody()]);
+    LogHelper::api('twitter.v2_media_upload_response', ['body' => (string)$response->getBody()]);
 
     $result = json_decode($response->getBody(), true);
 
@@ -452,7 +452,7 @@ class TwitterService extends BaseSocialService
   {
     $fileSize = filesize($mediaPath);
     
-    Log::info('Twitter large media upload starting', [
+    LogHelper::social('twitter.large_media_upload_starting', [
       'file_size_mb' => round($fileSize / 1024 / 1024, 2),
       'category' => $category,
       'has_social_account' => $this->socialAccount !== null,
@@ -464,7 +464,7 @@ class TwitterService extends BaseSocialService
     $oauthToken = $accountInfo['account_metadata']['oauth1_token'] ?? null;
     $oauthSecret = $accountInfo['account_metadata']['secret'] ?? null;
 
-    Log::info('Twitter OAuth credentials check', [
+    LogHelper::social('twitter.oauth_credentials_check', [
       'has_account_info' => !empty($accountInfo),
       'has_metadata' => isset($accountInfo['account_metadata']),
       'has_oauth1_token' => !empty($oauthToken),
@@ -516,7 +516,7 @@ class TwitterService extends BaseSocialService
         if (!isset($initData['media_id_string'])) throw new \Exception('V1 INIT Failed: ' . ($initData['error'] ?? json_encode($initData)));
         $mediaId = $initData['media_id_string'];
         
-        Log::info('Twitter upload initialized', ['media_id' => $mediaId]);
+        LogHelper::social('twitter.upload_initialized', ['media_id' => $mediaId]);
 
         $chunkSize = 2 * 1024 * 1024;
         $handle = fopen($mediaPath, 'rb');
@@ -543,7 +543,7 @@ class TwitterService extends BaseSocialService
           $progress = round(($uploadedBytes / $fileSize) * 100, 1);
           
           if ($segmentIndex % 5 == 0) { // Log cada 5 chunks
-            Log::info('Twitter upload progress', [
+            LogHelper::social('twitter.upload_progress', [
               'progress' => "{$progress}%",
               'uploaded_mb' => round($uploadedBytes / 1024 / 1024, 2)
             ]);
@@ -553,7 +553,7 @@ class TwitterService extends BaseSocialService
         }
         fclose($handle);
         
-        Log::info('Twitter upload chunks completed', ['segments' => $segmentIndex]);
+        LogHelper::social('twitter.upload_chunks_completed', ['segments' => $segmentIndex]);
 
         $finHeaders = $server->getHeaders($tokenCredentials, 'POST', $uploadUrl, [
           'command' => 'FINALIZE',
@@ -566,12 +566,12 @@ class TwitterService extends BaseSocialService
         $finData = json_decode($finResponse->getBody(), true);
 
         if (isset($finData['media_id_string'])) {
-          Log::info('Twitter upload completed', ['media_id' => $finData['media_id_string']]);
+          LogHelper::social('twitter.upload_completed', ['media_id' => $finData['media_id_string']]);
           return $finData['media_id_string'];
         }
         throw new \Exception('V1 FINALIZE Failed: ' . json_encode($finData));
       } catch (\Throwable $e) {
-        Log::error('Twitter V1 Chunked Upload Failed', ['error' => $e->getMessage()]);
+        LogHelper::socialError('twitter.v1_chunked_upload_failed', $e->getMessage(), ['error' => $e->getMessage()]);
         throw new \Exception("Twitter Auth V1 Video Upload Failed. Details: " . $e->getMessage());
       }
     }
@@ -609,7 +609,7 @@ class TwitterService extends BaseSocialService
     }
 
     $mediaId = $initData['media_id_string'];
-    Log::info('Twitter upload initialized (OAuth2)', ['media_id' => $mediaId]);
+    LogHelper::social('twitter.upload_initialized_oauth2', ['media_id' => $mediaId]);
     
     $chunkSize = 2 * 1024 * 1024;
     $handle = fopen($mediaPath, 'rb');
@@ -638,7 +638,7 @@ class TwitterService extends BaseSocialService
         $progress = round(($uploadedBytes / $fileSize) * 100, 1);
         
         if ($segmentIndex % 5 == 0) {
-          Log::info('Twitter upload progress', [
+          LogHelper::social('twitter.upload_progress', [
             'progress' => "{$progress}%",
             'uploaded_mb' => round($uploadedBytes / 1024 / 1024, 2)
           ]);
@@ -652,7 +652,7 @@ class TwitterService extends BaseSocialService
       }
     }
     
-    Log::info('Twitter upload chunks completed', ['segments' => $segmentIndex]);
+    LogHelper::social('twitter.upload_chunks_completed', ['segments' => $segmentIndex]);
 
     $finalizeResponse = $this->client->post('https://upload.twitter.com/1.1/media/upload.json', [
       'headers' => [
@@ -672,7 +672,7 @@ class TwitterService extends BaseSocialService
       throw new \Exception('FINALIZE failed: ' . $errorMsg);
     }
 
-    Log::info('Twitter upload completed', ['media_id' => $finalizeData['media_id_string']]);
+    LogHelper::social('twitter.upload_completed', ['media_id' => $finalizeData['media_id_string']]);
     return $finalizeData['media_id_string'];
   }
 
@@ -803,7 +803,7 @@ class TwitterService extends BaseSocialService
       ]);
       
       $fileSizeMB = round(filesize($tempFile) / 1024 / 1024, 2);
-      Log::info('Twitter media downloaded', ['size_mb' => $fileSizeMB]);
+      LogHelper::social('twitter.media_downloaded', ['size_mb' => $fileSizeMB]);
       
       return $tempFile;
     } catch (\Exception $e) {
@@ -811,7 +811,7 @@ class TwitterService extends BaseSocialService
         @unlink($tempFile);
       }
       
-      Log::error('Twitter media download failed', [
+      LogHelper::socialError('twitter.media_download_failed', $e->getMessage(), [
         'url' => $url,
         'error' => $e->getMessage()
       ]);
@@ -889,7 +889,7 @@ class TwitterService extends BaseSocialService
         ];
       }
     } catch (\Exception $e) {
-      Log::warning('Twitter analytics error', ['post_id' => $postId, 'error' => $e->getMessage()]);
+      LogHelper::social('twitter.analytics_error', ['post_id' => $postId, 'error' => $e->getMessage()]);
     }
 
     return [
@@ -916,7 +916,7 @@ class TwitterService extends BaseSocialService
       ]);
       return true;
     } catch (\Exception $e) {
-      Log::error('Twitter validateCredentials failed', ['error' => $e->getMessage()]);
+      LogHelper::socialError('twitter.validate_credentials_failed', $e->getMessage(), ['error' => $e->getMessage()]);
       return false;
     }
   }
@@ -943,11 +943,11 @@ class TwitterService extends BaseSocialService
         try {
           $response = $request();
         } catch (\Exception $retryError) {
-          Log::error('Twitter deletePost retry failed', ['post_id' => $postId, 'error' => $retryError->getMessage()]);
+          LogHelper::socialError('twitter.delete_post_retry_failed', $retryError->getMessage(), ['post_id' => $postId, 'error' => $retryError->getMessage()]);
           return false;
         }
       } else {
-        Log::error('Twitter deletePost error', ['post_id' => $postId, 'error' => $e->getMessage()]);
+        LogHelper::socialError('twitter.delete_post_error', $e->getMessage(), ['post_id' => $postId, 'error' => $e->getMessage()]);
         return false;
       }
     }
@@ -970,7 +970,7 @@ class TwitterService extends BaseSocialService
     // Twitter API v2 doesn't provide easy access to replies without elevated access
     // Would need to search for tweets mentioning the original tweet
     // For now, return empty array - can be implemented with elevated API access
-    Log::info('Twitter getPostComments called but not fully implemented', [
+    LogHelper::social('twitter.get_post_comments_not_implemented', [
       'postId' => $postId,
       'note' => 'Requires elevated API access for reply search'
     ]);

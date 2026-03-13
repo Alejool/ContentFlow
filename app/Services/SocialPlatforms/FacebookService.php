@@ -3,7 +3,7 @@
 namespace App\Services\SocialPlatforms;
 
 use GuzzleHttp\Exception\ClientException;
-use Illuminate\Support\Facades\Log;
+use App\Helpers\LogHelper;
 
 use App\DTOs\SocialPostDTO;
 use App\DTOs\PostResultDTO;
@@ -82,7 +82,7 @@ class FacebookService extends BaseSocialService
     
     // Si es una URL (S3 u otra), intentar primero upload directo, luego resumible
     if ($isUrl) {
-      Log::info('Facebook video from URL detected, trying direct upload first', [
+      LogHelper::social('facebook.video_from_url_detected', [
         'url' => $rawPath,
         'is_s3' => str_contains($rawPath, 's3.amazonaws.com')
       ]);
@@ -91,14 +91,14 @@ class FacebookService extends BaseSocialService
         // Intentar primero el método directo (más simple y rápido)
         return $this->uploadVideo($pageId, $rawPath, $content, $title);
       } catch (\Exception $e) {
-        Log::warning('Facebook direct upload failed, falling back to resumable', [
+        LogHelper::social('facebook.direct_upload_failed_fallback', [
           'error' => $e->getMessage(),
           'url' => $rawPath
         ]);
         
         // Verificar si es un error específico de archivo problemático
         if (str_contains($e->getMessage(), 'There was a problem uploading your video file')) {
-          Log::warning('Facebook reports problematic video file', [
+          LogHelper::social('facebook.problematic_video_file', [
             'url' => $rawPath,
             'error' => $e->getMessage()
           ]);
@@ -121,7 +121,7 @@ class FacebookService extends BaseSocialService
     
     $fileSizeMB = filesize($localPath) / 1024 / 1024;
     
-    Log::info('Facebook video upload decision', [
+    LogHelper::social('facebook.video_upload_decision', [
       'file_size_mb' => round($fileSizeMB, 2),
       'use_resumable' => $fileSizeMB > 50,
       'source' => 'local'
@@ -145,7 +145,7 @@ class FacebookService extends BaseSocialService
   {
     $isUrl = str_starts_with($rawPath, 'http://') || str_starts_with($rawPath, 'https://');
     
-    Log::info('Facebook Reel upload starting', [
+    LogHelper::social('facebook.reel_upload_starting', [
       'pageId' => $pageId,
       'is_url' => $isUrl,
       'path' => $rawPath

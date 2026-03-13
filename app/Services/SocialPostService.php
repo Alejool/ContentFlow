@@ -9,7 +9,7 @@ use App\Services\SocialPlatforms\InstagramService;
 use App\Services\SocialPlatforms\TwitterService;
 use App\Services\SocialPlatforms\TikTokService;
 use App\Services\SocialPlatforms\YouTubeService;
-use Illuminate\Support\Facades\Log;
+use App\Helpers\LogHelper;
 
 class SocialPostService
 {
@@ -45,7 +45,10 @@ class SocialPostService
       ], $media, $options);
 
       // Publish post
-      Log::info('Uploading data 6------', ['postData' => $postData]);
+      LogHelper::social('social.post_publishing', [
+        'platform' => $account->platform,
+        'account_id' => $account->id,
+      ]);
       $result = $service->publishPost($postData);
 
       // Log successful post
@@ -56,7 +59,10 @@ class SocialPostService
 
       return $result;
     } catch (\Exception $e) {
-      Log::error("Failed to publish to {$account->platform}: " . $e->getMessage());
+      LogHelper::socialError('social.post_failed', $e->getMessage(), [
+        'platform' => $account->platform,
+        'account_id' => $account->id,
+      ]);
 
       // Log failed post
       $this->logPost($account, $content, $media, [], 'failed', $e->getMessage());
