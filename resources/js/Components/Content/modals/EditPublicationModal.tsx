@@ -521,6 +521,7 @@ const EditPublicationModal = ({
             </div>
           }
         />
+        
         <ContentTypeSelectorBar
           selectedType={content_type}
           selectedPlatforms={selectedPlatformNames}
