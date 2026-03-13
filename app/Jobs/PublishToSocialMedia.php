@@ -137,7 +137,7 @@ class PublishToSocialMedia implements ShouldQueue
       );
       
       $publishDuration = round(microtime(true) - $startTime, 2);
-      LogHelper::jobInfo('Publishing completed', [
+      LogHelper::job('Publishing completed', [
         'publication_id' => $publication->id,
         'duration_seconds' => $publishDuration,
         'job_id' => $this->job->uuid()
