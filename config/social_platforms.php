@@ -25,6 +25,12 @@ return [
                     'min_duration_seconds' => 3,
                     'recommended_resolution' => '1080x1920',
                 ],
+                'story' => [
+                    'aspect_ratio' => '9:16',
+                    'max_duration_seconds' => 60,
+                    'min_duration_seconds' => 1,
+                    'recommended_resolution' => '1080x1920',
+                ],
             ],
         ],
         'image' => [
