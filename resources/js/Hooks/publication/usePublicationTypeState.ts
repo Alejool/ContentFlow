@@ -1,27 +1,6 @@
-import { REEL_COMPATIBLE_PLATFORMS } from '@/Constants/contentTypes';
+import { ContentType } from '@/Constants/contentTypes';
 import { Publication } from "@/types/Publication";
 import { useCallback, useRef, useState } from "react";
-
-type ContentType = "post" | "reel" | "story" | "poll" | "carousel";
-
-// Platform compatibility rules
-const CONTENT_TYPE_RULES: Record<ContentType, { platforms: string[] }> = {
-  post: {
-    platforms: ['instagram', 'twitter', 'facebook', 'linkedin', 'youtube', 'pinterest'],
-  },
-  reel: {
-    platforms: [...REEL_COMPATIBLE_PLATFORMS],
-  },
-  story: {
-    platforms: ['instagram', 'facebook'],
-  },
-  poll: {
-    platforms: ['twitter', 'facebook'],
-  },
-  carousel: {
-    platforms: ['instagram', 'facebook', 'linkedin'],
-  },
-};
 
 interface TypeSpecificState {
   selectedPlatforms: number[];
@@ -67,9 +46,9 @@ export const usePublicationTypeState = (): UsePublicationTypeStateReturn => {
   }, []);
 
   const getCompatiblePlatforms = useCallback((type: ContentType, connectedAccounts: any[]) => {
-    const compatiblePlatformNames = CONTENT_TYPE_RULES[type].platforms;
+    const compatiblePlatformNames = CONTENT_TYPE_CONFIG[type].platforms;
     return connectedAccounts.filter(account => 
-      compatiblePlatformNames.includes(account.platform.toLowerCase())
+      (compatiblePlatformNames as readonly string[]).includes(account.platform.toLowerCase())
     );
   }, []);
 

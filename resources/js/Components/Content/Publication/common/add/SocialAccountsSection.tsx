@@ -1,41 +1,20 @@
 import Button from "@/Components/common/Modern/Button";
 import DatePickerModern from "@/Components/common/Modern/DatePicker";
 import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
-import { REEL_COMPATIBLE_PLATFORMS } from '@/Constants/contentTypes';
+import { CONTENT_TYPE_CONFIG, ContentType } from '@/Constants/contentTypes';
 import { formatDateTimeStyled } from "@/Utils/dateHelpers";
 import { validateVideoDuration } from "@/Utils/validationUtils";
 import { parseISO } from "date-fns";
 import { AlertTriangle, Check, ChevronDown, Clock, Info, Target, X } from "lucide-react";
 import React, { memo, useMemo, useState } from "react";
 
-type ContentType = 'post' | 'reel' | 'story' | 'poll' | 'carousel';
-
-// Content type platform support rules
-const CONTENT_TYPE_RULES: Record<ContentType, { platforms: string[] }> = {
-  post: {
-    platforms: ['instagram', 'twitter', 'facebook', 'linkedin', 'youtube', 'pinterest'],
-  },
-  reel: {
-    platforms: [...REEL_COMPATIBLE_PLATFORMS],
-  },
-  story: {
-    platforms: ['instagram', 'facebook'],
-  },
-  poll: {
-    platforms: ['twitter', 'facebook'],
-  },
-  carousel: {
-    platforms: ['instagram', 'facebook', 'linkedin'],
-  },
-};
-
 /**
  * Check if a platform is compatible with the selected content type
  */
 function isPlatformCompatible(platform: string, contentType?: ContentType): boolean {
   if (!contentType) return true;
-  const rules = CONTENT_TYPE_RULES[contentType];
-  return rules.platforms.includes(platform.toLowerCase());
+  const rules = CONTENT_TYPE_CONFIG[contentType];
+  return (rules.platforms as readonly string[]).includes(platform.toLowerCase());
 }
 
 interface SocialAccount {

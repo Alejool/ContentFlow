@@ -94,6 +94,17 @@ export const TwitterPreview = ({
 
           {contentType === 'poll' && pollOptions.length >= 2 && (
             <div className="mt-3 border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
+              <div className="px-3 py-2 bg-gray-50 dark:bg-gray-900/30 border-b border-gray-200 dark:border-gray-800">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">📊 Encuesta</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    {pollDuration < 24 
+                      ? `${pollDuration} hora${pollDuration !== 1 ? 's' : ''} restante${pollDuration !== 1 ? 's' : ''}`
+                      : `${Math.floor(pollDuration / 24)} día${Math.floor(pollDuration / 24) !== 1 ? 's' : ''} restante${Math.floor(pollDuration / 24) !== 1 ? 's' : ''}`
+                    } · 0 votos
+                  </span>
+                </div>
+              </div>
               {pollOptions.filter(option => option.trim()).map((option, index) => (
                 <div
                   key={index}
@@ -112,12 +123,6 @@ export const TwitterPreview = ({
                   </span>
                 </div>
               ))}
-              <div className="px-3 py-2 bg-gray-50 dark:bg-gray-900/30 text-xs text-gray-500 dark:text-gray-400">
-                {pollDuration < 24 
-                  ? `${pollDuration} hour${pollDuration !== 1 ? 's' : ''} left`
-                  : `${Math.floor(pollDuration / 24)} day${Math.floor(pollDuration / 24) !== 1 ? 's' : ''} left`
-                } · 0 votes
-              </div>
             </div>
           )}
 

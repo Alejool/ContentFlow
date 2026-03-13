@@ -2,12 +2,22 @@ import { DatePicker as DatePickerModern } from "@/Components/common/Modern/DateP
 import Input from "@/Components/common/Modern/Input";
 import Select from "@/Components/common/Modern/Select";
 import ExportButtons from "@/Components/common/ui/ExportButtons";
+import { CONTENT_TYPES } from "@/constants/contentTypes";
 import { getPlatformOptions } from "@/Constants/socialPlatforms";
 import { format, parseISO } from "date-fns";
-import { Filter, Search, RotateCcw } from "lucide-react";
+import { Filter, RotateCcw, Search } from "lucide-react";
 
 // Constant to avoid creating new object on every render
 const EMPTY_FILTERS = {};
+
+// Configuración visual local para tipos de contenido
+const CONTENT_TYPE_DISPLAY = {
+  post: { label: 'Post', icon: 'FileText' },
+  reel: { label: 'Reel', icon: 'Video' },
+  story: { label: 'Story', icon: 'Circle' },
+  carousel: { label: 'Carousel', icon: 'Images' },
+  poll: { label: 'Encuesta', icon: 'BarChart3' }
+} as const;
 
 interface FilterSectionProps {
   mode: "campaigns" | "publications" | "logs" | "approvals" | "integrations";
@@ -16,6 +26,7 @@ interface FilterSectionProps {
   setSearch: (value: string) => void;
   statusFilter: string;
   platformFilter?: string | string[];
+  contentTypeFilter?: string | string[];
   sortFilter?: string;
   dateStart?: string;
   dateEnd?: string;
@@ -31,6 +42,7 @@ export default function FilterSection({
   setSearch,
   statusFilter,
   platformFilter,
+  contentTypeFilter,
   sortFilter = "newest",
   dateStart,
   dateEnd,
@@ -99,6 +111,18 @@ export default function FilterSection({
 
   const activePlatformOptions = getPlatformOptions();
 
+  // Content type options
+  const contentTypeOptions = [
+    { value: "all", label: "Todos los tipos" },
+    ...Object.values(CONTENT_TYPES).map(type => {
+      const display = CONTENT_TYPE_DISPLAY[type as keyof typeof CONTENT_TYPE_DISPLAY];
+      return {
+        value: type,
+        label: display ? display.label : type,
+      };
+    })
+  ];
+
   const sortOptions = [
     { value: "newest", label: t("common.sort.newest") || "Más recientes" },
     { value: "oldest", label: t("common.sort.oldest") || "Más antiguos" },
@@ -111,6 +135,7 @@ export default function FilterSection({
 
   const activeColor = "primary-500";
   const showPlatformFilter = mode === "publications" || mode === "logs";
+  const showContentTypeFilter = mode === "publications";
 
   const getExportEndpoint = () => {
     switch (mode) {
@@ -231,6 +256,23 @@ export default function FilterSection({
               />
             </div>
           </>
+        )}
+
+        {showContentTypeFilter && (
+          <div>
+            <Select<any>
+              id="content-type-filter"
+              options={contentTypeOptions}
+              value={Array.isArray(contentTypeFilter) ? contentTypeFilter : contentTypeFilter ? [contentTypeFilter] : []}
+              variant="outlined"
+              onChange={(val) => handleFilterChange("content_type", val)}
+              size="md"
+              placeholder="Tipo de contenido"
+              activeColor={activeColor}
+              multiple
+              clearable
+            />
+          </div>
         )}
 
         {showPlatformFilter && (

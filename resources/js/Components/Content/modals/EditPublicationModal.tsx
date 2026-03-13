@@ -28,7 +28,7 @@ import { useUploadQueue } from "@/stores/uploadQueueStore";
 import { Publication } from "@/types/Publication";
 import { usePage } from "@inertiajs/react";
 import axios from "axios";
-import { AlertCircle, Lock, Save } from "lucide-react";
+import { Lock, Save } from "lucide-react";
 import { memo, useEffect, useMemo, useState } from "react";
 import { useWatch } from "react-hook-form";
 import { Trans } from "react-i18next";
@@ -86,8 +86,6 @@ const EditPublicationModal = ({
     useState(false);
   const [isYouTubeThumbnailExpanded, setIsYouTubeThumbnailExpanded] = useState(true);
 
-  // Integrate focus trap for modal accessibility
-  // Requirements: 5.5
   const modalRef = useModalFocusTrap(isOpen);
 
   const { isLockedByMe, isLockedByOther, lockInfo, activeUsers } =
@@ -566,118 +564,98 @@ const EditPublicationModal = ({
               {/* ========================================
                   COLUMNA IZQUIERDA: MEDIA Y CONTENIDO
                   ======================================== */}
-              <div className={`space-y-6 ${fieldVisibility.showMediaSection ? 'lg:col-span-7' : ''}`}>
-                <div className="space-y-3">
+              <div className={` ${fieldVisibility.showMediaSection ? 'lg:col-span-7' : ''}`}>
+                <div className="space-y-6">
                   {!isLockedByMe &&
                     isLockedByOther &&
                     !hasPublishedPlatform &&
                     allowConfiguration &&
                     publication?.status !== "pending_review" && (
-                      <div className="p-4 rounded-lg border border-amber-500 bg-amber-50 dark:bg-amber-900/20 flex gap-3 text-sm text-amber-700 dark:text-amber-300 animate-in shake duration-500">
-                        <AlertCircle className="w-5 h-5 shrink-0 text-amber-500" />
-                        <div>
-                          <p className="font-semibold mb-1">
-                            {lockInfo?.locked_by === "session"
-                              ? t("publications.modal.edit.lockedBySession") ||
-                                "Sesión Duplicada"
-                              : t("publications.modal.edit.lockedByOther") ||
-                                "En cola de espera"}
-                          </p>
-                          <div className="opacity-80">
-                            {lockInfo?.locked_by === "session" ? (
-                              <>
-                                <Trans
-                                  i18nKey="publications.modal.edit.locking.sessionMessage"
-                                  values={{
-                                    browser: parseUserAgent(
-                                      lockInfo?.user_agent,
-                                    ),
-                                  }}
-                                  components={{
-                                    1: <span className="font-medium" />,
-                                  }}
-                                />
-                                {lockInfo?.ip_address && (
-                                  <span className="text-xs opacity-70">
-                                    {" "}
-                                    ({maskIpAddress(lockInfo.ip_address)})
-                                  </span>
-                                )}
-                              </>
-                            ) : (
-                              <>
-                                <Trans
-                                  i18nKey="publications.modal.edit.locking.userMessage"
-                                  values={{
-                                    user: lockInfo?.user_name,
-                                    browser: parseUserAgent(
-                                      lockInfo?.user_agent,
-                                    ),
-                                  }}
-                                  components={{
-                                    1: <span className="font-medium" />,
-                                  }}
-                                />
-                                <p className="mt-1 font-medium text-amber-600 dark:text-amber-400">
-                                  Tomarás el control automáticamente cuando se
-                                  libere.
-                                </p>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </div>
+                      <AlertCard
+                        type="amber"
+                        title={
+                          lockInfo?.locked_by === "session"
+                            ? t("publications.modal.edit.lockedBySession") || "Sesión Duplicada"
+                            : t("publications.modal.edit.lockedByOther") || "En cola de espera"
+                        }
+                        message={
+                          lockInfo?.locked_by === "session" ? (
+                            <div className="opacity-80">
+                              <Trans
+                                i18nKey="publications.modal.edit.locking.sessionMessage"
+                                values={{
+                                  browser: parseUserAgent(lockInfo?.user_agent),
+                                }}
+                                components={{
+                                  1: <span className="font-medium" />,
+                                }}
+                              />
+                              {lockInfo?.ip_address && (
+                                <span className="text-xs opacity-70">
+                                  {" "}({maskIpAddress(lockInfo.ip_address)})
+                                </span>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="opacity-80">
+                              <Trans
+                                i18nKey="publications.modal.edit.locking.userMessage"
+                                values={{
+                                  user: lockInfo?.user_name,
+                                  browser: parseUserAgent(lockInfo?.user_agent),
+                                }}
+                                components={{
+                                  1: <span className="font-medium" />,
+                                }}
+                              />
+                              <p className="mt-1 font-medium text-amber-600 dark:text-amber-400">
+                                Tomarás el control automáticamente cuando se libere.
+                              </p>
+                            </div>
+                          )
+                        }
+                        className="animate-in shake duration-500"
+                      />
                     )}
 
                   {/* Alerta: Eres el editor actual */}
                   {isLockedByMe && activeUsers.length > 1 && (
-                    <div className="p-3 rounded-lg border border-blue-500 bg-blue-50 dark:bg-blue-900/20 flex gap-2 text-xs text-blue-700 dark:text-blue-300">
-                      <Lock className="w-4 h-4 shrink-0" />
-                      <p>
-                        <strong>{t("publications.modal.edit.locking.youAreEditor") || "Eres el editor actual."}</strong>{" "}
-                        {t("publications.modal.edit.locking.usersWaiting", { count: activeUsers.length - 1 }) || 
-                          `Hay ${activeUsers.length - 1} usuario(s) en espera para cuando termines.`}
-                      </p>
-                    </div>
+                    <AlertCard
+                      type="info"
+                      title={t("publications.modal.edit.locking.youAreEditor") || "Eres el editor actual."}
+                      message={
+                        t("publications.modal.edit.locking.usersWaiting", { count: activeUsers.length - 1 }) || 
+                        `Hay ${activeUsers.length - 1} usuario(s) en espera para cuando termines.`
+                      }
+                      className="text-xs"
+                    />
                   )}
 
                   {/* Alerta: Pendiente de revisión */}
                   {publication?.status === "pending_review" && (
-                    <div className="p-4 rounded-lg border border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 flex gap-3 text-sm animate-in fade-in slide-in-from-top-4">
-                      <AlertCircle className="w-5 h-5 shrink-0 text-yellow-500" />
-                      <div>
-                        <p className="font-semibold mb-1">
-                          {t("publications.modal.edit.pendingReviewWarning") ||
-                            "Publicación en Revisión"}
-                        </p>
-                        <p className="opacity-90">
-                          {t(
-                            "publications.modal.edit.pendingReviewWarningHint",
-                          ) ||
-                            "Esta publicación está esperando aprobación. Debes aprobarla o rechazarla antes de poder editarla. Si la rechazas, el creador podrá hacer cambios y volver a solicitar aprobación."}
-                        </p>
-                      </div>
-                    </div>
+                    <AlertCard
+                      type="warning"
+                      title={t("publications.modal.edit.pendingReviewWarning") || "Publicación en Revisión"}
+                      message={
+                        t("publications.modal.edit.pendingReviewWarningHint") ||
+                        "Esta publicación está esperando aprobación. Debes aprobarla o rechazarla antes de poder editarla. Si la rechazas, el creador podrá hacer cambios y volver a solicitar aprobación."
+                      }
+                      className="animate-in fade-in slide-in-from-top-4"
+                    />
                   )}
 
                   {/* Alerta: Publicación aprobada */}
                   {publication?.status === "approved" &&
                     !hasPublishedPlatform && (
-                      <div className="p-4 rounded-lg border border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 flex gap-3 text-sm animate-in fade-in slide-in-from-top-4">
-                        <AlertCircle className="w-5 h-5 shrink-0 text-blue-500" />
-                        <div>
-                          <p className="font-semibold mb-1">
-                            {t("publications.modal.edit.approvedEditWarning") ||
-                              "Publicación Aprobada"}
-                          </p>
-                          <p className="opacity-80">
-                            {t(
-                              "publications.modal.edit.approvedEditWarningHint",
-                            ) ||
-                              "Esta publicación ya fue aprobada. Si realizas cambios, volverá a estado 'Pendiente' y requerirá una nueva aprobación."}
-                          </p>
-                        </div>
-                      </div>
+                      <AlertCard
+                        type="info"
+                        title={t("publications.modal.edit.approvedEditWarning") || "Publicación Aprobada"}
+                        message={
+                          t("publications.modal.edit.approvedEditWarningHint") ||
+                          "Esta publicación ya fue aprobada. Si realizas cambios, volverá a estado 'Pendiente' y requerirá una nueva aprobación."
+                        }
+                        className="animate-in fade-in slide-in-from-top-4"
+                      />
                     )}
 
 

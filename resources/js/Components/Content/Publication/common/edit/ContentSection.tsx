@@ -4,7 +4,8 @@ import { ContentType } from "@/Components/Content/Publication/common/ContentType
 import Input from "@/Components/common/Modern/Input";
 import Textarea from "@/Components/common/Modern/Textarea";
 import { useContentType } from "@/Hooks/publication/useContentType";
-import { FileText, Hash, Target } from "lucide-react";
+import { getFieldsConfig, isFieldRequired } from "@/constants/contentTypes";
+import { FileText, Hash, HelpCircle, Target } from "lucide-react";
 import { memo } from "react";
 import { FieldErrors, UseFormRegister, UseFormSetValue } from "react-hook-form";
 
@@ -35,22 +36,26 @@ const ContentSection = memo(
     contentType = 'post',
   }: ContentSectionProps) => {
     const { fieldVisibility, config } = useContentType(contentType);
+    const fieldsConfig = getFieldsConfig(contentType);
     
-    // Permitir hashtags en encuestas - los hashtags son útiles para todas las publicaciones
-    const shouldShowHashtags = fieldVisibility.showHashtags;
+    // Usar la configuración centralizada para determinar qué campos mostrar
+    const shouldShowTitle = !!fieldsConfig.title;
+    const shouldShowDescription = !!fieldsConfig.description;
+    const shouldShowHashtags = !!fieldsConfig.hashtags;
+    const shouldShowGoal = !!fieldsConfig.goal;
 
     const handleAiSuggestion = (data: any) => {
-      if (data.title && fieldVisibility.showTitle)
+      if (data.title && shouldShowTitle)
         setValue("title", data.title, {
           shouldValidate: true,
           shouldDirty: true,
         });
-      if (data.description && fieldVisibility.showDescription)
+      if (data.description && shouldShowDescription)
         setValue("description", data.description, {
           shouldValidate: true,
           shouldDirty: true,
         });
-      if (data.goal && fieldVisibility.showGoal)
+      if (data.goal && shouldShowGoal)
         setValue("goal", data.goal, {
           shouldValidate: true,
           shouldDirty: true,
@@ -75,28 +80,28 @@ const ContentSection = memo(
           />
         </div>
         
-        {fieldVisibility.showTitle && (
+        {shouldShowTitle && (
           <Input
             id="title"
-            label={contentType === 'poll' ? t("publications.modal.edit.questionField") || "Pregunta" : t("publications.modal.edit.titleField")}
+            label={t(fieldsConfig.title?.label || "publications.modal.edit.titleField")}
             type="text"
             register={register}
             name="title"
-            placeholder={contentType === 'poll' ? t("publications.modal.edit.placeholders.question") || "¿Cuál es tu pregunta?" : t("publications.modal.edit.placeholders.title")}
+            placeholder={t(fieldsConfig.title?.placeholder || "publications.modal.edit.placeholders.title")}
             error={errors.title?.message as string}
-            icon={FileText}
+            icon={contentType === 'poll' ? HelpCircle : FileText}
             variant="filled"
             sizeType="lg"
-            required
+            required={isFieldRequired(contentType, 'title')}
             hint={`${watched.title?.length || 0}/70 characters`}
             disabled={disabled}
           />
         )}
 
-        {fieldVisibility.showDescription && (
+        {shouldShowDescription && (
           <Textarea
             id="description"
-            label={t("publications.modal.edit.description")}
+            label={t(fieldsConfig.description?.label || "publications.modal.edit.description")}
             register={register}
             name="description"
             placeholder={t("publications.modal.edit.placeholders.description")}
@@ -104,7 +109,7 @@ const ContentSection = memo(
             icon={FileText}
             variant="filled"
             size="lg"
-            required={config.descriptionRequired}
+            required={isFieldRequired(contentType, 'description')}
             rows={contentType === 'story' ? 3 : 6}
             maxLength={config.descriptionMaxLength}
             showCharCount
@@ -113,10 +118,10 @@ const ContentSection = memo(
           />
         )}
 
-        {fieldVisibility.showGoal && (
+        {shouldShowGoal && (
           <Input
             id="goal"
-            label={t("publications.modal.edit.goal")}
+            label={t(fieldsConfig.goal?.label || "publications.modal.edit.goal")}
             type="text"
             register={register}
             name="goal"
@@ -125,22 +130,22 @@ const ContentSection = memo(
             icon={Target}
             variant="filled"
             sizeType="lg"
-            required
+            required={isFieldRequired(contentType, 'goal')}
             hint={`${watched.goal?.length || 0}/200 characters`}
             disabled={disabled}
           />
         )}
 
-        {/* Hashtags field - Ahora disponible para todos los tipos de contenido */}
+        {/* Hashtags field - Ahora controlado por la configuración centralizada */}
         {shouldShowHashtags && (
           <Input
             id="hashtags"
-            label={t("publications.modal.edit.hashtags")}
+            label={t(fieldsConfig.hashtags?.label || "publications.modal.edit.hashtags")}
             type="text"
             value={watched.hashtags || ""}
             name="hashtags"
             placeholder={t("publications.modal.edit.placeholders.hashtags")}
-            required={config.hashtagsRequired}
+            required={isFieldRequired(contentType, 'hashtags')}
             error={errors.hashtags?.message as string}
             onChange={(e) => {
               const value = e.target.value;

@@ -27,11 +27,17 @@ export const YouTubePreview = memo(
         {/* Video Player Area */}
         <div className="aspect-video bg-black relative flex items-center justify-center">
           {videoUrl ? (
-            <video
-              src={videoUrl}
-              className="w-full h-full object-contain"
-              controls
-            />
+            <div className="relative w-full h-full">
+              <video
+                src={videoUrl}
+                className="w-full h-full object-contain"
+                controls
+              />
+              {/* YouTube Short indicator for vertical videos */}
+              <div className="absolute top-3 left-3 bg-red-600 text-white px-2 py-1 rounded text-xs font-bold flex items-center gap-1">
+                ▶️ <span>SHORT</span>
+              </div>
+            </div>
           ) : imageUrl ? (
             <div className="w-full h-full relative">
               <img

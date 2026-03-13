@@ -134,12 +134,14 @@ export const FacebookPreview = memo(
         {contentType === 'poll' && pollOptions.length >= 2 && (
           <div className="mx-3 mb-3 border border-gray-200 dark:border-[#3e4042] rounded-lg overflow-hidden bg-gray-50 dark:bg-[#3a3b3c]">
             <div className="p-3 border-b border-gray-200 dark:border-[#3e4042] bg-white dark:bg-[#242526]">
-              <div className="text-sm font-semibold text-gray-900 dark:text-[#e4e6eb]">Poll</div>
-              <div className="text-xs text-gray-500 dark:text-[#b0b3b8] mt-1">
-                {pollDuration < 24 
-                  ? `${pollDuration} hour${pollDuration !== 1 ? 's' : ''} left`
-                  : `${Math.floor(pollDuration / 24)} day${Math.floor(pollDuration / 24) !== 1 ? 's' : ''} left`
-                } · 0 votes
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-semibold text-gray-900 dark:text-[#e4e6eb]">📊 Encuesta</span>
+                <div className="text-xs text-gray-500 dark:text-[#b0b3b8]">
+                  {pollDuration < 24 
+                    ? `${pollDuration} hora${pollDuration !== 1 ? 's' : ''} restante${pollDuration !== 1 ? 's' : ''}`
+                    : `${Math.floor(pollDuration / 24)} día${Math.floor(pollDuration / 24) !== 1 ? 's' : ''} restante${Math.floor(pollDuration / 24) !== 1 ? 's' : ''}`
+                  } · 0 votos
+                </div>
               </div>
             </div>
             {pollOptions.filter(option => option.trim()).map((option, index) => (

@@ -124,6 +124,13 @@ export const TikTokPreview = memo(
             For You
           </span>
         </div>
+
+        {/* Content Type Indicator */}
+        <div className="absolute top-16 left-3 z-10">
+          <div className="bg-black/70 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+            🎬 <span>REEL</span>
+          </div>
+        </div>
       </div>
     );
   },

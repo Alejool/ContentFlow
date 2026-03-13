@@ -12,13 +12,20 @@ interface PublicationState {
   publishingPlatforms: Record<number, number[]>;
   scheduledPlatforms: Record<number, number[]>;
   removedPlatforms: Record<number, number[]>;
+  duplicatePlatforms: Record<number, number[]>; // Plataformas con intentos duplicados
   recurringPosts: Record<number, Record<number, any[]>>; // publicationId -> accountId -> posts[]
   publishedRecurringPosts: Record<number, Record<number, any[]>>; // publicationId -> accountId -> posts[]
   retryInfo: Record<
     number,
     Record<
       number,
-      { retry_count: number; is_retrying: boolean; retry_status: string }
+      { 
+        retry_count: number; 
+        is_retrying: boolean; 
+        retry_status: string;
+        is_duplicate: boolean; // Indica si es un intento duplicado
+        original_attempt_at?: string; // Timestamp del intento original
+      }
     >
   >;
 
@@ -74,6 +81,7 @@ interface PublicationState {
   getRemovedPlatforms: (publicationId: number) => number[];
   getPublishingPlatforms: (publicationId: number) => number[];
   getScheduledPlatforms: (publicationId: number) => number[];
+  getDuplicatePlatforms: (publicationId: number) => number[]; // Getter para plataformas duplicadas
   getRetryInfo: (
     publicationId: number,
     platformId: number,
@@ -81,6 +89,8 @@ interface PublicationState {
     retry_count: number;
     is_retrying: boolean;
     retry_status: string;
+    is_duplicate: boolean;
+    original_attempt_at?: string;
   } | null;
 
   setPublishedPlatforms: (publicationId: number, accountIds: number[]) => void;
@@ -88,6 +98,7 @@ interface PublicationState {
   setRemovedPlatforms: (publicationId: number, accountIds: number[]) => void;
   setPublishingPlatforms: (publicationId: number, accountIds: number[]) => void;
   setScheduledPlatforms: (publicationId: number, accountIds: number[]) => void;
+  setDuplicatePlatforms: (publicationId: number, accountIds: number[]) => void; // Setter para plataformas duplicadas
 
   clearPageData: () => void;
   clearError: () => void;
@@ -109,6 +120,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
   publishingPlatforms: {},
   scheduledPlatforms: {},
   removedPlatforms: {},
+  duplicatePlatforms: {}, // Inicializar estado de duplicados
   recurringPosts: {},
   publishedRecurringPosts: {},
   retryInfo: {},
@@ -309,6 +321,8 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
         const publishing: number[] = [];
         const removed: number[] = [];
         const scheduled: number[] = [];
+        const duplicates: number[] = []; // Plataformas con intentos duplicados
+        const retryInfoUpdates: Record<number, any> = {};
 
         // Determine which social accounts have pending scheduled posts
         // to avoid marking them as "available" prematurely
@@ -319,29 +333,64 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
             .map((sp) => sp.social_account_id) || [],
         );
 
-        logs.forEach((log: any) => {
-          if (scheduledIds.has(log.social_account_id)) return;
+        // Agrupar logs por social_account_id para detectar duplicados
+        const logsByAccount = logs.reduce((acc: any, log: any) => {
+          if (!acc[log.social_account_id]) {
+            acc[log.social_account_id] = [];
+          }
+          acc[log.social_account_id].push(log);
+          return acc;
+        }, {});
 
-          const status = log.status;
-          const attempts = log.attempts || 0;
-          const maxAttempts = log.max_attempts || 3;
+        Object.entries(logsByAccount).forEach(([accountId, accountLogs]: [string, any]) => {
+          const socialAccountId = parseInt(accountId);
+          if (scheduledIds.has(socialAccountId)) return;
 
-          if (status === "published" || status === "success") {
-            published.push(log.social_account_id);
+          // Ordenar logs por fecha de creación (más reciente primero)
+          const sortedLogs = (accountLogs as any[]).sort((a, b) => 
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
+
+          const latestLog = sortedLogs[0];
+          const status = latestLog.status;
+          const attempts = latestLog.attempts || 0;
+          const maxAttempts = latestLog.max_attempts || 3;
+
+          // Detectar intentos duplicados: si hay múltiples logs activos (publishing/pending)
+          const activeAttempts = sortedLogs.filter(log => 
+            log.status === 'publishing' || log.status === 'pending'
+          );
+          
+          const isDuplicate = activeAttempts.length > 1;
+          const originalAttempt = isDuplicate ? sortedLogs[sortedLogs.length - 1] : null;
+
+          // Actualizar retry info con información de duplicados
+          retryInfoUpdates[socialAccountId] = {
+            retry_count: attempts,
+            is_retrying: latestLog.is_retrying || false,
+            retry_status: latestLog.retry_status || status,
+            is_duplicate: isDuplicate,
+            original_attempt_at: originalAttempt?.created_at
+          };
+
+          if (isDuplicate) {
+            duplicates.push(socialAccountId);
+          } else if (status === "published" || status === "success") {
+            published.push(socialAccountId);
           } else if (
             status === "failed" ||
             (status === "pending" && attempts >= maxAttempts)
           ) {
             // Mark as failed if explicitly failed OR if all retry attempts exhausted
-            failed.push(log.social_account_id);
+            failed.push(socialAccountId);
           } else if (
             (status === "publishing" || status === "pending") &&
             attempts < maxAttempts
           ) {
             // Only show as publishing if actively in progress and retries remain
-            publishing.push(log.social_account_id);
+            publishing.push(socialAccountId);
           } else if (status === "removed_on_platform" || status === "deleted") {
-            removed.push(log.social_account_id);
+            removed.push(socialAccountId);
           }
         });
 
@@ -360,6 +409,17 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
         newPlatformStatusUpdates.removedPlatforms = {
           ...state.removedPlatforms,
           [id]: Array.from(new Set(removed)),
+        };
+        newPlatformStatusUpdates.duplicatePlatforms = {
+          ...state.duplicatePlatforms,
+          [id]: Array.from(new Set(duplicates)),
+        };
+        newPlatformStatusUpdates.retryInfo = {
+          ...state.retryInfo,
+          [id]: {
+            ...state.retryInfo[id],
+            ...retryInfoUpdates
+          }
         };
       }
 
@@ -530,6 +590,8 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
   getScheduledPlatforms: (id) => get().scheduledPlatforms[id] ?? [],
 
+  getDuplicatePlatforms: (id) => get().duplicatePlatforms[id] ?? [], // Getter para plataformas duplicadas
+
   getRecurringPosts: (publicationId: number, accountId: number) => 
     get().recurringPosts[publicationId]?.[accountId] ?? [],
   
@@ -566,6 +628,11 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       scheduledPlatforms: { ...state.scheduledPlatforms, [id]: accounts },
     })),
 
+  setDuplicatePlatforms: (id, accounts) =>
+    set((state) => ({
+      duplicatePlatforms: { ...state.duplicatePlatforms, [id]: accounts },
+    })),
+
   clearPageData: () =>
     set((state) => ({
       // Clear publications array to free memory
@@ -576,6 +643,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       publishingPlatforms: {},
       scheduledPlatforms: {},
       removedPlatforms: {},
+      duplicatePlatforms: {}, // Limpiar cache de duplicados
       recurringPosts: {},
       publishedRecurringPosts: {},
       retryInfo: {},

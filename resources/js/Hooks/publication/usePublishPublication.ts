@@ -19,11 +19,18 @@ export interface PublishPublicationState {
   publishingPlatforms: number[];
   scheduledPlatforms: number[];
   removedPlatforms: number[];
+  duplicatePlatforms: number[]; // Plataformas con intentos duplicados
   unpublishing: number | null;
   youtubeThumbnails: Record<number, File | null>;
   existingThumbnails: Record<number, { url: string; id: number }>;
   isLoadingThumbnails: boolean;
-  retryInfo: Record<number, { retry_count: number; is_retrying: boolean; retry_status: string }>;
+  retryInfo: Record<number, { 
+    retry_count: number; 
+    is_retrying: boolean; 
+    retry_status: string;
+    is_duplicate: boolean;
+    original_attempt_at?: string;
+  }>;
   
   getRecurringPosts: (publicationId: number, accountId: number) => any[];
   getPublishedRecurringPosts: (publicationId: number, accountId: number) => any[];
@@ -90,6 +97,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     (s) => s.scheduledPlatforms,
   );
   const removedPlatformsCache = usePublicationStore((s) => s.removedPlatforms);
+  const duplicatePlatformsCache = usePublicationStore((s) => s.duplicatePlatforms); // Cache de plataformas duplicadas
   const retryInfoCache = usePublicationStore((s) => s.retryInfo);
 
   const fetchPublishedPlatformsFromStore = usePublicationStore(
@@ -206,6 +214,12 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
       ? removedPlatformsCache[currentPublicationId] || []
       : [];
   }, [removedPlatformsCache, currentPublicationId]);
+  
+  const duplicatePlatforms = useMemo(() => {
+    return currentPublicationId
+      ? duplicatePlatformsCache[currentPublicationId] || []
+      : [];
+  }, [duplicatePlatformsCache, currentPublicationId]);
   
   const retryInfo = useMemo(() => {
     return currentPublicationId
@@ -366,6 +380,12 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         return;
       }
       
+      // Prevent toggling if platform has duplicate attempts
+      if (duplicatePlatforms.includes(accountId)) {
+        toast.error("Esta plataforma tiene un intento de publicación duplicado. Espera a que termine el proceso actual.");
+        return;
+      }
+      
       // Prevent toggling if platform is currently retrying
       const platformRetry = retryInfoCache[currentPublicationId || 0]?.[accountId];
       if (platformRetry?.is_retrying) {
@@ -378,7 +398,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
           : [...prev, accountId],
       );
     },
-    [publishedPlatforms, scheduledPlatforms, retryInfoCache, currentPublicationId],
+    [publishedPlatforms, scheduledPlatforms, duplicatePlatforms, retryInfoCache, currentPublicationId],
   );
 
   const selectAll = useCallback(() => {
@@ -603,6 +623,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     publishedPlatforms,
     failedPlatforms,
     removedPlatforms,
+    duplicatePlatforms, // Agregar estado de duplicados
     publishingPlatforms,
     scheduledPlatforms,
     publishing,

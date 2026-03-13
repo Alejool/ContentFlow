@@ -13,6 +13,8 @@
         "locked": "El tipo de contenido está bloqueado después de subir archivos multimedia"
       },
       "poll": {
+        "question":"Pregunta de la Encuesta",
+        "questionPlaceholder": "Escribe tu pregunta aqui",
         "title": "Opciones de Encuesta",
         "options": "Opciones de la Encuesta (2-4 opciones)",
         "optionPlaceholder": "Opción",
@@ -87,6 +89,7 @@
           "hashtagMax": "Máximo 10 hashtags permitidos",
           "scheduledMinDifference": "La fecha debe ser al menos 1 minuto después de la actual",
           "scheduledAtRequired": "La fecha es requerida si la programación global está activada",
+          "pollScheduleRequired": "La fecha de programación es requerida para encuestas cuando se activa la programación global",
           "recurrenceDaysRequired": "Selected al menos un día para la recurrencia semanal",
           "recurrence_days": "Días de repetición no válidos",
           "durationErrors": "Por favor, corrige los errores de duracin antes de guardar.",

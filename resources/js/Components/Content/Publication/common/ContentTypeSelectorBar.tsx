@@ -1,7 +1,7 @@
-import { REEL_COMPATIBLE_PLATFORMS } from '@/Constants/contentTypes';
+import { CONTENT_TYPE_CONFIG, ContentType } from '@/Constants/contentTypes';
 import { AlertCircle } from "lucide-react";
 import { useMemo } from "react";
-import ContentTypeIconSelector, { ContentType } from "./ContentTypeIconSelector";
+import ContentTypeIconSelector from "./ContentTypeIconSelector";
 
 interface ContentTypeSelectorBarProps {
   selectedType: ContentType;
@@ -11,33 +11,6 @@ interface ContentTypeSelectorBarProps {
   disabled?: boolean;
   mediaFiles?: Array<{ mime_type?: string; type?: string }>;
 }
-
-// Content type validation rules (mirroring backend config/content_types.php)
-const CONTENT_TYPE_RULES: Record<ContentType, {
-  platforms: string[];
-  media: { required: boolean; min_count: number; max_count: number; types: string[] };
-}> = {
-  post: {
-    platforms: ['instagram', 'twitter', 'facebook', 'linkedin', 'youtube', 'pinterest', 'tiktok'],
-    media: { required: false, min_count: 0, max_count: 10, types: ['image', 'video'] },
-  },
-  reel: {
-    platforms: [...REEL_COMPATIBLE_PLATFORMS],
-    media: { required: true, min_count: 1, max_count: 1, types: ['video'] },
-  },
-  story: {
-    platforms: ['instagram', 'facebook', 'twitter', 'linkedin', 'youtube', 'pinterest', 'tiktok'],
-    media: { required: true, min_count: 1, max_count: 1, types: ['image', 'video'] },
-  },
-  carousel: {
-    platforms: ['instagram', 'facebook', 'linkedin', 'twitter', 'youtube', 'pinterest', 'tiktok'],
-    media: { required: true, min_count: 2, max_count: 10, types: ['image', 'video'] },
-  },
-  poll: {
-    platforms: ['twitter'], // Solo Twitter soporta encuestas nativas
-    media: { required: false, min_count: 0, max_count: 4, types: ['image', 'video'] },
-  },
-};
 
 /**
  * Validates if a content type is supported by all selected platforms
@@ -50,9 +23,9 @@ function validateContentTypePlatforms(
     return { isValid: true, unsupportedPlatforms: [] };
   }
 
-  const rules = CONTENT_TYPE_RULES[contentType];
+  const rules = CONTENT_TYPE_CONFIG[contentType];
   const unsupportedPlatforms = platforms.filter(
-    (platform) => !rules.platforms.includes(platform.toLowerCase())
+    (platform) => !(rules.platforms as readonly string[]).includes(platform.toLowerCase())
   );
 
   return {
@@ -68,7 +41,7 @@ function validateMediaFiles(
   contentType: ContentType,
   mediaFiles?: Array<{ mime_type?: string; type?: string }>
 ): { isValid: boolean; error: string | null } {
-  const rules = CONTENT_TYPE_RULES[contentType];
+  const rules = CONTENT_TYPE_CONFIG[contentType];
   const fileCount = mediaFiles?.length || 0;
 
   // Check file count
@@ -152,7 +125,7 @@ export default function ContentTypeSelectorBar({
 
     // Media validation warnings
     if (mediaValidation.error) {
-      const rules = CONTENT_TYPE_RULES[selectedType];
+      const rules = CONTENT_TYPE_CONFIG[selectedType];
       
       switch (mediaValidation.error) {
         case 'media_required':

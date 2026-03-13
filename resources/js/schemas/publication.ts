@@ -115,7 +115,6 @@ export const publicationSchema = (t: any, contentType: string = 'post') => {
           {
             message: t("publications.modal.validation.scheduledMinDifference") ||
               "La fecha debe ser al menos 1 minuto después de la actual",
-            // Only apply this validation when the field has a value
             path: ["scheduled_at"]
           }
         ),
@@ -171,6 +170,12 @@ export const publicationSchema = (t: any, contentType: string = 'post') => {
     })
     .refine(
       (data) => {
+        // Special handling for polls - they don't require scheduling validation
+        // if use_global_schedule is false
+        if (data.content_type === "poll" && !data.use_global_schedule) {
+          return true; // Skip scheduled_at validation for polls without global schedule
+        }
+        
         // If "use_global_schedule" is checked, we require a valid date.
         if (data.use_global_schedule) {
           if (!data.scheduled_at || data.scheduled_at === "" || data.scheduled_at === null) {
@@ -179,7 +184,23 @@ export const publicationSchema = (t: any, contentType: string = 'post') => {
           
           try {
             const scheduledDate = new Date(data.scheduled_at);
-            return !isNaN(scheduledDate.getTime());
+            const now = new Date();
+            
+            // Check if the date is valid
+            if (isNaN(scheduledDate.getTime())) {
+              return false;
+            }
+            
+            // For polls, be more lenient with the time requirement
+            if (data.content_type === "poll") {
+              // Allow polls to be scheduled with less strict time requirements
+              const diffInSeconds = (scheduledDate.getTime() - now.getTime()) / 1000;
+              return diffInSeconds > 0; // Just needs to be in the future
+            }
+            
+            // For other content types, require 1 minute in the future
+            const diffInSeconds = (scheduledDate.getTime() - now.getTime()) / 1000;
+            return diffInSeconds > 60;
           } catch {
             return false;
           }

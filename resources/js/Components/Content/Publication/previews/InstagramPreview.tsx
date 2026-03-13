@@ -1,11 +1,11 @@
 import { Avatar } from "@/Components/common/Avatar";
 import { format } from "date-fns";
 import {
-  Bookmark,
-  Heart,
-  MessageCircle,
-  MoreHorizontal,
-  Send,
+    Bookmark,
+    Heart,
+    MessageCircle,
+    MoreHorizontal,
+    Send,
 } from "lucide-react";
 
 interface InstagramPreviewProps {
@@ -47,19 +47,35 @@ export const InstagramPreview = ({
       {/* Media */}
       <div className="relative aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
         {mediaUrls.length > 0 ? (
-          mediaUrls[0].match(/\.(mp4|mov|webm)$/i) ? (
-            <video
-              src={mediaUrls[0]}
-              className="w-full h-full object-cover"
-              controls={false}
-            />
-          ) : (
-            <img
-              src={mediaUrls[0]}
-              alt="Post media"
-              className="w-full h-full object-cover"
-            />
-          )
+          <>
+            {mediaUrls[0].match(/\.(mp4|mov|webm)$/i) ? (
+              <div className="relative w-full h-full">
+                <video
+                  src={mediaUrls[0]}
+                  className="w-full h-full object-cover"
+                  controls={false}
+                />
+                {/* Reel indicator */}
+                <div className="absolute top-3 left-3 bg-black/70 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+                  🎬 <span>REEL</span>
+                </div>
+              </div>
+            ) : (
+              <div className="relative w-full h-full">
+                <img
+                  src={mediaUrls[0]}
+                  alt="Post media"
+                  className="w-full h-full object-cover"
+                />
+                {/* Carousel indicator */}
+                {mediaUrls.length > 1 && (
+                  <div className="absolute top-3 left-3 bg-black/70 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+                    🎠 <span>CAROUSEL</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </>
         ) : (
           <span className="text-gray-400 italic text-sm">
             No media selected

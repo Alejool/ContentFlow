@@ -1,3 +1,5 @@
+import { getMediaRulesForContentType, type ContentType } from "@/Components/Content/Publication/common/ContentTypeSelector";
+import { useContentTypeSuggestion } from "@/Hooks/publication/useContentTypeSuggestion";
 import { useS3Upload } from "@/Hooks/useS3Upload";
 import { validateVideoDuration } from "@/Utils/validationUtils";
 import { PublicationFormData, publicationSchema } from "@/schemas/publication";
@@ -30,6 +32,7 @@ export const usePublicationForm = ({
   isOpen,
 }: UsePublicationFormProps) => {
   const { t, i18n } = useTranslation();
+  const contentTypeSuggestion = useContentTypeSuggestion();
 
   const safeJsonParse = (value: any): any => {
     if (!value) return {};
@@ -291,10 +294,6 @@ export const usePublicationForm = ({
       if (isInitialLoad) {
         setIsDataReady(false); // Trigger Phase 2 re-processing safely
       }
-
-      // Sync platform settings (complex JSON, not in reset)
-      // Check if user has touched platform settings locally? No easy way, but usually safe
-      setPlatformSettings(safeJsonParse(publication.platform_settings));
     } else if (isOpen && !publication) {
       // Logic for NEW publication
       reset({
@@ -539,10 +538,170 @@ export const usePublicationForm = ({
     }
   }, [isOpen, publication]); // REMOVED isDirty dependency to allow media sync
 
+  // Auto-suggest content type based on media files
+  useEffect(() => {
+    if (!isOpen || mediaFiles.length === 0) return;
+    
+    const currentType = form.getValues('content_type');
+    
+    // Only suggest if we have completed media files (not uploading)
+    const completedFiles = mediaFiles.filter(f => f.status === 'completed');
+    if (completedFiles.length === 0) return;
+    
+    // Prepare media data for suggestion API
+    const mediaData = completedFiles.map(file => {
+      const metadata = videoMetadata[file.tempId];
+      return {
+        mime_type: file.type,
+        duration: metadata?.duration,
+        file_type: file.type.startsWith('video/') ? 'video' : 'image',
+      };
+    });
+    
+    contentTypeSuggestion.mutate({
+      media: mediaData,
+      current_type: currentType,
+    }, {
+      onSuccess: (result) => {
+        if (result.should_change && result.suggested_type !== currentType) {
+          // Show a toast notification about the suggestion
+          toast.success(
+            `Se sugiere cambiar el tipo de contenido a "${result.suggested_type}" basado en los archivos subidos.`
+          );
+          
+          // Auto-change the content type
+          form.setValue('content_type', result.suggested_type as ContentType, { shouldValidate: true });
+          setCurrentContentType(result.suggested_type);
+        }
+      },
+      onError: (error) => {
+        console.warn('Content type suggestion failed:', error);
+      }
+    });
+  }, [mediaFiles, videoMetadata, isOpen, form, contentTypeSuggestion]);
+
   const handleFileChange = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
     const newFiles = Array.from(files);
+    const contentType = watch("content_type") as ContentType || 'post';
+    const mediaRules = getMediaRulesForContentType(contentType);
+    
+    // Get current media counts
+    const currentImages = mediaFiles.filter(m => m.type.includes('image')).length;
+    const currentVideos = mediaFiles.filter(m => m.type.includes('video')).length;
+    const currentTotal = currentImages + currentVideos;
+
+    // Validate content type restrictions
+    const newImages = newFiles.filter(f => f.type.startsWith('image/')).length;
+    const newVideos = newFiles.filter(f => f.type.startsWith('video/')).length;
+    
+    // Check if content type allows these file types
+    if (mediaRules.videoOnly && newImages > 0) {
+      toast.error(
+        t("publications.validation.reel_requires_video_only", {
+          defaultValue: "Los Reels solo permiten videos, no imágenes"
+        })
+      );
+      setImageError(
+        t("publications.validation.reel_requires_video_only", {
+          defaultValue: "Los Reels solo permiten videos, no imágenes"
+        })
+      );
+      return;
+    }
+
+    if (mediaRules.imageOnly && newVideos > 0) {
+      toast.error(
+        t("publications.validation.image_only", {
+          defaultValue: "Este tipo de contenido solo permite imágenes"
+        })
+      );
+      setImageError(
+        t("publications.validation.image_only", {
+          defaultValue: "Este tipo de contenido solo permite imágenes"
+        })
+      );
+      return;
+    }
+
+    // Check count limits
+    if (mediaRules.maxImages !== undefined && mediaRules.maxImages === 0 && newImages > 0) {
+      toast.error(
+        t("publications.validation.no_images_allowed", {
+          defaultValue: "Este tipo de contenido no permite imágenes"
+        })
+      );
+      setImageError(
+        t("publications.validation.no_images_allowed", {
+          defaultValue: "Este tipo de contenido no permite imágenes"
+        })
+      );
+      return;
+    }
+
+    if (mediaRules.maxVideos !== undefined && mediaRules.maxVideos === 0 && newVideos > 0) {
+      toast.error(
+        t("publications.validation.no_videos_allowed", {
+          defaultValue: "Este tipo de contenido no permite videos"
+        })
+      );
+      setImageError(
+        t("publications.validation.no_videos_allowed", {
+          defaultValue: "Este tipo de contenido no permite videos"
+        })
+      );
+      return;
+    }
+
+    // Check if adding these files would exceed limits
+    if (mediaRules.maxImages && (currentImages + newImages) > mediaRules.maxImages) {
+      toast.error(
+        t("publications.validation.max_images_exceeded", {
+          defaultValue: `Máximo ${mediaRules.maxImages} imagen(es) permitida(s)`,
+          max: mediaRules.maxImages
+        })
+      );
+      setImageError(
+        t("publications.validation.max_images_exceeded", {
+          defaultValue: `Máximo ${mediaRules.maxImages} imagen(es) permitida(s)`,
+          max: mediaRules.maxImages
+        })
+      );
+      return;
+    }
+
+    if (mediaRules.maxVideos && (currentVideos + newVideos) > mediaRules.maxVideos) {
+      toast.error(
+        t("publications.validation.max_videos_exceeded", {
+          defaultValue: `Máximo ${mediaRules.maxVideos} video(s) permitido(s)`,
+          max: mediaRules.maxVideos
+        })
+      );
+      setImageError(
+        t("publications.validation.max_videos_exceeded", {
+          defaultValue: `Máximo ${mediaRules.maxVideos} video(s) permitido(s)`,
+          max: mediaRules.maxVideos
+        })
+      );
+      return;
+    }
+
+    if (mediaRules.maxCount && (currentTotal + newFiles.length) > mediaRules.maxCount) {
+      toast.error(
+        t("publications.validation.max_files_exceeded", {
+          defaultValue: `Máximo ${mediaRules.maxCount} archivo(s) permitido(s)`,
+          max: mediaRules.maxCount
+        })
+      );
+      setImageError(
+        t("publications.validation.max_files_exceeded", {
+          defaultValue: `Máximo ${mediaRules.maxCount} archivo(s) permitido(s)`,
+          max: mediaRules.maxCount
+        })
+      );
+      return;
+    }
 
     // Block SVG files for security reasons (can contain malicious scripts)
     const svgFiles = newFiles.filter(
@@ -566,7 +725,7 @@ export const usePublicationForm = ({
       );
       return;
     }
-    const newVideos = newFiles.filter((f) => f.type.startsWith("video/"));
+    const videoFiles = newFiles.filter((f) => f.type.startsWith("video/"));
 
     const newMediaItems = newFiles.map((file) => ({
       tempId: Math.random().toString(36).substring(7),
@@ -922,27 +1081,77 @@ export const usePublicationForm = ({
         "rejected",
       ];
       
-      // Si el status es "scheduled" pero no hay fecha programada, establecer una por defecto
+      // Manejar scheduled_at según el tipo de contenido y configuración
       let scheduledAtValue = data.scheduled_at;
-      if (currentStatus === "scheduled" && !scheduledAtValue) {
-        const defaultDate = new Date();
-        defaultDate.setMinutes(defaultDate.getMinutes() + 2); // 2 minutos en el futuro
-        scheduledAtValue = defaultDate.toISOString();
-        // Actualizar el formulario con la fecha por defecto
-        setValue("scheduled_at", scheduledAtValue, { shouldDirty: true });
+      const contentType = data.content_type || 'post';
+      const useGlobalSchedule = data.use_global_schedule;
+      
+      console.log('=== SCHEDULED_AT LOGIC DEBUG ===');
+      console.log('Content type:', contentType);
+      console.log('Use global schedule:', useGlobalSchedule);
+      console.log('Current status:', currentStatus);
+      console.log('Original scheduled_at:', scheduledAtValue);
+      
+      // Para encuestas (polls), la lógica es diferente
+      if (contentType === 'poll') {
+        // Si use_global_schedule está desactivado, NO enviar scheduled_at global
+        // Cada red social tendrá su propia fecha en accountSchedules
+        if (!useGlobalSchedule) {
+          console.log('Poll without global schedule - clearing scheduled_at');
+          scheduledAtValue = null;
+        } else if (currentStatus === "scheduled" && !scheduledAtValue) {
+          // Solo si use_global_schedule está activo y no hay fecha, establecer una por defecto
+          const defaultDate = new Date();
+          defaultDate.setMinutes(defaultDate.getMinutes() + 2);
+          scheduledAtValue = defaultDate.toISOString();
+          setValue("scheduled_at", scheduledAtValue, { shouldDirty: true });
+          console.log('Poll with global schedule - set default date:', scheduledAtValue);
+        }
+      } else {
+        // Para otros tipos de contenido, mantener la lógica original
+        if (currentStatus === "scheduled" && !scheduledAtValue) {
+          const defaultDate = new Date();
+          defaultDate.setMinutes(defaultDate.getMinutes() + 2);
+          scheduledAtValue = defaultDate.toISOString();
+          setValue("scheduled_at", scheduledAtValue, { shouldDirty: true });
+          console.log('Non-poll content - set default date:', scheduledAtValue);
+        }
       }
       
-      const finalStatus =
-        socialAccounts.length === 0 &&
-        !scheduledAtValue &&
-        currentStatus !== "published"
-          ? "draft"
-          : validStatuses.includes(currentStatus)
-            ? currentStatus
-            : "draft";
+      console.log('Final scheduled_at value:', scheduledAtValue);
+      
+      const finalStatus = (() => {
+        // Si no hay cuentas sociales y no hay fecha programada, siempre es draft
+        if (socialAccounts.length === 0 && !scheduledAtValue) {
+          return "draft";
+        }
+        
+        // Para encuestas sin programación global, puede ser published directamente
+        if (contentType === 'poll' && !useGlobalSchedule && !scheduledAtValue) {
+          // Si hay cuentas sociales pero no programación global, puede ser published
+          return socialAccounts.length > 0 ? (currentStatus === "published" ? "published" : "draft") : "draft";
+        }
+        
+        // Para otros casos, usar el status actual si es válido
+        return validStatuses.includes(currentStatus) ? currentStatus : "draft";
+      })();
 
+      console.log('Final status:', finalStatus);
       formData.append("status", finalStatus);
-      formData.append("scheduled_at", scheduledAtValue || "");
+      
+      // Solo enviar scheduled_at si realmente hay una fecha programada Y no es una encuesta sin programación global
+      const shouldSendScheduledAt = scheduledAtValue && 
+                                   scheduledAtValue.trim() !== "" && 
+                                   !(contentType === 'poll' && !useGlobalSchedule);
+      
+      console.log('Should send scheduled_at:', shouldSendScheduledAt);
+      
+      if (shouldSendScheduledAt) {
+        formData.append("scheduled_at", scheduledAtValue);
+        console.log('Added scheduled_at to formData:', scheduledAtValue);
+      } else {
+        console.log('Skipped adding scheduled_at to formData');
+      }
       
       formData.append("social_accounts_sync", "true");
 
@@ -1070,10 +1279,6 @@ export const usePublicationForm = ({
         removedThumbnailIds.forEach((id) =>
           formData.append("removed_thumbnail_ids[]", id.toString()),
         );
-      }
-
-      if (platformSettings) {
-        formData.append("platform_settings", JSON.stringify(platformSettings));
       }
 
       let result: any;
@@ -1275,10 +1480,19 @@ export const usePublicationForm = ({
           return true;
         }
         // Skip scheduled_at errors if use_global_schedule is false OR if scheduled_at is empty
+        // OR if it's a poll without scheduling requirements
         if (key === 'scheduled_at') {
           const hasGlobalSchedule = watched.use_global_schedule;
           const hasScheduledValue = watched.scheduled_at && watched.scheduled_at.trim() !== '';
-          console.log('Scheduled_at validation - global schedule:', hasGlobalSchedule, 'has value:', hasScheduledValue);
+          const isPoll = contentType === 'poll';
+          
+          console.log('Scheduled_at validation - content type:', contentType, 'global schedule:', hasGlobalSchedule, 'has value:', hasScheduledValue, 'is poll:', isPoll);
+          
+          // For polls, skip scheduled_at validation entirely if no global schedule is set
+          if (isPoll && !hasGlobalSchedule) {
+            console.log('Skipping scheduled_at validation for poll without global schedule');
+            return false;
+          }
           
           // Only validate scheduled_at if global schedule is enabled AND there's actually a value
           if (!hasGlobalSchedule || !hasScheduledValue) {

@@ -1,6 +1,7 @@
 import Button from "@/Components/common/Modern/Button";
 import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
 import RejectionReasonModal from "@/Components/Content/modals/RejectionReasonModal";
+import { CONTENT_TYPE_CONFIG } from "@/Constants/contentTypes";
 import { getPlatformConfig } from "@/Constants/socialPlatforms";
 import { usePublishPublication } from "@/Hooks/publication/usePublishPublication";
 import { useConfirm } from "@/Hooks/useConfirm";
@@ -132,6 +133,7 @@ export default function PublishPublicationModal({
     publishedPlatforms,
     failedPlatforms,
     removedPlatforms,
+    duplicatePlatforms, // Agregar estado de duplicados
     publishingPlatforms,
     scheduledPlatforms,
     publishing,
@@ -270,32 +272,31 @@ export default function PublishPublicationModal({
   // Early return after all hooks
   if (!publication) return null;
 
+  // Function to translate content type to human readable format
+  const getContentTypeLabel = (contentType: string) => {
+    const labels: Record<string, string> = {
+      'post': t('publications.contentTypes.post') || 'Publicación',
+      'reel': t('publications.contentTypes.reel') || 'Reel',
+      'story': t('publications.contentTypes.story') || 'Historia',
+      'poll': t('publications.contentTypes.poll') || 'Encuesta',
+      'carousel': t('publications.contentTypes.carousel') || 'Carrusel'
+    };
+    return labels[contentType] || contentType;
+  };
+
   // Function to get supported content types for each platform
   const getSupportedContentTypes = (platform: string): string[] => {
-    // Use the shared configuration from constants, but with explicit typing
     const supportedTypes: string[] = [];
-    
-    // Check reel compatibility using the shared constant
-    if (platform.toLowerCase() === 'instagram') {
-      supportedTypes.push('post', 'reel', 'story', 'carousel');
-    } else if (platform.toLowerCase() === 'twitter') {
-      supportedTypes.push('post', 'poll');
-    } else if (platform.toLowerCase() === 'tiktok') {
-      supportedTypes.push('reel');
-    } else if (platform.toLowerCase() === 'youtube') {
-      supportedTypes.push('post', 'reel');
-    } else if (platform.toLowerCase() === 'facebook') {
-      supportedTypes.push('post', 'story', 'reel'); // Facebook no soporta encuestas nativas
-    } else if (platform.toLowerCase() === 'linkedin') {
-      supportedTypes.push('post', 'carousel');
-    } else if (platform.toLowerCase() === 'pinterest') {
-      supportedTypes.push('post', 'carousel');
-    } else {
-      supportedTypes.push('post');
+
+    // Find which content types support this platform using shared config
+    for (const [contentType, config] of Object.entries(CONTENT_TYPE_CONFIG)) {
+      if ((config.platforms as readonly string[]).includes(platform.toLowerCase())) {
+        supportedTypes.push(contentType);
+      }
     }
 
     return supportedTypes;
-  };
+  }
 
   // Filter connected accounts based on content type compatibility
   const getCompatibleAccounts = () => {
@@ -638,8 +639,10 @@ export default function PublishPublicationModal({
                       {t("publications.modal.publish.incompatibleAccountsBanner.title") || "Cuentas No Compatibles"}
                     </h4>
                     <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
-                      {t("publications.modal.publish.incompatibleAccountsBanner.message") ||
-                        `Las siguientes cuentas no son compatibles con el tipo de contenido "${publication.content_type || 'post'}":`}
+                      {t("publications.modal.publish.incompatibleAccountsBanner.message", {
+                        contentType: getContentTypeLabel(publication.content_type || 'post')
+                      }) ||
+                        `Las siguientes cuentas no son compatibles con el tipo de contenido "${getContentTypeLabel(publication.content_type || 'post')}":`}
                     </p>
 
                     <div className="mt-2 flex flex-wrap gap-2">
@@ -717,6 +720,7 @@ export default function PublishPublicationModal({
                     const isRemovedPlatform = removedPlatforms.includes(
                       account.id,
                     );
+                    const isDuplicate = duplicatePlatforms.includes(account.id); // Estado de duplicado
                     // Mostrar "publishing" si la publicación está en estado "publishing" o "retrying" Y está en la lista
                     const isPublishing = publishingPlatforms.includes(account.id) &&
                       (publication?.status === "publishing" || publication?.status === "retrying");
@@ -727,6 +731,8 @@ export default function PublishPublicationModal({
                     const platformRetryInfo = retryInfo[account.id];
                     const isRetrying = platformRetryInfo?.is_retrying || false;
                     const retryStatus = platformRetryInfo?.retry_status || null;
+                    const isDuplicateAttempt = platformRetryInfo?.is_duplicate || false;
+                    const originalAttemptAt = platformRetryInfo?.original_attempt_at;
 
                     return (
                       <div
@@ -735,17 +741,19 @@ export default function PublishPublicationModal({
                       >
                         <div
                           onClick={() => {
-                            // Solo permitir toggle si no está publicado, programado, reintentando, o activamente publicando
-                            if (!isPublished && !isScheduled && !isPublishing && !isRetrying) {
+                            // Solo permitir toggle si no está publicado, programado, reintentando, duplicado, o activamente publicando
+                            if (!isPublished && !isScheduled && !isPublishing && !isRetrying && !isDuplicate && !isDuplicateAttempt) {
                               togglePlatform(account.id);
                             }
                           }}
                           className={`w-full h-[110px] flex flex-col gap-3 p-4 rounded-lg transition-all relative ${
-                            !isPublished && !isScheduled && !isPublishing && !isRetrying
+                            !isPublished && !isScheduled && !isPublishing && !isRetrying && !isDuplicate && !isDuplicateAttempt
                               ? "cursor-pointer"
                               : "cursor-default"
                           } ${
-                            isPublishing || isRetrying
+                            isDuplicate || isDuplicateAttempt
+                              ? "border border-orange-500 bg-orange-50 dark:bg-orange-900/20"
+                              : isPublishing || isRetrying
                               ? "border border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20"
                               : isPublished
                                 ? "border border-green-500 bg-green-50 dark:bg-green-900/20"
@@ -834,6 +842,34 @@ export default function PublishPublicationModal({
                                   {t("publications.modal.publish.unpublishing") ||
                                     "Despublicando..."}
                                 </span>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Duplicate Attempt Overlay */}
+                          {(isDuplicate || isDuplicateAttempt) && !isPublished && !isScheduled && (
+                            <div className="absolute inset-0 z-30 bg-orange-50/95 dark:bg-orange-900/30 backdrop-blur-sm flex flex-col items-center justify-center rounded-lg animate-in fade-in duration-300">
+                              <div className="flex flex-col items-center gap-2">
+                                <div className="relative flex-shrink-0">
+                                  <div className="w-10 h-10 bg-orange-100 dark:bg-orange-900/50 rounded-full flex items-center justify-center">
+                                    <svg className="w-6 h-6 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                    </svg>
+                                  </div>
+                                </div>
+                                <div className="flex flex-col items-center gap-0.5">
+                                  <span className="text-sm font-bold text-orange-800 dark:text-orange-300 tracking-wide capitalize">
+                                    {account.platform}
+                                  </span>
+                                  <span className="text-xs font-medium text-orange-600 dark:text-orange-400 text-center">
+                                    {t("publications.modal.publish.duplicate") || "Intento duplicado"}
+                                  </span>
+                                  {originalAttemptAt && (
+                                    <span className="text-xs text-orange-500 dark:text-orange-500 text-center mt-1">
+                                      {t("publications.modal.publish.original_attempt") || "Intento original:"} {new Date(originalAttemptAt).toLocaleString()}
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                             </div>
                           )}

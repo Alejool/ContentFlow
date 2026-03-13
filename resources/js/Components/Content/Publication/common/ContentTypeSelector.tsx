@@ -87,7 +87,9 @@ const contentTypes: ContentTypeOption[] = [
     platforms: [...REEL_COMPATIBLE_PLATFORMS],
     mediaRules: {
       maxVideos: 1,
+      maxImages: 0, // No permite imágenes
       videoOnly: true, // Solo permite video
+      allowMixed: false,
     }
   },
   {
@@ -97,9 +99,10 @@ const contentTypes: ContentTypeOption[] = [
     icon: Clock,
     platforms: ['instagram', 'facebook'],
     mediaRules: {
+      maxCount: 1, // Solo 1 archivo total
       maxImages: 1,
       maxVideos: 1,
-      allowMixed: false, // Solo uno u otro
+      allowMixed: false, // Solo uno u otro, no ambos
     }
   },
   {
@@ -109,8 +112,9 @@ const contentTypes: ContentTypeOption[] = [
     icon: BarChart3,
     platforms: ['twitter'], // Solo Twitter soporta encuestas nativas
     mediaRules: {
-      maxImages: 1, // Opcional: imagen de fondo en Instagram story poll
+      maxImages: 0, // No permite archivos de media
       maxVideos: 0,
+      allowMixed: false,
     }
   },
   {

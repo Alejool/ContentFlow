@@ -100,17 +100,19 @@ const MediaUploadSection = memo(
       const types: string[] = [];
       
       if (mediaRules.videoOnly) {
-        types.push('video/mp4');
+        // Solo videos (para reels)
+        types.push('video/mp4', 'video/mov', 'video/avi');
       } else if (mediaRules.imageOnly) {
-        types.push('image/jpeg', 'image/jpg', 'image/png', 'image/gif');
+        // Solo imágenes
+        types.push('image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp');
       } else {
         // Verificar si aún se pueden agregar imágenes
-        if (!mediaRules.maxImages || mediaCounts.images < mediaRules.maxImages) {
-          types.push('image/jpeg', 'image/jpg', 'image/png', 'image/gif');
+        if (mediaRules.maxImages === undefined || (mediaRules.maxImages > 0 && mediaCounts.images < mediaRules.maxImages)) {
+          types.push('image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp');
         }
         // Verificar si aún se pueden agregar videos
-        if (!mediaRules.maxVideos || mediaCounts.videos < mediaRules.maxVideos) {
-          types.push('video/mp4');
+        if (mediaRules.maxVideos === undefined || (mediaRules.maxVideos > 0 && mediaCounts.videos < mediaRules.maxVideos)) {
+          types.push('video/mp4', 'video/mov', 'video/avi');
         }
       }
       
@@ -119,13 +121,23 @@ const MediaUploadSection = memo(
 
     // Verificar si se puede agregar más contenido
     const canAddMore = useMemo(() => {
+      // Para polls que no permiten media
+      if (mediaRules.maxImages === 0 && mediaRules.maxVideos === 0) return false;
+      
+      // Para reels (solo video)
       if (mediaRules.videoOnly && mediaCounts.videos >= 1) return false;
+      
+      // Para tipos que solo permiten imágenes
       if (mediaRules.imageOnly && mediaRules.maxImages && mediaCounts.images >= mediaRules.maxImages) return false;
       
       // Para carousel, usar maxCount si está definido
       if (mediaRules.maxCount && mediaCounts.total >= mediaRules.maxCount) return false;
       
-      // Para otros tipos, usar la suma de maxImages + maxVideos
+      // Para otros tipos, verificar límites individuales
+      if (mediaRules.maxImages !== undefined && mediaRules.maxImages === 0 && mediaCounts.images > 0) return false;
+      if (mediaRules.maxVideos !== undefined && mediaRules.maxVideos === 0 && mediaCounts.videos > 0) return false;
+      
+      // Verificar límites totales
       const maxTotal = (mediaRules.maxImages || 0) + (mediaRules.maxVideos || 0);
       if (maxTotal > 0 && mediaCounts.total >= maxTotal) return false;
       

@@ -13,6 +13,8 @@
         "locked": "Content type is locked after uploading media"
       },
       "poll": {
+        "question": "Poll Question",
+        "questionPlaceholder": "Enter your question",
         "title": "Poll Options",
         "options": "Poll Options (2-4 options)",
         "optionPlaceholder": "Option",

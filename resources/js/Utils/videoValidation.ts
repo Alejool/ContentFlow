@@ -67,6 +67,12 @@ export const PLATFORM_REQUIREMENTS: Record<string, PlatformRequirements> = {
       aspectRatio: { min: 0.5, max: 1.0 }, // Vertical
       resolution: { minWidth: 540, minHeight: 960 },
     },
+    story: {
+      maxDuration: 60,
+      minDuration: 1,
+      aspectRatio: { min: 0.5, max: 1.0 }, // Vertical
+      resolution: { minWidth: 540, minHeight: 960 },
+    },
     video: {
       maxDuration: 14400, // 4 horas
       minDuration: 1,

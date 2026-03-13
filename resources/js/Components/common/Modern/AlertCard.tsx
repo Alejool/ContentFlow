@@ -1,6 +1,7 @@
-import { AlertTriangle, Info, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/Components/ui/alert';
 import { cn } from '@/lib/utils';
+import { AlertCircle, AlertTriangle, CheckCircle, Info, XCircle } from 'lucide-react';
+import React from 'react';
 
 /**
  * AlertCard - Componente de alerta reutilizable con diferentes tipos
@@ -16,6 +17,13 @@ import { cn } from '@/lib/utils';
  *   message="Los cambios afectan a todo el sistema" 
  * />
  * 
+ * // Alerta de advertencia amber (más intensa)
+ * <AlertCard 
+ *   type="amber" 
+ *   title="Atención" 
+ *   message="Sesión duplicada detectada" 
+ * />
+ * 
  * // Alerta de éxito
  * <AlertCard type="success" message="Operación completada exitosamente" />
  * 
@@ -27,9 +35,9 @@ import { cn } from '@/lib/utils';
  */
 
 interface AlertCardProps {
-  type?: 'warning' | 'info' | 'success' | 'error' | 'danger';
+  type?: 'warning' | 'info' | 'success' | 'error' | 'danger' | 'amber';
   title?: string;
-  message: string;
+  message: string | React.ReactNode;
   className?: string;
 }
 
@@ -47,6 +55,14 @@ export default function AlertCard({
       iconColor: 'text-yellow-600 dark:text-yellow-400',
       textColor: 'text-yellow-800 dark:text-yellow-300',
       titleColor: 'text-yellow-900 dark:text-yellow-200',
+    },
+    amber: {
+      icon: AlertCircle,
+      bgColor: 'bg-amber-50 dark:bg-amber-900/20',
+      borderColor: 'border-amber-500',
+      iconColor: 'text-amber-500',
+      textColor: 'text-amber-700 dark:text-amber-300',
+      titleColor: 'text-amber-700 dark:text-amber-300',
     },
     info: {
       icon: Info,
