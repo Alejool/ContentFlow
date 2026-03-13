@@ -173,8 +173,7 @@ export const usePublicationForm = ({
   useEffect(() => {
     const subscription = form.watch((value, { name }) => {
       if (name === 'content_type' && value.content_type !== currentContentType) {
-        console.log('Content type changed from', currentContentType, 'to', value.content_type);
-        setCurrentContentType(value.content_type || 'post');
+       setCurrentContentType(value.content_type || 'post');
         
         // Clear validation errors for fields that are no longer required
         const newContentType = value.content_type || 'post';
@@ -543,12 +542,7 @@ export const usePublicationForm = ({
 
   // Auto-suggest content type based on media files (backup method)
   useEffect(() => {
-    console.log('🎬 useEffect triggered (backup method):', {
-      isOpen,
-      mediaFilesLength: mediaFiles.length,
-      videoMetadataKeys: Object.keys(videoMetadata)
-    });
-    
+   
     // This is now a backup method - the primary suggestion happens immediately after video processing
     // Only run if no suggestion has been made yet
     
@@ -1748,8 +1742,7 @@ export const usePublicationForm = ({
           
           // Only validate scheduled_at if global schedule is enabled AND there's actually a value
           if (!hasGlobalSchedule || !hasScheduledValue) {
-            console.log('Skipping scheduled_at validation - global schedule not enabled or no value');
-            return false;
+           return false;
           }
         }
         // Include other required fields
@@ -1758,7 +1751,6 @@ export const usePublicationForm = ({
       .map(key => getFieldError(key))
       .filter(error => error !== null);
 
-    console.log('Relevant errors after filtering:', relevantErrors);
 
     // If there are no relevant errors, call onFormSubmit directly
     if (relevantErrors.length === 0) {
