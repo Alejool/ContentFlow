@@ -1,6 +1,5 @@
 import ApiSettingsTab from "@/Components/Workspace/ApiSettingsTab";
 import ApprovalWorkflowsTab from "@/Components/Workspace/ApprovalWorkflowsTab";
-import EnterpriseSupportTab from "@/Components/Workspace/EnterpriseSupportTab";
 import GeneralSettingsTab from "@/Components/Workspace/GeneralSettingsTab";
 import IntegrationsSettingsTab from "@/Components/Workspace/IntegrationsSettingsTab";
 import MembersManagement from "@/Components/Workspace/MembersManagement";
@@ -16,14 +15,13 @@ import { Head } from "@inertiajs/react";
 import {
   CheckCircle,
   Key,
-  Layout,
   Palette,
   Settings as SettingsIcon,
   Share2,
   Shield,
   Sparkles,
-  Users,
-  TrendingUp 
+  TrendingUp,
+  Users
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";

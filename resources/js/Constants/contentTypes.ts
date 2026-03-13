@@ -59,7 +59,7 @@ export const CONTENT_TYPE_CONFIG = {
     },
   },
   story: {
-    platforms: ['instagram', 'facebook',  'youtube', 'pinterest'],
+    platforms: ['instagram', 'facebook', 'pinterest'],
     media: { required: true, min_count: 1, max_count: 1, types: ['image', 'video'] },
     fields: {
       title: { required: true, label: 'publications.modal.add.title' },
