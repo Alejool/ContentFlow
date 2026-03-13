@@ -485,6 +485,14 @@ class Publication extends Model
     return $this->hasMany(\App\Models\ApprovalAction::class, 'content_id');
   }
 
+  /**
+   * Get the approval request for this publication (professional workflow).
+   */
+  public function approvalRequest(): HasOne
+  {
+    return $this->hasOne(\App\Models\Approval\ApprovalRequest::class);
+  }
+
   public function currentApprovalStep(): BelongsTo
   {
     return $this->belongsTo(ApprovalLevel::class, 'current_approval_step_id');

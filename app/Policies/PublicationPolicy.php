@@ -19,8 +19,9 @@ class PublicationPolicy
     /**
      * Determine if the user can submit content for approval.
      * 
-     * Simple rule: If user has 'publish' permission, they can submit for approval.
-     * The workflow validation happens in the service layer.
+     * Rule: Anyone with 'manage-content' OR 'publish' permission can submit for approval.
+     * - manage-content: Editors can create and submit content
+     * - publish: Publishers/Admins can also submit content
      */
     public function submitForApproval(User $user, Publication $publication): bool
     {
@@ -37,11 +38,12 @@ class PublicationPolicy
             return false;
         }
 
-        // Check if user has publish permission
+        // Check if user has manage-content OR publish permission
+        $hasManageContent = $this->roleService->userHasPermission($user, $workspace, 'manage-content');
         $hasPublishPermission = $this->roleService->userHasPermission($user, $workspace, 'publish');
         
-        if (!$hasPublishPermission) {
-            \Log::warning('submitForApproval: User lacks publish permission', [
+        if (!$hasManageContent && !$hasPublishPermission) {
+            \Log::warning('submitForApproval: User lacks manage-content or publish permission', [
                 'user_id' => $user->id,
                 'workspace_id' => $workspace->id,
                 'role' => $userRole->slug,
@@ -58,11 +60,13 @@ class PublicationPolicy
             return false;
         }
 
-        \Log::info('submitForApproval: User has publish permission, allowing submission', [
+        \Log::info('submitForApproval: User can submit for approval', [
             'user_id' => $user->id,
             'publication_id' => $publication->id,
             'workspace_id' => $workspace->id,
             'role' => $userRole->slug,
+            'has_manage_content' => $hasManageContent,
+            'has_publish' => $hasPublishPermission,
         ]);
 
         return true;
@@ -135,10 +139,11 @@ class PublicationPolicy
      * Determine if the user can publish content.
      * 
      * Requirements: 8.1, 8.2, 8.3, 8.5
-     * - User must have publish_content permission
+     * - Owner can always publish (bypass workflow)
      * - If approval workflow is enabled:
-     *   - Content must be in approved status (unless user is Owner)
-     * - Owner can bypass approval requirements
+     *   - Content must be in approved status
+     *   - User must be the approver of the LAST level (final approver)
+     * - If no workflow: User must have publish permission
      */
     public function publish(User $user, Publication $publication): bool
     {
@@ -163,16 +168,9 @@ class PublicationPolicy
         }
 
         // Owner can bypass ALL requirements (approval workflow and permissions)
-        // Owner should be able to publish directly without approval
-        // Compare using slug instead of name for case-insensitive comparison
         if ($userRole->slug === Role::OWNER) {
             \Log::info('PublicationPolicy::publish - User is OWNER, allowing publish');
             return true;
-        }
-
-        // For non-Owner users, check if they have publish permission
-        if (!$this->roleService->userHasPermission($user, $workspace, 'publish')) {
-            return false;
         }
 
         // Check if approval workflow is enabled
@@ -180,17 +178,42 @@ class PublicationPolicy
         
         if (!$workflow || !$workflow->is_enabled) {
             // No approval workflow, just need publish permission
-            return true;
+            $canPublish = $this->roleService->userHasPermission($user, $workspace, 'publish');
+            \Log::info('PublicationPolicy::publish - No workflow, checking publish permission', [
+                'can_publish' => $canPublish
+            ]);
+            return $canPublish;
         }
 
-        // If approval workflow is enabled, content MUST be approved
-        // Even users with publish_content permission cannot bypass the workflow
-        // (but Owner already returned true above)
+        // If approval workflow is enabled:
+        // 1. Content MUST be approved
         if ($publication->status !== 'approved') {
+            \Log::info('PublicationPolicy::publish - Content not approved', [
+                'status' => $publication->status
+            ]);
             return false;
         }
 
-        return true;
+        // 2. User must be the approver of the LAST level (final approver)
+        // Get the last (highest) level of the workflow
+        $lastLevel = $workflow->levels()->orderBy('level_number', 'desc')->first();
+        
+        if (!$lastLevel) {
+            \Log::warning('PublicationPolicy::publish - No levels found in workflow');
+            return false;
+        }
+
+        // Check if user's role matches the last level's required role
+        $canPublish = $userRole->id === $lastLevel->role_id;
+        
+        \Log::info('PublicationPolicy::publish - Workflow enabled, checking last level approver', [
+            'user_role_id' => $userRole->id,
+            'last_level_role_id' => $lastLevel->role_id,
+            'last_level_number' => $lastLevel->level_number,
+            'can_publish' => $canPublish
+        ]);
+
+        return $canPublish;
     }
 
     /**
