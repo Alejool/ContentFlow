@@ -456,7 +456,15 @@
       "delete": "Delete Publication",
       "close": "Close",
       "approve": "Approve",
-      "reject": "Reject"
+      "reject": "Reject",
+      "publish": "Publish",
+      "view": "View",
+      "viewDetails": "View Details",
+      "duplicate": "Duplicate",
+      "request": "Request",
+      "sendForReview": "Send for Review",
+      "sending": "Sending...",
+      "inReview": "In Review"
     },
     "table": {
       "name": "Name",
@@ -468,8 +476,16 @@
       "actions": "Actions",
       "noCampaign": "No Campaign",
       "noPlatforms": "No platforms configured",
+      "noMedia": "No media",
       "loading": "Loading...",
       "linkedAccount": "Linked Accounts",
+      "untitled": "Untitled",
+      "noDescription": "No description",
+      "platforms": "Platforms",
+      "linkedAccounts": "Linked Accounts",
+      "createdBy": "Created by",
+      "manualEvent": "Manual Event",
+      "socialNetworkEvent": "Social Network Event",
       "emptyState": {
         "title": "No publications found",
         "description": "Create a publication to start publishing content.",
@@ -479,7 +495,8 @@
       "lockedBy": "Locked by:",
       "publishingBy": "Publishing by",
       "rejectedBy": "Rejected by",
-      "pendingAdminReview": "Pending review"
+      "pendingAdminReview": "Pending review",
+      "editingBy": "Editing:"
     },
     "messages": {
       "addSuccess": "Publication added successfully!",
