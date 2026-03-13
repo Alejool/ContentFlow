@@ -17,10 +17,6 @@ export default function WorkspaceSwitcher({
   const { post } = useForm();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  console.log('current_workspace:', current_workspace);
-  console.log('workspaces:', workspaces);
-  console.log('auth:', auth);
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (

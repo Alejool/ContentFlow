@@ -156,6 +156,49 @@ export const getContentTypeDisplay = (contentType: ContentType) => {
   return CONTENT_TYPE_DISPLAY[contentType] || CONTENT_TYPE_DISPLAY.post;
 };
 
+// Función helper para sugerir automáticamente el tipo de contenido basado en archivos
+export const suggestContentTypeFromFiles = (files: File[], currentType?: ContentType): ContentType => {
+  if (!files || files.length === 0) {
+    return currentType || 'post';
+  }
+
+  const fileCount = files.length;
+  const videoFiles = files.filter(f => f.type.startsWith('video/'));
+  const imageFiles = files.filter(f => f.type.startsWith('image/'));
+
+  // Múltiples archivos = carousel
+  if (fileCount > 1) {
+    return 'carousel';
+  }
+
+  // Un solo archivo
+  if (fileCount === 1) {
+    const file = files[0];
+    
+    // Si es imagen, puede ser story o post
+    if (file.type.startsWith('image/')) {
+      // Si el tipo actual es story, mantenerlo
+      if (currentType === 'story') {
+        return 'story';
+      }
+      return 'post';
+    }
+    
+    // Si es video, hacer una sugerencia inicial inteligente
+    if (file.type.startsWith('video/')) {
+      // Si el tipo actual ya es válido para videos, mantenerlo
+      if (currentType && ['reel', 'story', 'post'].includes(currentType)) {
+        return currentType;
+      }
+      // Para videos nuevos sin tipo específico, sugerir reel como punto de partida
+      // El backend refinará basado en duración
+      return 'reel';
+    }
+  }
+
+  return currentType || 'post';
+};
+
 // Función helper para detectar el tipo de contenido basado en la configuración de plataforma
 export const detectContentType = (platformSettings: any, mediaFiles: any[]): ContentType => {
   if (!platformSettings || typeof platformSettings !== 'object') {

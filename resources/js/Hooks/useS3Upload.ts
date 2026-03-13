@@ -6,6 +6,44 @@ import { useCallback } from "react";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
+/**
+ * Extract video metadata from file
+ */
+const extractVideoMetadata = (file: File): Promise<{
+  duration: number;
+  width: number;
+  height: number;
+  aspectRatio: number;
+}> => {
+  return new Promise((resolve, reject) => {
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    
+    video.onloadedmetadata = () => {
+      const duration = Math.floor(video.duration);
+      const width = video.videoWidth;
+      const height = video.videoHeight;
+      const aspectRatio = width / height;
+      
+      URL.revokeObjectURL(video.src);
+      
+      resolve({
+        duration,
+        width,
+        height,
+        aspectRatio
+      });
+    };
+    
+    video.onerror = () => {
+      URL.revokeObjectURL(video.src);
+      reject(new Error('Failed to load video metadata'));
+    };
+    
+    video.src = URL.createObjectURL(file);
+  });
+};
+
 export const useS3Upload = () => {
   // Use global store state
   const queue = useUploadQueue((state) => state.queue);
@@ -204,25 +242,112 @@ export const useS3Upload = () => {
 
           if (currentItem?.publicationId) {
             try {
-              const { data } = await axios.post(
-                route(
-                  "api.v1.publications.attach-media",
-                  currentItem.publicationId,
-                ),
-                {
-                  key: result.key,
-                  filename: file.name,
-                  mime_type: file.type,
-                  size: file.size,
-                },
-              );
+              // If it's a video file, extract and send metadata
+              if (file.type.startsWith('video/')) {
+                try {
+                  const metadata = await extractVideoMetadata(file);
+                  if (metadata.duration > 0) {
+                    // Send metadata along with attach-media request
+                    const { data } = await axios.post(
+                      route(
+                        "api.v1.publications.attach-media",
+                        currentItem.publicationId,
+                      ),
+                      {
+                        key: result.key,
+                        filename: file.name,
+                        mime_type: file.type,
+                        size: file.size,
+                        duration: metadata.duration,
+                        width: metadata.width,
+                        height: metadata.height,
+                        aspect_ratio: metadata.aspectRatio,
+                      },
+                    );
 
-              // SYNC DB ID back to mediaStore so deletion works correctly!
-              if (data.media_file?.id) {
-                useMediaStore.getState().updateFile(tempId, {
-                  id: data.media_file.id,
-                  isNew: false, // Mark as existing now
-                });
+                    // SYNC DB ID back to mediaStore so deletion works correctly!
+                    if (data.media_file?.id) {
+                      useMediaStore.getState().updateFile(tempId, {
+                        id: data.media_file.id,
+                        isNew: false, // Mark as existing now
+                      });
+                    }
+
+                    console.log('Video metadata sent with attach-media', {
+                      mediaFileId: data.media_file?.id,
+                      duration: metadata.duration,
+                      width: metadata.width,
+                      height: metadata.height
+                    });
+                  } else {
+                    // No duration, send without metadata
+                    const { data } = await axios.post(
+                      route(
+                        "api.v1.publications.attach-media",
+                        currentItem.publicationId,
+                      ),
+                      {
+                        key: result.key,
+                        filename: file.name,
+                        mime_type: file.type,
+                        size: file.size,
+                      },
+                    );
+
+                    // SYNC DB ID back to mediaStore so deletion works correctly!
+                    if (data.media_file?.id) {
+                      useMediaStore.getState().updateFile(tempId, {
+                        id: data.media_file.id,
+                        isNew: false, // Mark as existing now
+                      });
+                    }
+                  }
+                } catch (metadataError) {
+                  console.warn('Failed to extract video metadata, sending without:', metadataError);
+                  // Send without metadata
+                  const { data } = await axios.post(
+                    route(
+                      "api.v1.publications.attach-media",
+                      currentItem.publicationId,
+                    ),
+                    {
+                      key: result.key,
+                      filename: file.name,
+                      mime_type: file.type,
+                      size: file.size,
+                    },
+                  );
+
+                  // SYNC DB ID back to mediaStore so deletion works correctly!
+                  if (data.media_file?.id) {
+                    useMediaStore.getState().updateFile(tempId, {
+                      id: data.media_file.id,
+                      isNew: false, // Mark as existing now
+                    });
+                  }
+                }
+              } else {
+                // Not a video, send without metadata
+                const { data } = await axios.post(
+                  route(
+                    "api.v1.publications.attach-media",
+                    currentItem.publicationId,
+                  ),
+                  {
+                    key: result.key,
+                    filename: file.name,
+                    mime_type: file.type,
+                    size: file.size,
+                  },
+                );
+
+                // SYNC DB ID back to mediaStore so deletion works correctly!
+                if (data.media_file?.id) {
+                  useMediaStore.getState().updateFile(tempId, {
+                    id: data.media_file.id,
+                    isNew: false, // Mark as existing now
+                  });
+                }
               }
 
               toast.success(
@@ -621,12 +746,103 @@ export const useS3Upload = () => {
               },
             );
 
-            if (data.media_file?.id) {
-              useMediaStore.getState().updateFile(id, {
-                id: data.media_file.id,
-                isNew: false,
-              });
-            }
+              // If it's a video file, extract and send metadata
+              if (file.type.startsWith('video/')) {
+                console.log('Processing video file:', file.name, 'Size:', file.size);
+                try {
+                  const metadata = await extractVideoMetadata(file);
+                  console.log('Video metadata extracted:', metadata);
+                  
+                  if (metadata.duration > 0) {
+                    console.log('Sending video with metadata - Duration:', metadata.duration, 'seconds');
+                    // Send metadata along with attach-media request
+                    const { data } = await axios.post(
+                      route("api.v1.publications.attach-media", upload.publicationId),
+                      {
+                        key: result.key,
+                        filename: upload.file.name,
+                        mime_type: upload.file.type,
+                        size: upload.file.size,
+                        duration: metadata.duration,
+                        width: metadata.width,
+                        height: metadata.height,
+                        aspect_ratio: metadata.aspectRatio,
+                      },
+                    );
+
+                    if (data.media_file?.id) {
+                      useMediaStore.getState().updateFile(id, {
+                        id: data.media_file.id,
+                        isNew: false,
+                      });
+                    }
+
+                    console.log('Video metadata sent with attach-media', {
+                      mediaFileId: data.media_file?.id,
+                      duration: metadata.duration,
+                      width: metadata.width,
+                      height: metadata.height
+                    });
+                  } else {
+                    console.log('Video duration is 0 or invalid, sending without metadata');
+                    // No duration, send without metadata
+                    const { data } = await axios.post(
+                      route("api.v1.publications.attach-media", upload.publicationId),
+                      {
+                        key: result.key,
+                        filename: upload.file.name,
+                        mime_type: upload.file.type,
+                        size: upload.file.size,
+                      },
+                    );
+
+                    if (data.media_file?.id) {
+                      useMediaStore.getState().updateFile(id, {
+                        id: data.media_file.id,
+                        isNew: false,
+                      });
+                    }
+                  }
+                } catch (metadataError) {
+                  console.error('Failed to extract video metadata:', metadataError);
+                  // Send without metadata
+                  const { data } = await axios.post(
+                    route("api.v1.publications.attach-media", upload.publicationId),
+                    {
+                      key: result.key,
+                      filename: upload.file.name,
+                      mime_type: upload.file.type,
+                      size: upload.file.size,
+                    },
+                  );
+
+                  if (data.media_file?.id) {
+                    useMediaStore.getState().updateFile(id, {
+                      id: data.media_file.id,
+                      isNew: false,
+                    });
+                  }
+                }
+              } else {
+                console.log('Not a video file, sending without metadata');
+                // Not a video, send without metadata
+                const { data } = await axios.post(
+                  route("api.v1.publications.attach-media", upload.publicationId),
+                  {
+                    key: result.key,
+                    filename: upload.file.name,
+                    mime_type: upload.file.type,
+                    size: upload.file.size,
+                  },
+                );
+
+                if (data.media_file?.id) {
+                  useMediaStore.getState().updateFile(id, {
+                    id: data.media_file.id,
+                    isNew: false,
+                  });
+                }
+              }
 
             toast.success(
               t("publications.messages.mediaAttached", {

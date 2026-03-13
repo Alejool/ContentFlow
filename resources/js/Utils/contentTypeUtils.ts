@@ -44,17 +44,29 @@ export const suggestContentType = async (
     if (file.type.startsWith('video/')) {
       try {
         duration = await getVideoDuration(file);
+        console.log('🎬 Video duration extracted:', {
+          filename: file.name,
+          duration: duration,
+          durationMinutes: duration ? (duration / 60).toFixed(2) : null,
+          currentType: currentType
+        });
       } catch (error) {
         console.warn('Failed to get video duration:', error);
         // Continue without duration - backend will handle it
       }
     }
     
-    const response = await axios.post(route('api.v1.uploads.suggest-content-type'), {
+    const requestData = {
       duration,
       mime_type: file.type,
       current_type: currentType
-    });
+    };
+    
+    console.log('🎬 Sending content type suggestion request:', requestData);
+    
+    const response = await axios.post(route('api.v1.uploads.suggest-content-type'), requestData);
+    
+    console.log('🎬 Content type suggestion response:', response.data);
     
     return response.data;
   } catch (error) {

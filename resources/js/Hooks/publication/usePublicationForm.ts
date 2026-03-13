@@ -1,13 +1,14 @@
 import { getMediaRulesForContentType, type ContentType } from "@/Components/Content/Publication/common/ContentTypeSelector";
+import { CONTENT_TYPE_DISPLAY } from "@/Constants/contentTypes";
 import { useContentTypeSuggestion } from "@/Hooks/publication/useContentTypeSuggestion";
 import { useS3Upload } from "@/Hooks/useS3Upload";
-import { validateVideoDuration } from "@/Utils/validationUtils";
 import { PublicationFormData, publicationSchema } from "@/schemas/publication";
 import { useMediaStore } from "@/stores/mediaStore";
 import { usePublicationStore } from "@/stores/publicationStore";
 import { useUploadQueue } from "@/stores/uploadQueueStore";
 import { PageProps } from "@/types";
 import { Publication } from "@/types/Publication";
+import { validateVideoDuration } from "@/Utils/validationUtils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { usePage } from "@inertiajs/react";
 import axios from "axios";
@@ -123,6 +124,7 @@ export const usePublicationForm = ({
   const [durationErrors, setDurationErrors] = useState<Record<number, string>>(
     {},
   );
+  const [contentTypeSuggested, setContentTypeSuggested] = useState<Set<string>>(new Set());
 
   const prevHashtagsRef = useRef<string>("");
 
@@ -319,6 +321,7 @@ export const usePublicationForm = ({
       });
       setPlatformSettings({});
       clearMedia();
+      setContentTypeSuggested(new Set()); // Clear content type suggestions
       setIsDataReady(true);
     }
   }, [isOpen, publication?.id, publication?.scheduled_at, reset]);
@@ -538,17 +541,51 @@ export const usePublicationForm = ({
     }
   }, [isOpen, publication]); // REMOVED isDirty dependency to allow media sync
 
-  // Auto-suggest content type based on media files
+  // Auto-suggest content type based on media files (backup method)
   useEffect(() => {
-    if (!isOpen || mediaFiles.length === 0) return;
+    console.log('🎬 useEffect triggered (backup method):', {
+      isOpen,
+      mediaFilesLength: mediaFiles.length,
+      videoMetadataKeys: Object.keys(videoMetadata)
+    });
+    
+    // This is now a backup method - the primary suggestion happens immediately after video processing
+    // Only run if no suggestion has been made yet
+    
+    if (!isOpen || mediaFiles.length === 0) {
+      return;
+    }
     
     const currentType = form.getValues('content_type');
-    
-    // Only suggest if we have completed media files (not uploading)
     const completedFiles = mediaFiles.filter(f => f.status === 'completed');
-    if (completedFiles.length === 0) return;
     
-    // Prepare media data for suggestion API
+    if (completedFiles.length === 0 || contentTypeSuggestion.isPending) {
+      return;
+    }
+    
+    // Only run as backup for videos that might have been missed
+    const videoFiles = completedFiles.filter(f => f.type.startsWith('video/'));
+    if (videoFiles.length === 0) return;
+    
+    const videoFilesWithDuration = videoFiles.filter(f => {
+      const hasDuration = videoMetadata[f.tempId]?.duration !== undefined && videoMetadata[f.tempId]?.duration > 0;
+      return hasDuration;
+    });
+    
+    if (videoFilesWithDuration.length === 0) return;
+    
+    // Create a key to avoid duplicate suggestions
+    const mediaKey = videoFilesWithDuration
+      .map(f => `${f.tempId}-${videoMetadata[f.tempId]?.duration}`)
+      .sort()
+      .join('|');
+    
+    if (contentTypeSuggested.has(mediaKey)) {
+      return;
+    }
+    
+    console.log('🎬 Backup useEffect making suggestion for:', mediaKey);
+    
     const mediaData = completedFiles.map(file => {
       const metadata = videoMetadata[file.tempId];
       return {
@@ -558,33 +595,76 @@ export const usePublicationForm = ({
       };
     });
     
+    setContentTypeSuggested(prev => new Set([...prev, mediaKey]));
+    
     contentTypeSuggestion.mutate({
       media: mediaData,
       current_type: currentType,
     }, {
       onSuccess: (result) => {
-        if (result.should_change && result.suggested_type !== currentType) {
-          // Show a toast notification about the suggestion
+        console.log('🎬 Backup useEffect suggestion result:', result);
+        if (result && result.should_change && result.suggested_type !== currentType) {
           toast.success(
-            `Se sugiere cambiar el tipo de contenido a "${result.suggested_type}" basado en los archivos subidos.`
+            `Tipo de contenido cambiado automáticamente a "${result.suggested_type}" basado en la duración del video.`,
+            {
+              icon: '🎬',
+              duration: 4000
+            }
           );
           
-          // Auto-change the content type
           form.setValue('content_type', result.suggested_type as ContentType, { shouldValidate: true });
           setCurrentContentType(result.suggested_type);
         }
       },
       onError: (error) => {
-        console.warn('Content type suggestion failed:', error);
+        console.error('🎬 Backup useEffect suggestion failed:', error);
+        setContentTypeSuggested(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(mediaKey);
+          return newSet;
+        });
       }
     });
-  }, [mediaFiles, videoMetadata, isOpen, form, contentTypeSuggestion]);
+  }, [mediaFiles, videoMetadata, isOpen, form]);
+
+  // Debug useEffect to track videoMetadata changes
+  useEffect(() => {
+    console.log('🎬 videoMetadata changed:', videoMetadata);
+  }, [videoMetadata]);
 
   const handleFileChange = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
     const newFiles = Array.from(files);
-    const contentType = watch("content_type") as ContentType || 'post';
+    const currentContentType = watch("content_type") as ContentType || 'post';
+    
+    console.log('🎬 handleFileChange called:', {
+      newFiles: newFiles.map(f => ({ name: f.name, type: f.type, size: f.size })),
+      currentContentType,
+      existingMediaFiles: mediaFiles.length
+    });
+    
+    // Solo hacer cambios básicos inmediatos (múltiples archivos = carousel)
+    const allFiles = [...mediaFiles.map(m => ({ type: m.type } as File)), ...newFiles];
+    
+    // Solo cambiar a carousel si hay múltiples archivos
+    if (allFiles.length > 1 && currentContentType !== 'carousel') {
+      console.log('🎬 Multiple files detected, changing to carousel');
+      setValue("content_type", 'carousel');
+      setCurrentContentType('carousel');
+      
+      toast.success(
+        `Tipo de contenido cambiado automáticamente a Carousel (múltiples archivos)`,
+        {
+          icon: '🖼️',
+          duration: 4000
+        }
+      );
+    }
+    
+    // Para videos individuales, esperar a que el backend haga la sugerencia basada en duración
+    
+    const contentType = currentContentType;
     const mediaRules = getMediaRulesForContentType(contentType);
     
     // Get current media counts
@@ -596,33 +676,42 @@ export const usePublicationForm = ({
     const newImages = newFiles.filter(f => f.type.startsWith('image/')).length;
     const newVideos = newFiles.filter(f => f.type.startsWith('video/')).length;
     
-    // Check if content type allows these file types
+    // Con la auto-detección, estas validaciones deberían ser menos estrictas
+    // Solo validar si realmente hay incompatibilidad después del cambio automático
     if (mediaRules.videoOnly && newImages > 0) {
-      toast.error(
-        t("publications.validation.reel_requires_video_only", {
-          defaultValue: "Los Reels solo permiten videos, no imágenes"
-        })
+      // Intentar cambiar a un tipo que permita imágenes
+      const alternativeType = newImages === 1 ? 'story' : 'carousel';
+      setValue("content_type", alternativeType);
+      
+      toast.success(
+        t("publications.validation.content_type_auto_changed", {
+          defaultValue: `Tipo de contenido cambiado automáticamente a ${CONTENT_TYPE_DISPLAY[alternativeType]?.label || alternativeType}`,
+          from: CONTENT_TYPE_DISPLAY[contentType]?.label || contentType,
+          to: CONTENT_TYPE_DISPLAY[alternativeType]?.label || alternativeType
+        }),
+        {
+          icon: '🔄',
+          duration: 4000
+        }
       );
-      setImageError(
-        t("publications.validation.reel_requires_video_only", {
-          defaultValue: "Los Reels solo permiten videos, no imágenes"
-        })
-      );
-      return;
     }
 
     if (mediaRules.imageOnly && newVideos > 0) {
-      toast.error(
-        t("publications.validation.image_only", {
-          defaultValue: "Este tipo de contenido solo permite imágenes"
-        })
+      // Intentar cambiar a un tipo que permita videos
+      const alternativeType = newVideos === 1 ? 'reel' : 'post';
+      setValue("content_type", alternativeType);
+      
+      toast.success(
+        t("publications.validation.content_type_auto_changed", {
+          defaultValue: `Tipo de contenido cambiado automáticamente a ${CONTENT_TYPE_DISPLAY[alternativeType]?.label || alternativeType}`,
+          from: CONTENT_TYPE_DISPLAY[contentType]?.label || contentType,
+          to: CONTENT_TYPE_DISPLAY[alternativeType]?.label || alternativeType
+        }),
+        {
+          icon: '🔄',
+          duration: 4000
+        }
       );
-      setImageError(
-        t("publications.validation.image_only", {
-          defaultValue: "Este tipo de contenido solo permite imágenes"
-        })
-      );
-      return;
     }
 
     // Check count limits
@@ -779,13 +868,119 @@ export const usePublicationForm = ({
 
           URL.revokeObjectURL(video.src);
 
-          setVideoMetadata(item.tempId, {
+          const metadata = {
             duration,
             width,
             height,
             aspectRatio,
             youtubeType: duration <= 60 && aspectRatio < 1 ? "short" : "video",
+          };
+
+          setVideoMetadata(item.tempId, metadata);
+          
+          console.log('🎬 Video metadata set:', {
+            tempId: item.tempId,
+            duration,
+            durationMinutes: (duration / 60).toFixed(2),
+            youtubeType: metadata.youtubeType,
+            aspectRatio
           });
+          
+          // Trigger content type suggestion immediately after setting metadata
+          setTimeout(() => {
+            console.log('🎬 Triggering content type suggestion after metadata set');
+            const currentType = form.getValues('content_type');
+            
+            // Prepare media data for API call
+            const mediaData = [{
+              mime_type: item.file?.type || 'video/mp4',
+              duration: duration,
+              file_type: 'video'
+            }];
+            
+            console.log('🎬 Calling contentTypeSuggestion.mutate with:', {
+              media: mediaData,
+              current_type: currentType,
+              durationInSeconds: duration,
+              durationInMinutes: (duration / 60).toFixed(2),
+              durationIsNumber: typeof duration === 'number',
+              durationValue: duration
+            });
+            
+            // Call the backend API for content type suggestion
+            contentTypeSuggestion.mutate({
+              media: mediaData,
+              current_type: currentType,
+            }, {
+              onSuccess: (result) => {
+                console.log('🎬 Content type suggestion API result:', result);
+                console.log('🎬 Detailed result analysis:', {
+                  result,
+                  hasResult: !!result,
+                  shouldChange: result?.should_change,
+                  suggestedType: result?.suggested_type,
+                  currentType,
+                  typesAreDifferent: result?.suggested_type !== currentType,
+                  allConditionsMet: result && result.should_change && result.suggested_type !== currentType
+                });
+                
+                if (result && result.should_change && result.suggested_type !== currentType) {
+                  console.log('🎬 Changing content type from', currentType, 'to', result.suggested_type);
+                  
+                  toast.success(
+                    `Tipo de contenido cambiado automáticamente a "${result.suggested_type}" basado en la duración del video (${(duration / 60).toFixed(1)} minutos).`,
+                    {
+                      icon: '🎬',
+                      duration: 4000
+                    }
+                  );
+                  
+                  form.setValue('content_type', result.suggested_type as ContentType, { shouldValidate: true });
+                  setCurrentContentType(result.suggested_type);
+                } else {
+                  console.log('🎬 No content type change needed, result:', result);
+                }
+              },
+              onError: (error) => {
+                console.error('🎬 Content type suggestion API failed:', error);
+              }
+            });
+          }, 100);
+
+          // If this is for an existing publication and the file is uploaded,
+          // send metadata to backend for content type auto-suggestion
+          if (publication?.id && item.file) {
+            try {
+              // Find the media file by matching filename and size
+              const mediaFile = publication.media_files?.find(
+                (mf: any) => mf.file_name === item.file?.name && mf.size === item.file?.size
+              );
+              
+              if (mediaFile) {
+                await axios.post(
+                  route("api.v1.publications.update-media-metadata", {
+                    publication: publication.id,
+                    mediaFile: mediaFile.id
+                  }),
+                  {
+                    duration,
+                    width,
+                    height,
+                    aspect_ratio: aspectRatio,
+                  }
+                );
+                
+                console.log('Video metadata sent to backend', {
+                  mediaFileId: mediaFile.id,
+                  duration,
+                  width,
+                  height
+                });
+              }
+            } catch (error) {
+              console.warn('Failed to send video metadata to backend:', error);
+            }
+          }
         } catch (e) {
           console.error("Failed to extract video metadata:", e);
         }
@@ -949,6 +1144,7 @@ export const usePublicationForm = ({
     setRemovedMediaIds([]);
     setAccountSchedules({});  // Clear account schedules
     setImageError(null);
+    setContentTypeSuggested(new Set()); // Clear content type suggestions
     onClose();
   };
 
