@@ -32,7 +32,7 @@ use App\Models\User;
 use App\Jobs\ProcessBackgroundUpload;
 use App\Models\Workspace\Workspace;
 use App\Models\Social\SocialAccount;
-use App\Models\ApprovalStep;
+use App\Models\ApprovalLevel;
 use App\Models\ApprovalWorkflow;
 use App\Models\MediaFiles\MediaFile;
 use App\Models\Publications\PublicationLock;
@@ -778,7 +778,7 @@ class PublicationController extends Controller
 
     // Multi-level logic
     if ($publication->current_approval_step_id) {
-      $currentStep = ApprovalStep::find($publication->current_approval_step_id);
+      $currentStep = ApprovalLevel::find($publication->current_approval_step_id);
 
       // Permission check for this specific step
       $canApproveThisStep = false;
@@ -810,9 +810,9 @@ class PublicationController extends Controller
       }
 
       // Find next step
-      $nextStep = ApprovalStep::where('workflow_id', $currentStep->workflow_id)
-        ->where('step_order', '>', $currentStep->step_order)
-        ->orderBy('step_order', 'asc')
+      $nextStep = ApprovalLevel::where('approval_workflow_id', $currentStep->approval_workflow_id)
+        ->where('level_number', '>', $currentStep->level_number)
+        ->orderBy('level_number', 'asc')
         ->first();
 
       if ($nextStep) {
@@ -821,9 +821,9 @@ class PublicationController extends Controller
         ]);
 
         $publication->logActivity('step_approved', [
-          'step_name' => $currentStep->name ?? "Step {$currentStep->step_order}",
+          'step_name' => $currentStep->level_name ?? "Nivel {$currentStep->level_number}",
           'approver' => Auth::user()->name,
-          'next_step' => $nextStep->name ?? "Step {$nextStep->step_order}",
+          'next_step' => $nextStep->level_name ?? "Nivel {$nextStep->level_number}",
         ]);
 
         return $this->successResponse([

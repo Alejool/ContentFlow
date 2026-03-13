@@ -120,17 +120,31 @@ class ApprovalWorkflowController extends Controller
         try {
             $workspace = $this->getWorkspace($idOrSlug);
 
+            // Debug: Log incoming request data
+            \Log::info('ApprovalWorkflow Configure Request', [
+                'workspace_id' => $workspace->id,
+                'is_multi_level' => $request->is_multi_level,
+                'levels' => $request->levels,
+                'raw_request' => $request->all()
+            ]);
+
             // Check authorization
             $this->authorize('configure', [ApprovalWorkflow::class, $workspace]);
 
             // Configure workflow
-            $workflow = $this->approvalWorkflowService->configureMultiLevelWorkflow(
+            $workflow = $this->approvalWorkflowService->configureWorkflow(
                 $workspace,
+                $request->is_multi_level,
                 $request->levels ?? []
             );
 
-            // Update multi-level flag
-            $workflow->update(['is_multi_level' => $request->is_multi_level]);
+            // Debug: Log result
+            \Log::info('ApprovalWorkflow Configure Result', [
+                'workflow_id' => $workflow->id,
+                'is_enabled' => $workflow->is_enabled,
+                'is_multi_level' => $workflow->is_multi_level,
+                'levels_count' => $workflow->levels()->count()
+            ]);
 
             // Invalidate workflow cache
             $this->approvalWorkflowService->invalidateCache($workspace->id);
@@ -145,7 +159,7 @@ class ApprovalWorkflowController extends Controller
                             'id' => $level->id,
                             'level_number' => $level->level_number,
                             'level_name' => $level->level_name,
-                            'role' => $level->role->name,
+                            'role' => $level->role ? $level->role->name : null,
                         ];
                     }),
                 ],
@@ -153,8 +167,17 @@ class ApprovalWorkflowController extends Controller
                 200
             );
         } catch (\App\Exceptions\InvalidWorkflowConfigurationException $e) {
+            \Log::error('ApprovalWorkflow Configuration Error', [
+                'error' => $e->getMessage(),
+                'workspace_id' => $workspace->id ?? null
+            ]);
             return $this->errorResponse($e->getMessage(), 422);
         } catch (\Exception $e) {
+            \Log::error('ApprovalWorkflow Configuration Exception', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'workspace_id' => $workspace->id ?? null
+            ]);
             return $this->errorResponse('Failed to configure workflow: ' . $e->getMessage(), 500);
         }
     }

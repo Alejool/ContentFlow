@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Workspace;
 
 use App\Http\Controllers\Controller;
 use App\Models\ApprovalWorkflow;
-use App\Models\ApprovalStep;
+use App\Models\ApprovalLevel;
 use App\Models\Workspace\Workspace;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
@@ -57,6 +57,7 @@ class WorkspaceApprovalWorkflowController extends Controller
 
     $request->validate([
       'name' => 'required|string|max:255',
+      'is_multi_level' => 'sometimes|boolean',
       'steps' => 'required|array|min:1',
       'steps.*.role_id' => 'nullable|exists:roles,id',
       'steps.*.user_id' => 'nullable|exists:users,id',
@@ -71,23 +72,40 @@ class WorkspaceApprovalWorkflowController extends Controller
     }
 
     return DB::transaction(function () use ($request, $workspace) {
-      $workflow = ApprovalWorkflow::create([
-        'workspace_id' => $workspace->id,
-        'name' => $request->name,
-        'is_active' => $request->is_active ?? true,
-      ]);
+      // Get or create workflow (since workspace can only have one workflow)
+      $workflow = ApprovalWorkflow::firstOrCreate(
+        ['workspace_id' => $workspace->id],
+        [
+          'name' => $request->name,
+          'is_active' => $request->is_active ?? true,
+          'is_multi_level' => count($request->steps) > 1,
+        ]
+      );
+
+      // If workflow already existed, update it
+      if (!$workflow->wasRecentlyCreated) {
+        $workflow->update([
+          'name' => $request->name,
+          'is_active' => $request->is_active ?? true,
+          'is_multi_level' => count($request->steps) > 1,
+        ]);
+        
+        // Clear existing steps to replace them
+        $workflow->steps()->delete();
+      }
 
       foreach ($request->steps as $index => $stepData) {
-        ApprovalStep::create([
-          'workflow_id' => $workflow->id,
+        ApprovalLevel::create([
+          'approval_workflow_id' => $workflow->id,
           'role_id' => $stepData['role_id'] ?? null,
           'user_id' => $stepData['user_id'] ?? null,
-          'name' => $stepData['name'] ?? null,
-          'step_order' => $index + 1,
+          'level_name' => $stepData['name'] ?? "Nivel " . ($index + 1),
+          'level_number' => $index + 1,
         ]);
       }
 
-      return $this->successResponse($workflow->load('steps'), 'Workflow created successfully', 201);
+      $message = $workflow->wasRecentlyCreated ? 'Workflow created successfully' : 'Workflow updated successfully';
+      return $this->successResponse($workflow->load('steps.role', 'steps.user'), $message, 201);
     });
   }
 
@@ -102,7 +120,11 @@ class WorkspaceApprovalWorkflowController extends Controller
 
     $request->validate([
       'name' => 'sometimes|string|max:255',
+      'is_multi_level' => 'sometimes|boolean',
       'steps' => 'sometimes|array|min:1',
+      'steps.*.role_id' => 'nullable|exists:roles,id',
+      'steps.*.user_id' => 'nullable|exists:users,id',
+      'steps.*.name' => 'nullable|string|max:255',
       'is_active' => 'sometimes|boolean',
     ]);
 
@@ -125,20 +147,23 @@ class WorkspaceApprovalWorkflowController extends Controller
       }
 
       if ($request->has('steps')) {
+        // Update is_multi_level based on steps count
+        $workflow->update(['is_multi_level' => count($request->steps) > 1]);
+        
         // Simplest way: recreate steps
         $workflow->steps()->delete();
         foreach ($request->steps as $index => $stepData) {
-          ApprovalStep::create([
-            'workflow_id' => $workflow->id,
+          ApprovalLevel::create([
+            'approval_workflow_id' => $workflow->id,
             'role_id' => $stepData['role_id'] ?? null,
             'user_id' => $stepData['user_id'] ?? null,
-            'name' => $stepData['name'] ?? null,
-            'step_order' => $index + 1,
+            'level_name' => $stepData['name'] ?? "Nivel " . ($index + 1),
+            'level_number' => $index + 1,
           ]);
         }
       }
 
-      return $this->successResponse(['workflow' => $workflow->load('steps')], 'Workflow updated successfully');
+      return $this->successResponse(['workflow' => $workflow->load('steps.role', 'steps.user')], 'Workflow updated successfully');
     });
   }
 

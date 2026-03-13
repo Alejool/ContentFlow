@@ -43,15 +43,12 @@ class ApprovalController extends Controller
         ->first();
 
       if ($userRole) {
-        // Check if user's role or user_id is in any active workflow step
-        $hasWorkflowAssignment = DB::table('approval_steps')
-          ->join('approval_workflows', 'approval_steps.workflow_id', '=', 'approval_workflows.id')
+        // Check if user's role is in any active workflow step
+        $hasWorkflowAssignment = DB::table('approval_levels')
+          ->join('approval_workflows', 'approval_levels.approval_workflow_id', '=', 'approval_workflows.id')
           ->where('approval_workflows.workspace_id', $workspaceId)
           ->where('approval_workflows.is_active', true)
-          ->where(function ($q) use ($userId, $userRole) {
-            $q->where('approval_steps.user_id', $userId)
-              ->orWhere('approval_steps.role_id', $userRole->role_id);
-          })
+          ->where('approval_levels.role_id', $userRole->role_id)
           ->exists();
 
         if ($hasWorkflowAssignment) {
@@ -100,12 +97,8 @@ class ApprovalController extends Controller
 
     // If user doesn't have admin permission, filter by workflow assignments
     if (!$hasAdminPermission && $userRole) {
-      $query->whereHas('currentApprovalStep', function ($q) use ($userId, $userRole) {
-        $q->where(function ($subQ) use ($userId, $userRole) {
-          $subQ->where('user_id', $userId)
-            ->orWhere('role_id', $userRole->role_id)
-            ->orWhereNull('user_id')->whereNull('role_id'); // Any user can approve
-        });
+      $query->whereHas('currentApprovalStep', function ($q) use ($userRole) {
+        $q->where('role_id', $userRole->role_id);
       });
     } elseif (!$hasAdminPermission) {
       // User has no permission and no role, return empty
