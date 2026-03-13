@@ -44,7 +44,25 @@ export function usePublicationActions({
       const result = await submitForApproval(item.id);
       
       if (result.success) {
-        toast.success(t("approvals.approvalSuccess"));
+        const approvalInfo = result.approvalInfo;
+        
+        if (approvalInfo) {
+          const approversList = approvalInfo.approvers.length > 0 
+            ? approvalInfo.approvers.join(", ")
+            : t("approvals.unknownApprover");
+          
+          const message = t("approvals.sentToReview", {
+            level: approvalInfo.level_name || `${t("approvals.level")} ${approvalInfo.current_level}`,
+            approvers: approversList,
+            defaultValue: `Enviado a revisión - ${approvalInfo.level_name || `Nivel ${approvalInfo.current_level}`}. Revisores: ${approversList}`,
+          });
+          
+          toast.success(message);
+        } else {
+          toast.success(t("approvals.sentToReviewGeneric", {
+            defaultValue: "Enviado a revisión exitosamente",
+          }));
+        }
       } else {
         toast.error(result.message || t("approvals.errors.submit_failed"));
       }
