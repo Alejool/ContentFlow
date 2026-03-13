@@ -38,6 +38,11 @@ Route::middleware('auth:sanctum')->group(function () {
             ->name('approval-history')
             ->whereNumber('content');
 
+        // Get complete approval flow visualization
+        Route::get('/{content}/approval-flow', [ContentApprovalController::class, 'getApprovalFlow'])
+            ->name('approval-flow')
+            ->whereNumber('content');
+
         // Publish approved content
         Route::post('/{content}/publish', [ContentApprovalController::class, 'publish'])
             ->name('publish')

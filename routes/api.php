@@ -66,6 +66,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     require __DIR__ . '/api/v1/approvals.php';
     require __DIR__ . '/api/v1/publications.php';
     require __DIR__ . '/api/v1/content-approval.php';
+    require __DIR__ . '/api/v1/approval-workflow.php'; // Professional approval workflow
     require __DIR__ . '/api/v1/campaigns.php';
     require __DIR__ . '/api/v1/analytics.php';
     require __DIR__ . '/api/v1/notifications.php';
