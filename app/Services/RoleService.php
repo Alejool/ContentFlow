@@ -259,7 +259,7 @@ class RoleService
 
         // Check if role has the specific permission
         return $role->permissions()
-            ->where('name', $permission)
+            ->where('slug', $permission)
             ->exists();
     }
 

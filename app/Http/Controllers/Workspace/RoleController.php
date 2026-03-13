@@ -201,6 +201,83 @@ class RoleController extends Controller
     }
 
     /**
+     * Update role permissions
+     * 
+     * PUT /api/v1/workspaces/{workspace}/roles/{role}
+     * 
+     * @param string $idOrSlug Workspace ID or slug
+     * @param int $roleId Role ID
+     * @return JsonResponse
+     */
+    public function update(string $idOrSlug, int $roleId): JsonResponse
+    {
+        // Find workspace by ID or slug
+        $workspace = Workspace::where('id', $idOrSlug)
+            ->orWhere('slug', $idOrSlug)
+            ->firstOrFail();
+
+        // Find the role
+        $role = Role::findOrFail($roleId);
+
+        // Get the authenticated user
+        $user = Auth::user();
+
+        // Check if user has permission to manage roles
+        if (!$this->roleService->userHasPermission($user, $workspace, 'manage-roles')) {
+            return $this->errorResponse('You do not have permission to update roles.', 403);
+        }
+
+        // Prevent editing Owner role
+        if ($role->slug === Role::OWNER) {
+            return $this->errorResponse('Cannot edit the Owner role.', 403);
+        }
+
+        // Validate request
+        $validated = request()->validate([
+            'permission_ids' => 'required|array',
+            'permission_ids.*' => 'exists:permissions,id',
+        ]);
+
+        try {
+            // Sync permissions
+            $role->permissions()->sync($validated['permission_ids']);
+
+            // Clear role cache
+            \Illuminate\Support\Facades\Cache::tags(['roles', "role_{$role->id}"])->flush();
+
+            // Reload role with permissions
+            $role->load('permissions');
+
+            return $this->successResponse(
+                [
+                    'role' => [
+                        'id' => $role->id,
+                        'name' => $role->name,
+                        'display_name' => $role->display_name,
+                        'description' => $role->description,
+                        'permissions' => $role->permissions->map(function ($permission) {
+                            return [
+                                'id' => $permission->id,
+                                'name' => $permission->name,
+                                'display_name' => $permission->display_name,
+                                'description' => $permission->description,
+                            ];
+                        }),
+                    ],
+                ],
+                'Role updated successfully.',
+                200
+            );
+        } catch (\Exception $e) {
+            return $this->errorResponse(
+                'An error occurred while updating the role.',
+                500,
+                config('app.debug') ? $e->getMessage() : null
+            );
+        }
+    }
+
+    /**
      * Get user permissions in a workspace
      * 
      * GET /api/v1/workspaces/{workspace}/users/{user}/permissions
