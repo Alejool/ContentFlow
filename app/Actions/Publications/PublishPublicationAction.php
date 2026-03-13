@@ -28,11 +28,9 @@ class PublishPublicationAction
       'has_platform_settings' => !empty($options['platform_settings'])
     ]);
 
-    // Verify publication can be published
-    // Note: Permission check should be done in controller before calling this action
-    $hasPublishPermission = auth()->check() && auth()->user()->hasPermission('publish', $publication->workspace_id);
-
-    if (!$publication->canBePublished($hasPublishPermission)) {
+    // Verify publication status allows publishing
+    // Note: Permission and workflow checks are done in PublicationPolicy before calling this action
+    if (!$publication->canBePublished()) {
       if ($publication->status === 'pending_review') {
         throw new \Exception(__('publications.errors.pending_review') . " Current status: {$publication->status}");
       }

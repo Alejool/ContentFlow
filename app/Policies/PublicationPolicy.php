@@ -41,7 +41,7 @@ class PublicationPolicy
 
         // Check if approval workflow is enabled
         $workflow = $workspace->approvalWorkflow;
-        if (!$workflow || !$workflow->is_enabled) {
+        if (!$workflow || !$workflow->is_active) {
             return false;
         }
 
@@ -81,7 +81,7 @@ class PublicationPolicy
         // Get approval workflow
         $workflow = $workspace->approvalWorkflow;
         
-        if (!$workflow || !$workflow->is_enabled) {
+        if (!$workflow || !$workflow->is_active) {
             return false;
         }
 
@@ -124,32 +124,33 @@ class PublicationPolicy
     {
         $workspace = $publication->workspace;
 
-        // Check if user has publish_content permission
-        if (!$this->roleService->userHasPermission($user, $workspace, 'publish_content')) {
-            return false;
-        }
-
-        // Get user's role in workspace
+        // Get user's role in workspace first
         $userRole = $this->getUserRoleInWorkspace($user, $workspace);
         
         if (!$userRole) {
             return false;
         }
 
-        // Owner can bypass approval requirements
+        // Owner can bypass ALL requirements (approval workflow and permissions)
         if ($userRole->name === Role::OWNER) {
             return true;
+        }
+
+        // For non-Owner users, check if they have publish_content permission
+        if (!$this->roleService->userHasPermission($user, $workspace, 'publish_content')) {
+            return false;
         }
 
         // Check if approval workflow is enabled
         $workflow = $workspace->approvalWorkflow;
         
-        if (!$workflow || !$workflow->is_enabled) {
+        if (!$workflow || !$workflow->is_active) {
             // No approval workflow, just need publish permission
             return true;
         }
 
-        // If approval workflow is enabled, content must be approved
+        // If approval workflow is enabled, content MUST be approved
+        // Even users with publish_content permission cannot bypass the workflow
         if ($publication->status !== 'approved') {
             return false;
         }

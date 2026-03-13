@@ -8,6 +8,7 @@ use App\Traits\HasTimezone;
 use Illuminate\Http\Request;
 use App\Models\Publications\Publication;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use App\Http\Requests\Publications\StorePublicationRequest;
 use App\Http\Requests\Publications\UpdatePublicationRequest;
@@ -443,12 +444,25 @@ class PublicationController extends Controller
       );
     }
 
-    // Check permissions first
-    $hasPublishPermission = Auth::user()->hasPermission('publish', $publication->workspace_id);
-    $hasManageContentPermission = Auth::user()->hasPermission('manage-content', $publication->workspace_id);
-
-    if (!$hasManageContentPermission) {
-      return $this->errorResponse('You do not have permission to manage content.', 403);
+    // Check permissions using Policy (respects approval workflow)
+    try {
+      \Illuminate\Support\Facades\Gate::authorize('publish', $publication);
+    } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+      // Check if it's because of approval workflow
+      $workflow = $publication->workspace->approvalWorkflow;
+      if ($workflow && $workflow->is_active && $publication->status !== 'approved') {
+        return $this->errorResponse(
+          'This workspace has an approval workflow enabled. Content must be approved before publishing.',
+          403,
+          [
+            'requires_approval' => true,
+            'current_status' => $publication->status,
+            'workflow_enabled' => true,
+          ]
+        );
+      }
+      
+      return $this->errorResponse('You do not have permission to publish this content.', 403);
     }
 
     // Validar límites de contenido según estado de verificación de cuentas
@@ -472,8 +486,8 @@ class PublicationController extends Controller
       }
     }
 
-    // Verify publication can be published based on status and permissions
-    if (!$publication->canBePublished($hasPublishPermission)) {
+    // Verify publication status allows publishing
+    if (!$publication->canBePublished()) {
       // If pending review, show specific message
       if ($publication->status === 'pending_review') {
         return $this->errorResponse(

@@ -247,16 +247,25 @@ class Publication extends Model
 
   /**
    * Check if the publication can be published.
+   * 
+   * IMPORTANT: This method only checks the publication status, NOT permissions or workflow.
+   * The actual permission and workflow checks are done in:
+   * - PublicationPolicy::publish() for authorization
+   * - ApprovalWorkflowService::canPublish() for workflow validation
+   * 
    * Can publish if:
    * - Status is 'approved' (first time publishing)
    * - Status is 'failed' (retry after failure)
    * - Status is 'published' (republish to additional platforms)
    * - Has been approved before (approved_at exists) - allows republishing
-   * - Status is 'draft' or 'rejected' (if user has publish permission)
    *
    * Cannot publish if:
    * - Status is 'pending_review' (must be approved or rejected first)
    * - Status is 'publishing' or 'retrying' (already in progress)
+   * - Status is 'draft' or 'rejected' (needs approval if workflow is enabled)
+   * 
+   * @param bool $hasPublishPermission Deprecated - workflow checks are now in Policy
+   * @return bool
    */
   public function canBePublished(bool $hasPublishPermission = false): bool
   {
@@ -271,12 +280,8 @@ class Publication extends Model
       return true;
     }
 
-    // If user has publish permission, allow any status except blocked ones
-    if ($hasPublishPermission) {
-      return true;
-    }
-
-    // Otherwise, only allow if approved, failed, published, or was previously approved
+    // Only allow if approved, failed, published, or was previously approved
+    // The Policy will handle workflow and permission checks
     return in_array($this->status, ['approved', 'failed', 'published']) ||
       !is_null($this->approved_at);
   }
