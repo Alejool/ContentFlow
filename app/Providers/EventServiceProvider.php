@@ -12,12 +12,14 @@ use App\Events\ApprovalLevelAdvanced;
 use App\Events\ApprovalTaskReassigned;
 use App\Events\ContentApproved;
 use App\Events\ContentRejected;
+use App\Events\ContentSubmittedForApproval;
 use App\Events\RoleChanged;
 
 // Approval workflow listeners
 use App\Listeners\InvalidatePermissionCache;
 use App\Listeners\NotifyContentCreator;
 use App\Listeners\NotifyNextLevelApprovers;
+use App\Listeners\NotifyApproversOnSubmission;
 use App\Listeners\NotifyUserOfReassignment;
 
 class EventServiceProvider extends ServiceProvider
@@ -36,6 +38,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         
         // Approval workflow events
+        ContentSubmittedForApproval::class => [
+            NotifyApproversOnSubmission::class,
+        ],
         ApprovalLevelAdvanced::class => [
             NotifyNextLevelApprovers::class,
         ],
