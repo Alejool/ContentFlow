@@ -5,7 +5,7 @@ namespace App\Services\Subscription;
 use App\Models\Workspace\Workspace;
 use App\Models\User;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\Log;
+use App\Helpers\LogHelper;
 
 class LimitNotificationService
 {
@@ -54,7 +54,7 @@ class LimitNotificationService
 
         $message = $messages[$limitType] ?? "Estás cerca del límite de {$limitType}.";
 
-        Log::info("Limit warning for workspace {$workspace->id}", [
+        LogHelper::billing('limit.warning_sent', [
             'workspace_id' => $workspace->id,
             'limit_type' => $limitType,
             'percentage' => $percentage,
@@ -78,7 +78,7 @@ class LimitNotificationService
 
         $upgradeMessage = $this->validator->getUpgradeMessage($workspace, $limitType);
 
-        Log::warning("Limit reached for workspace {$workspace->id}", [
+        LogHelper::billing('limit.reached', [
             'workspace_id' => $workspace->id,
             'limit_type' => $limitType,
             'upgrade_message' => $upgradeMessage,
@@ -99,7 +99,7 @@ class LimitNotificationService
             return;
         }
 
-        Log::info("Plan changed for workspace {$workspace->id}", [
+        LogHelper::billing('plan.changed', [
             'workspace_id' => $workspace->id,
             'old_plan' => $oldPlan,
             'new_plan' => $newPlan,

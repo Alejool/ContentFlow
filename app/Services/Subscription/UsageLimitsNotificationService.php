@@ -7,7 +7,7 @@ use App\Events\Subscription\UsageLimitsUpdated;
 use App\Services\Subscription\PlanLimitValidator;
 use App\Services\WorkspaceAddonService;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
+use App\Helpers\LogHelper;
 
 class UsageLimitsNotificationService
 {
@@ -32,7 +32,7 @@ class UsageLimitsNotificationService
         // Update cache for immediate API responses
         $this->updateLimitsCache($workspace, $limitsData);
         
-        Log::info('Usage limits updated via WebSocket', [
+        LogHelper::billing('usage_limits.updated_via_websocket', [
             'workspace_id' => $workspace->id,
             'trigger_action' => $triggerAction,
             'limits_count' => count($limitsData),

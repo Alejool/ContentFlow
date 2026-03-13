@@ -7,7 +7,7 @@ use App\Models\Subscription\Subscription;
 use App\Models\Subscription\UsageMetric;
 use App\Models\SubscriptionHistory;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use App\Helpers\LogHelper;
 
 class PlanMigrationService
 {
@@ -53,7 +53,7 @@ class PlanMigrationService
             // Update usage metrics with new limits
             $this->updateUsageLimits($workspace, $newPlan);
 
-            Log::info("Plan migrated for workspace {$workspace->id}", [
+            LogHelper::billing('plan.migrated', [
                 'workspace_id' => $workspace->id,
                 'old_plan' => $oldPlan,
                 'new_plan' => $newPlan,
