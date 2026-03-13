@@ -267,9 +267,30 @@ class Publication extends Model
    * @param bool $hasPublishPermission Deprecated - workflow checks are now in Policy
    * @return bool
    */
-  public function canBePublished(bool $hasPublishPermission = false): bool
+  /**
+   * Check if publication can be published based on its status.
+   * 
+   * IMPORTANT: This method only checks the publication status, NOT permissions or workflow.
+   * The actual permission and workflow checks are done in:
+   * - PublicationPolicy::publish() for authorization
+   * - ApprovalWorkflowService::canPublish() for workflow validation
+   * 
+   * Can publish if:
+   * - User is Owner (can bypass all workflow requirements)
+   * - Status is 'approved' (first time publishing)
+   * - Status is 'failed' (retry after failure)
+   * - Status is 'published' (republish to additional platforms)
+   * - Has been approved before (approved_at exists) - allows republishing
+   *
+   * Cannot publish if:
+   * - Status is 'pending_review' (must be approved or rejected first)
+   * 
+   * @param bool $isOwner Whether the user is the workspace owner (can bypass workflow)
+   * @return bool
+   */
+  public function canBePublished(bool $isOwner = false): bool
   {
-    // Never allow publishing if pending review
+    // Never allow publishing if pending review (must be approved/rejected first)
     if ($this->status === 'pending_review') {
       return false;
     }
@@ -280,7 +301,12 @@ class Publication extends Model
       return true;
     }
 
-    // Only allow if approved, failed, published, or was previously approved
+    // Owner can publish from any status (draft, rejected, approved, failed, published)
+    if ($isOwner) {
+      return true;
+    }
+
+    // For non-owners: Only allow if approved, failed, published, or was previously approved
     // The Policy will handle workflow and permission checks
     return in_array($this->status, ['approved', 'failed', 'published']) ||
       !is_null($this->approved_at);

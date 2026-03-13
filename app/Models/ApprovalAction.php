@@ -23,7 +23,11 @@ class ApprovalAction extends Model
 
     protected $casts = [
         'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
+
+    // Enable timestamps
+    public $timestamps = true;
 
     // Action type constants
     public const ACTION_SUBMITTED = 'submitted';
