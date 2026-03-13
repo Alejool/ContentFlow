@@ -1,6 +1,13 @@
 <?php
 
 return [
+  'contentTypes' => [
+    'post' => 'Publicación',
+    'reel' => 'Reel',
+    'story' => 'Historia',
+    'poll' => 'Encuesta',
+    'carousel' => 'Carrusel',
+  ],
   'title' => 'Tus Publicaciones',
   'subtitle' => 'Administra y rastrea tu contenido social',
   'table' => [
@@ -22,6 +29,7 @@ return [
   ],
   'validation' => [
     'scheduledMinDifference' => 'La fecha debe ser al menos 1 minuto después de la actual.',
+    'scheduledInPast' => 'La fecha programada debe estar en el futuro.',
     'recurrenceDaysRequired' => 'Por favor selecciona al menos un día para la recurrencia semanal.',
     'recurrenceEndDateRequired' => 'La fecha de fin es obligatoria para publicaciones recurrentes.',
     'titleRequired' => 'El título es obligatorio.',
@@ -44,11 +52,13 @@ return [
     ],
     'poll' => [
       'title' => 'Opciones de Encuesta',
+      'question' => 'Pregunta de la Encuesta',
+      'questionPlaceholder' => '¿Cuál es tu pregunta?',
       'options' => 'Opciones de la Encuesta (2-4 opciones)',
       'optionPlaceholder' => 'Opción',
       'addOption' => 'Agregar Opción',
       'duration' => 'Duración de la Encuesta',
-      'hours' => 'horas',
+      'durationHours' => 'horas',
       'note' => 'Las encuestas solo están disponibles en Twitter y Facebook. Asegúrate de seleccionar plataformas compatibles.',
     ],
     'live' => [

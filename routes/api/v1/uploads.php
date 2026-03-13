@@ -16,4 +16,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/sign-part', [MultipartUploadController::class, 'signPart'])->name('sign-part');
     Route::post('/complete', [MultipartUploadController::class, 'complete'])->name('complete');
   });
+  
+  // Content type suggestions
+  Route::post('/suggest-content-type', [\App\Http\Controllers\Api\ContentTypeController::class, 'suggestType'])->name('suggest-content-type');
 });

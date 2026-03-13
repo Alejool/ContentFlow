@@ -1,6 +1,13 @@
 <?php
 
 return [
+  'contentTypes' => [
+    'post' => 'Post',
+    'reel' => 'Reel',
+    'story' => 'Story',
+    'poll' => 'Poll',
+    'carousel' => 'Carousel',
+  ],
   'title' => 'Your Publications',
   'subtitle' => 'Manage and track your social media content',
   'table' => [
@@ -22,6 +29,7 @@ return [
   ],
   'validation' => [
     'scheduledMinDifference' => 'The scheduled date must be at least 1 minute after the current time.',
+    'scheduledInPast' => 'The scheduled date must be in the future.',
     'recurrenceDaysRequired' => 'Please select at least one day for weekly recurrence.',
     'recurrenceEndDateRequired' => 'End date is required for recurring publications.',
     'titleRequired' => 'Title is required.',
@@ -41,14 +49,24 @@ return [
     'contentType' => [
       'label' => 'Content Type',
       'filteredByPlatforms' => 'Filtered by selected platforms',
+      'autoChanged' => 'Content type automatically changed to {{to}} based on video duration',
+      'changed' => 'Content type changed to {{to}}',
+      'suggestion' => [
+        'title' => 'Content Type Suggestion',
+        'reason' => 'Based on your video duration ({{duration}}), we recommend changing to {{suggested}} format',
+        'apply' => 'Change to {{type}}',
+        'keep' => 'Keep {{type}}',
+      ],
     ],
     'poll' => [
       'title' => 'Poll Options',
+      'question' => 'Poll Question',
+      'questionPlaceholder' => 'What is your question?',
       'options' => 'Poll Options (2-4 options)',
       'optionPlaceholder' => 'Option',
       'addOption' => 'Add Option',
       'duration' => 'Poll Duration',
-      'hours' => 'hours',
+      'durationHours' => 'hours',
       'note' => 'Polls are only supported on Twitter and Facebook. Make sure to select compatible platforms.',
     ],
     'live' => [
@@ -65,6 +83,8 @@ return [
       'pollOptionsRequired' => 'Poll requires 2-4 non-empty options.',
       'pollDurationRequired' => 'Poll duration must be between 1 and 168 hours.',
       'liveStartTimeRequired' => 'Live stream start time is required.',
+      'uploadingInProgress' => 'Files are being uploaded. Please wait before changing content type.',
+      'contentTypeAdjusted' => 'Content type automatically adjusted based on video duration.',
     ],
     'schedule' => [
       'title' => 'Date for all networks',
