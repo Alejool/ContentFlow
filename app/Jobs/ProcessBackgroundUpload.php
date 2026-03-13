@@ -40,52 +40,71 @@ class ProcessBackgroundUpload implements ShouldQueue
     try {
       try {
         $this->mediaFile->update(['status' => 'processing']);
+        
+        // Broadcast processing start
+        $this->broadcastProgress(0, 'Starting media processing...');
 
         if ($this->tempPath) {
           // 1. Move file to S3 (Standard Upload Flow)
+          $this->broadcastProgress(10, 'Reading temporary file...');
           $fileContent = Storage::disk('local')->get($this->tempPath);
           if (!$fileContent) {
             throw new \Exception("Temporary file not found at: {$this->tempPath}");
           }
 
           $targetPath = $this->mediaFile->file_path;
-
+          
+          $this->broadcastProgress(30, 'Uploading to S3...');
           // Upload to S3
           Storage::disk('s3')->put($targetPath, $fileContent);
 
-          // Re-instantiate UploadedFile from tempPath for potential thumbnail generation
-          // (Simplified: we skip complex thumbnail generation logic here for brevity,
-          // assumes thumbnails were handled or will be handled by a separate dedicated job)
-
+          $this->broadcastProgress(50, 'Cleaning up temporary files...');
           // Cleanup temp file
           Storage::disk('local')->delete($this->tempPath);
         } else {
           // 2. Direct Upload Flow (Already on S3)
-          // Check for S3 existence with retries
+          $this->broadcastProgress(10, 'Verifying S3 file...');
+          
+          // Check for S3 existence with retries and timeout
           $path = $this->mediaFile->getRawOriginal('file_path');
           $pathTrimmed = ltrim($path, '/');
 
           $found = false;
           $attempts = 0;
-          $maxAttempts = 5;
+          $maxAttempts = 3; // Reduced from 5 to prevent hanging
+          $timeout = 30; // 30 second total timeout
+          $startTime = time();
 
-          while (!$found && $attempts < $maxAttempts) {
-            if (Storage::disk('s3')->exists($path)) {
-              $found = true;
-            } elseif (Storage::disk('s3')->exists($pathTrimmed)) {
-              $found = true;
-              $path = $pathTrimmed;
-            } else {
+          while (!$found && $attempts < $maxAttempts && (time() - $startTime) < $timeout) {
+            try {
+              if (Storage::disk('s3')->exists($path)) {
+                $found = true;
+              } elseif (Storage::disk('s3')->exists($pathTrimmed)) {
+                $found = true;
+                $path = $pathTrimmed;
+              } else {
+                $attempts++;
+                if ($attempts < $maxAttempts && (time() - $startTime) < $timeout) {
+                  Log::warning("ProcessBackgroundUpload: File not found yet in S3 ($path). Retrying ($attempts/$maxAttempts)...");
+                  $this->broadcastProgress(20 + ($attempts * 10), "Verifying file existence (attempt $attempts)...");
+                  sleep(1); // Reduced from 2 seconds
+                }
+              }
+            } catch (\Exception $s3Error) {
+              Log::error('S3 verification error', [
+                'error' => $s3Error->getMessage(),
+                'path' => $path,
+                'attempt' => $attempts
+              ]);
               $attempts++;
-              if ($attempts < $maxAttempts) {
-                Log::warning("ProcessBackgroundUpload: File not found yet in S3 ($path). Retrying ($attempts/$maxAttempts)...");
-                sleep(2);
+              if ($attempts < $maxAttempts && (time() - $startTime) < $timeout) {
+                sleep(1);
               }
             }
           }
 
           if (!$found) {
-            throw new \Exception("Direct upload file not found in S3 after {$maxAttempts} attempts at: {$pathTrimmed}");
+            throw new \Exception("Direct upload file not found in S3 after {$maxAttempts} attempts or {$timeout}s timeout at: {$pathTrimmed}");
           }
 
           // Normalize path in DB if needed
@@ -98,6 +117,7 @@ class ProcessBackgroundUpload implements ShouldQueue
         $metadata = [];
         if ($this->mediaFile->file_type === 'video') {
           try {
+            $this->broadcastProgress(60, 'Extracting video metadata...');
             $metadata = $this->extractVideoMetadata();
             Log::info('Video metadata extracted', [
               'media_file_id' => $this->mediaFile->id,
@@ -108,8 +128,12 @@ class ProcessBackgroundUpload implements ShouldQueue
               'media_file_id' => $this->mediaFile->id,
               'error' => $e->getMessage()
             ]);
+            // Don't fail the entire job for metadata extraction failure
+            $metadata = [];
           }
         }
+
+        $this->broadcastProgress(80, 'Finalizing processing...');
 
         // Update status and metadata
         $this->mediaFile->update([
@@ -139,13 +163,20 @@ class ProcessBackgroundUpload implements ShouldQueue
           );
         }
 
-        // Notify user
+        $this->broadcastProgress(90, 'Sending notifications...');
+
+        // Notify user of success
         $this->publication->user->notify(new MediaUploadProcessed($this->publication, $this->mediaFile, 'success'));
+        
+        // Broadcast success via WebSocket
+        $this->broadcastCompletion('success');
 
         // Update publication image if this was the main image
         if ($this->mediaFile->file_type === 'image' && !$this->publication->image) {
           $this->publication->update(['image' => Storage::url($this->mediaFile->getRawOriginal('file_path'))]);
         }
+
+        $this->broadcastProgress(100, 'Processing completed successfully');
 
         // Check if we can release the "processing" lock
         if ($this->publication->status === 'processing') {
@@ -250,9 +281,6 @@ class ProcessBackgroundUpload implements ShouldQueue
     $metadata = [];
 
     try {
-      // First, try to get metadata from S3 object metadata if available
-      $s3Metadata = Storage::disk('s3')->getMetadata($filePath);
-      
       // Try FFmpeg if available
       if ($this->isFFmpegAvailable()) {
         $metadata = $this->extractWithFFmpeg($filePath);
@@ -382,6 +410,59 @@ class ProcessBackgroundUpload implements ShouldQueue
         'error' => $e->getMessage(),
         'publication_id' => $this->publication->id,
         'media_file_id' => $this->mediaFile->id
+      ]);
+    }
+  }
+
+  /**
+   * Broadcast processing progress via WebSocket
+   */
+  private function broadcastProgress(int $percentage, string $message = ''): void
+  {
+    try {
+      $userId = $this->publication->user_id;
+      $jobId = "media_processing_{$this->mediaFile->id}";
+      
+      broadcast(new \App\Events\ProcessingProgressUpdated(
+        $userId,
+        $jobId,
+        $this->publication->id,
+        [
+          'progress' => $percentage,
+          'message' => $message,
+          'media_file_id' => $this->mediaFile->id,
+          'file_name' => $this->mediaFile->file_name,
+          'type' => 'media_processing'
+        ]
+      ));
+    } catch (\Exception $e) {
+      Log::warning('Failed to broadcast progress', [
+        'error' => $e->getMessage(),
+        'percentage' => $percentage,
+        'message' => $message
+      ]);
+    }
+  }
+
+  /**
+   * Broadcast processing completion via WebSocket
+   */
+  private function broadcastCompletion(string $status, string $errorMessage = ''): void
+  {
+    try {
+      $userId = $this->publication->user_id;
+      
+      broadcast(new \App\Events\VideoProcessingCompleted(
+        $userId,
+        $this->publication->id,
+        $status,
+        $errorMessage
+      ));
+    } catch (\Exception $e) {
+      Log::warning('Failed to broadcast completion', [
+        'error' => $e->getMessage(),
+        'status' => $status,
+        'errorMessage' => $errorMessage
       ]);
     }
   }

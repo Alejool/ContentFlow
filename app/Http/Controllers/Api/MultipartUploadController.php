@@ -152,7 +152,7 @@ class MultipartUploadController extends Controller
       $presignedUrl = (string) $requestS3->getUri();
 
       return response()->json([
-        'url' => $presignedUrl,
+        'upload_url' => $presignedUrl,
       ]);
     } catch (S3Exception $e) {
       return response()->json(['error' => $e->getMessage()], 500);
