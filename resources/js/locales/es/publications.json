@@ -312,6 +312,8 @@
         "completed": "completadas",
         "inProgress": "en curso",
         "sending": "Enviando",
+        "duplicate": "Intento duplicado",
+        "original_attempt": "Intento original:",
         "dragDrop": {
           "title": "Arrastra y suelta para agregar",
           "subtitle": "PNG, JPG, WebP (max 2MB)"

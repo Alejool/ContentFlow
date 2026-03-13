@@ -305,6 +305,8 @@
         "completed": "completed",
         "inProgress": "in progress",
         "sending": "Sending",
+        "duplicate": "Duplicate attempt",
+        "original_attempt": "Original attempt:",
         "dragDrop": {
           "title": "Drag and drop to add",
           "subtitle": "PNG, JPG, WebP (max 2MB)"

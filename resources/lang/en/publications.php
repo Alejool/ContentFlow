@@ -28,6 +28,7 @@ return [
     'accountMissingText' => 'This publication was posted on an account (:account) that is no longer connected. Editing it will create a new version for your current account(s). Proceed?',
   ],
   'validation' => [
+    'content_type_auto_changed' => 'Content type automatically changed to :to based on uploaded files',
     'scheduledMinDifference' => 'The scheduled date must be at least 1 minute after the current time.',
     'scheduledInPast' => 'The scheduled date must be in the future.',
     'recurrenceDaysRequired' => 'Please select at least one day for weekly recurrence.',

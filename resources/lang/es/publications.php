@@ -28,6 +28,7 @@ return [
     'accountMissingText' => 'Esta publicación fue publicada en una cuenta (:account) que ya no está conectada. Editarla creará una nueva versión para tus cuentas actuales. ¿Proceder?',
   ],
   'validation' => [
+    'content_type_auto_changed' => 'Tipo de contenido cambiado automáticamente a :to basado en los archivos subidos',
     'scheduledMinDifference' => 'La fecha debe ser al menos 1 minuto después de la actual.',
     'scheduledInPast' => 'La fecha programada debe estar en el futuro.',
     'recurrenceDaysRequired' => 'Por favor selecciona al menos un día para la recurrencia semanal.',
