@@ -37,7 +37,6 @@ class ToastServiceClass {
   warning(message: string, options?: CustomToastOptions): string {
     return toast(message, {
       duration: this.defaultDuration,
-      icon: "⚠️",
       ...options,
     });
   }
@@ -48,7 +47,6 @@ class ToastServiceClass {
   info(message: string, options?: CustomToastOptions): string {
     return toast(message, {
       duration: this.defaultDuration,
-      icon: "ℹ️",
       ...options,
     });
   }

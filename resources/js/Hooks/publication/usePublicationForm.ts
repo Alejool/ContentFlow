@@ -577,9 +577,7 @@ export const usePublicationForm = ({
     if (contentTypeSuggested.has(mediaKey)) {
       return;
     }
-    
-    console.log('🎬 Backup useEffect making suggestion for:', mediaKey);
-    
+
     const mediaData = completedFiles.map(file => {
       const metadata = videoMetadata[file.tempId];
       return {
@@ -596,12 +594,10 @@ export const usePublicationForm = ({
       current_type: currentType,
     }, {
       onSuccess: (result) => {
-        console.log('🎬 Backup useEffect suggestion result:', result);
         if (result && result.should_change && result.suggested_type !== currentType) {
           toast.success(
             `Tipo de contenido cambiado automáticamente a "${result.suggested_type}" basado en la duración del video.`,
             {
-              icon: '🎬',
               duration: 4000
             }
           );
@@ -621,36 +617,23 @@ export const usePublicationForm = ({
     });
   }, [mediaFiles, videoMetadata, isOpen, form]);
 
-  // Debug useEffect to track videoMetadata changes
-  useEffect(() => {
-    console.log('🎬 videoMetadata changed:', videoMetadata);
-  }, [videoMetadata]);
-
   const handleFileChange = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
     const newFiles = Array.from(files);
     const currentContentType = watch("content_type") as ContentType || 'post';
     
-    console.log('🎬 handleFileChange called:', {
-      newFiles: newFiles.map(f => ({ name: f.name, type: f.type, size: f.size })),
-      currentContentType,
-      existingMediaFiles: mediaFiles.length
-    });
-    
     // Solo hacer cambios básicos inmediatos (múltiples archivos = carousel)
     const allFiles = [...mediaFiles.map(m => ({ type: m.type } as File)), ...newFiles];
     
     // Solo cambiar a carousel si hay múltiples archivos
     if (allFiles.length > 1 && currentContentType !== 'carousel') {
-      console.log('🎬 Multiple files detected, changing to carousel');
       setValue("content_type", 'carousel');
       setCurrentContentType('carousel');
       
       toast.success(
         `Tipo de contenido cambiado automáticamente a Carousel (múltiples archivos)`,
         {
-          icon: '🖼️',
           duration: 4000
         }
       );
@@ -684,7 +667,6 @@ export const usePublicationForm = ({
           to: CONTENT_TYPE_DISPLAY[alternativeType]?.label || alternativeType
         }),
         {
-          icon: '🔄',
           duration: 4000
         }
       );
@@ -702,7 +684,6 @@ export const usePublicationForm = ({
           to: CONTENT_TYPE_DISPLAY[alternativeType]?.label || alternativeType
         }),
         {
-          icon: '🔄',
           duration: 4000
         }
       );
@@ -867,23 +848,12 @@ export const usePublicationForm = ({
             width,
             height,
             aspectRatio,
-            youtubeType: duration <= 60 && aspectRatio < 1 ? "short" : "video",
+            youtubeType: (duration <= 60 && aspectRatio < 1 ? "short" : "video") as "video" | "short",
           };
 
           setVideoMetadata(item.tempId, metadata);
-          
-          console.log('🎬 Video metadata set:', {
-            tempId: item.tempId,
-            duration,
-            durationMinutes: (duration / 60).toFixed(2),
-            youtubeType: metadata.youtubeType,
-            aspectRatio
-          });
-          
-          // Trigger content type suggestion immediately after setting metadata
           setTimeout(() => {
-            console.log('🎬 Triggering content type suggestion after metadata set');
-            const currentType = form.getValues('content_type');
+           const currentType = form.getValues('content_type');
             
             // Prepare media data for API call
             const mediaData = [{
@@ -892,48 +862,24 @@ export const usePublicationForm = ({
               file_type: 'video'
             }];
             
-            console.log('🎬 Calling contentTypeSuggestion.mutate with:', {
-              media: mediaData,
-              current_type: currentType,
-              durationInSeconds: duration,
-              durationInMinutes: (duration / 60).toFixed(2),
-              durationIsNumber: typeof duration === 'number',
-              durationValue: duration
-            });
-            
             // Call the backend API for content type suggestion
             contentTypeSuggestion.mutate({
               media: mediaData,
               current_type: currentType,
             }, {
               onSuccess: (result) => {
-                console.log('🎬 Content type suggestion API result:', result);
-                console.log('🎬 Detailed result analysis:', {
-                  result,
-                  hasResult: !!result,
-                  shouldChange: result?.should_change,
-                  suggestedType: result?.suggested_type,
-                  currentType,
-                  typesAreDifferent: result?.suggested_type !== currentType,
-                  allConditionsMet: result && result.should_change && result.suggested_type !== currentType
-                });
-                
+
                 if (result && result.should_change && result.suggested_type !== currentType) {
-                  console.log('🎬 Changing content type from', currentType, 'to', result.suggested_type);
-                  
                   toast.success(
                     `Tipo de contenido cambiado automáticamente a "${result.suggested_type}" basado en la duración del video (${(duration / 60).toFixed(1)} minutos).`,
                     {
-                      icon: '🎬',
                       duration: 4000
                     }
                   );
                   
                   form.setValue('content_type', result.suggested_type as ContentType, { shouldValidate: true });
                   setCurrentContentType(result.suggested_type);
-                } else {
-                  console.log('🎬 No content type change needed, result:', result);
-                }
+                } 
               },
               onError: (error) => {
                 console.error('🎬 Content type suggestion API failed:', error);
@@ -964,12 +910,6 @@ export const usePublicationForm = ({
                   }
                 );
                 
-                console.log('Video metadata sent to backend', {
-                  mediaFileId: mediaFile.id,
-                  duration,
-                  width,
-                  height
-                });
               }
             } catch (error) {
               console.warn('Failed to send video metadata to backend:', error);
@@ -1167,39 +1107,25 @@ export const usePublicationForm = ({
   };
 
   const onFormSubmit = async (data: PublicationFormData) => {
-    console.log('onFormSubmit called with data:', data);
-    console.log('Content type:', data.content_type);
-    console.log('Media files length:', mediaFiles.length);
-    console.log('Social accounts:', data.social_accounts);
-    console.log('Duration errors:', durationErrors);
-    
     // Skip media validation for polls (they don't require media)
     if (data.content_type !== "poll" && mediaFiles.length === 0) {
-      console.log('Blocking: Media required for non-poll content');
       setImageError(t("publications.modal.validation.imageRequired"));
       return;
     }
 
     if (data.social_accounts && data.social_accounts.length > 0) {
-      console.log('Validating social accounts schedule...');
       const hasGlobalSchedule = !!data.scheduled_at;
-      console.log('Has global schedule:', hasGlobalSchedule);
 
       // Skip schedule validation for already-published posts
       // Published posts don't need new schedule dates
       const isAlreadyPublished = publication?.status === "published";
-      console.log('Is already published:', isAlreadyPublished);
 
       // Only validate schedule for non-published posts (draft, scheduled, failed, etc.)
       if (!isAlreadyPublished) {
         const allAccountsHaveSchedule = data.social_accounts.every(
           (id) => accountSchedules[id] || hasGlobalSchedule,
         );
-        console.log('All accounts have schedule:', allAccountsHaveSchedule);
-        console.log('Account schedules:', accountSchedules);
-
         if (!allAccountsHaveSchedule && !data.scheduled_at) {
-          console.log('Blocking: Schedule validation failed');
           toast.error(
             t("publications.modal.validation.scheduleRequired") ||
               "Debes programar una fecha para todas las redes seleccionadas o establecer una fecha global.",
@@ -1210,15 +1136,12 @@ export const usePublicationForm = ({
     }
 
     if (Object.keys(durationErrors).length > 0) {
-      console.log('Blocking: Duration errors exist:', durationErrors);
       toast.error(
         t("publications.validation.durationErrors") ||
-          "Por favor, corrige los errores de duración antes de guardar.",
+          "Por favor, corrige los errores de duración antes de guardar."
       );
       return;
     }
-    
-    console.log('All validations passed, proceeding with form submission...');
     setIsSubmitting(true);
     try {
       const formData = new FormData();
@@ -1276,18 +1199,11 @@ export const usePublicationForm = ({
       const contentType = data.content_type || 'post';
       const useGlobalSchedule = data.use_global_schedule;
       
-      console.log('=== SCHEDULED_AT LOGIC DEBUG ===');
-      console.log('Content type:', contentType);
-      console.log('Use global schedule:', useGlobalSchedule);
-      console.log('Current status:', currentStatus);
-      console.log('Original scheduled_at:', scheduledAtValue);
-      
       // Para encuestas (polls), la lógica es diferente
       if (contentType === 'poll') {
         // Si use_global_schedule está desactivado, NO enviar scheduled_at global
         // Cada red social tendrá su propia fecha en accountSchedules
         if (!useGlobalSchedule) {
-          console.log('Poll without global schedule - clearing scheduled_at');
           scheduledAtValue = null;
         } else if (currentStatus === "scheduled" && !scheduledAtValue) {
           // Solo si use_global_schedule está activo y no hay fecha, establecer una por defecto
@@ -1295,8 +1211,7 @@ export const usePublicationForm = ({
           defaultDate.setMinutes(defaultDate.getMinutes() + 2);
           scheduledAtValue = defaultDate.toISOString();
           setValue("scheduled_at", scheduledAtValue, { shouldDirty: true });
-          console.log('Poll with global schedule - set default date:', scheduledAtValue);
-        }
+          }
       } else {
         // Para otros tipos de contenido, mantener la lógica original
         if (currentStatus === "scheduled" && !scheduledAtValue) {
@@ -1304,12 +1219,10 @@ export const usePublicationForm = ({
           defaultDate.setMinutes(defaultDate.getMinutes() + 2);
           scheduledAtValue = defaultDate.toISOString();
           setValue("scheduled_at", scheduledAtValue, { shouldDirty: true });
-          console.log('Non-poll content - set default date:', scheduledAtValue);
-        }
+         }
       }
       
-      console.log('Final scheduled_at value:', scheduledAtValue);
-      
+    
       const finalStatus = (() => {
         // Si no hay cuentas sociales y no hay fecha programada, siempre es draft
         if (socialAccounts.length === 0 && !scheduledAtValue) {
@@ -1326,7 +1239,6 @@ export const usePublicationForm = ({
         return validStatuses.includes(currentStatus) ? currentStatus : "draft";
       })();
 
-      console.log('Final status:', finalStatus);
       formData.append("status", finalStatus);
       
       // Solo enviar scheduled_at si realmente hay una fecha programada Y no es una encuesta sin programación global
@@ -1334,14 +1246,9 @@ export const usePublicationForm = ({
                                    scheduledAtValue.trim() !== "" && 
                                    !(contentType === 'poll' && !useGlobalSchedule);
       
-      console.log('Should send scheduled_at:', shouldSendScheduledAt);
-      
       if (shouldSendScheduledAt) {
         formData.append("scheduled_at", scheduledAtValue);
-        console.log('Added scheduled_at to formData:', scheduledAtValue);
-      } else {
-        console.log('Skipped adding scheduled_at to formData');
-      }
+       } 
       
       formData.append("social_accounts_sync", "true");
 
@@ -1399,8 +1306,7 @@ export const usePublicationForm = ({
 
       // If there are files uploading, WAIT for them to complete
       if (uploadingFiles.length > 0) {
-        console.log('⏳ Waiting for uploads to complete:', uploadingFiles.length);
-        toast.loading(
+         toast.loading(
           t("publications.modal.upload.waitingForUploads", {
             defaultValue: `Esperando a que se completen ${uploadingFiles.length} archivo(s)...`,
             count: uploadingFiles.length
@@ -1420,7 +1326,6 @@ export const usePublicationForm = ({
           });
 
           if (uploadingFiles.length === 0) {
-            console.log('✅ All uploads completed');
             toast.success(
               t("publications.modal.upload.uploadsCompleted", {
                 defaultValue: "Todos los archivos se han subido correctamente"
@@ -1647,7 +1552,9 @@ export const usePublicationForm = ({
           (result as any).title || (result as any).publication?.title;
 
         if (pubId) {
-          handleBackgroundLinking(pubId, pubTitle);
+          handleBackgroundLinking(pubId, pubTitle).catch((error) => {
+            console.error("Background linking failed:", error);
+          });
           toast.success(
             t("publications.modal.media.backgroundUpload") ||
               "Saved! Media is uploading in background.",
@@ -1661,7 +1568,7 @@ export const usePublicationForm = ({
       if (onSubmitSuccess) onSubmitSuccess(true);
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || t("publications.messages.error"),
+        error.response?.data?.message || t("publications.messages.error")
       );
     } finally {
       setIsSubmitting(false);
@@ -1669,12 +1576,6 @@ export const usePublicationForm = ({
   };
 
   const onInvalidSubmit = (errs: any) => {
-    console.log('=== onInvalidSubmit called ===');
-    console.log('Form validation errors:', errs);
-    console.log('Current form values:', watched);
-    console.log('Content type:', watched.content_type);
-    console.log('Hashtags value:', watched.hashtags, 'Type:', typeof watched.hashtags);
-    
     const contentType = watched.content_type || 'post';
     
     // Define what fields should be validated for each content type
@@ -1688,14 +1589,11 @@ export const usePublicationForm = ({
     
     const requiredFields = FIELD_VALIDATION_RULES[contentType as keyof typeof FIELD_VALIDATION_RULES] || FIELD_VALIDATION_RULES.post;
     
-    console.log('Required fields for', contentType, ':', requiredFields);
-    
     // Content-type specific validation messages
     const getFieldError = (field: string) => {
       // Skip validation if field is not required for this content type
       if (!requiredFields.includes(field)) {
-        console.log('Skipping validation for', field, 'in', contentType);
-        return null;
+       return null;
       }
       
       switch (field) {
@@ -1731,13 +1629,10 @@ export const usePublicationForm = ({
           const hasGlobalSchedule = watched.use_global_schedule;
           const hasScheduledValue = watched.scheduled_at && watched.scheduled_at.trim() !== '';
           const isPoll = contentType === 'poll';
-          
-          console.log('Scheduled_at validation - content type:', contentType, 'global schedule:', hasGlobalSchedule, 'has value:', hasScheduledValue, 'is poll:', isPoll);
-          
+ 
           // For polls, skip scheduled_at validation entirely if no global schedule is set
           if (isPoll && !hasGlobalSchedule) {
-            console.log('Skipping scheduled_at validation for poll without global schedule');
-            return false;
+             return false;
           }
           
           // Only validate scheduled_at if global schedule is enabled AND there's actually a value
@@ -1754,14 +1649,11 @@ export const usePublicationForm = ({
 
     // If there are no relevant errors, call onFormSubmit directly
     if (relevantErrors.length === 0) {
-      console.log('No relevant validation errors found, proceeding with submission');
-      console.log('About to call onFormSubmit directly');
       // Call the submit function directly with current form values
       try {
         onFormSubmit(watched as PublicationFormData);
-        console.log('onFormSubmit called successfully');
       } catch (error) {
-        console.error('Error calling onFormSubmit:', error);
+        console.error('Form submission error:', error);
       }
       return;
     }

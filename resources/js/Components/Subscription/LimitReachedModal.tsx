@@ -1,7 +1,7 @@
-import { AlertCircle, TrendingUp, Sparkles, X } from 'lucide-react';
-import { router } from '@inertiajs/react';
-import { Dialog, DialogContent, DialogHeader } from '@/Components/ui/dialog';
 import Button from '@/Components/common/Modern/Button';
+import { Dialog, DialogContent } from '@/Components/ui/dialog';
+import { router } from '@inertiajs/react';
+import { AlertCircle, Sparkles, TrendingUp } from 'lucide-react';
 
 interface LimitReachedModalProps {
   isOpen: boolean;
@@ -18,40 +18,36 @@ export function LimitReachedModal({
 }: LimitReachedModalProps) {
   const messages = {
     ai_credits: {
-      title: '🤖 Créditos de IA Agotados',
+      title: 'Créditos de IA Agotados',
       description: 'Has usado todos tus créditos de IA este mes.',
       planLimit: '10 créditos/mes',
       suggestion: '500 créditos adicionales',
       price: '$39.99',
       savings: 'Ahorra 20%',
-      icon: '💡',
     },
     storage: {
-      title: '💾 Almacenamiento Lleno',
+      title: 'Almacenamiento Lleno',
       description: 'Has alcanzado tu límite de almacenamiento.',
       planLimit: '1 GB',
       suggestion: '50 GB adicionales',
       price: '$19.99',
       savings: 'Ahorra 20%',
-      icon: '💾',
     },
     publications: {
-      title: '📝 Límite de Publicaciones Alcanzado',
+      title: 'Límite de Publicaciones Alcanzado',
       description: 'Has alcanzado el límite de publicaciones de tu plan.',
       planLimit: '10 publicaciones/mes',
       suggestion: 'Plan Professional',
       price: '$49/mes',
       savings: '200 publicaciones/mes',
-      icon: '📝',
     },
     social_accounts: {
-      title: '🔗 Límite de Cuentas Sociales',
+      title: 'Límite de Cuentas Sociales',
       description: 'Has conectado el máximo de cuentas sociales permitidas.',
       planLimit: '3 cuentas',
       suggestion: 'Plan Professional',
       price: '$49/mes',
       savings: '8 cuentas sociales',
-      icon: '🔗',
     },
   };
   

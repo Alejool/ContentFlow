@@ -62,8 +62,7 @@ export const useContentTypeAutoConversion = ({
             reason: suggestion.reason
           }),
           {
-            duration: 5000,
-            icon: '🔄'
+            duration: 5000
           }
         );
       } else if (!autoApply && suggestion.should_change) {
@@ -94,8 +93,7 @@ export const useContentTypeAutoConversion = ({
             </div>
           ),
           {
-            duration: 10000,
-            icon: '💡'
+            duration: 10000
           }
         );
       }

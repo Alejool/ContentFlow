@@ -341,7 +341,6 @@ export const useWorkspaceLocks = () => {
           updateLock(pubId, data.lock);
           const userName = data.lock.user_name || data.lock.user?.name || "Usuario";
           toast(`${userName} ha empezado a editar.`, {
-            icon: "🔒",
             id: `lock-${pubId}`,
           });
         }
