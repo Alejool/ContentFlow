@@ -108,7 +108,7 @@ class UpdatePublicationAction
         $suggestedType = $validation->suggestions['suggested_content_type'];
         $reason = $validation->suggestions['reason'] ?? '';
         
-        // Auto-apply the suggestion if it's a video duration-based change
+        // Auto-apply the suggestion if it's a valid change
         if ($suggestedType !== $contentType && $this->shouldAutoApplyContentTypeChange($contentType, $suggestedType)) {
           $data['content_type'] = $suggestedType;
           
@@ -119,6 +119,20 @@ class UpdatePublicationAction
             'to' => $suggestedType,
             'reason' => $reason
           ]);
+          
+          // Re-validate with the new content type to ensure it's valid
+          $revalidation = $this->validationService->validateContentType(
+            $suggestedType,
+            $socialAccountIds,
+            $mediaFiles
+          );
+          
+          if (!$revalidation->isValid) {
+            // If the suggested type is still invalid, throw the original validation error
+            throw ValidationException::withMessages([
+              'content_type' => $validation->errors
+            ]);
+          }
         }
       }
     }
@@ -681,14 +695,16 @@ class UpdatePublicationAction
    */
   private function shouldAutoApplyContentTypeChange(string $currentType, string $suggestedType): bool
   {
-    // Auto-apply changes based on video duration constraints
+    // Auto-apply changes based on media characteristics
     $autoApplyRules = [
-      // From story to reel/post based on duration
-      'story' => ['reel', 'post'],
-      // From reel to post based on duration
-      'reel' => ['post'],
-      // From post to reel/story if duration allows (less common but possible)
-      'post' => ['reel', 'story']
+      // From story to reel/post/carousel based on duration or file count
+      'story' => ['reel', 'post', 'carousel'],
+      // From reel to post/story/carousel based on duration or file count
+      'reel' => ['post', 'story', 'carousel'],
+      // From post to reel/story/carousel based on duration or file count
+      'post' => ['reel', 'story', 'carousel'],
+      // From carousel to post/reel/story if file count changes
+      'carousel' => ['post', 'reel', 'story']
     ];
     
     return isset($autoApplyRules[$currentType]) && 

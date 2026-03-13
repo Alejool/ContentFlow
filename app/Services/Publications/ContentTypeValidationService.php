@@ -4,6 +4,7 @@ namespace App\Services\Publications;
 
 use App\Models\Social\SocialAccount;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 
 class ContentTypeValidationService
 {
@@ -115,8 +116,33 @@ class ContentTypeValidationService
 
         $fileCount = count($mediaFiles);
         
-        // Multiple files = carousel
+        // Multiple files = carousel (unless all are very short videos that could be reels)
         if ($fileCount > 1) {
+            // Check if all files are short videos that could be reels
+            $allShortVideos = true;
+            foreach ($mediaFiles as $file) {
+                $mimeType = '';
+                $duration = null;
+                
+                if (is_array($file)) {
+                    $mimeType = $file['mime_type'] ?? $file['type'] ?? '';
+                    $duration = $file['duration'] ?? $file['metadata']['duration'] ?? null;
+                } elseif (is_object($file) && method_exists($file, 'getMimeType')) {
+                    $mimeType = $file->getMimeType();
+                }
+                
+                // If it's not a video or duration is > 90 seconds, it's not a short video
+                if (!str_starts_with($mimeType, 'video/') || ($duration !== null && $duration > 90)) {
+                    $allShortVideos = false;
+                    break;
+                }
+            }
+            
+            // If all are short videos and current type is reel, keep it as reel
+            if ($allShortVideos && $currentType === 'reel') {
+                return 'reel';
+            }
+            
             return 'carousel';
         }
         
@@ -132,12 +158,16 @@ class ContentTypeValidationService
             $mimeType = $file->getMimeType();
         }
         
-        // Image file
+        // Image file - can be story or post
         if (str_starts_with($mimeType, 'image/')) {
+            // If current type is story, keep it
+            if ($currentType === 'story') {
+                return 'story';
+            }
             return $currentType ?? 'post';
         }
         
-        // Video file
+        // Video file - suggest based on duration
         if (str_starts_with($mimeType, 'video/')) {
             if ($duration !== null) {
                 // Suggest based on duration limits:
@@ -147,7 +177,7 @@ class ContentTypeValidationService
                 
                 if ($duration <= 60) {
                     // Short videos can be either story or reel
-                    // If current type is valid, keep it; otherwise suggest reel
+                    // If current type is valid for this duration, keep it
                     if ($currentType === 'story' || $currentType === 'reel') {
                         return $currentType;
                     }
@@ -160,8 +190,11 @@ class ContentTypeValidationService
                     return 'post';
                 }
             } else {
-                // No duration info yet, keep current or default to reel
-                return $currentType ?? 'reel';
+                // No duration info yet, prefer current type if it's video-compatible
+                if (in_array($currentType, ['reel', 'story', 'post'])) {
+                    return $currentType;
+                }
+                return 'reel'; // Default to reel for videos without duration info
             }
         }
         
@@ -192,6 +225,21 @@ class ContentTypeValidationService
         $hasProcessingFiles = $this->hasProcessingFiles($mediaFiles);
         if ($hasProcessingFiles) {
             // Files are being processed, skip media validation
+            Log::info('⏭️ Skipping media validation - files are being processed', [
+                'content_type' => $contentType,
+                'file_count' => $fileCount,
+                'media_files' => array_map(function($file) {
+                    if (is_array($file)) {
+                        return [
+                            'type' => $file['mime_type'] ?? $file['type'] ?? 'unknown',
+                            'status' => $file['status'] ?? 'unknown',
+                            'temp_id' => $file['temp_id'] ?? null,
+                            'key' => $file['key'] ?? null,
+                        ];
+                    }
+                    return ['type' => 'UploadedFile'];
+                }, $mediaFiles)
+            ]);
             return new ContentTypeValidationResult(true, [], []);
         }
 
@@ -355,7 +403,7 @@ class ContentTypeValidationService
      * @param array $mediaFiles
      * @return bool
      */
-    private function hasProcessingFiles(array $mediaFiles): bool
+        private function hasProcessingFiles(array $mediaFiles): bool
     {
         foreach ($mediaFiles as $file) {
             // Check if it's a file being uploaded (UploadedFile)
@@ -395,7 +443,7 @@ class ContentTypeValidationService
     /**
      * Suggest content type based on video duration
      */
-    public function suggestContentTypeByDuration($mediaFile, string $currentType): string
+        public function suggestContentTypeByDuration($mediaFile, string $currentType): string
     {
         // Only suggest for video files
         $mimeType = '';
@@ -409,13 +457,23 @@ class ContentTypeValidationService
             // For uploaded files, we can't get duration yet
         }
         
+        Log::info('🎬 suggestContentTypeByDuration called', [
+            'mime_type' => $mimeType,
+            'duration' => $duration,
+            'duration_minutes' => $duration ? round($duration / 60, 2) : null,
+            'current_type' => $currentType,
+            'media_file' => $mediaFile
+        ]);
+        
         // Only process video files
         if (!str_starts_with($mimeType, 'video/')) {
+            Log::info('🎬 Not a video file, keeping current type', ['current_type' => $currentType]);
             return $currentType;
         }
         
         // If we don't have duration info yet, keep current type
         if ($duration === null) {
+            Log::info('🎬 No duration info, keeping current type', ['current_type' => $currentType]);
             return $currentType;
         }
         
@@ -424,14 +482,34 @@ class ContentTypeValidationService
             // 1-60 seconds: can be story or reel
             // If current type is valid, keep it
             if ($currentType === 'story' || $currentType === 'reel') {
+                Log::info('🎬 Duration <= 60s, keeping current type', [
+                    'duration' => $duration,
+                    'current_type' => $currentType,
+                    'result' => $currentType
+                ]);
                 return $currentType;
             }
+            Log::info('🎬 Duration <= 60s, suggesting reel', [
+                'duration' => $duration,
+                'current_type' => $currentType,
+                'result' => 'reel'
+            ]);
             return 'reel'; // Default to reel
         } elseif ($duration <= 90) {
             // 60-90 seconds: only reel is valid
+            Log::info('🎬 Duration 60-90s, suggesting reel', [
+                'duration' => $duration,
+                'current_type' => $currentType,
+                'result' => 'reel'
+            ]);
             return 'reel';
         } else {
             // > 90 seconds: must be post
+            Log::info('🎬 Duration > 90s, suggesting post', [
+                'duration' => $duration,
+                'current_type' => $currentType,
+                'result' => 'post'
+            ]);
             return 'post';
         }
     }

@@ -457,7 +457,7 @@ class UpdatePublicationRequest extends FormRequest
         // Create a representation of all media files that will exist after the update
         $allMediaFilesAfterUpdate = [];
         
-        // Add existing media files that won't be removed
+        // Add existing media files that won't be removed (including processing ones)
         $existingMediaFiles = $publication->mediaFiles()
           ->whereNotIn('media_files.id', $removedMediaIds)
           ->get();
@@ -466,6 +466,7 @@ class UpdatePublicationRequest extends FormRequest
           $allMediaFilesAfterUpdate[] = [
             'mime_type' => $mediaFile->mime_type,
             'type' => $mediaFile->mime_type,
+            'status' => $mediaFile->status, // Include status to detect processing files
           ];
         }
         
@@ -478,6 +479,17 @@ class UpdatePublicationRequest extends FormRequest
         $mediaResult = $validationService->validateMediaFiles($contentType, $allMediaFilesAfterUpdate);
         
         if (!$mediaResult->isValid) {
+          \Log::warning('❌ Media validation failed during publication update', [
+            'publication_id' => $publication->id,
+            'content_type' => $contentType,
+            'total_files_after_update' => count($allMediaFilesAfterUpdate),
+            'existing_files' => $existingMediaCount,
+            'new_files' => count($newMediaFiles),
+            'removed_files' => count($removedMediaIds),
+            'errors' => $mediaResult->errors,
+            'all_files_data' => $allMediaFilesAfterUpdate
+          ]);
+          
           foreach ($mediaResult->errors as $error) {
             $validator->errors()->add('media', $error);
           }

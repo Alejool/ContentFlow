@@ -94,11 +94,34 @@ class ProcessBackgroundUpload implements ShouldQueue
           }
         }
 
-        // Update status
+        // Process video metadata if it's a video file
+        $metadata = [];
+        if ($this->mediaFile->file_type === 'video') {
+          try {
+            $metadata = $this->extractVideoMetadata();
+            Log::info('Video metadata extracted', [
+              'media_file_id' => $this->mediaFile->id,
+              'metadata' => $metadata
+            ]);
+          } catch (\Exception $e) {
+            Log::warning('Failed to extract video metadata', [
+              'media_file_id' => $this->mediaFile->id,
+              'error' => $e->getMessage()
+            ]);
+          }
+        }
+
+        // Update status and metadata
         $this->mediaFile->update([
           'status' => 'completed',
-          'size' => Storage::disk('s3')->size($this->mediaFile->getRawOriginal('file_path'))
+          'size' => Storage::disk('s3')->size($this->mediaFile->getRawOriginal('file_path')),
+          'metadata' => $metadata
         ]);
+
+        // Auto-suggest content type based on duration if available
+        if (isset($metadata['duration']) && $metadata['duration'] > 0) {
+          $this->autoSuggestContentType($metadata['duration']);
+        }
 
         // Auto-generate reels if enabled, it's a video, and AI is configured
         if ($this->mediaFile->file_type === 'video' 
@@ -216,5 +239,150 @@ class ProcessBackgroundUpload implements ShouldQueue
       || !empty(config('services.anthropic.api_key'))
       || !empty(config('services.gemini.api_key'))
       || !empty(config('services.deepseek.api_key'));
+  }
+
+  /**
+   * Extract video metadata using FFmpeg or fallback methods
+   */
+  private function extractVideoMetadata(): array
+  {
+    $filePath = $this->mediaFile->getRawOriginal('file_path');
+    $metadata = [];
+
+    try {
+      // First, try to get metadata from S3 object metadata if available
+      $s3Metadata = Storage::disk('s3')->getMetadata($filePath);
+      
+      // Try FFmpeg if available
+      if ($this->isFFmpegAvailable()) {
+        $metadata = $this->extractWithFFmpeg($filePath);
+      }
+      
+      // If no duration found, try to get it from file size estimation (rough approximation)
+      if (!isset($metadata['duration'])) {
+        Log::info('FFmpeg not available or failed, using fallback metadata extraction', [
+          'media_file_id' => $this->mediaFile->id
+        ]);
+        
+        // For now, we'll rely on frontend-provided metadata
+        // The frontend should have already extracted duration before upload
+        $metadata['duration'] = null; // Will be updated by frontend
+      }
+
+    } catch (\Exception $e) {
+      Log::error('Failed to extract video metadata', [
+        'error' => $e->getMessage(),
+        'media_file_id' => $this->mediaFile->id
+      ]);
+    }
+
+    return $metadata;
+  }
+
+  /**
+   * Check if FFmpeg is available
+   */
+  private function isFFmpegAvailable(): bool
+  {
+    $output = shell_exec('which ffprobe 2>/dev/null');
+    return !empty($output);
+  }
+
+  /**
+   * Extract metadata using FFmpeg
+   */
+  private function extractWithFFmpeg(string $filePath): array
+  {
+    $metadata = [];
+    
+    // Download file temporarily for processing
+    $tempFile = tempnam(sys_get_temp_dir(), 'video_');
+    $fileContent = Storage::disk('s3')->get($filePath);
+    file_put_contents($tempFile, $fileContent);
+
+    try {
+      // Use FFprobe to get video metadata
+      $command = "ffprobe -v quiet -print_format json -show_format -show_streams " . escapeshellarg($tempFile);
+      $output = shell_exec($command);
+      
+      if ($output) {
+        $data = json_decode($output, true);
+        
+        if (isset($data['streams'])) {
+          foreach ($data['streams'] as $stream) {
+            if ($stream['codec_type'] === 'video') {
+              $metadata['duration'] = isset($stream['duration']) ? (float)$stream['duration'] : null;
+              $metadata['width'] = isset($stream['width']) ? (int)$stream['width'] : null;
+              $metadata['height'] = isset($stream['height']) ? (int)$stream['height'] : null;
+              
+              if ($metadata['width'] && $metadata['height']) {
+                $metadata['aspect_ratio'] = $metadata['width'] / $metadata['height'];
+              }
+              break;
+            }
+          }
+        }
+        
+        // Fallback to format duration if stream duration not available
+        if (!isset($metadata['duration']) && isset($data['format']['duration'])) {
+          $metadata['duration'] = (float)$data['format']['duration'];
+        }
+      }
+    } finally {
+      // Clean up temp file
+      if (file_exists($tempFile)) {
+        unlink($tempFile);
+      }
+    }
+
+    return $metadata;
+  }
+
+  /**
+   * Auto-suggest content type based on video duration
+   */
+  private function autoSuggestContentType(float $duration): void
+  {
+    try {
+      $contentTypeService = app(\App\Services\Publications\ContentTypeValidationService::class);
+      $currentType = $this->publication->content_type;
+      
+      $mediaFile = [
+        'duration' => $duration,
+        'mime_type' => $this->mediaFile->mime_type,
+        'type' => $this->mediaFile->mime_type
+      ];
+      
+      $suggestedType = $contentTypeService->suggestContentTypeByDuration($mediaFile, $currentType);
+      
+      if ($suggestedType !== $currentType) {
+        Log::info('Auto-suggesting content type change', [
+          'publication_id' => $this->publication->id,
+          'current_type' => $currentType,
+          'suggested_type' => $suggestedType,
+          'duration' => $duration
+        ]);
+        
+        // Update publication content type
+        $this->publication->update(['content_type' => $suggestedType]);
+        
+        // Log the change
+        $this->publication->logActivity('content_type_auto_changed', [
+          'from' => $currentType,
+          'to' => $suggestedType,
+          'reason' => "Video duration ({$duration}s) suggests {$suggestedType} format",
+          'media_file_id' => $this->mediaFile->id
+        ]);
+        
+        // Fire event to update frontend
+        event(new \App\Events\Publications\PublicationUpdated($this->publication));
+      }
+    } catch (\Exception $e) {
+      Log::error('Failed to auto-suggest content type', [
+        'error' => $e->getMessage(),
+        'publication_id' => $this->publication->id,
+        'media_file_id' => $this->mediaFile->id
+      ]);
+    }
   }
 }

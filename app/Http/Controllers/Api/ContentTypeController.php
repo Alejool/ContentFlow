@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\Publications\ContentTypeValidationService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 class ContentTypeController extends Controller
 {
@@ -31,6 +32,16 @@ class ContentTypeController extends Controller
         ];
 
         $currentType = $request->current_type;
+        
+        // Add logging to debug the issue
+        Log::info('🎯 Content type suggestion requested', [
+            'duration' => $request->duration,
+            'duration_minutes' => $request->duration ? round($request->duration / 60, 2) : null,
+            'mime_type' => $request->mime_type,
+            'current_type' => $currentType,
+            'media_file_data' => $mediaFile
+        ]);
+        
         $suggestedType = $this->validationService->suggestContentTypeByDuration($mediaFile, $currentType);
 
         $response = [
@@ -43,6 +54,14 @@ class ContentTypeController extends Controller
         if ($response['should_change']) {
             $response['reason'] = $this->getChangeReason($currentType, $suggestedType, $request->duration);
         }
+
+        Log::info('🎯 Content type suggestion result', [
+            'current_type' => $currentType,
+            'suggested_type' => $suggestedType,
+            'should_change' => $response['should_change'],
+            'reason' => $response['reason'],
+            'duration' => $request->duration
+        ]);
 
         return response()->json($response);
     }

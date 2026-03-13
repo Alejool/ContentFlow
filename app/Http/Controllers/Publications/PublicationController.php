@@ -1332,6 +1332,59 @@ class PublicationController extends Controller
   }
 
   /**
+  /**
+   * Auto-suggest content type for publication based on video duration
+   */
+  private function autoSuggestContentTypeForPublication(Publication $publication, float $duration, MediaFile $mediaFile): void
+  {
+    try {
+      $contentTypeService = app(\App\Services\Publications\ContentTypeValidationService::class);
+      $currentType = $publication->content_type;
+      
+      $mediaFileData = [
+        'duration' => $duration,
+        'mime_type' => $mediaFile->mime_type,
+        'type' => $mediaFile->mime_type
+      ];
+      
+      $suggestedType = $contentTypeService->suggestContentTypeByDuration($mediaFileData, $currentType);
+      
+      if ($suggestedType !== $currentType) {
+        Log::info('Auto-suggesting content type change', [
+          'publication_id' => $publication->id,
+          'current_type' => $currentType,
+          'suggested_type' => $suggestedType,
+          'duration' => $duration
+        ]);
+        
+        // Update publication content type
+        $publication->update(['content_type' => $suggestedType]);
+        
+        // Log the change
+        $publication->logActivity('content_type_auto_changed', [
+          'from' => $currentType,
+          'to' => $suggestedType,
+          'reason' => "Video duration ({$duration}s) suggests {$suggestedType} format",
+          'media_file_id' => $mediaFile->id
+        ]);
+        
+        Log::info('Content type automatically changed', [
+          'publication_id' => $publication->id,
+          'from' => $currentType,
+          'to' => $suggestedType,
+          'duration' => $duration
+        ]);
+      }
+    } catch (\Exception $e) {
+      Log::error('Failed to auto-suggest content type', [
+        'error' => $e->getMessage(),
+        'publication_id' => $publication->id,
+        'media_file_id' => $mediaFile->id
+      ]);
+    }
+  }
+
+  /**
    * Attach uploaded media to a publication
    */
   public function attachMedia(Request $request, Publication $publication)
@@ -1345,6 +1398,10 @@ class PublicationController extends Controller
       'filename' => 'required|string',
       'mime_type' => 'required|string',
       'size' => 'required|integer',
+      'duration' => 'nullable|numeric|min:0',
+      'width' => 'nullable|integer|min:1',
+      'height' => 'nullable|integer|min:1',
+      'aspect_ratio' => 'nullable|numeric|min:0',
     ]);
 
     try {
@@ -1353,7 +1410,11 @@ class PublicationController extends Controller
         'key' => $request->key,
         'filename' => $request->filename,
         'mime_type' => $request->mime_type,
-        'size' => $request->size
+        'size' => $request->size,
+        'duration' => $request->duration,
+        'width' => $request->width,
+        'height' => $request->height,
+        'aspect_ratio' => $request->aspect_ratio,
       ]);
 
       // Verify S3 file exists before creating database record
@@ -1396,6 +1457,20 @@ class PublicationController extends Controller
       Log::info("📊 Calculated order", ['max_order' => $maxOrder, 'next_order' => $nextOrder]);
 
       // Create MediaFile record explicitly
+      $metadata = [];
+      if ($request->has('duration')) {
+        $metadata['duration'] = $request->duration;
+      }
+      if ($request->has('width')) {
+        $metadata['width'] = $request->width;
+      }
+      if ($request->has('height')) {
+        $metadata['height'] = $request->height;
+      }
+      if ($request->has('aspect_ratio')) {
+        $metadata['aspect_ratio'] = $request->aspect_ratio;
+      }
+
       $mediaFile = MediaFile::create([
         'workspace_id' => $publication->workspace_id,
         'publication_id' => $publication->id, // Redundant if pivot used, but good for direct belonging
@@ -1406,6 +1481,7 @@ class PublicationController extends Controller
         'size' => $request->size,
         'status' => 'processing',
         'user_id' => Auth::id(), // Ensure user ownership
+        'metadata' => $metadata,
       ]);
 
       Log::info('✅ MediaFile created', ['id' => $mediaFile->id, 'status' => $mediaFile->status]);
@@ -1420,6 +1496,26 @@ class PublicationController extends Controller
       ProcessBackgroundUpload::dispatch($publication, $mediaFile, null);
 
       Log::info('🚀 ProcessBackgroundUpload job dispatched', ['media_file_id' => $mediaFile->id]);
+
+      // Auto-suggest content type based on duration if it's a video and we have duration
+      if ($mediaFile->file_type === 'video' && isset($metadata['duration']) && $metadata['duration'] > 0) {
+        Log::info('🎯 Auto-suggesting content type based on video duration', [
+          'publication_id' => $publication->id,
+          'media_file_id' => $mediaFile->id,
+          'duration' => $metadata['duration'],
+          'current_type' => $publication->content_type
+        ]);
+        $this->autoSuggestContentTypeForPublication($publication, $metadata['duration'], $mediaFile);
+      } else {
+        Log::info('⏭️ Skipping content type auto-suggestion', [
+          'publication_id' => $publication->id,
+          'media_file_id' => $mediaFile->id,
+          'file_type' => $mediaFile->file_type,
+          'has_duration' => isset($metadata['duration']),
+          'duration_value' => $metadata['duration'] ?? 'null',
+          'metadata' => $metadata
+        ]);
+      }
 
       // Clear media lock
       cache()->forget("publication:{$publication->id}:media_lock");
