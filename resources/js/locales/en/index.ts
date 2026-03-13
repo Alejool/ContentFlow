@@ -25,6 +25,7 @@ import pricing from "./pricing.json";
 import profile from "./profile.json";
 import publications from "./publications.json";
 import reels from "./reels.json";
+import roles from "./roles.json";
 import settings from "./settings.json";
 import shortcuts from "./shortcuts.json";
 import subscription from "./subscription.json";
@@ -55,6 +56,7 @@ export default {
   ...settings,
   ...publications,
   ...reels,
+  ...roles,
   ...logs,
   ...auth,
   ...ai,

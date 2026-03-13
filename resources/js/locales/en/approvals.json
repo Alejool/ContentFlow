@@ -4,6 +4,10 @@
     "reject": "Reject",
     "approvedSuccess": "Publication successfully approved",
     "rejectedSuccess": "Publication successfully rejected",
+    "sentToReview": "Sent to review - {{level}}. Reviewers: {{approvers}}",
+    "sentToReviewGeneric": "Successfully sent to review",
+    "unknownApprover": "Unknown reviewer",
+    "level": "Level",
     "noPending": "No pending approvals",
     "noPendingDesc": "Great! All publications are up to date.",
     "historyTitle": "Approval History",
@@ -67,6 +71,22 @@
     "locked": {
       "title": "Basic Approvals Enabled",
       "description": "Your current plan allows single-level approvals. Upgrade your plan to create advanced, multi-level approval workflows."
+    },
+    "workflow_progress": "Workflow Progress",
+    "progress": "Progress",
+    "in_progress": "In Progress",
+    "rejected_here": "Rejected Here",
+    "rejected_at_level": "Rejected at level {{level}}",
+    "approver_role": "Approver Role",
+    "approved_ready_to_publish": "Approved! Ready to publish",
+    "next_action": {
+      "submit_for_approval": "Submit this publication for review to start the approval process",
+      "awaiting_level_approval": "Awaiting approval from {{role}} ({{level}})",
+      "awaiting_final_approval": "Awaiting final approval from {{role}}",
+      "ready_to_publish": "The publication has been approved and is ready to be published"
+    },
+    "errors": {
+      "submit_failed": "Error submitting for review"
     }
   }
 }

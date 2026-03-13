@@ -1,0 +1,65 @@
+{
+  "roles": {
+    "edit_role": "Editar Rol",
+    "edit_role_subtitle": "Selecciona los permisos para este rol",
+    "select_permissions": "Selecciona los permisos que tendrá este rol",
+    "permissions": "Permisos",
+    "success": {
+      "updated": "Rol actualizado exitosamente",
+      "assigned": "Rol asignado exitosamente"
+    },
+    "errors": {
+      "update_failed": "Error al actualizar el rol",
+      "assignment_failed": "Error al asignar el rol",
+      "insufficient_permissions": "No tienes permisos suficientes"
+    },
+    "management": {
+      "title": "Gestión de Roles",
+      "subtitle": "Administra roles y asigna permisos a los usuarios"
+    },
+    "table": {
+      "user": "Usuario",
+      "current_role": "Rol Actual",
+      "permissions": "Permisos",
+      "actions": "Acciones"
+    },
+    "users_list": "Lista de Usuarios",
+    "users_list_subtitle": "Asigna roles a los miembros del equipo",
+    "insufficient_permissions_title": "Permisos Insuficientes",
+    "insufficient_permissions_message": "Solo los administradores y propietarios pueden gestionar roles",
+    "permissions_list": {
+      "publish": {
+        "name": "Publicar",
+        "description": "Permite publicar contenido en redes sociales"
+      },
+      "approve": {
+        "name": "Aprobar",
+        "description": "Permite aprobar contenido para publicación"
+      },
+      "view-analytics": {
+        "name": "Ver Analíticas",
+        "description": "Permite ver las analíticas del workspace"
+      },
+      "manage-accounts": {
+        "name": "Gestionar Cuentas",
+        "description": "Permite agregar/eliminar cuentas sociales"
+      },
+      "manage-team": {
+        "name": "Gestionar Equipo",
+        "description": "Permite invitar/eliminar miembros"
+      },
+      "manage-content": {
+        "name": "Gestionar Contenido",
+        "description": "Permite crear y editar publicaciones"
+      },
+      "manage-campaigns": {
+        "name": "Gestionar Campañas",
+        "description": "Permite crear y editar campañas"
+      },
+      "view-content": {
+        "name": "Ver Contenido",
+        "description": "Permite ver el contenido del workspace (solo lectura)"
+      }
+    }
+  }
+}
