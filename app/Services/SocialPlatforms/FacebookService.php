@@ -23,9 +23,12 @@ class FacebookService extends BaseSocialService
     $rawPath = $post->mediaPaths[0] ?? null;
 
     try {
-      // Check if this is a poll
+      // Check platform settings for content type
       $platformSettings = $post->platformSettings['facebook'] ?? [];
-      $isPoll = ($platformSettings['type'] ?? '') === 'poll';
+      $contentType = $platformSettings['type'] ?? 'post';
+      
+      // Check if this is a poll
+      $isPoll = $contentType === 'poll';
 
       if ($isPoll) {
         $pollResult = $this->handlePoll($pageId, $content, $platformSettings);
@@ -38,11 +41,18 @@ class FacebookService extends BaseSocialService
         }
       }
 
+      // Check if this is a reel
+      $isReel = $contentType === 'reel';
+
       if (!empty($rawPath)) {
         $isVideo = str_contains($rawPath, '.mp4') || str_contains($rawPath, '.mov') || str_contains($rawPath, '.avi') || str_contains($rawPath, '.m4v');
 
         if ($isVideo) {
-          $postId = $this->handleVideoUpload($pageId, $rawPath, $content, $post->title);
+          if ($isReel) {
+            $postId = $this->handleReelUpload($pageId, $rawPath, $content, $post->title);
+          } else {
+            $postId = $this->handleVideoUpload($pageId, $rawPath, $content, $post->title);
+          }
         } else {
           $postId = $this->uploadPhoto($pageId, $rawPath, $content);
         }
@@ -50,10 +60,13 @@ class FacebookService extends BaseSocialService
         $postId = $this->publishTextPost($pageId, $content, $link);
       }
 
+      $postType = $isReel ? 'reel' : 'post';
+      $postUrl = $isReel ? "https://facebook.com/reel/{$postId}" : "https://facebook.com/{$postId}";
+
       return PostResultDTO::success(
         postId: $postId,
-        postUrl: "https://facebook.com/{$postId}",
-        rawData: ['platform' => 'facebook']
+        postUrl: $postUrl,
+        rawData: ['platform' => 'facebook', 'type' => $postType]
       );
     } catch (\Exception $e) {
       return PostResultDTO::failure($e->getMessage(), ['trace' => $e->getTraceAsString()]);
@@ -122,6 +135,139 @@ class FacebookService extends BaseSocialService
       // Para archivos pequeños, convertir a URL pública y usar método directo
       $publicUrl = $this->getPublicUrl($rawPath);
       return $this->uploadVideo($pageId, $publicUrl, $content, $title);
+    }
+  }
+
+  /**
+   * Handle Facebook Reel upload
+   */
+  private function handleReelUpload(string $pageId, string $rawPath, string $content, ?string $title): string
+  {
+    $isUrl = str_starts_with($rawPath, 'http://') || str_starts_with($rawPath, 'https://');
+    
+    Log::info('Facebook Reel upload starting', [
+      'pageId' => $pageId,
+      'is_url' => $isUrl,
+      'path' => $rawPath
+    ]);
+    
+    // Facebook Reels use the same upload mechanism as regular videos
+    // but with different endpoint and parameters
+    if ($isUrl) {
+      return $this->uploadReelFromUrl($pageId, $rawPath, $content, $title);
+    }
+    
+    // For local files, convert to public URL and use URL method
+    $localPath = storage_path('app/' . $rawPath);
+    
+    if (!file_exists($localPath)) {
+      throw new \Exception("Reel video file not found: {$localPath}");
+    }
+    
+    $publicUrl = $this->getPublicUrl($rawPath);
+    return $this->uploadReelFromUrl($pageId, $publicUrl, $content, $title);
+  }
+
+  /**
+   * Upload Facebook Reel from URL
+   */
+  private function uploadReelFromUrl(string $pageId, string $videoUrl, string $description, ?string $title): string
+  {
+    Log::info('Facebook Reel upload from URL starting', [
+      'pageId' => $pageId,
+      'url' => $videoUrl
+    ]);
+
+    // Facebook Reels endpoint
+    $endpoint = "https://graph.facebook.com/" . self::API_VERSION . "/{$pageId}/video_reels";
+
+    $params = [
+      'upload_phase' => 'start',
+      'access_token' => $this->accessToken,
+    ];
+
+    try {
+      // Step 1: Initialize reel upload
+      $response = $this->client->post($endpoint, [
+        'form_params' => $params,
+        'timeout' => 60
+      ]);
+      
+      $initResult = json_decode($response->getBody(), true);
+      $videoId = $initResult['video_id'] ?? null;
+      $uploadUrl = $initResult['upload_url'] ?? null;
+
+      if (!$videoId || !$uploadUrl) {
+        Log::error('Facebook Reel initialization failed', [
+          'response' => $initResult
+        ]);
+        throw new \Exception("Failed to initialize Facebook Reel upload");
+      }
+
+      Log::info('Facebook Reel upload initialized', [
+        'video_id' => $videoId,
+        'upload_url' => $uploadUrl
+      ]);
+
+      // Step 2: Upload video to the provided URL
+      $videoResponse = $this->client->post($uploadUrl, [
+        'form_params' => [
+          'source' => $videoUrl,
+          'access_token' => $this->accessToken,
+        ],
+        'timeout' => 600 // 10 minutes for video processing
+      ]);
+
+      $uploadResult = json_decode($videoResponse->getBody(), true);
+      
+      if (!$uploadResult['success'] ?? false) {
+        throw new \Exception("Failed to upload video for Facebook Reel");
+      }
+
+      // Step 3: Finalize reel with metadata
+      $finalizeParams = [
+        'upload_phase' => 'finish',
+        'video_id' => $videoId,
+        'description' => $description,
+        'access_token' => $this->accessToken,
+      ];
+
+      if ($title) {
+        $finalizeParams['title'] = $title;
+      }
+
+      $finalizeResponse = $this->client->post($endpoint, [
+        'form_params' => $finalizeParams,
+        'timeout' => 300
+      ]);
+
+      $finalizeResult = json_decode($finalizeResponse->getBody(), true);
+      $reelId = $finalizeResult['id'] ?? $videoId;
+
+      if (!$reelId) {
+        Log::error('Facebook Reel finalization failed', [
+          'response' => $finalizeResult
+        ]);
+        throw new \Exception("Failed to finalize Facebook Reel");
+      }
+      
+      Log::info('Facebook Reel published successfully', [
+        'reel_id' => $reelId,
+        'pageId' => $pageId
+      ]);
+
+      return $reelId;
+
+    } catch (\Exception $e) {
+      Log::error('Facebook Reel upload failed', [
+        'error' => $e->getMessage(),
+        'pageId' => $pageId,
+        'url' => $videoUrl
+      ]);
+      
+      // Fallback to regular video upload if reel upload fails
+      Log::info('Falling back to regular video upload for Facebook');
+      return $this->uploadVideo($pageId, $videoUrl, $description, $title);
     }
   }
 

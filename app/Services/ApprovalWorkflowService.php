@@ -327,6 +327,62 @@ class ApprovalWorkflowService
     }
 
     /**
+     * Configure workflow (both simple and multi-level)
+     */
+    public function configureWorkflow(
+        Workspace $workspace,
+        bool $isMultiLevel,
+        array $levels = []
+    ): ApprovalWorkflow {
+        // Validate based on workflow type
+        if ($isMultiLevel) {
+            return $this->configureMultiLevelWorkflow($workspace, $levels);
+        } else {
+            return $this->configureSimpleWorkflow($workspace);
+        }
+    }
+
+    /**
+     * Configure simple workflow (single level)
+     */
+    public function configureSimpleWorkflow(Workspace $workspace): ApprovalWorkflow
+    {
+        // Check if any content is currently pending
+        $pendingContent = Publication::where('workspace_id', $workspace->id)
+            ->where('status', Publication::STATUS_PENDING_REVIEW)
+            ->exists();
+
+        if ($pendingContent) {
+            throw new InvalidWorkflowConfigurationException("Cannot modify approval workflow while content is pending review.");
+        }
+
+        return DB::transaction(function () use ($workspace) {
+            // Get or create workflow
+            $workflow = ApprovalWorkflow::firstOrCreate(
+                ['workspace_id' => $workspace->id],
+                [
+                    'is_enabled' => true,
+                    'is_multi_level' => false,
+                ]
+            );
+
+            // Update workflow to simple
+            $workflow->update([
+                'is_multi_level' => false,
+                'is_enabled' => true
+            ]);
+
+            // Delete all existing levels for simple workflow
+            ApprovalLevel::where('approval_workflow_id', $workflow->id)->delete();
+
+            // Invalidate cache after configuration changes
+            $this->invalidateWorkflowCache($workspace->id);
+
+            return $workflow->fresh(['levels']);
+        });
+    }
+
+    /**
      * Configure multi-level workflow
      * 
      * @param Workspace $workspace The workspace to configure
@@ -350,7 +406,7 @@ class ApprovalWorkflowService
         }
 
         // Validate sequential numbering
-        $levelNumbers = array_column($levels, 'level');
+        $levelNumbers = array_column($levels, 'level_number');
         sort($levelNumbers);
         $expectedNumbers = range(1, count($levels));
         
@@ -359,7 +415,7 @@ class ApprovalWorkflowService
         }
 
         // Validate no duplicate roles
-        $roleNames = array_column($levels, 'role');
+        $roleNames = array_column($levels, 'role_name');
         if (count($roleNames) !== count(array_unique($roleNames))) {
             throw new InvalidWorkflowConfigurationException("Each role can only be assigned to one approval level.");
         }
@@ -405,12 +461,16 @@ class ApprovalWorkflowService
 
             // Create new levels
             foreach ($levels as $levelData) {
-                $role = Role::where('name', $levelData['role'])->first();
+                $role = Role::where('name', $levelData['role_name'])->first();
+
+                if (!$role) {
+                    throw new InvalidWorkflowConfigurationException("Role '{$levelData['role_name']}' not found.");
+                }
 
                 ApprovalLevel::create([
                     'approval_workflow_id' => $workflow->id,
-                    'level_number' => $levelData['level'],
-                    'level_name' => $levelData['name'],
+                    'level_number' => $levelData['level_number'],
+                    'level_name' => $levelData['level_name'],
                     'role_id' => $role->id,
                 ]);
             }

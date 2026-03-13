@@ -231,13 +231,35 @@ class PlatformPublishService
     
     $pSettings[$platformKey]['content_type'] = $publication->content_type;
     
-    // Add content-type specific settings
+    // Add content-type specific settings with platform-specific mappings
     switch ($publication->content_type) {
       case 'reel':
-        $pSettings[$platformKey]['type'] = 'reel';
+        // Map reel to platform-specific types
+        switch ($socialAccount->platform) {
+          case 'youtube':
+            $pSettings[$platformKey]['type'] = 'short';
+            break;
+          case 'facebook':
+            $pSettings[$platformKey]['type'] = 'reel';
+            // Add Facebook-specific reel settings
+            $pSettings[$platformKey]['content_type'] = 'reel';
+            break;
+          case 'instagram':
+            $pSettings[$platformKey]['type'] = 'reel';
+            $pSettings[$platformKey]['content_type'] = 'reel';
+            break;
+          case 'tiktok':
+            $pSettings[$platformKey]['type'] = 'video'; // TikTok uses 'video' type
+            break;
+          default:
+            $pSettings[$platformKey]['type'] = 'reel';
+            break;
+        }
+        
         LogHelper::publicationInfo('Preparing reel for publishing', [
           'publication_id' => $publication->id,
           'platform' => $socialAccount->platform,
+          'platform_type' => $pSettings[$platformKey]['type'],
           'media_count' => count($mediaPaths)
         ]);
         break;
