@@ -4,7 +4,7 @@ namespace App\Services\Storage;
 
 use App\Models\User;
 use App\Models\Workspace;
-use App\Models\Publication;
+use App\Models\Publications\Publication;
 use Illuminate\Support\Str;
 
 /**

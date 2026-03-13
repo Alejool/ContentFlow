@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\SystemSetting;
+use App\Helpers\LogHelper;
 use Illuminate\Support\Facades\Cache;
 
 class SystemConfigService
@@ -85,7 +86,11 @@ class SystemConfigService
             // Verificar si el plan está habilitado en config/plans.php
             $isEnabledInConfig = ($plan['enabled'] ?? true);
             
-            \Log::info("Plan {$key}: system={$isEnabledInSystem}, config={$isEnabledInConfig}");
+            LogHelper::billing('plan.availability_check', [
+                'plan' => $key,
+                'system_enabled' => $isEnabledInSystem,
+                'config_enabled' => $isEnabledInConfig
+            ]);
             
             if ($isEnabledInSystem && $isEnabledInConfig) {
                 $available[$key] = $plan;

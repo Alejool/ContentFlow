@@ -3,7 +3,7 @@
 namespace App\Services\Validation;
 
 use App\Models\MediaFiles\MediaFile;
-use Illuminate\Support\Facades\Log;
+use App\Helpers\LogHelper;
 use Illuminate\Support\Facades\Storage;
 
 class MediaAnalyzer
@@ -17,7 +17,7 @@ class MediaAnalyzer
             $filePath = $this->resolveFilePath($mediaFile);
             
             if (!file_exists($filePath)) {
-                Log::warning("Media file not found for analysis", ['path' => $filePath]);
+                LogHelper::uploadError('media.file_not_found', 'Media file not found for analysis', ['path' => $filePath]);
                 return null;
             }
 
@@ -44,7 +44,7 @@ class MediaAnalyzer
 
             return $info;
         } catch (\Exception $e) {
-            Log::error("Error analyzing media file", [
+            LogHelper::uploadError('media.analysis_failed', $e->getMessage(), [
                 'media_file_id' => $mediaFile->id,
                 'error' => $e->getMessage()
             ]);
@@ -94,7 +94,7 @@ class MediaAnalyzer
         exec($command, $output, $returnCode);
 
         if ($returnCode !== 0) {
-            Log::warning("FFmpeg analysis failed", ['return_code' => $returnCode]);
+            LogHelper::uploadError('media.ffmpeg_analysis_failed', 'FFmpeg analysis failed', ['return_code' => $returnCode]);
             return [];
         }
 
@@ -137,7 +137,7 @@ class MediaAnalyzer
                 'bitrate' => $fileInfo['bitrate'] ?? 0,
             ];
         } catch (\Exception $e) {
-            Log::error("getID3 analysis failed", ['error' => $e->getMessage()]);
+            LogHelper::uploadError('media.getid3_analysis_failed', $e->getMessage(), ['error' => $e->getMessage()]);
             return [];
         }
     }

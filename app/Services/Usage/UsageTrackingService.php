@@ -7,7 +7,7 @@ use App\Models\Subscription\UsageMetric;
 use App\Events\Subscription\LimitReached;
 use App\Events\Subscription\LimitWarning;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
+use App\Helpers\LogHelper;
 
 class UsageTrackingService
 {
@@ -58,7 +58,7 @@ class UsageTrackingService
         // Notify via WebSocket about usage update
         $this->notifyUsageUpdated($workspace, $metricType);
 
-        Log::info("Usage incremented for workspace {$workspace->id}", [
+        LogHelper::billing('usage.incremented', [
             'workspace_id' => $workspace->id,
             'metric_type'  => $metricType,
             'amount'       => $amount,
@@ -82,7 +82,7 @@ class UsageTrackingService
             // Notify via WebSocket about usage update
             $this->notifyUsageUpdated($workspace, $metricType);
 
-            Log::info("Usage decremented for workspace {$workspace->id}", [
+            LogHelper::billing('usage.decremented', [
                 'workspace_id' => $workspace->id,
                 'metric_type'  => $metricType,
                 'amount'       => $amount,
@@ -198,7 +198,7 @@ class UsageTrackingService
 
         Cache::forget("workspace.{$workspace->id}.usage.storage_bytes");
 
-        Log::info("Monthly usage reset for workspace {$workspace->id}", [
+        LogHelper::billing('usage.monthly_reset', [
             'workspace_id'   => $workspace->id,
             'period_start'   => now()->startOfMonth()->toDateString(),
             'period_end'     => now()->endOfMonth()->toDateString(),
