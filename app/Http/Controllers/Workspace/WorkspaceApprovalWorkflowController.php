@@ -149,6 +149,7 @@ class WorkspaceApprovalWorkflowController extends Controller
       if ($request->has('steps')) {
         // Update is_multi_level based on steps count
         $workflow->update(['is_multi_level' => count($request->steps) > 1]);
+        $workflow->update(['is_enabled' => true]);
         
         // Simplest way: recreate steps
         $workflow->steps()->delete();

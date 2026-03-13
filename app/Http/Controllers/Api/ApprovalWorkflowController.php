@@ -51,10 +51,10 @@ class ApprovalWorkflowController extends Controller
             // Get or create workflow
             $workflow = ApprovalWorkflow::firstOrCreate(
                 ['workspace_id' => $workspace->id],
-                ['is_enabled' => false, 'is_multi_level' => false]
+                ['is_active' => false, 'is_multi_level' => false]
             );
 
-            $workflow->update(['is_enabled' => true]);
+            $workflow->update(['is_active' => true]);
 
             // Invalidate workflow cache
             $this->approvalWorkflowService->invalidateCache($workspace->id);
@@ -62,7 +62,7 @@ class ApprovalWorkflowController extends Controller
             return $this->successResponse(
                 [
                     'workflow_id' => $workflow->id,
-                    'is_enabled' => $workflow->is_enabled,
+                    'is_active' => $workflow->is_active,
                     'is_multi_level' => $workflow->is_multi_level,
                 ],
                 'Approval workflow enabled successfully',
@@ -92,7 +92,7 @@ class ApprovalWorkflowController extends Controller
                 return $this->errorResponse('Approval workflow not found', 404);
             }
 
-            $workflow->update(['is_enabled' => false]);
+            $workflow->update(['is_active' => false]);
 
             // Invalidate workflow cache
             $this->approvalWorkflowService->invalidateCache($workspace->id);
@@ -100,7 +100,7 @@ class ApprovalWorkflowController extends Controller
             return $this->successResponse(
                 [
                     'workflow_id' => $workflow->id,
-                    'is_enabled' => $workflow->is_enabled,
+                    'is_active' => $workflow->is_active,
                 ],
                 'Approval workflow disabled successfully',
                 200
@@ -141,7 +141,7 @@ class ApprovalWorkflowController extends Controller
             // Debug: Log result
             \Log::info('ApprovalWorkflow Configure Result', [
                 'workflow_id' => $workflow->id,
-                'is_enabled' => $workflow->is_enabled,
+                'is_active' => $workflow->is_active,
                 'is_multi_level' => $workflow->is_multi_level,
                 'levels_count' => $workflow->levels()->count()
             ]);
@@ -152,7 +152,7 @@ class ApprovalWorkflowController extends Controller
             return $this->successResponse(
                 [
                     'workflow_id' => $workflow->id,
-                    'is_enabled' => $workflow->is_enabled,
+                    'is_active' => $workflow->is_active,
                     'is_multi_level' => $workflow->is_multi_level,
                     'levels' => $workflow->levels()->ordered()->with('role')->get()->map(function ($level) {
                         return [
@@ -200,7 +200,7 @@ class ApprovalWorkflowController extends Controller
 
             if (!$workflow) {
                 return $this->successResponse([
-                    'is_enabled' => false,
+                    'is_active' => false,
                     'is_multi_level' => false,
                     'levels' => [],
                 ]);
@@ -208,7 +208,7 @@ class ApprovalWorkflowController extends Controller
 
             return $this->successResponse([
                 'workflow_id' => $workflow->id,
-                'is_enabled' => $workflow->is_enabled,
+                'is_active' => $workflow->is_active,
                 'is_multi_level' => $workflow->is_multi_level,
                 'levels' => $workflow->levels->map(function ($level) {
                     return [

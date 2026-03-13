@@ -24,7 +24,7 @@ class ApprovalAnalyticsService
     {
         $workflow = ApprovalWorkflow::where('workspace_id', $workspace->id)->first();
 
-        if (!$workflow || !$workflow->is_enabled) {
+        if (!$workflow || !$workflow->is_active) {
             return [];
         }
 
@@ -183,7 +183,7 @@ class ApprovalAnalyticsService
     {
         $workflow = ApprovalWorkflow::where('workspace_id', $workspace->id)->first();
 
-        if (!$workflow || !$workflow->is_enabled) {
+        if (!$workflow || !$workflow->is_active) {
             return [];
         }
 

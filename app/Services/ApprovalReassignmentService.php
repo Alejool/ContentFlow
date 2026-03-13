@@ -37,7 +37,7 @@ class ApprovalReassignmentService
     ): int {
         // Get workflow for workspace
         $workflow = ApprovalWorkflow::where('workspace_id', $workspace->id)
-            ->where('is_enabled', true)
+            ->where('is_active', true)
             ->first();
 
         if (!$workflow) {
@@ -248,7 +248,7 @@ class ApprovalReassignmentService
     public function handlePublishPermissionLoss(User $user, Workspace $workspace): int
     {
         $workflow = ApprovalWorkflow::where('workspace_id', $workspace->id)
-            ->where('is_enabled', true)
+            ->where('is_active', true)
             ->first();
 
         if (!$workflow) {

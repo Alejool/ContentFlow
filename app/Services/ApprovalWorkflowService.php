@@ -91,7 +91,7 @@ class ApprovalWorkflowService
         $workflow = $this->getWorkflowCached($workspace->id);
 
         // Validate workflow is enabled
-        if (!$workflow || !$workflow->is_enabled) {
+        if (!$workflow || !$workflow->is_active) {
             throw new ApprovalWorkflowNotEnabledException();
         }
 
@@ -162,7 +162,7 @@ class ApprovalWorkflowService
         $workspace = $content->workspace;
         $workflow = ApprovalWorkflow::where('workspace_id', $workspace->id)->first();
 
-        if (!$workflow || !$workflow->is_enabled) {
+        if (!$workflow || !$workflow->is_active) {
             throw new InvalidApprovalStateException("Approval workflow is not enabled.");
         }
 
@@ -236,7 +236,7 @@ class ApprovalWorkflowService
         $workspace = $content->workspace;
         $workflow = $this->getWorkflowCached($workspace->id);
 
-        if (!$workflow || !$workflow->is_enabled) {
+        if (!$workflow || !$workflow->is_active) {
             throw new InvalidApprovalStateException("Approval workflow is not enabled.");
         }
 
@@ -361,7 +361,7 @@ class ApprovalWorkflowService
             $workflow = ApprovalWorkflow::firstOrCreate(
                 ['workspace_id' => $workspace->id],
                 [
-                    'is_enabled' => true,
+                    'is_active' => true,
                     'is_multi_level' => false,
                 ]
             );
@@ -369,7 +369,7 @@ class ApprovalWorkflowService
             // Update workflow to simple
             $workflow->update([
                 'is_multi_level' => false,
-                'is_enabled' => true
+                'is_active' => true
             ]);
 
             // Delete all existing levels for simple workflow
@@ -447,7 +447,7 @@ class ApprovalWorkflowService
             $workflow = ApprovalWorkflow::firstOrCreate(
                 ['workspace_id' => $workspace->id],
                 [
-                    'is_enabled' => true,
+                    'is_active' => true,
                     'is_multi_level' => true,
                 ]
             );
@@ -494,13 +494,19 @@ class ApprovalWorkflowService
     {
         $workspace = $content->workspace;
 
-        // Check if user is Owner (bypass approval)
+        // Get user's role
         $userRole = $this->getUserRole($user, $workspace);
-        if ($userRole && $userRole->name === Role::OWNER) {
+        
+        if (!$userRole) {
+            return false;
+        }
+
+        // Owner can bypass ALL requirements
+        if ($userRole->name === Role::OWNER) {
             return true;
         }
 
-        // Check if user has publish_content permission
+        // For non-Owner users, check if they have publish_content permission
         $hasPublishPermission = $this->roleService->userHasPermission(
             $user,
             $workspace,
@@ -519,7 +525,8 @@ class ApprovalWorkflowService
             return true;
         }
 
-        // Workflow is enabled: content must be approved
+        // Workflow is enabled: content MUST be approved
+        // Even users with publish_content permission cannot bypass the workflow
         return $content->status === Publication::STATUS_APPROVED;
     }
 
@@ -590,7 +597,7 @@ class ApprovalWorkflowService
         $workspace = $content->workspace;
         $workflow = $this->getWorkflowCached($workspace->id);
 
-        if (!$workflow || !$workflow->is_enabled) {
+        if (!$workflow || !$workflow->is_active) {
             return null;
         }
 
