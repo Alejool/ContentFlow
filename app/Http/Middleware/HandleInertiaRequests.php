@@ -192,6 +192,31 @@ class HandleInertiaRequests extends Middleware
               // ✅ AGREGAR TIMEZONE DEL WORKSPACE
               $currentWorkspace->timezone = $currentWorkspace->timezone ?? 'UTC';
               
+              // ✅ AGREGAR INFORMACIÓN DEL WORKFLOW DE APROBACIÓN
+              $workflow = $currentWorkspace->approvalWorkflow()->with(['levels.role'])->first();
+              if ($workflow && $workflow->is_enabled) {
+                $currentWorkspace->approval_workflow = [
+                  'id' => $workflow->id,
+                  'name' => $workflow->name ?? 'Flujo de Aprobación',
+                  'is_enabled' => true,
+                  'is_multi_level' => $workflow->is_multi_level,
+                  'levels' => $workflow->levels->map(function($level) {
+                    return [
+                      'id' => $level->id,
+                      'level_number' => $level->level_number,
+                      'level_name' => $level->level_name,
+                      'role' => $level->role ? [
+                        'id' => $level->role->id,
+                        'name' => $level->role->name,
+                        'slug' => $level->role->slug,
+                      ] : null,
+                    ];
+                  })->toArray(),
+                ];
+              } else {
+                $currentWorkspace->approval_workflow = null;
+              }
+              
               Log::info('Current Workspace Final', [
                 'id' => $currentWorkspace->id,
                 'name' => $currentWorkspace->name,

@@ -19,31 +19,51 @@ class PublicationPolicy
     /**
      * Determine if the user can submit content for approval.
      * 
-     * Requirements: 5.1
-     * - User must have create_content or manage_content permission
-     * - Content must be in draft or rejected status
-     * - Approval workflow must be enabled for the workspace
+     * Simple rule: If user has 'publish' permission, they can submit for approval.
+     * The workflow validation happens in the service layer.
      */
     public function submitForApproval(User $user, Publication $publication): bool
     {
         $workspace = $publication->workspace;
 
-        // Check if user has permission to create or manage content
-        if (!$this->roleService->userHasPermission($user, $workspace, 'create_content') &&
-            !$this->roleService->userHasPermission($user, $workspace, 'manage_content')) {
+        // Get user's role in workspace
+        $userRole = $this->getUserRoleInWorkspace($user, $workspace);
+        
+        if (!$userRole) {
+            \Log::warning('submitForApproval: User has no role in workspace', [
+                'user_id' => $user->id,
+                'workspace_id' => $workspace->id,
+            ]);
+            return false;
+        }
+
+        // Check if user has publish permission
+        $hasPublishPermission = $this->roleService->userHasPermission($user, $workspace, 'publish');
+        
+        if (!$hasPublishPermission) {
+            \Log::warning('submitForApproval: User lacks publish permission', [
+                'user_id' => $user->id,
+                'workspace_id' => $workspace->id,
+                'role' => $userRole->slug,
+            ]);
             return false;
         }
 
         // Check if content is in a valid status for submission
-        if (!in_array($publication->status, ['draft', 'rejected'])) {
+        if (!in_array($publication->status, ['draft', 'rejected', 'failed'])) {
+            \Log::warning('submitForApproval: Invalid publication status', [
+                'publication_id' => $publication->id,
+                'status' => $publication->status,
+            ]);
             return false;
         }
 
-        // Check if approval workflow is enabled
-        $workflow = $workspace->approvalWorkflow;
-        if (!$workflow || !$workflow->is_active) {
-            return false;
-        }
+        \Log::info('submitForApproval: User has publish permission, allowing submission', [
+            'user_id' => $user->id,
+            'publication_id' => $publication->id,
+            'workspace_id' => $workspace->id,
+            'role' => $userRole->slug,
+        ]);
 
         return true;
     }
@@ -74,7 +94,7 @@ class PublicationPolicy
         }
 
         // Owner can always approve
-        if ($userRole->name === Role::OWNER) {
+        if ($userRole->slug === Role::OWNER) {
             return true;
         }
 
@@ -85,9 +105,9 @@ class PublicationPolicy
             return false;
         }
 
-        // For simple workflow, check publish_content permission
+        // For simple workflow, check publish permission
         if ($workflow->isSimpleWorkflow()) {
-            return $this->roleService->userHasPermission($user, $workspace, 'publish_content');
+            return $this->roleService->userHasPermission($user, $workspace, 'publish');
         }
 
         // For multi-level workflow, check if user has the required role for current level
@@ -127,30 +147,45 @@ class PublicationPolicy
         // Get user's role in workspace first
         $userRole = $this->getUserRoleInWorkspace($user, $workspace);
         
+        \Log::info('PublicationPolicy::publish - Debug', [
+            'user_id' => $user->id,
+            'publication_id' => $publication->id,
+            'workspace_id' => $workspace->id,
+            'user_role_name' => $userRole ? $userRole->name : 'NULL',
+            'user_role_slug' => $userRole ? $userRole->slug : 'NULL',
+            'publication_status' => $publication->status,
+            'comparing_with' => Role::OWNER,
+        ]);
+        
         if (!$userRole) {
+            \Log::warning('PublicationPolicy::publish - No role found for user');
             return false;
         }
 
         // Owner can bypass ALL requirements (approval workflow and permissions)
-        if ($userRole->name === Role::OWNER) {
+        // Owner should be able to publish directly without approval
+        // Compare using slug instead of name for case-insensitive comparison
+        if ($userRole->slug === Role::OWNER) {
+            \Log::info('PublicationPolicy::publish - User is OWNER, allowing publish');
             return true;
         }
 
-        // For non-Owner users, check if they have publish_content permission
-        if (!$this->roleService->userHasPermission($user, $workspace, 'publish_content')) {
+        // For non-Owner users, check if they have publish permission
+        if (!$this->roleService->userHasPermission($user, $workspace, 'publish')) {
             return false;
         }
 
         // Check if approval workflow is enabled
         $workflow = $workspace->approvalWorkflow;
         
-        if (!$workflow || !$workflow->is_active) {
+        if (!$workflow || !$workflow->is_enabled) {
             // No approval workflow, just need publish permission
             return true;
         }
 
         // If approval workflow is enabled, content MUST be approved
         // Even users with publish_content permission cannot bypass the workflow
+        // (but Owner already returned true above)
         if ($publication->status !== 'approved') {
             return false;
         }
@@ -165,7 +200,7 @@ class PublicationPolicy
     {
         $workspace = $publication->workspace;
         
-        return $this->roleService->userHasPermission($user, $workspace, 'view_content');
+        return $this->roleService->userHasPermission($user, $workspace, 'view-content');
     }
 
     /**
@@ -175,12 +210,12 @@ class PublicationPolicy
     {
         $workspace = $publication->workspace;
 
-        // User must have manage_content permission or be the creator
+        // User must have manage-content permission or be the creator
         if ($publication->user_id === $user->id) {
-            return $this->roleService->userHasPermission($user, $workspace, 'create_content');
+            return $this->roleService->userHasPermission($user, $workspace, 'manage-content');
         }
 
-        return $this->roleService->userHasPermission($user, $workspace, 'manage_content');
+        return $this->roleService->userHasPermission($user, $workspace, 'manage-content');
     }
 
     /**
@@ -190,12 +225,12 @@ class PublicationPolicy
     {
         $workspace = $publication->workspace;
 
-        // User must have manage_content permission or be the creator
+        // User must have manage-content permission or be the creator
         if ($publication->user_id === $user->id) {
-            return $this->roleService->userHasPermission($user, $workspace, 'manage_content');
+            return $this->roleService->userHasPermission($user, $workspace, 'manage-content');
         }
 
-        return $this->roleService->userHasPermission($user, $workspace, 'manage_content');
+        return $this->roleService->userHasPermission($user, $workspace, 'manage-content');
     }
 
     /**
@@ -203,7 +238,7 @@ class PublicationPolicy
      */
     public function create(User $user, Workspace $workspace): bool
     {
-        return $this->roleService->userHasPermission($user, $workspace, 'create_content');
+        return $this->roleService->userHasPermission($user, $workspace, 'manage-content');
     }
 
     /**
@@ -225,7 +260,58 @@ class PublicationPolicy
         }
 
         // Only Admin and Owner can manually resolve
-        return in_array($userRole->name, [Role::ADMIN, Role::OWNER]);
+        return in_array($userRole->slug, [Role::ADMIN, Role::OWNER]);
+    }
+
+    /**
+     * Determine if the user can bypass the approval workflow.
+     * 
+     * Only workspace owners can bypass approval workflow and publish directly.
+     * 
+     * @param User $user
+     * @param Workspace $workspace
+     * @return bool
+     */
+    public function canBypassApprovalWorkflow(User $user, Workspace $workspace): bool
+    {
+        // Get user's role in workspace
+        $userRole = $this->getUserRoleInWorkspace($user, $workspace);
+        
+        if (!$userRole) {
+            return false;
+        }
+
+        // Only Owner can bypass approval workflow
+        return $userRole->slug === Role::OWNER;
+    }
+
+    /**
+     * Determine the appropriate action for a user when creating/editing content.
+     * Returns 'publish' if user can publish directly, 'review' if must go through approval.
+     * 
+     * @param User $user
+     * @param Workspace $workspace
+     * @return string 'publish' or 'review'
+     */
+    public function getPublicationAction(User $user, Workspace $workspace): string
+    {
+        // Check if user is owner
+        if ($this->canBypassApprovalWorkflow($user, $workspace)) {
+            return 'publish';
+        }
+
+        // Check if approval workflow is enabled
+        $workflow = $workspace->approvalWorkflow;
+        
+        if (!$workflow || !$workflow->is_enabled) {
+            // No workflow, check if user has publish permission
+            if ($this->roleService->userHasPermission($user, $workspace, 'publish')) {
+                return 'publish';
+            }
+        }
+
+        // User must go through review process
+        return 'review';
     }
 
     /**
