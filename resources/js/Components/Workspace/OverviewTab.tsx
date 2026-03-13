@@ -82,22 +82,10 @@ export default function OverviewTab({
           color="blue"
         />
         <StatCard
-          icon={Database}
-          label={t("workspace.stats.projects")}
-          value={workspace.projects_count || 0}
-          color="purple"
-        />
-        <StatCard
           icon={Activity}
           label={t("workspace.stats.active_integrations")}
           value={activeIntegrationsCount}
           color="green"
-        />
-        <StatCard
-          icon={Clock}
-          label={t("workspace.stats.workspace_age")}
-          value={`${workspaceAge}m`}
-          color="primary"
         />
       </div>
 

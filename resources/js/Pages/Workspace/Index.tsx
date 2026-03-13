@@ -45,26 +45,27 @@ export default function Index({
       }
     >
       <Head title={t("workspace.my_workspaces")} />
+      <div className="min-h-screen">
+        <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-10 max-w-7xl mx-auto ">
+          {workspaces.map((workspace) => (
+            <WorkspaceCard
+              key={workspace.id}
+              workspace={workspace}
+              roles={roles}
+              currentWorkspaceId={auth.user.current_workspace_id}
+              auth={auth}
+            />
+          ))}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-10 max-w-7xl mx-auto">
-        {workspaces.map((workspace) => (
-          <WorkspaceCard
-            key={workspace.id}
-            workspace={workspace}
-            roles={roles}
-            currentWorkspaceId={auth.user.current_workspace_id}
-            auth={auth}
+          <CreateWorkspaceCard onClick={() => setShowCreateModal(true)} />
+        </div>
+
+        <CreateWorkspaceModal
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+          t={t}
           />
-        ))}
-
-        <CreateWorkspaceCard onClick={() => setShowCreateModal(true)} />
       </div>
-
-      <CreateWorkspaceModal
-        isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        t={t}
-      />
     </AuthenticatedLayout>
   );
 }

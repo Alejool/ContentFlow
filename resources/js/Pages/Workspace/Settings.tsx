@@ -29,15 +29,18 @@ import { useTranslation } from "react-i18next";
 interface WorkspaceSettingsProps {
   workspace: any;
   roles: any[];
+  permissions: any[];
   auth: any;
   current_workspace?: any;
 }
 
 const EMPTY_ROLES: any[] = [];
+const EMPTY_PERMISSIONS: any[] = [];
 
 export default function WorkspaceSettings({
   workspace,
   roles = EMPTY_ROLES,
+  permissions = EMPTY_PERMISSIONS,
   auth,
   current_workspace: globalWorkspace,
 }: WorkspaceSettingsProps) {
@@ -119,15 +122,6 @@ export default function WorkspaceSettings({
     current_workspace.plan ||
     "demo"
   ).toLowerCase();
-
-  // Debug: Log plan information
-  console.log("🔍 Plan Debug Info:", {
-    planId,
-    subscriptionPlan: current_workspace.subscription?.plan,
-    subscriptionObject: current_workspace.subscription,
-    directPlan: current_workspace.plan,
-    features: current_workspace.features,
-  });
 
   const isEnterprise =
     planId === "enterprise" || current_workspace.features?.white_label;
@@ -238,6 +232,7 @@ export default function WorkspaceSettings({
         return (
           <RolesManagementTab
             roles={roles}
+            permissions={permissions}
             workspace={current_workspace}
             userRole={userRole}
             canManageWorkspace={canManageWorkspace}
@@ -332,7 +327,7 @@ export default function WorkspaceSettings({
           />
         )}
 
-        <div className="min-h-[500px]">{renderTabContent()}</div>
+        <div className="min-h-screen">{renderTabContent()}</div>
       </div>
     </AuthenticatedLayout>
   );

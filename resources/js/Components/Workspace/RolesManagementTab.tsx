@@ -1,4 +1,9 @@
+import Button from "@/Components/common/Modern/Button";
+import { DynamicModal } from "@/Components/common/Modern/DynamicModal";
+import { router } from "@inertiajs/react";
+import axios from "axios";
 import {
+  Edit2,
   Eye,
   PencilLine,
   Shield,
@@ -6,10 +11,14 @@ import {
   User,
   UserStar,
 } from "lucide-react";
+import { useState } from "react";
+import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { route } from "ziggy-js";
 
 interface RolesManagementTabProps {
   roles: any[];
+  permissions: any[];
   workspace: any;
   userRole: string;
   canManageWorkspace: boolean;
@@ -17,11 +26,52 @@ interface RolesManagementTabProps {
 
 export default function RolesManagementTab({
   roles,
+  permissions,
   workspace,
   userRole,
   canManageWorkspace,
 }: RolesManagementTabProps) {
   const { t } = useTranslation();
+  const [editingRole, setEditingRole] = useState<any | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedPermissions, setSelectedPermissions] = useState<number[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleEditRole = (role: any) => {
+    setEditingRole(role);
+    setSelectedPermissions(role.permissions?.map((p: any) => p.id) || []);
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveRole = async () => {
+    if (!editingRole) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const url = route("api.v1.workspaces.roles.update", { 
+        idOrSlug: workspace.id, 
+        role: editingRole.id 
+      });
+      const response = await axios.put(url, {
+        permission_ids: selectedPermissions,
+      });
+    
+      toast.success(t("roles.success.updated") || "Role updated successfully");
+      router.reload({ only: ["roles"] });
+      setIsEditModalOpen(false);
+      setEditingRole(null);
+      setSelectedPermissions([]);
+    } catch (error: any) {
+      console.error("Error updating role:", error);
+      console.error("Error response:", error.response);
+      const message = error.response?.data?.message || t("roles.errors.update_failed") || "Failed to update role";
+      toast.error(message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -94,9 +144,21 @@ export default function RolesManagementTab({
                       </p>
                     </div>
                   </div>
-                  <span className="px-2 py-1 bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-neutral-400 text-xs font-mono rounded">
-                    {role.slug}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-1 bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-neutral-400 text-xs font-mono rounded">
+                      {role.slug}
+                    </span>
+                    {canManageWorkspace && role.slug !== "owner" && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        buttonStyle="icon"
+                        onClick={() => handleEditRole(role)}
+                        icon={Edit2}
+                        title={t("common.edit")}
+                      >{""}</Button>
+                    )}
+                  </div>
                 </div>
 
                 <p className="text-sm text-gray-600 dark:text-neutral-400 mb-4">
@@ -145,6 +207,86 @@ export default function RolesManagementTab({
           </div>
         )}
       </div>
+
+      {/* Edit Role Modal */}
+      <DynamicModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditingRole(null);
+          setSelectedPermissions([]);
+        }}
+        title={editingRole ? `${t("roles.edit_role")} - ${editingRole.name}` : ""}
+        size="2xl"
+      >
+        <div className="space-y-6">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            {t("roles.edit_role_subtitle")}
+          </p>
+          
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            {t("roles.select_permissions")}
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[50vh] overflow-y-auto">
+            {permissions.map((permission: any) => (
+              <label
+                key={permission.id}
+                className="flex items-start gap-3 p-3 border border-gray-200 dark:border-neutral-700 rounded-lg hover:bg-gray-50 dark:hover:bg-neutral-800/50 cursor-pointer transition-colors"
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedPermissions.includes(permission.id)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedPermissions([...selectedPermissions, permission.id]);
+                    } else {
+                      setSelectedPermissions(selectedPermissions.filter(id => id !== permission.id));
+                    }
+                  }}
+                  className="mt-0.5 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    {permission.display_name || permission.name}
+                  </p>
+                  {permission.description && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                      {permission.description}
+                    </p>
+                  )}
+                </div>
+              </label>
+            ))}
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-neutral-800">
+            <Button
+              variant="ghost"
+              buttonStyle="outline"
+              size="md"
+              onClick={() => {
+                setIsEditModalOpen(false);
+                setEditingRole(null);
+                setSelectedPermissions([]);
+              }}
+              disabled={isLoading}
+            >
+              {t("common.cancel")}
+            </Button>
+            <Button
+              variant="primary"
+              buttonStyle="solid"
+              size="md"
+              onClick={handleSaveRole}
+              disabled={isLoading || selectedPermissions.length === 0}
+              icon={Shield}
+            >
+              {isLoading ? t("common.saving") : t("common.save_changes")}
+            </Button>
+          </div>
+        </div>
+      </DynamicModal>
     </div>
   );
 }
