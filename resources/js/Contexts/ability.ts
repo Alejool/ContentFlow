@@ -27,9 +27,13 @@ export function defineAbilityFor(user: any, workspace: any): AppAbility {
   const userRole = workspace?.user_role_slug;
   const permissions = workspace?.permissions || [];
 
-  // Owner can do everything
+  // Owner can do everything - explicit permissions for better CASL compatibility
   if (userRole === 'owner') {
     can('manage', 'all');
+    can('approve', 'ApprovalRequest');
+    can('reject', 'ApprovalRequest');
+    can('publish', 'Publication');
+    can('submit_for_approval', 'Publication');
     return build();
   }
 
@@ -57,12 +61,16 @@ export function defineAbilityFor(user: any, workspace: any): AppAbility {
     can('read', 'MediaFile');
   }
 
+  // Approve permission (explicit approve permission)
+  if (permissions.includes('approve')) {
+    can('approve', 'ApprovalRequest');
+    can('reject', 'ApprovalRequest');
+  }
+
   // Publish permission (Publisher role)
   if (permissions.includes('publish')) {
     can('publish', 'Publication'); // Puede publicar solo si no hay workflow o si está aprobado
     can('submit_for_approval', 'Publication'); // Puede enviar a revisión cuando hay workflow
-    can('approve', 'ApprovalRequest'); // Puede aprobar si está asignado en el workflow
-    can('reject', 'ApprovalRequest'); // Puede rechazar si está asignado en el workflow
   }
 
   // Viewer permissions

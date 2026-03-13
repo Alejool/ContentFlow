@@ -90,6 +90,10 @@
     },
     "errors": {
       "submit_failed": "Error al enviar a revisión"
+    },
+    "workflowAssignment": {
+      "title": "Aprobaciones asignadas",
+      "description": "Estás viendo solo el contenido que requiere tu aprobación según tu rol o asignación en el flujo de trabajo. Los administradores pueden ver todo el contenido pendiente."
     }
   }
 }

@@ -87,6 +87,10 @@
     },
     "errors": {
       "submit_failed": "Error submitting for review"
+    },
+    "workflowAssignment": {
+      "title": "Assigned Approvals",
+      "description": "You are viewing only the content that requires your approval based on your role or assignment in the workflow. Administrators can view all pending content."
     }
   }
 }

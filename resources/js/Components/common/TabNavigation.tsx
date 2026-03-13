@@ -43,7 +43,7 @@ function TabNavigation({
     const normalizedTabs = tabs.map(tab => ({
         ...tab,
         key: tab.key || tab.id || '',
-        enabled: tab.enabled !== false && tab.hidden !== true,
+        enabled: tab.enabled !== false ,
     }));
 
     // Si es draggable o variant es 'draggable', usar DraggableTabs

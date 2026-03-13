@@ -65,9 +65,21 @@ export function formatDateTimeString(
       timeZone: timezone,
     };
     
+    // Filter out invalid options
+    const validOptions: Intl.DateTimeFormatOptions = {};
+    const validKeys = ['year', 'month', 'day', 'hour', 'minute', 'second', 'hour12', 'timeZone', 'weekday', 'era', 'timeZoneName'];
+    
+    if (options) {
+      Object.keys(options).forEach(key => {
+        if (validKeys.includes(key)) {
+          validOptions[key as keyof Intl.DateTimeFormatOptions] = options[key as keyof Intl.DateTimeFormatOptions];
+        }
+      });
+    }
+    
     return dateObj.toLocaleString(locale, {
       ...defaultOptions,
-      ...options,
+      ...validOptions,
       timeZone: timezone, // Siempre usar timezone del workspace
     });
   } catch (error) {
