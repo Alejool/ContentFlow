@@ -3,7 +3,7 @@
 namespace App\Services\Video;
 
 use App\Services\Storage\S3PathService;
-use Illuminate\Support\Facades\Log;
+use App\Helpers\LogHelper;
 use Illuminate\Support\Facades\Storage;
 use FFMpeg\FFMpeg;
 use FFMpeg\FFProbe;
@@ -33,7 +33,7 @@ class VideoProcessingService
    */
   public function extractMetadata(string $videoPath): array
   {
-    Log::info('📊 Extracting video metadata', ['path' => $videoPath]);
+    LogHelper::upload('video.metadata_extraction_started', ['path' => $videoPath]);
 
     try {
       $format = $this->ffprobe->format($videoPath);
@@ -66,11 +66,11 @@ class VideoProcessingService
         ];
       }
 
-      Log::info('✅ Metadata extracted', ['metadata' => $metadata]);
+      LogHelper::upload('video.metadata_extracted', ['metadata' => $metadata]);
 
       return $metadata;
     } catch (\Exception $e) {
-      Log::error('Failed to extract metadata', [
+      LogHelper::uploadError('video.metadata_extraction_failed', $e->getMessage(), [
         'error' => $e->getMessage(),
         'path' => $videoPath,
       ]);
@@ -84,7 +84,7 @@ class VideoProcessingService
    */
   public function generateThumbnails(string $videoPath, int $workspaceId, int $userId, int $publicationId, int $count = 3): array
   {
-    Log::info('🖼️ Generating thumbnails', ['path' => $videoPath, 'count' => $count]);
+    LogHelper::upload('video.thumbnails_generation_started', ['path' => $videoPath, 'count' => $count]);
 
     try {
       $video = $this->ffmpeg->open($videoPath);
@@ -116,11 +116,11 @@ class VideoProcessingService
         @unlink($thumbnailPath);
       }
 
-      Log::info('✅ Thumbnails generated', ['count' => count($thumbnails)]);
+      LogHelper::upload('video.thumbnails_generated', ['count' => count($thumbnails)]);
 
       return $thumbnails;
     } catch (\Exception $e) {
-      Log::error('Failed to generate thumbnails', [
+      LogHelper::uploadError('video.thumbnails_generation_failed', $e->getMessage(), [
         'error' => $e->getMessage(),
         'path' => $videoPath,
       ]);
@@ -133,7 +133,7 @@ class VideoProcessingService
    */
   public function optimizeVideo(string $videoPath): string
   {
-    Log::info('⚙️ Optimizing video', ['path' => $videoPath]);
+    LogHelper::upload('video.optimization_started', ['path' => $videoPath]);
 
     try {
       $video = $this->ffmpeg->open($videoPath);
@@ -152,14 +152,14 @@ class VideoProcessingService
 
       $video->save($format, $optimizedPath);
 
-      Log::info('✅ Video optimized', [
+      LogHelper::upload('video.optimized', [
         'original_size_mb' => round(filesize($videoPath) / 1024 / 1024, 2),
         'optimized_size_mb' => round(filesize($optimizedPath) / 1024 / 1024, 2),
       ]);
 
       return $optimizedPath;
     } catch (\Exception $e) {
-      Log::error('Failed to optimize video', [
+      LogHelper::uploadError('video.optimization_failed', $e->getMessage(), [
         'error' => $e->getMessage(),
         'path' => $videoPath,
       ]);
@@ -172,7 +172,7 @@ class VideoProcessingService
    */
   public function uploadToS3(string $localPath): string
   {
-    Log::info('☁️ Uploading to S3', ['path' => $localPath]);
+    LogHelper::upload('video.s3_upload_started', ['path' => $localPath]);
 
     try {
       $s3Key = 'processed-videos/' . uniqid('video_', true) . '.mp4';
@@ -188,14 +188,14 @@ class VideoProcessingService
         fclose($stream);
       }
 
-      Log::info('✅ Uploaded to S3', [
+      LogHelper::upload('video.s3_uploaded', [
         's3_key' => $s3Key,
         'url' => Storage::disk('s3')->url($s3Key),
       ]);
 
       return $s3Key;
     } catch (\Exception $e) {
-      Log::error('Failed to upload to S3', [
+      LogHelper::uploadError('video.s3_upload_failed', $e->getMessage(), [
         'error' => $e->getMessage(),
         'path' => $localPath,
       ]);
