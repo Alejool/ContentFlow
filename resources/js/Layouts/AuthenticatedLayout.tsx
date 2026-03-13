@@ -189,7 +189,7 @@ export default function AuthenticatedLayout({
       {props.maintenanceMode && props.maintenanceBanner ? (
         <MaintenanceBanner message={String(props.maintenanceBanner)} />
       ) : null}
-      <div className="h-screen flex flex-col overflow-hidden w-full max-w-full">
+      <div className="flex flex-col overflow-hidden w-full max-w-full">
         <div
           className="relative flex-1 min-h-0 flex w-full max-w-full min-w-0 overflow-x-hidden"
         >
