@@ -11,6 +11,15 @@ class SocialTokenManager
 {
   public function getValidToken(SocialAccount $account): string
   {
+    LogHelper::social('info', "Checking token validity", [
+      'account_id' => $account->id,
+      'platform' => $account->platform,
+      'has_access_token' => !empty($account->access_token),
+      'has_refresh_token' => !empty($account->refresh_token),
+      'token_expires_at' => $account->token_expires_at?->toIso8601String(),
+      'is_active' => $account->is_active
+    ]);
+
     // Check if token is corrupted or missing
     if (!$account->access_token) {
       $this->markAccountForReconnection($account, 'missing_or_corrupted_token');
@@ -22,13 +31,29 @@ class SocialTokenManager
       !$account->token_expires_at ||
       $account->token_expires_at->gt(now()->addMinutes(5))
     ) {
+      LogHelper::social('info', "Token is still valid", [
+        'account_id' => $account->id,
+        'platform' => $account->platform,
+        'expires_at' => $account->token_expires_at?->toIso8601String()
+      ]);
       return $account->access_token;
     }
+
+    LogHelper::social('info', "Token needs refresh", [
+      'account_id' => $account->id,
+      'platform' => $account->platform,
+      'expires_at' => $account->token_expires_at?->toIso8601String(),
+      'has_refresh_token' => !empty($account->refresh_token)
+    ]);
 
     // If it has a refresh token, try to renew
     if ($account->refresh_token) {
       $newToken = $this->refreshToken($account);
       if ($newToken) {
+        LogHelper::social('info', "Token refresh successful", [
+          'account_id' => $account->id,
+          'platform' => $account->platform
+        ]);
         return $newToken;
       }
       
@@ -133,30 +158,70 @@ class SocialTokenManager
   private function refreshTwitterToken($account, $client)
   {
     try {
+      LogHelper::social('info', "Attempting Twitter token refresh", [
+        'account_id' => $account->id,
+        'has_refresh_token' => !empty($account->refresh_token),
+        'token_expires_at' => $account->token_expires_at?->toIso8601String()
+      ]);
+
+      // Validate refresh token exists
+      if (empty($account->refresh_token)) {
+        LogHelper::social('error', "No refresh token available for Twitter account", [
+          'account_id' => $account->id
+        ]);
+        return null;
+      }
+
       $response = $client->post('https://api.twitter.com/2/oauth2/token', [
-        'auth' => [
-          config('services.twitter.client_id'),
-          config('services.twitter.client_secret')
+        'headers' => [
+          'Content-Type' => 'application/x-www-form-urlencoded',
+          'Authorization' => 'Basic ' . base64_encode(config('services.twitter.client_id') . ':' . config('services.twitter.client_secret'))
         ],
         'form_params' => [
           'refresh_token' => $account->refresh_token,
           'grant_type' => 'refresh_token',
           'client_id' => config('services.twitter.client_id'),
         ],
-        'http_errors' => false // Capture error body for logging
+        'timeout' => 30,
+        'http_errors' => false
       ]);
 
-      if ($response->getStatusCode() !== 200) {
-        $body = (string)$response->getBody();
+      $statusCode = $response->getStatusCode();
+      $body = (string)$response->getBody();
+      $data = json_decode($body, true);
+
+      LogHelper::social('info', "Twitter token refresh response", [
+        'account_id' => $account->id,
+        'status_code' => $statusCode,
+        'has_access_token' => isset($data['access_token']),
+        'has_refresh_token' => isset($data['refresh_token']),
+        'expires_in' => $data['expires_in'] ?? null
+      ]);
+
+      if ($statusCode !== 200) {
         LogHelper::social('error', "Twitter token refresh failed", [
-          'status_code' => $response->getStatusCode(),
-          'body' => $body,
+          'status_code' => $statusCode,
+          'error' => $data['error'] ?? 'Unknown error',
+          'error_description' => $data['error_description'] ?? $body,
           'account_id' => $account->id
         ]);
         return null;
       }
 
-      return json_decode($response->getBody(), true);
+      if (!isset($data['access_token'])) {
+        LogHelper::social('error', "Twitter token refresh missing access_token", [
+          'response_data' => $data,
+          'account_id' => $account->id
+        ]);
+        return null;
+      }
+
+      LogHelper::social('info', "Twitter token refresh successful", [
+        'account_id' => $account->id,
+        'new_expires_in' => $data['expires_in'] ?? null
+      ]);
+
+      return $data;
     } catch (\Exception $e) {
       LogHelper::social('error', "Twitter token refresh exception", [
         'error' => $e->getMessage(),

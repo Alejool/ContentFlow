@@ -26,78 +26,23 @@ class InstagramService extends BaseSocialService
           'account_id' => $accountId,
           'has_media' => true,
           'is_video' => $isVideo,
-          'media_url' => $rawPath
+          'media_url' => $rawPath,
+          'content_type' => $post->platformSettings['instagram']['content_type'] ?? 'post'
         ]);
       }
-      
-      // Step 1: Create media container
-      $containerEndpoint = "https://graph.facebook.com/v18.0/{$accountId}/media";
-      $containerData = [
-        'caption' => $post->content,
-        'access_token' => $this->accessToken,
-      ];
 
-      if ($rawPath) {
-        $isVideo = str_contains($rawPath, '.mp4') || str_contains($rawPath, '.mov') || str_contains($rawPath, '.avi') || str_contains($rawPath, '.m4v');
-        if ($isVideo) {
-          $instagramType = $post->platformSettings['instagram']['type'] ?? 'reel';
-          $containerData['media_type'] = (strtolower($instagramType) === 'reel') ? 'REELS' : 'VIDEO';
-          $containerData['video_url'] = $rawPath;
-        } else {
-          $containerData['image_url'] = $rawPath;
-        }
+      // Determine content type from platform settings
+      $contentType = $post->platformSettings['instagram']['content_type'] ?? 'post';
+      
+      // Handle different content types
+      switch ($contentType) {
+        case 'reel':
+          return $this->publishReel($post, $accountId, $rawPath);
+        case 'story':
+          return $this->publishStory($post, $accountId, $rawPath);
+        default:
+          return $this->publishPost($post, $accountId, $rawPath);
       }
-
-      // Timeout aumentado para videos grandes
-      $timeout = isset($isVideo) && $isVideo ? 600 : 120; // 10 min para videos, 2 min para imágenes
-
-      $containerResponse = $this->client->post($containerEndpoint, [
-        'form_params' => $containerData,
-        'timeout' => $timeout,
-        'connect_timeout' => 60
-      ]);
-      
-      $containerResult = json_decode($containerResponse->getBody(), true);
-
-      if (!isset($containerResult['id'])) {
-        LogHelper::social('error', 'Instagram container creation failed', [
-          'account_id' => $accountId,
-          'response' => $containerResult
-        ]);
-        return PostResultDTO::failure('Failed to create Instagram media container');
-      }
-      
-      Log::info('Instagram media container created', [
-        'container_id' => $containerResult['id']
-      ]);
-
-      // Step 2: Publish the container (puede tardar si es video)
-      // Para videos grandes, Instagram puede tardar en procesar
-      $publishTimeout = isset($isVideo) && $isVideo ? 900 : 300; // 15 min para videos, 5 min para imágenes
-      
-      $publishEndpoint = "https://graph.facebook.com/v18.0/{$accountId}/media_publish";
-      $publishResponse = $this->client->post($publishEndpoint, [
-        'form_params' => [
-          'creation_id' => $containerResult['id'],
-          'access_token' => $this->accessToken,
-        ],
-        'timeout' => $publishTimeout,
-        'connect_timeout' => 60
-      ]);
-
-      $publishResult = json_decode($publishResponse->getBody(), true);
-      $postId = $publishResult['id'];
-      
-      LogHelper::social('info', 'Instagram publish completed', [
-        'post_id' => $postId,
-        'account_id' => $accountId
-      ]);
-
-      return PostResultDTO::success(
-        postId: $postId,
-        postUrl: "https://www.instagram.com/p/{$postId}",
-        rawData: ['platform' => 'instagram']
-      );
     } catch (\Exception $e) {
       LogHelper::social('error', 'Instagram publish failed', [
         'error' => $e->getMessage(),
@@ -107,6 +52,236 @@ class InstagramService extends BaseSocialService
       
       return PostResultDTO::failure($e->getMessage());
     }
+  }
+
+  private function publishReel(SocialPostDTO $post, string $accountId, ?string $rawPath): PostResultDTO
+  {
+    if (!$rawPath) {
+      return PostResultDTO::failure('Reel requires a video file');
+    }
+
+    $isVideo = str_contains($rawPath, '.mp4') || str_contains($rawPath, '.mov') || str_contains($rawPath, '.avi') || str_contains($rawPath, '.m4v');
+    if (!$isVideo) {
+      return PostResultDTO::failure('Reel requires a video file, not an image');
+    }
+
+    LogHelper::social('info', 'Publishing Instagram Reel', [
+      'account_id' => $accountId,
+      'video_url' => $rawPath
+    ]);
+
+    // Step 1: Create reel container
+    $containerEndpoint = "https://graph.facebook.com/v18.0/{$accountId}/media";
+    $containerData = [
+      'caption' => $post->content,
+      'media_type' => 'REELS',
+      'video_url' => $rawPath,
+      'access_token' => $this->accessToken,
+    ];
+
+    // Add reel-specific settings
+    $reelSettings = $post->platformSettings['instagram'] ?? [];
+    if (isset($reelSettings['cover_url'])) {
+      $containerData['thumb_offset'] = $reelSettings['thumb_offset'] ?? 0;
+    }
+
+    $containerResponse = $this->client->post($containerEndpoint, [
+      'form_params' => $containerData,
+      'timeout' => 600, // 10 minutes for video processing
+      'connect_timeout' => 60
+    ]);
+    
+    $containerResult = json_decode($containerResponse->getBody(), true);
+
+    if (!isset($containerResult['id'])) {
+      LogHelper::social('error', 'Instagram reel container creation failed', [
+        'account_id' => $accountId,
+        'response' => $containerResult
+      ]);
+      return PostResultDTO::failure('Failed to create Instagram reel container');
+    }
+    
+    LogHelper::social('info', 'Instagram reel container created', [
+      'container_id' => $containerResult['id']
+    ]);
+
+    // Step 2: Publish the reel
+    $publishEndpoint = "https://graph.facebook.com/v18.0/{$accountId}/media_publish";
+    $publishResponse = $this->client->post($publishEndpoint, [
+      'form_params' => [
+        'creation_id' => $containerResult['id'],
+        'access_token' => $this->accessToken,
+      ],
+      'timeout' => 900, // 15 minutes for reel processing
+      'connect_timeout' => 60
+    ]);
+
+    $publishResult = json_decode($publishResponse->getBody(), true);
+    $postId = $publishResult['id'];
+    
+    LogHelper::social('info', 'Instagram reel published successfully', [
+      'post_id' => $postId,
+      'account_id' => $accountId
+    ]);
+
+    return PostResultDTO::success(
+      postId: $postId,
+      postUrl: "https://www.instagram.com/reel/{$postId}",
+      rawData: ['platform' => 'instagram', 'type' => 'reel']
+    );
+  }
+
+  private function publishStory(SocialPostDTO $post, string $accountId, ?string $rawPath): PostResultDTO
+  {
+    if (!$rawPath) {
+      return PostResultDTO::failure('Story requires a media file');
+    }
+
+    LogHelper::social('info', 'Publishing Instagram Story', [
+      'account_id' => $accountId,
+      'media_url' => $rawPath
+    ]);
+
+    $isVideo = str_contains($rawPath, '.mp4') || str_contains($rawPath, '.mov') || str_contains($rawPath, '.avi') || str_contains($rawPath, '.m4v');
+
+    // Step 1: Create story container
+    $containerEndpoint = "https://graph.facebook.com/v18.0/{$accountId}/media";
+    $containerData = [
+      'media_type' => 'STORIES',
+      'access_token' => $this->accessToken,
+    ];
+
+    if ($isVideo) {
+      $containerData['video_url'] = $rawPath;
+    } else {
+      $containerData['image_url'] = $rawPath;
+    }
+
+    // Add story text if provided
+    if (!empty($post->content)) {
+      // Note: Instagram Stories don't support captions like posts
+      // Text would need to be overlaid on the media itself
+      LogHelper::social('info', 'Story text content will be ignored', [
+        'content' => $post->content
+      ]);
+    }
+
+    $timeout = $isVideo ? 600 : 120;
+
+    $containerResponse = $this->client->post($containerEndpoint, [
+      'form_params' => $containerData,
+      'timeout' => $timeout,
+      'connect_timeout' => 60
+    ]);
+    
+    $containerResult = json_decode($containerResponse->getBody(), true);
+
+    if (!isset($containerResult['id'])) {
+      LogHelper::social('error', 'Instagram story container creation failed', [
+        'account_id' => $accountId,
+        'response' => $containerResult
+      ]);
+      return PostResultDTO::failure('Failed to create Instagram story container');
+    }
+    
+    LogHelper::social('info', 'Instagram story container created', [
+      'container_id' => $containerResult['id']
+    ]);
+
+    // Step 2: Publish the story
+    $publishTimeout = $isVideo ? 900 : 300;
+    
+    $publishEndpoint = "https://graph.facebook.com/v18.0/{$accountId}/media_publish";
+    $publishResponse = $this->client->post($publishEndpoint, [
+      'form_params' => [
+        'creation_id' => $containerResult['id'],
+        'access_token' => $this->accessToken,
+      ],
+      'timeout' => $publishTimeout,
+      'connect_timeout' => 60
+    ]);
+
+    $publishResult = json_decode($publishResponse->getBody(), true);
+    $postId = $publishResult['id'];
+    
+    LogHelper::social('info', 'Instagram story published successfully', [
+      'post_id' => $postId,
+      'account_id' => $accountId
+    ]);
+
+    return PostResultDTO::success(
+      postId: $postId,
+      postUrl: "https://www.instagram.com/stories/{$accountId}/{$postId}",
+      rawData: ['platform' => 'instagram', 'type' => 'story']
+    );
+  }
+
+  private function publishPost(SocialPostDTO $post, string $accountId, ?string $rawPath): PostResultDTO
+  {
+    // Original post logic
+    $containerEndpoint = "https://graph.facebook.com/v18.0/{$accountId}/media";
+    $containerData = [
+      'caption' => $post->content,
+      'access_token' => $this->accessToken,
+    ];
+
+    if ($rawPath) {
+      $isVideo = str_contains($rawPath, '.mp4') || str_contains($rawPath, '.mov') || str_contains($rawPath, '.avi') || str_contains($rawPath, '.m4v');
+      if ($isVideo) {
+        $containerData['media_type'] = 'VIDEO';
+        $containerData['video_url'] = $rawPath;
+      } else {
+        $containerData['image_url'] = $rawPath;
+      }
+    }
+
+    $timeout = isset($isVideo) && $isVideo ? 600 : 120;
+
+    $containerResponse = $this->client->post($containerEndpoint, [
+      'form_params' => $containerData,
+      'timeout' => $timeout,
+      'connect_timeout' => 60
+    ]);
+    
+    $containerResult = json_decode($containerResponse->getBody(), true);
+
+    if (!isset($containerResult['id'])) {
+      LogHelper::social('error', 'Instagram container creation failed', [
+        'account_id' => $accountId,
+        'response' => $containerResult
+      ]);
+      return PostResultDTO::failure('Failed to create Instagram media container');
+    }
+    
+    LogHelper::social('info', 'Instagram media container created', [
+      'container_id' => $containerResult['id']
+    ]);
+
+    $publishTimeout = isset($isVideo) && $isVideo ? 900 : 300;
+    
+    $publishEndpoint = "https://graph.facebook.com/v18.0/{$accountId}/media_publish";
+    $publishResponse = $this->client->post($publishEndpoint, [
+      'form_params' => [
+        'creation_id' => $containerResult['id'],
+        'access_token' => $this->accessToken,
+      ],
+      'timeout' => $publishTimeout,
+      'connect_timeout' => 60
+    ]);
+
+    $publishResult = json_decode($publishResponse->getBody(), true);
+    $postId = $publishResult['id'];
+    
+    LogHelper::social('info', 'Instagram post published successfully', [
+      'post_id' => $postId,
+      'account_id' => $accountId
+    ]);
+
+    return PostResultDTO::success(
+      postId: $postId,
+      postUrl: "https://www.instagram.com/p/{$postId}",
+      rawData: ['platform' => 'instagram', 'type' => 'post']
+    );
   }
 
   public function delete(string $postId): bool

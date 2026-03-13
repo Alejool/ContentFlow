@@ -76,8 +76,38 @@ class PublishValidationService
             }
         }
 
-        // Specific validations for video content
-        if ($publication->mediaFiles->isNotEmpty()) {
+        // Specific validations for reels
+        if ($publication->content_type === 'reel') {
+            $reelValidation = $this->validateReelContent($publication, $platform);
+            $errors = array_merge($errors, $reelValidation['errors']);
+            $warnings = array_merge($warnings, $reelValidation['warnings']);
+            if (!$reelValidation['compatible']) {
+                $compatible = false;
+            }
+        }
+
+        // Specific validations for stories
+        if ($publication->content_type === 'story') {
+            $storyValidation = $this->validateStoryContent($publication, $platform);
+            $errors = array_merge($errors, $storyValidation['errors']);
+            $warnings = array_merge($warnings, $storyValidation['warnings']);
+            if (!$storyValidation['compatible']) {
+                $compatible = false;
+            }
+        }
+
+        // Specific validations for carousels
+        if ($publication->content_type === 'carousel') {
+            $carouselValidation = $this->validateCarouselContent($publication, $platform);
+            $errors = array_merge($errors, $carouselValidation['errors']);
+            $warnings = array_merge($warnings, $carouselValidation['warnings']);
+            if (!$carouselValidation['compatible']) {
+                $compatible = false;
+            }
+        }
+
+        // Specific validations for video content (only for posts, not for reels/stories/carousels)
+        if ($publication->mediaFiles->isNotEmpty() && $publication->content_type === 'post') {
             $mediaValidation = $this->validateMediaContent($publication, $platform);
             $errors = array_merge($errors, $mediaValidation['errors']);
             $warnings = array_merge($warnings, $mediaValidation['warnings']);
@@ -202,5 +232,188 @@ class PublishValidationService
         }
 
         return $recommendations;
+    }
+
+    /**
+     * Validate reel content for platform compatibility
+     */
+    protected function validateReelContent(Publication $publication, string $platform): array
+    {
+        $errors = [];
+        $warnings = [];
+        $compatible = true;
+
+        $mediaFile = $publication->mediaFiles->first();
+        
+        if (!$mediaFile) {
+            $errors[] = __('validation.reel_requires_video');
+            return ['errors' => $errors, 'warnings' => $warnings, 'compatible' => false];
+        }
+
+        if ($mediaFile->file_type !== 'video') {
+            $errors[] = __('validation.reel_must_be_video');
+            $compatible = false;
+        }
+
+        // Platform-specific validations
+        switch ($platform) {
+            case 'instagram':
+                // Instagram Reels: 15 seconds to 90 seconds
+                if (isset($mediaFile->duration)) {
+                    if ($mediaFile->duration < 15) {
+                        $warnings[] = __('validation.instagram_reel_min_duration', ['duration' => $mediaFile->duration]);
+                    }
+                    if ($mediaFile->duration > 90) {
+                        $errors[] = __('validation.instagram_reel_max_duration', ['duration' => $mediaFile->duration]);
+                        $compatible = false;
+                    }
+                }
+                
+                // Aspect ratio should be vertical (9:16)
+                if (isset($mediaFile->width) && isset($mediaFile->height)) {
+                    $aspectRatio = $mediaFile->width / $mediaFile->height;
+                    if ($aspectRatio > 0.6) { // Not vertical enough
+                        $warnings[] = __('validation.instagram_reel_aspect_ratio');
+                    }
+                }
+                break;
+
+            case 'tiktok':
+                // TikTok: 15 seconds to 10 minutes
+                if (isset($mediaFile->duration)) {
+                    if ($mediaFile->duration < 15) {
+                        $warnings[] = __('validation.tiktok_min_duration', ['duration' => $mediaFile->duration]);
+                    }
+                    if ($mediaFile->duration > 600) {
+                        $errors[] = __('validation.tiktok_max_duration', ['duration' => $mediaFile->duration]);
+                        $compatible = false;
+                    }
+                }
+                break;
+
+            case 'youtube':
+                // YouTube Shorts: up to 60 seconds
+                if (isset($mediaFile->duration) && $mediaFile->duration > 60) {
+                    $errors[] = __('validation.youtube_shorts_max_duration', ['duration' => $mediaFile->duration]);
+                    $compatible = false;
+                }
+                break;
+
+            case 'facebook':
+                // Facebook Reels: 15 seconds to 90 seconds (similar to Instagram)
+                if (isset($mediaFile->duration)) {
+                    if ($mediaFile->duration < 15) {
+                        $warnings[] = __('validation.facebook_reel_min_duration', ['duration' => $mediaFile->duration]);
+                    }
+                    if ($mediaFile->duration > 90) {
+                        $errors[] = __('validation.facebook_reel_max_duration', ['duration' => $mediaFile->duration]);
+                        $compatible = false;
+                    }
+                }
+                break;
+        }
+
+        return ['errors' => $errors, 'warnings' => $warnings, 'compatible' => $compatible];
+    }
+
+    /**
+     * Validate story content for platform compatibility
+     */
+    protected function validateStoryContent(Publication $publication, string $platform): array
+    {
+        $errors = [];
+        $warnings = [];
+        $compatible = true;
+
+        $mediaFile = $publication->mediaFiles->first();
+        
+        if (!$mediaFile) {
+            $errors[] = __('validation.story_requires_media');
+            return ['errors' => $errors, 'warnings' => $warnings, 'compatible' => false];
+        }
+
+        // Platform-specific validations
+        switch ($platform) {
+            case 'instagram':
+                // Instagram Stories: 15 seconds max for videos
+                if ($mediaFile->file_type === 'video' && isset($mediaFile->duration)) {
+                    if ($mediaFile->duration > 15) {
+                        $errors[] = __('validation.instagram_story_max_duration', ['duration' => $mediaFile->duration]);
+                        $compatible = false;
+                    }
+                }
+                
+                // Aspect ratio should be vertical (9:16)
+                if (isset($mediaFile->width) && isset($mediaFile->height)) {
+                    $aspectRatio = $mediaFile->width / $mediaFile->height;
+                    if ($aspectRatio > 0.6) {
+                        $warnings[] = __('validation.instagram_story_aspect_ratio');
+                    }
+                }
+                break;
+
+            case 'facebook':
+                // Facebook Stories: 60 seconds max for videos (updated limit)
+                if ($mediaFile->file_type === 'video' && isset($mediaFile->duration)) {
+                    if ($mediaFile->duration > 60) {
+                        $errors[] = __('validation.facebook_story_max_duration', ['duration' => $mediaFile->duration]);
+                        $compatible = false;
+                    }
+                }
+                break;
+        }
+
+        return ['errors' => $errors, 'warnings' => $warnings, 'compatible' => $compatible];
+    }
+
+    /**
+     * Validate carousel content for platform compatibility
+     */
+    protected function validateCarouselContent(Publication $publication, string $platform): array
+    {
+        $errors = [];
+        $warnings = [];
+        $compatible = true;
+
+        $mediaFiles = $publication->mediaFiles;
+        
+        if ($mediaFiles->count() < 2) {
+            $errors[] = __('validation.carousel_min_media');
+            return ['errors' => $errors, 'warnings' => $warnings, 'compatible' => false];
+        }
+
+        // Platform-specific validations
+        switch ($platform) {
+            case 'instagram':
+                if ($mediaFiles->count() > 10) {
+                    $errors[] = __('validation.instagram_carousel_max_media', ['count' => $mediaFiles->count()]);
+                    $compatible = false;
+                }
+                
+                // Check for mixed media types
+                $hasImages = $mediaFiles->where('file_type', 'image')->count() > 0;
+                $hasVideos = $mediaFiles->where('file_type', 'video')->count() > 0;
+                
+                if ($hasImages && $hasVideos) {
+                    $warnings[] = __('validation.instagram_carousel_mixed_media');
+                }
+                break;
+
+            case 'facebook':
+                if ($mediaFiles->count() > 10) {
+                    $errors[] = __('validation.facebook_carousel_max_media', ['count' => $mediaFiles->count()]);
+                    $compatible = false;
+                }
+                break;
+
+            case 'linkedin':
+                if ($mediaFiles->count() > 9) {
+                    $errors[] = __('validation.linkedin_carousel_max_media', ['count' => $mediaFiles->count()]);
+                    $compatible = false;
+                }
+                break;
+        }
+
+        return ['errors' => $errors, 'warnings' => $warnings, 'compatible' => $compatible];
     }
 }

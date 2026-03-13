@@ -67,15 +67,36 @@ class FacebookService extends BaseSocialService
   {
     $isUrl = str_starts_with($rawPath, 'http://') || str_starts_with($rawPath, 'https://');
     
-    // Si es una URL (S3 u otra), usar upload resumible directamente
+    // Si es una URL (S3 u otra), intentar primero upload directo, luego resumible
     if ($isUrl) {
-      Log::info('Facebook video from URL detected, using resumable upload', [
+      Log::info('Facebook video from URL detected, trying direct upload first', [
         'url' => $rawPath,
         'is_s3' => str_contains($rawPath, 's3.amazonaws.com')
       ]);
       
-      // Siempre usar upload resumible para URLs (más confiable, evita timeouts 504)
-      return $this->uploadVideoFromUrl($pageId, $rawPath, $content, $title);
+      try {
+        // Intentar primero el método directo (más simple y rápido)
+        return $this->uploadVideo($pageId, $rawPath, $content, $title);
+      } catch (\Exception $e) {
+        Log::warning('Facebook direct upload failed, falling back to resumable', [
+          'error' => $e->getMessage(),
+          'url' => $rawPath
+        ]);
+        
+        // Verificar si es un error específico de archivo problemático
+        if (str_contains($e->getMessage(), 'There was a problem uploading your video file')) {
+          Log::warning('Facebook reports problematic video file', [
+            'url' => $rawPath,
+            'error' => $e->getMessage()
+          ]);
+          
+          // Aún así, intentar el método resumible una vez más
+          // Pero con información adicional para debugging
+        }
+        
+        // Si falla, usar upload resumible como fallback
+        return $this->uploadVideoFromUrl($pageId, $rawPath, $content, $title);
+      }
     }
     
     // Es un path local
@@ -98,9 +119,9 @@ class FacebookService extends BaseSocialService
     if ($fileSizeMB > 50) {
       return $this->uploadVideoResumable($pageId, $localPath, $content, $title);
     } else {
-      // Para archivos pequeños, convertir a URL pública y usar resumible también
+      // Para archivos pequeños, convertir a URL pública y usar método directo
       $publicUrl = $this->getPublicUrl($rawPath);
-      return $this->uploadVideoFromUrl($pageId, $publicUrl, $content, $title);
+      return $this->uploadVideo($pageId, $publicUrl, $content, $title);
     }
   }
 
@@ -424,7 +445,49 @@ class FacebookService extends BaseSocialService
       }
     }
     
-    Log::info('Download completed', ['temp_file' => $tempFile]);
+    // Validar que el archivo se descargó correctamente
+    if (!file_exists($tempFile) || filesize($tempFile) === 0) {
+      throw new \Exception('Downloaded file is empty or does not exist');
+    }
+    
+    // Validar que es un archivo de video válido
+    $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mimeType = finfo_file($fileInfo, $tempFile);
+    finfo_close($fileInfo);
+    
+    // Obtener información adicional del archivo para diagnóstico
+    $fileSize = filesize($tempFile);
+    $fileSizeMB = round($fileSize / 1024 / 1024, 2);
+    
+    // Intentar obtener información del video usando ffprobe si está disponible
+    $videoInfo = [];
+    if (function_exists('shell_exec')) {
+      $ffprobeOutput = @shell_exec("ffprobe -v quiet -print_format json -show_format -show_streams " . escapeshellarg($tempFile) . " 2>/dev/null");
+      if ($ffprobeOutput) {
+        $videoInfo = json_decode($ffprobeOutput, true) ?? [];
+      }
+    }
+    
+    Log::info('Download completed with detailed info', [
+      'temp_file' => $tempFile,
+      'file_size' => $fileSize,
+      'file_size_mb' => $fileSizeMB,
+      'mime_type' => $mimeType,
+      'video_info' => $videoInfo
+    ]);
+    
+    // Verificar que es un tipo de archivo de video válido
+    $validVideoTypes = ['video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/webm'];
+    if (!in_array($mimeType, $validVideoTypes)) {
+      @unlink($tempFile);
+      throw new \Exception("Invalid video file type: {$mimeType}. Expected video format.");
+    }
+    
+    // Verificar tamaño mínimo (evitar archivos corruptos)
+    if ($fileSize < 1024) { // Menos de 1KB
+      @unlink($tempFile);
+      throw new \Exception("File too small ({$fileSize} bytes), possibly corrupted");
+    }
     
     return $tempFile;
   }

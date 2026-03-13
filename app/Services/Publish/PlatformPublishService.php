@@ -223,6 +223,44 @@ class PlatformPublishService
       $pSettings[$platformKey]['poll_duration_hours'] = $publication->poll_duration_hours ?? 24;
     }
 
+    // Add content type information to platform settings
+    $platformKey = $socialAccount->platform;
+    if (!isset($pSettings[$platformKey])) {
+      $pSettings[$platformKey] = [];
+    }
+    
+    $pSettings[$platformKey]['content_type'] = $publication->content_type;
+    
+    // Add content-type specific settings
+    switch ($publication->content_type) {
+      case 'reel':
+        $pSettings[$platformKey]['type'] = 'reel';
+        LogHelper::publicationInfo('Preparing reel for publishing', [
+          'publication_id' => $publication->id,
+          'platform' => $socialAccount->platform,
+          'media_count' => count($mediaPaths)
+        ]);
+        break;
+        
+      case 'story':
+        $pSettings[$platformKey]['type'] = 'story';
+        LogHelper::publicationInfo('Preparing story for publishing', [
+          'publication_id' => $publication->id,
+          'platform' => $socialAccount->platform,
+          'media_count' => count($mediaPaths)
+        ]);
+        break;
+        
+      case 'carousel':
+        $pSettings[$platformKey]['type'] = 'carousel';
+        LogHelper::publicationInfo('Preparing carousel for publishing', [
+          'publication_id' => $publication->id,
+          'platform' => $socialAccount->platform,
+          'media_count' => count($mediaPaths)
+        ]);
+        break;
+    }
+
     return new SocialPostDTO(
       content: $this->buildCaption($publication),
       mediaPaths: $mediaPaths,
