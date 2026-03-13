@@ -21,7 +21,9 @@ class CheckSocialTokensJob implements ShouldQueue
 
     public function handle()
     {
-        LogHelper::social('info', 'Starting scheduled token check');
+        LogHelper::social('token_check.started', [
+            'message' => 'Starting scheduled token check'
+        ]);
 
         $tokenManager = app(SocialTokenManager::class);
         
@@ -33,7 +35,7 @@ class CheckSocialTokensJob implements ShouldQueue
         ->whereNotNull('refresh_token')
         ->get();
 
-        LogHelper::social('info', 'Found accounts needing token refresh', [
+        LogHelper::social('token_check.accounts_found', [
             'count' => $accounts->count()
         ]);
 
@@ -42,7 +44,7 @@ class CheckSocialTokensJob implements ShouldQueue
 
         foreach ($accounts as $account) {
             try {
-                LogHelper::social('info', 'Checking token for account', [
+                LogHelper::social('token_check.checking_account', [
                     'account_id' => $account->id,
                     'platform' => $account->platform,
                     'expires_at' => $account->token_expires_at?->toIso8601String(),
@@ -57,34 +59,33 @@ class CheckSocialTokensJob implements ShouldQueue
                     // Reactivate account if it was inactive
                     if (!$account->is_active) {
                         $account->update(['is_active' => true]);
-                        LogHelper::social('info', 'Reactivated account after token refresh', [
+                        LogHelper::social('token_check.account_reactivated', [
                             'account_id' => $account->id,
                             'platform' => $account->platform
                         ]);
                     }
                     
-                    LogHelper::social('info', 'Token refreshed successfully', [
+                    LogHelper::social('token_check.refresh_successful', [
                         'account_id' => $account->id,
                         'platform' => $account->platform
                     ]);
                 } else {
                     $failed++;
-                    LogHelper::social('warning', 'Token refresh failed', [
+                    LogHelper::social('token_check.refresh_failed', [
                         'account_id' => $account->id,
                         'platform' => $account->platform
                     ]);
                 }
             } catch (\Exception $e) {
                 $failed++;
-                LogHelper::social('error', 'Token refresh exception', [
+                LogHelper::socialError('token_check.exception', $e->getMessage(), [
                     'account_id' => $account->id,
-                    'platform' => $account->platform,
-                    'error' => $e->getMessage()
+                    'platform' => $account->platform
                 ]);
             }
         }
 
-        LogHelper::social('info', 'Token check completed', [
+        LogHelper::social('token_check.completed', [
             'total_checked' => $accounts->count(),
             'refreshed' => $refreshed,
             'failed' => $failed
@@ -96,7 +97,7 @@ class CheckSocialTokensJob implements ShouldQueue
                 ->whereNotNull('refresh_token')
                 ->get(['id', 'platform', 'failure_count', 'last_failed_at']);
 
-            LogHelper::social('warning', 'Some accounts still need manual reconnection', [
+            LogHelper::social('token_check.failed_accounts_summary', [
                 'failed_accounts' => $failedAccounts->map(function($account) {
                     return [
                         'id' => $account->id,

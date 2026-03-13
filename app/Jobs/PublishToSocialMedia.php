@@ -49,7 +49,7 @@ class PublishToSocialMedia implements ShouldQueue
     $publication = Publication::with(['user.currentWorkspace', 'workspace'])->find($this->publicationId);
     
     if (!$publication) {
-      LogHelper::publicationError('Publication not found', [
+      LogHelper::publicationError('Publication not found', 'Publication not found', [
         'publication_id' => $this->publicationId,
         'job_id' => $this->job->uuid()
       ]);
@@ -61,7 +61,7 @@ class PublishToSocialMedia implements ShouldQueue
       ->get();
 
     if ($socialAccounts->isEmpty()) {
-      LogHelper::publicationError('No social accounts found', [
+      LogHelper::publicationError('No social accounts found', 'No social accounts found', [
         'publication_id' => $publication->id,
         'social_account_ids' => $this->socialAccountIds,
         'job_id' => $this->job->uuid()
@@ -77,7 +77,7 @@ class PublishToSocialMedia implements ShouldQueue
     
     if (!$validation['can_publish']) {
       $errorMessage = 'Publishing validation failed: ' . implode(', ', $validation['global_errors'] ?? []);
-      LogHelper::publicationError($errorMessage, [
+      LogHelper::publicationError('Publishing validation failed', $errorMessage, [
         'publication_id' => $publication->id,
         'validation_errors' => $validation['global_errors'] ?? [],
         'job_id' => $this->job->uuid()
@@ -95,7 +95,7 @@ class PublishToSocialMedia implements ShouldQueue
     });
 
     if ($compatibleAccounts->isEmpty()) {
-      LogHelper::publicationError('No compatible platforms found after validation', [
+      LogHelper::publicationError('No compatible platforms found after validation', 'No compatible platforms found after validation', [
         'publication_id' => $publication->id,
         'platform_results' => $validation['platform_results'],
         'job_id' => $this->job->uuid()
