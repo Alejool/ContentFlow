@@ -1396,11 +1396,67 @@ export const usePublicationForm = ({
 
       // CRITICAL: Read mediaFiles FRESH from store (not from stale selector)
       // This ensures we get the updated metadata after S3 upload
-      const currentMediaFiles = useMediaStore.getState().mediaFiles;
+      let currentMediaFiles = useMediaStore.getState().mediaFiles;
+
+      // Check if there are files still uploading
+      let uploadingFiles = currentMediaFiles.filter((media) => {
+        return media.status === 'uploading' || media.status === 'processing' || (media.file instanceof File);
+      });
+
+      // If there are files uploading, WAIT for them to complete
+      if (uploadingFiles.length > 0) {
+        console.log('⏳ Waiting for uploads to complete:', uploadingFiles.length);
+        toast.loading(
+          t("publications.modal.upload.waitingForUploads", {
+            defaultValue: `Esperando a que se completen ${uploadingFiles.length} archivo(s)...`,
+            count: uploadingFiles.length
+          }),
+          { id: 'waiting-uploads' }
+        );
+
+        // Wait for all uploads to complete (max 60 seconds)
+        const maxWaitTime = 60000; // 60 seconds
+        const checkInterval = 500; // Check every 500ms
+        const startTime = Date.now();
+
+        while (Date.now() - startTime < maxWaitTime) {
+          currentMediaFiles = useMediaStore.getState().mediaFiles;
+          uploadingFiles = currentMediaFiles.filter((media) => {
+            return media.status === 'uploading' || media.status === 'processing' || (media.file instanceof File);
+          });
+
+          if (uploadingFiles.length === 0) {
+            console.log('✅ All uploads completed');
+            toast.success(
+              t("publications.modal.upload.uploadsCompleted", {
+                defaultValue: "Todos los archivos se han subido correctamente"
+              }),
+              { id: 'waiting-uploads' }
+            );
+            break;
+          }
+
+          // Wait before checking again
+          await new Promise(resolve => setTimeout(resolve, checkInterval));
+        }
+
+        // Check if we timed out
+        if (uploadingFiles.length > 0) {
+          toast.error(
+            t("publications.modal.upload.uploadTimeout", {
+              defaultValue: "Algunos archivos no se completaron. Por favor, intenta de nuevo.",
+              count: uploadingFiles.length
+            }),
+            { id: 'waiting-uploads' }
+          );
+          setIsSubmitting(false);
+          return;
+        }
+      }
 
       // 1. Filter out files that are still uploading (File objects)
       // We will link them later via background process
-      const readyMediaFiles = (currentMediaFiles || []).filter((media) => {
+      const readyMediaFiles = currentMediaFiles.filter((media) => {
         // Keep key-based (uploaded) files or existing IDs
         const isUploaded =
           typeof media.file === "object" && "key" in media.file;

@@ -1,5 +1,5 @@
-import { useUploadQueue } from "@/stores/uploadQueueStore";
 import { useProcessingProgress } from "@/stores/processingProgressStore";
+import { useUploadQueue } from "@/stores/uploadQueueStore";
 import axios from "axios";
 
 // Polling intervals
@@ -25,6 +25,8 @@ export function initProgressRealtime(userId: number) {
 
   if (isWebSocketAvailable) {
     initWebSocketListeners(userId);
+    // Still start polling as backup in case WebSocket fails
+    initPollingFallback();
   } else {
     initPollingFallback();
   }
@@ -224,6 +226,8 @@ function initPollingFallback() {
 
 /**
  * Poll upload progress from the server
+ * NOTE: This is only for legacy server-side uploads.
+ * For direct S3 uploads, progress is handled locally in useS3Upload hook.
  */
 async function pollUploadProgress() {
   const uploadStore = useUploadQueue.getState();
@@ -235,13 +239,24 @@ async function pollUploadProgress() {
     return; // No active uploads to poll
   }
 
-  const uploadIds = activeUploads.map((upload) => upload.id);
+  // Filter out S3 direct uploads (they have uploadId or s3Key)
+  // Only poll for server-side uploads (legacy)
+  const serverUploads = activeUploads.filter(
+    (upload) => !upload.uploadId && !upload.s3Key && !upload.isPausable
+  );
+
+  if (serverUploads.length === 0) {
+    return; // No server-side uploads to poll
+  }
+
+  const uploadIds = serverUploads.map((upload) => upload.id);
 
   try {
-    const response = await axios.get("/api/progress", {
+    const response = await axios.get("/api/v1/uploads/progress", {
       params: {
-        upload_ids: uploadIds,
+        upload_ids: uploadIds.join(','),
       },
+      timeout: 5000, // 5 second timeout
     });
 
     const { uploads } = response.data;
@@ -250,20 +265,45 @@ async function pollUploadProgress() {
     Object.entries(uploads || {}).forEach(([uploadId, progressData]: [string, any]) => {
       const upload = uploadStore.queue[uploadId];
       if (upload) {
-        uploadStore.updateUpload(uploadId, {
-          progress: Math.min(100, Math.max(0, progressData.progress || 0)),
-          stats: {
-            eta: progressData.eta || 0,
-            speed: progressData.speed || 0,
-            startTime: upload.stats?.startTime || Date.now(),
-            bytesUploaded: progressData.bytes_uploaded || 0,
-            lastUpdateTime: Date.now(),
-          },
-        });
+        // Check for completion or failure
+        if (progressData.status === 'completed') {
+          uploadStore.updateUpload(uploadId, {
+            status: "completed",
+            progress: 100,
+            s3Key: progressData.s3_key,
+          });
+        } else if (progressData.status === 'failed') {
+          uploadStore.updateUpload(uploadId, {
+            status: "error",
+            progress: 0,
+            error: progressData.error || 'Upload failed',
+          });
+        } else {
+          uploadStore.updateUpload(uploadId, {
+            progress: Math.min(100, Math.max(0, progressData.progress || 0)),
+            stats: {
+              eta: progressData.eta || 0,
+              speed: progressData.speed || 0,
+              startTime: upload.stats?.startTime || Date.now(),
+              bytesUploaded: progressData.bytes_uploaded || 0,
+              lastUpdateTime: Date.now(),
+            },
+          });
+        }
       }
     });
   } catch (error) {
+    // Check for timeout or network errors
+    if (axios.isAxiosError(error)) {
+      if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+        console.warn('Upload progress polling timed out, will retry');
+      } else if (error.response?.status === 404) {
+        // Upload not found on server - this is expected for S3 direct uploads
+        // Don't mark as failed, just log
+        console.debug('Upload not found on server (expected for S3 direct uploads)');
+      }
     }
+  }
 }
 
 /**
@@ -282,10 +322,11 @@ async function pollProcessingProgress() {
   const jobIds = activeJobs.map((job) => job.id);
 
   try {
-    const response = await axios.get("/api/progress", {
+    const response = await axios.get("/api/v1/processing/progress", {
       params: {
-        job_ids: jobIds,
+        job_ids: jobIds.join(','),
       },
+      timeout: 5000, // 5 second timeout
     });
 
     const { jobs } = response.data;
@@ -294,9 +335,13 @@ async function pollProcessingProgress() {
     Object.entries(jobs || {}).forEach(([jobId, progressData]: [string, any]) => {
       const job = processingStore.jobs[jobId];
       if (job) {
+        const isCompleted = progressData.progress >= 100 || progressData.status === 'completed';
+        const isFailed = progressData.status === 'failed';
+        
         processingStore.updateJob(jobId, {
           progress: Math.min(100, Math.max(0, progressData.progress || 0)),
-          status: progressData.progress >= 100 ? "completed" : "processing",
+          status: isFailed ? "failed" : (isCompleted ? "completed" : "processing"),
+          error: progressData.error || job.error,
           stats: {
             eta: progressData.eta || 0,
             currentStep: progressData.current_step || "",
@@ -305,8 +350,8 @@ async function pollProcessingProgress() {
           },
         });
 
-        // If completed, remove after delay
-        if (progressData.progress >= 100) {
+        // If completed or failed, remove after delay
+        if (isCompleted || isFailed) {
           setTimeout(() => {
             processingStore.removeJob(jobId);
           }, 3000);
@@ -314,7 +359,24 @@ async function pollProcessingProgress() {
       }
     });
   } catch (error) {
+    // Handle timeout or network errors
+    if (axios.isAxiosError(error)) {
+      if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+        console.warn('Processing progress polling timed out, will retry');
+      } else if (error.response?.status === 404) {
+        // Jobs not found, they may have completed
+        activeJobs.forEach(job => {
+          processingStore.updateJob(job.id, {
+            status: "completed",
+            progress: 100,
+          });
+          setTimeout(() => {
+            processingStore.removeJob(job.id);
+          }, 2000);
+        });
+      }
     }
+  }
 }
 
 /**
