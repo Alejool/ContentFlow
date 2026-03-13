@@ -162,6 +162,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             shadow-none
             rounded-full
             p-3
+            hover:bg-primary-500/15
           `;
         case "gradient":
           return `

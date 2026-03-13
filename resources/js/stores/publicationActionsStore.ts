@@ -17,7 +17,16 @@ interface PublicationActionsStore {
   setItemLoading: (itemId: number, key: keyof LoadingStates[number], value: boolean) => void;
   
   // Acciones de API
-  submitForApproval: (itemId: number) => Promise<{ success: boolean; message?: string }>;
+  submitForApproval: (itemId: number) => Promise<{ 
+    success: boolean; 
+    message?: string;
+    approvalInfo?: {
+      current_level: number;
+      level_name: string;
+      approvers: string[];
+      approver_count: number;
+    };
+  }>;
   deletePublication: (itemId: number) => Promise<{ success: boolean; message?: string }>;
   deleteUserEvent: (itemId: number) => Promise<{ success: boolean; message?: string }>;
   duplicatePublication: (itemId: number) => Promise<{ success: boolean; message?: string }>;
@@ -43,9 +52,15 @@ export const usePublicationActionsStore = create<PublicationActionsStore>((set, 
     setItemLoading(itemId, "submitting", true);
 
     try {
-      await axios.post(`/api/v1/content/${itemId}/submit-for-approval`);
+      const response = await axios.post(`/api/v1/content/${itemId}/submit-for-approval`);
+      const approvalInfo = response.data?.data?.approval_info;
+      
       router.reload({ only: ["publications"] });
-      return { success: true };
+      
+      return { 
+        success: true,
+        approvalInfo: approvalInfo,
+      };
     } catch (error: any) {
       console.error("Error submitting for approval:", error);
       return {

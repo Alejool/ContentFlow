@@ -6,10 +6,11 @@ import NotificationButton from "@/Components/Layout/NotificationButton";
 import ProfileDropdown from "@/Components/Layout/ProfileDropdown";
 import SearchButton from "@/Components/Layout/SearchButton";
 import Sidebar from "@/Components/Layout/Sidebar";
-import { ResumeUploadsPrompt } from "@/Components/Upload/ResumeUploadsPrompt";
-import KeyboardShortcutsModal from "@/Components/common/ui/KeyboardShortcutsModal";
-import { TimezoneInitializer } from "@/Components/common/TimezoneInitializer";
 import MaintenanceBanner from "@/Components/MaintenanceBanner";
+import { ResumeUploadsPrompt } from "@/Components/Upload/ResumeUploadsPrompt";
+import { TimezoneInitializer } from "@/Components/common/TimezoneInitializer";
+import KeyboardShortcutsModal from "@/Components/common/ui/KeyboardShortcutsModal";
+import { AbilityProvider } from "@/Contexts/AbilityContext";
 import { OnboardingProvider } from "@/Contexts/OnboardingContext";
 import { useCompletionNotifications } from "@/Hooks/useCompletionNotifications";
 import { useWorkspaceLocks } from "@/Hooks/usePublicationLock";
@@ -30,7 +31,7 @@ import type {
   TourStep,
 } from "@/types/onboarding";
 import { usePage } from "@inertiajs/react";
-import { ReactNode, Suspense, lazy, useEffect, useState } from "react";
+import { ReactNode, lazy, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 // Lazy load OnboardingFlow to reduce initial bundle size
@@ -181,23 +182,24 @@ export default function AuthenticatedLayout({
   }, []);
 
   return (
-    <OnboardingProvider>
-      {/* ✅ Inicializar timezone desde Inertia props */}
-      <TimezoneInitializer />
-      
-      {/* Banner de mantenimiento para super admins */}
-      {props.maintenanceMode && props.maintenanceBanner ? (
-        <MaintenanceBanner message={String(props.maintenanceBanner)} />
-      ) : null}
-      <div className="flex flex-col overflow-hidden w-full max-w-full">
-        <div
-          className="relative flex-1 min-h-0 flex w-full max-w-full min-w-0 overflow-x-hidden"
-        >
-          <div className="absolute inset-0 bg-white dark:bg-neutral-900" />
+    <AbilityProvider>
+      <OnboardingProvider>
+        {/* ✅ Inicializar timezone desde Inertia props */}
+        <TimezoneInitializer />
+        
+        {/* Banner de mantenimiento para super admins */}
+        {props.maintenanceMode && props.maintenanceBanner ? (
+          <MaintenanceBanner message={String(props.maintenanceBanner)} />
+        ) : null}
+        <div className="flex flex-col overflow-hidden w-full max-w-full">
+          <div
+            className="relative flex-1 min-h-0 flex w-full max-w-full min-w-0 overflow-x-hidden"
+          >
+            <div className="absolute inset-0 bg-white dark:bg-neutral-900" />
 
-          <Sidebar
-            isSidebarOpen={isSidebarOpen}
-            setIsSidebarOpen={setIsSidebarOpen}
+            <Sidebar
+              isSidebarOpen={isSidebarOpen}
+              setIsSidebarOpen={setIsSidebarOpen}
           />
 
           <div className="flex-1 flex flex-col min-h-0 min-w-0 max-w-full relative z-5">
@@ -245,14 +247,14 @@ export default function AuthenticatedLayout({
                 </div>
 
                 {header && (
-                  <div className="mx-auto w-full max-w-7xl px-4 md:px-6 py-4 ">
+                   <div className="mx-auto w-full max-w-7xl px-4 md:px-6 py-4 ">
                     <div className="min-w-0">{header}</div>
                   </div>
                 )}
               </header>
 
               <div className="flex-1 min-h-0 min-w-0">
-                <div className="h-full min-w-0">{children}</div>
+                <div className="min-h-full  min-w-0">{children}</div>
               </div>
             </main>
           </div>
@@ -305,5 +307,6 @@ export default function AuthenticatedLayout({
         )}
       </div>
     </OnboardingProvider>
+    </AbilityProvider>
   );
 }
