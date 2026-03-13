@@ -29,7 +29,6 @@ class DiagnoseApprovalWorkflow extends Command
         $this->info("Workspace: {$workflow->workspace->name} (ID: {$workflow->workspace_id})");
         $this->info("Name: {$workflow->name}");
         $this->info("is_active: " . ($workflow->is_active ? 'true' : 'false'));
-        $this->info("is_enabled: " . ($workflow->is_enabled ? 'true' : 'false'));
         $this->info("is_multi_level: " . ($workflow->is_multi_level ? 'true' : 'false'));
         
         $levels = $workflow->levels()->orderBy('level_number')->get();
@@ -54,10 +53,6 @@ class DiagnoseApprovalWorkflow extends Command
         
         if ($workflow->is_multi_level && $levels->count() <= 1) {
             $problems[] = "is_multi_level=true but has only {$levels->count()} level(s)";
-        }
-        
-        if (!$workflow->is_enabled && $workflow->is_active) {
-            $problems[] = "Workflow is active but not enabled";
         }
         
         if (empty($problems)) {
@@ -97,18 +92,12 @@ class DiagnoseApprovalWorkflow extends Command
                 $workflow->update(['is_multi_level' => $correctMultiLevel]);
             }
             
-            // If workflow is active but not enabled, enable it
-            if ($workflow->is_active && !$workflow->is_enabled) {
-                $this->info("Enabling workflow since it's active");
-                $workflow->update(['is_enabled' => true]);
-            }
-            
             // If no levels remain and it was supposed to be multi-level, disable it
             if ($remainingLevels === 0 && $workflow->is_multi_level) {
                 $this->info("No valid levels remain, disabling multi-level workflow");
                 $workflow->update([
                     'is_multi_level' => false,
-                    'is_enabled' => false
+                    'is_active' => false
                 ]);
             }
         });

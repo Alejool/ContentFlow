@@ -139,7 +139,7 @@ class ResolveStuckApprovalsCommand extends Command
     {
         $workflow = $workspace->approvalWorkflow;
         
-        if (!$workflow || !$workflow->is_enabled) {
+        if (!$workflow || !$workflow->is_active) {
             return collect();
         }
 

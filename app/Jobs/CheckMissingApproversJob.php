@@ -28,7 +28,7 @@ class CheckMissingApproversJob implements ShouldQueue
         Log::info('Starting missing approvers check');
 
         // Get all enabled workflows
-        $workflows = ApprovalWorkflow::where('is_enabled', true)
+        $workflows = ApprovalWorkflow::where('is_active', true)
             ->where('is_multi_level', true)
             ->with(['workspace', 'levels.role'])
             ->get();

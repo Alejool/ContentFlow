@@ -40,7 +40,6 @@ class CheckApprovalWorkflow extends Command
 
             $this->info("  Workflow ID: {$workflow->id}");
             $this->info("  is_active: " . ($workflow->is_active ? 'true' : 'false'));
-            $this->info("  is_enabled: " . ($workflow->is_enabled ? 'true' : 'false'));
             $this->info("  is_multi_level: " . ($workflow->is_multi_level ? 'true' : 'false'));
             
             $levels = $workflow->levels()->orderBy('level_number')->get();
