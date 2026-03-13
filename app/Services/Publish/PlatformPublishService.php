@@ -90,9 +90,8 @@ class PlatformPublishService
 
         $preparedLogs[$socialAccount->id] = $accountLogs;
       } catch (\Exception $e) {
-        LogHelper::publicationError('Failed to initialize logs for account', [
+        LogHelper::publicationError('Failed to initialize logs for account', $e->getMessage(), [
           'account_id' => $socialAccount->id,
-          'error' => $e->getMessage()
         ]);
         // We can't return logs for this account.
       }
@@ -167,10 +166,9 @@ class PlatformPublishService
         ];
       }
     } catch (\Throwable $e) {
-      LogHelper::publicationError('Publication failed', [
+      LogHelper::publicationError('Publication failed', $e->getMessage(), [
         'account' => $socialAccount->platform,
         'account_id' => $socialAccount->id,
-        'error' => $e->getMessage(),
         'trace' => $e->getTraceAsString()
       ]);
       $this->logService->markAsFailed($postLog, $e->getMessage());
@@ -401,9 +399,8 @@ class PlatformPublishService
     try {
       $preparedLogsMap = $this->initializeLogs($publication, $socialAccounts);
     } catch (\Exception $e) {
-      LogHelper::publicationError('Log initialization failed globally', [
+      LogHelper::publicationError('Log initialization failed globally', $e->getMessage(), [
         'publication_id' => $publication->id,
-        'error' => $e->getMessage(),
         'trace' => $e->getTraceAsString()
       ]);
       return [
@@ -547,11 +544,10 @@ class PlatformPublishService
           }
         }
 
-        LogHelper::publicationError('Platform publication error (handled)', [
+        LogHelper::publicationError('Platform publication error (handled)', $e->getMessage(), [
           'platform' => $socialAccount->platform,
           'publication_id' => $publication->id,
           'account_id' => $socialAccount->id,
-          'error' => $e->getMessage(),
           'trace' => $e->getTraceAsString(),
         ]);
 
@@ -610,12 +606,10 @@ class PlatformPublishService
       return $result;
     } catch (\Exception $e) {
       DB::rollBack();
-      LogHelper::publicationError('Post publication failed -----> rollback', [
+      LogHelper::publicationError('Post publication failed -----> rollback', $e->getMessage(), [
         'post_log_id' => $postLog->id,
         'platform' => $postLog->platform,
-        'error' => $e->getMessage(),
         'publication_id' => $postLog->publication_id,
-        'error' => $e->getMessage()
       ]);
 
       $this->logService->markAsFailed($postLog, "Retry failed: {$e->getMessage()}");

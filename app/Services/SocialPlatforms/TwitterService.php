@@ -8,6 +8,7 @@ use League\OAuth1\Client\Server\Twitter;
 use League\OAuth1\Client\Credentials\TokenCredentials;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 use App\DTOs\SocialPostDTO;
 use App\DTOs\PostResultDTO;
@@ -18,6 +19,34 @@ class TwitterService extends BaseSocialService
   public function publish(SocialPostDTO $post): PostResultDTO
   {
     $this->ensureValidToken();
+    
+    // Validación preventiva: verificar si hay video y si la cuenta tiene OAuth 1.0a
+    $rawPath = $post->mediaPaths[0] ?? null;
+    if ($rawPath) {
+      $resolvedUrl = $this->resolveUrl($rawPath);
+      $extension = strtolower(pathinfo(parse_url($resolvedUrl, PHP_URL_PATH), PATHINFO_EXTENSION));
+      $videoExtensions = ['mp4', 'mov', 'avi', 'mkv', 'webm', 'flv', 'wmv', 'm4v'];
+      
+      if (in_array($extension, $videoExtensions)) {
+        // Es un video, verificar OAuth 1.0a
+        $accountInfo = $this->getAccountInfoFromDb();
+        $hasOAuth1 = isset($accountInfo['account_metadata']['oauth1_token']) 
+                     && isset($accountInfo['account_metadata']['secret']);
+        
+        if (!$hasOAuth1) {
+          LogHelper::socialError('twitter.video_blocked_no_oauth1', 'Video upload blocked - missing OAuth 1.0a', [
+            'account_id' => $this->socialAccount?->id,
+            'account_name' => $this->socialAccount?->account_name
+          ]);
+          
+          return PostResultDTO::failure(
+            'Esta cuenta de Twitter no puede subir videos porque le faltan credenciales OAuth 1.0a. ' .
+            'Por favor, desconecta y vuelve a conectar esta cuenta desde la configuración de tu workspace para habilitar la subida de videos.'
+          );
+        }
+      }
+    }
+    
     $mediaIds = [];
     $rawPath = $post->mediaPaths[0] ?? null;
 
@@ -434,6 +463,8 @@ class TwitterService extends BaseSocialService
   {
     // Use the socialAccount property from BaseSocialService if available
     if ($this->socialAccount) {
+      // Refresh from database to get latest data
+      $this->socialAccount->refresh();
       return $this->socialAccount->toArray();
     }
     
@@ -578,7 +609,16 @@ class TwitterService extends BaseSocialService
 
     // OAuth 2.0 flow - Note: Twitter API v1.1 media upload requires OAuth 1.0a for videos
     if ($category === 'tweet_video') {
-      throw new \Exception('Video uploads require OAuth 1.0a authentication. Please reconnect your Twitter account with proper credentials.');
+      LogHelper::socialError('twitter.video_upload_requires_oauth1', 'Account missing OAuth 1.0a credentials', [
+        'account_id' => $this->socialAccount?->id,
+        'account_name' => $this->socialAccount?->account_name,
+        'has_oauth2' => !empty($this->accessToken)
+      ]);
+      
+      throw new \Exception(
+        'Esta cuenta de Twitter no puede subir videos porque le faltan credenciales OAuth 1.0a. ' .
+        'Por favor, desconecta y vuelve a conectar esta cuenta desde la configuración de tu workspace para habilitar la subida de videos.'
+      );
     }
     
     try {
@@ -596,7 +636,16 @@ class TwitterService extends BaseSocialService
       ]);
     } catch (ClientException $e) {
       if ($e->getResponse()->getStatusCode() === 403) {
-        throw new \Exception('Twitter API returned 403 Forbidden. Video/large media uploads require OAuth 1.0a authentication. Please reconnect your Twitter account.');
+        LogHelper::socialError('twitter.video_upload_403', 'Twitter API 403 Forbidden', [
+          'account_id' => $this->socialAccount?->id,
+          'status_code' => 403
+        ]);
+        
+        throw new \Exception(
+          'Twitter rechazó la subida del video (403 Forbidden). ' .
+          'Los videos requieren autenticación OAuth 1.0a. ' .
+          'Por favor, desconecta y vuelve a conectar esta cuenta desde la configuración de tu workspace.'
+        );
       }
       throw $e;
     }

@@ -7,6 +7,7 @@ use GuzzleHttp\Exception\ClientException;
 use App\Helpers\LogHelper;
 use App\Models\Publications\Publication;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Log;
 
 use App\DTOs\SocialPostDTO;
 use App\DTOs\PostResultDTO;
