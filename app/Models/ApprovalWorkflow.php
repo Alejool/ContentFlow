@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\ApprovalStep;
+use App\Models\ApprovalLevel;
 use App\Models\Workspace\Workspace;
 
 class ApprovalWorkflow extends Model
@@ -40,7 +40,7 @@ class ApprovalWorkflow extends Model
      */
     public function steps(): HasMany
     {
-        return $this->hasMany(ApprovalStep::class, 'workflow_id')->orderBy('step_order');
+        return $this->hasMany(ApprovalLevel::class, 'approval_workflow_id')->orderBy('level_number');
     }
 
     /**

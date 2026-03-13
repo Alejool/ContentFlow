@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Publications\Publication;
 use App\Models\User;
-use App\Models\ApprovalStep;
+use App\Models\ApprovalLevel;
 
 class ApprovalLog extends Model
 {
@@ -58,7 +58,7 @@ class ApprovalLog extends Model
    */
   public function currentStep(): BelongsTo
   {
-    return $this->belongsTo(ApprovalStep::class, 'current_step_id');
+    return $this->belongsTo(ApprovalLevel::class, 'current_step_id');
   }
 
   /**

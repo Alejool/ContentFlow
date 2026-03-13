@@ -22,7 +22,7 @@ use App\Models\Social\ScheduledPost;
 use App\Models\Campaigns\Campaign;
 use App\Models\Publications\PublicationComment;
 use App\Models\Calendar\ExternalCalendarEvent;
-use App\Models\ApprovalStep;
+use App\Models\ApprovalLevel;
 
 use App\Traits\HandlesUtcDates;
 use App\Events\Publications\PublicationCreated;
@@ -456,7 +456,7 @@ class Publication extends Model
 
   public function currentApprovalStep(): BelongsTo
   {
-    return $this->belongsTo(ApprovalStep::class, 'current_approval_step_id');
+    return $this->belongsTo(ApprovalLevel::class, 'current_approval_step_id');
   }
 
   // Accessors

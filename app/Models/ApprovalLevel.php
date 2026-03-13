@@ -17,6 +17,7 @@ class ApprovalLevel extends Model
         'level_number',
         'level_name',
         'role_id',
+        'user_id',
     ];
 
     /**
@@ -33,6 +34,14 @@ class ApprovalLevel extends Model
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
+    }
+
+    /**
+     * Get the user assigned to this approval level.
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\User::class);
     }
 
     /**
