@@ -102,15 +102,43 @@ class ApprovalWorkflowService
             );
         }
 
-        return DB::transaction(function () use ($content, $submitter, $workflow) {
+        return DB::transaction(function () use ($content, $submitter, $workflow, $workspace) {
             // Set status to pending_review
             $content->status = Publication::STATUS_PENDING_REVIEW;
             $content->submitted_for_approval_at = now();
 
-            // Set current_approval_level based on workflow type
+            // Determine starting level - skip levels where submitter is an approver
+            $startingLevel = 1;
+            
             if ($workflow->is_multi_level) {
-                // Multi-level workflow: start at level 1
-                $content->current_approval_level = 1;
+                // Get submitter's role in this workspace
+                $submitterRole = $submitter->roles()
+                    ->wherePivot('workspace_id', $workspace->id)
+                    ->first();
+                
+                if ($submitterRole) {
+                    // Find all levels where submitter is an approver
+                    $levels = $workflow->levels()->ordered()->get();
+                    
+                    foreach ($levels as $level) {
+                        // Check if submitter's role matches this level's role
+                        if ($level->role_id && $level->role_id === $submitterRole->id) {
+                            // Skip this level - move to next
+                            $startingLevel = $level->level_number + 1;
+                        } else {
+                            // Found a level where submitter is not an approver
+                            break;
+                        }
+                    }
+                    
+                    // If we've gone past all levels, use the max level
+                    $maxLevel = $workflow->getMaxLevel();
+                    if ($startingLevel > $maxLevel) {
+                        $startingLevel = $maxLevel;
+                    }
+                }
+                
+                $content->current_approval_level = $startingLevel;
             } else {
                 // Simple workflow: set to 0 (any admin can approve)
                 $content->current_approval_level = 0;
@@ -176,23 +204,53 @@ class ApprovalWorkflowService
                 // Multi-level workflow: check if this is the final level
                 $maxLevel = $workflow->getMaxLevel();
 
+                \Log::info('ApprovalWorkflowService: Processing multi-level approval', [
+                    'content_id' => $content->id,
+                    'current_level' => $currentLevel,
+                    'max_level' => $maxLevel,
+                    'approver_id' => $approver->id,
+                ]);
+
                 if ($currentLevel >= $maxLevel) {
-                    // Final level: set status to approved
+                    // FINAL LEVEL: Set status to approved and enable publishing
                     $content->status = Publication::STATUS_APPROVED;
                     $content->approved_at = now();
+                    $content->approved_by = $approver->id;
+                    $content->current_approval_level = 0; // Reset to 0 after final approval
+
+                    \Log::info('ApprovalWorkflowService: Final level approved, content ready to publish', [
+                        'content_id' => $content->id,
+                        'approver_id' => $approver->id,
+                    ]);
                 } else {
-                    // Advance to next level
-                    $content->current_approval_level = $currentLevel + 1;
+                    // INTERMEDIATE LEVEL: Advance to next level, keep status as pending_review
+                    $nextLevel = $currentLevel + 1;
+                    $content->current_approval_level = $nextLevel;
+                    // Status remains pending_review
+
+                    \Log::info('ApprovalWorkflowService: Intermediate level approved, advancing', [
+                        'content_id' => $content->id,
+                        'from_level' => $currentLevel,
+                        'to_level' => $nextLevel,
+                        'approver_id' => $approver->id,
+                    ]);
                 }
             } else {
-                // Simple workflow: set status to approved
+                // Simple workflow: set status to approved immediately
                 $content->status = Publication::STATUS_APPROVED;
                 $content->approved_at = now();
+                $content->approved_by = $approver->id;
+                $content->current_approval_level = 0;
+
+                \Log::info('ApprovalWorkflowService: Simple workflow approved', [
+                    'content_id' => $content->id,
+                    'approver_id' => $approver->id,
+                ]);
             }
 
             $content->save();
 
-            // Create ApprovalAction record
+            // Create ApprovalAction record for audit trail
             $approvalAction = ApprovalAction::create([
                 'content_id' => $content->id,
                 'user_id' => $approver->id,
@@ -201,7 +259,7 @@ class ApprovalWorkflowService
                 'comment' => $comment,
             ]);
 
-            // Dispatch event
+            // Dispatch event for notifications
             event(new ContentApproved($content, $approver, $currentLevel, $comment));
 
             return $approvalAction;
@@ -533,6 +591,8 @@ class ApprovalWorkflowService
     /**
      * Validate that a user has permission to approve/reject at a specific level
      * 
+     * STRICT VALIDATION: Only users with the exact role assigned to the current level can approve.
+     * 
      * @param User $user The user to validate
      * @param Workspace $workspace The workspace context
      * @param ApprovalWorkflow $workflow The approval workflow
@@ -550,11 +610,17 @@ class ApprovalWorkflowService
         $userRole = $this->getUserRole($user, $workspace);
 
         if (!$userRole) {
-            throw new InsufficientPermissionsException("You do not have a role in this workspace.");
+            throw new InsufficientPermissionsException(
+                "No tienes un rol asignado en este workspace."
+            );
         }
 
-        // Owner can always approve
+        // Owner can always approve at any level
         if ($userRole->slug === Role::OWNER) {
+            \Log::info('ApprovalWorkflowService: Owner bypassing approval level validation', [
+                'user_id' => $user->id,
+                'level' => $level,
+            ]);
             return;
         }
 
@@ -563,14 +629,37 @@ class ApprovalWorkflowService
             $approvalLevel = $workflow->levels->firstWhere('level_number', $level);
 
             if (!$approvalLevel) {
-                throw new InsufficientPermissionsException("Approval level {$level} not found.");
-            }
-
-            if ($userRole->id !== $approvalLevel->role_id) {
                 throw new InsufficientPermissionsException(
-                    "You do not have permission to approve at this level. Required role: {$approvalLevel->role->display_name}"
+                    "Nivel de aprobación {$level} no encontrado en el flujo de trabajo."
                 );
             }
+
+            // STRICT VALIDATION: User's role MUST match the role assigned to this level
+            if ($userRole->id !== $approvalLevel->role_id) {
+                \Log::warning('ApprovalWorkflowService: User role mismatch for approval level', [
+                    'user_id' => $user->id,
+                    'user_role' => $userRole->display_name,
+                    'user_role_id' => $userRole->id,
+                    'required_role' => $approvalLevel->role->display_name,
+                    'required_role_id' => $approvalLevel->role_id,
+                    'level' => $level,
+                    'level_name' => $approvalLevel->level_name,
+                ]);
+
+                throw new InsufficientPermissionsException(
+                    "No tienes permiso para aprobar en este nivel. " .
+                    "Nivel actual: {$approvalLevel->level_name} ({$approvalLevel->role->display_name}). " .
+                    "Tu rol: {$userRole->display_name}. " .
+                    "Solo usuarios con el rol {$approvalLevel->role->display_name} pueden aprobar en este nivel."
+                );
+            }
+
+            \Log::info('ApprovalWorkflowService: User authorized to approve at level', [
+                'user_id' => $user->id,
+                'user_role' => $userRole->display_name,
+                'level' => $level,
+                'level_name' => $approvalLevel->level_name,
+            ]);
         } else {
             // Simple workflow: user must have publish_content permission
             $hasPublishPermission = $this->roleService->userHasPermission(
@@ -580,7 +669,9 @@ class ApprovalWorkflowService
             );
 
             if (!$hasPublishPermission) {
-                throw new InsufficientPermissionsException("You do not have permission to approve content.");
+                throw new InsufficientPermissionsException(
+                    "No tienes permiso para aprobar contenido. Se requiere el permiso 'publish_content'."
+                );
             }
         }
     }
