@@ -28,9 +28,22 @@ class PublishPublicationAction
       'has_platform_settings' => !empty($options['platform_settings'])
     ]);
 
+    // Check if user is owner (can bypass workflow)
+    $isOwner = false;
+    if (auth()->check()) {
+      $userRole = auth()->user()->workspaces()
+        ->where('workspaces.id', $publication->workspace_id)
+        ->first();
+      
+      if ($userRole && $userRole->pivot->role_id) {
+        $role = \App\Models\Role\Role::find($userRole->pivot->role_id);
+        $isOwner = $role && $role->slug === \App\Models\Role\Role::OWNER;
+      }
+    }
+
     // Verify publication status allows publishing
     // Note: Permission and workflow checks are done in PublicationPolicy before calling this action
-    if (!$publication->canBePublished()) {
+    if (!$publication->canBePublished($isOwner)) {
       if ($publication->status === 'pending_review') {
         throw new \Exception(__('publications.errors.pending_review') . " Current status: {$publication->status}");
       }
@@ -52,7 +65,7 @@ class PublishPublicationAction
 
     // Handle Thumbnails for Publish (if any)
     if (!empty($options['thumbnails'] ?? [])) {
-      LogHelper::publicationInfo('Processing thumbnails in PublishPublicationAction', [
+      LogHelper::publication('Processing thumbnails in PublishPublicationAction', [
         'publication_id' => $publication->id,
         'count' => count($options['thumbnails'])
       ]);
@@ -150,7 +163,7 @@ class PublishPublicationAction
     $queueSize = \Illuminate\Support\Facades\Redis::llen('queues:publishing');
     $estimatedWaitMinutes = $this->estimateWaitTime($queueSize);
 
-    LogHelper::jobInfo('Dispatching PublishToSocialMedia job', [
+    LogHelper::job('Dispatching PublishToSocialMedia job', [
       'publication_id' => $publication->id,
       'platform_count' => $socialAccounts->count(),
       'platforms' => $socialAccounts->pluck('platform')->toArray(),

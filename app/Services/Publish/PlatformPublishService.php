@@ -256,7 +256,7 @@ class PlatformPublishService
             break;
         }
         
-        LogHelper::publicationInfo('Preparing reel for publishing', [
+        LogHelper::publication('Preparing reel for publishing', [
           'publication_id' => $publication->id,
           'platform' => $socialAccount->platform,
           'platform_type' => $pSettings[$platformKey]['type'],
@@ -266,7 +266,7 @@ class PlatformPublishService
         
       case 'story':
         $pSettings[$platformKey]['type'] = 'story';
-        LogHelper::publicationInfo('Preparing story for publishing', [
+        LogHelper::publication('Preparing story for publishing', [
           'publication_id' => $publication->id,
           'platform' => $socialAccount->platform,
           'media_count' => count($mediaPaths)
@@ -275,7 +275,7 @@ class PlatformPublishService
         
       case 'carousel':
         $pSettings[$platformKey]['type'] = 'carousel';
-        LogHelper::publicationInfo('Preparing carousel for publishing', [
+        LogHelper::publication('Preparing carousel for publishing', [
           'publication_id' => $publication->id,
           'platform' => $socialAccount->platform,
           'media_count' => count($mediaPaths)
@@ -343,7 +343,7 @@ class PlatformPublishService
     $socialAccounts
   ): array {
 
-    LogHelper::publicationInfo('Publishing to all platforms', [
+    LogHelper::publication('Publishing to all platforms', [
       'publication_id' => $publication->id,
       'social_accounts' => $socialAccounts->pluck('id')->toArray(),
       'platforms' => $socialAccounts->pluck('platform')->toArray()
@@ -362,7 +362,7 @@ class PlatformPublishService
         ->first();
 
       if ($existingSuccessfulLog) {
-        LogHelper::publicationInfo('Account already published successfully, skipping', [
+        LogHelper::publication('Account already published successfully, skipping', [
           'platform' => $socialAccount->platform,
           'account_id' => $socialAccount->id,
           'account_name' => $socialAccount->account_name,

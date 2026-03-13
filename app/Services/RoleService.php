@@ -207,12 +207,12 @@ class RoleService
         }
 
         // Owner can assign any role
-        if ($assignerRole->name === Role::OWNER) {
+        if ($assignerRole->slug === Role::OWNER) {
             return true;
         }
 
         // Admin can assign Editor and Viewer roles only
-        if ($assignerRole->name === Role::ADMIN) {
+        if ($assignerRole->slug === Role::ADMIN) {
             return in_array($targetRole, [Role::EDITOR, Role::VIEWER]);
         }
 
@@ -253,7 +253,7 @@ class RoleService
         }
 
         // Owner role has all permissions
-        if ($role->name === Role::OWNER) {
+        if ($role->slug === Role::OWNER) {
             return true;
         }
 
@@ -301,7 +301,7 @@ class RoleService
         }
 
         // Owner role has all permissions
-        if ($role->name === Role::OWNER) {
+        if ($role->slug === Role::OWNER) {
             return [
                 Permission::VIEW_CONTENT,
                 Permission::CREATE_CONTENT,

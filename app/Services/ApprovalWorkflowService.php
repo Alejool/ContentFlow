@@ -91,7 +91,7 @@ class ApprovalWorkflowService
         $workflow = $this->getWorkflowCached($workspace->id);
 
         // Validate workflow is enabled
-        if (!$workflow || !$workflow->is_active) {
+        if (!$workflow || !$workflow->is_enabled) {
             throw new ApprovalWorkflowNotEnabledException();
         }
 
@@ -162,7 +162,7 @@ class ApprovalWorkflowService
         $workspace = $content->workspace;
         $workflow = ApprovalWorkflow::where('workspace_id', $workspace->id)->first();
 
-        if (!$workflow || !$workflow->is_active) {
+        if (!$workflow || !$workflow->is_enabled) {
             throw new InvalidApprovalStateException("Approval workflow is not enabled.");
         }
 
@@ -236,7 +236,7 @@ class ApprovalWorkflowService
         $workspace = $content->workspace;
         $workflow = $this->getWorkflowCached($workspace->id);
 
-        if (!$workflow || !$workflow->is_active) {
+        if (!$workflow || !$workflow->is_enabled) {
             throw new InvalidApprovalStateException("Approval workflow is not enabled.");
         }
 
@@ -502,7 +502,7 @@ class ApprovalWorkflowService
         }
 
         // Owner can bypass ALL requirements
-        if ($userRole->name === Role::OWNER) {
+        if ($userRole->slug === Role::OWNER) {
             return true;
         }
 
@@ -554,7 +554,7 @@ class ApprovalWorkflowService
         }
 
         // Owner can always approve
-        if ($userRole->name === Role::OWNER) {
+        if ($userRole->slug === Role::OWNER) {
             return;
         }
 
@@ -597,7 +597,7 @@ class ApprovalWorkflowService
         $workspace = $content->workspace;
         $workflow = $this->getWorkflowCached($workspace->id);
 
-        if (!$workflow || !$workflow->is_active) {
+        if (!$workflow || !$workflow->is_enabled) {
             return null;
         }
 
