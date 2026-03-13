@@ -91,7 +91,9 @@
     },
     "extra": {
         "laravel": {
-            "dont-discover": []
+            "dont-discover": [
+                "laravel/sentinel"
+            ]
         }
     },
     "config": {
