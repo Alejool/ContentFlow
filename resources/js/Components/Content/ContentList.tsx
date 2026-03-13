@@ -285,7 +285,7 @@ export default function ContentList(props: ContentListProps) {
               {smoothLoading && (
                 <div className="col-start-1 row-start-1 bg-gray-50 dark:bg-neutral-900 animate-out fade-out duration-500 fill-mode-forwards z-20 overflow-y-auto">
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {[...Array(8)].map((_, i) => (
+                    {[...Array(12)].map((_, i) => (
                       <ContentCardSkeleton key={i} />
                     ))}
                   </div>

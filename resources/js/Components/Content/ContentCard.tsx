@@ -226,7 +226,7 @@ export default function ContentCard({
               <SimpleContentTypeBadge
                 contentType={item.content_type}
                 mediaFiles={item.media_files}
-                size="sm"
+                size="md"
                 className="shadow-sm backdrop-blur-md border border-white/20"
               />
             )}
@@ -236,7 +236,7 @@ export default function ContentCard({
                 <SimpleContentTypeBadge
                   contentType={item.content_type}
                   mediaFiles={item.media_files}
-                  size="sm"
+                  size="md"
                   className="shadow-sm backdrop-blur-md border border-white/20"
                 />
               </div>
@@ -450,7 +450,7 @@ export default function ContentCard({
                   disabled={isLoading?.publishing}
                   loading={isLoading?.publishing}
                   variant="primary"
-                  size="sm"
+                  size="md"
                   icon={Rocket}
                   className="flex-1"
                 >
@@ -465,7 +465,7 @@ export default function ContentCard({
                   disabled={isLoading?.submitting}
                   loading={isLoading?.submitting}
                   variant="primary"
-                  size="sm"
+                  size="md"
                   icon={Send}
                   className="flex-1"
                 >
@@ -476,8 +476,8 @@ export default function ContentCard({
               ) : item.status === "pending_review" ? (
                 <Button
                   disabled
-                  variant="warning"
-                  size="sm"
+                  buttonStyle="gradient"
+                  size="md"
                   icon={Clock}
                   className="flex-1"
                 >
@@ -490,11 +490,12 @@ export default function ContentCard({
                     handleViewDetails(item);
                   }}
                   variant="ghost"
-                  size="sm"
+                  buttonStyle="ghost"
+                  size="md"
                   icon={Eye}
                   className="flex-1"
                 >
-                  <span className="hidden sm:inline">{t("publications.button.view")}</span>
+                  <span >{t("publications.button.view")}</span>
                 </Button>
               ) : (
                 <Button
@@ -503,11 +504,12 @@ export default function ContentCard({
                     handleViewDetails(item);
                   }}
                   variant="ghost"
-                  size="sm"
+                  buttonStyle="ghost"
+                  size="md"
                   icon={Eye}
                   className="flex-1"
                 >
-                  <span className="sr-only">{t("publications.button.view")}</span>
+                  <span>{t("publications.button.view")}</span>
                 </Button>
               )}
             </>
@@ -520,11 +522,12 @@ export default function ContentCard({
                 handleViewDetails(item);
               }}
               variant="ghost"
-              size="sm"
+              buttonStyle="ghost"
+              size="md"
               icon={Eye}
               className="flex-1"
             >
-              <span className="sr-only">{t("publications.button.view")}</span>
+              <span >{t("publications.button.view")}</span>
             </Button>
           )}
 
@@ -536,7 +539,7 @@ export default function ContentCard({
               }}
               variant={remoteLock ? "ghost" : "secondary"}
               buttonStyle="icon"
-              size="sm"
+              size="md"
               icon={remoteLock ? Lock : Edit}
               disabled={!!remoteLock}
             >
@@ -554,7 +557,7 @@ export default function ContentCard({
               }}
               variant="secondary"
               buttonStyle="icon"
-              size="sm"
+              size="md"
               icon={Copy}
             >
               <span className="sr-only">{t("publications.button.duplicate")}</span>
@@ -569,9 +572,8 @@ export default function ContentCard({
                   handleDelete(item, (item as any).type === "user_event");
                 }
               }}
-              variant="danger"
               buttonStyle="icon"
-              size="sm"
+              size="md"
               icon={Trash2}
               disabled={isLoading?.deleting}
               loading={isLoading?.deleting}

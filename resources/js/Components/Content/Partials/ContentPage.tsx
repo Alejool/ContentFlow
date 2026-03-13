@@ -328,7 +328,7 @@ export default function ManageContentPage() {
         label: t("manageContent.tabs.approvals"),
         icon: CheckCircle,
         badge: pendingApprovals,
-        hidden: !canApprove, // Show if user can approve (admin OR workflow assignment)
+        enabled: canApprove,
       },
     ],
     [t, pendingApprovals, canApprove]
