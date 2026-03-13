@@ -121,6 +121,9 @@ makefile.dev
 # Test files temporales
 resources/js/test-import.ts
 
+# Auto-generated route files
+resources/js/ziggy.js
+
 # ============================================
 # DOCKER
 # ============================================
