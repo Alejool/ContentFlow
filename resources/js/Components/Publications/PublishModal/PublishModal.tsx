@@ -33,6 +33,7 @@ export default function PublishModal({
     setScheduledAt,
     resetState,
     publish,
+    requestReview,
     publishAnyway
   } = usePublishModal(publication, onPublished, onClose);
 
@@ -107,6 +108,7 @@ export default function PublishModal({
           isPublishing={isPublishing}
           onCancel={handleClose}
           onPublish={publish}
+          onRequestReview={requestReview}
           onPublishAnyway={publishAnyway}
         />
       </div>

@@ -1,6 +1,7 @@
 import { Publication } from '@/types/Publication';
 import axios from 'axios';
 import { useCallback, useState } from 'react';
+import toast from 'react-hot-toast';
 
 export function usePublishModal(
   publication: Publication,
@@ -27,6 +28,9 @@ export function usePublishModal(
     setIsPublishing(false);
   }, []);
 
+  /**
+   * Publish content directly (for owners)
+   */
   const publish = async () => {
     if (selectedPlatforms.length === 0 || isPublishing) return;
 
@@ -34,22 +38,56 @@ export function usePublishModal(
 
     try {
       const response = await axios.post(`/api/v1/publications/${publication.id}/publish`, {
-        platform_ids: selectedPlatforms,
+        platforms: selectedPlatforms,
         scheduled_at: schedulePost ? scheduledAt : null,
       });
 
+      toast.success('Contenido publicado exitosamente');
       onPublished(response.data);
       resetState();
       onClose();
     } catch (error: any) {
-      alert('Error al publicar: ' + (error.response?.data?.message || 'Error desconocido'));
+      const errorMessage = error.response?.data?.message || 'Error al publicar';
+      toast.error(errorMessage);
+      console.error('Error publishing:', error);
     } finally {
       setIsPublishing(false);
     }
   };
 
+  /**
+   * Send content to review (for non-owners)
+   */
+  const requestReview = async () => {
+    if (isPublishing) return;
+
+    setIsPublishing(true);
+
+    try {
+      const response = await axios.post(`/api/v1/publications/${publication.id}/request-review`, {
+        platform_settings: {
+          platforms: selectedPlatforms,
+          scheduled_at: schedulePost ? scheduledAt : null,
+        }
+      });
+
+      toast.success('Contenido enviado a revisión exitosamente');
+      onPublished(response.data);
+      resetState();
+      onClose();
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Error al enviar a revisión';
+      toast.error(errorMessage);
+      console.error('Error requesting review:', error);
+    } finally {
+      setIsPublishing(false);
+    }
+  };
+
+  /**
+   * Publish anyway (bypass warnings, only for owners)
+   */
   const publishAnyway = async () => {
-    // Same as publish but bypasses warnings
     await publish();
   };
 
@@ -63,6 +101,7 @@ export function usePublishModal(
     setScheduledAt,
     resetState,
     publish,
+    requestReview,
     publishAnyway
   };
 }
