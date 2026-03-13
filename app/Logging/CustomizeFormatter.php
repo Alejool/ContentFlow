@@ -2,7 +2,7 @@
 
 namespace App\Logging;
 
-use Monolog\Logger;
+use Illuminate\Log\Logger;
 
 /**
  * Clase para personalizar los canales de logging
