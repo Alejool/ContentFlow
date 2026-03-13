@@ -77,7 +77,8 @@ class WorkspaceApprovalWorkflowController extends Controller
         ['workspace_id' => $workspace->id],
         [
           'name' => $request->name,
-          'is_active' => $request->is_active ?? true,
+          'is_enabled' => $request->is_enabled ?? true,
+          'is_active' => true, // Keep for backward compatibility
           'is_multi_level' => count($request->steps) > 1,
         ]
       );
@@ -86,7 +87,8 @@ class WorkspaceApprovalWorkflowController extends Controller
       if (!$workflow->wasRecentlyCreated) {
         $workflow->update([
           'name' => $request->name,
-          'is_active' => $request->is_active ?? true,
+          'is_enabled' => $request->is_enabled ?? true,
+          'is_active' => true, // Keep for backward compatibility
           'is_multi_level' => count($request->steps) > 1,
         ]);
         
@@ -125,7 +127,8 @@ class WorkspaceApprovalWorkflowController extends Controller
       'steps.*.role_id' => 'nullable|exists:roles,id',
       'steps.*.user_id' => 'nullable|exists:users,id',
       'steps.*.name' => 'nullable|string|max:255',
-      'is_active' => 'sometimes|boolean',
+      'is_enabled' => 'sometimes|boolean',
+      'is_active' => 'sometimes|boolean', // Keep for backward compatibility
     ]);
 
     // Enforce tiered limits
@@ -142,6 +145,10 @@ class WorkspaceApprovalWorkflowController extends Controller
         $workflow->update(['name' => $request->name]);
       }
 
+      if ($request->has('is_enabled')) {
+        $workflow->update(['is_enabled' => $request->is_enabled]);
+      }
+      
       if ($request->has('is_active')) {
         $workflow->update(['is_active' => $request->is_active]);
       }
