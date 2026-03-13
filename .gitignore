@@ -105,6 +105,7 @@ enable-default-payment-methods.php
 test-maintenance-mode.php
 test-payment-cache.php
 test-payment-methods.php
+reprocess_media.php
 
 # ============================================
 # ARCHIVOS TEMPORALES
@@ -112,6 +113,7 @@ test-payment-methods.php
 $null
 *.tmp
 *.temp
+*.backup
 /md/
 draft.yaml
 laravel
