@@ -108,6 +108,13 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
           isPausable: false, // Will be set to true when multipart upload starts
           retryCount: 0,
           canRetry: true,
+          stats: {
+            eta: 0,
+            speed: 0,
+            startTime: Date.now(),
+            bytesUploaded: 0,
+            lastUpdateTime: Date.now(),
+          },
         },
       },
     })),
