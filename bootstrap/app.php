@@ -27,6 +27,7 @@ use Illuminate\Routing\Middleware\CacheResponse;
 use App\Http\Middleware\CheckApiWorkspacePlan;
 use App\Http\Middleware\CheckMaintenanceMode;
 use App\Http\Middleware\CheckNewRegistrations;
+use App\Http\Middleware\LogContextMiddleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -46,6 +47,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'api/*',
         ]);
         $middleware->web(append: [
+            LogContextMiddleware::class,
             SecurityHeaders::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
@@ -55,6 +57,7 @@ return Application::configure(basePath: dirname(__DIR__))
             CheckNewRegistrations::class,
         ]);
         $middleware->api(append: [
+            LogContextMiddleware::class,
             SecurityHeaders::class,
             SetLocale::class,
         ]);
