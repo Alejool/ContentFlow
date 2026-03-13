@@ -1,3 +1,4 @@
+import SimpleContentTypeBadge from "@/Components/Content/common/SimpleContentTypeBadge";
 import SocialAccountsDisplay from "@/Components/Content/Publication/SocialAccountsDisplay";
 import { Publication } from "@/types/Publication";
 import { formatDateTime } from "@/Utils/formatDate";
@@ -365,6 +366,14 @@ const PublicationMobileRow = memo(
 
                   {/* Status and metadata row */}
                   <div className="flex flex-wrap items-center gap-2">
+                    {/* Content Type Badge */}
+                    <SimpleContentTypeBadge
+                      contentType={item.content_type}
+                      mediaFiles={item.media_files}
+                      size="sm"
+                      className="order-first"
+                    />
+                    
                     {/* Status badge */}
                     <span
                       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}

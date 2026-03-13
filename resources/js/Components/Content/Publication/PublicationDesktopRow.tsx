@@ -1,3 +1,4 @@
+import SimpleContentTypeBadge from "@/Components/Content/common/SimpleContentTypeBadge";
 import PublicationThumbnail from "@/Components/Content/Publication/PublicationThumbnail";
 import SocialAccountsDisplay from "@/Components/Content/Publication/SocialAccountsDisplay";
 import { usePublicationStore } from "@/stores/publicationStore";
@@ -155,6 +156,16 @@ const PublicationRow = memo(
               >
                 {item.title || "Untitled"}
               </h3>
+              
+              {/* Content Type Badge */}
+              <div className="mt-1">
+                <SimpleContentTypeBadge
+                  contentType={item.content_type}
+                  mediaFiles={item.media_files}
+                  size="sm"
+                />
+              </div>
+              
               <p className="text-xs mt-0.5 truncate text-gray-500 dark:text-gray-400">
                 {item.description || "Sin descripción"}
               </p>

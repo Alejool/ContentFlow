@@ -1,22 +1,23 @@
+import SimpleContentTypeBadge from "@/Components/Content/common/SimpleContentTypeBadge";
 import { formatDateString } from "@/Utils/dateHelpers";
 import { getDateFnsLocale } from "@/Utils/dateLocales";
 import { canUserPublishDirectly } from "@/Utils/publicationPermissions";
 import { usePage } from "@inertiajs/react";
 import {
-    Calendar,
-    CheckCircle,
-    Clock,
-    Copy,
-    Edit,
-    Eye,
-    FileText,
-    Image as ImageIcon,
-    Loader2,
-    Lock,
-    Rocket,
-    Trash2,
-    Users,
-    Video,
+  Calendar,
+  CheckCircle,
+  Clock,
+  Copy,
+  Edit,
+  Eye,
+  FileText,
+  Image as ImageIcon,
+  Loader2,
+  Lock,
+  Rocket,
+  Trash2,
+  Users,
+  Video,
 } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -252,7 +253,30 @@ export default function ContentCard({
               </div>
             )}
           </div>
-          <div className="absolute top-3 right-3 z-10">
+          <div className="absolute top-3 left-3 z-10 flex flex-col gap-2 items-start">
+            {/* Content Type Badge - Solo para publicaciones */}
+            {type === "publication" && !remoteLock && (
+              <SimpleContentTypeBadge
+                contentType={item.content_type}
+                mediaFiles={item.media_files}
+                size="sm"
+                className="shadow-sm backdrop-blur-md border border-white/20"
+              />
+            )}
+            {/* Content Type Badge cuando hay remoteLock - posición ajustada */}
+            {type === "publication" && remoteLock && (
+              <div className="mt-12">
+                <SimpleContentTypeBadge
+                  contentType={item.content_type}
+                  mediaFiles={item.media_files}
+                  size="sm"
+                  className="shadow-sm backdrop-blur-md border border-white/20"
+                />
+              </div>
+            )}
+          </div>
+          <div className="absolute top-3 right-3 z-10 flex flex-col gap-2 items-end">
+            {/* Status Badge */}
             <span
               className={`px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 shadow-sm backdrop-blur-md border border-white/20 ${statusColors[statusKey] || statusColors.draft}`}
             >

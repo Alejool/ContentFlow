@@ -1,15 +1,16 @@
 import PublicationThumbnail from "@/Components/Content/Publication/PublicationThumbnail";
 import SocialAccountsDisplay from "@/Components/Content/Publication/SocialAccountsDisplay";
+import SimpleContentTypeBadge from "@/Components/Content/common/SimpleContentTypeBadge";
 import { Publication } from "@/types/Publication";
 import {
-  Copy,
-  Edit,
-  Eye,
-  Folder,
-  Image,
-  Rocket,
-  Trash2,
-  Video,
+    Copy,
+    Edit,
+    Eye,
+    Folder,
+    Image,
+    Rocket,
+    Trash2,
+    Video,
 } from "lucide-react";
 import { memo } from "react";
 
@@ -76,6 +77,13 @@ const PublicationMobileGrid = memo(
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2 mb-1">
+                      {/* Content Type Badge */}
+                      <SimpleContentTypeBadge
+                        contentType={item.content_type}
+                        mediaFiles={item.media_files}
+                        size="sm"
+                      />
+                      
                       <span
                         className={`inline-flex items-center px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-tight ${getStatusColor(item.status)}`}
                       >
