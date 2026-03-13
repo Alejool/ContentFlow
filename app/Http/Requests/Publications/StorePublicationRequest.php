@@ -133,14 +133,24 @@ class StorePublicationRequest extends FormRequest
         'nullable',
         'date',
         function ($attribute, $value, $fail) {
-          if ($value) {
-            $scheduledDate = Carbon::parse($value);
-            $now = Carbon::now();
+          if (!$value) return;
+          
+          $contentType = $this->input('content_type', 'post');
+          
+          $scheduledDate = Carbon::parse($value);
+          $now = Carbon::now();
 
-            // Check if scheduled date is more than 1 minute in the future
-            if ($scheduledDate->diffInSeconds($now, false) >= -60) {
-              $fail(__('publications.validation.scheduledMinDifference'));
+          // For polls, be more lenient - just needs to be in the future
+          if ($contentType === 'poll') {
+            if ($scheduledDate->isPast()) {
+              $fail(__('publications.validation.scheduledInPast', ['type' => 'poll']));
             }
+            return;
+          }
+
+          // For other content types, check if scheduled date is at least 1 minute in the future
+          if ($scheduledDate->diffInSeconds($now, false) > -60) {
+            $fail(__('publications.validation.scheduledMinDifference'));
           }
         }
       ],
@@ -151,14 +161,24 @@ class StorePublicationRequest extends FormRequest
         'nullable',
         'date',
         function ($attribute, $value, $fail) {
-          if ($value) {
-            $scheduledDate = Carbon::parse($value);
-            $now = Carbon::now();
+          if (!$value) return;
+          
+          $contentType = $this->input('content_type', 'post');
+          
+          $scheduledDate = Carbon::parse($value);
+          $now = Carbon::now();
 
-            // Check if scheduled date is more than 1 minute in the future
-            if ($scheduledDate->diffInSeconds($now, false) >= -60) {
-              $fail(__('publications.validation.scheduledMinDifference'));
+          // For polls, be more lenient - just needs to be in the future
+          if ($contentType === 'poll') {
+            if ($scheduledDate->isPast()) {
+              $fail(__('publications.validation.scheduledInPast', ['type' => 'poll']));
             }
+            return;
+          }
+
+          // For other content types, check if scheduled date is at least 1 minute in the future
+          if ($scheduledDate->diffInSeconds($now, false) > -60) {
+            $fail(__('publications.validation.scheduledMinDifference'));
           }
         }
       ],
@@ -232,9 +252,19 @@ class StorePublicationRequest extends FormRequest
       // Get social account IDs
       $socialAccountIds = $this->input('social_accounts', []);
       
-      // Get media files (filter only UploadedFile instances)
-      $mediaFiles = collect($this->file('media', []))
-        ->filter(fn($file) => $file instanceof UploadedFile)
+      // Get media files - include both UploadedFile instances and metadata arrays
+      $mediaFiles = collect($this->input('media', []))
+        ->filter(function ($file) {
+          // Accept UploadedFile instances
+          if ($file instanceof UploadedFile) {
+            return true;
+          }
+          // Accept metadata arrays with required fields
+          if (is_array($file) && (isset($file['key']) || isset($file['mime_type']) || isset($file['type']))) {
+            return true;
+          }
+          return false;
+        })
         ->values()
         ->toArray();
 

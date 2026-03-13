@@ -22,6 +22,11 @@ class Kernel extends ConsoleKernel
     // Verificar tokens expirados diariamente
     $schedule->command('social:check-tokens')->daily();
 
+    // Verificar y refrescar tokens cada 2 horas
+    $schedule->job(new \App\Jobs\CheckSocialTokensJob)
+      ->everyTwoHours()
+      ->withoutOverlapping();
+
     // Procesar cola de playlists de YouTube cada 5 minutos
     $schedule->command('youtube:process-playlist-queue')->everyFiveMinutes();
 

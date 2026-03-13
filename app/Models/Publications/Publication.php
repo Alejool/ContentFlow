@@ -683,7 +683,7 @@ class Publication extends Model
       'twitter' => ['post', 'poll'],
       'tiktok' => ['reel'],
       'youtube' => ['post', 'reel'],
-      'facebook' => ['post', 'story', 'poll', 'reel'], // Added reel for Facebook
+      'facebook' => ['post', 'story', 'poll', 'reel'],
       'linkedin' => ['post', 'carousel'],
       'pinterest' => ['post', 'carousel'],
     ];

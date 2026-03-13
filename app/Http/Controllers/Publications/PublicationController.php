@@ -38,6 +38,7 @@ use App\Models\MediaFiles\MediaFile;
 use App\Models\Publications\PublicationLock;
 use App\Services\Validation\ContentValidationService;
 use App\Services\Subscription\PlanLimitValidator;
+use App\Services\Publications\ContentTypeValidationService;
 use Maatwebsite\Excel\Facades\Excel;
 
 class PublicationController extends Controller
@@ -112,6 +113,18 @@ class PublicationController extends Controller
             $logQ->whereIn('platform', $platforms)
               ->whereIn('status', ['published', 'success']);
           });
+        }
+      }
+
+      if ($request->has('content_type') && !empty($request->content_type)) {
+        $contentTypes = $request->input('content_type', []);
+        if (!is_array($contentTypes)) {
+          $contentTypes = [$contentTypes];
+        }
+        // Filter out 'all' value if present
+        $contentTypes = array_filter($contentTypes, fn($type) => $type !== 'all');
+        if (!empty($contentTypes)) {
+          $query->whereIn('content_type', $contentTypes);
         }
       }
 
@@ -1561,4 +1574,29 @@ class PublicationController extends Controller
     return $this->successResponse($validation);
   }
 
+  /**
+   * Suggest optimal content type based on media files
+   *
+   * @param Request $request
+   * @return \Illuminate\Http\JsonResponse
+   */
+  public function suggestContentType(Request $request)
+  {
+    $request->validate([
+      'media' => 'nullable|array',
+      'current_type' => 'nullable|string|in:post,reel,story,carousel,poll',
+    ]);
+
+    $mediaFiles = $request->input('media', []);
+    $currentType = $request->input('current_type');
+
+    $validationService = app(ContentTypeValidationService::class);
+    $suggestedType = $validationService->suggestContentType($mediaFiles, $currentType);
+
+    return $this->successResponse([
+      'suggested_type' => $suggestedType,
+      'current_type' => $currentType,
+      'should_change' => $suggestedType !== $currentType,
+    ], 'Content type suggestion generated');
+  }
 }

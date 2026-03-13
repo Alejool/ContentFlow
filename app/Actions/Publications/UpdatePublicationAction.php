@@ -22,14 +22,19 @@ class UpdatePublicationAction
 
   public function execute(Publication $publication, array $data, array $newFiles = []): Publication
   {
+    // Check if there are files being uploaded
+    $hasUploadingFiles = $this->hasUploadingFiles($newFiles);
+    
     // Conditional validation: only validate if content_type, platforms, or media changed
+    // BUT skip validation if files are currently being uploaded
     $contentType = $data['content_type'] ?? $publication->content_type;
     $contentTypeChanged = $contentType !== $publication->content_type;
     $platformsChanged = array_key_exists('social_accounts', $data);
     $mediaChanged = !empty($newFiles) || !empty($data['removed_media_ids']);
     
     // Only validate if content_type is not null and something relevant changed
-    if (!empty($contentType) && ($contentTypeChanged || $platformsChanged || $mediaChanged)) {
+    // AND no files are currently being uploaded
+    if (!empty($contentType) && ($contentTypeChanged || $platformsChanged || $mediaChanged) && !$hasUploadingFiles) {
       // Determine which social accounts to validate against
       $socialAccountIds = [];
       if ($platformsChanged && isset($data['social_accounts'])) {
@@ -67,13 +72,18 @@ class UpdatePublicationAction
         // Convert existing media to a format compatible with validation
         // For existing media, we create mock UploadedFile objects with the mime type
         foreach ($existingMedia as $media) {
-          $mockFile = new class($media->mime_type) {
+          $mockFile = new class($media->mime_type, $media->duration) {
             private $mimeType;
-            public function __construct($mimeType) {
+            private $duration;
+            public function __construct($mimeType, $duration = null) {
               $this->mimeType = $mimeType;
+              $this->duration = $duration;
             }
             public function getMimeType() {
               return $this->mimeType;
+            }
+            public function getDuration() {
+              return $this->duration;
             }
           };
           $mediaFiles[] = $mockFile;
@@ -91,6 +101,25 @@ class UpdatePublicationAction
         throw ValidationException::withMessages([
           'content_type' => $validation->errors
         ]);
+      }
+      
+      // Handle auto-conversion suggestions
+      if (!empty($validation->suggestions['suggested_content_type'])) {
+        $suggestedType = $validation->suggestions['suggested_content_type'];
+        $reason = $validation->suggestions['reason'] ?? '';
+        
+        // Auto-apply the suggestion if it's a video duration-based change
+        if ($suggestedType !== $contentType && $this->shouldAutoApplyContentTypeChange($contentType, $suggestedType)) {
+          $data['content_type'] = $suggestedType;
+          
+          // Log the auto-conversion for debugging
+          \Log::info("Auto-converted content type", [
+            'publication_id' => $publication->id,
+            'from' => $contentType,
+            'to' => $suggestedType,
+            'reason' => $reason
+          ]);
+        }
       }
     }
     
@@ -162,12 +191,30 @@ class UpdatePublicationAction
       }
 
       // If currently processing, we MUST preserve that status unless this action is specifically finishing the job.
-      // And we must block NEW media uploads if it is processing.
+      // Allow text updates but block NEW media uploads if it is processing.
       if ($currentStatus === 'processing') {
         $newStatus = 'processing'; // Force keep processing
 
+        // Only block NEW media uploads, allow text updates
         if (!empty($newFiles)) {
-          throw new \Exception('Cannot upload new media while publication is processing. Please wait.');
+          // Check if these are actually new files or just metadata updates
+          $hasActualNewFiles = false;
+          foreach ($newFiles as $file) {
+            // If it's an UploadedFile object, it's a new upload
+            if ($file instanceof UploadedFile) {
+              $hasActualNewFiles = true;
+              break;
+            }
+            // If it's metadata without a media_file_id, it's a new upload
+            if (is_array($file) && !isset($file['media_file_id'])) {
+              $hasActualNewFiles = true;
+              break;
+            }
+          }
+          
+          if ($hasActualNewFiles) {
+            throw new \Exception('Cannot upload new media while publication is processing. Please wait.');
+          }
         }
       }
 
@@ -599,5 +646,52 @@ class UpdatePublicationAction
 
       return $publication;
     });
+  }
+
+  /**
+   * Check if there are files currently being uploaded
+   */
+  private function hasUploadingFiles(array $newFiles): bool
+  {
+    foreach ($newFiles as $file) {
+      // Check if it's a file being uploaded (UploadedFile)
+      if (is_object($file) && method_exists($file, 'isValid')) {
+        return true;
+      }
+      
+      // Check if it's metadata indicating upload in progress
+      if (is_array($file) && isset($file['status'])) {
+        $status = $file['status'];
+        if (in_array($status, ['uploading', 'processing', 'pending', 'transcoding'])) {
+          return true;
+        }
+      }
+      
+      // Check if it's a temporary upload
+      if (is_array($file) && isset($file['temp_id']) && !isset($file['media_file_id'])) {
+        return true;
+      }
+    }
+    
+    return false;
+  }
+
+  /**
+   * Determine if content type change should be auto-applied
+   */
+  private function shouldAutoApplyContentTypeChange(string $currentType, string $suggestedType): bool
+  {
+    // Auto-apply changes based on video duration constraints
+    $autoApplyRules = [
+      // From story to reel/post based on duration
+      'story' => ['reel', 'post'],
+      // From reel to post based on duration
+      'reel' => ['post'],
+      // From post to reel/story if duration allows (less common but possible)
+      'post' => ['reel', 'story']
+    ];
+    
+    return isset($autoApplyRules[$currentType]) && 
+           in_array($suggestedType, $autoApplyRules[$currentType]);
   }
 }

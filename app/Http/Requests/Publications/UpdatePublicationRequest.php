@@ -116,6 +116,18 @@ class UpdatePublicationRequest extends FormRequest
     if (!$publication instanceof Publication) {
       $publication = Publication::find($publication);
     }
+    
+    // Debug logging para entender qué datos llegan
+    \Log::info('UpdatePublicationRequest validation data', [
+      'publication_id' => $publication?->id,
+      'content_type' => $this->input('content_type'),
+      'scheduled_at' => $this->input('scheduled_at'),
+      'social_accounts' => $this->input('social_accounts'),
+      'social_account_schedules' => $this->input('social_account_schedules'),
+      'use_global_schedule' => $this->input('use_global_schedule'),
+      'all_input' => $this->all()
+    ]);
+    
     return [
       'title' => 'required|string|max:255',
       'description' => [
@@ -199,16 +211,24 @@ class UpdatePublicationRequest extends FormRequest
         'nullable',
         'date',
         function ($attribute, $value, $fail) use ($publication) {
-          if (!$publication) return;
-          $existing = $publication->scheduled_at;
-          if ($value) {
-            $scheduledDate = Carbon::parse($value);
-            $now = Carbon::now();
+          if (!$publication || !$value) return;
+          
+          $contentType = $this->input('content_type', $publication->content_type ?? 'post');
+          
+          $scheduledDate = Carbon::parse($value);
+          $now = Carbon::now();
 
-            // Check if scheduled date is more than 1 minute in the future
-            if ($scheduledDate->diffInSeconds($now, false) >= -60) {
-              $fail(__('publications.validation.scheduledMinDifference'));
+          // For polls, be more lenient - just needs to be in the future
+          if ($contentType === 'poll') {
+            if ($scheduledDate->isPast()) {
+              $fail(__('publications.validation.scheduledInPast', ['type' => 'poll']));
             }
+            return;
+          }
+
+          // For other content types, check if scheduled date is at least 1 minute in the future
+          if ($scheduledDate->diffInSeconds($now, false) > -60) {
+            $fail(__('publications.validation.scheduledMinDifference'));
           }
         }
       ],
@@ -222,21 +242,26 @@ class UpdatePublicationRequest extends FormRequest
         function ($attribute, $value, $fail) use ($publication) {
           if (!$publication || !$value) return;
 
+          $contentType = $this->input('content_type', $publication->content_type ?? 'post');
+
           // Extract account ID from attribute name
           preg_match('/(?:social_account_schedules|account_schedules)\.(\d+)/', $attribute, $matches);
           $accountId = $matches[1] ?? null;
 
           if ($accountId) {
-            $existingPost = $publication->scheduled_posts()
-              ->where('social_account_id', $accountId)
-              ->first();
-            $existing = $existingPost?->scheduled_at;
-
             $scheduledDate = Carbon::parse($value);
             $now = Carbon::now();
 
-            // Check if scheduled date is more than 1 minute in the future
-            if ($scheduledDate->diffInSeconds($now, false) >= -60) {
+            // For polls, be more lenient - just needs to be in the future
+            if ($contentType === 'poll') {
+              if ($scheduledDate->isPast()) {
+                $fail(__('publications.validation.scheduledInPast', ['type' => 'poll']));
+              }
+              return;
+            }
+
+            // For other content types, check if scheduled date is at least 1 minute in the future
+            if ($scheduledDate->diffInSeconds($now, false) > -60) {
               $fail(__('publications.validation.scheduledMinDifference'));
             }
           }
@@ -246,23 +271,41 @@ class UpdatePublicationRequest extends FormRequest
         function ($attribute, $value, $fail) use ($publication) {
           if (!$publication) return;
 
+          $contentType = $this->input('content_type', $publication->content_type ?? 'post');
           $accountId = $value;
+          
           // Check if this account has an individual schedule in the request
           $individualSchedule = $this->input("social_account_schedules.{$accountId}");
 
-          // If no individual schedule, it inherits the global scheduled_at
+          // If no individual schedule, check if there's a global schedule in the REQUEST
           if (!$individualSchedule) {
-            $globalSchedule = $this->input('scheduled_at') ?? $publication->scheduled_at;
+            $globalSchedule = $this->input('scheduled_at');
 
+            // Solo validar si hay una fecha global en el REQUEST
+            // No usar la fecha de la publicación existente para validación
             if ($globalSchedule) {
-              $scheduledDate = Carbon::parse($globalSchedule);
-              $now = Carbon::now();
+              try {
+                $scheduledDate = Carbon::parse($globalSchedule);
+                $now = Carbon::now();
 
-              // Check if scheduled date is more than 1 minute in the future
-              if ($scheduledDate->diffInSeconds($now, false) >= -60) {
-                $fail(__('publications.validation.scheduledMinDifference'));
+                // For polls, be more lenient - just needs to be in the future
+                if ($contentType === 'poll') {
+                  if ($scheduledDate->isPast()) {
+                    $fail(__('publications.validation.scheduledInPast', ['type' => 'poll']));
+                  }
+                  return;
+                }
+
+                // For other content types, check if scheduled date is at least 1 minute in the future
+                if ($scheduledDate->diffInSeconds($now, false) > -60) {
+                  $fail(__('publications.validation.scheduledMinDifference'));
+                }
+              } catch (\Exception $e) {
+                $fail('Invalid date format for global schedule.');
               }
             }
+            // Si no hay globalSchedule en el request, no validar nada
+            // Esto permite que las encuestas funcionen sin fecha global
           }
         }
       ],
@@ -361,10 +404,19 @@ class UpdatePublicationRequest extends FormRequest
         ? $this->input('social_accounts', [])
         : $publication->socialAccounts->pluck('id')->toArray();
       
-      // Get media files
-      // For updates, we need to consider existing media if not removed
-      $newMediaFiles = collect($this->file('media', []))
-        ->filter(fn($file) => $file instanceof UploadedFile)
+      // Get media files - include both UploadedFile instances and metadata arrays
+      $newMediaFiles = collect($this->input('media', []))
+        ->filter(function ($file) {
+          // Accept UploadedFile instances
+          if ($file instanceof UploadedFile) {
+            return true;
+          }
+          // Accept metadata arrays with required fields
+          if (is_array($file) && (isset($file['key']) || isset($file['mime_type']) || isset($file['type']))) {
+            return true;
+          }
+          return false;
+        })
         ->values()
         ->toArray();
 
