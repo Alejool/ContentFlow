@@ -9,8 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\Role\Role;
-use App\Models\Approval\ApprovalStepUser;
-use App\Models\Approval\ApprovalStepApproval;
+use App\Models\Logs\ApprovalLog;
 
 class ApprovalLevel extends Model
 {
@@ -83,9 +82,12 @@ class ApprovalLevel extends Model
     /**
      * Get all step approvals for this level.
      */
-    public function stepApprovals(): HasMany
+    /**
+     * Get all logs for this step.
+     */
+    public function logs(): HasMany
     {
-        return $this->hasMany(ApprovalStepApproval::class, 'step_id');
+        return $this->hasMany(ApprovalLog::class, 'approval_step_id');
     }
 
     /**

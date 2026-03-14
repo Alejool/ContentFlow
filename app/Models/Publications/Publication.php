@@ -332,13 +332,13 @@ class Publication extends Model
   }
 
   /**
-   * Get the latest approval log for this publication.
+   * Get the latest approval log for this publication (via approval_requests).
    */
   public function getLatestApprovalLog()
   {
-    return $this->approvalLogs()
-      ->latest('requested_at')
-      ->first();
+    $request = $this->approvalRequest;
+    if (!$request) return null;
+    return $request->logs()->latest()->first();
   }
 
   /**
@@ -347,9 +347,7 @@ class Publication extends Model
   public function hasPendingApproval(): bool
   {
     return $this->status === 'pending_review' &&
-      $this->approvalLogs()
-      ->whereNull('reviewed_at')
-      ->exists();
+      $this->approvalRequests()->where('status', 'pending')->exists();
   }
 
   public function approver(): BelongsTo
@@ -473,9 +471,16 @@ class Publication extends Model
       ->withTimestamps();
   }
 
-  public function approvalLogs(): HasMany
+  public function approvalLogs(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
   {
-    return $this->hasMany(ApprovalLog::class)->orderBy('requested_at', 'desc');
+    return $this->hasManyThrough(
+      \App\Models\Logs\ApprovalLog::class,
+      \App\Models\Approval\ApprovalRequest::class,
+      'publication_id',       // FK on approval_requests
+      'approval_request_id',  // FK on approval_logs
+      'id',                   // local key on publications
+      'id'                    // local key on approval_requests
+    )->orderBy('approval_logs.created_at', 'desc');
   }
 
   /**

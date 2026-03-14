@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Publications\Publication;
 use App\Models\ApprovalWorkflow;
 use App\Models\ApprovalLevel;
+use App\Models\Logs\ApprovalLog;
 use App\Models\User;
 
 class ApprovalRequest extends Model
@@ -81,19 +82,11 @@ class ApprovalRequest extends Model
     }
 
     /**
-     * Get all actions for this request.
+     * Get all logs for this request (complete audit trail).
      */
-    public function actions(): HasMany
+    public function logs(): HasMany
     {
-        return $this->hasMany(ApprovalAction::class, 'request_id');
-    }
-
-    /**
-     * Get all step approvals for this request.
-     */
-    public function stepApprovals(): HasMany
-    {
-        return $this->hasMany(ApprovalStepApproval::class, 'request_id');
+        return $this->hasMany(ApprovalLog::class, 'approval_request_id')->orderBy('created_at');
     }
 
     /**
@@ -130,14 +123,33 @@ class ApprovalRequest extends Model
 
     /**
      * Scope to get requests pending approval by a specific user.
+     * Only shows requests where the user is responsible for the current step.
      */
     public function scopePendingForUser($query, User $user)
     {
         return $query->where('status', self::STATUS_PENDING)
-            ->whereHas('stepApprovals', function ($q) use ($user) {
-                $q->where('user_id', $user->id)
-                    ->where('status', ApprovalStepApproval::STATUS_PENDING);
+            ->whereHas('currentStep', function ($q) use ($user) {
+                // Check if user has the role assigned to this step
+                $q->whereHas('role.users', function ($roleQuery) use ($user) {
+                    $roleQuery->where('users.id', $user->id);
+                })
+                // OR if user is directly assigned to this step
+                ->orWhere('user_id', $user->id)
+                // OR if user is in the step's user list
+                ->orWhereHas('users', function ($userQuery) use ($user) {
+                    $userQuery->where('users.id', $user->id);
+                });
             });
+    }
+
+    /**
+     * Scope to get the latest request for a publication.
+     */
+    public function scopeLatestForPublication($query, int $publicationId)
+    {
+        return $query->where('publication_id', $publicationId)
+            ->orderBy('submitted_at', 'desc')
+            ->limit(1);
     }
 
     /**
@@ -170,5 +182,40 @@ class ApprovalRequest extends Model
     public function isCancelled(): bool
     {
         return $this->status === self::STATUS_CANCELLED;
+    }
+
+    /**
+     * Check if request is completed (approved or rejected).
+     */
+    public function isCompleted(): bool
+    {
+        return in_array($this->status, [self::STATUS_APPROVED, self::STATUS_REJECTED]);
+    }
+
+    /**
+     * Get the rejection details from logs.
+     */
+    public function getRejectionDetails(): ?array
+    {
+        if (!$this->isRejected()) {
+            return null;
+        }
+
+        $rejectionLog = $this->logs()
+            ->where('action', 'rejected')
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        if (!$rejectionLog) {
+            return null;
+        }
+
+        return [
+            'level_number' => $rejectionLog->level_number,
+            'step_name' => $rejectionLog->approvalStep?->level_name,
+            'rejected_by' => $rejectionLog->user,
+            'rejected_at' => $rejectionLog->created_at,
+            'reason' => $rejectionLog->comment ?? $this->rejection_reason,
+        ];
     }
 }
