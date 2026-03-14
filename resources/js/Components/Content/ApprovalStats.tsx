@@ -29,9 +29,7 @@ export default function ApprovalStats({ refreshTrigger }: ApprovalStatsProps) {
       const response = await axios.get("/api/v1/approvals/stats");
       const json = response.data;
       if (json.success) {
-        const stats =
-          json.pending_requests !== undefined ? json : json.data || {};
-        setStats(stats);
+        setStats(json);
       }
     } catch (error) {
       } finally {
@@ -89,7 +87,7 @@ export default function ApprovalStats({ refreshTrigger }: ApprovalStatsProps) {
     },
     {
       label: t("approvals.stats.avgApprovalTime"),
-      value: `${stats.avg_approval_time_hours}h`,
+      value: stats.avg_approval_time_hours != null ? `${stats.avg_approval_time_hours}h` : "—",
       icon: Timer,
       color: "text-blue-600 dark:text-blue-400",
       bgColor: "bg-blue-50 dark:bg-blue-900/20",

@@ -1,307 +1,230 @@
+import { ApprovalRequest } from "@/types/ApprovalTypes";
 import { AlertCircle, CheckCircle, Clock, XCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-interface ApprovalWorkflow {
-  id: number;
-  name: string;
-  is_enabled: boolean;
-  is_multi_level: boolean;
-  current_level: number;
-  max_level: number;
-  levels: Array<{
-    id: number;
-    level_number: number;
-    level_name: string;
-    role: {
-      id: number;
-      name: string;
-      slug: string;
-    } | null;
-  }>;
-  status_info: {
-    current_status: string;
-    can_submit_for_approval: boolean;
-    is_pending_review: boolean;
-    is_approved: boolean;
-    is_rejected: boolean;
-    next_action: string;
-  };
-}
-
-interface ApprovalLog {
-  id: number;
-  action_type: "submitted" | "approved" | "rejected";
-  approval_level: number | null;
-  comment?: string;
-  requester?: {
-    id: number;
-    name: string;
-    photo_url?: string;
-  };
-  reviewer?: {
-    id: number;
-    name: string;
-    photo_url?: string;
-  };
-  requested_at?: string;
-  reviewed_at?: string;
-  created_at: string;
-}
-
 interface ApprovalWorkflowStatusProps {
-  workflow: ApprovalWorkflow;
-  approvalLogs?: ApprovalLog[];
+  approvalRequest: ApprovalRequest | null | undefined;
   className?: string;
 }
 
 export default function ApprovalWorkflowStatus({
-  workflow,
-  approvalLogs = [],
+  approvalRequest,
   className = "",
 }: ApprovalWorkflowStatusProps) {
   const { t } = useTranslation();
 
-  if (!workflow || !workflow.is_enabled) {
-    return null;
-  }
+  if (!approvalRequest) return null;
 
-  const { status_info, levels, current_level, max_level } = workflow;
+  const { status, currentStep, workflow, logs = [], rejection_reason } = approvalRequest;
+  const levels = workflow?.levels ?? [];
 
-  // Encontrar el último rechazo
-  const lastRejection = approvalLogs
-    .filter((log) => log.action_type === "rejected")
+  // Último rechazo
+  const lastRejection = [...logs]
+    .filter((l) => l.action === "rejected")
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
 
-  // Obtener el nivel actual
-  const currentLevelInfo = levels.find((l) => l.level_number === current_level);
-  const nextLevelInfo = levels.find((l) => l.level_number === current_level + 1);
+  const isRejected = status === "rejected";
+  const isApproved = status === "approved";
+  const isPending = status === "pending";
 
-  const getStatusIcon = () => {
-    if (status_info.is_rejected) return XCircle;
-    if (status_info.is_approved) return CheckCircle;
-    if (status_info.is_pending_review) return Clock;
-    return AlertCircle;
+  const statusConfig = {
+    pending: {
+      icon: Clock,
+      color: "text-yellow-600 dark:text-yellow-400",
+      bg: "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800",
+      label: t("approvals.status.pending") || "En revisión",
+    },
+    approved: {
+      icon: CheckCircle,
+      color: "text-green-600 dark:text-green-400",
+      bg: "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800",
+      label: t("approvals.status.approved") || "Aprobado",
+    },
+    rejected: {
+      icon: XCircle,
+      color: "text-red-600 dark:text-red-400",
+      bg: "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800",
+      label: t("approvals.status.rejected") || "Rechazado",
+    },
+    cancelled: {
+      icon: AlertCircle,
+      color: "text-gray-600 dark:text-gray-400",
+      bg: "bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-800",
+      label: t("approvals.status.cancelled") || "Cancelado",
+    },
   };
 
-  const getStatusColor = () => {
-    if (status_info.is_rejected) return "text-red-600 dark:text-red-400";
-    if (status_info.is_approved) return "text-green-600 dark:text-green-400";
-    if (status_info.is_pending_review) return "text-yellow-600 dark:text-yellow-400";
-    return "text-gray-600 dark:text-gray-400";
-  };
+  const cfg = statusConfig[status as keyof typeof statusConfig] ?? statusConfig.pending;
+  const StatusIcon = cfg.icon;
 
-  const getStatusBgColor = () => {
-    if (status_info.is_rejected) return "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800";
-    if (status_info.is_approved) return "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800";
-    if (status_info.is_pending_review) return "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800";
-    return "bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-800";
-  };
-
-  const getStatusText = () => {
-    if (status_info.is_rejected) return t("approval.status.rejected");
-    if (status_info.is_approved) return t("approval.status.approved");
-    if (status_info.is_pending_review) return t("approval.status.pending_review");
-    if (status_info.can_submit_for_approval) return t("approval.status.ready_to_submit");
-    return t("approval.status.draft");
-  };
-
-  const getNextActionText = () => {
-    const { next_action } = status_info;
-
-    if (next_action === "submit_for_approval") {
-      return t("approval.next_action.submit_for_approval");
-    }
-
-    if (next_action.startsWith("awaiting_level_")) {
-      const levelMatch = next_action.match(/awaiting_level_(\d+)_approval/);
-      if (levelMatch) {
-        const levelNum = parseInt(levelMatch[1]);
-        const level = levels.find((l) => l.level_number === levelNum);
-        return t("approval.next_action.awaiting_level_approval", {
-          level: level?.level_name || `Nivel ${levelNum}`,
-          role: level?.role?.name || t("common.unknown"),
-        });
-      }
-    }
-
-    if (next_action === "awaiting_final_approval") {
-      const finalLevel = levels[levels.length - 1];
-      return t("approval.next_action.awaiting_final_approval", {
-        role: finalLevel?.role?.name || t("common.unknown"),
-      });
-    }
-
-    if (next_action === "ready_to_publish") {
-      return t("approval.next_action.ready_to_publish");
-    }
-
-    return "";
-  };
-
-  const StatusIcon = getStatusIcon();
+  // Progreso
+  const completedLevels = logs.filter((l) => l.action === "approved").length;
+  const totalLevels = levels.length;
 
   return (
     <div className={`space-y-4 ${className}`}>
-      {/* Estado Actual */}
-      <div className={`border rounded-xl p-4 ${getStatusBgColor()}`}>
+      {/* Estado actual */}
+      <div className={`border rounded-xl p-4 ${cfg.bg}`}>
         <div className="flex items-start gap-3">
-          <StatusIcon className={`w-6 h-6 flex-shrink-0 mt-0.5 ${getStatusColor()}`} />
+          <StatusIcon className={`w-6 h-6 flex-shrink-0 mt-0.5 ${cfg.color}`} />
           <div className="flex-1">
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-1">
-              {getStatusText()}
-            </h4>
-            {getNextActionText() && (
+            <h4 className="font-semibold text-gray-900 dark:text-white mb-1">{cfg.label}</h4>
+            {isPending && currentStep && (
               <p className="text-sm text-gray-700 dark:text-gray-300">
-                {getNextActionText()}
+                {t("approvals.awaitingLevel") || "Esperando aprobación en"}:{" "}
+                <span className="font-medium">{currentStep.level_name}</span>
+                {currentStep.role && ` (${currentStep.role.name})`}
+              </p>
+            )}
+            {isApproved && (
+              <p className="text-sm text-gray-700 dark:text-gray-300">
+                {t("approvals.approvedReadyToPublish") || "Aprobado. Listo para publicar."}
               </p>
             )}
           </div>
         </div>
       </div>
 
-      {/* Mensaje de Rechazo */}
-      {status_info.is_rejected && lastRejection && (
+      {/* Detalle del rechazo */}
+      {isRejected && (lastRejection || rejection_reason) && (
         <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
           <div className="flex items-start gap-3">
             <XCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <h5 className="font-semibold text-red-900 dark:text-red-100 mb-2">
-                {t("approval.rejected_by", { name: lastRejection.reviewer?.name || t("common.unknown") })}
-              </h5>
-              {lastRejection.comment && (
+              {lastRejection?.user && (
+                <h5 className="font-semibold text-red-900 dark:text-red-100 mb-1">
+                  {t("approvals.rejectedBy") || "Rechazado por"}: {lastRejection.user.name}
+                </h5>
+              )}
+              {lastRejection?.level_number && (
+                <p className="text-xs text-red-700 dark:text-red-300 mb-2">
+                  {t("approvals.rejectedAtLevel") || "En nivel"} {lastRejection.level_number}
+                </p>
+              )}
+              {(lastRejection?.comment || rejection_reason) && (
                 <div className="bg-white/50 dark:bg-black/20 rounded-lg p-3">
                   <p className="text-sm text-red-800 dark:text-red-200">
-                    <span className="font-medium">{t("approval.reason")}:</span> {lastRejection.comment}
+                    <span className="font-medium">{t("approvals.reason") || "Razón"}:</span>{" "}
+                    {lastRejection?.comment || rejection_reason}
                   </p>
                 </div>
-              )}
-              {lastRejection.approval_level && (
-                <p className="text-xs text-red-700 dark:text-red-300 mt-2">
-                  {t("approval.rejected_at_level", { level: lastRejection.approval_level })}
-                </p>
               )}
             </div>
           </div>
         </div>
       )}
 
-      {/* Flujo de Aprobación */}
-      <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-xl p-4">
-        <h5 className="font-semibold text-gray-900 dark:text-white mb-4">
-          {t("approval.workflow_progress")}
-        </h5>
+      {/* Progreso del flujo */}
+      {levels.length > 0 && (
+        <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-xl p-4">
+          <h5 className="font-semibold text-gray-900 dark:text-white mb-4">
+            {t("approvals.workflowProgress") || "Progreso del flujo"}
+          </h5>
 
-        {/* Barra de Progreso */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
-            <span>{t("approval.progress")}</span>
-            <span>
-              {current_level} / {max_level}
-            </span>
-          </div>
-          <div className="w-full bg-gray-200 dark:bg-neutral-700 rounded-full h-2">
-            <div
-              className="bg-primary-600 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${(current_level / max_level) * 100}%` }}
-            />
-          </div>
-        </div>
+          {/* Barra */}
+          {totalLevels > 0 && (
+            <div className="mb-5">
+              <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mb-1.5">
+                <span>{t("approvals.progress") || "Progreso"}</span>
+                <span>{completedLevels} / {totalLevels}</span>
+              </div>
+              <div className="w-full bg-gray-200 dark:bg-neutral-700 rounded-full h-2">
+                <div
+                  className="bg-primary-600 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${totalLevels > 0 ? (completedLevels / totalLevels) * 100 : 0}%` }}
+                />
+              </div>
+            </div>
+          )}
 
-        {/* Niveles del Flujo */}
-        <div className="space-y-3">
-          {levels.map((level, index) => {
-            // Buscar el log de aprobación para este nivel
-            const stepLog = approvalLogs.find(log => log.approval_level === level.level_number);
-            
-            // Un nivel está completado si tiene un log con reviewer (fue revisado)
-            const isCompleted = stepLog?.reviewer !== null && stepLog?.reviewer !== undefined;
-            
-            // Un nivel es el actual si coincide con current_level y está en pending_review y NO está completado
-            const isCurrent = level.level_number === current_level && status_info.is_pending_review && !isCompleted;
-            
-            // Un nivel está pendiente si es mayor al actual y no está completado
-            const isPending = level.level_number > current_level && !isCompleted;
-            
-            // Verificar si fue rechazado en este nivel
-            const wasRejectedHere = lastRejection?.approval_level === level.level_number;
+          {/* Niveles */}
+          <div className="space-y-3">
+            {levels.map((level, index) => {
+              const approvedLog = logs.find(
+                (l) => l.action === "approved" && l.level_number === level.level_number
+              );
+              const rejectedLog = logs.find(
+                (l) => l.action === "rejected" && l.level_number === level.level_number
+              );
+              const isCurrent =
+                isPending && currentStep?.level_number === level.level_number;
+              const isDone = !!approvedLog;
+              const isRejectedHere = !!rejectedLog;
 
-            return (
-              <div key={level.id} className="relative">
-                {/* Línea conectora */}
-                {index < levels.length - 1 && (
-                  <div
-                    className={`absolute left-5 top-10 bottom-0 w-0.5 ${
-                      isCompleted
-                        ? "bg-green-500"
-                        : wasRejectedHere
+              return (
+                <div key={level.id} className="relative">
+                  {index < levels.length - 1 && (
+                    <div
+                      className={`absolute left-5 top-10 bottom-0 w-0.5 ${
+                        isDone
+                          ? "bg-green-500"
+                          : isRejectedHere
                           ? "bg-red-500"
                           : "bg-gray-200 dark:bg-neutral-700"
-                    }`}
-                  />
-                )}
-
-                <div className="flex items-start gap-3">
-                  {/* Icono del Nivel */}
-                  <div
-                    className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 font-semibold ${
-                      isCompleted
-                        ? "bg-green-500 text-white"
-                        : isCurrent
+                      }`}
+                    />
+                  )}
+                  <div className="flex items-start gap-3">
+                    <div
+                      className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 font-semibold text-sm ${
+                        isDone
+                          ? "bg-green-500 text-white"
+                          : isRejectedHere
+                          ? "bg-red-500 text-white"
+                          : isCurrent
                           ? "bg-primary-500 text-white animate-pulse"
-                          : wasRejectedHere
-                            ? "bg-red-500 text-white"
-                            : "bg-gray-200 dark:bg-neutral-700 text-gray-500 dark:text-gray-400"
-                    }`}
-                  >
-                    {isCompleted ? (
-                      <CheckCircle className="w-5 h-5" />
-                    ) : wasRejectedHere ? (
-                      <XCircle className="w-5 h-5" />
-                    ) : isCurrent ? (
-                      <Clock className="w-5 h-5" />
-                    ) : (
-                      level.level_number
-                    )}
-                  </div>
-
-                  {/* Información del Nivel */}
-                  <div className="flex-1 pt-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h6 className="font-semibold text-gray-900 dark:text-white">
-                        {level.level_name}
-                      </h6>
-                      {isCurrent && (
-                        <span className="px-2 py-0.5 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 text-xs font-medium rounded-full">
-                          {t("approval.in_progress")}
-                        </span>
-                      )}
-                      {wasRejectedHere && (
-                        <span className="px-2 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs font-medium rounded-full">
-                          {t("approval.rejected_here")}
-                        </span>
+                          : "bg-gray-200 dark:bg-neutral-700 text-gray-500 dark:text-gray-400"
+                      }`}
+                    >
+                      {isDone ? (
+                        <CheckCircle className="w-5 h-5" />
+                      ) : isRejectedHere ? (
+                        <XCircle className="w-5 h-5" />
+                      ) : isCurrent ? (
+                        <Clock className="w-5 h-5" />
+                      ) : (
+                        level.level_number
                       )}
                     </div>
-                    {level.role && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {t("approval.approver_role")}: {level.role.name}
-                      </p>
-                    )}
+
+                    <div className="flex-1 pt-1 pb-4">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-semibold text-gray-900 dark:text-white">
+                          {level.level_name}
+                        </span>
+                        {isCurrent && (
+                          <span className="px-2 py-0.5 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 text-xs font-medium rounded-full">
+                            {t("approvals.inProgress") || "En revisión"}
+                          </span>
+                        )}
+                        {isRejectedHere && (
+                          <span className="px-2 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs font-medium rounded-full">
+                            {t("approvals.rejectedHere") || "Rechazado aquí"}
+                          </span>
+                        )}
+                      </div>
+                      {level.role && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                          {t("approvals.approverRole") || "Rol"}: {level.role.name}
+                        </p>
+                      )}
+                      {/* Quién aprobó/rechazó */}
+                      {(approvedLog || rejectedLog) && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                          {(approvedLog || rejectedLog)!.user?.name} ·{" "}
+                          {new Date((approvedLog || rejectedLog)!.created_at).toLocaleString()}
+                          {(approvedLog || rejectedLog)!.comment && (
+                            <span className="italic ml-1">
+                              "{(approvedLog || rejectedLog)!.comment}"
+                            </span>
+                          )}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Información Adicional */}
-      {status_info.is_approved && (
-        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
-          <div className="flex items-center gap-2 text-green-800 dark:text-green-200">
-            <CheckCircle className="w-5 h-5" />
-            <p className="text-sm font-medium">
-              {t("approval.approved_ready_to_publish")}
-            </p>
+              );
+            })}
           </div>
         </div>
       )}

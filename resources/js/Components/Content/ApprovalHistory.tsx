@@ -3,114 +3,92 @@ import FilterSection from "@/Components/Content/common/FilterSection";
 import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
 import TableContainer from "@/Components/common/ui/TableContainer";
 import { getDateFnsLocale } from "@/Utils/dateLocales";
+import { ApprovalRequest } from "@/types/ApprovalTypes";
 import axios from "axios";
 import { format } from "date-fns";
+import { CheckCircle, Clock, Send, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-
-interface ApprovalLogItem {
-  id: number;
-  publication: {
-    id: number;
-    title: string;
-    status: string;
-  };
-  requester: {
-    id: number;
-    name: string;
-    photo_url?: string;
-  };
-  requested_at: string;
-  reviewer?: {
-    id: number;
-    name: string;
-    photo_url?: string;
-  };
-  reviewed_at?: string;
-  action?: "approved" | "rejected";
-  rejection_reason?: string;
-}
 
 interface ApprovalHistoryProps {
   onRefresh?: () => void;
   publicationId?: number;
-  logs?: ApprovalLogItem[]; // Optional: pass logs directly to avoid fetch
+  initialData?: ApprovalRequest[]; // Datos iniciales si se pasan directamente
 }
 
 export default function ApprovalHistory({
   onRefresh,
   publicationId,
-  logs: initialLogs,
+  initialData,
 }: ApprovalHistoryProps) {
   const { t, i18n } = useTranslation();
   const locale = getDateFnsLocale(i18n.language);
-  const [logs, setLogs] = useState<ApprovalLogItem[]>(initialLogs || []);
-  const [isLoading, setIsLoading] = useState(!initialLogs);
+  const [requests, setRequests] = useState<ApprovalRequest[]>(initialData || []);
+  const [isLoading, setIsLoading] = useState(!initialData);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(12);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [filters, setFilters] = useState({
-    action: "all",
+    status: "all",
     search: "",
   });
 
   useEffect(() => {
-    if (initialLogs && publicationId) {
-      // Client-side filtering
-      let filtered = [...initialLogs];
+    if (initialData) {
+      // Modo cliente: filtrar datos localmente
+      let filtered = [...initialData];
 
-      if (filters.action !== "all") {
-        filtered = filtered.filter((log) => log.action === filters.action);
+      if (filters.status !== "all") {
+        filtered = filtered.filter((req) => req.status === filters.status);
       }
 
       if (filters.search) {
         const searchLower = filters.search.toLowerCase();
         filtered = filtered.filter(
-          (log) =>
-            log.requester.name.toLowerCase().includes(searchLower) ||
-            (log.rejection_reason &&
-              log.rejection_reason.toLowerCase().includes(searchLower)),
+          (req) =>
+            req.submitter?.name.toLowerCase().includes(searchLower) ||
+            req.rejection_reason?.toLowerCase().includes(searchLower)
         );
       }
 
-      setLogs(filtered);
-      setIsLoading(false);
+      setRequests(filtered);
       setTotalItems(filtered.length);
-      setTotalPages(1);
+      setTotalPages(Math.ceil(filtered.length / perPage));
+      setIsLoading(false);
       return;
     }
+    
     fetchHistory();
-  }, [currentPage, perPage, filters, publicationId, initialLogs]);
+  }, [currentPage, perPage, filters, publicationId, initialData]);
 
   const fetchHistory = async () => {
-    // Skip fetch if we are in client-side mode (initialLogs provided)
-    if (initialLogs && publicationId) return;
+    if (initialData) return; // No hacer fetch si tenemos datos iniciales
 
     try {
       setIsLoading(true);
-      const params: any = {
-        page: currentPage,
-        per_page: perPage,
-        ...filters,
-        ...(publicationId ? { publication_id: publicationId } : {}),
-      };
+      const endpoint = publicationId
+        ? route("api.v1.approvals.publication.history", publicationId)
+        : route("api.v1.approvals.history");
 
-      const response = await axios.get("/api/v1/approvals/history", { params });
+      const response = await axios.get(endpoint, {
+        params: {
+          page: currentPage,
+          per_page: perPage,
+          status: filters.status !== "all" ? filters.status : undefined,
+          search: filters.search || undefined,
+        },
+      });
 
-      const json = response.data;
-      if (json.success) {
-        const dataContainer = json.logs ? json : json.data || {};
-        const logs = dataContainer.logs;
-
-        if (logs) {
-          setLogs(logs.data || []);
-          setTotalPages(logs.last_page || 1);
-          setTotalItems(logs.total || 0);
-        }
+      if (response.data.success) {
+        const data = response.data.history || response.data.data || [];
+        setRequests(Array.isArray(data) ? data : data.data || []);
+        setTotalPages(data.last_page || 1);
+        setTotalItems(data.total || (Array.isArray(data) ? data.length : 0));
       }
     } catch (error) {
-      } finally {
+      console.error("Error fetching approval history:", error);
+    } finally {
       setIsLoading(false);
     }
   };
@@ -120,26 +98,63 @@ export default function ApprovalHistory({
     setCurrentPage(1);
   };
 
-  const getActionBadge = (action?: string) => {
-    if (!action) return null;
+  const getStatusBadge = (status: string) => {
+    const config: Record<string, { color: string; icon: any; label: string }> = {
+      pending: {
+        color: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
+        icon: Clock,
+        label: t("approvals.status.pending"),
+      },
+      approved: {
+        color: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+        icon: CheckCircle,
+        label: t("approvals.status.approved"),
+      },
+      rejected: {
+        color: "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400",
+        icon: XCircle,
+        label: t("approvals.status.rejected"),
+      },
+      cancelled: {
+        color: "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400",
+        icon: XCircle,
+        label: t("approvals.status.cancelled"),
+      },
+    };
 
-    const styles =
-      action === "approved"
-        ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-        : "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400";
+    const { color, icon: Icon, label } = config[status] || config.pending;
 
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-bold ${styles}`}>
-        {t(`approvals.filters.${action}`)}
+      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${color}`}>
+        <Icon className="w-3.5 h-3.5" />
+        {label}
       </span>
     );
   };
+
+  const getActionIcon = (action: string) => {
+    switch (action) {
+      case "submitted":
+        return <Send className="w-4 h-4 text-blue-500" />;
+      case "approved":
+        return <CheckCircle className="w-4 h-4 text-green-500" />;
+      case "rejected":
+        return <XCircle className="w-4 h-4 text-red-500" />;
+      default:
+        return <Clock className="w-4 h-4 text-gray-500" />;
+    }
+  };
+
+  // Calcular paginación para datos locales
+  const displayedRequests = initialData
+    ? requests.slice((currentPage - 1) * perPage, currentPage * perPage)
+    : requests;
 
   return (
     <TableContainer
       title={t("approvals.historyTitle") || "Historial de Aprobaciones"}
       subtitle={
-        t("approvals.historySubtitle") || "Registros de estados y revisiones"
+        t("approvals.historySubtitle") || "Registros completos de solicitudes de aprobación"
       }
     >
       <FilterSection
@@ -147,29 +162,33 @@ export default function ApprovalHistory({
         t={t}
         search={filters.search}
         setSearch={(value) => handleFilterChange("search", value)}
-        statusFilter={filters.action}
+        statusFilter={filters.status}
         handleFilterChange={handleFilterChange}
       />
+      
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="bg-gray-50/50 dark:bg-neutral-900/50 border-b border-gray-100 dark:border-neutral-700">
             <tr className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
               {!publicationId && (
-                <th className="px-6 py-4 text-left font-bold w-[30%]">
+                <th className="px-6 py-4 text-left font-bold w-[25%]">
                   {t("approvals.historyTable.publication")}
                 </th>
               )}
-              <th className="px-6 py-4 text-left font-bold w-[20%]">
-                {t("approvals.historyTable.requestedBy")}
+              <th className="px-6 py-4 text-left font-bold w-[15%]">
+                {t("approvals.historyTable.submittedBy")}
               </th>
-              <th className="px-6 py-4 text-left font-bold w-[20%]">
-                {t("approvals.historyTable.requestedAt")}
+              <th className="px-6 py-4 text-left font-bold w-[15%]">
+                {t("approvals.historyTable.submittedAt")}
               </th>
-              <th className="px-6 py-4 text-left font-bold w-[20%]">
-                {t("approvals.historyTable.reviewedBy")}
+              <th className="px-6 py-4 text-left font-bold w-[15%]">
+                {t("approvals.historyTable.status")}
               </th>
-              <th className="px-6 py-4 text-left font-bold w-[10%]">
-                {t("approvals.historyTable.action")}
+              <th className="px-6 py-4 text-left font-bold w-[15%]">
+                {t("approvals.historyTable.completedBy")}
+              </th>
+              <th className="px-6 py-4 text-left font-bold w-[15%]">
+                {t("approvals.historyTable.actions")}
               </th>
             </tr>
           </thead>
@@ -180,10 +199,10 @@ export default function ApprovalHistory({
                   <ApprovalHistorySkeleton key={i} />
                 ))}
               </>
-            ) : logs.length === 0 ? (
+            ) : displayedRequests.length === 0 ? (
               <tr>
                 <td
-                  colSpan={publicationId ? 4 : 5}
+                  colSpan={publicationId ? 5 : 6}
                   className="px-6 py-16 text-center"
                 >
                   <div className="flex flex-col items-center justify-center">
@@ -199,39 +218,79 @@ export default function ApprovalHistory({
                 </td>
               </tr>
             ) : (
-              logs.map((log) => (
+              displayedRequests.map((request) => (
                 <tr
-                  key={log.id}
+                  key={request.id}
                   className="hover:bg-gray-50/50 dark:hover:bg-neutral-700/30 transition-colors"
                 >
                   {!publicationId && (
                     <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                      {log.publication?.title || t("common.unknown", "Unknown")}
+                      {request.publication?.title || t("common.unknown", "Unknown")}
                     </td>
                   )}
-                  <td className="px-6 py-4">{log.requester.name}</td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-2">
+                      {request.submitter?.photo_url && (
+                        <img
+                          src={request.submitter.photo_url}
+                          alt={request.submitter.name}
+                          className="w-8 h-8 rounded-full"
+                        />
+                      )}
+                      <span className="text-gray-900 dark:text-white">
+                        {request.submitter?.name || t("common.unknown")}
+                      </span>
+                    </div>
+                  </td>
                   <td className="px-6 py-4 text-gray-500 text-sm">
-                    {format(new Date(log.requested_at), "PPp", { locale })}
+                    {format(new Date(request.submitted_at), "PPp", { locale })}
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-gray-900 dark:text-white">
-                      {log.reviewer?.name || "-"}
-                    </div>
-                    {log.reviewed_at && (
-                      <div className="text-xs text-gray-500">
-                        {format(new Date(log.reviewed_at), "PPp", { locale })}
+                    {getStatusBadge(request.status)}
+                  </td>
+                  <td className="px-6 py-4">
+                    {request.completedBy ? (
+                      <div>
+                        <div className="text-gray-900 dark:text-white">
+                          {request.completedBy.name}
+                        </div>
+                        {request.completed_at && (
+                          <div className="text-xs text-gray-500">
+                            {format(new Date(request.completed_at), "PPp", { locale })}
+                          </div>
+                        )}
                       </div>
+                    ) : (
+                      <span className="text-gray-400">-</span>
                     )}
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex flex-col gap-1">
-                      {getActionBadge(log.action)}
-                      {log.action === "rejected" && log.rejection_reason && (
+                      {request.logs && request.logs.length > 0 ? (
+                        <div className="flex items-center gap-1">
+                          {request.logs.slice(0, 3).map((log) => (
+                            <div
+                              key={log.id}
+                              title={`${log.action} - ${log.user?.name || "System"}`}
+                            >
+                              {getActionIcon(log.action)}
+                            </div>
+                          ))}
+                          {request.logs.length > 3 && (
+                            <span className="text-xs text-gray-500">
+                              +{request.logs.length - 3}
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-gray-400 text-sm">-</span>
+                      )}
+                      {request.status === "rejected" && request.rejection_reason && (
                         <div
-                          className="text-xs text-gray-500 max-w-[200px] truncate"
-                          title={log.rejection_reason}
+                          className="text-xs text-rose-600 dark:text-rose-400 max-w-[200px] truncate"
+                          title={request.rejection_reason}
                         >
-                          {log.rejection_reason}
+                          {request.rejection_reason}
                         </div>
                       )}
                     </div>
