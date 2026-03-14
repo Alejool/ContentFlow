@@ -54,8 +54,44 @@ export const usePublicationActionsStore = create<PublicationActionsStore>((set, 
     try {
       const response = await axios.post(`/api/v1/content/${itemId}/submit-for-approval`);
       const approvalInfo = response.data?.data?.approval_info;
+      const publication = response.data?.data?.content || response.data?.data?.publication;
       
-      router.reload({ only: ["publications"] });
+      // Update publication store immediately for instant UI feedback
+      if (publication) {
+        const publicationStoreModule = await import("@/stores/publicationStore");
+        const manageContentUIStoreModule = await import("@/stores/manageContentUIStore");
+        
+        // CRITICAL: Update the publication with the new status immediately
+        publicationStoreModule.usePublicationStore.getState().updatePublication(itemId, {
+          status: publication.status,
+          current_approval_step_id: publication.current_approval_step_id,
+          currentApprovalStep: publication.currentApprovalStep,
+          approval_logs: publication.approval_logs,
+          approvalLogs: publication.approval_logs,
+          submitted_for_approval_at: publication.submitted_for_approval_at,
+          // Include all other fields from the response
+          ...publication
+        });
+        
+        // Also update selectedItem if this publication is currently open in a modal
+        const selectedItem = manageContentUIStoreModule.useManageContentUIStore.getState().selectedItem;
+        if (selectedItem?.id === itemId) {
+          manageContentUIStoreModule.useManageContentUIStore.getState().updateSelectedItem({
+            status: publication.status,
+            current_approval_step_id: publication.current_approval_step_id,
+            currentApprovalStep: publication.currentApprovalStep,
+            approval_logs: publication.approval_logs,
+            approvalLogs: publication.approval_logs,
+            submitted_for_approval_at: publication.submitted_for_approval_at,
+            ...publication
+          });
+        }
+      }
+      
+      // Reload in background to sync with server (without blocking UI)
+      setTimeout(() => {
+        router.reload({ only: ["publications"], preserveScroll: true });
+      }, 100);
       
       return { 
         success: true,

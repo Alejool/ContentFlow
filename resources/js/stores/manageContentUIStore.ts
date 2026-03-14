@@ -21,6 +21,7 @@ interface ManageContentUIState {
   ) => void;
   setTabOrder: (order: string[]) => void;
   setSelectedItem: (item: SelectedItem) => void;
+  updateSelectedItem: (updates: Partial<Campaign | Publication>) => void;
   setShowFilters: (tab: string, show: boolean) => void;
 
   openAddModal: (type?: "publication" | "campaign") => void;
@@ -91,6 +92,13 @@ export const useManageContentUIStore = create<ManageContentUIState>((set) => {
       }
     },
     setSelectedItem: (item) => set({ selectedItem: item }),
+    updateSelectedItem: (updates) =>
+      set((state) => {
+        if (!state.selectedItem) return state;
+        return {
+          selectedItem: { ...state.selectedItem, ...updates } as SelectedItem,
+        };
+      }),
     setShowFilters: (tab, show) =>
       set((state) => {
         const newShowFilters = { ...state.showFilters, [tab]: show };
