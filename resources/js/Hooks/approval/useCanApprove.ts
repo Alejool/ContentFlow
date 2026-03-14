@@ -58,13 +58,6 @@ export function useCanApprove(workspaceId?: number) {
     // Check if user has approve permission via CASL (lowercase 'approve')
     const canApprove = ability.can('approve', 'ApprovalRequest');
     
-    console.log('🔍 useCanApprove - ability check:', {
-      canApprove,
-      userRole: currentWorkspace?.user_role_slug,
-      permissions: currentWorkspace?.permissions,
-      abilityRules: ability.rules
-    });
-    
     // Determine reason
     let reason: 'admin_permission' | 'workflow_assignment' | '' = '';
     
