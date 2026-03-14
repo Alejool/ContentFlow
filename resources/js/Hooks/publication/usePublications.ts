@@ -147,8 +147,7 @@ export const usePublications = () => {
           await fetchLogs({ ...filters, per_page: itemsPerPage }, page);
           break;
         case "approvals":
-          // Use approval filter to only show publications assigned to the user
-          await fetchPublications({ ...filters, per_page: itemsPerPage }, page, true);
+          // Approvals tab uses its own hook (usePendingApprovals) — no fetch needed here
           break;
       }
     },

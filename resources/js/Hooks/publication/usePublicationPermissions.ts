@@ -162,8 +162,8 @@ export function usePublicationPermissions(permissions: string[] = []) {
     }
     
     // Si hay workflow activo:
-    // - Usuario con permiso "publish" puede publicar si el contenido está aprobado
-    // - Verificar que approval_request esté completado (completed_by existe)
+    // - Solo quien envió a revisión puede publicar cuando está aprobado
+    // - Owner puede publicar siempre
     if (hasWorkflow) {
       // Debe tener permiso de publicar
       if (!canPublish) {
@@ -176,8 +176,16 @@ export function usePublicationPermissions(permissions: string[] = []) {
         item.approval_request?.status === "approved" && 
         item.approval_request?.completed_by;
       
-      // Puede publicar si está aprobado (con request completado) o es retry
-      return isApprovedWithCompletedRequest || ["failed", "published", "scheduled"].includes(item.status || "");
+      if (isApprovedWithCompletedRequest) {
+        // CRÍTICO: Solo quien envió a revisión puede publicar
+        const submitterId = item.approval_request?.submitted_by;
+        const canPublishApproved = submitterId === currentUserId;
+        
+        return canPublishApproved;
+      }
+      
+      // Puede publicar si es retry (failed, published, scheduled)
+      return ["failed", "published", "scheduled"].includes(item.status || "");
     }
     
     // Sin workflow, usuarios con permiso "publish" pueden publicar directamente
