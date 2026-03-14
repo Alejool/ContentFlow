@@ -37,8 +37,8 @@ export const passwordSchema = (t: any) =>
     .object({
       current_password: z
         .string()
-        .min(6, t("validation.min.string", { count: 6 })),
-      password: z.string().min(6, t("validation.min.string", { count: 6 })),
+        .min(8, t("validation.min.string", { count: 8 })),
+      password: z.string().min(8, t("validation.min.string", { count: 8 })),
       password_confirmation: z.string(),
     })
     .refine((data) => data.password === data.password_confirmation, {

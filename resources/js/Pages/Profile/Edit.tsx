@@ -1,17 +1,17 @@
+import Button from "@/Components/common/Modern/Button";
+import TabNavigation from "@/Components/common/TabNavigation";
 import AccountStatistics from "@/Components/profile/Partials/AccountStatistics";
 import OnboardingSection from "@/Components/profile/Partials/OnboardingSection";
 import SubscriptionSection from "@/Components/profile/Partials/SubscriptionSection";
 import UpdatePasswordForm from "@/Components/profile/Partials/UpdatePasswordForm";
 import UpdateProfileInformationForm from "@/Components/profile/Partials/UpdateProfileInformationForm";
 import UpdateThemeForm from "@/Components/profile/Partials/UpdateThemeForm";
-import TabNavigation from "@/Components/common/TabNavigation";
-import Button from "@/Components/common/Modern/Button";
 
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { useUserStore } from "@/stores/userStore";
 import { Head, usePage } from "@inertiajs/react";
-import { CreditCard, Lock, User, Save, Palette } from "lucide-react";
-import { useEffect, useState, useRef } from "react";
+import { CreditCard, Lock, Save, User } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 interface EditProps {
@@ -191,9 +191,9 @@ export default function Edit({
                 </div>
               )}
 
-              {activeTab === "password" && (
+              {activeTab === "password" && user.provider === null && (
                 <div>
-                  <UpdatePasswordForm user={user} />
+                  <UpdatePasswordForm />
                 </div>
               )}
 

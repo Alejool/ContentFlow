@@ -1,6 +1,6 @@
-import { LucideIcon } from 'lucide-react';
 import DraggableTabs, { DraggableTab } from '@/Components/common/DraggableTabs';
 import Button from '@/Components/common/Modern/Button';
+import { LucideIcon } from 'lucide-react';
 
 export interface Tab {
     id?: string;
@@ -43,12 +43,17 @@ function TabNavigation({
     const normalizedTabs = tabs.map(tab => ({
         ...tab,
         key: tab.key || tab.id || '',
-        enabled: tab.enabled !== false ,
+        enabled: tab.enabled !== false,
     }));
+
+    // Filtrar tabs ocultos y deshabilitados
+    const visibleTabs = normalizedTabs.filter(tab => 
+        tab.enabled !== false && tab.hidden !== true
+    );
 
     // Si es draggable o variant es 'draggable', usar DraggableTabs
     if (isDraggable || variant === 'draggable') {
-        const draggableTabs: DraggableTab[] = normalizedTabs.map(tab => ({
+        const draggableTabs: DraggableTab[] = visibleTabs.map(tab => ({
             id: tab.key,
             label: tab.label,
             icon: tab.icon,
@@ -74,15 +79,14 @@ function TabNavigation({
     }
 
 
-    // Modo estático tradicional
-    const enabledTabs = normalizedTabs.filter(tab => tab.enabled !== false);
+    // Modo estático tradicional - usar visibleTabs en lugar de enabledTabs
 
     // Variante horizontal (styled like ContentPage)
     if (variant === 'horizontal') {
         return (
             <div className={`mb-8 overflow-x-auto ${className}`}>
                 <div className="inline-flex items-center p-1.5 rounded-lg bg-white dark:bg-neutral-800 backdrop-blur-sm border border-gray-200/60 dark:border-neutral-700/60 gap-1 shadow-sm min-w-max">
-                    {enabledTabs.map((tab) => {
+                    {visibleTabs.map((tab) => {
                         const Icon = tab.icon;
                         const isActive = activeTab === tab.key;
 
@@ -148,7 +152,7 @@ function TabNavigation({
 
     return (
         <nav className={`${containerClasses[variant]} ${className}`}>
-            {enabledTabs.map((tab) => {
+            {visibleTabs.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.key;
 

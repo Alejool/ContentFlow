@@ -1,13 +1,12 @@
-import ModernButton from "@/Components/common/Modern/Button.js";
-import ModernInput from "@/Components/common/Modern/Input.js";
-import { useUpdatePassword } from "@/Hooks/profile/useUpdatePassword.js";
+import ModernButton from "@/Components/common/Modern/Button";
+import ModernInput from "@/Components/common/Modern/Input";
+import { useUpdatePassword } from "@/Hooks/profile/useUpdatePassword";
 import { Transition } from "@headlessui/react";
 import { AlertTriangle, Check, Key, Lock, Shield } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface UpdatePasswordFormProps {
   className?: string;
-  user?: any;
 }
 
 interface IconProps {
@@ -53,7 +52,6 @@ const SuccessAlert = ({ show, t }: SuccessAlertProps) => (
 
 const UpdatePasswordForm = ({
   className = "",
-  user,
 }: UpdatePasswordFormProps) => {
   const { t } = useTranslation();
 
@@ -135,8 +133,9 @@ const UpdatePasswordForm = ({
 
           <div className="pt-6">
             <ModernButton
+              type="submit"
               disabled={isSubmitting}
-              variant="danger"
+              variant="primary"
               icon={Key}
               loading={isSubmitting}
               className="w-full sm:w-auto min-w-[200px] font-bold uppercase tracking-wider rounded-lg shadow-lg shadow-primary-500/20 active:scale-95 transition-transform"
@@ -155,37 +154,7 @@ const UpdatePasswordForm = ({
           </div>
         </form>
 
-        <div className="mt-8 md:mt-12 p-5 sm:p-8 rounded-lg border border-primary-100 dark:border-primary-800/30 bg-primary-50/20 dark:bg-primary-900/10">
-          <div className="flex items-center gap-3 mb-4 md:mb-6">
-            <div className="p-2 rounded-lg bg-primary-100 dark:bg-primary-900/40">
-              <Shield className="w-5 h-5 text-primary-600 dark:text-primary-400" />
-            </div>
-            <h4 className="text-[10px] md:text-sm font-bold text-primary-900 dark:text-primary-300 uppercase tracking-widest">
-              {t("profile.password.securityTips")}
-            </h4>
-          </div>
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-primary-800 dark:text-primary-400 font-medium">
-            <li className="flex items-start gap-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary-400 dark:bg-primary-600 mt-1.5 flex-shrink-0" />
-              <span>{t("profile.password.tip1")}</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary-400 dark:bg-primary-600 mt-1.5 flex-shrink-0" />
-              <span>{t("profile.password.tip2")}</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary-400 dark:bg-primary-600 mt-1.5 flex-shrink-0" />
-              <span>{t("profile.password.tip3")}</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary-400 dark:bg-primary-600 mt-1.5 flex-shrink-0" />
-              <span>
-                {t("profile.password.tip4") ||
-                  "Evita usar información personal como fechas de nacimiento o nombres"}
-              </span>
-            </li>
-          </ul>
-        </div>
+       
       </div>
     </div>
   );
