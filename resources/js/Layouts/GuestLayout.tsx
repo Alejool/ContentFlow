@@ -15,7 +15,14 @@ export default function GuestLayout({ children, section }: GuestLayoutProps) {
   const { t } = useTranslation();
 
   useEffect(() => {
+    // Force orange theme for guest pages
     document.documentElement.setAttribute("data-theme-color", "orange");
+    
+    // Clear any custom color properties that might persist from authenticated session
+    const root = document.documentElement;
+    [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].forEach((weight) => {
+      root.style.removeProperty(`--primary-${weight}`);
+    });
   }, []);
 
   return (
