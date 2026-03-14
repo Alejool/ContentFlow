@@ -65,10 +65,19 @@ Route::middleware('guest')->group(function () {
         ->values()
         ->toArray();
       
+      // Obtener características habilitadas del sistema
+      $systemFeatures = [
+        'ai' => $systemConfig->isFeatureEnabled('ai'),
+        'analytics' => $systemConfig->isFeatureEnabled('analytics'),
+        'reels' => $systemConfig->isFeatureEnabled('reels'),
+        'approval_workflows' => $systemConfig->isFeatureEnabled('approval_workflows'),
+      ];
+      
       return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
         'plans' => $plans,
+        'systemFeatures' => $systemFeatures,
       ]);
     }
   )->name('welcome');
