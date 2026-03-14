@@ -107,46 +107,102 @@ class ApprovalWorkflowService
             $content->status = Publication::STATUS_PENDING_REVIEW;
             $content->submitted_for_approval_at = now();
 
-            // Determine starting level - skip levels where submitter is an approver
+            // Determine starting level - skip levels where submitter is directly assigned
             $startingLevel = 1;
+            $startingLevelId = null;
+            $autoApprovedLevels = []; // Track auto-approved levels
             
             if ($workflow->is_multi_level) {
-                // Get submitter's role in this workspace
-                $submitterRole = $submitter->roles()
-                    ->wherePivot('workspace_id', $workspace->id)
-                    ->first();
+                // Get all levels ordered
+                $levels = $workflow->levels()->ordered()->get();
                 
-                if ($submitterRole) {
-                    // Find all levels where submitter is an approver
-                    $levels = $workflow->levels()->ordered()->get();
+                foreach ($levels as $level) {
+                    $shouldSkip = false;
                     
-                    foreach ($levels as $level) {
-                        // Check if submitter's role matches this level's role
-                        if ($level->role_id && $level->role_id === $submitterRole->id) {
-                            // Skip this level - move to next
-                            $startingLevel = $level->level_number + 1;
-                        } else {
-                            // Found a level where submitter is not an approver
-                            break;
+                    // Check if submitter should auto-approve this level
+                    // Case 1: User is directly assigned to this level
+                    if ($level->user_id && $level->user_id === $submitter->id) {
+                        $shouldSkip = true;
+                        \Log::info('Auto-approving level - user directly assigned', [
+                            'level' => $level->level_number,
+                            'level_name' => $level->level_name,
+                            'user_id' => $submitter->id,
+                            'user_name' => $submitter->name,
+                        ]);
+                    }
+                    // Case 2: User has the role assigned to this level
+                    elseif ($level->role_id) {
+                        $userHasRole = DB::table('role_user')
+                            ->where('workspace_id', $workspace->id)
+                            ->where('user_id', $submitter->id)
+                            ->where('role_id', $level->role_id)
+                            ->exists();
+                        
+                        if ($userHasRole) {
+                            $shouldSkip = true;
+                            \Log::info('Auto-approving level - user has required role', [
+                                'level' => $level->level_number,
+                                'level_name' => $level->level_name,
+                                'user_id' => $submitter->id,
+                                'user_name' => $submitter->name,
+                                'role_id' => $level->role_id,
+                            ]);
                         }
                     }
                     
-                    // If we've gone past all levels, use the max level
-                    $maxLevel = $workflow->getMaxLevel();
-                    if ($startingLevel > $maxLevel) {
-                        $startingLevel = $maxLevel;
+                    if ($shouldSkip) {
+                        // Auto-approve this level
+                        $autoApprovedLevels[] = [
+                            'level' => $level,
+                            'level_number' => $level->level_number,
+                        ];
+                        $startingLevel = $level->level_number + 1;
+                    } else {
+                        // Found a level where submitter cannot auto-approve - stop here
+                        break;
                     }
                 }
                 
-                $content->current_approval_level = $startingLevel;
+                // If we've gone past all levels, content is auto-approved
+                $maxLevel = $workflow->getMaxLevel();
+                if ($startingLevel > $maxLevel) {
+                    // All levels were auto-approved - set content as approved
+                    $content->status = Publication::STATUS_APPROVED;
+                    $content->approved_at = now();
+                    $content->approved_by = $submitter->id;
+                    $content->current_approval_level = $maxLevel;
+                    
+                    \Log::info('Content auto-approved - submitter directly assigned to all levels', [
+                        'content_id' => $content->id,
+                        'submitter_id' => $submitter->id,
+                        'auto_approved_levels' => count($autoApprovedLevels),
+                    ]);
+                } else {
+                    $content->current_approval_level = $startingLevel;
+                }
+                
+                // Get the approval level ID for the starting level
+                $startingLevelRecord = $workflow->getLevelByNumber($startingLevel);
+                if ($startingLevelRecord) {
+                    $startingLevelId = $startingLevelRecord->id;
+                }
             } else {
                 // Simple workflow: set to 0 (any admin can approve)
                 $content->current_approval_level = 0;
+                
+                // For simple workflow, use the first (and only) level if it exists
+                $firstLevel = $workflow->levels()->first();
+                if ($firstLevel) {
+                    $startingLevelId = $firstLevel->id;
+                }
             }
 
+            // Set current_approval_step_id for the new system
+            $content->current_approval_step_id = $startingLevelId;
+            
             $content->save();
 
-            // Create ApprovalAction record
+            // Create ApprovalAction record for submission
             $approvalAction = ApprovalAction::create([
                 'content_id' => $content->id,
                 'user_id' => $submitter->id,
@@ -155,8 +211,72 @@ class ApprovalWorkflowService
                 'comment' => null,
             ]);
 
+            // Create approval logs for auto-approved levels
+            foreach ($autoApprovedLevels as $autoApproved) {
+                $level = $autoApproved['level'];
+                
+                // Create approval log
+                \App\Models\Logs\ApprovalLog::create([
+                    'publication_id' => $content->id,
+                    'current_step_id' => $level->id,
+                    'requested_by' => $submitter->id,
+                    'requested_at' => now(),
+                    'reviewed_by' => $submitter->id,
+                    'reviewed_at' => now(),
+                    'action' => 'approved',
+                    'rejection_reason' => null,
+                ]);
+                
+                // Create approval action for auto-approval
+                ApprovalAction::create([
+                    'content_id' => $content->id,
+                    'user_id' => $submitter->id,
+                    'action_type' => ApprovalAction::ACTION_APPROVED,
+                    'approval_level' => $level->level_number,
+                    'comment' => 'Auto-aprobado: el usuario que envió a revisión está asignado a este nivel',
+                ]);
+                
+                \Log::info('Created auto-approval records', [
+                    'content_id' => $content->id,
+                    'level' => $level->level_number,
+                    'user_id' => $submitter->id,
+                ]);
+            }
+
+            // Create initial approval log for the current step (if not auto-approved)
+            if ($content->status === Publication::STATUS_PENDING_REVIEW && $startingLevelId) {
+                // Check if there's already a log for this step (from auto-approval)
+                $existingLog = \App\Models\Logs\ApprovalLog::where('publication_id', $content->id)
+                    ->where('current_step_id', $startingLevelId)
+                    ->exists();
+                
+                if (!$existingLog) {
+                    // Create initial log for the current pending step
+                    \App\Models\Logs\ApprovalLog::create([
+                        'publication_id' => $content->id,
+                        'current_step_id' => $startingLevelId,
+                        'requested_by' => $submitter->id,
+                        'requested_at' => now(),
+                        'reviewed_by' => null,
+                        'reviewed_at' => null,
+                        'action' => null, // Pending
+                        'rejection_reason' => null,
+                    ]);
+                    
+                    \Log::info('Created initial approval log for pending step', [
+                        'content_id' => $content->id,
+                        'step_id' => $startingLevelId,
+                        'requested_by' => $submitter->id,
+                    ]);
+                }
+            }
+
             // Dispatch event
-            event(new ContentSubmittedForApproval($content, $submitter));
+            if ($content->status === Publication::STATUS_APPROVED) {
+                event(new \App\Events\ContentApproved($content, $submitter));
+            } else {
+                event(new ContentSubmittedForApproval($content, $submitter));
+            }
 
             return $approvalAction;
         });

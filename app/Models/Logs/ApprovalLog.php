@@ -62,6 +62,14 @@ class ApprovalLog extends Model
   }
 
   /**
+   * Alias for currentStep to match frontend expectations.
+   */
+  public function step(): BelongsTo
+  {
+    return $this->currentStep();
+  }
+
+  /**
    * Scope to get pending approval logs.
    */
   public function scopePending($query)

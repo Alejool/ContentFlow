@@ -48,7 +48,7 @@ class ApprovalWorkflow extends Model
      */
     public function levels(): HasMany
     {
-        return $this->hasMany(ApprovalLevel::class)->orderBy('level_number');
+        return $this->hasMany(ApprovalLevel::class, 'approval_workflow_id')->orderBy('level_number');
     }
 
     /**
