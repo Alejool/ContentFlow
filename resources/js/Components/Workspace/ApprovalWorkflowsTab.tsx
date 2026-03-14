@@ -66,18 +66,43 @@ export default function ApprovalWorkflowsTab({
     "demo"
   ).toLowerCase();
   
+  // Obtener características del plan desde el backend
+  const planFeatures = workspace.features || {};
+  const approvalWorkflowFeature = planFeatures.approval_workflows;
+  
+  // Determinar si tiene acceso a aprobaciones basado en el plan
+  let hasBasicApprovalAccess = false;
+  
+  if (approvalWorkflowFeature !== undefined) {
+    // Si tenemos features del backend, usarlas
+    hasBasicApprovalAccess = approvalWorkflowFeature !== false;
+  } else {
+    // Fallback: usar lógica basada en planId
+    hasBasicApprovalAccess = ["demo", "professional", "enterprise"].includes(planId);
+  }
+  
+  // Determinar si tiene acceso avanzado (multinivel)
+  let hasAdvancedApprovalAccess = false;
+  
+  if (approvalWorkflowFeature !== undefined) {
+    hasAdvancedApprovalAccess = approvalWorkflowFeature === 'advanced';
+  } else {
+    // Fallback: Enterprise tiene acceso avanzado, o usar prop
+    hasAdvancedApprovalAccess = hasAdvancedAccess || planId === 'enterprise';
+  }
+  
   // Debug: Log access level
   console.log("🔍 ApprovalWorkflowsTab Debug:", {
     hasAdvancedAccess,
+    hasAdvancedApprovalAccess,
     planId,
     subscriptionPlan: workspace.subscription?.plan,
     subscriptionObject: workspace.subscription,
     directPlan: workspace.plan,
     workspaceFeatures: workspace.features,
+    approvalWorkflowFeature,
+    hasBasicApprovalAccess,
   });
-  
-  // Verificar que el workspace tenga acceso a aprobaciones
-  const hasBasicApprovalAccess = ["demo", "professional", "enterprise"].includes(planId);
   
   // Si no tiene acceso, mostrar mensaje de upgrade
   if (!hasBasicApprovalAccess) {
@@ -88,33 +113,32 @@ export default function ApprovalWorkflowsTab({
             <Shield className="w-8 h-8 text-blue-600 dark:text-blue-400" />
           </div>
           <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            {t("approvals.upgrade.title") || "Aprobaciones no disponibles"}
+            {t("common.approvals.upgrade.title")}
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-2xl mx-auto">
-            {t("approvals.upgrade.description") || 
-              "Las aprobaciones son una funcionalidad premium disponible en los planes Professional y Enterprise. Actualiza tu plan para obtener acceso a flujos de aprobación y control de contenido."}
+            {t("common.approvals.upgrade.description")}
           </p>
           
           <div className="bg-white dark:bg-neutral-900 rounded-lg p-6 mb-6 max-w-md mx-auto">
             <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-              Con aprobaciones obtienes:
+              {t("common.approvals.upgrade.benefits_title") || "With approvals you get:"}
             </p>
             <ul className="text-left space-y-2 text-sm text-gray-600 dark:text-gray-400">
               <li className="flex items-center">
                 <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
-                Flujos de aprobación personalizados
+                {t("common.approvals.upgrade.benefits.custom_workflows")}
               </li>
               <li className="flex items-center">
                 <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
-                Control de contenido antes de publicar
+                {t("common.approvals.upgrade.benefits.content_control")}
               </li>
               <li className="flex items-center">
                 <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
-                Asignación por roles o usuarios
+                {t("common.approvals.upgrade.benefits.role_assignment")}
               </li>
               <li className="flex items-center">
                 <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
-                Historial de aprobaciones
+                {t("common.approvals.upgrade.benefits.approval_history")}
               </li>
             </ul>
           </div>
@@ -126,14 +150,14 @@ export default function ApprovalWorkflowsTab({
               onClick={() => (window.location.href = route("pricing"))}
               icon={TrendingUp}
             >
-              Ver Planes
+              {t("common.view_plans")}
             </Button>
             <Button
               variant="secondary"
               buttonStyle="outline"
               onClick={() => (window.location.href = route("workspaces.settings", { workspace: workspace.slug, tab: "overview" }))}
             >
-              Volver a Settings
+              {t("common.back_to_settings")}
             </Button>
           </div>
         </div>
@@ -333,8 +357,12 @@ export default function ApprovalWorkflowsTab({
   };
 
   const addStep = () => {
-    if (!hasAdvancedAccess) {
-      toast.error(t("common.approvals.errors.multiLevelEnterprise"));
+    // Verificar que el plan actual soporte multinivel
+    if (!hasAdvancedApprovalAccess) {
+      toast.error(
+        t("common.approvals.errors.multiLevelEnterprise") || 
+        "Los flujos multinivel solo están disponibles en el plan Enterprise"
+      );
       return;
     }
     if (!editingWorkflow) return;
@@ -431,7 +459,7 @@ export default function ApprovalWorkflowsTab({
                 >
                   {t("common.approvals.newRole")}
                 </Button>
-                {hasAdvancedAccess ? (
+                {hasAdvancedApprovalAccess ? (
                   <Button
                     size="md"
                     variant="ghost"
@@ -450,41 +478,13 @@ export default function ApprovalWorkflowsTab({
                     className="text-gray-400 cursor-not-allowed opacity-50"
                     icon={Plus}
                     disabled
+                    title={t("approvals.locked.title") || "Requiere plan Enterprise"}
                   >
                     {t("common.approvals.addLevel")}
                   </Button>
                 )}
               </div>
             </div>
-
-            {!hasAdvancedAccess && (
-              <div className="bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm animate-in fade-in slide-in-from-top-2 duration-500">
-                <div className="flex items-start gap-4">
-                  <div className="p-2 bg-primary-100 dark:bg-primary-900/40 rounded-full shrink-0">
-                    <Shield className="w-5 h-5 text-primary-600 dark:text-primary-400" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-primary-900 dark:text-primary-300">
-                      {t("approvals.locked.title") ||
-                        "Flujos de aprobación multi-nivel"}
-                    </p>
-                    <p className="text-xs text-primary-700 dark:text-primary-400 mt-1 leading-relaxed max-w-xl">
-                      {t("approvals.locked.description") ||
-                        "Tu plan actual permite aprobaciones de un nivel. Mejora tu plan para crear flujos de aprobación avanzados y multi-nivel con responsables jerárquicos."}
-                    </p>
-                  </div>
-                </div>
-                <Button
-                  size="sm"
-                  variant="primary"
-                  buttonStyle="solid"
-                  onClick={() => (window.location.href = route("pricing"))}
-                  className="shrink-0 whitespace-nowrap shadow-md shadow-primary-500/20"
-                >
-                  {t("common.upgradePlan") || "Mejorar Plan"}
-                </Button>
-              </div>
-            )}
 
             {(rolesWithApprovePermission.length === 0 && usersWithApprovePermission.length === 0) && (
               <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-4">
@@ -651,7 +651,7 @@ export default function ApprovalWorkflowsTab({
             >
               {t("common.approvals.invite")}
             </Button>
-            {workflows.length === 0 || hasAdvancedAccess ? (
+            {workflows.length === 0 || hasAdvancedApprovalAccess ? (
               <Button
                 variant="primary"
                 buttonStyle="solid"

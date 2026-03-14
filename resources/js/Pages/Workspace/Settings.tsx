@@ -13,15 +13,15 @@ import AlertCard from "@/Components/common/Modern/AlertCard";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
 import {
-  CheckCircle,
-  Key,
-  Palette,
-  Settings as SettingsIcon,
-  Share2,
-  Shield,
-  Sparkles,
-  TrendingUp,
-  Users
+    CheckCircle,
+    Key,
+    Palette,
+    Settings as SettingsIcon,
+    Share2,
+    Shield,
+    Sparkles,
+    TrendingUp,
+    Users
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -166,19 +166,45 @@ export default function WorkspaceSettings({
     },
   ];
 
-  const hasBasicApprovalAccess = [
-    "demo",
-    "professional",
-    "enterprise",
-  ].includes(planId);
-  const hasAdvancedApprovalAccess = ["enterprise"].includes(planId);
-
-  if (canManageWorkspace && hasBasicApprovalAccess) {
+  // Obtener características del plan desde el workspace
+  const planFeatures = current_workspace.features || {};
+  const approvalWorkflowFeature = planFeatures.approval_workflows;
+  
+  // Determinar si tiene acceso a aprobaciones basado en el plan
+  // SOLO Enterprise tiene acceso a aprobaciones
+  let hasApprovalAccess = false;
+  
+  if (approvalWorkflowFeature !== undefined) {
+    // Si tenemos features del backend, solo 'advanced' tiene acceso
+    hasApprovalAccess = approvalWorkflowFeature === 'advanced';
+  } else {
+    // Fallback: SOLO Enterprise tiene acceso
+    hasApprovalAccess = planId === 'enterprise';
+  }
+  
+  // Determinar nivel de acceso a aprobaciones (siempre advanced si tiene acceso)
+  const hasAdvancedApprovalAccess = hasApprovalAccess;
+  
+  // Debug: verificar qué está llegando
+  console.log('🔍 Settings.tsx - Plan Features Debug:', {
+    workspace_id: current_workspace.id,
+    workspace_name: current_workspace.name,
+    planId,
+    features: current_workspace.features,
+    planFeatures,
+    approvalWorkflowFeature,
+    hasApprovalAccess,
+    hasAdvancedApprovalAccess,
+    subscription: current_workspace.subscription,
+  });
+  
+  // Solo mostrar el tab de aprobaciones si es Enterprise
+  if (canManageWorkspace && hasApprovalAccess) {
     tabs.splice(4, 0, {
       id: "approvals",
-      label: "Aprobaciones",
+      label: t("workspace.tabs.approvals") || "Aprobaciones",
       icon: CheckCircle,
-      planRequired: ["demo", "professional", "enterprise"],
+      planRequired: ["enterprise"], // SOLO Enterprise
     });
   }
 
@@ -261,7 +287,7 @@ export default function WorkspaceSettings({
           />
         );
       case "approvals":
-        if (!canManageWorkspace || !hasBasicApprovalAccess) {
+        if (!canManageWorkspace || !hasApprovalAccess) {
           return (
             <OverviewTab
               workspace={current_workspace}
