@@ -278,6 +278,78 @@ class RoleController extends Controller
     }
 
     /**
+     * Delete a custom role
+     *
+     * DELETE /api/v1/workspaces/{workspace}/roles/{role}
+     *
+     * @param string $idOrSlug Workspace ID or slug
+     * @param int $roleId Role ID
+     * @return JsonResponse
+     */
+    public function destroy(string $idOrSlug, int $roleId): JsonResponse
+    {
+        // Find workspace by ID or slug
+        $workspace = Workspace::where('id', $idOrSlug)
+            ->orWhere('slug', $idOrSlug)
+            ->firstOrFail();
+
+        // Find the role
+        $role = Role::findOrFail($roleId);
+
+        // Get the authenticated user
+        $user = Auth::user();
+
+        // Check if user has permission to manage roles
+        if (!$this->roleService->userHasPermission($user, $workspace, 'manage-roles')) {
+            return $this->errorResponse('You do not have permission to delete roles.', 403);
+        }
+
+        // Prevent deleting system roles
+        if ($role->is_system_role) {
+            return $this->errorResponse('Cannot delete system roles.', 403);
+        }
+
+        // Prevent deleting protected roles (owner, admin, editor)
+        $protectedRoles = [Role::OWNER, Role::ADMIN, Role::EDITOR];
+        if (in_array($role->slug, $protectedRoles)) {
+            return $this->errorResponse('Cannot delete protected roles.', 403);
+        }
+
+        // Check if any users have this role
+        $userCount = \Illuminate\Support\Facades\DB::table('role_user')
+            ->where('role_id', $role->id)
+            ->where('workspace_id', $workspace->id)
+            ->count();
+
+        if ($userCount > 0) {
+            return $this->errorResponse('Cannot delete a role that has users assigned to it.', 400);
+        }
+
+        try {
+            // Delete the role
+            $role->delete();
+
+            // Clear role cache
+            \Illuminate\Support\Facades\Cache::tags(['roles', "role_{$role->id}"])->flush();
+
+            return $this->successResponse(
+                [
+                    'role_id' => $roleId,
+                ],
+                'Role deleted successfully.',
+                200
+            );
+        } catch (\Exception $e) {
+            return $this->errorResponse(
+                'An error occurred while deleting the role.',
+                500,
+                config('app.debug') ? $e->getMessage() : null
+            );
+        }
+    }
+
+
+    /**
      * Get user permissions in a workspace
      * 
      * GET /api/v1/workspaces/{workspace}/users/{user}/permissions

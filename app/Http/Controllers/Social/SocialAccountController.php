@@ -46,6 +46,43 @@ class SocialAccountController extends Controller
 
   public function getAuthUrl(Request $request, $platform)
   {
+    // Verify user has manage-accounts permission
+    $workspace = Auth::user()->currentWorkspace;
+    if (!$workspace) {
+      return response()->json([
+        'success' => false,
+        'message' => 'No workspace selected'
+      ], 403);
+    }
+
+    $role = Auth::user()->workspaces()
+      ->where('workspaces.id', $workspace->id)
+      ->first();
+    
+    if (!$role || !$role->pivot->role_id) {
+      return response()->json([
+        'success' => false,
+        'message' => 'You do not have permission to manage social accounts'
+      ], 403);
+    }
+
+    $userRole = \App\Models\Role\Role::find($role->pivot->role_id);
+    $hasPermission = $userRole && $userRole->permissions()->where('slug', 'manage-accounts')->exists();
+    
+    if (!$hasPermission) {
+      \Log::warning('User attempted to connect social account without manage-accounts permission', [
+        'user_id' => Auth::id(),
+        'workspace_id' => $workspace->id,
+        'role' => $userRole ? $userRole->slug : 'NULL',
+        'platform' => $platform
+      ]);
+      
+      return response()->json([
+        'success' => false,
+        'message' => 'You do not have permission to manage social accounts. Only users with "manage-accounts" permission can connect or disconnect social accounts.'
+      ], 403);
+    }
+
     if (strtolower($platform) === 'x') {
       $platform = 'twitter';
     }
@@ -959,6 +996,43 @@ class SocialAccountController extends Controller
   public function destroy(Request $request, $id)
   {
     try {
+      // Verify user has manage-accounts permission
+      $workspace = Auth::user()->currentWorkspace;
+      if (!$workspace) {
+        return response()->json([
+          'success' => false,
+          'message' => 'No workspace selected'
+        ], 403);
+      }
+
+      $role = Auth::user()->workspaces()
+        ->where('workspaces.id', $workspace->id)
+        ->first();
+      
+      if (!$role || !$role->pivot->role_id) {
+        return response()->json([
+          'success' => false,
+          'message' => 'You do not have permission to manage social accounts'
+        ], 403);
+      }
+
+      $userRole = \App\Models\Role\Role::find($role->pivot->role_id);
+      $hasPermission = $userRole && $userRole->permissions()->where('slug', 'manage-accounts')->exists();
+      
+      if (!$hasPermission) {
+        \Log::warning('User attempted to disconnect social account without manage-accounts permission', [
+          'user_id' => Auth::id(),
+          'workspace_id' => $workspace->id,
+          'role' => $userRole ? $userRole->slug : 'NULL',
+          'account_id' => $id
+        ]);
+        
+        return response()->json([
+          'success' => false,
+          'message' => 'You do not have permission to manage social accounts. Only users with "manage-accounts" permission can connect or disconnect social accounts.'
+        ], 403);
+      }
+
       $account = SocialAccount::where('id', $id)
         ->where('workspace_id', Auth::user()->current_workspace_id)
         ->first();

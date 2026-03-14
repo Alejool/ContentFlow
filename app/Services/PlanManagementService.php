@@ -14,7 +14,8 @@ class PlanManagementService
     public function __construct(
         private SubscriptionTrackingService $trackingService,
         private AddonUsageService $addonUsageService,
-        private \App\Services\Subscription\PlanLimitValidator $planLimitValidator
+        private \App\Services\Subscription\PlanLimitValidator $planLimitValidator,
+        private \App\Services\Subscription\PlanFeatureTransitionService $featureTransitionService
     ) {}
 
     /**
@@ -90,6 +91,13 @@ class PlanManagementService
                 // Recalcular addons
                 $this->addonUsageService->recalculateAddonUsageForPlanChange($workspace);
                 
+                // 7. Manejar transición de características (desactivar lo que ya no está disponible)
+                $featureChanges = $this->featureTransitionService->handlePlanTransition(
+                    $workspace,
+                    $previousPlan,
+                    $newPlan
+                );
+                
                 // Notify via WebSocket about plan change
                 $notificationService = app(\App\Services\Subscription\UsageLimitsNotificationService::class);
                 $notificationService->notifyLimitsUpdated($workspace, 'plan_changed');
@@ -99,6 +107,7 @@ class PlanManagementService
                     'workspace_id' => $workspace->id,
                     'new_plan' => $newPlan,
                     'previous_plan' => $previousPlan,
+                    'feature_changes' => $featureChanges,
                 ]);
             }
 

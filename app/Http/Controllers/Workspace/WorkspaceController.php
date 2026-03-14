@@ -160,16 +160,23 @@ class WorkspaceController extends Controller
       ];
     });
 
+    // Obtener características del plan actual
+    $planFeatures = $workspace->getPlanFeatures();
+    
+    // Agregar features al workspace para que estén disponibles en el frontend
+    $workspaceData = $workspace->load(['users', 'subscription']);
+    $workspaceData->features = $planFeatures;
+
     if ($request->wantsJson() || $request->is('api/*')) {
       return $this->successResponse([
-        'workspace' => $workspace->load(['users', 'subscription']),
+        'workspace' => $workspaceData,
         'roles' => Role::with('permissions')->get(),
         'permissions' => $permissions,
       ]);
     }
 
     return Inertia::render('Workspace/Settings', [
-      'workspace' => $workspace->load(['users', 'subscription']),
+      'workspace' => $workspaceData,
       'roles' => Role::with('permissions')->get(),
       'permissions' => $permissions,
     ]);

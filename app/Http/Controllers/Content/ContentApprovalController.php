@@ -44,7 +44,68 @@ class ContentApprovalController extends Controller
             Gate::authorize('submitForApproval', $content);
 
             $user = Auth::user();
-            $approvalRequest = $this->engine->submitForApproval($content, $user);
+            
+            // Check if there's an enabled workflow
+            $workflow = $content->workspace->approvalWorkflow;
+            $hasWorkflow = $workflow && $workflow->is_enabled && $workflow->levels && $workflow->levels->isNotEmpty();
+            
+            if ($hasWorkflow) {
+
+              Log::info('esta entrando a tine workflow');
+                // Use ApprovalWorkflowEngine for multi-level workflow
+                $approvalRequest = $this->engine->submitForApproval($content, $user);
+            } else {
+                // Create simple approval request (no workflow)
+                Log::info('Creating simple approval request (no workflow) - legacy route', [
+                    'content_id' => $content->id,
+                    'user_id' => $user->id,
+                ]);
+                
+                // Update publication status
+                $content->update([
+                    'status' => 'pending_review',
+                    'rejected_by' => null,
+                    'rejected_at' => null,
+                    'rejection_reason' => null,
+                    'current_approval_step_id' => null,
+                ]);
+                
+                // Create simple approval request
+                $approvalRequest = \App\Models\Approval\ApprovalRequest::create([
+                    'publication_id' => $content->id,
+                    'workflow_id' => null,
+                    'current_step_id' => null,
+                    'status' => \App\Models\Approval\ApprovalRequest::STATUS_PENDING,
+                    'submitted_by' => $user->id,
+                    'submitted_at' => now(),
+                    'metadata' => [
+                        'ip' => request()->ip(),
+                        'user_agent' => request()->userAgent(),
+                        'simple_approval' => true,
+                        'note' => 'Simple approval request - no workflow configured',
+                    ],
+                ]);
+                
+                // Create initial log entry
+                \App\Models\Logs\ApprovalLog::create([
+                    'approval_request_id' => $approvalRequest->id,
+                    'approval_step_id' => null,
+                    'user_id' => $user->id,
+                    'action' => \App\Models\Logs\ApprovalLog::ACTION_SUBMITTED,
+                    'level_number' => 0,
+                    'comment' => 'Publication submitted for simple approval (no workflow)',
+                    'metadata' => [
+                        'ip' => request()->ip(),
+                        'user_agent' => request()->userAgent(),
+                        'simple_approval' => true,
+                    ],
+                ]);
+                
+                Log::info('Simple ApprovalRequest created successfully (no workflow) - legacy route', [
+                    'content_id' => $content->id,
+                    'request_id' => $approvalRequest->id,
+                ]);
+            }
 
             $content->refresh();
 
