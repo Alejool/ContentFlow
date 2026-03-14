@@ -9,14 +9,14 @@ import { formatDateString } from "@/Utils/dateHelpers";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { usePage } from "@inertiajs/react";
 import {
-  Calendar,
-  Edit,
-  FileText,
-  Hash,
-  Layers,
-  Target,
-  User,
-  X,
+    Calendar,
+    Edit,
+    FileText,
+    Hash,
+    Layers,
+    Target,
+    User,
+    X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -560,8 +560,9 @@ export default function ViewCampaignModal({
                       <div>
                         <ApprovalHistorySection
                           logs={(item as any).approval_logs || []}
-                          workflow={(item as any).currentApprovalStep?.workflow}
-                          currentStepNumber={(item as any).currentApprovalStep?.level_number}
+                          workflow={(item as any).approval_request?.workflow || (item as any).currentApprovalStep?.workflow}
+                          currentStepNumber={(item as any).approval_request?.current_step?.level_number || (item as any).currentApprovalStep?.level_number}
+                          approvalStatus={(item as any).approval_request?.status}
                         />
                       </div>
                     )}

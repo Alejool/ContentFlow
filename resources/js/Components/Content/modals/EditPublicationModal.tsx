@@ -1079,8 +1079,9 @@ const EditPublicationModal = ({
                               !isApprovalHistoryExpanded,
                             )
                           }
-                          workflow={publication?.current_approval_step?.workflow}
-                          currentStepNumber={publication?.current_approval_step?.level_number}
+                          workflow={publication?.approval_request?.workflow || publication?.current_approval_step?.workflow}
+                          currentStepNumber={publication?.approval_request?.current_step?.level_number || publication?.current_approval_step?.level_number}
+                          approvalStatus={publication?.approval_request?.status}
                         />
                       )}
 

@@ -16,6 +16,7 @@ interface CommentsHistorySectionProps {
   onTimelineToggle: () => void;
   workflow?: any;
   currentStepNumber?: number;
+  approvalStatus?: 'pending' | 'approved' | 'rejected' | 'cancelled';
 }
 
 export const CommentsHistorySection = ({
@@ -30,6 +31,7 @@ export const CommentsHistorySection = ({
   onTimelineToggle,
   workflow,
   currentStepNumber,
+  approvalStatus,
 }: CommentsHistorySectionProps) => {
   return (
     <>
@@ -59,6 +61,7 @@ export const CommentsHistorySection = ({
               onToggle={onApprovalHistoryToggle}
               workflow={workflow}
               currentStepNumber={currentStepNumber}
+              approvalStatus={approvalStatus}
             />
           )}
 
