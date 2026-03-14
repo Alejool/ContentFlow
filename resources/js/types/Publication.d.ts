@@ -79,6 +79,7 @@ export type Publication = {
   } | null;
   current_approval_step_id?: number | null;
   current_approval_step?: {
+    level_number: number;
     id: number;
     name: string;
     step_order: number;
