@@ -587,6 +587,8 @@
     "filters": {
       "title": "Filtros de publicación",
       "all": "Todo",
+      "all_types": "Todos los tipos",
+      "content_type": "Tipo de contenido",
       "published": "Publicadas",
       "draft": "Borrador",
       "approved": "Aprobadas",
@@ -594,6 +596,13 @@
       "pending_review": "Pendiente de revisión",
       "rejected": "Rechazadas",
       "failed": "Fallidas"
+    },
+    "content_types": {
+      "post": "Publicación",
+      "reel": "Reel",
+      "story": "Historia",
+      "carousel": "Carrusel",
+      "poll": "Encuesta"
     },
     "gallery": {
       "sendingToSocial": "Enviando a plataformas sociales...",

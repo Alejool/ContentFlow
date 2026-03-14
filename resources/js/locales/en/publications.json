@@ -537,8 +537,17 @@
     "filters": {
       "title": "Publications Filters",
       "all": "All",
+      "all_types": "All types",
+      "content_type": "Content type",
       "published": "Published",
       "draft": "Draft"
+    },
+    "content_types": {
+      "post": "Post",
+      "reel": "Reel",
+      "story": "Story",
+      "carousel": "Carousel",
+      "poll": "Poll"
     },
     "gallery": {
       "sendingToSocial": "Sending to social platforms...",

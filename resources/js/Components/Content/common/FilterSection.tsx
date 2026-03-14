@@ -2,22 +2,13 @@ import { DatePicker as DatePickerModern } from "@/Components/common/Modern/DateP
 import Input from "@/Components/common/Modern/Input";
 import Select from "@/Components/common/Modern/Select";
 import ExportButtons from "@/Components/common/ui/ExportButtons";
-import { CONTENT_TYPES } from "@/constants/contentTypes";
+import { CONTENT_TYPES } from "@/Constants/contentTypes";
 import { getPlatformOptions } from "@/Constants/socialPlatforms";
 import { format, parseISO } from "date-fns";
 import { Filter, RotateCcw, Search } from "lucide-react";
 
 // Constant to avoid creating new object on every render
 const EMPTY_FILTERS = {};
-
-// Configuración visual local para tipos de contenido
-const CONTENT_TYPE_DISPLAY = {
-  post: { label: 'Post', icon: 'FileText' },
-  reel: { label: 'Reel', icon: 'Video' },
-  story: { label: 'Story', icon: 'Circle' },
-  carousel: { label: 'Carousel', icon: 'Images' },
-  poll: { label: 'Encuesta', icon: 'BarChart3' }
-} as const;
 
 interface FilterSectionProps {
   mode: "campaigns" | "publications" | "logs" | "approvals" | "integrations";
@@ -101,26 +92,15 @@ export default function FilterSection({
     { value: "discord", label: "Discord" },
   ];
 
-  const platformOptions = [
-    { value: "facebook", label: "Facebook" },
-    { value: "instagram", label: "Instagram" },
-    { value: "twitter", label: "Twitter" },
-    { value: "youtube", label: "YouTube" },
-    { value: "tiktok", label: "TikTok" },
-  ];
-
   const activePlatformOptions = getPlatformOptions();
 
-  // Content type options
+  // Content type options with translations
   const contentTypeOptions = [
-    { value: "all", label: "Todos los tipos" },
-    ...Object.values(CONTENT_TYPES).map(type => {
-      const display = CONTENT_TYPE_DISPLAY[type as keyof typeof CONTENT_TYPE_DISPLAY];
-      return {
-        value: type,
-        label: display ? display.label : type,
-      };
-    })
+    { value: "all", label: t("publications.filters.all_types") || "Todos los tipos" },
+    ...Object.values(CONTENT_TYPES).map(type => ({
+      value: type,
+      label: t(`publications.content_types.${type}`) || type,
+    }))
   ];
 
   const sortOptions = [
@@ -265,9 +245,9 @@ export default function FilterSection({
               options={contentTypeOptions}
               value={Array.isArray(contentTypeFilter) ? contentTypeFilter : contentTypeFilter ? [contentTypeFilter] : []}
               variant="outlined"
-              onChange={(val) => handleFilterChange("content_type", val)}
+              onChange={(val) => handleFilterChange("content_type", val as string | string[])}
               size="md"
-              placeholder="Tipo de contenido"
+              placeholder={t("publications.filters.content_type") || "Tipo de contenido"}
               activeColor={activeColor}
               multiple
               clearable
@@ -282,7 +262,7 @@ export default function FilterSection({
               options={activePlatformOptions}
               value={Array.isArray(platformFilter) ? platformFilter : platformFilter ? [platformFilter] : []}
               variant="outlined"
-              onChange={(val) => handleFilterChange("platform", val)}
+              onChange={(val) => handleFilterChange("platform", val as string | string[])}
               size="md"
               placeholder={t("common.platform.title") || "Plataforma"}
               activeColor={activeColor}
