@@ -52,64 +52,48 @@ export const usePublicationActionsStore = create<PublicationActionsStore>((set, 
     setItemLoading(itemId, "submitting", true);
 
     try {
-      const response = await axios.post(`/api/v1/content/${itemId}/submit-for-approval`);
-      const approvalInfo = response.data?.data?.approval_info;
-      const publication = response.data?.data?.content || response.data?.data?.publication;
-      
-      console.log('submitForApproval response:', { publication, approvalInfo });
-      
-      // Update publication store immediately for instant UI feedback
+      // Nuevo endpoint del sistema simplificado
+      const response = await axios.post(route("api.v1.approvals.submit"), {
+        publication_id: itemId,
+      });
+
+      const approvalRequest = response.data?.data?.request;
+      const publication = response.data?.data?.publication;
+
+      // Actualizar el store de publicaciones con el nuevo estado
       if (publication) {
         const { usePublicationStore } = await import("@/stores/publicationStore");
         const { useManageContentUIStore } = await import("@/stores/manageContentUIStore");
-        
-        // CRITICAL: Update the publication with the new status immediately
-        // Ensure we're updating with the complete publication object
+
         const updateData = {
           ...publication,
-          // Normalize field names (backend might use snake_case, frontend uses camelCase)
           status: publication.status,
           current_approval_step_id: publication.current_approval_step_id,
           current_approval_level: publication.current_approval_level,
-          currentApprovalStep: publication.currentApprovalStep || publication.current_approval_step,
-          approval_logs: publication.approval_logs || publication.approvalLogs,
-          approvalLogs: publication.approval_logs || publication.approvalLogs,
           submitted_for_approval_at: publication.submitted_for_approval_at,
+          // Incluir el approval_request activo para el frontend
+          approval_request: approvalRequest,
         };
-        
-        console.log('Updating publication in store:', {
-          itemId,
-          oldStatus: usePublicationStore.getState().publications.find(p => p.id === itemId)?.status,
-          newStatus: updateData.status,
-          updateData
-        });
-        
+
         usePublicationStore.getState().updatePublication(itemId, updateData);
-        
-        // Verify the update was applied
-        const updatedPub = usePublicationStore.getState().publications.find(p => p.id === itemId);
-        console.log('Publication after update:', {
-          id: updatedPub?.id,
-          status: updatedPub?.status,
-          current_approval_step_id: updatedPub?.current_approval_step_id
-        });
-        
-        // Also update selectedItem if this publication is currently open in a modal
+
+        // Actualizar selectedItem si está abierto
         const selectedItem = useManageContentUIStore.getState().selectedItem;
         if (selectedItem?.id === itemId) {
           useManageContentUIStore.getState().updateSelectedItem(updateData);
-          console.log('Selected item also updated');
         }
-      } else {
-        console.warn('No publication data in response');
       }
-      
-      return { 
+
+      return {
         success: true,
-        approvalInfo: approvalInfo,
+        approvalInfo: approvalRequest ? {
+          current_level: approvalRequest.currentStep?.level_number ?? 1,
+          level_name: approvalRequest.currentStep?.level_name ?? "",
+          approvers: [],
+          approver_count: 0,
+        } : undefined,
       };
     } catch (error: any) {
-      console.error("Error submitting for approval:", error);
       return {
         success: false,
         message: error.response?.data?.message || "Error al enviar a revisión",

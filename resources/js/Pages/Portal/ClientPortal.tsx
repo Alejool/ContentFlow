@@ -1,20 +1,22 @@
+import { CarouselDots, CarouselPagination } from "@/Components/common/CarouselPagination";
 import Button from "@/Components/common/Modern/Button";
 import { getPlatformConfig } from "@/Constants/socialPlatforms";
 import { MediaFile, Publication } from "@/types";
+import { formatDateTimeString } from "@/Utils/dateHelpers";
 import { Head, useForm } from "@inertiajs/react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
-  AlertCircle,
-  Calendar,
-  Check,
-  Info,
-  Loader2,
-  MessageSquare,
-  Share2,
-  X,
+    AlertCircle,
+    Calendar,
+    Check,
+    Info,
+    Loader2,
+    MessageSquare,
+    Share2,
+    X,
 } from "lucide-react";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
-import { formatDateTimeString } from "@/Utils/dateHelpers";
 
 interface Props {
   publication: Publication & { media_files: MediaFile[] };
@@ -24,10 +26,26 @@ interface Props {
 const ClientPortal: React.FC<Props> = ({ publication, token }) => {
   const [showRejectReason, setShowRejectReason] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
 
   const { post, processing, data, setData, errors } = useForm({
     reason: "",
   });
+
+  const mediaFiles = publication.media_files || [];
+  const hasMultipleMedia = mediaFiles.length > 1;
+
+  const nextMedia = () => {
+    setCurrentMediaIndex((prev) => (prev + 1) % mediaFiles.length);
+  };
+
+  const prevMedia = () => {
+    setCurrentMediaIndex((prev) => (prev - 1 + mediaFiles.length) % mediaFiles.length);
+  };
+
+  const goToMedia = (index: number) => {
+    setCurrentMediaIndex(index);
+  };
 
   const handleApprove = () => {
     if (confirm("¿Estás seguro de que deseas aprobar este contenido?")) {
@@ -198,30 +216,79 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
               {publication.title}
             </h1>
 
-            {/* Media Preview */}
-            {publication.media_files && publication.media_files.length > 0 && (
-              <div className="mb-8 rounded-lg overflow-hidden bg-gray-100 dark:bg-zinc-800 shadow-inner flex items-center justify-center relative group min-h-[300px]">
-                {publication.media_files[0].file_type.startsWith("image/") ? (
-                  <img
-                    src={publication.media_files[0].file_path}
-                    alt="Preview"
-                    className="max-w-full max-h-[600px] object-contain transition-transform duration-500 group-hover:scale-[1.02]"
-                  />
-                ) : (
-                  <div className="flex flex-col items-center gap-4 p-12 text-center">
-                    <div className="flex items-center justify-center w-16 h-16 bg-gray-200 rounded-full dark:bg-zinc-700">
-                      <AlertCircle className="w-8 h-8 text-gray-400" />
+            {/* Media Preview with Carousel */}
+            {mediaFiles.length > 0 && (
+              <div className="mb-8 space-y-4">
+                <div className="rounded-lg overflow-hidden bg-gray-100 dark:bg-zinc-800 shadow-inner flex items-center justify-center relative group min-h-[300px]">
+                  <AnimatePresence mode="wait" initial={false}>
+                    <motion.div
+                      key={currentMediaIndex}
+                      initial={{ opacity: 0, x: 100 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -100 }}
+                      transition={{ 
+                        duration: 0.3,
+                        ease: "easeInOut"
+                      }}
+                      className="w-full h-full flex items-center justify-center"
+                    >
+                      {mediaFiles[currentMediaIndex].file_type.startsWith("image/") ? (
+                        <img
+                          src={mediaFiles[currentMediaIndex].file_path}
+                          alt={`Preview ${currentMediaIndex + 1}`}
+                          className="max-w-full max-h-[600px] object-contain transition-transform duration-500 group-hover:scale-[1.02]"
+                        />
+                      ) : mediaFiles[currentMediaIndex].file_type.startsWith("video/") ? (
+                        <video
+                          src={mediaFiles[currentMediaIndex].file_path}
+                          controls
+                          className="max-w-full max-h-[600px] object-contain"
+                        >
+                          Tu navegador no soporta la reproducción de video.
+                        </video>
+                      ) : (
+                        <div className="flex flex-col items-center gap-4 p-12 text-center">
+                          <div className="flex items-center justify-center w-16 h-16 bg-gray-200 rounded-full dark:bg-zinc-700">
+                            <AlertCircle className="w-8 h-8 text-gray-400" />
+                          </div>
+                          <div>
+                            <p className="font-bold text-gray-900 dark:text-white">
+                              Vista previa limitada
+                            </p>
+                            <p className="mt-1 text-sm text-gray-400">
+                              Este archivo de tipo "
+                              {mediaFiles[currentMediaIndex].file_type}" se procesará
+                              para el canal final.
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </motion.div>
+                  </AnimatePresence>
+
+                  {/* Counter Badge */}
+                  {hasMultipleMedia && (
+                    <div className="absolute top-4 right-4 bg-black/70 text-white px-3 py-1.5 rounded-full text-sm font-medium backdrop-blur-sm">
+                      {currentMediaIndex + 1} / {mediaFiles.length}
                     </div>
-                    <div>
-                      <p className="font-bold text-gray-900 dark:text-white">
-                        Vista previa limitada
-                      </p>
-                      <p className="mt-1 text-sm text-gray-400">
-                        Este archivo de tipo "
-                        {publication.media_files[0].file_type}" se procesará
-                        para el canal final.
-                      </p>
-                    </div>
+                  )}
+                </div>
+
+                {/* Carousel Controls */}
+                {hasMultipleMedia && (
+                  <div className="flex flex-col items-center gap-3">
+                    <CarouselPagination
+                      currentSlide={currentMediaIndex}
+                      totalSlides={mediaFiles.length}
+                      onPrevious={prevMedia}
+                      onNext={nextMedia}
+                      className="justify-center"
+                    />
+                    <CarouselDots
+                      totalSlides={mediaFiles.length}
+                      currentSlide={currentMediaIndex}
+                      onDotClick={goToMedia}
+                    />
                   </div>
                 )}
               </div>
