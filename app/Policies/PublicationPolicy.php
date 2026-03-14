@@ -159,7 +159,8 @@ class PublicationPolicy
             'user_role_name' => $userRole ? $userRole->name : 'NULL',
             'user_role_slug' => $userRole ? $userRole->slug : 'NULL',
             'publication_status' => $publication->status,
-            'comparing_with' => Role::OWNER,
+            'publication_user_id' => $publication->user_id,
+            'is_creator' => $user->id === $publication->user_id,
         ]);
         
         if (!$userRole) {
@@ -194,22 +195,16 @@ class PublicationPolicy
             return false;
         }
 
-        // 2. User must be the approver of the LAST level (final approver)
-        // Get the last (highest) level of the workflow
-        $lastLevel = $workflow->levels()->orderBy('level_number', 'desc')->first();
+        // 2. CRITICAL: Only the person who submitted for approval can publish
+        // Use submitted_for_approval_by field (fallback to user_id if not set)
+        $submitterId = $publication->submitted_for_approval_by ?? $publication->user_id;
+        $canPublish = $user->id === $submitterId;
         
-        if (!$lastLevel) {
-            \Log::warning('PublicationPolicy::publish - No levels found in workflow');
-            return false;
-        }
-
-        // Check if user's role matches the last level's required role
-        $canPublish = $userRole->id === $lastLevel->role_id;
-        
-        \Log::info('PublicationPolicy::publish - Workflow enabled, checking last level approver', [
-            'user_role_id' => $userRole->id,
-            'last_level_role_id' => $lastLevel->role_id,
-            'last_level_number' => $lastLevel->level_number,
+        \Log::info('PublicationPolicy::publish - Workflow enabled, checking if user submitted for approval', [
+            'user_id' => $user->id,
+            'submitter_id' => $submitterId,
+            'publication_user_id' => $publication->user_id,
+            'submitted_for_approval_by' => $publication->submitted_for_approval_by,
             'can_publish' => $canPublish
         ]);
 
