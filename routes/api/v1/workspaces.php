@@ -22,6 +22,7 @@ Route::middleware('auth:sanctum')->prefix('workspaces')->name('workspaces.')->gr
   // Role management
   Route::post('/{idOrSlug}/roles/assign', [RoleController::class, 'assign'])->name('roles.assign');
   Route::put('/{idOrSlug}/roles/{role}', [RoleController::class, 'update'])->name('roles.update');
+  Route::delete('/{idOrSlug}/roles/{role}', [RoleController::class, 'destroy'])->name('roles.destroy');
   Route::delete('/{idOrSlug}/roles/revoke', [RoleController::class, 'revoke'])->name('roles.revoke');
   Route::get('/{idOrSlug}/roles', [RoleController::class, 'index'])->name('roles.index');
   Route::get('/{idOrSlug}/users/{user}/permissions', [RoleController::class, 'permissions'])->name('users.permissions');
