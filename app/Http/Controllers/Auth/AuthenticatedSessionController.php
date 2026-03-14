@@ -68,7 +68,8 @@ class AuthenticatedSessionController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        // Force orange theme for guest pages
+        return redirect('/')->with('forceOrangeTheme', true);
     }
 
     public function checkUser(Request $request)
