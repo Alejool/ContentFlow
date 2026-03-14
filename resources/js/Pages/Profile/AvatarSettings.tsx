@@ -19,6 +19,7 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
   );
   const [processing, setProcessing] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -44,6 +45,7 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewUrl(reader.result as string);
+        setImageLoaded(false); // Reset para mostrar loader
       };
       reader.readAsDataURL(file);
 
@@ -142,15 +144,29 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
         <div className="relative">
           <div className="w-32 h-32 rounded-full overflow-hidden bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white text-3xl font-bold shadow-xl ring-4 ring-primary-100 dark:ring-primary-900/30">
             {previewUrl && !imageError ? (
-              <img
-                src={previewUrl}
-                alt={user.name}
-                className="w-full h-full object-cover"
-                onError={() => {
-                  setImageError(true);
-                  setPreviewUrl(null);
-                }}
-              />
+              <>
+                {/* Loader mientras carga la imagen */}
+                {!imageLoaded && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary-500 to-primary-600 animate-pulse">
+                    <div className="w-10 h-10 border-3 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  </div>
+                )}
+                
+                <img
+                  src={previewUrl}
+                  alt={user.name}
+                  loading="lazy"
+                  className={`w-full h-full object-cover transition-opacity duration-300 ${
+                    imageLoaded ? "opacity-100" : "opacity-0"
+                  }`}
+                  onLoad={() => setImageLoaded(true)}
+                  onError={() => {
+                    setImageError(true);
+                    setPreviewUrl(null);
+                    setImageLoaded(false);
+                  }}
+                />
+              </>
             ) : (
               <span>{getInitials(user.name)}</span>
             )}

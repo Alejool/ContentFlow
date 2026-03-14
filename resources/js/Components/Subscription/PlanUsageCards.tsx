@@ -1,4 +1,5 @@
 import { CarouselPagination } from '@/Components/common/CarouselPagination';
+import AnimatedPagination from '@/Components/common/ui/AnimatedPagination';
 import { useSubscriptionUsage } from '@/Hooks/useSubscriptionUsage';
 import { PageProps as InertiaPageProps } from '@inertiajs/core';
 import { usePage } from '@inertiajs/react';

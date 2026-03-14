@@ -1,4 +1,5 @@
 import { useTheme } from "@/Hooks/useTheme";
+import { useState } from "react";
 
 interface AvatarProps {
   src?: string | null;
@@ -7,6 +8,7 @@ interface AvatarProps {
   className?: string;
   showStatus?: boolean;
   status?: "online" | "offline" | "busy" | "away";
+  loading?: "lazy" | "eager";
 }
 
 export default function Avatar({
@@ -16,8 +18,11 @@ export default function Avatar({
   className = "",
   showStatus = false,
   status = "online",
+  loading = "lazy",
 }: AvatarProps) {
   const { theme } = useTheme();
+  const [imageError, setImageError] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   const getInitials = (name: string) => {
     if (!name.trim()) return "?";
@@ -61,19 +66,35 @@ export default function Avatar({
       <div
         className={`${sizeClasses[size]} ${borderClass} ${avatarBgClass} rounded-full overflow-hidden flex items-center justify-center font-bold shadow-lg`}
       >
-        {src ? (
-          <img
-            src={src}
-            alt={name}
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              e.currentTarget.style.display = "none";
-              const fallback = document.createElement("div");
-              fallback.className = `w-full h-full flex items-center justify-center ${avatarTextClass}`;
-              fallback.textContent = getInitials(name);
-              e.currentTarget.parentElement?.appendChild(fallback);
-            }}
-          />
+        {src && !imageError ? (
+          <>
+            {/* Loader mientras carga */}
+            {!imageLoaded && (
+              <div className={`absolute inset-0 flex items-center justify-center ${avatarBgClass} animate-pulse`}>
+                <div className={`border-2 ${theme === "dark" ? "border-primary-400/30 border-t-primary-400" : "border-primary-600/30 border-t-primary-600"} rounded-full animate-spin ${
+                  size === "xs" ? "w-3 h-3" :
+                  size === "sm" ? "w-4 h-4" :
+                  size === "md" ? "w-5 h-5" :
+                  size === "lg" ? "w-6 h-6" :
+                  size === "xl" ? "w-8 h-8" : "w-10 h-10"
+                }`}></div>
+              </div>
+            )}
+            
+            <img
+              src={src}
+              alt={name}
+              loading={loading}
+              className={`w-full h-full object-cover transition-opacity duration-300 ${
+                imageLoaded ? "opacity-100" : "opacity-0"
+              }`}
+              onLoad={() => setImageLoaded(true)}
+              onError={() => {
+                setImageError(true);
+                setImageLoaded(false);
+              }}
+            />
+          </>
         ) : (
           <div
             className={`w-full h-full flex items-center justify-center ${avatarTextClass}`}

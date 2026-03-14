@@ -27,7 +27,20 @@ export const ActiveUsersIndicator = ({
               <img
                 src={user.avatar}
                 alt={user.name}
+                loading="lazy"
                 className="h-full w-full rounded-full object-cover"
+                onError={(e) => {
+                  // Si falla, mostrar iniciales
+                  const target = e.currentTarget;
+                  target.style.display = "none";
+                  const parent = target.parentElement;
+                  if (parent) {
+                    const fallback = document.createElement("div");
+                    fallback.className = "h-full w-full flex items-center justify-center text-xs font-bold text-gray-500 uppercase";
+                    fallback.textContent = user.name.charAt(0);
+                    parent.appendChild(fallback);
+                  }
+                }}
               />
             ) : (
               <div className="h-full w-full flex items-center justify-center text-xs font-bold text-gray-500 uppercase">

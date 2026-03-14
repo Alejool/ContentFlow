@@ -1,5 +1,5 @@
-import defaultProfile from "@/../assets/profile-default.svg";
-import { User, Briefcase, Smile, Star, Heart, Zap, Crown, Sparkles } from "lucide-react";
+import { Briefcase, Crown, Heart, Smile, Sparkles, Star, User, Zap } from "lucide-react";
+import { useState } from "react";
 
 interface UnifiedAvatarProps {
   src?: string | null;
@@ -9,6 +9,7 @@ interface UnifiedAvatarProps {
   className?: string;
   showStatus?: boolean;
   statusColor?: string;
+  loading?: "lazy" | "eager";
 }
 
 // Iconos disponibles por defecto
@@ -31,7 +32,10 @@ export function UnifiedAvatar({
   className = "",
   showStatus = false,
   statusColor = "bg-emerald-500",
+  loading = "lazy",
 }: UnifiedAvatarProps) {
+  const [imageError, setImageError] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const sizeClasses = {
     xs: "w-6 h-6 text-[10px]",
     sm: "w-8 h-8 text-xs",
@@ -61,20 +65,38 @@ export function UnifiedAvatar({
   };
 
   const renderContent = () => {
-    // Si hay foto, mostrarla
-    if (src) {
+    // Si hay foto y no ha fallado, intentar mostrarla
+    if (src && !imageError) {
       return (
-        <img
-          src={src}
-          alt={name}
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            const img = e.currentTarget;
-            if (img.src !== defaultProfile) {
-              img.src = defaultProfile;
-            }
-          }}
-        />
+        <>
+          {/* Loader mientras carga */}
+          {!imageLoaded && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary-500 to-primary-600 animate-pulse">
+              <div className={`border-2 border-white/30 border-t-white rounded-full animate-spin ${
+                size === "xs" ? "w-3 h-3" :
+                size === "sm" ? "w-4 h-4" :
+                size === "md" ? "w-5 h-5" :
+                size === "lg" ? "w-6 h-6" :
+                size === "xl" ? "w-8 h-8" : "w-10 h-10"
+              }`}></div>
+            </div>
+          )}
+          
+          {/* Imagen con lazy loading */}
+          <img
+            src={src}
+            alt={name}
+            loading={loading}
+            className={`w-full h-full object-cover transition-opacity duration-300 ${
+              imageLoaded ? "opacity-100" : "opacity-0"
+            }`}
+            onLoad={() => setImageLoaded(true)}
+            onError={() => {
+              setImageError(true);
+              setImageLoaded(false);
+            }}
+          />
+        </>
       );
     }
 
@@ -88,7 +110,7 @@ export function UnifiedAvatar({
       );
     }
 
-    // Si no hay nada, mostrar iniciales
+    // Si no hay nada o falló la imagen, mostrar iniciales
     return (
       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-500 to-primary-600 text-white font-bold">
         {getInitials(name)}
@@ -119,3 +141,4 @@ export function UnifiedAvatar({
 }
 
 export { DEFAULT_ICONS };
+

@@ -8,6 +8,7 @@ interface AvatarProps {
   className?: string;
   showStatus?: boolean;
   statusColor?: string;
+  loading?: "lazy" | "eager";
 }
 
 export function Avatar({
@@ -18,6 +19,7 @@ export function Avatar({
   className = "",
   showStatus = false,
   statusColor = "bg-emerald-500",
+  loading = "lazy",
 }: AvatarProps) {
   return (
     <UnifiedAvatar
@@ -28,6 +30,7 @@ export function Avatar({
       className={className}
       showStatus={showStatus}
       statusColor={statusColor}
+      loading={loading}
     />
   );
 }

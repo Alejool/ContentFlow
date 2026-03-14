@@ -1,10 +1,11 @@
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head } from "@inertiajs/react";
-import { Line } from "@ant-design/plots";
-import { PartyPopper, TrendingUp, Calendar, BarChart3 } from "lucide-react";
-import { useTranslation } from "react-i18next";
 import EmptyState from "@/Components/common/EmptyState";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { getEmptyStateByKey } from "@/Utils/emptyStateMapper";
+import { Line } from "@ant-design/plots";
+import { Head } from "@inertiajs/react";
+import { BarChart3, Calendar, TrendingUp } from "lucide-react";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const postStats = [
   { time: "08:00", instagram: 200, twitter: 150, facebook: 180 },
@@ -75,13 +76,47 @@ const posts: Post[] = [
 ];
 
 function ContentCard({ post }: { post: Post }) {
+  const [imageError, setImageError] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
+
   return (
     <div className="overflow-hidden bg-white rounded-lg shadow-md hover:bg-gray-50 transition duration-300 p-4">
-      <img
-        src={post.image}
-        alt="Content Thumbnail"
-        className="w-full h-40 object-cover rounded-md"
-      />
+      <div className="relative w-full h-40 rounded-md overflow-hidden bg-neutral-100">
+        {!imageLoaded && !imageError && (
+          <div className="absolute inset-0 flex items-center justify-center bg-neutral-100 animate-pulse">
+            <div className="w-8 h-8 border-3 border-neutral-300 border-t-neutral-600 rounded-full animate-spin"></div>
+          </div>
+        )}
+        
+        {!imageError ? (
+          <img
+            src={post.image}
+            alt="Content Thumbnail"
+            loading="lazy"
+            className={`w-full h-full object-cover transition-opacity duration-300 ${
+              imageLoaded ? "opacity-100" : "opacity-0"
+            }`}
+            onLoad={() => setImageLoaded(true)}
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center bg-neutral-100">
+            <svg
+              className="w-12 h-12 text-neutral-300"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
+        )}
+      </div>
       <div className="mt-4">
         <h3 className="text-lg font-semibold text-gray-800">{post.title}</h3>
         <p className="mt-2 text-sm text-gray-600">{post.description}</p>
