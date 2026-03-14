@@ -8,6 +8,7 @@ interface ApprovalHistoryCompactoProps {
   onToggle: () => void;
   workflow?: any;
   currentStepNumber?: number;
+  approvalStatus?: 'pending' | 'approved' | 'rejected' | 'cancelled';
 }
 
 const ApprovalHistoryCompacto = ({
@@ -16,6 +17,7 @@ const ApprovalHistoryCompacto = ({
   onToggle,
   workflow,
   currentStepNumber,
+  approvalStatus,
 }: ApprovalHistoryCompactoProps) => {
   const { t } = useTranslation();
   const getLatestApprovalStatus = () => {
@@ -30,9 +32,9 @@ const ApprovalHistoryCompacto = ({
   };
 
   const getApprovalStats = () => {
-    const approved = logs.filter((log) => log.status === "approved").length;
-    const rejected = logs.filter((log) => log.status === "rejected").length;
-    const pending = logs.filter((log) => log.status === "pending").length;
+    const approved = logs.filter((log) => log.action === "approved").length;
+    const rejected = logs.filter((log) => log.action === "rejected").length;
+    const pending = logs.filter((log) => log.action === "submitted" || (!log.action)).length;
 
     return { approved, rejected, pending };
   };
@@ -90,29 +92,10 @@ const ApprovalHistoryCompacto = ({
               </span>
               {latestLog && (
                 <span
-                  className={`text-xs px-2 py-1 rounded-full flex items-center gap-1 ${getStatusColor(latestLog.status)}`}
+                  className={`text-xs px-2 py-1 rounded-full flex items-center gap-1 ${getStatusColor(latestLog.action)}`}
                 >
-                  {getStatusIcon(latestLog.status)}
-                  {getStatusText(latestLog.status)}
-                </span>
-              )}
-            </div>
-            <div className="flex gap-3 mt-1">
-              {stats.approved > 0 && (
-                <span className="text-xs text-green-600 dark:text-green-400">
-                  ✓ {stats.approved} {t("approvals.approved")}
-                  {stats.approved !== 1 ? "s" : ""}
-                </span>
-              )}
-              {stats.rejected > 0 && (
-                <span className="text-xs text-red-600 dark:text-red-400">
-                  ✗ {stats.rejected} {t("approvals.rejected")}
-                  {stats.rejected !== 1 ? "s" : ""}
-                </span>
-              )}
-              {stats.pending > 0 && (
-                <span className="text-xs text-yellow-600 dark:text-yellow-400">
-                  ⏳ {stats.pending} pendiente{stats.pending !== 1 ? "s" : ""}
+                  {getStatusIcon(latestLog.action)}
+                  {getStatusText(latestLog.action)}
                 </span>
               )}
             </div>
@@ -136,6 +119,7 @@ const ApprovalHistoryCompacto = ({
             logs={logs} 
             workflow={workflow}
             currentStepNumber={currentStepNumber}
+            approvalStatus={approvalStatus}
           />
         </div>
       )}

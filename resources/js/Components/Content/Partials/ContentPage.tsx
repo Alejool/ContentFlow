@@ -11,14 +11,14 @@ import { useCampaignStore } from "@/stores/campaignStore";
 import { usePublicationStore } from "@/stores/publicationStore";
 import { Head, usePage } from "@inertiajs/react";
 import {
-  Calendar as CalendarIcon,
-  CheckCircle,
-  FileText,
-  Folder,
-  Plus,
-  Shield,
-  Target,
-  Trash2
+    Calendar as CalendarIcon,
+    CheckCircle,
+    FileText,
+    Folder,
+    Plus,
+    Shield,
+    Target,
+    Trash2
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import toast from "react-hot-toast";
@@ -32,9 +32,10 @@ import Button from "@/Components/common/Modern/Button";
 import TabNavigation from "@/Components/common/TabNavigation";
 
 import { useCanApprove } from "@/Hooks/approval/useCanApprove";
+import { usePendingApprovals } from "@/Hooks/approval/usePendingApprovals";
 import {
-  ContentTab,
-  usePublications,
+    ContentTab,
+    usePublications,
 } from "@/Hooks/publication/usePublications";
 import { useManageContentUIStore } from "@/stores/manageContentUIStore";
 import { useShallow } from "zustand/react/shallow";
@@ -240,6 +241,12 @@ export default function ManageContentPage() {
   const [approvalTab, setApprovalTab] = useState("pending");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
+  const {
+    requests: pendingApprovalRequests,
+    isLoading: isApprovalsLoading,
+    refresh: refreshApprovals,
+  } = usePendingApprovals(refreshTrigger);
+
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
     isOpen: boolean;
     id: number | null;
@@ -313,10 +320,7 @@ export default function ManageContentPage() {
     [publications, openEditModal, fetchPublicationById],
   );
 
-  const pendingApprovals = useMemo(
-    () => publications.filter((p) => p.status === "pending_review").length,
-    [publications]
-  );
+  const pendingApprovals = pendingApprovalRequests.length;
 
   const tabsConfig = useMemo(
     () => [
@@ -554,10 +558,8 @@ export default function ManageContentPage() {
                   <div className="p-0">
                     {approvalTab === "pending" ? (
                       <ApprovalList
-                        publications={publications.filter(
-                          (p) => p.status === "pending_review",
-                        )}
-                        isLoading={isPubLoading}
+                        requests={pendingApprovalRequests}
+                        isLoading={isApprovalsLoading}
                         onRefresh={handleRefreshWrapped}
                         onViewDetail={openViewDetailsModal}
                       />

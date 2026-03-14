@@ -211,7 +211,7 @@ export default function FilterSection({
               variant="outlined"
               onChange={(val) => {
                 handleFilterChange(
-                  mode === "approvals" ? "action" : "status",
+                  "status",
                   String(val),
                 );
               }}
