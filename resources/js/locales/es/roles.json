@@ -4,14 +4,27 @@
     "edit_role_subtitle": "Selecciona los permisos para este rol",
     "select_permissions": "Selecciona los permisos que tendrá este rol",
     "permissions": "Permisos",
+    "protected": "Protegido",
+    "editor_publish_info": "Al publicar, el contenido se enviará a revisión si no eres Admin. En workspaces con flujo multinivel, debe pasar por todas las etapas de aprobación configuradas.",
+    "admin_publish_info": "Puede publicar directamente sin revisión y aprobar contenido de otros usuarios.",
+    "owner_info": "Control total del workspace. Este rol no puede ser editado ni eliminado.",
+    "delete_role": "Eliminar Rol",
+    "delete_confirmation_title": "¿Estás seguro?",
+    "delete_confirmation_message": "Esta acción no se puede deshacer. El rol",
+    "will_be_deleted": "será eliminado permanentemente",
     "success": {
       "updated": "Rol actualizado exitosamente",
-      "assigned": "Rol asignado exitosamente"
+      "assigned": "Rol asignado exitosamente",
+      "deleted": "Rol eliminado exitosamente"
     },
     "errors": {
       "update_failed": "Error al actualizar el rol",
       "assignment_failed": "Error al asignar el rol",
-      "insufficient_permissions": "No tienes permisos suficientes"
+      "insufficient_permissions": "No tienes permisos suficientes",
+      "cannot_edit_protected": "No se puede editar este rol protegido (Owner, Admin o Editor)",
+      "cannot_delete_protected": "No se puede eliminar este rol protegido (Owner, Admin o Editor)",
+      "delete_failed": "Error al eliminar el rol",
+      "role_has_users": "No se puede eliminar un rol que tiene usuarios asignados"
     },
     "management": {
       "title": "Gestión de Roles",

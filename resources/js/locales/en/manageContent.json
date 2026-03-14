@@ -48,7 +48,8 @@
         "connect": "Connect",
         "disconnect": "Disconnect",
         "processing": "Processing...",
-        "publishing": "Publishing..."
+        "publishing": "Publishing...",
+        "noPermission": "No Permission"
       },
       "apiLimits": "API Limits",
       "limits": {
@@ -123,7 +124,8 @@
         "unauthorized": "Unauthorized. Please log in again.",
         "loadError": "Could not load connected accounts",
         "disconnectError": "Error disconnecting",
-        "cannotDisconnectPublishing": "You cannot disconnect this account while there are publications in progress"
+        "cannotDisconnectPublishing": "You cannot disconnect this account while there are publications in progress",
+        "noPermission": "You do not have permission to manage social media accounts. Only users with 'manage-accounts' permission can connect or disconnect accounts."
       }
     }
   }

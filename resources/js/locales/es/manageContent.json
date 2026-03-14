@@ -54,7 +54,8 @@
         "connect": "Conectar",
         "disconnect": "Desconectar",
         "processing": "Procesando...",
-        "publishing": "Publicando..."
+        "publishing": "Publicando...",
+        "noPermission": "Sin Permiso"
       },
       "apiLimits": "Límites API",
       "limits": {
@@ -107,7 +108,8 @@
         "popupBlocked": "El navegador bloqueó la ventana emergente. Por favor permite ventanas emergentes para este sitio.",
         "urlError": "No se pudo obtener la URL de autenticación",
         "connectError": "Error al conectar con",
-        "cannotDisconnectPublishing": "No puedes desconectar esta cuenta mientras hay publicaciones en proceso"
+        "cannotDisconnectPublishing": "No puedes desconectar esta cuenta mientras hay publicaciones en proceso",
+        "noPermission": "No tienes permiso para gestionar cuentas de redes sociales. Solo usuarios con el permiso 'manage-accounts' pueden conectar o desconectar cuentas."
       },
       "disconnectModal": {
         "title": "Advertencia de desconexión",

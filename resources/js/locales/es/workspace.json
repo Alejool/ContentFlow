@@ -126,6 +126,7 @@
     "tabs": {
       "overview": "Vista General",
       "general": "General",
+      "approvals":"Aprobación",
       "members": "Miembros",
       "roles": "Roles",
       "integrations": "Integraciones",
