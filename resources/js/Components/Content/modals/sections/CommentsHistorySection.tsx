@@ -1,7 +1,7 @@
-import { TFunction } from "i18next";
 import { CommentsSection } from "@/Components/Content/Publication/comments/CommentsSection";
 import ApprovalHistoryCompacto from "@/Components/Content/Publication/common/ApprovalHistoryCompacto";
 import TimelineCompacto from "@/Components/Content/Publication/common/TimelineCompacto";
+import { TFunction } from "i18next";
 import { SectionHeader } from "../common/SectionHeader";
 
 interface CommentsHistorySectionProps {
@@ -14,6 +14,8 @@ interface CommentsHistorySectionProps {
   isTimelineExpanded: boolean;
   onApprovalHistoryToggle: () => void;
   onTimelineToggle: () => void;
+  workflow?: any;
+  currentStepNumber?: number;
 }
 
 export const CommentsHistorySection = ({
@@ -26,6 +28,8 @@ export const CommentsHistorySection = ({
   isTimelineExpanded,
   onApprovalHistoryToggle,
   onTimelineToggle,
+  workflow,
+  currentStepNumber,
 }: CommentsHistorySectionProps) => {
   return (
     <>
@@ -53,6 +57,8 @@ export const CommentsHistorySection = ({
               logs={approvalLogs}
               isExpanded={isApprovalHistoryExpanded}
               onToggle={onApprovalHistoryToggle}
+              workflow={workflow}
+              currentStepNumber={currentStepNumber}
             />
           )}
 

@@ -2,8 +2,10 @@ import CampaignMediaCarousel from "@/Components/Campaigns/CampaignMediaCarousel"
 import ActivityList from "@/Components/Content/ActivityList";
 import ApprovalHistorySection from "@/Components/Content/Publication/common/edit/ApprovalHistorySection";
 import ReelsCarousel from "@/Components/Content/ReelsCarousel";
+import { usePublicationStore } from "@/stores/publicationStore";
 import { Campaign } from "@/types/Campaign";
 import { Publication } from "@/types/Publication";
+import { formatDateString } from "@/Utils/dateHelpers";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { usePage } from "@inertiajs/react";
 import {
@@ -16,9 +18,8 @@ import {
   User,
   X,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { formatDateString } from "@/Utils/dateHelpers";
 
 interface ViewCampaignModalProps {
   isOpen: boolean;
@@ -30,7 +31,7 @@ interface ViewCampaignModalProps {
 export default function ViewCampaignModal({
   isOpen,
   onClose,
-  campaign: item,
+  campaign: initialItem,
   onEdit,
 }: ViewCampaignModalProps) {
   const { t } = useTranslation();
@@ -39,6 +40,26 @@ export default function ViewCampaignModal({
   const [hashtagsExpanded, setHashtagsExpanded] = useState(false);
   const canEdit =
     auth.current_workspace?.permissions?.includes("manage-content");
+
+  // Get fresh data from publicationStore if this is a publication
+  const publicationsFromStore = usePublicationStore((s) => s.publications);
+  const [item, setItem] = useState(initialItem);
+
+  // Update item when store changes (e.g., after approval)
+  useEffect(() => {
+    if (initialItem && (initialItem as any).title && initialItem.id) {
+      // This is a publication - check for updates in store
+      const freshPub = publicationsFromStore.find((p) => p.id === initialItem.id);
+      if (freshPub) {
+        setItem(freshPub);
+      } else {
+        setItem(initialItem);
+      }
+    } else {
+      // This is a campaign - use initial item
+      setItem(initialItem);
+    }
+  }, [initialItem, publicationsFromStore]);
 
   // Early return after all hooks
   if (!item) return null;
@@ -430,13 +451,123 @@ export default function ViewCampaignModal({
 
                 {/* Approvals Tab */}
                 {activeTab === "approvals" && isActuallyPublication && (
-                  <div className="max-h-[500px] overflow-y-auto pr-2 space-y-4">
-                    {(item as any).approval_logs &&
-                    (item as any).approval_logs.length > 0 ? (
-                      <ApprovalHistorySection
-                        logs={(item as any).approval_logs || []}
-                      />
-                    ) : (
+                  <div className="max-h-[500px] overflow-y-auto pr-2 space-y-6">
+                    {/* Current Workflow Progress */}
+                    {(item as any).status === "pending_review" && (item as any).currentApprovalStep?.workflow && (
+                      <div className="bg-gradient-to-br from-primary-50 to-blue-50 dark:from-primary-900/20 dark:to-blue-900/20 rounded-lg p-4 border border-primary-200 dark:border-primary-800">
+                        <h4 className="text-sm font-bold text-primary-900 dark:text-primary-300 mb-3 flex items-center gap-2">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                          </svg>
+                          {t("approvals.workflow_progress") || "Progreso del Flujo Actual"}
+                        </h4>
+                        <div className="space-y-2">
+                          {(item as any).currentApprovalStep.workflow.steps?.map((step: any, index: number) => {
+                            const isCurrent = step.id === (item as any).currentApprovalStep?.id;
+                            const isPast = step.level_number < ((item as any).currentApprovalStep?.level_number || 0);
+                            
+                            return (
+                              <div
+                                key={step.id}
+                                className={`flex items-center gap-3 p-3 rounded-lg transition-all ${
+                                  isCurrent
+                                    ? 'bg-primary-100 dark:bg-primary-900/40 border-2 border-primary-400 dark:border-primary-600 shadow-sm'
+                                    : isPast
+                                    ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800'
+                                    : 'bg-white/50 dark:bg-neutral-800/50 border border-gray-200 dark:border-neutral-700'
+                                }`}
+                              >
+                                <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold ${
+                                  isCurrent
+                                    ? 'bg-primary-500 text-white ring-2 ring-primary-300 dark:ring-primary-700'
+                                    : isPast
+                                    ? 'bg-green-500 text-white'
+                                    : 'bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-300'
+                                }`}>
+                                  {isPast ? '✓' : index + 1}
+                                </div>
+                                <div className="flex-1">
+                                  <div className="text-sm font-semibold text-gray-900 dark:text-white">
+                                    {step.name}
+                                  </div>
+                                  <div className="text-xs text-gray-600 dark:text-gray-400">
+                                    {step.role?.name || 'Sin rol asignado'}
+                                  </div>
+                                </div>
+                                {isCurrent && (
+                                  <span className="text-xs font-bold text-primary-600 dark:text-primary-400 px-2 py-1 bg-primary-200 dark:bg-primary-800 rounded-full">
+                                    {t("approvals.in_progress") || "En Proceso"}
+                                  </span>
+                                )}
+                                {isPast && (
+                                  <span className="text-xs font-bold text-green-600 dark:text-green-400">
+                                    ✓ {t("common.completed") || "Completado"}
+                                  </span>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Workflow Completed */}
+                    {(item as any).status === "approved" && (item as any).currentApprovalStep?.workflow && (
+                      <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center">
+                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-bold text-green-900 dark:text-green-300">
+                              {t("approvals.approved_ready_to_publish") || "¡Flujo Completado y Aprobado!"}
+                            </h4>
+                            <p className="text-xs text-green-700 dark:text-green-400">
+                              {t("approvals.next_action.ready_to_publish") || "La publicación ha sido aprobada y está lista para publicarse"}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          {(item as any).currentApprovalStep.workflow.steps?.map((step: any, index: number) => (
+                            <div
+                              key={step.id}
+                              className="flex items-center gap-3 p-2 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800"
+                            >
+                              <div className="flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold bg-green-500 text-white">
+                                ✓
+                              </div>
+                              <div className="flex-1">
+                                <div className="text-xs font-semibold text-gray-900 dark:text-white">
+                                  {step.name}
+                                </div>
+                                <div className="text-[10px] text-gray-600 dark:text-gray-400">
+                                  {step.role?.name || 'Sin rol asignado'}
+                                </div>
+                              </div>
+                              <span className="text-[10px] font-bold text-green-600 dark:text-green-400">
+                                ✓ {t("common.completed") || "Completado"}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Approval History */}
+                    {(item as any).approval_logs && (item as any).approval_logs.length > 0 && (
+                      <div>
+                        <ApprovalHistorySection
+                          logs={(item as any).approval_logs || []}
+                          workflow={(item as any).currentApprovalStep?.workflow}
+                          currentStepNumber={(item as any).currentApprovalStep?.level_number}
+                        />
+                      </div>
+                    )}
+
+                    {/* No approvals */}
+                    {!(item as any).approval_logs?.length && (item as any).status !== "pending_review" && (item as any).status !== "approved" && (
                       <div className="text-center py-12 text-gray-500 dark:text-gray-400">
                         <p>
                           {t("approvals.noHistory") ||
