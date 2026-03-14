@@ -39,6 +39,8 @@ export default function AddPublicationModal({
   const { campaigns } = useCampaigns();
   const { accounts: socialAccounts } = useAccountsStore();
   const { auth } = usePage<any>().props;
+  const canManageAccounts =
+    auth.current_workspace?.permissions?.includes("manage-accounts");
   const planId = auth.current_workspace?.plan?.toLowerCase() || "demo";
   const hasRecurrenceAccess = ["demo", "professional", "enterprise"].includes(
     planId,
@@ -453,6 +455,7 @@ export default function AddPublicationModal({
                   error={errors.social_accounts?.message as string}
                   socialPostLogs={publication?.social_post_logs}
                   contentType={watched.content_type}
+                  disabled={!canManageAccounts}
                 />
                 </div>
 

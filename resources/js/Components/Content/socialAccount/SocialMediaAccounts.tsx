@@ -41,6 +41,10 @@ const SocialMediaAccounts = memo(() => {
   const { auth } = usePage<any>().props;
   const [activePlatform, setActivePlatform] = useState<string | null>(null);
   const [localSettings, setLocalSettings] = useState<any>({});
+  
+  // Check if user has manage-accounts permission from current workspace
+  const userPermissions = auth?.current_workspace?.permissions || [];
+  const canManageAccounts = userPermissions.includes('manage-accounts');
 
   useEffect(() => {
     setLocalSettings({});
@@ -302,6 +306,15 @@ const SocialMediaAccounts = memo(() => {
   }, [accounts]);
 
   const handleConnectionToggle = async (account: Account) => {
+    // Check permission first
+    if (!canManageAccounts) {
+      toast.error(
+        t("manageContent.socialMedia.messages.noPermission") ||
+        "No tienes permiso para gestionar cuentas de redes sociales. Solo usuarios con el permiso 'manage-accounts' pueden conectar o desconectar cuentas."
+      );
+      return;
+    }
+
     if (blockerModalData?.account?.id === account.id) {
       setBlockerModalData(null);
     }
@@ -595,24 +608,31 @@ const SocialMediaAccounts = memo(() => {
                   <div className="flex gap-2 w-full">
                     <button
                       onClick={() => handleConnectionToggle(account)}
-                      disabled={isLoading || (account.isConnected && accountsWithPublishing.has(account.accountId as number))}
+                      disabled={!canManageAccounts || isLoading || (account.isConnected && accountsWithPublishing.has(account.accountId as number))}
                       className={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm flex items-center justify-center gap-2
                         transition-all duration-200 relative overflow-hidden group/btn
                         ${
-                          isLoading || (account.isConnected && accountsWithPublishing.has(account.accountId as number))
+                          !canManageAccounts || isLoading || (account.isConnected && accountsWithPublishing.has(account.accountId as number))
                             ? "bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-neutral-700/50 opacity-60"
                             : account.isConnected
                               ? "bg-gradient-to-r from-primary-50 to-primary-50 text-primary-600 border border-primary-200 hover:bg-primary-100 dark:bg-gradient-to-r dark:from-primary-900/10 dark:to-primary-800/10 dark:text-primary-400 dark:border-primary-900/30 dark:hover:bg-primary-900/20"
                               : `bg-gradient-to-r ${account.gradient} text-white shadow-lg hover:shadow-xl hover:scale-[1.02]`
                         }`}
                       title={
-                        account.isConnected && accountsWithPublishing.has(account.accountId as number)
+                        !canManageAccounts
+                          ? t("manageContent.socialMedia.messages.noPermission") || "No tienes permiso para gestionar cuentas de redes sociales"
+                          : account.isConnected && accountsWithPublishing.has(account.accountId as number)
                           ? t("manageContent.socialMedia.messages.cannotDisconnectPublishing") || "No puedes desconectar mientras hay publicaciones en proceso"
                           : undefined
                       }
                     >
                       <span className="relative z-10 flex items-center gap-2">
-                        {isLoading ? (
+                        {!canManageAccounts ? (
+                          <>
+                            <X className="w-4 h-4" />
+                            {t("manageContent.socialMedia.actions.noPermission") || "Sin permiso"}
+                          </>
+                        ) : isLoading ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
                             {t("manageContent.socialMedia.actions.processing")}
@@ -634,7 +654,7 @@ const SocialMediaAccounts = memo(() => {
                           </>
                         )}
                       </span>
-                      {!isLoading && !(account.isConnected && accountsWithPublishing.has(account.accountId as number)) && (
+                      {canManageAccounts && !isLoading && !(account.isConnected && accountsWithPublishing.has(account.accountId as number)) && (
                         <div className="absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent dark:via-white/5"></div>
                       )}
                     </button>
@@ -642,8 +662,18 @@ const SocialMediaAccounts = memo(() => {
                     {account.isConnected && (
                       <button
                         onClick={() => handleOpenSettings(account.platform)}
-                        className="p-3 rounded-lg border transition-all flex items-center justify-center bg-white border-gray-200 text-primary-600 hover:bg-gray-50 hover:border-gray-300 shadow-sm dark:bg-neutral-800 dark:border-neutral-700 dark:text-primary-400 dark:hover:bg-neutral-700 dark:hover:border-neutral-600"
-                        title={t("platformSettings.title")}
+                        disabled={!canManageAccounts}
+                        className={`p-3 rounded-lg border transition-all flex items-center justify-center shadow-sm
+                          ${
+                            !canManageAccounts
+                              ? "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed dark:bg-neutral-700/50 dark:border-neutral-700 opacity-60"
+                              : "bg-white border-gray-200 text-primary-600 hover:bg-gray-50 hover:border-gray-300 dark:bg-neutral-800 dark:border-neutral-700 dark:text-primary-400 dark:hover:bg-neutral-700 dark:hover:border-neutral-600"
+                          }`}
+                        title={
+                          !canManageAccounts
+                            ? t("manageContent.socialMedia.messages.noPermission") || "No tienes permiso para gestionar cuentas"
+                            : t("platformSettings.title")
+                        }
                       >
                         <Settings className="w-5 h-5" />
                       </button>

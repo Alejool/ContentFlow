@@ -322,6 +322,8 @@ const EditPublicationModal = ({
   const user = auth.user;
   const canManage =
     auth.current_workspace?.permissions?.includes("manage-content");
+  const canManageAccounts =
+    auth.current_workspace?.permissions?.includes("manage-accounts");
   const planId = auth.current_workspace?.plan?.toLowerCase() || "demo";
   const hasRecurrenceAccess = ["demo", "professional", "enterprise"].includes(
     planId,
@@ -919,7 +921,7 @@ const EditPublicationModal = ({
                     durationErrors={durationErrors}
                     videoMetadata={videoMetadata}
                     mediaFiles={mediaFiles}
-                    disabled={isContentSectionDisabled || !allowConfiguration}
+                    disabled={isContentSectionDisabled || !allowConfiguration || !canManageAccounts}
                     socialPostLogs={publication?.social_post_logs}
                     contentType={watched.content_type}
                     onThumbnailChange={(_videoId, file) => {

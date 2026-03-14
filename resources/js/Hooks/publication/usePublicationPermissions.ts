@@ -93,6 +93,16 @@ export function usePublicationPermissions(permissions: string[] = []) {
     [currentWorkspace]
   );
 
+  const isAdmin = useMemo(
+    () => currentWorkspace?.user_role_slug === "admin",
+    [currentWorkspace]
+  );
+
+  const isAdminOrOwner = useMemo(
+    () => isOwner || isAdmin,
+    [isOwner, isAdmin]
+  );
+
   // Verificar si puede publicar directamente una publicación específica
   const canPublishDirectly = (item: Publication) => {
     if (!item || !currentUserId) return false;
@@ -113,8 +123,9 @@ export function usePublicationPermissions(permissions: string[] = []) {
       return item.status === 'approved' || item.status === 'failed' || item.status === 'published' || item.status === 'scheduled';
     }
 
-    // Sin workflow, usuarios con permiso "publish" pueden publicar directamente
-    if (canPublish) {
+    // CRÍTICO: Sin workflow, SOLO Admin y Owner pueden publicar directamente
+    // Otros roles (incluso con permiso "publish") deben enviar a revisión
+    if (isAdminOrOwner) {
       return ["draft", "rejected", "failed", "published", "scheduled"].includes(item.status || "");
     }
 
@@ -126,14 +137,19 @@ export function usePublicationPermissions(permissions: string[] = []) {
 
     console.log('item shouldShowSendToReview');
     console.log(item);
-    // Owner nunca necesita enviar a revisión
-    if (isOwner) return false;
-    
-    // Si no hay workflow activo, no hay revisión
-    if (!hasWorkflow) return false;
+    // Admin y Owner nunca necesitan enviar a revisión (publican directamente)
+    if (isAdminOrOwner) return false;
     
     // Si no tiene permiso de enviar a revisión, no mostrar
     if (!canSubmitForApproval) return false;
+    
+    // CRÍTICO: Si NO hay workflow activo, los roles que no son Admin/Owner
+    // DEBEN enviar a revisión (no pueden publicar directamente)
+    // Esto aplica incluso si tienen el permiso "publish"
+    if (!hasWorkflow) {
+      // Mostrar para estados draft, rejected, failed
+      return ["draft", "rejected", "failed"].includes(item.status || "draft");
+    }
     
     // Si es el aprobador del último nivel, no necesita enviar a revisión
     // (puede publicar directamente)
@@ -188,8 +204,9 @@ export function usePublicationPermissions(permissions: string[] = []) {
       return ["failed", "published", "scheduled"].includes(item.status || "");
     }
     
-    // Sin workflow, usuarios con permiso "publish" pueden publicar directamente
-    if (canPublish) {
+    // CRÍTICO: Sin workflow, SOLO Admin y Owner pueden publicar directamente
+    // Otros roles (incluso con permiso "publish") NO deben ver el botón de publicar
+    if (isAdminOrOwner) {
       return ["draft", "rejected", "failed", "published", "scheduled", "approved"].includes(item.status || "");
     }
     
@@ -236,6 +253,8 @@ export function usePublicationPermissions(permissions: string[] = []) {
     // Información del workspace
     hasWorkflow,
     isOwner,
+    isAdmin,
+    isAdminOrOwner,
     isLastLevelApprover,
     currentUserId,
 

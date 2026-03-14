@@ -19,7 +19,7 @@ export default function ContentPublishButton({
 
   // Permissions check
   const isOwner = auth.user.id === content.workspace?.created_by;
-  const hasPublishPermission = auth.permissions?.includes("publish_content");
+  const hasPublishPermission = auth.current_workspace?.permissions?.includes("publish");
   
   // Check if approved based on approval_request (source of truth)
   const isApproved = 
