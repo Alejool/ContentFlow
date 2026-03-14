@@ -41,6 +41,19 @@ class ApprovalWorkflowEngine
         }
 
         return DB::transaction(function () use ($publication, $submitter, $workflow) {
+            // CRITICAL: Cancel any previous pending approval requests
+            ApprovalRequest::where('publication_id', $publication->id)
+                ->where('status', ApprovalRequest::STATUS_PENDING)
+                ->update([
+                    'status' => ApprovalRequest::STATUS_CANCELLED,
+                    'completed_at' => now(),
+                    'metadata' => DB::raw("jsonb_set(COALESCE(metadata, '{}'), '{cancelled_reason}', '\"Resubmitted for approval\"')")
+                ]);
+            
+            Log::info('Cancelled previous pending approval requests', [
+                'publication_id' => $publication->id,
+            ]);
+            
             // Get first step
             $firstStep = $workflow->levels()->orderBy('level_number')->first();
             
@@ -83,7 +96,9 @@ class ApprovalWorkflowEngine
             $publication->update([
                 'status' => Publication::STATUS_PENDING_REVIEW,
                 'current_approval_level' => $firstStep->level_number,
+                'current_approval_step_id' => $firstStep->id, // CRITICAL: Set initial step ID
                 'submitted_for_approval_at' => now(),
+                'submitted_for_approval_by' => $submitter->id, // CRITICAL: Track who submitted
             ]);
 
             Log::info('Approval request submitted', [
@@ -229,6 +244,7 @@ class ApprovalWorkflowEngine
             $request->publication->update([
                 'status' => 'rejected',
                 'current_approval_level' => 0,
+                'current_approval_step_id' => null, // Clear step ID when rejected
                 'rejected_at' => now(),
                 'rejected_by' => $rejector->id,
                 'rejection_reason' => $reason,
@@ -432,6 +448,7 @@ class ApprovalWorkflowEngine
 
             $request->publication->update([
                 'current_approval_level' => $nextStep->level_number,
+                'current_approval_step_id' => $nextStep->id, // CRITICAL: Update step ID for pending approvals list
             ]);
 
             // Create pending approvals for next step
@@ -441,6 +458,7 @@ class ApprovalWorkflowEngine
                 'request_id' => $request->id,
                 'from_step' => $step->id,
                 'to_step' => $nextStep->id,
+                'publication_id' => $request->publication_id,
             ]);
 
             // Dispatch event
@@ -457,6 +475,7 @@ class ApprovalWorkflowEngine
             $request->publication->update([
                 'status' => Publication::STATUS_APPROVED,
                 'current_approval_level' => 0,
+                'current_approval_step_id' => null, // Clear step ID when approved
                 'approved_at' => now(),
                 'approved_by' => $approver->id,
             ]);

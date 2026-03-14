@@ -14,6 +14,8 @@ use App\Events\ContentApproved;
 use App\Events\ContentRejected;
 use App\Events\ContentSubmittedForApproval;
 use App\Events\RoleChanged;
+use App\Events\Approval\ApprovalRequestSubmitted;
+use App\Events\Approval\ApprovalStepCompleted;
 
 // Approval workflow listeners
 use App\Listeners\InvalidatePermissionCache;
@@ -21,6 +23,8 @@ use App\Listeners\NotifyContentCreator;
 use App\Listeners\NotifyNextLevelApprovers;
 use App\Listeners\NotifyApproversOnSubmission;
 use App\Listeners\NotifyUserOfReassignment;
+use App\Listeners\Approval\NotifyFirstStepApprovers;
+use App\Listeners\Approval\NotifyNextStepApprovers;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -55,6 +59,14 @@ class EventServiceProvider extends ServiceProvider
         ],
         RoleChanged::class => [
             InvalidatePermissionCache::class,
+        ],
+        
+        // New approval workflow events
+        ApprovalRequestSubmitted::class => [
+            NotifyFirstStepApprovers::class,
+        ],
+        ApprovalStepCompleted::class => [
+            NotifyNextStepApprovers::class,
         ],
     ];
 

@@ -2,6 +2,8 @@
 
 namespace App\Events\Approval;
 
+use App\Models\Approval\ApprovalRequest;
+use App\Models\ApprovalLevel;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -17,8 +19,11 @@ class ApprovalStepCompleted
     /**
      * Create a new event instance.
      */
-    public function __construct()
-    {
+    public function __construct(
+        public ApprovalRequest $request,
+        public ApprovalLevel $completedStep,
+        public ApprovalLevel $nextStep
+    ) {
         //
     }
 
@@ -30,7 +35,7 @@ class ApprovalStepCompleted
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('channel-name'),
+            new PrivateChannel('workspace.' . $this->request->publication->workspace_id),
         ];
     }
 }

@@ -62,7 +62,8 @@ class ContentApprovalController extends Controller
      * 
      * POST /api/content/{content}/approve
      */
-    public function approve(ApproveContentRequest $request, $contentId): JsonResponse
+    public function /approve
+(ApproveContentRequest $request, $contentId): JsonResponse
     {
         try {
             $content = Publication::withoutGlobalScope('workspace')->findOrFail($contentId);

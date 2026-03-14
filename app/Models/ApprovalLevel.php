@@ -101,9 +101,15 @@ class ApprovalLevel extends Model
      */
     public function getApprovers(): \Illuminate\Support\Collection
     {
-        // If step has specific users assigned
+        // If step has specific users assigned via pivot table
         if ($this->users()->exists()) {
             return $this->users;
+        }
+
+        // If step has a single user assigned via user_id
+        if ($this->user_id) {
+            $user = \App\Models\User::find($this->user_id);
+            return $user ? collect([$user]) : collect();
         }
 
         // If step has role assigned
