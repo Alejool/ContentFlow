@@ -81,13 +81,12 @@ class ApprovalWorkflowController extends Controller
                 return $this->errorResponse('You do not have permission to approve at this step.', 403);
             }
 
-            $action = $this->engine->approve($request, $user, $validated['comment'] ?? null);
+            $approvalRequest = $this->engine->approve($request, $user, $validated['comment'] ?? null);
 
             return $this->successResponse([
                 'message' => 'Approval recorded successfully.',
-                'action' => $action,
-                'request' => $request->fresh(['currentStep.role', 'workflow', 'publication']),
-            ], 200);
+                'request' => $approvalRequest,
+            ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return $this->errorResponse('Validation failed', 422, $e->errors());
         } catch (\Throwable $e) {
@@ -118,38 +117,16 @@ class ApprovalWorkflowController extends Controller
                 return $this->errorResponse('You do not have permission to reject at this step.', 403);
             }
 
-            $action = $this->engine->reject($request, $user, $validated['reason']);
+            $approvalRequest = $this->engine->reject($request, $user, $validated['reason']);
 
             return $this->successResponse([
-                'message' => 'Publication rejected successfully.',
-                'action' => $action,
-                'request' => $request->fresh(['workflow', 'publication']),
-            ], 200);
+                'message' => 'Rejection recorded successfully.',
+                'request' => $approvalRequest,
+            ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return $this->errorResponse('Validation failed', 422, $e->errors());
         } catch (\Throwable $e) {
             return $this->errorResponse('Failed to reject: ' . $e->getMessage(), 500);
-        }
-    }
-
-    /**
-     * Get approval status with detailed flow
-     * 
-     * GET /api/v1/approvals/{request}/status
-     * 
-     * @param ApprovalRequest $request
-     * @return JsonResponse
-     */
-    public function status(ApprovalRequest $request): JsonResponse
-    {
-        try {
-            $status = $this->engine->getApprovalStatus($request);
-
-            return $this->successResponse([
-                'status' => $status,
-            ], 200);
-        } catch (\Throwable $e) {
-            return $this->errorResponse('Failed to retrieve status: ' . $e->getMessage(), 500);
         }
     }
 
@@ -165,64 +142,65 @@ class ApprovalWorkflowController extends Controller
     {
         try {
             $user = Auth::user();
-            
-            $pendingRequests = ApprovalRequest::pendingForUser($user)
-                ->with([
-                    'publication',
-                    'currentStep.role',
-                    'workflow',
-                    'submitter',
-                ])
-                ->orderBy('submitted_at', 'desc')
-                ->paginate($request->input('per_page', 15));
+            $workspaceId = $user->current_workspace_id ?? $user->workspaces()->first()?->id;
+
+            if (!$workspaceId) {
+                return $this->errorResponse('No active workspace found.', 404);
+            }
+
+            $pendingRequests = $this->engine->getPendingRequestsForUser($user, $workspaceId);
 
             return $this->successResponse([
                 'requests' => $pendingRequests,
-            ], 200);
+                'count' => $pendingRequests->count(),
+            ]);
         } catch (\Throwable $e) {
-            return $this->errorResponse('Failed to retrieve pending approvals: ' . $e->getMessage(), 500);
+            return $this->errorResponse('Failed to fetch pending approvals: ' . $e->getMessage(), 500);
         }
     }
 
     /**
-     * Get approval history for publication
+     * Get detailed approval status
      * 
-     * GET /api/v1/approvals/publication/{publication}/history
+     * GET /api/v1/approvals/{request}/status
      * 
-     * @param Publication $publication
+     * @param ApprovalRequest $request
      * @return JsonResponse
      */
-    public function history(Publication $publication): JsonResponse
+    public function status(ApprovalRequest $request): JsonResponse
     {
         try {
-            $approvalRequest = ApprovalRequest::where('publication_id', $publication->id)
-                ->with([
-                    'actions.user',
-                    'actions.step',
-                    'stepApprovals.user',
-                    'stepApprovals.step',
-                ])
-                ->first();
+            $request->load([
+                'workflow.levels',
+                'currentStep.role',
+                'submitter',
+                'completedBy',
+                'logs.user',
+                'logs.approvalStep',
+                'publication',
+            ]);
 
-            if (!$approvalRequest) {
-                return $this->successResponse([
-                    'message' => 'No approval history found for this publication.',
-                    'history' => [],
-                ], 200);
+            $data = [
+                'request' => $request,
+                'is_pending' => $request->isPending(),
+                'is_approved' => $request->isApproved(),
+                'is_rejected' => $request->isRejected(),
+                'is_cancelled' => $request->isCancelled(),
+            ];
+
+            // Add rejection details if rejected
+            if ($request->isRejected()) {
+                $data['rejection_details'] = $request->getRejectionDetails();
             }
 
-            return $this->successResponse([
-                'request' => $approvalRequest,
-                'actions' => $approvalRequest->actions()->orderBy('created_at', 'asc')->get(),
-                'step_approvals' => $approvalRequest->stepApprovals()->orderBy('created_at', 'asc')->get(),
-            ], 200);
+            return $this->successResponse($data);
         } catch (\Throwable $e) {
-            return $this->errorResponse('Failed to retrieve history: ' . $e->getMessage(), 500);
+            return $this->errorResponse('Failed to fetch approval status: ' . $e->getMessage(), 500);
         }
     }
 
     /**
-     * Check if user can approve a specific request
+     * Check if current user can approve
      * 
      * GET /api/v1/approvals/{request}/can-approve
      * 
@@ -237,14 +215,32 @@ class ApprovalWorkflowController extends Controller
 
             return $this->successResponse([
                 'can_approve' => $canApprove,
-                'current_step' => $request->currentStep ? [
-                    'id' => $request->currentStep->id,
-                    'name' => $request->currentStep->level_name,
-                    'order' => $request->currentStep->level_number,
-                ] : null,
-            ], 200);
+                'current_step' => $request->currentStep?->load('role'),
+            ]);
         } catch (\Throwable $e) {
-            return $this->errorResponse('Failed to check permissions: ' . $e->getMessage(), 500);
+            return $this->errorResponse('Failed to check approval permission: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Get approval history for publication
+     * 
+     * GET /api/v1/approvals/publication/{publication}/history
+     * 
+     * @param Publication $publication
+     * @return JsonResponse
+     */
+    public function history(Publication $publication): JsonResponse
+    {
+        try {
+            $history = $this->engine->getApprovalHistory($publication);
+
+            return $this->successResponse([
+                'history' => $history,
+                'count' => $history->count(),
+            ]);
+        } catch (\Throwable $e) {
+            return $this->errorResponse('Failed to fetch approval history: ' . $e->getMessage(), 500);
         }
     }
 }

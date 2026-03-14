@@ -5,265 +5,197 @@ namespace App\Http\Controllers\Content;
 use App\Http\Controllers\Controller;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
-use App\Models\Logs\ApprovalLog;
+use App\Models\Approval\ApprovalRequest;
 use App\Models\Publications\Publication;
+use App\Services\Approval\ApprovalWorkflowEngine;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ApprovalController extends Controller
 {
-  use ApiResponse;
+    use ApiResponse;
 
-  /**
-   * Check if current user can approve content in the workspace
-   * Considers both basic permission and multi-level workflow assignments
-   */
-  public function canApprove(Request $request)
-  {
-    $workspaceId = Auth::user()->current_workspace_id ?? Auth::user()->workspaces()->first()?->id;
+    public function __construct(
+        private ApprovalWorkflowEngine $engine
+    ) {}
 
-    if (!$workspaceId) {
-      return $this->errorResponse('No active workspace found.', 404);
-    }
+    /**
+     * Check if current user can approve content in the workspace
+     */
+    public function canApprove(Request $request)
+    {
+        $workspaceId = Auth::user()->current_workspace_id ?? Auth::user()->workspaces()->first()?->id;
 
-    $userId = Auth::id();
-    $canApprove = false;
-    $reason = '';
-
-    // Check if user has general 'approve' permission (admin/owner)
-    if (Auth::user()->hasPermission('approve', $workspaceId)) {
-      $canApprove = true;
-      $reason = 'admin_permission';
-    } else {
-      // Check if user is assigned to any approval workflow step
-      // Get user's role in workspace
-      $userRole = DB::table('role_user')
-        ->where('workspace_id', $workspaceId)
-        ->where('user_id', $userId)
-        ->first();
-
-      if ($userRole) {
-        // Check if user's role is in any active workflow step
-        $hasWorkflowAssignment = DB::table('approval_levels')
-          ->join('approval_workflows', 'approval_levels.approval_workflow_id', '=', 'approval_workflows.id')
-          ->where('approval_workflows.workspace_id', $workspaceId)
-          ->where('approval_workflows.is_active', true)
-          ->where('approval_levels.role_id', $userRole->role_id)
-          ->exists();
-
-        if ($hasWorkflowAssignment) {
-          $canApprove = true;
-          $reason = 'workflow_assignment';
+        if (!$workspaceId) {
+            return $this->errorResponse('No active workspace found.', 404);
         }
-      }
-    }
 
-    return $this->successResponse([
-      'can_approve' => $canApprove,
-      'reason' => $reason,
-    ]);
-  }
+        $userId = Auth::id();
+        $canApprove = false;
+        $reason = '';
 
-  /**
-   * Get list of pending approval requests
-   * Now filters by what the user can actually approve
-   */
-  public function index(Request $request)
-  {
-    $workspaceId = Auth::user()->current_workspace_id ?? Auth::user()->workspaces()->first()?->id;
+        // Check if user has general 'approve' permission (admin/owner)
+        if (Auth::user()->hasPermission('approve', $workspaceId)) {
+            $canApprove = true;
+            $reason = 'admin_permission';
+        } else {
+            // Check if user is assigned to any approval workflow step
+            $userRole = DB::table('role_user')
+                ->where('workspace_id', $workspaceId)
+                ->where('user_id', $userId)
+                ->first();
 
-    if (!$workspaceId) {
-      return $this->errorResponse('No active workspace found.', 404);
-    }
+            if ($userRole) {
+                // Check if user's role is in any active workflow step
+                $hasWorkflowAssignment = DB::table('approval_levels')
+                    ->join('approval_workflows', 'approval_levels.approval_workflow_id', '=', 'approval_workflows.id')
+                    ->where('approval_workflows.workspace_id', $workspaceId)
+                    ->where('approval_workflows.is_active', true)
+                    ->where(function ($query) use ($userRole, $userId) {
+                        $query->where('approval_levels.role_id', $userRole->role_id)
+                            ->orWhere('approval_levels.user_id', $userId);
+                    })
+                    ->exists();
 
-    $userId = Auth::id();
-    $hasAdminPermission = Auth::user()->hasPermission('approve', $workspaceId);
+                if ($hasWorkflowAssignment) {
+                    $canApprove = true;
+                    $reason = 'workflow_assignment';
+                }
+            }
+        }
 
-    // Get user's role in workspace
-    $userRole = DB::table('role_user')
-      ->where('workspace_id', $workspaceId)
-      ->where('user_id', $userId)
-      ->first();
-
-    $query = Publication::where('workspace_id', $workspaceId)
-      ->where('status', 'pending_review')
-      ->with([
-        'user:id,name,email,photo_url',
-        'mediaFiles:media_files.id,media_files.file_path,media_files.file_type',
-        'approvalLogs' => fn($q) => $q->latest('requested_at')->limit(1)->with('requester:id,name,photo_url'),
-        'currentApprovalStep.workflow'
-      ])
-      ->orderBy('updated_at', 'desc');
-
-    // If user doesn't have admin permission, filter by workflow assignments
-    if (!$hasAdminPermission && $userRole) {
-      $query->whereHas('currentApprovalStep', function ($q) use ($userRole) {
-        $q->where('role_id', $userRole->role_id);
-      });
-    } elseif (!$hasAdminPermission) {
-      // User has no permission and no role, return empty
-      return $this->successResponse(['publications' => []]);
-    }
-
-    $publications = $query->paginate($request->query('per_page', 10));
-
-    return $this->successResponse(['publications' => $publications]);
-  }
-
-  /**
-   * Get approval history with filters
-   */
-  public function history(Request $request)
-  {
-    try {
-      $workspaceId = Auth::user()->current_workspace_id ?? Auth::user()->workspaces()->first()?->id;
-
-      if (!$workspaceId) {
-        return $this->errorResponse('No active workspace found.', 400);
-      }
-
-      // Only users with 'approve' permission can access this
-      if (!Auth::user()->hasPermission('approve', $workspaceId)) {
-        return $this->errorResponse('You do not have permission to view approval history.', 403);
-      }
-
-      $query = ApprovalLog::whereHas('publication', function ($q) use ($workspaceId) {
-        $q->where('workspace_id', $workspaceId);
-      })
-        ->with([
-          'publication:id,title,status',
-          'requester:id,name,email,photo_url',
-          'reviewer:id,name,email,photo_url'
-        ])
-        ->whereNotNull('action')
-        ->whereNotNull('reviewed_at')
-        ->orderBy('reviewed_at', 'desc');
-
-      // Filter by action (approved/rejected)
-      if ($request->has('action') && in_array($request->action, ['approved', 'rejected'])) {
-        $query->where('action', $request->action);
-      }
-
-      // Filter by date range
-      if ($request->has('date_start') && $request->has('date_end')) {
-        $query->whereBetween('requested_at', [$request->date_start, $request->date_end]);
-      }
-
-      // Search by publication title
-      if ($request->has('search') && $request->search) {
-        $query->whereHas('publication', function ($q) use ($request) {
-          $q->where('title', 'ILIKE', '%' . $request->search . '%');
-        });
-      }
-
-      // Filter by specific publication ID (for details view)
-      if ($request->has('publication_id')) {
-        $query->where('publication_id', $request->publication_id);
-      }
-
-      $logs = $query->paginate($request->query('per_page', 10));
-
-      return $this->successResponse(['logs' => $logs]);
-    } catch (\Throwable $e) {
-      return $this->errorResponse('Server Error: ' . $e->getMessage(), 500);
-    }
-  }
-
-  /**
-   * Get approval statistics filtered by current user's assignments
-   * Only shows stats for approvals the user can actually handle
-   */
-  public function stats()
-  {
-    $workspaceId = Auth::user()->current_workspace_id ?? Auth::user()->workspaces()->first()?->id;
-
-    if (!$workspaceId) {
-      return $this->errorResponse('No active workspace found.', 400);
-    }
-
-    // Only users with 'approve' permission can access this
-    if (!Auth::user()->hasPermission('approve', $workspaceId)) {
-      return $this->errorResponse('You do not have permission to view approval statistics.', 403);
-    }
-
-    $userId = Auth::id();
-    $workspace = \App\Models\Workspace\Workspace::find($workspaceId);
-    
-    // Get user's role in the workspace
-    $userRole = Auth::user()->workspaces()
-      ->where('workspaces.id', $workspaceId)
-      ->first()
-      ?->pivot
-      ?->role;
-
-    // Check if user is owner or admin
-    $isOwner = $workspace->user_id === $userId;
-    $isAdmin = $userRole && in_array($userRole->slug, ['owner', 'admin']);
-
-    // Get the active approval workflow
-    $workflow = $workspace->approvalWorkflow()->with('levels.role')->where('is_enabled', true)->first();
-
-    // Base query for pending requests (exclude own publications)
-    $pendingQuery = Publication::where('workspace_id', $workspaceId)
-      ->where('status', 'pending_review')
-      ->where('user_id', '!=', $userId);
-
-    // If there's a workflow AND user is NOT admin, filter by assigned levels
-    if ($workflow && !$isOwner && !$isAdmin && $userRole) {
-      $assignedLevelIds = $workflow->levels()
-        ->where('role_id', $userRole->id)
-        ->pluck('id')
-        ->toArray();
-
-      if (!empty($assignedLevelIds)) {
-        $pendingQuery->whereIn('current_approval_step_id', $assignedLevelIds);
-      } else {
-        // User has no assigned levels, return zero stats
         return $this->successResponse([
-          'pending_requests' => 0,
-          'approved_today' => 0,
-          'rejected_today' => 0,
-          'avg_approval_time_hours' => 0,
+            'can_approve' => $canApprove,
+            'reason' => $reason,
         ]);
-      }
     }
 
-    $pendingRequests = $pendingQuery->count();
+    /**
+     * Get list of pending approval requests for current user
+     */
+    public function index(Request $request)
+    {
+        $workspaceId = Auth::user()->current_workspace_id ?? Auth::user()->workspaces()->first()?->id;
 
-    // For approved/rejected stats, filter by reviewed_by (only count actions by this user)
-    // Approved today by this user
-    $approvedToday = ApprovalLog::whereHas('publication', function ($q) use ($workspaceId) {
-      $q->where('workspace_id', $workspaceId);
-    })
-      ->where('action', 'approved')
-      ->where('reviewed_by', $userId) // Only count approvals by this user
-      ->whereDate('reviewed_at', today())
-      ->count();
+        if (!$workspaceId) {
+            return $this->errorResponse('No active workspace found.', 404);
+        }
 
-    // Rejected today by this user
-    $rejectedToday = ApprovalLog::whereHas('publication', function ($q) use ($workspaceId) {
-      $q->where('workspace_id', $workspaceId);
-    })
-      ->where('action', 'rejected')
-      ->where('reviewed_by', $userId) // Only count rejections by this user
-      ->whereDate('reviewed_at', today())
-      ->count();
+        $user = Auth::user();
 
-    // Average approval time for this user's approvals (in hours)
-    $avgApprovalTime = ApprovalLog::whereHas('publication', function ($q) use ($workspaceId) {
-      $q->where('workspace_id', $workspaceId);
-    })
-      ->whereNotNull('reviewed_at')
-      ->where('action', 'approved')
-      ->where('reviewed_by', $userId) // Only count this user's approval times
-      ->selectRaw('AVG(EXTRACT(EPOCH FROM (reviewed_at - requested_at)) / 3600) as avg_hours')
-      ->value('avg_hours');
+        // Get pending requests for this user
+        $requests = $this->engine->getPendingRequestsForUser($user, $workspaceId);
 
-    return $this->successResponse([
-      'pending_requests' => $pendingRequests,
-      'approved_today' => $approvedToday,
-      'rejected_today' => $rejectedToday,
-      'avg_approval_time_hours' => round($avgApprovalTime ?? 0, 2),
-    ]);
-  }
+        return $this->successResponse([
+            'requests' => $requests,
+            'count' => $requests->count(),
+        ]);
+    }
+
+    /**
+     * Get approval statistics
+     */
+    public function stats(Request $request)
+    {
+        $workspaceId = Auth::user()->current_workspace_id ?? Auth::user()->workspaces()->first()?->id;
+
+        if (!$workspaceId) {
+            return $this->errorResponse('No active workspace found.', 404);
+        }
+
+        $user = Auth::user();
+
+        // Get counts
+        $pendingCount = ApprovalRequest::whereHas('publication', function ($query) use ($workspaceId) {
+            $query->where('workspace_id', $workspaceId);
+        })
+        ->where('status', ApprovalRequest::STATUS_PENDING)
+        ->count();
+
+        $myPendingCount = $this->engine->getPendingRequestsForUser($user, $workspaceId)->count();
+
+        $approvedToday = ApprovalRequest::whereHas('publication', function ($query) use ($workspaceId) {
+            $query->where('workspace_id', $workspaceId);
+        })
+        ->where('status', ApprovalRequest::STATUS_APPROVED)
+        ->whereDate('completed_at', today())
+        ->count();
+
+        $rejectedToday = ApprovalRequest::whereHas('publication', function ($query) use ($workspaceId) {
+            $query->where('workspace_id', $workspaceId);
+        })
+        ->where('status', ApprovalRequest::STATUS_REJECTED)
+        ->whereDate('completed_at', today())
+        ->count();
+
+        // Average approval time in hours (from submitted_at to completed_at)
+        $avgTimeHours = ApprovalRequest::whereHas('publication', function ($query) use ($workspaceId) {
+            $query->where('workspace_id', $workspaceId);
+        })
+        ->where('status', ApprovalRequest::STATUS_APPROVED)
+        ->whereNotNull('completed_at')
+        ->selectRaw('AVG(EXTRACT(EPOCH FROM (completed_at - submitted_at)) / 3600) as avg_hours')
+        ->value('avg_hours');
+
+        return $this->successResponse([
+            'pending_requests' => $pendingCount,
+            'pending_total' => $pendingCount,
+            'pending_for_me' => $myPendingCount,
+            'approved_today' => $approvedToday,
+            'rejected_today' => $rejectedToday,
+            'avg_approval_time_hours' => $avgTimeHours !== null ? round($avgTimeHours, 1) : null,
+        ]);
+    }
+
+    /**
+     * Get approval history
+     */
+    public function history(Request $request)
+    {
+        $workspaceId = Auth::user()->current_workspace_id ?? Auth::user()->workspaces()->first()?->id;
+
+        if (!$workspaceId) {
+            return $this->errorResponse('No active workspace found.', 404);
+        }
+
+        $query = ApprovalRequest::with([
+            'publication',
+            'workflow',
+            'submitter',
+            'completedBy',
+            'logs.user',
+            'logs.approvalStep',
+        ])
+        ->whereHas('publication', function ($q) use ($workspaceId) {
+            $q->where('workspace_id', $workspaceId);
+        });
+
+        // Filters
+        if ($request->has('status') && $request->status !== 'all') {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->has('publication_id')) {
+            $query->where('publication_id', $request->publication_id);
+        }
+
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('submitter', function ($sq) use ($search) {
+                    $sq->where('name', 'like', "%{$search}%");
+                })
+                ->orWhere('rejection_reason', 'like', "%{$search}%");
+            });
+        }
+
+        // Pagination
+        $perPage = $request->get('per_page', 12);
+        $history = $query->orderBy('submitted_at', 'desc')->paginate($perPage);
+
+        return $this->successResponse([
+            'history' => $history,
+            'count' => $history->total(),
+        ]);
+    }
 }
