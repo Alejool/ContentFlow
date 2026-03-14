@@ -107,6 +107,16 @@ test-payment-cache.php
 test-payment-methods.php
 reprocess_media.php
 
+# Debug and test scripts for approval workflow
+check_*.php
+debug_*.php
+test_*.php
+fix_*.php
+find_*.php
+
+# Test console commands
+app/Console/Commands/Test*.php
+
 # ============================================
 # ARCHIVOS TEMPORALES
 # ============================================
