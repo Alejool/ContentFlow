@@ -1,10 +1,12 @@
 import { CampaignStat } from "@/Components/Analytics/PerformanceTable";
+import { AddonsPromotionCard } from "@/Components/Dashboard/AddonsPromotionCard";
 import StatCard from "@/Components/Statistics/StatCard";
 import Skeleton from "@/Components/common/ui/Skeleton";
 import { useTheme } from "@/Hooks/useTheme";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, router } from "@inertiajs/react";
 import axios from "axios";
+import { motion } from "framer-motion";
 import {
   BarChart3,
   Calendar,
@@ -21,7 +23,6 @@ import {
 } from "lucide-react";
 import { Suspense, lazy, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AddonsPromotionCard } from "@/Components/Dashboard/AddonsPromotionCard";
 
 // Custom hook to fetch publication stats (avoids fetch in useEffect warning)
 const useFetchPublicationStats = (shouldFetch: boolean) => {
@@ -157,7 +158,10 @@ export default function Dashboard({
         className={`py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto
           min-h-screen transition-colors duration-300 `}
       >
-        <div
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
           data-theme-color={auth.user?.theme_color || 'orange'}
           className="rounded-lg p-8 mb-8 shadow-sm transition-colors duration-300 flex flex-col md:flex-row items-center justify-between gap-6 bg-gradient-to-r from-white/90 to-white/95 border border-white/70 dark:bg-gradient-to-r dark:from-neutral-800 dark:to-neutral-900 dark:border-neutral-700"
         >
@@ -185,11 +189,15 @@ export default function Dashboard({
               </button>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {!auth.user.email_verified_at && showBanner && (
-          <div className="mb-8 rounded-lg p-6 shadow-sm transition-colors duration-300 bg-white border border-gray-200 dark:bg-gradient-to-r dark:from-neutral-800 dark:to-neutral-900 dark:border-neutral-700">
-            <div className="flex items-start justify-between">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="mb-8 rounded-lg p-6 shadow-sm transition-colors duration-300 bg-white border border-gray-200 dark:bg-gradient-to-r dark:from-neutral-800 dark:to-neutral-900 dark:border-neutral-700"
+          >            <div className="flex items-start justify-between">
               <div className="flex items-start gap-4 flex-1">
                 <div className="flex-shrink-0">
                   <div className="w-12 h-12 rounded-full flex items-center justify-center bg-gray-100 dark:bg-neutral-700">
@@ -228,62 +236,56 @@ export default function Dashboard({
                 <X className="w-5 h-5" />
               </button>
             </div>
-          </div>
+          </motion.div>
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
-          <StatCard
-            title={t("dashboard.totalViews")}
-            value={stats.totalViews}
-            icon={<Eye className="w-6 h-6" />}
-            color="primary"
-            variant={1}
-            theme={theme}
-          />
-          <StatCard
-            title={t("dashboard.totalClicks")}
-            value={stats.totalClicks}
-            icon={<MousePointer2 className="w-6 h-6" />}
-            color="primary"
-            variant={2}
-            theme={theme}
-          />
-          <StatCard
-            title={t("dashboard.conversions")}
-            value={stats.totalConversions}
-            icon={<TrendingUp className="w-6 h-6" />}
-            color="primary"
-            variant={3}
-            theme={theme}
-          />
-          <StatCard
-            title={t("dashboard.totalReach")}
-            value={stats.totalReach}
-            icon={<Users className="w-6 h-6" />}
-            color="primary"
-            variant={4}
-            theme={theme}
-          />
+          {[
+            { title: t("dashboard.totalViews"), value: stats.totalViews, icon: <Eye className="w-6 h-6" />, variant: 1 as const },
+            { title: t("dashboard.totalClicks"), value: stats.totalClicks, icon: <MousePointer2 className="w-6 h-6" />, variant: 2 as const },
+            { title: t("dashboard.conversions"), value: stats.totalConversions, icon: <TrendingUp className="w-6 h-6" />, variant: 3 as const },
+            { title: t("dashboard.totalReach"), value: stats.totalReach, icon: <Users className="w-6 h-6" />, variant: 4 as const },
+          ].map((stat, index) => (
+            <motion.div
+              key={stat.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
+            >
+              <StatCard
+                title={stat.title}
+                value={stat.value}
+                icon={stat.icon}
+                color="primary"
+                variant={stat.variant}
+                theme={theme}
+              />
+            </motion.div>
+          ))}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
-          <StatCard
-            title={t("dashboard.totalEngagement")}
-            value={stats.totalEngagement}
-            icon={<Heart className="w-6 h-6" />}
-            color="primary"
-            variant={1}
-            theme={theme}
-          />
-          <StatCard
-            title={t("dashboard.avgEngagementRate")}
-            value={stats.avgEngagementRate.toFixed(2)}
-            icon={<TrendingUp className="w-6 h-6" />}
-            color="primary"
-            format="percentage"
-            variant={2}
-            theme={theme}
-          />
+          {[
+            { title: t("dashboard.totalEngagement"), value: stats.totalEngagement, icon: <Heart className="w-6 h-6" />, variant: 1 as const, format: undefined },
+            { title: t("dashboard.avgEngagementRate"), value: stats.avgEngagementRate.toFixed(2), icon: <TrendingUp className="w-6 h-6" />, variant: 2 as const, format: "percentage" as const },
+          ].map((stat, index) => (
+            <motion.div
+              key={stat.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.7 + index * 0.1 }}
+            >
+              <StatCard
+                title={stat.title}
+                value={stat.value}
+                icon={stat.icon}
+                color="primary"
+                format={stat.format}
+                variant={stat.variant}
+                theme={theme}
+              />
+            </motion.div>
+          ))}
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3 mb-8">
