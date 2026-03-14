@@ -56,7 +56,7 @@ export function defineAbilityFor(user: any, workspace: any): AppAbility {
     can('read', 'Publication');
     can('create', 'Publication');
     can('update', 'Publication', { user_id: user.id }); // Own content only
-    can('submit_for_approval', 'Publication');
+    // REMOVED: submit_for_approval - solo usuarios con permiso "publish" pueden enviar a revisión
     can('read', 'Campaign');
     can('read', 'MediaFile');
   }
@@ -68,9 +68,10 @@ export function defineAbilityFor(user: any, workspace: any): AppAbility {
   }
 
   // Publish permission (Publisher role)
+  // CRÍTICO: Solo usuarios con permiso "publish" pueden enviar a revisión
   if (permissions.includes('publish')) {
     can('publish', 'Publication'); // Puede publicar solo si no hay workflow o si está aprobado
-    can('submit_for_approval', 'Publication'); // Puede enviar a revisión cuando hay workflow
+    can('submit_for_approval', 'Publication'); // SOLO usuarios con "publish" pueden enviar a revisión
   }
 
   // Viewer permissions

@@ -4,12 +4,12 @@ import WorkspaceSwitcher from "@/Components/Workspace/WorkspaceSwitcher";
 import { useTheme } from "@/Hooks/useTheme";
 import { Link, usePage } from "@inertiajs/react";
 import {
-  BarChart3,
-  ChevronLeft,
-  ChevronRight,
-  FileText,
-  Home,
-  Layers,
+    BarChart3,
+    ChevronLeft,
+    ChevronRight,
+    FileText,
+    Home,
+    Layers,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -49,6 +49,19 @@ export default function Sidebar({
   const { t } = useTranslation();
   const { actualTheme } = useTheme();
   const { auth } = usePage().props as any;
+
+  // Get user permissions from current workspace
+  const userPermissions = auth?.current_workspace?.permissions || [];
+  const hasAnalyticsPermission = userPermissions.includes('view-analytics');
+
+  // Filter navigation items based on permissions
+  const filteredNavigationItems = navigationItems.filter((item) => {
+    // Hide Analytics if user doesn't have view-analytics permission
+    if (item.href === 'analytics.index' && !hasAnalyticsPermission) {
+      return false;
+    }
+    return true;
+  });
 
   const isRouteActive = (routeName: string): boolean => {
     if (typeof window === "undefined") return false;
@@ -200,7 +213,7 @@ export default function Sidebar({
             className="flex-1 px-4  space-y-2"
             aria-label="Main navigation"
           >
-            {navigationItems.map((item) => {
+            {filteredNavigationItems.map((item) => {
               const isActive = !!route().current(item.href);
               return (
                 <NavLink

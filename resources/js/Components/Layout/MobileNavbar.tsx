@@ -3,14 +3,14 @@ import ResponsiveNavLink from "@/Components/common/ui/ResponsiveNavLink";
 import { useTheme } from "@/Hooks/useTheme";
 import { usePage } from "@inertiajs/react";
 import {
-  BarChart3,
-  X as CloseIcon,
-  FileText,
-  Home,
-  Layers,
-  LogOut,
-  Menu,
-  User,
+    BarChart3,
+    X as CloseIcon,
+    FileText,
+    Home,
+    Layers,
+    LogOut,
+    Menu,
+    User,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import NotificationButton from "./NotificationButton";
@@ -52,6 +52,19 @@ export default function MobileNavbar({
   const isProfileActive = !!route().current("profile.edit");
 
   const whiteLabelLogo = auth?.current_workspace?.white_label_logo_url;
+
+  // Get user permissions from current workspace
+  const userPermissions = auth?.current_workspace?.permissions || [];
+  const hasAnalyticsPermission = userPermissions.includes('view-analytics');
+
+  // Filter navigation items based on permissions
+  const filteredMobileNavigationItems = mobileNavigationItems.filter((item) => {
+    // Hide Analytics if user doesn't have view-analytics permission
+    if (item.href === 'analytics.index' && !hasAnalyticsPermission) {
+      return false;
+    }
+    return true;
+  });
 
   return (
     <nav
@@ -115,7 +128,7 @@ export default function MobileNavbar({
         }`}
       >
         <div className="px-4 py-6 space-y-1">
-          {mobileNavigationItems.map((item) => {
+          {filteredMobileNavigationItems.map((item) => {
             const isActive = !!route().current(item.href);
             return (
               <ResponsiveNavLink
