@@ -237,6 +237,9 @@ class StorePublicationRequest extends FormRequest
       'carousel_items' => 'nullable|array',
       // Content metadata
       'content_metadata' => 'nullable|array',
+      // Background upload flags
+      'has_uploading_files' => 'nullable',
+      'uploading_files_count' => 'nullable|integer',
     ];
   }
 
@@ -267,6 +270,19 @@ class StorePublicationRequest extends FormRequest
         })
         ->values()
         ->toArray();
+
+      // Check if there are files currently uploading
+      $hasUploadingFiles = $this->input('has_uploading_files') === '1' || $this->input('has_uploading_files') === true;
+      $uploadingFilesCount = (int) $this->input('uploading_files_count', 0);
+
+      // If files are uploading, skip media validation
+      if ($hasUploadingFiles) {
+        \Log::info('⏭️ Skipping media validation - files are uploading in background (new publication)', [
+          'uploading_files_count' => $uploadingFilesCount,
+          'content_type' => $contentType
+        ]);
+        return; // Skip validation
+      }
 
       // Validate content type
       $validationService = app(ContentTypeValidationService::class);

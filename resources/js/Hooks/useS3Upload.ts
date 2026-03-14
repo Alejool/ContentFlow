@@ -445,6 +445,38 @@ export const useS3Upload = () => {
           } as any,
         });
 
+        // CRITICAL: If this upload is linked to a publication, attach it automatically
+        const currentUpload = useUploadQueue.getState().queue[tempId];
+        if (currentUpload?.publicationId) {
+          console.log('🔗 Auto-attaching media to publication:', {
+            publicationId: currentUpload.publicationId,
+            key: result.key,
+            filename: file.name
+          });
+          
+          // Call attach-media endpoint in background (fire and forget)
+          axios.post(
+            route("api.v1.publications.attach-media", currentUpload.publicationId),
+            {
+              key: result.key,
+              filename: file.name,
+              mime_type: file.type,
+              size: file.size,
+            }
+          ).then(() => {
+            console.log('✅ Media attached successfully to publication', currentUpload.publicationId);
+            toast.success(
+              `${file.name} vinculado correctamente`,
+              { duration: 3000 }
+            );
+          }).catch((error) => {
+            console.error('❌ Failed to attach media to publication:', error);
+            toast.error(
+              `Error al vincular ${file.name}. Intenta refrescar la página.`
+            );
+          });
+        }
+
         return result;
       } catch (error: any) {
         // Check if error is due to cancellation/pause

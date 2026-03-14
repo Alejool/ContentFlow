@@ -370,10 +370,11 @@ const MediaPreviewItem = memo(
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const formatETA = (seconds?: number) => {
-      if (!seconds) return "";
-      if (seconds < 60) return `${seconds}s`;
-      const mins = Math.floor(seconds / 60);
-      const secs = seconds % 60;
+      if (!seconds || typeof seconds !== 'number' || isNaN(seconds)) return "";
+      const roundedSeconds = Math.round(seconds);
+      if (roundedSeconds < 60) return `${roundedSeconds}s`;
+      const mins = Math.floor(roundedSeconds / 60);
+      const secs = roundedSeconds % 60;
       return `${mins}m ${secs}s`;
     };
 
@@ -437,7 +438,9 @@ const MediaPreviewItem = memo(
             </div>
             <div className="text-[10px] text-white/90 font-bold flex justify-between w-full uppercase tracking-tighter">
               <span>{Math.round(progress || 0)}%</span>
-              {stats?.eta && <span>~{formatETA(stats.eta)}</span>}
+              {stats?.eta && typeof stats.eta === 'number' && !isNaN(stats.eta) && (
+                <span>~{formatETA(stats.eta)}</span>
+              )}
             </div>
           </div>
         )}

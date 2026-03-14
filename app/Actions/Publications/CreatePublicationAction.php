@@ -24,17 +24,29 @@ class CreatePublicationAction
     // Default content_type to 'post' if not provided
     $contentType = $data['content_type'] ?? 'post';
     
-    // Validate content type before DB transaction
-    $validation = $this->validationService->validateContentType(
-      $contentType,
-      $data['social_accounts'] ?? [],
-      $files
-    );
+    // Check if there are files currently uploading - skip validation if so
+    $hasUploadingFiles = isset($data['has_uploading_files']) && 
+                        ($data['has_uploading_files'] === '1' || $data['has_uploading_files'] === true);
+    $uploadingFilesCount = (int) ($data['uploading_files_count'] ?? 0);
     
-    if (!$validation->isValid) {
-      throw ValidationException::withMessages([
-        'content_type' => $validation->errors
+    if ($hasUploadingFiles) {
+      \Log::info('⏭️ CreatePublicationAction: Skipping content type validation - files uploading', [
+        'uploading_files_count' => $uploadingFilesCount,
+        'content_type' => $contentType
       ]);
+    } else {
+      // Validate content type before DB transaction only if no files are uploading
+      $validation = $this->validationService->validateContentType(
+        $contentType,
+        $data['social_accounts'] ?? [],
+        $files
+      );
+      
+      if (!$validation->isValid) {
+        throw ValidationException::withMessages([
+          'content_type' => $validation->errors
+        ]);
+      }
     }
     
     return DB::transaction(function () use ($data, $files, $contentType) {

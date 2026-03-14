@@ -377,6 +377,19 @@ class PublishValidationService
 
         $mediaFiles = $publication->mediaFiles;
         
+        \Log::info('🎠 Carousel validation', [
+            'publication_id' => $publication->id,
+            'media_files_count' => $mediaFiles->count(),
+            'media_files' => $mediaFiles->map(function($file) {
+                return [
+                    'id' => $file->id,
+                    'file_name' => $file->file_name,
+                    'file_type' => $file->file_type,
+                    'status' => $file->status,
+                ];
+            })->toArray(),
+        ]);
+        
         if ($mediaFiles->count() < 2) {
             $errors[] = __('validation.carousel_min_media');
             return ['errors' => $errors, 'warnings' => $warnings, 'compatible' => false];

@@ -1304,53 +1304,28 @@ export const usePublicationForm = ({
         return media.status === 'uploading' || media.status === 'processing' || (media.file instanceof File);
       });
 
-      // If there are files uploading, WAIT for them to complete
+      // If there are files uploading, notify user but DON'T WAIT
+      // Files will be linked automatically when they complete via useS3Upload
       if (uploadingFiles.length > 0) {
-         toast.loading(
-          t("publications.modal.upload.waitingForUploads", {
-            defaultValue: `Esperando a que se completen ${uploadingFiles.length} archivo(s)...`,
+        toast.loading(
+          t("publications.modal.upload.uploadingInBackground", {
+            defaultValue: `${uploadingFiles.length} archivo(s) se están subiendo en segundo plano. Se vincularán automáticamente cuando se completen.`,
             count: uploadingFiles.length
           }),
-          { id: 'waiting-uploads' }
-        );
-
-        // Wait for all uploads to complete (max 60 seconds)
-        const maxWaitTime = 60000; // 60 seconds
-        const checkInterval = 500; // Check every 500ms
-        const startTime = Date.now();
-
-        while (Date.now() - startTime < maxWaitTime) {
-          currentMediaFiles = useMediaStore.getState().mediaFiles;
-          uploadingFiles = currentMediaFiles.filter((media) => {
-            return media.status === 'uploading' || media.status === 'processing' || (media.file instanceof File);
-          });
-
-          if (uploadingFiles.length === 0) {
-            toast.success(
-              t("publications.modal.upload.uploadsCompleted", {
-                defaultValue: "Todos los archivos se han subido correctamente"
-              }),
-              { id: 'waiting-uploads' }
-            );
-            break;
+          { 
+            id: 'background-uploads',
+            duration: 5000
           }
-
-          // Wait before checking again
-          await new Promise(resolve => setTimeout(resolve, checkInterval));
-        }
-
-        // Check if we timed out
-        if (uploadingFiles.length > 0) {
-          toast.error(
-            t("publications.modal.upload.uploadTimeout", {
-              defaultValue: "Algunos archivos no se completaron. Por favor, intenta de nuevo.",
-              count: uploadingFiles.length
-            }),
-            { id: 'waiting-uploads' }
-          );
-          setIsSubmitting(false);
-          return;
-        }
+        );
+        
+        // Dismiss the loading toast after 5 seconds
+        setTimeout(() => {
+          toast.dismiss('background-uploads');
+        }, 5000);
+        
+        // CRITICAL: Tell backend to skip media validation because files are uploading
+        formData.append("has_uploading_files", "1");
+        formData.append("uploading_files_count", uploadingFiles.length.toString());
       }
 
       // 1. Filter out files that are still uploading (File objects)
@@ -1567,9 +1542,18 @@ export const usePublicationForm = ({
       handleClose();
       if (onSubmitSuccess) onSubmitSuccess(true);
     } catch (error: any) {
-      toast.error(
-        error.response?.data?.message || t("publications.messages.error")
-      );
+      console.error('❌ Form submission error:', error);
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response,
+        stack: error.stack
+      });
+      
+      const errorMessage = error.response?.data?.message 
+        || error.message 
+        || t("publications.messages.error");
+      
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

@@ -22,8 +22,8 @@ class UpdatePublicationAction
 
   public function execute(Publication $publication, array $data, array $newFiles = []): Publication
   {
-    // Check if there are files being uploaded
-    $hasUploadingFiles = $this->hasUploadingFiles($newFiles);
+    // Check if there are files being uploaded (check both flag and files array)
+    $hasUploadingFiles = $this->hasUploadingFiles($newFiles, $data);
     
     // Conditional validation: only validate if content_type, platforms, or media changed
     // BUT skip validation if files are currently being uploaded
@@ -69,6 +69,15 @@ class UpdatePublicationAction
           })
           ->get();
         
+        \Log::info('🔍 UpdatePublicationAction: Media files for validation', [
+          'publication_id' => $publication->id,
+          'content_type' => $contentType,
+          'new_files_count' => count($newFiles),
+          'existing_media_count' => $existingMedia->count(),
+          'removed_media_ids' => $data['removed_media_ids'] ?? [],
+          'existing_media_ids' => $existingMedia->pluck('id')->toArray(),
+        ]);
+        
         // Convert existing media to a format compatible with validation
         // For existing media, we create mock UploadedFile objects with the mime type
         foreach ($existingMedia as $media) {
@@ -90,51 +99,67 @@ class UpdatePublicationAction
         }
       }
       
-      // Validate content type
-      $validation = $this->validationService->validateContentType(
-        $contentType,
-        $socialAccountIds,
-        $mediaFiles
-      );
+      \Log::info('🔍 UpdatePublicationAction: Total media files for validation', [
+        'publication_id' => $publication->id,
+        'content_type' => $contentType,
+        'total_media_files' => count($mediaFiles),
+      ]);
       
-      if (!$validation->isValid) {
-        throw ValidationException::withMessages([
-          'content_type' => $validation->errors
+      // Use the hasUploadingFiles flag we already checked at the beginning
+      if ($hasUploadingFiles) {
+        $uploadingFilesCount = (int) ($data['uploading_files_count'] ?? 0);
+        \Log::info('⏭️ UpdatePublicationAction: Skipping content type validation - files uploading', [
+          'publication_id' => $publication->id,
+          'uploading_files_count' => $uploadingFilesCount,
+          'content_type' => $contentType
         ]);
-      }
-      
-      // Handle auto-conversion suggestions
-      if (!empty($validation->suggestions['suggested_content_type'])) {
-        $suggestedType = $validation->suggestions['suggested_content_type'];
-        $reason = $validation->suggestions['reason'] ?? '';
+      } else {
+        // Validate content type only if no files are uploading
+        $validation = $this->validationService->validateContentType(
+          $contentType,
+          $socialAccountIds,
+          $mediaFiles
+        );
         
-        // Auto-apply the suggestion if it's a valid change
-        if ($suggestedType !== $contentType && $this->shouldAutoApplyContentTypeChange($contentType, $suggestedType)) {
-          $data['content_type'] = $suggestedType;
-          
-          // Log the auto-conversion for debugging
-          \Log::info("Auto-converted content type", [
-            'publication_id' => $publication->id,
-            'from' => $contentType,
-            'to' => $suggestedType,
-            'reason' => $reason
+        if (!$validation->isValid) {
+          throw ValidationException::withMessages([
+            'content_type' => $validation->errors
           ]);
+        }
+        
+        // Handle auto-conversion suggestions
+        if (!empty($validation->suggestions['suggested_content_type'])) {
+          $suggestedType = $validation->suggestions['suggested_content_type'];
+          $reason = $validation->suggestions['reason'] ?? '';
           
-          // Re-validate with the new content type to ensure it's valid
-          $revalidation = $this->validationService->validateContentType(
-            $suggestedType,
-            $socialAccountIds,
-            $mediaFiles
-          );
-          
-          if (!$revalidation->isValid) {
-            // If the suggested type is still invalid, throw the original validation error
-            throw ValidationException::withMessages([
-              'content_type' => $validation->errors
+          // Auto-apply the suggestion if it's a valid change
+          if ($suggestedType !== $contentType && $this->shouldAutoApplyContentTypeChange($contentType, $suggestedType)) {
+            $data['content_type'] = $suggestedType;
+            
+            // Log the auto-conversion for debugging
+            \Log::info("Auto-converted content type", [
+              'publication_id' => $publication->id,
+              'from' => $contentType,
+              'to' => $suggestedType,
+              'reason' => $reason
             ]);
+            
+            // Re-validate with the new content type to ensure it's valid
+            $revalidation = $this->validationService->validateContentType(
+              $suggestedType,
+              $socialAccountIds,
+              $mediaFiles
+            );
+            
+            if (!$revalidation->isValid) {
+              // If the suggested type is still invalid, throw the original validation error
+              throw ValidationException::withMessages([
+                'content_type' => $validation->errors
+              ]);
+            }
           }
         }
-      }
+      } // End of else block for validation
     }
     
     return DB::transaction(function () use ($publication, $data, $newFiles) {
@@ -702,8 +727,20 @@ class UpdatePublicationAction
   /**
    * Check if there are files currently being uploaded
    */
-  private function hasUploadingFiles(array $newFiles): bool
+  private function hasUploadingFiles(array $newFiles, array $data = []): bool
   {
+    // PRIORITY 1: Check the explicit flag from frontend
+    if (isset($data['has_uploading_files']) && 
+        ($data['has_uploading_files'] === '1' || $data['has_uploading_files'] === true)) {
+      $uploadingFilesCount = (int) ($data['uploading_files_count'] ?? 0);
+      \Log::info('⏭️ hasUploadingFiles: Flag detected from frontend', [
+        'has_uploading_files' => $data['has_uploading_files'],
+        'uploading_files_count' => $uploadingFilesCount
+      ]);
+      return true;
+    }
+    
+    // PRIORITY 2: Check the $newFiles array (legacy/fallback)
     foreach ($newFiles as $file) {
       // Check if it's a file being uploaded (UploadedFile)
       if (is_object($file) && method_exists($file, 'isValid')) {
