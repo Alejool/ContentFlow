@@ -7,6 +7,8 @@ import EmptyState from "@/Components/common/ui/EmptyState";
 import { VirtualList } from "@/Components/common/ui/VirtualList";
 import { formatDateTimeString, formatTimeString } from "@/Utils/dateHelpers";
 import { getDateFnsLocale } from "@/Utils/dateLocales";
+import { useManageContentUIStore } from "@/stores/manageContentUIStore";
+import { usePublicationStore } from "@/stores/publicationStore";
 import { Publication } from "@/types/Publication";
 import { usePage } from "@inertiajs/react";
 import axios from "axios";
@@ -61,7 +63,7 @@ function ApprovalPublicationItem({
                 <Layers className="w-3 h-3" />
                 {pub.current_approval_step.name}
                 {pub.current_approval_step.workflow?.steps &&
-                  ` (${pub.current_approval_step.step_order}/${pub.current_approval_step.workflow.steps.length})`}
+                  ` (${pub.current_approval_step.level_number}/${pub.current_approval_step.workflow.steps.length})`}
               </span>
             )}
             <span
@@ -148,6 +150,12 @@ export default function ApprovalList({
     approvedAt: string;
   } | null>(null);
 
+  // Get store methods
+  const removePublication = usePublicationStore((s) => s.removePublication);
+  const updatePublication = usePublicationStore((s) => s.updatePublication);
+  const updateSelectedItem = useManageContentUIStore((s) => s.updateSelectedItem);
+  const selectedItem = useManageContentUIStore((s) => s.selectedItem);
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(12);
@@ -173,11 +181,22 @@ export default function ApprovalList({
             approvedAt: pub.approved_at,
           });
           setApprovalModalOpen(true);
+          
+          // Remove from list immediately
+          removePublication(publication.id);
         } else {
-          // Partial approval (next step)
+          // Partial approval (next step) - update the publication in store
           toast.success(
             `Aprobación del nivel registrada. Ahora en: ${pub.current_approval_step?.name || "Siguiente paso"}`,
           );
+          
+          // Update publication in store with new data including approval logs
+          updatePublication(publication.id, pub);
+          
+          // If this publication is currently being viewed in a modal, update it
+          if (selectedItem?.id === publication.id) {
+            updateSelectedItem(pub);
+          }
         }
 
         onRefresh();
@@ -207,6 +226,10 @@ export default function ApprovalList({
         toast.success(t("approvals.rejectedSuccess") || "Publication rejected");
         setRejectionModalOpen(false);
         setSelectedPublication(null);
+        
+        // Remove from list immediately
+        removePublication(selectedPublication.id);
+        
         onRefresh();
       }
     } catch (error: any) {

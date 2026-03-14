@@ -2,13 +2,13 @@ import Button from "@/Components/common/Modern/Button";
 import Input from "@/Components/common/Modern/Input";
 import axios from "axios";
 import {
+  AlertCircle,
   CheckCircle,
   Clock,
-  XCircle,
-  AlertCircle,
-  ThumbsUp,
-  ThumbsDown,
   Send,
+  ThumbsDown,
+  ThumbsUp,
+  XCircle,
 } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -132,7 +132,40 @@ export default function ContentApprovalStatus({
   const handleSubmitForApproval = async () => {
     try {
       setIsSubmitting(true);
-      await axios.post(route("api.content.submit-for-approval", content.id));
+      const response = await axios.post(route("api.content.submit-for-approval", content.id));
+      
+      // Update stores with fresh data
+      const publication = response.data?.data?.content || response.data?.data?.publication;
+      if (publication) {
+        const publicationStoreModule = await import("@/stores/publicationStore");
+        const manageContentUIStoreModule = await import("@/stores/manageContentUIStore");
+        
+        // CRITICAL: Update immediately with new status
+        publicationStoreModule.usePublicationStore.getState().updatePublication(content.id, {
+          status: publication.status,
+          current_approval_step_id: publication.current_approval_step_id,
+          currentApprovalStep: publication.currentApprovalStep,
+          approval_logs: publication.approval_logs,
+          approvalLogs: publication.approval_logs,
+          submitted_for_approval_at: publication.submitted_for_approval_at,
+          ...publication
+        });
+        
+        // Also update selectedItem if this publication is currently open in a modal
+        const selectedItem = manageContentUIStoreModule.useManageContentUIStore.getState().selectedItem;
+        if (selectedItem?.id === content.id) {
+          manageContentUIStoreModule.useManageContentUIStore.getState().updateSelectedItem({
+            status: publication.status,
+            current_approval_step_id: publication.current_approval_step_id,
+            currentApprovalStep: publication.currentApprovalStep,
+            approval_logs: publication.approval_logs,
+            approvalLogs: publication.approval_logs,
+            submitted_for_approval_at: publication.submitted_for_approval_at,
+            ...publication
+          });
+        }
+      }
+      
       toast.success(t("approval.success.submitted"));
       onStatusChange?.();
     } catch (error: any) {
