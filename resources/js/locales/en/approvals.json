@@ -2,6 +2,7 @@
   "approvals": {
     "approve": "Approve",
     "reject": "Reject",
+    "levelApproved": "Level {{level}} approved",
     "approvedSuccess": "Publication successfully approved",
     "rejectedSuccess": "Publication successfully rejected",
     "sentToReview": "Sent to review - {{level}}. Reviewers: {{approvers}}",
@@ -51,6 +52,11 @@
     },
     "historyTable": {
       "publication": "Publication",
+      "submittedBy": "Submitted by",
+      "submittedAt": "Submitted At",
+      "status": "Status",
+      "completedBy": "Completed by",
+      "actions": "Actions",
       "requestedBy": "Requested by",
       "requestedAt": "Request Date",
       "reviewedBy": "Reviewed by",
