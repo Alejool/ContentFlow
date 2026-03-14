@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -487,10 +488,21 @@ class Publication extends Model
 
   /**
    * Get the approval request for this publication (professional workflow).
+   * Returns the most recent approval request.
    */
   public function approvalRequest(): HasOne
   {
-    return $this->hasOne(\App\Models\Approval\ApprovalRequest::class);
+    return $this->hasOne(\App\Models\Approval\ApprovalRequest::class)
+      ->latestOfMany('created_at');
+  }
+
+  /**
+   * Get all approval requests for this publication.
+   */
+  public function approvalRequests(): HasMany
+  {
+    return $this->hasMany(\App\Models\Approval\ApprovalRequest::class)
+      ->orderBy('created_at', 'desc');
   }
 
   public function currentApprovalStep(): BelongsTo
