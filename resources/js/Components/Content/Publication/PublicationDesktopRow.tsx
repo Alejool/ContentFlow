@@ -233,9 +233,16 @@ const PublicationRow = memo(
                   <div className="relative flex items-center justify-center w-4 h-4 rounded-full bg-yellow-100 dark:bg-yellow-800 text-yellow-600 dark:text-yellow-400">
                     <Clock className="w-2.5 h-2.5" />
                   </div>
-                  <span className="text-[10px] font-bold text-yellow-700 dark:text-yellow-400 uppercase tracking-tight">
-                    {t("publications.table.pendingAdminReview") || "Pendiente de revisión"}
-                  </span>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-bold text-yellow-700 dark:text-yellow-400 uppercase tracking-tight">
+                      {t("publications.table.pendingAdminReview") || "Pendiente de revisión"}
+                    </span>
+                    {item.currentApprovalStep?.role?.name && (
+                      <span className="text-[9px] text-yellow-600 dark:text-yellow-500">
+                        {t("approvals.approver_role")}: {item.currentApprovalStep.role.name}
+                      </span>
+                    )}
+                  </div>
                 </div>
               )}
               {item.status === "publishing" && item.publisher && (

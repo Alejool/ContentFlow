@@ -367,9 +367,16 @@ const PublicationMobileRow = memo(
                       <div className="relative flex items-center justify-center w-5 h-5 rounded-full bg-yellow-100 dark:bg-yellow-800 text-yellow-600 dark:text-yellow-400">
                         <Clock className="w-3 h-3" />
                       </div>
-                      <span className="text-xs font-semibold text-yellow-700 dark:text-yellow-400">
-                        {t("publications.table.pendingAdminReview") || "Pendiente de revisión"}
-                      </span>
+                      <div className="flex flex-col flex-1">
+                        <span className="text-xs font-semibold text-yellow-700 dark:text-yellow-400">
+                          {t("publications.table.pendingAdminReview") || "Pendiente de revisión"}
+                        </span>
+                        {item.currentApprovalStep?.role?.name && (
+                          <span className="text-[10px] text-yellow-600 dark:text-yellow-500">
+                            {t("approvals.approver_role")}: {item.currentApprovalStep.role.name}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>

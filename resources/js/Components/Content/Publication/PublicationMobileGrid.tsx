@@ -3,7 +3,7 @@ import SimpleContentTypeBadge from "@/Components/Content/common/SimpleContentTyp
 import PublicationThumbnail from "@/Components/Content/Publication/PublicationThumbnail";
 import SocialAccountsDisplay from "@/Components/Content/Publication/SocialAccountsDisplay";
 import { Publication } from "@/types/Publication";
-import { router, usePage } from "@inertiajs/react";
+import { usePage } from "@inertiajs/react";
 import axios from "axios";
 import {
   Clock,
@@ -72,12 +72,44 @@ const PublicationMobileGrid = memo(
       try {
         setIsSubmittingForApproval(prev => ({ ...prev, [item.id]: true }));
         
-        await axios.post(`/api/v1/content/${item.id}/submit-for-approval`);
+        const response = await axios.post(`/api/v1/content/${item.id}/submit-for-approval`);
+        
+        // Update stores with fresh data
+        const publication = response.data?.data?.content || response.data?.data?.publication;
+        if (publication) {
+          const publicationStoreModule = await import("@/stores/publicationStore");
+          const manageContentUIStoreModule = await import("@/stores/manageContentUIStore");
+          
+          // CRITICAL: Update immediately with new status
+          publicationStoreModule.usePublicationStore.getState().updatePublication(item.id, {
+            status: publication.status,
+            current_approval_step_id: publication.current_approval_step_id,
+            currentApprovalStep: publication.currentApprovalStep,
+            approval_logs: publication.approval_logs,
+            approvalLogs: publication.approval_logs,
+            submitted_for_approval_at: publication.submitted_for_approval_at,
+            ...publication
+          });
+          
+          // Also update selectedItem if this publication is currently open in a modal
+          const selectedItem = manageContentUIStoreModule.useManageContentUIStore.getState().selectedItem;
+          if (selectedItem?.id === item.id) {
+            manageContentUIStoreModule.useManageContentUIStore.getState().updateSelectedItem({
+              status: publication.status,
+              current_approval_step_id: publication.current_approval_step_id,
+              currentApprovalStep: publication.currentApprovalStep,
+              approval_logs: publication.approval_logs,
+              approvalLogs: publication.approval_logs,
+              submitted_for_approval_at: publication.submitted_for_approval_at,
+              ...publication
+            });
+          }
+        }
         
         toast.success("Enviado a revisión exitosamente");
         
         // Recargar la página para actualizar el estado
-        router.reload({ only: ['publications'] });
+        window.location.reload();
         
       } catch (error: any) {
         console.error("Error submitting for approval:", error);
