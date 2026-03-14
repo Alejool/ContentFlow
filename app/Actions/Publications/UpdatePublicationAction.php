@@ -173,6 +173,43 @@ class UpdatePublicationAction
         }
       }
 
+      // Handle status change to draft - cancel current approval request
+      if (isset($data['status']) && $data['status'] === 'draft' && $currentStatus !== 'draft') {
+        // Cancel any pending or approved approval requests
+        $activeRequest = $publication->approvalRequest()
+          ->whereIn('status', ['pending', 'approved'])
+          ->first();
+        
+        if ($activeRequest) {
+          $activeRequest->update([
+            'status' => 'cancelled',
+            'completed_at' => now(),
+            'completed_by' => Auth::id(),
+          ]);
+          
+          // Log the cancellation
+          \App\Models\Logs\ApprovalLog::create([
+            'approval_request_id' => $activeRequest->id,
+            'approval_step_id' => $activeRequest->current_step_id,
+            'user_id' => Auth::id(),
+            'action' => \App\Models\Logs\ApprovalLog::ACTION_CANCELLED,
+            'level_number' => $activeRequest->currentStep?->level_number,
+            'comment' => 'Publicación revertida a borrador - requiere nueva aprobación',
+            'metadata' => [
+              'previous_status' => $currentStatus,
+              'reason' => 'status_changed_to_draft'
+            ],
+          ]);
+          
+          Log::info('Approval request cancelled due to status change to draft', [
+            'publication_id' => $publication->id,
+            'approval_request_id' => $activeRequest->id,
+            'previous_status' => $currentStatus,
+            'new_status' => 'draft'
+          ]);
+        }
+      }
+
       // Prevent manual status changes to bypass approval workflow
       // Only allow specific status transitions
       if (isset($data['status'])) {

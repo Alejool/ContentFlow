@@ -196,15 +196,17 @@ class PublicationPolicy
         }
 
         // 2. CRITICAL: Only the person who submitted for approval can publish
-        // Use submitted_for_approval_by field (fallback to user_id if not set)
-        $submitterId = $publication->submitted_for_approval_by ?? $publication->user_id;
+        // Get submitter from the approval request
+        $approvalRequest = $publication->approvalRequest;
+        $submitterId = $approvalRequest?->submitted_by ?? $publication->user_id;
         $canPublish = $user->id === $submitterId;
         
         \Log::info('PublicationPolicy::publish - Workflow enabled, checking if user submitted for approval', [
             'user_id' => $user->id,
             'submitter_id' => $submitterId,
             'publication_user_id' => $publication->user_id,
-            'submitted_for_approval_by' => $publication->submitted_for_approval_by,
+            'approval_request_id' => $approvalRequest?->id,
+            'approval_request_submitted_by' => $approvalRequest?->submitted_by,
             'can_publish' => $canPublish
         ]);
 

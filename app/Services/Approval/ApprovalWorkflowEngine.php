@@ -5,8 +5,7 @@ namespace App\Services\Approval;
 use App\Models\Publications\Publication;
 use App\Models\Approval\ApprovalRequest;
 use App\Models\ApprovalLevel;
-use App\Models\ApprovalAction;
-use App\Models\Approval\ApprovalStepApproval;
+use App\Models\Logs\ApprovalLog;
 use App\Models\ApprovalWorkflow;
 use App\Models\User;
 use App\Events\Approval\ApprovalRequestSubmitted;
@@ -41,7 +40,7 @@ class ApprovalWorkflowEngine
         }
 
         return DB::transaction(function () use ($publication, $submitter, $workflow) {
-            // CRITICAL: Cancel any previous pending approval requests
+            // Cancel any previous pending approval requests
             ApprovalRequest::where('publication_id', $publication->id)
                 ->where('status', ApprovalRequest::STATUS_PENDING)
                 ->update([
@@ -75,45 +74,160 @@ class ApprovalWorkflowEngine
                 ],
             ]);
 
-            // Create initial action
-            ApprovalAction::create([
-                'request_id' => $request->id,
-                'content_id' => $publication->id,
-                'step_id' => null,
+            // Create initial log entry
+            ApprovalLog::create([
+                'approval_request_id' => $request->id,
+                'approval_step_id' => null,
                 'user_id' => $submitter->id,
-                'action_type' => 'submitted',
-                'approval_level' => 0,
+                'action' => ApprovalLog::ACTION_SUBMITTED,
+                'level_number' => 0,
+                'comment' => 'Publication submitted for approval',
                 'metadata' => [
                     'ip' => request()->ip(),
                     'user_agent' => request()->userAgent(),
                 ],
             ]);
 
-            // Create pending approvals for first step
-            $this->createPendingApprovalsForStep($request, $firstStep);
-
             // Update publication status
             $publication->update([
                 'status' => Publication::STATUS_PENDING_REVIEW,
                 'current_approval_level' => $firstStep->level_number,
-                'current_approval_step_id' => $firstStep->id, // CRITICAL: Set initial step ID
+                'current_approval_step_id' => $firstStep->id,
                 'submitted_for_approval_at' => now(),
-                'submitted_for_approval_by' => $submitter->id, // CRITICAL: Track who submitted
             ]);
 
-            Log::info('Approval request submitted', [
-                'request_id' => $request->id,
-                'publication_id' => $publication->id,
-                'workflow_id' => $workflow->id,
-                'first_step_id' => $firstStep->id,
-                'submitted_by' => $submitter->id,
-            ]);
+            // Clear cache
+            $this->clearApprovalCache($publication->workspace_id);
 
             // Dispatch event
             event(new ApprovalRequestSubmitted($request, $submitter));
 
-            return $request->fresh(['currentStep', 'workflow']);
+            Log::info('Publication submitted for approval', [
+                'publication_id' => $publication->id,
+                'request_id' => $request->id,
+                'workflow_id' => $workflow->id,
+                'first_step_id' => $firstStep->id,
+            ]);
+
+            // Auto-approve steps where submitter is assigned
+            $request = $this->autoApproveSubmitterSteps($request, $submitter);
+
+            return $request->load(['currentStep.role', 'workflow', 'submitter']);
         });
+    }
+
+    /**
+     * Auto-approve steps where the submitter is assigned as approver
+     * 
+     * @param ApprovalRequest $request
+     * @param User $submitter
+     * @return ApprovalRequest
+     */
+    private function autoApproveSubmitterSteps(ApprovalRequest $request, User $submitter): ApprovalRequest
+    {
+        $maxIterations = 10; // Prevent infinite loops
+        $iteration = 0;
+
+        while ($request->isPending() && $iteration < $maxIterations) {
+            $iteration++;
+            
+            // Check if submitter can approve current step
+            if (!$this->canApprove($submitter, $request)) {
+                // Submitter cannot approve this step, stop auto-approval
+                Log::info('Auto-approval stopped - submitter cannot approve current step', [
+                    'request_id' => $request->id,
+                    'current_step' => $request->current_step_id,
+                    'submitter_id' => $submitter->id,
+                ]);
+                break;
+            }
+
+            $currentStep = $request->currentStep;
+            
+            Log::info('Auto-approving step for submitter', [
+                'request_id' => $request->id,
+                'step_id' => $currentStep->id,
+                'step_number' => $currentStep->level_number,
+                'submitter_id' => $submitter->id,
+            ]);
+
+            // Create auto-approval log entry
+            ApprovalLog::create([
+                'approval_request_id' => $request->id,
+                'approval_step_id' => $currentStep->id,
+                'user_id' => $submitter->id,
+                'action' => ApprovalLog::ACTION_AUTO_ADVANCED,
+                'level_number' => $currentStep->level_number,
+                'comment' => 'Auto-approved: Submitter is assigned to this approval level',
+                'metadata' => [
+                    'auto_approved' => true,
+                    'reason' => 'submitter_is_approver',
+                ],
+            ]);
+
+            // Check if there are more steps
+            $nextStep = $request->workflow->levels()
+                ->where('level_number', '>', $currentStep->level_number)
+                ->orderBy('level_number')
+                ->first();
+
+            if ($nextStep) {
+                // Move to next step
+                $request->update([
+                    'current_step_id' => $nextStep->id,
+                ]);
+
+                $request->publication->update([
+                    'current_approval_level' => $nextStep->level_number,
+                    'current_approval_step_id' => $nextStep->id,
+                ]);
+
+                Log::info('Auto-approval advanced to next step', [
+                    'request_id' => $request->id,
+                    'from_step' => $currentStep->level_number,
+                    'to_step' => $nextStep->level_number,
+                ]);
+
+                // Dispatch event for step completion
+                event(new ApprovalStepCompleted($request, $currentStep, $nextStep));
+
+                // Refresh request to get updated step
+                $request = $request->fresh();
+            } else {
+                // No more steps - final approval
+                $request->update([
+                    'status' => ApprovalRequest::STATUS_APPROVED,
+                    'current_step_id' => null,
+                    'completed_at' => now(),
+                    'completed_by' => $submitter->id,
+                ]);
+
+                $request->publication->update([
+                    'status' => Publication::STATUS_APPROVED,
+                    'approved_at' => now(),
+                    'approved_by' => $submitter->id,
+                    'current_approval_level' => null,
+                    'current_approval_step_id' => null,
+                ]);
+
+                Log::info('Auto-approval completed - all steps approved', [
+                    'request_id' => $request->id,
+                    'publication_id' => $request->publication_id,
+                ]);
+
+                event(new ApprovalRequestCompleted($request));
+                break;
+            }
+        }
+
+        if ($iteration >= $maxIterations) {
+            Log::warning('Auto-approval stopped - max iterations reached', [
+                'request_id' => $request->id,
+                'iterations' => $iteration,
+            ]);
+        }
+
+        return $request;
     }
 
     /**
@@ -122,49 +236,29 @@ class ApprovalWorkflowEngine
      * @param ApprovalRequest $request
      * @param User $approver
      * @param string|null $comment
-     * @return ApprovalAction
+     * @return ApprovalRequest
      * @throws \Exception
      */
-    public function approve(
-        ApprovalRequest $request,
-        User $approver,
-        ?string $comment = null
-    ): ApprovalAction {
+    public function approve(ApprovalRequest $request, User $approver, ?string $comment = null): ApprovalRequest
+    {
         if (!$request->isPending()) {
-            throw new \Exception('Request is not pending approval');
+            throw new \Exception('Approval request is not pending');
         }
 
-        $currentStep = $request->currentStep;
-        
-        if (!$currentStep) {
-            throw new \Exception('No current step found');
+        if (!$this->canApprove($approver, $request)) {
+            throw new \Exception('User does not have permission to approve at this step');
         }
 
-        // Validate approver has permission
-        $this->validateApprover($approver, $request, $currentStep);
-
-        return DB::transaction(function () use ($request, $currentStep, $approver, $comment) {
-            // Record individual approval
-            $stepApproval = ApprovalStepApproval::where([
-                'request_id' => $request->id,
-                'step_id' => $currentStep->id,
+        return DB::transaction(function () use ($request, $approver, $comment) {
+            $currentStep = $request->currentStep;
+            
+            // Create approval log entry
+            ApprovalLog::create([
+                'approval_request_id' => $request->id,
+                'approval_step_id' => $currentStep->id,
                 'user_id' => $approver->id,
-            ])->firstOrFail();
-
-            $stepApproval->update([
-                'status' => ApprovalStepApproval::STATUS_APPROVED,
-                'comment' => $comment,
-                'approved_at' => now(),
-            ]);
-
-            // Create action record
-            $action = ApprovalAction::create([
-                'request_id' => $request->id,
-                'content_id' => $request->publication_id,
-                'step_id' => $currentStep->id,
-                'user_id' => $approver->id,
-                'action_type' => 'approved',
-                'approval_level' => $currentStep->level_number,
+                'action' => ApprovalLog::ACTION_APPROVED,
+                'level_number' => $currentStep->level_number,
                 'comment' => $comment,
                 'metadata' => [
                     'ip' => request()->ip(),
@@ -172,19 +266,58 @@ class ApprovalWorkflowEngine
                 ],
             ]);
 
-            Log::info('Step approval recorded', [
-                'request_id' => $request->id,
-                'step_id' => $currentStep->id,
-                'user_id' => $approver->id,
-                'step_approval_id' => $stepApproval->id,
-            ]);
+            // Check if there are more steps
+            $nextStep = $request->workflow->levels()
+                ->where('level_number', '>', $currentStep->level_number)
+                ->orderBy('level_number')
+                ->first();
 
-            // Check if step is complete
-            if ($this->isStepComplete($request, $currentStep)) {
-                $this->completeStep($request, $currentStep, $approver);
+            if ($nextStep) {
+                // Move to next step
+                $request->update([
+                    'current_step_id' => $nextStep->id,
+                ]);
+
+                $request->publication->update([
+                    'current_approval_level' => $nextStep->level_number,
+                    'current_approval_step_id' => $nextStep->id,
+                ]);
+
+                Log::info('Approval request advanced to next step', [
+                    'request_id' => $request->id,
+                    'from_step' => $currentStep->level_number,
+                    'to_step' => $nextStep->level_number,
+                ]);
+
+                event(new ApprovalStepCompleted($request, $currentStep, $nextStep));
+            } else {
+                // Final approval - complete the request
+                $request->update([
+                    'status' => ApprovalRequest::STATUS_APPROVED,
+                    'current_step_id' => null,
+                    'completed_at' => now(),
+                    'completed_by' => $approver->id,
+                ]);
+
+                $request->publication->update([
+                    'status' => Publication::STATUS_APPROVED,
+                    'approved_at' => now(),
+                    'current_approval_level' => null,
+                    'current_approval_step_id' => null,
+                ]);
+
+                Log::info('Approval request completed', [
+                    'request_id' => $request->id,
+                    'publication_id' => $request->publication_id,
+                ]);
+
+                event(new ApprovalRequestCompleted($request));
             }
 
-            return $action;
+            // Clear cache
+            $this->clearApprovalCache($request->publication->workspace_id);
+
+            return $request->fresh()->load(['currentStep.role', 'workflow', 'submitter', 'publication']);
         });
     }
 
@@ -194,45 +327,29 @@ class ApprovalWorkflowEngine
      * @param ApprovalRequest $request
      * @param User $rejector
      * @param string $reason
-     * @return ApprovalAction
+     * @return ApprovalRequest
      * @throws \Exception
      */
-    public function reject(
-        ApprovalRequest $request,
-        User $rejector,
-        string $reason
-    ): ApprovalAction {
+    public function reject(ApprovalRequest $request, User $rejector, string $reason): ApprovalRequest
+    {
         if (!$request->isPending()) {
-            throw new \Exception('Request is not pending approval');
+            throw new \Exception('Approval request is not pending');
         }
 
-        $currentStep = $request->currentStep;
-        
-        if (!$currentStep) {
-            throw new \Exception('No current step found');
+        if (!$this->canApprove($rejector, $request)) {
+            throw new \Exception('User does not have permission to reject at this step');
         }
 
-        // Validate rejector has permission
-        $this->validateApprover($rejector, $request, $currentStep);
-
-        return DB::transaction(function () use ($request, $currentStep, $rejector, $reason) {
-            // Update request
-            $request->update([
-                'status' => ApprovalRequest::STATUS_REJECTED,
-                'current_step_id' => null,
-                'rejection_reason' => $reason,
-                'completed_at' => now(),
-                'completed_by' => $rejector->id,
-            ]);
-
-            // Create action record
-            $action = ApprovalAction::create([
-                'request_id' => $request->id,
-                'content_id' => $request->publication_id,
-                'step_id' => $currentStep->id,
+        return DB::transaction(function () use ($request, $rejector, $reason) {
+            $currentStep = $request->currentStep;
+            
+            // Create rejection log entry
+            ApprovalLog::create([
+                'approval_request_id' => $request->id,
+                'approval_step_id' => $currentStep->id,
                 'user_id' => $rejector->id,
-                'action_type' => 'rejected',
-                'approval_level' => $currentStep->level_number,
+                'action' => ApprovalLog::ACTION_REJECTED,
+                'level_number' => $currentStep->level_number,
                 'comment' => $reason,
                 'metadata' => [
                     'ip' => request()->ip(),
@@ -240,27 +357,37 @@ class ApprovalWorkflowEngine
                 ],
             ]);
 
-            // Update publication
-            $request->publication->update([
-                'status' => 'rejected',
-                'current_approval_level' => 0,
-                'current_approval_step_id' => null, // Clear step ID when rejected
-                'rejected_at' => now(),
-                'rejected_by' => $rejector->id,
+            // Update request status
+            $request->update([
+                'status' => ApprovalRequest::STATUS_REJECTED,
+                'current_step_id' => null,
+                'completed_at' => now(),
+                'completed_by' => $rejector->id,
                 'rejection_reason' => $reason,
+            ]);
+
+            // Update publication status
+            $request->publication->update([
+                'status' => Publication::STATUS_REJECTED,
+                'rejected_at' => now(),
+                'rejection_reason' => $reason,
+                'current_approval_level' => null,
+                'current_approval_step_id' => null,
             ]);
 
             Log::info('Approval request rejected', [
                 'request_id' => $request->id,
-                'step_id' => $currentStep->id,
+                'publication_id' => $request->publication_id,
+                'rejected_at_level' => $currentStep->level_number,
                 'rejected_by' => $rejector->id,
-                'reason' => $reason,
             ]);
 
-            // Dispatch event
-            event(new ApprovalRequestRejected($request, $rejector, $reason));
+            // Clear cache
+            $this->clearApprovalCache($request->publication->workspace_id);
 
-            return $action;
+            event(new ApprovalRequestRejected($request, $reason));
+
+            return $request->fresh()->load(['currentStep.role', 'workflow', 'submitter', 'publication']);
         });
     }
 
@@ -283,241 +410,98 @@ class ApprovalWorkflowEngine
             return false;
         }
 
-        // Check if user has pending approval for this step
-        return ApprovalStepApproval::where([
-            'request_id' => $request->id,
-            'step_id' => $currentStep->id,
-            'user_id' => $user->id,
-            'status' => ApprovalStepApproval::STATUS_PENDING,
-        ])->exists();
-    }
-
-    /**
-     * Get approval status with detailed info
-     * 
-     * @param ApprovalRequest $request
-     * @return array
-     */
-    public function getApprovalStatus(ApprovalRequest $request): array
-    {
-        $workflow = $request->workflow;
-        $currentStep = $request->currentStep;
-        
-        $steps = $workflow->levels()->orderBy('level_number')->get()->map(function ($step) use ($request) {
-            $approvals = ApprovalStepApproval::where([
-                'request_id' => $request->id,
-                'step_id' => $step->id,
-            ])->with('user')->get();
-
-            $isCurrentStep = $request->current_step_id === $step->id;
-            $isPastStep = $request->current_step_id && 
-                $step->level_number < $request->currentStep->level_number;
-
-            return [
-                'id' => $step->id,
-                'order' => $step->level_number,
-                'name' => $step->level_name,
-                'description' => $step->description,
-                'is_current' => $isCurrentStep,
-                'is_past' => $isPastStep,
-                'is_future' => !$isCurrentStep && !$isPastStep,
-                'status' => $this->getStepStatus($approvals),
-                'approvals' => $approvals->map(fn($a) => [
-                    'user' => [
-                        'id' => $a->user->id,
-                        'name' => $a->user->name,
-                        'photo_url' => $a->user->photo_url,
-                    ],
-                    'status' => $a->status,
-                    'comment' => $a->comment,
-                    'approved_at' => $a->approved_at?->toIso8601String(),
-                ]),
-                'required_approvals' => $step->require_all_users 
-                    ? $approvals->count() 
-                    : 1,
-                'completed_approvals' => $approvals->where('status', ApprovalStepApproval::STATUS_APPROVED)->count(),
-            ];
-        });
-
-        return [
-            'request_id' => $request->id,
-            'status' => $request->status,
-            'current_step' => $currentStep ? [
-                'id' => $currentStep->id,
-                'order' => $currentStep->level_number,
-                'name' => $currentStep->level_name,
-            ] : null,
-            'steps' => $steps,
-            'submitted_by' => [
-                'id' => $request->submitter->id,
-                'name' => $request->submitter->name,
-            ],
-            'submitted_at' => $request->submitted_at->toIso8601String(),
-            'completed_at' => $request->completed_at?->toIso8601String(),
-        ];
-    }
-
-    /**
-     * Private helper methods
-     */
-
-    private function validateApprover(User $user, ApprovalRequest $request, ApprovalLevel $step): void
-    {
-        // Check if user is in the step's approvers list
-        $hasPermission = ApprovalStepApproval::where([
-            'request_id' => $request->id,
-            'step_id' => $step->id,
-            'user_id' => $user->id,
-            'status' => ApprovalStepApproval::STATUS_PENDING,
-        ])->exists();
-
-        if (!$hasPermission) {
-            throw new \Exception('User does not have permission to approve at this step');
-        }
-    }
-
-    private function createPendingApprovalsForStep(
-        ApprovalRequest $request,
-        ApprovalLevel $step
-    ): void {
-        $approvers = $step->getApprovers();
-
-        if ($approvers->isEmpty()) {
-            throw new \Exception('Step has no approvers configured');
+        // Check if user is directly assigned to this step
+        if ($currentStep->user_id === $user->id) {
+            return true;
         }
 
-        foreach ($approvers as $approver) {
-            ApprovalStepApproval::create([
-                'request_id' => $request->id,
-                'step_id' => $step->id,
-                'user_id' => $approver->id,
-                'status' => ApprovalStepApproval::STATUS_PENDING,
-            ]);
+        // Check if user is in the step's user list
+        if ($currentStep->users()->where('users.id', $user->id)->exists()) {
+            return true;
         }
 
-        Log::info('Created pending approvals for step', [
-            'request_id' => $request->id,
-            'step_id' => $step->id,
-            'approvers_count' => $approvers->count(),
-        ]);
-    }
-
-    private function isStepComplete(ApprovalRequest $request, ApprovalLevel $step): bool
-    {
-        $approvals = ApprovalStepApproval::where([
-            'request_id' => $request->id,
-            'step_id' => $step->id,
-        ])->get();
-
-        if ($step->require_all_users) {
-            // All users must approve
-            $isComplete = $approvals->every(fn($a) => $a->status === ApprovalStepApproval::STATUS_APPROVED);
-        } else {
-            // At least one user must approve
-            $isComplete = $approvals->contains(fn($a) => $a->status === ApprovalStepApproval::STATUS_APPROVED);
-        }
-
-        Log::info('Step completion check', [
-            'request_id' => $request->id,
-            'step_id' => $step->id,
-            'require_all' => $step->require_all_users,
-            'total_approvals' => $approvals->count(),
-            'approved_count' => $approvals->where('status', ApprovalStepApproval::STATUS_APPROVED)->count(),
-            'is_complete' => $isComplete,
-        ]);
-
-        return $isComplete;
-    }
-
-    private function completeStep(
-        ApprovalRequest $request,
-        ApprovalLevel $step,
-        User $approver
-    ): void {
-        // Get next step
-        $nextStep = ApprovalLevel::where('approval_workflow_id', $step->approval_workflow_id)
-            ->where('level_number', '>', $step->level_number)
-            ->orderBy('level_number')
-            ->first();
-
-        if ($nextStep) {
-            // Advance to next step
-            $request->update([
-                'current_step_id' => $nextStep->id,
-            ]);
-
-            $request->publication->update([
-                'current_approval_level' => $nextStep->level_number,
-                'current_approval_step_id' => $nextStep->id, // CRITICAL: Update step ID for pending approvals list
-            ]);
-
-            // Create pending approvals for next step
-            $this->createPendingApprovalsForStep($request, $nextStep);
-
-            Log::info('Advanced to next step', [
-                'request_id' => $request->id,
-                'from_step' => $step->id,
-                'to_step' => $nextStep->id,
-                'publication_id' => $request->publication_id,
-            ]);
-
-            // Dispatch event
-            event(new ApprovalStepCompleted($request, $step, $nextStep));
-        } else {
-            // Final step completed - approve request
-            $request->update([
-                'status' => ApprovalRequest::STATUS_APPROVED,
-                'current_step_id' => null,
-                'completed_at' => now(),
-                'completed_by' => $approver->id,
-            ]);
-
-            $request->publication->update([
-                'status' => Publication::STATUS_APPROVED,
-                'current_approval_level' => 0,
-                'current_approval_step_id' => null, // Clear step ID when approved
-                'approved_at' => now(),
-                'approved_by' => $approver->id,
-            ]);
-
-            Log::info('Approval request completed', [
-                'request_id' => $request->id,
-                'completed_by' => $approver->id,
-            ]);
-
-            // Auto-publish if configured
-            if ($request->workflow->auto_publish_on_final_approval) {
-                Log::info('Auto-publish triggered', [
-                    'request_id' => $request->id,
-                    'publication_id' => $request->publication_id,
-                ]);
-                // Dispatch publish job
-                // \App\Jobs\PublishContent::dispatch($request->publication);
+        // Check if user has the role assigned to this step
+        if ($currentStep->role_id) {
+            $hasRole = DB::table('role_user')
+                ->where('user_id', $user->id)
+                ->where('role_id', $currentStep->role_id)
+                ->where('workspace_id', $request->publication->workspace_id)
+                ->exists();
+            
+            if ($hasRole) {
+                return true;
             }
-
-            // Dispatch event
-            event(new ApprovalRequestCompleted($request, $approver));
         }
+
+        return false;
     }
 
-    private function getStepStatus($approvals): string
+    /**
+     * Get pending approval requests for a user
+     * 
+     * @param User $user
+     * @param int $workspaceId
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getPendingRequestsForUser(User $user, int $workspaceId)
     {
-        if ($approvals->isEmpty()) {
-            return 'pending';
-        }
+        return ApprovalRequest::with([
+            'publication',
+            'workflow',
+            'currentStep.role',
+            'submitter',
+        ])
+        ->whereHas('publication', function ($query) use ($workspaceId) {
+            $query->where('workspace_id', $workspaceId);
+        })
+        ->where('status', ApprovalRequest::STATUS_PENDING)
+        ->whereHas('currentStep', function ($q) use ($user, $workspaceId) {
+            // User is directly assigned
+            $q->where('user_id', $user->id)
+                // OR user is in the step's user list
+                ->orWhereHas('users', function ($userQuery) use ($user) {
+                    $userQuery->where('users.id', $user->id);
+                })
+                // OR user has the role assigned to this step
+                ->orWhereHas('role', function ($roleQuery) use ($user, $workspaceId) {
+                    $roleQuery->whereHas('users', function ($userRoleQuery) use ($user, $workspaceId) {
+                        $userRoleQuery->where('users.id', $user->id)
+                            ->where('role_user.workspace_id', $workspaceId);
+                    });
+                });
+        })
+        ->orderBy('submitted_at', 'desc')
+        ->get();
+    }
 
-        if ($approvals->contains(fn($a) => $a->status === ApprovalStepApproval::STATUS_REJECTED)) {
-            return 'rejected';
-        }
+    /**
+     * Get approval history for a publication
+     * 
+     * @param Publication $publication
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getApprovalHistory(Publication $publication)
+    {
+        return ApprovalRequest::with([
+            'workflow',
+            'submitter',
+            'completedBy',
+            'logs.user',
+            'logs.approvalStep',
+        ])
+        ->where('publication_id', $publication->id)
+        ->orderBy('submitted_at', 'desc')
+        ->get();
+    }
 
-        if ($approvals->every(fn($a) => $a->status === ApprovalStepApproval::STATUS_APPROVED)) {
-            return 'approved';
-        }
-
-        if ($approvals->contains(fn($a) => $a->status === ApprovalStepApproval::STATUS_APPROVED)) {
-            return 'partially_approved';
-        }
-
-        return 'pending';
+    /**
+     * Clear approval cache for workspace
+     * 
+     * @param int $workspaceId
+     */
+    private function clearApprovalCache(int $workspaceId): void
+    {
+        Cache::forget("approval_workflow_{$workspaceId}");
+        Cache::forget("pending_approvals_workspace_{$workspaceId}");
     }
 }
