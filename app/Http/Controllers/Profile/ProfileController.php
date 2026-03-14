@@ -388,14 +388,13 @@ class ProfileController extends Controller
 
   public function changePassword(PasswordUpdateRequest $request)
   {
-
     if (!Auth::check()) {
       return response()->json([
         'success' => false,
         'message' => __('messages.auth.not_authenticated')
-      ]);
+      ], 401);
     }
-    $data = $request->validated();
+
     $user = User::find(Auth::id());
 
     if (!$user) {
@@ -405,18 +404,35 @@ class ProfileController extends Controller
       ], 404);
     }
 
+    // Check if user registered via OAuth (Google, etc.)
+    if ($user->provider !== null) {
+      return response()->json([
+        'success' => false,
+        'message' => __('messages.profile.oauth_password_change_not_allowed'),
+        'errors' => [
+          'current_password' => [__('messages.profile.oauth_password_change_not_allowed')]
+        ]
+      ], 403);
+    }
 
-    // Use Hash::check() to properly compare hashed passwords
+    $data = $request->validated();
+
+    // Verify current password
     if (!Hash::check($data['current_password'], $user->password)) {
       return response()->json([
         'success' => false,
-        'message' => __('messages.profile.current_password_incorrect')
-      ]);
+        'message' => __('messages.profile.current_password_incorrect'),
+        'errors' => [
+          'current_password' => [__('messages.profile.current_password_incorrect')]
+        ]
+      ], 422);
     }
+
+    // Update password
     $user->password = Hash::make($data['password']);
     $user->save();
 
-    return $this->successResponse(null, 'Password updated successfully');
+    return $this->successResponse(null, __('messages.profile.password_updated'));
   }
 
 
