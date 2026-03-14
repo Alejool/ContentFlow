@@ -170,7 +170,8 @@ class ApprovalController extends Controller
   }
 
   /**
-   * Get approval statistics
+   * Get approval statistics filtered by current user's assignments
+   * Only shows stats for approvals the user can actually handle
    */
   public function stats()
   {
@@ -185,33 +186,76 @@ class ApprovalController extends Controller
       return $this->errorResponse('You do not have permission to view approval statistics.', 403);
     }
 
-    // Total pending requests
-    $pendingRequests = Publication::where('workspace_id', $workspaceId)
-      ->where('status', 'pending_review')
-      ->count();
+    $userId = Auth::id();
+    $workspace = \App\Models\Workspace\Workspace::find($workspaceId);
+    
+    // Get user's role in the workspace
+    $userRole = Auth::user()->workspaces()
+      ->where('workspaces.id', $workspaceId)
+      ->first()
+      ?->pivot
+      ?->role;
 
-    // Approved today
+    // Check if user is owner or admin
+    $isOwner = $workspace->user_id === $userId;
+    $isAdmin = $userRole && in_array($userRole->slug, ['owner', 'admin']);
+
+    // Get the active approval workflow
+    $workflow = $workspace->approvalWorkflow()->with('levels.role')->where('is_enabled', true)->first();
+
+    // Base query for pending requests (exclude own publications)
+    $pendingQuery = Publication::where('workspace_id', $workspaceId)
+      ->where('status', 'pending_review')
+      ->where('user_id', '!=', $userId);
+
+    // If there's a workflow AND user is NOT admin, filter by assigned levels
+    if ($workflow && !$isOwner && !$isAdmin && $userRole) {
+      $assignedLevelIds = $workflow->levels()
+        ->where('role_id', $userRole->id)
+        ->pluck('id')
+        ->toArray();
+
+      if (!empty($assignedLevelIds)) {
+        $pendingQuery->whereIn('current_approval_step_id', $assignedLevelIds);
+      } else {
+        // User has no assigned levels, return zero stats
+        return $this->successResponse([
+          'pending_requests' => 0,
+          'approved_today' => 0,
+          'rejected_today' => 0,
+          'avg_approval_time_hours' => 0,
+        ]);
+      }
+    }
+
+    $pendingRequests = $pendingQuery->count();
+
+    // For approved/rejected stats, filter by reviewed_by (only count actions by this user)
+    // Approved today by this user
     $approvedToday = ApprovalLog::whereHas('publication', function ($q) use ($workspaceId) {
       $q->where('workspace_id', $workspaceId);
     })
       ->where('action', 'approved')
+      ->where('reviewed_by', $userId) // Only count approvals by this user
       ->whereDate('reviewed_at', today())
       ->count();
 
-    // Rejected today
+    // Rejected today by this user
     $rejectedToday = ApprovalLog::whereHas('publication', function ($q) use ($workspaceId) {
       $q->where('workspace_id', $workspaceId);
     })
       ->where('action', 'rejected')
+      ->where('reviewed_by', $userId) // Only count rejections by this user
       ->whereDate('reviewed_at', today())
       ->count();
 
-    // Average approval time (in hours)
+    // Average approval time for this user's approvals (in hours)
     $avgApprovalTime = ApprovalLog::whereHas('publication', function ($q) use ($workspaceId) {
       $q->where('workspace_id', $workspaceId);
     })
       ->whereNotNull('reviewed_at')
       ->where('action', 'approved')
+      ->where('reviewed_by', $userId) // Only count this user's approval times
       ->selectRaw('AVG(EXTRACT(EPOCH FROM (reviewed_at - requested_at)) / 3600) as avg_hours')
       ->value('avg_hours');
 

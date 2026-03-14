@@ -45,25 +45,51 @@ class ContentApprovalController extends Controller
             
             $approvalAction = $this->approvalWorkflowService->submitForApproval($content, $user);
             
-            // Refresh content to get updated data
-            $content = $content->fresh(['workspace.approvalWorkflow.levels.role']);
+            // Refresh content to get updated data with all necessary relationships
+            $content->refresh();
+            $content->load([
+                'user:id,name,email,photo_url',
+                'currentApprovalStep' => fn($q) => $q->with([
+                    'role:id,name',
+                    'user:id,name,photo_url',
+                    'workflow.steps' => fn($q) => $q->orderBy('level_number')->with(['role:id,name', 'user:id,name,photo_url'])
+                ]),
+                'approvalLogs' => fn($q) => $q->latest('requested_at')->with([
+                    'requester:id,name,photo_url',
+                    'reviewer:id,name,photo_url',
+                    'step' => fn($q) => $q->with(['role:id,name', 'user:id,name,photo_url'])
+                ])
+            ]);
             
-            // Get current approval level info
-            $workflow = $content->workspace->approvalWorkflow;
-            $currentLevel = $content->current_approval_level;
-            $approvalLevel = $workflow?->getLevelByNumber($currentLevel);
+            // Get current approval step info
+            $currentStep = $content->currentApprovalStep;
+            $approvers = [];
+            $approverNames = [];
             
-            // Get approvers for this level
-            $approvers = $approvalLevel ? $approvalLevel->getApprovers() : collect();
-            $approverNames = $approvers->pluck('name')->toArray();
+            if ($currentStep) {
+                if ($currentStep->user_id) {
+                    $approvers = [$currentStep->user];
+                    $approverNames = [$currentStep->user->name];
+                } elseif ($currentStep->role_id) {
+                    // Get users with this role in the workspace
+                    $approvers = \DB::table('role_user')
+                        ->join('users', 'users.id', '=', 'role_user.user_id')
+                        ->where('role_user.workspace_id', $content->workspace_id)
+                        ->where('role_user.role_id', $currentStep->role_id)
+                        ->select('users.id', 'users.name')
+                        ->get();
+                    $approverNames = $approvers->pluck('name')->toArray();
+                }
+            }
             
             return $this->successResponse([
                 'message' => 'Content submitted for approval successfully.',
                 'content' => $content,
+                'publication' => $content, // Add alias for frontend compatibility
                 'approval_action' => $approvalAction,
                 'approval_info' => [
-                    'current_level' => $currentLevel,
-                    'level_name' => $approvalLevel?->level_name,
+                    'current_level' => $currentStep?->level_number,
+                    'level_name' => $currentStep?->name,
                     'approvers' => $approverNames,
                     'approver_count' => count($approverNames),
                 ],

@@ -90,7 +90,21 @@ class PublicationController extends Controller
           'user' => fn($q) => $q->select('users.id', 'users.name', 'users.email', 'users.photo_url'),
           'publisher' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url'),
           'rejector' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url'),
-          'approvalLogs' => fn($q) => $q->latest('requested_at')->with(['requester:id,name,photo_url', 'reviewer:id,name,photo_url']),
+          'currentApprovalStep' => fn($q) => $q->with([
+            'role:id,name,slug',
+            'user:id,name,photo_url',
+            'workflow' => fn($wq) => $wq->with([
+              'steps' => fn($sq) => $sq->with([
+                'role:id,name,slug',
+                'user:id,name,photo_url'
+              ])->orderBy('level_number')
+            ])
+          ]),
+          'approvalLogs' => fn($q) => $q->latest('requested_at')->with([
+            'requester:id,name,photo_url',
+            'reviewer:id,name,photo_url',
+            'step:id,level_number,level_name,role_id,user_id'
+          ]),
           'activities' => fn($q) => $q->orderBy('created_at', 'desc')->with('user:id,name,photo_url'),
           'recurrenceSettings', // Load recurrence settings
         ]);
@@ -277,7 +291,16 @@ class PublicationController extends Controller
       'campaigns' => fn($q) => $q->select('campaigns.id', 'campaigns.name', 'campaigns.status'),
       'publisher' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url'),
       'rejector' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url'),
-      'rejector' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url'),
+      'currentApprovalStep' => fn($q) => $q->with([
+        'role:id,name,slug',
+        'user:id,name,photo_url',
+        'workflow' => fn($wq) => $wq->with([
+          'steps' => fn($sq) => $sq->with([
+            'role:id,name,slug',
+            'user:id,name,photo_url'
+          ])->orderBy('level_number')
+        ])
+      ]),
       'approvalLogs' => fn($q) => $q->latest('requested_at')->with(['requester:id,name,photo_url', 'reviewer:id,name,photo_url']),
       'activities' => fn($q) => $q->orderBy('created_at', 'desc')->with('user:id,name,photo_url'),
       'recurrenceSettings', // Load recurrence settings
@@ -784,14 +807,15 @@ class PublicationController extends Controller
     }
 
     // Check for active workflow
-    $workflow = ApprovalWorkflow::where('workspace_id', $publication->workspace_id)
+    $workflow = ApprovalWorkflow::with('levels')
+      ->where('workspace_id', $publication->workspace_id)
       ->where('is_active', true)
       ->orderBy('created_at', 'desc')
       ->first();
 
     $currentStepId = null;
-    if ($workflow && $workflow->steps->isNotEmpty()) {
-      $currentStepId = $workflow->steps->first()->id;
+    if ($workflow && $workflow->levels->isNotEmpty()) {
+      $currentStepId = $workflow->levels->first()->id;
     }
 
     $publication->update($updateData + ['current_approval_step_id' => $currentStepId]);
@@ -901,6 +925,17 @@ class PublicationController extends Controller
         }
       }
 
+      // Check if this user already approved this step
+      $alreadyApproved = ApprovalLog::where('publication_id', $publication->id)
+        ->where('current_step_id', $currentStep->id)
+        ->where('reviewed_by', Auth::id())
+        ->where('action', 'approved')
+        ->exists();
+
+      if ($alreadyApproved) {
+        return $this->errorResponse('You have already approved this step.', 422);
+      }
+
       // Find next step
       $nextStep = ApprovalLevel::where('approval_workflow_id', $currentStep->approval_workflow_id)
         ->where('level_number', '>', $currentStep->level_number)
@@ -908,6 +943,18 @@ class PublicationController extends Controller
         ->first();
 
       if ($nextStep) {
+        // Create approval log for this step
+        ApprovalLog::create([
+          'publication_id' => $publication->id,
+          'requested_by' => $publication->user_id,
+          'requested_at' => $publication->submitted_for_approval_at ?? now(),
+          'reviewed_by' => Auth::id(),
+          'reviewed_at' => now(),
+          'action' => 'approved',
+          'rejection_reason' => $request->input('comment'),
+          'current_step_id' => $currentStep->id,
+        ]);
+
         $publication->update([
           'current_approval_step_id' => $nextStep->id,
         ]);
@@ -918,13 +965,55 @@ class PublicationController extends Controller
           'next_step' => $nextStep->level_name ?? "Nivel {$nextStep->level_number}",
         ]);
 
+        $this->clearPublicationCache(Auth::user()->current_workspace_id);
+
+        // Load all necessary relationships for the response
+        $publication->load([
+          'currentApprovalStep' => fn($q) => $q->with([
+            'role:id,name',
+            'user:id,name,photo_url',
+            'workflow.steps' => fn($q) => $q->orderBy('level_number')->with(['role:id,name', 'user:id,name,photo_url'])
+          ]),
+          'approvalLogs' => fn($q) => $q->latest('requested_at')->with([
+            'requester:id,name,photo_url',
+            'reviewer:id,name,photo_url',
+            'step' => fn($q) => $q->with(['role:id,name', 'user:id,name,photo_url'])
+          ])
+        ]);
+
         return $this->successResponse([
-          'publication' => $publication->load(['currentApprovalStep', 'approvalLogs']),
-        ], 'Step approved. Publication moved to ' . ($nextStep->name ?? "the next step") . '.');
+          'publication' => $publication,
+        ], 'Step approved. Publication moved to ' . ($nextStep->level_name ?? "the next step") . '.');
       }
     }
 
     // If no more steps or no workflow, mark as fully approved
+    // Check if this user already approved this final step
+    if ($publication->current_approval_step_id) {
+      $currentStep = ApprovalLevel::find($publication->current_approval_step_id);
+      $alreadyApproved = ApprovalLog::where('publication_id', $publication->id)
+        ->where('current_step_id', $currentStep->id)
+        ->where('reviewed_by', Auth::id())
+        ->where('action', 'approved')
+        ->exists();
+
+      if ($alreadyApproved) {
+        return $this->errorResponse('You have already approved this step.', 422);
+      }
+
+      // Create approval log for final step
+      ApprovalLog::create([
+        'publication_id' => $publication->id,
+        'requested_by' => $publication->user_id,
+        'requested_at' => $publication->submitted_for_approval_at ?? now(),
+        'reviewed_by' => Auth::id(),
+        'reviewed_at' => now(),
+        'action' => 'approved',
+        'rejection_reason' => $request->input('comment'),
+        'current_step_id' => $currentStep->id,
+      ]);
+    }
+
     $publication->update([
       'status' => 'approved',
       'current_approval_step_id' => null,
@@ -936,7 +1025,7 @@ class PublicationController extends Controller
       'rejection_reason' => null,
     ]);
 
-    if ($latestLog) {
+    if ($latestLog && !$latestLog->reviewed_at) {
       $latestLog->update([
         'reviewed_by' => Auth::id(),
         'reviewed_at' => now(),
@@ -969,7 +1058,19 @@ class PublicationController extends Controller
     broadcast(new PublicationUpdated($publication))->toOthers();
 
     // Load approver relationship and logs for response
-    $publication->load(['approvedBy:id,name,email', 'approvalLogs' => fn($q) => $q->latest('requested_at')->with(['requester:id,name,photo_url', 'reviewer:id,name,photo_url'])]);
+    $publication->load([
+      'approvedBy:id,name,email', 
+      'approvalLogs' => fn($q) => $q->latest('requested_at')->with([
+        'requester:id,name,photo_url', 
+        'reviewer:id,name,photo_url',
+        'step' => fn($q) => $q->with(['role:id,name', 'user:id,name,photo_url'])
+      ]),
+      'currentApprovalStep' => fn($q) => $q->with([
+        'role:id,name',
+        'user:id,name,photo_url',
+        'workflow.steps' => fn($q) => $q->orderBy('level_number')->with(['role:id,name', 'user:id,name,photo_url'])
+      ])
+    ]);
 
     return $this->successResponse([
       'publication' => $publication,
@@ -1006,6 +1107,32 @@ class PublicationController extends Controller
       'rejection_reason.max' => __('validation.rejection_reason_max'),
     ]);
 
+    // Check if this user already rejected this step
+    if ($publication->current_approval_step_id) {
+      $currentStep = ApprovalLevel::find($publication->current_approval_step_id);
+      $alreadyRejected = ApprovalLog::where('publication_id', $publication->id)
+        ->where('current_step_id', $currentStep->id)
+        ->where('reviewed_by', Auth::id())
+        ->where('action', 'rejected')
+        ->exists();
+
+      if ($alreadyRejected) {
+        return $this->errorResponse('You have already rejected this publication.', 422);
+      }
+
+      // Create approval log for rejection
+      ApprovalLog::create([
+        'publication_id' => $publication->id,
+        'requested_by' => $publication->user_id,
+        'requested_at' => $publication->submitted_for_approval_at ?? now(),
+        'reviewed_by' => Auth::id(),
+        'reviewed_at' => now(),
+        'action' => 'rejected',
+        'rejection_reason' => $request->input('rejection_reason'),
+        'current_step_id' => $currentStep->id,
+      ]);
+    }
+
     // Reject and unlock by changing status to draft
     $publication->update([
       'status' => 'draft',
@@ -1015,6 +1142,7 @@ class PublicationController extends Controller
       'approved_by' => null,
       'approved_at' => null,
       'approved_retries_remaining' => 2,
+      'current_approval_step_id' => null, // Reset workflow
     ]);
 
     $latestLog = $publication->approvalLogs()
@@ -1022,7 +1150,7 @@ class PublicationController extends Controller
       ->latest('requested_at')
       ->first();
 
-    if ($latestLog) {
+    if ($latestLog && !$latestLog->reviewed_at) {
       $latestLog->update([
         'reviewed_by' => Auth::id(),
         'reviewed_at' => now(),
@@ -1860,11 +1988,11 @@ class PublicationController extends Controller
     
     return 'unknown';
   }
-}
 
   /**
    * Get publications pending approval for the current user
    * Filters based on workflow assignment - only shows publications at the user's approval level
+   * EXCLUDES publications submitted by the current user (can't approve own content)
    * 
    * @param Request $request
    * @return \Illuminate\Http\JsonResponse
@@ -1891,7 +2019,7 @@ class PublicationController extends Controller
       ?->pivot
       ?->role;
 
-    // Check if user is owner or admin - they can see ALL pending approvals
+    // Check if user is owner or admin - they can see ALL pending approvals (except their own)
     $isOwner = $workspace->user_id === $user->id;
     $isAdmin = $userRole && in_array($userRole->slug, ['owner', 'admin']);
 
@@ -1901,15 +2029,28 @@ class PublicationController extends Controller
     // Base query for pending review publications
     $query = Publication::where('workspace_id', $workspaceId)
       ->where('status', 'pending_review')
+      ->where('user_id', '!=', $user->id) // Exclude publications created by current user
+      ->whereDoesntHave('approvalLogs', function ($q) use ($user) {
+        // CRITICAL: Exclude publications submitted for approval by current user
+        // If user is the one who submitted (requested_by), don't show it to them
+        $q->where('requested_by', $user->id);
+      })
       ->with([
         'mediaFiles' => fn($q) => $q->select('media_files.id', 'media_files.file_path', 'media_files.file_type', 'media_files.file_name'),
         'user' => fn($q) => $q->select('users.id', 'users.name', 'users.email', 'users.photo_url'),
-        'current_approval_step' => fn($q) => $q->with(['role', 'workflow']),
+        'currentApprovalStep' => fn($q) => $q->with(['role', 'workflow']),
         'approvalLogs' => fn($q) => $q->latest('requested_at')->with(['requester:id,name', 'reviewer:id,name']),
       ]);
 
-    // If there's NO workflow OR user is owner/admin, show ALL pending publications
+    // If there's NO workflow OR user is owner/admin, show ALL pending publications (except own)
+    // BUT also exclude publications already approved by this user
     if (!$workflow || $isOwner || $isAdmin) {
+      // Exclude publications already approved by this user
+      $query->whereDoesntHave('approvalLogs', function ($q) use ($user) {
+        $q->where('reviewed_by', $user->id)
+          ->where('action', 'approved');
+      });
+      
       $publications = $query->orderBy('updated_at', 'desc')->get();
       
       return $this->successResponse([
@@ -1932,14 +2073,17 @@ class PublicationController extends Controller
       ]);
     }
 
-    // Get approval levels assigned to the user's role
+    // Get approval levels assigned to the user's role OR directly to the user
     $assignedLevelIds = $workflow->levels()
-      ->where('role_id', $userRoleId)
+      ->where(function ($q) use ($userRoleId, $user) {
+        $q->where('role_id', $userRoleId)
+          ->orWhere('user_id', $user->id);
+      })
       ->pluck('id')
       ->toArray();
 
     if (empty($assignedLevelIds)) {
-      // User's role is not assigned to any approval level
+      // User's role is not assigned to any approval level AND user is not directly assigned
       return $this->successResponse([
         'publications' => [],
         'filter_type' => 'not_assigned',
@@ -1947,8 +2091,15 @@ class PublicationController extends Controller
       ]);
     }
 
-    // Filter publications where current_approval_level_id matches user's assigned levels
-    $query->whereIn('current_approval_level_id', $assignedLevelIds);
+    // Filter publications where current_approval_step_id matches user's assigned levels
+    // AND exclude publications submitted by the current user
+    // AND exclude publications already approved by this user at this step
+    $query->whereIn('current_approval_step_id', $assignedLevelIds)
+      ->whereDoesntHave('approvalLogs', function ($q) use ($user, $assignedLevelIds) {
+        $q->where('reviewed_by', $user->id)
+          ->where('action', 'approved')
+          ->whereIn('current_step_id', $assignedLevelIds);
+      });
 
     $publications = $query->orderBy('updated_at', 'desc')->get();
 
@@ -1959,3 +2110,4 @@ class PublicationController extends Controller
       'assigned_levels' => $assignedLevelIds,
     ]);
   }
+}
