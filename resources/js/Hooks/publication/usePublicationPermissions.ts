@@ -123,6 +123,9 @@ export function usePublicationPermissions(permissions: string[] = []) {
 
   // Verificar si debe mostrar botón de enviar a revisión
   const shouldShowSendToReview = (item: Publication) => {
+
+    console.log('item shouldShowSendToReview');
+    console.log(item);
     // Owner nunca necesita enviar a revisión
     if (isOwner) return false;
     
@@ -159,23 +162,27 @@ export function usePublicationPermissions(permissions: string[] = []) {
     }
     
     // Si hay workflow activo:
-    // - SOLO el aprobador del último nivel puede publicar contenido aprobado
-    // - Nadie más puede publicar, deben enviar a revisión
+    // - Usuario con permiso "publish" puede publicar si el contenido está aprobado
+    // - Verificar que approval_request esté completado (completed_by existe)
     if (hasWorkflow) {
-      // Solo mostrar publicar si:
-      // 1. El usuario es el aprobador del último nivel
-      // 2. Y el contenido está en estado aprobado, failed, published o scheduled
-      if (!isLastLevelApprover) {
-        return false; // No es el aprobador del último nivel
+      // Debe tener permiso de publicar
+      if (!canPublish) {
+        return false;
       }
       
-      // Es el aprobador del último nivel, puede publicar si está aprobado o es retry
-      return ["approved", "failed", "published", "scheduled"].includes(item.status || "");
+      // Verificar que el contenido esté aprobado Y el approval_request esté completado
+      const isApprovedWithCompletedRequest = 
+        item.status === "approved" && 
+        item.approval_request?.status === "approved" && 
+        item.approval_request?.completed_by;
+      
+      // Puede publicar si está aprobado (con request completado) o es retry
+      return isApprovedWithCompletedRequest || ["failed", "published", "scheduled"].includes(item.status || "");
     }
     
     // Sin workflow, usuarios con permiso "publish" pueden publicar directamente
     if (canPublish) {
-      return ["draft", "rejected", "failed", "published", "scheduled"].includes(item.status || "");
+      return ["draft", "rejected", "failed", "published", "scheduled", "approved"].includes(item.status || "");
     }
     
     return false;

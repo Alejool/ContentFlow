@@ -90,6 +90,18 @@ export type Publication = {
     };
   };
   approval_logs?: ApprovalLog[];
+  approval_request?: {
+    id: number;
+    status: 'pending' | 'approved' | 'rejected' | 'cancelled';
+    current_step_id: number | null;
+    completed_by: number | null;
+    completed_at: string | null;
+    currentStep?: {
+      id: number;
+      level_number: number;
+      level_name: string;
+    };
+  };
   platform_status_summary?: Record<
     string,
     {
