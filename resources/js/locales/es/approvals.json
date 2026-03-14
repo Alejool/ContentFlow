@@ -76,11 +76,14 @@
       "description": "Tu plan actual permite aprobaciones de un nivel. Mejora tu plan para crear flujos de aprobación avanzados y multi-nivel."
     },
     "workflow_progress": "Progreso del Flujo",
+    "workflow_flow": "Flujo de Aprobación",
     "progress": "Progreso",
     "in_progress": "En Proceso",
     "rejected_here": "Rechazado Aquí",
     "rejected_at_level": "Rechazado en el nivel {{level}}",
     "approver_role": "Rol Aprobador",
+    "no_role_assigned": "Sin rol asignado",
+    "step": "Nivel",
     "approved_ready_to_publish": "¡Aprobado! Listo para publicar",
     "next_action": {
       "submit_for_approval": "Envía esta publicación a revisión para comenzar el proceso de aprobación",
