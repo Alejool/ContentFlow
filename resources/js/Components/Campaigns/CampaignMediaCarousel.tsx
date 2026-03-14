@@ -1,13 +1,13 @@
 import { useTheme } from "@/Hooks/useTheme";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import {
-  ChevronLeft,
-  ChevronRight,
-  File,
-  Film,
-  Image as ImageIcon,
-  Play,
-  X,
+    ChevronLeft,
+    ChevronRight,
+    File,
+    Film,
+    Image as ImageIcon,
+    Play,
+    X,
 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -407,19 +407,13 @@ function ModernCarousel({
       )}
 
       {totalSlides > 1 && (
-        <div className="flex justify-center mt-6 gap-2">
-          {Array.from({ length: totalSlides }).map((_, idx) => (
-            <button
-              key={`slide-${idx}`}
-              aria-label={`Go to slide ${idx + 1} of ${totalSlides}`}
-              className={`w-8 h-2 rounded-full transition-all duration-300 ${
-                idx === Math.floor(currentIndex / slidesToShow)
-                  ? "bg-blue-500 dark:bg-blue-400"
-                  : "bg-gray-200 dark:bg-gray-700"
-              }`}
-              onClick={() => setCurrentIndex(idx * slidesToShow)}
-            />
-          ))}
+        <div className="mt-6">
+          <AnimatedPagination
+            total={totalSlides}
+            current={Math.floor(currentIndex / slidesToShow)}
+            onPageChange={(idx) => setCurrentIndex(idx * slidesToShow)}
+            autoAdvance={false}
+          />
         </div>
       )}
     </div>

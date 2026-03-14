@@ -1,12 +1,12 @@
-import { Sparkles, Zap, HardDrive, FileText, Share2, Users } from 'lucide-react';
-import { usePage } from '@inertiajs/react';
-import { useTranslation } from 'react-i18next';
+import { CarouselPagination } from '@/Components/common/CarouselPagination';
 import { useSubscriptionUsage } from '@/Hooks/useSubscriptionUsage';
-import { useState, useEffect } from 'react';
-import { CarouselPagination, CarouselDots } from '@/Components/common/CarouselPagination';
 import { PageProps as InertiaPageProps } from '@inertiajs/core';
+import { usePage } from '@inertiajs/react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { FileText, HardDrive, Share2, Sparkles, Users, Zap } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { UsageCard } from './UsageCard';
-import { motion, AnimatePresence } from 'framer-motion';
 
 interface PlanUsageCardsProps {
   showCarousel?: boolean;
@@ -201,32 +201,44 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
                     : 'grid-cols-4'
                 }`}
               >
-                {getCurrentSlideMetrics().map((metric) => (
-                  <UsageCard
+                {getCurrentSlideMetrics().map((metric, index) => (
+                  <motion.div
                     key={metric.key}
-                    label={metric.label}
-                    icon={metric.icon}
-                    percentage={metric.percentage}
-                    used={metric.used}
-                    limit={metric.limit}
-                    total_available={metric.total_available}
-                    remaining={metric.remaining}
-                    addon_info={metric.addon_info}
-                    canBuy={metric.canBuy}
-                    addonType={metric.addonType}
-                    upgradeUrl={metric.upgradeUrl}
-                  />
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ 
+                      duration: 0.3,
+                      delay: index * 0.1,
+                      ease: "easeOut"
+                    }}
+                  >
+                    <UsageCard
+                      label={metric.label}
+                      icon={metric.icon}
+                      percentage={metric.percentage}
+                      used={metric.used}
+                      limit={metric.limit}
+                      total_available={metric.total_available}
+                      remaining={metric.remaining}
+                      addon_info={metric.addon_info}
+                      canBuy={metric.canBuy}
+                      addonType={metric.addonType}
+                      upgradeUrl={metric.upgradeUrl}
+                    />
+                  </motion.div>
                 ))}
               </motion.div>
             </AnimatePresence>
           </div>
           
-          <CarouselDots
-            totalSlides={totalSlides}
-            currentSlide={currentSlide}
-            onDotClick={goToSlide}
-            className="mt-4"
-          />
+          <div className="mt-6">
+            <AnimatedPagination
+              total={totalSlides}
+              current={currentSlide}
+              onPageChange={goToSlide}
+              autoAdvance={false}
+            />
+          </div>
         </div>
       ) : (
         <div className={`grid gap-4 ${
