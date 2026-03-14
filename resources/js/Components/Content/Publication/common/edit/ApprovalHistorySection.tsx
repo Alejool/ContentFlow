@@ -127,24 +127,11 @@ export default function ApprovalHistorySection({
                   {step.user ? (
                     // Mostrar avatar del usuario si está asignado
                     <div className="relative">
-                      <div className={`${
-                        isCurrent
-                          ? 'ring-2 ring-blue-300 dark:ring-blue-700'
-                          : isPast || isCompleted
-                          ? 'ring-2 ring-green-300 dark:ring-green-700'
-                          : ''
-                      } rounded-full`}>
+                      <div>
                         <Avatar
                           src={step.user.photo_url}
                           name={step.user.name}
                           size="md"
-                          className={`border-2 ${
-                            isCurrent
-                              ? 'border-blue-500'
-                              : isPast || isCompleted
-                              ? 'border-green-500'
-                              : 'border-gray-300 dark:border-gray-600'
-                          }`}
                         />
                       </div>
                       {(isPast || isCompleted) && (
@@ -249,9 +236,18 @@ export default function ApprovalHistorySection({
                         </span>
                       )}
                     </div>
-                    <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 font-medium">
-                      {formatDateTime(log.requested_at)}
-                    </span>
+                    <div className="flex flex-col items-end gap-0.5">
+                      {log.reviewed_at && (
+                        <span className="text-[10px] sm:text-xs text-gray-900 dark:text-gray-100 font-bold">
+                          {formatDateTime(log.reviewed_at)}
+                        </span>
+                      )}
+                      {!log.reviewed_at && (
+                        <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 font-medium">
+                          {formatDateTime(log.requested_at)}
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-600 dark:text-gray-400">

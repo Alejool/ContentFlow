@@ -182,8 +182,8 @@ export default function ApprovalList({
           });
           setApprovalModalOpen(true);
           
-          // Remove from list immediately
-          removePublication(publication.id);
+          // DON'T remove manually - let onRefresh handle it
+          // removePublication(publication.id);
         } else {
           // Partial approval (next step) - update the publication in store
           toast.success(
@@ -199,6 +199,8 @@ export default function ApprovalList({
           }
         }
 
+        // CRITICAL: Refresh to get updated list from server
+        // This will show publications for the next level if applicable
         onRefresh();
       }
     } catch (error: any) {
@@ -227,9 +229,10 @@ export default function ApprovalList({
         setRejectionModalOpen(false);
         setSelectedPublication(null);
         
-        // Remove from list immediately
-        removePublication(selectedPublication.id);
+        // DON'T remove manually - let onRefresh handle it
+        // removePublication(selectedPublication.id);
         
+        // CRITICAL: Refresh to get updated list from server
         onRefresh();
       }
     } catch (error: any) {

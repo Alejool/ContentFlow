@@ -20,17 +20,18 @@ export default function ContentPublishButton({
   // Permissions check
   const isOwner = auth.user.id === content.workspace?.created_by;
   const hasPublishPermission = auth.permissions?.includes("publish_content");
-  const isApproved =
-    content.status === "approved" || content.approval_status === "approved";
-  const isDraft = content.status === "draft";
-  const isPendingReview =
-    content.status === "pending_review" ||
-    content.approval_status === "pending_review";
-  const isRejected =
+  
+  // Check if approved based on approval_request (source of truth)
+  const isApproved = 
+    (content.status === "approved" && content.approval_request?.status === "approved" && content.approval_request?.completed_by) ||
+    (content.status === "approved" && !content.approval_request); // No workflow, just status
+  
+  const isDraft = content
     content.status === "rejected" || content.approval_status === "rejected";
 
-  // Owner can always publish (bypasses approval)
-  // Others need publish permission AND approved status
+  // Can publish if:
+  // 1. Is workspace owner (bypasses everything)
+  // 2. Has publish permission AND content is approved (regardless of who created it)
   const canPublish = isOwner || (hasPublishPermission && isApproved);
   const needsApproval = !isApproved && !isOwner;
 

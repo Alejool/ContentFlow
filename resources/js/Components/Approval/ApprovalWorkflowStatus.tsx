@@ -210,9 +210,19 @@ export default function ApprovalWorkflowStatus({
         {/* Niveles del Flujo */}
         <div className="space-y-3">
           {levels.map((level, index) => {
-            const isCompleted = level.level_number < current_level;
-            const isCurrent = level.level_number === current_level && status_info.is_pending_review;
-            const isPending = level.level_number > current_level;
+            // Buscar el log de aprobación para este nivel
+            const stepLog = approvalLogs.find(log => log.approval_level === level.level_number);
+            
+            // Un nivel está completado si tiene un log con reviewer (fue revisado)
+            const isCompleted = stepLog?.reviewer !== null && stepLog?.reviewer !== undefined;
+            
+            // Un nivel es el actual si coincide con current_level y está en pending_review y NO está completado
+            const isCurrent = level.level_number === current_level && status_info.is_pending_review && !isCompleted;
+            
+            // Un nivel está pendiente si es mayor al actual y no está completado
+            const isPending = level.level_number > current_level && !isCompleted;
+            
+            // Verificar si fue rechazado en este nivel
             const wasRejectedHere = lastRejection?.approval_level === level.level_number;
 
             return (
