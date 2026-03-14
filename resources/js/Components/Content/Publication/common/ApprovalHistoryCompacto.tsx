@@ -1,17 +1,21 @@
-import { AlertCircle, CheckCircle, ChevronDown, ChevronUp, Shield } from "lucide-react";
 import ApprovalHistorySection from "@/Components/Content/Publication/common/edit/ApprovalHistorySection";
+import { AlertCircle, CheckCircle, ChevronDown, ChevronUp, Shield } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface ApprovalHistoryCompactoProps {
   logs: any[];
   isExpanded: boolean;
   onToggle: () => void;
+  workflow?: any;
+  currentStepNumber?: number;
 }
 
 const ApprovalHistoryCompacto = ({
   logs,
   isExpanded,
   onToggle,
+  workflow,
+  currentStepNumber,
 }: ApprovalHistoryCompactoProps) => {
   const { t } = useTranslation();
   const getLatestApprovalStatus = () => {
@@ -128,7 +132,11 @@ const ApprovalHistoryCompacto = ({
 
       {isExpanded && (
         <div className="border-t border-gray-200 dark:border-neutral-600 p-4 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
-          <ApprovalHistorySection logs={logs} />
+          <ApprovalHistorySection 
+            logs={logs} 
+            workflow={workflow}
+            currentStepNumber={currentStepNumber}
+          />
         </div>
       )}
     </div>
