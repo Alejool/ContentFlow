@@ -880,32 +880,104 @@ class PublicationController extends Controller
     // Check for active workflow
     $workflow = ApprovalWorkflow::with('levels')
       ->where('workspace_id', $publication->workspace_id)
-      ->where('is_active', true)
+      ->where('is_enabled', true)
       ->orderBy('created_at', 'desc')
       ->first();
 
+    \Log::info('Checking for workflow', [
+      'publication_id' => $publication->id,
+      'workspace_id' => $publication->workspace_id,
+      'has_workflow' => !!$workflow,
+      'workflow_id' => $workflow?->id,
+      'is_enabled' => $workflow?->is_enabled,
+      'levels_count' => $workflow?->levels->count() ?? 0,
+    ]);
+
     $currentStepId = null;
-    if ($workflow && $workflow->levels->isNotEmpty()) {
+    $hasWorkflow = $workflow && $workflow->levels && $workflow->levels->isNotEmpty();
+    
+    \Log::info('Workflow check result', [
+      'hasWorkflow' => $hasWorkflow,
+      'will_use_engine' => $hasWorkflow ? 'YES' : 'NO',
+    ]);
+    
+    if ($hasWorkflow) {
       $currentStepId = $workflow->levels->first()->id;
     }
 
     $publication->update($updateData + ['current_approval_step_id' => $currentStepId]);
 
-    // CRITICAL: Create ApprovalRequest for new system (handles approval log creation)
-    $approvalEngine = app(\App\Services\Approval\ApprovalWorkflowEngine::class);
-    try {
-      $approvalRequest = $approvalEngine->submitForApproval($publication, Auth::user());
+    // CRITICAL: Create ApprovalRequest based on workflow existence
+    if ($hasWorkflow) {
+      // Use ApprovalWorkflowEngine for multi-level workflow
+      \Log::info('Using ApprovalWorkflowEngine for multi-level workflow');
+      $approvalEngine = app(\App\Services\Approval\ApprovalWorkflowEngine::class);
+      try {
+        $approvalRequest = $approvalEngine->submitForApproval($publication, Auth::user());
+        
+        \Log::info('ApprovalRequest created from requestReview (with workflow)', [
+          'publication_id' => $publication->id,
+          'request_id' => $approvalRequest->id,
+        ]);
+      } catch (\Exception $e) {
+        \Log::error('Failed to create ApprovalRequest with workflow', [
+          'publication_id' => $publication->id,
+          'error' => $e->getMessage(),
+          'trace' => $e->getTraceAsString(),
+        ]);
+        return $this->errorResponse('Failed to submit for approval: ' . $e->getMessage(), 500);
+      }
+    } else {
+      // Create simple approval request (no workflow)
+      // This allows non-Admin/Owner users to submit for approval even without workflow
+      \Log::info('Creating simple approval request (no workflow)', [
+        'publication_id' => $publication->id,
+        'user_id' => Auth::id(),
+        'workspace_id' => $publication->workspace_id,
+      ]);
       
-      \Log::info('ApprovalRequest created from requestReview', [
-        'publication_id' => $publication->id,
-        'request_id' => $approvalRequest->id,
-      ]);
-    } catch (\Exception $e) {
-      \Log::warning('Failed to create ApprovalRequest', [
-        'publication_id' => $publication->id,
-        'error' => $e->getMessage(),
-      ]);
-      // Continue with old system if new system fails
+      try {
+        $approvalRequest = \App\Models\Approval\ApprovalRequest::create([
+          'publication_id' => $publication->id,
+          'workflow_id' => null, // No workflow
+          'current_step_id' => null,
+          'status' => \App\Models\Approval\ApprovalRequest::STATUS_PENDING,
+          'submitted_by' => Auth::id(),
+          'submitted_at' => now(),
+          'metadata' => [
+            'ip' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+            'simple_approval' => true, // Flag to indicate this is a simple approval
+            'note' => 'Simple approval request - no workflow configured',
+          ],
+        ]);
+
+        // Create initial log entry
+        \App\Models\Logs\ApprovalLog::create([
+          'approval_request_id' => $approvalRequest->id,
+          'approval_step_id' => null,
+          'user_id' => Auth::id(),
+          'action' => \App\Models\Logs\ApprovalLog::ACTION_SUBMITTED,
+          'level_number' => 0,
+          'comment' => 'Publication submitted for simple approval (no workflow)',
+          'metadata' => [
+            'ip' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+            'simple_approval' => true,
+          ],
+        ]);
+
+        \Log::info('Simple ApprovalRequest created successfully (no workflow)', [
+          'publication_id' => $publication->id,
+          'request_id' => $approvalRequest->id,
+        ]);
+      } catch (\Exception $e) {
+        \Log::error('Failed to create simple ApprovalRequest', [
+          'publication_id' => $publication->id,
+          'error' => $e->getMessage(),
+        ]);
+        // Continue even if approval request creation fails
+      }
     }
 
     $publication->logActivity('requested_approval', [
@@ -991,6 +1063,36 @@ class PublicationController extends Controller
     
     if (!$approvalRequest || $approvalRequest->status !== 'pending') {
       return $this->errorResponse('No pending approval request found for this publication.', 422);
+    }
+
+    // Check if this is a simple approval (no workflow)
+    $isSimpleApproval = !$approvalRequest->current_step_id && !$approvalRequest->workflow_id;
+    
+    if ($isSimpleApproval) {
+      // For simple approvals, only Admin and Owner can approve
+      $userRole = DB::table('role_user')
+        ->join('roles', 'roles.id', '=', 'role_user.role_id')
+        ->where('role_user.workspace_id', $publication->workspace_id)
+        ->where('role_user.user_id', Auth::id())
+        ->select('roles.slug')
+        ->first();
+      
+      $isAdminOrOwner = $userRole && in_array($userRole->slug, ['owner', 'admin']);
+      
+      if (!$isAdminOrOwner) {
+        \Log::warning('User cannot approve simple approval - not Admin or Owner', [
+          'user_id' => Auth::id(),
+          'user_role' => $userRole?->slug ?? 'none',
+          'publication_id' => $publication->id,
+        ]);
+        return $this->errorResponse('Only Admin and Owner can approve publications when no workflow is configured.', 403);
+      }
+      
+      \Log::info('Simple approval - Admin/Owner can approve', [
+        'user_id' => Auth::id(),
+        'user_role' => $userRole->slug,
+        'publication_id' => $publication->id,
+      ]);
     }
 
     // Multi-level logic - use approval_request.current_step_id as source of truth
@@ -1173,6 +1275,27 @@ class PublicationController extends Controller
         'action' => 'approved',
         'level_number' => $currentStep->level_number,
         'comment' => $request->input('comment'),
+      ]);
+    } else {
+      // Simple approval (no workflow) - create log entry
+      \App\Models\Logs\ApprovalLog::create([
+        'approval_request_id' => $approvalRequest->id,
+        'approval_step_id' => null,
+        'user_id' => Auth::id(),
+        'action' => 'approved',
+        'level_number' => 1, // Simple approval is level 1
+        'comment' => $request->input('comment') ?? 'Simple approval - no workflow configured',
+        'metadata' => [
+          'simple_approval' => true,
+          'ip' => request()->ip(),
+          'user_agent' => request()->userAgent(),
+        ],
+      ]);
+      
+      \Log::info('Simple approval log created', [
+        'approval_request_id' => $approvalRequest->id,
+        'user_id' => Auth::id(),
+        'publication_id' => $publication->id,
       ]);
     }
 
@@ -2183,8 +2306,9 @@ class PublicationController extends Controller
       ?->pivot
       ?->role;
 
-    // Check if user is owner - they can see ALL pending approvals (except their own)
+    // Check if user is owner or admin - they can see ALL pending approvals (except their own)
     $isOwner = $workspace->created_by === $user->id;
+    $isAdmin = $userRole && in_array($userRole->slug, ['owner', 'admin']);
 
     // Get the active approval workflow
     $workflow = $workspace->approvalWorkflow()->with('levels.role')->where('is_enabled', true)->first();
@@ -2203,11 +2327,21 @@ class PublicationController extends Controller
         'approvalRequest' => fn($q) => $q->with(['currentStep.role', 'currentStep.user', 'submitter', 'logs.user']),
       ]);
 
-    // If there's NO workflow OR user is owner, show ALL pending publications
+    \Log::info('pendingApprovals - Base query setup', [
+      'user_id' => $user->id,
+      'workspace_id' => $workspaceId,
+      'is_owner' => $isOwner,
+      'is_admin' => $isAdmin,
+      'user_role' => $userRole?->slug ?? 'none',
+      'has_workflow' => $workflow ? true : false,
+      'sql' => $query->toSql(),
+    ]);
+
+    // If there's NO workflow OR user is owner/admin, show ALL pending publications
     // Exclude: 1) Publications created by user, 2) Publications already approved by this user
-    if (!$workflow || $isOwner) {
-      // Exclude publications already approved by this user (via approval_logs through approval_requests)
-      $query->whereDoesntHave('approvalRequests', function ($q) use ($user) {
+    if (!$workflow || $isAdmin) {
+      // Exclude publications already approved by this user (via approval_logs through approval_request)
+      $query->whereDoesntHave('approvalRequest', function ($q) use ($user) {
         $q->where('status', 'pending')
           ->whereHas('logs', function ($logQ) use ($user) {
             $logQ->where('user_id', $user->id)
@@ -2215,10 +2349,11 @@ class PublicationController extends Controller
           });
       });
       
-      \Log::info('pendingApprovals - No workflow or owner', [
+      \Log::info('pendingApprovals - No workflow or admin', [
         'user_id' => $user->id,
         'workspace_id' => $workspaceId,
         'is_owner' => $isOwner,
+        'is_admin' => $isAdmin,
         'has_workflow' => $workflow ? true : false,
       ]);
 
@@ -2226,7 +2361,7 @@ class PublicationController extends Controller
       
       return $this->successResponse([
         'publications' => $publications,
-        'filter_type' => $isOwner ? 'admin_all' : 'no_workflow',
+        'filter_type' => $isAdmin ? 'admin_all' : 'no_workflow',
         'user_role' => $userRole?->slug ?? 'member',
       ]);
     }
@@ -2254,7 +2389,7 @@ class PublicationController extends Controller
         });
     })
     // Exclude publications already approved by this user at the CURRENT step
-    ->whereDoesntHave('approvalRequests', function ($q) use ($user) {
+    ->whereDoesntHave('approvalRequest', function ($q) use ($user) {
       $q->where('status', 'pending')
         ->whereHas('logs', function ($logQ) use ($user) {
           $logQ->where('user_id', $user->id)

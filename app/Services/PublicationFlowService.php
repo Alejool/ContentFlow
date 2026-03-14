@@ -25,17 +25,43 @@ class PublicationFlowService
     /**
      * Determine if a user can publish directly without approval.
      * 
+     * CRITICAL RULES:
+     * - When NO workflow is active: Admin and Owner can publish directly
+     * - When workflow IS active: ONLY Owner can publish directly (Admin must use workflow)
+     * - All other roles must always send to review
+     * 
      * @param User $user
      * @param Workspace $workspace
      * @return bool
      */
     public function canPublishDirectly(User $user, Workspace $workspace): bool
     {
-        return $this->policy->canBypassApprovalWorkflow($user, $workspace);
+        // Get user's role
+        $role = $this->getUserRole($user, $workspace);
+        
+        if (!$role) {
+            return false;
+        }
+
+        // Check if approval workflow is enabled
+        $workflow = $workspace->approvalWorkflow;
+        $workflowEnabled = $workflow && $workflow->is_enabled;
+
+        if ($workflowEnabled) {
+            // When workflow is ENABLED: ONLY Owner can publish directly
+            return $role->slug === Role::OWNER;
+        } else {
+            // When NO workflow: Both Admin and Owner can publish directly
+            return in_array($role->slug, [Role::ADMIN, Role::OWNER]);
+        }
     }
 
     /**
      * Determine if a user must send content to review.
+     * 
+     * CRITICAL RULES:
+     * - When NO workflow is active: Only Admin and Owner can publish directly, others must review
+     * - When workflow IS active: Only Owner can publish directly, everyone else (including Admin) must review
      * 
      * @param User $user
      * @param Workspace $workspace
@@ -43,19 +69,25 @@ class PublicationFlowService
      */
     public function mustSendToReview(User $user, Workspace $workspace): bool
     {
-        // If user can bypass workflow, they don't need review
-        if ($this->canPublishDirectly($user, $workspace)) {
-            return false;
+        // Get user's role
+        $role = $this->getUserRole($user, $workspace);
+        
+        if (!$role) {
+            return true; // No role = must review
         }
 
         // Check if approval workflow is enabled
         $workflow = $workspace->approvalWorkflow;
-        
-        if (!$workflow || !$workflow->is_enabled) {
-            return false;
-        }
+        $workflowEnabled = $workflow && $workflow->is_enabled;
 
-        return true;
+        if ($workflowEnabled) {
+            // When workflow is ENABLED: Only Owner can bypass, everyone else must review (including Admin)
+            return $role->slug !== Role::OWNER;
+        } else {
+            // When NO workflow: Admin and Owner can publish directly, others must review
+            $isAdminOrOwner = in_array($role->slug, [Role::ADMIN, Role::OWNER]);
+            return !$isAdminOrOwner;
+        }
     }
 
     /**
@@ -74,6 +106,10 @@ class PublicationFlowService
      * Validate that a publication can be published by a user.
      * Throws exception if not allowed.
      * 
+     * CRITICAL RULE: When NO multi-level workflow is active:
+     * - ONLY Admin and Owner can publish directly
+     * - All other roles must send to review
+     * 
      * @param Publication $publication
      * @param User $user
      * @throws \Exception
@@ -81,13 +117,20 @@ class PublicationFlowService
     public function validateCanPublish(Publication $publication, User $user): void
     {
         $workspace = $publication->workspace;
+        $role = $this->getUserRole($user, $workspace);
 
-        // Check if user can bypass workflow (is owner)
-        if ($this->canPublishDirectly($user, $workspace)) {
-            Log::info('User can publish directly (owner)', [
+        if (!$role) {
+            throw new \Exception('User has no role in this workspace.');
+        }
+
+        // Check if user is Admin or Owner - they can publish directly
+        $isAdminOrOwner = in_array($role->slug, [Role::ADMIN, Role::OWNER]);
+        if ($isAdminOrOwner) {
+            Log::info('User can publish directly (Admin or Owner)', [
                 'user_id' => $user->id,
                 'workspace_id' => $workspace->id,
                 'publication_id' => $publication->id,
+                'role' => $role->slug,
             ]);
             return;
         }
@@ -96,11 +139,10 @@ class PublicationFlowService
         $workflow = $workspace->approvalWorkflow;
         
         if (!$workflow || !$workflow->is_enabled) {
-            Log::info('No approval workflow, user can publish', [
-                'user_id' => $user->id,
-                'workspace_id' => $workspace->id,
-            ]);
-            return;
+            // CRITICAL: When NO workflow is active, ONLY Admin and Owner can publish
+            throw new \Exception(
+                'Only Admin and Owner can publish content directly. Please send your content to review.'
+            );
         }
 
         // If workflow is enabled, publication must be approved
@@ -121,6 +163,14 @@ class PublicationFlowService
      * Validate that a publication can be sent to review.
      * Throws exception if not allowed.
      * 
+     * CRITICAL RULES:
+     * - When NO workflow is active:
+     *   - Admin and Owner should publish directly (not use review) - PERO permitimos que lo hagan si quieren
+     *   - All other roles MUST send to review (no pueden publicar directamente)
+     * - When workflow IS active:
+     *   - Admin and Owner can choose to publish directly OR send to review
+     *   - All other roles must send to review
+     * 
      * @param Publication $publication
      * @param User $user
      * @throws \Exception
@@ -128,29 +178,28 @@ class PublicationFlowService
     public function validateCanRequestReview(Publication $publication, User $user): void
     {
         $workspace = $publication->workspace;
+        $role = $this->getUserRole($user, $workspace);
 
-        // Owners should not use request review
-        if ($this->canPublishDirectly($user, $workspace)) {
-            throw new \Exception(
-                'As workspace owner, you can publish content directly without approval.'
-            );
+        if (!$role) {
+            throw new \Exception('User has no role in this workspace.');
         }
 
-        // Check if approval workflow is enabled (check both is_active and is_enabled)
+        // Check if approval workflow is enabled
         $workflow = $workspace->approvalWorkflow;
+        $workflowEnabled = $workflow && $workflow->is_enabled;
+
+        // CAMBIO CRÍTICO: Permitir que TODOS los roles envíen a revisión
+        // Esto es necesario porque:
+        // 1. Cuando NO hay workflow: roles no-admin/owner DEBEN enviar a revisión
+        // 2. Cuando SÍ hay workflow: todos pueden enviar a revisión
+        // 3. Admin/Owner pueden elegir publicar directamente O enviar a revisión
         
-        if (!$workflow) {
-            throw new \Exception(
-                'No approval workflow found for this workspace.'
-            );
-        }
-        
-        $workflowEnabled = $workflow->is_enabled || $workflow->is_active;
-        if (!$workflowEnabled) {
-            throw new \Exception(
-                'Approval workflow is not enabled for this workspace.'
-            );
-        }
+        Log::info('Validating can request review', [
+            'user_id' => $user->id,
+            'workspace_id' => $workspace->id,
+            'role' => $role->slug,
+            'workflow_enabled' => $workflowEnabled,
+        ]);
 
         // Check publication status
         $allowedStatuses = ['draft', 'failed', 'rejected'];
@@ -164,6 +213,7 @@ class PublicationFlowService
             'user_id' => $user->id,
             'publication_id' => $publication->id,
             'status' => $publication->status,
+            'role' => $role->slug,
         ]);
     }
 
