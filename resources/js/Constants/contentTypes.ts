@@ -233,6 +233,7 @@ export const suggestContentTypeFromFiles = (
   // Un solo archivo
   if (fileCount === 1) {
     const file = files[0];
+    if (!file) return currentType || 'post';
 
     // Si es imagen, puede ser story o post
     if (file.type.startsWith('image/')) {
