@@ -1,7 +1,6 @@
-import { useTheme } from '@/Hooks/useTheme';
 import { Dialog, DialogPanel } from '@headlessui/react';
 import { ChevronLeft, ChevronRight, File, Film, Image as ImageIcon, Play, X } from 'lucide-react';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface MediaFile {
   id: number;
@@ -15,12 +14,10 @@ interface CampaignMediaCarouselProps {
 }
 
 export default function CampaignMediaCarousel({ mediaFiles }: CampaignMediaCarouselProps) {
-  const { theme } = useTheme();
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [slidesToShow, setSlidesToShow] = useState(3);
-  const carouselRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -70,8 +67,9 @@ export default function CampaignMediaCarousel({ mediaFiles }: CampaignMediaCarou
 
     return (
       <div className="mb-6">
-        <div
-          className="group relative cursor-pointer overflow-hidden rounded-lg"
+        <button
+          type="button"
+          className="group relative w-full cursor-pointer overflow-hidden rounded-lg"
           onClick={() => openLightbox(0)}
         >
           {isImage ? (
@@ -95,7 +93,9 @@ export default function CampaignMediaCarousel({ mediaFiles }: CampaignMediaCarou
                 className="h-full w-full object-cover"
                 controls
                 onClick={(e) => e.stopPropagation()}
-              />
+              >
+                <track kind="captions" />
+              </video>
               <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-black/70 px-3 py-1 text-xs font-medium text-white">
                 <Film className="h-3 w-3" />
                 VIDEO
@@ -112,7 +112,7 @@ export default function CampaignMediaCarousel({ mediaFiles }: CampaignMediaCarou
               </span>
             </div>
           )}
-        </div>
+        </button>
         {/* Lightbox para caso único */}
         <Lightbox
           isOpen={isLightboxOpen}
@@ -236,7 +236,8 @@ function ImageGridItem({
   const isLarge = (total === 3 && index === 0) || (total === 4 && index === 0);
 
   return (
-    <div
+    <button
+      type="button"
       className={`group relative cursor-pointer overflow-hidden rounded-lg ${
         isLarge ? 'row-span-2' : ''
       }`}
@@ -259,7 +260,7 @@ function ImageGridItem({
           <span className="text-lg font-semibold text-white">+{total - 4}</span>
         </div>
       )}
-    </div>
+    </button>
   );
 }
 
@@ -310,8 +311,9 @@ function ModernCarousel({
             media.file_path?.match(/\.(mp4|avi|mov|wmv|flv|webm)$/i);
 
           return (
-            <div
+            <button
               key={media.id}
+              type="button"
               className={`flex-shrink-0 transition-all duration-300 ${
                 slidesToShow > 1 ? 'w-1/2' : 'w-full'
               } ${slidesToShow === 2 ? 'lg:w-1/2' : slidesToShow === 3 ? 'lg:w-1/3' : ''}`}
@@ -337,7 +339,9 @@ function ModernCarousel({
                       src={media.file_path}
                       className="h-full w-full object-cover"
                       onClick={(e) => e.stopPropagation()}
-                    />
+                    >
+                      <track kind="captions" />
+                    </video>
                     <div className="absolute inset-0 bg-black/20 transition-colors duration-300 group-hover/card:bg-black/10" />
                     <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-black/70 px-3 py-1 text-xs font-medium text-white">
                       <Film className="h-3 w-3" />
@@ -361,7 +365,7 @@ function ModernCarousel({
                   </div>
                 )}
               </div>
-            </div>
+            </button>
           );
         })}
       </div>
@@ -386,13 +390,20 @@ function ModernCarousel({
       )}
 
       {totalSlides > 1 && (
-        <div className="mt-6">
-          <AnimatedPagination
-            total={totalSlides}
-            current={Math.floor(currentIndex / slidesToShow)}
-            onPageChange={(idx) => setCurrentIndex(idx * slidesToShow)}
-            autoAdvance={false}
-          />
+        <div className="mt-4 flex justify-center gap-2">
+          {Array.from({ length: totalSlides }).map((_, idx) => (
+            <button
+              key={idx}
+              type="button"
+              aria-label={`Go to slide ${idx + 1}`}
+              onClick={() => setCurrentIndex(idx * slidesToShow)}
+              className={`h-2 rounded-full transition-all ${
+                Math.floor(currentIndex / slidesToShow) === idx
+                  ? 'w-6 bg-primary-600'
+                  : 'w-2 bg-gray-300 hover:bg-gray-400'
+              }`}
+            />
+          ))}
         </div>
       )}
     </div>
@@ -441,9 +452,12 @@ function Lightbox({
       document.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = 'unset';
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, selectedIndex]);
 
   if (!isOpen) return null;
+
+  if (!currentMedia) return null;
 
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-[9999]">
@@ -492,7 +506,9 @@ function Lightbox({
                     controls
                     autoPlay
                     className="max-h-[70vh] max-w-full rounded-lg"
-                  />
+                  >
+                    <track kind="captions" />
+                  </video>
                 </div>
               )}
 
