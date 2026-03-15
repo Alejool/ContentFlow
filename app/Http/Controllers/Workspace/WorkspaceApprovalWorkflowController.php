@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Workspace;
 use App\Http\Controllers\Controller;
 use App\Models\ApprovalWorkflow;
 use App\Models\ApprovalLevel;
+use App\Models\Approval\ApprovalRequest;
+use App\Models\Logs\ApprovalLog;
 use App\Models\Workspace\Workspace;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class WorkspaceApprovalWorkflowController extends Controller
@@ -184,7 +187,43 @@ class WorkspaceApprovalWorkflowController extends Controller
       return $this->errorResponse('Unauthorized', 403);
     }
 
-    $workflow->delete();
+    DB::transaction(function () use ($workflow) {
+      // 1. Cancel pending requests and revert their publications to draft
+      $pendingRequests = ApprovalRequest::where('workflow_id', $workflow->id)
+        ->where('status', ApprovalRequest::STATUS_PENDING)
+        ->with('publication')
+        ->get();
+
+      foreach ($pendingRequests as $approvalRequest) {
+        ApprovalLog::create([
+          'approval_request_id' => $approvalRequest->id,
+          'user_id'             => Auth::id(),
+          'action'              => ApprovalLog::ACTION_CANCELLED,
+          'comment'             => 'Flujo eliminado — revisión pendiente cancelada automáticamente.',
+          'metadata'            => ['reason' => 'workflow_deleted'],
+        ]);
+
+        $approvalRequest->update([
+          'status'       => ApprovalRequest::STATUS_CANCELLED,
+          'completed_at' => now(),
+        ]);
+
+        if ($approvalRequest->publication) {
+          $approvalRequest->publication->update([
+            'status'           => 'failed',
+            'rejection_reason' => 'El flujo de aprobación fue eliminado mientras la publicación estaba en revisión.',
+          ]);
+        }
+      }
+
+      // 2. Nullify workflow_id on ALL requests (breaks the FK before delete)
+      ApprovalRequest::where('workflow_id', $workflow->id)
+        ->update(['workflow_id' => null]);
+
+      // 3. Delete levels/steps then the workflow
+      $workflow->steps()->delete();
+      $workflow->delete();
+    });
 
     return $this->successResponse(null, 'Workflow deleted successfully');
   }
