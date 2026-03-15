@@ -4,33 +4,32 @@ import SocialAccountsDisplay from '@/Components/Content/Publication/SocialAccoun
 import { usePublicationActions } from '@/Hooks/publication/usePublicationActions';
 import { Publication } from '@/types/Publication';
 import {
-    countMediaFiles,
-    formatPublicationDate,
-    getLockedByName,
-    getMediaUrl,
-    hasMedia,
-    isVideoMedia,
-    prepareMediaForPreview,
+  countMediaFiles,
+  formatPublicationDate,
+  getLockedByName,
+  getMediaUrl,
+  hasMedia,
+  isVideoMedia,
+  prepareMediaForPreview,
 } from '@/Utils/publicationHelpers';
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import {
-    Calendar,
-    CheckCircle,
-    Clock,
-    Copy,
-    Edit,
-    Eye,
-    Image as ImageIcon,
-    Loader2,
-    Lock,
-    MoreVertical,
-    Rocket,
-    Trash2,
-    Users,
-    Video,
-    XCircle,
+  Calendar,
+  CheckCircle,
+  Clock,
+  Copy,
+  Edit,
+  Eye,
+  Image as ImageIcon,
+  Loader2,
+  Lock,
+  MoreVertical,
+  Rocket,
+  Trash2,
+  Video,
+  XCircle,
 } from 'lucide-react';
-import React, { memo, useState } from 'react';
-import toast from 'react-hot-toast';
+import { memo, useState } from 'react';
 
 interface PublicationMobileRowProps {
   items: Publication[];
@@ -71,7 +70,6 @@ const PublicationMobileRow = memo(
     permissions,
     onPreviewMedia,
   }: PublicationMobileRowProps) {
-    // Usar el hook centralizado
     const {
       loadingStates,
       canManageContent,
@@ -86,25 +84,13 @@ const PublicationMobileRow = memo(
       onEdit,
       onDelete,
       onPublish,
-      onViewDetails,
-      onDuplicate,
-      onEditRequest,
-      permissions,
+      onViewDetails: onViewDetails || (() => {}),
+      onDuplicate: onDuplicate || (() => {}),
+      onEditRequest: onEditRequest || (() => {}),
+      permissions: permissions || [],
     });
 
-    const [expandedRow, setExpandedRow] = useState<number | null>(null);
     const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
-
-    const toggleExpand = (id: number) => {
-      setExpandedRow((prev) => (prev === id ? null : id));
-    };
-
-    const handleRowClick = (id: number, event: React.MouseEvent) => {
-      if ((event.target as HTMLElement).closest('button')) {
-        return;
-      }
-      toggleExpand(id);
-    };
 
     const getStatusIcon = (status: string) => {
       switch (status) {
@@ -143,7 +129,6 @@ const PublicationMobileRow = memo(
       <div className="w-full space-y-3 px-1">
         {items.map((item) => {
           const mediaCount = countMediaFiles(item);
-          const isExpanded = expandedRow === item.id;
           const isLoading = loadingStates[item.id];
           const isVideo = isVideoMedia(item);
           const mediaUrl = getMediaUrl(item);
@@ -154,53 +139,30 @@ const PublicationMobileRow = memo(
           return (
             <div
               key={item.id}
-              role="button"
-              tabIndex={0}
-              onClick={(e) => handleRowClick(item.id, e)}
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleExpand(item.id); } }}
-              className={`relative overflow-hidden rounded-lg border transition-all duration-300 ${
-                isExpanded
-                  ? 'border-primary-200 bg-white shadow-md ring-1 ring-primary-500/10 dark:border-primary-900/40 dark:bg-neutral-800'
-                  : 'border-gray-100 bg-white/80 shadow-sm hover:border-gray-200 dark:border-neutral-800 dark:bg-neutral-900/80 dark:hover:border-neutral-700'
-              } `}
+              className="relative rounded-lg border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-neutral-700 dark:bg-neutral-900"
               style={{
                 contentVisibility: 'auto',
                 containIntrinsicSize: '0 88px',
               }}
             >
-              {/* Header Content */}
               <div className="flex items-start gap-3 p-4">
-                {/* Thumbnail with media preview */}
-                <div
-                  role="button"
-                  tabIndex={0}
-                  className="relative flex-shrink-0 cursor-pointer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (hasMedia(item) && onPreviewMedia) {
-                      const allMedia = prepareMediaForPreview(item);
-                      onPreviewMedia(allMedia, 0);
-                    } else {
-                      if (!hasMedia(item)) toggleExpand(item.id);
-                    }
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      if (hasMedia(item) && onPreviewMedia) {
+                {/* Thumbnail - clickable para preview */}
+                {hasMedia(item) && mediaUrl ? (
+                  <button
+                    type="button"
+                    className="relative flex-shrink-0 cursor-pointer transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded-lg"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onPreviewMedia) {
                         const allMedia = prepareMediaForPreview(item);
                         onPreviewMedia(allMedia, 0);
-                      } else {
-                        if (!hasMedia(item)) toggleExpand(item.id);
                       }
-                    }
-                  }}
-                >
-                  {hasMedia(item) && mediaUrl ? (
-                    <div className="h-16 w-16 overflow-hidden rounded-lg border border-gray-200 bg-gray-100 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
+                    }}
+                  >
+                    <div className="relative h-20 w-20 overflow-hidden rounded-lg border-2 border-gray-200 bg-gray-100 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
                       {(item as Publication & { type?: string }).type === 'user_event' ? (
-                        <div className="flex h-16 w-16 items-center justify-center rounded-lg border border-gray-200 bg-gray-100 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
-                          <Calendar className="h-8 w-8 text-primary-500" />
+                        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20">
+                          <Calendar className="h-10 w-10 text-primary-600 dark:text-primary-400" />
                         </div>
                       ) : !hasImageError ? (
                         <img
@@ -213,421 +175,284 @@ const PublicationMobileRow = memo(
                       ) : (
                         <div className="flex h-full w-full items-center justify-center bg-gray-100 text-gray-400 dark:bg-neutral-800">
                           {isVideo ? (
-                            <Video className="h-6 w-6" />
+                            <Video className="h-8 w-8" />
                           ) : (
-                            <ImageIcon className="h-6 w-6" />
+                            <ImageIcon className="h-8 w-8" />
                           )}
                         </div>
                       )}
-                      {isVideo && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                          <Video className="h-5 w-5 text-white" />
+                      {isVideo && !hasImageError && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-[1px]">
+                          <div className="rounded-full bg-white/90 p-2 shadow-lg">
+                            <Video className="h-6 w-6 text-primary-600" />
+                          </div>
                         </div>
                       )}
                       {mediaCount.total > 1 && (
-                        <div className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full border border-white bg-gray-800 text-[10px] text-white">
+                        <div className="absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-primary-600 text-[11px] font-bold text-white shadow-md dark:border-neutral-900">
                           +{mediaCount.total - 1}
                         </div>
                       )}
                     </div>
-                  ) : (
-                    <div className="flex h-16 w-16 items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 shadow-sm dark:border-neutral-700 dark:bg-neutral-900/30">
-                      <div className="text-center">
-                        <ImageIcon className="mx-auto h-6 w-6 text-gray-300 dark:text-neutral-700" />
-                      </div>
-                    </div>
-                  )}
-                </div>
+                  </button>
+                ) : (
+                  <div className="flex h-20 w-20 items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 dark:border-neutral-700 dark:bg-neutral-900/30">
+                    <ImageIcon className="h-8 w-8 text-gray-300 dark:text-neutral-700" />
+                  </div>
+                )}
 
                 {/* Main content */}
                 <div className="min-w-0 flex-1">
-                  <div className="mb-2 flex items-start justify-between gap-2">
-                    <div className="min-w-0 flex-1">
-                      <h3 className="truncate text-sm font-semibold leading-tight text-gray-900 dark:text-white">
-                        {item.title || t('publications.table.untitled')}
-                      </h3>
-                      <p className="mt-1 line-clamp-2 break-words text-xs text-gray-500 dark:text-gray-400">
-                        {item.description || t('publications.table.noDescription')}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {(item as Publication & { type?: string }).type === 'user_event' && canManageContent && (
-                        <Button
-                          onClick={async (e) => {
-                            e.stopPropagation();
-                            await handleDelete(item, true);
-                          }}
-                          disabled={isLoading?.deleting}
-                          loading={isLoading?.deleting}
-                          variant="danger"
-                          buttonStyle="icon"
-                          size="sm"
-                          icon={Trash2}
-                        >
-                          <span className="sr-only">{t('common.delete')}</span>
-                        </Button>
-                      )}
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleExpand(item.id);
-                        }}
-                        variant="ghost"
-                        buttonStyle="icon"
-                        size="sm"
-                        icon={MoreVertical}
-                        className={`transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
-                      >
-                        <span className="sr-only">{t('common.more')}</span>
-                      </Button>
-                    </div>
+                  <div className="mb-2">
+                    <h3 className="truncate text-base font-bold leading-tight text-gray-900 dark:text-white">
+                      {item.title || t('publications.table.untitled')}
+                    </h3>
+                    <p className="mt-1 line-clamp-2 break-words text-xs text-gray-600 dark:text-gray-400">
+                      {item.description || t('publications.table.noDescription')}
+                    </p>
                   </div>
 
-                  {/* Creator info for events */}
-                  {(item as Publication & { type?: string }).type === 'user_event' && item.user && (
-                    <div className="mb-2 flex items-center gap-1.5">
-                      <Users className="h-3 w-3 text-gray-400" />
-                      <span className="text-[10px] font-medium italic text-gray-500 dark:text-gray-400">
-                        {t('publications.table.createdBy')}: {item.user.name}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Status and metadata row */}
-                  <div className="flex flex-wrap items-center gap-2">
-                    {/* Content Type Badge */}
-                    <SimpleContentTypeBadge
-                      contentType={item.content_type}
-                      mediaFiles={item.media_files}
-                      size="sm"
-                      className="order-first"
-                    />
-
-                    {/* Status badge */}
+                  {/* Status and metadata */}
+                  <div className="mb-3 flex flex-wrap items-center gap-2">
                     <span
-                      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${getStatusColor(item.status)}`}
+                      className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold shadow-sm ${getStatusColor(item.status)}`}
                     >
                       {getStatusIcon(item.status || 'draft')}
-                      <span className="font-medium">{getStatusText(item.status || 'draft')}</span>
+                      <span>{getStatusText(item.status || 'draft')}</span>
                     </span>
 
-                    {/* Media indicators */}
-                    {hasMedia(item) && (
-                      <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-                        {mediaCount.images > 0 && (
-                          <div className="flex items-center gap-1">
-                            <ImageIcon className="h-3 w-3 text-blue-500" />
-                            <span>{mediaCount.images}</span>
-                          </div>
-                        )}
-                        {mediaCount.videos > 0 && (
-                          <div className="flex items-center gap-1">
-                            <Video className="h-3 w-3 text-purple-500" />
-                            <span>{mediaCount.videos}</span>
-                          </div>
-                        )}
-                      </div>
+                    {item.content_type && (
+                      <SimpleContentTypeBadge
+                        contentType={item.content_type}
+                        mediaFiles={item.media_files || []}
+                        size="sm"
+                        className=""
+                      />
                     )}
 
-                    {/* Scheduled time */}
                     {item.scheduled_at && (
-                      <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-                        <Calendar className="h-3 w-3" />
+                      <div className="flex items-center gap-1.5 rounded-lg bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
+                        <Calendar className="h-3.5 w-3.5" />
                         <span>{formatDate(item.scheduled_at)}</span>
                       </div>
                     )}
-
-                    {/* Event indicators */}
-                    {((item as Publication & { type?: string }).type === 'user_event' ||
-                      (item.scheduled_at && item.status !== 'published')) && (
-                      <div className="flex items-center gap-1.5 rounded-full bg-primary-50 px-2.5 py-1 text-xs font-medium text-primary-600 dark:bg-primary-900/20 dark:text-primary-400">
-                        <Calendar className="h-3.5 w-3.5" />
-                        <span className="font-medium">
-                          {(item as Publication & { type?: string }).type === 'user_event'
-                            ? t('publications.table.manualEvent')
-                            : t('publications.table.socialNetworkEvent')}
-                        </span>
-                      </div>
-                    )}
                   </div>
 
-                  {/* Lock indicator */}
+                  {/* Social accounts */}
+                  <div className="mb-3">
+                    <SocialAccountsDisplay
+                      publication={item}
+                      connectedAccounts={connectedAccounts}
+                      compact={true}
+                    />
+                  </div>
+
+                  {/* Alerts */}
                   {remoteLocks[item.id] && item.status !== 'pending_review' && (
-                    <div className="animate-in fade-in slide-in-from-top-1 mt-2 flex w-full items-center gap-2 rounded-lg border border-amber-100 bg-amber-50 p-2 dark:border-amber-800/30 dark:bg-amber-900/20">
-                      <div className="relative flex h-5 w-5 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-800 dark:text-amber-400">
-                        <Lock className="h-3 w-3" />
-                        <span className="absolute -right-1 -top-1 flex h-2 w-2">
-                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75"></span>
-                          <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500"></span>
-                        </span>
-                      </div>
+                    <div className="mb-3 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 p-2.5 dark:border-amber-800/30 dark:bg-amber-900/20">
+                      <Lock className="h-4 w-4 flex-shrink-0 text-amber-600 dark:text-amber-400" />
                       <span className="text-xs font-semibold text-amber-700 dark:text-amber-400">
                         {t('publications.table.editingBy')} {lockedByName}
                       </span>
                     </div>
                   )}
-                  {/* Pending review indicator */}
                   {item.status === 'pending_review' && (
-                    <div className="animate-in fade-in slide-in-from-top-1 mt-2 flex w-full items-center gap-2 rounded-lg border border-yellow-100 bg-yellow-50 p-2 dark:border-yellow-800/30 dark:bg-yellow-900/20">
-                      <div className="relative flex h-5 w-5 items-center justify-center rounded-full bg-yellow-100 text-yellow-600 dark:bg-yellow-800 dark:text-yellow-400">
-                        <Clock className="h-3 w-3" />
-                      </div>
-                      <div className="flex flex-1 flex-col">
+                    <div className="mb-3 flex items-center gap-2 rounded-lg border border-yellow-200 bg-yellow-50 p-2.5 dark:border-yellow-800/30 dark:bg-yellow-900/20">
+                      <Clock className="h-4 w-4 flex-shrink-0 text-yellow-600 dark:text-yellow-400" />
+                      <div className="flex-1">
                         <span className="text-xs font-semibold text-yellow-700 dark:text-yellow-400">
                           {t('publications.table.pendingAdminReview') || 'Pendiente de revisión'}
                         </span>
-                        {item.currentApprovalStep?.role?.name && (
-                          <span className="text-[10px] text-yellow-600 dark:text-yellow-500">
-                            {t('approvals.approver_role')}: {item.currentApprovalStep.role.name}
+                        {item.current_approval_step?.name && (
+                          <span className="ml-1 text-[10px] text-yellow-600 dark:text-yellow-500">
+                            ({item.current_approval_step.name})
                           </span>
                         )}
                       </div>
                     </div>
                   )}
-                </div>
-              </div>
 
-              {/* Quick actions bar */}
-              <div className="flex items-center gap-2 px-4 pb-4">
-                {/* View Details button - Always visible */}
-                <Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleViewDetails(item);
-                  }}
-                  variant="ghost"
-                  size="sm"
-                  icon={Eye}
-                  className="flex-1"
-                >
-                  {t('publications.button.view')}
-                </Button>
-
-                {/* Duplicate button */}
-                {canManageContent && (
-                  <Button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDuplicate(item.id);
-                    }}
-                    disabled={isLoading?.duplicating}
-                    loading={isLoading?.duplicating}
-                    variant="secondary"
-                    size="sm"
-                    icon={Copy}
-                    className="flex-1"
-                  >
-                    {t('publications.button.duplicate')}
-                  </Button>
-                )}
-
-                {/* Publish/Request button */}
-                {shouldShowPublish(item) && canManageContent ? (
-                  <Button
-                    onClick={async (e) => {
-                      e.stopPropagation();
-                      await handlePublish(item);
-                    }}
-                    disabled={isLoading?.publishing}
-                    loading={isLoading?.publishing}
-                    variant="success"
-                    size="sm"
-                    icon={Rocket}
-                    className="flex-1"
-                  >
-                    {t('publications.button.publish')}
-                  </Button>
-                ) : shouldShowSendToReview(item) && canManageContent ? (
-                  <Button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleSubmitForApproval(item);
-                    }}
-                    disabled={isLoading?.submitting}
-                    loading={isLoading?.submitting}
-                    variant="warning"
-                    size="sm"
-                    icon={Clock}
-                    className="flex-1"
-                  >
-                    {t('publications.button.request')}
-                  </Button>
-                ) : null}
-              </div>
-
-              {/* Expanded Content */}
-              {isExpanded && (
-                <div className="animate-in fade-in slide-in-from-top-1 px-4 pb-4 duration-200">
-                  <div className="space-y-4 border-t border-gray-100 pt-4 dark:border-neutral-700/50">
-                    {/* Additional info */}
-                    <div className="space-y-3">
-                      {/* User info */}
-                      {item.user && (
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-500">
-                            {item.user.photo_url ? (
-                              <img
-                                src={item.user.photo_url}
-                                alt={item.user.name}
-                                className="h-full w-full rounded-full object-cover"
-                                loading="lazy"
-                              />
-                            ) : (
-                              <span className="text-xs font-bold uppercase text-white">
-                                {item.user.name.charAt(0)}
-                              </span>
-                            )}
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-gray-900 dark:text-white">
-                              {item.user.name}
-                            </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              {t('common.creator')}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Platform badges */}
-                      {item.platform_settings &&
-                        typeof item.platform_settings === 'object' &&
-                        !Array.isArray(item.platform_settings) &&
-                        Object.keys(item.platform_settings).length > 0 && (
-                          <div>
-                            <h4 className="mb-2 text-xs font-semibold text-gray-600 dark:text-gray-400">
-                              {t('publications.table.platforms')}:
-                            </h4>
-                            <div className="flex flex-wrap gap-1.5">
-                              {Object.keys(item.platform_settings).map((platform) => (
-                                <span
-                                  key={platform}
-                                  className="rounded-lg bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700 dark:bg-gray-800 dark:text-gray-300"
-                                >
-                                  {platform.charAt(0).toUpperCase() + platform.slice(1)}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                      {/* Campaigns */}
-                      {item.campaigns && item.campaigns.length > 0 && (
-                        <div className="flex items-center gap-2">
-                          <div className="rounded-lg bg-indigo-50 p-1.5 dark:bg-indigo-900/20">
-                            <Users className="h-4 w-4 text-indigo-500" />
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-gray-900 dark:text-white">
-                              {item.campaigns.length === 1
-                                ? t('campaigns.inCampaigns').replace(
-                                    '{{count}}',
-                                    String(item.campaigns.length),
-                                  )
-                                : t('campaigns.inCampaigns_plural').replace(
-                                    '{{count}}',
-                                    String(item.campaigns.length),
-                                  )}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Accounts */}
-                      <div>
-                        <h4 className="mb-2 text-xs font-semibold text-gray-600 dark:text-gray-400">
-                          {t('publications.table.linkedAccounts')}:
-                        </h4>
-                        <SocialAccountsDisplay
-                          publication={item}
-                          connectedAccounts={connectedAccounts}
-                          compact={true}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Expanded actions */}
-                    <div className="flex items-center gap-2">
-                      {/* View Button (Expanded) */}
+                  {/* Actions */}
+                  <div className="flex items-center gap-2">
+                    {/* Primary action */}
+                    {shouldShowPublish(item) && canManageContent ? (
+                      <Button
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          await handlePublish(item);
+                        }}
+                        disabled={isLoading?.publishing || false}
+                        loading={isLoading?.publishing || false}
+                        variant="primary"
+                        size="sm"
+                        icon={Rocket}
+                        className="flex-1 bg-primary-600 hover:bg-primary-700 dark:bg-primary-600 dark:hover:bg-primary-700"
+                      >
+                        {t('publications.button.publish')}
+                      </Button>
+                    ) : shouldShowSendToReview(item) && canManageContent ? (
                       <Button
                         onClick={(e) => {
                           e.stopPropagation();
-                          onViewDetails?.(item);
+                          handleSubmitForApproval(item);
                         }}
-                        variant="ghost"
+                        disabled={isLoading?.submitting || false}
+                        loading={isLoading?.submitting || false}
+                        variant="warning"
                         size="sm"
-                        icon={Eye}
+                        icon={Clock}
                         className="flex-1"
                       >
-                        {t('publications.button.viewDetails')}
+                        {t('publications.button.request')}
                       </Button>
+                    ) : canManageContent && !remoteLocks[item.id] ? (
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (onEditRequest) {
+                            onEditRequest(item);
+                          } else {
+                            onEdit(item);
+                          }
+                        }}
+                        disabled={isLoading?.editing || false}
+                        loading={isLoading?.editing || false}
+                        variant="primary"
+                        size="sm"
+                        icon={Edit}
+                        className="flex-1 bg-primary-600 hover:bg-primary-700 dark:bg-primary-600 dark:hover:bg-primary-700"
+                      >
+                        {t('common.edit')}
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleViewDetails(item);
+                        }}
+                        variant="primary"
+                        size="sm"
+                        icon={Eye}
+                        className="flex-1 bg-primary-600 hover:bg-primary-700 dark:bg-primary-600 dark:hover:bg-primary-700"
+                      >
+                        {t('publications.button.view')}
+                      </Button>
+                    )}
 
-                      {/* Edit button */}
-                      {canManageContent && (
-                        <Button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (remoteLocks[item.id]) {
-                              toast.error(
-                                `${t('publications.table.lockedBy') || 'Editando por'} ${lockedByName}`,
-                              );
-                              return;
-                            }
-                            if (onEditRequest) {
-                              onEditRequest(item);
-                            } else {
-                              onEdit(item);
-                            }
-                          }}
-                          disabled={
-                            isLoading?.publishing ||
-                            isLoading?.editing ||
-                            isLoading?.deleting ||
-                            !!remoteLocks[item.id]
-                          }
-                          loading={isLoading?.editing}
-                          variant={remoteLocks[item.id] ? 'ghost' : 'primary'}
-                          size="sm"
-                          icon={
-                            remoteLocks[item.id]
-                              ? Lock
-                              : (item.status as string) === 'processing'
-                                ? Loader2
-                                : Edit
-                          }
-                          className="flex-1"
-                        >
-                          {remoteLocks[item.id] || (item.status as string) === 'processing'
-                            ? (item.status as string) === 'processing'
-                              ? t('common.processing')
-                              : t('publications.table.lockedBy').replace(':', '')
-                            : t('common.edit')}
-                        </Button>
-                      )}
+                    {/* More options menu */}
+                    <Menu>
+                      <MenuButton className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white p-2 text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:border-neutral-600 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700">
+                        <MoreVertical className="h-5 w-5" />
+                        <span className="sr-only">{t('common.more')}</span>
+                      </MenuButton>
+                      <MenuItems
+                        anchor="bottom end"
+                        className="z-[9999] mt-2 w-56 origin-top-right rounded-xl border border-gray-200 bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:border-neutral-700 dark:bg-neutral-800"
+                      >
+                        <div className="p-2 space-y-1">
+                          <MenuItem>
+                            {({ focus }: { focus: boolean }) => (
+                              <Button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleViewDetails(item);
+                                }}
+                                variant="ghost"
+                                buttonStyle="outline"
+                                size="sm"
+                                icon={Eye}
+                                className={`w-full justify-start ${
+                                  focus ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400' : ''
+                                }`}
+                              >
+                                {t('publications.button.viewDetails')}
+                              </Button>
+                            )}
+                          </MenuItem>
 
-                      {/* Delete button */}
-                      {permissions?.includes('publish') && canManageContent && (
-                        <Button
-                          onClick={async (e) => {
-                            e.stopPropagation();
-                            await handleDelete(item, (item as Publication & { type?: string }).type === 'user_event');
-                          }}
-                          disabled={
-                            isLoading?.publishing || isLoading?.editing || isLoading?.deleting
-                          }
-                          loading={isLoading?.deleting}
-                          variant="danger"
-                          size="sm"
-                          icon={Trash2}
-                          className="flex-1"
-                        >
-                          {t('common.delete')}
-                        </Button>
-                      )}
-                    </div>
+                          {canManageContent && !remoteLocks[item.id] && (
+                            <MenuItem>
+                              {({ focus }: { focus: boolean }) => (
+                                <Button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (onEditRequest) {
+                                      onEditRequest(item);
+                                    } else {
+                                      onEdit(item);
+                                    }
+                                  }}
+                                  disabled={isLoading?.editing || false}
+                                  loading={isLoading?.editing || false}
+                                  variant="ghost"
+                                  buttonStyle="outline"
+                                  size="sm"
+                                  icon={Edit}
+                                  className={`w-full justify-start ${
+                                    focus ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400' : ''
+                                  }`}
+                                >
+                                  {t('common.edit')}
+                                </Button>
+                              )}
+                            </MenuItem>
+                          )}
+
+                          {canManageContent && (
+                            <MenuItem>
+                              {({ focus }: { focus: boolean }) => (
+                                <Button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDuplicate(item.id);
+                                  }}
+                                  disabled={isLoading?.duplicating || false}
+                                  loading={isLoading?.duplicating || false}
+                                  variant="ghost"
+                                  buttonStyle="outline"
+                                  size="sm"
+                                  icon={Copy}
+                                  className={`w-full justify-start ${
+                                    focus ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400' : ''
+                                  }`}
+                                >
+                                  {t('publications.button.duplicate')}
+                                </Button>
+                              )}
+                            </MenuItem>
+                          )}
+
+                          {permissions?.includes('publish') && canManageContent && (
+                            <>
+                              <div className="my-1 h-px bg-gray-200 dark:bg-neutral-700" />
+                              <MenuItem>
+                                {({ focus }: { focus: boolean }) => (
+                                  <Button
+                                    onClick={async (e) => {
+                                      e.stopPropagation();
+                                      await handleDelete(item, (item as Publication & { type?: string }).type === 'user_event');
+                                    }}
+                                    disabled={isLoading?.deleting || false}
+                                    loading={isLoading?.deleting || false}
+                                    variant="primary"
+                                    size="sm"
+                                    icon={Trash2}
+                                    className={`w-full justify-start ${
+                                      focus ? 'bg-red-50 dark:bg-red-900/20' : ''
+                                    }`}
+                                  >
+                                    {t('common.delete')}
+                                  </Button>
+                                )}
+                              </MenuItem>
+                            </>
+                          )}
+                        </div>
+                      </MenuItems>
+                    </Menu>
                   </div>
                 </div>
-              )}
+              </div>
             </div>
           );
         })}
