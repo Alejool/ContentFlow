@@ -9,13 +9,7 @@ import CreateWorkspaceModal from "@/Components/Workspace/CreateWorkspaceModal";
 import WorkspaceCard from "@/Components/Workspace/WorkspaceCard";
 import { Plus } from "lucide-react";
 
-export default function Index({
-  workspaces,
-  roles,
-}: {
-  workspaces: any[];
-  roles: any[];
-}) {
+export default function Index({ workspaces, roles }: { workspaces: any[]; roles: any[] }) {
   const { t } = useTranslation();
   const { auth } = usePage().props as any;
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -23,12 +17,12 @@ export default function Index({
   return (
     <AuthenticatedLayout
       header={
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
           <div>
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-neutral-300 bg-clip-text text-transparent">
+            <h2 className="bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-3xl font-bold text-transparent dark:from-white dark:to-neutral-300">
               {t("workspace.my_workspaces")}
             </h2>
-            <p className="text-sm text-gray-500 dark:text-neutral-500 mt-1">
+            <p className="mt-1 text-sm text-gray-500 dark:text-neutral-500">
               {t("workspace.subtitle")}
             </p>
           </div>
@@ -46,7 +40,7 @@ export default function Index({
     >
       <Head title={t("workspace.my_workspaces")} />
       <div className="min-h-screen">
-        <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-10 max-w-7xl mx-auto ">
+        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 p-10 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {workspaces.map((workspace) => (
             <WorkspaceCard
               key={workspace.id}

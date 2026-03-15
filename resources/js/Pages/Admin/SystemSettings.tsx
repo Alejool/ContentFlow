@@ -2,13 +2,7 @@ import { useState } from "react";
 import { Head, router } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import AdminNavigation from "@/Components/Admin/AdminNavigation";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/Components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card";
 import Button from "@/Components/common/Modern/Button";
 import { Badge } from "@/Components/ui/badge";
 import Switch from "@/Components/common/Modern/Switch";
@@ -53,8 +47,7 @@ interface Props {
 
 export default function SystemSettings({ settings, categories }: Props) {
   const { t } = useTranslation();
-  const [localSettings, setLocalSettings] =
-    useState<SettingsByCategory>(settings);
+  const [localSettings, setLocalSettings] = useState<SettingsByCategory>(settings);
   const [hasChanges, setHasChanges] = useState(false);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("plans");
@@ -135,7 +128,7 @@ export default function SystemSettings({ settings, categories }: Props) {
       return (
         <Badge
           variant="destructive"
-          className="ml-2 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800"
+          className="ml-2 border-red-200 bg-red-100 text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-400"
         >
           {t("admin.system_settings.badges.high_impact")}
         </Badge>
@@ -145,7 +138,7 @@ export default function SystemSettings({ settings, categories }: Props) {
       return (
         <Badge
           variant="default"
-          className="ml-2 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800"
+          className="ml-2 border-amber-200 bg-amber-100 text-amber-700 dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-400"
         >
           {t("admin.system_settings.badges.medium_impact")}
         </Badge>
@@ -154,34 +147,27 @@ export default function SystemSettings({ settings, categories }: Props) {
     return null;
   };
 
-  const renderSettingCard = (
-    category: keyof SettingsByCategory,
-    setting: Setting,
-  ) => {
+  const renderSettingCard = (category: keyof SettingsByCategory, setting: Setting) => {
     const isEnabled = setting.value as boolean;
 
     return (
       <div
         key={setting.id}
-        className="mb-4 p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm hover:shadow-md transition-shadow"
+        className="mb-4 rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
       >
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
+            <div className="mb-2 flex items-center gap-2">
               <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
                 {setting.label}
               </h3>
               {getImpactBadge(setting.key)}
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-              {setting.description}
-            </p>
+            <p className="mb-3 text-sm text-gray-600 dark:text-gray-400">{setting.description}</p>
             {setting.updated_by && (
               <p className="text-xs text-gray-500 dark:text-gray-500">
                 {t("admin.system_settings.last_updated", {
-                  date: new Date(setting.updated_at).toLocaleString(
-                    t("common.locale") || "es-ES",
-                  ),
+                  date: new Date(setting.updated_at).toLocaleString(t("common.locale") || "es-ES"),
                   user: setting.updated_by,
                 })}
               </p>
@@ -203,25 +189,16 @@ export default function SystemSettings({ settings, categories }: Props) {
   return (
     <AuthenticatedLayout
       header={
-        <div className="flex items-center justify-between text-gray-900 dark:text-gray-100 ">
+        <div className="flex items-center justify-between text-gray-900 dark:text-gray-100">
           <div>
-            <h2 className="text-3xl font-bold">
-              {t("admin.system_settings.page_title")}
-            </h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            <h2 className="text-3xl font-bold">{t("admin.system_settings.page_title")}</h2>
+            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
               {t("admin.system_settings.page_description")}
             </p>
           </div>
           {hasChanges && (
-            <Button
-              onClick={handleSave}
-              disabled={saving}
-              icon={Save}
-              iconPosition="left"
-            >
-              {saving
-                ? t("admin.system_settings.saving")
-                : t("admin.system_settings.save_changes")}
+            <Button onClick={handleSave} disabled={saving} icon={Save} iconPosition="left">
+              {saving ? t("admin.system_settings.saving") : t("admin.system_settings.save_changes")}
             </Button>
           )}
         </div>
@@ -231,8 +208,8 @@ export default function SystemSettings({ settings, categories }: Props) {
 
       <AdminNavigation currentRoute="/admin/system-settings" />
 
-      <div className=" bg-gray-50 dark:bg-gray-900 min-h-screen">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {hasChanges && (
             <AlertCard
               type="info"
@@ -265,28 +242,19 @@ export default function SystemSettings({ settings, categories }: Props) {
               ([categoryKey, categoryLabel]) =>
                 activeTab === categoryKey && (
                   <div key={categoryKey}>
-                    <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                    <Card className="border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
                       <CardHeader className="border-b border-gray-200 dark:border-gray-700">
                         <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-gray-100">
                           {getCategoryIconElement(categoryKey)}
-                          {t(
-                            `admin.system_settings.categories.${categoryKey}`,
-                          ) || categoryLabel}
+                          {t(`admin.system_settings.categories.${categoryKey}`) || categoryLabel}
                         </CardTitle>
                         <CardDescription className="text-gray-600 dark:text-gray-400">
-                          {t(
-                            `admin.system_settings.descriptions.${categoryKey}`,
-                          )}
+                          {t(`admin.system_settings.descriptions.${categoryKey}`)}
                         </CardDescription>
                       </CardHeader>
                       <CardContent className="pt-6">
-                        {localSettings[
-                          categoryKey as keyof SettingsByCategory
-                        ]?.map((setting) =>
-                          renderSettingCard(
-                            categoryKey as keyof SettingsByCategory,
-                            setting,
-                          ),
+                        {localSettings[categoryKey as keyof SettingsByCategory]?.map((setting) =>
+                          renderSettingCard(categoryKey as keyof SettingsByCategory, setting),
                         )}
                       </CardContent>
                     </Card>
@@ -295,58 +263,52 @@ export default function SystemSettings({ settings, categories }: Props) {
             )}
           </div>
 
-          <Card className="mt-6 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+          <Card className="mt-6 border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
             <CardHeader className="border-b border-gray-200 dark:border-gray-700">
               <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-gray-100">
                 <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
                 {t("admin.system_settings.info_section.title")}
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-6 space-y-4">
-              <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
-                <h4 className="font-semibold mb-2 text-gray-900 dark:text-gray-100">
+            <CardContent className="space-y-4 pt-6">
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900/50">
+                <h4 className="mb-2 font-semibold text-gray-900 dark:text-gray-100">
                   {t("admin.system_settings.info_section.plans_title")}
                 </h4>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   {t("admin.system_settings.info_section.plans_description")}
                 </p>
               </div>
-              <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
-                <h4 className="font-semibold mb-2 text-gray-900 dark:text-gray-100">
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900/50">
+                <h4 className="mb-2 font-semibold text-gray-900 dark:text-gray-100">
                   {t("admin.system_settings.info_section.features_title")}
                 </h4>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   {t("admin.system_settings.info_section.features_description")}
                 </p>
               </div>
-              <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
-                <h4 className="font-semibold mb-2 text-gray-900 dark:text-gray-100">
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900/50">
+                <h4 className="mb-2 font-semibold text-gray-900 dark:text-gray-100">
                   {t("admin.system_settings.info_section.addons_title")}
                 </h4>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   {t("admin.system_settings.info_section.addons_description")}
                 </p>
               </div>
-              <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
-                <h4 className="font-semibold mb-2 text-gray-900 dark:text-gray-100">
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900/50">
+                <h4 className="mb-2 font-semibold text-gray-900 dark:text-gray-100">
                   {t("admin.system_settings.info_section.integrations_title")}
                 </h4>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {t(
-                    "admin.system_settings.info_section.integrations_description",
-                  )}
+                  {t("admin.system_settings.info_section.integrations_description")}
                 </p>
               </div>
-              <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
-                <h4 className="font-semibold mb-2 text-gray-900 dark:text-gray-100">
-                  {t(
-                    "admin.system_settings.info_section.payment_methods_title",
-                  )}
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900/50">
+                <h4 className="mb-2 font-semibold text-gray-900 dark:text-gray-100">
+                  {t("admin.system_settings.info_section.payment_methods_title")}
                 </h4>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {t(
-                    "admin.system_settings.info_section.payment_methods_description",
-                  )}
+                  {t("admin.system_settings.info_section.payment_methods_description")}
                 </p>
               </div>
             </CardContent>

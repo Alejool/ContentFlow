@@ -25,28 +25,28 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
     <GuestLayout section="forgot-password">
       <Head title={t("auth.forgot-password.title")} />
 
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8">
+      <div className="flex w-full items-center justify-center p-4 sm:p-8 lg:w-1/2">
         <div className="w-full max-w-md">
           <div className="mb-8 text-center">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white ">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
               {t("auth.forgot-password.title")}
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">
+            <p className="mt-2 text-gray-600 dark:text-gray-400">
               {t("auth.forgot-password.enterEmail")}
             </p>
           </div>
 
           <form onSubmit={submit} className="space-y-6">
             {status && (
-              <div className="rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-4">
+              <div className="rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
                 <div className="flex items-center gap-3 text-green-700 dark:text-green-400">
-                  <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
+                  <CheckCircle2 className="h-5 w-5 flex-shrink-0" />
                   <p className="text-sm font-medium">{status}</p>
                 </div>
               </div>
             )}
 
-            <div className="rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-4">
+            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
               <p className="text-sm text-gray-700 dark:text-gray-300">
                 {t("auth.forgot-password.description")}
               </p>
@@ -83,11 +83,11 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
             </Button>
 
             <div className="pt-4">
-              <div className="rounded-lg p-4 bg-gray-50 dark:bg-gray-800/50 ">
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+              <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-800/50">
+                <p className="mb-2 text-sm text-gray-600 dark:text-gray-400">
                   {t("auth.forgot-password.recomendations.receiveEmail")}
                 </p>
-                <ul className="space-y-1 text-sm list-disc px-2">
+                <ul className="list-disc space-y-1 px-2 text-sm">
                   <li className="text-gray-500 dark:text-gray-500">
                     {t("auth.forgot-password.recomendations.1")}
                   </li>
@@ -104,11 +104,9 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
             <div className="text-center">
               <Link
                 href={route("login")}
-                className="inline-flex items-center gap-2 text-sm text-primary-600
-                                             hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300
-                                             transition-colors"
+                className="inline-flex items-center gap-2 text-sm text-primary-600 transition-colors hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
               >
-                <ArrowLeft className="w-4 h-4" />
+                <ArrowLeft className="h-4 w-4" />
                 {t("auth.forgot-password.buttons.back")}
               </Link>
             </div>

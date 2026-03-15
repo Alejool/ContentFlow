@@ -17,16 +17,7 @@ interface ResetPasswordProps {
 export default function ResetPassword({ token, email }: ResetPasswordProps) {
   const { t } = useTranslation();
 
-  const {
-    data,
-    setData,
-    post,
-    processing,
-    errors,
-    reset,
-    setError,
-    clearErrors,
-  } = useForm({
+  const { data, setData, post, processing, errors, reset, setError, clearErrors } = useForm({
     token: token,
     email: email,
     password: "",
@@ -67,27 +58,27 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
     <GuestLayout section="reset-password">
       <Head title="Reset Password" />
 
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8">
+      <div className="flex w-full items-center justify-center p-4 sm:p-8 lg:w-1/2">
         <div className="w-full max-w-md">
           <div className="mb-8 text-center">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white ">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
               {t("auth.reset-password.title")}
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">
+            <p className="mt-2 text-gray-600 dark:text-gray-400">
               {t("auth.reset-password.subtitle")}
             </p>
           </div>
 
           <form onSubmit={submit} className="space-y-6">
             {!errors.email && (
-              <div className="rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-4">
+              <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
                 <div className="flex items-center gap-3 text-blue-700 dark:text-blue-400">
-                  <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
+                  <CheckCircle2 className="h-5 w-5 flex-shrink-0" />
                   <div>
                     <p className="text-sm font-medium">
                       {t("auth.reset-password.status.verified")}
                     </p>
-                    <p className="text-xs mt-1">
+                    <p className="mt-1 text-xs">
                       {t("auth.reset-password.status.entering_for")} {email}
                     </p>
                   </div>
@@ -110,9 +101,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
               type="password"
               label={t("auth.reset-password.inputs.password")}
               value={data.password}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                setData("password", e.target.value)
-              }
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setData("password", e.target.value)}
               placeholder={t("auth.reset-password.placeholders.password")}
               autoComplete="new-password"
               required
@@ -130,9 +119,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setData("password_confirmation", e.target.value)
               }
-              placeholder={t(
-                "auth.reset-password.placeholders.confirm_password",
-              )}
+              placeholder={t("auth.reset-password.placeholders.confirm_password")}
               autoComplete="new-password"
               required
               icon={Lock}
@@ -152,23 +139,23 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
 
             {data.password && data.password_confirmation && (
               <div
-                className={`p-3 rounded-lg ${
+                className={`rounded-lg p-3 ${
                   data.password === data.password_confirmation
-                    ? "bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800"
-                    : "bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800"
+                    ? "border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20"
+                    : "border border-primary-200 bg-primary-50 dark:border-primary-800 dark:bg-primary-900/20"
                 }`}
               >
                 <div className="flex items-center gap-2">
                   {data.password === data.password_confirmation ? (
                     <>
-                      <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400" />
+                      <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
                       <span className="text-sm text-green-600 dark:text-green-400">
                         {t("auth.reset-password.match.success")}
                       </span>
                     </>
                   ) : (
                     <>
-                      <AlertCircle className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+                      <AlertCircle className="h-4 w-4 text-primary-600 dark:text-primary-400" />
                       <span className="text-sm text-primary-600 dark:text-primary-400">
                         {t("auth.reset-password.match.error")}
                       </span>

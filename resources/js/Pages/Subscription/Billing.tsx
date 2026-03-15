@@ -1,13 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Head, router, usePage } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/Components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card";
 import Button from "@/Components/common/Modern/Button";
 import { Badge } from "@/Components/ui/badge";
 import { Alert, AlertDescription } from "@/Components/ui/alert";
@@ -80,19 +74,12 @@ interface Props {
   usage?: UsageMetric[];
 }
 
-export default function Billing({
-  auth,
-  subscription,
-  invoices,
-  upcomingInvoice,
-  usage,
-}: Props) {
+export default function Billing({ auth, subscription, invoices, upcomingInvoice, usage }: Props) {
   const { t, i18n } = useTranslation();
   const { flash } = usePage().props as any;
 
   // Determinar si invoices es paginado o array simple
-  const isPaginated =
-    invoices && typeof invoices === "object" && "data" in invoices;
+  const isPaginated = invoices && typeof invoices === "object" && "data" in invoices;
   const invoicesList = isPaginated
     ? (invoices as InvoicesPagination).data
     : (invoices as Invoice[]) || [];
@@ -118,13 +105,10 @@ export default function Billing({
 
   const handlePerPageChange = (newPerPage: number) => {
     setPerPage(newPerPage);
-    router.visit(
-      route("subscription.billing", { page: 1, per_page: newPerPage }),
-      {
-        preserveState: true,
-        preserveScroll: true,
-      },
-    );
+    router.visit(route("subscription.billing", { page: 1, per_page: newPerPage }), {
+      preserveState: true,
+      preserveScroll: true,
+    });
   };
 
   const handleExportInvoices = () => {
@@ -159,12 +143,7 @@ export default function Billing({
 
   const handleUpdatePayment = async () => {
     try {
-      toast.loading(
-        t(
-          "subscription.billing.loadingPortal",
-          "Abriendo portal de facturación...",
-        ),
-      );
+      toast.loading(t("subscription.billing.loadingPortal", "Abriendo portal de facturación..."));
 
       const response = await axios.post(
         route("subscription.billing-portal"),
@@ -190,10 +169,7 @@ export default function Billing({
       const errorMessage =
         error.response?.data?.error ||
         error.response?.data?.message ||
-        t(
-          "subscription.billing.portalError",
-          "No se pudo acceder al portal de facturación",
-        );
+        t("subscription.billing.portalError", "No se pudo acceder al portal de facturación");
       toast.error(errorMessage);
     }
   };
@@ -216,10 +192,7 @@ export default function Billing({
       if (response.data.success) {
         toast.success(
           response.data.message ||
-            t(
-              "subscription.billing.cancelSuccess",
-              "Suscripción cancelada exitosamente",
-            ),
+            t("subscription.billing.cancelSuccess", "Suscripción cancelada exitosamente"),
         );
         setShowCancelModal(false);
         setTimeout(() => {
@@ -233,10 +206,7 @@ export default function Billing({
       const errorMessage =
         error.response?.data?.error ||
         error.response?.data?.message ||
-        t(
-          "subscription.billing.cancelError",
-          "No se pudo cancelar la suscripción",
-        );
+        t("subscription.billing.cancelError", "No se pudo cancelar la suscripción");
       toast.error(errorMessage);
     } finally {
       setIsCancelling(false);
@@ -304,25 +274,17 @@ export default function Billing({
       <Head title={t("subscription.billing.title", "Facturación")} />
 
       <div className="py-12 dark:text-white">
-        <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
           {/* Header */}
           <div className="mb-8">
-            <Button
-              onClick={handleBack}
-              variant="ghost"
-              icon={ArrowLeft}
-              className="mb-4"
-            >
+            <Button onClick={handleBack} variant="ghost" icon={ArrowLeft} className="mb-4">
               {t("common.back", "Volver")}
             </Button>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
               {t("subscription.billing.title", "Facturación")}
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">
-              {t(
-                "subscription.billing.description",
-                "Gestiona tu facturación y métodos de pago",
-              )}
+            <p className="mt-2 text-gray-600 dark:text-gray-400">
+              {t("subscription.billing.description", "Gestiona tu facturación y métodos de pago")}
             </p>
           </div>
 
@@ -349,7 +311,7 @@ export default function Billing({
                     "Tienes una suscripción activa. Puedes cambiar a cualquier plan de pago desde la página de Pricing. Para cambiar a Free, primero cancela tu suscripción.",
                   )}
                   <Button
-                    className="ml-2 p-0 h-auto text-green-800 dark:text-green-300 underline"
+                    className="ml-2 h-auto p-0 text-green-800 underline dark:text-green-300"
                     onClick={() => router.visit("/pricing")}
                   >
                     {t("subscription.billing.changePlan", "Cambiar Plan")}
@@ -368,13 +330,10 @@ export default function Billing({
                   "Estás en el plan gratuito. Para acceder al portal de facturación, necesitas suscribirte a un plan de pago.",
                 )}
                 <Button
-                  className="ml-2 p-0 h-auto text-yellow-800 dark:text-yellow-300 underline"
+                  className="ml-2 h-auto p-0 text-yellow-800 underline dark:text-yellow-300"
                   onClick={() => router.visit("/pricing")}
                 >
-                  {t(
-                    "subscription.billing.viewPlans",
-                    "Ver planes disponibles",
-                  )}
+                  {t("subscription.billing.viewPlans", "Ver planes disponibles")}
                 </Button>
               </AlertDescription>
             </Alert>
@@ -386,20 +345,16 @@ export default function Billing({
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="flex items-center gap-2">
-                    <CreditCard className="w-5 h-5" />
+                    <CreditCard className="h-5 w-5" />
                     {t("subscription.billing.currentPlan", "Plan Actual")}
                   </CardTitle>
                   <CardDescription className="mt-2">
-                    {t(
-                      "subscription.billing.planDescription",
-                      "Información de tu suscripción",
-                    )}
+                    {t("subscription.billing.planDescription", "Información de tu suscripción")}
                   </CardDescription>
                 </div>
                 <div className="flex flex-col items-end gap-2">
                   <Badge className={getPlanBadgeClass(subscription.plan)}>
-                    {subscription.plan.charAt(0).toUpperCase() +
-                      subscription.plan.slice(1)}
+                    {subscription.plan.charAt(0).toUpperCase() + subscription.plan.slice(1)}
                   </Badge>
                   <Badge
                     variant={getStatusBadgeVariant(subscription.stripe_status)}
@@ -415,12 +370,12 @@ export default function Billing({
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <div className="flex items-center justify-between rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
                   <div>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       {t("subscription.billing.plan", "Plan")}
                     </p>
-                    <p className="text-lg font-semibold text-gray-900 dark:text-white capitalize">
+                    <p className="text-lg font-semibold capitalize text-gray-900 dark:text-white">
                       {subscription.plan}
                     </p>
                   </div>
@@ -436,34 +391,30 @@ export default function Billing({
                   )}
                 </div>
 
-                {subscription.plan !== "free" &&
-                  subscription.plan !== "demo" && (
-                    <div className="flex flex-col gap-3">
-                      <div className="flex gap-3">
-                        <Button
-                          className="flex-1"
-                          icon={CreditCard}
-                          size="md"
-                          onClick={handleUpdatePayment}
-                        >
-                          {t(
-                            "subscription.billing.updatePayment",
-                            "Actualizar Método de Pago",
-                          )}
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          buttonStyle="outline"
-                          className="flex-1"
-                          icon={TrendingUp}
-                          size="md"
-                          onClick={() => router.visit("/pricing")}
-                        >
-                          {t("subscription.billing.changePlan", "Cambiar Plan")}
-                        </Button>
-                      </div>
+                {subscription.plan !== "free" && subscription.plan !== "demo" && (
+                  <div className="flex flex-col gap-3">
+                    <div className="flex gap-3">
+                      <Button
+                        className="flex-1"
+                        icon={CreditCard}
+                        size="md"
+                        onClick={handleUpdatePayment}
+                      >
+                        {t("subscription.billing.updatePayment", "Actualizar Método de Pago")}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        buttonStyle="outline"
+                        className="flex-1"
+                        icon={TrendingUp}
+                        size="md"
+                        onClick={() => router.visit("/pricing")}
+                      >
+                        {t("subscription.billing.changePlan", "Cambiar Plan")}
+                      </Button>
                     </div>
-                  )}
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -473,7 +424,7 @@ export default function Billing({
             <Card className="mb-8">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5" />
+                  <TrendingUp className="h-5 w-5" />
                   {t("subscription.usage.currentUsage", "Uso Actual")}
                 </CardTitle>
                 <CardDescription>
@@ -484,13 +435,13 @@ export default function Billing({
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
                   {usage.map((metric) => (
                     <div
                       key={metric.type}
-                      className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg"
+                      className="rounded-lg border border-gray-200 p-4 dark:border-gray-700"
                     >
-                      <div className="flex items-center gap-2 mb-2">
+                      <div className="mb-2 flex items-center gap-2">
                         {getMetricIcon(metric.type)}
                         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                           {getMetricName(metric.type)}
@@ -533,12 +484,12 @@ export default function Billing({
             <Card className="mb-8">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5" />
+                  <Calendar className="h-5 w-5" />
                   {t("subscription.billing.upcomingInvoice", "Próxima Factura")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                <div className="flex items-center justify-between rounded-lg bg-blue-50 p-4 dark:bg-blue-900/20">
                   <div>
                     <p className="text-sm text-blue-600 dark:text-blue-400">
                       {t("subscription.billing.amount", "Monto")}
@@ -549,10 +500,7 @@ export default function Billing({
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-blue-600 dark:text-blue-400">
-                      {t(
-                        "subscription.billing.dueDate",
-                        "Fecha de vencimiento",
-                      )}
+                      {t("subscription.billing.dueDate", "Fecha de vencimiento")}
                     </p>
                     <p className="text-lg font-semibold text-blue-700 dark:text-blue-300">
                       {formatDate(upcomingInvoice.date)}
@@ -569,11 +517,8 @@ export default function Billing({
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="flex items-center gap-2">
-                    <DollarSign className="w-5 h-5" />
-                    {t(
-                      "subscription.billing.invoiceHistory",
-                      "Historial de Facturas",
-                    )}
+                    <DollarSign className="h-5 w-5" />
+                    {t("subscription.billing.invoiceHistory", "Historial de Facturas")}
                   </CardTitle>
                   <CardDescription>
                     {t(
@@ -590,23 +535,17 @@ export default function Billing({
                     buttonStyle="outline"
                     onClick={handleExportInvoices}
                   >
-                    {t(
-                      "subscription.billing.exportToExcel",
-                      "Exportar a Excel",
-                    )}
+                    {t("subscription.billing.exportToExcel", "Exportar a Excel")}
                   </Button>
                 )}
               </div>
             </CardHeader>
             <CardContent>
               {invoicesList.length === 0 ? (
-                <div className="text-center py-12">
-                  <DollarSign className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 dark:text-gray-400 mb-2">
-                    {t(
-                      "subscription.billing.noInvoices",
-                      "No hay facturas disponibles",
-                    )}
+                <div className="py-12 text-center">
+                  <DollarSign className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+                  <p className="mb-2 text-gray-600 dark:text-gray-400">
+                    {t("subscription.billing.noInvoices", "No hay facturas disponibles")}
                   </p>
                   <p className="text-sm text-gray-500 dark:text-gray-500">
                     {t(
@@ -621,51 +560,41 @@ export default function Billing({
                     {invoicesList.map((invoice) => (
                       <div
                         key={invoice.id}
-                        className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                        className="flex items-center justify-between rounded-lg border border-gray-200 p-4 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
                       >
-                        <div className="flex items-center gap-4 flex-1">
-                          <div className="p-3 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 rounded-lg">
-                            <FileText className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                        <div className="flex flex-1 items-center gap-4">
+                          <div className="rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 p-3 dark:from-blue-900/30 dark:to-blue-800/30">
+                            <FileText className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                           </div>
                           <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-1">
+                            <div className="mb-1 flex items-center gap-3">
                               <p className="font-semibold text-gray-900 dark:text-white">
                                 {formatDate(invoice.date)}
                               </p>
-                              {invoice.plan_name &&
-                                invoice.plan_name !== "N/A" && (
-                                  <Badge className="bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 border-primary-200 dark:border-primary-800">
-                                    {invoice.plan_name}
-                                  </Badge>
-                                )}
+                              {invoice.plan_name && invoice.plan_name !== "N/A" && (
+                                <Badge className="border-primary-200 bg-primary-100 text-primary-700 dark:border-primary-800 dark:bg-primary-900/30 dark:text-primary-300">
+                                  {invoice.plan_name}
+                                </Badge>
+                              )}
                             </div>
                             <p className="text-sm text-gray-600 dark:text-gray-400">
                               {invoice.description || "Suscripción"}
                             </p>
-                            <div className="flex items-center gap-4 mt-2">
+                            <div className="mt-2 flex items-center gap-4">
                               <span className="text-lg font-bold text-gray-900 dark:text-white">
-                                {invoice.currency || "USD"} $
-                                {formatAmount(invoice.total)}
+                                {invoice.currency || "USD"} ${formatAmount(invoice.total)}
                               </span>
                               <Badge
-                                variant={
-                                  invoice.status === "paid"
-                                    ? "default"
-                                    : "destructive"
-                                }
+                                variant={invoice.status === "paid" ? "default" : "destructive"}
                                 className="text-xs"
                               >
-                                {t(
-                                  `subscription.status.${invoice.status}`,
-                                  invoice.status,
-                                )}
+                                {t(`subscription.status.${invoice.status}`, invoice.status)}
                               </Badge>
                             </div>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          {(invoice.hosted_invoice_url ||
-                            invoice.invoice_pdf) && (
+                          {(invoice.hosted_invoice_url || invoice.invoice_pdf) && (
                             <Button
                               size="md"
                               icon={Download}
@@ -673,9 +602,7 @@ export default function Billing({
                               buttonStyle="outline"
                               onClick={() => {
                                 // Priorizar hosted_invoice_url de Stripe (página web), luego invoice_pdf (PDF directo)
-                                const url =
-                                  invoice.hosted_invoice_url ||
-                                  invoice.invoice_pdf;
+                                const url = invoice.hosted_invoice_url || invoice.invoice_pdf;
                                 if (url) {
                                   window.open(url, "_blank");
                                 }
@@ -688,15 +615,11 @@ export default function Billing({
                               {t("subscription.billing.download", "Descargar")}
                             </Button>
                           )}
-                          {!invoice.hosted_invoice_url &&
-                            !invoice.invoice_pdf && (
-                              <span className="text-xs text-gray-400 dark:text-gray-500">
-                                {t(
-                                  "subscription.billing.noDownload",
-                                  "No disponible",
-                                )}
-                              </span>
-                            )}
+                          {!invoice.hosted_invoice_url && !invoice.invoice_pdf && (
+                            <span className="text-xs text-gray-400 dark:text-gray-500">
+                              {t("subscription.billing.noDownload", "No disponible")}
+                            </span>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -725,17 +648,14 @@ export default function Billing({
       <DynamicModal
         isOpen={showCancelModal}
         onClose={() => setShowCancelModal(false)}
-        title={t(
-          "subscription.billing.cancelSubscription",
-          "Cancelar Suscripción",
-        )}
+        title={t("subscription.billing.cancelSubscription", "Cancelar Suscripción")}
         size="lg"
       >
         <div className="space-y-4">
-          <div className="flex items-start gap-3 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-            <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+          <div className="flex items-start gap-3 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
+            <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-600 dark:text-yellow-400" />
             <div>
-              <p className="text-sm text-yellow-800 dark:text-yellow-200 font-medium mb-1">
+              <p className="mb-1 text-sm font-medium text-yellow-800 dark:text-yellow-200">
                 {t("subscription.billing.cancelWarningTitle", "Importante")}
               </p>
               <p className="text-sm text-yellow-700 dark:text-yellow-300">
@@ -749,12 +669,9 @@ export default function Billing({
 
           <div className="space-y-2">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              {t(
-                "subscription.billing.cancelDetails",
-                "Al cancelar tu suscripción:",
-              )}
+              {t("subscription.billing.cancelDetails", "Al cancelar tu suscripción:")}
             </p>
-            <ul className="list-disc list-inside space-y-1 text-sm text-gray-600 dark:text-gray-400 ml-2">
+            <ul className="ml-2 list-inside list-disc space-y-1 text-sm text-gray-600 dark:text-gray-400">
               <li>
                 {t(
                   "subscription.billing.cancelPoint1",
@@ -762,10 +679,7 @@ export default function Billing({
                 )}
               </li>
               <li>
-                {t(
-                  "subscription.billing.cancelPoint2",
-                  "No se realizarán más cobros automáticos",
-                )}
+                {t("subscription.billing.cancelPoint2", "No se realizarán más cobros automáticos")}
               </li>
               <li>
                 {t(
@@ -776,7 +690,7 @@ export default function Billing({
             </ul>
           </div>
 
-          <div className="flex gap-3 pt-4 justify-end">
+          <div className="flex justify-end gap-3 pt-4">
             <Button
               variant="secondary"
               buttonStyle="outline"
@@ -795,10 +709,7 @@ export default function Billing({
             >
               {isCancelling
                 ? t("subscription.billing.cancelling", "Cancelando...")
-                : t(
-                    "subscription.billing.confirmCancel",
-                    "Sí, cancelar suscripción",
-                  )}
+                : t("subscription.billing.confirmCancel", "Sí, cancelar suscripción")}
             </Button>
           </div>
         </div>

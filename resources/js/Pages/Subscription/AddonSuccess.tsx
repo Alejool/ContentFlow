@@ -53,10 +53,10 @@ export default function AddonSuccess() {
       <Head title="Compra Exitosa" />
 
       <div className="py-12">
-        <div className="max-w-3xl mx-auto sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-3xl sm:px-6 lg:px-8">
           <Card className="border-green-200 bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20">
-            <CardHeader className="text-center space-y-4">
-              <div className="mx-auto w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+            <CardHeader className="space-y-4 text-center">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900">
                 <CheckCircle className="h-10 w-10 text-green-600 dark:text-green-400" />
               </div>
 
@@ -64,7 +64,7 @@ export default function AddonSuccess() {
                 <CardTitle className="text-3xl font-bold text-green-900 dark:text-green-100">
                   ¡Compra Exitosa!
                 </CardTitle>
-                <CardDescription className="text-lg mt-2 text-green-700 dark:text-green-300">
+                <CardDescription className="mt-2 text-lg text-green-700 dark:text-green-300">
                   Tu add-on ha sido activado correctamente
                 </CardDescription>
               </div>
@@ -72,37 +72,28 @@ export default function AddonSuccess() {
 
             <CardContent className="space-y-6">
               {/* Success Message */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-6 space-y-4">
+              <div className="space-y-4 rounded-lg bg-white p-6 dark:bg-gray-800">
                 <div className="flex items-start gap-4">
-                  <Sparkles className="h-6 w-6 text-blue-600 flex-shrink-0 mt-1" />
+                  <Sparkles className="mt-1 h-6 w-6 flex-shrink-0 text-blue-600" />
                   <div className="space-y-2">
-                    <h3 className="font-semibold text-lg">¿Qué sigue?</h3>
-                    <ul className="space-y-2 text-sm text-muted-foreground">
+                    <h3 className="text-lg font-semibold">¿Qué sigue?</h3>
+                    <ul className="text-muted-foreground space-y-2 text-sm">
                       <li className="flex items-start gap-2">
-                        <span className="text-blue-600 font-bold">•</span>
-                        <span>
-                          Tus créditos adicionales están disponibles
-                          inmediatamente
-                        </span>
+                        <span className="font-bold text-blue-600">•</span>
+                        <span>Tus créditos adicionales están disponibles inmediatamente</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="text-blue-600 font-bold">•</span>
-                        <span>
-                          Se usarán automáticamente cuando excedas el límite de
-                          tu plan
-                        </span>
+                        <span className="font-bold text-blue-600">•</span>
+                        <span>Se usarán automáticamente cuando excedas el límite de tu plan</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="text-blue-600 font-bold">•</span>
-                        <span>
-                          Puedes ver tu balance actualizado en el dashboard
-                        </span>
+                        <span className="font-bold text-blue-600">•</span>
+                        <span>Puedes ver tu balance actualizado en el dashboard</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="text-blue-600 font-bold">•</span>
+                        <span className="font-bold text-blue-600">•</span>
                         <span>
-                          Recibirás un email de confirmación con los detalles de
-                          tu compra
+                          Recibirás un email de confirmación con los detalles de tu compra
                         </span>
                       </li>
                     </ul>
@@ -111,16 +102,16 @@ export default function AddonSuccess() {
               </div>
 
               {/* Info Box */}
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+              <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
                 <p className="text-sm text-blue-800 dark:text-blue-200">
-                  💡 <strong>Tip:</strong> Los add-ons no expiran y se acumulan
-                  si compras múltiples paquetes. Puedes solicitar reembolso
-                  dentro de los 7 días si no has usado el add-on.
+                  💡 <strong>Tip:</strong> Los add-ons no expiran y se acumulan si compras múltiples
+                  paquetes. Puedes solicitar reembolso dentro de los 7 días si no has usado el
+                  add-on.
                 </p>
               </div>
             </CardContent>
 
-            <CardFooter className="flex flex-col sm:flex-row gap-3 justify-center">
+            <CardFooter className="flex flex-col justify-center gap-3 sm:flex-row">
               <Button asChild variant="default" size="lg">
                 <Link href="/dashboard">
                   Ir al Dashboard
@@ -136,7 +127,7 @@ export default function AddonSuccess() {
 
           {/* Additional Actions */}
           <div className="mt-8 text-center">
-            <p className="text-sm text-muted-foreground mb-4">
+            <p className="text-muted-foreground mb-4 text-sm">
               ¿Necesitas ayuda? Contáctanos en soporte@contenflow.com
             </p>
           </div>

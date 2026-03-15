@@ -42,12 +42,7 @@ interface EditProps {
   };
 }
 
-export default function Edit({
-  mustVerifyEmail,
-  status,
-  subscription,
-  usage,
-}: EditProps) {
+export default function Edit({ mustVerifyEmail, status, subscription, usage }: EditProps) {
   const { t } = useTranslation();
   const user = usePage<any>().props.auth.user;
   const { auth } = usePage<any>().props;
@@ -107,25 +102,23 @@ export default function Edit({
 
   const handleSaveClick = () => {
     if (formRef.current && activeTab === "profile") {
-      formRef.current.dispatchEvent(
-        new Event("submit", { cancelable: true, bubbles: true }),
-      );
+      formRef.current.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
     }
   };
 
   return (
     <AuthenticatedLayout
       header={
-        <div className="flex items-center flex-col gap-6 md:flex-row justify-between w-full">
+        <div className="flex w-full flex-col items-center justify-between gap-6 md:flex-row">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary-100 dark:bg-primary-900/30">
-              <User className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+            <div className="rounded-lg bg-primary-100 p-2 dark:bg-primary-900/30">
+              <User className="h-5 w-5 text-primary-600 dark:text-primary-400" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white leading-tight">
+              <h2 className="text-xl font-bold leading-tight text-gray-900 dark:text-white">
                 {t("nav.profile")}
               </h2>
-              <p className="text-xs text-gray-500 dark:text-neutral-500 font-medium">
+              <p className="text-xs font-medium text-gray-500 dark:text-neutral-500">
                 {t("profile.settings_description")}
               </p>
             </div>
@@ -146,8 +139,8 @@ export default function Edit({
     >
       <Head title={t("nav.profile")} />
 
-      <div className="w-full max-w-full overflow-x-hidden min-w-0 bg-gray-50/30 dark:bg-neutral-900/10 min-h-screen">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+      <div className="min-h-screen w-full min-w-0 max-w-full overflow-x-hidden bg-gray-50/30 dark:bg-neutral-900/10">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           {/* Horizontal Menu */}
           <TabNavigation
             tabs={tabs}
@@ -158,7 +151,7 @@ export default function Edit({
 
           {/* Statistics Section */}
           <div className="">
-            <div className="rounded-lg py-2 px-6">
+            <div className="rounded-lg px-6 py-2">
               <AccountStatistics status={status} />
             </div>
           </div>
@@ -166,8 +159,7 @@ export default function Edit({
           {/* Main Content Area */}
           <div className="w-full">
             <div
-              className={`rounded-lg p-6 md:p-10 shadow-sm dark:bg-neutral-900 dark:border-neutral-800"bg-white border-gray-100"
-              }`}
+              className={`dark:border-neutral-800"bg-white border-gray-100" } rounded-lg p-6 shadow-sm dark:bg-neutral-900 md:p-10`}
             >
               {activeTab === "profile" && (
                 <div

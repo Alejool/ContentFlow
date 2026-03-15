@@ -6,14 +6,7 @@ import Textarea from "@/Components/common/Modern/Textarea";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import AdminNavigation from "@/Components/Admin/AdminNavigation";
 import { Head, useForm } from "@inertiajs/react";
-import {
-  AlertTriangle,
-  Bell,
-  CheckCircle,
-  Info,
-  Send,
-  XCircle,
-} from "lucide-react";
+import { AlertTriangle, Bell, CheckCircle, Info, Send, XCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export default function SystemNotifications() {
@@ -39,29 +32,29 @@ export default function SystemNotifications() {
     {
       value: "info",
       label: t("notifications.admin.form.types.info"),
-      icon: <Info className="w-4 h-4" />,
+      icon: <Info className="h-4 w-4" />,
     },
     {
       value: "success",
       label: t("notifications.admin.form.types.success"),
-      icon: <CheckCircle className="w-4 h-4" />,
+      icon: <CheckCircle className="h-4 w-4" />,
     },
     {
       value: "warning",
       label: t("notifications.admin.form.types.warning"),
-      icon: <AlertTriangle className="w-4 h-4" />,
+      icon: <AlertTriangle className="h-4 w-4" />,
     },
     {
       value: "error",
       label: t("notifications.admin.form.types.error"),
-      icon: <XCircle className="w-4 h-4" />,
+      icon: <XCircle className="h-4 w-4" />,
     },
   ];
 
   return (
     <AuthenticatedLayout
       header={
-        <div className="flex items-center justify-center text-gray-900 dark:text-gray-100 text-3xl mt-2">
+        <div className="mt-2 flex items-center justify-center text-3xl text-gray-900 dark:text-gray-100">
           <div>
             <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
               {t("admin.system_notifications.page_title")}
@@ -77,8 +70,8 @@ export default function SystemNotifications() {
 
       <AdminNavigation currentRoute="/admin/system-notifications" />
 
-      <div className="py-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 py-6 dark:bg-gray-900">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <ModernCard
             title={t("notifications.admin.card_title")}
             description={t("notifications.admin.card_description")}
@@ -86,7 +79,7 @@ export default function SystemNotifications() {
             headerColor="orange"
           >
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div className="space-y-4">
                   <Input
                     id="title"
@@ -94,9 +87,7 @@ export default function SystemNotifications() {
                     value={data.title}
                     onChange={(e) => setData("title", e.target.value)}
                     error={errors.title}
-                    placeholder={t(
-                      "notifications.admin.form.title_placeholder",
-                    )}
+                    placeholder={t("notifications.admin.form.title_placeholder")}
                     required
                   />
 
@@ -105,10 +96,7 @@ export default function SystemNotifications() {
                     label={t("notifications.admin.form.type")}
                     value={data.type}
                     onChange={(value: string | number | string[]) =>
-                      setData(
-                        "type",
-                        String(Array.isArray(value) ? value[0] : value),
-                      )
+                      setData("type", String(Array.isArray(value) ? value[0] : value))
                     }
                     error={errors.type}
                     options={notificationTypes}
@@ -145,19 +133,12 @@ export default function SystemNotifications() {
                 value={data.description}
                 onChange={(e) => setData("description", e.target.value)}
                 error={errors.description}
-                placeholder={t(
-                  "notifications.admin.form.description_placeholder",
-                )}
+                placeholder={t("notifications.admin.form.description_placeholder")}
                 rows={4}
               />
 
               <div className="flex justify-end pt-4">
-                <Button
-                  type="submit"
-                  variant="primary"
-                  loading={processing}
-                  icon={Send}
-                >
+                <Button type="submit" variant="primary" loading={processing} icon={Send}>
                   {t("notifications.admin.form.submit")}
                 </Button>
               </div>

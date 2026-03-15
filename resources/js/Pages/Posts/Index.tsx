@@ -48,8 +48,7 @@ const posts: Post[] = [
     id: 2,
     title: "Tech Tips",
     description: "Improve your workflow with these tips.",
-    image:
-      "https://dlvrit.com/wp-content/uploads/2022/09/dlvr.it-social-media-posting-2.png",
+    image: "https://dlvrit.com/wp-content/uploads/2022/09/dlvr.it-social-media-posting-2.png",
     date: "2025-03-09 16:00",
     platform: "Twitter",
     engagement: 330,
@@ -59,8 +58,7 @@ const posts: Post[] = [
     id: 3,
     title: "Community Update",
     description: "We reached 10k followers!",
-    image:
-      "https://media.wiley.com/product_data/coverImage300/19/11190416/1119041619.jpg",
+    image: "https://media.wiley.com/product_data/coverImage300/19/11190416/1119041619.jpg",
     date: "2025-03-09 12:00",
     platform: "Facebook",
     engagement: 300,
@@ -73,11 +71,11 @@ function ContentCard({ post }: { post: Post }) {
   const [imageLoaded, setImageLoaded] = useState(false);
 
   return (
-    <div className="overflow-hidden bg-white rounded-lg shadow-md hover:bg-gray-50 transition duration-300 p-4">
-      <div className="relative w-full h-40 rounded-md overflow-hidden bg-neutral-100">
+    <div className="overflow-hidden rounded-lg bg-white p-4 shadow-md transition duration-300 hover:bg-gray-50">
+      <div className="relative h-40 w-full overflow-hidden rounded-md bg-neutral-100">
         {!imageLoaded && !imageError && (
-          <div className="absolute inset-0 flex items-center justify-center bg-neutral-100 animate-pulse">
-            <div className="w-8 h-8 border-3 border-neutral-300 border-t-neutral-600 rounded-full animate-spin"></div>
+          <div className="absolute inset-0 flex animate-pulse items-center justify-center bg-neutral-100">
+            <div className="border-3 h-8 w-8 animate-spin rounded-full border-neutral-300 border-t-neutral-600"></div>
           </div>
         )}
 
@@ -86,7 +84,7 @@ function ContentCard({ post }: { post: Post }) {
             src={post.image}
             alt="Content Thumbnail"
             loading="lazy"
-            className={`w-full h-full object-cover transition-opacity duration-300 ${
+            className={`h-full w-full object-cover transition-opacity duration-300 ${
               imageLoaded ? "opacity-100" : "opacity-0"
             }`}
             onLoad={() => setImageLoaded(true)}
@@ -95,7 +93,7 @@ function ContentCard({ post }: { post: Post }) {
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-neutral-100">
             <svg
-              className="w-12 h-12 text-neutral-300"
+              className="h-12 w-12 text-neutral-300"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -113,11 +111,10 @@ function ContentCard({ post }: { post: Post }) {
       <div className="mt-4">
         <h3 className="text-lg font-semibold text-gray-800">{post.title}</h3>
         <p className="mt-2 text-sm text-gray-600">{post.description}</p>
-        <p className="mt-2 text-sm text-gray-500 flex items-center gap-1">
-          <Calendar className="h-4 w-4" /> Published: {post.date} on{" "}
-          {post.platform}
+        <p className="mt-2 flex items-center gap-1 text-sm text-gray-500">
+          <Calendar className="h-4 w-4" /> Published: {post.date} on {post.platform}
         </p>
-        <p className="mt-2 text-sm text-green-600 flex items-center gap-1">
+        <p className="mt-2 flex items-center gap-1 text-sm text-green-600">
           <BarChart3 className="h-4 w-4" /> Engagement: {post.engagement} (
           <TrendingUp className="inline h-3 w-3" />
           {post.growth})
@@ -137,19 +134,15 @@ export default function SchedulePosts() {
         <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">
-              Manage Scheduled Posts
-            </h1>
+            <h1 className="text-3xl font-bold text-gray-900">Manage Scheduled Posts</h1>
             <p className="mt-2 text-lg text-gray-600">
               Track and optimize your content strategy across social platforms.
             </p>
           </div>
 
           {/* Overview */}
-          <div className="mt-8 bg-white p-6 shadow-md rounded-lg">
-            <h3 className="text-xl font-semibold text-gray-800">
-              Post Performance Overview
-            </h3>
+          <div className="mt-8 rounded-lg bg-white p-6 shadow-md">
+            <h3 className="text-xl font-semibold text-gray-800">Post Performance Overview</h3>
             <div className="mt-4">
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={postStats}>
@@ -185,14 +178,12 @@ export default function SchedulePosts() {
           </div>
 
           {/* Posts Section */}
-          <div className="mt-8 bg-white p-6 shadow-md rounded-lg">
-            <h3 className="text-xl font-semibold text-gray-800">
-              Recent Posts
-            </h3>
+          <div className="mt-8 rounded-lg bg-white p-6 shadow-md">
+            <h3 className="text-xl font-semibold text-gray-800">Recent Posts</h3>
             {posts.length === 0 ? (
               <EmptyState config={getEmptyStateByKey("scheduledPosts", t)!} />
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+              <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-3">
                 {posts.map((post) => (
                   <ContentCard key={post.id} post={post} />
                 ))}

@@ -25,13 +25,13 @@ export default function ConfirmPassword() {
     <GuestLayout section="confirm-password">
       <Head title={t("confirm-password.title")} />
 
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8">
+      <div className="flex w-full items-center justify-center p-4 sm:p-8 lg:w-1/2">
         <div className="w-full max-w-md">
           <div className="mb-8 text-center">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white ">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
               {t("confirm-password.title")}
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">
+            <p className="mt-2 text-gray-600 dark:text-gray-400">
               {t("confirm-password.description")}
             </p>
           </div>

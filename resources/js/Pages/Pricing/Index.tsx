@@ -1,14 +1,7 @@
 import { Head } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import CheckoutButton from "@/Components/Stripe/CheckoutButton";
-import {
-  FiCheck,
-  FiZap,
-  FiTrendingUp,
-  FiUsers,
-  FiStar,
-  FiGift,
-} from "react-icons/fi";
+import { FiCheck, FiZap, FiTrendingUp, FiUsers, FiStar, FiGift } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 
 interface PlanFeature {
@@ -122,20 +115,20 @@ export default function Pricing() {
     <AuthenticatedLayout>
       <Head title={t("pricing.title")} />
 
-      <div className="py-12 bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="bg-gradient-to-b from-gray-50 to-white py-12">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Header */}
-          <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+          <div className="mb-16 text-center">
+            <h1 className="mb-4 text-4xl font-bold text-gray-900 md:text-5xl">
               {t("pricing.title")}
             </h1>
-            <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="mx-auto max-w-3xl text-lg text-gray-600 md:text-xl">
               {t("pricing.subtitle")}
             </p>
           </div>
 
           {/* Plans Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
             {plans.map((plan) => {
               const Icon = plan.icon;
               const isHighlighted = plan.highlighted;
@@ -143,90 +136,67 @@ export default function Pricing() {
               return (
                 <div
                   key={plan.id}
-                  className={`
-                    relative flex flex-col bg-white rounded-2xl shadow-lg
-                    transition-all duration-300 hover:shadow-xl hover:-translate-y-1
-                    ${
-                      isHighlighted
-                        ? "border-2 border-primary-500 ring-4 ring-primary-100"
-                        : "border-2 border-gray-200"
-                    }
-                  `}
+                  className={`relative flex flex-col rounded-2xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${
+                    isHighlighted
+                      ? "border-2 border-primary-500 ring-4 ring-primary-100"
+                      : "border-2 border-gray-200"
+                  } `}
                 >
                   {/* Badge */}
                   {plan.badge && (
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
-                      <div className="flex items-center gap-1 bg-gradient-to-r from-primary-500 to-primary-600 text-white px-4 py-1.5 rounded-full text-sm font-semibold shadow-lg">
-                        <FiStar className="w-4 h-4" />
+                    <div className="absolute -top-4 left-1/2 z-10 -translate-x-1/2 transform">
+                      <div className="flex items-center gap-1 rounded-full bg-gradient-to-r from-primary-500 to-primary-600 px-4 py-1.5 text-sm font-semibold text-white shadow-lg">
+                        <FiStar className="h-4 w-4" />
                         {plan.badge}
                       </div>
                     </div>
                   )}
 
                   {/* Card Content */}
-                  <div className="flex flex-col h-full p-6">
+                  <div className="flex h-full flex-col p-6">
                     {/* Icon & Title */}
-                    <div className="text-center mb-6">
+                    <div className="mb-6 text-center">
                       <div
-                        className={`
-                        inline-flex items-center justify-center w-14 h-14 rounded-xl mb-4
-                        ${
+                        className={`mb-4 inline-flex h-14 w-14 items-center justify-center rounded-xl ${
                           isHighlighted
                             ? "bg-gradient-to-br from-primary-500 to-primary-600 text-white"
                             : "bg-gray-100 text-gray-700"
-                        }
-                      `}
+                        } `}
                       >
-                        <Icon className="w-7 h-7" />
+                        <Icon className="h-7 w-7" />
                       </div>
 
-                      <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                        {plan.name}
-                      </h3>
+                      <h3 className="mb-2 text-2xl font-bold text-gray-900">{plan.name}</h3>
 
-                      <p className="text-sm text-gray-600 min-h-[40px]">
-                        {plan.description}
-                      </p>
+                      <p className="min-h-[40px] text-sm text-gray-600">{plan.description}</p>
                     </div>
 
                     {/* Price */}
-                    <div className="text-center mb-6 pb-6 border-b border-gray-200">
+                    <div className="mb-6 border-b border-gray-200 pb-6 text-center">
                       <div className="flex items-baseline justify-center gap-1">
-                        <span className="text-2xl font-semibold text-gray-900">
-                          $
-                        </span>
-                        <span className="text-5xl font-bold text-gray-900">
-                          {plan.price}
-                        </span>
-                        <span className="text-gray-600 text-base">
-                          {plan.period}
-                        </span>
+                        <span className="text-2xl font-semibold text-gray-900">$</span>
+                        <span className="text-5xl font-bold text-gray-900">{plan.price}</span>
+                        <span className="text-base text-gray-600">{plan.period}</span>
                       </div>
                     </div>
 
                     {/* Features */}
-                    <ul className="space-y-3 mb-8 flex-grow">
+                    <ul className="mb-8 flex-grow space-y-3">
                       {plan.features.map((feature, index) => (
                         <li key={index} className="flex items-start gap-3">
                           <div
-                            className={`
-                            flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5
-                            ${
+                            className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full ${
                               feature.included
                                 ? isHighlighted
                                   ? "bg-primary-100 text-primary-600"
                                   : "bg-green-100 text-green-600"
                                 : "bg-gray-100 text-gray-400"
-                            }
-                          `}
+                            } `}
                           >
-                            <FiCheck className="w-3.5 h-3.5" strokeWidth={3} />
+                            <FiCheck className="h-3.5 w-3.5" strokeWidth={3} />
                           </div>
                           <span
-                            className={`
-                            text-sm
-                            ${feature.included ? "text-gray-700" : "text-gray-400 line-through"}
-                          `}
+                            className={`text-sm ${feature.included ? "text-gray-700" : "text-gray-400 line-through"} `}
                           >
                             {feature.text}
                           </span>
@@ -238,34 +208,18 @@ export default function Pricing() {
                     <div className="mt-auto">
                       {plan.buttonVariant === "primary" ? (
                         <CheckoutButton
-                          className={`
-                            w-full py-3 px-6 rounded-xl font-semibold
-                            transition-all duration-200
-                            bg-gradient-to-r from-primary-500 to-primary-600 
-                            hover:from-primary-600 hover:to-primary-700
-                            text-white shadow-lg hover:shadow-xl
-                            transform hover:scale-105
-                          `}
+                          className={`w-full transform rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 px-6 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:from-primary-600 hover:to-primary-700 hover:shadow-xl`}
                         />
                       ) : plan.buttonVariant === "secondary" ? (
                         <button
-                          className={`
-                            w-full py-3 px-6 rounded-xl font-semibold
-                            transition-all duration-200
-                            bg-gray-900 hover:bg-gray-800 text-white
-                            shadow-md hover:shadow-lg
-                          `}
+                          className={`w-full rounded-xl bg-gray-900 px-6 py-3 font-semibold text-white shadow-md transition-all duration-200 hover:bg-gray-800 hover:shadow-lg`}
                         >
                           {plan.buttonText}
                         </button>
                       ) : (
                         <button
                           disabled
-                          className={`
-                            w-full py-3 px-6 rounded-xl font-semibold
-                            bg-gray-100 text-gray-500 cursor-not-allowed
-                            border-2 border-gray-200
-                          `}
+                          className={`w-full cursor-not-allowed rounded-xl border-2 border-gray-200 bg-gray-100 px-6 py-3 font-semibold text-gray-500`}
                         >
                           {plan.buttonText}
                         </button>
@@ -278,12 +232,12 @@ export default function Pricing() {
           </div>
 
           {/* Footer Info */}
-          <div className="mt-16 text-center space-y-4">
+          <div className="mt-16 space-y-4 text-center">
             <p className="text-gray-600">
               {t("pricing.faq")}{" "}
               <a
                 href="mailto:support@example.com"
-                className="text-primary-600 hover:text-primary-700 font-semibold"
+                className="font-semibold text-primary-600 hover:text-primary-700"
               >
                 {t("pricing.contactUs")}
               </a>

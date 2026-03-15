@@ -19,9 +19,7 @@ export default function CalendarSettings() {
     if (success === "connected") {
       toast.success(
         t("calendar.external.connectionSuccess", {
-          provider: provider
-            ? provider.charAt(0).toUpperCase() + provider.slice(1)
-            : "Calendar",
+          provider: provider ? provider.charAt(0).toUpperCase() + provider.slice(1) : "Calendar",
         }),
       );
       // Clean URL
@@ -32,12 +30,9 @@ export default function CalendarSettings() {
         expired_state: t("calendar.external.errors.expiredState"),
         provider_mismatch: t("calendar.external.errors.providerMismatch"),
         no_code: t("calendar.external.errors.noCode"),
-        connection_failed:
-          message || t("calendar.external.errors.connectionFailed"),
+        connection_failed: message || t("calendar.external.errors.connectionFailed"),
       };
-      toast.error(
-        errorMessages[error] || t("calendar.external.errors.unknown"),
-      );
+      toast.error(errorMessages[error] || t("calendar.external.errors.unknown"));
       // Clean URL
       window.history.replaceState({}, "", "/calendar/settings");
     }
@@ -48,10 +43,10 @@ export default function CalendarSettings() {
       <Head title={t("calendar.external.settings")} />
 
       <div className="py-12">
-        <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-          <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+        <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <div className="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
             <div className="p-6">
-              <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-6">
+              <h2 className="mb-6 text-2xl font-semibold text-gray-900 dark:text-gray-100">
                 {t("calendar.external.title")}
               </h2>
               <ExternalCalendarSettings />

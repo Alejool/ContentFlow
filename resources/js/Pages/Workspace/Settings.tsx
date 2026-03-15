@@ -66,9 +66,7 @@ export default function WorkspaceSettings({
   // Cargar el orden de tabs guardado
   const [tabOrder, setTabOrder] = useState<string[]>(() => {
     if (typeof window !== "undefined" && current_workspace?.id) {
-      const saved = localStorage.getItem(
-        `workspace_${current_workspace.id}_tab_order`,
-      );
+      const saved = localStorage.getItem(`workspace_${current_workspace.id}_tab_order`);
       return saved ? JSON.parse(saved) : [];
     }
     return [];
@@ -78,15 +76,15 @@ export default function WorkspaceSettings({
     return (
       <AuthenticatedLayout>
         <Head title={t("workspace.settings")} />
-        <div className="flex flex-col items-center justify-center min-h-[60vh]">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mb-4"></div>
+        <div className="flex min-h-[60vh] flex-col items-center justify-center">
+          <div className="mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-primary-600"></div>
           <p className="text-lg font-medium text-gray-700 dark:text-neutral-300">
             {t("common.loading")}
           </p>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
             Cargando configuración del workspace...
           </p>
-          <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg text-sm">
+          <div className="mt-4 rounded-lg bg-yellow-50 p-4 text-sm dark:bg-yellow-900/20">
             <p>Debug info:</p>
             <p>Workspace: {current_workspace ? "✓" : "✗"}</p>
             <p>Roles: {roles ? "✓" : "✗"}</p>
@@ -100,19 +98,15 @@ export default function WorkspaceSettings({
   // Encuentra el usuario actual en el workspace
   const currentUser = current_workspace.users
     ? Array.isArray(current_workspace.users)
-      ? current_workspace.users.find(
-          (u: any) => Number(u.id) === Number(auth.user.id),
-        )
+      ? current_workspace.users.find((u: any) => Number(u.id) === Number(auth.user.id))
       : Object.values(current_workspace.users).find(
           (u: any) => Number(u.id) === Number(auth.user.id),
         )
     : null;
 
-  const userRole =
-    currentUser?.pivot?.role?.slug || currentUser?.role?.slug || "member";
+  const userRole = currentUser?.pivot?.role?.slug || currentUser?.role?.slug || "member";
   const isOwner =
-    Number(current_workspace.created_by) === Number(auth.user.id) ||
-    userRole === "owner";
+    Number(current_workspace.created_by) === Number(auth.user.id) || userRole === "owner";
 
   const canManageWorkspace = isOwner || userRole === "admin";
 
@@ -123,8 +117,7 @@ export default function WorkspaceSettings({
     "demo"
   ).toLowerCase();
 
-  const isEnterprise =
-    planId === "enterprise" || current_workspace.features?.white_label;
+  const isEnterprise = planId === "enterprise" || current_workspace.features?.white_label;
 
   const tabs: Array<{
     id: string;
@@ -251,9 +244,7 @@ export default function WorkspaceSettings({
           />
         );
       case "members":
-        return (
-          <MembersManagement roles={roles} workspace={current_workspace} />
-        );
+        return <MembersManagement roles={roles} workspace={current_workspace} />;
       case "roles":
         return (
           <RolesManagementTab
@@ -281,10 +272,7 @@ export default function WorkspaceSettings({
         );
       case "api":
         return (
-          <ApiSettingsTab
-            workspace={current_workspace}
-            canManageWorkspace={canManageWorkspace}
-          />
+          <ApiSettingsTab workspace={current_workspace} canManageWorkspace={canManageWorkspace} />
         );
       case "approvals":
         if (!canManageWorkspace || !hasApprovalAccess) {
@@ -318,12 +306,10 @@ export default function WorkspaceSettings({
   };
 
   return (
-    <AuthenticatedLayout
-      header={<WorkspaceSettingsHeader workspace={current_workspace} />}
-    >
+    <AuthenticatedLayout header={<WorkspaceSettingsHeader workspace={current_workspace} />}>
       <Head title={`${current_workspace.name} - ${t("workspace.settings")}`} />
 
-      <div className="max-w-7xl mx-auto py-6 sm:py-10 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
         <SettingsTabs
           tabs={tabs}
           activeTab={activeTab}

@@ -2,13 +2,7 @@ import { Head, Link } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import AdminNavigation from "@/Components/Admin/AdminNavigation";
 import SystemStatusCard from "@/Components/Admin/SystemStatusCard";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/Components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card";
 import Button from "@/Components/common/Modern/Button";
 import {
   Settings,
@@ -119,7 +113,7 @@ export default function AdminDashboard({ systemStatus, stats }: Props) {
   return (
     <AuthenticatedLayout
       header={
-        <div className="flex items-center justify-center text-gray-900 dark:text-gray-100 text-3xl mt-2">
+        <div className="mt-2 flex items-center justify-center text-3xl text-gray-900 dark:text-gray-100">
           <div>
             <h2 className="font-bold text-gray-900 dark:text-gray-100">
               {t("admin.dashboard.title")}
@@ -135,28 +129,26 @@ export default function AdminDashboard({ systemStatus, stats }: Props) {
 
       <AdminNavigation currentRoute="/admin/dashboard" />
 
-      <div className="py-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 py-6 dark:bg-gray-900">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* System Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
             {systemMetrics.map((metric) => {
               const Icon = metric.icon;
               return (
                 <Card
                   key={metric.title}
-                  className={`bg-white dark:bg-gray-800 border ${metric.borderColor} hover:shadow-lg transition-shadow`}
+                  className={`border bg-white dark:bg-gray-800 ${metric.borderColor} transition-shadow hover:shadow-lg`}
                 >
                   <CardContent className="pt-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {metric.title}
-                        </p>
-                        <p className="text-2xl font-bold mt-1 text-gray-900 dark:text-gray-100">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{metric.title}</p>
+                        <p className="mt-1 text-2xl font-bold text-gray-900 dark:text-gray-100">
                           {metric.value}
                         </p>
                       </div>
-                      <div className={`p-3 rounded-lg ${metric.bgColor}`}>
+                      <div className={`rounded-lg p-3 ${metric.bgColor}`}>
                         <Icon className={`h-6 w-6 ${metric.color}`} />
                       </div>
                     </div>
@@ -166,9 +158,9 @@ export default function AdminDashboard({ systemStatus, stats }: Props) {
             })}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             {/* Quick Actions */}
-            <div className="lg:col-span-2 space-y-4">
+            <div className="space-y-4 lg:col-span-2">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                 {t("admin.dashboard.quick_actions")}
               </h3>
@@ -177,13 +169,13 @@ export default function AdminDashboard({ systemStatus, stats }: Props) {
                 return (
                   <Card
                     key={action.title}
-                    className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-200 group"
+                    className="group border-gray-200 bg-white transition-all duration-200 hover:shadow-lg dark:border-gray-700 dark:bg-gray-800"
                   >
                     <CardContent className="pt-6">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
                           <div
-                            className={`p-3 rounded-xl ${action.iconBg} group-hover:scale-110 transition-transform`}
+                            className={`rounded-xl p-3 ${action.iconBg} transition-transform group-hover:scale-110`}
                           >
                             <Icon className={`h-6 w-6 ${action.iconColor}`} />
                           </div>
@@ -198,7 +190,7 @@ export default function AdminDashboard({ systemStatus, stats }: Props) {
                         </div>
                         <Link href={action.href}>
                           <Button
-                            className="group-hover:translate-x-1 transition-transform"
+                            className="transition-transform group-hover:translate-x-1"
                             icon={ArrowRight}
                             iconPosition="right"
                           >
@@ -212,7 +204,7 @@ export default function AdminDashboard({ systemStatus, stats }: Props) {
               })}
 
               {/* Recent Activity */}
-              <Card className="mt-6 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+              <Card className="mt-6 border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
                 <CardHeader>
                   <CardTitle className="text-gray-900 dark:text-gray-100">
                     {t("admin.dashboard.recent_activity")}
@@ -224,7 +216,7 @@ export default function AdminDashboard({ systemStatus, stats }: Props) {
                 <CardContent>
                   <div className="space-y-3">
                     <div className="flex items-center gap-3 text-sm">
-                      <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                      <div className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
                       <span className="text-gray-700 dark:text-gray-300">
                         {t("admin.dashboard.activity.system_started")}
                       </span>
@@ -262,7 +254,7 @@ export default function AdminDashboard({ systemStatus, stats }: Props) {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm">
-                  <div className="p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
+                  <div className="rounded-lg bg-white/50 p-3 dark:bg-gray-800/50">
                     <p className="font-semibold text-gray-900 dark:text-gray-100">
                       {t("admin.dashboard.info.exclusive_access")}
                     </p>
@@ -270,7 +262,7 @@ export default function AdminDashboard({ systemStatus, stats }: Props) {
                       {t("admin.dashboard.info.exclusive_description")}
                     </p>
                   </div>
-                  <div className="p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
+                  <div className="rounded-lg bg-white/50 p-3 dark:bg-gray-800/50">
                     <p className="font-semibold text-gray-900 dark:text-gray-100">
                       {t("admin.dashboard.info.realtime_changes")}
                     </p>
@@ -278,7 +270,7 @@ export default function AdminDashboard({ systemStatus, stats }: Props) {
                       {t("admin.dashboard.info.realtime_description")}
                     </p>
                   </div>
-                  <div className="p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
+                  <div className="rounded-lg bg-white/50 p-3 dark:bg-gray-800/50">
                     <p className="font-semibold text-gray-900 dark:text-gray-100">
                       {t("admin.dashboard.info.full_audit")}
                     </p>

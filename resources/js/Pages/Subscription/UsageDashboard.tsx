@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/Components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Progress } from "@/Components/ui/progress";
 import Button from "@/Components/common/Modern/Button";
 import { Badge } from "@/Components/ui/badge";
@@ -113,20 +107,12 @@ export default function UsageDashboard({ subscription, usage }: Props) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">
-            {t("subscription.usage.title")}
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            {t("subscription.usage.description")}
-          </p>
+          <h1 className="text-3xl font-bold">{t("subscription.usage.title")}</h1>
+          <p className="text-muted-foreground mt-1">{t("subscription.usage.description")}</p>
         </div>
-        <Badge
-          variant={getPlanBadgeColor(subscription.plan)}
-          className="text-lg px-4 py-2"
-        >
+        <Badge variant={getPlanBadgeColor(subscription.plan)} className="px-4 py-2 text-lg">
           {t("subscription.billing.plan")}{" "}
-          {subscription.plan.charAt(0).toUpperCase() +
-            subscription.plan.slice(1)}
+          {subscription.plan.charAt(0).toUpperCase() + subscription.plan.slice(1)}
         </Badge>
       </div>
 
@@ -136,24 +122,19 @@ export default function UsageDashboard({ subscription, usage }: Props) {
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             {t("subscription.usage.trialEndsOn")}{" "}
-            <strong>
-              {formatDate(subscription.trial_ends_at, "long", i18n.language)}
-            </strong>
+            <strong>{formatDate(subscription.trial_ends_at, "long", i18n.language)}</strong>
           </AlertDescription>
         </Alert>
       )}
 
       {/* Usage Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         {usage.map((metric) => {
           const isNearLimit = metric.percentage >= 80;
           const isAtLimit = metric.percentage >= 100;
 
           return (
-            <Card
-              key={metric.type}
-              className={isAtLimit ? "border-red-500" : ""}
-            >
+            <Card key={metric.type} className={isAtLimit ? "border-red-500" : ""}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <span className="text-2xl">{getMetricIcon(metric.type)}</span>
@@ -167,11 +148,7 @@ export default function UsageDashboard({ subscription, usage }: Props) {
                 <Progress
                   value={Math.min(metric.percentage, 100)}
                   className={`h-2 ${
-                    isAtLimit
-                      ? "bg-red-100"
-                      : isNearLimit
-                        ? "bg-yellow-100"
-                        : "bg-gray-100"
+                    isAtLimit ? "bg-red-100" : isNearLimit ? "bg-yellow-100" : "bg-gray-100"
                   }`}
                 />
 
@@ -186,24 +163,22 @@ export default function UsageDashboard({ subscription, usage }: Props) {
                 {isNearLimit && !isAtLimit && (
                   <Alert>
                     <AlertDescription className="text-sm">
-                      {t("subscription.usage.nearLimit")} (
-                      {Math.round(metric.percentage)}%)
+                      {t("subscription.usage.nearLimit")} ({Math.round(metric.percentage)}%)
                     </AlertDescription>
                   </Alert>
                 )}
 
-                {(isNearLimit || isAtLimit) &&
-                  subscription.plan !== "enterprise" && (
-                    <Button
-                      onClick={() => handleUpgrade("professional")}
-                      className="w-full"
-                      variant="default"
-                      disabled={isLoading}
-                    >
-                      <TrendingUp className="mr-2 h-4 w-4" />
-                      {t("subscription.usage.upgradePlan")}
-                    </Button>
-                  )}
+                {(isNearLimit || isAtLimit) && subscription.plan !== "enterprise" && (
+                  <Button
+                    onClick={() => handleUpgrade("professional")}
+                    className="w-full"
+                    variant="default"
+                    disabled={isLoading}
+                  >
+                    <TrendingUp className="mr-2 h-4 w-4" />
+                    {t("subscription.usage.upgradePlan")}
+                  </Button>
+                )}
               </CardContent>
             </Card>
           );
@@ -212,22 +187,16 @@ export default function UsageDashboard({ subscription, usage }: Props) {
 
       {/* Upgrade Section */}
       {subscription.plan === "free" && (
-        <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+        <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Zap className="h-5 w-5 text-yellow-500" />
               {t("subscription.usage.upgrade")}
             </CardTitle>
-            <CardDescription>
-              {t("subscription.usage.upgradeDescription")}
-            </CardDescription>
+            <CardDescription>{t("subscription.usage.upgradeDescription")}</CardDescription>
           </CardHeader>
           <CardContent className="flex gap-4">
-            <Button
-              onClick={() => handleUpgrade("starter")}
-              variant="default"
-              disabled={isLoading}
-            >
+            <Button onClick={() => handleUpgrade("starter")} variant="default" disabled={isLoading}>
               {t("pricing.plans.starter.name")} - $19/
               {t("pricing.billing.month")}
             </Button>

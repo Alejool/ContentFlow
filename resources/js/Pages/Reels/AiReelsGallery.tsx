@@ -1,14 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Head } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import {
-  Sparkles,
-  Film,
-  Download,
-  ExternalLink,
-  Play,
-  Filter,
-} from "lucide-react";
+import { Sparkles, Film, Download, ExternalLink, Play, Filter } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -108,12 +101,12 @@ export default function AiReelsGallery() {
       <Head title="Reels Generados con IA" />
 
       <div className="py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="mb-8">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-white" />
+            <div className="mb-2 flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-pink-500">
+                <Sparkles className="h-6 w-6 text-white" />
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -129,16 +122,14 @@ export default function AiReelsGallery() {
           {/* Filters */}
           <div className="mb-6 flex flex-wrap gap-4">
             <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4 text-gray-500" />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Filtros:
-              </span>
+              <Filter className="h-4 w-4 text-gray-500" />
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filtros:</span>
             </div>
 
             <select
               value={selectedPlatform}
               onChange={(e) => setSelectedPlatform(e.target.value)}
-              className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-neutral-800 text-gray-900 dark:text-white"
+              className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-neutral-800 dark:text-white"
             >
               <option value="all">Todas las plataformas</option>
               <option value="instagram">📸 Instagram</option>
@@ -149,7 +140,7 @@ export default function AiReelsGallery() {
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-neutral-800 text-gray-900 dark:text-white"
+              className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-neutral-800 dark:text-white"
             >
               <option value="all">Todos los estados</option>
               <option value="completed">Completados</option>
@@ -160,7 +151,7 @@ export default function AiReelsGallery() {
 
           {/* Reels Grid */}
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {Array.from({ length: 8 }).map((_, index) => (
                 <ReelCardSkeleton key={index} />
               ))}
@@ -169,40 +160,36 @@ export default function AiReelsGallery() {
             <EmptyState config={getEmptyStateByKey("reels", t)!} />
           ) : (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {reels.map((reel) => (
                   <div
                     key={reel.id}
-                    className="group relative bg-white dark:bg-neutral-800 rounded-xl overflow-hidden border border-gray-200 dark:border-neutral-700 hover:border-primary-300 dark:hover:border-primary-600 transition-all shadow-sm hover:shadow-lg"
+                    className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:border-primary-300 hover:shadow-lg dark:border-neutral-700 dark:bg-neutral-800 dark:hover:border-primary-600"
                   >
                     {/* Video Preview */}
                     <div className="relative aspect-[9/16] bg-black">
-                      <video
-                        src={reel.file_path}
-                        className="w-full h-full object-cover"
-                        muted
-                      />
-                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Play className="w-12 h-12 text-white" fill="white" />
+                      <video src={reel.file_path} className="h-full w-full object-cover" muted />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity group-hover:opacity-100">
+                        <Play className="h-12 w-12 text-white" fill="white" />
                       </div>
 
                       {/* Platform Badge */}
                       <div
-                        className={`absolute top-3 left-3 px-2.5 py-1 rounded-lg text-xs font-bold text-white bg-gradient-to-r ${getPlatformColor(reel.metadata?.platform)} shadow-lg`}
+                        className={`absolute left-3 top-3 rounded-lg bg-gradient-to-r px-2.5 py-1 text-xs font-bold text-white ${getPlatformColor(reel.metadata?.platform)} shadow-lg`}
                       >
                         {getPlatformIcon(reel.metadata?.platform)}{" "}
                         {reel.metadata?.platform?.toUpperCase()}
                       </div>
 
                       {/* AI Badge */}
-                      <div className="absolute top-3 right-3 px-2 py-1 rounded-lg text-xs font-bold text-white bg-gradient-to-r from-purple-500 to-pink-500 shadow-lg flex items-center gap-1">
-                        <Sparkles className="w-3 h-3" />
+                      <div className="absolute right-3 top-3 flex items-center gap-1 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-2 py-1 text-xs font-bold text-white shadow-lg">
+                        <Sparkles className="h-3 w-3" />
                         AI
                       </div>
 
                       {/* Duration */}
                       {reel.metadata?.duration && (
-                        <div className="absolute bottom-3 right-3 px-2 py-1 rounded bg-black/70 text-white text-xs font-medium">
+                        <div className="absolute bottom-3 right-3 rounded bg-black/70 px-2 py-1 text-xs font-medium text-white">
                           {Math.floor(reel.metadata.duration)}s
                         </div>
                       )}
@@ -211,18 +198,15 @@ export default function AiReelsGallery() {
                     {/* Info & Actions */}
                     <div className="p-4">
                       <div className="mb-3">
-                        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1 truncate">
+                        <h3 className="mb-1 truncate text-sm font-semibold text-gray-900 dark:text-white">
                           {reel.publication?.title || reel.file_name}
                         </h3>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {new Date(reel.created_at).toLocaleDateString(
-                            "es-ES",
-                            {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                            },
-                          )}
+                          {new Date(reel.created_at).toLocaleDateString("es-ES", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })}
                         </p>
                       </div>
 
@@ -230,16 +214,16 @@ export default function AiReelsGallery() {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleOpenInNewTab(reel)}
-                          className="flex-1 px-3 py-2 text-xs font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 bg-primary-50 hover:bg-primary-100 dark:bg-primary-900/20 dark:hover:bg-primary-900/30 rounded-lg flex items-center justify-center gap-1.5 transition-colors"
+                          className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-primary-50 px-3 py-2 text-xs font-medium text-primary-600 transition-colors hover:bg-primary-100 hover:text-primary-700 dark:bg-primary-900/20 dark:text-primary-400 dark:hover:bg-primary-900/30 dark:hover:text-primary-300"
                         >
-                          <ExternalLink className="w-3.5 h-3.5" />
+                          <ExternalLink className="h-3.5 w-3.5" />
                           Ver
                         </button>
                         <button
                           onClick={() => handleDownload(reel)}
-                          className="flex-1 px-3 py-2 text-xs font-medium text-gray-600 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 bg-gray-100 hover:bg-gray-200 dark:bg-neutral-700 dark:hover:bg-neutral-600 rounded-lg flex items-center justify-center gap-1.5 transition-colors"
+                          className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-gray-100 px-3 py-2 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-200 hover:text-gray-700 dark:bg-neutral-700 dark:text-gray-400 dark:hover:bg-neutral-600 dark:hover:text-gray-300"
                         >
-                          <Download className="w-3.5 h-3.5" />
+                          <Download className="h-3.5 w-3.5" />
                           Descargar
                         </button>
                       </div>
@@ -254,7 +238,7 @@ export default function AiReelsGallery() {
                   <button
                     onClick={() => fetchReels(pagination.current_page - 1)}
                     disabled={pagination.current_page === 1}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-600 rounded-lg hover:bg-gray-50 dark:hover:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-600 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700"
                   >
                     Anterior
                   </button>
@@ -264,7 +248,7 @@ export default function AiReelsGallery() {
                   <button
                     onClick={() => fetchReels(pagination.current_page + 1)}
                     disabled={pagination.current_page === pagination.last_page}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-600 rounded-lg hover:bg-gray-50 dark:hover:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-600 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700"
                   >
                     Siguiente
                   </button>

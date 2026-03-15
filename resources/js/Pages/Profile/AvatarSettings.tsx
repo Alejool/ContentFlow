@@ -27,17 +27,13 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
 
     // Validar tamaño (max 2MB)
     if (file.size > 2 * 1024 * 1024) {
-      toast.error(
-        t("profile.avatar_too_large", "La imagen es muy grande. Máximo 2MB"),
-      );
+      toast.error(t("profile.avatar_too_large", "La imagen es muy grande. Máximo 2MB"));
       return;
     }
 
     // Validar tipo
     if (!file.type.startsWith("image/")) {
-      toast.error(
-        t("profile.invalid_file_type", "Solo se permiten archivos de imagen"),
-      );
+      toast.error(t("profile.invalid_file_type", "Solo se permiten archivos de imagen"));
       return;
     }
 
@@ -73,9 +69,7 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
         setPreviewUrl(newPhotoUrl);
         setImageError(false);
 
-        toast.success(
-          t("profile.avatar_uploaded", "Foto subida correctamente"),
-        );
+        toast.success(t("profile.avatar_uploaded", "Foto subida correctamente"));
 
         // Recargar para actualizar en toda la app
         setTimeout(() => {
@@ -83,8 +77,7 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
         }, 500);
       } else {
         toast.error(
-          response.data.message ||
-            t("profile.avatar_update_failed", "Error al subir la foto"),
+          response.data.message || t("profile.avatar_update_failed", "Error al subir la foto"),
         );
         setPreviewUrl(user.photo_url || null);
       }
@@ -113,9 +106,7 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
       if (response.data.success) {
         setPreviewUrl(null);
 
-        toast.success(
-          t("profile.avatar_removed", "Avatar eliminado correctamente"),
-        );
+        toast.success(t("profile.avatar_removed", "Avatar eliminado correctamente"));
 
         // Recargar para actualizar en toda la app
         setTimeout(() => {
@@ -123,8 +114,7 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
         }, 500);
       } else {
         toast.error(
-          response.data.message ||
-            t("profile.avatar_remove_failed", "Error al eliminar el avatar"),
+          response.data.message || t("profile.avatar_remove_failed", "Error al eliminar el avatar"),
         );
         setPreviewUrl(user.photo_url || null);
       }
@@ -132,10 +122,7 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
       console.error("Error removing avatar:", error);
       const errorMessage =
         error.response?.data?.message ||
-        t(
-          "profile.avatar_remove_error",
-          "Ocurrió un error al eliminar el avatar",
-        );
+        t("profile.avatar_remove_error", "Ocurrió un error al eliminar el avatar");
       toast.error(errorMessage);
       setPreviewUrl(user.photo_url || null);
     } finally {
@@ -158,13 +145,13 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
       {/* Vista previa del avatar */}
       <div className="flex flex-col items-center gap-4">
         <div className="relative">
-          <div className="w-32 h-32 rounded-full overflow-hidden bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white text-3xl font-bold shadow-xl ring-4 ring-primary-100 dark:ring-primary-900/30">
+          <div className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-primary-500 to-primary-600 text-3xl font-bold text-white shadow-xl ring-4 ring-primary-100 dark:ring-primary-900/30">
             {previewUrl && !imageError ? (
               <>
                 {/* Loader mientras carga la imagen */}
                 {!imageLoaded && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary-500 to-primary-600 animate-pulse">
-                    <div className="w-10 h-10 border-3 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  <div className="absolute inset-0 flex animate-pulse items-center justify-center bg-gradient-to-br from-primary-500 to-primary-600">
+                    <div className="border-3 h-10 w-10 animate-spin rounded-full border-white/30 border-t-white"></div>
                   </div>
                 )}
 
@@ -172,7 +159,7 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
                   src={previewUrl}
                   alt={user.name}
                   loading="lazy"
-                  className={`w-full h-full object-cover transition-opacity duration-300 ${
+                  className={`h-full w-full object-cover transition-opacity duration-300 ${
                     imageLoaded ? "opacity-100" : "opacity-0"
                   }`}
                   onLoad={() => setImageLoaded(true)}
@@ -188,8 +175,8 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
             )}
           </div>
           {processing && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
-              <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+            <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50">
+              <div className="h-10 w-10 animate-spin rounded-full border-4 border-white border-t-transparent"></div>
             </div>
           )}
         </div>
@@ -201,8 +188,8 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
               : t("profile.using_initials", "Usando iniciales")}
           </p>
           {processing && (
-            <div className="text-xs text-primary-600 dark:text-primary-400 mt-1 font-medium flex items-center justify-center gap-1">
-              <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+            <div className="mt-1 flex items-center justify-center gap-1 text-xs font-medium text-primary-600 dark:text-primary-400">
+              <div className="h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent"></div>
               {t("profile.uploading", "Subiendo...")}
             </div>
           )}
@@ -222,8 +209,8 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
           />
           <label
             htmlFor="avatar-upload"
-            className={`inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium transition-all duration-200 bg-transparent border-2 border-primary-600 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 ${
-              processing ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+            className={`inline-flex items-center justify-center gap-2 rounded-lg border-2 border-primary-600 bg-transparent px-4 py-2.5 text-sm font-medium text-primary-600 transition-all duration-200 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:hover:bg-primary-900/20 ${
+              processing ? "cursor-not-allowed opacity-50" : "cursor-pointer"
             }`}
           >
             <Upload size={16} />
@@ -245,11 +232,8 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
             </Button>
           )}
         </div>
-        <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-          {t(
-            "profile.avatar_requirements",
-            "Máximo 2MB. Formatos: JPG, PNG, GIF",
-          )}
+        <p className="text-center text-xs text-gray-500 dark:text-gray-400">
+          {t("profile.avatar_requirements", "Máximo 2MB. Formatos: JPG, PNG, GIF")}
         </p>
       </div>
     </div>

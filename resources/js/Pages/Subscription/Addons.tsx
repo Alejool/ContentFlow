@@ -78,13 +78,11 @@ export default function Addons({ addons }: Props) {
     },
     publications: {
       ...addons.publications,
-      enabled:
-        addons.publications.enabled && systemAddons?.publications !== false,
+      enabled: addons.publications.enabled && systemAddons?.publications !== false,
     },
     team_members: {
       ...addons.team_members,
-      enabled:
-        addons.team_members.enabled && systemAddons?.team_members !== false,
+      enabled: addons.team_members.enabled && systemAddons?.team_members !== false,
     },
   };
 
@@ -146,13 +144,10 @@ export default function Addons({ addons }: Props) {
       <AuthenticatedLayout>
         <Head title={t("subscription.addons.title", "Paquetes Adicionales")} />
         <div className="py-12">
-          <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+          <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
               <p className="text-red-800 dark:text-red-200">
-                {t(
-                  "subscription.addons.loadingError",
-                  "Error al cargar add-ons",
-                )}
+                {t("subscription.addons.loadingError", "Error al cargar add-ons")}
               </p>
             </div>
           </div>
@@ -166,28 +161,28 @@ export default function Addons({ addons }: Props) {
       <Head title={t("subscription.addons.title", "Paquetes Adicionales")} />
 
       <div className="py-12">
-        <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
+        <div className="mx-auto max-w-7xl space-y-8 sm:px-6 lg:px-8">
           {/* Notificación de éxito/error */}
           {notification && (
             <div
-              className={`rounded-lg p-4 border-2 ${
+              className={`rounded-lg border-2 p-4 ${
                 notification.type === "success"
-                  ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+                  ? "border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20"
                   : notification.type === "error"
-                    ? "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
-                    : "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800"
+                    ? "border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20"
+                    : "border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/20"
               }`}
             >
               <div className="flex items-start gap-3">
                 <div className="flex-shrink-0">
                   {notification.type === "success" && (
-                    <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
+                    <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
                   )}
                   {notification.type === "error" && (
-                    <XCircle className="w-6 h-6 text-red-600 dark:text-red-400" />
+                    <XCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
                   )}
                   {notification.type === "info" && (
-                    <AlertCircle className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                    <AlertCircle className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                   )}
                 </div>
                 <div className="flex-1">
@@ -213,7 +208,7 @@ export default function Addons({ addons }: Props) {
                         : "text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200"
                   }`}
                 >
-                  <XCircle className="w-5 h-5" />
+                  <XCircle className="h-5 w-5" />
                 </button>
               </div>
             </div>
@@ -221,7 +216,7 @@ export default function Addons({ addons }: Props) {
 
           {/* Header */}
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">
               {t("subscription.addons.title", "Paquetes Adicionales")}
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
@@ -250,45 +245,36 @@ export default function Addons({ addons }: Props) {
                   (pkg: any) => pkg.currency && pkg.currency !== "USD",
                 ),
             ) && (
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6 shadow-sm">
+              <div className="rounded-xl border border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 p-6 shadow-sm dark:border-blue-800 dark:from-blue-900/20 dark:to-indigo-900/20">
                 <div className="flex items-start gap-4">
-                  <div className="p-3 bg-blue-100 dark:bg-blue-800/50 rounded-lg">
-                    <Info className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                  <div className="rounded-lg bg-blue-100 p-3 dark:bg-blue-800/50">
+                    <Info className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                      {t(
-                        "subscription.addons.currencyBanner.title",
-                        "Precios en tu Moneda Local",
-                      )}
+                    <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
+                      {t("subscription.addons.currencyBanner.title", "Precios en tu Moneda Local")}
                     </h3>
-                    <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
+                    <p className="mb-3 text-sm text-gray-700 dark:text-gray-300">
                       {t(
                         "subscription.addons.currencyBanner.description",
                         "Los precios se muestran automáticamente en tu moneda local para tu comodidad. El equivalente en USD se muestra como referencia.",
                       )}
                     </p>
                     <div className="flex flex-wrap gap-2">
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                      <span className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
                         ✓{" "}
-                        {t(
-                          "subscription.addons.currencyBanner.automatic",
-                          "Conversión automática",
-                        )}
+                        {t("subscription.addons.currencyBanner.automatic", "Conversión automática")}
                       </span>
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                      <span className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
                         ✓{" "}
                         {t(
                           "subscription.addons.currencyBanner.transparent",
                           "Precios transparentes",
                         )}
                       </span>
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                      <span className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
                         ✓{" "}
-                        {t(
-                          "subscription.addons.currencyBanner.noHiddenFees",
-                          "Sin cargos ocultos",
-                        )}
+                        {t("subscription.addons.currencyBanner.noHiddenFees", "Sin cargos ocultos")}
                       </span>
                     </div>
                   </div>

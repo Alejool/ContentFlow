@@ -2,13 +2,7 @@ import { Head, Link, router } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { CheckCircle, ArrowRight, Sparkles } from "lucide-react";
 import Button from "@/Components/common/Modern/Button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/Components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card";
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 
@@ -42,15 +36,15 @@ export default function Success({ auth, plan, amount, currency }: Props) {
     <AuthenticatedLayout user={auth.user}>
       <Head title={t("subscription.success.title")} />
 
-      <div className="min-h-screen  to-primary-50/30 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 py-16 dark:text-white ">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen to-primary-50/30 py-16 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 dark:text-white">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
           {/* Success Icon */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full mb-6">
+          <div className="mb-8 text-center">
+            <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
               <CheckCircle className="h-12 w-12 text-green-600 dark:text-green-400" />
             </div>
 
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+            <h1 className="mb-4 text-4xl font-bold text-gray-900 dark:text-white md:text-5xl">
               {t("subscription.success.heading")}
             </h1>
 
@@ -66,36 +60,34 @@ export default function Success({ auth, plan, amount, currency }: Props) {
                 <Sparkles className="h-5 w-5 text-primary-600 dark:text-primary-400" />
                 {t("subscription.success.detailsTitle")}
               </CardTitle>
-              <CardDescription>
-                {t("subscription.success.detailsDescription")}
-              </CardDescription>
+              <CardDescription>{t("subscription.success.detailsDescription")}</CardDescription>
             </CardHeader>
 
             <CardContent className="pt-6">
               <div className="space-y-4">
-                <div className="flex justify-between items-center py-3 border-b border-gray-200 dark:border-neutral-800">
+                <div className="flex items-center justify-between border-b border-gray-200 py-3 dark:border-neutral-800">
                   <span className="text-gray-600 dark:text-gray-400">
                     {t("subscription.success.selectedPlan")}
                   </span>
-                  <span className="font-semibold text-gray-900 dark:text-white text-lg">
+                  <span className="text-lg font-semibold text-gray-900 dark:text-white">
                     {planNames[plan] || plan}
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center py-3 border-b border-gray-200 dark:border-neutral-800">
+                <div className="flex items-center justify-between border-b border-gray-200 py-3 dark:border-neutral-800">
                   <span className="text-gray-600 dark:text-gray-400">
                     {t("subscription.success.amountPaid")}
                   </span>
-                  <span className="font-semibold text-gray-900 dark:text-white text-lg">
+                  <span className="text-lg font-semibold text-gray-900 dark:text-white">
                     {currency} ${amount.toFixed(2)}
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center py-3">
+                <div className="flex items-center justify-between py-3">
                   <span className="text-gray-600 dark:text-gray-400">
                     {t("subscription.success.status")}
                   </span>
-                  <span className="inline-flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full text-sm font-medium">
+                  <span className="inline-flex items-center gap-2 rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
                     <CheckCircle className="h-4 w-4" />
                     {t("subscription.success.active")}
                   </span>
@@ -108,33 +100,31 @@ export default function Success({ auth, plan, amount, currency }: Props) {
           <Card className="mb-8">
             <CardHeader>
               <CardTitle>{t("subscription.success.nextStepsTitle")}</CardTitle>
-              <CardDescription>
-                {t("subscription.success.nextStepsDescription")}
-              </CardDescription>
+              <CardDescription>{t("subscription.success.nextStepsDescription")}</CardDescription>
             </CardHeader>
 
             <CardContent>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
                   <span className="text-gray-700 dark:text-gray-300">
                     {t("subscription.success.step1")}
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
                   <span className="text-gray-700 dark:text-gray-300">
                     {t("subscription.success.step2")}
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
                   <span className="text-gray-700 dark:text-gray-300">
                     {t("subscription.success.step3")}
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
                   <span className="text-gray-700 dark:text-gray-300">
                     {t("subscription.success.step4")}
                   </span>
@@ -144,11 +134,11 @@ export default function Success({ auth, plan, amount, currency }: Props) {
           </Card>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col justify-center gap-4 sm:flex-row">
             <Link href="/dashboard">
               <Button
                 size="lg"
-                className="w-full sm:w-auto bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white shadow-lg"
+                className="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg hover:from-primary-600 hover:to-primary-700 sm:w-auto"
               >
                 <span className="flex items-center gap-2">
                   {t("subscription.success.goToDashboard")}
@@ -175,7 +165,7 @@ export default function Success({ auth, plan, amount, currency }: Props) {
               {t("subscription.success.needHelp")}{" "}
               <a
                 href="mailto:support@contentflow.com"
-                className="text-primary-600 dark:text-primary-400 hover:underline font-medium"
+                className="font-medium text-primary-600 hover:underline dark:text-primary-400"
               >
                 support@contentflow.com
               </a>

@@ -15,9 +15,7 @@ interface SocialConfigProps {
 }
 
 // Filtrar solo las plataformas activas
-const activePlatforms = Object.values(SOCIAL_PLATFORMS).filter(
-  (platform) => platform.active,
-);
+const activePlatforms = Object.values(SOCIAL_PLATFORMS).filter((platform) => platform.active);
 
 // Componente extraído para usar hooks correctamente
 interface PlatformCardProps {
@@ -41,33 +39,31 @@ function PlatformCard({
     <div
       key={platform.key}
       {...keyboardProps}
-      className="bg-white dark:bg-neutral-900 rounded-lg border-2 border-gray-200 dark:border-neutral-700 p-6 cursor-pointer hover:border-primary-500 dark:hover:border-primary-600 hover:shadow-lg transition-all flex flex-col h-full"
+      className="flex h-full cursor-pointer flex-col rounded-lg border-2 border-gray-200 bg-white p-6 transition-all hover:border-primary-500 hover:shadow-lg dark:border-neutral-700 dark:bg-neutral-900 dark:hover:border-primary-600"
     >
-      <div className="flex items-start gap-4 mb-5">
-        <div className="p-3 rounded-lg">
-          <img src={platform.logo} alt={platform.name} className="w-8 h-8" />
+      <div className="mb-5 flex items-start gap-4">
+        <div className="rounded-lg p-3">
+          <img src={platform.logo} alt={platform.name} className="h-8 w-8" />
         </div>
-        <div className="flex-1 min-w-0">
-          <h3 className="font-bold text-gray-900 dark:text-white text-base mb-2 truncate">
+        <div className="min-w-0 flex-1">
+          <h3 className="mb-2 truncate text-base font-bold text-gray-900 dark:text-white">
             {platform.name}
           </h3>
           <div
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold ${
+            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold ${
               hasSettings
-                ? "bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400"
-                : "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"
+                ? "bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400"
+                : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
             }`}
           >
             <div
-              className={`w-2 h-2 rounded-full ${
-                hasSettings ? "bg-primary-600" : "bg-amber-500"
-              }`}
+              className={`h-2 w-2 rounded-full ${hasSettings ? "bg-primary-600" : "bg-amber-500"}`}
             />
             {hasSettings ? t("common.configured") : t("common.notConfigured")}
           </div>
         </div>
       </div>
-      <div className="flex-1 mb-5">
+      <div className="mb-5 flex-1">
         {hasSettings ? (
           <div className="space-y-3">
             {Object.entries(platformSettings)
@@ -96,32 +92,32 @@ function PlatformCard({
                 return (
                   <div
                     key={key}
-                    className="flex items-start justify-between gap-2 p-2.5 rounded-lg bg-gray-50 dark:bg-neutral-800/50"
+                    className="flex items-start justify-between gap-2 rounded-lg bg-gray-50 p-2.5 dark:bg-neutral-800/50"
                   >
-                    <span className="text-xs font-medium text-gray-600 dark:text-gray-400 truncate">
+                    <span className="truncate text-xs font-medium text-gray-600 dark:text-gray-400">
                       {label}
                     </span>
-                    <span className="text-xs font-bold text-gray-900 dark:text-white truncate">
+                    <span className="truncate text-xs font-bold text-gray-900 dark:text-white">
                       {displayValue}
                     </span>
                   </div>
                 );
               })}
             {Object.keys(platformSettings).length > 3 && (
-              <div className="text-xs font-medium text-gray-500 dark:text-gray-400 text-center pt-1">
+              <div className="pt-1 text-center text-xs font-medium text-gray-500 dark:text-gray-400">
                 +{Object.keys(platformSettings).length - 3} más
               </div>
             )}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center h-full min-h-[120px] p-4 rounded-lg border-2 border-dashed border-amber-200 dark:border-amber-800/30 bg-amber-50/50 dark:bg-amber-900/10">
-            <div className="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mb-3">
-              <Settings2 className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+          <div className="flex h-full min-h-[120px] flex-col items-center justify-center rounded-lg border-2 border-dashed border-amber-200 bg-amber-50/50 p-4 dark:border-amber-800/30 dark:bg-amber-900/10">
+            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
+              <Settings2 className="h-6 w-6 text-amber-600 dark:text-amber-400" />
             </div>
-            <p className="text-sm font-semibold text-amber-700 dark:text-amber-400 text-center mb-1">
+            <p className="mb-1 text-center text-sm font-semibold text-amber-700 dark:text-amber-400">
               {t("common.notConfigured")}
             </p>
-            <p className="text-xs text-amber-600 dark:text-amber-500 text-center">
+            <p className="text-center text-xs text-amber-600 dark:text-amber-500">
               {t("platformSettings.clickToConfigure")}
             </p>
           </div>
@@ -141,9 +137,7 @@ function PlatformCard({
   );
 }
 
-export default function SocialConfig({
-  settings: initialSettings,
-}: SocialConfigProps) {
+export default function SocialConfig({ settings: initialSettings }: SocialConfigProps) {
   const { t } = useTranslation();
   const [globalSettings, setGlobalSettings] = useState(initialSettings || {});
   const [activePlatform, setActivePlatform] = useState<string | null>(null);
@@ -178,16 +172,16 @@ export default function SocialConfig({
   return (
     <AuthenticatedLayout
       header={
-        <div className="flex items-center flex-col gap-6 md:flex-row justify-between w-full">
+        <div className="flex w-full flex-col items-center justify-between gap-6 md:flex-row">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary-100 dark:bg-primary-900/30">
-              <Settings2 className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+            <div className="rounded-lg bg-primary-100 p-2 dark:bg-primary-900/30">
+              <Settings2 className="h-5 w-5 text-primary-600 dark:text-primary-400" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white leading-tight">
+              <h2 className="text-xl font-bold leading-tight text-gray-900 dark:text-white">
                 {t("platformSettings.title")}
               </h2>
-              <p className="text-xs text-gray-500 dark:text-neutral-500 font-medium">
+              <p className="text-xs font-medium text-gray-500 dark:text-neutral-500">
                 {t("platformSettings.subtitle")}
               </p>
             </div>
@@ -209,12 +203,11 @@ export default function SocialConfig({
     >
       <Head title={t("platformSettings.title")} />
 
-      <div className="w-full max-w-full overflow-x-hidden min-w-0 bg-gray-50/30 dark:bg-neutral-900/10 min-h-screen">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="min-h-screen w-full min-w-0 max-w-full overflow-x-hidden bg-gray-50/30 dark:bg-neutral-900/10">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {activePlatforms.map((platform) => {
-              const platformSettings =
-                globalSettings[platform.key.toLowerCase()] || {};
+              const platformSettings = globalSettings[platform.key.toLowerCase()] || {};
               const hasSettings = Object.keys(platformSettings).length > 0;
 
               return (

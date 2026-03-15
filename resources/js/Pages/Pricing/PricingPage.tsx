@@ -1,11 +1,5 @@
 import PricingPlansSection from "@/Components/Pricing/PricingPlansSection";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/Components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
 import { ArrowRight } from "lucide-react";
@@ -65,14 +59,14 @@ export default function PricingPage({
     <AuthenticatedLayout user={auth.user}>
       <Head title={t("pricing.title")} />
 
-      <div className="relative min-h-screen bg-gradient-to-br from-gray-50 via-white to-orange-50/30 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 py-16 overflow-hidden dark:text-white">
+      <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-gray-50 via-white to-orange-50/30 py-16 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 dark:text-white">
         {/* Decorative background elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl" />
-          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-primary-400/10 rounded-full blur-3xl" />
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -right-40 -top-40 h-96 w-96 rounded-full bg-primary-500/10 blur-3xl" />
+          <div className="absolute -bottom-40 -left-40 h-96 w-96 rounded-full bg-primary-400/10 blur-3xl" />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Pricing Plans Section */}
           <PricingPlansSection
             plans={plans}
@@ -86,21 +80,21 @@ export default function PricingPage({
           />
           <div className="mt-12">
             <Card className="">
-              <CardHeader className="text-center pb-6">
-                <CardTitle className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3">
+              <CardHeader className="pb-6 text-center">
+                <CardTitle className="mb-3 text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">
                   {t("pricing.faq", "¿Tienes preguntas?")}
                 </CardTitle>
                 <CardDescription className="text-lg text-gray-600 dark:text-gray-400">
                   {t("pricing.faqSubtitle", "Estamos aquí para ayudarte")}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="text-center pb-8">
+              <CardContent className="pb-8 text-center">
                 <a
                   href="mailto:support@contentflow.com"
-                  className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-200 group"
+                  className="group inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 px-8 py-4 text-lg font-semibold text-white shadow-lg transition-all duration-200 hover:from-primary-600 hover:to-primary-700 hover:shadow-xl"
                 >
                   <span>support@contentflow.com</span>
-                  <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </a>
               </CardContent>
             </Card>
