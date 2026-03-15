@@ -24,16 +24,22 @@ export interface PublishPublicationState {
   youtubeThumbnails: Record<number, File | null>;
   existingThumbnails: Record<number, { url: string; id: number }>;
   isLoadingThumbnails: boolean;
-  retryInfo: Record<number, { 
-    retry_count: number; 
-    is_retrying: boolean; 
-    retry_status: string;
-    is_duplicate: boolean;
-    original_attempt_at?: string;
-  }>;
-  
+  retryInfo: Record<
+    number,
+    {
+      retry_count: number;
+      is_retrying: boolean;
+      retry_status: string;
+      is_duplicate: boolean;
+      original_attempt_at?: string;
+    }
+  >;
+
   getRecurringPosts: (publicationId: number, accountId: number) => any[];
-  getPublishedRecurringPosts: (publicationId: number, accountId: number) => any[];
+  getPublishedRecurringPosts: (
+    publicationId: number,
+    accountId: number,
+  ) => any[];
 }
 
 export interface UsePublishPublicationReturn extends PublishPublicationState {
@@ -54,7 +60,10 @@ export interface UsePublishPublicationReturn extends PublishPublicationState {
     platformSettings?: Record<string, any>,
   ) => Promise<boolean>;
   handleCancelPublication: (publicationId: number) => Promise<void>;
-  handleCancelPlatform: (publicationId: number, platformId: number) => Promise<void>;
+  handleCancelPlatform: (
+    publicationId: number,
+    platformId: number,
+  ) => Promise<void>;
   setYoutubeThumbnails: React.Dispatch<
     React.SetStateAction<Record<number, File | null>>
   >;
@@ -97,7 +106,9 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     (s) => s.scheduledPlatforms,
   );
   const removedPlatformsCache = usePublicationStore((s) => s.removedPlatforms);
-  const duplicatePlatformsCache = usePublicationStore((s) => s.duplicatePlatforms); // Cache de plataformas duplicadas
+  const duplicatePlatformsCache = usePublicationStore(
+    (s) => s.duplicatePlatforms,
+  ); // Cache de plataformas duplicadas
   const retryInfoCache = usePublicationStore((s) => s.retryInfo);
 
   const fetchPublishedPlatformsFromStore = usePublicationStore(
@@ -170,10 +181,13 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
       fetchPublishedPlatformsFromStore(currentPublicationId);
     };
 
-    window.addEventListener('publication-started', handlePublicationUpdate);
-    
+    window.addEventListener("publication-started", handlePublicationUpdate);
+
     return () => {
-      window.removeEventListener('publication-started', handlePublicationUpdate);
+      window.removeEventListener(
+        "publication-started",
+        handlePublicationUpdate,
+      );
     };
   }, [currentPublicationId]);
 
@@ -202,25 +216,29 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
       ? scheduledPlatformsCache[currentPublicationId] || []
       : [];
   }, [scheduledPlatformsCache, currentPublicationId]);
-  
+
   const recurringPostsCache = usePublicationStore((s) => s.recurringPosts);
-  const publishedRecurringPostsCache = usePublicationStore((s) => s.publishedRecurringPosts);
-  
+  const publishedRecurringPostsCache = usePublicationStore(
+    (s) => s.publishedRecurringPosts,
+  );
+
   const getRecurringPosts = usePublicationStore((s) => s.getRecurringPosts);
-  const getPublishedRecurringPosts = usePublicationStore((s) => s.getPublishedRecurringPosts);
+  const getPublishedRecurringPosts = usePublicationStore(
+    (s) => s.getPublishedRecurringPosts,
+  );
 
   const removedPlatforms = useMemo(() => {
     return currentPublicationId
       ? removedPlatformsCache[currentPublicationId] || []
       : [];
   }, [removedPlatformsCache, currentPublicationId]);
-  
+
   const duplicatePlatforms = useMemo(() => {
     return currentPublicationId
       ? duplicatePlatformsCache[currentPublicationId] || []
       : [];
   }, [duplicatePlatformsCache, currentPublicationId]);
-  
+
   const retryInfo = useMemo(() => {
     return currentPublicationId
       ? retryInfoCache[currentPublicationId] || {}
@@ -234,12 +252,12 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     setYoutubeThumbnails({});
     setExistingThumbnails({});
     setUnpublishing(null);
-    
+
     // Clear platform states for the current publication to avoid stale data
     if (currentPublicationId) {
       clearPublicationPlatformStates(currentPublicationId);
     }
-    
+
     setCurrentPublicationId(null);
   }, [currentPublicationId, clearPublicationPlatformStates]);
 
@@ -379,15 +397,18 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
       ) {
         return;
       }
-      
+
       // Prevent toggling if platform has duplicate attempts
       if (duplicatePlatforms.includes(accountId)) {
-        toast.error("Esta plataforma tiene un intento de publicación duplicado. Espera a que termine el proceso actual.");
+        toast.error(
+          "Esta plataforma tiene un intento de publicación duplicado. Espera a que termine el proceso actual.",
+        );
         return;
       }
-      
+
       // Prevent toggling if platform is currently retrying
-      const platformRetry = retryInfoCache[currentPublicationId || 0]?.[accountId];
+      const platformRetry =
+        retryInfoCache[currentPublicationId || 0]?.[accountId];
       if (platformRetry?.is_retrying) {
         return;
       }
@@ -398,16 +419,22 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
           : [...prev, accountId],
       );
     },
-    [publishedPlatforms, scheduledPlatforms, duplicatePlatforms, retryInfoCache, currentPublicationId],
+    [
+      publishedPlatforms,
+      scheduledPlatforms,
+      duplicatePlatforms,
+      retryInfoCache,
+      currentPublicationId,
+    ],
   );
 
   const selectAll = useCallback(() => {
-    const retryingPlatforms = currentPublicationId 
+    const retryingPlatforms = currentPublicationId
       ? Object.entries(retryInfoCache[currentPublicationId] || {})
           .filter(([_, info]) => info.is_retrying)
           .map(([id, _]) => parseInt(id))
       : [];
-    
+
     setSelectedPlatforms(
       activeAccounts
         .filter(
@@ -472,7 +499,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
                 const account = accounts.find((acc) => acc.id === id);
                 return account?.platform?.toLowerCase();
               })
-              .filter(Boolean)
+              .filter(Boolean),
           );
 
           const filteredSettings: Record<string, any> = {};
@@ -562,22 +589,25 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     }
   }, []);
 
-  const handleReject = useCallback(async (publicationId: number, reason?: string) => {
-    try {
-      const response = await axios.post(
-        route("api.v1.publications.reject", publicationId),
-        { rejection_reason: reason }
-      );
-      if (response.data.success) {
-        toast.success("Publication rejected and moved to draft");
-        return true;
+  const handleReject = useCallback(
+    async (publicationId: number, reason?: string) => {
+      try {
+        const response = await axios.post(
+          route("api.v1.publications.reject", publicationId),
+          { rejection_reason: reason },
+        );
+        if (response.data.success) {
+          toast.success("Publication rejected and moved to draft");
+          return true;
+        }
+        return false;
+      } catch (error: any) {
+        toast.error(error.response?.data?.message || "Failed to reject");
+        return false;
       }
-      return false;
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to reject");
-      return false;
-    }
-  }, []);
+    },
+    [],
+  );
 
   const handleCancelPublication = useCallback(async (publicationId: number) => {
     try {
@@ -590,28 +620,36 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     }
   }, []);
 
-  const handleCancelPlatform = useCallback(async (publicationId: number, platformId: number) => {
-    try {
-      const payload = {
-        platform_ids: [platformId]
-      };
-      
-      const response = await axios.post(route("api.v1.publications.cancel", publicationId), payload);
-      toast.success("Plataforma cancelada");
-      
-      // Dispatch event to update UI
-      window.dispatchEvent(new CustomEvent('publication-cancelled', { 
-        detail: { publicationId, platformId } 
-      }));
-      
-      await fetchPublishedPlatformsFromStore(publicationId);
-      usePublicationStore.getState().fetchPublicationById(publicationId);
-    } catch (err: any) {
-      console.error("Failed to cancel platform", err);
-      console.error("Error response:", err.response?.data);
-      toast.error("Error al cancelar la plataforma");
-    }
-  }, [fetchPublishedPlatformsFromStore]);
+  const handleCancelPlatform = useCallback(
+    async (publicationId: number, platformId: number) => {
+      try {
+        const payload = {
+          platform_ids: [platformId],
+        };
+
+        const response = await axios.post(
+          route("api.v1.publications.cancel", publicationId),
+          payload,
+        );
+        toast.success("Plataforma cancelada");
+
+        // Dispatch event to update UI
+        window.dispatchEvent(
+          new CustomEvent("publication-cancelled", {
+            detail: { publicationId, platformId },
+          }),
+        );
+
+        await fetchPublishedPlatformsFromStore(publicationId);
+        usePublicationStore.getState().fetchPublicationById(publicationId);
+      } catch (err: any) {
+        console.error("Failed to cancel platform", err);
+        console.error("Error response:", err.response?.data);
+        toast.error("Error al cancelar la plataforma");
+      }
+    },
+    [fetchPublishedPlatformsFromStore],
+  );
 
   /* ------------------------------- RETURN ----------------------------------- */
 
@@ -632,7 +670,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     existingThumbnails,
     isLoadingThumbnails,
     retryInfo,
-    
+
     getRecurringPosts,
     getPublishedRecurringPosts,
 

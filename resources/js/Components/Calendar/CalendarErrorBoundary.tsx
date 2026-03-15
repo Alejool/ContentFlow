@@ -1,6 +1,6 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+import React, { Component, ErrorInfo, ReactNode } from "react";
+import { AlertTriangle, RefreshCw } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   children: ReactNode;
@@ -34,7 +34,11 @@ class CalendarErrorBoundaryClass extends Component<Props, State> {
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log error to console in development
     if (import.meta.env.DEV) {
-      console.error('Calendar Error Boundary caught an error:', error, errorInfo);
+      console.error(
+        "Calendar Error Boundary caught an error:",
+        error,
+        errorInfo,
+      );
     }
 
     // Log to error tracking service
@@ -49,11 +53,14 @@ class CalendarErrorBoundaryClass extends Component<Props, State> {
   logErrorToService = (error: Error, errorInfo: ErrorInfo) => {
     // Log to backend error tracking
     try {
-      fetch('/api/v1/errors/log', {
-        method: 'POST',
+      fetch("/api/v1/errors/log", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+          "Content-Type": "application/json",
+          "X-CSRF-TOKEN":
+            document
+              .querySelector('meta[name="csrf-token"]')
+              ?.getAttribute("content") || "",
         },
         body: JSON.stringify({
           error: {
@@ -61,12 +68,12 @@ class CalendarErrorBoundaryClass extends Component<Props, State> {
             stack: error.stack,
             componentStack: errorInfo.componentStack,
           },
-          context: 'calendar',
+          context: "calendar",
           timestamp: new Date().toISOString(),
         }),
       });
     } catch (loggingError) {
-      console.error('Failed to log error:', loggingError);
+      console.error("Failed to log error:", loggingError);
     }
   };
 
@@ -84,7 +91,9 @@ class CalendarErrorBoundaryClass extends Component<Props, State> {
         return this.props.fallback;
       }
 
-      return <ErrorFallback error={this.state.error} onRetry={this.handleRetry} />;
+      return (
+        <ErrorFallback error={this.state.error} onRetry={this.handleRetry} />
+      );
     }
 
     return this.props.children;
@@ -109,13 +118,13 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, onRetry }) => {
         </div>
 
         <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-          {t('calendar.error.title', 'Something went wrong')}
+          {t("calendar.error.title", "Something went wrong")}
         </h2>
 
         <p className="text-gray-600 dark:text-gray-400 mb-4">
           {t(
-            'calendar.error.description',
-            'An error occurred while rendering the calendar. Please try again.'
+            "calendar.error.description",
+            "An error occurred while rendering the calendar. Please try again.",
           )}
         </p>
 
@@ -130,16 +139,16 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, onRetry }) => {
         <button
           onClick={onRetry}
           className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          aria-label={t('calendar.error.retry', 'Retry loading calendar')}
+          aria-label={t("calendar.error.retry", "Retry loading calendar")}
         >
           <RefreshCw className="w-4 h-4" />
-          {t('calendar.error.retry_button', 'Try Again')}
+          {t("calendar.error.retry_button", "Try Again")}
         </button>
 
         <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
           {t(
-            'calendar.error.persist',
-            'If the problem persists, please contact support.'
+            "calendar.error.persist",
+            "If the problem persists, please contact support.",
           )}
         </p>
       </div>

@@ -58,7 +58,8 @@ const WorkspaceCard = ({
       }`}
       style={{
         backgroundImage: `radial-gradient(circle at top left, var(--tw-gradient-from), var(--tw-gradient-to))`,
-        transition: 'background-color 0.7s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.7s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s ease-out',
+        transition:
+          "background-color 0.7s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.7s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s ease-out",
       }}
       onMouseEnter={() => setHoveredWorkspace(workspace.id)}
       onMouseLeave={() => setHoveredWorkspace(null)}

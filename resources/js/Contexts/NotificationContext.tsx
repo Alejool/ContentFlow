@@ -73,8 +73,7 @@ export const NotificationProvider = ({
       setNotifications(sortedNotifications);
       setUnreadCount(response.data.unread_count);
       setLoading(false);
-    } catch (error) {
-      }
+    } catch (error) {}
   }, []);
 
   const markAsRead = async (id: string) => {
@@ -86,8 +85,7 @@ export const NotificationProvider = ({
         ),
       );
       setUnreadCount((prev) => Math.max(0, prev - 1));
-    } catch (error) {
-      }
+    } catch (error) {}
   };
 
   const markAllAsRead = async () => {
@@ -97,8 +95,7 @@ export const NotificationProvider = ({
         prev.map((n) => ({ ...n, read_at: new Date().toISOString() })),
       );
       setUnreadCount(0);
-    } catch (error) {
-      }
+    } catch (error) {}
   };
 
   const deleteNotification = async (id: string) => {
@@ -109,16 +106,14 @@ export const NotificationProvider = ({
       if (notification && !notification.read_at) {
         setUnreadCount((prev) => Math.max(0, prev - 1));
       }
-    } catch (error) {
-      }
+    } catch (error) {}
   };
 
   const deleteAllRead = async () => {
     try {
       await axios.delete("/api/v1/notifications/read");
       setNotifications((prev) => prev.filter((n) => !n.read_at));
-    } catch (error) {
-      }
+    } catch (error) {}
   };
 
   const filterByPlatform = (platform: string | null): NotificationData[] => {

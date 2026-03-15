@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import SocialMediaLimitsService, { ValidationResponse } from '@/Services/SocialMediaLimitsService';
+import React, { useEffect, useState } from "react";
+import SocialMediaLimitsService, {
+  ValidationResponse,
+} from "@/Services/SocialMediaLimitsService";
 
 interface QuickValidationIndicatorProps {
   publicationId: number;
@@ -28,12 +30,12 @@ export default function QuickValidationIndicator({
     try {
       const result = await SocialMediaLimitsService.validatePublication(
         publicationId,
-        selectedPlatforms
+        selectedPlatforms,
       );
       setValidation(result);
       onValidationComplete?.(result);
     } catch (error) {
-      console.error('Validation error:', error);
+      console.error("Validation error:", error);
     } finally {
       setIsValidating(false);
     }
@@ -54,7 +56,9 @@ export default function QuickValidationIndicator({
     );
   }
 
-  const summary = SocialMediaLimitsService.getValidationSummary(validation.validation_results);
+  const summary = SocialMediaLimitsService.getValidationSummary(
+    validation.validation_results,
+  );
 
   if (summary.incompatible === 0) {
     return (

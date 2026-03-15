@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { format } from 'date-fns';
-import { useTimezoneStore } from '@/stores/timezoneStore';
-import { toLocalDate, toUTC } from '@/Utils/timezoneUtils';
+import React, { useEffect, useState } from "react";
+import { format } from "date-fns";
+import { useTimezoneStore } from "@/stores/timezoneStore";
+import { toLocalDate, toUTC } from "@/Utils/timezoneUtils";
 
 interface DateTimePickerProps {
   value: string | null;
@@ -22,12 +22,12 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
   min,
   max,
   disabled = false,
-  className = '',
+  className = "",
   error,
-  required = false
+  required = false,
 }) => {
   const { timezoneLabel } = useTimezoneStore();
-  const [localValue, setLocalValue] = useState('');
+  const [localValue, setLocalValue] = useState("");
 
   // Convertir valor UTC del backend a datetime-local
   useEffect(() => {
@@ -37,7 +37,7 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
         setLocalValue(format(localDate, "yyyy-MM-dd'T'HH:mm"));
       }
     } else {
-      setLocalValue('');
+      setLocalValue("");
     }
   }, [value]);
 
@@ -45,16 +45,16 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
   const minValue = min
     ? format(
         min instanceof Date ? min : toLocalDate(min) || new Date(),
-        "yyyy-MM-dd'T'HH:mm"
+        "yyyy-MM-dd'T'HH:mm",
       )
-    : '';
+    : "";
 
   const maxValue = max
     ? format(
         max instanceof Date ? max : toLocalDate(max) || new Date(),
-        "yyyy-MM-dd'T'HH:mm"
+        "yyyy-MM-dd'T'HH:mm",
       )
-    : '';
+    : "";
 
   // Manejar cambio
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,7 +92,7 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500
           disabled:bg-gray-100 disabled:cursor-not-allowed
           dark:bg-gray-800 dark:border-gray-600 dark:text-white
-          ${error ? 'border-red-500' : 'border-gray-300'}
+          ${error ? "border-red-500" : "border-gray-300"}
         `}
       />
 
@@ -101,9 +101,7 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
           <i className="bi bi-clock"></i>
           {timezoneLabel()}
         </small>
-        {error && (
-          <small className="text-xs text-red-500">{error}</small>
-        )}
+        {error && <small className="text-xs text-red-500">{error}</small>}
       </div>
     </div>
   );

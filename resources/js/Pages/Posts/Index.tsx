@@ -1,11 +1,11 @@
 import EmptyState from "@/Components/common/EmptyState";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { getEmptyStateByKey } from "@/Utils/emptyStateMapper";
-import { Line } from "@ant-design/plots";
 import { Head } from "@inertiajs/react";
 import { BarChart3, Calendar, TrendingUp } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Line } from "recharts";
 
 const postStats = [
   { time: "08:00", instagram: 200, twitter: 150, facebook: 180 },
@@ -15,17 +15,10 @@ const postStats = [
   { time: "23:00", instagram: 450, twitter: 380, facebook: 390 },
 ];
 
-const config = {
-  data: postStats.flatMap((item) => [
-    { time: item.time, platform: "Instagram", engagement: item.instagram },
-    { time: item.time, platform: "Twitter", engagement: item.twitter },
-    { time: item.time, platform: "Facebook", engagement: item.facebook },
-  ]),
-  xField: "time",
-  yField: "engagement",
-  seriesField: "platform",
-  smooth: true,
-  height: 300,
+const PLATFORM_COLORS = {
+  instagram: "#E1306C",
+  twitter: "#1DA1F2",
+  facebook: "#1877F2",
 };
 
 interface Post {
@@ -87,7 +80,7 @@ function ContentCard({ post }: { post: Post }) {
             <div className="w-8 h-8 border-3 border-neutral-300 border-t-neutral-600 rounded-full animate-spin"></div>
           </div>
         )}
-        
+
         {!imageError ? (
           <img
             src={post.image}
@@ -136,7 +129,7 @@ function ContentCard({ post }: { post: Post }) {
 
 export default function SchedulePosts() {
   const { t } = useTranslation();
-  
+
   return (
     <AuthenticatedLayout>
       <Head title="Schedule Posts" />
@@ -158,7 +151,36 @@ export default function SchedulePosts() {
               Post Performance Overview
             </h3>
             <div className="mt-4">
-              <Line {...config} />
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={postStats}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="time" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="instagram"
+                    stroke={PLATFORM_COLORS.instagram}
+                    name="Instagram"
+                    dot={false}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="twitter"
+                    stroke={PLATFORM_COLORS.twitter}
+                    name="Twitter"
+                    dot={false}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="facebook"
+                    stroke={PLATFORM_COLORS.facebook}
+                    name="Facebook"
+                    dot={false}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
           </div>
 
@@ -168,7 +190,7 @@ export default function SchedulePosts() {
               Recent Posts
             </h3>
             {posts.length === 0 ? (
-              <EmptyState config={getEmptyStateByKey('scheduledPosts', t)!} />
+              <EmptyState config={getEmptyStateByKey("scheduledPosts", t)!} />
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
                 {posts.map((post) => (

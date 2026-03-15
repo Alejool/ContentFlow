@@ -7,10 +7,19 @@ interface PublicationItemProps {
   publication: Publication;
   onCancel: (e: React.MouseEvent, id: number) => void;
   onDismiss: (e: React.MouseEvent, id: number) => void;
-  onCancelPlatform?: (publicationId: number, platformId: number, platformName: string) => void;
+  onCancelPlatform?: (
+    publicationId: number,
+    platformId: number,
+    platformName: string,
+  ) => void;
 }
 
-export function PublicationItem({ publication, onCancel, onDismiss, onCancelPlatform }: PublicationItemProps) {
+export function PublicationItem({
+  publication,
+  onCancel,
+  onDismiss,
+  onCancelPlatform,
+}: PublicationItemProps) {
   const { t } = useTranslation();
 
   // Calculate platform statistics
@@ -22,14 +31,19 @@ export function PublicationItem({ publication, onCancel, onDismiss, onCancelPlat
     const total = platforms.length;
     const published = platforms.filter((p) => p.status === "published").length;
     const failed = platforms.filter((p) => p.status === "failed").length;
-    const publishing = platforms.filter((p) => p.status === "publishing" || p.status === "pending" || p.status === "retrying").length;
+    const publishing = platforms.filter(
+      (p) =>
+        p.status === "publishing" ||
+        p.status === "pending" ||
+        p.status === "retrying",
+    ).length;
 
     return { total, published, failed, publishing };
   };
 
   const getStatusIcon = () => {
     const stats = getPlatformStats();
-    
+
     switch (publication.status) {
       case "failed":
         return <AlertTriangle className="w-3.5 h-3.5 text-red-500" />;
@@ -70,7 +84,8 @@ export function PublicationItem({ publication, onCancel, onDismiss, onCancelPlat
               defaultValue: `Reintentando ${stats.published}/${stats.total}`,
             })
           : t("common.retrying") || "Reintentando",
-        className: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
+        className:
+          "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
       },
       published: {
         text: stats
@@ -92,7 +107,8 @@ export function PublicationItem({ publication, onCancel, onDismiss, onCancelPlat
       },
       failed: {
         text: t("common.failed") || "Falló",
-        className: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
+        className:
+          "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
       },
     };
 
@@ -100,14 +116,20 @@ export function PublicationItem({ publication, onCancel, onDismiss, onCancelPlat
     if (!badge) return null;
 
     return (
-      <span className={`text-[9px] px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider ${badge.className}`}>
+      <span
+        className={`text-[9px] px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider ${badge.className}`}
+      >
         {badge.text}
       </span>
     );
   };
 
-  const canCancel = publication.status === "publishing" || publication.status === "processing" || publication.status === "retrying";
-  const canDismiss = publication.status === "failed" || publication.status === "published";
+  const canCancel =
+    publication.status === "publishing" ||
+    publication.status === "processing" ||
+    publication.status === "retrying";
+  const canDismiss =
+    publication.status === "failed" || publication.status === "published";
 
   return (
     <div className="p-3 border-b border-gray-100 dark:border-neutral-700 last:border-0 group">
@@ -142,7 +164,10 @@ export function PublicationItem({ publication, onCancel, onDismiss, onCancelPlat
         </div>
       </div>
 
-      <PlatformProgress publication={publication} onCancelPlatform={onCancelPlatform} />
+      <PlatformProgress
+        publication={publication}
+        onCancelPlatform={onCancelPlatform}
+      />
     </div>
   );
 }

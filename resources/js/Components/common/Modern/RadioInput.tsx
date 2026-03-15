@@ -1,6 +1,9 @@
 import { InputHTMLAttributes, forwardRef } from "react";
 
-interface RadioInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
+interface RadioInputProps extends Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  "type"
+> {
   label?: string;
   description?: string;
 }
@@ -43,7 +46,7 @@ const RadioInput = forwardRef<HTMLInputElement, RadioInputProps>(
         )}
       </div>
     );
-  }
+  },
 );
 
 RadioInput.displayName = "RadioInput";

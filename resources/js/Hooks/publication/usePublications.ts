@@ -231,13 +231,16 @@ export const usePublications = () => {
     [fetchData],
   );
 
-  const handleFilterChange = useCallback((newFilters: any) => {
-    setFilters(newFilters);
-    localStorage.setItem(
-      `contentPage_filters_${activeTab}`,
-      JSON.stringify(newFilters),
-    );
-  }, [activeTab]);
+  const handleFilterChange = useCallback(
+    (newFilters: any) => {
+      setFilters(newFilters);
+      localStorage.setItem(
+        `contentPage_filters_${activeTab}`,
+        JSON.stringify(newFilters),
+      );
+    },
+    [activeTab],
+  );
 
   const handleSingleFilterChange = useCallback(
     (key: string, value: any) => {

@@ -3,7 +3,11 @@ import { useTranslation } from "react-i18next";
 import { useOnboarding } from "@/Contexts/OnboardingContext";
 import { OnboardingErrorBoundary } from "./OnboardingErrorBoundary";
 import { Building2, Gem, Target, Link2, Check } from "lucide-react";
-import type { TourStep, SocialPlatform, PublicationTemplate } from "@/types/onboarding";
+import type {
+  TourStep,
+  SocialPlatform,
+  PublicationTemplate,
+} from "@/types/onboarding";
 
 // Lazy load onboarding components to reduce initial bundle size
 const BusinessInfoStep = lazy(() => import("./BusinessInfoStep"));
@@ -18,20 +22,26 @@ interface OnboardingFlowProps {
   templates: PublicationTemplate[];
 }
 
-type OnboardingStage = "businessInfo" | "planSelection" | "tour" | "wizard" | "templates" | "complete";
+type OnboardingStage =
+  | "businessInfo"
+  | "planSelection"
+  | "tour"
+  | "wizard"
+  | "templates"
+  | "complete";
 
 /**
  * OnboardingFlow orchestrates the complete onboarding experience.
- * 
+ *
  * It determines the current onboarding stage based on state and renders
  * the appropriate component (Tour, Wizard, or Templates).
- * 
+ *
  * Features:
  * - Determines current onboarding stage
  * - Renders appropriate component (Tour, Wizard, Templates)
  * - Handles stage transitions
  * - Shows progress indicator
- * 
+ *
  * Requirements: 5.3, 5.4
  */
 export default function OnboardingFlow({
@@ -40,8 +50,15 @@ export default function OnboardingFlow({
   connectedAccounts = [],
   templates,
 }: OnboardingFlowProps) {
-  const { state, completeBusinessInfo, selectPlan, completeTourStep, skipTour, nextTourStep } = useOnboarding();
-  
+  const {
+    state,
+    completeBusinessInfo,
+    selectPlan,
+    completeTourStep,
+    skipTour,
+    nextTourStep,
+  } = useOnboarding();
+
   // Determine initial stage based on current state to avoid flash
   const determineCurrentStage = useCallback((): OnboardingStage => {
     // If business info not completed, show business info
@@ -66,13 +83,21 @@ export default function OnboardingFlow({
 
     // All stages complete
     return "complete";
-  }, [state.businessInfoCompleted, state.planSelected, state.tourCompleted, state.tourSkipped, state.wizardCompleted, state.wizardSkipped]);
-  
-  const [currentStage, setCurrentStage] = useState<OnboardingStage>(() => determineCurrentStage());
+  }, [
+    state.businessInfoCompleted,
+    state.planSelected,
+    state.tourCompleted,
+    state.tourSkipped,
+    state.wizardCompleted,
+    state.wizardSkipped,
+  ]);
+
+  const [currentStage, setCurrentStage] = useState<OnboardingStage>(() =>
+    determineCurrentStage(),
+  );
 
   // Debug logging
-  useEffect(() => {
-    }, []);
+  useEffect(() => {}, []);
 
   // Determine current onboarding stage based on state
   useEffect(() => {
@@ -133,7 +158,7 @@ export default function OnboardingFlow({
     const lastStep = tourSteps[tourSteps.length - 1];
     if (lastStep) {
       await completeTourStep(lastStep.id);
-      }
+    }
     // Stage will automatically transition via useEffect
   };
 
@@ -218,7 +243,11 @@ export default function OnboardingFlow({
         <OnboardingErrorBoundary>
           <Suspense fallback={<OnboardingLoadingFallback />}>
             <TourOverlay
-              currentStep={tourSteps[Math.min(state.tourCurrentStep, tourSteps.length - 1)] || tourSteps[0]}
+              currentStep={
+                tourSteps[
+                  Math.min(state.tourCurrentStep, tourSteps.length - 1)
+                ] || tourSteps[0]
+              }
               totalSteps={tourSteps.length}
               onNext={nextTourStep}
               onSkip={handleTourSkip}
@@ -257,17 +286,29 @@ function OnboardingProgressIndicator({
   completionPercentage: number;
 }) {
   const { t } = useTranslation();
-  
+
   // Don't show progress indicator during tour (tour has its own progress)
   if (currentStage === "tour" || currentStage === "complete") {
     return null;
   }
 
   const stages = [
-    { id: "businessInfo", label: t('onboarding.progress.stages.businessInfo'), Icon: Building2 },
-    { id: "planSelection", label: t('onboarding.progress.stages.plan'), Icon: Gem },
-    { id: "tour", label: t('onboarding.progress.stages.tour'), Icon: Target },
-    { id: "wizard", label: t('onboarding.progress.stages.connect'), Icon: Link2 },
+    {
+      id: "businessInfo",
+      label: t("onboarding.progress.stages.businessInfo"),
+      Icon: Building2,
+    },
+    {
+      id: "planSelection",
+      label: t("onboarding.progress.stages.plan"),
+      Icon: Gem,
+    },
+    { id: "tour", label: t("onboarding.progress.stages.tour"), Icon: Target },
+    {
+      id: "wizard",
+      label: t("onboarding.progress.stages.connect"),
+      Icon: Link2,
+    },
   ];
 
   const currentStageIndex = stages.findIndex((s) => s.id === currentStage);
@@ -275,7 +316,6 @@ function OnboardingProgressIndicator({
   return (
     <div className="fixed top-6 right-6 z-[99] bg-white dark:bg-neutral-800 rounded-lg shadow-2xl border border-gray-200 dark:border-neutral-700 p-6 w-80">
       {/* Header */}
-      
     </div>
   );
 }

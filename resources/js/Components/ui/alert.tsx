@@ -17,7 +17,7 @@ const Alert = React.forwardRef<
         "border-destructive/50 text-destructive dark:border-destructive":
           variant === "destructive",
       },
-      className
+      className,
     )}
     {...props}
   />

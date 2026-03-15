@@ -1,7 +1,6 @@
 import { Check, Key, Smartphone } from "lucide-react";
 import PlatformFeatureTag from "@/Components/Auth/PlatformFeatureTag";
 
-
 export default function RegisterSection() {
   return (
     <div className="space-y-4 text-left">

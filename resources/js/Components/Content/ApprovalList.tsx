@@ -50,7 +50,8 @@ function ApprovalRequestItem({
 
   // Get media preview
   const firstMedia = publication.media_files?.[0];
-  const mediaPreview = firstMedia?.thumbnail?.file_path || firstMedia?.file_path;
+  const mediaPreview =
+    firstMedia?.thumbnail?.file_path || firstMedia?.file_path;
 
   return (
     <div className="group bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden hover:border-primary-400 dark:hover:border-primary-600">
@@ -162,7 +163,8 @@ function ApprovalRequestItem({
                     {t("approvals.progress") || "Progreso de Aprobación"}
                   </span>
                   <span className="text-xs font-bold text-primary-600 dark:text-primary-400">
-                    {request.currentStep.level_number} / {request.workflow.levels.length}
+                    {request.currentStep.level_number} /{" "}
+                    {request.workflow.levels.length}
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 dark:bg-neutral-700 rounded-full h-2 overflow-hidden">
@@ -232,7 +234,8 @@ export default function ApprovalList({
   const locale = getDateFnsLocale(i18n.language);
   const [rejectionModalOpen, setRejectionModalOpen] = useState(false);
   const [approvalModalOpen, setApprovalModalOpen] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState<ApprovalRequest | null>(null);
+  const [selectedRequest, setSelectedRequest] =
+    useState<ApprovalRequest | null>(null);
   const [approvalData, setApprovalData] = useState<{
     approverName: string;
     approvedAt: string;
@@ -240,7 +243,9 @@ export default function ApprovalList({
 
   // Get store methods
   const updatePublication = usePublicationStore((s) => s.updatePublication);
-  const updateSelectedItem = useManageContentUIStore((s) => s.updateSelectedItem);
+  const updateSelectedItem = useManageContentUIStore(
+    (s) => s.updateSelectedItem,
+  );
   const selectedItem = useManageContentUIStore((s) => s.selectedItem);
 
   // Pagination state
@@ -249,7 +254,8 @@ export default function ApprovalList({
 
   // Check if user has admin permission
   const { auth } = usePage<any>().props;
-  const hasAdminPermission = auth.current_workspace?.permissions?.includes("approve") || false;
+  const hasAdminPermission =
+    auth.current_workspace?.permissions?.includes("approve") || false;
 
   const handleApprove = async (request: ApprovalRequest) => {
     try {
@@ -257,7 +263,7 @@ export default function ApprovalList({
         route("api.v1.approvals.approve", request.id),
         {
           comment: null, // Opcional: agregar modal para comentario
-        }
+        },
       );
 
       if (response.data.success) {
@@ -276,13 +282,17 @@ export default function ApprovalList({
           // Aprobación parcial - avanzó al siguiente nivel
           toast.success(
             t("approvals.levelApproved", {
-              level: updatedRequest.currentStep?.level_name || "Siguiente nivel",
-            })
+              level:
+                updatedRequest.currentStep?.level_name || "Siguiente nivel",
+            }),
           );
 
           // Actualizar publicación en el store
           if (updatedRequest.publication) {
-            updatePublication(updatedRequest.publication_id, updatedRequest.publication);
+            updatePublication(
+              updatedRequest.publication_id,
+              updatedRequest.publication,
+            );
           }
 
           // Actualizar item seleccionado si está abierto
@@ -295,7 +305,9 @@ export default function ApprovalList({
         onRefresh();
       }
     } catch (error: any) {
-      toast.error(error.response?.data?.message || t("approvals.errors.approveFailed"));
+      toast.error(
+        error.response?.data?.message || t("approvals.errors.approveFailed"),
+      );
     }
   };
 
@@ -312,7 +324,7 @@ export default function ApprovalList({
         route("api.v1.approvals.reject", selectedRequest.id),
         {
           reason: reason,
-        }
+        },
       );
 
       if (response.data.success) {
@@ -419,7 +431,10 @@ export default function ApprovalList({
   const totalItems = safeRequests.length;
   const totalPages = Math.ceil(totalItems / perPage);
   const startIndex = (currentPage - 1) * perPage;
-  const displayedRequests = safeRequests.slice(startIndex, startIndex + perPage);
+  const displayedRequests = safeRequests.slice(
+    startIndex,
+    startIndex + perPage,
+  );
 
   const renderItem = (request: ApprovalRequest) => (
     <ApprovalRequestItem
@@ -438,7 +453,9 @@ export default function ApprovalList({
       {!hasAdminPermission && (
         <AlertCard
           type="info"
-          title={t("approvals.workflowAssignment.title") || "Aprobaciones asignadas"}
+          title={
+            t("approvals.workflowAssignment.title") || "Aprobaciones asignadas"
+          }
           message={
             t("approvals.workflowAssignment.description") ||
             "Estás viendo solo las solicitudes que requieren tu aprobación según tu rol o asignación en el flujo de trabajo."

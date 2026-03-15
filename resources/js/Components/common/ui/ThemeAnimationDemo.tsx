@@ -10,19 +10,25 @@ import { flushSync } from "react-dom";
 export default function ThemeAnimationDemo() {
   const { theme, setTheme, actualTheme } = useTheme();
   const [isAnimating, setIsAnimating] = useState(false);
-  const [lastClickPosition, setLastClickPosition] = useState<{ x: number; y: number } | null>(null);
+  const [lastClickPosition, setLastClickPosition] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
 
-  const handleThemeChange = (newTheme: "light" | "dark" | "system", e: React.MouseEvent) => {
+  const handleThemeChange = (
+    newTheme: "light" | "dark" | "system",
+    e: React.MouseEvent,
+  ) => {
     if (isAnimating) return;
 
     const x = e.clientX;
     const y = e.clientY;
-    
+
     setLastClickPosition({ x, y });
-    
+
     const endRadius = Math.hypot(
       Math.max(x, window.innerWidth - x),
-      Math.max(y, window.innerHeight - y)
+      Math.max(y, window.innerHeight - y),
     );
 
     setIsAnimating(true);
@@ -64,21 +70,24 @@ export default function ThemeAnimationDemo() {
       label: "Light Mode",
       icon: Sun,
       gradient: "from-amber-400 to-orange-500",
-      bgColor: "bg-gradient-to-br from-amber-50 to-orange-100 dark:from-amber-900/20 dark:to-orange-900/20",
+      bgColor:
+        "bg-gradient-to-br from-amber-50 to-orange-100 dark:from-amber-900/20 dark:to-orange-900/20",
     },
     {
       value: "dark" as const,
       label: "Dark Mode",
       icon: Moon,
       gradient: "from-indigo-500 to-purple-600",
-      bgColor: "bg-gradient-to-br from-indigo-50 to-purple-100 dark:from-indigo-900/20 dark:to-purple-900/20",
+      bgColor:
+        "bg-gradient-to-br from-indigo-50 to-purple-100 dark:from-indigo-900/20 dark:to-purple-900/20",
     },
     {
       value: "system" as const,
       label: "System",
       icon: Monitor,
       gradient: "from-gray-500 to-gray-700",
-      bgColor: "bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900",
+      bgColor:
+        "bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900",
     },
   ];
 
@@ -94,7 +103,8 @@ export default function ThemeAnimationDemo() {
             </h1>
           </div>
           <p className="text-gray-600 dark:text-gray-400">
-            Haz clic en cualquier botón para ver la animación circular expandiéndose desde ese punto
+            Haz clic en cualquier botón para ver la animación circular
+            expandiéndose desde ese punto
           </p>
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300">
             <span className="text-sm font-medium">Tema actual:</span>
@@ -160,12 +170,15 @@ export default function ThemeAnimationDemo() {
         {/* Botones en las esquinas */}
         <div className="relative h-64 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
           <p className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 text-center">
-            Haz clic en las esquinas para ver la animación desde diferentes puntos
+            Haz clic en las esquinas para ver la animación desde diferentes
+            puntos
           </p>
 
           {/* Esquina superior izquierda */}
           <button
-            onClick={(e) => handleThemeChange(theme === "dark" ? "light" : "dark", e)}
+            onClick={(e) =>
+              handleThemeChange(theme === "dark" ? "light" : "dark", e)
+            }
             disabled={isAnimating}
             className="absolute top-4 left-4 p-4 rounded-full bg-primary-500 hover:bg-primary-600 text-white shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
           >
@@ -174,7 +187,9 @@ export default function ThemeAnimationDemo() {
 
           {/* Esquina superior derecha */}
           <button
-            onClick={(e) => handleThemeChange(theme === "dark" ? "light" : "dark", e)}
+            onClick={(e) =>
+              handleThemeChange(theme === "dark" ? "light" : "dark", e)
+            }
             disabled={isAnimating}
             className="absolute top-4 right-4 p-4 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
           >
@@ -192,7 +207,9 @@ export default function ThemeAnimationDemo() {
 
           {/* Esquina inferior derecha */}
           <button
-            onClick={(e) => handleThemeChange(theme === "light" ? "dark" : "light", e)}
+            onClick={(e) =>
+              handleThemeChange(theme === "light" ? "dark" : "light", e)
+            }
             disabled={isAnimating}
             className="absolute bottom-4 right-4 p-4 rounded-full bg-purple-500 hover:bg-purple-600 text-white shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
           >
@@ -219,8 +236,13 @@ export default function ThemeAnimationDemo() {
           </h3>
           <ul className="space-y-2 text-sm text-blue-800 dark:text-blue-200">
             <li>• La animación usa la View Transition API del navegador</li>
-            <li>• Se expande en forma circular desde el punto exacto donde haces clic</li>
-            <li>• El radio se calcula dinámicamente para cubrir toda la pantalla</li>
+            <li>
+              • Se expande en forma circular desde el punto exacto donde haces
+              clic
+            </li>
+            <li>
+              • El radio se calcula dinámicamente para cubrir toda la pantalla
+            </li>
             <li>• Duración: 0.7 segundos con curva de animación suave</li>
             <li>• Funciona en Chrome, Edge y Opera (navegadores Chromium)</li>
           </ul>

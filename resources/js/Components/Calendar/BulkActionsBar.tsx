@@ -45,7 +45,7 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
     // Validate that the selected date is not in the past
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     if (selectedDate < today) {
       return; // Date is in the past
     }
@@ -61,7 +61,7 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
 
   const handleBulkDelete = async () => {
     if (!onBulkDelete) return;
-    
+
     setIsDeleting(true);
     try {
       await onBulkDelete(selectedEventIds);
@@ -86,7 +86,12 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
               </div>
               <div>
                 <div className="text-sm font-semibold text-gray-900 dark:text-white">
-                  {selectedCount} {t(selectedCount === 1 ? "calendar.event" : "calendar.events.count")}{" "}
+                  {selectedCount}{" "}
+                  {t(
+                    selectedCount === 1
+                      ? "calendar.event"
+                      : "calendar.events.count",
+                  )}{" "}
                   {t("calendar.selected")}
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-400">
@@ -192,11 +197,11 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
                 {t("calendar.selected_date")}
               </p>
               <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
-                {selectedDate.toLocaleDateString('es-ES', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
+                {selectedDate.toLocaleDateString("es-ES", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
                 })}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">

@@ -16,7 +16,15 @@ interface FacebookPreviewProps {
 }
 
 export const FacebookPreview = memo(
-  ({ content, mediaUrls, user, publishedAt, contentType = "post", pollOptions = [], pollDuration = 24 }: FacebookPreviewProps) => {
+  ({
+    content,
+    mediaUrls,
+    user,
+    publishedAt,
+    contentType = "post",
+    pollOptions = [],
+    pollDuration = 24,
+  }: FacebookPreviewProps) => {
     return (
       <div className="w-full max-w-[500px] bg-white dark:bg-[#242526] rounded-lg shadow-sm border border-gray-200 dark:border-[#3e4042] overflow-hidden text-gray-900 dark:text-[#e4e6eb]">
         {/* Header */}
@@ -28,11 +36,14 @@ export const FacebookPreview = memo(
                 {user?.name || "ContentFlow User"}
               </div>
               <div className="text-[13px] text-gray-500 dark:text-[#b0b3b8] leading-tight flex items-center gap-1">
-                {publishedAt ? (
-                  new Date(publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-                ) : (
-                  'Just now'
-                )} ·{" "}
+                {publishedAt
+                  ? new Date(publishedAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })
+                  : "Just now"}{" "}
+                ·{" "}
                 <span className="inline-block w-3 h-3 bg-gray-400 dark:bg-[#b0b3b8] rounded-full" />
               </div>
             </div>
@@ -51,9 +62,9 @@ export const FacebookPreview = memo(
         </div>
 
         {/* Media */}
-        {mediaUrls.length > 0 && contentType !== 'poll' && (
+        {mediaUrls.length > 0 && contentType !== "poll" && (
           <div className="relative border-y border-gray-100 dark:border-[#3e4042] bg-black">
-            {contentType === 'carousel' && mediaUrls.length > 1 ? (
+            {contentType === "carousel" && mediaUrls.length > 1 ? (
               // Carousel layout for multiple images
               <div className="relative">
                 <div className="grid gap-0.5 grid-cols-2">
@@ -67,7 +78,10 @@ export const FacebookPreview = memo(
                       }`}
                     >
                       {url.includes("video") || url.includes(".mp4") ? (
-                        <video src={url} className="w-full h-full object-cover" />
+                        <video
+                          src={url}
+                          className="w-full h-full object-cover"
+                        />
                       ) : (
                         <img
                           src={url}
@@ -89,14 +103,16 @@ export const FacebookPreview = memo(
                 {/* Carousel dots indicator */}
                 {mediaUrls.length > 1 && (
                   <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1">
-                    {mediaUrls.slice(0, Math.min(5, mediaUrls.length)).map((_, index) => (
-                      <div
-                        key={index}
-                        className={`w-2 h-2 rounded-full ${
-                          index === 0 ? 'bg-white' : 'bg-white/50'
-                        }`}
-                      />
-                    ))}
+                    {mediaUrls
+                      .slice(0, Math.min(5, mediaUrls.length))
+                      .map((_, index) => (
+                        <div
+                          key={index}
+                          className={`w-2 h-2 rounded-full ${
+                            index === 0 ? "bg-white" : "bg-white/50"
+                          }`}
+                        />
+                      ))}
                   </div>
                 )}
               </div>
@@ -131,37 +147,41 @@ export const FacebookPreview = memo(
         )}
 
         {/* Poll */}
-        {contentType === 'poll' && pollOptions.length >= 2 && (
+        {contentType === "poll" && pollOptions.length >= 2 && (
           <div className="mx-3 mb-3 border border-gray-200 dark:border-[#3e4042] rounded-lg overflow-hidden bg-gray-50 dark:bg-[#3a3b3c]">
             <div className="p-3 border-b border-gray-200 dark:border-[#3e4042] bg-white dark:bg-[#242526]">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-gray-900 dark:text-[#e4e6eb]">📊 Encuesta</span>
+                <span className="text-sm font-semibold text-gray-900 dark:text-[#e4e6eb]">
+                  📊 Encuesta
+                </span>
                 <div className="text-xs text-gray-500 dark:text-[#b0b3b8]">
-                  {pollDuration < 24 
-                    ? `${pollDuration} hora${pollDuration !== 1 ? 's' : ''} restante${pollDuration !== 1 ? 's' : ''}`
-                    : `${Math.floor(pollDuration / 24)} día${Math.floor(pollDuration / 24) !== 1 ? 's' : ''} restante${Math.floor(pollDuration / 24) !== 1 ? 's' : ''}`
-                  } · 0 votos
+                  {pollDuration < 24
+                    ? `${pollDuration} hora${pollDuration !== 1 ? "s" : ""} restante${pollDuration !== 1 ? "s" : ""}`
+                    : `${Math.floor(pollDuration / 24)} día${Math.floor(pollDuration / 24) !== 1 ? "s" : ""} restante${Math.floor(pollDuration / 24) !== 1 ? "s" : ""}`}{" "}
+                  · 0 votos
                 </div>
               </div>
             </div>
-            {pollOptions.filter(option => option.trim()).map((option, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between p-3 hover:bg-gray-100 dark:hover:bg-[#4e4f50] border-b border-gray-200 dark:border-[#3e4042] last:border-b-0 cursor-pointer transition-colors"
-              >
-                <div className="flex items-center gap-3 flex-1">
-                  <div className="w-4 h-4 border-2 border-blue-500 rounded-full flex items-center justify-center">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+            {pollOptions
+              .filter((option) => option.trim())
+              .map((option, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-3 hover:bg-gray-100 dark:hover:bg-[#4e4f50] border-b border-gray-200 dark:border-[#3e4042] last:border-b-0 cursor-pointer transition-colors"
+                >
+                  <div className="flex items-center gap-3 flex-1">
+                    <div className="w-4 h-4 border-2 border-blue-500 rounded-full flex items-center justify-center">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                    <span className="text-sm text-gray-900 dark:text-[#e4e6eb]">
+                      {option}
+                    </span>
                   </div>
-                  <span className="text-sm text-gray-900 dark:text-[#e4e6eb]">
-                    {option}
+                  <span className="text-sm text-gray-500 dark:text-[#b0b3b8]">
+                    0%
                   </span>
                 </div>
-                <span className="text-sm text-gray-500 dark:text-[#b0b3b8]">
-                  0%
-                </span>
-              </div>
-            ))}
+              ))}
           </div>
         )}
 

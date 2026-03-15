@@ -14,7 +14,7 @@ interface LazyImageProps {
 
 /**
  * Componente de imagen con carga lazy, fallback automático y animaciones suaves
- * 
+ *
  * Características:
  * - Lazy loading nativo del navegador
  * - Fallback automático si la imagen falla

@@ -16,7 +16,7 @@ type WizardStep = "welcome" | "platforms" | "success";
 
 /**
  * SetupWizard provides a multi-step interface for connecting social media accounts.
- * 
+ *
  * Steps:
  * 1. Welcome screen with platform overview
  * 2. Platform selection grid
@@ -33,8 +33,7 @@ export default function SetupWizard({
   const [isSkipping, setIsSkipping] = useState(false);
 
   // Log when connected accounts change
-  useEffect(() => {
-    }, [connectedAccounts]);
+  useEffect(() => {}, [connectedAccounts]);
 
   // ALWAYS use SOCIAL_PLATFORMS constant, ignore props
   const availablePlatforms = useMemo(() => {
@@ -50,7 +49,7 @@ export default function SetupWizard({
           defaultValue: `Connect your ${platform.name} account`,
         }),
       }));
-    
+
     return platforms;
   }, [t]);
 
@@ -82,7 +81,7 @@ export default function SetupWizard({
       await skipWizard();
       onComplete?.();
     } catch (error) {
-      } finally {
+    } finally {
       setIsSkipping(false);
     }
   };
@@ -93,8 +92,7 @@ export default function SetupWizard({
       await completeWizardStep("step-3");
       // Don't call onComplete - let the state change trigger the transition
       // onComplete?.();
-    } catch (error) {
-      }
+    } catch (error) {}
   };
 
   // Keyboard navigation (Requirement 7.5, 7.6)
@@ -106,7 +104,10 @@ export default function SetupWizard({
           if (currentStep === "welcome") {
             e.preventDefault();
             handleNext();
-          } else if (currentStep === "platforms" && connectedAccounts.length > 0) {
+          } else if (
+            currentStep === "platforms" &&
+            connectedAccounts.length > 0
+          ) {
             e.preventDefault();
             handleNext();
           } else if (currentStep === "success") {
@@ -132,27 +133,39 @@ export default function SetupWizard({
   }, [currentStep, connectedAccounts.length]);
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-2 md:p-4" role="dialog" aria-modal="true" aria-labelledby="wizard-title" aria-describedby="wizard-description">
+    <div
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-2 md:p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="wizard-title"
+      aria-describedby="wizard-description"
+    >
       <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[95vh] md:max-h-[90vh] overflow-y-auto">
         {/* Header - Responsive layout (Requirement 7.1, 7.2) */}
         <div className="sticky top-0 z-10 bg-white dark:bg-neutral-800 border-b border-gray-200 dark:border-neutral-700 px-4 md:px-6 py-3 md:py-4 flex items-start md:items-center justify-between gap-2 md:gap-4">
           <div className="flex-1 min-w-0">
-            <h2 id="wizard-title" className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white truncate">
-              {currentStep === "welcome" && t('wizard.title.welcome')}
-              {currentStep === "platforms" && t('wizard.title.platforms')}
-              {currentStep === "success" && t('wizard.title.success')}
+            <h2
+              id="wizard-title"
+              className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white truncate"
+            >
+              {currentStep === "welcome" && t("wizard.title.welcome")}
+              {currentStep === "platforms" && t("wizard.title.platforms")}
+              {currentStep === "success" && t("wizard.title.success")}
             </h2>
-            <p id="wizard-description" className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
-              {currentStep === "welcome" && t('wizard.description.welcome')}
-              {currentStep === "platforms" && t('wizard.description.platforms')}
-              {currentStep === "success" && t('wizard.description.success')}
+            <p
+              id="wizard-description"
+              className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-2"
+            >
+              {currentStep === "welcome" && t("wizard.description.welcome")}
+              {currentStep === "platforms" && t("wizard.description.platforms")}
+              {currentStep === "success" && t("wizard.description.success")}
             </p>
           </div>
           <button
             onClick={handleSkip}
             disabled={isSkipping || state.isLoading}
             className="flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2 min-w-[44px] min-h-[44px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded-md"
-            aria-label={t('wizard.close')}
+            aria-label={t("wizard.close")}
           >
             <X className="w-5 h-5 md:w-6 md:h-6" />
           </button>
@@ -185,21 +198,25 @@ export default function SetupWizard({
             onClick={handleBack}
             disabled={currentStep === "welcome" || state.isLoading}
             className="flex items-center justify-center gap-2 px-4 py-2 min-h-[44px] text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors order-2 md:order-1 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded-lg"
-            aria-label={t('wizard.previousStep')}
+            aria-label={t("wizard.previousStep")}
           >
             <ArrowLeft className="w-4 h-4" />
-            <span className="md:inline">{t('wizard.back')}</span>
+            <span className="md:inline">{t("wizard.back")}</span>
           </button>
 
-          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-3 order-1 md:order-2" role="group" aria-label={t('wizard.navigation')}>
+          <div
+            className="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-3 order-1 md:order-2"
+            role="group"
+            aria-label={t("wizard.navigation")}
+          >
             {currentStep !== "success" && (
               <button
                 onClick={handleSkip}
                 disabled={isSkipping || state.isLoading}
                 className="px-4 py-2 min-h-[44px] text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded-lg"
-                aria-label={t('wizard.skipSetup')}
+                aria-label={t("wizard.skipSetup")}
               >
-                {isSkipping ? t('wizard.skipping') : t('wizard.skip')}
+                {isSkipping ? t("wizard.skipping") : t("wizard.skip")}
               </button>
             )}
 
@@ -208,9 +225,9 @@ export default function SetupWizard({
                 onClick={handleNext}
                 disabled={state.isLoading}
                 className="flex items-center justify-center gap-2 px-6 py-2 min-h-[44px] bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-                aria-label={t('wizard.getStartedSetup')}
+                aria-label={t("wizard.getStartedSetup")}
               >
-                {t('wizard.getStarted')}
+                {t("wizard.getStarted")}
                 <ArrowRight className="w-4 h-4" />
               </button>
             )}
@@ -220,9 +237,11 @@ export default function SetupWizard({
                 onClick={handleNext}
                 disabled={state.isLoading}
                 className="flex items-center justify-center gap-2 px-6 py-2 min-h-[44px] bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-                aria-label={t('wizard.nextStep')}
+                aria-label={t("wizard.nextStep")}
               >
-                {connectedAccounts.length > 0 ? t('wizard.continue') : t('wizard.continueWithout', 'Continue Without Connecting')}
+                {connectedAccounts.length > 0
+                  ? t("wizard.continue")
+                  : t("wizard.continueWithout", "Continue Without Connecting")}
                 <ArrowRight className="w-4 h-4" />
               </button>
             )}
@@ -232,9 +251,9 @@ export default function SetupWizard({
                 onClick={handleComplete}
                 disabled={state.isLoading}
                 className="flex items-center justify-center gap-2 px-6 py-2 min-h-[44px] bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-                aria-label={t('wizard.finishSetup')}
+                aria-label={t("wizard.finishSetup")}
               >
-                {t('wizard.finish')}
+                {t("wizard.finish")}
                 <ArrowRight className="w-4 h-4" />
               </button>
             )}
@@ -257,7 +276,7 @@ function WelcomeScreen({
   onSkip: () => void;
 }) {
   const { t } = useTranslation();
-  
+
   return (
     <div className="text-center max-w-2xl mx-auto space-y-4 md:space-y-6">
       <div className="w-16 h-16 md:w-20 md:h-20 bg-primary-100 dark:bg-primary-900/20 rounded-full flex items-center justify-center mx-auto">
@@ -278,10 +297,10 @@ function WelcomeScreen({
 
       <div>
         <h3 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-2 md:mb-3">
-          {t('wizard.welcome.heading')}
+          {t("wizard.welcome.heading")}
         </h3>
         <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
-          {t('wizard.welcome.description')}
+          {t("wizard.welcome.description")}
         </p>
       </div>
 
@@ -303,10 +322,10 @@ function WelcomeScreen({
             </svg>
           </div>
           <h4 className="font-medium text-gray-900 dark:text-white mb-1">
-            {t('wizard.welcome.features.schedule.title')}
+            {t("wizard.welcome.features.schedule.title")}
           </h4>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            {t('wizard.welcome.features.schedule.description')}
+            {t("wizard.welcome.features.schedule.description")}
           </p>
         </div>
 
@@ -327,10 +346,10 @@ function WelcomeScreen({
             </svg>
           </div>
           <h4 className="font-medium text-gray-900 dark:text-white mb-1">
-            {t('wizard.welcome.features.analytics.title')}
+            {t("wizard.welcome.features.analytics.title")}
           </h4>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            {t('wizard.welcome.features.analytics.description')}
+            {t("wizard.welcome.features.analytics.description")}
           </p>
         </div>
 
@@ -351,10 +370,10 @@ function WelcomeScreen({
             </svg>
           </div>
           <h4 className="font-medium text-gray-900 dark:text-white mb-1">
-            {t('wizard.welcome.features.collaborate.title')}
+            {t("wizard.welcome.features.collaborate.title")}
           </h4>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            {t('wizard.welcome.features.collaborate.description')}
+            {t("wizard.welcome.features.collaborate.description")}
           </p>
         </div>
       </div>
@@ -374,16 +393,20 @@ function PlatformsScreen({
   connectedAccounts: Array<{ platform: string; account_name: string }>;
 }) {
   const { t } = useTranslation();
-  
+
   return (
     <div className="space-y-6">
       <div className="text-center">
         <p className="text-gray-600 dark:text-gray-200">
-          {t('wizard.platforms.description')}
+          {t("wizard.platforms.description")}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" role="list" aria-label={t('wizard.platforms.availablePlatforms')}>
+      <div
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+        role="list"
+        aria-label={t("wizard.platforms.availablePlatforms")}
+      >
         {availablePlatforms.length === 0 ? (
           <div className="col-span-full text-center py-8">
             <p className="text-gray-500 dark:text-gray-400">
@@ -393,7 +416,7 @@ function PlatformsScreen({
         ) : (
           availablePlatforms.map((platform) => {
             const isConnected = connectedAccounts.some(
-              (acc) => acc.platform.toLowerCase() === platform.id.toLowerCase()
+              (acc) => acc.platform.toLowerCase() === platform.id.toLowerCase(),
             );
             return (
               <PlatformCard
@@ -402,7 +425,7 @@ function PlatformsScreen({
                 isConnected={isConnected}
                 connectedAccount={connectedAccounts.find(
                   (acc) =>
-                    acc.platform.toLowerCase() === platform.id.toLowerCase()
+                    acc.platform.toLowerCase() === platform.id.toLowerCase(),
                 )}
               />
             );
@@ -413,7 +436,7 @@ function PlatformsScreen({
       {connectedAccounts.length === 0 && (
         <div className="text-center py-8" role="status" aria-live="polite">
           <p className="text-gray-500 dark:text-gray-400">
-            {t('wizard.platforms.noAccounts')}
+            {t("wizard.platforms.noAccounts")}
           </p>
         </div>
       )}
@@ -433,10 +456,11 @@ function SuccessScreen({
   onComplete: () => void;
 }) {
   const { t } = useTranslation();
-  const accountText = connectedAccounts.length === 1 
-    ? t('wizard.success.account') 
-    : t('wizard.success.accounts');
-  
+  const accountText =
+    connectedAccounts.length === 1
+      ? t("wizard.success.account")
+      : t("wizard.success.accounts");
+
   return (
     <div className="text-center max-w-2xl mx-auto space-y-4 md:space-y-6">
       <div className="w-16 h-16 md:w-20 md:h-20 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto">
@@ -457,19 +481,19 @@ function SuccessScreen({
 
       <div>
         <h3 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-2 md:mb-3">
-          {t('wizard.success.heading')}
+          {t("wizard.success.heading")}
         </h3>
         <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
-          {t('wizard.success.description', { 
-            count: connectedAccounts.length, 
-            accountText 
+          {t("wizard.success.description", {
+            count: connectedAccounts.length,
+            accountText,
           })}
         </p>
       </div>
 
       <div className="bg-gray-50 dark:bg-neutral-900 rounded-lg p-6">
         <h4 className="font-medium text-gray-900 dark:text-white mb-4">
-          {t('wizard.success.connectedAccounts')}
+          {t("wizard.success.connectedAccounts")}
         </h4>
         <div className="space-y-3">
           {connectedAccounts.map((account, index) => (
@@ -510,7 +534,7 @@ function SuccessScreen({
 
       <div className="pt-4">
         <p className="text-sm text-gray-500 dark:text-gray-400">
-          {t('wizard.success.nextStep')}
+          {t("wizard.success.nextStep")}
         </p>
       </div>
     </div>

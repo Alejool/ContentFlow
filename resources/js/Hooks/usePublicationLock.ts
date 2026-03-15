@@ -31,8 +31,7 @@ const syncAllUIStores = async (pubId: number, freshData: Publication) => {
     if (store.selectedItem?.id === pubId) {
       store.setSelectedItem(freshData);
     }
-  } catch (e) {
-    }
+  } catch (e) {}
 
   // 2. Sync useManageContentUIStore
   try {
@@ -42,8 +41,7 @@ const syncAllUIStores = async (pubId: number, freshData: Publication) => {
     if (store.selectedItem?.id === pubId) {
       store.setSelectedItem(freshData);
     }
-  } catch (e) {
-    }
+  } catch (e) {}
 };
 
 const refreshPublicationInAllStores = async (
@@ -87,8 +85,7 @@ const refreshPublicationInAllStores = async (
         // Calendar store might not be initialized or present
       }
     }
-  } catch (err) {
-    }
+  } catch (err) {}
 };
 
 export const usePublicationLock = (
@@ -159,8 +156,7 @@ export const usePublicationLock = (
           setLockInfo(data.details);
           setLockedByMeInternal(false);
         }
-      } catch (err) {
-        }
+      } catch (err) {}
     },
     [publicationId, userId, userName],
   );
@@ -178,8 +174,7 @@ export const usePublicationLock = (
     // Even if we think we don't have it, attempt to release to ensure cleanup
     try {
       await usePublicationStore.getState().releaseLock(publicationId);
-    } catch (e) {
-      }
+    } catch (e) {}
   }, [publicationId]);
 
   useEffect(() => {
@@ -203,8 +198,7 @@ export const usePublicationLock = (
             setLockInfo(null);
             setLockedByMeInternal(false);
           }
-        } catch (err) {
-          }
+        } catch (err) {}
       }, 5000);
     };
 
@@ -339,7 +333,8 @@ export const useWorkspaceLocks = () => {
       if (data.lock) {
         if (data.lock.user_id !== wsUserId) {
           updateLock(pubId, data.lock);
-          const userName = data.lock.user_name || data.lock.user?.name || "Usuario";
+          const userName =
+            data.lock.user_name || data.lock.user?.name || "Usuario";
           toast(`${userName} ha empezado a editar.`, {
             id: `lock-${pubId}`,
           });
@@ -389,8 +384,7 @@ export const useWorkspaceLocks = () => {
           }
         });
         setRemoteLocks(lockMap);
-      } catch (error) {
-        }
+      } catch (error) {}
     };
 
     fetchLocks();

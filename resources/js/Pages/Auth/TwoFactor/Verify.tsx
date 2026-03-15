@@ -6,20 +6,14 @@ import { z } from "zod";
 
 import Button from "@/Components/common/Modern/Button";
 import Input from "@/Components/common/Modern/Input";
-import {
-  AlertCircle,
-  Key,
-  Shield,
-} from "lucide-react";
+import { AlertCircle, Key, Shield } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export default function Verify() {
   const { t } = useTranslation();
 
   const verifySchema = z.object({
-    code: z
-      .string()
-      .min(1, { message: "Verification code is required" }),
+    code: z.string().min(1, { message: "Verification code is required" }),
   });
 
   type VerifyFormData = z.infer<typeof verifySchema>;
@@ -75,7 +69,9 @@ export default function Verify() {
                     Security Check Required
                   </p>
                   <p className="text-xs text-primary-600 dark:text-primary-500 mt-1">
-                    Open your authenticator app and enter the 6-digit code. You can also use a backup code if you don't have access to your device.
+                    Open your authenticator app and enter the 6-digit code. You
+                    can also use a backup code if you don't have access to your
+                    device.
                   </p>
                 </div>
               </div>

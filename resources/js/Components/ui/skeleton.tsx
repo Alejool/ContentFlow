@@ -8,14 +8,11 @@ const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
     return (
       <div
         ref={ref}
-        className={cn(
-          "animate-pulse rounded-md bg-muted",
-          className
-        )}
+        className={cn("animate-pulse rounded-md bg-muted", className)}
         {...props}
       />
     );
-  }
+  },
 );
 Skeleton.displayName = "Skeleton";
 

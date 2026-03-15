@@ -3,13 +3,13 @@ import { Publication } from "@/types/Publication";
 import { getDateFnsLocale } from "@/Utils/dateLocales";
 import { format } from "date-fns";
 import {
-    Check,
-    CheckCircle,
-    Clock,
-    Info,
-    User,
-    X,
-    XCircle,
+  Check,
+  CheckCircle,
+  Clock,
+  Info,
+  User,
+  X,
+  XCircle,
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -166,11 +166,9 @@ export default function ApprovalLevelCard({
                   </span>
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {format(
-                    new Date(level.approved_action.created_at),
-                    "PPp",
-                    { locale }
-                  )}
+                  {format(new Date(level.approved_action.created_at), "PPp", {
+                    locale,
+                  })}
                 </p>
                 {level.approved_action.comment && (
                   <p className="text-sm text-gray-700 dark:text-gray-300 mt-2 italic">
@@ -199,11 +197,9 @@ export default function ApprovalLevelCard({
                   </span>
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {format(
-                    new Date(level.rejected_action.created_at),
-                    "PPp",
-                    { locale }
-                  )}
+                  {format(new Date(level.rejected_action.created_at), "PPp", {
+                    locale,
+                  })}
                 </p>
                 {level.rejected_action.comment && (
                   <div className="mt-2">

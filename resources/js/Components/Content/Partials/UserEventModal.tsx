@@ -9,12 +9,12 @@ import { usePage } from "@inertiajs/react";
 import axios from "axios";
 import { isBefore, parseISO, startOfDay } from "date-fns";
 import {
-    AlignLeft,
-    Bell,
-    Calendar as CalendarIcon,
-    Globe,
-    Lock,
-    Type,
+  AlignLeft,
+  Bell,
+  Calendar as CalendarIcon,
+  Globe,
+  Lock,
+  Type,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";

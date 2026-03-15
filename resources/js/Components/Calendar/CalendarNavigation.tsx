@@ -1,9 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, ChevronDown, Calendar as CalendarIcon, Loader2 } from 'lucide-react';
-import { format, setMonth, setYear } from 'date-fns';
-import { useTranslation } from 'react-i18next';
-import { formatDate } from '@/Utils/i18nHelpers';
-import { CalendarView } from '@/types/calendar';
+import React, { useState, useEffect } from "react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronDown,
+  Calendar as CalendarIcon,
+  Loader2,
+} from "lucide-react";
+import { format, setMonth, setYear } from "date-fns";
+import { useTranslation } from "react-i18next";
+import { formatDate } from "@/Utils/i18nHelpers";
+import { CalendarView } from "@/types/calendar";
 
 interface CalendarNavigationProps {
   currentDate: Date;
@@ -33,16 +39,16 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element;
-      if (showMonthPicker && !target.closest('.month-picker-container')) {
+      if (showMonthPicker && !target.closest(".month-picker-container")) {
         setShowMonthPicker(false);
       }
-      if (showDatePicker && !target.closest('.date-picker-container')) {
+      if (showDatePicker && !target.closest(".date-picker-container")) {
         setShowDatePicker(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showMonthPicker, showDatePicker]);
 
   const goToMonth = (month: number, year: number) => {
@@ -62,11 +68,11 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
   // Format the current date display based on view
   const getDateDisplay = () => {
     switch (view) {
-      case 'day':
+      case "day":
         return formatDate(currentDate, "dayWeekMonthYear");
-      case 'week':
+      case "week":
         return formatDate(currentDate, "monthYear");
-      case 'month':
+      case "month":
       default:
         return formatDate(currentDate, "monthYear");
     }
@@ -90,7 +96,7 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
         >
           {getDateDisplay()}
           <ChevronDown
-            className={`w-5 h-5 transition-transform ${showMonthPicker ? 'rotate-180' : ''}`}
+            className={`w-5 h-5 transition-transform ${showMonthPicker ? "rotate-180" : ""}`}
           />
           {isLoading && (
             <Loader2 className="w-5 h-5 animate-spin text-primary-500" />
@@ -107,8 +113,8 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
                   onClick={() => goToMonth(i, currentDate.getFullYear())}
                   className={`p-2 text-sm rounded-lg transition-colors ${
                     currentDate.getMonth() === i
-                      ? 'bg-primary-500 text-white'
-                      : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+                      ? "bg-primary-500 text-white"
+                      : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
                   }`}
                 >
                   {formatDate(new Date(2024, i, 1), "monthShort")}
@@ -118,7 +124,10 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
             <div className="flex items-center justify-between gap-2">
               <button
                 onClick={() =>
-                  goToMonth(currentDate.getMonth(), currentDate.getFullYear() - 1)
+                  goToMonth(
+                    currentDate.getMonth(),
+                    currentDate.getFullYear() - 1,
+                  )
                 }
                 className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
               >
@@ -129,7 +138,10 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
               </span>
               <button
                 onClick={() =>
-                  goToMonth(currentDate.getMonth(), currentDate.getFullYear() + 1)
+                  goToMonth(
+                    currentDate.getMonth(),
+                    currentDate.getFullYear() + 1,
+                  )
                 }
                 className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
               >
@@ -146,7 +158,7 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
         <button
           onClick={onNavigatePrevious}
           className="p-2 hover:bg-white dark:hover:bg-gray-700 rounded-lg transition-all shadow-sm hover:shadow text-gray-600 dark:text-gray-300"
-          title={t('calendar.navigation.previous') || 'Anterior'}
+          title={t("calendar.navigation.previous") || "Anterior"}
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
@@ -156,22 +168,22 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
           onClick={onNavigateToToday}
           className={`px-4 py-2 text-sm font-semibold hover:bg-white dark:hover:bg-gray-700 rounded-lg transition-all shadow-sm hover:shadow relative ${
             isCurrentDay(currentDate)
-              ? 'bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300'
-              : 'text-gray-700 dark:text-gray-200'
+              ? "bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300"
+              : "text-gray-700 dark:text-gray-200"
           }`}
-          title={t('calendar.navigation.today') || 'Hoy'}
+          title={t("calendar.navigation.today") || "Hoy"}
         >
           {isCurrentDay(currentDate) && (
             <span className="absolute top-1 right-1 w-2 h-2 bg-primary-500 rounded-full"></span>
           )}
-          {t('calendar.navigation.today') || 'Hoy'}
+          {t("calendar.navigation.today") || "Hoy"}
         </button>
 
         {/* Next Button */}
         <button
           onClick={onNavigateNext}
           className="p-2 hover:bg-white dark:hover:bg-gray-700 rounded-lg transition-all shadow-sm hover:shadow text-gray-600 dark:text-gray-300"
-          title={t('calendar.navigation.next') || 'Siguiente'}
+          title={t("calendar.navigation.next") || "Siguiente"}
         >
           <ChevronRight className="w-5 h-5" />
         </button>
@@ -181,7 +193,7 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
           <button
             onClick={() => setShowDatePicker(!showDatePicker)}
             className="p-2 hover:bg-white dark:hover:bg-gray-700 rounded-lg transition-all shadow-sm hover:shadow text-gray-600 dark:text-gray-300"
-            title={t('calendar.navigation.selectDate') || 'Seleccionar fecha'}
+            title={t("calendar.navigation.selectDate") || "Seleccionar fecha"}
           >
             <CalendarIcon className="w-5 h-5" />
           </button>
@@ -190,11 +202,11 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
           {showDatePicker && (
             <div className="absolute top-full right-0 mt-2 bg-white dark:bg-black border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 p-4">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {t('calendar.navigation.selectDate') || 'Seleccionar fecha'}
+                {t("calendar.navigation.selectDate") || "Seleccionar fecha"}
               </label>
               <input
                 type="date"
-                value={format(currentDate, 'yyyy-MM-dd')}
+                value={format(currentDate, "yyyy-MM-dd")}
                 onChange={handleDatePickerChange}
                 className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:text-white"
               />

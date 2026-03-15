@@ -31,8 +31,7 @@ function ConfirmationDialog({
           </div>
           <div className="flex-1">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-              {t("profile.onboarding.confirmTitle") ||
-                "Restart Onboarding?"}
+              {t("profile.onboarding.confirmTitle") || "Restart Onboarding?"}
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               {t("profile.onboarding.confirmMessage") ||

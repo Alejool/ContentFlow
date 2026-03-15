@@ -1,10 +1,16 @@
-import { Head, Link, router } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { CheckCircle, ArrowRight, Sparkles } from 'lucide-react';
-import Button from '@/Components/common/Modern/Button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
-import { useTranslation } from 'react-i18next';
-import { useEffect } from 'react';
+import { Head, Link, router } from "@inertiajs/react";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import { CheckCircle, ArrowRight, Sparkles } from "lucide-react";
+import Button from "@/Components/common/Modern/Button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/Components/ui/card";
+import { useTranslation } from "react-i18next";
+import { useEffect } from "react";
 
 interface Props {
   auth: any;
@@ -18,23 +24,23 @@ export default function Success({ auth, plan, amount, currency }: Props) {
 
   useEffect(() => {
     // Dispatch event to notify all components that subscription has changed
-    window.dispatchEvent(new CustomEvent('subscription-plan-changed'));
-    
+    window.dispatchEvent(new CustomEvent("subscription-plan-changed"));
+
     // Force reload of shared data after a short delay to ensure backend has processed
     setTimeout(() => {
-      router.reload({ only: ['auth', 'onboarding'] });
+      router.reload({ only: ["auth", "onboarding"] });
     }, 1000);
   }, []);
 
   const planNames: Record<string, string> = {
-    starter: 'Starter',
-    professional: 'Professional',
-    enterprise: 'Enterprise',
+    starter: "Starter",
+    professional: "Professional",
+    enterprise: "Enterprise",
   };
 
   return (
     <AuthenticatedLayout user={auth.user}>
-      <Head title={t('subscription.success.title')} />
+      <Head title={t("subscription.success.title")} />
 
       <div className="min-h-screen  to-primary-50/30 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 py-16 dark:text-white ">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -43,13 +49,13 @@ export default function Success({ auth, plan, amount, currency }: Props) {
             <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full mb-6">
               <CheckCircle className="h-12 w-12 text-green-600 dark:text-green-400" />
             </div>
-            
+
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-              {t('subscription.success.heading')}
+              {t("subscription.success.heading")}
             </h1>
-            
+
             <p className="text-xl text-gray-600 dark:text-gray-400">
-              {t('subscription.success.message')}
+              {t("subscription.success.message")}
             </p>
           </div>
 
@@ -58,40 +64,40 @@ export default function Success({ auth, plan, amount, currency }: Props) {
             <CardHeader className="bg-gradient-to-r from-green-50 to-primary-50 dark:from-green-900/20 dark:to-primary-900/20">
               <CardTitle className="flex items-center gap-2">
                 <Sparkles className="h-5 w-5 text-primary-600 dark:text-primary-400" />
-                {t('subscription.success.detailsTitle')}
+                {t("subscription.success.detailsTitle")}
               </CardTitle>
               <CardDescription>
-                {t('subscription.success.detailsDescription')}
+                {t("subscription.success.detailsDescription")}
               </CardDescription>
             </CardHeader>
-            
+
             <CardContent className="pt-6">
               <div className="space-y-4">
                 <div className="flex justify-between items-center py-3 border-b border-gray-200 dark:border-neutral-800">
                   <span className="text-gray-600 dark:text-gray-400">
-                    {t('subscription.success.selectedPlan')}
+                    {t("subscription.success.selectedPlan")}
                   </span>
                   <span className="font-semibold text-gray-900 dark:text-white text-lg">
                     {planNames[plan] || plan}
                   </span>
                 </div>
-                
+
                 <div className="flex justify-between items-center py-3 border-b border-gray-200 dark:border-neutral-800">
                   <span className="text-gray-600 dark:text-gray-400">
-                    {t('subscription.success.amountPaid')}
+                    {t("subscription.success.amountPaid")}
                   </span>
                   <span className="font-semibold text-gray-900 dark:text-white text-lg">
                     {currency} ${amount.toFixed(2)}
                   </span>
                 </div>
-                
+
                 <div className="flex justify-between items-center py-3">
                   <span className="text-gray-600 dark:text-gray-400">
-                    {t('subscription.success.status')}
+                    {t("subscription.success.status")}
                   </span>
                   <span className="inline-flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full text-sm font-medium">
                     <CheckCircle className="h-4 w-4" />
-                    {t('subscription.success.active')}
+                    {t("subscription.success.active")}
                   </span>
                 </div>
               </div>
@@ -101,36 +107,36 @@ export default function Success({ auth, plan, amount, currency }: Props) {
           {/* Next Steps */}
           <Card className="mb-8">
             <CardHeader>
-              <CardTitle>{t('subscription.success.nextStepsTitle')}</CardTitle>
+              <CardTitle>{t("subscription.success.nextStepsTitle")}</CardTitle>
               <CardDescription>
-                {t('subscription.success.nextStepsDescription')}
+                {t("subscription.success.nextStepsDescription")}
               </CardDescription>
             </CardHeader>
-            
+
             <CardContent>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
                   <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
                   <span className="text-gray-700 dark:text-gray-300">
-                    {t('subscription.success.step1')}
+                    {t("subscription.success.step1")}
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
                   <span className="text-gray-700 dark:text-gray-300">
-                    {t('subscription.success.step2')}
+                    {t("subscription.success.step2")}
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
                   <span className="text-gray-700 dark:text-gray-300">
-                    {t('subscription.success.step3')}
+                    {t("subscription.success.step3")}
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
                   <span className="text-gray-700 dark:text-gray-300">
-                    {t('subscription.success.step4')}
+                    {t("subscription.success.step4")}
                   </span>
                 </li>
               </ul>
@@ -140,25 +146,25 @@ export default function Success({ auth, plan, amount, currency }: Props) {
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/dashboard">
-              <Button 
+              <Button
                 size="lg"
                 className="w-full sm:w-auto bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white shadow-lg"
               >
                 <span className="flex items-center gap-2">
-                  {t('subscription.success.goToDashboard')}
+                  {t("subscription.success.goToDashboard")}
                   <ArrowRight className="h-4 w-4" />
                 </span>
               </Button>
             </Link>
-            
+
             <Link href="/subscription/billing">
-              <Button 
+              <Button
                 size="lg"
                 variant="secondary"
                 buttonStyle="outline"
                 className="w-full sm:w-auto"
               >
-                {t('subscription.success.viewBilling')}
+                {t("subscription.success.viewBilling")}
               </Button>
             </Link>
           </div>
@@ -166,9 +172,9 @@ export default function Success({ auth, plan, amount, currency }: Props) {
           {/* Support Info */}
           <div className="mt-12 text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              {t('subscription.success.needHelp')}{' '}
-              <a 
-                href="mailto:support@contentflow.com" 
+              {t("subscription.success.needHelp")}{" "}
+              <a
+                href="mailto:support@contentflow.com"
                 className="text-primary-600 dark:text-primary-400 hover:underline font-medium"
               >
                 support@contentflow.com

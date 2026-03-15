@@ -1,23 +1,23 @@
 /**
  * Animated Page Transition Component
- * 
+ *
  * Smooth page transitions with Framer Motion
  */
 
-import React from 'react';
-import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
-import { useReducedMotion } from '@/Hooks/useReducedMotion';
+import React from "react";
+import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
+import { useReducedMotion } from "@/Hooks/useReducedMotion";
 
 interface AnimatedPageTransitionProps {
   children: React.ReactNode;
   pageKey: string;
-  variant?: 'fade' | 'slide' | 'scale';
+  variant?: "fade" | "slide" | "scale";
 }
 
 export const AnimatedPageTransition: React.FC<AnimatedPageTransitionProps> = ({
   children,
   pageKey,
-  variant = 'fade',
+  variant = "fade",
 }) => {
   const reducedMotion = useReducedMotion();
 
@@ -52,7 +52,7 @@ export const AnimatedPageTransition: React.FC<AnimatedPageTransitionProps> = ({
           animate="animate"
           exit="exit"
           variants={selectedVariant}
-          transition={{ duration: 0.25, ease: 'easeInOut' }}
+          transition={{ duration: 0.25, ease: "easeInOut" }}
         >
           {children}
         </m.div>

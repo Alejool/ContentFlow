@@ -18,8 +18,9 @@ export default function PlatformModalHeader({
 
   const getPlatformIcon = () => {
     const platformKey = platform.toLowerCase();
-    const platformConfig = SOCIAL_PLATFORMS[platformKey as keyof typeof SOCIAL_PLATFORMS];
-    
+    const platformConfig =
+      SOCIAL_PLATFORMS[platformKey as keyof typeof SOCIAL_PLATFORMS];
+
     if (platformConfig && platformConfig.logo) {
       return (
         <img
@@ -33,16 +34,14 @@ export default function PlatformModalHeader({
     if (platformKey === "all") {
       return <Settings2 className="w-6 h-6 text-primary-500" />;
     }
-    
+
     return <Settings2 className="w-6 h-6 text-primary-500" />;
   };
 
   return (
     <div className="flex items-center justify-between py-8">
       <div className="flex items-center gap-5">
-        <div className="p-2">
-          {getPlatformIcon()}
-        </div>
+        <div className="p-2">{getPlatformIcon()}</div>
         <div>
           <h2 className="text-xl font-black tracking-tight uppercase">
             {isAllPlatforms

@@ -11,7 +11,7 @@ import {
   hasMedia,
   isProcessing,
   isVideoMedia,
-  prepareMediaForPreview
+  prepareMediaForPreview,
 } from "@/Utils/publicationHelpers";
 import {
   Calendar,
@@ -28,7 +28,7 @@ import {
   Send,
   Trash2,
   Users,
-  Video
+  Video,
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -70,7 +70,7 @@ export default function ContentCard({
   onPreviewMedia,
 }: ContentCardProps) {
   const { t } = useTranslation();
-  
+
   // Hook centralizado - SIN lógica en el componente
   const {
     loadingStates,
@@ -93,7 +93,7 @@ export default function ContentCard({
   });
 
   const [imageError, setImageError] = useState(false);
-  
+
   // Early return after all hooks
   if (!item) {
     return null;
@@ -120,7 +120,7 @@ export default function ContentCard({
       approved: CheckCircle,
       rejected: Clock,
       publishing: Clock,
-    }[(item.status || "draft")] || Edit;
+    }[item.status || "draft"] || Edit;
 
   // Get platform icons for publication
   const getPlatformIcons = () => {
@@ -207,7 +207,9 @@ export default function ContentCard({
                     )}
                   </div>
                   <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {isVideo ? t("common.videoTypes.video") : t("common.videoTypes.post")}
+                    {isVideo
+                      ? t("common.videoTypes.video")
+                      : t("common.videoTypes.post")}
                   </span>
                 </div>
               </div>
@@ -308,12 +310,16 @@ export default function ContentCard({
           </div>
 
           <h3 className="font-bold text-gray-900 dark:text-white text-base line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-            {item.title ? item.title : (item.name ?? t("publications.table.untitled"))}
+            {item.title
+              ? item.title
+              : (item.name ?? t("publications.table.untitled"))}
           </h3>
         </div>
       )}
 
-      <div className={`${itemHasMedia ? "p-4" : "px-4 pb-4"} flex-1 flex flex-col`}>
+      <div
+        className={`${itemHasMedia ? "p-4" : "px-4 pb-4"} flex-1 flex flex-col`}
+      >
         {itemHasMedia && (
           <h3 className="font-bold text-gray-900 dark:text-white text-base line-clamp-2 mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
             {item.title ? item.title : (item.name ?? "Sin título")}
@@ -351,11 +357,13 @@ export default function ContentCard({
               </div>
               <div className="flex flex-col">
                 <span className="text-xs font-semibold text-yellow-700 dark:text-yellow-400">
-                  {t("publications.table.pendingAdminReview") || "Pendiente de revisión"}
+                  {t("publications.table.pendingAdminReview") ||
+                    "Pendiente de revisión"}
                 </span>
                 {item.currentApprovalStep?.role?.name && (
                   <span className="text-[10px] text-yellow-600 dark:text-yellow-500">
-                    {t("approvals.approver_role")}: {item.currentApprovalStep.role.name}
+                    {t("approvals.approver_role")}:{" "}
+                    {item.currentApprovalStep.role.name}
                   </span>
                 )}
               </div>
@@ -436,7 +444,9 @@ export default function ContentCard({
                 )}
                 <span className="text-xs text-gray-500 dark:text-gray-400">
                   {mediaCount.total}{" "}
-                  {mediaCount.total === 1 ? t("common.item") : t("common.files")}
+                  {mediaCount.total === 1
+                    ? t("common.item")
+                    : t("common.files")}
                 </span>
               </div>
             )}
@@ -461,7 +471,9 @@ export default function ContentCard({
                   icon={Rocket}
                   className="flex-1"
                 >
-                  <span className="hidden sm:inline">{t("publications.button.publish")}</span>
+                  <span className="hidden sm:inline">
+                    {t("publications.button.publish")}
+                  </span>
                 </Button>
               ) : shouldShowSendToReview(item) ? (
                 <Button
@@ -477,7 +489,9 @@ export default function ContentCard({
                   className="flex-1"
                 >
                   <span className="hidden sm:inline">
-                    {isLoading?.submitting ? t("publications.button.sending") : t("publications.button.sendForReview")}
+                    {isLoading?.submitting
+                      ? t("publications.button.sending")
+                      : t("publications.button.sendForReview")}
                   </span>
                 </Button>
               ) : item.status === "pending_review" ? (
@@ -488,7 +502,9 @@ export default function ContentCard({
                   icon={Clock}
                   className="flex-1"
                 >
-                  <span className="hidden sm:inline">{t("publications.button.inReview")}</span>
+                  <span className="hidden sm:inline">
+                    {t("publications.button.inReview")}
+                  </span>
                 </Button>
               ) : item.status === "published" ? (
                 <Button
@@ -502,7 +518,7 @@ export default function ContentCard({
                   icon={Eye}
                   className="flex-1"
                 >
-                  <span >{t("publications.button.view")}</span>
+                  <span>{t("publications.button.view")}</span>
                 </Button>
               ) : (
                 <Button
@@ -534,7 +550,7 @@ export default function ContentCard({
               icon={Eye}
               className="flex-1"
             >
-              <span >{t("publications.button.view")}</span>
+              <span>{t("publications.button.view")}</span>
             </Button>
           )}
 
@@ -567,7 +583,9 @@ export default function ContentCard({
               size="md"
               icon={Copy}
             >
-              <span className="sr-only">{t("publications.button.duplicate")}</span>
+              <span className="sr-only">
+                {t("publications.button.duplicate")}
+              </span>
             </Button>
           )}
 

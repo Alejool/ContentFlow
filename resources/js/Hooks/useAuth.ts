@@ -64,15 +64,15 @@ export const useAuth = () => {
 
       if (loginResponse.data.success) {
         setSuccessMessage(t("auth.login.success"));
-        
+
         // ✅ CARGAR TIMEZONES DESPUÉS DEL LOGIN
         await loadTimezones();
-        
+
         window.location.href = loginResponse.data.redirect || "/dashboard";
       } else {
         // ✅ CARGAR TIMEZONES TAMBIÉN EN ESTE CASO
         await loadTimezones();
-        
+
         window.location.href = "/dashboard";
       }
     } catch (err: any) {

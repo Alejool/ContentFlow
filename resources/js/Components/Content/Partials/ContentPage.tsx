@@ -20,9 +20,16 @@ import {
   Plus,
   Shield,
   Target,
-  Trash2
+  Trash2,
 } from "lucide-react";
-import { Fragment, useCallback, useEffect, useMemo, useState, useTransition } from "react";
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useTransition,
+} from "react";
 import toast from "react-hot-toast";
 
 import ApprovalHistory from "@/Components/Content/ApprovalHistory";
@@ -51,7 +58,9 @@ export default function ManageContentPage() {
     "demo";
 
   // Check if user can approve content (admin permission OR workflow assignment)
-  const { canApprove, reason: approvalReason } = useCanApprove(auth.current_workspace?.id);
+  const { canApprove, reason: approvalReason } = useCanApprove(
+    auth.current_workspace?.id,
+  );
 
   const {
     t,
@@ -212,23 +221,33 @@ export default function ManageContentPage() {
 
     // CRITICAL: Listen on workspace channel for approval level advancement
     // This is a SPECIFIC event for when a publication moves to the next approval level
-    const workspaceChannel = window.Echo.private(`workspace.${auth.user.current_workspace_id}`);
-    
+    const workspaceChannel = window.Echo.private(
+      `workspace.${auth.user.current_workspace_id}`,
+    );
+
     const handleApprovalLevelAdvanced = (event: any) => {
-      console.log('[ContentPage] Approval level advanced:', event);
-      console.log(`  Publication ${event.publication_id} moved from level ${event.from_level.number} to ${event.to_level.number}`);
-      
+      console.log("[ContentPage] Approval level advanced:", event);
+      console.log(
+        `  Publication ${event.publication_id} moved from level ${event.from_level.number} to ${event.to_level.number}`,
+      );
+
       // Refresh to show updated publications
       // - Users in the OLD level will see it disappear
       // - Users in the NEW level will see it appear
       handleRefresh();
     };
-    
-    workspaceChannel.listen(".approval.level.advanced", handleApprovalLevelAdvanced);
+
+    workspaceChannel.listen(
+      ".approval.level.advanced",
+      handleApprovalLevelAdvanced,
+    );
 
     return () => {
       channel.stopListening(".PublicationStatusUpdated", handleStatusUpdate);
-      workspaceChannel.stopListening(".approval.level.advanced", handleApprovalLevelAdvanced);
+      workspaceChannel.stopListening(
+        ".approval.level.advanced",
+        handleApprovalLevelAdvanced,
+      );
     };
   }, [auth.user?.id, auth.user?.current_workspace_id, handleRefresh]);
 
@@ -243,7 +262,7 @@ export default function ManageContentPage() {
   // CRITICAL: Refresh approvals when switching to approvals tab
   useEffect(() => {
     if (activeTab === "approvals") {
-      console.log('[ContentPage] Switched to approvals tab, refreshing...');
+      console.log("[ContentPage] Switched to approvals tab, refreshing...");
       setRefreshTrigger((prev) => prev + 1);
     }
   }, [activeTab]);
@@ -251,17 +270,26 @@ export default function ManageContentPage() {
   // Listen for publication submitted for approval event
   useEffect(() => {
     const handleSubmittedForApproval = (event: CustomEvent) => {
-      console.log('[ContentPage] Publication submitted for approval:', event.detail);
+      console.log(
+        "[ContentPage] Publication submitted for approval:",
+        event.detail,
+      );
       // Refresh the publications list to reflect the new status
       handleRefresh();
       // CRITICAL: Also refresh approvals list to show the new pending request
       setRefreshTrigger((prev) => prev + 1);
     };
 
-    window.addEventListener('publication-submitted-for-approval', handleSubmittedForApproval as EventListener);
+    window.addEventListener(
+      "publication-submitted-for-approval",
+      handleSubmittedForApproval as EventListener,
+    );
 
     return () => {
-      window.removeEventListener('publication-submitted-for-approval', handleSubmittedForApproval as EventListener);
+      window.removeEventListener(
+        "publication-submitted-for-approval",
+        handleSubmittedForApproval as EventListener,
+      );
     };
   }, [handleRefresh]);
 
@@ -281,8 +309,8 @@ export default function ManageContentPage() {
 
   const [excelImporter, setExcelImporter] = useState<{
     isOpen: boolean;
-    type: 'publications' | 'campaigns';
-  }>({ isOpen: false, type: 'publications' });
+    type: "publications" | "campaigns";
+  }>({ isOpen: false, type: "publications" });
 
   const handleRefreshWrapped = useCallback(() => {
     handleRefresh();
@@ -378,7 +406,7 @@ export default function ManageContentPage() {
         enabled: canApprove,
       },
     ],
-    [t, pendingApprovals, canApprove]
+    [t, pendingApprovals, canApprove],
   );
 
   return (
@@ -386,103 +414,114 @@ export default function ManageContentPage() {
       header={
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4  min-w-0">
           <div className="min-w-0 flex-1">
-              <h1 className="text-xl lg:text-2xl font-extrabold text-gray-900 dark:text-white truncate tracking-tight">
-                {t("manageContent.title")}
-              </h1>
-              <p className="text-gray-500 dark:text-gray-400 mt-0.5 text-xs sm:text-base lg:text-lg truncate">
-                {t("manageContent.subtitle")}
-              </p>
-            </div>
+            <h1 className="text-xl lg:text-2xl font-extrabold text-gray-900 dark:text-white truncate tracking-tight">
+              {t("manageContent.title")}
+            </h1>
+            <p className="text-gray-500 dark:text-gray-400 mt-0.5 text-xs sm:text-base lg:text-lg truncate">
+              {t("manageContent.subtitle")}
+            </p>
+          </div>
 
-              <div className="flex justify-end gap-2">
-              {permissions.includes("manage-content") && (
-                <>
-                  <Menu as="div" className="relative">
-                    <MenuButton as={Fragment}>
-                      <Button
-                        id="create-publication"
-                        variant="primary"
-                        size="md"
-                        icon={Plus}
-                        className="gap-2 uppercase tracking-wider font-bold text-xs"
-                      >
-                        {t("manageContent.createNew").toUpperCase()}
-                      </Button>
-                    </MenuButton>
-                    <MenuItems
-                      transition
-                      className="absolute right-0 z-50 mt-2 w-56 origin-top-right rounded-lg bg-white dark:bg-neutral-900 shadow-2xl ring-1 ring-black/8 dark:ring-white/10 focus:outline-none overflow-hidden transition data-[closed]:scale-95 data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+          <div className="flex justify-end gap-2">
+            {permissions.includes("manage-content") && (
+              <>
+                <Menu as="div" className="relative">
+                  <MenuButton as={Fragment}>
+                    <Button
+                      id="create-publication"
+                      variant="primary"
+                      size="md"
+                      icon={Plus}
+                      className="gap-2 uppercase tracking-wider font-bold text-xs"
                     >
-                      <div className="px-4 pt-3 pb-2">
-                        <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-neutral-500">
-                          {t("manageContent.createNew")}
-                        </p>
-                      </div>
+                      {t("manageContent.createNew").toUpperCase()}
+                    </Button>
+                  </MenuButton>
+                  <MenuItems
+                    transition
+                    className="absolute right-0 z-50 mt-2 w-56 origin-top-right rounded-lg bg-white dark:bg-neutral-900 shadow-2xl ring-1 ring-black/8 dark:ring-white/10 focus:outline-none overflow-hidden transition data-[closed]:scale-95 data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+                  >
+                    <div className="px-4 pt-3 pb-2">
+                      <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-neutral-500">
+                        {t("manageContent.createNew")}
+                      </p>
+                    </div>
 
-                      <div className="px-2 pb-2 space-y-0.5">
-                        <MenuItem>
-                          {({ focus }) => (
-                            <button
-                              onClick={() => openAddModal("publication")}
-                              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 text-left ${
+                    <div className="px-2 pb-2 space-y-0.5">
+                      <MenuItem>
+                        {({ focus }) => (
+                          <button
+                            onClick={() => openAddModal("publication")}
+                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 text-left ${
+                              focus
+                                ? "bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300"
+                                : "text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-neutral-800"
+                            }`}
+                          >
+                            <span
+                              className={`flex items-center justify-center w-8 h-8 rounded-lg shrink-0 transition-colors ${
                                 focus
-                                  ? "bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300"
-                                  : "text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-neutral-800"
+                                  ? "bg-primary-100 dark:bg-primary-900/50"
+                                  : "bg-gray-100 dark:bg-neutral-800"
                               }`}
                             >
-                              <span className={`flex items-center justify-center w-8 h-8 rounded-lg shrink-0 transition-colors ${
-                                focus ? "bg-primary-100 dark:bg-primary-900/50" : "bg-gray-100 dark:bg-neutral-800"
-                              }`}>
-                                <FileText className="w-4 h-4" />
+                              <FileText className="w-4 h-4" />
+                            </span>
+                            <div className="flex flex-col min-w-0">
+                              <span className="truncate">
+                                {t("manageContent.tabs.publications")}
                               </span>
-                              <div className="flex flex-col min-w-0">
-                                <span className="truncate">{t("manageContent.tabs.publications")}</span>
-                                <span className="text-[11px] font-normal text-gray-400 dark:text-neutral-500 truncate">
-                                  {t("manageContent.createPublication")}
-                                </span>
-                              </div>
-                            </button>
-                          )}
-                        </MenuItem>
+                              <span className="text-[11px] font-normal text-gray-400 dark:text-neutral-500 truncate">
+                                {t("manageContent.createPublication")}
+                              </span>
+                            </div>
+                          </button>
+                        )}
+                      </MenuItem>
 
-                        <MenuItem>
-                          {({ focus }) => (
-                            <button
-                              onClick={() => openAddModal("campaign")}
-                              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 text-left ${
+                      <MenuItem>
+                        {({ focus }) => (
+                          <button
+                            onClick={() => openAddModal("campaign")}
+                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 text-left ${
+                              focus
+                                ? "bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300"
+                                : "text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-neutral-800"
+                            }`}
+                          >
+                            <span
+                              className={`flex items-center justify-center w-8 h-8 rounded-lg shrink-0 transition-colors ${
                                 focus
-                                  ? "bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300"
-                                  : "text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-neutral-800"
+                                  ? "bg-primary-100 dark:bg-primary-900/50"
+                                  : "bg-gray-100 dark:bg-neutral-800"
                               }`}
                             >
-                              <span className={`flex items-center justify-center w-8 h-8 rounded-lg shrink-0 transition-colors ${
-                                focus ? "bg-primary-100 dark:bg-primary-900/50" : "bg-gray-100 dark:bg-neutral-800"
-                              }`}>
-                                <Target className="w-4 h-4" />
+                              <Target className="w-4 h-4" />
+                            </span>
+                            <div className="flex flex-col min-w-0">
+                              <span className="truncate">
+                                {t("manageContent.tabs.campaigns")}
                               </span>
-                              <div className="flex flex-col min-w-0">
-                                <span className="truncate">{t("manageContent.tabs.campaigns")}</span>
-                                <span className="text-[11px] font-normal text-gray-400 dark:text-neutral-500 truncate">
-                                  {t("manageContent.createCampaign")}
-                                </span>
-                              </div>
-                            </button>
-                          )}
-                        </MenuItem>
-                      </div>
-                    </MenuItems>
-                  </Menu>
-                </>
-              )}
-            </div>
-
+                              <span className="text-[11px] font-normal text-gray-400 dark:text-neutral-500 truncate">
+                                {t("manageContent.createCampaign")}
+                              </span>
+                            </div>
+                          </button>
+                        )}
+                      </MenuItem>
+                    </div>
+                  </MenuItems>
+                </Menu>
+              </>
+            )}
+          </div>
         </div>
-      }>
+      }
+    >
       <Head title={t("manageContent.title")} />
 
       <div className="w-full max-w-full overflow-x-hidden min-w-0 bg-gray-50/30 dark:bg-neutral-900/10 min-h-screen">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-5 sm:py-8 min-w-0">
-
           <div className="mb-8">
             <SocialMediaAccounts />
           </div>
@@ -545,7 +584,8 @@ export default function ManageContentPage() {
                         id: "pending",
                         label: t("approvals.tabs.pending"),
                         icon: Clock,
-                        badge: pendingApprovals > 0 ? pendingApprovals : undefined,
+                        badge:
+                          pendingApprovals > 0 ? pendingApprovals : undefined,
                       },
                       {
                         id: "history",

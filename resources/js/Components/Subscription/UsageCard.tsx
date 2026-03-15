@@ -1,7 +1,7 @@
-import { LucideIcon } from 'lucide-react';
-import { Link } from '@inertiajs/react';
-import { useTranslation } from 'react-i18next';
-import { Sparkles, Zap } from 'lucide-react';
+import { LucideIcon } from "lucide-react";
+import { Link } from "@inertiajs/react";
+import { useTranslation } from "react-i18next";
+import { Sparkles, Zap } from "lucide-react";
 
 interface UsageCardProps {
   label: string;
@@ -42,27 +42,27 @@ export function UsageCard({
   const shouldShowUpgradeButton = !canBuy && percentage > 70;
 
   const getProgressBarColor = (percentage: number) => {
-    if (percentage > 90) return 'bg-red-500';
-    if (percentage > 80) return 'bg-orange-500';
-    if (percentage > 70) return 'bg-yellow-500';
-    return 'bg-primary-500';
+    if (percentage > 90) return "bg-red-500";
+    if (percentage > 80) return "bg-orange-500";
+    if (percentage > 70) return "bg-yellow-500";
+    return "bg-primary-500";
   };
 
   const getBadgeColor = (percentage: number) => {
-    if (percentage > 90) return 'bg-red-500';
-    if (percentage > 80) return 'bg-orange-500';
-    if (percentage > 70) return 'bg-yellow-500';
-    return '';
+    if (percentage > 90) return "bg-red-500";
+    if (percentage > 80) return "bg-orange-500";
+    if (percentage > 70) return "bg-yellow-500";
+    return "";
   };
 
   const getBadgeText = (percentage: number) => {
-    if (percentage > 90) return t('subscription.addons.critical', '¡Crítico!');
-    if (percentage > 80) return t('subscription.addons.high', 'Muy Alto');
-    if (percentage > 70) return t('subscription.addons.warning', 'Alto');
-    return '';
+    if (percentage > 90) return t("subscription.addons.critical", "¡Crítico!");
+    if (percentage > 80) return t("subscription.addons.high", "Muy Alto");
+    if (percentage > 70) return t("subscription.addons.warning", "Alto");
+    return "";
   };
 
-  const isUnlimited = limit === '∞' || limit === -1;
+  const isUnlimited = limit === "∞" || limit === -1;
 
   return (
     <div className="bg-gradient-to-br from-primary-50/10 to-primary-50 dark:from-primary-200/10 dark:to-primary-600/20 rounded-lg p-4   shadow-sm hover:shadow-md transition-all h-full">
@@ -90,14 +90,14 @@ export function UsageCard({
         </div>
         <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
           {isUnlimited
-            ? t('subscription.usage.unlimited', 'Ilimitado')
+            ? t("subscription.usage.unlimited", "Ilimitado")
             : `${used} / ${total_available || limit}`}
         </div>
         {addon_info && addon_info.total > 0 && (
           <div className="text-xs text-primary-600 dark:text-primary-400 mt-1">
             <span className="font-medium">Plan:</span> {limit} +
-            <span className="font-medium"> Addons:</span>{' '}
-            {addon_info.remaining}/{addon_info.total}
+            <span className="font-medium"> Addons:</span> {addon_info.remaining}
+            /{addon_info.total}
           </div>
         )}
       </div>
@@ -115,13 +115,13 @@ export function UsageCard({
 
       <div className="text-xs text-gray-600 dark:text-gray-400 mb-3">
         {isUnlimited ? (
-          t('subscription.addons.noLimits', 'Sin límites')
+          t("subscription.addons.noLimits", "Sin límites")
         ) : (
           <>
             <span className="font-semibold text-primary-600 dark:text-primary-400">
               {remaining}
-            </span>{' '}
-            {t('subscription.addons.remaining', 'restantes')}
+            </span>{" "}
+            {t("subscription.addons.remaining", "restantes")}
           </>
         )}
       </div>
@@ -132,17 +132,17 @@ export function UsageCard({
           className="block w-full text-center bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 text-white text-sm font-semibold py-2 px-3 rounded-lg transition-colors"
         >
           <Sparkles className="w-3 h-3 inline mr-1" />
-          {t('subscription.addons.buyMore', 'Comprar Más')}
+          {t("subscription.addons.buyMore", "Comprar Más")}
         </Link>
       )}
 
       {shouldShowUpgradeButton && (
         <Link
-          href={upgradeUrl || '/pricing'}
+          href={upgradeUrl || "/pricing"}
           className="block w-full text-center bg-gray-600 hover:bg-gray-700 dark:bg-gray-500 dark:hover:bg-gray-600 text-white text-sm font-semibold py-2 px-3 rounded-lg transition-colors"
         >
           <Zap className="w-3 h-3 inline mr-1" />
-          {t('subscription.addons.upgradePlan', 'Actualizar Plan')}
+          {t("subscription.addons.upgradePlan", "Actualizar Plan")}
         </Link>
       )}
     </div>

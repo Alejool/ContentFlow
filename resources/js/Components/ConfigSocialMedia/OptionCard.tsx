@@ -25,7 +25,7 @@ export default function OptionCard({
   const inputId = `option-card-${value}`;
 
   return (
-    <label 
+    <label
       htmlFor={inputId}
       className="flex items-center justify-between p-4 border border-gray-200 dark:border-neutral-700 rounded-lg hover:border-primary-500 cursor-pointer transition-colors"
     >

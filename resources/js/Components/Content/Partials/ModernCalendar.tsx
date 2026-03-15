@@ -7,8 +7,8 @@ import ModalFooter from "@/Components/Content/modals/common/ModalFooter";
 import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
 import Modal from "@/Components/common/ui/Modal";
 import {
-    getActivePlatformKeys,
-    getPlatformConfig,
+  getActivePlatformKeys,
+  getPlatformConfig,
 } from "@/Constants/socialPlatforms";
 import { useCalendar } from "@/Hooks/calendar/useCalendar";
 import { validateDate } from "@/Utils/dateValidation";
@@ -17,44 +17,44 @@ import { formatDate } from "@/Utils/i18nHelpers";
 import { useLockStore } from "@/stores/lockStore";
 import { CalendarView } from "@/types/calendar";
 import {
-    DndContext,
-    DragEndEvent,
-    PointerSensor,
-    useDraggable,
-    useDroppable,
-    useSensor,
-    useSensors,
+  DndContext,
+  DragEndEvent,
+  PointerSensor,
+  useDraggable,
+  useDroppable,
+  useSensor,
+  useSensors,
 } from "@dnd-kit/core";
 import { usePage } from "@inertiajs/react";
 import {
-    addDays,
-    eachDayOfInterval,
-    endOfMonth,
-    endOfWeek,
-    format,
-    isBefore,
-    isSameDay,
-    isSameMonth,
-    isToday,
-    parseISO,
-    setHours,
-    startOfDay,
-    startOfMonth,
-    startOfWeek,
+  addDays,
+  eachDayOfInterval,
+  endOfMonth,
+  endOfWeek,
+  format,
+  isBefore,
+  isSameDay,
+  isSameMonth,
+  isToday,
+  parseISO,
+  setHours,
+  startOfDay,
+  startOfMonth,
+  startOfWeek,
 } from "date-fns";
 import {
-    Calendar as CalendarIcon,
-    CheckSquare,
-    ChevronDown,
-    ChevronLeft,
-    ChevronRight,
-    Clock,
-    Filter,
-    Loader2,
-    Lock,
-    Square,
-    Trash2,
-    X,
+  Calendar as CalendarIcon,
+  CheckSquare,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Filter,
+  Loader2,
+  Lock,
+  Square,
+  Trash2,
+  X,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";

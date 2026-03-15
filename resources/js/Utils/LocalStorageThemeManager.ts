@@ -1,16 +1,16 @@
 /**
  * LocalStorageThemeManager
- * 
+ *
  * Manages theme preferences in localStorage with workspace ID scoping.
  * Handles quota errors gracefully and provides CRUD operations for theme preferences.
- * 
+ *
  * Requirements: 2.1, 2.4
  */
 
-export type ThemePreference = 'light' | 'dark' | 'system';
+export type ThemePreference = "light" | "dark" | "system";
 
-const STORAGE_KEY_PREFIX = 'workspace_theme_';
-const FALLBACK_KEY = 'theme'; // Fallback for non-workspace usage
+const STORAGE_KEY_PREFIX = "workspace_theme_";
+const FALLBACK_KEY = "theme"; // Fallback for non-workspace usage
 
 export interface LocalStorageThemeManager {
   save(workspaceId: string, theme: ThemePreference): void;
@@ -30,17 +30,19 @@ function save(workspaceId: string, theme: ThemePreference): void {
   }
 
   const key = `${STORAGE_KEY_PREFIX}${workspaceId}`;
-  
+
   try {
     // Clean up old workspace themes before saving (keep only current)
     clearOtherWorkspaceThemes(workspaceId);
-    
+
     localStorage.setItem(key, theme);
   } catch (error) {
     // Handle quota exceeded error
-    if (error instanceof DOMException && 
-        (error.name === 'QuotaExceededError' || error.name === 'NS_ERROR_DOM_QUOTA_REACHED')) {
-      
+    if (
+      error instanceof DOMException &&
+      (error.name === "QuotaExceededError" ||
+        error.name === "NS_ERROR_DOM_QUOTA_REACHED")
+    ) {
       try {
         // Clear all workspace themes and retry
         clearAll();
@@ -62,14 +64,14 @@ function load(workspaceId: string): ThemePreference | null {
   }
 
   const key = `${STORAGE_KEY_PREFIX}${workspaceId}`;
-  
+
   try {
     const stored = localStorage.getItem(key);
-    
-    if (stored === 'light' || stored === 'dark' || stored === 'system') {
+
+    if (stored === "light" || stored === "dark" || stored === "system") {
       return stored;
     }
-    
+
     return null;
   } catch (error) {
     return null;
@@ -85,7 +87,7 @@ function remove(workspaceId: string): void {
   }
 
   const key = `${STORAGE_KEY_PREFIX}${workspaceId}`;
-  
+
   try {
     localStorage.removeItem(key);
   } catch (error) {
@@ -99,9 +101,11 @@ function remove(workspaceId: string): void {
 function clearAll(): void {
   try {
     const keys = Object.keys(localStorage);
-    const workspaceThemeKeys = keys.filter(key => key.startsWith(STORAGE_KEY_PREFIX));
-    
-    workspaceThemeKeys.forEach(key => {
+    const workspaceThemeKeys = keys.filter((key) =>
+      key.startsWith(STORAGE_KEY_PREFIX),
+    );
+
+    workspaceThemeKeys.forEach((key) => {
       localStorage.removeItem(key);
     });
   } catch (error) {
@@ -116,11 +120,13 @@ function clearAll(): void {
 function clearOtherWorkspaceThemes(currentWorkspaceId: string): void {
   try {
     const keys = Object.keys(localStorage);
-    const workspaceThemeKeys = keys.filter(key => key.startsWith(STORAGE_KEY_PREFIX));
+    const workspaceThemeKeys = keys.filter((key) =>
+      key.startsWith(STORAGE_KEY_PREFIX),
+    );
     const currentKey = `${STORAGE_KEY_PREFIX}${currentWorkspaceId}`;
-    
+
     // Remove all workspace themes except the current one
-    workspaceThemeKeys.forEach(key => {
+    workspaceThemeKeys.forEach((key) => {
       if (key !== currentKey) {
         localStorage.removeItem(key);
       }

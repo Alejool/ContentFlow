@@ -24,7 +24,7 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
 }: YouTubeThumbnailUploaderProps) {
   const { t } = useTranslation();
   const [preview, setPreview] = useState<string | null>(
-    existingThumbnail?.url || null
+    existingThumbnail?.url || null,
   );
   const [showFullSize, setShowFullSize] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
@@ -37,62 +37,71 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
     setPreview(existingThumbnail?.url || null);
   }, [existingThumbnail?.url]);
 
-  const validateThumbnail = useCallback((file: File): Promise<string | null> => {
-    return new Promise((resolve) => {
-      if (!file.type.startsWith("image/")) {
-        resolve("Only image files are allowed");
-        return;
-      }
-
-      if (file.size > 2 * 1024 * 1024) {
-        resolve("Image must be smaller than 2MB");
-        return;
-      }
-
-      const img = new Image();
-      const objectUrl = URL.createObjectURL(file);
-      
-      img.onload = () => {
-        URL.revokeObjectURL(objectUrl);
-        if (img.width < 1280 || img.height < 720) {
-          resolve("Image must be at least 1280x720 pixels");
-        } else {
-          resolve(null);
+  const validateThumbnail = useCallback(
+    (file: File): Promise<string | null> => {
+      return new Promise((resolve) => {
+        if (!file.type.startsWith("image/")) {
+          resolve("Only image files are allowed");
+          return;
         }
+
+        if (file.size > 2 * 1024 * 1024) {
+          resolve("Image must be smaller than 2MB");
+          return;
+        }
+
+        const img = new Image();
+        const objectUrl = URL.createObjectURL(file);
+
+        img.onload = () => {
+          URL.revokeObjectURL(objectUrl);
+          if (img.width < 1280 || img.height < 720) {
+            resolve("Image must be at least 1280x720 pixels");
+          } else {
+            resolve(null);
+          }
+        };
+        img.onerror = () => {
+          URL.revokeObjectURL(objectUrl);
+          resolve("Failed to load image");
+        };
+        img.src = objectUrl;
+      });
+    },
+    [],
+  );
+
+  const handleFileSelect = useCallback(
+    async (file: File) => {
+      const validationError = await validateThumbnail(file);
+      if (validationError) {
+        setError(validationError);
+        return;
+      }
+
+      setError(null);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result as string);
+        onThumbnailChange(videoId, file);
       };
-      img.onerror = () => {
-        URL.revokeObjectURL(objectUrl);
-        resolve("Failed to load image");
-      };
-      img.src = objectUrl;
-    });
-  }, []);
+      reader.readAsDataURL(file);
+    },
+    [validateThumbnail, onThumbnailChange, videoId],
+  );
 
-  const handleFileSelect = useCallback(async (file: File) => {
-    const validationError = await validateThumbnail(file);
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setIsDragging(false);
 
-    setError(null);
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreview(reader.result as string);
-      onThumbnailChange(videoId, file);
-    };
-    reader.readAsDataURL(file);
-  }, [validateThumbnail, onThumbnailChange, videoId]);
-
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-
-    const file = e.dataTransfer.files[0];
-    if (file) {
-      handleFileSelect(file);
-    }
-  }, [handleFileSelect]);
+      const file = e.dataTransfer.files[0];
+      if (file) {
+        handleFileSelect(file);
+      }
+    },
+    [handleFileSelect],
+  );
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -145,7 +154,10 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
       {videoPreviewUrl && (
         <div className="p-3 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800">
           <div className="flex items-center gap-3">
-            <div className="relative flex-shrink-0 group cursor-pointer" onClick={handleShowVideoModal}>
+            <div
+              className="relative flex-shrink-0 group cursor-pointer"
+              onClick={handleShowVideoModal}
+            >
               {/* Thumbnail estático sin cargar el video */}
               <div className="w-32 h-20 bg-gradient-to-br from-gray-800 to-gray-900 rounded border border-gray-300 dark:border-gray-600 overflow-hidden relative flex items-center justify-center">
                 <Play className="w-12 h-12 text-white/60" />
@@ -155,7 +167,9 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
               </div>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Video:</p>
+              <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Video:
+              </p>
               <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
                 {videoFileName || `Video #${videoId}`}
               </p>
@@ -316,12 +330,12 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
 };
 
 // Comparación personalizada para React.memo
-YouTubeThumbnailUploader.displayName = 'YouTubeThumbnailUploader';
+YouTubeThumbnailUploader.displayName = "YouTubeThumbnailUploader";
 
 // Función de comparación que verifica si las props realmente cambiaron
 const arePropsEqual = (
   prevProps: YouTubeThumbnailUploaderProps,
-  nextProps: YouTubeThumbnailUploaderProps
+  nextProps: YouTubeThumbnailUploaderProps,
 ) => {
   // Comparar props primitivas
   if (
@@ -335,7 +349,7 @@ const arePropsEqual = (
   // Comparar existingThumbnail por contenido, no por referencia
   const prevThumb = prevProps.existingThumbnail;
   const nextThumb = nextProps.existingThumbnail;
-  
+
   if (prevThumb === nextThumb) return true;
   if (!prevThumb && !nextThumb) return true;
   if (!prevThumb || !nextThumb) return false;

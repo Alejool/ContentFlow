@@ -1,8 +1,8 @@
-import { useEffect } from 'react';
-import { useCalendarStore } from '@/stores/calendarStore';
-import { useCalendarEvents } from '@/hooks/useCalendarEvents';
-import ModernCalendar from './ModernCalendar';
-import { CalendarSkeleton, LoadingOverlay } from './CalendarSkeleton';
+import { useEffect } from "react";
+import { useCalendarStore } from "@/stores/calendarStore";
+import { useCalendarEvents } from "@/hooks/useCalendarEvents";
+import ModernCalendar from "./ModernCalendar";
+import { CalendarSkeleton, LoadingOverlay } from "./CalendarSkeleton";
 
 interface CalendarWithCacheProps {
   onEventClick: (event: any) => void;
@@ -11,7 +11,7 @@ interface CalendarWithCacheProps {
 /**
  * Calendar wrapper component that integrates React Query caching
  * with the Zustand calendar store.
- * 
+ *
  * This component:
  * - Uses React Query to fetch and cache calendar events (5-minute cache)
  * - Automatically refetches when date range or filters change
@@ -20,10 +20,17 @@ interface CalendarWithCacheProps {
  * - Shows loading indicators during data fetch and operations
  */
 export function CalendarWithCache({ onEventClick }: CalendarWithCacheProps) {
-  const { currentMonth, filters, setEvents, setLoading, setError } = useCalendarStore();
+  const { currentMonth, filters, setEvents, setLoading, setError } =
+    useCalendarStore();
 
   // Use React Query hook for cached data fetching
-  const { data: events, isLoading, error, isError, isFetching } = useCalendarEvents({
+  const {
+    data: events,
+    isLoading,
+    error,
+    isError,
+    isFetching,
+  } = useCalendarEvents({
     currentMonth,
     filters,
   });
@@ -35,9 +42,13 @@ export function CalendarWithCache({ onEventClick }: CalendarWithCacheProps) {
       setEvents(events);
     }
     setLoading(isLoading);
-    
+
     if (isError && error) {
-      setError(error instanceof Error ? error.message : 'Failed to fetch calendar events');
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch calendar events",
+      );
     } else {
       setError(null);
     }
@@ -51,7 +62,10 @@ export function CalendarWithCache({ onEventClick }: CalendarWithCacheProps) {
   return (
     <div className="relative">
       {/* Show overlay when refetching (e.g., after filter change) */}
-      <LoadingOverlay show={isFetching && !!events} message="Updating calendar..." />
+      <LoadingOverlay
+        show={isFetching && !!events}
+        message="Updating calendar..."
+      />
       <ModernCalendar onEventClick={onEventClick} />
     </div>
   );

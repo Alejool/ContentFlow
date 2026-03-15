@@ -12,8 +12,16 @@ const aiPromptSchema = (t: any) =>
   z.object({
     prompt: z
       .string()
-      .min(10, t("common.ai.prompt_min") || "El prompt debe tener al menos 10 caracteres")
-      .max(500, t("common.ai.prompt_max") || "El prompt no puede exceder 500 caracteres"),
+      .min(
+        10,
+        t("common.ai.prompt_min") ||
+          "El prompt debe tener al menos 10 caracteres",
+      )
+      .max(
+        500,
+        t("common.ai.prompt_max") ||
+          "El prompt no puede exceder 500 caracteres",
+      ),
   });
 
 interface AiPromptSectionProps {
@@ -67,27 +75,28 @@ const AiPromptSection: React.FC<AiPromptSectionProps> = ({
       const today = new Date();
       const twoDaysLater = new Date(today);
       twoDaysLater.setDate(today.getDate() + 2);
-      
+
       const formatDate = (date: Date) => {
         const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
         return `${year}-${month}-${day}`;
       };
 
       // Define field limits based on type
-      const fieldLimits = type === "publication" 
-        ? {
-            title: { min: 1, max: 70 },
-            description: { min: 10, max: 700 },
-            goal: { min: 5, max: 200 },
-            hashtags: { min: 1, max: 10 }
-          }
-        : {
-            name: { min: 1, max: 100 },
-            description: { min: 1, max: 500 },
-            goal: { min: 1, max: 200 }
-          };
+      const fieldLimits =
+        type === "publication"
+          ? {
+              title: { min: 1, max: 70 },
+              description: { min: 10, max: 700 },
+              goal: { min: 5, max: 200 },
+              hashtags: { min: 1, max: 10 },
+            }
+          : {
+              name: { min: 1, max: 100 },
+              description: { min: 1, max: 500 },
+              goal: { min: 1, max: 200 },
+            };
 
       const response = await axios.post(route("api.v1.ai.suggest-fields"), {
         fields: { ...currentFields, ai_prompt: prompt },
@@ -98,19 +107,19 @@ const AiPromptSection: React.FC<AiPromptSectionProps> = ({
 
       if (response.data.success && response.data.data) {
         onSuggest(response.data.data);
-        
+
         // Only show success message if there's actual data
         const message = response.data.message;
         if (!message || message === "OK" || message.trim() === "") {
           toast.success(
             t("common.ai.suggestions_generated") ||
               "Sugerencias generadas con éxito",
-            { id: "ai-suggestions" }
+            { id: "ai-suggestions" },
           );
         } else {
           toast.success(message, { id: "ai-suggestions" });
         }
-        
+
         setPrompt("");
         setError("");
       } else {
@@ -164,7 +173,7 @@ const AiPromptSection: React.FC<AiPromptSectionProps> = ({
           error={error}
           className="text-sm"
         />
-        
+
         <Button
           type="button"
           onClick={handleGenerate}

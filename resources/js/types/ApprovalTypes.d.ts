@@ -5,14 +5,14 @@ export interface ApprovalRequest {
   publication_id: number;
   workflow_id: number;
   current_step_id: number | null;
-  status: 'pending' | 'approved' | 'rejected' | 'cancelled';
+  status: "pending" | "approved" | "rejected" | "cancelled";
   submitted_by: number;
   submitted_at: string;
   completed_at: string | null;
   completed_by: number | null;
   rejection_reason: string | null;
   metadata: Record<string, any> | null;
-  
+
   // Relaciones
   publication?: any;
   workflow?: ApprovalWorkflow;
@@ -27,13 +27,19 @@ export interface ApprovalLog {
   approval_request_id: number;
   approval_step_id: number | null;
   user_id: number | null;
-  action: 'submitted' | 'approved' | 'rejected' | 'reassigned' | 'cancelled' | 'auto_advanced';
+  action:
+    | "submitted"
+    | "approved"
+    | "rejected"
+    | "reassigned"
+    | "cancelled"
+    | "auto_advanced";
   level_number: number | null;
   comment: string | null;
   metadata: Record<string, any> | null;
   created_at: string;
   updated_at: string;
-  
+
   // Relaciones
   approvalRequest?: ApprovalRequest;
   approvalStep?: ApprovalLevel;
@@ -50,7 +56,7 @@ export interface ApprovalLevel {
   require_all_users: boolean;
   auto_advance: boolean;
   description: string | null;
-  
+
   // Relaciones
   workflow?: ApprovalWorkflow;
   role?: Role;
@@ -65,7 +71,7 @@ export interface ApprovalWorkflow {
   is_active: boolean;
   is_enabled: boolean;
   is_multi_level: boolean;
-  
+
   // Relaciones
   levels?: ApprovalLevel[];
 }

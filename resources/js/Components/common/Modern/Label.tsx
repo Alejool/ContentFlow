@@ -102,8 +102,8 @@ export default function Label({
       align === "center"
         ? "justify-center"
         : align === "right"
-        ? "justify-end"
-        : ""
+          ? "justify-end"
+          : ""
     }`;
 
     if (disabled) {

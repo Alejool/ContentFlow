@@ -1,11 +1,11 @@
 import { Avatar } from "@/Components/common/Avatar";
 import { format } from "date-fns";
 import {
-    Bookmark,
-    Heart,
-    MessageCircle,
-    MoreHorizontal,
-    Send,
+  Bookmark,
+  Heart,
+  MessageCircle,
+  MoreHorizontal,
+  Send,
 } from "lucide-react";
 
 interface InstagramPreviewProps {

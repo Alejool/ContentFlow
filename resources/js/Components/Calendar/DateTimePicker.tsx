@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import { AlertTriangle } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import { validateDate, DateValidationResult } from '@/Utils/dateValidation';
+import React, { useState, useEffect } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { AlertTriangle } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { validateDate, DateValidationResult } from "@/Utils/dateValidation";
 
 interface DateTimePickerProps {
   selectedDate: Date;
@@ -18,7 +18,7 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
   onChange,
   minDate,
   showWarningForPastDates = true,
-  className = '',
+  className = "",
 }) => {
   const { t } = useTranslation();
   const [validation, setValidation] = useState<DateValidationResult>({
@@ -68,16 +68,20 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
           <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
             <p className="text-sm font-medium text-red-800 dark:text-red-200">
-              {validation.isPastDate 
-                ? t('calendar.validation.past_date_error', 'Cannot Schedule in the Past')
-                : t('calendar.validation.invalid_date', 'Invalid Date')
-              }
+              {validation.isPastDate
+                ? t(
+                    "calendar.validation.past_date_error",
+                    "Cannot Schedule in the Past",
+                  )
+                : t("calendar.validation.invalid_date", "Invalid Date")}
             </p>
             <p className="text-xs text-red-600 dark:text-red-300 mt-1">
-              {validation.isPastDate 
-                ? t('calendar.validation.past_date_message', 'You cannot schedule events for past dates. Please select a future date and time.')
-                : validation.error
-              }
+              {validation.isPastDate
+                ? t(
+                    "calendar.validation.past_date_message",
+                    "You cannot schedule events for past dates. Please select a future date and time.",
+                  )
+                : validation.error}
             </p>
           </div>
         </div>
@@ -87,16 +91,16 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
       {validation.isValid && (
         <div className="text-center">
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            {t('calendar.selected_date', 'Selected date:')}
+            {t("calendar.selected_date", "Selected date:")}
           </p>
           <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
-            {selectedDate.toLocaleString('es-ES', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit',
+            {selectedDate.toLocaleString("es-ES", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
             })}
           </p>
         </div>

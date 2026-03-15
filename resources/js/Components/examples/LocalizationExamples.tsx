@@ -6,8 +6,17 @@ import { useState } from "react";
  * Componente de ejemplo que muestra todas las capacidades de localización
  */
 export const LocalizationExamples = () => {
-  const { t, date, number, currency, percent, compact, relative, list, plural } =
-    useLocalization();
+  const {
+    t,
+    date,
+    number,
+    currency,
+    percent,
+    compact,
+    relative,
+    list,
+    plural,
+  } = useLocalization();
   const [translatedText, setTranslatedText] = useState("");
   const [isTranslating, setIsTranslating] = useState(false);
 
@@ -25,7 +34,7 @@ export const LocalizationExamples = () => {
       });
       setTranslatedText(result.translatedText);
     } catch (error) {
-      } finally {
+    } finally {
       setIsTranslating(false);
     }
   };
@@ -91,7 +100,8 @@ export const LocalizationExamples = () => {
         <h3 className="text-lg font-semibold">Formatos de Listas</h3>
         <div className="space-y-1 text-sm">
           <p>
-            Conjunción: {list(["Facebook", "Instagram", "Twitter"], "conjunction")}
+            Conjunción:{" "}
+            {list(["Facebook", "Instagram", "Twitter"], "conjunction")}
           </p>
           <p>
             Disyunción: {list(["Lunes", "Martes", "Miércoles"], "disjunction")}

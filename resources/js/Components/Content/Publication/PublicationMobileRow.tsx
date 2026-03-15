@@ -10,7 +10,7 @@ import {
   getMediaUrl,
   hasMedia,
   isVideoMedia,
-  prepareMediaForPreview
+  prepareMediaForPreview,
 } from "@/Utils/publicationHelpers";
 import {
   Calendar,
@@ -68,7 +68,7 @@ const PublicationMobileRow = memo(
     onDelete,
     onPublish,
     onEditRequest,
-    onViewDetails, 
+    onViewDetails,
     onDuplicate,
     remoteLocks = {},
     permissions,
@@ -94,7 +94,7 @@ const PublicationMobileRow = memo(
       onEditRequest,
       permissions,
     });
-    
+
     const [expandedRow, setExpandedRow] = useState<number | null>(null);
     const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
 
@@ -239,7 +239,8 @@ const PublicationMobileRow = memo(
                         {item.title || t("publications.table.untitled")}
                       </h3>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 break-words line-clamp-2">
-                        {item.description || t("publications.table.noDescription")}
+                        {item.description ||
+                          t("publications.table.noDescription")}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
@@ -257,7 +258,9 @@ const PublicationMobileRow = memo(
                             size="sm"
                             icon={Trash2}
                           >
-                            <span className="sr-only">{t("common.delete")}</span>
+                            <span className="sr-only">
+                              {t("common.delete")}
+                            </span>
                           </Button>
                         )}
                       <Button
@@ -295,7 +298,7 @@ const PublicationMobileRow = memo(
                       size="sm"
                       className="order-first"
                     />
-                    
+
                     {/* Status badge */}
                     <span
                       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}
@@ -369,11 +372,13 @@ const PublicationMobileRow = memo(
                       </div>
                       <div className="flex flex-col flex-1">
                         <span className="text-xs font-semibold text-yellow-700 dark:text-yellow-400">
-                          {t("publications.table.pendingAdminReview") || "Pendiente de revisión"}
+                          {t("publications.table.pendingAdminReview") ||
+                            "Pendiente de revisión"}
                         </span>
                         {item.currentApprovalStep?.role?.name && (
                           <span className="text-[10px] text-yellow-600 dark:text-yellow-500">
-                            {t("approvals.approver_role")}: {item.currentApprovalStep.role.name}
+                            {t("approvals.approver_role")}:{" "}
+                            {item.currentApprovalStep.role.name}
                           </span>
                         )}
                       </div>
@@ -517,9 +522,15 @@ const PublicationMobileRow = memo(
                           </div>
                           <div>
                             <p className="text-sm font-medium text-gray-900 dark:text-white">
-                              {item.campaigns.length === 1 
-                                ? t("campaigns.inCampaigns").replace("{{count}}", String(item.campaigns.length))
-                                : t("campaigns.inCampaigns_plural").replace("{{count}}", String(item.campaigns.length))}
+                              {item.campaigns.length === 1
+                                ? t("campaigns.inCampaigns").replace(
+                                    "{{count}}",
+                                    String(item.campaigns.length),
+                                  )
+                                : t("campaigns.inCampaigns_plural").replace(
+                                    "{{count}}",
+                                    String(item.campaigns.length),
+                                  )}
                             </p>
                           </div>
                         </div>
@@ -581,40 +592,51 @@ const PublicationMobileRow = memo(
                           loading={isLoading?.editing}
                           variant={remoteLocks[item.id] ? "ghost" : "primary"}
                           size="sm"
-                          icon={remoteLocks[item.id] ? Lock : (item.status as string) === "processing" ? Loader2 : Edit}
+                          icon={
+                            remoteLocks[item.id]
+                              ? Lock
+                              : (item.status as string) === "processing"
+                                ? Loader2
+                                : Edit
+                          }
                           className="flex-1"
                         >
                           {remoteLocks[item.id] ||
                           (item.status as string) === "processing"
                             ? (item.status as string) === "processing"
                               ? t("common.processing")
-                              : t("publications.table.lockedBy").replace(":", "")
+                              : t("publications.table.lockedBy").replace(
+                                  ":",
+                                  "",
+                                )
                             : t("common.edit")}
                         </Button>
                       )}
 
                       {/* Delete button */}
-                      {permissions?.includes("publish") &&
-                        canManageContent && (
-                          <Button
-                            onClick={async (e) => {
-                              e.stopPropagation();
-                              await handleDelete(item, (item as any).type === "user_event");
-                            }}
-                            disabled={
-                              isLoading?.publishing ||
-                              isLoading?.editing ||
-                              isLoading?.deleting
-                            }
-                            loading={isLoading?.deleting}
-                            variant="danger"
-                            size="sm"
-                            icon={Trash2}
-                            className="flex-1"
-                          >
-                            {t("common.delete")}
-                          </Button>
-                        )}
+                      {permissions?.includes("publish") && canManageContent && (
+                        <Button
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            await handleDelete(
+                              item,
+                              (item as any).type === "user_event",
+                            );
+                          }}
+                          disabled={
+                            isLoading?.publishing ||
+                            isLoading?.editing ||
+                            isLoading?.deleting
+                          }
+                          loading={isLoading?.deleting}
+                          variant="danger"
+                          size="sm"
+                          icon={Trash2}
+                          className="flex-1"
+                        >
+                          {t("common.delete")}
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>

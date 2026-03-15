@@ -1,25 +1,25 @@
 /**
  * Live Region Component
- * 
+ *
  * Announces dynamic content changes to screen readers
  * WCAG 4.1.3 - Status Messages (Level AA)
  */
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from "react";
 
 interface LiveRegionProps {
   message: string;
-  politeness?: 'polite' | 'assertive' | 'off';
+  politeness?: "polite" | "assertive" | "off";
   atomic?: boolean;
-  relevant?: 'additions' | 'removals' | 'text' | 'all';
+  relevant?: "additions" | "removals" | "text" | "all";
   clearOnUnmount?: boolean;
 }
 
 export const LiveRegion: React.FC<LiveRegionProps> = ({
   message,
-  politeness = 'polite',
+  politeness = "polite",
   atomic = true,
-  relevant = 'additions text',
+  relevant = "additions text",
   clearOnUnmount = true,
 }) => {
   const regionRef = useRef<HTMLDivElement>(null);
@@ -27,7 +27,7 @@ export const LiveRegion: React.FC<LiveRegionProps> = ({
   useEffect(() => {
     return () => {
       if (clearOnUnmount && regionRef.current) {
-        regionRef.current.textContent = '';
+        regionRef.current.textContent = "";
       }
     };
   }, [clearOnUnmount]);
@@ -53,18 +53,18 @@ export function useAnnounce() {
   const announce = (
     message: string,
     options: {
-      politeness?: 'polite' | 'assertive';
+      politeness?: "polite" | "assertive";
       timeout?: number;
-    } = {}
+    } = {},
   ) => {
-    const { politeness = 'polite', timeout = 0 } = options;
+    const { politeness = "polite", timeout = 0 } = options;
 
-    const liveRegion = document.createElement('div');
-    liveRegion.setAttribute('role', 'status');
-    liveRegion.setAttribute('aria-live', politeness);
-    liveRegion.setAttribute('aria-atomic', 'true');
-    liveRegion.className = 'sr-only';
-    
+    const liveRegion = document.createElement("div");
+    liveRegion.setAttribute("role", "status");
+    liveRegion.setAttribute("aria-live", politeness);
+    liveRegion.setAttribute("aria-atomic", "true");
+    liveRegion.className = "sr-only";
+
     document.body.appendChild(liveRegion);
 
     // Delay to ensure screen reader picks up the change

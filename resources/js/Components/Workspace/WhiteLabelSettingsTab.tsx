@@ -28,7 +28,12 @@ export default function WhiteLabelSettingsTab({
   const [logoTempId, setLogoTempId] = useState<string | null>(null);
   const [faviconTempId, setFaviconTempId] = useState<string | null>(null);
 
-  const { uploadFile, uploading, progress, errors: uploadErrors } = useS3Upload();
+  const {
+    uploadFile,
+    uploading,
+    progress,
+    errors: uploadErrors,
+  } = useS3Upload();
 
   const { data, setData, post, processing, errors } = useForm({
     logo_key: null as string | null,
@@ -47,8 +52,14 @@ export default function WhiteLabelSettingsTab({
     if (!canManageWorkspace) return;
 
     // Verificar que no hay subidas en progreso
-    const logoUploading = logoTempId && progress[logoTempId] !== undefined && progress[logoTempId] < 100;
-    const faviconUploading = faviconTempId && progress[faviconTempId] !== undefined && progress[faviconTempId] < 100;
+    const logoUploading =
+      logoTempId &&
+      progress[logoTempId] !== undefined &&
+      progress[logoTempId] < 100;
+    const faviconUploading =
+      faviconTempId &&
+      progress[faviconTempId] !== undefined &&
+      progress[faviconTempId] < 100;
 
     if (logoUploading || faviconUploading) {
       toast.error("Por favor espera a que terminen de subirse las imágenes");
@@ -124,7 +135,7 @@ export default function WhiteLabelSettingsTab({
       const tempId = `logo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       setLogoFile(file);
       setLogoTempId(tempId);
-      
+
       // Mostrar preview inmediatamente
       const reader = new FileReader();
       reader.onloadend = () => setLogoPreview(reader.result as string);
@@ -144,13 +155,15 @@ export default function WhiteLabelSettingsTab({
     }
   };
 
-  const handleFaviconChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFaviconChange = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = e.target.files?.[0];
     if (file) {
       const tempId = `favicon-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       setFaviconFile(file);
       setFaviconTempId(tempId);
-      
+
       // Mostrar preview inmediatamente
       const reader = new FileReader();
       reader.onloadend = () => setFaviconPreview(reader.result as string);
@@ -253,29 +266,47 @@ export default function WhiteLabelSettingsTab({
                     {/* Upload Success Overlay */}
                     {logoTempId && progress[logoTempId] === 100 && (
                       <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        <svg
+                          className="w-4 h-4"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clipRule="evenodd"
+                          />
                         </svg>
                       </div>
                     )}
 
                     {/* Upload Progress Overlay */}
-                    {logoTempId && progress[logoTempId] !== undefined && progress[logoTempId] < 100 && (
-                      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center">
-                        <div className="text-center text-white">
-                          <div className="w-16 h-16 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-2"></div>
-                          <div className="text-sm font-medium">{progress[logoTempId]}%</div>
-                          <div className="text-xs opacity-75">Subiendo logo...</div>
+                    {logoTempId &&
+                      progress[logoTempId] !== undefined &&
+                      progress[logoTempId] < 100 && (
+                        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center">
+                          <div className="text-center text-white">
+                            <div className="w-16 h-16 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-2"></div>
+                            <div className="text-sm font-medium">
+                              {progress[logoTempId]}%
+                            </div>
+                            <div className="text-xs opacity-75">
+                              Subiendo logo...
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
                     {/* Upload Error Overlay */}
                     {logoTempId && uploadErrors[logoTempId] && (
                       <div className="absolute inset-0 bg-red-500/80 backdrop-blur-sm flex items-center justify-center">
                         <div className="text-center text-white p-4">
-                          <div className="text-sm font-medium mb-1">Error de subida</div>
-                          <div className="text-xs opacity-90">{uploadErrors[logoTempId]}</div>
+                          <div className="text-sm font-medium mb-1">
+                            Error de subida
+                          </div>
+                          <div className="text-xs opacity-90">
+                            {uploadErrors[logoTempId]}
+                          </div>
                         </div>
                       </div>
                     )}
@@ -336,21 +367,33 @@ export default function WhiteLabelSettingsTab({
                     {/* Upload Success Overlay */}
                     {faviconTempId && progress[faviconTempId] === 100 && (
                       <div className="absolute top-1 right-1 bg-green-500 text-white rounded-full p-1">
-                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        <svg
+                          className="w-3 h-3"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clipRule="evenodd"
+                          />
                         </svg>
                       </div>
                     )}
 
                     {/* Upload Progress Overlay */}
-                    {faviconTempId && progress[faviconTempId] !== undefined && progress[faviconTempId] < 100 && (
-                      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center">
-                        <div className="text-center text-white">
-                          <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-1"></div>
-                          <div className="text-xs font-medium">{progress[faviconTempId]}%</div>
+                    {faviconTempId &&
+                      progress[faviconTempId] !== undefined &&
+                      progress[faviconTempId] < 100 && (
+                        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center">
+                          <div className="text-center text-white">
+                            <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-1"></div>
+                            <div className="text-xs font-medium">
+                              {progress[faviconTempId]}%
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
                     {/* Upload Error Overlay */}
                     {faviconTempId && uploadErrors[faviconTempId] && (
@@ -438,7 +481,11 @@ export default function WhiteLabelSettingsTab({
                   type="submit"
                   disabled={!canManageWorkspace || uploading}
                   loading={processing || uploading}
-                  loadingText={uploading ? "Subiendo archivos..." : (t("common.saving") || "Guardando...")}
+                  loadingText={
+                    uploading
+                      ? "Subiendo archivos..."
+                      : t("common.saving") || "Guardando..."
+                  }
                   variant="primary"
                   size="lg"
                   rounded="2xl"
@@ -456,14 +503,16 @@ export default function WhiteLabelSettingsTab({
         <div className="space-y-6">
           <div className="sticky top-24">
             <h4 className="text-sm font-bold text-gray-500 dark:text-neutral-500 uppercase tracking-widest mb-4 ml-2">
-              {t("workspace.white_label.live_preview") || "Vista Previa en Vivo"}
+              {t("workspace.white_label.live_preview") ||
+                "Vista Previa en Vivo"}
             </h4>
 
             <div className="space-y-6">
               {/* Button Preview */}
               <div className="bg-white dark:bg-neutral-900 rounded-lg p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm">
                 <p className="text-xs font-bold text-gray-400 dark:text-neutral-500 mb-4">
-                  {t("workspace.white_label.buttons_actions") || "BOTONES Y ACCIONES"}
+                  {t("workspace.white_label.buttons_actions") ||
+                    "BOTONES Y ACCIONES"}
                 </p>
                 <div className="flex flex-col gap-3">
                   <button
@@ -473,7 +522,8 @@ export default function WhiteLabelSettingsTab({
                       boxShadow: `0 10px 15px -3px ${data.primary_color}40`,
                     }}
                   >
-                    {t("workspace.white_label.primary_button") || "Botón Principal"}
+                    {t("workspace.white_label.primary_button") ||
+                      "Botón Principal"}
                   </button>
                   <button
                     className="w-full py-2.5 rounded-lg text-sm font-bold border transition-all"
@@ -482,7 +532,8 @@ export default function WhiteLabelSettingsTab({
                       color: data.primary_color,
                     }}
                   >
-                    {t("workspace.white_label.secondary_button") || "Botón Secundario"}
+                    {t("workspace.white_label.secondary_button") ||
+                      "Botón Secundario"}
                   </button>
                   <div className="flex items-center gap-2 mt-2">
                     <div
@@ -490,7 +541,8 @@ export default function WhiteLabelSettingsTab({
                       style={{ backgroundColor: data.primary_color }}
                     />
                     <span className="text-xs font-medium text-gray-500">
-                      {t("workspace.white_label.activity_indicator") || "Indicador de actividad"}
+                      {t("workspace.white_label.activity_indicator") ||
+                        "Indicador de actividad"}
                     </span>
                   </div>
                 </div>
@@ -499,7 +551,8 @@ export default function WhiteLabelSettingsTab({
               {/* Sidebar Header Preview */}
               <div className="bg-white dark:bg-neutral-900 rounded-lg p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden relative">
                 <p className="text-xs font-bold text-gray-400 dark:text-neutral-500 mb-4 uppercase">
-                  {t("workspace.white_label.sidebar_header") || "Cabecera del Menú"}
+                  {t("workspace.white_label.sidebar_header") ||
+                    "Cabecera del Menú"}
                 </p>
 
                 <div className="rounded-lg p-4 flex items-center gap-3 border dark:border-neutral-800 bg-neutral-50 dark:bg-black/20">
@@ -523,7 +576,8 @@ export default function WhiteLabelSettingsTab({
                       {workspace.name}
                     </p>
                     <p className="text-[10px] font-bold uppercase tracking-tighter opacity-60">
-                      {t("workspace.white_label.workspace_branding") || "Workspace Branding"}
+                      {t("workspace.white_label.workspace_branding") ||
+                        "Workspace Branding"}
                     </p>
                   </div>
                 </div>
@@ -534,7 +588,8 @@ export default function WhiteLabelSettingsTab({
                 <div className="flex gap-3">
                   <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-500" />
                   <p className="text-sm text-emerald-800 dark:text-emerald-400 leading-relaxed font-medium">
-                    {t("workspace.white_label.impact_notice") || "Los cambios se aplican inmediatamente para todos los usuarios de este espacio de trabajo."}
+                    {t("workspace.white_label.impact_notice") ||
+                      "Los cambios se aplican inmediatamente para todos los usuarios de este espacio de trabajo."}
                   </p>
                 </div>
               </div>

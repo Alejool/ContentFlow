@@ -58,15 +58,23 @@ export default function WorkspaceDropdown({
             {isSidebarOpen && (
               <>
                 <div className="flex-1 text-left min-w-0">
-                  <p className={`text-sm font-semibold truncate ${open ? "text-white" : "text-gray-700 dark:text-neutral-200"}`}>
+                  <p
+                    className={`text-sm font-semibold truncate ${open ? "text-white" : "text-gray-700 dark:text-neutral-200"}`}
+                  >
                     {current_workspace.name}
                   </p>
                   <div className="flex items-center gap-2">
-                    <p className={`text-[10px] font-bold uppercase tracking-wider ${open ? "text-primary-100" : "text-primary-600 dark:text-primary-400"}`}>
+                    <p
+                      className={`text-[10px] font-bold uppercase tracking-wider ${open ? "text-primary-100" : "text-primary-600 dark:text-primary-400"}`}
+                    >
                       {roleLabel || t("workspace.member")}
                     </p>
-                    <span className={`w-1 h-1 rounded-full ${open ? "bg-primary-200" : "bg-gray-300 dark:bg-neutral-600"}`} />
-                    <p className={`text-[10px] truncate ${open ? "text-primary-100" : "text-gray-500 dark:text-neutral-400"}`}>
+                    <span
+                      className={`w-1 h-1 rounded-full ${open ? "bg-primary-200" : "bg-gray-300 dark:bg-neutral-600"}`}
+                    />
+                    <p
+                      className={`text-[10px] truncate ${open ? "text-primary-100" : "text-gray-500 dark:text-neutral-400"}`}
+                    >
                       {workspaces.length}{" "}
                       {t("workspace.workspaces", { count: workspaces.length })}
                     </p>
@@ -94,8 +102,18 @@ export default function WorkspaceDropdown({
                 as={motion.div}
                 variants={{
                   hidden: { opacity: 0, scale: 0.96, y: -6 },
-                  visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.15, ease: "easeOut" } },
-                  exit: { opacity: 0, scale: 0.96, y: -6, transition: { duration: 0.1, ease: "easeIn" } },
+                  visible: {
+                    opacity: 1,
+                    scale: 1,
+                    y: 0,
+                    transition: { duration: 0.15, ease: "easeOut" },
+                  },
+                  exit: {
+                    opacity: 0,
+                    scale: 0.96,
+                    y: -6,
+                    transition: { duration: 0.1, ease: "easeIn" },
+                  },
                 }}
                 initial="hidden"
                 animate="visible"
@@ -134,13 +152,18 @@ export default function WorkspaceDropdown({
                             }`}
                           >
                             {ws.white_label_logo_url ? (
-                              <WorkspaceLogo src={ws.white_label_logo_url} alt={ws.name} />
+                              <WorkspaceLogo
+                                src={ws.white_label_logo_url}
+                                alt={ws.name}
+                              />
                             ) : (
                               ws.name.charAt(0).toUpperCase()
                             )}
                           </div>
                           <div className="flex-1 text-left min-w-0">
-                            <span className="block truncate font-medium">{ws.name}</span>
+                            <span className="block truncate font-medium">
+                              {ws.name}
+                            </span>
                             <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-neutral-400">
                               <span className="flex items-center gap-1">
                                 <Users className="h-3 w-3" />

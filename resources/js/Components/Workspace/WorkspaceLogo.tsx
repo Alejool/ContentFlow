@@ -14,7 +14,9 @@ export function WorkspaceLogo({
   fallback,
   timeoutMs = 5000,
 }: WorkspaceLogoProps) {
-  const [status, setStatus] = useState<"loading" | "loaded" | "error">("loading");
+  const [status, setStatus] = useState<"loading" | "loaded" | "error">(
+    "loading",
+  );
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const initial = (fallback ?? alt).charAt(0).toUpperCase();

@@ -60,9 +60,7 @@ export default function ConfirmDialog({
       />
 
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <DialogPanel
-          className="w-full max-w-md rounded-lg p-6 shadow-2xl bg-white dark:bg-neutral-800 border border-transparent dark:border-neutral-700"
-        >
+        <DialogPanel className="w-full max-w-md rounded-lg p-6 shadow-2xl bg-white dark:bg-neutral-800 border border-transparent dark:border-neutral-700">
           <div className="flex items-start gap-4">
             <div
               className={`flex-shrink-0 w-12 h-12 rounded-full ${styles.iconBg} flex items-center justify-center`}
@@ -71,14 +69,10 @@ export default function ConfirmDialog({
             </div>
 
             <div className="flex-1">
-              <DialogTitle
-                className="text-lg font-bold mb-2 text-gray-900 dark:text-white"
-              >
+              <DialogTitle className="text-lg font-bold mb-2 text-gray-900 dark:text-white">
                 {title}
               </DialogTitle>
-              <p
-                className="text-sm text-gray-600 dark:text-gray-400"
-              >
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 {message}
               </p>
             </div>

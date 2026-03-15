@@ -55,7 +55,9 @@ export const MediaSection = ({
   return (
     <div className="space-y-4">
       <SectionHeader
-        title={t("publications.modal.edit.mediaSection") || "Archivos Multimedia"}
+        title={
+          t("publications.modal.edit.mediaSection") || "Archivos Multimedia"
+        }
       />
 
       {!isDataReady ? (

@@ -21,7 +21,7 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-} from '@dnd-kit/core';
+} from "@dnd-kit/core";
 
 interface WeekViewProps {
   currentDate: Date;
@@ -121,7 +121,7 @@ const DroppableTimeSlot: React.FC<DroppableTimeSlotProps> = ({
   onEventClick,
   PlatformIcon,
 }) => {
-  const slotId = `${format(day, 'yyyy-MM-dd')}-${hour}`;
+  const slotId = `${format(day, "yyyy-MM-dd")}-${hour}`;
   const { setNodeRef, isOver } = useDroppable({
     id: slotId,
     data: { day, hour },
@@ -133,7 +133,7 @@ const DroppableTimeSlot: React.FC<DroppableTimeSlotProps> = ({
       className={`
         p-1 border-r border-gray-100 dark:border-gray-800 
         hover:bg-gray-50 dark:hover:bg-gray-900/30 transition-colors
-        ${isOver ? 'bg-primary-100/50 dark:bg-primary-900/20 ring-1 ring-primary-500' : ''}
+        ${isOver ? "bg-primary-100/50 dark:bg-primary-900/20 ring-1 ring-primary-500" : ""}
       `}
     >
       {events.map((event) => (
@@ -172,7 +172,7 @@ export const WeekView: React.FC<WeekViewProps> = ({
       activationConstraint: {
         distance: 8,
       },
-    })
+    }),
   );
 
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 0 });

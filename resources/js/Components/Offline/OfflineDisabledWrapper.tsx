@@ -1,6 +1,6 @@
-import React, { ReactNode } from 'react';
-import { useOfflineDisable } from '@/Hooks/useOfflineDisable';
-import { WifiOff } from 'lucide-react';
+import React, { ReactNode } from "react";
+import { useOfflineDisable } from "@/Hooks/useOfflineDisable";
+import { WifiOff } from "lucide-react";
 
 /**
  * Props for OfflineDisabledWrapper component
@@ -15,12 +15,12 @@ interface OfflineDisabledWrapperProps {
 
 /**
  * OfflineDisabledWrapper Component
- * 
+ *
  * Wraps content and visually disables it when offline.
  * Optionally shows an overlay with offline message.
- * 
+ *
  * Requirements: 6.3
- * 
+ *
  * @example
  * <OfflineDisabledWrapper requiresConnection={true} showOfflineOverlay={true}>
  *   <VideoPlayer />
@@ -29,9 +29,9 @@ interface OfflineDisabledWrapperProps {
 export const OfflineDisabledWrapper: React.FC<OfflineDisabledWrapperProps> = ({
   children,
   requiresConnection = false,
-  offlineMessage = 'This feature requires an internet connection',
+  offlineMessage = "This feature requires an internet connection",
   showOfflineOverlay = true,
-  className = '',
+  className = "",
 }) => {
   const { isDisabled, disabledReason } = useOfflineDisable({
     requiresConnection,

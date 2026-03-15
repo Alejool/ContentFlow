@@ -5,15 +5,15 @@ import { LinkedInPreview } from "@/Components/Content/Publication/previews/Linke
 import { TikTokPreview } from "@/Components/Content/Publication/previews/TikTokPreview";
 import { TwitterPreview } from "@/Components/Content/Publication/previews/TwitterPreview";
 import { YouTubePreview } from "@/Components/Content/Publication/previews/YouTubePreview";
-import { REEL_COMPATIBLE_PLATFORMS } from '@/Constants/contentTypes';
+import { REEL_COMPATIBLE_PLATFORMS } from "@/Constants/contentTypes";
 import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatformsConfig";
 import {
-    Facebook,
-    Instagram,
-    Linkedin,
-    Music2,
-    Twitter,
-    Youtube,
+  Facebook,
+  Instagram,
+  Linkedin,
+  Music2,
+  Twitter,
+  Youtube,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -31,7 +31,9 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-12">
         <div className="w-12 h-12 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
-        <p className="text-sm text-gray-500 dark:text-gray-400">Cargando publicación...</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          Cargando publicación...
+        </p>
       </div>
     );
   }
@@ -65,8 +67,12 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
         <div className="text-center space-y-3 py-8">
           <div className="flex flex-col items-center gap-3">
             <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
-              <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              <svg
+                className="w-6 h-6 text-blue-600 dark:text-blue-400"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
               </svg>
             </div>
             <div>
@@ -74,7 +80,8 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
                 Publicación de Facebook
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                Facebook no permite previsualizar posts embebidos desde localhost o dominios no verificados
+                Facebook no permite previsualizar posts embebidos desde
+                localhost o dominios no verificados
               </p>
             </div>
           </div>
@@ -85,7 +92,7 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
             className="inline-flex items-center gap-2 px-4 py-2 bg-[#1877f2] hover:bg-[#166fe5] text-white rounded-lg transition-colors"
           >
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
             </svg>
             Ver en Facebook
           </a>
@@ -93,7 +100,9 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
       );
 
     case "youtube":
-      const videoId = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([^&?\s]+)/)?.[1];
+      const videoId = url.match(
+        /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([^&?\s]+)/,
+      )?.[1];
       return (
         <iframe
           src={`https://www.youtube.com/embed/${videoId}`}
@@ -128,7 +137,7 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
             className="inline-flex items-center gap-2 px-4 py-2 bg-[#0077b5] hover:bg-[#006399] text-white rounded-lg transition-colors"
           >
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+              <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
             </svg>
             Ver en LinkedIn
           </a>
@@ -143,7 +152,6 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
       );
   }
 };
-
 
 interface LivePreviewSectionProps {
   content: string;
@@ -180,7 +188,7 @@ export const LivePreviewSection = ({
   className,
   title,
   publishedAt,
-  contentType = 'post',
+  contentType = "post",
   selectedPlatforms = [],
   pollOptions = [],
   pollDuration = 24,
@@ -191,28 +199,35 @@ export const LivePreviewSection = ({
   const compatiblePlatforms = useMemo(() => {
     const contentTypes = [
       {
-        value: 'post',
-        platforms: ['instagram', 'twitter', 'facebook', 'linkedin', 'youtube', 'pinterest'],
+        value: "post",
+        platforms: [
+          "instagram",
+          "twitter",
+          "facebook",
+          "linkedin",
+          "youtube",
+          "pinterest",
+        ],
       },
       {
-        value: 'reel',
+        value: "reel",
         platforms: [...REEL_COMPATIBLE_PLATFORMS],
       },
       {
-        value: 'story',
-        platforms: ['instagram', 'facebook'],
+        value: "story",
+        platforms: ["instagram", "facebook"],
       },
       {
-        value: 'poll',
-        platforms: ['twitter'], // Solo Twitter soporta encuestas nativas
+        value: "poll",
+        platforms: ["twitter"], // Solo Twitter soporta encuestas nativas
       },
       {
-        value: 'carousel',
-        platforms: ['instagram', 'facebook', 'linkedin'],
+        value: "carousel",
+        platforms: ["instagram", "facebook", "linkedin"],
       },
     ];
-    
-    const type = contentTypes.find(t => t.value === contentType);
+
+    const type = contentTypes.find((t) => t.value === contentType);
     return type?.platforms || [];
   }, [contentType]);
 
@@ -229,14 +244,15 @@ export const LivePreviewSection = ({
     return allTabs.filter((tab) => {
       const config = (SOCIAL_PLATFORMS as any)[tab.id];
       const isActive = config?.active === true;
-      
+
       // Filtrar por tipo de contenido
       const isCompatible = compatiblePlatforms.includes(tab.id);
-      
+
       // Si hay plataformas seleccionadas, solo mostrar esas
-      const isSelected = selectedPlatforms.length === 0 || 
-        selectedPlatforms.some(p => p.toLowerCase() === tab.id);
-      
+      const isSelected =
+        selectedPlatforms.length === 0 ||
+        selectedPlatforms.some((p) => p.toLowerCase() === tab.id);
+
       return isActive && isCompatible && isSelected;
     });
   }, [compatiblePlatforms, selectedPlatforms]);
@@ -244,10 +260,10 @@ export const LivePreviewSection = ({
   const [activePlatform, setActivePlatform] = useState<Platform>(
     tabs.length > 0 ? tabs[0].id : "twitter",
   );
-  
+
   // Actualizar plataforma activa si ya no es válida
   useEffect(() => {
-    if (tabs.length > 0 && !tabs.find(t => t.id === activePlatform)) {
+    if (tabs.length > 0 && !tabs.find((t) => t.id === activePlatform)) {
       setActivePlatform(tabs[0].id);
     }
   }, [tabs, activePlatform]);
@@ -287,7 +303,9 @@ export const LivePreviewSection = ({
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                   <span className="text-sm font-medium text-green-700 dark:text-green-400">
-                    Publicado en {activePlatform.charAt(0).toUpperCase() + activePlatform.slice(1)}
+                    Publicado en{" "}
+                    {activePlatform.charAt(0).toUpperCase() +
+                      activePlatform.slice(1)}
                   </span>
                 </div>
                 <a
@@ -296,24 +314,39 @@ export const LivePreviewSection = ({
                   rel="noopener noreferrer"
                   className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded-md transition-colors flex items-center gap-1.5"
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  <svg
+                    className="w-3.5 h-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    />
                   </svg>
-                  Abrir en {activePlatform.charAt(0).toUpperCase() + activePlatform.slice(1)}
+                  Abrir en{" "}
+                  {activePlatform.charAt(0).toUpperCase() +
+                    activePlatform.slice(1)}
                 </a>
               </div>
             </div>
             <div className="flex items-center justify-center bg-white dark:bg-neutral-800 rounded-lg p-4 min-h-[500px]">
-              <EmbeddedPost platform={activePlatform} url={publishedLinks[activePlatform]} />
+              <EmbeddedPost
+                platform={activePlatform}
+                url={publishedLinks[activePlatform]}
+              />
             </div>
           </div>
         ) : (
           <div className="flex items-center justify-center">
             {activePlatform === "twitter" && (
-              <TwitterPreview 
-                content={content} 
-                mediaUrls={mediaUrls} 
-                user={user} 
+              <TwitterPreview
+                content={content}
+                mediaUrls={mediaUrls}
+                user={user}
                 contentType={contentType}
                 pollOptions={pollOptions}
                 pollDuration={pollDuration}
@@ -345,12 +378,16 @@ export const LivePreviewSection = ({
               />
             )}
             {activePlatform === "tiktok" && (
-              <TikTokPreview content={content} mediaUrls={mediaUrls} user={user} />
+              <TikTokPreview
+                content={content}
+                mediaUrls={mediaUrls}
+                user={user}
+              />
             )}
             {activePlatform === "youtube" && (
-              <YouTubePreview 
-                content={content} 
-                mediaUrls={mediaUrls} 
+              <YouTubePreview
+                content={content}
+                mediaUrls={mediaUrls}
                 user={user}
                 title={title}
                 publishedAt={publishedAt}

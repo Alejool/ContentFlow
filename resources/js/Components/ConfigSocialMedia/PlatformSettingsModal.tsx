@@ -33,7 +33,8 @@ export default function PlatformSettingsModal({
   allSettings = {},
   onAllSettingsChange,
 }: PlatformSettingsModalProps) {
-  const isAllPlatforms = platform.toLowerCase() === "all" || allPlatforms.length > 0;
+  const isAllPlatforms =
+    platform.toLowerCase() === "all" || allPlatforms.length > 0;
 
   return (
     <Modal show={isOpen} onClose={onClose} maxWidth="lg">

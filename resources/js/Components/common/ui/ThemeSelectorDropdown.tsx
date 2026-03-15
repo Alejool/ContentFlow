@@ -13,7 +13,10 @@ export default function ThemeSelectorDropdown() {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
@@ -27,7 +30,10 @@ export default function ThemeSelectorDropdown() {
     };
   }, [isOpen]);
 
-  const handleThemeChange = async (newTheme: ThemeOption, e: React.MouseEvent) => {
+  const handleThemeChange = async (
+    newTheme: ThemeOption,
+    e: React.MouseEvent,
+  ) => {
     if (isAnimating || newTheme === theme) {
       setIsOpen(false);
       return;
@@ -143,7 +149,9 @@ export default function ThemeSelectorDropdown() {
                   />
                   <div className="flex-1 text-left">
                     <div className="text-sm font-medium">{option.label}</div>
-                    <div className="text-xs opacity-70">{option.description}</div>
+                    <div className="text-xs opacity-70">
+                      {option.description}
+                    </div>
                   </div>
                   {isActive && (
                     <Check className="w-4 h-4 text-primary-600 dark:text-primary-400" />

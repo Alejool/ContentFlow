@@ -7,7 +7,9 @@ interface DialogContextValue {
   onOpenChange: (open: boolean) => void;
 }
 
-const DialogContext = React.createContext<DialogContextValue | undefined>(undefined);
+const DialogContext = React.createContext<DialogContextValue | undefined>(
+  undefined,
+);
 
 const useDialogContext = () => {
   const context = React.useContext(DialogContext);
@@ -40,7 +42,7 @@ const Dialog: React.FC<DialogProps> = ({
       }
       onOpenChange?.(newOpen);
     },
-    [controlledOpen, onOpenChange]
+    [controlledOpen, onOpenChange],
   );
 
   return (
@@ -111,7 +113,7 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
             className={cn(
               "relative w-full max-w-lg rounded-lg bg-white dark:bg-gray-800 p-6 shadow-lg",
               "animate-in fade-in-0 zoom-in-95",
-              className
+              className,
             )}
             onClick={(e) => e.stopPropagation()}
             {...props}
@@ -134,7 +136,7 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
         </div>
       </>
     );
-  }
+  },
 );
 DialogContent.displayName = "DialogContent";
 
@@ -144,7 +146,10 @@ const DialogHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col space-y-1.5 text-center sm:text-left", className)}
+    className={cn(
+      "flex flex-col space-y-1.5 text-center sm:text-left",
+      className,
+    )}
     {...props}
   />
 ));
@@ -158,7 +163,7 @@ const DialogFooter = React.forwardRef<
     ref={ref}
     className={cn(
       "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
-      className
+      className,
     )}
     {...props}
   />
@@ -173,7 +178,7 @@ const DialogTitle = React.forwardRef<
     ref={ref}
     className={cn(
       "text-lg font-semibold leading-none tracking-tight",
-      className
+      className,
     )}
     {...props}
   />

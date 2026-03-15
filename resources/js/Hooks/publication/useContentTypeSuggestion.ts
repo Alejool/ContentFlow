@@ -1,5 +1,5 @@
-import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
 
 interface ContentTypeSuggestionRequest {
   media?: any[];
@@ -13,9 +13,16 @@ interface ContentTypeSuggestionResponse {
 }
 
 export const useContentTypeSuggestion = () => {
-  return useMutation<ContentTypeSuggestionResponse, Error, ContentTypeSuggestionRequest>({
+  return useMutation<
+    ContentTypeSuggestionResponse,
+    Error,
+    ContentTypeSuggestionRequest
+  >({
     mutationFn: async (data) => {
-      const response = await axios.post('/api/v1/publications/suggest-content-type', data);
+      const response = await axios.post(
+        "/api/v1/publications/suggest-content-type",
+        data,
+      );
       // Handle both response.data.data and response.data structures
       const result = response.data.data || response.data;
       return result;

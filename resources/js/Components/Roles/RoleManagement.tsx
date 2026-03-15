@@ -52,7 +52,9 @@ export default function RoleManagement({
 }: RoleManagementProps) {
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
-  const [expandedPermissions, setExpandedPermissions] = useState<number | null>(null);
+  const [expandedPermissions, setExpandedPermissions] = useState<number | null>(
+    null,
+  );
   const [editingRole, setEditingRole] = useState<Role | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedPermissions, setSelectedPermissions] = useState<number[]>([]);
@@ -70,13 +72,14 @@ export default function RoleManagement({
         {
           user_id: userId,
           role_id: roleId,
-        }
+        },
       );
-      
+
       toast.success(t("roles.success.assigned"));
       router.reload({ only: ["users"] });
     } catch (error: any) {
-      const message = error.response?.data?.message || t("roles.errors.assignment_failed");
+      const message =
+        error.response?.data?.message || t("roles.errors.assignment_failed");
       toast.error(message);
     } finally {
       setIsLoading(false);
@@ -85,7 +88,7 @@ export default function RoleManagement({
 
   const handleEditRole = (role: Role) => {
     setEditingRole(role);
-    setSelectedPermissions(role.permissions.map(p => p.id));
+    setSelectedPermissions(role.permissions.map((p) => p.id));
     setIsEditModalOpen(true);
   };
 
@@ -93,19 +96,23 @@ export default function RoleManagement({
     try {
       setIsLoading(true);
       await axios.put(
-        route("api.v1.workspaces.roles.update", { idOrSlug: workspace.id, role: roleId }),
+        route("api.v1.workspaces.roles.update", {
+          idOrSlug: workspace.id,
+          role: roleId,
+        }),
         {
           permission_ids: permissionIds,
-        }
+        },
       );
-      
+
       toast.success(t("roles.success.updated"));
       router.reload({ only: ["roles"] });
       setIsEditModalOpen(false);
       setEditingRole(null);
       setSelectedPermissions([]);
     } catch (error: any) {
-      const message = error.response?.data?.message || t("roles.errors.update_failed");
+      const message =
+        error.response?.data?.message || t("roles.errors.update_failed");
       toast.error(message);
     } finally {
       setIsLoading(false);
@@ -118,10 +125,13 @@ export default function RoleManagement({
 
   const getRoleBadgeColor = (roleName: string) => {
     const colors: Record<string, string> = {
-      owner: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
+      owner:
+        "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
       admin: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-      editor: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-      viewer: "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400",
+      editor:
+        "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+      viewer:
+        "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400",
     };
     return colors[roleName.toLowerCase()] || colors.viewer;
   };
@@ -157,25 +167,30 @@ export default function RoleManagement({
                 {role.display_name}
               </h4>
               <div className="flex items-center gap-2">
-                <span className={`px-2 py-1 rounded-full text-xs font-bold ${getRoleBadgeColor(role.name)}`}>
+                <span
+                  className={`px-2 py-1 rounded-full text-xs font-bold ${getRoleBadgeColor(role.name)}`}
+                >
                   {users.filter((u) => u.pivot?.role_id === role.id).length}
                 </span>
-                {canManageRoles && !role.name.toLowerCase().includes('owner') && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    buttonStyle="icon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEditRole(role);
-                    }}
-                    icon={Edit2}
-                    title={t("common.edit")}
-                  >{""}</Button>
-                )}
+                {canManageRoles &&
+                  !role.name.toLowerCase().includes("owner") && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      buttonStyle="icon"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEditRole(role);
+                      }}
+                      icon={Edit2}
+                      title={t("common.edit")}
+                    >
+                      {""}
+                    </Button>
+                  )}
               </div>
             </div>
-            
+
             {role.description && (
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
                 {role.description}
@@ -183,7 +198,11 @@ export default function RoleManagement({
             )}
 
             <div
-              onClick={() => setExpandedPermissions(expandedPermissions === role.id ? null : role.id)}
+              onClick={() =>
+                setExpandedPermissions(
+                  expandedPermissions === role.id ? null : role.id,
+                )
+              }
               className="w-full text-left cursor-pointer"
             >
               {expandedPermissions === role.id && (
@@ -273,7 +292,9 @@ export default function RoleManagement({
                     </td>
                     <td className="px-6 py-4">
                       {userRole && (
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${getRoleBadgeColor(userRole.name)}`}>
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-bold ${getRoleBadgeColor(userRole.name)}`}
+                        >
                           {userRole.display_name}
                         </span>
                       )}
@@ -305,7 +326,9 @@ export default function RoleManagement({
                             label: r.display_name,
                           }))}
                           value={user.pivot?.role_id?.toString() || ""}
-                          onChange={(value) => handleRoleAssignment(user.id, parseInt(value))}
+                          onChange={(value) =>
+                            handleRoleAssignment(user.id, parseInt(value))
+                          }
                           size="sm"
                           containerClassName="inline-block w-40"
                           disabled={isLoading}
@@ -344,18 +367,22 @@ export default function RoleManagement({
           setEditingRole(null);
           setSelectedPermissions([]);
         }}
-        title={editingRole ? `${t("roles.edit_role")} - ${editingRole.display_name}` : ""}
+        title={
+          editingRole
+            ? `${t("roles.edit_role")} - ${editingRole.display_name}`
+            : ""
+        }
         size="2xl"
       >
         <div className="space-y-6">
           <p className="text-sm text-gray-600 dark:text-gray-400">
             {t("roles.edit_role_subtitle")}
           </p>
-          
+
           <p className="text-sm text-gray-600 dark:text-gray-400">
             {t("roles.select_permissions")}
           </p>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[50vh] overflow-y-auto">
             {permissions.map((permission) => (
               <label
@@ -367,9 +394,16 @@ export default function RoleManagement({
                   checked={selectedPermissions.includes(permission.id)}
                   onChange={(e) => {
                     if (e.target.checked) {
-                      setSelectedPermissions([...selectedPermissions, permission.id]);
+                      setSelectedPermissions([
+                        ...selectedPermissions,
+                        permission.id,
+                      ]);
                     } else {
-                      setSelectedPermissions(selectedPermissions.filter(id => id !== permission.id));
+                      setSelectedPermissions(
+                        selectedPermissions.filter(
+                          (id) => id !== permission.id,
+                        ),
+                      );
                     }
                   }}
                   className="mt-0.5 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
@@ -406,7 +440,10 @@ export default function RoleManagement({
               variant="primary"
               buttonStyle="solid"
               size="md"
-              onClick={() => editingRole && handleSaveRole(editingRole.id, selectedPermissions)}
+              onClick={() =>
+                editingRole &&
+                handleSaveRole(editingRole.id, selectedPermissions)
+              }
               disabled={isLoading || selectedPermissions.length === 0}
               icon={Shield}
             >

@@ -72,17 +72,24 @@ export const useSocialMediaAuth = () => {
             } else if (isErrorEvent) {
               window.removeEventListener("message", handleMessage);
               authWindow.close();
-              
+
               setLoading(false);
-              const errorMsg = event.data?.message || "Error al conectar la cuenta";
-              
+              const errorMsg =
+                event.data?.message || "Error al conectar la cuenta";
+
               // Detectar errores específicos de rate limit
-              if (errorMsg.includes("429") || errorMsg.toLowerCase().includes("rate limit") || errorMsg.toLowerCase().includes("too many requests")) {
-                toast.error("Twitter/X: Límite de solicitudes excedido. Por favor, intenta de nuevo en unos minutos.");
+              if (
+                errorMsg.includes("429") ||
+                errorMsg.toLowerCase().includes("rate limit") ||
+                errorMsg.toLowerCase().includes("too many requests")
+              ) {
+                toast.error(
+                  "Twitter/X: Límite de solicitudes excedido. Por favor, intenta de nuevo en unos minutos.",
+                );
               } else {
                 toast.error(errorMsg);
               }
-              
+
               resolve(false);
             }
           };

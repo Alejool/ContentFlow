@@ -92,8 +92,7 @@ export default function ImageCropper({
         const croppedImage = await getCroppedImg(image, croppedAreaPixels);
         onCropComplete(croppedImage);
         onClose();
-      } catch (e) {
-        }
+      } catch (e) {}
     }
   };
 

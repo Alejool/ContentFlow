@@ -6,7 +6,10 @@ interface FormSkeletonProps {
   hasSubmitButton?: boolean;
 }
 
-const FormSkeleton = ({ fields = 4, hasSubmitButton = true }: FormSkeletonProps) => {
+const FormSkeleton = ({
+  fields = 4,
+  hasSubmitButton = true,
+}: FormSkeletonProps) => {
   return (
     <div className="space-y-6">
       {Array.from({ length: fields }).map((_, index) => (
@@ -15,7 +18,7 @@ const FormSkeleton = ({ fields = 4, hasSubmitButton = true }: FormSkeletonProps)
           <Skeleton className="h-10 w-full rounded-lg" />
         </div>
       ))}
-      
+
       {hasSubmitButton && (
         <div className="flex justify-end pt-4">
           <Skeleton className="h-10 w-32 rounded-lg" />

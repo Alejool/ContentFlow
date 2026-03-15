@@ -38,7 +38,7 @@ export function usePricing({
   const [expiredPlans, setExpiredPlans] = useState<string[]>([]);
   const [modal, setModal] = useState<PricingModal>(MODAL_CLOSED);
   const { billingCycle, setBillingCycle } = usePricingStore();
-  
+
   // Get auth from Inertia page props
   const { auth } = usePage<any>().props;
 
@@ -50,16 +50,16 @@ export function usePricing({
 
     const channel = window.Echo.channel(`user.${auth.user.id}`);
 
-    channel.listen('.subscription.updated', (event: any) => {
+    channel.listen(".subscription.updated", (event: any) => {
       // Refresh subscription data
       checkActiveSubscription().then(() => {
         // Reload Inertia props to update UI with new subscription data
-        router.reload({ only: ['auth', 'subscription', 'currentPlan'] });
+        router.reload({ only: ["auth", "subscription", "currentPlan"] });
       });
     });
 
     return () => {
-      channel.stopListening('.subscription.updated');
+      channel.stopListening(".subscription.updated");
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, auth?.user?.id]);
@@ -82,7 +82,10 @@ export function usePricing({
     window.location.href = "/dashboard";
   };
 
-  const handleSelectPlan = async (planId: string, forceCheckout: boolean = false) => {
+  const handleSelectPlan = async (
+    planId: string,
+    forceCheckout: boolean = false,
+  ) => {
     if (!isAuthenticated) {
       router.visit("/register", { data: { plan: planId }, method: "get" });
       return;
@@ -209,16 +212,15 @@ export function usePricing({
 
       // ── Success → reload data and redirect ─────────────────────────
       if (changeResponse.ok && changeData.success) {
-
         // Dispatch event FIRST
         window.dispatchEvent(new CustomEvent("subscription-plan-changed"));
-        
+
         // Wait a bit for WebSocket to propagate
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
         // Clear any cached subscription data
         await checkActiveSubscription();
-        
+
         // Force Inertia to reload ALL shared data
         router.reload({
           preserveScroll: false,
@@ -231,11 +233,11 @@ export function usePricing({
               `Tu plan ha sido cambiado exitosamente a ${changeData.plan}.`,
               {
                 closeLabel: "Entendido",
-              }
+              },
             );
-          }
+          },
         });
-        
+
         return;
       }
 

@@ -7,7 +7,7 @@ import { Publication } from "@/types/Publication";
 export function canUserPublishDirectly(
   publication: Publication | null | undefined,
   currentUserId: number | undefined,
-  permissions: string[]
+  permissions: string[],
 ): boolean {
   if (!publication || !currentUserId) return false;
 
@@ -20,7 +20,7 @@ export function canUserPublishDirectly(
     (log: any) =>
       log.requested_by === currentUserId &&
       log.action === "approved" &&
-      log.reviewed_at !== null
+      log.reviewed_at !== null,
   );
 
   if (!hasActiveApproval) return false;
@@ -45,7 +45,7 @@ export function canUserPublishDirectly(
 export function shouldShowRequestApproval(
   publication: Publication | null | undefined,
   currentUserId: number | undefined,
-  permissions: string[]
+  permissions: string[],
 ): boolean {
   if (!publication || !currentUserId) return false;
 

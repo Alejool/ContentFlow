@@ -1,10 +1,10 @@
 /**
  * Keyboard Navigation Hook
- * 
+ *
  * Provides keyboard navigation utilities for accessible components
  */
 
-import { useEffect, useCallback, RefObject } from 'react';
+import { useEffect, useCallback, RefObject } from "react";
 
 interface KeyboardNavigationOptions {
   onEscape?: () => void;
@@ -21,7 +21,7 @@ interface KeyboardNavigationOptions {
 
 export function useKeyboardNavigation(
   ref: RefObject<HTMLElement>,
-  options: KeyboardNavigationOptions
+  options: KeyboardNavigationOptions,
 ): void {
   const {
     onEscape,
@@ -41,63 +41,63 @@ export function useKeyboardNavigation(
       if (!enabled) return;
 
       switch (event.key) {
-        case 'Escape':
+        case "Escape":
           if (onEscape) {
             event.preventDefault();
             onEscape();
           }
           break;
 
-        case 'Enter':
+        case "Enter":
           if (onEnter) {
             event.preventDefault();
             onEnter();
           }
           break;
 
-        case 'ArrowUp':
+        case "ArrowUp":
           if (onArrowUp) {
             event.preventDefault();
             onArrowUp();
           }
           break;
 
-        case 'ArrowDown':
+        case "ArrowDown":
           if (onArrowDown) {
             event.preventDefault();
             onArrowDown();
           }
           break;
 
-        case 'ArrowLeft':
+        case "ArrowLeft":
           if (onArrowLeft) {
             event.preventDefault();
             onArrowLeft();
           }
           break;
 
-        case 'ArrowRight':
+        case "ArrowRight":
           if (onArrowRight) {
             event.preventDefault();
             onArrowRight();
           }
           break;
 
-        case 'Tab':
+        case "Tab":
           if (onTab) {
             event.preventDefault();
             onTab(event.shiftKey);
           }
           break;
 
-        case 'Home':
+        case "Home":
           if (onHome) {
             event.preventDefault();
             onHome();
           }
           break;
 
-        case 'End':
+        case "End":
           if (onEnd) {
             event.preventDefault();
             onEnd();
@@ -105,17 +105,28 @@ export function useKeyboardNavigation(
           break;
       }
     },
-    [enabled, onEscape, onEnter, onArrowUp, onArrowDown, onArrowLeft, onArrowRight, onTab, onHome, onEnd]
+    [
+      enabled,
+      onEscape,
+      onEnter,
+      onArrowUp,
+      onArrowDown,
+      onArrowLeft,
+      onArrowRight,
+      onTab,
+      onHome,
+      onEnd,
+    ],
   );
 
   useEffect(() => {
     const element = ref.current;
     if (!element || !enabled) return;
 
-    element.addEventListener('keydown', handleKeyDown);
+    element.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      element.removeEventListener('keydown', handleKeyDown);
+      element.removeEventListener("keydown", handleKeyDown);
     };
   }, [ref, handleKeyDown, enabled]);
 }
@@ -125,21 +136,21 @@ export function useKeyboardNavigation(
  */
 export function useFocusTrap(
   containerRef: RefObject<HTMLElement>,
-  enabled: boolean = true
+  enabled: boolean = true,
 ): void {
   useEffect(() => {
     if (!enabled || !containerRef.current) return;
 
     const container = containerRef.current;
     const focusableElements = container.querySelectorAll<HTMLElement>(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
     );
 
     const firstElement = focusableElements[0];
     const lastElement = focusableElements[focusableElements.length - 1];
 
     const handleTabKey = (e: KeyboardEvent) => {
-      if (e.key !== 'Tab') return;
+      if (e.key !== "Tab") return;
 
       if (e.shiftKey) {
         if (document.activeElement === firstElement) {
@@ -157,10 +168,10 @@ export function useFocusTrap(
     // Focus first element on mount
     firstElement?.focus();
 
-    container.addEventListener('keydown', handleTabKey);
+    container.addEventListener("keydown", handleTabKey);
 
     return () => {
-      container.removeEventListener('keydown', handleTabKey);
+      container.removeEventListener("keydown", handleTabKey);
     };
   }, [containerRef, enabled]);
 }
@@ -171,7 +182,7 @@ export function useFocusTrap(
 export function useRovingTabIndex(
   containerRef: RefObject<HTMLElement>,
   itemSelector: string = '[role="menuitem"], [role="option"]',
-  orientation: 'horizontal' | 'vertical' = 'vertical'
+  orientation: "horizontal" | "vertical" = "vertical",
 ): void {
   useEffect(() => {
     if (!containerRef.current) return;
@@ -180,13 +191,15 @@ export function useRovingTabIndex(
     let currentIndex = 0;
 
     const updateTabIndex = () => {
-      const items = Array.from(container.querySelectorAll<HTMLElement>(itemSelector));
-      
+      const items = Array.from(
+        container.querySelectorAll<HTMLElement>(itemSelector),
+      );
+
       items.forEach((item, index) => {
         if (index === currentIndex) {
-          item.setAttribute('tabindex', '0');
+          item.setAttribute("tabindex", "0");
         } else {
-          item.setAttribute('tabindex', '-1');
+          item.setAttribute("tabindex", "-1");
         }
       });
 
@@ -195,8 +208,8 @@ export function useRovingTabIndex(
 
     const handleKeyDown = (e: KeyboardEvent) => {
       const items = updateTabIndex();
-      const nextKey = orientation === 'vertical' ? 'ArrowDown' : 'ArrowRight';
-      const prevKey = orientation === 'vertical' ? 'ArrowUp' : 'ArrowLeft';
+      const nextKey = orientation === "vertical" ? "ArrowDown" : "ArrowRight";
+      const prevKey = orientation === "vertical" ? "ArrowUp" : "ArrowLeft";
 
       if (e.key === nextKey) {
         e.preventDefault();
@@ -208,12 +221,12 @@ export function useRovingTabIndex(
         currentIndex = (currentIndex - 1 + items.length) % items.length;
         updateTabIndex();
         items[currentIndex]?.focus();
-      } else if (e.key === 'Home') {
+      } else if (e.key === "Home") {
         e.preventDefault();
         currentIndex = 0;
         updateTabIndex();
         items[currentIndex]?.focus();
-      } else if (e.key === 'End') {
+      } else if (e.key === "End") {
         e.preventDefault();
         currentIndex = items.length - 1;
         updateTabIndex();
@@ -222,10 +235,10 @@ export function useRovingTabIndex(
     };
 
     updateTabIndex();
-    container.addEventListener('keydown', handleKeyDown);
+    container.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      container.removeEventListener('keydown', handleKeyDown);
+      container.removeEventListener("keydown", handleKeyDown);
     };
   }, [containerRef, itemSelector, orientation]);
 }

@@ -5,7 +5,7 @@
 /**
  * Handle keyboard events for clickable elements
  * Use this for div/span elements that need to be clickable
- * 
+ *
  * @example
  * <div
  *   onClick={handleClick}
@@ -18,7 +18,7 @@
  */
 export const handleKeyboardClick = (callback: () => void) => {
   return (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
+    if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       callback();
     }
@@ -27,7 +27,7 @@ export const handleKeyboardClick = (callback: () => void) => {
 
 /**
  * Props for making a div/span clickable and accessible
- * 
+ *
  * @example
  * <div {...makeClickable(handleClick)}>
  *   Click me
@@ -35,7 +35,7 @@ export const handleKeyboardClick = (callback: () => void) => {
  */
 export const makeClickable = (onClick: () => void) => {
   return {
-    role: 'button' as const,
+    role: "button" as const,
     tabIndex: 0,
     onClick,
     onKeyDown: handleKeyboardClick(onClick),
@@ -45,7 +45,7 @@ export const makeClickable = (onClick: () => void) => {
 /**
  * Empty array constant to use as default prop value
  * Prevents creating new array references on every render
- * 
+ *
  * @example
  * function MyComponent({ items = EMPTY_ARRAY }: { items?: Item[] }) {
  *   // items will always be the same reference when empty

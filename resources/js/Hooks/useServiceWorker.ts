@@ -1,16 +1,16 @@
 /**
  * useServiceWorker Hook
- * 
+ *
  * React hook for managing service worker lifecycle and updates
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   registerServiceWorker,
   skipWaiting,
   getServiceWorkerStatus,
   isStandalone,
-} from '../utils/registerServiceWorker';
+} from "../utils/registerServiceWorker";
 
 interface UseServiceWorkerReturn {
   isSupported: boolean;
@@ -40,25 +40,23 @@ export function useServiceWorker(): UseServiceWorkerReturn {
       onUpdate: () => {
         setHasUpdate(true);
       },
-      onOnline: () => {
-        },
-      onOffline: () => {
-        },
+      onOnline: () => {},
+      onOffline: () => {},
     });
 
     // Check if running as standalone PWA
     setStandalone(isStandalone());
 
     // Listen for display mode changes
-    const mediaQuery = window.matchMedia('(display-mode: standalone)');
+    const mediaQuery = window.matchMedia("(display-mode: standalone)");
     const handleChange = (e: MediaQueryListEvent) => {
       setStandalone(e.matches);
     };
 
-    mediaQuery.addEventListener('change', handleChange);
+    mediaQuery.addEventListener("change", handleChange);
 
     return () => {
-      mediaQuery.removeEventListener('change', handleChange);
+      mediaQuery.removeEventListener("change", handleChange);
     };
   }, []);
 

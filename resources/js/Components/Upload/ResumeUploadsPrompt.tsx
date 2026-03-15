@@ -7,13 +7,20 @@ import toast from "react-hot-toast";
 export function ResumeUploadsPrompt() {
   const persistedState = useUploadQueue((state) => state.persistedState);
   const showResumePrompt = useUploadQueue((state) => state.showResumePrompt);
-  const dismissResumePrompt = useUploadQueue((state) => state.dismissResumePrompt);
-  const clearAllPersistedUploads = useUploadQueue((state) => state.clearAllPersistedUploads);
-  
+  const dismissResumePrompt = useUploadQueue(
+    (state) => state.dismissResumePrompt,
+  );
+  const clearAllPersistedUploads = useUploadQueue(
+    (state) => state.clearAllPersistedUploads,
+  );
+
   const { t } = useTranslation();
 
   const incompleteUploads = Object.values(persistedState).filter(
-    (upload) => upload.status === "uploading" || upload.status === "paused" || upload.status === "pending"
+    (upload) =>
+      upload.status === "uploading" ||
+      upload.status === "paused" ||
+      upload.status === "pending",
   );
 
   if (!showResumePrompt || incompleteUploads.length === 0) {
@@ -22,7 +29,7 @@ export function ResumeUploadsPrompt() {
 
   const handleGoToContent = () => {
     // Navigate to content page where user can manage publications
-    router.visit('/content');
+    router.visit("/content");
     dismissResumePrompt();
   };
 
@@ -44,9 +51,13 @@ export function ResumeUploadsPrompt() {
                 {t("common.upload.resume_prompt.title")}
               </h3>
               <p className="text-xs text-gray-600 dark:text-neutral-400 mt-1">
-                {incompleteUploads.length === 1 
-                  ? t("common.upload.resume_prompt.description", { count: incompleteUploads.length })
-                  : t("common.upload.resume_prompt.description_plural", { count: incompleteUploads.length })}
+                {incompleteUploads.length === 1
+                  ? t("common.upload.resume_prompt.description", {
+                      count: incompleteUploads.length,
+                    })
+                  : t("common.upload.resume_prompt.description_plural", {
+                      count: incompleteUploads.length,
+                    })}
               </p>
             </div>
           </div>
@@ -78,7 +89,9 @@ export function ResumeUploadsPrompt() {
           ))}
           {incompleteUploads.length > 3 && (
             <div className="text-xs text-gray-500 dark:text-neutral-400 text-center">
-              {t("common.upload.resume_prompt.more", { count: incompleteUploads.length - 3 })}
+              {t("common.upload.resume_prompt.more", {
+                count: incompleteUploads.length - 3,
+              })}
             </div>
           )}
         </div>

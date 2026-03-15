@@ -1,6 +1,6 @@
 export const parseUserAgent = (userAgent?: string): string => {
   if (!userAgent) return "Unknown Device";
-  
+
   let browser = "Unknown Browser";
   if (userAgent.includes("Firefox")) browser = "Firefox";
   else if (userAgent.includes("Edg")) browser = "Edge";

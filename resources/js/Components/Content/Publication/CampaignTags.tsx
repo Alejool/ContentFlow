@@ -6,17 +6,12 @@ interface CampaignTagsProps {
   t: (key: string) => string;
 }
 
-const CampaignTags = memo(({
-  publication,
-  t,
-}: CampaignTagsProps) => {
+const CampaignTags = memo(({ publication, t }: CampaignTagsProps) => {
   const campaigns = publication.campaigns || [];
 
   if (campaigns.length === 0) {
     return (
-      <span
-        className="text-xs italic text-gray-400 dark:text-gray-500"
-      >
+      <span className="text-xs italic text-gray-400 dark:text-gray-500">
         {t("publications.table.noCampaign")}
       </span>
     );
@@ -24,13 +19,13 @@ const CampaignTags = memo(({
 
   const handleCampaignClick = (campaignId: number) => {
     const campaignTab = document.querySelector(
-      '[data-tab="campaigns"]'
+      '[data-tab="campaigns"]',
     ) as HTMLButtonElement;
     if (campaignTab) {
       campaignTab.click();
       setTimeout(() => {
         const campaignRow = document.querySelector(
-          `[data-campaign-id="${campaignId}"]`
+          `[data-campaign-id="${campaignId}"]`,
         );
         if (campaignRow) {
           campaignRow.scrollIntoView({
@@ -38,7 +33,7 @@ const CampaignTags = memo(({
             block: "center",
           });
           const expandButton = campaignRow.querySelector(
-            "button[data-expand]"
+            "button[data-expand]",
           ) as HTMLButtonElement;
           if (expandButton && !expandButton.getAttribute("data-expanded")) {
             expandButton.click();

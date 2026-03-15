@@ -6,7 +6,10 @@ interface TableRowSkeletonProps {
   hasActions?: boolean;
 }
 
-const TableRowSkeleton = ({ columns = 5, hasActions = true }: TableRowSkeletonProps) => {
+const TableRowSkeleton = ({
+  columns = 5,
+  hasActions = true,
+}: TableRowSkeletonProps) => {
   return (
     <tr className="border-b border-gray-50 dark:border-neutral-800">
       {Array.from({ length: columns }).map((_, index) => (

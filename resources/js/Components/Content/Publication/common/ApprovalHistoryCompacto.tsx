@@ -1,5 +1,11 @@
 import ApprovalHistorySection from "@/Components/Content/Publication/common/edit/ApprovalHistorySection";
-import { AlertCircle, CheckCircle, ChevronDown, ChevronUp, Shield } from "lucide-react";
+import {
+  AlertCircle,
+  CheckCircle,
+  ChevronDown,
+  ChevronUp,
+  Shield,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface ApprovalHistoryCompactoProps {
@@ -8,7 +14,7 @@ interface ApprovalHistoryCompactoProps {
   onToggle: () => void;
   workflow?: any;
   currentStepNumber?: number;
-  approvalStatus?: 'pending' | 'approved' | 'rejected' | 'cancelled';
+  approvalStatus?: "pending" | "approved" | "rejected" | "cancelled";
 }
 
 const ApprovalHistoryCompacto = ({
@@ -34,7 +40,9 @@ const ApprovalHistoryCompacto = ({
   const getApprovalStats = () => {
     const approved = logs.filter((log) => log.action === "approved").length;
     const rejected = logs.filter((log) => log.action === "rejected").length;
-    const pending = logs.filter((log) => log.action === "submitted" || (!log.action)).length;
+    const pending = logs.filter(
+      (log) => log.action === "submitted" || !log.action,
+    ).length;
 
     return { approved, rejected, pending };
   };
@@ -115,8 +123,8 @@ const ApprovalHistoryCompacto = ({
 
       {isExpanded && (
         <div className="border-t border-gray-200 dark:border-neutral-600 p-4 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
-          <ApprovalHistorySection 
-            logs={logs} 
+          <ApprovalHistorySection
+            logs={logs}
             workflow={workflow}
             currentStepNumber={currentStepNumber}
             approvalStatus={approvalStatus}

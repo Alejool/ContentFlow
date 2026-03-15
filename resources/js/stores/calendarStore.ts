@@ -1,15 +1,15 @@
 import axios from "axios";
-import { 
-  endOfMonth, 
-  endOfWeek, 
-  startOfMonth, 
+import {
+  endOfMonth,
+  endOfWeek,
+  startOfMonth,
   startOfWeek,
   addMonths,
   subMonths,
   addWeeks,
   subWeeks,
   addDays,
-  subDays
+  subDays,
 } from "date-fns";
 import { create } from "zustand";
 import { CalendarEvent, CalendarView, CalendarFilters } from "@/types/calendar";
@@ -64,7 +64,7 @@ interface CalendarState {
   navigateToToday: () => void;
   navigateToDate: (date: Date) => void;
   setConflict: (conflict: DataConflict | null) => void;
-  resolveConflict: (resolution: 'local' | 'server') => Promise<boolean>;
+  resolveConflict: (resolution: "local" | "server") => Promise<boolean>;
 }
 
 export const useCalendarStore = create<CalendarState>((set, get) => ({
@@ -93,10 +93,10 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
   setCampaignFilter: (campaign) => set({ campaignFilter: campaign }),
   setView: (view) => {
     // Persist view preference to localStorage
-    localStorage.setItem('calendar_preferred_view', view);
+    localStorage.setItem("calendar_preferred_view", view);
     set({ view });
   },
-  
+
   setFilters: (filters) => {
     set({ filters });
     // React Query will handle re-fetching with new filters
@@ -104,7 +104,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
 
   applyFilters: (events) => {
     const { filters } = get();
-    
+
     // If no filters are active, return all events
     if (
       filters.platforms.length === 0 &&
@@ -119,17 +119,26 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       // Platform filter - normalize both sides to lowercase for comparison
       const platformMatch =
         filters.platforms.length === 0 ||
-        (event.platform && filters.platforms.map(p => p.toLowerCase()).includes(event.platform.toLowerCase())) ||
-        (event.extendedProps?.platforms && 
-         Array.isArray(event.extendedProps.platforms) &&
-         event.extendedProps.platforms.some((p: string) => filters.platforms.map(f => f.toLowerCase()).includes(p.toLowerCase())));
+        (event.platform &&
+          filters.platforms
+            .map((p) => p.toLowerCase())
+            .includes(event.platform.toLowerCase())) ||
+        (event.extendedProps?.platforms &&
+          Array.isArray(event.extendedProps.platforms) &&
+          event.extendedProps.platforms.some((p: string) =>
+            filters.platforms
+              .map((f) => f.toLowerCase())
+              .includes(p.toLowerCase()),
+          ));
 
       // Campaign filter - check if event's campaign matches any selected campaign
       const campaignMatch =
         filters.campaigns.length === 0 ||
-        (event.extendedProps?.campaigns && 
-         Array.isArray(event.extendedProps.campaigns) &&
-         event.extendedProps.campaigns.some((c: string) => filters.campaigns.includes(c)));
+        (event.extendedProps?.campaigns &&
+          Array.isArray(event.extendedProps.campaigns) &&
+          event.extendedProps.campaigns.some((c: string) =>
+            filters.campaigns.includes(c),
+          ));
 
       // Status filter
       const statusMatch =
@@ -145,7 +154,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
     const { events } = get();
     return get().applyFilters(events);
   },
-  
+
   toggleEventSelection: (eventId) => {
     const selectedEvents = new Set(get().selectedEvents);
     if (selectedEvents.has(eventId)) {
@@ -157,9 +166,11 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
   },
 
   clearSelection: () => set({ selectedEvents: new Set() }),
-  
+
   selectAll: () => {
-    const allEventIds = get().getFilteredEvents().map(e => e.id);
+    const allEventIds = get()
+      .getFilteredEvents()
+      .map((e) => e.id);
     set({ selectedEvents: new Set(allEventIds) });
   },
 
@@ -173,15 +184,15 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
 
       // Build query params with filters
       const params: any = { start, end };
-      
+
       if (filters.platforms.length > 0) {
-        params.platforms = filters.platforms.join(',');
+        params.platforms = filters.platforms.join(",");
       }
       if (filters.campaigns.length > 0) {
-        params.campaigns = filters.campaigns.join(',');
+        params.campaigns = filters.campaigns.join(",");
       }
       if (filters.statuses.length > 0) {
-        params.statuses = filters.statuses.join(',');
+        params.statuses = filters.statuses.join(",");
       }
 
       const response = await axios.get(route("api.v1.calendar.events"), {
@@ -199,13 +210,13 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       });
     }
   },
-  
+
   // Method to set events from React Query (for cache integration)
   setEvents: (events: CalendarEvent[]) => set({ events, isLoading: false }),
-  
+
   // Method to set loading state
   setLoading: (isLoading: boolean) => set({ isLoading }),
-  
+
   // Method to set error state
   setError: (error: string | null) => set({ error }),
 
@@ -214,18 +225,18 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       // Validate that the new date is not in the past
       const targetDate = new Date(newDate);
       const now = new Date();
-      
+
       // Set both dates to start of day for comparison
       const targetDay = new Date(targetDate);
       targetDay.setHours(0, 0, 0, 0);
       const today = new Date(now);
       today.setHours(0, 0, 0, 0);
-      
+
       // Prevent moving to past dates
       if (targetDay < today) {
         throw new Error("No puedes mover eventos a fechas anteriores a hoy");
       }
-      
+
       const resourceId = id.split("_").pop();
       let eventType = type;
 
@@ -236,7 +247,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       }
 
       // Get current event for conflict detection
-      const currentEvent = get().events.find(ev => ev.id === id);
+      const currentEvent = get().events.find((ev) => ev.id === id);
 
       await axios.patch(`/api/v1/calendar/events/${resourceId}`, {
         scheduled_at: newDate,
@@ -257,7 +268,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
         const conflictData = error.response.data.conflict;
         const conflict: DataConflict = {
           eventId: id,
-          field: conflictData.field || 'start',
+          field: conflictData.field || "start",
           localValue: newDate,
           serverValue: conflictData.server_value,
           localTimestamp: new Date(),
@@ -271,7 +282,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       set({
         error: error.message ?? "Failed to update event",
       });
-      
+
       // Re-throw the error so it can be caught by the caller
       throw error;
     }
@@ -296,10 +307,10 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
 
   bulkUpdateEvents: async (eventIds, newDate) => {
     try {
-      const response = await axios.post('/api/v1/calendar/bulk-update', {
+      const response = await axios.post("/api/v1/calendar/bulk-update", {
         event_ids: eventIds,
         new_date: newDate,
-        operation: 'move',
+        operation: "move",
       });
 
       if (response.data.success) {
@@ -307,17 +318,17 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
         const events = get().events.map((ev) =>
           eventIds.includes(ev.id) ? { ...ev, start: newDate } : ev,
         );
-        set({ 
-          events, 
+        set({
+          events,
           selectedEvents: new Set(),
           canUndo: true,
           lastBulkOperation: response.data.data,
           lastBulkOperationTime: new Date(),
         });
-        
+
         return true;
       }
-      
+
       return false;
     } catch (error: any) {
       set({
@@ -330,26 +341,26 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
 
   bulkDeleteEvents: async (eventIds) => {
     try {
-      const response = await axios.post('/api/v1/calendar/bulk-update', {
+      const response = await axios.post("/api/v1/calendar/bulk-update", {
         event_ids: eventIds,
         new_date: new Date().toISOString(), // Not used for delete
-        operation: 'delete',
+        operation: "delete",
       });
 
       if (response.data.success) {
         // Remove deleted events from local state
         const events = get().events.filter((ev) => !eventIds.includes(ev.id));
-        set({ 
-          events, 
+        set({
+          events,
           selectedEvents: new Set(),
           canUndo: true,
           lastBulkOperation: response.data.data,
           lastBulkOperationTime: new Date(),
         });
-        
+
         return true;
       }
-      
+
       return false;
     } catch (error: any) {
       set({
@@ -362,20 +373,20 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
 
   undoBulkOperation: async () => {
     try {
-      const response = await axios.post('/api/v1/calendar/bulk-undo');
+      const response = await axios.post("/api/v1/calendar/bulk-undo");
 
       if (response.data.success) {
         // Refresh events to get the restored state
         await get().fetchEvents();
-        set({ 
+        set({
           canUndo: false,
           lastBulkOperation: null,
           lastBulkOperationTime: null,
         });
-        
+
         return true;
       }
-      
+
       return false;
     } catch (error: any) {
       set({
@@ -390,12 +401,13 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
     if (!state.canUndo || !state.lastBulkOperationTime) {
       return false;
     }
-    
+
     // Check if operation is within 5 minutes
     const now = new Date();
     const operationTime = new Date(state.lastBulkOperationTime);
-    const diffInMinutes = (now.getTime() - operationTime.getTime()) / (1000 * 60);
-    
+    const diffInMinutes =
+      (now.getTime() - operationTime.getTime()) / (1000 * 60);
+
     return diffInMinutes < 5;
   },
 
@@ -425,7 +437,10 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
     } catch (error: any) {
       console.error("Delete event error:", error);
       set({
-        error: error.response?.data?.message || error.message || "Failed to delete event",
+        error:
+          error.response?.data?.message ||
+          error.message ||
+          "Failed to delete event",
       });
       return false;
     }
@@ -434,17 +449,17 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
   exportToGoogleCalendar: async () => {
     try {
       const { events } = get();
-      const response = await axios.post('/api/v1/calendar/export/google', {
-        events: events.map(e => ({
+      const response = await axios.post("/api/v1/calendar/export/google", {
+        events: events.map((e) => ({
           title: e.title,
           start: e.start,
           end: e.end,
           description: `Status: ${e.status}`,
         })),
       });
-      
+
       if (response.data.url) {
-        window.open(response.data.url, '_blank');
+        window.open(response.data.url, "_blank");
       }
     } catch (error: any) {
       set({
@@ -456,17 +471,17 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
   exportToOutlook: async () => {
     try {
       const { events } = get();
-      const response = await axios.post('/api/v1/calendar/export/outlook', {
-        events: events.map(e => ({
+      const response = await axios.post("/api/v1/calendar/export/outlook", {
+        events: events.map((e) => ({
           title: e.title,
           start: e.start,
           end: e.end,
           description: `Status: ${e.status}`,
         })),
       });
-      
+
       if (response.data.url) {
-        window.open(response.data.url, '_blank');
+        window.open(response.data.url, "_blank");
       }
     } catch (error: any) {
       set({
@@ -481,13 +496,13 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
     let newDate: Date;
 
     switch (view) {
-      case 'day':
+      case "day":
         newDate = subDays(currentMonth, 1);
         break;
-      case 'week':
+      case "week":
         newDate = subWeeks(currentMonth, 1);
         break;
-      case 'month':
+      case "month":
       default:
         newDate = subMonths(currentMonth, 1);
         break;
@@ -502,13 +517,13 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
     let newDate: Date;
 
     switch (view) {
-      case 'day':
+      case "day":
         newDate = addDays(currentMonth, 1);
         break;
-      case 'week':
+      case "week":
         newDate = addWeeks(currentMonth, 1);
         break;
-      case 'month':
+      case "month":
       default:
         newDate = addMonths(currentMonth, 1);
         break;
@@ -532,26 +547,36 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
     set({ conflict });
   },
 
-  resolveConflict: async (resolution: 'local' | 'server') => {
+  resolveConflict: async (resolution: "local" | "server") => {
     const { conflict } = get();
     if (!conflict) return false;
 
     try {
       const resourceId = conflict.eventId.split("_").pop();
-      
-      await axios.post(`/api/v1/calendar/events/${resourceId}/resolve-conflict`, {
-        resolution,
-        field: conflict.field,
-        value: resolution === 'local' ? conflict.localValue : conflict.serverValue,
-      });
+
+      await axios.post(
+        `/api/v1/calendar/events/${resourceId}/resolve-conflict`,
+        {
+          resolution,
+          field: conflict.field,
+          value:
+            resolution === "local" ? conflict.localValue : conflict.serverValue,
+        },
+      );
 
       // Update local state
       const events = get().events.map((ev) =>
-        ev.id === conflict.eventId 
-          ? { ...ev, [conflict.field]: resolution === 'local' ? conflict.localValue : conflict.serverValue } 
+        ev.id === conflict.eventId
+          ? {
+              ...ev,
+              [conflict.field]:
+                resolution === "local"
+                  ? conflict.localValue
+                  : conflict.serverValue,
+            }
           : ev,
       );
-      
+
       set({ events, conflict: null });
       return true;
     } catch (error: any) {

@@ -81,7 +81,8 @@ export default function PublicationStatusSection({
                     )}
                     {totalInProgress > 0 && (
                       <span className="font-medium text-blue-600 dark:text-blue-400">
-                        {totalInProgress} {t("publish.inProgress") || "en curso"}
+                        {totalInProgress}{" "}
+                        {t("publish.inProgress") || "en curso"}
                       </span>
                     )}
                   </p>

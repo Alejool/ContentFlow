@@ -32,12 +32,13 @@ export default function PlatformModalContent({
   onAllSettingsChange,
 }: PlatformModalContentProps) {
   const { t } = useTranslation();
-  const isAllPlatforms = platform.toLowerCase() === "all" || allPlatforms.length > 0;
+  const isAllPlatforms =
+    platform.toLowerCase() === "all" || allPlatforms.length > 0;
 
   const renderPlatformSettings = (
     platformName: string,
     platformSettings: any,
-    onChange: (newSettings: any) => void
+    onChange: (newSettings: any) => void,
   ) => {
     switch (platformName.toLowerCase()) {
       case "youtube":
@@ -83,8 +84,9 @@ export default function PlatformModalContent({
 
   const getPlatformIcon = (platformName: string) => {
     const platformKey = platformName.toLowerCase();
-    const platformConfig = SOCIAL_PLATFORMS[platformKey as keyof typeof SOCIAL_PLATFORMS];
-    
+    const platformConfig =
+      SOCIAL_PLATFORMS[platformKey as keyof typeof SOCIAL_PLATFORMS];
+
     if (platformConfig && platformConfig.logo) {
       return (
         <img
@@ -94,7 +96,7 @@ export default function PlatformModalContent({
         />
       );
     }
-    
+
     return <Settings2 className="w-6 h-6 text-primary-500" />;
   };
 
@@ -109,7 +111,8 @@ export default function PlatformModalContent({
             <div className="flex items-center gap-3 mb-6">
               {getPlatformIcon(platformName)}
               <h3 className="text-lg font-bold uppercase">
-                {t(`platformSettings.${platformName.toLowerCase()}.title`) || platformName}
+                {t(`platformSettings.${platformName.toLowerCase()}.title`) ||
+                  platformName}
               </h3>
             </div>
             {renderPlatformSettings(
@@ -119,7 +122,7 @@ export default function PlatformModalContent({
                 if (onAllSettingsChange) {
                   onAllSettingsChange(platformName.toLowerCase(), newSettings);
                 }
-              }
+              },
             )}
           </div>
         ))}

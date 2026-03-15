@@ -4,12 +4,12 @@ import WorkspaceSwitcher from "@/Components/Workspace/WorkspaceSwitcher";
 import { useTheme } from "@/Hooks/useTheme";
 import { Link, usePage } from "@inertiajs/react";
 import {
-    BarChart3,
-    ChevronLeft,
-    ChevronRight,
-    FileText,
-    Home,
-    Layers,
+  BarChart3,
+  ChevronLeft,
+  ChevronRight,
+  FileText,
+  Home,
+  Layers,
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -55,12 +55,12 @@ export default function Sidebar({
 
   // Get user permissions from current workspace
   const userPermissions = auth?.current_workspace?.permissions || [];
-  const hasAnalyticsPermission = userPermissions.includes('view-analytics');
+  const hasAnalyticsPermission = userPermissions.includes("view-analytics");
 
   // Filter navigation items based on permissions
   const filteredNavigationItems = navigationItems.filter((item) => {
     // Hide Analytics if user doesn't have view-analytics permission
-    if (item.href === 'analytics.index' && !hasAnalyticsPermission) {
+    if (item.href === "analytics.index" && !hasAnalyticsPermission) {
       return false;
     }
     return true;
@@ -121,9 +121,6 @@ export default function Sidebar({
     logoutHoverBg: isDark
       ? "hover:bg-primary-900/30 hover:text-primary-300"
       : "hover:bg-red-50 hover:text-red-600",
-    tooltipBg: isDark
-      ? "bg-neutral-800 text-gray-100"
-      : "bg-gray-900 text-white",
   };
 
   return (
@@ -157,7 +154,9 @@ export default function Sidebar({
                 )}
                 {logoError ? (
                   <span className="text-lg font-bold text-primary-600 dark:text-primary-400">
-                    {(auth?.current_workspace?.name || "C").charAt(0).toUpperCase()}
+                    {(auth?.current_workspace?.name || "C")
+                      .charAt(0)
+                      .toUpperCase()}
                   </span>
                 ) : (
                   <img
@@ -225,18 +224,15 @@ export default function Sidebar({
 
           <WorkspaceSwitcher isSidebarOpen={isSidebarOpen} />
 
-          <nav
-            className="flex-1 px-4  space-y-2"
-            aria-label="Main navigation"
-          >
+          <nav className="flex-1 px-4  space-y-2" aria-label="Main navigation">
             {filteredNavigationItems.map((item) => {
               const isActive = !!route().current(item.href);
-              return (
+              const navLink = (
                 <NavLink
                   key={item.href}
                   href={getRouteUrl(item.href)}
                   active={isActive}
-                  className={`group w-full flex items-center
+                  className={`group relative w-full flex items-center
                         px-4 py-3 text-sm
                         ${isSidebarOpen ? "" : "justify-center"}
                         font-medium rounded-lg transition-all duration-300
@@ -261,22 +257,18 @@ export default function Sidebar({
 
                   {!isSidebarOpen && (
                     <div
-                      className={`absolute left-full ml-2 px-3 py-2
-                        ${classes.tooltipBg} text-sm rounded-lg
-                        opacity-0 group-hover:opacity-100 transition-opacity
-                        duration-200 pointer-events-none whitespace-nowrap
-                        z-50`}
+                      className={`absolute left-full ml-2 px-3 py-2 text-sm rounded-lg
+                      opacity-0 group-hover:opacity-100 transition-opacity duration-200
+                      pointer-events-none whitespace-nowrap z-50
+                      ${isDark ? "bg-neutral-800 text-gray-100" : "bg-gray-900 text-white"}`}
                     >
                       {t(item.nameKey)}
-                      <div
-                        className={`absolute left-0 top-1/2 transform
-                        -translate-y-1/2 -translate-x-1 w-2 h-2
-                        ${isDark ? "bg-neutral-800" : "bg-gray-900"} rotate-45`}
-                      />
                     </div>
                   )}
                 </NavLink>
               );
+
+              return navLink;
             })}
           </nav>
         </div>

@@ -3,7 +3,13 @@ import { useS3Upload } from "@/Hooks/useS3Upload";
 import { useUploadQueue } from "@/stores/uploadQueueStore";
 import { useProcessingProgress } from "@/stores/processingProgressStore";
 import axios from "axios";
-import { AlertTriangle, CheckCircle2, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  Loader2,
+} from "lucide-react";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { UploadItem } from "./Upload/UploadItem";
@@ -16,21 +22,25 @@ export default function GlobalUploadIndicator() {
   const queue = useUploadQueue((state) => state.queue);
   const removeUpload = useUploadQueue((state) => state.removeUpload);
   const retryUpload = useUploadQueue((state) => state.retryUpload);
-  
-  const { 
-    pauseUpload, 
-    resumeUpload: resumeUploadWithLogic, 
-    cancelUpload: cancelUploadWithCleanup 
+
+  const {
+    pauseUpload,
+    resumeUpload: resumeUploadWithLogic,
+    cancelUpload: cancelUploadWithCleanup,
   } = useS3Upload();
-  
+
   const processingJobs = useProcessingProgress((state) => state.jobs);
   const cancelJob = useProcessingProgress((state) => state.cancelJob);
-  
+
   const [isExpanded, setIsExpanded] = useState(false);
   const [dismissedIds, setDismissedIds] = useState<number[]>([]);
-  const [uploadProgressUpdates, setUploadProgressUpdates] = useState<Record<string, number>>({});
-  const [processingProgressUpdates, setProcessingProgressUpdates] = useState<Record<string, number>>({});
-  
+  const [uploadProgressUpdates, setUploadProgressUpdates] = useState<
+    Record<string, number>
+  >({});
+  const [processingProgressUpdates, setProcessingProgressUpdates] = useState<
+    Record<string, number>
+  >({});
+
   const { t } = useTranslation();
   const { confirm, ConfirmDialog } = useConfirm();
 
@@ -38,24 +48,40 @@ export default function GlobalUploadIndicator() {
   const uploads = Object.values(queue);
   const jobs = Object.values(processingJobs);
 
-  const activeUploads = uploads.filter((u) => u.status === "uploading" || u.status === "pending" || u.status === "paused");
+  const activeUploads = uploads.filter(
+    (u) =>
+      u.status === "uploading" ||
+      u.status === "pending" ||
+      u.status === "paused",
+  );
   const errorUploads = uploads.filter((u) => u.status === "error");
 
   const activePublications = publications.filter(
-    (p) => p.status === "processing" || p.status === "publishing"
+    (p) => p.status === "processing" || p.status === "publishing",
   );
   const failedPublications = publications.filter((p) => p.status === "failed");
-  const completedPublications = publications.filter((p) => p.status === "published");
-  
-  const activeJobs = jobs.filter((j) => j.status === "processing" || j.status === "queued");
+  const completedPublications = publications.filter(
+    (p) => p.status === "published",
+  );
+
+  const activeJobs = jobs.filter(
+    (j) => j.status === "processing" || j.status === "queued",
+  );
   const failedJobs = jobs.filter((j) => j.status === "failed");
 
-  const totalActive = activeUploads.length + activePublications.length + activeJobs.length;
-  const hasErrors = errorUploads.length > 0 || failedPublications.length > 0 || failedJobs.length > 0;
-  const hasCompleted = completedPublications.length > 0 || uploads.some((u) => u.status === "completed") || jobs.some((j) => j.status === "completed");
+  const totalActive =
+    activeUploads.length + activePublications.length + activeJobs.length;
+  const hasErrors =
+    errorUploads.length > 0 ||
+    failedPublications.length > 0 ||
+    failedJobs.length > 0;
+  const hasCompleted =
+    completedPublications.length > 0 ||
+    uploads.some((u) => u.status === "completed") ||
+    jobs.some((j) => j.status === "completed");
 
   useUploadWarning(activeUploads.length > 0);
-  
+
   // Progress update responsiveness: 500ms for uploads, 1s for processing
   useEffect(() => {
     const uploadInterval = setInterval(() => {
@@ -85,10 +111,16 @@ export default function GlobalUploadIndicator() {
     e.stopPropagation();
 
     const isConfirmed = await confirm({
-      title: t("publications.modal.cancel_confirmation.title") || "Cancelar Publicación",
-      message: t("publications.modal.cancel_confirmation.message") || "¿Cancelar esta publicación?",
-      confirmText: t("publications.modal.cancel_confirmation.confirm") || "Sí, cancelar",
-      cancelText: t("publications.modal.cancel_confirmation.cancel") || "No, continuar",
+      title:
+        t("publications.modal.cancel_confirmation.title") ||
+        "Cancelar Publicación",
+      message:
+        t("publications.modal.cancel_confirmation.message") ||
+        "¿Cancelar esta publicación?",
+      confirmText:
+        t("publications.modal.cancel_confirmation.confirm") || "Sí, cancelar",
+      cancelText:
+        t("publications.modal.cancel_confirmation.cancel") || "No, continuar",
       type: "danger",
     });
 
@@ -96,15 +128,28 @@ export default function GlobalUploadIndicator() {
 
     try {
       await axios.post(route("api.v1.publications.cancel", id));
-    } catch (err) {
-      }
+    } catch (err) {}
   };
 
-  const handleCancelPlatform = async (publicationId: number, platformId: number, platformName: string) => {
+  const handleCancelPlatform = async (
+    publicationId: number,
+    platformId: number,
+    platformName: string,
+  ) => {
     const isConfirmed = await confirm({
-      title: t("publications.modal.cancel_platform.title", { platform: platformName }) || "¿Cancelar " + platformName + "?",
-      message: t("publications.modal.cancel_platform.message", { platform: platformName }) || "¿Estás seguro de que deseas cancelar la publicación en " + platformName + "? Se detendrán todos los reintentos para esta plataforma.",
-      confirmText: t("publications.modal.cancel_platform.confirm") || "Sí, cancelar",
+      title:
+        t("publications.modal.cancel_platform.title", {
+          platform: platformName,
+        }) || "¿Cancelar " + platformName + "?",
+      message:
+        t("publications.modal.cancel_platform.message", {
+          platform: platformName,
+        }) ||
+        "¿Estás seguro de que deseas cancelar la publicación en " +
+          platformName +
+          "? Se detendrán todos los reintentos para esta plataforma.",
+      confirmText:
+        t("publications.modal.cancel_platform.confirm") || "Sí, cancelar",
       cancelText: t("publications.modal.cancel_platform.cancel") || "No",
       type: "warning",
     });
@@ -113,65 +158,78 @@ export default function GlobalUploadIndicator() {
 
     try {
       await axios.post(route("api.v1.publications.cancel", publicationId), {
-        platform_ids: [platformId]
+        platform_ids: [platformId],
       });
-      
+
       // Force refresh of publication status after canceling
       // This will trigger a re-fetch of the publication data
-      window.dispatchEvent(new CustomEvent('publication-cancelled', { 
-        detail: { publicationId, platformId } 
-      }));
-    } catch (err) {
-      }
+      window.dispatchEvent(
+        new CustomEvent("publication-cancelled", {
+          detail: { publicationId, platformId },
+        }),
+      );
+    } catch (err) {}
   };
 
   const handleDismissPublication = (e: React.MouseEvent, id: number) => {
     e.stopPropagation();
     setDismissedIds((prev) => [...prev, id]);
   };
-  
+
   const handlePauseUpload = (id: string) => {
     pauseUpload(id);
   };
-  
+
   const handleResumeUpload = (id: string) => {
     resumeUploadWithLogic(id);
   };
-  
+
   const handleCancelUpload = async (id: string) => {
     const isConfirmed = await confirm({
-      title: t("publications.modal.cancel_confirmation.title") || "Cancel Upload",
-      message: t("publications.modal.upload.cancel_message") || "Are you sure you want to cancel this upload?",
-      confirmText: t("publications.modal.cancel_confirmation.confirm") || "Yes, cancel",
-      cancelText: t("publications.modal.cancel_confirmation.cancel") || "No, continue",
+      title:
+        t("publications.modal.cancel_confirmation.title") || "Cancel Upload",
+      message:
+        t("publications.modal.upload.cancel_message") ||
+        "Are you sure you want to cancel this upload?",
+      confirmText:
+        t("publications.modal.cancel_confirmation.confirm") || "Yes, cancel",
+      cancelText:
+        t("publications.modal.cancel_confirmation.cancel") || "No, continue",
       type: "danger",
     });
 
     if (!isConfirmed) return;
-    
+
     // Use the hook's cancelUpload which includes cleanup
     await cancelUploadWithCleanup(id);
   };
-  
+
   const handleCancelJob = async (id: string) => {
     const isConfirmed = await confirm({
-      title: t("publications.modal.cancel_confirmation.title") || "Cancel Processing",
-      message: t("publications.modal.processing.cancel_message") || "Are you sure you want to cancel this processing job?",
-      confirmText: t("publications.modal.cancel_confirmation.confirm") || "Yes, cancel",
-      cancelText: t("publications.modal.cancel_confirmation.cancel") || "No, continue",
+      title:
+        t("publications.modal.cancel_confirmation.title") ||
+        "Cancel Processing",
+      message:
+        t("publications.modal.processing.cancel_message") ||
+        "Are you sure you want to cancel this processing job?",
+      confirmText:
+        t("publications.modal.cancel_confirmation.confirm") || "Yes, cancel",
+      cancelText:
+        t("publications.modal.cancel_confirmation.cancel") || "No, continue",
       type: "danger",
     });
 
     if (!isConfirmed) return;
-    
+
     cancelJob(id);
   };
-  
+
   const handleRetryUpload = (id: string) => {
     retryUpload(id);
   };
 
-  if (uploads.length === 0 && publications.length === 0 && jobs.length === 0) return null;
+  if (uploads.length === 0 && publications.length === 0 && jobs.length === 0)
+    return null;
 
   const getHeaderIcon = () => {
     if (totalActive > 0) {
@@ -203,12 +261,18 @@ export default function GlobalUploadIndicator() {
       });
     }
     if (hasErrors) {
-      return t("publications.modal.upload.uploadFailed", { defaultValue: "Algo salió mal" });
+      return t("publications.modal.upload.uploadFailed", {
+        defaultValue: "Algo salió mal",
+      });
     }
     if (hasCompleted) {
-      return t("publications.modal.upload.uploadsCompleted", { defaultValue: "Completado" });
+      return t("publications.modal.upload.uploadsCompleted", {
+        defaultValue: "Completado",
+      });
     }
-    return t("publications.modal.upload.uploadsCompleted", { defaultValue: "Completado" });
+    return t("publications.modal.upload.uploadsCompleted", {
+      defaultValue: "Completado",
+    });
   };
 
   return (
@@ -218,7 +282,13 @@ export default function GlobalUploadIndicator() {
         <button
           onClick={() => setIsExpanded(!isExpanded)}
           className="w-full flex items-center justify-between p-3 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-neutral-700/50 dark:to-neutral-700/30 hover:from-gray-100 hover:to-gray-50 dark:hover:from-neutral-700/70 dark:hover:to-neutral-700/50 transition-colors"
-          aria-label={isExpanded ? t("common.collapse", { defaultValue: "Collapse upload indicator" }) : t("common.expand", { defaultValue: "Expand upload indicator" })}
+          aria-label={
+            isExpanded
+              ? t("common.collapse", {
+                  defaultValue: "Collapse upload indicator",
+                })
+              : t("common.expand", { defaultValue: "Expand upload indicator" })
+          }
           aria-expanded={isExpanded}
         >
           <div className="flex items-center gap-2.5">
@@ -256,7 +326,10 @@ export default function GlobalUploadIndicator() {
                   </span>
                 </div>
                 {uploads.map((upload) => (
-                  <div key={upload.id} className="p-3 border-b border-gray-100 dark:border-neutral-700 last:border-0">
+                  <div
+                    key={upload.id}
+                    className="p-3 border-b border-gray-100 dark:border-neutral-700 last:border-0"
+                  >
                     <div className="flex justify-between items-start mb-2">
                       <span
                         className="text-xs font-medium truncate max-w-[200px] text-neutral-900 dark:text-neutral-100"
@@ -270,10 +343,27 @@ export default function GlobalUploadIndicator() {
                       eta={upload.stats?.eta}
                       speed={upload.stats?.speed}
                       status={upload.status}
-                      onPause={upload.isPausable && upload.status === "uploading" ? () => handlePauseUpload(upload.id) : undefined}
-                      onResume={upload.status === "paused" ? () => handleResumeUpload(upload.id) : undefined}
-                      onCancel={(upload.status === "uploading" || upload.status === "paused") ? () => handleCancelUpload(upload.id) : undefined}
-                      onRetry={upload.status === "error" && upload.canRetry ? () => handleRetryUpload(upload.id) : undefined}
+                      onPause={
+                        upload.isPausable && upload.status === "uploading"
+                          ? () => handlePauseUpload(upload.id)
+                          : undefined
+                      }
+                      onResume={
+                        upload.status === "paused"
+                          ? () => handleResumeUpload(upload.id)
+                          : undefined
+                      }
+                      onCancel={
+                        upload.status === "uploading" ||
+                        upload.status === "paused"
+                          ? () => handleCancelUpload(upload.id)
+                          : undefined
+                      }
+                      onRetry={
+                        upload.status === "error" && upload.canRetry
+                          ? () => handleRetryUpload(upload.id)
+                          : undefined
+                      }
                       isPausable={upload.isPausable}
                       isPaused={upload.status === "paused"}
                       error={upload.error}
@@ -284,10 +374,16 @@ export default function GlobalUploadIndicator() {
                 ))}
               </div>
             )}
-            
+
             {/* Processing Jobs Section */}
             {jobs.length > 0 && (
-              <div className={uploads.length > 0 ? "border-t-2 border-gray-200 dark:border-neutral-600" : ""}>
+              <div
+                className={
+                  uploads.length > 0
+                    ? "border-t-2 border-gray-200 dark:border-neutral-600"
+                    : ""
+                }
+              >
                 <div className="bg-gray-50/70 dark:bg-neutral-700/30 px-3 py-2 flex items-center justify-between border-b border-gray-100 dark:border-neutral-700">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">
                     {t("common.processing") || "Processing"}
@@ -297,17 +393,26 @@ export default function GlobalUploadIndicator() {
                   </span>
                 </div>
                 {jobs.map((job) => (
-                  <div key={job.id} className="p-3 border-b border-gray-100 dark:border-neutral-700 last:border-0">
+                  <div
+                    key={job.id}
+                    className="p-3 border-b border-gray-100 dark:border-neutral-700 last:border-0"
+                  >
                     <div className="flex justify-between items-start mb-2">
                       <div className="flex-1">
                         <span className="text-xs font-medium text-neutral-900 dark:text-neutral-100 block">
-                          {job.type === "video_processing" && (t("common.video_processing") || "Video Processing")}
-                          {job.type === "reel_generation" && (t("common.reel_generation") || "Reel Generation")}
-                          {job.type === "thumbnail_generation" && (t("common.thumbnail_generation") || "Thumbnail Generation")}
+                          {job.type === "video_processing" &&
+                            (t("common.video_processing") ||
+                              "Video Processing")}
+                          {job.type === "reel_generation" &&
+                            (t("common.reel_generation") || "Reel Generation")}
+                          {job.type === "thumbnail_generation" &&
+                            (t("common.thumbnail_generation") ||
+                              "Thumbnail Generation")}
                         </span>
                         {job.stats?.currentStep && (
                           <span className="text-[10px] text-gray-500 dark:text-neutral-400">
-                            {job.stats.currentStep} ({job.stats.completedSteps}/{job.stats.totalSteps})
+                            {job.stats.currentStep} ({job.stats.completedSteps}/
+                            {job.stats.totalSteps})
                           </span>
                         )}
                       </div>
@@ -315,8 +420,18 @@ export default function GlobalUploadIndicator() {
                     <ProgressDisplay
                       percentage={job.progress}
                       eta={job.stats?.eta}
-                      status={job.status === "queued" ? "pending" : job.status === "processing" ? "uploading" : job.status}
-                      onCancel={(job.status === "processing" || job.status === "queued") ? () => handleCancelJob(job.id) : undefined}
+                      status={
+                        job.status === "queued"
+                          ? "pending"
+                          : job.status === "processing"
+                            ? "uploading"
+                            : job.status
+                      }
+                      onCancel={
+                        job.status === "processing" || job.status === "queued"
+                          ? () => handleCancelJob(job.id)
+                          : undefined
+                      }
                       isPausable={false}
                       isPaused={false}
                       error={job.error}
@@ -328,7 +443,13 @@ export default function GlobalUploadIndicator() {
 
             {/* Publications Section */}
             {publications.length > 0 && (
-              <div className={(uploads.length > 0 || jobs.length > 0) ? "border-t-2 border-gray-200 dark:border-neutral-600" : ""}>
+              <div
+                className={
+                  uploads.length > 0 || jobs.length > 0
+                    ? "border-t-2 border-gray-200 dark:border-neutral-600"
+                    : ""
+                }
+              >
                 <div className="bg-gray-50/70 dark:bg-neutral-700/30 px-3 py-2 flex items-center justify-between border-b border-gray-100 dark:border-neutral-700">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">
                     {t("common.publications") || "Publicaciones"}

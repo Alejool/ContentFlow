@@ -252,7 +252,11 @@ const LogsList = memo(
                         className="group transition-colors hover:bg-gray-50/30 dark:hover:bg-neutral-700/30"
                       >
                         <td className="px-4 py-3 whitespace-nowrap text-gray-500 dark:text-gray-400 text-xs">
-                          {formatDate(new Date(log.updated_at), "datetime", localeLang)}
+                          {formatDate(
+                            new Date(log.updated_at),
+                            "datetime",
+                            localeLang,
+                          )}
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex flex-col gap-1">
@@ -388,7 +392,11 @@ const LogsList = memo(
                     >
                       <div className="flex justify-between items-start mb-3">
                         <div className="text-sm text-gray-500 dark:text-gray-400">
-                          {formatDate(new Date(log.updated_at), "datetime", localeLang)}
+                          {formatDate(
+                            new Date(log.updated_at),
+                            "datetime",
+                            localeLang,
+                          )}
                         </div>
                         <div
                           className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium ${getStatusColor(

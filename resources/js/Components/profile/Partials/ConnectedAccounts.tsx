@@ -179,7 +179,10 @@ export default function ConnectedAccounts({ className = "" }) {
           className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
         >
           <Settings className="w-4 h-4" />
-          {t("profile.connectedAccounts.manageLink", "Gestionar cuentas conectadas")}
+          {t(
+            "profile.connectedAccounts.manageLink",
+            "Gestionar cuentas conectadas",
+          )}
         </button>
       </div>
     </div>

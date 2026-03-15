@@ -144,7 +144,6 @@ export default function CreateRoleModal({
                 {...register("description")}
                 error={errors.description?.message}
               />
-              
             </div>
 
             <div>

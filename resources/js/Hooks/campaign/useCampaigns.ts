@@ -15,7 +15,7 @@ export const useCampaigns = () => {
         setCampaigns(response.data.campaigns);
       }
     } catch (error) {
-      } finally {
+    } finally {
       setLoading(false);
     }
   };

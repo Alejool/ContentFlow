@@ -1,4 +1,4 @@
-import { KeyboardEvent } from 'react';
+import { KeyboardEvent } from "react";
 
 /**
  * Hook para manejar clicks con teclado en elementos no interactivos
@@ -6,14 +6,14 @@ import { KeyboardEvent } from 'react';
  */
 export const useKeyboardClick = (onClick: () => void) => {
   const handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
+    if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       onClick();
     }
   };
 
   return {
-    role: 'button' as const,
+    role: "button" as const,
     tabIndex: 0,
     onClick,
     onKeyDown: handleKeyDown,

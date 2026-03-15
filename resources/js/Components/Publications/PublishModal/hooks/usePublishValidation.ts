@@ -1,6 +1,6 @@
-import { Publication } from '@/types/Publication';
-import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { Publication } from "@/types/Publication";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
 interface ValidationResult {
   can_publish?: boolean;
@@ -10,8 +10,12 @@ interface ValidationResult {
   recommendations?: string[];
 }
 
-export function usePublishValidation(publication: Publication, selectedPlatforms: number[]) {
-  const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
+export function usePublishValidation(
+  publication: Publication,
+  selectedPlatforms: number[],
+) {
+  const [validationResult, setValidationResult] =
+    useState<ValidationResult | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [isValidating, setIsValidating] = useState(false);
 
@@ -29,15 +33,19 @@ export function usePublishValidation(publication: Publication, selectedPlatforms
     setValidationError(null);
 
     try {
-      const response = await axios.post(`/api/v1/publications/${publication.id}/validate-publish`, {
-        platform_ids: selectedPlatforms,
-      });
-      
-      console.log('Validation response:', response.data);
+      const response = await axios.post(
+        `/api/v1/publications/${publication.id}/validate-publish`,
+        {
+          platform_ids: selectedPlatforms,
+        },
+      );
+
+      console.log("Validation response:", response.data);
       setValidationResult(response.data);
     } catch (error: any) {
-      console.error('Validation error:', error);
-      const errorMessage = error.response?.data?.message || 'Error al validar contenido';
+      console.error("Validation error:", error);
+      const errorMessage =
+        error.response?.data?.message || "Error al validar contenido";
       setValidationError(errorMessage);
       setValidationResult(null);
     } finally {
@@ -47,19 +55,26 @@ export function usePublishValidation(publication: Publication, selectedPlatforms
 
   const hasBlockingErrors = (): boolean => {
     if (!validationResult) return false;
-    return !validationResult.can_publish || 
-           (validationResult.global_errors && validationResult.global_errors.length > 0);
+    return (
+      !validationResult.can_publish ||
+      (validationResult.global_errors &&
+        validationResult.global_errors.length > 0)
+    );
   };
 
   const hasWarnings = (): boolean => {
     if (!validationResult) return false;
-    return validationResult.global_warnings && validationResult.global_warnings.length > 0;
+    return (
+      validationResult.global_warnings &&
+      validationResult.global_warnings.length > 0
+    );
   };
 
-  const canPublish = selectedPlatforms.length > 0 && 
-                    !isValidating && 
-                    !hasBlockingErrors() && 
-                    validationResult?.can_publish;
+  const canPublish =
+    selectedPlatforms.length > 0 &&
+    !isValidating &&
+    !hasBlockingErrors() &&
+    validationResult?.can_publish;
 
   return {
     validationResult,
@@ -68,6 +83,6 @@ export function usePublishValidation(publication: Publication, selectedPlatforms
     hasBlockingErrors,
     hasWarnings,
     canPublish: !!canPublish,
-    revalidate: validateContent
+    revalidate: validateContent,
   };
 }

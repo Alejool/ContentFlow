@@ -263,16 +263,16 @@ export default function Index({ stats, period }: AnalyticsProps) {
                   >
                     {t("analytics.advanced.daily_metrics")}
                   </p>
-                <Suspense
-                  fallback={
-                    <Skeleton className="h-[400px] w-full rounded-lg" />
-                  }
-                >
-                  <DetailedPlatformChart
-                    platforms={detailedPlatforms}
-                    theme={theme}
-                  />
-                </Suspense>
+                  <Suspense
+                    fallback={
+                      <Skeleton className="h-[400px] w-full rounded-lg" />
+                    }
+                  >
+                    <DetailedPlatformChart
+                      platforms={detailedPlatforms}
+                      theme={theme}
+                    />
+                  </Suspense>
                 </div>
                 {detailedPublications.length > 0 && (
                   <div className="my-8">
@@ -285,23 +285,22 @@ export default function Index({ stats, period }: AnalyticsProps) {
                       >
                         {t("analytics.advanced.platform_breakdown")}
                       </p>
-           
-                    <Suspense
-                      fallback={
-                        <Skeleton className="h-[400px] w-full rounded-lg" />
-                      }
-                    >
-                      <DetailedPublicationPerformance
-                        publications={detailedPublications}
-                        theme={theme}
-                      />
-                    </Suspense>
+
+                      <Suspense
+                        fallback={
+                          <Skeleton className="h-[400px] w-full rounded-lg" />
+                        }
+                      >
+                        <DetailedPublicationPerformance
+                          publications={detailedPublications}
+                          theme={theme}
+                        />
+                      </Suspense>
                     </div>
                   </div>
                 )}
               </div>
             )}
-
           </>
         ) : (
           // Upgrade prompt for basic plans

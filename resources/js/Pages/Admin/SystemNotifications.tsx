@@ -105,7 +105,10 @@ export default function SystemNotifications() {
                     label={t("notifications.admin.form.type")}
                     value={data.type}
                     onChange={(value: string | number | string[]) =>
-                      setData("type", String(Array.isArray(value) ? value[0] : value))
+                      setData(
+                        "type",
+                        String(Array.isArray(value) ? value[0] : value),
+                      )
                     }
                     error={errors.type}
                     options={notificationTypes}

@@ -61,7 +61,7 @@ class ToastServiceClass {
       success: string | ((data: T) => string);
       error: string | ((error: any) => string);
     },
-    options?: ToastOptions
+    options?: ToastOptions,
   ): Promise<T> {
     return toast.promise(promise, messages, options);
   }

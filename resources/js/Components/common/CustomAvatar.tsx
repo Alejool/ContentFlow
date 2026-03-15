@@ -70,17 +70,27 @@ export default function Avatar({
           <>
             {/* Loader mientras carga */}
             {!imageLoaded && (
-              <div className={`absolute inset-0 flex items-center justify-center ${avatarBgClass} animate-pulse`}>
-                <div className={`border-2 ${theme === "dark" ? "border-primary-400/30 border-t-primary-400" : "border-primary-600/30 border-t-primary-600"} rounded-full animate-spin ${
-                  size === "xs" ? "w-3 h-3" :
-                  size === "sm" ? "w-4 h-4" :
-                  size === "md" ? "w-5 h-5" :
-                  size === "lg" ? "w-6 h-6" :
-                  size === "xl" ? "w-8 h-8" : "w-10 h-10"
-                }`}></div>
+              <div
+                className={`absolute inset-0 flex items-center justify-center ${avatarBgClass} animate-pulse`}
+              >
+                <div
+                  className={`border-2 ${theme === "dark" ? "border-primary-400/30 border-t-primary-400" : "border-primary-600/30 border-t-primary-600"} rounded-full animate-spin ${
+                    size === "xs"
+                      ? "w-3 h-3"
+                      : size === "sm"
+                        ? "w-4 h-4"
+                        : size === "md"
+                          ? "w-5 h-5"
+                          : size === "lg"
+                            ? "w-6 h-6"
+                            : size === "xl"
+                              ? "w-8 h-8"
+                              : "w-10 h-10"
+                  }`}
+                ></div>
               </div>
             )}
-            
+
             <img
               src={src}
               alt={name}

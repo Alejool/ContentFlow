@@ -19,7 +19,6 @@ export default function LiveFields({
   t,
   errors = {},
 }: LiveFieldsProps) {
-  
   const handleStartTimeChange = (value: string) => {
     onChange({ startTime: value, duration });
   };
@@ -83,7 +82,7 @@ export default function LiveFields({
       <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-3">
         <p className="text-xs text-purple-700 dark:text-purple-300">
           <strong>{t("common.note") || "Note"}:</strong>{" "}
-          {t("publications.modal.live.note") || 
+          {t("publications.modal.live.note") ||
             "Live streaming is supported on YouTube and Facebook. You'll need to configure streaming settings on each platform."}
         </p>
       </div>

@@ -1,4 +1,7 @@
-import { getMediaRulesForContentType, type ContentType } from "@/Components/Content/Publication/common/ContentTypeSelector";
+import {
+  getMediaRulesForContentType,
+  type ContentType,
+} from "@/Components/Content/Publication/common/ContentTypeSelector";
 import { CONTENT_TYPE_DISPLAY } from "@/Constants/contentTypes";
 import { useContentTypeSuggestion } from "@/Hooks/publication/useContentTypeSuggestion";
 import { useS3Upload } from "@/Hooks/useS3Upload";
@@ -52,8 +55,10 @@ export const usePublicationForm = ({
     }
   };
 
-  const [currentContentType, setCurrentContentType] = useState<string>(publication?.content_type || 'post');
-  
+  const [currentContentType, setCurrentContentType] = useState<string>(
+    publication?.content_type || "post",
+  );
+
   const schema = useMemo(() => {
     return publicationSchema(t, currentContentType);
   }, [t, currentContentType]);
@@ -124,7 +129,9 @@ export const usePublicationForm = ({
   const [durationErrors, setDurationErrors] = useState<Record<number, string>>(
     {},
   );
-  const [contentTypeSuggested, setContentTypeSuggested] = useState<Set<string>>(new Set());
+  const [contentTypeSuggested, setContentTypeSuggested] = useState<Set<string>>(
+    new Set(),
+  );
 
   const prevHashtagsRef = useRef<string>("");
 
@@ -172,28 +179,34 @@ export const usePublicationForm = ({
   // Update schema when content type changes
   useEffect(() => {
     const subscription = form.watch((value, { name }) => {
-      if (name === 'content_type' && value.content_type !== currentContentType) {
-       setCurrentContentType(value.content_type || 'post');
-        
+      if (
+        name === "content_type" &&
+        value.content_type !== currentContentType
+      ) {
+        setCurrentContentType(value.content_type || "post");
+
         // Clear validation errors for fields that are no longer required
-        const newContentType = value.content_type || 'post';
+        const newContentType = value.content_type || "post";
         const FIELD_VALIDATION_RULES = {
-          post: ['title', 'description', 'goal', 'hashtags'],
-          reel: ['title', 'description', 'hashtags'],
+          post: ["title", "description", "goal", "hashtags"],
+          reel: ["title", "description", "hashtags"],
           story: [], // No required fields for stories
-          poll: ['title', 'poll_options', 'poll_duration_hours'], // Only poll-specific fields
-          carousel: ['title', 'description', 'goal', 'hashtags'],
+          poll: ["title", "poll_options", "poll_duration_hours"], // Only poll-specific fields
+          carousel: ["title", "description", "goal", "hashtags"],
         };
-        
-        const newRequiredFields = FIELD_VALIDATION_RULES[newContentType as keyof typeof FIELD_VALIDATION_RULES] || FIELD_VALIDATION_RULES.post;
-        
+
+        const newRequiredFields =
+          FIELD_VALIDATION_RULES[
+            newContentType as keyof typeof FIELD_VALIDATION_RULES
+          ] || FIELD_VALIDATION_RULES.post;
+
         // Clear errors for fields that are no longer required
-        ['hashtags', 'description', 'goal'].forEach(field => {
+        ["hashtags", "description", "goal"].forEach((field) => {
           if (!newRequiredFields.includes(field)) {
             form.clearErrors(field as any);
           }
         });
-        
+
         // Force re-validation with new schema
         setTimeout(() => {
           form.trigger();
@@ -251,39 +264,52 @@ export const usePublicationForm = ({
         // - If no scheduled_posts exist but scheduled_at exists, use_global_schedule = true
         use_global_schedule: (() => {
           if (!publication.scheduled_at) return false;
-          
+
           const scheduledPosts = publication.scheduled_posts || [];
           if (scheduledPosts.length === 0) return !!publication.scheduled_at;
-          
+
           // Check if all scheduled posts have the same date as the global scheduled_at
           const allSameAsGlobal = scheduledPosts.every((post: any) => {
-            if (post.status !== 'pending') return true; // Ignore non-pending posts
+            if (post.status !== "pending") return true; // Ignore non-pending posts
             const postDate = new Date(post.scheduled_at).getTime();
             const globalDate = new Date(publication.scheduled_at).getTime();
             // Allow 1 minute difference for rounding
             return Math.abs(postDate - globalDate) < 60000;
           });
-          
+
           return allSameAsGlobal;
         })(),
         is_recurring: !!publication.is_recurring,
         // Load from recurrenceSettings if available, fallback to old fields
-        recurrence_type: publication.recurrence_settings?.recurrence_type || publication.recurrence_type || "daily",
-        recurrence_interval: publication.recurrence_settings?.recurrence_interval || publication.recurrence_interval || 1,
-        recurrence_days: (publication.recurrence_settings?.recurrence_days || publication.recurrence_days || []).map((d: any) =>
-          parseInt(d),
-        ),
-        recurrence_end_date: publication.recurrence_settings?.recurrence_end_date || publication.recurrence_end_date || null,
+        recurrence_type:
+          publication.recurrence_settings?.recurrence_type ||
+          publication.recurrence_type ||
+          "daily",
+        recurrence_interval:
+          publication.recurrence_settings?.recurrence_interval ||
+          publication.recurrence_interval ||
+          1,
+        recurrence_days: (
+          publication.recurrence_settings?.recurrence_days ||
+          publication.recurrence_days ||
+          []
+        ).map((d: any) => parseInt(d)),
+        recurrence_end_date:
+          publication.recurrence_settings?.recurrence_end_date ||
+          publication.recurrence_end_date ||
+          null,
         // IMPORTANT: Keep null as null (means all accounts), don't convert to empty array
         recurrence_accounts: (() => {
           // ALWAYS use recurrence_settings if it exists, ignore old field
-          const accounts = publication.recurrence_settings 
-            ? publication.recurrence_settings.recurrence_accounts 
+          const accounts = publication.recurrence_settings
+            ? publication.recurrence_settings.recurrence_accounts
             : publication.recurrence_accounts;
           if (accounts === null || accounts === undefined) {
             return []; // Empty array in form means "all accounts"
           }
-          const converted = accounts.map((id: any) => typeof id === 'string' ? parseInt(id) : id);
+          const converted = accounts.map((id: any) =>
+            typeof id === "string" ? parseInt(id) : id,
+          );
           return converted;
         })(),
       };
@@ -291,7 +317,7 @@ export const usePublicationForm = ({
       // Always reset with fresh data when modal opens
       // This ensures we always show the latest data from the database
       reset(resetData as any, { keepDirtyValues: false });
-      
+
       if (isInitialLoad) {
         setIsDataReady(false); // Trigger Phase 2 re-processing safely
       }
@@ -391,12 +417,10 @@ export const usePublicationForm = ({
 
         // LIVE SYNC PROTECTION: Only update social accounts if untouched
         if (!getFieldState("social_accounts").isDirty) {
-
           setValue("social_accounts", pendingSocialAccounts, {
             shouldValidate: false,
           });
         } else {
-         
         }
 
         // Process account schedules
@@ -411,13 +435,13 @@ export const usePublicationForm = ({
               sp.social_account_id &&
               sp.scheduled_at &&
               !calculatedPublished.has(sp.social_account_id) &&
-              sp.is_recurring_instance === false  // Only load original posts
+              sp.is_recurring_instance === false // Only load original posts
             ) {
               initialAccountSchedules[sp.social_account_id] = sp.scheduled_at;
             }
           });
         }
-        
+
         setAccountSchedules((prev) => {
           // Only update if this is the initial load or if the user hasn't made changes
           // Check if prev is empty (initial load) or if we're reopening the modal
@@ -542,227 +566,269 @@ export const usePublicationForm = ({
 
   // Auto-suggest content type based on media files (backup method)
   useEffect(() => {
-   
     // This is now a backup method - the primary suggestion happens immediately after video processing
     // Only run if no suggestion has been made yet
-    
+
     if (!isOpen || mediaFiles.length === 0) {
       return;
     }
-    
-    const currentType = form.getValues('content_type');
-    const completedFiles = mediaFiles.filter(f => f.status === 'completed');
-    
+
+    const currentType = form.getValues("content_type");
+    const completedFiles = mediaFiles.filter((f) => f.status === "completed");
+
     if (completedFiles.length === 0 || contentTypeSuggestion.isPending) {
       return;
     }
-    
+
     // Only run as backup for videos that might have been missed
-    const videoFiles = completedFiles.filter(f => f.type.startsWith('video/'));
+    const videoFiles = completedFiles.filter((f) =>
+      f.type.startsWith("video/"),
+    );
     if (videoFiles.length === 0) return;
-    
-    const videoFilesWithDuration = videoFiles.filter(f => {
-      const hasDuration = videoMetadata[f.tempId]?.duration !== undefined && videoMetadata[f.tempId]?.duration > 0;
+
+    const videoFilesWithDuration = videoFiles.filter((f) => {
+      const hasDuration =
+        videoMetadata[f.tempId]?.duration !== undefined &&
+        videoMetadata[f.tempId]?.duration > 0;
       return hasDuration;
     });
-    
+
     if (videoFilesWithDuration.length === 0) return;
-    
+
     // Create a key to avoid duplicate suggestions
     const mediaKey = videoFilesWithDuration
-      .map(f => `${f.tempId}-${videoMetadata[f.tempId]?.duration}`)
+      .map((f) => `${f.tempId}-${videoMetadata[f.tempId]?.duration}`)
       .sort()
-      .join('|');
-    
+      .join("|");
+
     if (contentTypeSuggested.has(mediaKey)) {
       return;
     }
 
-    const mediaData = completedFiles.map(file => {
+    const mediaData = completedFiles.map((file) => {
       const metadata = videoMetadata[file.tempId];
       return {
         mime_type: file.type,
         duration: metadata?.duration,
-        file_type: file.type.startsWith('video/') ? 'video' : 'image',
+        file_type: file.type.startsWith("video/") ? "video" : "image",
       };
     });
-    
-    setContentTypeSuggested(prev => new Set([...prev, mediaKey]));
-    
-    contentTypeSuggestion.mutate({
-      media: mediaData,
-      current_type: currentType,
-    }, {
-      onSuccess: (result) => {
-        if (result && result.should_change && result.suggested_type !== currentType) {
-          toast.success(
-            `Tipo de contenido cambiado automáticamente a "${result.suggested_type}" basado en la duración del video.`,
-            {
-              duration: 4000
-            }
-          );
-          
-          form.setValue('content_type', result.suggested_type as ContentType, { shouldValidate: true });
-          setCurrentContentType(result.suggested_type);
-        }
+
+    setContentTypeSuggested((prev) => new Set([...prev, mediaKey]));
+
+    contentTypeSuggestion.mutate(
+      {
+        media: mediaData,
+        current_type: currentType,
       },
-      onError: (error) => {
-        console.error('🎬 Backup useEffect suggestion failed:', error);
-        setContentTypeSuggested(prev => {
-          const newSet = new Set(prev);
-          newSet.delete(mediaKey);
-          return newSet;
-        });
-      }
-    });
+      {
+        onSuccess: (result) => {
+          if (
+            result &&
+            result.should_change &&
+            result.suggested_type !== currentType
+          ) {
+            toast.success(
+              `Tipo de contenido cambiado automáticamente a "${result.suggested_type}" basado en la duración del video.`,
+              {
+                duration: 4000,
+              },
+            );
+
+            form.setValue(
+              "content_type",
+              result.suggested_type as ContentType,
+              { shouldValidate: true },
+            );
+            setCurrentContentType(result.suggested_type);
+          }
+        },
+        onError: (error) => {
+          console.error("🎬 Backup useEffect suggestion failed:", error);
+          setContentTypeSuggested((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(mediaKey);
+            return newSet;
+          });
+        },
+      },
+    );
   }, [mediaFiles, videoMetadata, isOpen, form]);
 
   const handleFileChange = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
     const newFiles = Array.from(files);
-    const currentContentType = watch("content_type") as ContentType || 'post';
-    
+    const currentContentType = (watch("content_type") as ContentType) || "post";
+
     // Solo hacer cambios básicos inmediatos (múltiples archivos = carousel)
-    const allFiles = [...mediaFiles.map(m => ({ type: m.type } as File)), ...newFiles];
-    
+    const allFiles = [
+      ...mediaFiles.map((m) => ({ type: m.type }) as File),
+      ...newFiles,
+    ];
+
     // Solo cambiar a carousel si hay múltiples archivos
-    if (allFiles.length > 1 && currentContentType !== 'carousel') {
-      setValue("content_type", 'carousel');
-      setCurrentContentType('carousel');
-      
+    if (allFiles.length > 1 && currentContentType !== "carousel") {
+      setValue("content_type", "carousel");
+      setCurrentContentType("carousel");
+
       toast.success(
         `Tipo de contenido cambiado automáticamente a Carousel (múltiples archivos)`,
         {
-          duration: 4000
-        }
+          duration: 4000,
+        },
       );
     }
-    
+
     // Para videos individuales, esperar a que el backend haga la sugerencia basada en duración
-    
+
     const contentType = currentContentType;
     const mediaRules = getMediaRulesForContentType(contentType);
-    
+
     // Get current media counts
-    const currentImages = mediaFiles.filter(m => m.type.includes('image')).length;
-    const currentVideos = mediaFiles.filter(m => m.type.includes('video')).length;
+    const currentImages = mediaFiles.filter((m) =>
+      m.type.includes("image"),
+    ).length;
+    const currentVideos = mediaFiles.filter((m) =>
+      m.type.includes("video"),
+    ).length;
     const currentTotal = currentImages + currentVideos;
 
     // Validate content type restrictions
-    const newImages = newFiles.filter(f => f.type.startsWith('image/')).length;
-    const newVideos = newFiles.filter(f => f.type.startsWith('video/')).length;
-    
+    const newImages = newFiles.filter((f) =>
+      f.type.startsWith("image/"),
+    ).length;
+    const newVideos = newFiles.filter((f) =>
+      f.type.startsWith("video/"),
+    ).length;
+
     // Con la auto-detección, estas validaciones deberían ser menos estrictas
     // Solo validar si realmente hay incompatibilidad después del cambio automático
     if (mediaRules.videoOnly && newImages > 0) {
       // Intentar cambiar a un tipo que permita imágenes
-      const alternativeType = newImages === 1 ? 'story' : 'carousel';
+      const alternativeType = newImages === 1 ? "story" : "carousel";
       setValue("content_type", alternativeType);
-      
+
       toast.success(
         t("publications.validation.content_type_auto_changed", {
           defaultValue: `Tipo de contenido cambiado automáticamente a ${CONTENT_TYPE_DISPLAY[alternativeType]?.label || alternativeType}`,
           from: CONTENT_TYPE_DISPLAY[contentType]?.label || contentType,
-          to: CONTENT_TYPE_DISPLAY[alternativeType]?.label || alternativeType
+          to: CONTENT_TYPE_DISPLAY[alternativeType]?.label || alternativeType,
         }),
         {
-          duration: 4000
-        }
+          duration: 4000,
+        },
       );
     }
 
     if (mediaRules.imageOnly && newVideos > 0) {
       // Intentar cambiar a un tipo que permita videos
-      const alternativeType = newVideos === 1 ? 'reel' : 'post';
+      const alternativeType = newVideos === 1 ? "reel" : "post";
       setValue("content_type", alternativeType);
-      
+
       toast.success(
         t("publications.validation.content_type_auto_changed", {
           defaultValue: `Tipo de contenido cambiado automáticamente a ${CONTENT_TYPE_DISPLAY[alternativeType]?.label || alternativeType}`,
           from: CONTENT_TYPE_DISPLAY[contentType]?.label || contentType,
-          to: CONTENT_TYPE_DISPLAY[alternativeType]?.label || alternativeType
+          to: CONTENT_TYPE_DISPLAY[alternativeType]?.label || alternativeType,
         }),
         {
-          duration: 4000
-        }
+          duration: 4000,
+        },
       );
     }
 
     // Check count limits
-    if (mediaRules.maxImages !== undefined && mediaRules.maxImages === 0 && newImages > 0) {
+    if (
+      mediaRules.maxImages !== undefined &&
+      mediaRules.maxImages === 0 &&
+      newImages > 0
+    ) {
       toast.error(
         t("publications.validation.no_images_allowed", {
-          defaultValue: "Este tipo de contenido no permite imágenes"
-        })
+          defaultValue: "Este tipo de contenido no permite imágenes",
+        }),
       );
       setImageError(
         t("publications.validation.no_images_allowed", {
-          defaultValue: "Este tipo de contenido no permite imágenes"
-        })
+          defaultValue: "Este tipo de contenido no permite imágenes",
+        }),
       );
       return;
     }
 
-    if (mediaRules.maxVideos !== undefined && mediaRules.maxVideos === 0 && newVideos > 0) {
+    if (
+      mediaRules.maxVideos !== undefined &&
+      mediaRules.maxVideos === 0 &&
+      newVideos > 0
+    ) {
       toast.error(
         t("publications.validation.no_videos_allowed", {
-          defaultValue: "Este tipo de contenido no permite videos"
-        })
+          defaultValue: "Este tipo de contenido no permite videos",
+        }),
       );
       setImageError(
         t("publications.validation.no_videos_allowed", {
-          defaultValue: "Este tipo de contenido no permite videos"
-        })
+          defaultValue: "Este tipo de contenido no permite videos",
+        }),
       );
       return;
     }
 
     // Check if adding these files would exceed limits
-    if (mediaRules.maxImages && (currentImages + newImages) > mediaRules.maxImages) {
+    if (
+      mediaRules.maxImages &&
+      currentImages + newImages > mediaRules.maxImages
+    ) {
       toast.error(
         t("publications.validation.max_images_exceeded", {
           defaultValue: `Máximo ${mediaRules.maxImages} imagen(es) permitida(s)`,
-          max: mediaRules.maxImages
-        })
+          max: mediaRules.maxImages,
+        }),
       );
       setImageError(
         t("publications.validation.max_images_exceeded", {
           defaultValue: `Máximo ${mediaRules.maxImages} imagen(es) permitida(s)`,
-          max: mediaRules.maxImages
-        })
+          max: mediaRules.maxImages,
+        }),
       );
       return;
     }
 
-    if (mediaRules.maxVideos && (currentVideos + newVideos) > mediaRules.maxVideos) {
+    if (
+      mediaRules.maxVideos &&
+      currentVideos + newVideos > mediaRules.maxVideos
+    ) {
       toast.error(
         t("publications.validation.max_videos_exceeded", {
           defaultValue: `Máximo ${mediaRules.maxVideos} video(s) permitido(s)`,
-          max: mediaRules.maxVideos
-        })
+          max: mediaRules.maxVideos,
+        }),
       );
       setImageError(
         t("publications.validation.max_videos_exceeded", {
           defaultValue: `Máximo ${mediaRules.maxVideos} video(s) permitido(s)`,
-          max: mediaRules.maxVideos
-        })
+          max: mediaRules.maxVideos,
+        }),
       );
       return;
     }
 
-    if (mediaRules.maxCount && (currentTotal + newFiles.length) > mediaRules.maxCount) {
+    if (
+      mediaRules.maxCount &&
+      currentTotal + newFiles.length > mediaRules.maxCount
+    ) {
       toast.error(
         t("publications.validation.max_files_exceeded", {
           defaultValue: `Máximo ${mediaRules.maxCount} archivo(s) permitido(s)`,
-          max: mediaRules.maxCount
-        })
+          max: mediaRules.maxCount,
+        }),
       );
       setImageError(
         t("publications.validation.max_files_exceeded", {
           defaultValue: `Máximo ${mediaRules.maxCount} archivo(s) permitido(s)`,
-          max: mediaRules.maxCount
-        })
+          max: mediaRules.maxCount,
+        }),
       );
       return;
     }
@@ -771,7 +837,7 @@ export const usePublicationForm = ({
     const svgFiles = newFiles.filter(
       (file) =>
         file.type === "image/svg+xml" ||
-        file.name.toLowerCase().endsWith(".svg")
+        file.name.toLowerCase().endsWith(".svg"),
     );
 
     if (svgFiles.length > 0) {
@@ -780,12 +846,12 @@ export const usePublicationForm = ({
         t("publications.modal.upload.errors.svgNotAllowed", {
           defaultValue: `SVG files are not allowed for security reasons: ${fileNames}`,
           files: fileNames,
-        })
+        }),
       );
       setImageError(
         t("publications.modal.upload.errors.svgNotAllowed", {
           defaultValue: "SVG files are not allowed for security reasons",
-        })
+        }),
       );
       return;
     }
@@ -848,43 +914,60 @@ export const usePublicationForm = ({
             width,
             height,
             aspectRatio,
-            youtubeType: (duration <= 60 && aspectRatio < 1 ? "short" : "video") as "video" | "short",
+            youtubeType: (duration <= 60 && aspectRatio < 1
+              ? "short"
+              : "video") as "video" | "short",
           };
 
           setVideoMetadata(item.tempId, metadata);
           setTimeout(() => {
-           const currentType = form.getValues('content_type');
-            
-            // Prepare media data for API call
-            const mediaData = [{
-              mime_type: item.file?.type || 'video/mp4',
-              duration: duration,
-              file_type: 'video'
-            }];
-            
-            // Call the backend API for content type suggestion
-            contentTypeSuggestion.mutate({
-              media: mediaData,
-              current_type: currentType,
-            }, {
-              onSuccess: (result) => {
+            const currentType = form.getValues("content_type");
 
-                if (result && result.should_change && result.suggested_type !== currentType) {
-                  toast.success(
-                    `Tipo de contenido cambiado automáticamente a "${result.suggested_type}" basado en la duración del video (${(duration / 60).toFixed(1)} minutos).`,
-                    {
-                      duration: 4000
-                    }
-                  );
-                  
-                  form.setValue('content_type', result.suggested_type as ContentType, { shouldValidate: true });
-                  setCurrentContentType(result.suggested_type);
-                } 
+            // Prepare media data for API call
+            const mediaData = [
+              {
+                mime_type: item.file?.type || "video/mp4",
+                duration: duration,
+                file_type: "video",
               },
-              onError: (error) => {
-                console.error('🎬 Content type suggestion API failed:', error);
-              }
-            });
+            ];
+
+            // Call the backend API for content type suggestion
+            contentTypeSuggestion.mutate(
+              {
+                media: mediaData,
+                current_type: currentType,
+              },
+              {
+                onSuccess: (result) => {
+                  if (
+                    result &&
+                    result.should_change &&
+                    result.suggested_type !== currentType
+                  ) {
+                    toast.success(
+                      `Tipo de contenido cambiado automáticamente a "${result.suggested_type}" basado en la duración del video (${(duration / 60).toFixed(1)} minutos).`,
+                      {
+                        duration: 4000,
+                      },
+                    );
+
+                    form.setValue(
+                      "content_type",
+                      result.suggested_type as ContentType,
+                      { shouldValidate: true },
+                    );
+                    setCurrentContentType(result.suggested_type);
+                  }
+                },
+                onError: (error) => {
+                  console.error(
+                    "🎬 Content type suggestion API failed:",
+                    error,
+                  );
+                },
+              },
+            );
           }, 100);
 
           // If this is for an existing publication and the file is uploaded,
@@ -893,26 +976,27 @@ export const usePublicationForm = ({
             try {
               // Find the media file by matching filename and size
               const mediaFile = publication.media_files?.find(
-                (mf: any) => mf.file_name === item.file?.name && mf.size === item.file?.size
+                (mf: any) =>
+                  mf.file_name === item.file?.name &&
+                  mf.size === item.file?.size,
               );
-              
+
               if (mediaFile) {
                 await axios.post(
                   route("api.v1.publications.update-media-metadata", {
                     publication: publication.id,
-                    mediaFile: mediaFile.id
+                    mediaFile: mediaFile.id,
                   }),
                   {
                     duration,
                     width,
                     height,
                     aspect_ratio: aspectRatio,
-                  }
+                  },
                 );
-                
               }
             } catch (error) {
-              console.warn('Failed to send video metadata to backend:', error);
+              console.warn("Failed to send video metadata to backend:", error);
             }
           }
         } catch (e) {
@@ -954,8 +1038,8 @@ export const usePublicationForm = ({
 
   const handleHashtagChange = (value: string) => {
     // Ensure we always work with a string
-    const stringValue = String(value || '');
-    
+    const stringValue = String(value || "");
+
     const isDeleting = stringValue.length < prevHashtagsRef.current.length;
     const endsWithSpace = stringValue.endsWith(" ");
 
@@ -979,8 +1063,8 @@ export const usePublicationForm = ({
     }
 
     // Ensure formatted is always a string
-    const finalValue = String(formatted || '');
-    
+    const finalValue = String(formatted || "");
+
     prevHashtagsRef.current = finalValue;
     setValue("hashtags", finalValue, {
       shouldValidate: false, // Disable validation during typing
@@ -1076,7 +1160,7 @@ export const usePublicationForm = ({
     reset();
     clearMedia();
     setRemovedMediaIds([]);
-    setAccountSchedules({});  // Clear account schedules
+    setAccountSchedules({}); // Clear account schedules
     setImageError(null);
     setContentTypeSuggested(new Set()); // Clear content type suggestions
     onClose();
@@ -1138,7 +1222,7 @@ export const usePublicationForm = ({
     if (Object.keys(durationErrors).length > 0) {
       toast.error(
         t("publications.validation.durationErrors") ||
-          "Por favor, corrige los errores de duración antes de guardar."
+          "Por favor, corrige los errores de duración antes de guardar.",
       );
       return;
     }
@@ -1149,10 +1233,10 @@ export const usePublicationForm = ({
       formData.append("description", data.description || "");
       formData.append("goal", data.goal || "");
       formData.append("hashtags", data.hashtags || "");
-      
+
       // Add content type and poll fields
       formData.append("content_type", data.content_type || "post");
-      
+
       if (data.content_type === "poll") {
         if (data.poll_options && data.poll_options.length > 0) {
           data.poll_options.forEach((option, index) => {
@@ -1160,7 +1244,10 @@ export const usePublicationForm = ({
           });
         }
         if (data.poll_duration_hours) {
-          formData.append("poll_duration_hours", data.poll_duration_hours.toString());
+          formData.append(
+            "poll_duration_hours",
+            data.poll_duration_hours.toString(),
+          );
         }
       }
 
@@ -1193,14 +1280,14 @@ export const usePublicationForm = ({
         "scheduled",
         "rejected",
       ];
-      
+
       // Manejar scheduled_at según el tipo de contenido y configuración
       let scheduledAtValue = data.scheduled_at;
-      const contentType = data.content_type || 'post';
+      const contentType = data.content_type || "post";
       const useGlobalSchedule = data.use_global_schedule;
-      
+
       // Para encuestas (polls), la lógica es diferente
-      if (contentType === 'poll') {
+      if (contentType === "poll") {
         // Si use_global_schedule está desactivado, NO enviar scheduled_at global
         // Cada red social tendrá su propia fecha en accountSchedules
         if (!useGlobalSchedule) {
@@ -1211,7 +1298,7 @@ export const usePublicationForm = ({
           defaultDate.setMinutes(defaultDate.getMinutes() + 2);
           scheduledAtValue = defaultDate.toISOString();
           setValue("scheduled_at", scheduledAtValue, { shouldDirty: true });
-          }
+        }
       } else {
         // Para otros tipos de contenido, mantener la lógica original
         if (currentStatus === "scheduled" && !scheduledAtValue) {
@@ -1219,37 +1306,41 @@ export const usePublicationForm = ({
           defaultDate.setMinutes(defaultDate.getMinutes() + 2);
           scheduledAtValue = defaultDate.toISOString();
           setValue("scheduled_at", scheduledAtValue, { shouldDirty: true });
-         }
+        }
       }
-      
-    
+
       const finalStatus = (() => {
         // Si no hay cuentas sociales y no hay fecha programada, siempre es draft
         if (socialAccounts.length === 0 && !scheduledAtValue) {
           return "draft";
         }
-        
+
         // Para encuestas sin programación global, puede ser published directamente
-        if (contentType === 'poll' && !useGlobalSchedule && !scheduledAtValue) {
+        if (contentType === "poll" && !useGlobalSchedule && !scheduledAtValue) {
           // Si hay cuentas sociales pero no programación global, puede ser published
-          return socialAccounts.length > 0 ? (currentStatus === "published" ? "published" : "draft") : "draft";
+          return socialAccounts.length > 0
+            ? currentStatus === "published"
+              ? "published"
+              : "draft"
+            : "draft";
         }
-        
+
         // Para otros casos, usar el status actual si es válido
         return validStatuses.includes(currentStatus) ? currentStatus : "draft";
       })();
 
       formData.append("status", finalStatus);
-      
+
       // Solo enviar scheduled_at si realmente hay una fecha programada Y no es una encuesta sin programación global
-      const shouldSendScheduledAt = scheduledAtValue && 
-                                   scheduledAtValue.trim() !== "" && 
-                                   !(contentType === 'poll' && !useGlobalSchedule);
-      
+      const shouldSendScheduledAt =
+        scheduledAtValue &&
+        scheduledAtValue.trim() !== "" &&
+        !(contentType === "poll" && !useGlobalSchedule);
+
       if (shouldSendScheduledAt) {
         formData.append("scheduled_at", scheduledAtValue);
-       } 
-      
+      }
+
       formData.append("social_accounts_sync", "true");
 
       // Always send social_accounts - even if empty
@@ -1301,7 +1392,11 @@ export const usePublicationForm = ({
 
       // Check if there are files still uploading
       let uploadingFiles = currentMediaFiles.filter((media) => {
-        return media.status === 'uploading' || media.status === 'processing' || (media.file instanceof File);
+        return (
+          media.status === "uploading" ||
+          media.status === "processing" ||
+          media.file instanceof File
+        );
       });
 
       // If there are files uploading, notify user but DON'T WAIT
@@ -1310,22 +1405,25 @@ export const usePublicationForm = ({
         toast.loading(
           t("publications.modal.upload.uploadingInBackground", {
             defaultValue: `${uploadingFiles.length} archivo(s) se están subiendo en segundo plano. Se vincularán automáticamente cuando se completen.`,
-            count: uploadingFiles.length
+            count: uploadingFiles.length,
           }),
-          { 
-            id: 'background-uploads',
-            duration: 5000
-          }
+          {
+            id: "background-uploads",
+            duration: 5000,
+          },
         );
-        
+
         // Dismiss the loading toast after 5 seconds
         setTimeout(() => {
-          toast.dismiss('background-uploads');
+          toast.dismiss("background-uploads");
         }, 5000);
-        
+
         // CRITICAL: Tell backend to skip media validation because files are uploading
         formData.append("has_uploading_files", "1");
-        formData.append("uploading_files_count", uploadingFiles.length.toString());
+        formData.append(
+          "uploading_files_count",
+          uploadingFiles.length.toString(),
+        );
       }
 
       // 1. Filter out files that are still uploading (File objects)
@@ -1425,9 +1523,9 @@ export const usePublicationForm = ({
         toast.success(
           publication
             ? t("publications.messages.updateSuccess")
-            : t("publications.messages.createSuccess")
+            : t("publications.messages.createSuccess"),
         );
-        
+
         // Reset dirty state after successful save so next time modal opens with fresh data
         if (publication) {
           reset(undefined, { keepValues: true, keepDirty: false });
@@ -1542,17 +1640,18 @@ export const usePublicationForm = ({
       handleClose();
       if (onSubmitSuccess) onSubmitSuccess(true);
     } catch (error: any) {
-      console.error('❌ Form submission error:', error);
-      console.error('Error details:', {
+      console.error("❌ Form submission error:", error);
+      console.error("Error details:", {
         message: error.message,
         response: error.response,
-        stack: error.stack
+        stack: error.stack,
       });
-      
-      const errorMessage = error.response?.data?.message 
-        || error.message 
-        || t("publications.messages.error");
-      
+
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        t("publications.messages.error");
+
       toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
@@ -1560,76 +1659,102 @@ export const usePublicationForm = ({
   };
 
   const onInvalidSubmit = (errs: any) => {
-    const contentType = watched.content_type || 'post';
-    
+    const contentType = watched.content_type || "post";
+
     // Define what fields should be validated for each content type
     const FIELD_VALIDATION_RULES = {
-      post: ['title', 'description', 'goal', 'hashtags'],
-      reel: ['title', 'description', 'hashtags'],
+      post: ["title", "description", "goal", "hashtags"],
+      reel: ["title", "description", "hashtags"],
       story: [], // No required fields for stories
-      poll: ['title', 'poll_options', 'poll_duration_hours'], // Only poll-specific fields
-      carousel: ['title', 'description', 'goal', 'hashtags'],
+      poll: ["title", "poll_options", "poll_duration_hours"], // Only poll-specific fields
+      carousel: ["title", "description", "goal", "hashtags"],
     };
-    
-    const requiredFields = FIELD_VALIDATION_RULES[contentType as keyof typeof FIELD_VALIDATION_RULES] || FIELD_VALIDATION_RULES.post;
-    
+
+    const requiredFields =
+      FIELD_VALIDATION_RULES[
+        contentType as keyof typeof FIELD_VALIDATION_RULES
+      ] || FIELD_VALIDATION_RULES.post;
+
     // Content-type specific validation messages
     const getFieldError = (field: string) => {
       // Skip validation if field is not required for this content type
       if (!requiredFields.includes(field)) {
-       return null;
+        return null;
       }
-      
+
       switch (field) {
-        case 'hashtags':
-          return t("publications.modal.validation.hashtagsRequired") || "Hashtags are required";
-        case 'description':
-          return t("publications.modal.validation.descriptionRequired") || "Description is required";
-        case 'goal':
-          return t("publications.modal.validation.goalRequired") || "Goal is required";
-        case 'title':
-          return contentType === 'poll' 
-            ? t("publications.modal.validation.questionRequired") || "Question is required"
-            : t("publications.modal.validation.titleRequired") || "Title is required";
-        case 'poll_options':
-          return t("publications.modal.validation.pollOptionsRequired") || "Poll options are required";
-        case 'poll_duration_hours':
-          return t("publications.modal.validation.pollDurationRequired") || "Poll duration is required";
+        case "hashtags":
+          return (
+            t("publications.modal.validation.hashtagsRequired") ||
+            "Hashtags are required"
+          );
+        case "description":
+          return (
+            t("publications.modal.validation.descriptionRequired") ||
+            "Description is required"
+          );
+        case "goal":
+          return (
+            t("publications.modal.validation.goalRequired") ||
+            "Goal is required"
+          );
+        case "title":
+          return contentType === "poll"
+            ? t("publications.modal.validation.questionRequired") ||
+                "Question is required"
+            : t("publications.modal.validation.titleRequired") ||
+                "Title is required";
+        case "poll_options":
+          return (
+            t("publications.modal.validation.pollOptionsRequired") ||
+            "Poll options are required"
+          );
+        case "poll_duration_hours":
+          return (
+            t("publications.modal.validation.pollDurationRequired") ||
+            "Poll duration is required"
+          );
         default:
-          return t(`publications.modal.validation.${field}Required`) || `${field} is required`;
+          return (
+            t(`publications.modal.validation.${field}Required`) ||
+            `${field} is required`
+          );
       }
     };
 
     // Filter errors based on content type - only show errors for required fields
     const relevantErrors = Object.keys(errs)
-      .filter(key => {
+      .filter((key) => {
         // Always include poll-specific errors for polls
-        if (contentType === 'poll' && (key === 'poll_options' || key === 'poll_duration_hours')) {
+        if (
+          contentType === "poll" &&
+          (key === "poll_options" || key === "poll_duration_hours")
+        ) {
           return true;
         }
         // Skip scheduled_at errors if use_global_schedule is false OR if scheduled_at is empty
         // OR if it's a poll without scheduling requirements
-        if (key === 'scheduled_at') {
+        if (key === "scheduled_at") {
           const hasGlobalSchedule = watched.use_global_schedule;
-          const hasScheduledValue = watched.scheduled_at && watched.scheduled_at.trim() !== '';
-          const isPoll = contentType === 'poll';
- 
+          const hasScheduledValue =
+            watched.scheduled_at && watched.scheduled_at.trim() !== "";
+          const isPoll = contentType === "poll";
+
           // For polls, skip scheduled_at validation entirely if no global schedule is set
           if (isPoll && !hasGlobalSchedule) {
-             return false;
+            return false;
           }
-          
+
           // Only validate scheduled_at if global schedule is enabled AND there's actually a value
           if (!hasGlobalSchedule || !hasScheduledValue) {
-           return false;
+            return false;
           }
         }
         // Include other required fields
         return requiredFields.includes(key);
       })
-      .map(key => getFieldError(key))
-      .filter(error => error !== null);
-
+      .map((key) => getFieldError(key))
+      .filter((error) => error !== null);
 
     // If there are no relevant errors, call onFormSubmit directly
     if (relevantErrors.length === 0) {
@@ -1637,20 +1762,23 @@ export const usePublicationForm = ({
       try {
         onFormSubmit(watched as PublicationFormData);
       } catch (error) {
-        console.error('Form submission error:', error);
+        console.error("Form submission error:", error);
       }
       return;
     }
 
     // Show errors only if there are relevant ones
     toast.error(
-      `${t("common.errors.checkFormErrors")}: ${relevantErrors.join(", ")}`
+      `${t("common.errors.checkFormErrors")}: ${relevantErrors.join(", ")}`,
     );
 
     // Content-type specific media validation
-    const mediaRequiredTypes = ['reel', 'story', 'carousel'];
+    const mediaRequiredTypes = ["reel", "story", "carousel"];
     if (mediaRequiredTypes.includes(contentType) && mediaFiles.length === 0) {
-      setImageError(t("publications.modal.validation.mediaRequired") || "Media is required for this content type");
+      setImageError(
+        t("publications.modal.validation.mediaRequired") ||
+          "Media is required for this content type",
+      );
     }
   };
 

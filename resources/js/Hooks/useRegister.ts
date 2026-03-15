@@ -27,8 +27,7 @@ export const useRegister = () => {
           setError(key as any, payload[key]);
         });
       }
-    } catch (e) {
-      }
+    } catch (e) {}
   };
 
   const submitRegister = async (payload: {

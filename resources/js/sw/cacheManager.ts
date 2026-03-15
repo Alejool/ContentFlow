@@ -207,7 +207,7 @@ export class CacheManager {
           }
           
           if (this.isDevelopment) {
-            `);
+            console.log(`[CacheManager] Cache hit: ${url}`);
           }
           
           return response;
@@ -215,7 +215,8 @@ export class CacheManager {
       }
       
       if (this.isDevelopment) {
-        }
+        console.log(`[CacheManager] Cache miss: ${request.url}`);
+      }
       
       return null;
     } catch (error) {
@@ -320,14 +321,14 @@ export class CacheManager {
         evictedCount++;
         
         if (this.isDevelopment) {
-          : ${entry.url} (accessed: ${entry.accessCount}x, age: ${Math.round((Date.now() - entry.lastAccessed) / 1000)}s)`);
+          console.log(`[CacheManager] Evicted: ${entry.url} (accessed: ${entry.accessCount}x, age: ${Math.round((Date.now() - entry.lastAccessed) / 1000)}s)`);
         }
       }
       
       if (evictedCount > 0) {
         const evictedMB = (evictedSize / (1024 * 1024)).toFixed(2);
         const remainingMB = ((totalSize - evictedSize) / (1024 * 1024)).toFixed(2);
-        from ${cacheName}. Remaining: ${remainingMB}MB`);
+        console.log(`[CacheManager] Evicted ${evictedCount} entries (${evictedMB}MB) from ${cacheName}. Remaining: ${remainingMB}MB`);
       }
     } catch (error) {
       }
@@ -488,10 +489,10 @@ export class CacheManager {
       
       // Clear all metadata
       this.metadataStore.clear();
-      
-      `);
+      console.log('[CacheManager] All caches cleared');
     } catch (error) {
-      }
+      // Ignore errors
+    }
   }
 
   /**

@@ -30,8 +30,16 @@ export default function RejectionReasonModal({
   const rejectionSchema = z.object({
     reason: z
       .string()
-      .min(10, t("approvals.validation.reasonMin") || "La razón debe tener al menos 10 caracteres")
-      .max(500, t("approvals.validation.reasonMax") || "La razón no puede exceder 500 caracteres"),
+      .min(
+        10,
+        t("approvals.validation.reasonMin") ||
+          "La razón debe tener al menos 10 caracteres",
+      )
+      .max(
+        500,
+        t("approvals.validation.reasonMax") ||
+          "La razón no puede exceder 500 caracteres",
+      ),
   });
 
   const {

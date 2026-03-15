@@ -4,10 +4,17 @@ import { useTranslation } from "react-i18next";
 
 interface PlatformProgressProps {
   publication: Publication;
-  onCancelPlatform?: (publicationId: number, platformId: number, platformName: string) => void;
+  onCancelPlatform?: (
+    publicationId: number,
+    platformId: number,
+    platformName: string,
+  ) => void;
 }
 
-export function PlatformProgress({ publication, onCancelPlatform }: PlatformProgressProps) {
+export function PlatformProgress({
+  publication,
+  onCancelPlatform,
+}: PlatformProgressProps) {
   const { t } = useTranslation();
   const platformSummary = (publication as any).platform_status_summary;
 
@@ -19,12 +26,18 @@ export function PlatformProgress({ publication, onCancelPlatform }: PlatformProg
         </div>
         <span className="block text-center text-[10px] text-gray-500 dark:text-neutral-400 italic">
           {publication.status === "publishing"
-            ? t("publications.gallery.sendingToSocial", { defaultValue: "Iniciando envío..." })
+            ? t("publications.gallery.sendingToSocial", {
+                defaultValue: "Iniciando envío...",
+              })
             : publication.status === "retrying"
-              ? t("publications.gallery.retrying", { defaultValue: "Reintentando..." })
+              ? t("publications.gallery.retrying", {
+                  defaultValue: "Reintentando...",
+                })
               : publication.status === "failed"
                 ? "Error en el procesamiento"
-                : t("publications.gallery.processing", { defaultValue: "Procesando..." })}
+                : t("publications.gallery.processing", {
+                    defaultValue: "Procesando...",
+                  })}
         </span>
       </div>
     );
@@ -49,7 +62,10 @@ export function PlatformProgress({ publication, onCancelPlatform }: PlatformProg
       {platforms.map((platform: any) => {
         const isDone = platform.status === "published";
         const isFailed = platform.status === "failed";
-        const isPublishing = platform.status === "publishing" || platform.status === "pending" || platform.status === "retrying";
+        const isPublishing =
+          platform.status === "publishing" ||
+          platform.status === "pending" ||
+          platform.status === "retrying";
         const progress = isDone ? 100 : isFailed ? 100 : isPublishing ? 50 : 0;
         const canCancel = isPublishing && onCancelPlatform;
 
@@ -76,7 +92,11 @@ export function PlatformProgress({ publication, onCancelPlatform }: PlatformProg
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      onCancelPlatform(publication.id, platform.social_account_id, platform.platform);
+                      onCancelPlatform(
+                        publication.id,
+                        platform.social_account_id,
+                        platform.platform,
+                      );
                     }}
                     className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
                     title={t("common.cancel") || "Cancelar"}
@@ -93,7 +113,11 @@ export function PlatformProgress({ publication, onCancelPlatform }: PlatformProg
                         : "bg-primary/10 text-primary dark:bg-primary/20"
                   }`}
                 >
-                  {isDone ? t("common.sent") || "Enviado" : isFailed ? t("publications.modal.publish.failed") || "Falló" : t("common.sending") || "Enviando"}
+                  {isDone
+                    ? t("common.sent") || "Enviado"
+                    : isFailed
+                      ? t("publications.modal.publish.failed") || "Falló"
+                      : t("common.sending") || "Enviando"}
                 </span>
               </div>
             </div>
@@ -126,9 +150,21 @@ export function PlatformProgress({ publication, onCancelPlatform }: PlatformProg
                 rel="noopener noreferrer"
                 className="mt-1.5 text-[10px] text-primary-500 hover:underline flex items-center gap-1"
               >
-                {t("publications.viewPost", { defaultValue: "Ver publicación" })}
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                {t("publications.viewPost", {
+                  defaultValue: "Ver publicación",
+                })}
+                <svg
+                  className="w-3 h-3"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                  />
                 </svg>
               </a>
             )}

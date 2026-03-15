@@ -1,15 +1,15 @@
-import React from 'react';
-import { useTheme } from '@/Hooks/useTheme';
+import React from "react";
+import { useTheme } from "@/Hooks/useTheme";
 
 /**
  * SkipLink component - Provides a skip to main content link for keyboard users
- * 
+ *
  * This component is positioned at the top of the page and is only visible when focused,
  * allowing keyboard users to bypass repetitive navigation elements and jump directly
  * to the main content.
- * 
+ *
  * Requirements: 5.4
- * 
+ *
  * @example
  * // In your layout component
  * <SkipLink />
@@ -23,7 +23,7 @@ interface SkipLinkProps {
    * @default "main-content"
    */
   targetId?: string;
-  
+
   /**
    * The text to display in the skip link
    * @default "Skip to main content"
@@ -32,28 +32,28 @@ interface SkipLinkProps {
 }
 
 export const SkipLink: React.FC<SkipLinkProps> = ({
-  targetId = 'main-content',
-  text = 'Skip to main content',
+  targetId = "main-content",
+  text = "Skip to main content",
 }) => {
   const { actualTheme } = useTheme();
 
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
-    
+
     const target = document.getElementById(targetId);
     if (target) {
       // Set focus to the target element
       target.focus();
-      
+
       // If the element is not naturally focusable, set tabindex
-      if (!target.hasAttribute('tabindex')) {
-        target.setAttribute('tabindex', '-1');
+      if (!target.hasAttribute("tabindex")) {
+        target.setAttribute("tabindex", "-1");
       }
-      
+
       // Scroll to the target
       target.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
+        behavior: "smooth",
+        block: "start",
       });
     }
   };
@@ -79,9 +79,9 @@ export const SkipLink: React.FC<SkipLinkProps> = ({
         focus:ring-2 focus:ring-offset-2
         
         ${
-          actualTheme === 'dark'
-            ? 'bg-orange-500 text-white focus:ring-orange-400 focus:ring-offset-neutral-900'
-            : 'bg-orange-600 text-white focus:ring-orange-500 focus:ring-offset-white'
+          actualTheme === "dark"
+            ? "bg-orange-500 text-white focus:ring-orange-400 focus:ring-offset-neutral-900"
+            : "bg-orange-600 text-white focus:ring-orange-500 focus:ring-offset-white"
         }
       `}
       style={{

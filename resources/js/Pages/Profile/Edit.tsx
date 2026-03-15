@@ -63,10 +63,10 @@ export default function Edit({
       currentWorkspace.user_role_slug === "owner");
 
   const tabs = [
-    { 
-      key: "profile", 
-      label: t("profile.tabs.general") || "General", 
-      icon: User 
+    {
+      key: "profile",
+      label: t("profile.tabs.general") || "General",
+      icon: User,
     },
     {
       key: "password",
@@ -108,7 +108,7 @@ export default function Edit({
   const handleSaveClick = () => {
     if (formRef.current && activeTab === "profile") {
       formRef.current.dispatchEvent(
-        new Event("submit", { cancelable: true, bubbles: true })
+        new Event("submit", { cancelable: true, bubbles: true }),
       );
     }
   };
@@ -130,7 +130,7 @@ export default function Edit({
               </p>
             </div>
           </div>
-          
+
           {activeTab === "profile" && (
             <Button
               onClick={handleSaveClick}
@@ -170,13 +170,15 @@ export default function Edit({
               }`}
             >
               {activeTab === "profile" && (
-                <div ref={(el) => {
-                  if (el) {
-                    const form = el.querySelector('form');
-                    // @ts-ignore - Asignación directa a ref.current es válida aquí
-                    formRef.current = form;
-                  }
-                }}>
+                <div
+                  ref={(el) => {
+                    if (el) {
+                      const form = el.querySelector("form");
+                      // @ts-ignore - Asignación directa a ref.current es válida aquí
+                      formRef.current = form;
+                    }
+                  }}
+                >
                   <UpdateProfileInformationForm
                     mustVerifyEmail={mustVerifyEmail}
                     user={user}

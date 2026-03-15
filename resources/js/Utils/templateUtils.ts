@@ -7,7 +7,7 @@ import type { PublicationTemplate } from "@/types/onboarding";
 /**
  * Stores template data in session storage for use when creating a publication.
  * This allows the template data to persist across page navigation.
- * 
+ *
  * @param template - The template to store
  */
 export function storeTemplateInSession(template: PublicationTemplate): void {
@@ -20,7 +20,7 @@ export function storeTemplateInSession(template: PublicationTemplate): void {
 
 /**
  * Retrieves template data from session storage.
- * 
+ *
  * @returns The stored template, or null if none exists
  */
 export function getTemplateFromSession(): PublicationTemplate | null {
@@ -46,7 +46,7 @@ export function clearTemplateFromSession(): void {
 
 /**
  * Checks if a template is currently stored in session.
- * 
+ *
  * @returns True if a template is stored, false otherwise
  */
 export function hasTemplateInSession(): boolean {
@@ -59,7 +59,7 @@ export function hasTemplateInSession(): boolean {
 
 /**
  * Formats hashtags from an array to a space-separated string with # prefix.
- * 
+ *
  * @param hashtags - Array of hashtags (with or without # prefix)
  * @returns Formatted hashtag string
  */
@@ -71,13 +71,13 @@ export function formatHashtags(hashtags: string[]): string {
 
 /**
  * Applies template content to a publication form using setValue.
- * 
+ *
  * @param template - The template to apply
  * @param setValue - React Hook Form setValue function
  */
 export function applyTemplateToForm(
   template: PublicationTemplate,
-  setValue: (name: string, value: any, options?: any) => void
+  setValue: (name: string, value: any, options?: any) => void,
 ): void {
   // Populate title
   setValue("title", template.name, {

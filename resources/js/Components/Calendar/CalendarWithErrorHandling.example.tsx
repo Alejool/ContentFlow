@@ -1,37 +1,39 @@
 /**
  * Example: Calendar Component with Complete Error Handling
- * 
+ *
  * This example demonstrates how to integrate all error handling components
  * into a calendar view.
  */
 
-import React, { useState, useEffect } from 'react';
-import { CalendarErrorBoundary } from './CalendarErrorBoundary';
-import { ConflictResolutionModal, DataConflict } from './ConflictResolutionModal';
-import { SyncErrorList } from './SyncErrorDisplay';
-import { useCalendarStore } from '@/stores/calendarStore';
-import { validateDate } from '@/Utils/dateValidation';
-import { SyncError } from '@/types/errors';
+import React, { useState, useEffect } from "react";
+import { CalendarErrorBoundary } from "./CalendarErrorBoundary";
+import {
+  ConflictResolutionModal,
+  DataConflict,
+} from "./ConflictResolutionModal";
+import { SyncErrorList } from "./SyncErrorDisplay";
+import { useCalendarStore } from "@/stores/calendarStore";
+import { validateDate } from "@/Utils/dateValidation";
+import { SyncError } from "@/types/errors";
 
 export const CalendarWithErrorHandling: React.FC = () => {
-  const {
-    events,
-    conflict,
-    setConflict,
-    resolveConflict,
-    updateEvent,
-  } = useCalendarStore();
+  const { events, conflict, setConflict, resolveConflict, updateEvent } =
+    useCalendarStore();
 
   const [syncErrors, setSyncErrors] = useState<SyncError[]>([]);
 
   // Handle event update with validation
-  const handleEventUpdate = async (eventId: string, newDate: string, type: string) => {
+  const handleEventUpdate = async (
+    eventId: string,
+    newDate: string,
+    type: string,
+  ) => {
     // Validate date before sending
     const validation = validateDate(newDate);
-    
+
     if (!validation.isValid) {
       // Show error toast or message
-      console.error('Invalid date:', validation.error);
+      console.error("Invalid date:", validation.error);
       return;
     }
 
@@ -45,17 +47,15 @@ export const CalendarWithErrorHandling: React.FC = () => {
 
     // Attempt update
     const success = await updateEvent(eventId, newDate, type);
-    
   };
 
   // Handle conflict resolution
-  const handleConflictResolve = async (resolution: 'local' | 'server') => {
+  const handleConflictResolve = async (resolution: "local" | "server") => {
     const success = await resolveConflict(resolution);
   };
 
   // Handle sync error retry
-  const handleSyncRetry = async (error: SyncError) => {
-  };
+  const handleSyncRetry = async (error: SyncError) => {};
 
   return (
     <CalendarErrorBoundary>
@@ -67,7 +67,7 @@ export const CalendarWithErrorHandling: React.FC = () => {
               errors={syncErrors}
               onRetry={handleSyncRetry}
               onDismiss={(error) => {
-                setSyncErrors(errors => errors.filter(e => e !== error));
+                setSyncErrors((errors) => errors.filter((e) => e !== error));
               }}
               onDismissAll={() => setSyncErrors([])}
             />
@@ -76,7 +76,7 @@ export const CalendarWithErrorHandling: React.FC = () => {
 
         {/* Calendar Grid */}
         <div className="calendar-grid">
-          {events.map(event => (
+          {events.map((event) => (
             <div
               key={event.id}
               onClick={() => {
@@ -92,7 +92,7 @@ export const CalendarWithErrorHandling: React.FC = () => {
         {conflict && (
           <ConflictResolutionModal
             conflict={conflict}
-            event={events.find(e => e.id === conflict.eventId)}
+            event={events.find((e) => e.id === conflict.eventId)}
             onResolve={handleConflictResolve}
             onCancel={() => setConflict(null)}
             isOpen={true}
@@ -105,9 +105,9 @@ export const CalendarWithErrorHandling: React.FC = () => {
 
 /**
  * Usage in Calendar Page:
- * 
+ *
  * import { CalendarWithErrorHandling } from '@/Components/Calendar/CalendarWithErrorHandling.example';
- * 
+ *
  * function CalendarPage() {
  *   return (
  *     <div>

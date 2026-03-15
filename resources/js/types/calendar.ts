@@ -1,11 +1,11 @@
 // Calendar View Types
-export type CalendarView = 'month' | 'week' | 'day';
+export type CalendarView = "month" | "week" | "day";
 
 export interface ViewConfig {
   type: CalendarView;
   dateRange: { start: Date; end: Date };
   gridColumns: number;
-  eventDisplayMode: 'compact' | 'detailed' | 'full';
+  eventDisplayMode: "compact" | "detailed" | "full";
 }
 
 // Calendar Event Types
@@ -13,7 +13,7 @@ export interface CalendarEvent {
   publicationId: number;
   id: string;
   resourceId: number;
-  type: 'publication' | 'post' | 'user_event';
+  type: "publication" | "post" | "user_event";
   title: string;
   start: string;
   end?: string;
@@ -61,16 +61,16 @@ export interface Campaign {
   color: string;
 }
 
-export type PublicationStatus = 
-  | 'draft' 
-  | 'published' 
-  | 'publishing' 
-  | 'failed' 
-  | 'pending_review' 
-  | 'approved' 
-  | 'scheduled' 
-  | 'rejected'
-  | 'retrying';
+export type PublicationStatus =
+  | "draft"
+  | "published"
+  | "publishing"
+  | "failed"
+  | "pending_review"
+  | "approved"
+  | "scheduled"
+  | "rejected"
+  | "retrying";
 
 // Bulk Operations Types
 export interface BulkOperationResult {
@@ -80,11 +80,11 @@ export interface BulkOperationResult {
 
 // External Calendar Types
 export interface ExternalCalendarConnection {
-  provider: 'google' | 'outlook';
+  provider: "google" | "outlook";
   connected: boolean;
   email?: string;
   lastSync?: Date;
-  status: 'connected' | 'disconnected' | 'error';
+  status: "connected" | "disconnected" | "error";
   errorMessage?: string;
 }
 
@@ -92,5 +92,5 @@ export interface SyncConfig {
   enabled: boolean;
   syncCampaigns: number[];
   syncPlatforms: string[];
-  syncDirection: 'one-way' | 'two-way';
+  syncDirection: "one-way" | "two-way";
 }

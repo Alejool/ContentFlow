@@ -1,6 +1,6 @@
 /**
  * Onboarding System Type Definitions
- * 
+ *
  * This file contains all TypeScript interfaces and types for the interactive
  * onboarding system, including tour steps, tooltips, wizards, and templates.
  */
@@ -35,7 +35,7 @@ export interface TourStep {
   title: string;
   description: string;
   targetSelector: string;
-  position: 'top' | 'bottom' | 'left' | 'right';
+  position: "top" | "bottom" | "left" | "right";
   highlightPadding: number;
   route?: string; // Optional route to navigate to if element not found
 }
@@ -56,7 +56,7 @@ export interface TooltipDefinition {
   id: string;
   content: string;
   targetSelector: string;
-  position: 'top' | 'bottom' | 'left' | 'right' | 'auto';
+  position: "top" | "bottom" | "left" | "right" | "auto";
   dismissible: boolean;
 }
 

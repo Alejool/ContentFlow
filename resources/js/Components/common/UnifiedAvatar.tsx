@@ -1,4 +1,13 @@
-import { Briefcase, Crown, Heart, Smile, Sparkles, Star, User, Zap } from "lucide-react";
+import {
+  Briefcase,
+  Crown,
+  Heart,
+  Smile,
+  Sparkles,
+  Star,
+  User,
+  Zap,
+} from "lucide-react";
 import { useState } from "react";
 
 interface UnifiedAvatarProps {
@@ -106,8 +115,12 @@ export function UnifiedAvatar({
     }
 
     // Si hay icono por defecto seleccionado, mostrarlo
-    if (defaultIcon && DEFAULT_ICONS[defaultIcon as keyof typeof DEFAULT_ICONS]) {
-      const IconComponent = DEFAULT_ICONS[defaultIcon as keyof typeof DEFAULT_ICONS];
+    if (
+      defaultIcon &&
+      DEFAULT_ICONS[defaultIcon as keyof typeof DEFAULT_ICONS]
+    ) {
+      const IconComponent =
+        DEFAULT_ICONS[defaultIcon as keyof typeof DEFAULT_ICONS];
       return (
         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-500 to-primary-600 text-white">
           <IconComponent size={iconSizes[size]} />
@@ -146,4 +159,3 @@ export function UnifiedAvatar({
 }
 
 export { DEFAULT_ICONS };
-

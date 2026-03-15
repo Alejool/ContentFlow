@@ -1,19 +1,19 @@
 // Calendar Error Codes
 export enum CalendarErrorCode {
   // Synchronization errors
-  SYNC_FAILED = 'SYNC_FAILED',
-  TOKEN_EXPIRED = 'TOKEN_EXPIRED',
-  PROVIDER_UNAVAILABLE = 'PROVIDER_UNAVAILABLE',
-  
+  SYNC_FAILED = "SYNC_FAILED",
+  TOKEN_EXPIRED = "TOKEN_EXPIRED",
+  PROVIDER_UNAVAILABLE = "PROVIDER_UNAVAILABLE",
+
   // Operation errors
-  BULK_OPERATION_PARTIAL_FAILURE = 'BULK_OPERATION_PARTIAL_FAILURE',
-  INVALID_DATE = 'INVALID_DATE',
-  PERMISSION_DENIED = 'PERMISSION_DENIED',
-  
+  BULK_OPERATION_PARTIAL_FAILURE = "BULK_OPERATION_PARTIAL_FAILURE",
+  INVALID_DATE = "INVALID_DATE",
+  PERMISSION_DENIED = "PERMISSION_DENIED",
+
   // Data errors
-  PUBLICATION_NOT_FOUND = 'PUBLICATION_NOT_FOUND',
-  CONFLICT = 'CONFLICT',
-  VALIDATION_ERROR = 'VALIDATION_ERROR',
+  PUBLICATION_NOT_FOUND = "PUBLICATION_NOT_FOUND",
+  CONFLICT = "CONFLICT",
+  VALIDATION_ERROR = "VALIDATION_ERROR",
 }
 
 export interface CalendarError {
@@ -25,7 +25,7 @@ export interface CalendarError {
 }
 
 export interface SyncError extends CalendarError {
-  provider: 'google' | 'outlook';
+  provider: "google" | "outlook";
   publicationId?: number;
   retryable: boolean;
   retryCount?: number;

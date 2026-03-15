@@ -38,8 +38,7 @@ export default function LanguageSwitcher() {
     if (auth?.user) {
       try {
         await axios.patch(route("settings.locale"), { locale: newLang });
-      } catch (error) {
-        }
+      } catch (error) {}
     }
   };
 

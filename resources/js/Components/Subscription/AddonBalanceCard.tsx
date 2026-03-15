@@ -1,24 +1,27 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
-import { Progress } from '@/Components/ui/progress';
-import type { AddonBalance } from '@/types/addon';
-import { Sparkles, HardDrive } from 'lucide-react';
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
+import { Progress } from "@/Components/ui/progress";
+import type { AddonBalance } from "@/types/addon";
+import { Sparkles, HardDrive } from "lucide-react";
 
 interface AddonBalanceCardProps {
   balance: AddonBalance;
   onBuyMore?: () => void;
 }
 
-export const AddonBalanceCard: React.FC<AddonBalanceCardProps> = ({ balance, onBuyMore }) => {
-  const isAI = balance.type === 'ai_credits';
+export const AddonBalanceCard: React.FC<AddonBalanceCardProps> = ({
+  balance,
+  onBuyMore,
+}) => {
+  const isAI = balance.type === "ai_credits";
   const Icon = isAI ? Sparkles : HardDrive;
-  const unit = isAI ? 'créditos' : 'GB';
-  const title = isAI ? 'Créditos IA' : 'Almacenamiento';
+  const unit = isAI ? "créditos" : "GB";
+  const title = isAI ? "Créditos IA" : "Almacenamiento";
 
   const getProgressColor = () => {
-    if (balance.percentage_used >= 90) return 'bg-red-500';
-    if (balance.percentage_used >= 70) return 'bg-yellow-500';
-    return 'bg-blue-500';
+    if (balance.percentage_used >= 90) return "bg-red-500";
+    if (balance.percentage_used >= 70) return "bg-yellow-500";
+    return "bg-blue-500";
   };
 
   return (
@@ -41,8 +44,8 @@ export const AddonBalanceCard: React.FC<AddonBalanceCardProps> = ({ balance, onB
 
           {/* Progress Bar */}
           <div className="space-y-1">
-            <Progress 
-              value={balance.percentage_used} 
+            <Progress
+              value={balance.percentage_used}
               className="h-2"
               indicatorClassName={getProgressColor()}
             />
@@ -54,7 +57,9 @@ export const AddonBalanceCard: React.FC<AddonBalanceCardProps> = ({ balance, onB
           {/* Addons Count */}
           {balance.addons_count > 0 && (
             <p className="text-xs text-muted-foreground">
-              {balance.addons_count} paquete{balance.addons_count !== 1 ? 's' : ''} activo{balance.addons_count !== 1 ? 's' : ''}
+              {balance.addons_count} paquete
+              {balance.addons_count !== 1 ? "s" : ""} activo
+              {balance.addons_count !== 1 ? "s" : ""}
             </p>
           )}
 
@@ -71,7 +76,8 @@ export const AddonBalanceCard: React.FC<AddonBalanceCardProps> = ({ balance, onB
           {balance.total === 0 && (
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-2">
               <p className="text-xs text-blue-800 dark:text-blue-200">
-                No tienes add-ons activos. Compra paquetes adicionales para extender tu capacidad.
+                No tienes add-ons activos. Compra paquetes adicionales para
+                extender tu capacidad.
               </p>
             </div>
           )}

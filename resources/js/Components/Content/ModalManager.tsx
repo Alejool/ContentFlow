@@ -58,7 +58,7 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
       ? (publications.find((p) => p.id === selectedItem.id) as Publication) ||
         (selectedItem as Publication)
       : null;
-  
+
   // Debug log to track publication updates
   if (currentPub && isEditModalOpen) {
   }

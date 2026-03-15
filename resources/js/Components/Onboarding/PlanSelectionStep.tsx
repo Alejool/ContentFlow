@@ -42,9 +42,9 @@ export default function PlanSelectionStep({
     const checkActiveSubscription = async () => {
       try {
         // First check onboarding state
-        const onboardingResponse = await axios.get('/api/v1/onboarding/state');
+        const onboardingResponse = await axios.get("/api/v1/onboarding/state");
         const onboardingState = onboardingResponse.data?.state;
-        
+
         // If plan is already selected in onboarding, complete this step
         if (onboardingState?.planSelected && onboardingState?.selectedPlan) {
           setTimeout(() => {
@@ -55,21 +55,22 @@ export default function PlanSelectionStep({
 
         // Check if user has an active subscription
         try {
-          const response = await axios.get('/api/v1/subscription/current-usage');
+          const response = await axios.get(
+            "/api/v1/subscription/current-usage",
+          );
           const currentPlan = response.data?.data?.plan;
-          
+
           // If user has an active paid plan, update onboarding and complete this step
-          if (currentPlan && currentPlan !== 'free' && currentPlan !== 'demo') {
-            
+          if (currentPlan && currentPlan !== "free" && currentPlan !== "demo") {
             // Update onboarding state on backend
             try {
-              await axios.post('/api/v1/onboarding/plan/select', {
-                plan_id: currentPlan
+              await axios.post("/api/v1/onboarding/plan/select", {
+                plan_id: currentPlan,
               });
             } catch (error) {
-              console.error('Error updating onboarding state:', error);
+              console.error("Error updating onboarding state:", error);
             }
-            
+
             // Complete this step
             setTimeout(() => {
               onComplete(currentPlan);
@@ -79,11 +80,11 @@ export default function PlanSelectionStep({
         } catch (error) {
           // 404 means no active subscription, which is expected during onboarding
           if (error.response?.status !== 404) {
-            console.error('Error checking subscription:', error);
+            console.error("Error checking subscription:", error);
           }
         }
       } catch (error) {
-        console.error('Error checking onboarding state:', error);
+        console.error("Error checking onboarding state:", error);
       } finally {
         setCheckingSubscription(false);
       }
@@ -96,10 +97,10 @@ export default function PlanSelectionStep({
     // Fetch plans from the API
     const fetchPlans = async () => {
       try {
-        const response = await axios.get('/api/v1/plans');
+        const response = await axios.get("/api/v1/plans");
         setPlans(response.data);
       } catch (error) {
-        console.error('Error fetching plans:', error);
+        console.error("Error fetching plans:", error);
         setPlans([]);
       } finally {
         setIsLoading(false);
@@ -128,7 +129,9 @@ export default function PlanSelectionStep({
             {t("planSelection.title")}
           </h3>
           <p className="text-gray-600 dark:text-gray-400">
-            {checkingSubscription ? t('common.messages.checkingSubscription') : t('common.messages.loadingPlans')}
+            {checkingSubscription
+              ? t("common.messages.checkingSubscription")
+              : t("common.messages.loadingPlans")}
           </p>
         </div>
       </div>

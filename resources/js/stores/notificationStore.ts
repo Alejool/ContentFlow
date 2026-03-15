@@ -28,14 +28,20 @@ export interface NotificationData {
 }
 
 /** Derive a semantic type from the Laravel notification class name */
-export function getNotificationType(n: NotificationData): NotificationTypeFilter {
+export function getNotificationType(
+  n: NotificationData,
+): NotificationTypeFilter {
   const cls = n.type ?? "";
   const notifType = n.data?.notification_type ?? "";
 
   if (notifType) return notifType as NotificationTypeFilter;
 
-  if (/Approval|Awaiting|Approved|Rejected|Reassigned|MissingApprovers/i.test(cls)) return "approvals";
-  if (/Publication|Playlist|Reels|Video|Media/i.test(cls)) return "publications";
+  if (
+    /Approval|Awaiting|Approved|Rejected|Reassigned|MissingApprovers/i.test(cls)
+  )
+    return "approvals";
+  if (/Publication|Playlist|Reels|Video|Media/i.test(cls))
+    return "publications";
   if (/Campaign/i.test(cls) || n.data?.campaign_id) return "campaigns";
   if (/Social|Workspace|Role|TwoFactor|Verify/i.test(cls)) return "account";
   if (/System|Trial|Usage|API|Error/i.test(cls)) return "system";
@@ -56,8 +62,14 @@ interface NotificationState {
   markAllAsRead: () => Promise<void>;
   deleteNotification: (id: string) => Promise<void>;
   filterByPriority: (priority: string | null) => NotificationData[];
-  filterByType: (type: NotificationTypeFilter, source?: NotificationData[]) => NotificationData[];
-  countByType: (type: NotificationTypeFilter, source?: NotificationData[]) => number;
+  filterByType: (
+    type: NotificationTypeFilter,
+    source?: NotificationData[],
+  ) => NotificationData[];
+  countByType: (
+    type: NotificationTypeFilter,
+    source?: NotificationData[],
+  ) => number;
 }
 
 export const useNotificationStore = create<NotificationState>((set, get) => ({
@@ -134,8 +146,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
           ),
         };
       });
-    } catch (error) {
-      }
+    } catch (error) {}
   },
 
   markAllAsRead: async () => {
@@ -161,8 +172,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
           ),
         };
       });
-    } catch (error) {
-      }
+    } catch (error) {}
   },
 
   deleteNotification: async (id: string) => {
@@ -193,8 +203,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
           ),
         };
       });
-    } catch (error) {
-      }
+    } catch (error) {}
   },
 
   filterByPriority: (priority: string | null) => {

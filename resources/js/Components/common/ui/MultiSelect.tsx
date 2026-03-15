@@ -33,7 +33,7 @@ export default function MultiSelect({
     onChange(
       selected.includes(value)
         ? selected.filter((v) => v !== value)
-        : [...selected, value]
+        : [...selected, value],
     );
   };
 
@@ -41,8 +41,8 @@ export default function MultiSelect({
     selected.length === 0
       ? placeholder
       : selected.length === options.length
-      ? "All"
-      : `${selected.length} selected`;
+        ? "All"
+        : `${selected.length} selected`;
 
   return (
     <div ref={ref} className={`relative ${className}`}>
@@ -55,11 +55,13 @@ export default function MultiSelect({
         aria-label={`Select options. ${selected.length} of ${options.length} selected`}
       >
         <span className="truncate">{displayText}</span>
-        <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+        <ChevronDown
+          className={`w-4 h-4 transition-transform ${isOpen ? "rotate-180" : ""}`}
+        />
       </button>
 
       {isOpen && (
-        <div 
+        <div
           className="absolute z-50 mt-1 w-full bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-600 rounded-lg shadow-lg max-h-60 overflow-auto"
           role="listbox"
           aria-multiselectable="true"

@@ -1,10 +1,17 @@
-import React, { useEffect } from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/Components/ui/card';
-import Button from '@/Components/common/Modern/Button';
-import { CheckCircle, Sparkles, ArrowRight } from 'lucide-react';
-import confetti from 'canvas-confetti';
+import React, { useEffect } from "react";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import { Head, Link } from "@inertiajs/react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/Components/ui/card";
+import Button from "@/Components/common/Modern/Button";
+import { CheckCircle, Sparkles, ArrowRight } from "lucide-react";
+import confetti from "canvas-confetti";
 
 export default function AddonSuccess() {
   useEffect(() => {
@@ -17,7 +24,7 @@ export default function AddonSuccess() {
       return Math.random() * (max - min) + min;
     }
 
-    const interval: any = setInterval(function() {
+    const interval: any = setInterval(function () {
       const timeLeft = animationEnd - Date.now();
 
       if (timeLeft <= 0) {
@@ -25,16 +32,16 @@ export default function AddonSuccess() {
       }
 
       const particleCount = 50 * (timeLeft / duration);
-      
+
       confetti({
         ...defaults,
         particleCount,
-        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
       });
       confetti({
         ...defaults,
         particleCount,
-        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
       });
     }, 250);
 
@@ -52,7 +59,7 @@ export default function AddonSuccess() {
               <div className="mx-auto w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
                 <CheckCircle className="h-10 w-10 text-green-600 dark:text-green-400" />
               </div>
-              
+
               <div>
                 <CardTitle className="text-3xl font-bold text-green-900 dark:text-green-100">
                   ¡Compra Exitosa!
@@ -73,19 +80,30 @@ export default function AddonSuccess() {
                     <ul className="space-y-2 text-sm text-muted-foreground">
                       <li className="flex items-start gap-2">
                         <span className="text-blue-600 font-bold">•</span>
-                        <span>Tus créditos adicionales están disponibles inmediatamente</span>
+                        <span>
+                          Tus créditos adicionales están disponibles
+                          inmediatamente
+                        </span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-blue-600 font-bold">•</span>
-                        <span>Se usarán automáticamente cuando excedas el límite de tu plan</span>
+                        <span>
+                          Se usarán automáticamente cuando excedas el límite de
+                          tu plan
+                        </span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-blue-600 font-bold">•</span>
-                        <span>Puedes ver tu balance actualizado en el dashboard</span>
+                        <span>
+                          Puedes ver tu balance actualizado en el dashboard
+                        </span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-blue-600 font-bold">•</span>
-                        <span>Recibirás un email de confirmación con los detalles de tu compra</span>
+                        <span>
+                          Recibirás un email de confirmación con los detalles de
+                          tu compra
+                        </span>
                       </li>
                     </ul>
                   </div>
@@ -95,8 +113,9 @@ export default function AddonSuccess() {
               {/* Info Box */}
               <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                 <p className="text-sm text-blue-800 dark:text-blue-200">
-                  💡 <strong>Tip:</strong> Los add-ons no expiran y se acumulan si compras múltiples paquetes. 
-                  Puedes solicitar reembolso dentro de los 7 días si no has usado el add-on.
+                  💡 <strong>Tip:</strong> Los add-ons no expiran y se acumulan
+                  si compras múltiples paquetes. Puedes solicitar reembolso
+                  dentro de los 7 días si no has usado el add-on.
                 </p>
               </div>
             </CardContent>
@@ -108,11 +127,9 @@ export default function AddonSuccess() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-              
+
               <Button asChild variant="outline" size="lg">
-                <Link href="/subscription/addons">
-                  Ver Mis Add-ons
-                </Link>
+                <Link href="/subscription/addons">Ver Mis Add-ons</Link>
               </Button>
             </CardFooter>
           </Card>

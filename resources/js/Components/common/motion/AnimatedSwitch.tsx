@@ -1,14 +1,17 @@
 /**
  * Animated Switch Component
- * 
+ *
  * Toggle switch with animations and full accessibility support
  */
 
-import React, { forwardRef, InputHTMLAttributes } from 'react';
-import { LazyMotion, domAnimation, m } from 'framer-motion';
-import { prefersReducedMotion } from '@/Utils/themeTransition';
+import React, { forwardRef, InputHTMLAttributes } from "react";
+import { LazyMotion, domAnimation, m } from "framer-motion";
+import { prefersReducedMotion } from "@/Utils/themeTransition";
 
-interface AnimatedSwitchProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
+interface AnimatedSwitchProps extends Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  "type"
+> {
   label?: string;
   description?: string;
   onCheckedChange?: (checked: boolean) => void;
@@ -24,10 +27,10 @@ export const AnimatedSwitch = forwardRef<HTMLInputElement, AnimatedSwitchProps>(
       onChange,
       disabled,
       id,
-      className = '',
+      className = "",
       ...props
     },
-    ref
+    ref,
   ) => {
     const reducedMotion = prefersReducedMotion();
     const switchId = id || `switch-${Math.random().toString(36).substr(2, 9)}`;
@@ -38,7 +41,7 @@ export const AnimatedSwitch = forwardRef<HTMLInputElement, AnimatedSwitchProps>(
     };
 
     const spring = {
-      type: 'spring',
+      type: "spring",
       stiffness: 700,
       damping: 30,
     };
@@ -56,10 +59,12 @@ export const AnimatedSwitch = forwardRef<HTMLInputElement, AnimatedSwitchProps>(
             className="sr-only peer"
             role="switch"
             aria-checked={checked}
-            aria-describedby={description ? `${switchId}-description` : undefined}
+            aria-describedby={
+              description ? `${switchId}-description` : undefined
+            }
             {...props}
           />
-          
+
           <label
             htmlFor={switchId}
             className={`
@@ -68,11 +73,7 @@ export const AnimatedSwitch = forwardRef<HTMLInputElement, AnimatedSwitchProps>(
               cursor-pointer
               peer-focus-visible:ring-2 peer-focus-visible:ring-primary-500 peer-focus-visible:ring-offset-2
               peer-disabled:opacity-50 peer-disabled:cursor-not-allowed
-              ${
-                checked
-                  ? 'bg-primary-600'
-                  : 'bg-theme-border-strong'
-              }
+              ${checked ? "bg-primary-600" : "bg-theme-border-strong"}
             `}
           >
             <LazyMotion features={domAnimation}>
@@ -112,7 +113,7 @@ export const AnimatedSwitch = forwardRef<HTMLInputElement, AnimatedSwitchProps>(
         )}
       </div>
     );
-  }
+  },
 );
 
-AnimatedSwitch.displayName = 'AnimatedSwitch';
+AnimatedSwitch.displayName = "AnimatedSwitch";

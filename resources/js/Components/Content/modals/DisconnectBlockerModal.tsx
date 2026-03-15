@@ -8,7 +8,7 @@ interface DisconnectBlockerModalProps {
   onClose: () => void;
   accountName: string;
   posts: any[];
-  reason: 'publishing' | 'scheduled';
+  reason: "publishing" | "scheduled";
 }
 
 export default function DisconnectBlockerModal({
@@ -20,23 +20,32 @@ export default function DisconnectBlockerModal({
 }: DisconnectBlockerModalProps) {
   const { t } = useTranslation();
 
-
   if (!isOpen) return null;
 
   const getTitle = () => {
-    if (reason === 'publishing') {
-      return t('manageContent.socialMedia.blockerModal.titlePublishing') || 'No se puede desconectar';
+    if (reason === "publishing") {
+      return (
+        t("manageContent.socialMedia.blockerModal.titlePublishing") ||
+        "No se puede desconectar"
+      );
     }
-    return t('manageContent.socialMedia.blockerModal.titleScheduled') || 'No se puede desconectar';
+    return (
+      t("manageContent.socialMedia.blockerModal.titleScheduled") ||
+      "No se puede desconectar"
+    );
   };
 
   const getMessage = () => {
-    if (reason === 'publishing') {
-      return t('manageContent.socialMedia.blockerModal.messagePublishing') || 
-        'Esta cuenta tiene publicaciones que se están publicando en este momento. Por favor, espera a que terminen antes de desconectar.';
+    if (reason === "publishing") {
+      return (
+        t("manageContent.socialMedia.blockerModal.messagePublishing") ||
+        "Esta cuenta tiene publicaciones que se están publicando en este momento. Por favor, espera a que terminen antes de desconectar."
+      );
     }
-    return t('manageContent.socialMedia.blockerModal.messageScheduled') ||
-      'Esta cuenta tiene publicaciones programadas. Debes eliminarlas de las publicaciones antes de poder desconectar esta cuenta.';
+    return (
+      t("manageContent.socialMedia.blockerModal.messageScheduled") ||
+      "Esta cuenta tiene publicaciones programadas. Debes eliminarlas de las publicaciones antes de poder desconectar esta cuenta."
+    );
   };
 
   return (
@@ -56,7 +65,10 @@ export default function DisconnectBlockerModal({
             </div>
 
             <div className="flex-1">
-              <DialogTitle as="h3" className="text-lg font-bold leading-6 mb-2 text-gray-900 dark:text-white">
+              <DialogTitle
+                as="h3"
+                className="text-lg font-bold leading-6 mb-2 text-gray-900 dark:text-white"
+              >
                 {getTitle()}
               </DialogTitle>
 
@@ -75,13 +87,18 @@ export default function DisconnectBlockerModal({
                       <thead className="sticky top-0 bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-400">
                         <tr>
                           <th className="px-4 py-2 font-medium">
-                            {t("manageContent.socialMedia.blockerModal.table.publication") || "Publicación"}
+                            {t(
+                              "manageContent.socialMedia.blockerModal.table.publication",
+                            ) || "Publicación"}
                           </th>
                           <th className="px-4 py-2 font-medium">
-                            {reason === 'publishing' 
-                              ? (t("manageContent.socialMedia.blockerModal.table.status") || "Estado")
-                              : (t("manageContent.socialMedia.blockerModal.table.scheduledDate") || "Fecha programada")
-                            }
+                            {reason === "publishing"
+                              ? t(
+                                  "manageContent.socialMedia.blockerModal.table.status",
+                                ) || "Estado"
+                              : t(
+                                  "manageContent.socialMedia.blockerModal.table.scheduledDate",
+                                ) || "Fecha programada"}
                           </th>
                         </tr>
                       </thead>
@@ -92,7 +109,7 @@ export default function DisconnectBlockerModal({
                               {post.title || t("common.untitled", "Sin título")}
                             </td>
                             <td className="px-4 py-2 whitespace-nowrap">
-                              {reason === 'publishing' ? (
+                              {reason === "publishing" ? (
                                 <div className="flex items-center gap-2">
                                   <Clock className="w-3 h-3 opacity-60 animate-pulse" />
                                   <span className="text-xs font-semibold text-blue-500 dark:text-blue-400">
@@ -124,14 +141,19 @@ export default function DisconnectBlockerModal({
                 <div className="mt-4 p-3 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-900/30">
                   <p className="text-xs text-orange-700 dark:text-orange-300">
                     <strong>
-                      {t("manageContent.socialMedia.blockerModal.action") || "Acción requerida"}:
+                      {t("manageContent.socialMedia.blockerModal.action") ||
+                        "Acción requerida"}
+                      :
                     </strong>{" "}
-                    {reason === 'publishing' 
-                      ? (t("manageContent.socialMedia.blockerModal.waitForPublishing") || 
-                          "Espera a que las publicaciones terminen de publicarse.")
-                      : (t("manageContent.socialMedia.blockerModal.removeScheduled") ||
-                          "Ve a la sección de Contenido y elimina estas publicaciones de la programación.")
-                    }
+                    {reason === "publishing"
+                      ? t(
+                          "manageContent.socialMedia.blockerModal.waitForPublishing",
+                        ) ||
+                        "Espera a que las publicaciones terminen de publicarse."
+                      : t(
+                          "manageContent.socialMedia.blockerModal.removeScheduled",
+                        ) ||
+                        "Ve a la sección de Contenido y elimina estas publicaciones de la programación."}
                   </p>
                 </div>
               </div>

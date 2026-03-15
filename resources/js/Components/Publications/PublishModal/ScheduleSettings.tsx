@@ -1,4 +1,4 @@
-import { DateTimePicker } from '@/Components/common/DateTimePicker';
+import { DateTimePicker } from "@/Components/common/DateTimePicker";
 
 interface ScheduleSettingsProps {
   schedulePost: boolean;
@@ -11,7 +11,7 @@ export default function ScheduleSettings({
   schedulePost,
   scheduledAt,
   onScheduleChange,
-  onScheduledAtChange
+  onScheduledAtChange,
 }: ScheduleSettingsProps) {
   return (
     <div className="mb-6">
@@ -35,7 +35,7 @@ export default function ScheduleSettings({
         <div className="ml-7">
           <DateTimePicker
             value={scheduledAt}
-            onChange={(value) => onScheduledAtChange(value || '')}
+            onChange={(value) => onScheduledAtChange(value || "")}
             required
           />
         </div>

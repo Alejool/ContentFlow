@@ -2,17 +2,17 @@
  * ============================================================================
  * EJEMPLO: Configuración de Planes con algunos ocultos
  * ============================================================================
- * 
+ *
  * Este es un ejemplo de cómo ocultar planes específicos.
  * Copia este contenido a plans.ts si quieres usar esta configuración.
- * 
+ *
  * En este ejemplo:
  * - ✅ Free: Visible
  * - ❌ Demo: Oculto (comentado)
  * - ✅ Starter: Visible
  * - ✅ Professional: Visible (marcado como popular)
  * - ❌ Enterprise: Oculto (enabled: false)
- * 
+ *
  * ============================================================================
  */
 
@@ -47,16 +47,16 @@ export const PLAN_CONFIG_EXAMPLE = {
   free: {
     enabled: true, // ✅ Visible
     price: 0,
-    billingCycle: 'monthly' as const,
+    billingCycle: "monthly" as const,
     popular: false,
     requiresStripe: false,
     features: [
-      'publications3',
-      'socialAccounts2',
-      'storage1',
-      'aiRequests10',
-      'basicAnalytics',
-      'emailSupport',
+      "publications3",
+      "socialAccounts2",
+      "storage1",
+      "aiRequests10",
+      "basicAnalytics",
+      "emailSupport",
     ],
   },
 
@@ -66,18 +66,18 @@ export const PLAN_CONFIG_EXAMPLE = {
   starter: {
     enabled: true, // ✅ Visible
     price: 19,
-    billingCycle: 'monthly' as const,
+    billingCycle: "monthly" as const,
     popular: false,
     requiresStripe: true,
     features: [
-      'publications50',
-      'socialAccounts10',
-      'storage10',
-      'aiRequests100',
-      'basicAnalytics',
-      'advancedScheduling',
-      'calendarSync',
-      'emailSupport',
+      "publications50",
+      "socialAccounts10",
+      "storage10",
+      "aiRequests100",
+      "basicAnalytics",
+      "advancedScheduling",
+      "calendarSync",
+      "emailSupport",
     ],
   },
 
@@ -87,20 +87,20 @@ export const PLAN_CONFIG_EXAMPLE = {
   professional: {
     enabled: true, // ✅ Visible
     price: 49,
-    billingCycle: 'monthly' as const,
+    billingCycle: "monthly" as const,
     popular: true, // ⭐ Marcado como "Más Popular"
     requiresStripe: true,
     features: [
-      'publications200',
-      'socialAccounts50',
-      'storage100',
-      'aiRequestsUnlimited',
-      'advancedAnalytics',
-      'advancedScheduling',
-      'calendarSync',
-      'bulkOperations',
-      'customBranding',
-      'prioritySupport',
+      "publications200",
+      "socialAccounts50",
+      "storage100",
+      "aiRequestsUnlimited",
+      "advancedAnalytics",
+      "advancedScheduling",
+      "calendarSync",
+      "bulkOperations",
+      "customBranding",
+      "prioritySupport",
     ],
   },
 
@@ -110,33 +110,33 @@ export const PLAN_CONFIG_EXAMPLE = {
   enterprise: {
     enabled: false, // ❌ Oculto
     price: 199,
-    billingCycle: 'monthly' as const,
+    billingCycle: "monthly" as const,
     popular: false,
     requiresStripe: true,
     features: [
-      'publicationsUnlimited',
-      'socialAccountsUnlimited',
-      'storage1TB',
-      'aiRequestsUnlimited',
-      'advancedAnalytics',
-      'whiteLabel',
-      'apiAccess',
-      'customIntegrations',
-      'slaGuarantee',
-      'dedicatedSupport',
+      "publicationsUnlimited",
+      "socialAccountsUnlimited",
+      "storage1TB",
+      "aiRequestsUnlimited",
+      "advancedAnalytics",
+      "whiteLabel",
+      "apiAccess",
+      "customIntegrations",
+      "slaGuarantee",
+      "dedicatedSupport",
     ],
   },
 } as const;
 
 /**
  * RESULTADO EN LA PÁGINA DE PRECIOS:
- * 
+ *
  * Solo se mostrarán estos 3 planes:
- * 
+ *
  * ┌─────────────┬─────────────┬─────────────────────┐
  * │    Free     │   Starter   │   Professional ⭐   │
  * │    $0/mes   │   $19/mes   │      $49/mes        │
  * └─────────────┴─────────────┴─────────────────────┘
- * 
+ *
  * Demo y Enterprise NO aparecerán en la lista.
  */

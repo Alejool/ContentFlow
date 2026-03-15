@@ -11,7 +11,7 @@ const PageHeaderSkeleton = () => {
         </div>
         <Skeleton className="h-10 w-32 rounded-lg" />
       </div>
-      
+
       {/* Tabs or filters */}
       <div className="flex items-center gap-2">
         <Skeleton className="h-9 w-24 rounded-lg" />

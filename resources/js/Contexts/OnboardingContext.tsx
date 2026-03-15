@@ -41,10 +41,10 @@ interface OnboardingProviderProps {
 /**
  * OnboardingProvider manages global onboarding state and provides
  * onboarding functionality to child components.
- * 
+ *
  * It initializes state from Inertia page props and synchronizes
  * state changes with the backend via the Zustand store.
- * 
+ *
  * Features periodic sync with backend to keep state fresh.
  */
 export function OnboardingProvider({ children }: OnboardingProviderProps) {
@@ -68,20 +68,27 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
       // 1. Backend has a higher step (user progressed on another device)
       // 2. We don't have local state yet (currentStep === 0)
       // 3. Tour was completed on backend but not locally
-      if (currentStep === 0 || propsStep > currentStep || (propsTourCompleted && !currentTourCompleted)) {
-       store.setState(onboardingProps);
-      } 
+      if (
+        currentStep === 0 ||
+        propsStep > currentStep ||
+        (propsTourCompleted && !currentTourCompleted)
+      ) {
+        store.setState(onboardingProps);
+      }
     }
   }, [onboardingProps]);
 
   // Periodic sync with backend (every 5 minutes)
   useEffect(() => {
-    const syncInterval = setInterval(() => {
-      // Only sync if user is online and onboarding is not complete
-      if (!store.isOffline && !store.completedAt) {
-        store.syncWithBackend();
-      }
-    }, 5 * 60 * 1000); // 5 minutes
+    const syncInterval = setInterval(
+      () => {
+        // Only sync if user is online and onboarding is not complete
+        if (!store.isOffline && !store.completedAt) {
+          store.syncWithBackend();
+        }
+      },
+      5 * 60 * 1000,
+    ); // 5 minutes
 
     return () => clearInterval(syncInterval);
   }, [store.isOffline, store.completedAt]);
@@ -93,10 +100,16 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
       store.syncWithBackend();
     };
 
-    window.addEventListener('subscription-plan-changed', handleSubscriptionChange);
+    window.addEventListener(
+      "subscription-plan-changed",
+      handleSubscriptionChange,
+    );
 
     return () => {
-      window.removeEventListener('subscription-plan-changed', handleSubscriptionChange);
+      window.removeEventListener(
+        "subscription-plan-changed",
+        handleSubscriptionChange,
+      );
     };
   }, []);
 
@@ -154,9 +167,7 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
 export function useOnboarding(): OnboardingContextValue {
   const context = useContext(OnboardingContext);
   if (context === undefined) {
-    throw new Error(
-      "useOnboarding must be used within an OnboardingProvider"
-    );
+    throw new Error("useOnboarding must be used within an OnboardingProvider");
   }
   return context;
 }

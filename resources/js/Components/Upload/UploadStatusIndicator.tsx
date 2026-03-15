@@ -1,13 +1,20 @@
-import { Badge } from '@/Components/ui/badge';
-import { Button } from '@/Components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
-import { Progress } from '@/Components/ui/progress';
-import { useProcessingProgress } from '@/stores/processingProgressStore';
-import { useUploadQueue } from '@/stores/uploadQueueStore';
-import { AlertCircle, CheckCircle, Clock, RotateCcw, Upload, X } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
+import { Badge } from "@/Components/ui/badge";
+import { Button } from "@/Components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
+import { Progress } from "@/Components/ui/progress";
+import { useProcessingProgress } from "@/stores/processingProgressStore";
+import { useUploadQueue } from "@/stores/uploadQueueStore";
+import {
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  RotateCcw,
+  Upload,
+  X,
+} from "lucide-react";
+import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 interface UploadStatusIndicatorProps {
   className?: string;
@@ -15,40 +22,40 @@ interface UploadStatusIndicatorProps {
 }
 
 export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
-  className = '',
+  className = "",
   showDetails = false,
 }) => {
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(showDetails);
-  
+
   const { queue, retryUpload, cancelUpload, removeUpload } = useUploadQueue();
   const { jobs } = useProcessingProgress();
-  
+
   const uploads = Object.values(queue);
   const processingJobs = Object.values(jobs);
-  
-  const activeUploads = uploads.filter(u => 
-    u.status === 'uploading' || u.status === 'pending'
+
+  const activeUploads = uploads.filter(
+    (u) => u.status === "uploading" || u.status === "pending",
   );
-  const failedUploads = uploads.filter(u => u.status === 'error');
-  const completedUploads = uploads.filter(u => u.status === 'completed');
-  
-  const activeProcessing = processingJobs.filter(j => 
-    j.status === 'processing' || j.status === 'queued'
+  const failedUploads = uploads.filter((u) => u.status === "error");
+  const completedUploads = uploads.filter((u) => u.status === "completed");
+
+  const activeProcessing = processingJobs.filter(
+    (j) => j.status === "processing" || j.status === "queued",
   );
-  const failedProcessing = processingJobs.filter(j => j.status === 'failed');
-  
+  const failedProcessing = processingJobs.filter((j) => j.status === "failed");
+
   const totalActive = activeUploads.length + activeProcessing.length;
   const totalFailed = failedUploads.length + failedProcessing.length;
   const totalCompleted = completedUploads.length;
-  
+
   // Auto-expand when there are active or failed items
   useEffect(() => {
     if (totalActive > 0 || totalFailed > 0) {
       setIsExpanded(true);
     }
   }, [totalActive, totalFailed]);
-  
+
   // Auto-collapse after all uploads complete (with delay)
   useEffect(() => {
     if (totalActive === 0 && totalFailed === 0 && totalCompleted > 0) {
@@ -58,82 +65,82 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
       return () => clearTimeout(timer);
     }
   }, [totalActive, totalFailed, totalCompleted]);
-  
+
   if (uploads.length === 0 && processingJobs.length === 0) {
     return null;
   }
-  
+
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'uploading':
-      case 'processing':
+      case "uploading":
+      case "processing":
         return <Upload className="h-4 w-4 animate-spin" />;
-      case 'pending':
-      case 'queued':
+      case "pending":
+      case "queued":
         return <Clock className="h-4 w-4" />;
-      case 'completed':
+      case "completed":
         return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'error':
-      case 'failed':
+      case "error":
+      case "failed":
         return <AlertCircle className="h-4 w-4 text-red-500" />;
       default:
         return <Clock className="h-4 w-4" />;
     }
   };
-  
+
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'uploading':
-      case 'processing':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
-      case 'pending':
-      case 'queued':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
-      case 'completed':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
-      case 'error':
-      case 'failed':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+      case "uploading":
+      case "processing":
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400";
+      case "pending":
+      case "queued":
+        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400";
+      case "completed":
+        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400";
+      case "error":
+      case "failed":
+        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400";
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+        return "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400";
     }
   };
-  
+
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 B';
+    if (bytes === 0) return "0 B";
     const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const sizes = ["B", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
   };
-  
+
   const formatSpeed = (bytesPerSecond: number) => {
-    return formatFileSize(bytesPerSecond) + '/s';
+    return formatFileSize(bytesPerSecond) + "/s";
   };
-  
+
   const formatETA = (seconds: number) => {
     if (seconds < 60) return `${Math.round(seconds)}s`;
     if (seconds < 3600) return `${Math.round(seconds / 60)}m`;
     return `${Math.round(seconds / 3600)}h`;
   };
-  
+
   const handleRetry = (uploadId: string) => {
     retryUpload(uploadId);
-    toast.success('Retrying upload...');
+    toast.success("Retrying upload...");
   };
-  
+
   const handleCancel = (uploadId: string) => {
     cancelUpload(uploadId);
-    toast.success('Upload cancelled');
+    toast.success("Upload cancelled");
   };
-  
+
   const handleRemove = (uploadId: string) => {
     removeUpload(uploadId);
   };
-  
+
   return (
     <Card className={`fixed bottom-4 right-4 w-96 z-50 shadow-lg ${className}`}>
-      <CardHeader 
+      <CardHeader
         className="pb-2 cursor-pointer"
         onClick={() => setIsExpanded(!isExpanded)}
       >
@@ -161,11 +168,15 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
               setIsExpanded(!isExpanded);
             }}
           >
-            {isExpanded ? <X className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
+            {isExpanded ? (
+              <X className="h-3 w-3" />
+            ) : (
+              <Clock className="h-3 w-3" />
+            )}
           </Button>
         </CardTitle>
       </CardHeader>
-      
+
       {isExpanded && (
         <CardContent className="pt-0 max-h-96 overflow-y-auto">
           <div className="space-y-3">
@@ -183,9 +194,9 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
                     {upload.status}
                   </Badge>
                 </div>
-                
+
                 <Progress value={upload.progress} className="mb-2" />
-                
+
                 <div className="flex justify-between text-xs text-gray-500">
                   <span>{upload.progress}%</span>
                   <div className="flex gap-4">
@@ -197,13 +208,15 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
                     )}
                   </div>
                 </div>
-                
+
                 <div className="flex justify-end gap-1 mt-2">
-                  {upload.isPausable && upload.status === 'uploading' && (
+                  {upload.isPausable && upload.status === "uploading" && (
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => {/* TODO: implement pause */}}
+                      onClick={() => {
+                        /* TODO: implement pause */
+                      }}
                     >
                       Pause
                     </Button>
@@ -218,10 +231,13 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
                 </div>
               </div>
             ))}
-            
+
             {/* Failed Uploads */}
             {failedUploads.map((upload) => (
-              <div key={upload.id} className="border border-red-200 rounded-lg p-3">
+              <div
+                key={upload.id}
+                className="border border-red-200 rounded-lg p-3"
+              >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     {getStatusIcon(upload.status)}
@@ -233,11 +249,11 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
                     Failed
                   </Badge>
                 </div>
-                
+
                 {upload.error && (
                   <p className="text-xs text-red-600 mb-2">{upload.error}</p>
                 )}
-                
+
                 <div className="flex justify-end gap-1">
                   {upload.canRetry && (
                     <Button
@@ -259,7 +275,7 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
                 </div>
               </div>
             ))}
-            
+
             {/* Active Processing Jobs */}
             {activeProcessing.map((job) => (
               <div key={job.id} className="border rounded-lg p-3">
@@ -274,16 +290,16 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
                     {job.status}
                   </Badge>
                 </div>
-                
+
                 <Progress value={job.progress} className="mb-2" />
-                
+
                 <div className="flex justify-between text-xs text-gray-500">
                   <span>{job.progress}%</span>
                   {job.stats?.eta && job.stats.eta > 0 && (
                     <span>ETA: {formatETA(job.stats.eta)}</span>
                   )}
                 </div>
-                
+
                 {job.stats?.currentStep && (
                   <p className="text-xs text-gray-600 mt-1">
                     {job.stats.currentStep}
@@ -291,10 +307,13 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
                 )}
               </div>
             ))}
-            
+
             {/* Completed Uploads (show briefly) */}
             {completedUploads.slice(-3).map((upload) => (
-              <div key={upload.id} className="border border-green-200 rounded-lg p-3">
+              <div
+                key={upload.id}
+                className="border border-green-200 rounded-lg p-3"
+              >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     {getStatusIcon(upload.status)}

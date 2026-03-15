@@ -99,7 +99,7 @@ class OfflineQueueManager {
    * @param syncFn Function to execute each queued action
    */
   async sync(
-    syncFn: (action: QueuedAction) => Promise<void>
+    syncFn: (action: QueuedAction) => Promise<void>,
   ): Promise<{ success: number; failed: number }> {
     if (this.isSyncing || this.queue.length === 0) {
       return { success: 0, failed: 0 };
@@ -118,10 +118,9 @@ class OfflineQueueManager {
         this.dequeue(action.id);
         successCount++;
       } catch (error) {
-        
         // Increment retry count
         action.retries++;
-        
+
         // Remove if max retries reached
         if (action.retries >= MAX_RETRIES) {
           this.dequeue(action.id);

@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 
 export interface PlatformLimits {
   max_video_duration: number;
@@ -29,12 +29,12 @@ class SocialMediaLimitsService {
    */
   async validatePublication(
     publicationId: number,
-    platformIds: number[]
+    platformIds: number[],
   ): Promise<ValidationResponse> {
     try {
       const response = await axios.post(
         `/api/v1/publications/${publicationId}/validate`,
-        { platforms: platformIds }
+        { platforms: platformIds },
       );
       return response.data.data;
     } catch (error: any) {
@@ -68,15 +68,15 @@ class SocialMediaLimitsService {
    */
   getVerificationBadgeColor(isVerified: boolean): string {
     return isVerified
-      ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300'
-      : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400';
+      ? "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300"
+      : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400";
   }
 
   /**
    * Obtiene el icono según el estado de verificación
    */
   getVerificationIcon(isVerified: boolean): string {
-    return isVerified ? '✓' : '○';
+    return isVerified ? "✓" : "○";
   }
 
   /**
@@ -97,11 +97,17 @@ class SocialMediaLimitsService {
 
     errors.forEach((error) => {
       const lowerError = error.toLowerCase();
-      if (lowerError.includes('duración') || lowerError.includes('largo')) {
+      if (lowerError.includes("duración") || lowerError.includes("largo")) {
         categorized.duration.push(error);
-      } else if (lowerError.includes('tamaño') || lowerError.includes('grande')) {
+      } else if (
+        lowerError.includes("tamaño") ||
+        lowerError.includes("grande")
+      ) {
         categorized.size.push(error);
-      } else if (lowerError.includes('formato') || lowerError.includes('imagen')) {
+      } else if (
+        lowerError.includes("formato") ||
+        lowerError.includes("imagen")
+      ) {
         categorized.format.push(error);
       } else {
         categorized.other.push(error);
@@ -117,20 +123,20 @@ class SocialMediaLimitsService {
   getHelpMessage(error: string): string | null {
     const lowerError = error.toLowerCase();
 
-    if (lowerError.includes('verifica tu cuenta')) {
-      return 'Verifica tu cuenta en la plataforma para desbloquear límites más altos de duración y tamaño de video.';
+    if (lowerError.includes("verifica tu cuenta")) {
+      return "Verifica tu cuenta en la plataforma para desbloquear límites más altos de duración y tamaño de video.";
     }
 
-    if (lowerError.includes('no permite combinar')) {
-      return 'Considera crear publicaciones separadas para videos e imágenes.';
+    if (lowerError.includes("no permite combinar")) {
+      return "Considera crear publicaciones separadas para videos e imágenes.";
     }
 
-    if (lowerError.includes('demasiadas imágenes')) {
-      return 'Reduce el número de imágenes o divide el contenido en múltiples publicaciones.';
+    if (lowerError.includes("demasiadas imágenes")) {
+      return "Reduce el número de imágenes o divide el contenido en múltiples publicaciones.";
     }
 
-    if (lowerError.includes('múltiples videos')) {
-      return 'Esta plataforma solo permite un video por publicación. Considera publicar los videos por separado.';
+    if (lowerError.includes("múltiples videos")) {
+      return "Esta plataforma solo permite un video por publicación. Considera publicar los videos por separado.";
     }
 
     return null;
@@ -141,11 +147,11 @@ class SocialMediaLimitsService {
    */
   isCriticalError(error: string): boolean {
     const criticalKeywords = [
-      'demasiado largo',
-      'demasiado grande',
-      'no permite',
-      'requiere',
-      'excede',
+      "demasiado largo",
+      "demasiado grande",
+      "no permite",
+      "requiere",
+      "excede",
     ];
 
     const lowerError = error.toLowerCase();
@@ -156,7 +162,7 @@ class SocialMediaLimitsService {
    * Obtiene sugerencias de optimización basadas en los errores
    */
   getOptimizationSuggestions(
-    validationResults: Record<number, ValidationResult>
+    validationResults: Record<number, ValidationResult>,
   ): string[] {
     const suggestions: string[] = [];
     const allErrors: string[] = [];
@@ -166,41 +172,41 @@ class SocialMediaLimitsService {
     });
 
     // Sugerencia para videos largos
-    if (allErrors.some((e) => e.toLowerCase().includes('demasiado largo'))) {
+    if (allErrors.some((e) => e.toLowerCase().includes("demasiado largo"))) {
       suggestions.push(
-        '💡 Considera recortar el video o publicar solo en plataformas que soporten videos largos (YouTube, Facebook)'
+        "💡 Considera recortar el video o publicar solo en plataformas que soporten videos largos (YouTube, Facebook)",
       );
     }
 
     // Sugerencia para archivos grandes
-    if (allErrors.some((e) => e.toLowerCase().includes('demasiado grande'))) {
+    if (allErrors.some((e) => e.toLowerCase().includes("demasiado grande"))) {
       suggestions.push(
-        '💡 Comprime el video para reducir su tamaño sin perder mucha calidad'
+        "💡 Comprime el video para reducir su tamaño sin perder mucha calidad",
       );
     }
 
     // Sugerencia para verificación
     const hasUnverifiedLimits = Object.values(validationResults).some(
-      (result) => !result.is_verified && result.errors.length > 0
+      (result) => !result.is_verified && result.errors.length > 0,
     );
 
     if (hasUnverifiedLimits) {
       suggestions.push(
-        '⭐ Verifica tus cuentas para desbloquear límites más altos y publicar contenido más largo'
+        "⭐ Verifica tus cuentas para desbloquear límites más altos y publicar contenido más largo",
       );
     }
 
     // Sugerencia para múltiples plataformas
     const incompatibleCount = Object.values(validationResults).filter(
-      (r) => !r.can_publish
+      (r) => !r.can_publish,
     ).length;
     const compatibleCount = Object.values(validationResults).filter(
-      (r) => r.can_publish
+      (r) => r.can_publish,
     ).length;
 
     if (incompatibleCount > 0 && compatibleCount > 0) {
       suggestions.push(
-        `✅ Puedes publicar en ${compatibleCount} plataforma(s) compatible(s) y ajustar el contenido para las ${incompatibleCount} restante(s)`
+        `✅ Puedes publicar en ${compatibleCount} plataforma(s) compatible(s) y ajustar el contenido para las ${incompatibleCount} restante(s)`,
       );
     }
 

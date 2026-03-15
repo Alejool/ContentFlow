@@ -72,10 +72,13 @@ export const useCalendar = () => {
         } else {
           // Show events matching the selected platform
           if (e.type === "user_event") return false;
-          
+
           // Check both platform and extendedProps.platform for compatibility
-          const eventPlatform = (e.platform || e.extendedProps?.platform)?.toLowerCase();
-          if (!eventPlatform || eventPlatform !== platformFilter.toLowerCase()) return false;
+          const eventPlatform = (
+            e.platform || e.extendedProps?.platform
+          )?.toLowerCase();
+          if (!eventPlatform || eventPlatform !== platformFilter.toLowerCase())
+            return false;
         }
       }
 
@@ -83,7 +86,8 @@ export const useCalendar = () => {
       if (statusFilter !== "all" && e.status !== statusFilter) return false;
 
       // Campaign filter
-      if (campaignFilter && e.extendedProps.campaign_id !== campaignFilter) return false;
+      if (campaignFilter && e.extendedProps.campaign_id !== campaignFilter)
+        return false;
 
       return true;
     });
@@ -169,8 +173,7 @@ export const useCalendar = () => {
         } else {
           openViewDetailsModal(data);
         }
-      } catch (error) {
-        }
+      } catch (error) {}
     },
     [openEditModal, openViewDetailsModal],
   );

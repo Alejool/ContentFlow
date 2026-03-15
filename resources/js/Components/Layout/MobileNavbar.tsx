@@ -2,6 +2,7 @@ import Logo from "@/../assets/logo-with-name-1024.png";
 import ResponsiveNavLink from "@/Components/common/ui/ResponsiveNavLink";
 import { useTheme } from "@/Hooks/useTheme";
 import { usePage } from "@inertiajs/react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   BarChart3,
   X as CloseIcon,
@@ -18,18 +19,36 @@ import NotificationButton from "./NotificationButton";
 import ProfileDropdown from "./ProfileDropdown";
 import SearchButton from "./SearchButton";
 
-function NavLogo({ src, fallbackSrc, isWhiteLabel }: { src: string; fallbackSrc: string; isWhiteLabel: boolean }) {
-  const [status, setStatus] = useState<"loading" | "loaded" | "error">("loading");
+function NavLogo({
+  src,
+  fallbackSrc,
+  isWhiteLabel,
+}: {
+  src: string;
+  fallbackSrc: string;
+  isWhiteLabel: boolean;
+}) {
+  const [status, setStatus] = useState<"loading" | "loaded" | "error">(
+    "loading",
+  );
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     setStatus("loading");
     const img = new Image();
     timerRef.current = setTimeout(() => setStatus("error"), 5000);
-    img.onload = () => { clearTimeout(timerRef.current!); setStatus("loaded"); };
-    img.onerror = () => { clearTimeout(timerRef.current!); setStatus("error"); };
+    img.onload = () => {
+      clearTimeout(timerRef.current!);
+      setStatus("loaded");
+    };
+    img.onerror = () => {
+      clearTimeout(timerRef.current!);
+      setStatus("error");
+    };
     img.src = src;
-    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
   }, [src]);
 
   // Si el whiteLabelLogo falla, caer al logo por defecto
@@ -97,12 +116,12 @@ export default function MobileNavbar({
 
   // Get user permissions from current workspace
   const userPermissions = auth?.current_workspace?.permissions || [];
-  const hasAnalyticsPermission = userPermissions.includes('view-analytics');
+  const hasAnalyticsPermission = userPermissions.includes("view-analytics");
 
   // Filter navigation items based on permissions
   const filteredMobileNavigationItems = mobileNavigationItems.filter((item) => {
     // Hide Analytics if user doesn't have view-analytics permission
-    if (item.href === 'analytics.index' && !hasAnalyticsPermission) {
+    if (item.href === "analytics.index" && !hasAnalyticsPermission) {
       return false;
     }
     return true;
@@ -158,63 +177,72 @@ export default function MobileNavbar({
         </div>
       </div>
 
-      <div
-        className={`${showingNavigationDropdown ? "block" : "hidden"} border-t ${
-          actualTheme === "dark"
-            ? "border-neutral-800 bg-neutral-900"
-            : "border-gray-100 bg-white"
-        }`}
-      >
-        <div className="px-4 py-6 space-y-1">
-          {filteredMobileNavigationItems.map((item) => {
-            const isActive = !!route().current(item.href);
-            return (
-              <ResponsiveNavLink
-                key={item.href}
-                href={route(item.href)}
-                active={isActive}
-                className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-300
-                  ${
-                    isActive
-                      ? `bg-primary-600 text-white shadow-sm`
-                      : `${
-                          actualTheme === "dark"
-                            ? "text-gray-300 hover:bg-neutral-800 hover:text-primary-400"
-                            : "text-gray-700 hover:bg-gray-50 hover:text-primary-600"
-                        }`
-                  }`}
-              >
-                <item.lucideIcon
-                  className={`h-5 w-5 ${isActive ? "text-white" : "text-gray-400"}`}
-                />
-                <span className="font-bold">{t(item.nameKey)}</span>
-                {isActive && (
-                  <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white"></div>
-                )}
-              </ResponsiveNavLink>
-            );
-          })}
-
-          <div
-            className={`pt-4 mt-4 border-t ${actualTheme === "dark" ? "border-neutral-800" : "border-gray-100"}`}
+      <AnimatePresence>
+        {showingNavigationDropdown && (
+          <motion.div
+            key="mobile-menu"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
+            className={`overflow-hidden border-t ${
+              actualTheme === "dark"
+                ? "border-neutral-800 bg-neutral-900"
+                : "border-gray-100 bg-white"
+            }`}
           >
-            <ResponsiveNavLink
-              href={route("logout")}
-              method="post"
-              as="button"
-              className={`w-full flex items-center justify-center space-x-3 px-4 py-3 rounded-lg border transition-all duration-300 font-bold
-                  ${
-                    actualTheme === "dark"
-                      ? "bg-neutral-800 border-neutral-700 text-red-400 hover:bg-red-900/20"
-                      : "bg-gray-50 border-gray-200 text-red-600 hover:bg-red-50"
-                  }`}
-            >
-              <LogOut className="h-5 w-5" />
-              <span>{t("nav.logout")}</span>
-            </ResponsiveNavLink>
-          </div>
-        </div>
-      </div>
+            <div className="px-4 py-6 space-y-1">
+              {filteredMobileNavigationItems.map((item) => {
+                const isActive = !!route().current(item.href);
+                return (
+                  <ResponsiveNavLink
+                    key={item.href}
+                    href={route(item.href)}
+                    active={isActive}
+                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-300
+                      ${
+                        isActive
+                          ? `bg-primary-600 text-white shadow-sm`
+                          : `${
+                              actualTheme === "dark"
+                                ? "text-gray-300 hover:bg-neutral-800 hover:text-primary-400"
+                                : "text-gray-700 hover:bg-gray-50 hover:text-primary-600"
+                            }`
+                      }`}
+                  >
+                    <item.lucideIcon
+                      className={`h-5 w-5 ${isActive ? "text-white" : "text-gray-400"}`}
+                    />
+                    <span className="font-bold">{t(item.nameKey)}</span>
+                    {isActive && (
+                      <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white"></div>
+                    )}
+                  </ResponsiveNavLink>
+                );
+              })}
+
+              <div
+                className={`pt-4 mt-4 border-t ${actualTheme === "dark" ? "border-neutral-800" : "border-gray-100"}`}
+              >
+                <ResponsiveNavLink
+                  href={route("logout")}
+                  method="post"
+                  as="button"
+                  className={`w-full flex items-center justify-center space-x-3 px-4 py-3 rounded-lg border transition-all duration-300 font-bold
+                      ${
+                        actualTheme === "dark"
+                          ? "bg-neutral-800 border-neutral-700 text-red-400 hover:bg-red-900/20"
+                          : "bg-gray-50 border-gray-200 text-red-600 hover:bg-red-50"
+                      }`}
+                >
+                  <LogOut className="h-5 w-5" />
+                  <span>{t("nav.logout")}</span>
+                </ResponsiveNavLink>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }

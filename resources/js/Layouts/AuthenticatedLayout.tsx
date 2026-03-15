@@ -186,90 +186,88 @@ export default function AuthenticatedLayout({
       <OnboardingProvider>
         {/* ✅ Inicializar timezone desde Inertia props */}
         <TimezoneInitializer />
-        
+
         {/* Banner de mantenimiento para super admins */}
         {props.maintenanceMode && props.maintenanceBanner ? (
           <MaintenanceBanner message={String(props.maintenanceBanner)} />
         ) : null}
         <div className="flex flex-col overflow-hidden w-full max-w-full">
-          <div
-            className="relative flex-1 min-h-0 flex w-full max-w-full min-w-0 overflow-x-hidden"
-          >
+          <div className="relative flex-1 min-h-0 flex w-full max-w-full min-w-0 overflow-x-hidden">
             <div className="absolute inset-0 bg-white dark:bg-neutral-900" />
 
             <Sidebar
               isSidebarOpen={isSidebarOpen}
               setIsSidebarOpen={setIsSidebarOpen}
-          />
-
-          <div className="flex-1 flex flex-col min-h-0 min-w-0 max-w-full relative z-5">
-            <MobileNavbar
-              user={user}
-              showingNavigationDropdown={showingNavigationDropdown}
-              setShowingNavigationDropdown={setShowingNavigationDropdown}
             />
 
-            <main
-              className={`flex-1 min-w-0 max-w-full overflow-y-auto overflow-x-hidden transition-all duration-500  ease-in-out ${
-                isSidebarOpen ? "lg:ml-80" : "lg:ml-32"
-              }`}
-              role="main"
-              aria-label="Main content"
-            >
-              <header
-                className="border-b border-gray-200/50
+            <div className="flex-1 flex flex-col min-h-0 min-w-0 max-w-full relative z-5">
+              <MobileNavbar
+                user={user}
+                showingNavigationDropdown={showingNavigationDropdown}
+                setShowingNavigationDropdown={setShowingNavigationDropdown}
+              />
+
+              <main
+                className={`flex-1 min-w-0 max-w-full overflow-y-auto overflow-x-hidden transition-all duration-500  ease-in-out ${
+                  isSidebarOpen ? "lg:ml-80" : "lg:ml-32"
+                }`}
+                role="main"
+                aria-label="Main content"
+              >
+                <header
+                  className="border-b border-gray-200/50
                 dark:border-neutral-800 bg-white/80 dark:bg-black/80
                 backdrop-blur-xl z-40 min-w-0 sticky top-0 flex flex-col"
-              >
-                {!route().current("workspaces.*") && (
-                  <div className="w-full">
-                    <ActiveWorkspace />
-                  </div>
-                )}
+                >
+                  {!route().current("workspaces.*") && (
+                    <div className="w-full">
+                      <ActiveWorkspace />
+                    </div>
+                  )}
 
-                <div className="hidden lg:flex mx-auto w-full max-w-7xl px-4 md:px-6 py-3 md:py-4 justify-between items-center gap-4 min-w-0">
-                  <div className="flex-1 min-w-0 flex items-center gap-4">
-                    <div className="hidden lg:block">
-                      <SearchButton />
+                  <div className="hidden lg:flex mx-auto w-full max-w-7xl px-4 md:px-6 py-3 md:py-4 justify-between items-center gap-4 min-w-0">
+                    <div className="flex-1 min-w-0 flex items-center gap-4">
+                      <div className="hidden lg:block">
+                        <SearchButton />
+                      </div>
+                    </div>
+                    <div className="flex-shrink-0 min-w-0 flex items-center gap-3">
+                      <div className="hidden md:flex items-center gap-2">
+                        <div className="h-6 w-px bg-gray-200 dark:bg-neutral-800 mx-1"></div>
+                        <NotificationButton />
+                        <div className="h-6 w-px bg-gray-200 dark:bg-neutral-800 mx-1"></div>
+                        <ProfileDropdown
+                          user={user}
+                          isProfileActive={!!route().current("profile.edit")}
+                        />
+                      </div>
                     </div>
                   </div>
-                  <div className="flex-shrink-0 min-w-0 flex items-center gap-3">
-                    <div className="hidden md:flex items-center gap-2">
-                      <div className="h-6 w-px bg-gray-200 dark:bg-neutral-800 mx-1"></div>
-                      <NotificationButton />
-                      <div className="h-6 w-px bg-gray-200 dark:bg-neutral-800 mx-1"></div>
-                      <ProfileDropdown
-                        user={user}
-                        isProfileActive={!!route().current("profile.edit")}
-                      />
+
+                  {header && (
+                    <div className="mx-auto w-full max-w-7xl px-4 md:px-6 py-4 ">
+                      <div className="min-w-0">{header}</div>
                     </div>
-                  </div>
+                  )}
+                </header>
+
+                <div className="flex-1 min-h-0 min-w-0">
+                  <div className=" min-w-0">{children}</div>
                 </div>
+              </main>
+            </div>
 
-                {header && (
-                   <div className="mx-auto w-full max-w-7xl px-4 md:px-6 py-4 ">
-                    <div className="min-w-0">{header}</div>
-                  </div>
-                )}
-              </header>
-
-              <div className="flex-1 min-h-0 min-w-0">
-                <div className=" min-w-0">{children}</div>
-              </div>
-            </main>
+            <CommandPalette />
           </div>
+          <GlobalUploadIndicator />
+          <ResumeUploadsPrompt />
+          <KeyboardShortcutsModal
+            isOpen={showShortcutsModal}
+            onClose={() => setShowShortcutsModal(false)}
+          />
 
-          <CommandPalette />
-        </div>
-        <GlobalUploadIndicator />
-        <ResumeUploadsPrompt />
-        <KeyboardShortcutsModal
-          isOpen={showShortcutsModal}
-          onClose={() => setShowShortcutsModal(false)}
-        />
-
-        {/* Conditionally render OnboardingFlow for incomplete onboarding */}
-        {/* {shouldShowOnboarding &&
+          {/* Conditionally render OnboardingFlow for incomplete onboarding */}
+          {/* {shouldShowOnboarding &&
           tourSteps &&
           availablePlatforms &&
           templates && (
@@ -283,30 +281,30 @@ export default function AuthenticatedLayout({
             </Suspense>
           )} */}
 
-        {/* Debug: Show why onboarding is not showing */}
-        {!shouldShowOnboarding && user && (
-          <div style={{ display: "none" }}>
-            OnboardingFlow not showing: shouldShowOnboarding=
-            {String(shouldShowOnboarding)}
-          </div>
-        )}
-        {shouldShowOnboarding && !tourSteps && (
-          <div style={{ display: "none" }}>
-            OnboardingFlow not showing: no tourSteps
-          </div>
-        )}
-        {shouldShowOnboarding && !availablePlatforms && (
-          <div style={{ display: "none" }}>
-            OnboardingFlow not showing: no availablePlatforms
-          </div>
-        )}
-        {shouldShowOnboarding && !templates && (
-          <div style={{ display: "none" }}>
-            OnboardingFlow not showing: no templates
-          </div>
-        )}
-      </div>
-    </OnboardingProvider>
+          {/* Debug: Show why onboarding is not showing */}
+          {!shouldShowOnboarding && user && (
+            <div style={{ display: "none" }}>
+              OnboardingFlow not showing: shouldShowOnboarding=
+              {String(shouldShowOnboarding)}
+            </div>
+          )}
+          {shouldShowOnboarding && !tourSteps && (
+            <div style={{ display: "none" }}>
+              OnboardingFlow not showing: no tourSteps
+            </div>
+          )}
+          {shouldShowOnboarding && !availablePlatforms && (
+            <div style={{ display: "none" }}>
+              OnboardingFlow not showing: no availablePlatforms
+            </div>
+          )}
+          {shouldShowOnboarding && !templates && (
+            <div style={{ display: "none" }}>
+              OnboardingFlow not showing: no templates
+            </div>
+          )}
+        </div>
+      </OnboardingProvider>
     </AbilityProvider>
   );
 }

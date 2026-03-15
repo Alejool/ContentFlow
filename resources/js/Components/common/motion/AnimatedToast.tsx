@@ -1,54 +1,54 @@
 /**
  * Animated Toast Component
- * 
+ *
  * Toast notifications with animations and accessibility
  */
 
-import React, { useEffect } from 'react';
-import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
-import { createPortal } from 'react-dom';
-import { useReducedMotion } from '@/Hooks/useReducedMotion';
-import { useAnnounce } from '../Accessibility/LiveRegion';
+import React, { useEffect } from "react";
+import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
+import { createPortal } from "react-dom";
+import { useReducedMotion } from "@/Hooks/useReducedMotion";
+import { useAnnounce } from "../Accessibility/LiveRegion";
 
 interface ToastProps {
   id: string;
   message: string;
-  type?: 'success' | 'error' | 'warning' | 'info';
+  type?: "success" | "error" | "warning" | "info";
   duration?: number;
   onClose: (id: string) => void;
 }
 
 const typeStyles = {
   success: {
-    bg: 'bg-success-50 dark:bg-success-900/20',
-    border: 'border-success-500',
-    text: 'text-success-800 dark:text-success-200',
-    icon: '✓',
+    bg: "bg-success-50 dark:bg-success-900/20",
+    border: "border-success-500",
+    text: "text-success-800 dark:text-success-200",
+    icon: "✓",
   },
   error: {
-    bg: 'bg-error-50 dark:bg-error-900/20',
-    border: 'border-error-500',
-    text: 'text-error-800 dark:text-error-200',
-    icon: '✕',
+    bg: "bg-error-50 dark:bg-error-900/20",
+    border: "border-error-500",
+    text: "text-error-800 dark:text-error-200",
+    icon: "✕",
   },
   warning: {
-    bg: 'bg-warning-50 dark:bg-warning-900/20',
-    border: 'border-warning-500',
-    text: 'text-warning-800 dark:text-warning-200',
-    icon: '⚠',
+    bg: "bg-warning-50 dark:bg-warning-900/20",
+    border: "border-warning-500",
+    text: "text-warning-800 dark:text-warning-200",
+    icon: "⚠",
   },
   info: {
-    bg: 'bg-info-50 dark:bg-info-900/20',
-    border: 'border-info-500',
-    text: 'text-info-800 dark:text-info-200',
-    icon: 'ℹ',
+    bg: "bg-info-50 dark:bg-info-900/20",
+    border: "border-info-500",
+    text: "text-info-800 dark:text-info-200",
+    icon: "ℹ",
   },
 };
 
 export const AnimatedToast: React.FC<ToastProps> = ({
   id,
   message,
-  type = 'info',
+  type = "info",
   duration = 5000,
   onClose,
 }) => {
@@ -58,7 +58,9 @@ export const AnimatedToast: React.FC<ToastProps> = ({
 
   useEffect(() => {
     // Announce to screen readers
-    announce(message, { politeness: type === 'error' ? 'assertive' : 'polite' });
+    announce(message, {
+      politeness: type === "error" ? "assertive" : "polite",
+    });
 
     // Auto dismiss
     if (duration > 0) {
@@ -86,7 +88,7 @@ export const AnimatedToast: React.FC<ToastProps> = ({
         initial="initial"
         animate="animate"
         exit="exit"
-        transition={{ duration: 0.25, ease: 'easeInOut' }}
+        transition={{ duration: 0.25, ease: "easeInOut" }}
         className={`
           flex items-start gap-3 p-4 rounded-lg shadow-lg
           border-l-4 ${styles.border}
@@ -94,15 +96,13 @@ export const AnimatedToast: React.FC<ToastProps> = ({
           min-w-[320px] max-w-md
         `}
         role="alert"
-        aria-live={type === 'error' ? 'assertive' : 'polite'}
+        aria-live={type === "error" ? "assertive" : "polite"}
       >
         <span className={`text-xl ${styles.text}`} aria-hidden="true">
           {styles.icon}
         </span>
 
-        <p className={`flex-1 text-sm font-medium ${styles.text}`}>
-          {message}
-        </p>
+        <p className={`flex-1 text-sm font-medium ${styles.text}`}>{message}</p>
 
         <button
           onClick={() => onClose(id)}
@@ -137,26 +137,32 @@ interface ToastContainerProps {
   toasts: Array<{
     id: string;
     message: string;
-    type?: 'success' | 'error' | 'warning' | 'info';
+    type?: "success" | "error" | "warning" | "info";
     duration?: number;
   }>;
   onClose: (id: string) => void;
-  position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center' | 'bottom-center';
+  position?:
+    | "top-right"
+    | "top-left"
+    | "bottom-right"
+    | "bottom-left"
+    | "top-center"
+    | "bottom-center";
 }
 
 const positionStyles = {
-  'top-right': 'top-4 right-4',
-  'top-left': 'top-4 left-4',
-  'bottom-right': 'bottom-4 right-4',
-  'bottom-left': 'bottom-4 left-4',
-  'top-center': 'top-4 left-1/2 -translate-x-1/2',
-  'bottom-center': 'bottom-4 left-1/2 -translate-x-1/2',
+  "top-right": "top-4 right-4",
+  "top-left": "top-4 left-4",
+  "bottom-right": "bottom-4 right-4",
+  "bottom-left": "bottom-4 left-4",
+  "top-center": "top-4 left-1/2 -translate-x-1/2",
+  "bottom-center": "bottom-4 left-1/2 -translate-x-1/2",
 };
 
 export const ToastContainer: React.FC<ToastContainerProps> = ({
   toasts,
   onClose,
-  position = 'top-right',
+  position = "top-right",
 }) => {
   const content = (
     <div

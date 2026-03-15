@@ -16,7 +16,7 @@ interface SocialConfigProps {
 
 // Filtrar solo las plataformas activas
 const activePlatforms = Object.values(SOCIAL_PLATFORMS).filter(
-  (platform) => platform.active
+  (platform) => platform.active,
 );
 
 // Componente extraído para usar hooks correctamente
@@ -28,7 +28,13 @@ interface PlatformCardProps {
   t: any;
 }
 
-function PlatformCard({ platform, platformSettings, hasSettings, onOpenSettings, t }: PlatformCardProps) {
+function PlatformCard({
+  platform,
+  platformSettings,
+  hasSettings,
+  onOpenSettings,
+  t,
+}: PlatformCardProps) {
   const keyboardProps = useKeyboardClick(() => onOpenSettings(platform.key));
 
   return (
@@ -39,11 +45,7 @@ function PlatformCard({ platform, platformSettings, hasSettings, onOpenSettings,
     >
       <div className="flex items-start gap-4 mb-5">
         <div className="p-3 rounded-lg">
-          <img
-            src={platform.logo}
-            alt={platform.name}
-            className="w-8 h-8"
-          />
+          <img src={platform.logo} alt={platform.name} className="w-8 h-8" />
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="font-bold text-gray-900 dark:text-white text-base mb-2 truncate">
@@ -61,9 +63,7 @@ function PlatformCard({ platform, platformSettings, hasSettings, onOpenSettings,
                 hasSettings ? "bg-primary-600" : "bg-amber-500"
               }`}
             />
-            {hasSettings
-              ? t("common.configured")
-              : t("common.notConfigured")}
+            {hasSettings ? t("common.configured") : t("common.notConfigured")}
           </div>
         </div>
       </div>
@@ -73,19 +73,16 @@ function PlatformCard({ platform, platformSettings, hasSettings, onOpenSettings,
             {Object.entries(platformSettings)
               .slice(0, 3)
               .map(([key, value]) => {
-                const label = t(
-                  `modal.platformSettings.labels.${key}`,
-                  { defaultValue: key.replace(/_/g, " ") },
-                );
+                const label = t(`modal.platformSettings.labels.${key}`, {
+                  defaultValue: key.replace(/_/g, " "),
+                });
 
                 let displayValue = String(value);
-                
+
                 // Traducir valores booleanos
                 if (typeof value === "boolean") {
-                  displayValue = value
-                    ? t("common.yes")
-                    : t("common.no");
-                } 
+                  displayValue = value ? t("common.yes") : t("common.no");
+                }
                 // Traducir valores específicos de plataforma
                 else if (typeof value === "string") {
                   const translationKey = `platformSettings.${platform.key}.${value}`;
@@ -195,7 +192,7 @@ export default function SocialConfig({
               </p>
             </div>
           </div>
-          
+
           <Button
             onClick={handleSave}
             disabled={isSaving}

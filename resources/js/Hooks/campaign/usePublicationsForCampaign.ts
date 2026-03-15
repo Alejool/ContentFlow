@@ -27,7 +27,7 @@ export const usePublicationsForCampaign = (isOpen: boolean) => {
         setAvailablePublications(response.data);
       }
     } catch (error) {
-      } finally {
+    } finally {
       setLoading(false);
     }
   };

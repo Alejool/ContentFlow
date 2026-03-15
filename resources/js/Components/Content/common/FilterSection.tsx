@@ -55,7 +55,10 @@ export default function FilterSection({
     { value: "published", label: t("publications.filters.published") },
     { value: "draft", label: t("publications.filters.draft") },
     { value: "scheduled", label: t("publications.filters.scheduled") },
-    { value: "pending_review", label: t("publications.filters.pending_review") },
+    {
+      value: "pending_review",
+      label: t("publications.filters.pending_review"),
+    },
     { value: "failed", label: t("publications.filters.failed") },
   ];
 
@@ -96,11 +99,14 @@ export default function FilterSection({
 
   // Content type options with translations
   const contentTypeOptions = [
-    { value: "all", label: t("publications.filters.all_types") || "Todos los tipos" },
-    ...Object.values(CONTENT_TYPES).map(type => ({
+    {
+      value: "all",
+      label: t("publications.filters.all_types") || "Todos los tipos",
+    },
+    ...Object.values(CONTENT_TYPES).map((type) => ({
       value: type,
       label: t(`publications.content_types.${type}`) || type,
-    }))
+    })),
   ];
 
   const sortOptions = [
@@ -130,7 +136,9 @@ export default function FilterSection({
     }
   };
 
-  const showExportButtons = ["publications", "campaigns", "logs"].includes(mode);
+  const showExportButtons = ["publications", "campaigns", "logs"].includes(
+    mode,
+  );
 
   return (
     <div className="bg-white dark:bg-neutral-800/50 p-4 rounded-lg border border-gray-100 dark:border-neutral-700 shadow-sm mt-4">
@@ -141,10 +149,7 @@ export default function FilterSection({
         </h3>
         <div className="flex items-center gap-2">
           {showExportButtons && (
-            <ExportButtons 
-              endpoint={getExportEndpoint()} 
-              filters={filters}
-            />
+            <ExportButtons endpoint={getExportEndpoint()} filters={filters} />
           )}
           {onResetFilters && (
             <button
@@ -190,10 +195,7 @@ export default function FilterSection({
               value={statusFilter}
               variant="outlined"
               onChange={(val) => {
-                handleFilterChange(
-                  "status",
-                  String(val),
-                );
+                handleFilterChange("status", String(val));
               }}
               size="md"
               icon={Filter}
@@ -243,11 +245,21 @@ export default function FilterSection({
             <Select<any>
               id="content-type-filter"
               options={contentTypeOptions}
-              value={Array.isArray(contentTypeFilter) ? contentTypeFilter : contentTypeFilter ? [contentTypeFilter] : []}
+              value={
+                Array.isArray(contentTypeFilter)
+                  ? contentTypeFilter
+                  : contentTypeFilter
+                    ? [contentTypeFilter]
+                    : []
+              }
               variant="outlined"
-              onChange={(val) => handleFilterChange("content_type", val as string | string[])}
+              onChange={(val) =>
+                handleFilterChange("content_type", val as string | string[])
+              }
               size="md"
-              placeholder={t("publications.filters.content_type") || "Tipo de contenido"}
+              placeholder={
+                t("publications.filters.content_type") || "Tipo de contenido"
+              }
               activeColor={activeColor}
               multiple
               clearable
@@ -260,9 +272,17 @@ export default function FilterSection({
             <Select<any>
               id="platform-filter"
               options={activePlatformOptions}
-              value={Array.isArray(platformFilter) ? platformFilter : platformFilter ? [platformFilter] : []}
+              value={
+                Array.isArray(platformFilter)
+                  ? platformFilter
+                  : platformFilter
+                    ? [platformFilter]
+                    : []
+              }
               variant="outlined"
-              onChange={(val) => handleFilterChange("platform", val as string | string[])}
+              onChange={(val) =>
+                handleFilterChange("platform", val as string | string[])
+              }
               size="md"
               placeholder={t("common.platform.title") || "Plataforma"}
               activeColor={activeColor}

@@ -7,7 +7,9 @@ interface UsePublicationStatusOptions {
   dismissedIds: number[];
 }
 
-export function usePublicationStatus({ dismissedIds }: UsePublicationStatusOptions) {
+export function usePublicationStatus({
+  dismissedIds,
+}: UsePublicationStatusOptions) {
   const [publications, setPublications] = useState<Publication[]>([]);
   const [isFetching, setIsFetching] = useState(false);
   const props = usePage().props as any;
@@ -32,7 +34,11 @@ export function usePublicationStatus({ dismissedIds }: UsePublicationStatusOptio
 
         const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
         const filtered = items.filter((item) => {
-          if (item.status === "processing" || item.status === "publishing" || item.status === "retrying") {
+          if (
+            item.status === "processing" ||
+            item.status === "publishing" ||
+            item.status === "retrying"
+          ) {
             return true;
           }
 
@@ -51,7 +57,7 @@ export function usePublicationStatus({ dismissedIds }: UsePublicationStatusOptio
       if (axios.isCancel(err) || (err as any)?.name === "CanceledError") {
         return;
       }
-      } finally {
+    } finally {
       setIsFetching(false);
     }
   };
@@ -95,18 +101,27 @@ export function usePublicationStatus({ dismissedIds }: UsePublicationStatusOptio
     const handlePublicationStarted = () => {
       fetchPublications(abortController.signal);
     };
-    
+
     const handlePublicationCancelled = () => {
       fetchPublications(abortController.signal);
     };
 
     window.addEventListener("publication-started", handlePublicationStarted);
-    window.addEventListener("publication-cancelled", handlePublicationCancelled);
+    window.addEventListener(
+      "publication-cancelled",
+      handlePublicationCancelled,
+    );
 
     return () => {
       abortController.abort();
-      window.removeEventListener("publication-started", handlePublicationStarted);
-      window.removeEventListener("publication-cancelled", handlePublicationCancelled);
+      window.removeEventListener(
+        "publication-started",
+        handlePublicationStarted,
+      );
+      window.removeEventListener(
+        "publication-cancelled",
+        handlePublicationCancelled,
+      );
     };
   }, []);
 

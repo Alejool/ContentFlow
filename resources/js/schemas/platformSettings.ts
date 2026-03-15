@@ -38,7 +38,7 @@ export const twitterSettingsSchema = z.discriminatedUnion(
       }
       return { message: ctx.defaultError };
     },
-  }
+  },
 );
 
 export const tiktokSettingsSchema = z.object({

@@ -1,4 +1,4 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import React, { Component, ErrorInfo, ReactNode } from "react";
 
 interface Props {
   children: ReactNode;
@@ -44,11 +44,11 @@ export class OnboardingErrorBoundary extends Component<Props, State> {
   private logErrorToService(error: Error, errorInfo: ErrorInfo): void {
     // Log to console in development
     if (import.meta.env.DEV) {
-      }
+    }
 
     // In production, send to error tracking service
     // Example: Sentry.captureException(error, { contexts: { react: errorInfo } });
-    
+
     // For now, we'll use a simple console log
     // This can be replaced with actual error tracking service integration
     try {
@@ -57,14 +57,14 @@ export class OnboardingErrorBoundary extends Component<Props, State> {
         stack: error.stack,
         componentStack: errorInfo.componentStack,
         timestamp: new Date().toISOString(),
-        context: 'onboarding',
+        context: "onboarding",
       };
 
       // Send to backend logging endpoint if available
-      fetch('/api/logs/client-error', {
-        method: 'POST',
+      fetch("/api/logs/client-error", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(errorData),
       }).catch(() => {
@@ -72,7 +72,7 @@ export class OnboardingErrorBoundary extends Component<Props, State> {
       });
     } catch (loggingError) {
       // Don't let logging errors break the error boundary
-      }
+    }
   }
 
   private handleReset = (): void => {
@@ -108,13 +108,13 @@ export class OnboardingErrorBoundary extends Component<Props, State> {
                 />
               </svg>
             </div>
-            
+
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white text-center mb-2">
               Something went wrong
             </h2>
-            
+
             <p className="text-gray-600 dark:text-gray-400 text-center mb-6">
-              We encountered an error while loading the onboarding experience. 
+              We encountered an error while loading the onboarding experience.
               Don't worry, your progress has been saved.
             </p>
 
@@ -131,9 +131,9 @@ export class OnboardingErrorBoundary extends Component<Props, State> {
               >
                 Try Again
               </button>
-              
+
               <button
-                onClick={() => window.location.href = '/dashboard'}
+                onClick={() => (window.location.href = "/dashboard")}
                 className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg font-medium transition-colors"
               >
                 Go to Dashboard

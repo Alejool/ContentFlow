@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   eachDayOfInterval,
   endOfMonth,
@@ -8,12 +8,12 @@ import {
   isToday,
   parseISO,
   startOfMonth,
-} from 'date-fns';
-import { Clock, Trash2 } from 'lucide-react';
-import { CalendarEvent } from '@/types/calendar';
-import { formatTime } from '@/Utils/formatDate';
-import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatformsConfig';
-import { useTranslation } from 'react-i18next';
+} from "date-fns";
+import { Clock, Trash2 } from "lucide-react";
+import { CalendarEvent } from "@/types/calendar";
+import { formatTime } from "@/Utils/formatDate";
+import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatformsConfig";
+import { useTranslation } from "react-i18next";
 import {
   DndContext,
   DragEndEvent,
@@ -24,7 +24,7 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-} from '@dnd-kit/core';
+} from "@dnd-kit/core";
 
 interface MonthViewProps {
   currentDate: Date;
@@ -66,25 +66,33 @@ const DraggableEvent: React.FC<DraggableEventProps> = ({
   });
 
   // Check if publication has no platforms assigned
-  const hasNoPlatforms = event.hasNoPlatforms || 
-    (event.type === 'post' && 
-     (!event.extendedProps?.platforms || event.extendedProps.platforms.length === 0));
+  const hasNoPlatforms =
+    event.hasNoPlatforms ||
+    (event.type === "post" &&
+      (!event.extendedProps?.platforms ||
+        event.extendedProps.platforms.length === 0));
 
   // Get platforms array - for posts, use the single platform, for publications use all platforms
-  const platforms = event.type === 'post' 
-    ? [event.platform?.toLowerCase()].filter(Boolean)
-    : (event.extendedProps?.platforms || []).map((p: string) => p.toLowerCase());
+  const platforms =
+    event.type === "post"
+      ? [event.platform?.toLowerCase()].filter(Boolean)
+      : (event.extendedProps?.platforms || []).map((p: string) =>
+          p.toLowerCase(),
+        );
 
   // Get primary platform for color scheme (first platform or the single platform)
   const primaryPlatform = platforms[0];
-  const platformConfig = primaryPlatform && SOCIAL_PLATFORMS[primaryPlatform as keyof typeof SOCIAL_PLATFORMS];
+  const platformConfig =
+    primaryPlatform &&
+    SOCIAL_PLATFORMS[primaryPlatform as keyof typeof SOCIAL_PLATFORMS];
 
   // Determine if delete button should be shown
-  const canDelete = onEventDelete && (
-    ['user_event', 'event'].includes(String(event.type)) 
-      ? (!event.extendedProps?.is_public || event.extendedProps?.user_name === currentUser?.name)
-      : false // Don't allow delete for posts from calendar
-  );
+  const canDelete =
+    onEventDelete &&
+    (["user_event", "event"].includes(String(event.type))
+      ? !event.extendedProps?.is_public ||
+        event.extendedProps?.user_name === currentUser?.name
+      : false); // Don't allow delete for posts from calendar
 
   return (
     <div
@@ -98,20 +106,23 @@ const DraggableEvent: React.FC<DraggableEventProps> = ({
         shadow-sm hover:shadow-lg
         cursor-grab active:cursor-grabbing transition-all duration-200 hover:-translate-y-0.5
         group/card
-        ${isSelected ? 'ring-2 ring-primary-500 ring-offset-2' : ''}
-        ${isDragging ? 'opacity-50 scale-95' : ''}
-        ${hasNoPlatforms ? 'border-orange-300 dark:border-orange-600 bg-orange-50 dark:bg-orange-900/10' : ''}
-        ${platformConfig && !hasNoPlatforms ? `${platformConfig.borderColor} ${platformConfig.darkBorderColor} ${platformConfig.bgClass} ${platformConfig.darkColor}` : !hasNoPlatforms ? 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800' : ''}
+        ${isSelected ? "ring-2 ring-primary-500 ring-offset-2" : ""}
+        ${isDragging ? "opacity-50 scale-95" : ""}
+        ${hasNoPlatforms ? "border-orange-300 dark:border-orange-600 bg-orange-50 dark:bg-orange-900/10" : ""}
+        ${platformConfig && !hasNoPlatforms ? `${platformConfig.borderColor} ${platformConfig.darkBorderColor} ${platformConfig.bgClass} ${platformConfig.darkColor}` : !hasNoPlatforms ? "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800" : ""}
       `}
     >
       {/* Status Indicator Bar with platform color */}
       <div
-        className={`absolute left-0 top-0 bottom-0 w-1.5 ${platformConfig ? platformConfig.color : hasNoPlatforms ? 'bg-orange-500' : 'bg-gray-400'}`}
+        className={`absolute left-0 top-0 bottom-0 w-1.5 ${platformConfig ? platformConfig.color : hasNoPlatforms ? "bg-orange-500" : "bg-gray-400"}`}
       />
 
       {/* Warning indicator for publications without platforms */}
       {hasNoPlatforms && (
-        <div className="absolute right-2 top-2 bg-orange-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold shadow-md z-10" title="Sin redes sociales asignadas">
+        <div
+          className="absolute right-2 top-2 bg-orange-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold shadow-md z-10"
+          title="Sin redes sociales asignadas"
+        >
           !
         </div>
       )}
@@ -133,12 +144,13 @@ const DraggableEvent: React.FC<DraggableEventProps> = ({
         <div className="flex items-center gap-1 mt-0.5 flex-shrink-0">
           {platforms.length > 0 ? (
             platforms.map((platform) => {
-              const config = SOCIAL_PLATFORMS[platform as keyof typeof SOCIAL_PLATFORMS];
+              const config =
+                SOCIAL_PLATFORMS[platform as keyof typeof SOCIAL_PLATFORMS];
               const IconComponent = config?.icon;
               if (!IconComponent) return null;
-              
+
               return (
-                <div 
+                <div
                   key={platform}
                   className={`${config.textColor} ${config.darkTextColor}`}
                   title={config.name}
@@ -151,8 +163,8 @@ const DraggableEvent: React.FC<DraggableEventProps> = ({
             // Fallback for user events
             <PlatformIcon
               platform={
-                ['user_event', 'event'].includes(String(event.type))
-                  ? 'user_event'
+                ["user_event", "event"].includes(String(event.type))
+                  ? "user_event"
                   : event.platform
               }
               className="w-4 h-4 text-gray-400 dark:text-gray-500"
@@ -165,7 +177,7 @@ const DraggableEvent: React.FC<DraggableEventProps> = ({
           <div className="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate leading-tight mb-1">
             {event.title}
           </div>
-          
+
           {/* Creator info */}
           {event.extendedProps?.user_name && (
             <div className="text-[10px] text-gray-500 dark:text-gray-400 mb-1">
@@ -174,18 +186,22 @@ const DraggableEvent: React.FC<DraggableEventProps> = ({
           )}
 
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-            <span className={`text-[11px] flex items-center gap-1 font-medium ${platformConfig ? platformConfig.textColor + ' ' + platformConfig.darkTextColor : 'text-gray-500 dark:text-gray-400'}`}>
+            <span
+              className={`text-[11px] flex items-center gap-1 font-medium ${platformConfig ? platformConfig.textColor + " " + platformConfig.darkTextColor : "text-gray-500 dark:text-gray-400"}`}
+            >
               <Clock className="w-3 h-3" />
               {formatTime(event.start)}
             </span>
             {event.status && (
-              <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium uppercase tracking-wide
-                ${event.status === 'published' || event.status === 'posted' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : ''}
-                ${event.status === 'scheduled' || event.status === 'pending' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' : ''}
-                ${event.status === 'draft' ? 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400' : ''}
-                ${event.status === 'failed' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' : ''}
-                ${event.status === 'event' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400' : ''}
-              `}>
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded font-medium uppercase tracking-wide
+                ${event.status === "published" || event.status === "posted" ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400" : ""}
+                ${event.status === "scheduled" || event.status === "pending" ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400" : ""}
+                ${event.status === "draft" ? "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400" : ""}
+                ${event.status === "failed" ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400" : ""}
+                ${event.status === "event" ? "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400" : ""}
+              `}
+              >
                 {t(`status.${event.status}`, event.status)}
               </span>
             )}
@@ -252,9 +268,9 @@ const DroppableDay: React.FC<DroppableDayProps> = ({
       ref={setNodeRef}
       className={`
         relative p-3 min-h-[140px] transition-all group border
-        ${isCurrentMonth ? 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800' : 'bg-gray-50 dark:bg-gray-900/50 border-gray-100 dark:border-gray-800/50'}
-        ${isTodayDay ? 'ring-2 ring-primary-500 ring-inset' : ''}
-        ${isOver ? 'bg-primary-50 dark:bg-primary-900/20 ring-2 ring-primary-500 ring-inset' : ''}
+        ${isCurrentMonth ? "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800" : "bg-gray-50 dark:bg-gray-900/50 border-gray-100 dark:border-gray-800/50"}
+        ${isTodayDay ? "ring-2 ring-primary-500 ring-inset" : ""}
+        ${isOver ? "bg-primary-50 dark:bg-primary-900/20 ring-2 ring-primary-500 ring-inset" : ""}
         hover:bg-gray-50 dark:hover:bg-gray-800/50
       `}
     >
@@ -266,18 +282,20 @@ const DroppableDay: React.FC<DroppableDayProps> = ({
               text-sm font-semibold w-8 h-8 flex items-center justify-center rounded-full transition-all
               ${
                 isTodayDay
-                  ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/30 scale-110'
+                  ? "bg-primary-600 text-white shadow-lg shadow-primary-500/30 scale-110"
                   : isCurrentMonth
-                  ? 'text-gray-700 dark:text-gray-300 group-hover:bg-gray-100 dark:group-hover:bg-gray-800'
-                  : 'text-gray-400 dark:text-gray-600'
+                    ? "text-gray-700 dark:text-gray-300 group-hover:bg-gray-100 dark:group-hover:bg-gray-800"
+                    : "text-gray-400 dark:text-gray-600"
               }
             `}
           >
-            {format(day, 'd')}
+            {format(day, "d")}
           </span>
           {/* Show weekday on mobile/tablet */}
-          <span className={`lg:hidden text-xs font-medium uppercase ${isTodayDay ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400'}`}>
-            {format(day, 'EEE')}
+          <span
+            className={`lg:hidden text-xs font-medium uppercase ${isTodayDay ? "text-primary-600 dark:text-primary-400" : "text-gray-500 dark:text-gray-400"}`}
+          >
+            {format(day, "EEE")}
           </span>
         </div>
 
@@ -337,7 +355,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
       activationConstraint: {
         distance: 8, // 8px movement required to start drag
       },
-    })
+    }),
   );
 
   // Calculate days in the month
@@ -386,7 +404,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
       <div className="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden shadow-sm bg-white dark:bg-gray-900">
         {/* Weekday Headers - Desktop Only */}
         <div className="hidden lg:grid grid-cols-7 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-          {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map((day) => (
+          {["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"].map((day) => (
             <div
               key={day}
               className="py-3 text-center text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-400"
@@ -409,7 +427,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
           {/* Actual Days */}
           {days.map((day) => {
             const dayEvents = events.filter((e) =>
-              isSameDay(parseISO(e.start), day)
+              isSameDay(parseISO(e.start), day),
             );
             const isCurrentMonth = isSameMonth(day, currentDate);
             const isTodayDay = isToday(day);
@@ -436,54 +454,68 @@ export const MonthView: React.FC<MonthViewProps> = ({
 
       {/* Drag Overlay - shows the dragged item */}
       <DragOverlay>
-        {activeEvent ? (
-          (() => {
-            const platforms = activeEvent.type === 'post' 
-              ? [activeEvent.platform?.toLowerCase()].filter(Boolean)
-              : (activeEvent.extendedProps?.platforms || []).map((p: string) => p.toLowerCase());
-            
-            const primaryPlatform = platforms[0];
-            const platformConfig = primaryPlatform && SOCIAL_PLATFORMS[primaryPlatform as keyof typeof SOCIAL_PLATFORMS];
-            
-            return (
-              <div className={`rounded-lg border-2 shadow-2xl p-3 opacity-95 cursor-grabbing ${platformConfig ? `${platformConfig.borderColor} ${platformConfig.bgClass}` : 'border-primary-500 bg-white dark:bg-gray-800'}`}>
-                <div className="flex items-center gap-2">
-                  {/* Show all platform icons */}
-                  <div className="flex items-center gap-1">
-                    {platforms.length > 0 ? (
-                      platforms.map((platform) => {
-                        const config = SOCIAL_PLATFORMS[platform as keyof typeof SOCIAL_PLATFORMS];
-                        const IconComponent = config?.icon;
-                        if (!IconComponent) return null;
-                        
-                        return (
-                          <div 
-                            key={platform}
-                            className={`${config.textColor}`}
-                          >
-                            <IconComponent className="w-5 h-5" />
-                          </div>
-                        );
-                      })
-                    ) : (
-                      <PlatformIcon
-                        platform={
-                          ['user_event', 'event'].includes(String(activeEvent.type))
-                            ? 'user_event'
-                            : activeEvent.platform
-                        }
-                        className="w-5 h-5"
-                      />
-                    )}
-                  </div>
-                  <div className="text-sm font-semibold text-gray-800 dark:text-gray-100">
-                    {activeEvent.title}
+        {activeEvent
+          ? (() => {
+              const platforms =
+                activeEvent.type === "post"
+                  ? [activeEvent.platform?.toLowerCase()].filter(Boolean)
+                  : (activeEvent.extendedProps?.platforms || []).map(
+                      (p: string) => p.toLowerCase(),
+                    );
+
+              const primaryPlatform = platforms[0];
+              const platformConfig =
+                primaryPlatform &&
+                SOCIAL_PLATFORMS[
+                  primaryPlatform as keyof typeof SOCIAL_PLATFORMS
+                ];
+
+              return (
+                <div
+                  className={`rounded-lg border-2 shadow-2xl p-3 opacity-95 cursor-grabbing ${platformConfig ? `${platformConfig.borderColor} ${platformConfig.bgClass}` : "border-primary-500 bg-white dark:bg-gray-800"}`}
+                >
+                  <div className="flex items-center gap-2">
+                    {/* Show all platform icons */}
+                    <div className="flex items-center gap-1">
+                      {platforms.length > 0 ? (
+                        platforms.map((platform) => {
+                          const config =
+                            SOCIAL_PLATFORMS[
+                              platform as keyof typeof SOCIAL_PLATFORMS
+                            ];
+                          const IconComponent = config?.icon;
+                          if (!IconComponent) return null;
+
+                          return (
+                            <div
+                              key={platform}
+                              className={`${config.textColor}`}
+                            >
+                              <IconComponent className="w-5 h-5" />
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <PlatformIcon
+                          platform={
+                            ["user_event", "event"].includes(
+                              String(activeEvent.type),
+                            )
+                              ? "user_event"
+                              : activeEvent.platform
+                          }
+                          className="w-5 h-5"
+                        />
+                      )}
+                    </div>
+                    <div className="text-sm font-semibold text-gray-800 dark:text-gray-100">
+                      {activeEvent.title}
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })()
-        ) : null}
+              );
+            })()
+          : null}
       </DragOverlay>
     </DndContext>
   );

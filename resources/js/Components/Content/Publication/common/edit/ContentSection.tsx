@@ -33,11 +33,11 @@ const ContentSection = memo(
     publication,
     onHashtagChange,
     disabled,
-    contentType = 'post',
+    contentType = "post",
   }: ContentSectionProps) => {
     const { fieldVisibility, config } = useContentType(contentType);
     const fieldsConfig = getFieldsConfig(contentType);
-    
+
     // Usar la configuración centralizada para determinar qué campos mostrar
     const shouldShowTitle = !!fieldsConfig.title;
     const shouldShowDescription = !!fieldsConfig.description;
@@ -79,20 +79,25 @@ const ContentSection = memo(
             disabled={disabled}
           />
         </div>
-        
+
         {shouldShowTitle && (
           <Input
             id="title"
-            label={t(fieldsConfig.title?.label || "publications.modal.edit.titleField")}
+            label={t(
+              fieldsConfig.title?.label || "publications.modal.edit.titleField",
+            )}
             type="text"
             register={register}
             name="title"
-            placeholder={t(fieldsConfig.title?.placeholder || "publications.modal.edit.placeholders.title")}
+            placeholder={t(
+              fieldsConfig.title?.placeholder ||
+                "publications.modal.edit.placeholders.title",
+            )}
             error={errors.title?.message as string}
-            icon={contentType === 'poll' ? HelpCircle : FileText}
+            icon={contentType === "poll" ? HelpCircle : FileText}
             variant="filled"
             sizeType="lg"
-            required={isFieldRequired(contentType, 'title')}
+            required={isFieldRequired(contentType, "title")}
             hint={`${watched.title?.length || 0}/70 characters`}
             disabled={disabled}
           />
@@ -101,7 +106,10 @@ const ContentSection = memo(
         {shouldShowDescription && (
           <Textarea
             id="description"
-            label={t(fieldsConfig.description?.label || "publications.modal.edit.description")}
+            label={t(
+              fieldsConfig.description?.label ||
+                "publications.modal.edit.description",
+            )}
             register={register}
             name="description"
             placeholder={t("publications.modal.edit.placeholders.description")}
@@ -109,8 +117,8 @@ const ContentSection = memo(
             icon={FileText}
             variant="filled"
             size="lg"
-            required={isFieldRequired(contentType, 'description')}
-            rows={contentType === 'story' ? 3 : 6}
+            required={isFieldRequired(contentType, "description")}
+            rows={contentType === "story" ? 3 : 6}
             maxLength={config.descriptionMaxLength}
             showCharCount
             hint={`Maximum ${config.descriptionMaxLength} characters`}
@@ -121,7 +129,9 @@ const ContentSection = memo(
         {shouldShowGoal && (
           <Input
             id="goal"
-            label={t(fieldsConfig.goal?.label || "publications.modal.edit.goal")}
+            label={t(
+              fieldsConfig.goal?.label || "publications.modal.edit.goal",
+            )}
             type="text"
             register={register}
             name="goal"
@@ -130,7 +140,7 @@ const ContentSection = memo(
             icon={Target}
             variant="filled"
             sizeType="lg"
-            required={isFieldRequired(contentType, 'goal')}
+            required={isFieldRequired(contentType, "goal")}
             hint={`${watched.goal?.length || 0}/200 characters`}
             disabled={disabled}
           />
@@ -140,16 +150,22 @@ const ContentSection = memo(
         {shouldShowHashtags && (
           <Input
             id="hashtags"
-            label={t(fieldsConfig.hashtags?.label || "publications.modal.edit.hashtags")}
+            label={t(
+              fieldsConfig.hashtags?.label ||
+                "publications.modal.edit.hashtags",
+            )}
             type="text"
             value={watched.hashtags || ""}
             name="hashtags"
             placeholder={t("publications.modal.edit.placeholders.hashtags")}
-            required={isFieldRequired(contentType, 'hashtags')}
+            required={isFieldRequired(contentType, "hashtags")}
             error={errors.hashtags?.message as string}
             onChange={(e) => {
               const value = e.target.value;
-              setValue("hashtags", value, { shouldValidate: true, shouldDirty: true });
+              setValue("hashtags", value, {
+                shouldValidate: true,
+                shouldDirty: true,
+              });
               onHashtagChange(value);
             }}
             icon={Hash}
@@ -158,18 +174,19 @@ const ContentSection = memo(
             hint={`${
               watched.hashtags
                 ? (() => {
-                    const hashtagsStr = typeof watched.hashtags === 'string' 
-                      ? watched.hashtags 
-                      : Array.isArray(watched.hashtags) 
-                        ? watched.hashtags.join(' ')
-                        : '';
-                    
+                    const hashtagsStr =
+                      typeof watched.hashtags === "string"
+                        ? watched.hashtags
+                        : Array.isArray(watched.hashtags)
+                          ? watched.hashtags.join(" ")
+                          : "";
+
                     // Better hashtag separation logic
                     const hashtagArray = hashtagsStr
                       .split(/[\s,]+/) // Split by spaces or commas
-                      .map(tag => tag.trim())
-                      .filter(tag => tag.startsWith("#") && tag.length > 1);
-                    
+                      .map((tag) => tag.trim())
+                      .filter((tag) => tag.startsWith("#") && tag.length > 1);
+
                     return hashtagArray.length;
                   })()
                 : 0

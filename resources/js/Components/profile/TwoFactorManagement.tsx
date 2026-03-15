@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { router } from "@inertiajs/react";
 import { useTranslation } from "react-i18next";
-import { Shield, ShieldCheck, ShieldOff, RefreshCw, AlertTriangle } from "lucide-react";
+import {
+  Shield,
+  ShieldCheck,
+  ShieldOff,
+  RefreshCw,
+  AlertTriangle,
+} from "lucide-react";
 import Button from "@/Components/common/Modern/Button";
 import Input from "@/Components/common/Modern/Input";
 import Modal from "@/Components/common/Modern/Modal";
@@ -11,14 +17,19 @@ interface TwoFactorManagementProps {
   enabledAt?: string;
 }
 
-export default function TwoFactorManagement({ isEnabled, enabledAt }: TwoFactorManagementProps) {
+export default function TwoFactorManagement({
+  isEnabled,
+  enabledAt,
+}: TwoFactorManagementProps) {
   const { t } = useTranslation();
   const [showDisableModal, setShowDisableModal] = useState(false);
   const [showRegenerateModal, setShowRegenerateModal] = useState(false);
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errors, setErrors] = useState<{ password?: string; code?: string }>({});
+  const [errors, setErrors] = useState<{ password?: string; code?: string }>(
+    {},
+  );
 
   const handleDisable2FA = () => {
     setIsSubmitting(true);
@@ -38,7 +49,7 @@ export default function TwoFactorManagement({ isEnabled, enabledAt }: TwoFactorM
         onFinish: () => {
           setIsSubmitting(false);
         },
-      }
+      },
     );
   };
 
@@ -60,7 +71,7 @@ export default function TwoFactorManagement({ isEnabled, enabledAt }: TwoFactorM
         onFinish: () => {
           setIsSubmitting(false);
         },
-      }
+      },
     );
   };
 
@@ -158,7 +169,8 @@ export default function TwoFactorManagement({ isEnabled, enabledAt }: TwoFactorM
                   Warning
                 </p>
                 <p className="text-xs text-yellow-600 dark:text-yellow-500 mt-1">
-                  Disabling 2FA will make your account less secure. You'll need to re-enable it to access admin features.
+                  Disabling 2FA will make your account less secure. You'll need
+                  to re-enable it to access admin features.
                 </p>
               </div>
             </div>
@@ -211,7 +223,8 @@ export default function TwoFactorManagement({ isEnabled, enabledAt }: TwoFactorM
         <div className="space-y-4">
           <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
             <p className="text-sm text-blue-700 dark:text-blue-400">
-              This will invalidate your current backup codes and generate new ones. Make sure to save the new codes in a safe place.
+              This will invalidate your current backup codes and generate new
+              ones. Make sure to save the new codes in a safe place.
             </p>
           </div>
 

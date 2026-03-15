@@ -1,4 +1,7 @@
-import { CarouselDots, CarouselPagination } from "@/Components/common/CarouselPagination";
+import {
+  CarouselDots,
+  CarouselPagination,
+} from "@/Components/common/CarouselPagination";
 import Button from "@/Components/common/Modern/Button";
 import { getPlatformConfig } from "@/Constants/socialPlatforms";
 import { MediaFile, Publication } from "@/types";
@@ -6,14 +9,14 @@ import { formatDateTimeString } from "@/Utils/dateHelpers";
 import { Head, useForm } from "@inertiajs/react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-    AlertCircle,
-    Calendar,
-    Check,
-    Info,
-    Loader2,
-    MessageSquare,
-    Share2,
-    X,
+  AlertCircle,
+  Calendar,
+  Check,
+  Info,
+  Loader2,
+  MessageSquare,
+  Share2,
+  X,
 } from "lucide-react";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
@@ -40,7 +43,9 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
   };
 
   const prevMedia = () => {
-    setCurrentMediaIndex((prev) => (prev - 1 + mediaFiles.length) % mediaFiles.length);
+    setCurrentMediaIndex(
+      (prev) => (prev - 1 + mediaFiles.length) % mediaFiles.length,
+    );
   };
 
   const goToMedia = (index: number) => {
@@ -186,8 +191,7 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
                 <div className="flex items-center gap-1.5 bg-white dark:bg-zinc-800 px-2 py-1 rounded shadow-sm">
                   <Calendar className="w-3.5 h-3.5 text-orange-500" />
                   <span>
-                    Programado:{" "}
-                    {formatDateTimeString(publication.scheduled_at)}
+                    Programado: {formatDateTimeString(publication.scheduled_at)}
                   </span>
                 </div>
               )}
@@ -226,13 +230,15 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
                       initial={{ opacity: 0, x: 100 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -100 }}
-                      transition={{ 
+                      transition={{
                         duration: 0.3,
-                        ease: "easeInOut"
+                        ease: "easeInOut",
                       }}
                       className="w-full h-full flex items-center justify-center"
                     >
-                      {mediaFiles[currentMediaIndex].file_type.startsWith("image/") ? (
+                      {mediaFiles[currentMediaIndex].file_type.startsWith(
+                        "image/",
+                      ) ? (
                         <div className="relative max-w-full max-h-[600px]">
                           <img
                             src={mediaFiles[currentMediaIndex].file_path}
@@ -245,7 +251,8 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
                               const parent = target.parentElement;
                               if (parent) {
                                 const fallback = document.createElement("div");
-                                fallback.className = "flex flex-col items-center gap-4 p-12 text-center text-neutral-400";
+                                fallback.className =
+                                  "flex flex-col items-center gap-4 p-12 text-center text-neutral-400";
                                 fallback.innerHTML = `
                                   <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -257,7 +264,9 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
                             }}
                           />
                         </div>
-                      ) : mediaFiles[currentMediaIndex].file_type.startsWith("video/") ? (
+                      ) : mediaFiles[currentMediaIndex].file_type.startsWith(
+                          "video/",
+                        ) ? (
                         <video
                           src={mediaFiles[currentMediaIndex].file_path}
                           controls
@@ -277,8 +286,8 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
                             </p>
                             <p className="mt-1 text-sm text-gray-400">
                               Este archivo de tipo "
-                              {mediaFiles[currentMediaIndex].file_type}" se procesará
-                              para el canal final.
+                              {mediaFiles[currentMediaIndex].file_type}" se
+                              procesará para el canal final.
                             </p>
                           </div>
                         </div>

@@ -37,7 +37,9 @@ export default function ApprovalHistoryTimeline({
 }: ApprovalHistoryTimelineProps) {
   const { t, i18n } = useTranslation();
   const locale = getDateFnsLocale(i18n.language);
-  const [actions, setActions] = useState<ApprovalAction[]>(initialActions || []);
+  const [actions, setActions] = useState<ApprovalAction[]>(
+    initialActions || [],
+  );
   const [isLoading, setIsLoading] = useState(!initialActions);
 
   useEffect(() => {
@@ -50,7 +52,7 @@ export default function ApprovalHistoryTimeline({
     try {
       setIsLoading(true);
       const response = await axios.get(
-        route("api.content.approval-history", contentId)
+        route("api.content.approval-history", contentId),
       );
       setActions(response.data.data || []);
     } catch (error: any) {
@@ -138,7 +140,9 @@ export default function ApprovalHistoryTimeline({
 
               <div className="flex gap-4">
                 {/* Icon */}
-                <div className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${getActionColor(action.action_type)}`}>
+                <div
+                  className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${getActionColor(action.action_type)}`}
+                >
                   <Icon className="w-5 h-5" />
                 </div>
 
@@ -150,7 +154,9 @@ export default function ApprovalHistoryTimeline({
                         <span className="font-bold text-gray-900 dark:text-white">
                           {action.user.name}
                         </span>
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${getActionColor(action.action_type)}`}>
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-xs font-bold ${getActionColor(action.action_type)}`}
+                        >
                           {getActionLabel(action.action_type)}
                         </span>
                         {action.approval_level && (

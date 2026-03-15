@@ -6,16 +6,16 @@ export function useTheme() {
 
   if (context === undefined) {
     return {
-      theme: 'light' as const,
+      theme: "light" as const,
       setTheme: () => {},
       toggleTheme: () => {},
-      actualTheme: 'light' as const,
+      actualTheme: "light" as const,
       isDark: false,
     };
   }
 
   return {
     ...context,
-    isDark: context.actualTheme === 'dark',
+    isDark: context.actualTheme === "dark",
   };
 }

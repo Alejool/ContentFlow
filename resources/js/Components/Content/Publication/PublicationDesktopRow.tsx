@@ -17,7 +17,7 @@ import {
   Rocket,
   Send,
   Trash2,
-  Video
+  Video,
 } from "lucide-react";
 import React, { memo, useMemo } from "react";
 import toast from "react-hot-toast";
@@ -158,7 +158,7 @@ const PublicationRow = memo(
               >
                 {item.title || "Untitled"}
               </h3>
-              
+
               {/* Content Type Badge */}
               <div className="mt-1">
                 <SimpleContentTypeBadge
@@ -167,7 +167,7 @@ const PublicationRow = memo(
                   size="sm"
                 />
               </div>
-              
+
               <p className="text-xs mt-0.5 truncate text-gray-500 dark:text-gray-400">
                 {item.description || t("publications.table.noDescription")}
               </p>
@@ -235,11 +235,13 @@ const PublicationRow = memo(
                   </div>
                   <div className="flex flex-col">
                     <span className="text-[10px] font-bold text-yellow-700 dark:text-yellow-400 uppercase tracking-tight">
-                      {t("publications.table.pendingAdminReview") || "Pendiente de revisión"}
+                      {t("publications.table.pendingAdminReview") ||
+                        "Pendiente de revisión"}
                     </span>
                     {item.currentApprovalStep?.role?.name && (
                       <span className="text-[9px] text-yellow-600 dark:text-yellow-500">
-                        {t("approvals.approver_role")}: {item.currentApprovalStep.role.name}
+                        {t("approvals.approver_role")}:{" "}
+                        {item.currentApprovalStep.role.name}
                       </span>
                     )}
                   </div>
@@ -391,14 +393,20 @@ const PublicationRow = memo(
                       e.stopPropagation();
                       await handlePublish(item);
                     }}
-                    disabled={isLoading?.publishing || isLoading?.editing || isLoading?.deleting}
+                    disabled={
+                      isLoading?.publishing ||
+                      isLoading?.editing ||
+                      isLoading?.deleting
+                    }
                     loading={isLoading?.publishing}
                     variant="success"
                     buttonStyle="icon"
                     size="sm"
                     icon={Rocket}
                   >
-                    <span className="sr-only">{t("publications.button.publish")}</span>
+                    <span className="sr-only">
+                      {t("publications.button.publish")}
+                    </span>
                   </Button>
                 ) : shouldShowSendToReview(item) ? (
                   <Button
@@ -413,7 +421,9 @@ const PublicationRow = memo(
                     size="sm"
                     icon={Send}
                   >
-                    <span className="sr-only">{t("publications.button.sendForReview")}</span>
+                    <span className="sr-only">
+                      {t("publications.button.sendForReview")}
+                    </span>
                   </Button>
                 ) : item.status === "pending_review" ? (
                   <Button
@@ -423,7 +433,9 @@ const PublicationRow = memo(
                     size="sm"
                     icon={Clock}
                   >
-                    <span className="sr-only">{t("publications.button.inReview")}</span>
+                    <span className="sr-only">
+                      {t("publications.button.inReview")}
+                    </span>
                   </Button>
                 ) : null}
               </>
@@ -462,7 +474,12 @@ const PublicationRow = memo(
                     onEdit(item);
                   }
                 }}
-                disabled={isLoading?.publishing || isLoading?.editing || isLoading?.deleting || !!remoteLock}
+                disabled={
+                  isLoading?.publishing ||
+                  isLoading?.editing ||
+                  isLoading?.deleting ||
+                  !!remoteLock
+                }
                 loading={isLoading?.editing}
                 variant={item.status === "published" ? "warning" : "primary"}
                 buttonStyle="icon"
@@ -480,14 +497,20 @@ const PublicationRow = memo(
                   e.stopPropagation();
                   handleDuplicate(item.id);
                 }}
-                disabled={isLoading?.publishing || isLoading?.editing || isLoading?.deleting}
+                disabled={
+                  isLoading?.publishing ||
+                  isLoading?.editing ||
+                  isLoading?.deleting
+                }
                 loading={isLoading?.duplicating}
                 variant="secondary"
                 buttonStyle="icon"
                 size="sm"
                 icon={Copy}
               >
-                <span className="sr-only">{t("publications.button.duplicate")}</span>
+                <span className="sr-only">
+                  {t("publications.button.duplicate")}
+                </span>
               </Button>
             )}
 
@@ -499,7 +522,11 @@ const PublicationRow = memo(
                   const isUserEvent = (item as any).type === "user_event";
                   await handleDelete(item, isUserEvent);
                 }}
-                disabled={isLoading?.publishing || isLoading?.editing || isLoading?.deleting}
+                disabled={
+                  isLoading?.publishing ||
+                  isLoading?.editing ||
+                  isLoading?.deleting
+                }
                 loading={isLoading?.deleting}
                 variant="danger"
                 buttonStyle="icon"

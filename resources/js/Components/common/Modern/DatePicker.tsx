@@ -85,7 +85,7 @@ interface DatePickerProps<T extends FieldValues> {
   containerClassName?: string;
   activeColor?: string;
   id?: string;
-  
+
   // UTC/Timezone handling
   useUTC?: boolean; // If true, converts between UTC and local timezone
   showTimezone?: boolean; // If true, shows timezone label
@@ -1185,7 +1185,17 @@ const DatePickerModern = <T extends FieldValues>({
                 </div>
               );
             },
-          [selected, localDate, useUTC, handleDateChange, currentLocale, showTimeSelect, isClearable, showTimezone, timezoneLabel],
+          [
+            selected,
+            localDate,
+            useUTC,
+            handleDateChange,
+            currentLocale,
+            showTimeSelect,
+            isClearable,
+            showTimezone,
+            timezoneLabel,
+          ],
         )}
       />
     </div>

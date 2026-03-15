@@ -229,7 +229,7 @@ export default function PlanCard({
 
     // IMPORTANTE: Las tarjetas de planes SIEMPRE redirigen a comprar/renovar
     // Solo la tabla de "Planes comprados" permite usar sin pagar
-    
+
     if (isDowngradeBlocked) {
       return {
         label: t(
@@ -499,7 +499,7 @@ export default function PlanCard({
               {t("pricing.paymentSetup", "Configuración en proceso")}
             </p>
           )}
-          
+
           <Button
             onClick={() => onSelectPlan(plan.id)}
             disabled={
@@ -509,7 +509,8 @@ export default function PlanCard({
             }
             variant={isPopular ? "primary" : "ghost"}
             buttonStyle={
-              buttonConfig.variant === "current" || buttonConfig.variant === "blocked"
+              buttonConfig.variant === "current" ||
+              buttonConfig.variant === "blocked"
                 ? "outline"
                 : isPopular
                   ? "solid"
@@ -529,8 +530,10 @@ export default function PlanCard({
             iconPosition="right"
             className={cn(
               "group transition-all",
-              buttonConfig.variant === "current" && "opacity-60 cursor-not-allowed",
-              buttonConfig.variant === "blocked" && "opacity-60 cursor-not-allowed",
+              buttonConfig.variant === "current" &&
+                "opacity-60 cursor-not-allowed",
+              buttonConfig.variant === "blocked" &&
+                "opacity-60 cursor-not-allowed",
             )}
           >
             {getButtonText()}
@@ -738,13 +741,10 @@ export default function PlanCard({
               isLoading ||
               (!plan.enabled && plan.requires_stripe)
             }
-            variant={
-              isPopular
-                  ? "primary"
-                  : "ghost"
-            }
+            variant={isPopular ? "primary" : "ghost"}
             buttonStyle={
-              buttonConfig.variant === "current" || buttonConfig.variant === "blocked"
+              buttonConfig.variant === "current" ||
+              buttonConfig.variant === "blocked"
                 ? "gradient"
                 : isPopular
                   ? "solid"
@@ -764,8 +764,10 @@ export default function PlanCard({
             iconPosition="right"
             className={cn(
               "group transition-all",
-              buttonConfig.variant === "current" && "opacity-60 cursor-not-allowed",
-              buttonConfig.variant === "blocked" && "opacity-60 cursor-not-allowed",
+              buttonConfig.variant === "current" &&
+                "opacity-60 cursor-not-allowed",
+              buttonConfig.variant === "blocked" &&
+                "opacity-60 cursor-not-allowed",
             )}
           >
             {getButtonText()}

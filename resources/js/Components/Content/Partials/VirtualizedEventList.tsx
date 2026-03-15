@@ -1,5 +1,5 @@
-import { CalendarEvent } from '@/types/calendar';
-import { useMemo } from 'react';
+import { CalendarEvent } from "@/types/calendar";
+import { useMemo } from "react";
 
 interface VirtualizedEventListProps {
   events: CalendarEvent[];
@@ -10,7 +10,7 @@ interface VirtualizedEventListProps {
 /**
  * Virtualized event list for days with many events
  * Shows a limited number of events with a "show more" option
- * 
+ *
  * This is a lightweight alternative to full virtualization libraries
  * for the calendar grid where each day cell has limited space.
  */

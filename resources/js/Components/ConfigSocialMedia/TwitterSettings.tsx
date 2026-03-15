@@ -56,7 +56,10 @@ export default function TwitterSettings({
             icon={Twitter}
             iconColor="text-sky-500"
             iconBgColor="bg-sky-100 dark:bg-sky-900/20"
-            selected={settings?.type === "tweet" || (!settings?.type && defaultSettings.type === "tweet")}
+            selected={
+              settings?.type === "tweet" ||
+              (!settings?.type && defaultSettings.type === "tweet")
+            }
             onSelect={(val) => handleChange("type", val)}
           />
           <PlatformCard
@@ -83,7 +86,11 @@ export default function TwitterSettings({
       {settings?.type === "poll" && (
         <PollOptions
           pollOptions={settings?.poll_options || []}
-          pollDuration={settings?.poll_duration_hours ? settings.poll_duration_hours * 60 : 1440}
+          pollDuration={
+            settings?.poll_duration_hours
+              ? settings.poll_duration_hours * 60
+              : 1440
+          }
           onOptionsChange={handlePollOptionsChange}
           onDurationChange={handlePollDurationChange}
         />

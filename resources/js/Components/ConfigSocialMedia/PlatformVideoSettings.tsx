@@ -42,13 +42,15 @@ export default function PlatformVideoSettings({
         duration: videoMetadata.duration,
         width: videoMetadata.width,
         height: videoMetadata.height,
-        aspectRatio: videoMetadata.aspectRatio || videoMetadata.width / videoMetadata.height,
+        aspectRatio:
+          videoMetadata.aspectRatio ||
+          videoMetadata.width / videoMetadata.height,
         size: 0,
         format: "",
       },
       platform,
       currentType,
-      t
+      t,
     );
 
     setValidation(result);
@@ -72,8 +74,13 @@ export default function PlatformVideoSettings({
                   <div>
                     <p className="font-medium">YouTube Shorts:</p>
                     <ul className="ml-4 mt-1 space-y-1">
-                      <li>• {t("videoValidation.maxDuration")}: {requirements.short.maxDuration}s</li>
-                      <li>• {t("videoValidation.aspectRatio")}: 9:16 (vertical)</li>
+                      <li>
+                        • {t("videoValidation.maxDuration")}:{" "}
+                        {requirements.short.maxDuration}s
+                      </li>
+                      <li>
+                        • {t("videoValidation.aspectRatio")}: 9:16 (vertical)
+                      </li>
                       <li>• {t("videoValidation.minResolution")}: 720x1280</li>
                     </ul>
                   </div>
@@ -82,9 +89,18 @@ export default function PlatformVideoSettings({
                   <div>
                     <p className="font-medium">{requirements.name} Reels:</p>
                     <ul className="ml-4 mt-1 space-y-1">
-                      <li>• {t("videoValidation.maxDuration")}: {requirements.reel.maxDuration}s</li>
-                      <li>• {t("videoValidation.aspectRatio")}: 9:16 (vertical)</li>
-                      <li>• {t("videoValidation.minResolution")}: {requirements.reel.resolution.minWidth}x{requirements.reel.resolution.minHeight}</li>
+                      <li>
+                        • {t("videoValidation.maxDuration")}:{" "}
+                        {requirements.reel.maxDuration}s
+                      </li>
+                      <li>
+                        • {t("videoValidation.aspectRatio")}: 9:16 (vertical)
+                      </li>
+                      <li>
+                        • {t("videoValidation.minResolution")}:{" "}
+                        {requirements.reel.resolution.minWidth}x
+                        {requirements.reel.resolution.minHeight}
+                      </li>
                     </ul>
                   </div>
                 )}
@@ -92,7 +108,10 @@ export default function PlatformVideoSettings({
                   <div>
                     <p className="font-medium">{requirements.name} Video:</p>
                     <ul className="ml-4 mt-1 space-y-1">
-                      <li>• {t("videoValidation.maxDuration")}: {Math.floor(requirements.video.maxDuration / 3600)}h</li>
+                      <li>
+                        • {t("videoValidation.maxDuration")}:{" "}
+                        {Math.floor(requirements.video.maxDuration / 3600)}h
+                      </li>
                       <li>• {t("videoValidation.anyAspectRatio")}</li>
                     </ul>
                   </div>
@@ -144,9 +163,10 @@ export default function PlatformVideoSettings({
                 {videoMetadata.aspectRatio?.toFixed(2)} (
                 {videoMetadata.aspectRatio && videoMetadata.aspectRatio < 1
                   ? "9:16"
-                  : videoMetadata.aspectRatio && Math.abs(videoMetadata.aspectRatio - 1) < 0.1
-                  ? "1:1"
-                  : "16:9"}
+                  : videoMetadata.aspectRatio &&
+                      Math.abs(videoMetadata.aspectRatio - 1) < 0.1
+                    ? "1:1"
+                    : "16:9"}
                 )
               </span>
             </div>

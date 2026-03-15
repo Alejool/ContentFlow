@@ -143,30 +143,35 @@ export default function PricingPlansSection({
     await handleSelectPlan(planId, true); // forceCheckout = true
     if (onPlanSelected) onPlanSelected(planId);
   };
-  
+
   // CRITICAL: Determinar si tiene plan de pago activo
   // Esto bloquea Free/Demo cuando tienes Starter, Growth, Professional o Enterprise activo
   const hasPaidPlanActive = React.useMemo(() => {
-    const paidPlans = ['starter', 'growth', 'professional', 'enterprise'];
-    
+    const paidPlans = ["starter", "growth", "professional", "enterprise"];
+
     // Verificar si el plan actual es de pago
     const currentIsPaid = currentPlan && paidPlans.includes(currentPlan);
-    
+
     // Verificar si tiene planes de pago en activePlans
-    const hasActivePaidPlan = effectiveActivePlans.some(id => paidPlans.includes(id));
-    
+    const hasActivePaidPlan = effectiveActivePlans.some((id) =>
+      paidPlans.includes(id),
+    );
+
     // Verificar si tiene suscripciones activas de pago
     const hasActivePaidSubscription = activeSubscriptions.some(
-      sub => paidPlans.includes(sub.plan) && sub.status === 'active'
+      (sub) => paidPlans.includes(sub.plan) && sub.status === "active",
     );
-    
+
     return currentIsPaid || hasActivePaidPlan || hasActivePaidSubscription;
   }, [currentPlan, effectiveActivePlans, activeSubscriptions]);
 
   // DEBUG: Ver qué datos llegan
-  React.useEffect(() => {
-    
-  }, [currentPlan, effectiveActivePlans, expiredPlans, activeSubscriptions]);
+  React.useEffect(() => {}, [
+    currentPlan,
+    effectiveActivePlans,
+    expiredPlans,
+    activeSubscriptions,
+  ]);
 
   // Plans purchased + still active (not current) → can switch for free
   const switchablePlans = effectiveActivePlans.filter(
@@ -175,8 +180,8 @@ export default function PricingPlansSection({
       ["starter", "growth", "professional", "enterprise"].includes(id),
   );
   // Plans purchased but now expired → need Stripe renewal
-  const renewablePlans = expiredPlans.filter(
-    (id) => ["starter", "growth", "professional", "enterprise"].includes(id),
+  const renewablePlans = expiredPlans.filter((id) =>
+    ["starter", "growth", "professional", "enterprise"].includes(id),
   );
 
   const meta =
@@ -289,8 +294,7 @@ export default function PricingPlansSection({
               </div>
             )}
 
-          {
-          /* ── Billing toggle ──────────────────────────────────────────────── */}
+          {/* ── Billing toggle ──────────────────────────────────────────────── */}
           {showBillingToggle && (
             <div className="inline-flex items-center gap-2 bg-white dark:bg-neutral-800 p-1.5 rounded-lg shadow-lg border border-gray-200 dark:border-neutral-700">
               <button
@@ -333,7 +337,10 @@ export default function PricingPlansSection({
                 {switchablePlans.length > 0 && (
                   <div className="px-5 py-4 border-t border-neutral-100 dark:border-neutral-800">
                     <p className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-3">
-                      {t("pricing.purchasedPlansAvailable", "Planes comprados — cambiar sin pago")}
+                      {t(
+                        "pricing.purchasedPlansAvailable",
+                        "Planes comprados — cambiar sin pago",
+                      )}
                     </p>
                     <div className="flex flex-col gap-2">
                       {switchablePlans.map((id) => (
@@ -348,8 +355,11 @@ export default function PricingPlansSection({
                                 {getPlanName(id, plans)}
                               </p>
                               <p className="text-xs text-green-600 dark:text-green-500">
-                                {t("pricing.timeAvailable", "Tiempo disponible")} · $
-                                {getPlanPrice(id, plans)}/
+                                {t(
+                                  "pricing.timeAvailable",
+                                  "Tiempo disponible",
+                                )}{" "}
+                                · ${getPlanPrice(id, plans)}/
                                 {t("pricing.billing.month")}
                               </p>
                             </div>
@@ -388,7 +398,8 @@ export default function PricingPlansSection({
                                 {getPlanName(id, plans)}
                               </p>
                               <p className="text-xs text-amber-600 dark:text-amber-500">
-                                {t("pricing.expired")} · ${getPlanPrice(id, plans)}/
+                                {t("pricing.expired")} · $
+                                {getPlanPrice(id, plans)}/
                                 {t("pricing.billing.month")}
                               </p>
                             </div>

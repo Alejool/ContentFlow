@@ -270,9 +270,11 @@ export default function AddPublicationModal({
     control,
     name: "recurrence_accounts",
   });
-  const content_type = useWatch({ control, name: "content_type" }) as ContentType || 'post';
-  const poll_options = useWatch({ control, name: "poll_options" }) || ['', ''];
-  const poll_duration_hours = useWatch({ control, name: "poll_duration_hours" }) || 24;
+  const content_type =
+    (useWatch({ control, name: "content_type" }) as ContentType) || "post";
+  const poll_options = useWatch({ control, name: "poll_options" }) || ["", ""];
+  const poll_duration_hours =
+    useWatch({ control, name: "poll_duration_hours" }) || 24;
 
   // Use content type hook for field visibility
   const { fieldVisibility } = useContentType(content_type);
@@ -280,8 +282,8 @@ export default function AddPublicationModal({
   // Get selected platform names for content type filtering
   const selectedPlatformNames = useMemo(() => {
     return selectedSocialAccounts
-      .map(id => {
-        const account = socialAccounts.find(a => a.id === id);
+      .map((id) => {
+        const account = socialAccounts.find((a) => a.id === id);
         return account?.platform;
       })
       .filter(Boolean) as string[];
@@ -345,15 +347,15 @@ export default function AddPublicationModal({
           title="publications.modal.add.title"
           subtitle="publications.modal.add.subtitle"
         />
-        
+
         <ContentTypeSelectorBar
           selectedType={content_type}
           selectedPlatforms={selectedPlatformNames}
           onChange={(type) => {
             setValue("content_type", type, { shouldValidate: true });
-            
+
             // Reset type-specific fields when changing type
-            if (type !== 'poll') {
+            if (type !== "poll") {
               setValue("poll_options", null);
               setValue("poll_duration_hours", null);
             }
@@ -379,41 +381,44 @@ export default function AddPublicationModal({
                     <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700">
                       <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
                       <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
-                        {t("publications.modal.add.mediaSection") || "Archivos Multimedia"}
+                        {t("publications.modal.add.mediaSection") ||
+                          "Archivos Multimedia"}
                       </h3>
                     </div>
 
                     <MediaUploadSection
-                    mediaPreviews={stabilizedMediaPreviews}
-                    thumbnails={thumbnails}
-                    imageError={imageError}
-                    isDragOver={isDragOver}
-                    t={t}
-                    onFileChange={handleFileChange}
-                    onRemoveMedia={handleRemoveMedia}
-                    onSetThumbnail={(tempId, file) => setThumbnail(tempId, file)}
-                    onClearThumbnail={(tempId) => clearThumbnail(tempId)}
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setIsDragOver(true);
-                    }}
-                    onDragLeave={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setIsDragOver(false);
-                    }}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setIsDragOver(false);
-                      handleFileChange(e.dataTransfer.files);
-                    }}
-                    lockedBy={remoteLock}
-                    onUpdateFile={updateFile}
-                    uploadProgress={uploadProgress}
-                    uploadErrors={uploadErrors}
-                  />
+                      mediaPreviews={stabilizedMediaPreviews}
+                      thumbnails={thumbnails}
+                      imageError={imageError}
+                      isDragOver={isDragOver}
+                      t={t}
+                      onFileChange={handleFileChange}
+                      onRemoveMedia={handleRemoveMedia}
+                      onSetThumbnail={(tempId, file) =>
+                        setThumbnail(tempId, file)
+                      }
+                      onClearThumbnail={(tempId) => clearThumbnail(tempId)}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setIsDragOver(true);
+                      }}
+                      onDragLeave={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setIsDragOver(false);
+                      }}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setIsDragOver(false);
+                        handleFileChange(e.dataTransfer.files);
+                      }}
+                      lockedBy={remoteLock}
+                      onUpdateFile={updateFile}
+                      uploadProgress={uploadProgress}
+                      uploadErrors={uploadErrors}
+                    />
                   </div>
                 )}
 
@@ -422,41 +427,47 @@ export default function AddPublicationModal({
                   <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700">
                     <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
                     <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
-                      {t("publications.modal.add.socialAccountsSection") || "Redes Sociales"}
+                      {t("publications.modal.add.socialAccountsSection") ||
+                        "Redes Sociales"}
                     </h3>
                   </div>
 
                   <SocialAccountsSection
-                  publishingAccountIds={publishingAccountIds}
-                  publishedAccountIds={publishedAccountIds}
-                  socialAccounts={socialAccounts as any}
-                  selectedAccounts={watched.social_accounts || []}
-                  accountSchedules={accountSchedules}
-                  t={t}
-                  onAccountToggle={handleAccountToggle}
-                  onScheduleChange={(id, date) => {
-                    setAccountSchedules((prev) => ({ ...prev, [id]: date }));
-                    
-                    if (watched.use_global_schedule && date !== watched.scheduled_at) {
-                      setValue("use_global_schedule", false, { shouldDirty: true });
+                    publishingAccountIds={publishingAccountIds}
+                    publishedAccountIds={publishedAccountIds}
+                    socialAccounts={socialAccounts as any}
+                    selectedAccounts={watched.social_accounts || []}
+                    accountSchedules={accountSchedules}
+                    t={t}
+                    onAccountToggle={handleAccountToggle}
+                    onScheduleChange={(id, date) => {
+                      setAccountSchedules((prev) => ({ ...prev, [id]: date }));
+
+                      if (
+                        watched.use_global_schedule &&
+                        date !== watched.scheduled_at
+                      ) {
+                        setValue("use_global_schedule", false, {
+                          shouldDirty: true,
+                        });
+                      }
+                    }}
+                    onScheduleRemove={(id) => {
+                      setAccountSchedules((prev) => {
+                        const n = { ...prev };
+                        delete n[id];
+                        return n;
+                      });
+                    }}
+                    onPlatformSettingsClick={(platform) =>
+                      setActivePlatformSettings(platform)
                     }
-                  }}
-                  onScheduleRemove={(id) => {
-                    setAccountSchedules((prev) => {
-                      const n = { ...prev };
-                      delete n[id];
-                      return n;
-                    });
-                  }}
-                  onPlatformSettingsClick={(platform) =>
-                    setActivePlatformSettings(platform)
-                  }
-                  globalSchedule={watched.scheduled_at ?? undefined}
-                  error={errors.social_accounts?.message as string}
-                  socialPostLogs={publication?.social_post_logs}
-                  contentType={watched.content_type}
-                  disabled={!canManageAccounts}
-                />
+                    globalSchedule={watched.scheduled_at ?? undefined}
+                    error={errors.social_accounts?.message as string}
+                    socialPostLogs={publication?.social_post_logs}
+                    contentType={watched.content_type}
+                    disabled={!canManageAccounts}
+                  />
                 </div>
 
                 {/* ==================== SECCIÓN: PROGRAMACIÓN Y RECURRENCIA ==================== */}
@@ -464,54 +475,55 @@ export default function AddPublicationModal({
                   <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700">
                     <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
                     <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
-                      {t("publications.modal.add.scheduleSection") || "Programación"}
+                      {t("publications.modal.add.scheduleSection") ||
+                        "Programación"}
                     </h3>
                   </div>
 
                   <ScheduleSection
-                  scheduledAt={watched.scheduled_at ?? undefined}
-                  t={t}
-                  onScheduleChange={(date) => {
-                    let finalDate = date;
-                    if (!date && !watched.scheduled_at) {
-                      const defaultDate = new Date();
-                      defaultDate.setMinutes(defaultDate.getMinutes() + 2);
-                      finalDate = defaultDate.toISOString();
+                    scheduledAt={watched.scheduled_at ?? undefined}
+                    t={t}
+                    onScheduleChange={(date) => {
+                      let finalDate = date;
+                      if (!date && !watched.scheduled_at) {
+                        const defaultDate = new Date();
+                        defaultDate.setMinutes(defaultDate.getMinutes() + 2);
+                        finalDate = defaultDate.toISOString();
+                      }
+
+                      setValue("scheduled_at", finalDate);
+                    }}
+                    useGlobalSchedule={watched.use_global_schedule}
+                    onGlobalScheduleToggle={(val) =>
+                      setValue("use_global_schedule", val)
                     }
-                    
-                    setValue("scheduled_at", finalDate);
-                  }}
-                  useGlobalSchedule={watched.use_global_schedule}
-                  onGlobalScheduleToggle={(val) =>
-                    setValue("use_global_schedule", val)
-                  }
-                  onClearAccountSchedules={() => {
-                    setAccountSchedules({});
-                  }}
-                  error={errors.scheduled_at?.message as string}
-                  hasRecurrenceAccess={hasRecurrenceAccess}
-                  isRecurring={watched.is_recurring}
-                  recurrenceType={watched.recurrence_type as any}
-                  recurrenceInterval={watched.recurrence_interval}
-                  recurrenceDays={watched.recurrence_days}
-                  recurrenceEndDate={watched.recurrence_end_date ?? undefined}
-                  recurrenceAccounts={watched.recurrence_accounts}
-                  recurrenceDaysError={
-                    errors.recurrence_days?.message as string
-                  }
-                  onRecurrenceChange={(data) => {
-                    Object.entries(data).forEach(([key, val]) => {
-                      setValue(key as any, val, { 
-                        shouldValidate: true,
-                        shouldDirty: true,
-                        shouldTouch: true
+                    onClearAccountSchedules={() => {
+                      setAccountSchedules({});
+                    }}
+                    error={errors.scheduled_at?.message as string}
+                    hasRecurrenceAccess={hasRecurrenceAccess}
+                    isRecurring={watched.is_recurring}
+                    recurrenceType={watched.recurrence_type as any}
+                    recurrenceInterval={watched.recurrence_interval}
+                    recurrenceDays={watched.recurrence_days}
+                    recurrenceEndDate={watched.recurrence_end_date ?? undefined}
+                    recurrenceAccounts={watched.recurrence_accounts}
+                    recurrenceDaysError={
+                      errors.recurrence_days?.message as string
+                    }
+                    onRecurrenceChange={(data) => {
+                      Object.entries(data).forEach(([key, val]) => {
+                        setValue(key as any, val, {
+                          shouldValidate: true,
+                          shouldDirty: true,
+                          shouldTouch: true,
+                        });
                       });
-                    });
-                  }}
-                  selectedAccounts={selectedSocialAccounts}
-                  socialAccounts={socialAccounts}
-                  accountSchedules={accountSchedules}
-                />
+                    }}
+                    selectedAccounts={selectedSocialAccounts}
+                    socialAccounts={socialAccounts}
+                    accountSchedules={accountSchedules}
+                  />
                 </div>
               </div>
 
@@ -525,8 +537,12 @@ export default function AddPublicationModal({
                     options={poll_options}
                     duration={poll_duration_hours}
                     onChange={(data) => {
-                      setValue("poll_options", data.options, { shouldValidate: true });
-                      setValue("poll_duration_hours", data.duration, { shouldValidate: true });
+                      setValue("poll_options", data.options, {
+                        shouldValidate: true,
+                      });
+                      setValue("poll_duration_hours", data.duration, {
+                        shouldValidate: true,
+                      });
                     }}
                     t={t}
                     errors={{
@@ -542,33 +558,36 @@ export default function AddPublicationModal({
                     <div className="flex items-center gap-2">
                       <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
                       <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
-                        {t("publications.modal.add.contentSection") || "Contenido"}
+                        {t("publications.modal.add.contentSection") ||
+                          "Contenido"}
                       </h3>
                     </div>
                     <AiFieldSuggester
-                    type="publication"
-                    fields={{
-                      title: watched.title,
-                      description: watched.description,
-                      goal: watched.goal,
-                    }}
-                    onSuggest={(data) => {
-                      if (data.title)
-                        setValue("title", data.title, { shouldValidate: true });
-                      if (data.description)
-                        setValue("description", data.description, {
-                          shouldValidate: true,
-                        });
-                      if (data.goal)
-                        setValue("goal", data.goal, { shouldValidate: true });
-                      if (data.hashtags) {
-                        setValue("hashtags", data.hashtags, {
-                          shouldValidate: true,
-                        });
-                        handleHashtagChange(data.hashtags);
-                      }
-                    }}
-                  />
+                      type="publication"
+                      fields={{
+                        title: watched.title,
+                        description: watched.description,
+                        goal: watched.goal,
+                      }}
+                      onSuggest={(data) => {
+                        if (data.title)
+                          setValue("title", data.title, {
+                            shouldValidate: true,
+                          });
+                        if (data.description)
+                          setValue("description", data.description, {
+                            shouldValidate: true,
+                          });
+                        if (data.goal)
+                          setValue("goal", data.goal, { shouldValidate: true });
+                        if (data.hashtags) {
+                          setValue("hashtags", data.hashtags, {
+                            shouldValidate: true,
+                          });
+                          handleHashtagChange(data.hashtags);
+                        }
+                      }}
+                    />
                   </div>
 
                   {fieldVisibility.showTitle && (
@@ -578,7 +597,9 @@ export default function AddPublicationModal({
                       type="text"
                       register={register}
                       name="title"
-                      placeholder={t("publications.modal.add.placeholders.title")}
+                      placeholder={t(
+                        "publications.modal.add.placeholders.title",
+                      )}
                       error={errors.title?.message as string}
                       icon={FileText}
                       variant="filled"
@@ -588,71 +609,84 @@ export default function AddPublicationModal({
                     />
                   )}
 
-                <Textarea
-                  id="content-add-publication-description"
-                  label={t("publications.modal.add.description")}
-                  register={register}
-                  name="description"
-                  placeholder={t(
-                    "publications.modal.add.placeholders.description",
-                  )}
-                  error={errors.description?.message as string}
-                  icon={FileText}
-                  variant="filled"
-                  size="lg"
-                  rows={content_type === 'story' ? 3 : 6}
-                  maxLength={content_type === 'reel' ? 300 : content_type === 'story' ? 150 : content_type === 'poll' ? 280 : 700}
-                  required={fieldVisibility.showDescription}
-                  showCharCount
-                  hint={`Maximum ${content_type === 'reel' ? 300 : content_type === 'story' ? 150 : content_type === 'poll' ? 280 : 700} characters`}
-                />
-
-                {fieldVisibility.showGoal && (
-                  <Input
-                    id="content-add-publication-goal"
-                    label={t("publications.modal.add.goal")}
-                    type="text"
+                  <Textarea
+                    id="content-add-publication-description"
+                    label={t("publications.modal.add.description")}
                     register={register}
-                    name="goal"
-                    placeholder={t("publications.modal.add.placeholders.goal")}
-                    error={errors.goal?.message as string}
-                    icon={Target}
-                    variant="filled"
-                    required
-                    sizeType="lg"
-                    hint={`${watched.goal?.length || 0}/200 characters`}
-                  />
-                )}
-
-                {fieldVisibility.showHashtags && (
-                  <Input
-                    id="content-add-publication-hashtags"
-                    label={t("publications.modal.add.hashtags")}
-                    type="text"
-                    register={register}
-                    name="hashtags"
+                    name="description"
                     placeholder={t(
-                      "publications.modal.add.placeholders.hashtags",
+                      "publications.modal.add.placeholders.description",
                     )}
-                    error={errors.hashtags?.message as string}
-                    onChange={(e) => handleHashtagChange(e.target.value)}
-                    icon={Hash}
+                    error={errors.description?.message as string}
+                    icon={FileText}
                     variant="filled"
-                    required={content_type === 'post' || content_type === 'reel'}
-                    sizeType="lg"
-                    hint={`${
-                      watched.hashtags
-                        ? typeof watched.hashtags === "string"
-                          ? watched.hashtags
-                              .split(" ")
-                              .filter((tag: string) => tag.startsWith("#")).length
-                          : Array.isArray(watched.hashtags)
-                            ? (watched.hashtags as any).length
-                            : 0
-                        : 0
-                    }/10 hashtags`}
+                    size="lg"
+                    rows={content_type === "story" ? 3 : 6}
+                    maxLength={
+                      content_type === "reel"
+                        ? 300
+                        : content_type === "story"
+                          ? 150
+                          : content_type === "poll"
+                            ? 280
+                            : 700
+                    }
+                    required={fieldVisibility.showDescription}
+                    showCharCount
+                    hint={`Maximum ${content_type === "reel" ? 300 : content_type === "story" ? 150 : content_type === "poll" ? 280 : 700} characters`}
                   />
-                )}
+
+                  {fieldVisibility.showGoal && (
+                    <Input
+                      id="content-add-publication-goal"
+                      label={t("publications.modal.add.goal")}
+                      type="text"
+                      register={register}
+                      name="goal"
+                      placeholder={t(
+                        "publications.modal.add.placeholders.goal",
+                      )}
+                      error={errors.goal?.message as string}
+                      icon={Target}
+                      variant="filled"
+                      required
+                      sizeType="lg"
+                      hint={`${watched.goal?.length || 0}/200 characters`}
+                    />
+                  )}
+
+                  {fieldVisibility.showHashtags && (
+                    <Input
+                      id="content-add-publication-hashtags"
+                      label={t("publications.modal.add.hashtags")}
+                      type="text"
+                      register={register}
+                      name="hashtags"
+                      placeholder={t(
+                        "publications.modal.add.placeholders.hashtags",
+                      )}
+                      error={errors.hashtags?.message as string}
+                      onChange={(e) => handleHashtagChange(e.target.value)}
+                      icon={Hash}
+                      variant="filled"
+                      required={
+                        content_type === "post" || content_type === "reel"
+                      }
+                      sizeType="lg"
+                      hint={`${
+                        watched.hashtags
+                          ? typeof watched.hashtags === "string"
+                            ? watched.hashtags
+                                .split(" ")
+                                .filter((tag: string) => tag.startsWith("#"))
+                                .length
+                            : Array.isArray(watched.hashtags)
+                              ? (watched.hashtags as any).length
+                              : 0
+                          : 0
+                      }/10 hashtags`}
+                    />
+                  )}
                 </div>
 
                 {/* ==================== SECCIÓN: CAMPAÑA ==================== */}

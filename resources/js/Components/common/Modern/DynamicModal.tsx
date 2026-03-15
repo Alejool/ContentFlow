@@ -57,7 +57,7 @@ export const DynamicModal = ({
     if (isOpen && dialogPanelRef.current) {
       // Trap focus when modal opens
       const cleanup = FocusManager.trapFocus(dialogPanelRef.current);
-      
+
       // Restore focus when modal closes
       return () => {
         cleanup();

@@ -30,16 +30,16 @@ export const useLocalization = () => {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
-            "X-CSRF-TOKEN": document
-              .querySelector('meta[name="csrf-token"]')
-              ?.getAttribute("content") || "",
+            "X-CSRF-TOKEN":
+              document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content") || "",
           },
           body: JSON.stringify({ locale: lng }),
         });
-      } catch (error) {
-        }
+      } catch (error) {}
     },
-    [i18n]
+    [i18n],
   );
 
   // Funciones de formateo con el idioma actual
@@ -61,7 +61,7 @@ export const useLocalization = () => {
       plural: (count: number, singular: string, plural?: string) =>
         pluralize(count, singular, plural, currentLanguage),
     }),
-    [currentLanguage]
+    [currentLanguage],
   );
 
   return {

@@ -122,8 +122,8 @@ function CampaignOptions({ campaigns, theme }: CampaignOptionsProps) {
                           ? "bg-green-900/30 text-green-400"
                           : "bg-green-100 text-green-700"
                         : theme === "dark"
-                        ? "bg-yellow-900/30 text-yellow-400"
-                        : "bg-yellow-100 text-yellow-700"
+                          ? "bg-yellow-900/30 text-yellow-400"
+                          : "bg-yellow-100 text-yellow-700"
                     }`}
                   >
                     {campaign.status}

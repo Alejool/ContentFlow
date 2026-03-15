@@ -22,7 +22,7 @@ interface Position {
 
 /**
  * TourOverlay displays the guided tour with step-by-step highlights and explanations.
- * 
+ *
  * Features:
  * - Spotlight effect for target elements
  * - Explanation card with title and description
@@ -38,17 +38,23 @@ export default function TourOverlay({
   onComplete,
 }: TourOverlayProps) {
   const { t } = useTranslation();
-  const { navigateToTourStep, enableTourNavigation, isNavigating: navIsNavigating } = useOnboardingNavigation();
+  const {
+    navigateToTourStep,
+    enableTourNavigation,
+    isNavigating: navIsNavigating,
+  } = useOnboardingNavigation();
   const [targetPosition, setTargetPosition] = useState<Position | null>(null);
-  const [cardPosition, setCardPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
+  const [cardPosition, setCardPosition] = useState<{
+    top: number;
+    left: number;
+  }>({ top: 0, left: 0 });
   const [shouldNavigate, setShouldNavigate] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false); // Prevent multiple calls
   const cardRef = useRef<HTMLDivElement>(null);
   const isLastStep = currentStep.id === `step-${totalSteps}`;
 
   // Debug: Log step information
-  useEffect(() => {
-    }, [currentStep.id, totalSteps, isLastStep]);
+  useEffect(() => {}, [currentStep.id, totalSteps, isLastStep]);
 
   // Enable tour navigation on mount
   useEffect(() => {
@@ -91,7 +97,9 @@ export default function TourOverlay({
     // Try to check if target exists without throwing error
     let targetExists = false;
     try {
-      const selectors = currentStep.targetSelector.split(',').map(s => s.trim());
+      const selectors = currentStep.targetSelector
+        .split(",")
+        .map((s) => s.trim());
       for (const selector of selectors) {
         try {
           if (document.querySelector(selector)) {
@@ -110,18 +118,25 @@ export default function TourOverlay({
   // Calculate target element position
   const calculateTargetPosition = useCallback(() => {
     const isMobile = window.innerWidth < 1024; // lg breakpoint
-    
+
     // Try multiple selectors (comma-separated)
-    const selectors = currentStep.targetSelector.split(',').map(s => s.trim());
+    const selectors = currentStep.targetSelector
+      .split(",")
+      .map((s) => s.trim());
     let targetElement: Element | null = null;
-    
+
     for (const selector of selectors) {
       try {
         // For mobile on step-2, we want to target the mobile menu dropdown, not the navbar
-        if (isMobile && currentStep.id === 'step-2') {
+        if (isMobile && currentStep.id === "step-2") {
           // Look for the mobile menu dropdown content
-          const mobileMenuDropdown = document.querySelector('nav.lg\\:hidden > div:last-child');
-          if (mobileMenuDropdown && !mobileMenuDropdown.classList.contains('hidden')) {
+          const mobileMenuDropdown = document.querySelector(
+            "nav.lg\\:hidden > div:last-child",
+          );
+          if (
+            mobileMenuDropdown &&
+            !mobileMenuDropdown.classList.contains("hidden")
+          ) {
             // Menu is open, target the dropdown content
             targetElement = mobileMenuDropdown;
             break;
@@ -129,14 +144,21 @@ export default function TourOverlay({
           // If menu is not open, we'll handle opening it in the useEffect
           continue;
         }
-        
+
         // For mobile on step-4 (Calendar), look for the Calendar link in the mobile menu
-        if (isMobile && currentStep.id === 'step-4') {
+        if (isMobile && currentStep.id === "step-4") {
           // First check if mobile menu is open
-          const mobileMenuDropdown = document.querySelector('nav.lg\\:hidden > div:last-child');
-          if (mobileMenuDropdown && !mobileMenuDropdown.classList.contains('hidden')) {
+          const mobileMenuDropdown = document.querySelector(
+            "nav.lg\\:hidden > div:last-child",
+          );
+          if (
+            mobileMenuDropdown &&
+            !mobileMenuDropdown.classList.contains("hidden")
+          ) {
             // Menu is open, look for Calendar link inside it
-            const calendarLink = mobileMenuDropdown.querySelector('a[href*="/calendar"]');
+            const calendarLink = mobileMenuDropdown.querySelector(
+              'a[href*="/calendar"]',
+            );
             if (calendarLink) {
               targetElement = calendarLink;
               break;
@@ -145,14 +167,21 @@ export default function TourOverlay({
           // If menu is not open, we'll handle opening it in the useEffect
           continue;
         }
-        
+
         // For mobile on step-5 (Analytics), look for the Analytics link in the mobile menu
-        if (isMobile && currentStep.id === 'step-5') {
+        if (isMobile && currentStep.id === "step-5") {
           // First check if mobile menu is open
-          const mobileMenuDropdown = document.querySelector('nav.lg\\:hidden > div:last-child');
-          if (mobileMenuDropdown && !mobileMenuDropdown.classList.contains('hidden')) {
+          const mobileMenuDropdown = document.querySelector(
+            "nav.lg\\:hidden > div:last-child",
+          );
+          if (
+            mobileMenuDropdown &&
+            !mobileMenuDropdown.classList.contains("hidden")
+          ) {
             // Menu is open, look for Analytics link inside it
-            const analyticsLink = mobileMenuDropdown.querySelector('a[href*="/analytics"]');
+            const analyticsLink = mobileMenuDropdown.querySelector(
+              'a[href*="/analytics"]',
+            );
             if (analyticsLink) {
               targetElement = analyticsLink;
               break;
@@ -161,20 +190,23 @@ export default function TourOverlay({
           // If menu is not open, we'll handle opening it in the useEffect
           continue;
         }
-        
+
         // For mobile, skip sidebar selectors
-        if (isMobile && (selector.includes('aside') || selector.includes('lg\\:block'))) {
+        if (
+          isMobile &&
+          (selector.includes("aside") || selector.includes("lg\\:block"))
+        ) {
           continue;
         }
-        
+
         targetElement = document.querySelector(selector);
-        
+
         if (targetElement) break;
       } catch (error) {
         continue;
       }
     }
-    
+
     if (!targetElement) {
       // Element not found - check if we need to navigate
       return null;
@@ -192,57 +224,60 @@ export default function TourOverlay({
   }, [currentStep]);
 
   // Calculate explanation card position relative to target
-  const calculateCardPosition = useCallback((targetPos: Position) => {
-    if (!cardRef.current) return { top: 0, left: 0 };
+  const calculateCardPosition = useCallback(
+    (targetPos: Position) => {
+      if (!cardRef.current) return { top: 0, left: 0 };
 
-    const cardRect = cardRef.current.getBoundingClientRect();
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-    const spacing = 16;
-    const isMobile = viewportWidth < 768;
+      const cardRect = cardRef.current.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const spacing = 16;
+      const isMobile = viewportWidth < 768;
 
-    let top = 0;
-    let left = 0;
+      let top = 0;
+      let left = 0;
 
-    // Mobile responsive: always position card at bottom on small screens (Requirement 7.1, 7.2)
-    if (isMobile) {
-      top = viewportHeight - cardRect.height - spacing;
-      left = spacing;
+      // Mobile responsive: always position card at bottom on small screens (Requirement 7.1, 7.2)
+      if (isMobile) {
+        top = viewportHeight - cardRect.height - spacing;
+        left = spacing;
+        return { top, left };
+      }
+
+      // Desktop: Determine position based on currentStep.position and available space
+      switch (currentStep.position) {
+        case "top":
+          top = targetPos.top - cardRect.height - spacing;
+          left = targetPos.left + targetPos.width / 2 - cardRect.width / 2;
+          break;
+        case "bottom":
+          top = targetPos.top + targetPos.height + spacing;
+          left = targetPos.left + targetPos.width / 2 - cardRect.width / 2;
+          break;
+        case "left":
+          top = targetPos.top + targetPos.height / 2 - cardRect.height / 2;
+          left = targetPos.left - cardRect.width - spacing;
+          break;
+        case "right":
+          top = targetPos.top + targetPos.height / 2 - cardRect.height / 2;
+          left = targetPos.left + targetPos.width + spacing;
+          break;
+      }
+
+      // Adjust for viewport boundaries
+      if (left < spacing) left = spacing;
+      if (left + cardRect.width > viewportWidth - spacing) {
+        left = viewportWidth - cardRect.width - spacing;
+      }
+      if (top < spacing) top = spacing;
+      if (top + cardRect.height > viewportHeight - spacing) {
+        top = viewportHeight - cardRect.height - spacing;
+      }
+
       return { top, left };
-    }
-
-    // Desktop: Determine position based on currentStep.position and available space
-    switch (currentStep.position) {
-      case "top":
-        top = targetPos.top - cardRect.height - spacing;
-        left = targetPos.left + targetPos.width / 2 - cardRect.width / 2;
-        break;
-      case "bottom":
-        top = targetPos.top + targetPos.height + spacing;
-        left = targetPos.left + targetPos.width / 2 - cardRect.width / 2;
-        break;
-      case "left":
-        top = targetPos.top + targetPos.height / 2 - cardRect.height / 2;
-        left = targetPos.left - cardRect.width - spacing;
-        break;
-      case "right":
-        top = targetPos.top + targetPos.height / 2 - cardRect.height / 2;
-        left = targetPos.left + targetPos.width + spacing;
-        break;
-    }
-
-    // Adjust for viewport boundaries
-    if (left < spacing) left = spacing;
-    if (left + cardRect.width > viewportWidth - spacing) {
-      left = viewportWidth - cardRect.width - spacing;
-    }
-    if (top < spacing) top = spacing;
-    if (top + cardRect.height > viewportHeight - spacing) {
-      top = viewportHeight - cardRect.height - spacing;
-    }
-
-    return { top, left };
-  }, [currentStep.position]);
+    },
+    [currentStep.position],
+  );
 
   // Update positions on mount and when step changes
   useEffect(() => {
@@ -250,23 +285,36 @@ export default function TourOverlay({
       const isMobile = window.innerWidth < 1024;
       const stepRoute = (currentStep as any).route;
       const currentPath = window.location.pathname;
-      
+
       // Check if we need to navigate first
       if (stepRoute && currentPath !== stepRoute) {
         setShouldNavigate(true);
         return;
       }
-      
+
       // Special handling for step-2, step-4, and step-5 on mobile: open mobile menu if closed
-      if ((currentStep.id === 'step-2' || currentStep.id === 'step-4' || currentStep.id === 'step-5') && isMobile) {
-        const mobileMenuButton = document.querySelector('nav.lg\\:hidden button');
-        const mobileMenuContent = document.querySelector('nav.lg\\:hidden > div:last-child');
-      
+      if (
+        (currentStep.id === "step-2" ||
+          currentStep.id === "step-4" ||
+          currentStep.id === "step-5") &&
+        isMobile
+      ) {
+        const mobileMenuButton = document.querySelector(
+          "nav.lg\\:hidden button",
+        );
+        const mobileMenuContent = document.querySelector(
+          "nav.lg\\:hidden > div:last-child",
+        );
+
         // Check if menu is closed (hidden class)
-        if (mobileMenuButton && mobileMenuContent && mobileMenuContent.classList.contains('hidden')) {
+        if (
+          mobileMenuButton &&
+          mobileMenuContent &&
+          mobileMenuContent.classList.contains("hidden")
+        ) {
           // Click the button to open the menu
           (mobileMenuButton as HTMLButtonElement).click();
-          
+
           // Wait for menu to open and animate before calculating position
           setTimeout(() => {
             const targetPos = calculateTargetPosition();
@@ -286,7 +334,7 @@ export default function TourOverlay({
           return;
         }
       }
-      
+
       // Try to find the target element
       const targetPos = calculateTargetPosition();
       if (targetPos) {
@@ -361,7 +409,7 @@ export default function TourOverlay({
           <div className="flex items-center gap-3">
             <div className="w-6 h-6 border-3 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
             <p className="text-gray-700 dark:text-gray-300">
-              {t('tour.navigating', 'Navigating to next section...')}
+              {t("tour.navigating", "Navigating to next section...")}
             </p>
           </div>
         </div>
@@ -372,9 +420,13 @@ export default function TourOverlay({
   // If no target position, show card without spotlight
   if (!targetPosition) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        role="dialog"
+        aria-modal="true"
+      >
         <div className="absolute inset-0 bg-black/60" aria-hidden="true" />
-        
+
         <div
           ref={cardRef}
           className="relative bg-white dark:bg-neutral-800 rounded-lg shadow-2xl w-full max-w-md"
@@ -384,11 +436,17 @@ export default function TourOverlay({
           <div className="px-6 py-4 border-b border-gray-200 dark:border-neutral-700">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
-                <h3 id="tour-title" className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h3
+                  id="tour-title"
+                  className="text-lg font-semibold text-gray-900 dark:text-white"
+                >
                   {currentStep.title}
                 </h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  {t('tour.step', { current: currentStep.id.split("-")[1] || 1, total: totalSteps })}
+                  {t("tour.step", {
+                    current: currentStep.id.split("-")[1] || 1,
+                    total: totalSteps,
+                  })}
                 </p>
               </div>
               <button
@@ -396,7 +454,7 @@ export default function TourOverlay({
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 
                          transition-colors p-2 rounded-md hover:bg-gray-100 
                          dark:hover:bg-neutral-700 min-w-[44px] min-h-[44px] flex items-center justify-center"
-                aria-label={t('tour.close')}
+                aria-label={t("tour.close")}
               >
                 <X size={20} />
               </button>
@@ -405,7 +463,10 @@ export default function TourOverlay({
 
           {/* Content */}
           <div className="px-6 py-4">
-            <p id="tour-description" className="text-gray-700 dark:text-gray-300 leading-relaxed">
+            <p
+              id="tour-description"
+              className="text-gray-700 dark:text-gray-300 leading-relaxed"
+            >
               {currentStep.description}
             </p>
           </div>
@@ -435,7 +496,7 @@ export default function TourOverlay({
                   iconPosition="left"
                   className="text-gray-600 dark:text-gray-400 w-full md:w-auto justify-center"
                 >
-                  {t('tour.skipTour')}
+                  {t("tour.skipTour")}
                 </Button>
                 <Button
                   variant="primary"
@@ -445,7 +506,7 @@ export default function TourOverlay({
                   iconPosition="right"
                   className="w-full md:w-auto justify-center"
                 >
-                  {isLastStep ? t('tour.complete') : t('tour.next')}
+                  {isLastStep ? t("tour.complete") : t("tour.next")}
                 </Button>
               </div>
             </div>
@@ -456,9 +517,18 @@ export default function TourOverlay({
   }
 
   return (
-    <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-labelledby="tour-title" aria-describedby="tour-description">
+    <div
+      className="fixed inset-0 z-50"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="tour-title"
+      aria-describedby="tour-description"
+    >
       {/* Backdrop with spotlight effect */}
-      <div className="absolute inset-0 bg-black/60 transition-opacity duration-300" aria-hidden="true">
+      <div
+        className="absolute inset-0 bg-black/60 transition-opacity duration-300"
+        aria-hidden="true"
+      >
         {/* Spotlight cutout using box-shadow */}
         <div
           className="absolute transition-all duration-300"
@@ -491,11 +561,23 @@ export default function TourOverlay({
         <div className="px-6 py-4 border-b border-gray-200 dark:border-neutral-700">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
-              <h3 id="tour-title" className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h3
+                id="tour-title"
+                className="text-lg font-semibold text-gray-900 dark:text-white"
+              >
                 {currentStep.title}
               </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1" aria-label={t('tour.step', { current: currentStep.id.split("-")[1] || 1, total: totalSteps })}>
-                {t('tour.step', { current: currentStep.id.split("-")[1] || 1, total: totalSteps })}
+              <p
+                className="text-sm text-gray-500 dark:text-gray-400 mt-1"
+                aria-label={t("tour.step", {
+                  current: currentStep.id.split("-")[1] || 1,
+                  total: totalSteps,
+                })}
+              >
+                {t("tour.step", {
+                  current: currentStep.id.split("-")[1] || 1,
+                  total: totalSteps,
+                })}
               </p>
             </div>
             <button
@@ -503,7 +585,7 @@ export default function TourOverlay({
               className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 
                        transition-colors p-2 rounded-md hover:bg-gray-100 
                        dark:hover:bg-neutral-700 min-w-[44px] min-h-[44px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-              aria-label={t('tour.close')}
+              aria-label={t("tour.close")}
             >
               <X size={20} />
             </button>
@@ -512,18 +594,30 @@ export default function TourOverlay({
 
         {/* Content */}
         <div className="px-6 py-4">
-          <p id="tour-description" className="text-gray-700 dark:text-gray-300 leading-relaxed">
+          <p
+            id="tour-description"
+            className="text-gray-700 dark:text-gray-300 leading-relaxed"
+          >
             {currentStep.description}
           </p>
         </div>
 
         {/* Footer with actions - Responsive layout (Requirement 7.1) */}
-        <div className="px-4 md:px-6 py-4 bg-gray-50 dark:bg-neutral-900/50 
+        <div
+          className="px-4 md:px-6 py-4 bg-gray-50 dark:bg-neutral-900/50 
                        border-t border-gray-200 dark:border-neutral-700 
-                       rounded-b-lg">
+                       rounded-b-lg"
+        >
           <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
             {/* Progress indicator */}
-            <div className="flex gap-1.5 justify-center md:justify-start" role="progressbar" aria-valuenow={parseInt(currentStep.id.split("-")[1] || "1")} aria-valuemin={1} aria-valuemax={totalSteps} aria-label={t('tour.progress')}>
+            <div
+              className="flex gap-1.5 justify-center md:justify-start"
+              role="progressbar"
+              aria-valuenow={parseInt(currentStep.id.split("-")[1] || "1")}
+              aria-valuemin={1}
+              aria-valuemax={totalSteps}
+              aria-label={t("tour.progress")}
+            >
               {Array.from({ length: totalSteps }).map((_, index) => (
                 <div
                   key={index}
@@ -538,7 +632,11 @@ export default function TourOverlay({
             </div>
 
             {/* Action buttons - Stack on mobile */}
-            <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto" role="group" aria-label={t('tour.title')}>
+            <div
+              className="flex flex-col md:flex-row gap-2 w-full md:w-auto"
+              role="group"
+              aria-label={t("tour.title")}
+            >
               <Button
                 variant="ghost"
                 size="sm"
@@ -546,9 +644,9 @@ export default function TourOverlay({
                 icon={SkipForward}
                 iconPosition="left"
                 className="text-gray-600 dark:text-gray-400 w-full md:w-auto justify-center"
-                aria-label={t('tour.skipGuidedTour')}
+                aria-label={t("tour.skipGuidedTour")}
               >
-                {t('tour.skipTour')}
+                {t("tour.skipTour")}
               </Button>
               <Button
                 variant="primary"
@@ -557,9 +655,11 @@ export default function TourOverlay({
                 icon={ChevronRight}
                 iconPosition="right"
                 className="w-full md:w-auto justify-center"
-                aria-label={isLastStep ? t('tour.completeTour') : t('tour.nextStep')}
+                aria-label={
+                  isLastStep ? t("tour.completeTour") : t("tour.nextStep")
+                }
               >
-                {isLastStep ? t('tour.complete') : t('tour.next')}
+                {isLastStep ? t("tour.complete") : t("tour.next")}
               </Button>
             </div>
           </div>

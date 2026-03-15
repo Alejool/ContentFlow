@@ -6,13 +6,7 @@ import { z } from "zod";
 
 import Button from "@/Components/common/Modern/Button";
 import Input from "@/Components/common/Modern/Input";
-import {
-  AlertCircle,
-  CheckCircle2,
-  Copy,
-  Key,
-  Shield,
-} from "lucide-react";
+import { AlertCircle, CheckCircle2, Copy, Key, Shield } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { QRCodeSVG } from "qrcode.react";
@@ -63,7 +57,11 @@ export default function Setup({ qrCodeUrl, secret, backupCodes }: SetupProps) {
     });
   };
 
-  const copyToClipboard = (text: string, type: "secret" | "backup", index?: number) => {
+  const copyToClipboard = (
+    text: string,
+    type: "secret" | "backup",
+    index?: number,
+  ) => {
     navigator.clipboard.writeText(text);
     if (type === "secret") {
       setCopiedSecret(true);
@@ -116,14 +114,14 @@ export default function Setup({ qrCodeUrl, secret, backupCodes }: SetupProps) {
                 {t("twoFactor.setup.step1.description")}
               </p>
               <div className="flex justify-center mb-4 p-4 bg-white rounded-lg">
-                <QRCodeSVG 
-                  value={qrCodeUrl} 
+                <QRCodeSVG
+                  value={qrCodeUrl}
                   size={192}
                   level="H"
                   includeMargin={true}
                 />
               </div>
-              
+
               {/* Manual Entry */}
               <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
                 <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
@@ -140,7 +138,9 @@ export default function Setup({ qrCodeUrl, secret, backupCodes }: SetupProps) {
                     onClick={() => copyToClipboard(secret, "secret")}
                     icon={copiedSecret ? CheckCircle2 : Copy}
                   >
-                    {copiedSecret ? t("twoFactor.setup.copied") : t("twoFactor.setup.copy")}
+                    {copiedSecret
+                      ? t("twoFactor.setup.copied")
+                      : t("twoFactor.setup.copy")}
                   </Button>
                 </div>
               </div>
@@ -164,7 +164,7 @@ export default function Setup({ qrCodeUrl, secret, backupCodes }: SetupProps) {
                   </div>
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-2">
                 {backupCodes.map((code, index) => (
                   <div key={index} className="flex items-center gap-2">
@@ -188,14 +188,17 @@ export default function Setup({ qrCodeUrl, secret, backupCodes }: SetupProps) {
             </div>
 
             {/* Verification Form */}
-            <form onSubmit={handleSubmit(onSubmit)} className="rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6">
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6"
+            >
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                 {t("twoFactor.setup.step3.title")}
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 {t("twoFactor.setup.step3.description")}
               </p>
-              
+
               <div className="mb-4">
                 <Input
                   id="verification_code"

@@ -21,16 +21,12 @@ export default function HeaderSection({
     <div className="p-6 border-b border-gray-100 dark:border-neutral-700/50">
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
         <div>
-          <h2
-            className="text-2xl font-bold text-gray-900 dark:text-white"
-          >
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
             {mode === "campaigns"
               ? t("campaigns.title") || "Campaign Groups"
               : t("publications.title") || "Your Publications"}
           </h2>
-          <p
-            className="text-sm mt-1 text-gray-500 dark:text-gray-400"
-          >
+          <p className="text-sm mt-1 text-gray-500 dark:text-gray-400">
             {mode === "campaigns"
               ? t("campaigns.subtitle") || "Campaign Groups"
               : t("publications.subtitle") || "Your Publications"}
@@ -39,10 +35,11 @@ export default function HeaderSection({
         <div className="flex gap-2">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`p-2 rounded-lg transition-colors ${showFilters
+            className={`p-2 rounded-lg transition-colors ${
+              showFilters
                 ? "bg-primary-500 text-white"
                 : "hover:bg-gray-100 dark:hover:bg-neutral-700"
-              }`}
+            }`}
             title={
               mode === "campaigns"
                 ? t("campaigns.filters.title") || "Campaign Filters"

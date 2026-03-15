@@ -1,12 +1,12 @@
-import Modal from '@/Components/common/ui/Modal';
-import { Publication, SocialAccount } from '@/types/Publication';
-import { useEffect } from 'react';
-import PlatformSelector from './PlatformSelector';
-import PublishActions from './PublishActions';
-import ScheduleSettings from './ScheduleSettings';
-import ValidationPanel from './ValidationPanel';
-import { usePublishModal } from './hooks/usePublishModal';
-import { usePublishValidation } from './hooks/usePublishValidation';
+import Modal from "@/Components/common/ui/Modal";
+import { Publication, SocialAccount } from "@/types/Publication";
+import { useEffect } from "react";
+import PlatformSelector from "./PlatformSelector";
+import PublishActions from "./PublishActions";
+import ScheduleSettings from "./ScheduleSettings";
+import ValidationPanel from "./ValidationPanel";
+import { usePublishModal } from "./hooks/usePublishModal";
+import { usePublishValidation } from "./hooks/usePublishValidation";
 
 interface PublishModalProps {
   show: boolean;
@@ -34,7 +34,7 @@ export default function PublishModal({
     resetState,
     publish,
     requestReview,
-    publishAnyway
+    publishAnyway,
   } = usePublishModal(publication, onPublished, onClose);
 
   const {
@@ -43,7 +43,7 @@ export default function PublishModal({
     isValidating,
     hasBlockingErrors,
     hasWarnings,
-    canPublish
+    canPublish,
   } = usePublishValidation(publication, selectedPlatforms);
 
   useEffect(() => {

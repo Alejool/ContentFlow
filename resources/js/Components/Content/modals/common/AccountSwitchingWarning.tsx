@@ -23,7 +23,7 @@ interface AccountSwitchingWarningProps {
 /**
  * Component to display warnings when content is published on a different account
  * than the currently connected one.
- * 
+ *
  * This addresses the issue where users switch between accounts of the same platform
  * and need to understand which account has the published content.
  */
@@ -35,7 +35,8 @@ export default function AccountSwitchingWarning({
 }: AccountSwitchingWarningProps) {
   // Find all published statuses for this platform
   const platformStatuses = Object.entries(platformStatus).filter(
-    ([_, status]) => status.platform === platform && status.status === "published"
+    ([_, status]) =>
+      status.platform === platform && status.status === "published",
   );
 
   if (platformStatuses.length === 0) {
@@ -44,11 +45,11 @@ export default function AccountSwitchingWarning({
 
   // Check if any published content is on a different account
   const otherAccountPublications = platformStatuses.filter(
-    ([accountId, _]) => parseInt(accountId) !== currentAccountId
+    ([accountId, _]) => parseInt(accountId) !== currentAccountId,
   );
 
   const currentAccountPublication = platformStatuses.find(
-    ([accountId, _]) => parseInt(accountId) === currentAccountId
+    ([accountId, _]) => parseInt(accountId) === currentAccountId,
   );
 
   return (

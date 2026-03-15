@@ -1,5 +1,3 @@
-
-
 export interface SocialAccount {
   id: number;
   platform: string;
@@ -16,5 +14,3 @@ export interface SocialAccount {
     name: string;
   };
 }
-
-

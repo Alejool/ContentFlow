@@ -34,7 +34,11 @@ export const TikTokPreview = memo(
               autoPlay
             />
           ) : imageUrl ? (
-            <img src={imageUrl} className="w-full h-full object-cover" alt="TikTok video thumbnail" />
+            <img
+              src={imageUrl}
+              className="w-full h-full object-cover"
+              alt="TikTok video thumbnail"
+            />
           ) : (
             <div className="text-white/20 text-xs text-center px-8">
               TikTok is primarily a video platform. Upload a video for the best

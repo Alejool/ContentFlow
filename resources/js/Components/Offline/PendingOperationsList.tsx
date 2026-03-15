@@ -1,27 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import { useOffline } from '@/Hooks/useOffline';
-import type { QueuedOperation } from '@/types/optimistic';
-import { 
-  RefreshCw, 
-  Trash2, 
-  Clock, 
+import React, { useEffect, useState } from "react";
+import { useOffline } from "@/Hooks/useOffline";
+import type { QueuedOperation } from "@/types/optimistic";
+import {
+  RefreshCw,
+  Trash2,
+  Clock,
   AlertCircle,
   CheckCircle,
   Loader2,
   FileText,
   Image as ImageIcon,
   Video,
-  Calendar
-} from 'lucide-react';
+  Calendar,
+} from "lucide-react";
 
 /**
  * PendingOperationsList Component
- * 
+ *
  * Displays a list of pending operations with:
  * - Operation status (queued, syncing, failed)
  * - Retry and discard actions
  * - Visual feedback for each operation
- * 
+ *
  * Requirements: 6.5
  */
 export const PendingOperationsList: React.FC = () => {
@@ -33,10 +33,10 @@ export const PendingOperationsList: React.FC = () => {
   // Load operations on mount and refresh periodically
   useEffect(() => {
     loadOperations();
-    
+
     // Refresh every 2 seconds to show sync progress
     const interval = setInterval(loadOperations, 2000);
-    
+
     return () => clearInterval(interval);
   }, []);
 
@@ -45,7 +45,7 @@ export const PendingOperationsList: React.FC = () => {
       const ops = await getQueuedOperations();
       setOperations(ops);
     } catch (error) {
-      } finally {
+    } finally {
       setIsLoading(false);
     }
   };
@@ -60,7 +60,7 @@ export const PendingOperationsList: React.FC = () => {
       await syncNow();
       await loadOperations();
     } catch (error) {
-      } finally {
+    } finally {
       setRetryingId(null);
     }
   };
@@ -69,52 +69,51 @@ export const PendingOperationsList: React.FC = () => {
     try {
       await clearFailed();
       await loadOperations();
-    } catch (error) {
-      }
+    } catch (error) {}
   };
 
   const getResourceIcon = (resource: string) => {
     switch (resource.toLowerCase()) {
-      case 'posts':
-      case 'publications':
+      case "posts":
+      case "publications":
         return <FileText className="h-4 w-4" />;
-      case 'images':
+      case "images":
         return <ImageIcon className="h-4 w-4" />;
-      case 'videos':
-      case 'reels':
+      case "videos":
+      case "reels":
         return <Video className="h-4 w-4" />;
-      case 'calendar':
-      case 'events':
+      case "calendar":
+      case "events":
         return <Calendar className="h-4 w-4" />;
       default:
         return <FileText className="h-4 w-4" />;
     }
   };
 
-  const getStatusBadge = (status: QueuedOperation['status']) => {
+  const getStatusBadge = (status: QueuedOperation["status"]) => {
     switch (status) {
-      case 'queued':
+      case "queued":
         return (
           <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
             <Clock className="h-3 w-3" />
             Queued
           </span>
         );
-      case 'syncing':
+      case "syncing":
         return (
           <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
             <Loader2 className="h-3 w-3 animate-spin" />
             Syncing
           </span>
         );
-      case 'failed':
+      case "failed":
         return (
           <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
             <AlertCircle className="h-3 w-3" />
             Failed
           </span>
         );
-      case 'completed':
+      case "completed":
         return (
           <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
             <CheckCircle className="h-3 w-3" />
@@ -129,13 +128,13 @@ export const PendingOperationsList: React.FC = () => {
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
-    
-    if (diffMins < 1) return 'Just now';
+
+    if (diffMins < 1) return "Just now";
     if (diffMins < 60) return `${diffMins}m ago`;
-    
+
     const diffHours = Math.floor(diffMins / 60);
     if (diffHours < 24) return `${diffHours}h ago`;
-    
+
     return date.toLocaleDateString();
   };
 
@@ -161,7 +160,7 @@ export const PendingOperationsList: React.FC = () => {
     );
   }
 
-  const failedOps = operations.filter(op => op.status === 'failed');
+  const failedOps = operations.filter((op) => op.status === "failed");
 
   return (
     <div className="space-y-4">
@@ -169,7 +168,8 @@ export const PendingOperationsList: React.FC = () => {
       {failedOps.length > 0 && (
         <div className="flex items-center justify-between pb-3 border-b border-gray-200 dark:border-gray-700">
           <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            {failedOps.length} failed operation{failedOps.length !== 1 ? 's' : ''}
+            {failedOps.length} failed operation
+            {failedOps.length !== 1 ? "s" : ""}
           </p>
           <button
             onClick={handleClearFailed}
@@ -197,7 +197,8 @@ export const PendingOperationsList: React.FC = () => {
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2 mb-1">
                   <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                    {operation.description || `${operation.method} ${operation.resource}`}
+                    {operation.description ||
+                      `${operation.method} ${operation.resource}`}
                   </p>
                   {getStatusBadge(operation.status)}
                 </div>
@@ -207,7 +208,7 @@ export const PendingOperationsList: React.FC = () => {
                 </p>
 
                 {/* Error message for failed operations */}
-                {operation.status === 'failed' && operation.lastError && (
+                {operation.status === "failed" && operation.lastError && (
                   <p className="text-xs text-red-600 dark:text-red-400 mt-2 line-clamp-2">
                     {operation.lastError}
                   </p>
@@ -222,7 +223,7 @@ export const PendingOperationsList: React.FC = () => {
               </div>
 
               {/* Actions */}
-              {operation.status === 'failed' && (
+              {operation.status === "failed" && (
                 <div className="flex-shrink-0 flex items-center gap-1">
                   <button
                     onClick={() => handleRetry(operation.id)}
@@ -231,8 +232,8 @@ export const PendingOperationsList: React.FC = () => {
                     title="Retry operation"
                     aria-label="Retry operation"
                   >
-                    <RefreshCw 
-                      className={`h-4 w-4 ${retryingId === operation.id ? 'animate-spin' : ''}`} 
+                    <RefreshCw
+                      className={`h-4 w-4 ${retryingId === operation.id ? "animate-spin" : ""}`}
                     />
                   </button>
                 </div>
@@ -243,7 +244,7 @@ export const PendingOperationsList: React.FC = () => {
       </div>
 
       {/* Offline notice */}
-      {!isOnline && operations.some(op => op.status === 'queued') && (
+      {!isOnline && operations.some((op) => op.status === "queued") && (
         <div className="mt-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
           <p className="text-xs text-blue-800 dark:text-blue-300">
             Operations will sync automatically when you're back online

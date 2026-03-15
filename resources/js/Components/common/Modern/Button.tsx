@@ -238,7 +238,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const baseStyles = `
       font-medium transition-all duration-200
-      ${buttonStyle !== 'icon'? 'flex' : ''} items-center justify-center gap-2
+      ${buttonStyle !== "icon" ? "flex" : ""} items-center justify-center gap-2
       disabled:opacity-50 disabled:cursor-not-allowed
       focus:outline-none focus:ring-2 focus:ring-offset-2
       active:scale-[0.98] 
@@ -246,7 +246,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       ${buttonStyle !== "icon" ? sizeClasses[size] : ""}
       ${getStyleClasses()}
       ${
-        variant === "primary" && buttonStyle !== "outline" && buttonStyle !== "icon"
+        variant === "primary" &&
+        buttonStyle !== "outline" &&
+        buttonStyle !== "icon"
           ? "hover:shadow-primary-500/25 shadow-xl hover:shadow-2xl"
           : "hover:bg-gray-700/10"
       }
@@ -258,8 +260,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         currentTheme === "dark" && buttonStyle !== "icon"
           ? "focus:ring-offset-gray-900"
           : buttonStyle !== "icon"
-          ? "focus:ring-offset-white"
-          : "!text-black dark:!text-white"
+            ? "focus:ring-offset-white"
+            : "!text-black dark:!text-white"
       }
     `;
 

@@ -1,6 +1,6 @@
-import React from 'react';
-import { formatDate, DATE_FORMATS } from '@/Utils/timezoneUtils';
-import { useTimezoneStore } from '@/stores/timezoneStore';
+import React from "react";
+import { formatDate, DATE_FORMATS } from "@/Utils/timezoneUtils";
+import { useTimezoneStore } from "@/stores/timezoneStore";
 
 interface DateDisplayProps {
   date: string | null | undefined;
@@ -12,7 +12,7 @@ interface DateDisplayProps {
 
 /**
  * Componente para mostrar fechas formateadas según el timezone del workspace
- * 
+ *
  * @example
  * <DateDisplay date={publication.scheduled_at} format="FULL" showTimezone />
  * <DateDisplay date={post.published_at} format="SHORT" />
@@ -20,10 +20,10 @@ interface DateDisplayProps {
  */
 export const DateDisplay: React.FC<DateDisplayProps> = ({
   date,
-  format = 'FULL',
+  format = "FULL",
   showTimezone = false,
-  className = '',
-  fallback = '-'
+  className = "",
+  fallback = "-",
 }) => {
   const { timezoneLabel } = useTimezoneStore();
 
@@ -32,9 +32,10 @@ export const DateDisplay: React.FC<DateDisplayProps> = ({
   }
 
   // Obtener formato predefinido o usar el custom
-  const formatStr = format in DATE_FORMATS 
-    ? DATE_FORMATS[format as keyof typeof DATE_FORMATS]
-    : format;
+  const formatStr =
+    format in DATE_FORMATS
+      ? DATE_FORMATS[format as keyof typeof DATE_FORMATS]
+      : format;
 
   const formattedDate = formatDate(date, formatStr);
 

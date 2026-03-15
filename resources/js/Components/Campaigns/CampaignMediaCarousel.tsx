@@ -1,13 +1,13 @@
 import { useTheme } from "@/Hooks/useTheme";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import {
-    ChevronLeft,
-    ChevronRight,
-    File,
-    Film,
-    Image as ImageIcon,
-    Play,
-    X,
+  ChevronLeft,
+  ChevronRight,
+  File,
+  Film,
+  Image as ImageIcon,
+  Play,
+  X,
 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 

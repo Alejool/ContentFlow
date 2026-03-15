@@ -15,13 +15,22 @@ export default function ApprovalWorkflowStatus({
 
   if (!approvalRequest) return null;
 
-  const { status, currentStep, workflow, logs = [], rejection_reason } = approvalRequest;
+  const {
+    status,
+    currentStep,
+    workflow,
+    logs = [],
+    rejection_reason,
+  } = approvalRequest;
   const levels = workflow?.levels ?? [];
 
   // Último rechazo
   const lastRejection = [...logs]
     .filter((l) => l.action === "rejected")
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
+    .sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+    )[0];
 
   const isRejected = status === "rejected";
   const isApproved = status === "approved";
@@ -54,7 +63,8 @@ export default function ApprovalWorkflowStatus({
     },
   };
 
-  const cfg = statusConfig[status as keyof typeof statusConfig] ?? statusConfig.pending;
+  const cfg =
+    statusConfig[status as keyof typeof statusConfig] ?? statusConfig.pending;
   const StatusIcon = cfg.icon;
 
   // Progreso
@@ -68,7 +78,9 @@ export default function ApprovalWorkflowStatus({
         <div className="flex items-start gap-3">
           <StatusIcon className={`w-6 h-6 flex-shrink-0 mt-0.5 ${cfg.color}`} />
           <div className="flex-1">
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-1">{cfg.label}</h4>
+            <h4 className="font-semibold text-gray-900 dark:text-white mb-1">
+              {cfg.label}
+            </h4>
             {isPending && currentStep && (
               <p className="text-sm text-gray-700 dark:text-gray-300">
                 {t("approvals.awaitingLevel") || "Esperando aprobación en"}:{" "}
@@ -78,7 +90,8 @@ export default function ApprovalWorkflowStatus({
             )}
             {isApproved && (
               <p className="text-sm text-gray-700 dark:text-gray-300">
-                {t("approvals.approvedReadyToPublish") || "Aprobado. Listo para publicar."}
+                {t("approvals.approvedReadyToPublish") ||
+                  "Aprobado. Listo para publicar."}
               </p>
             )}
           </div>
@@ -93,18 +106,22 @@ export default function ApprovalWorkflowStatus({
             <div className="flex-1">
               {lastRejection?.user && (
                 <h5 className="font-semibold text-red-900 dark:text-red-100 mb-1">
-                  {t("approvals.rejectedBy") || "Rechazado por"}: {lastRejection.user.name}
+                  {t("approvals.rejectedBy") || "Rechazado por"}:{" "}
+                  {lastRejection.user.name}
                 </h5>
               )}
               {lastRejection?.level_number && (
                 <p className="text-xs text-red-700 dark:text-red-300 mb-2">
-                  {t("approvals.rejectedAtLevel") || "En nivel"} {lastRejection.level_number}
+                  {t("approvals.rejectedAtLevel") || "En nivel"}{" "}
+                  {lastRejection.level_number}
                 </p>
               )}
               {(lastRejection?.comment || rejection_reason) && (
                 <div className="bg-white/50 dark:bg-black/20 rounded-lg p-3">
                   <p className="text-sm text-red-800 dark:text-red-200">
-                    <span className="font-medium">{t("approvals.reason") || "Razón"}:</span>{" "}
+                    <span className="font-medium">
+                      {t("approvals.reason") || "Razón"}:
+                    </span>{" "}
                     {lastRejection?.comment || rejection_reason}
                   </p>
                 </div>
@@ -126,12 +143,16 @@ export default function ApprovalWorkflowStatus({
             <div className="mb-5">
               <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mb-1.5">
                 <span>{t("approvals.progress") || "Progreso"}</span>
-                <span>{completedLevels} / {totalLevels}</span>
+                <span>
+                  {completedLevels} / {totalLevels}
+                </span>
               </div>
               <div className="w-full bg-gray-200 dark:bg-neutral-700 rounded-full h-2">
                 <div
                   className="bg-primary-600 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${totalLevels > 0 ? (completedLevels / totalLevels) * 100 : 0}%` }}
+                  style={{
+                    width: `${totalLevels > 0 ? (completedLevels / totalLevels) * 100 : 0}%`,
+                  }}
                 />
               </div>
             </div>
@@ -141,10 +162,14 @@ export default function ApprovalWorkflowStatus({
           <div className="space-y-3">
             {levels.map((level, index) => {
               const approvedLog = logs.find(
-                (l) => l.action === "approved" && l.level_number === level.level_number
+                (l) =>
+                  l.action === "approved" &&
+                  l.level_number === level.level_number,
               );
               const rejectedLog = logs.find(
-                (l) => l.action === "rejected" && l.level_number === level.level_number
+                (l) =>
+                  l.action === "rejected" &&
+                  l.level_number === level.level_number,
               );
               const isCurrent =
                 isPending && currentStep?.level_number === level.level_number;
@@ -159,8 +184,8 @@ export default function ApprovalWorkflowStatus({
                         isDone
                           ? "bg-green-500"
                           : isRejectedHere
-                          ? "bg-red-500"
-                          : "bg-gray-200 dark:bg-neutral-700"
+                            ? "bg-red-500"
+                            : "bg-gray-200 dark:bg-neutral-700"
                       }`}
                     />
                   )}
@@ -170,10 +195,10 @@ export default function ApprovalWorkflowStatus({
                         isDone
                           ? "bg-green-500 text-white"
                           : isRejectedHere
-                          ? "bg-red-500 text-white"
-                          : isCurrent
-                          ? "bg-primary-500 text-white animate-pulse"
-                          : "bg-gray-200 dark:bg-neutral-700 text-gray-500 dark:text-gray-400"
+                            ? "bg-red-500 text-white"
+                            : isCurrent
+                              ? "bg-primary-500 text-white animate-pulse"
+                              : "bg-gray-200 dark:bg-neutral-700 text-gray-500 dark:text-gray-400"
                       }`}
                     >
                       {isDone ? (
@@ -205,14 +230,17 @@ export default function ApprovalWorkflowStatus({
                       </div>
                       {level.role && (
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                          {t("approvals.approverRole") || "Rol"}: {level.role.name}
+                          {t("approvals.approverRole") || "Rol"}:{" "}
+                          {level.role.name}
                         </p>
                       )}
                       {/* Quién aprobó/rechazó */}
                       {(approvedLog || rejectedLog) && (
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                           {(approvedLog || rejectedLog)!.user?.name} ·{" "}
-                          {new Date((approvedLog || rejectedLog)!.created_at).toLocaleString()}
+                          {new Date(
+                            (approvedLog || rejectedLog)!.created_at,
+                          ).toLocaleString()}
                           {(approvedLog || rejectedLog)!.comment && (
                             <span className="italic ml-1">
                               "{(approvedLog || rejectedLog)!.comment}"

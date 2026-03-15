@@ -1,25 +1,30 @@
-import React from 'react';
-import { Link } from '@inertiajs/react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
-import Button from '@/Components/common/Modern/Button';
-import { Progress } from '@/Components/ui/progress';
-import { Sparkles, HardDrive, Plus } from 'lucide-react';
-import type { AddonSummary } from '@/types/addon';
+import React from "react";
+import { Link } from "@inertiajs/react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
+import Button from "@/Components/common/Modern/Button";
+import { Progress } from "@/Components/ui/progress";
+import { Sparkles, HardDrive, Plus } from "lucide-react";
+import type { AddonSummary } from "@/types/addon";
 
 interface AddonBalanceWidgetProps {
   summary: AddonSummary | null;
   loading?: boolean;
 }
 
-export const AddonBalanceWidget: React.FC<AddonBalanceWidgetProps> = ({ summary, loading }) => {
+export const AddonBalanceWidget: React.FC<AddonBalanceWidgetProps> = ({
+  summary,
+  loading,
+}) => {
   if (loading || !summary) {
     return null;
   }
 
   // Solo mostrar si tiene add-ons activos o si está cerca del límite
   const hasAddons = summary.active_addons_count > 0;
-  const aiLowBalance = summary.ai_credits.percentage_used >= 70 && summary.ai_credits.total > 0;
-  const storageLowBalance = summary.storage.percentage_used >= 70 && summary.storage.total > 0;
+  const aiLowBalance =
+    summary.ai_credits.percentage_used >= 70 && summary.ai_credits.total > 0;
+  const storageLowBalance =
+    summary.storage.percentage_used >= 70 && summary.storage.total > 0;
 
   if (!hasAddons && !aiLowBalance && !storageLowBalance) {
     return null;
@@ -28,7 +33,9 @@ export const AddonBalanceWidget: React.FC<AddonBalanceWidgetProps> = ({ summary,
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-        <CardTitle className="text-base font-semibold">Add-ons Activos</CardTitle>
+        <CardTitle className="text-base font-semibold">
+          Add-ons Activos
+        </CardTitle>
         <Button asChild variant="ghost" size="sm">
           <Link href="/subscription/addons">
             <Plus className="h-4 w-4 mr-1" />
@@ -49,15 +56,15 @@ export const AddonBalanceWidget: React.FC<AddonBalanceWidgetProps> = ({ summary,
                 {summary.ai_credits.remaining} / {summary.ai_credits.total}
               </span>
             </div>
-            <Progress 
-              value={summary.ai_credits.percentage_used} 
+            <Progress
+              value={summary.ai_credits.percentage_used}
               className="h-2"
               indicatorClassName={
-                summary.ai_credits.percentage_used >= 90 
-                  ? 'bg-red-500' 
-                  : summary.ai_credits.percentage_used >= 70 
-                  ? 'bg-yellow-500' 
-                  : 'bg-blue-500'
+                summary.ai_credits.percentage_used >= 90
+                  ? "bg-red-500"
+                  : summary.ai_credits.percentage_used >= 70
+                    ? "bg-yellow-500"
+                    : "bg-blue-500"
               }
             />
           </div>
@@ -75,15 +82,15 @@ export const AddonBalanceWidget: React.FC<AddonBalanceWidgetProps> = ({ summary,
                 {summary.storage.remaining} / {summary.storage.total} GB
               </span>
             </div>
-            <Progress 
-              value={summary.storage.percentage_used} 
+            <Progress
+              value={summary.storage.percentage_used}
               className="h-2"
               indicatorClassName={
-                summary.storage.percentage_used >= 90 
-                  ? 'bg-red-500' 
-                  : summary.storage.percentage_used >= 70 
-                  ? 'bg-yellow-500' 
-                  : 'bg-purple-500'
+                summary.storage.percentage_used >= 90
+                  ? "bg-red-500"
+                  : summary.storage.percentage_used >= 70
+                    ? "bg-yellow-500"
+                    : "bg-purple-500"
               }
             />
           </div>

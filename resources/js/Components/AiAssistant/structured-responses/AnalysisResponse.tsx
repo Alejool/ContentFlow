@@ -36,12 +36,12 @@ export default function AnalysisResponse({
                         ? "bg-primary-900/30"
                         : "bg-primary-100"
                       : insight.impact === "Medium"
-                      ? theme === "dark"
-                        ? "bg-yellow-900/30"
-                        : "bg-yellow-100"
-                      : theme === "dark"
-                      ? "bg-green-900/30"
-                      : "bg-green-100"
+                        ? theme === "dark"
+                          ? "bg-yellow-900/30"
+                          : "bg-yellow-100"
+                        : theme === "dark"
+                          ? "bg-green-900/30"
+                          : "bg-green-100"
                   }`}
                 >
                   <Lightbulb
@@ -51,12 +51,12 @@ export default function AnalysisResponse({
                           ? "text-primary-400"
                           : "text-primary-600"
                         : insight.impact === "Medium"
-                        ? theme === "dark"
-                          ? "text-yellow-400"
-                          : "text-yellow-600"
-                        : theme === "dark"
-                        ? "text-green-400"
-                        : "text-green-600"
+                          ? theme === "dark"
+                            ? "text-yellow-400"
+                            : "text-yellow-600"
+                          : theme === "dark"
+                            ? "text-green-400"
+                            : "text-green-600"
                     }`}
                   />
                 </div>
@@ -80,12 +80,12 @@ export default function AnalysisResponse({
                             ? "bg-primary-900/30 text-primary-300"
                             : "bg-primary-100 text-primary-700"
                           : insight.impact === "Medium"
-                          ? theme === "dark"
-                            ? "bg-yellow-900/30 text-yellow-300"
-                            : "bg-yellow-100 text-yellow-700"
-                          : theme === "dark"
-                          ? "bg-green-900/30 text-green-300"
-                          : "bg-green-100 text-green-700"
+                            ? theme === "dark"
+                              ? "bg-yellow-900/30 text-yellow-300"
+                              : "bg-yellow-100 text-yellow-700"
+                            : theme === "dark"
+                              ? "bg-green-900/30 text-green-300"
+                              : "bg-green-100 text-green-700"
                       }`}
                     >
                       Impacto: {insight.impact}

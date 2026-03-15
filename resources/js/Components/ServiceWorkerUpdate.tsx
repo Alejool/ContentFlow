@@ -1,11 +1,11 @@
 /**
  * ServiceWorkerUpdate Component
- * 
+ *
  * Shows a notification when a new service worker version is available
  */
 
-import React from 'react';
-import { useServiceWorker } from '../hooks/useServiceWorker';
+import React from "react";
+import { useServiceWorker } from "../hooks/useServiceWorker";
 
 export function ServiceWorkerUpdate() {
   const { hasUpdate, updateServiceWorker } = useServiceWorker();
@@ -40,7 +40,8 @@ export function ServiceWorkerUpdate() {
             Nueva versión disponible
           </h3>
           <p className="mt-1 text-sm text-gray-500">
-            Una nueva versión de la aplicación está lista. Actualiza para obtener las últimas mejoras.
+            Una nueva versión de la aplicación está lista. Actualiza para
+            obtener las últimas mejoras.
           </p>
           <div className="mt-3 flex space-x-3">
             <button

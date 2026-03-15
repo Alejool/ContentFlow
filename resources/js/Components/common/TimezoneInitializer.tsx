@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
-import { usePage } from '@inertiajs/react';
-import { useTimezoneStore } from '@/stores/timezoneStore';
+import { useEffect } from "react";
+import { usePage } from "@inertiajs/react";
+import { useTimezoneStore } from "@/stores/timezoneStore";
 
 /**
  * Componente que inicializa el timezone store desde los props de Inertia
@@ -15,7 +15,7 @@ export const TimezoneInitializer: React.FC = () => {
       // Inicializar desde props de Inertia (más rápido que hacer requests)
       initializeFromInertia(
         auth.current_workspace?.timezone,
-        auth.user?.timezone
+        auth.user?.timezone,
       );
     }
   }, [auth, isLoaded, initializeFromInertia]);

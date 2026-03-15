@@ -148,8 +148,14 @@ export const AlertsSection = ({
       {hasPublishedPlatform && (
         <AlertCard
           type="info"
-          title={t("publications.modal.edit.contentLocked") || "Publication partially live"}
-          message={t("publications.modal.edit.contentLockedHint") || "This publication is live on some platforms. Changes will apply to pending and future uploads."}
+          title={
+            t("publications.modal.edit.contentLocked") ||
+            "Publication partially live"
+          }
+          message={
+            t("publications.modal.edit.contentLockedHint") ||
+            "This publication is live on some platforms. Changes will apply to pending and future uploads."
+          }
           className="animate-in fade-in slide-in-from-top-4"
         />
       )}

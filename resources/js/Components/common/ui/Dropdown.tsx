@@ -9,7 +9,6 @@ import {
   useState,
 } from "react";
 
-
 import { Link as InertiaLink } from "@inertiajs/react";
 
 interface DropDownContextType {
@@ -53,14 +52,14 @@ const Trigger = ({ children }: TriggerProps) => {
 
   return (
     <>
-      <div 
+      <div
         onClick={toggleOpen}
         role="button"
         aria-expanded={open}
         aria-haspopup="true"
         tabIndex={0}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
+          if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
             toggleOpen();
           }

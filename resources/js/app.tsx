@@ -39,7 +39,7 @@ createInertiaApp<PageProps>({
     // Lazy loading agresivo por rutas
     return resolvePageComponent(
       `./Pages/${cleanName}.tsx`,
-      import.meta.glob("./Pages/**/*.tsx")
+      import.meta.glob("./Pages/**/*.tsx"),
     );
   },
 
@@ -48,7 +48,7 @@ createInertiaApp<PageProps>({
 
     const user = props.initialPage.props.auth?.user;
     const userLocale = user?.locale;
-    
+
     if (userLocale) {
       loadI18n().then(({ default: i18n }) => {
         i18n.changeLanguage(userLocale);
@@ -63,9 +63,13 @@ createInertiaApp<PageProps>({
             initialTheme={user?.theme as "light" | "dark" | undefined}
             workspaceId={user?.current_workspace_id}
           >
-            <Suspense fallback={<div className="flex items-center justify-center min-h-screen">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-            </div>}>
+            <Suspense
+              fallback={
+                <div className="flex items-center justify-center min-h-screen">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+                </div>
+              }
+            >
               <AnimatedPage variant="fade" pageKey={props.initialPage.url}>
                 <App {...props} />
               </AnimatedPage>
@@ -75,7 +79,7 @@ createInertiaApp<PageProps>({
             <InertiaProgressIndicator color="#ad421e" />
           </ThemeProvider>
         </QueryProvider>
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
   },
 });

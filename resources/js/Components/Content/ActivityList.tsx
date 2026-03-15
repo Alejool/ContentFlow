@@ -41,16 +41,16 @@ interface ActivityListProps {
 }
 
 // Componente extraído fuera del componente principal
-const ActivityTimelineItem = ({ 
-  activity, 
-  activityIdx, 
+const ActivityTimelineItem = ({
+  activity,
+  activityIdx,
   activitiesLength,
   t,
   locale,
   getActivityIcon,
-  formatActivityText
-}: { 
-  activity: ActivityItem; 
+  formatActivityText,
+}: {
+  activity: ActivityItem;
   activityIdx: number;
   activitiesLength: number;
   t: any;
@@ -119,11 +119,7 @@ const ActivityTimelineItem = ({
               </div>
               <div className="text-gray-700 dark:text-gray-300 break-words font-mono text-[10px] leading-tight">
                 {typeof activity.formatted_changes.before === "object"
-                  ? JSON.stringify(
-                      activity.formatted_changes.before,
-                      null,
-                      2,
-                    )
+                  ? JSON.stringify(activity.formatted_changes.before, null, 2)
                   : activity.formatted_changes.before || "(vacío)"}
               </div>
             </div>
@@ -133,11 +129,7 @@ const ActivityTimelineItem = ({
               </div>
               <div className="text-gray-700 dark:text-gray-300 break-words font-mono text-[10px] leading-tight">
                 {typeof activity.formatted_changes.after === "object"
-                  ? JSON.stringify(
-                      activity.formatted_changes.after,
-                      null,
-                      2,
-                    )
+                  ? JSON.stringify(activity.formatted_changes.after, null, 2)
                   : activity.formatted_changes.after || "(vacío)"}
               </div>
             </div>
@@ -161,9 +153,7 @@ const ActivityTimelineItem = ({
                         key={i}
                         className="px-1.5 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300"
                       >
-                        {typeof item === "string"
-                          ? item
-                          : JSON.stringify(item)}
+                        {typeof item === "string" ? item : JSON.stringify(item)}
                       </span>
                     ),
                   )}
@@ -182,9 +172,7 @@ const ActivityTimelineItem = ({
                         key={i}
                         className="px-1.5 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300"
                       >
-                        {typeof item === "string"
-                          ? item
-                          : JSON.stringify(item)}
+                        {typeof item === "string" ? item : JSON.stringify(item)}
                       </span>
                     ),
                   )}

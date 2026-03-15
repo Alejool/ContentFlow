@@ -13,7 +13,7 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-} from '@dnd-kit/core';
+} from "@dnd-kit/core";
 
 interface DayViewProps {
   currentDate: Date;
@@ -87,8 +87,6 @@ const DraggableDayEvent: React.FC<DraggableDayEventProps> = ({
                 {event.title}
               </h3>
             </div>
-
-
           </div>
 
           <div className="flex items-center gap-4 mt-2 text-sm text-gray-500 dark:text-gray-400">
@@ -142,7 +140,7 @@ const DroppableHourSlot: React.FC<DroppableHourSlotProps> = ({
       className={`
         flex border-b border-gray-100 dark:border-gray-800 min-h-[100px] 
         hover:bg-gray-50 dark:hover:bg-gray-900/30 transition-colors
-        ${isOver ? 'bg-primary-100/50 dark:bg-primary-900/20' : ''}
+        ${isOver ? "bg-primary-100/50 dark:bg-primary-900/20" : ""}
       `}
     >
       {/* Time label */}
@@ -201,7 +199,7 @@ export const DayView: React.FC<DayViewProps> = ({
       activationConstraint: {
         distance: 8,
       },
-    })
+    }),
   );
 
   const hours = Array.from({ length: 24 }, (_, i) => i);

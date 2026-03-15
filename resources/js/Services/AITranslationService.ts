@@ -45,7 +45,7 @@ export class AITranslationService {
           target_language: targetLanguage,
           source_language: sourceLanguage,
           context,
-        }
+        },
       );
 
       // Guardar en caché
@@ -66,7 +66,7 @@ export class AITranslationService {
   static async translateBatch(
     texts: string[],
     targetLanguage: string,
-    sourceLanguage?: string
+    sourceLanguage?: string,
   ): Promise<string[]> {
     try {
       const response = await axios.post<{ translations: string[] }>(
@@ -75,7 +75,7 @@ export class AITranslationService {
           texts,
           target_language: targetLanguage,
           source_language: sourceLanguage,
-        }
+        },
       );
 
       return response.data.translations;
@@ -91,7 +91,7 @@ export class AITranslationService {
     try {
       const response = await axios.post<{ language: string }>(
         "/api/ai/detect-language",
-        { text }
+        { text },
       );
 
       return response.data.language;

@@ -2,7 +2,7 @@
  * Cache Decision Logger
  * Logs cache decisions for debugging and performance analysis
  * Only active in development mode
- * 
+ *
  * Requirements: 10.4
  */
 
@@ -11,8 +11,17 @@ export interface CacheDecisionLog {
   timestamp: number;
   url: string;
   method: string;
-  strategy: 'cache-first' | 'network-first' | 'stale-while-revalidate' | 'network-only';
-  result: 'cache-hit' | 'cache-miss' | 'network-success' | 'network-error' | 'fallback';
+  strategy:
+    | "cache-first"
+    | "network-first"
+    | "stale-while-revalidate"
+    | "network-only";
+  result:
+    | "cache-hit"
+    | "cache-miss"
+    | "network-success"
+    | "network-error"
+    | "fallback";
   responseTime: number;
   cacheAge?: number;
   size?: number;
@@ -28,7 +37,7 @@ export interface CacheLoggerConfig {
 class CacheLogger {
   private logs: CacheDecisionLog[] = [];
   private config: CacheLoggerConfig;
-  private readonly STORAGE_KEY = 'cache-decision-logs';
+  private readonly STORAGE_KEY = "cache-decision-logs";
   private readonly isDevelopment: boolean;
 
   constructor(config: CacheLoggerConfig = {}) {
@@ -37,9 +46,9 @@ class CacheLogger {
       persistToStorage: config.persistToStorage !== false,
       consoleOutput: config.consoleOutput !== false,
     };
-    
+
     this.isDevelopment = import.meta.env.DEV;
-    
+
     // Only restore logs in development mode
     if (this.isDevelopment && this.config.persistToStorage) {
       this.restoreLogs();
@@ -53,8 +62,8 @@ class CacheLogger {
   logDecision(decision: {
     url: string;
     method?: string;
-    strategy: CacheDecisionLog['strategy'];
-    result: CacheDecisionLog['result'];
+    strategy: CacheDecisionLog["strategy"];
+    result: CacheDecisionLog["result"];
     responseTime: number;
     cacheAge?: number;
     size?: number;
@@ -69,7 +78,7 @@ class CacheLogger {
       id: `cache-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       timestamp: Date.now(),
       url: decision.url,
-      method: decision.method || 'GET',
+      method: decision.method || "GET",
       strategy: decision.strategy,
       result: decision.result,
       responseTime: decision.responseTime,
@@ -110,8 +119,8 @@ class CacheLogger {
    * Get all cache decision logs
    */
   getLogs(filter?: {
-    strategy?: CacheDecisionLog['strategy'];
-    result?: CacheDecisionLog['result'];
+    strategy?: CacheDecisionLog["strategy"];
+    result?: CacheDecisionLog["result"];
     url?: string;
     since?: number;
   }): CacheDecisionLog[] {
@@ -119,16 +128,16 @@ class CacheLogger {
 
     if (filter) {
       if (filter.strategy) {
-        filtered = filtered.filter(log => log.strategy === filter.strategy);
+        filtered = filtered.filter((log) => log.strategy === filter.strategy);
       }
       if (filter.result) {
-        filtered = filtered.filter(log => log.result === filter.result);
+        filtered = filtered.filter((log) => log.result === filter.result);
       }
       if (filter.url) {
-        filtered = filtered.filter(log => log.url.includes(filter.url));
+        filtered = filtered.filter((log) => log.url.includes(filter.url));
       }
       if (filter.since) {
-        filtered = filtered.filter(log => log.timestamp >= filter.since);
+        filtered = filtered.filter((log) => log.timestamp >= filter.since);
       }
     }
 
@@ -163,9 +172,10 @@ class CacheLogger {
     let cacheHits = 0;
     let networkErrors = 0;
 
-    this.logs.forEach(log => {
+    this.logs.forEach((log) => {
       // Count by strategy
-      stats.byStrategy[log.strategy] = (stats.byStrategy[log.strategy] || 0) + 1;
+      stats.byStrategy[log.strategy] =
+        (stats.byStrategy[log.strategy] || 0) + 1;
 
       // Count by result
       stats.byResult[log.result] = (stats.byResult[log.result] || 0) + 1;
@@ -174,17 +184,19 @@ class CacheLogger {
       totalResponseTime += log.responseTime;
 
       // Count cache hits
-      if (log.result === 'cache-hit') {
+      if (log.result === "cache-hit") {
         cacheHits++;
       }
 
       // Count network errors
-      if (log.result === 'network-error') {
+      if (log.result === "network-error") {
         networkErrors++;
       }
     });
 
-    stats.averageResponseTime = Math.round(totalResponseTime / this.logs.length);
+    stats.averageResponseTime = Math.round(
+      totalResponseTime / this.logs.length,
+    );
     stats.cacheHitRate = (cacheHits / this.logs.length) * 100;
     stats.networkErrorRate = (networkErrors / this.logs.length) * 100;
 
@@ -202,7 +214,7 @@ class CacheLogger {
   } {
     const strategyTimes: Record<string, number[]> = {};
 
-    this.logs.forEach(log => {
+    this.logs.forEach((log) => {
       if (!strategyTimes[log.strategy]) {
         strategyTimes[log.strategy] = [];
       }
@@ -210,8 +222,8 @@ class CacheLogger {
     });
 
     const averageByStrategy: Record<string, number> = {};
-    let fastestStrategy = '';
-    let slowestStrategy = '';
+    let fastestStrategy = "";
+    let slowestStrategy = "";
     let fastestTime = Infinity;
     let slowestTime = 0;
 
@@ -231,8 +243,11 @@ class CacheLogger {
     });
 
     // Calculate cache efficiency (cache hits vs total requests)
-    const cacheHits = this.logs.filter(log => log.result === 'cache-hit').length;
-    const cacheEfficiency = this.logs.length > 0 ? (cacheHits / this.logs.length) * 100 : 0;
+    const cacheHits = this.logs.filter(
+      (log) => log.result === "cache-hit",
+    ).length;
+    const cacheEfficiency =
+      this.logs.length > 0 ? (cacheHits / this.logs.length) * 100 : 0;
 
     return {
       fastestStrategy,
@@ -247,7 +262,7 @@ class CacheLogger {
    */
   clearLogs(): void {
     this.logs = [];
-    
+
     if (this.config.persistToStorage) {
       try {
         localStorage.removeItem(this.STORAGE_KEY);
@@ -262,8 +277,8 @@ class CacheLogger {
    */
   clearOldLogs(olderThan: number): void {
     const cutoff = Date.now() - olderThan;
-    this.logs = this.logs.filter(log => log.timestamp >= cutoff);
-    
+    this.logs = this.logs.filter((log) => log.timestamp >= cutoff);
+
     if (this.config.persistToStorage) {
       this.persistLogs();
     }
@@ -306,8 +321,18 @@ class CacheLogger {
    * Export logs as CSV
    */
   exportLogsCSV(): string {
-    const headers = ['ID', 'Timestamp', 'URL', 'Method', 'Strategy', 'Result', 'Response Time (ms)', 'Cache Age (ms)', 'Size (bytes)'];
-    const rows = this.logs.map(log => [
+    const headers = [
+      "ID",
+      "Timestamp",
+      "URL",
+      "Method",
+      "Strategy",
+      "Result",
+      "Response Time (ms)",
+      "Cache Age (ms)",
+      "Size (bytes)",
+    ];
+    const rows = this.logs.map((log) => [
       log.id,
       new Date(log.timestamp).toISOString(),
       log.url,
@@ -315,13 +340,15 @@ class CacheLogger {
       log.strategy,
       log.result,
       log.responseTime,
-      log.cacheAge || '',
-      log.size || '',
+      log.cacheAge || "",
+      log.size || "",
     ]);
 
     const csv = [headers, ...rows]
-      .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
-      .join('\n');
+      .map((row) =>
+        row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","),
+      )
+      .join("\n");
 
     return csv;
   }

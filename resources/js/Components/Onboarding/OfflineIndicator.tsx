@@ -9,7 +9,7 @@ import { useOnboardingStore } from "@/stores/onboardingStore";
 export const OfflineIndicator: React.FC = () => {
   const isOnline = useOnlineStatus();
   const { queuedActionsCount } = useOnboardingStore();
-  
+
   const isOffline = !isOnline;
 
   // Don't show anything if online and no queued actions

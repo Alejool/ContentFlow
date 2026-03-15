@@ -25,7 +25,7 @@ export default function PlatformCard({
   const inputId = `platform-card-${value}`;
 
   return (
-    <label 
+    <label
       htmlFor={inputId}
       className="flex flex-col items-center p-5 border-2 border-gray-200 dark:border-neutral-700 rounded-lg hover:border-primary-500 cursor-pointer transition-all"
     >

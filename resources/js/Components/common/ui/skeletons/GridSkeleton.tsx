@@ -7,7 +7,11 @@ interface GridSkeletonProps {
   cardHeight?: string;
 }
 
-const GridSkeleton = ({ items = 6, columns = 3, cardHeight = "h-64" }: GridSkeletonProps) => {
+const GridSkeleton = ({
+  items = 6,
+  columns = 3,
+  cardHeight = "h-64",
+}: GridSkeletonProps) => {
   const gridCols = {
     2: "grid-cols-1 sm:grid-cols-2",
     3: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",

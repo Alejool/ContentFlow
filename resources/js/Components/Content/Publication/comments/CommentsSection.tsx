@@ -56,8 +56,7 @@ export const CommentsSection = ({
         route("api.v1.workspaces.members", currentUser.current_workspace_id),
       );
       setMembers(response.data.members || []);
-    } catch (error) {
-      }
+    } catch (error) {}
   };
 
   const fetchComments = async () => {
@@ -68,7 +67,7 @@ export const CommentsSection = ({
       );
       setComments(response.data);
     } catch (error) {
-      } finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -332,7 +331,8 @@ export const CommentsSection = ({
               }
             }}
             placeholder={
-              t("publications.modal.comments.placeholder") || "Write a comment..."
+              t("publications.modal.comments.placeholder") ||
+              "Write a comment..."
             }
             className={`pr-12 ${replyTo ? "rounded-t-none" : ""}`}
             disabled={submitting}

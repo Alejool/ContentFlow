@@ -1,8 +1,8 @@
-import { useEffect, useRef, useCallback } from 'react';
-import { router } from '@inertiajs/react';
-import { useUploadQueue } from '@/stores/uploadQueueStore';
-import { useProcessingProgress } from '@/stores/processingProgressStore';
-import { useNotificationStore } from '@/stores/notificationStore';
+import { useEffect, useRef, useCallback } from "react";
+import { router } from "@inertiajs/react";
+import { useUploadQueue } from "@/stores/uploadQueueStore";
+import { useProcessingProgress } from "@/stores/processingProgressStore";
+import { useNotificationStore } from "@/stores/notificationStore";
 
 /**
  * Notification preferences interface
@@ -25,31 +25,31 @@ const DEFAULT_PREFERENCES: NotificationPreferences = {
   notifyOnProcessingComplete: true,
 };
 
-const PREFERENCES_KEY = 'completion_notification_preferences';
+const PREFERENCES_KEY = "completion_notification_preferences";
 
 /**
  * Hook for managing completion notifications for uploads and processing jobs
- * 
+ *
  * Features:
  * - In-app notifications via notification store
  * - Browser notifications with permission checking
  * - Click handlers for navigation to completed content
  * - User preferences for notification types
- * 
+ *
  * Requirements: 8.1, 8.2, 8.3, 8.4, 8.5
  */
 export function useCompletionNotifications() {
   const uploadQueue = useUploadQueue();
   const processingProgress = useProcessingProgress();
   const notificationStore = useNotificationStore();
-  
+
   // Track previously completed items to avoid duplicate notifications
   const completedUploadsRef = useRef<Set<string>>(new Set());
   const completedJobsRef = useRef<Set<string>>(new Set());
-  
+
   // Browser notification permission state
   const browserNotificationPermission = useRef<NotificationPermission>(
-    typeof Notification !== 'undefined' ? Notification.permission : 'denied'
+    typeof Notification !== "undefined" ? Notification.permission : "denied",
   );
 
   /**
@@ -63,8 +63,7 @@ export function useCompletionNotifications() {
         const parsed = JSON.parse(stored);
         return { ...DEFAULT_PREFERENCES, ...parsed };
       }
-    } catch (error) {
-      }
+    } catch (error) {}
     return DEFAULT_PREFERENCES;
   }, []);
 
@@ -72,40 +71,43 @@ export function useCompletionNotifications() {
    * Save notification preferences to localStorage
    * Requirement 8.5: Add notification preferences to user settings
    */
-  const savePreferences = useCallback((preferences: NotificationPreferences) => {
-    try {
-      localStorage.setItem(PREFERENCES_KEY, JSON.stringify(preferences));
-    } catch (error) {
-      }
-  }, []);
+  const savePreferences = useCallback(
+    (preferences: NotificationPreferences) => {
+      try {
+        localStorage.setItem(PREFERENCES_KEY, JSON.stringify(preferences));
+      } catch (error) {}
+    },
+    [],
+  );
 
   /**
    * Request browser notification permission
    * Requirement 8.3, 8.4: Browser notification support with permission checking
    */
-  const requestBrowserNotificationPermission = useCallback(async (): Promise<boolean> => {
-    if (typeof Notification === 'undefined') {
-      return false;
-    }
+  const requestBrowserNotificationPermission =
+    useCallback(async (): Promise<boolean> => {
+      if (typeof Notification === "undefined") {
+        return false;
+      }
 
-    if (Notification.permission === 'granted') {
-      browserNotificationPermission.current = 'granted';
-      return true;
-    }
+      if (Notification.permission === "granted") {
+        browserNotificationPermission.current = "granted";
+        return true;
+      }
 
-    if (Notification.permission === 'denied') {
-      browserNotificationPermission.current = 'denied';
-      return false;
-    }
+      if (Notification.permission === "denied") {
+        browserNotificationPermission.current = "denied";
+        return false;
+      }
 
-    try {
-      const permission = await Notification.requestPermission();
-      browserNotificationPermission.current = permission;
-      return permission === 'granted';
-    } catch (error) {
-      return false;
-    }
-  }, []);
+      try {
+        const permission = await Notification.requestPermission();
+        browserNotificationPermission.current = permission;
+        return permission === "granted";
+      } catch (error) {
+        return false;
+      }
+    }, []);
 
   /**
    * Show browser notification
@@ -114,8 +116,8 @@ export function useCompletionNotifications() {
   const showBrowserNotification = useCallback(
     (title: string, body: string, onClick?: () => void) => {
       if (
-        typeof Notification === 'undefined' ||
-        browserNotificationPermission.current !== 'granted'
+        typeof Notification === "undefined" ||
+        browserNotificationPermission.current !== "granted"
       ) {
         return;
       }
@@ -123,8 +125,8 @@ export function useCompletionNotifications() {
       try {
         const notification = new Notification(title, {
           body,
-          icon: '/favicon.ico',
-          badge: '/favicon.ico',
+          icon: "/favicon.ico",
+          badge: "/favicon.ico",
           tag: `completion-${Date.now()}`,
         });
 
@@ -138,10 +140,9 @@ export function useCompletionNotifications() {
 
         // Auto-close after 5 seconds
         setTimeout(() => notification.close(), 5000);
-      } catch (error) {
-        }
+      } catch (error) {}
     },
-    []
+    [],
   );
 
   /**
@@ -154,7 +155,7 @@ export function useCompletionNotifications() {
       // The notification store will handle the display via the notification center
       notificationStore.fetchNotifications();
     },
-    [notificationStore]
+    [notificationStore],
   );
 
   /**
@@ -165,7 +166,7 @@ export function useCompletionNotifications() {
     if (publicationId) {
       router.visit(`/content`);
     } else {
-      router.visit('/content');
+      router.visit("/content");
     }
   }, []);
 
@@ -182,13 +183,16 @@ export function useCompletionNotifications() {
 
       completedUploadsRef.current.add(uploadId);
 
-      const title = 'Upload Complete';
+      const title = "Upload Complete";
       const message = upload.publicationTitle
         ? `"${upload.publicationTitle}" has been uploaded successfully`
-        : 'Your file has been uploaded successfully';
+        : "Your file has been uploaded successfully";
 
       // Show in-app notification
-      if (preferences.enableInAppNotifications && preferences.notifyOnUploadComplete) {
+      if (
+        preferences.enableInAppNotifications &&
+        preferences.notifyOnUploadComplete
+      ) {
         showInAppNotification(title, message, upload.publicationId);
       }
 
@@ -196,14 +200,14 @@ export function useCompletionNotifications() {
       if (
         preferences.enableBrowserNotifications &&
         preferences.notifyOnUploadComplete &&
-        browserNotificationPermission.current === 'granted'
+        browserNotificationPermission.current === "granted"
       ) {
         showBrowserNotification(title, message, () => {
           navigateToContent(upload.publicationId);
         });
       }
     },
-    [showInAppNotification, showBrowserNotification, navigateToContent]
+    [showInAppNotification, showBrowserNotification, navigateToContent],
   );
 
   /**
@@ -219,11 +223,14 @@ export function useCompletionNotifications() {
 
       completedJobsRef.current.add(jobId);
 
-      const title = 'Processing Complete';
-      const message = `Your ${job.type.replace('_', ' ')} has been completed successfully`;
+      const title = "Processing Complete";
+      const message = `Your ${job.type.replace("_", " ")} has been completed successfully`;
 
       // Show in-app notification
-      if (preferences.enableInAppNotifications && preferences.notifyOnProcessingComplete) {
+      if (
+        preferences.enableInAppNotifications &&
+        preferences.notifyOnProcessingComplete
+      ) {
         showInAppNotification(title, message, job.publicationId);
       }
 
@@ -231,14 +238,14 @@ export function useCompletionNotifications() {
       if (
         preferences.enableBrowserNotifications &&
         preferences.notifyOnProcessingComplete &&
-        browserNotificationPermission.current === 'granted'
+        browserNotificationPermission.current === "granted"
       ) {
         showBrowserNotification(title, message, () => {
           navigateToContent(job.publicationId);
         });
       }
     },
-    [showInAppNotification, showBrowserNotification, navigateToContent]
+    [showInAppNotification, showBrowserNotification, navigateToContent],
   );
 
   /**
@@ -246,10 +253,13 @@ export function useCompletionNotifications() {
    */
   useEffect(() => {
     const preferences = loadPreferences();
-    
+
     // Check for completed uploads
     Object.entries(uploadQueue.queue).forEach(([id, upload]) => {
-      if (upload.status === 'completed' && !completedUploadsRef.current.has(id)) {
+      if (
+        upload.status === "completed" &&
+        !completedUploadsRef.current.has(id)
+      ) {
         handleUploadCompletion(id, upload, preferences);
       }
     });
@@ -260,10 +270,10 @@ export function useCompletionNotifications() {
    */
   useEffect(() => {
     const preferences = loadPreferences();
-    
+
     // Check for completed jobs
     Object.entries(processingProgress.jobs).forEach(([id, job]) => {
-      if (job.status === 'completed' && !completedJobsRef.current.has(id)) {
+      if (job.status === "completed" && !completedJobsRef.current.has(id)) {
         handleProcessingCompletion(id, job, preferences);
       }
     });

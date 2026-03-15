@@ -7,7 +7,7 @@ interface AddMoreButtonProps {
 
 const AddMoreButton: React.FC<AddMoreButtonProps> = ({ onClick }) => {
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
+    if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       onClick();
     }

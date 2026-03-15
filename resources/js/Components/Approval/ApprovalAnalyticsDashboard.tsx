@@ -4,13 +4,13 @@ import PieChart from "@/Components/Statistics/PieChart";
 import { useTheme } from "@/Hooks/useTheme";
 import axios from "axios";
 import {
-    AlertCircle,
-    BarChart3,
-    Clock,
-    Download,
-    FileText,
-    TrendingUp,
-    Users,
+  AlertCircle,
+  BarChart3,
+  Clock,
+  Download,
+  FileText,
+  TrendingUp,
+  Users,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -76,7 +76,9 @@ export default function ApprovalAnalyticsDashboard({
     try {
       setIsLoading(true);
       const response = await axios.get(
-        route("api.v1.workspaces.approval-analytics.index", { idOrSlug: workspace.id }),
+        route("api.v1.workspaces.approval-analytics.index", {
+          idOrSlug: workspace.id,
+        }),
       );
       setAnalytics(response.data.data);
     } catch (error: any) {
@@ -90,7 +92,9 @@ export default function ApprovalAnalyticsDashboard({
     try {
       setIsExporting(true);
       const response = await axios.get(
-        route("api.v1.workspaces.approval-analytics.export", { idOrSlug: workspace.id }),
+        route("api.v1.workspaces.approval-analytics.export", {
+          idOrSlug: workspace.id,
+        }),
         {
           params: { format },
           responseType: "blob",
@@ -377,7 +381,11 @@ export default function ApprovalAnalyticsDashboard({
             </h4>
           </div>
           {approvalRatesPieData.length > 0 ? (
-            <PieChart data={approvalRatesPieData} height={300} theme={actualTheme} />
+            <PieChart
+              data={approvalRatesPieData}
+              height={300}
+              theme={actualTheme}
+            />
           ) : (
             <div className="flex items-center justify-center h-[300px] text-gray-500 dark:text-gray-400">
               {t("approval.analytics.no_data_available")}

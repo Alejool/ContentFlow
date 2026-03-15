@@ -1,9 +1,10 @@
-import { useState } from 'react';
-import axios, { type AxiosError } from 'axios';
-import type { ContentValidationResult } from '@/types/validation';
+import { useState } from "react";
+import axios, { type AxiosError } from "axios";
+import type { ContentValidationResult } from "@/types/validation";
 
 export function useContentValidation() {
-  const [validationResult, setValidationResult] = useState<ContentValidationResult | null>(null);
+  const [validationResult, setValidationResult] =
+    useState<ContentValidationResult | null>(null);
   const [isValidating, setIsValidating] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
 
@@ -14,10 +15,10 @@ export function useContentValidation() {
    */
   const validateContent = async (
     publicationId: number,
-    platformIds: number[]
+    platformIds: number[],
   ): Promise<ContentValidationResult | null> => {
     if (!publicationId || !platformIds || platformIds.length === 0) {
-      setValidationError('Datos de validación incompletos');
+      setValidationError("Datos de validación incompletos");
       return null;
     }
 
@@ -28,14 +29,16 @@ export function useContentValidation() {
     try {
       const response = await axios.post<{ data: ContentValidationResult }>(
         `/api/v1/publications/${publicationId}/validate`,
-        { platform_ids: platformIds }
+        { platform_ids: platformIds },
       );
 
       setValidationResult(response.data.data);
       return response.data.data;
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string }>;
-      setValidationError(axiosError.response?.data?.message || 'Error al validar el contenido');
+      setValidationError(
+        axiosError.response?.data?.message || "Error al validar el contenido",
+      );
       return null;
     } finally {
       setIsValidating(false);
@@ -58,7 +61,7 @@ export function useContentValidation() {
     return (
       (validationResult.warnings?.length ?? 0) > 0 ||
       Object.values(validationResult.platform_results || {}).some(
-        (r) => (r.warnings?.length ?? 0) > 0
+        (r) => (r.warnings?.length ?? 0) > 0,
       )
     );
   };

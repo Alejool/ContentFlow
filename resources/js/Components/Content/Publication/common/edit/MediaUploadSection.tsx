@@ -1,15 +1,18 @@
 import Label from "@/Components/common/Modern/Label";
-import { getMediaRulesForContentType, type ContentType } from "@/Components/Content/Publication/common/ContentTypeSelector";
+import {
+  getMediaRulesForContentType,
+  type ContentType,
+} from "@/Components/Content/Publication/common/ContentTypeSelector";
 import ImageCropper from "@/Components/Content/Publication/common/edit/ImageCropper";
 import {
-    AlertTriangle,
-    Crop,
-    FileImage,
-    Info,
-    Loader2,
-    Upload,
-    Video,
-    X
+  AlertTriangle,
+  Crop,
+  FileImage,
+  Info,
+  Loader2,
+  Upload,
+  Video,
+  X,
 } from "lucide-react";
 import React, { memo, useMemo, useRef, useState } from "react";
 
@@ -77,7 +80,7 @@ const MediaUploadSection = memo(
     videoMetadata,
     publicationId,
     allMediaFiles = [],
-    contentType = 'post',
+    contentType = "post",
   }: MediaUploadSectionProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [croppingImage, setCroppingImage] = useState<{
@@ -86,61 +89,106 @@ const MediaUploadSection = memo(
     } | null>(null);
 
     // Obtener reglas de medios según el tipo de contenido
-    const mediaRules = useMemo(() => getMediaRulesForContentType(contentType), [contentType]);
+    const mediaRules = useMemo(
+      () => getMediaRulesForContentType(contentType),
+      [contentType],
+    );
 
     // Calcular contadores de medios actuales
     const mediaCounts = useMemo(() => {
-      const images = mediaPreviews.filter(m => m.type.includes('image')).length;
-      const videos = mediaPreviews.filter(m => m.type.includes('video')).length;
+      const images = mediaPreviews.filter((m) =>
+        m.type.includes("image"),
+      ).length;
+      const videos = mediaPreviews.filter((m) =>
+        m.type.includes("video"),
+      ).length;
       return { images, videos, total: images + videos };
     }, [mediaPreviews]);
 
     // Determinar qué tipos de archivo aceptar según las reglas
     const acceptedFileTypes = useMemo(() => {
       const types: string[] = [];
-      
+
       if (mediaRules.videoOnly) {
         // Solo videos (para reels)
-        types.push('video/mp4', 'video/mov', 'video/avi');
+        types.push("video/mp4", "video/mov", "video/avi");
       } else if (mediaRules.imageOnly) {
         // Solo imágenes
-        types.push('image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp');
+        types.push(
+          "image/jpeg",
+          "image/jpg",
+          "image/png",
+          "image/gif",
+          "image/webp",
+        );
       } else {
         // Verificar si aún se pueden agregar imágenes
-        if (mediaRules.maxImages === undefined || (mediaRules.maxImages > 0 && mediaCounts.images < mediaRules.maxImages)) {
-          types.push('image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp');
+        if (
+          mediaRules.maxImages === undefined ||
+          (mediaRules.maxImages > 0 &&
+            mediaCounts.images < mediaRules.maxImages)
+        ) {
+          types.push(
+            "image/jpeg",
+            "image/jpg",
+            "image/png",
+            "image/gif",
+            "image/webp",
+          );
         }
         // Verificar si aún se pueden agregar videos
-        if (mediaRules.maxVideos === undefined || (mediaRules.maxVideos > 0 && mediaCounts.videos < mediaRules.maxVideos)) {
-          types.push('video/mp4', 'video/mov', 'video/avi');
+        if (
+          mediaRules.maxVideos === undefined ||
+          (mediaRules.maxVideos > 0 &&
+            mediaCounts.videos < mediaRules.maxVideos)
+        ) {
+          types.push("video/mp4", "video/mov", "video/avi");
         }
       }
-      
-      return types.join(',');
+
+      return types.join(",");
     }, [mediaRules, mediaCounts]);
 
     // Verificar si se puede agregar más contenido
     const canAddMore = useMemo(() => {
       // Para polls que no permiten media
-      if (mediaRules.maxImages === 0 && mediaRules.maxVideos === 0) return false;
-      
+      if (mediaRules.maxImages === 0 && mediaRules.maxVideos === 0)
+        return false;
+
       // Para reels (solo video)
       if (mediaRules.videoOnly && mediaCounts.videos >= 1) return false;
-      
+
       // Para tipos que solo permiten imágenes
-      if (mediaRules.imageOnly && mediaRules.maxImages && mediaCounts.images >= mediaRules.maxImages) return false;
-      
+      if (
+        mediaRules.imageOnly &&
+        mediaRules.maxImages &&
+        mediaCounts.images >= mediaRules.maxImages
+      )
+        return false;
+
       // Para carousel, usar maxCount si está definido
-      if (mediaRules.maxCount && mediaCounts.total >= mediaRules.maxCount) return false;
-      
+      if (mediaRules.maxCount && mediaCounts.total >= mediaRules.maxCount)
+        return false;
+
       // Para otros tipos, verificar límites individuales
-      if (mediaRules.maxImages !== undefined && mediaRules.maxImages === 0 && mediaCounts.images > 0) return false;
-      if (mediaRules.maxVideos !== undefined && mediaRules.maxVideos === 0 && mediaCounts.videos > 0) return false;
-      
+      if (
+        mediaRules.maxImages !== undefined &&
+        mediaRules.maxImages === 0 &&
+        mediaCounts.images > 0
+      )
+        return false;
+      if (
+        mediaRules.maxVideos !== undefined &&
+        mediaRules.maxVideos === 0 &&
+        mediaCounts.videos > 0
+      )
+        return false;
+
       // Verificar límites totales
-      const maxTotal = (mediaRules.maxImages || 0) + (mediaRules.maxVideos || 0);
+      const maxTotal =
+        (mediaRules.maxImages || 0) + (mediaRules.maxVideos || 0);
       if (maxTotal > 0 && mediaCounts.total >= maxTotal) return false;
-      
+
       return true;
     }, [mediaRules, mediaCounts]);
 
@@ -183,20 +231,19 @@ const MediaUploadSection = memo(
             >
               Media
             </Label>
-            
+
             {/* Indicador de límites */}
             {mediaPreviews.length > 0 && (
               <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                 <Info className="w-3 h-3" />
                 <span>
-                  {mediaRules.videoOnly 
+                  {mediaRules.videoOnly
                     ? `${mediaCounts.videos}/1 video`
                     : mediaRules.imageOnly
-                    ? `${mediaCounts.images}/${mediaRules.maxImages || '∞'} imágenes`
-                    : mediaRules.maxCount
-                    ? `${mediaCounts.total}/${mediaRules.maxCount} archivos`
-                    : `${mediaCounts.total}/${(mediaRules.maxImages || 0) + (mediaRules.maxVideos || 0)} archivos`
-                  }
+                      ? `${mediaCounts.images}/${mediaRules.maxImages || "∞"} imágenes`
+                      : mediaRules.maxCount
+                        ? `${mediaCounts.total}/${mediaRules.maxCount} archivos`
+                        : `${mediaCounts.total}/${(mediaRules.maxImages || 0) + (mediaRules.maxVideos || 0)} archivos`}
                 </span>
               </div>
             )}
@@ -242,7 +289,9 @@ const MediaUploadSection = memo(
                       />
                     </div>
                   ))}
-                  {!disabled && !isAnyMediaProcessing && canAddMore && <AddMoreButton />}
+                  {!disabled && !isAnyMediaProcessing && canAddMore && (
+                    <AddMoreButton />
+                  )}
                 </div>
               ) : (
                 <label
@@ -296,7 +345,12 @@ const MediaUploadSection = memo(
                 id="media-file-input"
                 type="file"
                 className="hidden"
-                multiple={!mediaRules.videoOnly && (mediaRules.maxCount ? mediaRules.maxCount > 1 : (mediaRules.maxImages || 1) > 1)}
+                multiple={
+                  !mediaRules.videoOnly &&
+                  (mediaRules.maxCount
+                    ? mediaRules.maxCount > 1
+                    : (mediaRules.maxImages || 1) > 1)
+                }
                 accept={acceptedFileTypes}
                 onChange={(e) => onFileChange(e.target.files)}
               />
@@ -309,16 +363,15 @@ const MediaUploadSection = memo(
               {imageError}
             </div>
           )}
-          
+
           {/* Mensaje informativo sobre límites alcanzados */}
           {!canAddMore && mediaPreviews.length > 0 && (
             <div className="mt-2 flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400">
               <Info className="w-4 h-4" />
               <span>
-                {mediaRules.videoOnly 
+                {mediaRules.videoOnly
                   ? "Los Reels/Shorts solo permiten 1 video"
-                  : `Límite alcanzado para este tipo de contenido`
-                }
+                  : `Límite alcanzado para este tipo de contenido`}
               </span>
             </div>
           )}
@@ -370,7 +423,7 @@ const MediaPreviewItem = memo(
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const formatETA = (seconds?: number) => {
-      if (!seconds || typeof seconds !== 'number' || isNaN(seconds)) return "";
+      if (!seconds || typeof seconds !== "number" || isNaN(seconds)) return "";
       const roundedSeconds = Math.round(seconds);
       if (roundedSeconds < 60) return `${roundedSeconds}s`;
       const mins = Math.floor(roundedSeconds / 60);
@@ -438,9 +491,9 @@ const MediaPreviewItem = memo(
             </div>
             <div className="text-[10px] text-white/90 font-bold flex justify-between w-full uppercase tracking-tighter">
               <span>{Math.round(progress || 0)}%</span>
-              {stats?.eta && typeof stats.eta === 'number' && !isNaN(stats.eta) && (
-                <span>~{formatETA(stats.eta)}</span>
-              )}
+              {stats?.eta &&
+                typeof stats.eta === "number" &&
+                !isNaN(stats.eta) && <span>~{formatETA(stats.eta)}</span>}
             </div>
           </div>
         )}
@@ -598,28 +651,35 @@ const EmptyUploadState = memo(
   }) => {
     const getMediaHint = () => {
       if (!mediaRules) return "Arrastra imágenes o videos aquí";
-      
+
       if (mediaRules.videoOnly) return "Solo 1 video vertical";
-      if (mediaRules.imageOnly) return `Hasta ${mediaRules.maxImages || 1} imagen${(mediaRules.maxImages || 1) > 1 ? 'es' : ''}`;
-      
+      if (mediaRules.imageOnly)
+        return `Hasta ${mediaRules.maxImages || 1} imagen${(mediaRules.maxImages || 1) > 1 ? "es" : ""}`;
+
       // Para carousel, usar maxCount si está definido
       if (mediaRules.maxCount) {
-        const minText = mediaRules.minCount ? `${mediaRules.minCount}-` : '';
+        const minText = mediaRules.minCount ? `${mediaRules.minCount}-` : "";
         return `${minText}${mediaRules.maxCount} archivos (imágenes o videos)`;
       }
-      
+
       const parts: string[] = [];
       if (mediaRules.maxImages && mediaRules.maxImages > 0) {
-        parts.push(`${mediaRules.maxImages} imagen${mediaRules.maxImages > 1 ? 'es' : ''}`);
+        parts.push(
+          `${mediaRules.maxImages} imagen${mediaRules.maxImages > 1 ? "es" : ""}`,
+        );
       }
       if (mediaRules.maxVideos && mediaRules.maxVideos > 0) {
-        parts.push(`${mediaRules.maxVideos} video${mediaRules.maxVideos > 1 ? 's' : ''}`);
+        parts.push(
+          `${mediaRules.maxVideos} video${mediaRules.maxVideos > 1 ? "s" : ""}`,
+        );
       }
-      
+
       if (parts.length === 0) return "Arrastra archivos aquí";
-      
-      const result = parts.join(' o ');
-      return mediaRules.allowMixed ? `Hasta ${result} (puedes mezclar)` : `Hasta ${result}`;
+
+      const result = parts.join(" o ");
+      return mediaRules.allowMixed
+        ? `Hasta ${result} (puedes mezclar)`
+        : `Hasta ${result}`;
     };
 
     return (

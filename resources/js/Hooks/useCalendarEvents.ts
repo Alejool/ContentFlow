@@ -1,13 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
-import { 
-  endOfMonth, 
-  endOfWeek, 
-  startOfMonth, 
-  startOfWeek 
-} from 'date-fns';
-import { CalendarEvent, CalendarFilters } from '@/types/calendar';
-import { usePage } from '@inertiajs/react';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { endOfMonth, endOfWeek, startOfMonth, startOfWeek } from "date-fns";
+import { CalendarEvent, CalendarFilters } from "@/types/calendar";
+import { usePage } from "@inertiajs/react";
 
 interface FetchEventsParams {
   currentMonth: Date;
@@ -23,38 +18,41 @@ interface UpdateEventParams {
 interface BulkUpdateParams {
   eventIds: string[];
   newDate: string;
-  operation: 'move' | 'delete';
+  operation: "move" | "delete";
 }
 
 // Fetch calendar events with caching
-export function useCalendarEvents({ currentMonth, filters }: FetchEventsParams) {
+export function useCalendarEvents({
+  currentMonth,
+  filters,
+}: FetchEventsParams) {
   const { auth } = usePage<any>().props;
   const workspaceId = auth?.user?.current_workspace_id;
-  
+
   const start = startOfWeek(startOfMonth(currentMonth)).toISOString();
   const end = endOfWeek(endOfMonth(currentMonth)).toISOString();
 
   // Build query params with filters
   const params: any = { start, end };
-  
+
   if (filters.platforms.length > 0) {
-    params.platforms = filters.platforms.join(',');
+    params.platforms = filters.platforms.join(",");
   }
   if (filters.campaigns.length > 0) {
-    params.campaigns = filters.campaigns.join(',');
+    params.campaigns = filters.campaigns.join(",");
   }
   if (filters.statuses.length > 0) {
-    params.statuses = filters.statuses.join(',');
+    params.statuses = filters.statuses.join(",");
   }
 
   // Create a unique query key based on workspace, date range and filters
   // Including workspaceId ensures the cache is invalidated when workspace changes
-  const queryKey = ['calendar-events', workspaceId, start, end, filters];
+  const queryKey = ["calendar-events", workspaceId, start, end, filters];
 
   return useQuery({
     queryKey,
     queryFn: async () => {
-      const response = await axios.get(route('api.v1.calendar.events'), {
+      const response = await axios.get(route("api.v1.calendar.events"), {
         params,
       });
       return response.data.data || [];
@@ -70,13 +68,13 @@ export function useUpdateEvent() {
 
   return useMutation({
     mutationFn: async ({ id, newDate, type }: UpdateEventParams) => {
-      const resourceId = id.split('_').pop();
+      const resourceId = id.split("_").pop();
       let eventType = type;
 
       if (!eventType) {
-        if (id.startsWith('pub_')) eventType = 'publication';
-        else if (id.startsWith('post_')) eventType = 'post';
-        else if (id.startsWith('user_event_')) eventType = 'user_event';
+        if (id.startsWith("pub_")) eventType = "publication";
+        else if (id.startsWith("post_")) eventType = "post";
+        else if (id.startsWith("user_event_")) eventType = "user_event";
       }
 
       await axios.patch(`/api/v1/calendar/events/${resourceId}`, {
@@ -88,7 +86,7 @@ export function useUpdateEvent() {
     },
     onSuccess: () => {
       // Invalidate all calendar event queries to refetch
-      queryClient.invalidateQueries({ queryKey: ['calendar-events'] });
+      queryClient.invalidateQueries({ queryKey: ["calendar-events"] });
     },
   });
 }
@@ -99,7 +97,7 @@ export function useBulkUpdateEvents() {
 
   return useMutation({
     mutationFn: async ({ eventIds, newDate, operation }: BulkUpdateParams) => {
-      const response = await axios.post('/api/v1/calendar/bulk-update', {
+      const response = await axios.post("/api/v1/calendar/bulk-update", {
         event_ids: eventIds,
         new_date: newDate,
         operation,
@@ -109,7 +107,7 @@ export function useBulkUpdateEvents() {
     },
     onSuccess: () => {
       // Invalidate all calendar event queries to refetch
-      queryClient.invalidateQueries({ queryKey: ['calendar-events'] });
+      queryClient.invalidateQueries({ queryKey: ["calendar-events"] });
     },
   });
 }
@@ -120,12 +118,12 @@ export function useUndoBulkOperation() {
 
   return useMutation({
     mutationFn: async () => {
-      const response = await axios.post('/api/v1/calendar/bulk-undo');
+      const response = await axios.post("/api/v1/calendar/bulk-undo");
       return response.data;
     },
     onSuccess: () => {
       // Invalidate all calendar event queries to refetch
-      queryClient.invalidateQueries({ queryKey: ['calendar-events'] });
+      queryClient.invalidateQueries({ queryKey: ["calendar-events"] });
     },
   });
 }
@@ -136,13 +134,13 @@ export function useDeleteEvent() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const resourceId = id.includes('_') ? id.split('_')[2] : id;
+      const resourceId = id.includes("_") ? id.split("_")[2] : id;
       await axios.delete(`/api/v1/calendar/user-events/${resourceId}`);
       return id;
     },
     onSuccess: () => {
       // Invalidate all calendar event queries to refetch
-      queryClient.invalidateQueries({ queryKey: ['calendar-events'] });
+      queryClient.invalidateQueries({ queryKey: ["calendar-events"] });
     },
   });
 }

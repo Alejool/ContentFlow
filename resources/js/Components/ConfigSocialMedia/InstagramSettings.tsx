@@ -55,7 +55,10 @@ export default function InstagramSettings({
             icon={Video}
             iconColor="text-pink-500"
             iconBgColor="bg-pink-100 dark:bg-pink-900/20"
-            selected={settings?.type === "reel" || (!settings?.type && defaultSettings.type === "reel")}
+            selected={
+              settings?.type === "reel" ||
+              (!settings?.type && defaultSettings.type === "reel")
+            }
             onSelect={(val) => handleChange("type", val)}
           />
           <PlatformCard

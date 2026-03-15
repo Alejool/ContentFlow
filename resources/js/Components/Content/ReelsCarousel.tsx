@@ -1,8 +1,15 @@
-import { ChevronLeft, ChevronRight, Download, ExternalLink, Film, Trash2 } from 'lucide-react';
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import toast from 'react-hot-toast';
-import axios from 'axios';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  ExternalLink,
+  Film,
+  Trash2,
+} from "lucide-react";
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+import toast from "react-hot-toast";
+import axios from "axios";
 
 interface MediaFile {
   id: number;
@@ -20,7 +27,10 @@ interface ReelsCarouselProps {
   onReelDeleted?: (reelId: number) => void;
 }
 
-export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselProps) {
+export default function ReelsCarousel({
+  reels,
+  onReelDeleted,
+}: ReelsCarouselProps) {
   const { t } = useTranslation();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [deleting, setDeleting] = useState(false);
@@ -40,53 +50,54 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
 
   const getPlatformIcon = (platform?: string) => {
     const icons: Record<string, string> = {
-      instagram: '📸',
-      tiktok: '🎵',
-      youtube_shorts: '▶️',
+      instagram: "📸",
+      tiktok: "🎵",
+      youtube_shorts: "▶️",
     };
-    return icons[platform || ''] || '🎬';
+    return icons[platform || ""] || "🎬";
   };
 
   const getPlatformColor = (platform?: string) => {
     const colors: Record<string, string> = {
-      instagram: 'from-pink-500 to-purple-500',
-      tiktok: 'from-black to-cyan-500',
-      youtube_shorts: 'from-red-500 to-red-600',
+      instagram: "from-pink-500 to-purple-500",
+      tiktok: "from-black to-cyan-500",
+      youtube_shorts: "from-red-500 to-red-600",
     };
-    return colors[platform || ''] || 'from-purple-500 to-purple-600';
+    return colors[platform || ""] || "from-purple-500 to-purple-600";
   };
 
   const handleDownload = () => {
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = currentReel.file_path;
-    link.download = currentReel.file_name || `reel-${currentReel.metadata?.platform}.mp4`;
+    link.download =
+      currentReel.file_name || `reel-${currentReel.metadata?.platform}.mp4`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
   const handleOpenInNewTab = () => {
-    window.open(currentReel.file_path, '_blank');
+    window.open(currentReel.file_path, "_blank");
   };
 
   const handleDeleteReel = async () => {
-    if (!confirm(t('reels.messages.confirmDelete'))) return;
+    if (!confirm(t("reels.messages.confirmDelete"))) return;
 
     setDeleting(true);
     try {
       await axios.delete(`/api/v1/media/${currentReel.id}`);
-      toast.success(t('reels.messages.reelDeleted'));
-      
+      toast.success(t("reels.messages.reelDeleted"));
+
       // Move to next reel or previous if this was the last one
       if (reels.length > 1) {
         if (currentIndex >= reels.length - 1) {
           setCurrentIndex(Math.max(0, currentIndex - 1));
         }
       }
-      
+
       onReelDeleted?.(currentReel.id);
     } catch (error) {
-      toast.error(t('reels.messages.deleteError'));
+      toast.error(t("reels.messages.deleteError"));
     } finally {
       setDeleting(false);
     }
@@ -107,9 +118,15 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
         />
 
         {/* Platform Badge */}
-        <div className={`absolute top-4 left-4 px-3 py-1.5 rounded-full bg-gradient-to-r ${getPlatformColor(currentReel.metadata?.platform)} text-white text-sm font-bold flex items-center gap-2 shadow-lg`}>
-          <span className="text-base">{getPlatformIcon(currentReel.metadata?.platform)}</span>
-          <span className="capitalize">{currentReel.metadata?.platform || 'Reel'}</span>
+        <div
+          className={`absolute top-4 left-4 px-3 py-1.5 rounded-full bg-gradient-to-r ${getPlatformColor(currentReel.metadata?.platform)} text-white text-sm font-bold flex items-center gap-2 shadow-lg`}
+        >
+          <span className="text-base">
+            {getPlatformIcon(currentReel.metadata?.platform)}
+          </span>
+          <span className="capitalize">
+            {currentReel.metadata?.platform || "Reel"}
+          </span>
         </div>
 
         {/* Duration Badge */}
@@ -146,21 +163,21 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
             onClick={handleDeleteReel}
             disabled={deleting}
             className="p-2.5 bg-red-500/80 hover:bg-red-600/80 backdrop-blur-sm rounded-full transition-all text-white disabled:opacity-50"
-            title={t('reels.actions.delete')}
+            title={t("reels.actions.delete")}
           >
             <Trash2 className="w-5 h-5" />
           </button>
           <button
             onClick={handleDownload}
             className="p-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full transition-all text-white"
-            title={t('common.download')}
+            title={t("common.download")}
           >
             <Download className="w-5 h-5" />
           </button>
           <button
             onClick={handleOpenInNewTab}
             className="p-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full transition-all text-white"
-            title={t('common.openInNewTab')}
+            title={t("common.openInNewTab")}
           >
             <ExternalLink className="w-5 h-5" />
           </button>
@@ -176,8 +193,8 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
               onClick={() => setCurrentIndex(index)}
               className={`relative flex-shrink-0 w-20 h-28 rounded-lg overflow-hidden transition-all ${
                 index === currentIndex
-                  ? 'ring-4 ring-purple-500 scale-105'
-                  : 'opacity-60 hover:opacity-100'
+                  ? "ring-4 ring-purple-500 scale-105"
+                  : "opacity-60 hover:opacity-100"
               }`}
             >
               <video

@@ -7,7 +7,13 @@ interface UploadItemProps {
     id: string;
     file: { name: string };
     progress: number;
-    status: "uploading" | "pending" | "paused" | "completed" | "error" | "cancelled";
+    status:
+      | "uploading"
+      | "pending"
+      | "paused"
+      | "completed"
+      | "error"
+      | "cancelled";
     error?: string;
     stats?: { speed?: number; eta?: number };
   };
@@ -40,10 +46,17 @@ export function UploadItem({ upload, onRemove }: UploadItemProps) {
       return `~${formatTime(upload.stats.eta)} ${t("publications.modal.upload.left", { defaultValue: "restante" })}`;
     }
     if (upload.status === "error") return upload.error;
-    if (upload.status === "completed") return t("publications.modal.upload.done", { defaultValue: "Listo" });
-    if (upload.status === "paused") return t("publications.modal.upload.paused", { defaultValue: "Pausado" });
-    if (upload.status === "cancelled") return t("publications.modal.upload.cancelled", { defaultValue: "Cancelado" });
-    return t("publications.modal.upload.pending", { defaultValue: "Pendiente" });
+    if (upload.status === "completed")
+      return t("publications.modal.upload.done", { defaultValue: "Listo" });
+    if (upload.status === "paused")
+      return t("publications.modal.upload.paused", { defaultValue: "Pausado" });
+    if (upload.status === "cancelled")
+      return t("publications.modal.upload.cancelled", {
+        defaultValue: "Cancelado",
+      });
+    return t("publications.modal.upload.pending", {
+      defaultValue: "Pendiente",
+    });
   };
 
   return (

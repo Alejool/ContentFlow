@@ -10,9 +10,7 @@ export function TableHeader({ mode, t }: TableHeaderProps) {
         <th className="p-4  font-semibold w-8"></th>
         <th className="p-4  font-semibold">{t("campaigns.table.name")}</th>
         <th className="p-4  font-semibold">Author</th>
-        <th className="p-4  font-semibold">
-          {t("campaigns.table.status")}
-        </th>
+        <th className="p-4  font-semibold">{t("campaigns.table.status")}</th>
         <th className="p-4  font-semibold">
           {t("campaigns.table.publications")}
         </th>
@@ -26,19 +24,11 @@ export function TableHeader({ mode, t }: TableHeaderProps) {
   return (
     <>
       <th className="p-4  font-semibold w-8"></th>
-      <th className="p-4  font-semibold">
-        {t("publications.table.name")}
-      </th>
+      <th className="p-4  font-semibold">{t("publications.table.name")}</th>
       <th className="p-4  font-semibold">Author</th>
-      <th className="p-4  font-semibold">
-        {t("publications.table.status")}
-      </th>
-      <th className="p-4  font-semibold">
-        {t("publications.table.media")}
-      </th>
-      <th className="p-4  font-semibold">
-        {t("publications.table.campaign")}
-      </th>
+      <th className="p-4  font-semibold">{t("publications.table.status")}</th>
+      <th className="p-4  font-semibold">{t("publications.table.media")}</th>
+      <th className="p-4  font-semibold">{t("publications.table.campaign")}</th>
       <th className="p-4  font-semibold">
         {t("publications.table.linkedAccount")}
       </th>

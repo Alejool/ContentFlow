@@ -75,7 +75,10 @@ export default function TikTokSettings({
                 label={label}
                 description={description}
                 icon={Icon}
-                selected={settings?.privacy === value || (!settings?.privacy && defaultSettings.privacy === value)}
+                selected={
+                  settings?.privacy === value ||
+                  (!settings?.privacy && defaultSettings.privacy === value)
+                }
                 onSelect={(val) => handleChange("privacy", val)}
               />
             ))}

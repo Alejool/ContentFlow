@@ -69,7 +69,7 @@ interface SubscriptionSectionProps {
 function UsageStatsWithAddons({ usage: legacyUsage }: { usage?: any }) {
   const { t } = useTranslation();
   const { usage, loading } = useSubscriptionUsage();
-  
+
   if (loading || !usage) {
     return (
       <div className="space-y-4">
@@ -99,8 +99,8 @@ function UsageStatsWithAddons({ usage: legacyUsage }: { usage?: any }) {
 
   const metrics = [
     {
-      key: 'publications',
-      label: t('subscription.usage.publications', 'Publicaciones'),
+      key: "publications",
+      label: t("subscription.usage.publications", "Publicaciones"),
       icon: FileText,
       used: usage.publications.used,
       limit: usage.publications.limit,
@@ -110,8 +110,8 @@ function UsageStatsWithAddons({ usage: legacyUsage }: { usage?: any }) {
       show: true,
     },
     {
-      key: 'storage',
-      label: t('subscription.usage.storage', 'Almacenamiento'),
+      key: "storage",
+      label: t("subscription.usage.storage", "Almacenamiento"),
       icon: HardDrive,
       used: formatBytes(usage.storage.used_bytes),
       limit: `${usage.storage.limit_gb} GB`,
@@ -121,37 +121,55 @@ function UsageStatsWithAddons({ usage: legacyUsage }: { usage?: any }) {
       show: true,
     },
     {
-      key: 'ai_requests',
-      label: t('subscription.addons.aiCredits', 'Créditos IA'),
+      key: "ai_requests",
+      label: t("subscription.addons.aiCredits", "Créditos IA"),
       icon: Sparkles,
       used: usage.ai_requests.used,
-      limit: usage.ai_requests.limit === -1 || usage.ai_requests.limit === null ? '∞' : usage.ai_requests.limit,
-      total_available: usage.ai_requests.total_available === -1 || usage.ai_requests.total_available === null ? '∞' : usage.ai_requests.total_available,
+      limit:
+        usage.ai_requests.limit === -1 || usage.ai_requests.limit === null
+          ? "∞"
+          : usage.ai_requests.limit,
+      total_available:
+        usage.ai_requests.total_available === -1 ||
+        usage.ai_requests.total_available === null
+          ? "∞"
+          : usage.ai_requests.total_available,
       percentage: usage.ai_requests.percentage || 0,
       addon_info: usage.ai_requests.addon_info,
       show: usage.ai_requests.limit !== null && usage.ai_requests.limit !== -1,
     },
     {
-      key: 'social_accounts',
-      label: t('subscription.addons.socialAccounts', 'Cuentas Sociales'),
+      key: "social_accounts",
+      label: t("subscription.addons.socialAccounts", "Cuentas Sociales"),
       icon: Share2,
       used: usage.social_accounts.used,
-      limit: usage.social_accounts.limit === -1 ? '∞' : usage.social_accounts.limit,
-      total_available: usage.social_accounts.total_available === -1 ? '∞' : usage.social_accounts.total_available,
+      limit:
+        usage.social_accounts.limit === -1 ? "∞" : usage.social_accounts.limit,
+      total_available:
+        usage.social_accounts.total_available === -1
+          ? "∞"
+          : usage.social_accounts.total_available,
       percentage: usage.social_accounts.percentage,
       show: true,
     },
     {
-      key: 'team_members',
-      label: t('subscription.addons.teamMembers', 'Miembros del Equipo'),
+      key: "team_members",
+      label: t("subscription.addons.teamMembers", "Miembros del Equipo"),
       icon: Users,
       used: usage.team_members?.used || 0,
-      limit: usage.team_members?.limit === -1 || !usage.team_members?.limit ? '∞' : usage.team_members.limit,
-      total_available: usage.team_members?.total_available === -1 || !usage.team_members?.total_available ? '∞' : usage.team_members.total_available,
+      limit:
+        usage.team_members?.limit === -1 || !usage.team_members?.limit
+          ? "∞"
+          : usage.team_members.limit,
+      total_available:
+        usage.team_members?.total_available === -1 ||
+        !usage.team_members?.total_available
+          ? "∞"
+          : usage.team_members.total_available,
       percentage: usage.team_members?.percentage || 0,
       show: usage.team_members?.limit !== undefined,
     },
-  ].filter(metric => metric.show);
+  ].filter((metric) => metric.show);
 
   return (
     <div className="space-y-4">
@@ -167,14 +185,13 @@ function UsageStatsWithAddons({ usage: legacyUsage }: { usage?: any }) {
                 </span>
               </div>
               <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                {metric.limit === '∞' || metric.limit === -1
+                {metric.limit === "∞" || metric.limit === -1
                   ? `${metric.used} / ∞`
-                  : `${metric.used} / ${metric.total_available || metric.limit}`
-                }
+                  : `${metric.used} / ${metric.total_available || metric.limit}`}
               </span>
             </div>
-            
-            {metric.limit !== '∞' && metric.limit !== -1 && (
+
+            {metric.limit !== "∞" && metric.limit !== -1 && (
               <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                 <div
                   className={`h-2 rounded-full transition-all ${getProgressBarColor(metric.percentage)}`}
@@ -182,13 +199,14 @@ function UsageStatsWithAddons({ usage: legacyUsage }: { usage?: any }) {
                 />
               </div>
             )}
-            
+
             {/* Mostrar desglose de addons si existen */}
             {metric.addon_info && metric.addon_info.total > 0 && (
               <div className="text-xs text-primary-600 dark:text-primary-400">
-                <span className="font-medium">Plan:</span> {metric.limit} + 
-                <span className="font-medium"> Addons:</span> {metric.addon_info.remaining}/{metric.addon_info.total}
-                {metric.key === 'storage' && ' GB'}
+                <span className="font-medium">Plan:</span> {metric.limit} +
+                <span className="font-medium"> Addons:</span>{" "}
+                {metric.addon_info.remaining}/{metric.addon_info.total}
+                {metric.key === "storage" && " GB"}
               </div>
             )}
           </div>

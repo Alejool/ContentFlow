@@ -178,8 +178,8 @@ export default function Checkbox<T extends FieldValues>({
         error
           ? "text-primary-400"
           : success
-          ? "text-green-400"
-          : "text-gray-300"
+            ? "text-green-400"
+            : "text-gray-300"
       }`;
     }
     return `${base} ${
@@ -272,13 +272,13 @@ export default function Checkbox<T extends FieldValues>({
                 ? error
                   ? "text-primary-400"
                   : success
-                  ? "text-green-400"
-                  : "text-gray-400"
+                    ? "text-green-400"
+                    : "text-gray-400"
                 : error
-                ? "text-primary-500"
-                : success
-                ? "text-green-500"
-                : "text-gray-400"
+                  ? "text-primary-500"
+                  : success
+                    ? "text-green-500"
+                    : "text-gray-400"
             }
           `}
           >

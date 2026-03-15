@@ -1,17 +1,17 @@
 /**
  * FocusVisibleManager - Utility for managing focus-visible state
- * 
+ *
  * Detects whether focus was triggered by keyboard or mouse interaction
  * and applies the 'focus-visible' class accordingly. This ensures that
  * focus indicators are only shown for keyboard navigation, not mouse clicks.
- * 
+ *
  * Requirements: 6.1, 6.2, 6.3
  */
 
 class FocusVisibleManagerClass {
   private isKeyboardMode: boolean = false;
   private isInitialized: boolean = false;
-  private readonly FOCUS_VISIBLE_CLASS = 'focus-visible';
+  private readonly FOCUS_VISIBLE_CLASS = "focus-visible";
 
   /**
    * Initialize the focus-visible detection system
@@ -24,10 +24,10 @@ class FocusVisibleManagerClass {
 
     // Detect keyboard usage
     this.setupKeyboardDetection();
-    
+
     // Detect mouse usage
     this.setupMouseDetection();
-    
+
     // Handle focus events
     this.setupFocusHandling();
 
@@ -39,12 +39,16 @@ class FocusVisibleManagerClass {
    * Switches to keyboard mode when Tab key is pressed
    */
   private setupKeyboardDetection(): void {
-    document.addEventListener('keydown', (event: KeyboardEvent) => {
-      // Tab key indicates keyboard navigation
-      if (event.key === 'Tab') {
-        this.isKeyboardMode = true;
-      }
-    }, true);
+    document.addEventListener(
+      "keydown",
+      (event: KeyboardEvent) => {
+        // Tab key indicates keyboard navigation
+        if (event.key === "Tab") {
+          this.isKeyboardMode = true;
+        }
+      },
+      true,
+    );
   }
 
   /**
@@ -52,17 +56,25 @@ class FocusVisibleManagerClass {
    * Switches to mouse mode on mouse down
    */
   private setupMouseDetection(): void {
-    document.addEventListener('mousedown', () => {
-      this.isKeyboardMode = false;
-    }, true);
+    document.addEventListener(
+      "mousedown",
+      () => {
+        this.isKeyboardMode = false;
+      },
+      true,
+    );
 
     // Also detect pointer events for touch devices
-    document.addEventListener('pointerdown', (event: PointerEvent) => {
-      // Only switch to mouse mode for mouse/touch, not pen
-      if (event.pointerType === 'mouse' || event.pointerType === 'touch') {
-        this.isKeyboardMode = false;
-      }
-    }, true);
+    document.addEventListener(
+      "pointerdown",
+      (event: PointerEvent) => {
+        // Only switch to mouse mode for mouse/touch, not pen
+        if (event.pointerType === "mouse" || event.pointerType === "touch") {
+          this.isKeyboardMode = false;
+        }
+      },
+      true,
+    );
   }
 
   /**
@@ -71,31 +83,39 @@ class FocusVisibleManagerClass {
    */
   private setupFocusHandling(): void {
     // Handle focus events
-    document.addEventListener('focus', (event: FocusEvent) => {
-      const target = event.target as HTMLElement;
-      
-      if (!target || !(target instanceof HTMLElement)) {
-        return;
-      }
+    document.addEventListener(
+      "focus",
+      (event: FocusEvent) => {
+        const target = event.target as HTMLElement;
 
-      // Add focus-visible class if in keyboard mode
-      if (this.isKeyboardMode) {
-        this.addFocusVisible(target);
-      } else {
-        this.removeFocusVisible(target);
-      }
-    }, true);
+        if (!target || !(target instanceof HTMLElement)) {
+          return;
+        }
+
+        // Add focus-visible class if in keyboard mode
+        if (this.isKeyboardMode) {
+          this.addFocusVisible(target);
+        } else {
+          this.removeFocusVisible(target);
+        }
+      },
+      true,
+    );
 
     // Handle blur events to clean up
-    document.addEventListener('blur', (event: FocusEvent) => {
-      const target = event.target as HTMLElement;
-      
-      if (!target || !(target instanceof HTMLElement)) {
-        return;
-      }
+    document.addEventListener(
+      "blur",
+      (event: FocusEvent) => {
+        const target = event.target as HTMLElement;
 
-      this.removeFocusVisible(target);
-    }, true);
+        if (!target || !(target instanceof HTMLElement)) {
+          return;
+        }
+
+        this.removeFocusVisible(target);
+      },
+      true,
+    );
   }
 
   /**
@@ -121,9 +141,9 @@ class FocusVisibleManagerClass {
     }
 
     element.classList.add(this.FOCUS_VISIBLE_CLASS);
-    
+
     // Also set data attribute for CSS selectors
-    element.setAttribute('data-focus-visible', 'true');
+    element.setAttribute("data-focus-visible", "true");
   }
 
   /**
@@ -136,7 +156,7 @@ class FocusVisibleManagerClass {
     }
 
     element.classList.remove(this.FOCUS_VISIBLE_CLASS);
-    element.removeAttribute('data-focus-visible');
+    element.removeAttribute("data-focus-visible");
   }
 
   /**
@@ -155,11 +175,11 @@ class FocusVisibleManagerClass {
       'input[type="tel"]',
       'input[type="url"]',
       'input[type="number"]',
-      'textarea',
+      "textarea",
       '[contenteditable="true"]',
     ];
 
-    const shouldAlwaysShow = alwaysShowFocusSelectors.some(selector => {
+    const shouldAlwaysShow = alwaysShowFocusSelectors.some((selector) => {
       try {
         return element.matches(selector);
       } catch {
@@ -180,8 +200,8 @@ class FocusVisibleManagerClass {
    * Get the current input mode
    * @returns 'keyboard' or 'mouse'
    */
-  getInputMode(): 'keyboard' | 'mouse' {
-    return this.isKeyboardMode ? 'keyboard' : 'mouse';
+  getInputMode(): "keyboard" | "mouse" {
+    return this.isKeyboardMode ? "keyboard" : "mouse";
   }
 
   /**

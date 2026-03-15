@@ -16,7 +16,13 @@ export interface QueuedUpload {
   id: string;
   file: File;
   progress: number;
-  status: "pending" | "uploading" | "paused" | "completed" | "error" | "cancelled";
+  status:
+    | "pending"
+    | "uploading"
+    | "paused"
+    | "completed"
+    | "error"
+    | "cancelled";
   publicationId?: number;
   publicationTitle?: string;
   s3Key?: string;
@@ -32,7 +38,7 @@ export interface QueuedUpload {
   }>;
   abortController?: AbortController; // For cancellation
   isPausable: boolean; // Whether this upload supports pausing
-  
+
   // Retry tracking
   retryCount?: number; // Number of retry attempts made
   lastError?: string; // Last error message for debugging
@@ -286,8 +292,7 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
 
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(persistedState));
-    } catch (error) {
-      }
+    } catch (error) {}
   },
 
   restoreState: () => {
@@ -357,28 +362,30 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
         const { [id]: _, ...rest } = state.persistedState;
         return { persistedState: rest };
       });
-    } catch (error) {
-      }
+    } catch (error) {}
   },
 
   initializeStore: () => {
     const state = get();
-    
+
     // Only restore once
     if (state.hasRestoredState) return;
-    
+
     // Restore persisted state
     get().restoreState();
-    
+
     // Check if there are any incomplete uploads to resume
     const persistedUploads = Object.values(get().persistedState);
     const hasIncompleteUploads = persistedUploads.some(
-      (upload) => upload.status === "uploading" || upload.status === "paused" || upload.status === "pending"
+      (upload) =>
+        upload.status === "uploading" ||
+        upload.status === "paused" ||
+        upload.status === "pending",
     );
-    
-    set({ 
+
+    set({
       hasRestoredState: true,
-      showResumePrompt: hasIncompleteUploads 
+      showResumePrompt: hasIncompleteUploads,
     });
   },
 
@@ -390,7 +397,6 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
     try {
       localStorage.removeItem(STORAGE_KEY);
       set({ persistedState: {}, showResumePrompt: false });
-    } catch (error) {
-      }
+    } catch (error) {}
   },
 }));

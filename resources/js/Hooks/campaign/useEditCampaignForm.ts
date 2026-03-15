@@ -6,7 +6,7 @@ import { Campaign } from "@/types/Campaign";
 
 export const useEditCampaignForm = (
   t: (key: string) => string,
-  campaign: Campaign | null
+  campaign: Campaign | null,
 ) => {
   const schema = useMemo(() => campaignSchema(t), [t]);
 

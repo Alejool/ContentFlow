@@ -25,7 +25,7 @@ const VideoPreviewItem: React.FC<VideoPreviewItemProps> = ({
   onYoutubeTypeChange,
 }) => {
   const [isTooLong, setIsTooLong] = useState(
-    duration && duration > 60 && youtubeType === "short"
+    duration && duration > 60 && youtubeType === "short",
   );
 
   const formatDuration = (seconds: number) => {
@@ -110,8 +110,8 @@ const VideoPreviewItem: React.FC<VideoPreviewItemProps> = ({
                   youtubeType === "short"
                     ? "bg-primary-500 text-white"
                     : duration > 60
-                    ? "bg-gray-600/50 text-gray-400 cursor-not-allowed"
-                    : "bg-white/20 text-white hover:bg-white/30"
+                      ? "bg-gray-600/50 text-gray-400 cursor-not-allowed"
+                      : "bg-white/20 text-white hover:bg-white/30"
                 }`}
                 title={
                   duration > 60

@@ -1,5 +1,6 @@
 import DynamicIcon from "@/Components/Notifications/DynamicIcon";
 import { formatDistanceToNow } from "date-fns";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertCircle,
   AlertTriangle,
@@ -91,8 +92,9 @@ export default function NotificationItem({
   };
 
   return (
-    <div
-      className={`p-3 sm:p-4 border-b border-gray-200 dark:border-neutral-800 transition-all duration-200 cursor-pointer relative group hover:bg-gray-50 dark:hover:bg-neutral-800/50 ${
+    <motion.div
+      layout
+      className={`p-3 sm:p-4 border-b border-gray-200 dark:border-neutral-800 transition-colors duration-200 cursor-pointer relative group hover:bg-gray-50 dark:hover:bg-neutral-800/50 ${
         !isRead ? "bg-primary-50/50 dark:bg-primary-900/10" : ""
       }`}
       onClick={() => onMarkAsRead(notification.id)}
@@ -114,13 +116,19 @@ export default function NotificationItem({
             )}
 
             {data.message && (
-              <p
-                className={`text-sm mb-1 break-words text-gray-700 dark:text-gray-200 ${
-                  isExpanded ? "" : "line-clamp-2"
-                }`}
-              >
-                {data.message}
-              </p>
+              <AnimatePresence initial={false}>
+                <motion.p
+                  key={isExpanded ? "expanded" : "collapsed"}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.15 }}
+                  className={`text-sm mb-1 break-words text-gray-700 dark:text-gray-200 ${
+                    isExpanded ? "" : "line-clamp-2"
+                  }`}
+                >
+                  {data.message}
+                </motion.p>
+              </AnimatePresence>
             )}
 
             {data.message && data.message.length > 100 && (
@@ -148,7 +156,9 @@ export default function NotificationItem({
                 <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
                   {data.publication_title}
                 </span>
-                <span className="text-xs text-gray-400 dark:text-gray-600">•</span>
+                <span className="text-xs text-gray-400 dark:text-gray-600">
+                  •
+                </span>
               </>
             )}
 
@@ -157,7 +167,9 @@ export default function NotificationItem({
                 <span className="text-xs italic text-gray-500">
                   {data.campaign_name}
                 </span>
-                <span className="text-xs text-gray-400 dark:text-gray-600">•</span>
+                <span className="text-xs text-gray-400 dark:text-gray-600">
+                  •
+                </span>
               </>
             )}
 
@@ -166,7 +178,9 @@ export default function NotificationItem({
                 <span className={`text-xs capitalize ${getStatusColor()}`}>
                   {data.platform}
                 </span>
-                <span className="text-xs text-gray-400 dark:text-gray-600">•</span>
+                <span className="text-xs text-gray-400 dark:text-gray-600">
+                  •
+                </span>
               </>
             )}
 
@@ -223,6 +237,6 @@ export default function NotificationItem({
           <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-primary-500 flex-shrink-0" />
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }

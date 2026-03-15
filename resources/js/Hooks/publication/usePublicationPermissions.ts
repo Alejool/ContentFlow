@@ -15,54 +15,47 @@ export function usePublicationPermissions(permissions: string[] = []) {
 
   // Permisos básicos usando CASL
   const canManageContent = useMemo(
-    () => ability.can('update', 'Publication') || ability.can('create', 'Publication'),
-    [ability]
+    () =>
+      ability.can("update", "Publication") ||
+      ability.can("create", "Publication"),
+    [ability],
   );
 
   const canPublish = useMemo(
-    () => ability.can('publish', 'Publication'),
-    [ability]
+    () => ability.can("publish", "Publication"),
+    [ability],
   );
 
   const canDelete = useMemo(
-    () => ability.can('delete', 'Publication'),
-    [ability]
+    () => ability.can("delete", "Publication"),
+    [ability],
   );
 
-  const canEdit = useMemo(
-    () => canManageContent,
-    [canManageContent]
-  );
+  const canEdit = useMemo(() => canManageContent, [canManageContent]);
 
-  const canDuplicate = useMemo(
-    () => canManageContent,
-    [canManageContent]
-  );
+  const canDuplicate = useMemo(() => canManageContent, [canManageContent]);
 
-  const canView = useMemo(
-    () => ability.can('read', 'Publication'),
-    [ability]
-  );
+  const canView = useMemo(() => ability.can("read", "Publication"), [ability]);
 
   const canApprove = useMemo(
-    () => ability.can('approve', 'ApprovalRequest'),
-    [ability]
+    () => ability.can("approve", "ApprovalRequest"),
+    [ability],
   );
 
   const canReject = useMemo(
-    () => ability.can('reject', 'ApprovalRequest'),
-    [ability]
+    () => ability.can("reject", "ApprovalRequest"),
+    [ability],
   );
 
   const canSubmitForApproval = useMemo(
-    () => ability.can('submit_for_approval', 'Publication'),
-    [ability]
+    () => ability.can("submit_for_approval", "Publication"),
+    [ability],
   );
 
   // Información del workspace
   const hasWorkflow = useMemo(
     () => currentWorkspace?.approval_workflow?.is_enabled === true,
-    [currentWorkspace]
+    [currentWorkspace],
   );
 
   // Verificar si el usuario es el aprobador del último nivel del workflow
@@ -77,9 +70,10 @@ export function usePublicationPermissions(permissions: string[] = []) {
     }
 
     // Obtener el último nivel (el de mayor level_number)
-    const lastLevel = levels.reduce((max, level) => 
-      level.level_number > max.level_number ? level : max
-    , levels[0]);
+    const lastLevel = levels.reduce(
+      (max, level) => (level.level_number > max.level_number ? level : max),
+      levels[0],
+    );
 
     // Verificar si el rol del usuario coincide con el rol del último nivel
     const userRoleSlug = currentWorkspace?.user_role_slug;
@@ -90,25 +84,22 @@ export function usePublicationPermissions(permissions: string[] = []) {
 
   const isOwner = useMemo(
     () => currentWorkspace?.user_role_slug === "owner",
-    [currentWorkspace]
+    [currentWorkspace],
   );
 
   const isAdmin = useMemo(
     () => currentWorkspace?.user_role_slug === "admin",
-    [currentWorkspace]
+    [currentWorkspace],
   );
 
-  const isAdminOrOwner = useMemo(
-    () => isOwner || isAdmin,
-    [isOwner, isAdmin]
-  );
+  const isAdminOrOwner = useMemo(() => isOwner || isAdmin, [isOwner, isAdmin]);
 
   // Verificar si puede publicar directamente una publicación específica
   const canPublishDirectly = (item: Publication) => {
     if (!item || !currentUserId) return false;
 
     // SOLO el Owner puede publicar directamente sin importar el workflow
-    if (isOwner && item.status !== 'pending_review') return true;
+    if (isOwner && item.status !== "pending_review") return true;
 
     // Si hay workflow activo:
     // - NADIE puede publicar directamente desde draft/rejected (deben enviar a revisión)
@@ -118,15 +109,22 @@ export function usePublicationPermissions(permissions: string[] = []) {
       if (!isLastLevelApprover) {
         return false;
       }
-      
+
       // Solo puede publicar si el contenido ya está aprobado o es retry
-      return item.status === 'approved' || item.status === 'failed' || item.status === 'published' || item.status === 'scheduled';
+      return (
+        item.status === "approved" ||
+        item.status === "failed" ||
+        item.status === "published" ||
+        item.status === "scheduled"
+      );
     }
 
     // CRÍTICO: Sin workflow, SOLO Admin y Owner pueden publicar directamente
     // Otros roles (incluso con permiso "publish") deben enviar a revisión
     if (isAdminOrOwner) {
-      return ["draft", "rejected", "failed", "published", "scheduled"].includes(item.status || "");
+      return ["draft", "rejected", "failed", "published", "scheduled"].includes(
+        item.status || "",
+      );
     }
 
     return false;
@@ -134,15 +132,14 @@ export function usePublicationPermissions(permissions: string[] = []) {
 
   // Verificar si debe mostrar botón de enviar a revisión
   const shouldShowSendToReview = (item: Publication) => {
-
-    console.log('item shouldShowSendToReview');
+    console.log("item shouldShowSendToReview");
     console.log(item);
     // Admin y Owner nunca necesitan enviar a revisión (publican directamente)
     if (isAdminOrOwner) return false;
-    
+
     // Si no tiene permiso de enviar a revisión, no mostrar
     if (!canSubmitForApproval) return false;
-    
+
     // CRÍTICO: Si NO hay workflow activo, los roles que no son Admin/Owner
     // DEBEN enviar a revisión (no pueden publicar directamente)
     // Esto aplica incluso si tienen el permiso "publish"
@@ -150,16 +147,18 @@ export function usePublicationPermissions(permissions: string[] = []) {
       // Mostrar para estados draft, rejected, failed
       return ["draft", "rejected", "failed"].includes(item.status || "draft");
     }
-    
+
     // Si es el aprobador del último nivel, no necesita enviar a revisión
     // (puede publicar directamente)
     if (isLastLevelApprover) return false;
-    
+
     // No mostrar si está en proceso de revisión o publicación
-    if (["pending_review", "publishing", "retrying"].includes(item.status || "")) {
+    if (
+      ["pending_review", "publishing", "retrying"].includes(item.status || "")
+    ) {
       return false;
     }
-    
+
     // Mostrar para estados draft, rejected, failed
     // También para published y scheduled si quieren republicar en otras redes
     return ["draft", "rejected", "scheduled"].includes(item.status || "draft");
@@ -180,7 +179,9 @@ export function usePublicationPermissions(permissions: string[] = []) {
     const isSubmitter = submitterId === currentUserId;
 
     // Retry / republicar — mismas reglas pero para estados de reintento
-    const isRetryStatus = ["failed", "published", "scheduled"].includes(item.status || "");
+    const isRetryStatus = ["failed", "published", "scheduled"].includes(
+      item.status || "",
+    );
 
     // Owner: siempre puede publicar
     if (isOwner) return true;
@@ -212,10 +213,10 @@ export function usePublicationPermissions(permissions: string[] = []) {
   const canEditItem = (item: Publication, remoteLock?: any) => {
     if (!canEdit) return false;
     if (remoteLock) return false;
-    
+
     // Si está en revisión, no puede editar
-    if (item.status === 'pending_review') return false;
-    
+    if (item.status === "pending_review") return false;
+
     return true;
   };
 
@@ -227,8 +228,8 @@ export function usePublicationPermissions(permissions: string[] = []) {
   // Verificar si puede aprobar una publicación específica
   const canApproveItem = (item: Publication) => {
     if (!canApprove) return false;
-    if (item.status !== 'pending_review') return false;
-    
+    if (item.status !== "pending_review") return false;
+
     // Verificación detallada se hace en el backend
     return true;
   };

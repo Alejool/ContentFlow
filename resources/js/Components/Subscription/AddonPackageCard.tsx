@@ -1,9 +1,16 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/Components/ui/card';
-import Button from '@/Components/common/Modern/Button';
-import { Badge } from '@/Components/ui/badge';
-import type { AddonPackage } from '@/types/addon';
-import { Sparkles, HardDrive, Minus, Plus } from 'lucide-react';
+import React, { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/Components/ui/card";
+import Button from "@/Components/common/Modern/Button";
+import { Badge } from "@/Components/ui/badge";
+import type { AddonPackage } from "@/types/addon";
+import { Sparkles, HardDrive, Minus, Plus } from "lucide-react";
 
 interface AddonPackageCardProps {
   package: AddonPackage;
@@ -11,17 +18,17 @@ interface AddonPackageCardProps {
   loading?: boolean;
 }
 
-export const AddonPackageCard: React.FC<AddonPackageCardProps> = ({ 
-  package: pkg, 
+export const AddonPackageCard: React.FC<AddonPackageCardProps> = ({
+  package: pkg,
   onPurchase,
-  loading = false 
+  loading = false,
 }) => {
   const [quantity, setQuantity] = useState(1);
-  
-  const isAI = pkg.sku.startsWith('ai_');
+
+  const isAI = pkg.sku.startsWith("ai_");
   const Icon = isAI ? Sparkles : HardDrive;
-  const unit = isAI ? 'créditos' : 'GB';
-  
+  const unit = isAI ? "créditos" : "GB";
+
   const totalPrice = pkg.price * quantity;
   const totalAmount = pkg.amount * quantity;
 
@@ -38,18 +45,23 @@ export const AddonPackageCard: React.FC<AddonPackageCardProps> = ({
   };
 
   return (
-    <Card className={`relative hover:shadow-lg transition-all ${pkg.popular ? 'border-blue-500 border-2' : ''}`}>
+    <Card
+      className={`relative hover:shadow-lg transition-all ${pkg.popular ? "border-blue-500 border-2" : ""}`}
+    >
       {pkg.popular && (
         <Badge className="absolute -top-3 right-4 bg-blue-600">
           Más Popular
         </Badge>
       )}
-      
+
       <CardHeader>
         <div className="flex items-center justify-between">
           <Icon className="h-8 w-8 text-blue-600" />
           {pkg.savings_percentage > 0 && (
-            <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
+            <Badge
+              variant="secondary"
+              className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
+            >
               Ahorra {pkg.savings_percentage}%
             </Badge>
           )}
@@ -69,9 +81,7 @@ export const AddonPackageCard: React.FC<AddonPackageCardProps> = ({
 
         {/* Price */}
         <div className="text-center">
-          <div className="text-2xl font-bold">
-            ${totalPrice.toFixed(2)}
-          </div>
+          <div className="text-2xl font-bold">${totalPrice.toFixed(2)}</div>
           {quantity > 1 && (
             <div className="text-xs text-muted-foreground">
               ${pkg.price.toFixed(2)} × {quantity}
@@ -92,7 +102,9 @@ export const AddonPackageCard: React.FC<AddonPackageCardProps> = ({
             >
               <Minus className="h-4 w-4" />
             </Button>
-            <span className="text-lg font-semibold w-12 text-center">{quantity}</span>
+            <span className="text-lg font-semibold w-12 text-center">
+              {quantity}
+            </span>
             <Button
               variant="outline"
               size="icon"
@@ -112,7 +124,7 @@ export const AddonPackageCard: React.FC<AddonPackageCardProps> = ({
           disabled={loading}
           className="w-full bg-blue-600 hover:bg-blue-700"
         >
-          {loading ? 'Procesando...' : 'Comprar Ahora'}
+          {loading ? "Procesando..." : "Comprar Ahora"}
         </Button>
       </CardFooter>
     </Card>

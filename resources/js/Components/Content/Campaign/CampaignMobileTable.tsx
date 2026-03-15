@@ -43,9 +43,9 @@ export default function CampaignMobileTable({
   getStatusColor,
 }: CampaignMobileTableProps) {
   const { auth } = usePage<any>().props;
-const canManageContent =
+  const canManageContent =
     auth.current_workspace?.permissions?.includes("manage-content");
-  
+
   const { i18n } = useTranslation();
   const locale = getDateFnsLocale(i18n.language);
 

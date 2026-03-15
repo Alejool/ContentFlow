@@ -50,9 +50,7 @@ const SuccessAlert = ({ show, t }: SuccessAlertProps) => (
   </Transition>
 );
 
-const UpdatePasswordForm = ({
-  className = "",
-}: UpdatePasswordFormProps) => {
+const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
   const { t } = useTranslation();
 
   const { register, handleSubmit, errors, isSubmitting, isSuccess } =
@@ -153,8 +151,6 @@ const UpdatePasswordForm = ({
             )}
           </div>
         </form>
-
-       
       </div>
     </div>
   );

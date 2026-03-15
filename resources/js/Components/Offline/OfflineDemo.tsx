@@ -1,32 +1,32 @@
-import React, { useState } from 'react';
-import { OfflineIndicator } from './OfflineIndicator';
-import { PendingOperationsList } from './PendingOperationsList';
-import { OfflineDisabledWrapper } from './OfflineDisabledWrapper';
-import { useOfflineDisable } from '@/Hooks/useOfflineDisable';
-import { X } from 'lucide-react';
+import React, { useState } from "react";
+import { OfflineIndicator } from "./OfflineIndicator";
+import { PendingOperationsList } from "./PendingOperationsList";
+import { OfflineDisabledWrapper } from "./OfflineDisabledWrapper";
+import { useOfflineDisable } from "@/Hooks/useOfflineDisable";
+import { X } from "lucide-react";
 
 /**
  * OfflineDemo Component
- * 
+ *
  * Demonstrates the usage of offline components:
  * - OfflineIndicator: Shows offline status banner
  * - PendingOperationsList: Shows list of pending operations
  * - OfflineDisabledWrapper: Disables features when offline
  * - useOfflineDisable: Hook for disabling individual elements
- * 
+ *
  * This is a demo component for testing and documentation purposes.
  */
 export const OfflineDemo: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
-  
+
   const { offlineProps: submitProps } = useOfflineDisable({
     requiresConnection: true,
-    offlineMessage: 'Submit requires internet connection',
+    offlineMessage: "Submit requires internet connection",
   });
 
   const { offlineProps: streamProps } = useOfflineDisable({
     requiresConnection: true,
-    offlineMessage: 'Streaming requires internet connection',
+    offlineMessage: "Streaming requires internet connection",
   });
 
   return (
@@ -36,9 +36,12 @@ export const OfflineDemo: React.FC = () => {
 
         {/* Example 1: Disabled button */}
         <section className="mb-8 p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
-          <h2 className="text-lg font-semibold mb-4">Example 1: Disabled Button</h2>
+          <h2 className="text-lg font-semibold mb-4">
+            Example 1: Disabled Button
+          </h2>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            This button is automatically disabled when offline using the useOfflineDisable hook.
+            This button is automatically disabled when offline using the
+            useOfflineDisable hook.
           </p>
           <button
             {...submitProps}
@@ -50,9 +53,12 @@ export const OfflineDemo: React.FC = () => {
 
         {/* Example 2: Disabled wrapper */}
         <section className="mb-8 p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
-          <h2 className="text-lg font-semibold mb-4">Example 2: Disabled Content Wrapper</h2>
+          <h2 className="text-lg font-semibold mb-4">
+            Example 2: Disabled Content Wrapper
+          </h2>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            This video player is wrapped and disabled when offline with an overlay.
+            This video player is wrapped and disabled when offline with an
+            overlay.
           </p>
           <OfflineDisabledWrapper
             requiresConnection={true}
@@ -72,7 +78,9 @@ export const OfflineDemo: React.FC = () => {
 
         {/* Example 3: Pending operations modal */}
         <section className="mb-8 p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
-          <h2 className="text-lg font-semibold mb-4">Example 3: Pending Operations</h2>
+          <h2 className="text-lg font-semibold mb-4">
+            Example 3: Pending Operations
+          </h2>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
             Click the button to view pending operations in a modal.
           </p>

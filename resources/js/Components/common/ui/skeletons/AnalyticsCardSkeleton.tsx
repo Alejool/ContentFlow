@@ -10,13 +10,13 @@ const AnalyticsCardSkeleton = () => {
           <Skeleton className="h-5 w-32" />
           <Skeleton variant="circle" className="w-8 h-8" />
         </div>
-        
+
         {/* Main Value */}
         <Skeleton className="h-10 w-24" />
-        
+
         {/* Chart Area */}
         <Skeleton className="h-32 w-full rounded-lg" />
-        
+
         {/* Footer Stats */}
         <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-700">
           <Skeleton className="h-4 w-20" />

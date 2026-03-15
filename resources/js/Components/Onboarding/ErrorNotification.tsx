@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useOnboarding } from '@/Contexts/OnboardingContext';
+import { useEffect, useState } from "react";
+import { useOnboarding } from "@/Contexts/OnboardingContext";
 
 /**
  * ErrorNotification displays user-friendly error messages with retry option
@@ -13,7 +13,7 @@ export function ErrorNotification() {
   useEffect(() => {
     if (state.error && !dismissed) {
       setVisible(true);
-      
+
       // Auto-hide after 10 seconds
       const timer = setTimeout(() => {
         setVisible(false);

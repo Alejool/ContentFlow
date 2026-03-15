@@ -14,15 +14,8 @@ import { useCampaignStore } from "@/stores/campaignStore";
 import { CalendarEvent } from "@/types/calendar";
 import { getEmptyStateByKey } from "@/Utils/emptyStateMapper";
 import { Head } from "@inertiajs/react";
-import {
-    eachDayOfInterval,
-    endOfMonth,
-    startOfMonth
-} from "date-fns";
-import {
-    Calendar as CalendarIcon,
-    Filter
-} from "lucide-react";
+import { eachDayOfInterval, endOfMonth, startOfMonth } from "date-fns";
+import { Calendar as CalendarIcon, Filter } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -35,20 +28,22 @@ const PlatformIcon = ({
   className?: string;
 }) => {
   const platformKey = platform?.toLowerCase();
-  
+
   // Handle user events
   if (["user_event", "event", "events"].includes(platformKey || "")) {
     return <CalendarIcon className={`text-primary-500 ${className}`} />;
   }
-  
+
   // Get platform config from SOCIAL_PLATFORMS
-  const platformConfig = platformKey && SOCIAL_PLATFORMS[platformKey as keyof typeof SOCIAL_PLATFORMS];
-  
+  const platformConfig =
+    platformKey &&
+    SOCIAL_PLATFORMS[platformKey as keyof typeof SOCIAL_PLATFORMS];
+
   if (platformConfig) {
     const Icon = platformConfig.icon;
     return <Icon className={`${platformConfig.textColor} ${className}`} />;
   }
-  
+
   // Fallback for unknown platforms
   return <CalendarIcon className={`text-gray-500 ${className}`} />;
 };
@@ -131,7 +126,9 @@ export default function CalendarIndex({ auth }: { auth: any }) {
   const [eventToDelete, setEventToDelete] = useState<CalendarEvent | null>(
     null,
   );
-  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(
+    null,
+  );
   const [showEventDetailsModal, setShowEventDetailsModal] = useState(false);
 
   useEffect(() => {
@@ -189,23 +186,27 @@ export default function CalendarIndex({ auth }: { auth: any }) {
   const handleUpdateEventDate = async (eventId: string, newDate: Date) => {
     // Check if dropping to a past date
     const now = new Date();
-    
+
     if (newDate < now) {
       const confirmed = window.confirm(
-        t('calendar.warnings.pastDate') || 
-        '¿Estás seguro de que quieres mover este evento a una fecha/hora pasada?'
+        t("calendar.warnings.pastDate") ||
+          "¿Estás seguro de que quieres mover este evento a una fecha/hora pasada?",
       );
       if (!confirmed) {
-        throw new Error('User cancelled');
+        throw new Error("User cancelled");
       }
     }
-    
-    const success = await updateEvent(eventId, newDate.toISOString(), '');
+
+    const success = await updateEvent(eventId, newDate.toISOString(), "");
     if (success) {
-      toast.success(t('calendar.messages.eventUpdated') || 'Evento actualizado');
+      toast.success(
+        t("calendar.messages.eventUpdated") || "Evento actualizado",
+      );
     } else {
-      toast.error(t('calendar.messages.updateFailed') || 'Error al actualizar evento');
-      throw new Error('Update failed');
+      toast.error(
+        t("calendar.messages.updateFailed") || "Error al actualizar evento",
+      );
+      throw new Error("Update failed");
     }
   };
 
@@ -286,7 +287,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
 
               {/* Calendar Grid */}
               {!loading && filteredEvents.length === 0 ? (
-                <EmptyState config={getEmptyStateByKey('calendarView', t)!} />
+                <EmptyState config={getEmptyStateByKey("calendarView", t)!} />
               ) : (
                 <>
                   {/* Filter Panel */}
@@ -300,7 +301,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                     />
                   </div>
 
-                  {view === 'month' && (
+                  {view === "month" && (
                     <MonthView
                       currentDate={currentDate}
                       events={filteredEvents}
@@ -310,23 +311,33 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                         now.setHours(0, 0, 0, 0);
                         const targetDate = new Date(newDate);
                         targetDate.setHours(0, 0, 0, 0);
-                        
+
                         if (targetDate < now) {
                           // Show warning for past date
                           const confirmed = window.confirm(
-                            t('calendar.warnings.pastDate') || 
-                            '¿Estás seguro de que quieres mover este evento a una fecha pasada?'
+                            t("calendar.warnings.pastDate") ||
+                              "¿Estás seguro de que quieres mover este evento a una fecha pasada?",
                           );
                           if (!confirmed) {
                             return; // Cancel the drop
                           }
                         }
-                        
-                        const success = await updateEvent(eventId, newDate.toISOString(), '');
+
+                        const success = await updateEvent(
+                          eventId,
+                          newDate.toISOString(),
+                          "",
+                        );
                         if (success) {
-                          toast.success(t('calendar.messages.eventUpdated') || 'Evento actualizado');
+                          toast.success(
+                            t("calendar.messages.eventUpdated") ||
+                              "Evento actualizado",
+                          );
                         } else {
-                          toast.error(t('calendar.messages.updateFailed') || 'Error al actualizar evento');
+                          toast.error(
+                            t("calendar.messages.updateFailed") ||
+                              "Error al actualizar evento",
+                          );
                         }
                       }}
                       onEventDelete={handleDeleteEvent}
@@ -338,30 +349,40 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                       t={t}
                     />
                   )}
-                  
-                  {view === 'week' && (
+
+                  {view === "week" && (
                     <WeekView
                       currentDate={currentDate}
                       events={filteredEvents}
                       onEventDrop={async (event, newDate) => {
                         // Check if dropping to a past date/time
                         const now = new Date();
-                        
+
                         if (newDate < now) {
                           const confirmed = window.confirm(
-                            t('calendar.warnings.pastDate') || 
-                            '¿Estás seguro de que quieres mover este evento a una fecha/hora pasada?'
+                            t("calendar.warnings.pastDate") ||
+                              "¿Estás seguro de que quieres mover este evento a una fecha/hora pasada?",
                           );
                           if (!confirmed) {
                             return;
                           }
                         }
-                        
-                        const success = await updateEvent(event.id, newDate.toISOString(), event.type);
+
+                        const success = await updateEvent(
+                          event.id,
+                          newDate.toISOString(),
+                          event.type,
+                        );
                         if (success) {
-                          toast.success(t('calendar.messages.eventUpdated') || 'Evento actualizado');
+                          toast.success(
+                            t("calendar.messages.eventUpdated") ||
+                              "Evento actualizado",
+                          );
                         } else {
-                          toast.error(t('calendar.messages.updateFailed') || 'Error al actualizar evento');
+                          toast.error(
+                            t("calendar.messages.updateFailed") ||
+                              "Error al actualizar evento",
+                          );
                         }
                       }}
                       onEventClick={handleEventClick}
@@ -370,30 +391,40 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                       PlatformIcon={PlatformIcon}
                     />
                   )}
-                  
-                  {view === 'day' && (
+
+                  {view === "day" && (
                     <DayView
                       currentDate={currentDate}
                       events={filteredEvents}
                       onEventDrop={async (event, newDate) => {
                         // Check if dropping to a past date/time
                         const now = new Date();
-                        
+
                         if (newDate < now) {
                           const confirmed = window.confirm(
-                            t('calendar.warnings.pastDate') || 
-                            '¿Estás seguro de que quieres mover este evento a una fecha/hora pasada?'
+                            t("calendar.warnings.pastDate") ||
+                              "¿Estás seguro de que quieres mover este evento a una fecha/hora pasada?",
                           );
                           if (!confirmed) {
                             return;
                           }
                         }
-                        
-                        const success = await updateEvent(event.id, newDate.toISOString(), event.type);
+
+                        const success = await updateEvent(
+                          event.id,
+                          newDate.toISOString(),
+                          event.type,
+                        );
                         if (success) {
-                          toast.success(t('calendar.messages.eventUpdated') || 'Evento actualizado');
+                          toast.success(
+                            t("calendar.messages.eventUpdated") ||
+                              "Evento actualizado",
+                          );
                         } else {
-                          toast.error(t('calendar.messages.updateFailed') || 'Error al actualizar evento');
+                          toast.error(
+                            t("calendar.messages.updateFailed") ||
+                              "Error al actualizar evento",
+                          );
                         }
                       }}
                       onEventClick={handleEventClick}
@@ -459,9 +490,10 @@ export default function CalendarIndex({ auth }: { auth: any }) {
         canEdit={true}
         canDelete={
           selectedEvent &&
-          ['user_event', 'event'].includes(String(selectedEvent.type)) &&
+          ["user_event", "event"].includes(String(selectedEvent.type)) &&
           (Number(selectedEvent.user?.id) === Number(auth.user?.id) ||
-            (!selectedEvent.user?.id && selectedEvent.extendedProps?.user_name === auth.user?.name))
+            (!selectedEvent.user?.id &&
+              selectedEvent.extendedProps?.user_name === auth.user?.name))
         }
       />
 
@@ -475,12 +507,14 @@ export default function CalendarIndex({ auth }: { auth: any }) {
         onBulkMove={async (newDate) => {
           const success = await bulkUpdateEvents(
             Array.from(selectedEvents),
-            newDate.toISOString()
+            newDate.toISOString(),
           );
           if (success) {
-            toast.success(`${selectedEvents.size} eventos movidos exitosamente`);
+            toast.success(
+              `${selectedEvents.size} eventos movidos exitosamente`,
+            );
           } else {
-            toast.error('Error al mover eventos');
+            toast.error("Error al mover eventos");
           }
         }}
         onBulkDelete={async (eventIds) => {
@@ -488,15 +522,15 @@ export default function CalendarIndex({ auth }: { auth: any }) {
           if (success) {
             toast.success(`${eventIds.length} eventos eliminados exitosamente`);
           } else {
-            toast.error('Error al eliminar eventos');
+            toast.error("Error al eliminar eventos");
           }
         }}
         onUndo={async () => {
           const success = await undoBulkOperation();
           if (success) {
-            toast.success(t('calendar.bulkActions.undoSuccess'));
+            toast.success(t("calendar.bulkActions.undoSuccess"));
           } else {
-            toast.error(t('calendar.bulkActions.undoError'));
+            toast.error(t("calendar.bulkActions.undoError"));
           }
         }}
         canUndo={canUndo && isUndoAvailable()}

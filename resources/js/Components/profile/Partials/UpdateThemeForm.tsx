@@ -163,7 +163,9 @@ export default function UpdateThemeForm({
             </p>
             <Button
               type="button"
-              onClick={() => router.visit(route("workspace.settings", { tab: "branding" }))}
+              onClick={() =>
+                router.visit(route("workspace.settings", { tab: "branding" }))
+              }
               icon={Palette}
               variant="outline"
             >

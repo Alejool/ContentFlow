@@ -58,7 +58,7 @@ export const TwitterPreview = ({
             )}
           </div>
 
-          {mediaUrls.length > 0 && contentType !== 'poll' && (
+          {mediaUrls.length > 0 && contentType !== "poll" && (
             <div
               className={`mt-3 grid gap-0.5 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800 ${
                 mediaUrls.length === 1
@@ -92,37 +92,41 @@ export const TwitterPreview = ({
             </div>
           )}
 
-          {contentType === 'poll' && pollOptions.length >= 2 && (
+          {contentType === "poll" && pollOptions.length >= 2 && (
             <div className="mt-3 border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
               <div className="px-3 py-2 bg-gray-50 dark:bg-gray-900/30 border-b border-gray-200 dark:border-gray-800">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">📊 Encuesta</span>
+                  <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                    📊 Encuesta
+                  </span>
                   <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {pollDuration < 24 
-                      ? `${pollDuration} hora${pollDuration !== 1 ? 's' : ''} restante${pollDuration !== 1 ? 's' : ''}`
-                      : `${Math.floor(pollDuration / 24)} día${Math.floor(pollDuration / 24) !== 1 ? 's' : ''} restante${Math.floor(pollDuration / 24) !== 1 ? 's' : ''}`
-                    } · 0 votos
+                    {pollDuration < 24
+                      ? `${pollDuration} hora${pollDuration !== 1 ? "s" : ""} restante${pollDuration !== 1 ? "s" : ""}`
+                      : `${Math.floor(pollDuration / 24)} día${Math.floor(pollDuration / 24) !== 1 ? "s" : ""} restante${Math.floor(pollDuration / 24) !== 1 ? "s" : ""}`}{" "}
+                    · 0 votos
                   </span>
                 </div>
               </div>
-              {pollOptions.filter(option => option.trim()).map((option, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800 last:border-b-0 cursor-pointer transition-colors"
-                >
-                  <div className="flex items-center gap-3 flex-1">
-                    <div className="w-4 h-4 border-2 border-blue-400 rounded-full flex items-center justify-center">
-                      <div className="w-2 h-2 bg-blue-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+              {pollOptions
+                .filter((option) => option.trim())
+                .map((option, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800 last:border-b-0 cursor-pointer transition-colors"
+                  >
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className="w-4 h-4 border-2 border-blue-400 rounded-full flex items-center justify-center">
+                        <div className="w-2 h-2 bg-blue-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                      <span className="text-[15px] text-gray-900 dark:text-gray-100">
+                        {option}
+                      </span>
                     </div>
-                    <span className="text-[15px] text-gray-900 dark:text-gray-100">
-                      {option}
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      0%
                     </span>
                   </div>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    0%
-                  </span>
-                </div>
-              ))}
+                ))}
             </div>
           )}
 

@@ -445,7 +445,11 @@ export default function Select<T extends FieldValues>({
 
   const activeColorRGB = activeColor ? getRGBValues(activeColor) : "";
   const isSolidActive =
-    activeColor && !multiple && value !== undefined && value !== "" && value !== null;
+    activeColor &&
+    !multiple &&
+    value !== undefined &&
+    value !== "" &&
+    value !== null;
 
   return (
     <>

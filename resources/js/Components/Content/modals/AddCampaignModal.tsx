@@ -149,7 +149,7 @@ export default function AddCampaignModal({
         onClick={handleClose}
       />
 
-      <div 
+      <div
         ref={modalRef as React.RefObject<HTMLDivElement>}
         className="relative w-full max-w-2xl bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300 border border-gray-200/50 dark:border-neutral-800/50"
       >

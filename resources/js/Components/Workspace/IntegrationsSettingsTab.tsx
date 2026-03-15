@@ -17,7 +17,7 @@ import {
   Server,
   Share2,
   ShieldCheck,
-  XCircle
+  XCircle,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -78,9 +78,7 @@ const IntegrationCard = ({
             <Icon className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h4 className="font-bold text-gray-900 dark:text-white">
-              {title}
-            </h4>
+            <h4 className="font-bold text-gray-900 dark:text-white">{title}</h4>
             <p className="text-sm text-gray-500 dark:text-neutral-500">
               {description}
             </p>
@@ -170,8 +168,8 @@ export default function IntegrationsSettingsTab({
 
   const handleFilterChange = (key: string, value: string | string[]) => {
     // Convert array to string if needed (take first value or empty string)
-    const stringValue = Array.isArray(value) ? (value[0] || "") : value;
-    
+    const stringValue = Array.isArray(value) ? value[0] || "" : value;
+
     if (key === "channel") {
       setChannelFilter(stringValue);
       fetchActivity(1, activityData?.per_page || 5, stringValue, statusFilter);
@@ -220,7 +218,7 @@ export default function IntegrationsSettingsTab({
           per_page: payload.per_page || perPage,
         });
       } catch (error) {
-        } finally {
+      } finally {
         setLoadingActivity(false);
       }
     },
@@ -482,20 +480,20 @@ export default function IntegrationsSettingsTab({
           <div className="p-6 border-b border-gray-100 dark:border-neutral-800 flex flex-col gap-4">
             <div className="flex  items-center justify-between gap-3">
               <div className="flex">
-              <div className="h-10 mr-2 w-10 rounded-lg bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
-                <Activity className="h-5 w-5 text-primary-500" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                  {t("workspace.activity_log")}
-                </h3>
-                <p className="text-sm text-gray-500 dark:text-neutral-500">
-                  {t("workspace.recent_webhook_activity")}
-                </p>
-              </div>
+                <div className="h-10 mr-2 w-10 rounded-lg bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
+                  <Activity className="h-5 w-5 text-primary-500" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                    {t("workspace.activity_log")}
+                  </h3>
+                  <p className="text-sm text-gray-500 dark:text-neutral-500">
+                    {t("workspace.recent_webhook_activity")}
+                  </p>
+                </div>
               </div>
 
-              <div >
+              <div>
                 <Button
                   variant="secondary"
                   buttonStyle="outline"

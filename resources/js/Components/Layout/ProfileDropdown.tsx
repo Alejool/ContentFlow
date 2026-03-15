@@ -5,8 +5,15 @@ import { useSubscriptionUsage } from "@/Hooks/useSubscriptionUsage";
 import { useTheme } from "@/Hooks/useTheme";
 import { cssPropertiesManager } from "@/Utils/CSSCustomPropertiesManager";
 import { transitionTheme } from "@/Utils/themeTransition";
-import { Menu, MenuButton, MenuItems } from "@headlessui/react";
+import {
+  Menu,
+  MenuButton,
+  MenuItems,
+  Radio,
+  RadioGroup,
+} from "@headlessui/react";
 import { Link as InertiaLink, Link, usePage } from "@inertiajs/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -81,33 +88,39 @@ export default function ProfileDropdown({
   const getBaseLang = (lang: string) => lang.split("-")[0];
   const currentLangCode = getBaseLang(i18n.resolvedLanguage || i18n.language);
 
-  const handleModeChange = (
-    newTheme: "light" | "dark" | "system",
-    e: React.MouseEvent,
-  ) => {
-    transitionTheme(() => setTheme(newTheme), { event: e });
+  const handleModeChange = (newTheme: "light" | "dark" | "system") => {
+    transitionTheme(() => setTheme(newTheme));
   };
 
-  const handleColorChange = async (color: string) => {
+  const queryClient = useQueryClient();
+
+  const updateThemeColorMutation = useMutation({
+    mutationFn: (color: string) =>
+      axios.patch((route as any)("api.v1.profile.theme.update"), {
+        theme_color: color,
+      }),
+    onError: () =>
+      toast.error(t("common.error") || "Error al actualizar el tema"),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["profile"] }),
+  });
+
+  const updateLocaleMutation = useMutation({
+    mutationFn: (locale: string) =>
+      axios.patch((route as any)("settings.locale"), { locale }),
+    onError: () =>
+      toast.error(t("common.error") || "Error al actualizar el idioma"),
+  });
+
+  const handleColorChange = (color: string) => {
     setCurrentTheme(color);
     cssPropertiesManager.applyPrimaryColor(color);
-    try {
-      await axios.patch(route("api.v1.profile.theme.update"), {
-        theme_color: color,
-      });
-    } catch (_) {
-      toast.error(t("common.error", "Error al actualizar el tema"));
-    }
+    updateThemeColorMutation.mutate(color);
   };
 
-  const handleLanguageChange = async (langCode: string) => {
+  const handleLanguageChange = (langCode: string) => {
     i18n.changeLanguage(langCode);
     if (auth?.user) {
-      try {
-        await axios.patch(route("settings.locale"), { locale: langCode });
-      } catch (_) {
-        toast.error(t("common.error", "Error al actualizar el idioma"));
-      }
+      updateLocaleMutation.mutate(langCode);
     }
   };
 
@@ -165,8 +178,18 @@ export default function ProfileDropdown({
                 as={motion.div}
                 variants={{
                   hidden: { opacity: 0, scale: 0.96, y: -6 },
-                  visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.15, ease: "easeOut" } },
-                  exit: { opacity: 0, scale: 0.96, y: -6, transition: { duration: 0.1, ease: "easeIn" } },
+                  visible: {
+                    opacity: 1,
+                    scale: 1,
+                    y: 0,
+                    transition: { duration: 0.15, ease: "easeOut" },
+                  },
+                  exit: {
+                    opacity: 0,
+                    scale: 0.96,
+                    y: -6,
+                    transition: { duration: 0.1, ease: "easeIn" },
+                  },
                 }}
                 initial="hidden"
                 animate="visible"
@@ -207,28 +230,46 @@ export default function ProfileDropdown({
                     </div>
 
                     {/* Color picker */}
-                    <div className="flex items-center gap-2 mt-3 px-1">
+                    <RadioGroup
+                      value={currentTheme}
+                      onChange={(val: string) => {
+                        handleColorChange(val);
+                      }}
+                      className="flex items-center gap-2 mt-3 px-1"
+                      aria-label={t("profile.appearance.color") || "Color"}
+                    >
                       {colors.map((color) => (
-                        <button
+                        <Radio
                           key={color.value}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleColorChange(color.value);
-                          }}
-                          className={`relative w-6 h-6 rounded-full flex items-center justify-center transition-all ${
-                            currentTheme === color.value
-                              ? "ring-2 ring-offset-2 ring-primary-500 dark:ring-offset-neutral-900 scale-110"
-                              : "hover:scale-110 opacity-70 hover:opacity-100"
-                          } ${color.bg}`}
-                          style={(color as any).isCustom ? { backgroundColor: color.value } : {}}
-                          title={(color as any).isCustom ? t("workspace.white_label.title") || "Marca Blanca" : t(`colors.${color.name}`) || color.name}
+                          value={color.value}
+                          onClick={(e) => e.stopPropagation()}
+                          className={({ checked }: { checked: boolean }) =>
+                            `relative w-6 h-6 rounded-full flex items-center justify-center transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
+                              checked
+                                ? "ring-2 ring-offset-2 ring-primary-500 dark:ring-offset-neutral-900 scale-110"
+                                : "hover:scale-110 opacity-70 hover:opacity-100"
+                            } ${color.bg}`
+                          }
+                          style={
+                            (color as any).isCustom
+                              ? { backgroundColor: color.value }
+                              : {}
+                          }
+                          title={
+                            (color as any).isCustom
+                              ? t("workspace.white_label.title") ||
+                                "Marca Blanca"
+                              : t(`colors.${color.name}`) || color.name
+                          }
                         >
-                          {currentTheme === color.value && (
-                            <Check className="w-3 h-3 text-white" />
-                          )}
-                        </button>
+                          {({ checked }: { checked: boolean }) =>
+                            checked ? (
+                              <Check className="w-3 h-3 text-white" />
+                            ) : null
+                          }
+                        </Radio>
                       ))}
-                    </div>
+                    </RadioGroup>
                   </div>
                 </div>
 
@@ -248,7 +289,8 @@ export default function ProfileDropdown({
                             href={route("pricing")}
                             className="text-xs font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
                           >
-                            {t("subscription.usage.upgradePlan", "Actualizar")}
+                            {t("subscription.usage.upgradePlan") ||
+                              "Actualizar"}
                           </Link>
                         )}
                       </div>
@@ -259,7 +301,10 @@ export default function ProfileDropdown({
                           <div className="flex items-center justify-between text-xs">
                             <div className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300">
                               <FileText className="w-3 h-3" />
-                              <span>{t("subscription.usage.publications", "Publicaciones")}</span>
+                              <span>
+                                {t("subscription.usage.publications") ||
+                                  "Publicaciones"}
+                              </span>
                             </div>
                             <span className="font-semibold text-xs text-gray-900 dark:text-white">
                               {usage.publications.limit === -1
@@ -271,20 +316,28 @@ export default function ProfileDropdown({
                             <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                               <div
                                 className={`h-full rounded-full transition-all ${
-                                  usage.publications.percentage >= 90 ? "bg-red-500"
-                                  : usage.publications.percentage >= 70 ? "bg-yellow-500"
-                                  : "bg-primary-500"
+                                  usage.publications.percentage >= 90
+                                    ? "bg-red-500"
+                                    : usage.publications.percentage >= 70
+                                      ? "bg-yellow-500"
+                                      : "bg-primary-500"
                                 }`}
-                                style={{ width: `${Math.min(usage.publications.percentage, 100)}%` }}
+                                style={{
+                                  width: `${Math.min(usage.publications.percentage, 100)}%`,
+                                }}
                               />
                             </div>
                           )}
-                          {usage.publications.addon_info && usage.publications.addon_info.total > 0 && (
-                            <div className="text-xs text-primary-600 dark:text-primary-400 mt-1">
-                              <span className="font-medium">Plan:</span> {usage.publications.limit} +{" "}
-                              <span className="font-medium">Addons:</span> {usage.publications.addon_info.remaining}/{usage.publications.addon_info.total}
-                            </div>
-                          )}
+                          {usage.publications.addon_info &&
+                            usage.publications.addon_info.total > 0 && (
+                              <div className="text-xs text-primary-600 dark:text-primary-400 mt-1">
+                                <span className="font-medium">Plan:</span>{" "}
+                                {usage.publications.limit} +{" "}
+                                <span className="font-medium">Addons:</span>{" "}
+                                {usage.publications.addon_info.remaining}/
+                                {usage.publications.addon_info.total}
+                              </div>
+                            )}
                         </div>
 
                         {/* Storage */}
@@ -292,7 +345,10 @@ export default function ProfileDropdown({
                           <div className="flex items-center justify-between text-xs">
                             <div className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300">
                               <HardDrive className="w-3 h-3" />
-                              <span>{t("subscription.usage.storage", "Almacenamiento")}</span>
+                              <span>
+                                {t("subscription.usage.storage") ||
+                                  "Almacenamiento"}
+                              </span>
                             </div>
                             <span className="font-semibold text-gray-900 dark:text-white">
                               {usage.storage.limit_gb === -1
@@ -304,20 +360,28 @@ export default function ProfileDropdown({
                             <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                               <div
                                 className={`h-full rounded-full transition-all ${
-                                  usage.storage.percentage >= 90 ? "bg-red-500"
-                                  : usage.storage.percentage >= 70 ? "bg-yellow-500"
-                                  : "bg-primary-500"
+                                  usage.storage.percentage >= 90
+                                    ? "bg-red-500"
+                                    : usage.storage.percentage >= 70
+                                      ? "bg-yellow-500"
+                                      : "bg-primary-500"
                                 }`}
-                                style={{ width: `${Math.min(usage.storage.percentage, 100)}%` }}
+                                style={{
+                                  width: `${Math.min(usage.storage.percentage, 100)}%`,
+                                }}
                               />
                             </div>
                           )}
-                          {usage.storage.addon_info && usage.storage.addon_info.total > 0 && (
-                            <div className="text-xs text-primary-600 dark:text-primary-400 mt-1">
-                              <span className="font-medium">Plan:</span> {usage.storage.limit_gb} GB +{" "}
-                              <span className="font-medium">Addons:</span> {usage.storage.addon_info.remaining}/{usage.storage.addon_info.total} GB
-                            </div>
-                          )}
+                          {usage.storage.addon_info &&
+                            usage.storage.addon_info.total > 0 && (
+                              <div className="text-xs text-primary-600 dark:text-primary-400 mt-1">
+                                <span className="font-medium">Plan:</span>{" "}
+                                {usage.storage.limit_gb} GB +{" "}
+                                <span className="font-medium">Addons:</span>{" "}
+                                {usage.storage.addon_info.remaining}/
+                                {usage.storage.addon_info.total} GB
+                              </div>
+                            )}
                         </div>
                       </div>
 
@@ -330,7 +394,8 @@ export default function ProfileDropdown({
                             <div className="flex items-center gap-2">
                               <Zap className="w-4 h-4" />
                               <span className="text-xs font-semibold">
-                                {t("subscription.addons.buyCredits", "Comprar Créditos")}
+                                {t("subscription.addons.buyCredits") ||
+                                  "Comprar Créditos"}
                               </span>
                             </div>
                             <ChevronDown className="w-3 h-3 -rotate-90 group-hover:translate-x-0.5 transition-transform" />
@@ -355,30 +420,46 @@ export default function ProfileDropdown({
                       {t("profile.appearance.title") || "Apariencia"}
                     </span>
                   </div>
-                  <div className="grid grid-cols-3 gap-2">
+                  <RadioGroup
+                    value={theme}
+                    onChange={(val: "light" | "dark" | "system") =>
+                      handleModeChange(val)
+                    }
+                    className="grid grid-cols-3 gap-2"
+                    aria-label={t("profile.appearance.title") || "Apariencia"}
+                  >
                     {(["light", "dark", "system"] as const).map((mode) => {
-                      const Icon = mode === "light" ? Sun : mode === "dark" ? Moon : Palette;
-                      const label = mode === "light"
-                        ? t("profile.appearance.light") || "Claro"
-                        : mode === "dark"
-                        ? t("profile.appearance.dark") || "Oscuro"
-                        : t("profile.appearance.system") || "Sistema";
+                      const Icon =
+                        mode === "light"
+                          ? Sun
+                          : mode === "dark"
+                            ? Moon
+                            : Palette;
+                      const label =
+                        mode === "light"
+                          ? t("profile.appearance.light") || "Claro"
+                          : mode === "dark"
+                            ? t("profile.appearance.dark") || "Oscuro"
+                            : t("profile.appearance.system") || "Sistema";
                       return (
-                        <button
+                        <Radio
                           key={mode}
-                          onClick={(e) => { e.stopPropagation(); handleModeChange(mode, e); }}
-                          className={`flex flex-col items-center justify-center gap-1.5 px-2 py-2.5 rounded-lg text-xs font-medium transition-all ${
-                            theme === mode
-                              ? "bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-400 ring-2 ring-primary-500"
-                              : "bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-neutral-700"
-                          }`}
+                          value={mode}
+                          onClick={(e) => e.stopPropagation()}
+                          className={({ checked }: { checked: boolean }) =>
+                            `flex flex-col items-center justify-center gap-1.5 px-2 py-2.5 rounded-lg text-xs font-medium transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
+                              checked
+                                ? "bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-400 ring-2 ring-primary-500"
+                                : "bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-neutral-700"
+                            }`
+                          }
                         >
                           <Icon className="w-4 h-4" />
                           <span>{label}</span>
-                        </button>
+                        </Radio>
                       );
                     })}
-                  </div>
+                  </RadioGroup>
                 </div>
 
                 {/* Language */}
@@ -389,22 +470,34 @@ export default function ProfileDropdown({
                       {t("profile.language.title") || "Idioma"}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <RadioGroup
+                    value={currentLangCode}
+                    onChange={(val: string) => handleLanguageChange(val)}
+                    className="flex items-center gap-2"
+                    aria-label={t("profile.language.title") || "Idioma"}
+                  >
                     {languages.map((lang) => (
-                      <button
+                      <Radio
                         key={lang.code}
-                        onClick={(e) => { e.stopPropagation(); handleLanguageChange(lang.code); }}
-                        className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                          currentLangCode === lang.code
-                            ? "bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-400 ring-2 ring-primary-500"
-                            : "bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-neutral-700"
-                        }`}
+                        value={lang.code}
+                        onClick={(e) => e.stopPropagation()}
+                        className={({ checked }: { checked: boolean }) =>
+                          `flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
+                            checked
+                              ? "bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-400 ring-2 ring-primary-500"
+                              : "bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-neutral-700"
+                          }`
+                        }
                       >
-                        <img src={lang.flag} alt={lang.name} className="w-5 h-3.5 object-cover rounded-sm" />
+                        <img
+                          src={lang.flag}
+                          alt={lang.name}
+                          className="w-5 h-3.5 object-cover rounded-sm"
+                        />
                         <span>{lang.name}</span>
-                      </button>
+                      </Radio>
                     ))}
-                  </div>
+                  </RadioGroup>
                 </div>
 
                 {/* Links */}
@@ -417,11 +510,13 @@ export default function ProfileDropdown({
                         : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-800 hover:text-gray-900 dark:hover:text-white"
                     }`}
                   >
-                    <div className={`p-1.5 rounded-md ${
-                      isProfileActive
-                        ? "bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400"
-                        : "bg-gray-100 dark:bg-neutral-800 text-gray-500 dark:text-gray-400"
-                    }`}>
+                    <div
+                      className={`p-1.5 rounded-md ${
+                        isProfileActive
+                          ? "bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400"
+                          : "bg-gray-100 dark:bg-neutral-800 text-gray-500 dark:text-gray-400"
+                      }`}
+                    >
                       <User className="h-4 w-4" />
                     </div>
                     {t("nav.profile")}

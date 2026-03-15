@@ -73,15 +73,16 @@ export const dateTimeFormats: Record<string, Intl.DateTimeFormatOptions> = {
 export const formatDate = (
   date: Date | string | number,
   format: keyof typeof dateTimeFormats = "medium",
-  locale?: string
+  locale?: string,
 ): string => {
-  const dateObj = typeof date === "string" || typeof date === "number" 
-    ? new Date(date) 
-    : date;
-  
+  const dateObj =
+    typeof date === "string" || typeof date === "number"
+      ? new Date(date)
+      : date;
+
   const currentLocale = locale || i18n.language || "es";
   const timezone = getWorkspaceTimezone();
-  
+
   return new Intl.DateTimeFormat(currentLocale, {
     ...dateTimeFormats[format],
     timeZone: timezone,
@@ -94,7 +95,7 @@ export const formatDate = (
 export const formatNumber = (
   value: number,
   options?: Intl.NumberFormatOptions,
-  locale?: string
+  locale?: string,
 ): string => {
   const currentLocale = locale || i18n.language || "es";
   return new Intl.NumberFormat(currentLocale, options).format(value);
@@ -106,10 +107,10 @@ export const formatNumber = (
 export const formatCurrency = (
   amount: number,
   currency: string = "USD",
-  locale?: string
+  locale?: string,
 ): string => {
   const currentLocale = locale || i18n.language || "es";
-  
+
   return new Intl.NumberFormat(currentLocale, {
     style: "currency",
     currency,
@@ -124,10 +125,10 @@ export const formatCurrency = (
 export const formatPercent = (
   value: number,
   decimals: number = 1,
-  locale?: string
+  locale?: string,
 ): string => {
   const currentLocale = locale || i18n.language || "es";
-  
+
   return new Intl.NumberFormat(currentLocale, {
     style: "percent",
     minimumFractionDigits: decimals,
@@ -138,12 +139,9 @@ export const formatPercent = (
 /**
  * Formatea números grandes con abreviaciones (K, M, B)
  */
-export const formatCompactNumber = (
-  value: number,
-  locale?: string
-): string => {
+export const formatCompactNumber = (value: number, locale?: string): string => {
   const currentLocale = locale || i18n.language || "es";
-  
+
   return new Intl.NumberFormat(currentLocale, {
     notation: "compact",
     compactDisplay: "short",
@@ -155,18 +153,19 @@ export const formatCompactNumber = (
  */
 export const formatRelativeTime = (
   date: Date | string | number,
-  locale?: string
+  locale?: string,
 ): string => {
-  const dateObj = typeof date === "string" || typeof date === "number"
-    ? new Date(date)
-    : date;
-  
+  const dateObj =
+    typeof date === "string" || typeof date === "number"
+      ? new Date(date)
+      : date;
+
   const currentLocale = locale || i18n.language || "es";
   const now = new Date();
   const diffInSeconds = Math.floor((dateObj.getTime() - now.getTime()) / 1000);
-  
+
   const rtf = new Intl.RelativeTimeFormat(currentLocale, { numeric: "auto" });
-  
+
   const units: { unit: Intl.RelativeTimeFormatUnit; seconds: number }[] = [
     { unit: "year", seconds: 31536000 },
     { unit: "month", seconds: 2592000 },
@@ -176,14 +175,14 @@ export const formatRelativeTime = (
     { unit: "minute", seconds: 60 },
     { unit: "second", seconds: 1 },
   ];
-  
+
   for (const { unit, seconds } of units) {
     const value = Math.floor(diffInSeconds / seconds);
     if (Math.abs(value) >= 1) {
       return rtf.format(value, unit);
     }
   }
-  
+
   return rtf.format(0, "second");
 };
 
@@ -208,10 +207,10 @@ export const getUserTimezone = (): string => {
 export const formatList = (
   items: string[],
   type: "conjunction" | "disjunction" = "conjunction",
-  locale?: string
+  locale?: string,
 ): string => {
   const currentLocale = locale || i18n.language || "es";
-  
+
   return new Intl.ListFormat(currentLocale, {
     style: "long",
     type,
@@ -225,15 +224,15 @@ export const pluralize = (
   count: number,
   singular: string,
   plural?: string,
-  locale?: string
+  locale?: string,
 ): string => {
   const currentLocale = locale || i18n.language || "es";
   const pluralRules = new Intl.PluralRules(currentLocale);
   const rule = pluralRules.select(count);
-  
+
   if (rule === "one") {
     return singular;
   }
-  
+
   return plural || `${singular}s`;
 };

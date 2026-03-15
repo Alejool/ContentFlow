@@ -56,10 +56,11 @@ export default function KeyboardShortcutsModal({
 }: KeyboardShortcutsModalProps) {
   const { t } = useTranslation();
 
-  const isMac = typeof navigator !== "undefined" && 
-    (navigator.userAgent.toUpperCase().indexOf("MAC") >= 0 || 
-     navigator.userAgent.toUpperCase().indexOf("IPHONE") >= 0 ||
-     navigator.userAgent.toUpperCase().indexOf("IPAD") >= 0);
+  const isMac =
+    typeof navigator !== "undefined" &&
+    (navigator.userAgent.toUpperCase().indexOf("MAC") >= 0 ||
+      navigator.userAgent.toUpperCase().indexOf("IPHONE") >= 0 ||
+      navigator.userAgent.toUpperCase().indexOf("IPAD") >= 0);
 
   // Mapeo de categorías a sus traducciones
   const categoryTranslations: Record<string, string> = {
@@ -75,13 +76,16 @@ export default function KeyboardShortcutsModal({
     category: categoryTranslations[config.category] || config.category,
   }));
 
-  const groupedShortcuts = shortcuts.reduce((acc, shortcut) => {
-    if (!acc[shortcut.category]) {
-      acc[shortcut.category] = [];
-    }
-    acc[shortcut.category].push(shortcut);
-    return acc;
-  }, {} as Record<string, Shortcut[]>);
+  const groupedShortcuts = shortcuts.reduce(
+    (acc, shortcut) => {
+      if (!acc[shortcut.category]) {
+        acc[shortcut.category] = [];
+      }
+      acc[shortcut.category].push(shortcut);
+      return acc;
+    },
+    {} as Record<string, Shortcut[]>,
+  );
 
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
@@ -110,39 +114,44 @@ export default function KeyboardShortcutsModal({
           </div>
 
           <div className="p-6 max-h-[60vh] overflow-y-auto custom-scrollbar">
-            {Object.entries(groupedShortcuts).map(([category, categoryShortcuts]) => (
-              <div key={category} className="mb-6 last:mb-0">
-                <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
-                  {category}
-                </h3>
-                <div className="space-y-2">
-                  {categoryShortcuts.map((shortcut, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-neutral-900/50 hover:bg-gray-100 dark:hover:bg-neutral-900 transition-colors"
-                    >
-                      <span className="text-sm text-gray-700 dark:text-gray-300">
-                        {shortcut.description}
-                      </span>
-                      <div className="flex items-center gap-1">
-                        {shortcut.keys.map((key, keyIndex) => (
-                          <span key={keyIndex} className="flex items-center gap-1">
-                            <kbd className="px-2.5 py-1.5 rounded text-xs font-mono font-bold shadow-sm bg-white text-gray-700 border border-gray-300 dark:bg-neutral-700 dark:text-neutral-200 dark:border-neutral-600">
-                              {key}
-                            </kbd>
-                            {keyIndex < shortcut.keys.length - 1 && (
-                              <span className="text-gray-400 dark:text-gray-600 text-xs font-bold">
-                                +
-                              </span>
-                            )}
-                          </span>
-                        ))}
+            {Object.entries(groupedShortcuts).map(
+              ([category, categoryShortcuts]) => (
+                <div key={category} className="mb-6 last:mb-0">
+                  <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+                    {category}
+                  </h3>
+                  <div className="space-y-2">
+                    {categoryShortcuts.map((shortcut, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-neutral-900/50 hover:bg-gray-100 dark:hover:bg-neutral-900 transition-colors"
+                      >
+                        <span className="text-sm text-gray-700 dark:text-gray-300">
+                          {shortcut.description}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          {shortcut.keys.map((key, keyIndex) => (
+                            <span
+                              key={keyIndex}
+                              className="flex items-center gap-1"
+                            >
+                              <kbd className="px-2.5 py-1.5 rounded text-xs font-mono font-bold shadow-sm bg-white text-gray-700 border border-gray-300 dark:bg-neutral-700 dark:text-neutral-200 dark:border-neutral-600">
+                                {key}
+                              </kbd>
+                              {keyIndex < shortcut.keys.length - 1 && (
+                                <span className="text-gray-400 dark:text-gray-600 text-xs font-bold">
+                                  +
+                                </span>
+                              )}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ),
+            )}
           </div>
 
           <div className="flex justify-end gap-3 p-4 border-t border-gray-200 dark:border-neutral-700">

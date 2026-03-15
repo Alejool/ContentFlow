@@ -16,7 +16,7 @@ export interface ThemeTransitionOptions {
  */
 export function prefersReducedMotion(): boolean {
   if (typeof window === "undefined") return false;
-  
+
   const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   return mediaQuery.matches;
 }
@@ -39,7 +39,7 @@ export function instantTransition(callback: () => void): void {
  */
 export function transitionTheme(
   callback: () => void,
-  options?: ThemeTransitionOptions
+  options?: ThemeTransitionOptions,
 ): Promise<void> {
   const {
     duration = 250,
@@ -62,8 +62,14 @@ export function transitionTheme(
 
   // Apply custom duration and easing if provided
   if (duration !== 250 || easing !== "cubic-bezier(0.4, 0, 0.2, 1)") {
-    document.documentElement.style.setProperty("--theme-transition-duration", `${duration}ms`);
-    document.documentElement.style.setProperty("--theme-transition-easing", easing);
+    document.documentElement.style.setProperty(
+      "--theme-transition-duration",
+      `${duration}ms`,
+    );
+    document.documentElement.style.setProperty(
+      "--theme-transition-easing",
+      easing,
+    );
   }
 
   // Capturar posición del cursor si está disponible

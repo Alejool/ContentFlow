@@ -1,4 +1,4 @@
-import { useOffline } from './useOffline';
+import { useOffline } from "./useOffline";
 
 /**
  * Options for useOfflineDisable hook
@@ -17,22 +17,22 @@ interface UseOfflineDisableReturn {
   offlineProps: {
     disabled: boolean;
     title?: string;
-    'aria-disabled'?: boolean;
-    'data-offline-disabled'?: boolean;
+    "aria-disabled"?: boolean;
+    "data-offline-disabled"?: boolean;
   };
 }
 
 /**
  * useOfflineDisable Hook
- * 
+ *
  * Provides utilities to disable features when offline.
  * Returns disabled state and props to spread on components.
- * 
+ *
  * Requirements: 6.3
- * 
+ *
  * @example
  * const { isDisabled, offlineProps } = useOfflineDisable({ requiresConnection: true });
- * 
+ *
  * return (
  *   <button {...offlineProps}>
  *     Submit
@@ -40,12 +40,12 @@ interface UseOfflineDisableReturn {
  * );
  */
 export function useOfflineDisable(
-  options: UseOfflineDisableOptions = {}
+  options: UseOfflineDisableOptions = {},
 ): UseOfflineDisableReturn {
   const { isOnline } = useOffline();
   const {
     requiresConnection = false,
-    offlineMessage = 'This feature requires an internet connection',
+    offlineMessage = "This feature requires an internet connection",
   } = options;
 
   // Determine if should be disabled
@@ -57,8 +57,8 @@ export function useOfflineDisable(
     disabled: isDisabled,
     ...(isDisabled && {
       title: offlineMessage,
-      'aria-disabled': true,
-      'data-offline-disabled': true,
+      "aria-disabled": true,
+      "data-offline-disabled": true,
     }),
   };
 

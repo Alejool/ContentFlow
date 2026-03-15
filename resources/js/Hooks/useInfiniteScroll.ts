@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from "react";
 
 interface UseInfiniteScrollOptions<T> {
   fetchFn: (page: number) => Promise<{ data: T[]; hasMore: boolean }>;
@@ -25,7 +25,7 @@ export function useInfiniteScroll<T>({
   fetchFn,
   initialPage = 1,
   threshold = 0.5,
-  rootMargin = '100px',
+  rootMargin = "100px",
 }: UseInfiniteScrollOptions<T>): UseInfiniteScrollReturn<T> {
   const [items, setItems] = useState<T[]>([]);
   const [page, setPage] = useState(initialPage);
@@ -44,13 +44,13 @@ export function useInfiniteScroll<T>({
 
     try {
       const result = await fetchFn(page);
-      
+
       setItems((prev) => [...prev, ...result.data]);
       setHasMore(result.hasMore);
       setPage((prev) => prev + 1);
     } catch (err) {
       setError(err as Error);
-      console.error('Failed to load more items:', err);
+      console.error("Failed to load more items:", err);
     } finally {
       setIsLoading(false);
       isLoadingRef.current = false;
@@ -77,7 +77,7 @@ export function useInfiniteScroll<T>({
       {
         threshold,
         rootMargin,
-      }
+      },
     );
 
     observer.observe(observerRef.current);
@@ -125,7 +125,7 @@ export function useVirtualizedList<T>({
   const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan);
   const endIndex = Math.min(
     items.length - 1,
-    Math.ceil((scrollTop + containerHeight) / itemHeight) + overscan
+    Math.ceil((scrollTop + containerHeight) / itemHeight) + overscan,
   );
 
   const visibleItems = items.slice(startIndex, endIndex + 1);

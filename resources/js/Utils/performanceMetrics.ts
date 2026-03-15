@@ -1,7 +1,7 @@
 /**
  * Performance Metrics Tracker
  * Tracks and analyzes performance metrics for optimistic updates
- * 
+ *
  * Requirements: 10.5
  */
 
@@ -9,7 +9,7 @@ export interface PerformanceMetric {
   id: string;
   timestamp: number;
   resource: string;
-  operation: 'create' | 'update' | 'delete';
+  operation: "create" | "update" | "delete";
   optimisticUpdateTime: number;
   serverResponseTime: number;
   totalTime: number;
@@ -28,7 +28,7 @@ export interface PerformanceMetricsConfig {
 class PerformanceMetricsTracker {
   private metrics: PerformanceMetric[] = [];
   private config: PerformanceMetricsConfig;
-  private readonly STORAGE_KEY = 'performance-metrics';
+  private readonly STORAGE_KEY = "performance-metrics";
   private readonly isDevelopment: boolean;
 
   constructor(config: PerformanceMetricsConfig = {}) {
@@ -37,9 +37,9 @@ class PerformanceMetricsTracker {
       persistToStorage: config.persistToStorage !== false,
       trackingEnabled: config.trackingEnabled !== false,
     };
-    
+
     this.isDevelopment = import.meta.env.DEV;
-    
+
     // Restore metrics from storage on initialization
     if (this.config.persistToStorage) {
       this.restoreMetrics();
@@ -52,7 +52,7 @@ class PerformanceMetricsTracker {
    */
   trackMetric(metric: {
     resource: string;
-    operation: PerformanceMetric['operation'];
+    operation: PerformanceMetric["operation"];
     optimisticUpdateTime: number;
     serverResponseTime: number;
     success: boolean;
@@ -111,7 +111,7 @@ class PerformanceMetricsTracker {
    */
   getMetrics(filter?: {
     resource?: string;
-    operation?: PerformanceMetric['operation'];
+    operation?: PerformanceMetric["operation"];
     success?: boolean;
     since?: number;
   }): PerformanceMetric[] {
@@ -119,16 +119,16 @@ class PerformanceMetricsTracker {
 
     if (filter) {
       if (filter.resource) {
-        filtered = filtered.filter(m => m.resource === filter.resource);
+        filtered = filtered.filter((m) => m.resource === filter.resource);
       }
       if (filter.operation) {
-        filtered = filtered.filter(m => m.operation === filter.operation);
+        filtered = filtered.filter((m) => m.operation === filter.operation);
       }
       if (filter.success !== undefined) {
-        filtered = filtered.filter(m => m.success === filter.success);
+        filtered = filtered.filter((m) => m.success === filter.success);
       }
       if (filter.since) {
-        filtered = filtered.filter(m => m.timestamp >= filter.since);
+        filtered = filtered.filter((m) => m.timestamp >= filter.since);
       }
     }
 
@@ -148,15 +148,18 @@ class PerformanceMetricsTracker {
     averageServerTime: number;
     averageTimeSaved: number;
     totalTimeSaved: number;
-    byOperation: Record<string, {
-      count: number;
-      successRate: number;
-      avgServerTime: number;
-      avgTimeSaved: number;
-    }>;
+    byOperation: Record<
+      string,
+      {
+        count: number;
+        successRate: number;
+        avgServerTime: number;
+        avgTimeSaved: number;
+      }
+    >;
   } {
-    const filtered = resource 
-      ? this.metrics.filter(m => m.resource === resource)
+    const filtered = resource
+      ? this.metrics.filter((m) => m.resource === resource)
       : this.metrics;
 
     if (filtered.length === 0) {
@@ -173,12 +176,18 @@ class PerformanceMetricsTracker {
       };
     }
 
-    const successMetrics = filtered.filter(m => m.success);
-    const failedMetrics = filtered.filter(m => !m.success);
+    const successMetrics = filtered.filter((m) => m.success);
+    const failedMetrics = filtered.filter((m) => !m.success);
 
     // Calculate averages
-    const totalOptimisticTime = filtered.reduce((sum, m) => sum + m.optimisticUpdateTime, 0);
-    const totalServerTime = filtered.reduce((sum, m) => sum + m.serverResponseTime, 0);
+    const totalOptimisticTime = filtered.reduce(
+      (sum, m) => sum + m.optimisticUpdateTime,
+      0,
+    );
+    const totalServerTime = filtered.reduce(
+      (sum, m) => sum + m.serverResponseTime,
+      0,
+    );
     const totalTimeSaved = filtered.reduce((sum, m) => sum + m.timeSaved, 0);
 
     const averageOptimisticTime = totalOptimisticTime / filtered.length;
@@ -186,19 +195,25 @@ class PerformanceMetricsTracker {
     const averageTimeSaved = totalTimeSaved / filtered.length;
 
     // Calculate by operation
-    const byOperation: Record<string, {
-      count: number;
-      successRate: number;
-      avgServerTime: number;
-      avgTimeSaved: number;
-    }> = {};
+    const byOperation: Record<
+      string,
+      {
+        count: number;
+        successRate: number;
+        avgServerTime: number;
+        avgTimeSaved: number;
+      }
+    > = {};
 
-    ['create', 'update', 'delete'].forEach(op => {
-      const opMetrics = filtered.filter(m => m.operation === op);
-      
+    ["create", "update", "delete"].forEach((op) => {
+      const opMetrics = filtered.filter((m) => m.operation === op);
+
       if (opMetrics.length > 0) {
-        const opSuccess = opMetrics.filter(m => m.success).length;
-        const opServerTime = opMetrics.reduce((sum, m) => sum + m.serverResponseTime, 0);
+        const opSuccess = opMetrics.filter((m) => m.success).length;
+        const opServerTime = opMetrics.reduce(
+          (sum, m) => sum + m.serverResponseTime,
+          0,
+        );
         const opTimeSaved = opMetrics.reduce((sum, m) => sum + m.timeSaved, 0);
 
         byOperation[op] = {
@@ -236,20 +251,20 @@ class PerformanceMetricsTracker {
   } {
     if (this.metrics.length === 0) {
       return {
-        fastestOperation: 'N/A',
-        slowestOperation: 'N/A',
-        mostReliableOperation: 'N/A',
-        leastReliableOperation: 'N/A',
+        fastestOperation: "N/A",
+        slowestOperation: "N/A",
+        mostReliableOperation: "N/A",
+        leastReliableOperation: "N/A",
         averageRetryCount: 0,
         performanceImprovement: 0,
       };
     }
 
     const stats = this.getStats();
-    
+
     // Find fastest and slowest operations
-    let fastestOp = '';
-    let slowestOp = '';
+    let fastestOp = "";
+    let slowestOp = "";
     let fastestTime = Infinity;
     let slowestTime = 0;
 
@@ -265,8 +280,8 @@ class PerformanceMetricsTracker {
     });
 
     // Find most and least reliable operations
-    let mostReliableOp = '';
-    let leastReliableOp = '';
+    let mostReliableOp = "";
+    let leastReliableOp = "";
     let highestSuccessRate = 0;
     let lowestSuccessRate = 100;
 
@@ -286,15 +301,16 @@ class PerformanceMetricsTracker {
     const averageRetryCount = totalRetries / this.metrics.length;
 
     // Calculate performance improvement (percentage)
-    const performanceImprovement = stats.averageServerTime > 0
-      ? (stats.averageTimeSaved / stats.averageServerTime) * 100
-      : 0;
+    const performanceImprovement =
+      stats.averageServerTime > 0
+        ? (stats.averageTimeSaved / stats.averageServerTime) * 100
+        : 0;
 
     return {
-      fastestOperation: fastestOp || 'N/A',
-      slowestOperation: slowestOp || 'N/A',
-      mostReliableOperation: mostReliableOp || 'N/A',
-      leastReliableOperation: leastReliableOp || 'N/A',
+      fastestOperation: fastestOp || "N/A",
+      slowestOperation: slowestOp || "N/A",
+      mostReliableOperation: mostReliableOp || "N/A",
+      leastReliableOperation: leastReliableOp || "N/A",
       averageRetryCount: Math.round(averageRetryCount * 100) / 100,
       performanceImprovement: Math.round(performanceImprovement * 100) / 100,
     };
@@ -303,7 +319,7 @@ class PerformanceMetricsTracker {
   /**
    * Get time series data for charting
    */
-  getTimeSeries(interval: 'minute' | 'hour' | 'day' = 'hour'): {
+  getTimeSeries(interval: "minute" | "hour" | "day" = "hour"): {
     labels: string[];
     successRate: number[];
     avgResponseTime: number[];
@@ -327,8 +343,8 @@ class PerformanceMetricsTracker {
 
     // Group metrics by interval
     const groups: Record<number, PerformanceMetric[]> = {};
-    
-    this.metrics.forEach(metric => {
+
+    this.metrics.forEach((metric) => {
       const bucket = Math.floor(metric.timestamp / intervalMs) * intervalMs;
       if (!groups[bucket]) {
         groups[bucket] = [];
@@ -348,10 +364,13 @@ class PerformanceMetricsTracker {
         const date = new Date(Number(timestamp));
         labels.push(date.toLocaleTimeString());
 
-        const successCount = metrics.filter(m => m.success).length;
+        const successCount = metrics.filter((m) => m.success).length;
         successRate.push((successCount / metrics.length) * 100);
 
-        const totalResponseTime = metrics.reduce((sum, m) => sum + m.serverResponseTime, 0);
+        const totalResponseTime = metrics.reduce(
+          (sum, m) => sum + m.serverResponseTime,
+          0,
+        );
         avgResponseTime.push(Math.round(totalResponseTime / metrics.length));
 
         const totalTimeSaved = metrics.reduce((sum, m) => sum + m.timeSaved, 0);
@@ -371,7 +390,7 @@ class PerformanceMetricsTracker {
    */
   clearMetrics(): void {
     this.metrics = [];
-    
+
     if (this.config.persistToStorage) {
       try {
         localStorage.removeItem(this.STORAGE_KEY);
@@ -386,8 +405,8 @@ class PerformanceMetricsTracker {
    */
   clearOldMetrics(olderThan: number): void {
     const cutoff = Date.now() - olderThan;
-    this.metrics = this.metrics.filter(m => m.timestamp >= cutoff);
-    
+    this.metrics = this.metrics.filter((m) => m.timestamp >= cutoff);
+
     if (this.config.persistToStorage) {
       this.persistMetrics();
     }
@@ -431,12 +450,19 @@ class PerformanceMetricsTracker {
    */
   exportMetricsCSV(): string {
     const headers = [
-      'ID', 'Timestamp', 'Resource', 'Operation', 
-      'Optimistic Time (ms)', 'Server Time (ms)', 'Time Saved (ms)', 
-      'Success', 'Retry Count', 'Error'
+      "ID",
+      "Timestamp",
+      "Resource",
+      "Operation",
+      "Optimistic Time (ms)",
+      "Server Time (ms)",
+      "Time Saved (ms)",
+      "Success",
+      "Retry Count",
+      "Error",
     ];
-    
-    const rows = this.metrics.map(m => [
+
+    const rows = this.metrics.map((m) => [
       m.id,
       new Date(m.timestamp).toISOString(),
       m.resource,
@@ -446,12 +472,14 @@ class PerformanceMetricsTracker {
       m.timeSaved,
       m.success,
       m.retryCount,
-      m.error || '',
+      m.error || "",
     ]);
 
     const csv = [headers, ...rows]
-      .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
-      .join('\n');
+      .map((row) =>
+        row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","),
+      )
+      .join("\n");
 
     return csv;
   }

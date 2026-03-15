@@ -36,12 +36,7 @@ const INDUSTRIES = [
   "other",
 ];
 
-const BUSINESS_SIZES = [
-  "solo",
-  "small",
-  "medium",
-  "large",
-];
+const BUSINESS_SIZES = ["solo", "small", "medium", "large"];
 
 export default function BusinessInfoStep({
   onComplete,
@@ -56,7 +51,9 @@ export default function BusinessInfoStep({
     businessSize: initialData?.businessSize || "",
   });
 
-  const [errors, setErrors] = useState<Partial<Record<keyof BusinessInfoData, string>>>({});
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof BusinessInfoData, string>>
+  >({});
 
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof BusinessInfoData, string>> = {};
@@ -175,12 +172,7 @@ export default function BusinessInfoStep({
 
         {/* Actions */}
         <div className="flex justify-end pt-4">
-          <Button
-            type="submit"
-            variant="primary"
-            size="lg"
-            className="px-8"
-          >
+          <Button type="submit" variant="primary" size="lg" className="px-8">
             {t("businessInfo.continue")}
           </Button>
         </div>

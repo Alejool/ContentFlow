@@ -5,22 +5,22 @@ import { formatDateString, formatDateTimeStyled } from "@/Utils/dateHelpers";
 import { useForm } from "@inertiajs/react";
 import axios from "axios";
 import {
-    AlertTriangle,
-    CheckCircle2,
-    Clock,
-    Copy,
-    Download,
-    Eye,
-    EyeOff,
-    FileCode2,
-    FileText,
-    Info,
-    Key,
-    Loader2,
-    Plus,
-    RefreshCw,
-    Trash2,
-    XCircle,
+  AlertTriangle,
+  CheckCircle2,
+  Clock,
+  Copy,
+  Download,
+  Eye,
+  EyeOff,
+  FileCode2,
+  FileText,
+  Info,
+  Key,
+  Loader2,
+  Plus,
+  RefreshCw,
+  Trash2,
+  XCircle,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
@@ -446,7 +446,11 @@ export default function ApiSettingsTab({
                             {/* Last used */}
                             <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-neutral-400">
                               {token.last_used_at
-                                ? formatDateTimeStyled(token.last_used_at, "short", "short")
+                                ? formatDateTimeStyled(
+                                    token.last_used_at,
+                                    "short",
+                                    "short",
+                                  )
                                 : t("workspace.api.table.never_used")}
                             </td>
 
@@ -457,7 +461,11 @@ export default function ApiSettingsTab({
 
                             {/* Created at */}
                             <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-neutral-400">
-                              {formatDateTimeStyled(token.created_at, "short", "short")}
+                              {formatDateTimeStyled(
+                                token.created_at,
+                                "short",
+                                "short",
+                              )}
                             </td>
 
                             {/* Actions */}
@@ -539,7 +547,9 @@ export default function ApiSettingsTab({
                   <Download className="h-4 w-4 text-indigo-500 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
                 <p className="text-xs text-gray-500 dark:text-neutral-400 mt-1">
-                  {t("workspace.api.documentation.enterprise_guide_description")}
+                  {t(
+                    "workspace.api.documentation.enterprise_guide_description",
+                  )}
                 </p>
                 <span className="inline-flex items-center mt-2 px-2 py-0.5 rounded text-xs font-medium bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300">
                   {t("workspace.api.documentation.enterprise_guide_badge")}
@@ -587,7 +597,10 @@ export default function ApiSettingsTab({
       <AlertCard
         type="warning"
         title={t("workspace.api.security_notice") || "Aviso de Seguridad"}
-        message={t("workspace.api.security_help") || "Los tokens API otorgan acceso completo a este workspace. Nunca los compartas ni los incluyas en repositorios públicos."}
+        message={
+          t("workspace.api.security_help") ||
+          "Los tokens API otorgan acceso completo a este workspace. Nunca los compartas ni los incluyas en repositorios públicos."
+        }
       />
 
       {/* ── Revoke Confirmation Modal ─────────────────────────── */}

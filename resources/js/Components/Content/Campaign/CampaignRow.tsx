@@ -44,7 +44,7 @@ const CampaignRow = memo(
     const { t, i18n } = useTranslation();
     const locale = getDateFnsLocale(i18n.language);
     const { auth } = usePage<any>().props;
-     const canManage =
+    const canManage =
       auth.current_workspace?.permissions?.includes("manage-content");
     return (
       <tr

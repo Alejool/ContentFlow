@@ -15,7 +15,7 @@ class ErrorLoggerClass {
    */
   async log(
     error: Error | string,
-    context?: Record<string, any>
+    context?: Record<string, any>,
   ): Promise<void> {
     try {
       const entry: ErrorLogEntry = {
@@ -29,7 +29,7 @@ class ErrorLoggerClass {
 
       // Log to console in development
       if (import.meta.env.DEV) {
-        }
+      }
 
       // Send to backend (don't await to avoid blocking)
       fetch(this.endpoint, {
@@ -41,10 +41,10 @@ class ErrorLoggerClass {
         body: JSON.stringify(entry),
       }).catch((err) => {
         // Silently fail if logging fails
-        });
+      });
     } catch (err) {
       // Don't throw errors from the error logger
-      }
+    }
   }
 
   /**

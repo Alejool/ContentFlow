@@ -51,7 +51,7 @@ export default function MessageBubble({ message, theme }: MessageBubbleProps) {
                 </span>
                 <span>
                   {new Date(
-                    message.aiResponse._metadata.timestamp
+                    message.aiResponse._metadata.timestamp,
                   ).toLocaleTimeString([], {
                     hour: "2-digit",
                     minute: "2-digit",

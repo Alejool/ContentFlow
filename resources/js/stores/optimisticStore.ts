@@ -33,7 +33,8 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
       
       // Log in development mode
       if (import.meta.env.DEV) {
-        }
+        console.log(`[OptimisticStore] Added operation: ${operation.id} (${operation.type} ${operation.resource})`);
+      }
       
       return { operations: newOps };
     });
@@ -64,7 +65,8 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
         
         // Log in development mode
         if (import.meta.env.DEV) {
-          }
+          console.log(`[OptimisticStore] Confirmed operation: ${id}`);
+        }
         
         // Sync with Inertia.js state (Requirements: 9.4)
         syncWithInertia(updatedOp, 'success', serverData);
@@ -74,7 +76,8 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
           try {
             op.onSuccess(serverData);
           } catch (error) {
-            }
+            console.warn('[OptimisticStore] onSuccess callback error:', error);
+          }
         }
       }
       
@@ -128,10 +131,8 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
         
         // Log in development mode
         if (import.meta.env.DEV) {
-          }
-        
-        // Sync with Inertia.js state (Requirements: 9.4)
-        syncWithInertia(failedOp, 'failed');
+          console.log(`[OptimisticStore] Rolled back operation: ${id} - ${error.message}`);
+        }
         
         // Execute error callback if provided
         if (op.onError) {
@@ -236,13 +237,12 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
       localStorage.setItem('optimistic-operations', JSON.stringify(dataToStore));
       
       if (import.meta.env.DEV) {
-        }
-    } catch (error) {
+        console.log(`[OptimisticStore] Persisted ${state.operations.size} operations`);
       }
+    } catch (error) {
+      // Ignore storage errors
+    }
   },
-
-  /**
-   * Restore state from localStorage
    * Requirements: 2.5
    */
   restore: () => {
@@ -270,12 +270,13 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
         });
         
         if (import.meta.env.DEV) {
-          - data.timestamp,
-          });
+          const age = Math.round((Date.now() - data.timestamp) / 1000);
+          console.log(`[OptimisticStore] Restored ${operationsMap.size} operations (age: ${age}s)`);
         }
       }
     } catch (error) {
-      }
+      // Ignore storage errors
+    }
   },
 }));
 

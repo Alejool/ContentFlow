@@ -11,14 +11,14 @@ import es from "./locales/es";
 // Configuración mejorada de detección de idioma
 const languageDetectorOptions = {
   order: [
-    "querystring",      // ?lng=es
-    "cookie",           // cookie i18next
-    "localStorage",     // localStorage i18nextLng
-    "sessionStorage",   // sessionStorage i18nextLng
-    "navigator",        // navegador del usuario
-    "htmlTag",          // html lang attribute
-    "path",             // /es/page
-    "subdomain",        // es.domain.com
+    "querystring", // ?lng=es
+    "cookie", // cookie i18next
+    "localStorage", // localStorage i18nextLng
+    "sessionStorage", // sessionStorage i18nextLng
+    "navigator", // navegador del usuario
+    "htmlTag", // html lang attribute
+    "path", // /es/page
+    "subdomain", // es.domain.com
   ],
   lookupQuerystring: "lng",
   lookupCookie: "i18next",

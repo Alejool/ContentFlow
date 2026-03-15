@@ -19,7 +19,7 @@ function Badge({ className, variant = "default", ...props }: BadgeProps) {
             variant === "destructive",
           "text-foreground": variant === "outline",
         },
-        className
+        className,
       )}
       {...props}
     />

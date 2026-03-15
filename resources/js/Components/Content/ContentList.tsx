@@ -25,7 +25,10 @@ interface ContentGridItemProps {
   onPublish?: (item: any) => void;
   permissions?: string[];
   remoteLock: any;
-  onPreviewMedia: (media: { url: string; type: "image" | "video"; title?: string }[], initialIndex?: number) => void;
+  onPreviewMedia: (
+    media: { url: string; type: "image" | "video"; title?: string }[],
+    initialIndex?: number,
+  ) => void;
 }
 
 function ContentGridItem({
@@ -99,7 +102,7 @@ export default function ContentList(props: ContentListProps) {
   const { items, isLoading, mode, title, onRefresh } = props;
   const [smoothLoading, setSmoothLoading] = useState(isLoading);
 
- const [lightboxMedia, setLightboxMedia] = useState<
+  const [lightboxMedia, setLightboxMedia] = useState<
     | {
         url: string;
         type: "image" | "video";
@@ -275,7 +278,7 @@ export default function ContentList(props: ContentListProps) {
               <div
                 className={`col-start-1 row-start-1 transition-all duration-500 overflow-y-auto ${smoothLoading ? "invisible opacity-0" : "visible opacity-100"}`}
               >
-               <VirtualGrid
+                <VirtualGrid
                   items={items}
                   columns={4}
                   overscan={2}

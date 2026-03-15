@@ -16,79 +16,84 @@ export default function ContentTypeValidationBanner({
   connectedAccounts,
   t,
 }: ContentTypeValidationBannerProps) {
-  const contentType = publication.content_type || 'post';
+  const contentType = publication.content_type || "post";
   const incompatibleAccounts = connectedAccounts.filter(
-    account => !compatiblePlatforms.some(comp => comp.id === account.id)
+    (account) => !compatiblePlatforms.some((comp) => comp.id === account.id),
   );
 
   // Validaciones específicas por tipo
   const getValidationMessages = () => {
-    const messages: { type: 'error' | 'warning' | 'info'; message: string }[] = [];
+    const messages: { type: "error" | "warning" | "info"; message: string }[] =
+      [];
 
     switch (contentType) {
-      case 'poll':
+      case "poll":
         if (!publication.poll_options || publication.poll_options.length < 2) {
           messages.push({
-            type: 'error',
-            message: 'Poll requires at least 2 options'
+            type: "error",
+            message: "Poll requires at least 2 options",
           });
         }
-        if (!publication.poll_duration_hours || publication.poll_duration_hours < 1) {
+        if (
+          !publication.poll_duration_hours ||
+          publication.poll_duration_hours < 1
+        ) {
           messages.push({
-            type: 'error',
-            message: 'Poll duration must be at least 1 hour'
+            type: "error",
+            message: "Poll duration must be at least 1 hour",
           });
         }
         if (publication.media_files && publication.media_files.length > 0) {
           messages.push({
-            type: 'warning',
-            message: 'Media files will be ignored for poll posts'
+            type: "warning",
+            message: "Media files will be ignored for poll posts",
           });
         }
         break;
 
-      case 'story':
+      case "story":
         if (!publication.media_files || publication.media_files.length === 0) {
           messages.push({
-            type: 'error',
-            message: 'Story requires at least 1 media file'
+            type: "error",
+            message: "Story requires at least 1 media file",
           });
         }
         if (publication.media_files && publication.media_files.length > 1) {
           messages.push({
-            type: 'error',
-            message: 'Story can only have 1 media file'
+            type: "error",
+            message: "Story can only have 1 media file",
           });
         }
         break;
 
-      case 'reel':
-        const videoFiles = publication.media_files?.filter(m => m.file_type === 'video') || [];
+      case "reel":
+        const videoFiles =
+          publication.media_files?.filter((m) => m.file_type === "video") || [];
         if (videoFiles.length === 0) {
           messages.push({
-            type: 'error',
-            message: 'Reel requires 1 video file'
+            type: "error",
+            message: "Reel requires 1 video file",
           });
         }
         if (videoFiles.length > 1) {
           messages.push({
-            type: 'error',
-            message: 'Reel can only have 1 video file'
+            type: "error",
+            message: "Reel can only have 1 video file",
           });
         }
         break;
 
-      case 'carousel':
+      case "carousel":
         if (!publication.media_files || publication.media_files.length < 2) {
           messages.push({
-            type: 'error',
-            message: 'Carousel requires at least 2 media files'
+            type: "error",
+            message: "Carousel requires at least 2 media files",
           });
         }
         if (publication.media_files && publication.media_files.length > 10) {
           messages.push({
-            type: 'error',
-            message: 'Carousel can have maximum 10 media files'
+            type: "error",
+            message: "Carousel can have maximum 10 media files",
           });
         }
         break;
@@ -97,8 +102,8 @@ export default function ContentTypeValidationBanner({
     // Validar plataformas seleccionadas
     if (selectedPlatforms.length === 0) {
       messages.push({
-        type: 'error',
-        message: 'At least one platform must be selected'
+        type: "error",
+        message: "At least one platform must be selected",
       });
     }
 
@@ -106,8 +111,8 @@ export default function ContentTypeValidationBanner({
   };
 
   const validationMessages = getValidationMessages();
-  const hasErrors = validationMessages.some(msg => msg.type === 'error');
-  const hasWarnings = validationMessages.some(msg => msg.type === 'warning');
+  const hasErrors = validationMessages.some((msg) => msg.type === "error");
+  const hasWarnings = validationMessages.some((msg) => msg.type === "warning");
 
   if (validationMessages.length === 0 && incompatibleAccounts.length === 0) {
     return null;
@@ -128,7 +133,7 @@ export default function ContentTypeValidationBanner({
                 The following platforms don't support {contentType} content:
               </p>
               <div className="mt-2 flex flex-wrap gap-1">
-                {incompatibleAccounts.map(account => (
+                {incompatibleAccounts.map((account) => (
                   <span
                     key={account.id}
                     className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300"
@@ -148,28 +153,30 @@ export default function ContentTypeValidationBanner({
         <div
           key={index}
           className={`p-3 rounded-lg border ${
-            msg.type === 'error'
-              ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
-              : msg.type === 'warning'
-              ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800'
-              : 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
+            msg.type === "error"
+              ? "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
+              : msg.type === "warning"
+                ? "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800"
+                : "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800"
           }`}
         >
           <div className="flex items-start gap-2">
-            {msg.type === 'error' ? (
+            {msg.type === "error" ? (
               <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
-            ) : msg.type === 'warning' ? (
+            ) : msg.type === "warning" ? (
               <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
             ) : (
               <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
             )}
-            <p className={`text-sm ${
-              msg.type === 'error'
-                ? 'text-red-800 dark:text-red-200'
-                : msg.type === 'warning'
-                ? 'text-amber-800 dark:text-amber-200'
-                : 'text-blue-800 dark:text-blue-200'
-            }`}>
+            <p
+              className={`text-sm ${
+                msg.type === "error"
+                  ? "text-red-800 dark:text-red-200"
+                  : msg.type === "warning"
+                    ? "text-amber-800 dark:text-amber-200"
+                    : "text-blue-800 dark:text-blue-200"
+              }`}
+            >
               {msg.message}
             </p>
           </div>

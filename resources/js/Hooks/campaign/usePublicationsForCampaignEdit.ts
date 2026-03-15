@@ -30,7 +30,7 @@ export const usePublicationsForCampaignEdit = (
         setAvailablePublications(response.data);
       }
     } catch (error) {
-      } finally {
+    } finally {
       setLoading(false);
     }
   };

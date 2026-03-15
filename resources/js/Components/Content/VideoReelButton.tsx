@@ -1,9 +1,15 @@
-import Button from '@/Components/common/Modern/Button';
-import axios from 'axios';
-import { AlertCircle, CheckCircle2, ExternalLink, Loader2, Sparkles } from 'lucide-react';
-import { useState } from 'react';
-import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
+import Button from "@/Components/common/Modern/Button";
+import axios from "axios";
+import {
+  AlertCircle,
+  CheckCircle2,
+  ExternalLink,
+  Loader2,
+  Sparkles,
+} from "lucide-react";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 interface MediaFile {
   id: number;
@@ -26,11 +32,11 @@ interface VideoReelButtonProps {
   compact?: boolean;
 }
 
-export default function VideoReelButton({ 
-  videoFile, 
-  publicationId, 
+export default function VideoReelButton({
+  videoFile,
+  publicationId,
   allMediaFiles = [],
-  compact = false
+  compact = false,
 }: VideoReelButtonProps) {
   const { t } = useTranslation();
   const [generating, setGenerating] = useState(false);
@@ -38,41 +44,44 @@ export default function VideoReelButton({
 
   // Filter reels generated from this video
   const generatedReels = allMediaFiles.filter(
-    media => media.metadata?.original_media_id === videoFile.id
+    (media) => media.metadata?.original_media_id === videoFile.id,
   );
 
   const handleGenerate = async () => {
     // Check if there are reels currently processing
-    const hasProcessingReels = generatedReels.some(reel => reel.status === 'processing');
+    const hasProcessingReels = generatedReels.some(
+      (reel) => reel.status === "processing",
+    );
     if (hasProcessingReels) {
-      toast.error(t('reels.messages.alreadyProcessing'));
+      toast.error(t("reels.messages.alreadyProcessing"));
       return;
     }
 
     // If reels already exist, ask for confirmation to regenerate
     if (generatedReels.length > 0) {
-      const confirmed = confirm(t('reels.messages.confirmRegenerate'));
+      const confirmed = confirm(t("reels.messages.confirmRegenerate"));
       if (!confirmed) return;
     }
 
     setGenerating(true);
 
     try {
-      await axios.post('/api/v1/reels/generate', {
+      await axios.post("/api/v1/reels/generate", {
         media_file_id: videoFile.id,
         publication_id: publicationId,
-        platforms: ['instagram', 'tiktok', 'youtube_shorts'],
+        platforms: ["instagram", "tiktok", "youtube_shorts"],
         add_subtitles: true,
-        language: 'es',
+        language: "es",
       });
 
-      toast.success(t('reels.messages.generating'));
+      toast.success(t("reels.messages.generating"));
       setShowReels(true);
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || t('reels.messages.error');
-      
-      if (errorMessage.includes('AI service not configured')) {
-        toast.error(t('reels.messages.noAiConfigured'));
+      const errorMessage =
+        error.response?.data?.message || t("reels.messages.error");
+
+      if (errorMessage.includes("AI service not configured")) {
+        toast.error(t("reels.messages.noAiConfigured"));
       } else {
         toast.error(errorMessage);
       }
@@ -83,17 +92,19 @@ export default function VideoReelButton({
 
   const getPlatformIcon = (platform: string) => {
     const icons: Record<string, string> = {
-      instagram: '',
-      tiktok: '',
-      youtube_shorts: '▶️',
+      instagram: "",
+      tiktok: "",
+      youtube_shorts: "▶️",
     };
-    return icons[platform] || '🎬';
+    return icons[platform] || "🎬";
   };
 
-  if (videoFile.file_type !== 'video') return null;
+  if (videoFile.file_type !== "video") return null;
 
   // Check if there are reels currently processing
-  const hasProcessingReels = generatedReels.some(reel => reel.status === 'processing');
+  const hasProcessingReels = generatedReels.some(
+    (reel) => reel.status === "processing",
+  );
   const isButtonDisabled = generating || hasProcessingReels;
 
   return (
@@ -108,7 +119,9 @@ export default function VideoReelButton({
         icon={generating || hasProcessingReels ? Loader2 : Sparkles}
         loading={generating || hasProcessingReels}
       >
-        {generating || hasProcessingReels ? t('reels.button.generating') : t('reels.button.generate')}
+        {generating || hasProcessingReels
+          ? t("reels.button.generating")
+          : t("reels.button.generate")}
       </Button>
 
       {generatedReels.length > 0 && (
@@ -117,9 +130,10 @@ export default function VideoReelButton({
             onClick={() => setShowReels(!showReels)}
             className="text-xs font-medium text-purple-600 hover:text-purple-700 flex items-center gap-1.5 w-full"
           >
-            {showReels ? '▼' : '▶'} 
+            {showReels ? "▼" : "▶"}
             <span className="flex-1 text-left">
-              {generatedReels.length} {t('reels.list.reelsGenerated', { count: generatedReels.length })}
+              {generatedReels.length}{" "}
+              {t("reels.list.reelsGenerated", { count: generatedReels.length })}
             </span>
           </button>
 
@@ -131,10 +145,12 @@ export default function VideoReelButton({
                   className="flex items-center justify-between text-xs p-2 rounded-md bg-purple-50 hover:bg-purple-100 border border-purple-200 transition-colors"
                 >
                   <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <span className="text-base">{getPlatformIcon(reel.metadata?.platform || '')}</span>
+                    <span className="text-base">
+                      {getPlatformIcon(reel.metadata?.platform || "")}
+                    </span>
                     <div className="flex flex-col flex-1 min-w-0">
                       <span className="font-medium text-gray-700 capitalize truncate">
-                        {reel.metadata?.platform || 'Reel'}
+                        {reel.metadata?.platform || "Reel"}
                       </span>
                       {reel.metadata?.duration && (
                         <span className="text-[10px] text-gray-500">
@@ -145,15 +161,15 @@ export default function VideoReelButton({
                   </div>
 
                   <div className="flex items-center gap-1.5">
-                    {reel.status === 'completed' && (
+                    {reel.status === "completed" && (
                       <>
                         <CheckCircle2 className="h-3.5 w-3.5 text-green-600" />
                         <button
                           onClick={() => {
-                            const url = reel.file_path.startsWith('http') 
-                              ? reel.file_path 
+                            const url = reel.file_path.startsWith("http")
+                              ? reel.file_path
                               : `/storage/${reel.file_path}`;
-                            window.open(url, '_blank');
+                            window.open(url, "_blank");
                           }}
                           className="p-1 hover:bg-purple-200 rounded transition-colors"
                           title="Ver reel"
@@ -162,16 +178,20 @@ export default function VideoReelButton({
                         </button>
                       </>
                     )}
-                    {reel.status === 'processing' && (
+                    {reel.status === "processing" && (
                       <div className="flex items-center gap-1">
                         <Loader2 className="h-3.5 w-3.5 animate-spin text-blue-600" />
-                        <span className="text-[10px] text-blue-600 font-medium">Procesando</span>
+                        <span className="text-[10px] text-blue-600 font-medium">
+                          Procesando
+                        </span>
                       </div>
                     )}
-                    {reel.status === 'failed' && (
+                    {reel.status === "failed" && (
                       <div className="flex items-center gap-1">
                         <AlertCircle className="h-3.5 w-3.5 text-red-600" />
-                        <span className="text-[10px] text-red-600 font-medium">Error</span>
+                        <span className="text-[10px] text-red-600 font-medium">
+                          Error
+                        </span>
                       </div>
                     )}
                   </div>

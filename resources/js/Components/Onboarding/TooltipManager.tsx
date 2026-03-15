@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { Tooltip } from './Tooltip';
-import { useOnboardingStore } from '@/stores/onboardingStore';
-import type { TooltipDefinition } from '@/types/onboarding';
+import React, { useEffect, useState, useCallback } from "react";
+import { Tooltip } from "./Tooltip";
+import { useOnboardingStore } from "@/stores/onboardingStore";
+import type { TooltipDefinition } from "@/types/onboarding";
 
 export interface TooltipManagerProps {
   tooltips: TooltipDefinition[];
@@ -10,11 +10,11 @@ export interface TooltipManagerProps {
 
 /**
  * TooltipManager Component
- * 
+ *
  * Manages the display and lifecycle of contextual tooltips throughout the application.
  * Enforces mutual exclusion (only one tooltip visible at a time) and handles
  * dismissed tooltip persistence.
- * 
+ *
  * Requirements: 2.5, 2.6, 2.7
  */
 export const TooltipManager: React.FC<TooltipManagerProps> = ({
@@ -23,23 +23,25 @@ export const TooltipManager: React.FC<TooltipManagerProps> = ({
 }) => {
   const { dismissedTooltips, dismissTooltip } = useOnboardingStore();
   const [activeTooltipId, setActiveTooltipId] = useState<string | null>(null);
-  const [tooltipElements, setTooltipElements] = useState<Map<string, HTMLElement>>(
-    new Map()
-  );
+  const [tooltipElements, setTooltipElements] = useState<
+    Map<string, HTMLElement>
+  >(new Map());
 
   // Find and cache target elements for tooltips
   useEffect(() => {
     if (!enabled) return;
 
     const elements = new Map<string, HTMLElement>();
-    
+
     tooltips.forEach((tooltip) => {
       // Skip dismissed tooltips (Requirement 2.5)
       if (dismissedTooltips.includes(tooltip.id)) {
         return;
       }
 
-      const element = document.querySelector(tooltip.targetSelector) as HTMLElement;
+      const element = document.querySelector(
+        tooltip.targetSelector,
+      ) as HTMLElement;
       if (element) {
         elements.set(tooltip.id, element);
       }
@@ -50,13 +52,15 @@ export const TooltipManager: React.FC<TooltipManagerProps> = ({
     // Re-run when DOM changes (for dynamic content)
     const observer = new MutationObserver(() => {
       const updatedElements = new Map<string, HTMLElement>();
-      
+
       tooltips.forEach((tooltip) => {
         if (dismissedTooltips.includes(tooltip.id)) {
           return;
         }
 
-        const element = document.querySelector(tooltip.targetSelector) as HTMLElement;
+        const element = document.querySelector(
+          tooltip.targetSelector,
+        ) as HTMLElement;
         if (element) {
           updatedElements.set(tooltip.id, element);
         }
@@ -83,10 +87,12 @@ export const TooltipManager: React.FC<TooltipManagerProps> = ({
         setActiveTooltipId(tooltipId);
       } else {
         // Only clear if this tooltip was the active one
-        setActiveTooltipId((current) => (current === tooltipId ? null : current));
+        setActiveTooltipId((current) =>
+          current === tooltipId ? null : current,
+        );
       }
     },
-    []
+    [],
   );
 
   // Handle tooltip dismissal (Requirement 2.4, 2.7)
@@ -96,7 +102,7 @@ export const TooltipManager: React.FC<TooltipManagerProps> = ({
       // Persist dismissal to backend (Requirement 2.7)
       await dismissTooltip(tooltipId);
     },
-    [dismissTooltip]
+    [dismissTooltip],
   );
 
   if (!enabled) {

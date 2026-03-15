@@ -66,7 +66,10 @@ export default function YoutubeSettings({
                 icon={Video}
                 iconColor="text-red-500"
                 iconBgColor="bg-red-100 dark:bg-red-900/20"
-                selected={settings?.type === "video" || (!settings?.type && defaultSettings.type === "video")}
+                selected={
+                  settings?.type === "video" ||
+                  (!settings?.type && defaultSettings.type === "video")
+                }
                 onSelect={(val) => handleChange("type", val)}
               />
               <OptionCard
@@ -107,7 +110,10 @@ export default function YoutubeSettings({
                   value={value}
                   label={label}
                   icon={Icon}
-                  selected={settings?.privacy === value || (!settings?.privacy && defaultSettings.privacy === value)}
+                  selected={
+                    settings?.privacy === value ||
+                    (!settings?.privacy && defaultSettings.privacy === value)
+                  }
                   onSelect={(val) => handleChange("privacy", val)}
                 />
               ))}

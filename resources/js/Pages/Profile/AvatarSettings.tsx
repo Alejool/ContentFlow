@@ -15,7 +15,7 @@ interface AvatarSettingsProps {
 export default function AvatarSettings({ user }: AvatarSettingsProps) {
   const { t } = useTranslation();
   const [previewUrl, setPreviewUrl] = useState<string | null>(
-    user.photo_url && user.photo_url.trim() !== '' ? user.photo_url : null
+    user.photo_url && user.photo_url.trim() !== "" ? user.photo_url : null,
   );
   const [processing, setProcessing] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -27,13 +27,17 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
 
     // Validar tamaño (max 2MB)
     if (file.size > 2 * 1024 * 1024) {
-      toast.error(t("profile.avatar_too_large", "La imagen es muy grande. Máximo 2MB"));
+      toast.error(
+        t("profile.avatar_too_large", "La imagen es muy grande. Máximo 2MB"),
+      );
       return;
     }
 
     // Validar tipo
     if (!file.type.startsWith("image/")) {
-      toast.error(t("profile.invalid_file_type", "Solo se permiten archivos de imagen"));
+      toast.error(
+        t("profile.invalid_file_type", "Solo se permiten archivos de imagen"),
+      );
       return;
     }
 
@@ -51,25 +55,26 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
 
       // Subir archivo usando FormData
       const formData = new FormData();
-      formData.append('avatar', file);
-      formData.append('name', user.name);
+      formData.append("avatar", file);
+      formData.append("name", user.name);
 
       const response = await axios.post("/api/v1/profile/avatar", formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       });
 
       if (response.data.success) {
         const updatedUser = response.data.user;
-        const newPhotoUrl = updatedUser.photo_url && updatedUser.photo_url.trim() !== '' 
-          ? updatedUser.photo_url 
-          : null;
+        const newPhotoUrl =
+          updatedUser.photo_url && updatedUser.photo_url.trim() !== ""
+            ? updatedUser.photo_url
+            : null;
         setPreviewUrl(newPhotoUrl);
         setImageError(false);
-        
+
         toast.success(
-          t("profile.avatar_uploaded", "Foto subida correctamente")
+          t("profile.avatar_uploaded", "Foto subida correctamente"),
         );
 
         // Recargar para actualizar en toda la app
@@ -77,12 +82,16 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
           window.location.reload();
         }, 500);
       } else {
-        toast.error(response.data.message || t("profile.avatar_update_failed", "Error al subir la foto"));
+        toast.error(
+          response.data.message ||
+            t("profile.avatar_update_failed", "Error al subir la foto"),
+        );
         setPreviewUrl(user.photo_url || null);
       }
     } catch (error: any) {
       console.error("Error uploading avatar:", error);
-      const errorMessage = error.response?.data?.message || 
+      const errorMessage =
+        error.response?.data?.message ||
         t("profile.avatar_upload_error", "Ocurrió un error al subir la foto");
       toast.error(errorMessage);
       setPreviewUrl(user.photo_url || null);
@@ -93,7 +102,7 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
 
   const handleRemovePhoto = async () => {
     if (processing) return;
-    
+
     setProcessing(true);
     setPreviewUrl(null);
     setImageError(false);
@@ -103,9 +112,9 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
 
       if (response.data.success) {
         setPreviewUrl(null);
-        
+
         toast.success(
-          t("profile.avatar_removed", "Avatar eliminado correctamente")
+          t("profile.avatar_removed", "Avatar eliminado correctamente"),
         );
 
         // Recargar para actualizar en toda la app
@@ -113,13 +122,20 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
           window.location.reload();
         }, 500);
       } else {
-        toast.error(response.data.message || t("profile.avatar_remove_failed", "Error al eliminar el avatar"));
+        toast.error(
+          response.data.message ||
+            t("profile.avatar_remove_failed", "Error al eliminar el avatar"),
+        );
         setPreviewUrl(user.photo_url || null);
       }
     } catch (error: any) {
       console.error("Error removing avatar:", error);
-      const errorMessage = error.response?.data?.message || 
-        t("profile.avatar_remove_error", "Ocurrió un error al eliminar el avatar");
+      const errorMessage =
+        error.response?.data?.message ||
+        t(
+          "profile.avatar_remove_error",
+          "Ocurrió un error al eliminar el avatar",
+        );
       toast.error(errorMessage);
       setPreviewUrl(user.photo_url || null);
     } finally {
@@ -151,7 +167,7 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
                     <div className="w-10 h-10 border-3 border-white/30 border-t-white rounded-full animate-spin"></div>
                   </div>
                 )}
-                
+
                 <img
                   src={previewUrl}
                   alt={user.name}
@@ -177,7 +193,7 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
             </div>
           )}
         </div>
-        
+
         <div className="text-center">
           <p className="text-xs font-medium text-gray-600 dark:text-gray-400">
             {previewUrl
@@ -211,7 +227,9 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
             }`}
           >
             <Upload size={16} />
-            {processing ? t("profile.uploading", "Subiendo...") : t("profile.choose_file", "Elegir Archivo")}
+            {processing
+              ? t("profile.uploading", "Subiendo...")
+              : t("profile.choose_file", "Elegir Archivo")}
           </label>
           {previewUrl && (
             <Button
@@ -228,7 +246,10 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
           )}
         </div>
         <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-          {t("profile.avatar_requirements", "Máximo 2MB. Formatos: JPG, PNG, GIF")}
+          {t(
+            "profile.avatar_requirements",
+            "Máximo 2MB. Formatos: JPG, PNG, GIF",
+          )}
         </p>
       </div>
     </div>

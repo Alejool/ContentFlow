@@ -6,7 +6,14 @@ export interface ProgressDisplayProps {
   percentage: number;
   eta?: number;
   speed?: number;
-  status: "pending" | "uploading" | "paused" | "completed" | "error" | "cancelled" | "processing";
+  status:
+    | "pending"
+    | "uploading"
+    | "paused"
+    | "completed"
+    | "error"
+    | "cancelled"
+    | "processing";
   onPause?: () => void;
   onResume?: () => void;
   onCancel?: () => void;
@@ -36,7 +43,10 @@ export function ProgressDisplay({
   const { t } = useTranslation();
 
   // Ensure progress is a valid number between 0-100
-  const validPercentage = Math.min(100, Math.max(0, Math.round(percentage || 0)));
+  const validPercentage = Math.min(
+    100,
+    Math.max(0, Math.round(percentage || 0)),
+  );
 
   const getProgressColor = () => {
     switch (status) {
@@ -80,7 +90,8 @@ export function ProgressDisplay({
 
   const showControls = status === "uploading" || status === "paused";
   const showRetry = status === "error" && canRetry && onRetry;
-  const showMaxRetriesMessage = status === "error" && !canRetry && retryCount && retryCount >= 3;
+  const showMaxRetriesMessage =
+    status === "error" && !canRetry && retryCount && retryCount >= 3;
 
   return (
     <div className="space-y-2">

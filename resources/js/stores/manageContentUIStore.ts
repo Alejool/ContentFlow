@@ -52,7 +52,8 @@ export const useManageContentUIStore = create<ManageContentUIState>((set) => {
     typeof window !== "undefined"
       ? localStorage.getItem("manage_content_active_tab")
       : null;
-  const initialActiveTab = (savedActiveTab as ManageContentUIState["activeTab"]) || "publications";
+  const initialActiveTab =
+    (savedActiveTab as ManageContentUIState["activeTab"]) || "publications";
 
   // Try to load saved filter visibility from localStorage
   const savedShowFilters =

@@ -5,21 +5,21 @@ import { useTheme } from "@/Hooks/useTheme";
 import { Head, Link } from "@inertiajs/react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-    ArrowRight,
-    BarChart3,
-    Brain,
-    Calendar,
-    CheckCircle2,
-    Globe,
-    Image as ImageIcon,
-    Mail,
-    Rocket,
-    Share2,
-    Shield,
-    Sparkles,
-    Upload,
-    Users,
-    Zap,
+  ArrowRight,
+  BarChart3,
+  Brain,
+  Calendar,
+  CheckCircle2,
+  Globe,
+  Image as ImageIcon,
+  Mail,
+  Rocket,
+  Share2,
+  Shield,
+  Sparkles,
+  Upload,
+  Users,
+  Zap,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -62,7 +62,13 @@ const SUPPORTED_NETWORKS = Object.values(SOCIAL_PLATFORMS).filter(
   (platform) => platform.active,
 );
 
-export default function Welcome({ auth, canLogin, canRegister, plans = [], systemFeatures }: WelcomeProps) {
+export default function Welcome({
+  auth,
+  canLogin,
+  canRegister,
+  plans = [],
+  systemFeatures,
+}: WelcomeProps) {
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
   const pricingSectionRef = useRef<HTMLDivElement>(null);
@@ -70,9 +76,9 @@ export default function Welcome({ auth, canLogin, canRegister, plans = [], syste
 
   const scrollToPricing = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    pricingSectionRef.current?.scrollIntoView({ 
-      behavior: 'smooth',
-      block: 'start'
+    pricingSectionRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
     });
   };
 
@@ -92,7 +98,7 @@ export default function Welcome({ auth, canLogin, canRegister, plans = [], syste
   useEffect(() => {
     // Force orange theme for welcome page
     document.documentElement.setAttribute("data-theme-color", "orange");
-    
+
     // Clear any custom color properties that might persist from authenticated session
     const root = document.documentElement;
     [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].forEach((weight) => {
@@ -103,113 +109,120 @@ export default function Welcome({ auth, canLogin, canRegister, plans = [], syste
   // Definir todas las características posibles
   const allFeatures = [
     {
-      id: 'content',
+      id: "content",
       icon: <Upload className="w-12 h-12" />,
       title: "Gestión de Contenido Multimedia",
-      description: "Organiza y gestiona todos tus archivos multimedia en un solo lugar con colecciones inteligentes, etiquetas y búsqueda avanzada.",
+      description:
+        "Organiza y gestiona todos tus archivos multimedia en un solo lugar con colecciones inteligentes, etiquetas y búsqueda avanzada.",
       highlights: [
         "Biblioteca multimedia ilimitada",
         "Colecciones y etiquetas personalizadas",
         "Búsqueda y filtros avanzados",
-        "Soporte para imágenes, videos y GIFs"
+        "Soporte para imágenes, videos y GIFs",
       ],
-      enabled: true // Siempre habilitado
+      enabled: true, // Siempre habilitado
     },
     {
-      id: 'publishing',
+      id: "publishing",
       icon: <Share2 className="w-12 h-12" />,
       title: "Publicación Multiplataforma",
-      description: `Publica en ${SUPPORTED_NETWORKS.length} redes sociales desde un solo lugar: ${SUPPORTED_NETWORKS.map(p => p.name).join(', ')}.`,
+      description: `Publica en ${SUPPORTED_NETWORKS.length} redes sociales desde un solo lugar: ${SUPPORTED_NETWORKS.map((p) => p.name).join(", ")}.`,
       highlights: [
         `${SUPPORTED_NETWORKS.length} plataformas soportadas`,
         "Publicación simultánea",
         "Formatos específicos por red",
-        "Gestión de múltiples cuentas"
+        "Gestión de múltiples cuentas",
       ],
-      enabled: true 
+      enabled: true,
     },
     {
-      id: 'scheduling',
+      id: "scheduling",
       icon: <Calendar className="w-12 h-12" />,
       title: "Programación Inteligente",
-      description: "Programa tus publicaciones con calendario visual, cola automática y sugerencias de horarios óptimos.",
+      description:
+        "Programa tus publicaciones con calendario visual, cola automática y sugerencias de horarios óptimos.",
       highlights: [
         "Calendario visual interactivo",
         "Cola de publicaciones automática",
         "Programación por zonas horarias",
-        "Vista de calendario mensual"
+        "Vista de calendario mensual",
       ],
-      enabled: true // Siempre habilitado
+      enabled: true, // Siempre habilitado
     },
     {
-      id: 'ai',
+      id: "ai",
       icon: <Brain className="w-12 h-12" />,
       title: "Inteligencia Artificial",
-      description: "Genera contenido, hashtags y descripciones con IA. Obtén sugerencias personalizadas para maximizar el engagement.",
+      description:
+        "Genera contenido, hashtags y descripciones con IA. Obtén sugerencias personalizadas para maximizar el engagement.",
       highlights: [
         "Generación de contenido con IA",
         "Sugerencias de hashtags inteligentes",
         "Optimización de textos",
-        "Análisis de tendencias"
+        "Análisis de tendencias",
       ],
-      enabled: systemFeatures?.ai || false
+      enabled: systemFeatures?.ai || false,
     },
     {
-      id: 'analytics',
+      id: "analytics",
       icon: <BarChart3 className="w-12 h-12" />,
       title: "Analíticas Avanzadas",
-      description: "Monitorea el rendimiento de tus publicaciones con métricas detalladas, gráficos interactivos y reportes personalizados.",
+      description:
+        "Monitorea el rendimiento de tus publicaciones con métricas detalladas, gráficos interactivos y reportes personalizados.",
       highlights: [
         "Métricas en tiempo real",
         "Gráficos interactivos",
         "Reportes personalizados",
-        "Comparativas de rendimiento"
+        "Comparativas de rendimiento",
       ],
-      enabled: systemFeatures?.analytics || false
+      enabled: systemFeatures?.analytics || false,
     },
     {
-      id: 'team',
+      id: "team",
       icon: <Users className="w-12 h-12" />,
       title: "Colaboración en Equipo",
-      description: "Trabaja en equipo con roles y permisos personalizados, flujos de aprobación y comentarios en tiempo real.",
+      description:
+        "Trabaja en equipo con roles y permisos personalizados, flujos de aprobación y comentarios en tiempo real.",
       highlights: [
         "Múltiples miembros del equipo",
         "Roles y permisos granulares",
         "Comentarios y colaboración",
-        "Gestión de workspaces"
+        "Gestión de workspaces",
       ],
-      enabled: true // Siempre habilitado
+      enabled: true, // Siempre habilitado
     },
     {
-      id: 'approval',
+      id: "approval",
       icon: <CheckCircle2 className="w-12 h-12" />,
       title: "Flujos de Aprobación",
-      description: "Implementa procesos de revisión y aprobación con múltiples niveles, notificaciones automáticas y historial completo.",
+      description:
+        "Implementa procesos de revisión y aprobación con múltiples niveles, notificaciones automáticas y historial completo.",
       highlights: [
         "Aprobaciones multinivel",
         "Notificaciones automáticas",
         "Historial de cambios",
-        "Comentarios y feedback"
+        "Comentarios y feedback",
       ],
-      enabled: systemFeatures?.approval_workflows || false
+      enabled: systemFeatures?.approval_workflows || false,
     },
     {
-      id: 'editor',
+      id: "editor",
       icon: <ImageIcon className="w-12 h-12" />,
       title: "Editor de Contenido",
-      description: "Crea y edita publicaciones con un editor visual intuitivo, plantillas prediseñadas y vista previa en tiempo real.",
+      description:
+        "Crea y edita publicaciones con un editor visual intuitivo, plantillas prediseñadas y vista previa en tiempo real.",
       highlights: [
         "Editor visual intuitivo",
         "Plantillas prediseñadas",
         "Vista previa por plataforma",
-        "Emojis y formato enriquecido"
+        "Emojis y formato enriquecido",
       ],
-      enabled: true // Siempre habilitado
-    }
+      enabled: true, // Siempre habilitado
+    },
   ];
 
   // Filtrar solo las características habilitadas
-  const features = allFeatures.filter(feature => feature.enabled);
+  const features = allFeatures.filter((feature) => feature.enabled);
 
   // Auto-advance carousel
   useEffect(() => {
@@ -268,7 +281,11 @@ export default function Welcome({ auth, canLogin, canRegister, plans = [], syste
                   <span className="text-sm font-medium text-primary-600 dark:text-primary-400 flex items-center gap-1">
                     <motion.div
                       animate={{ rotate: [0, 360] }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "linear",
+                      }}
                     >
                       <Sparkles className="w-4 h-4" />
                     </motion.div>
@@ -323,7 +340,10 @@ export default function Welcome({ auth, canLogin, canRegister, plans = [], syste
                 >
                   {canRegister ? (
                     <>
-                      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
                         <Link
                           href="/register"
                           className="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors shadow-lg hover:shadow-xl"
@@ -332,7 +352,10 @@ export default function Welcome({ auth, canLogin, canRegister, plans = [], syste
                           <ArrowRight className="w-5 h-5 ml-2" />
                         </Link>
                       </motion.div>
-                      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
                         <a
                           href="#pricing"
                           onClick={scrollToPricing}
@@ -381,7 +404,10 @@ export default function Welcome({ auth, canLogin, canRegister, plans = [], syste
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
-                            transition={{ duration: 0.5, delay: 0.5 + index * 0.1 }}
+                            transition={{
+                              duration: 0.5,
+                              delay: 0.5 + index * 0.1,
+                            }}
                             whileHover={{ scale: 1.1, filter: "grayscale(0%)" }}
                             className="flex items-center gap-3 text-xl md:text-2xl font-bold font-heading text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white transition-all duration-300 cursor-default grayscale"
                           >
@@ -449,7 +475,11 @@ export default function Welcome({ auth, canLogin, canRegister, plans = [], syste
                               <motion.div
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
-                                transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+                                transition={{
+                                  delay: 0.3,
+                                  type: "spring",
+                                  stiffness: 200,
+                                }}
                                 className="inline-flex items-center justify-center w-24 h-24 rounded-lg bg-primary-500 text-white mb-6 shadow-2xl"
                               >
                                 {features[currentFeatureIndex].icon}
@@ -469,27 +499,35 @@ export default function Welcome({ auth, canLogin, canRegister, plans = [], syste
                               transition={{ delay: 0.4, duration: 0.5 }}
                               className="space-y-4"
                             >
-                              {features[currentFeatureIndex].highlights.map((highlight, idx) => (
-                                <motion.div
-                                  key={idx}
-                                  initial={{ opacity: 0, x: 20 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  transition={{ delay: 0.5 + idx * 0.1, duration: 0.4 }}
-                                  className="flex items-start gap-3 p-4 rounded-lg bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                                >
+                              {features[currentFeatureIndex].highlights.map(
+                                (highlight, idx) => (
                                   <motion.div
-                                    initial={{ scale: 0 }}
-                                    animate={{ scale: 1 }}
-                                    transition={{ delay: 0.6 + idx * 0.1, type: "spring" }}
-                                    className="flex-shrink-0 w-6 h-6 rounded-full bg-primary-500 flex items-center justify-center"
+                                    key={idx}
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{
+                                      delay: 0.5 + idx * 0.1,
+                                      duration: 0.4,
+                                    }}
+                                    className="flex items-start gap-3 p-4 rounded-lg bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                                   >
-                                    <CheckCircle2 className="w-4 h-4 text-white" />
+                                    <motion.div
+                                      initial={{ scale: 0 }}
+                                      animate={{ scale: 1 }}
+                                      transition={{
+                                        delay: 0.6 + idx * 0.1,
+                                        type: "spring",
+                                      }}
+                                      className="flex-shrink-0 w-6 h-6 rounded-full bg-primary-500 flex items-center justify-center"
+                                    >
+                                      <CheckCircle2 className="w-4 h-4 text-white" />
+                                    </motion.div>
+                                    <span className="text-gray-700 dark:text-gray-300 font-medium">
+                                      {highlight}
+                                    </span>
                                   </motion.div>
-                                  <span className="text-gray-700 dark:text-gray-300 font-medium">
-                                    {highlight}
-                                  </span>
-                                </motion.div>
-                              ))}
+                                ),
+                              )}
                             </motion.div>
                           </div>
                         </div>
@@ -505,8 +543,8 @@ export default function Welcome({ auth, canLogin, canRegister, plans = [], syste
                         onClick={() => setCurrentFeatureIndex(index)}
                         className={`relative h-3 rounded-full transition-all duration-300 ${
                           index === currentFeatureIndex
-                            ? 'w-12 bg-primary-600'
-                            : 'w-3 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
+                            ? "w-12 bg-primary-600"
+                            : "w-3 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500"
                         }`}
                         whileHover={{ scale: 1.2 }}
                         whileTap={{ scale: 0.9 }}
@@ -526,7 +564,12 @@ export default function Welcome({ auth, canLogin, canRegister, plans = [], syste
                   {/* Navigation Arrows */}
                   <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 flex justify-between pointer-events-none px-4">
                     <motion.button
-                      onClick={() => setCurrentFeatureIndex((prev) => (prev - 1 + features.length) % features.length)}
+                      onClick={() =>
+                        setCurrentFeatureIndex(
+                          (prev) =>
+                            (prev - 1 + features.length) % features.length,
+                        )
+                      }
                       className="pointer-events-auto w-12 h-12 rounded-full bg-white dark:bg-gray-800 shadow-lg flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                       whileHover={{ scale: 1.1, x: -5 }}
                       whileTap={{ scale: 0.9 }}
@@ -534,7 +577,11 @@ export default function Welcome({ auth, canLogin, canRegister, plans = [], syste
                       <ArrowRight className="w-6 h-6 rotate-180" />
                     </motion.button>
                     <motion.button
-                      onClick={() => setCurrentFeatureIndex((prev) => (prev + 1) % features.length)}
+                      onClick={() =>
+                        setCurrentFeatureIndex(
+                          (prev) => (prev + 1) % features.length,
+                        )
+                      }
                       className="pointer-events-auto w-12 h-12 rounded-full bg-white dark:bg-gray-800 shadow-lg flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                       whileHover={{ scale: 1.1, x: 5 }}
                       whileTap={{ scale: 0.9 }}
@@ -571,17 +618,23 @@ export default function Welcome({ auth, canLogin, canRegister, plans = [], syste
                   transition={{ duration: 0.6, delay: 0.4 }}
                   className="mt-4 text-center text-gray-600 dark:text-gray-300"
                 >
-                  {t("welcome.pricingSubtitle") || "Desde planes gratuitos hasta soluciones empresariales"}
+                  {t("welcome.pricingSubtitle") ||
+                    "Desde planes gratuitos hasta soluciones empresariales"}
                 </motion.p>
 
-                <div className={`mt-10 grid gap-6 ${plans.length === 1 ? 'grid-cols-1 max-w-md mx-auto' : plans.length === 2 ? 'sm:grid-cols-2 max-w-3xl mx-auto' : plans.length === 3 ? 'sm:grid-cols-2 lg:grid-cols-3' : 'sm:grid-cols-2 lg:grid-cols-4'}`}>
+                <div
+                  className={`mt-10 grid gap-6 ${plans.length === 1 ? "grid-cols-1 max-w-md mx-auto" : plans.length === 2 ? "sm:grid-cols-2 max-w-3xl mx-auto" : plans.length === 3 ? "sm:grid-cols-2 lg:grid-cols-3" : "sm:grid-cols-2 lg:grid-cols-4"}`}
+                >
                   {plans.map((plan, planIndex) => {
                     const isPopular = plan.popular;
-                    
+
                     // Formatear límites con traducciones
                     const getPublicationsText = () => {
                       if (plan.limits.publications_per_month === -1) {
-                        return t("pricing.features.publicationsUnlimited") || "Publicaciones ilimitadas";
+                        return (
+                          t("pricing.features.publicationsUnlimited") ||
+                          "Publicaciones ilimitadas"
+                        );
                       }
                       const count = plan.limits.publications_per_month;
                       return `${count} ${t("common.publicationsPerMonth") || "publicaciones/mes"}`;
@@ -589,10 +642,13 @@ export default function Welcome({ auth, canLogin, canRegister, plans = [], syste
 
                     const getSocialAccountsText = () => {
                       if (plan.limits.social_accounts === -1) {
-                        return t("pricing.features.socialAccountsUnlimited") || "Cuentas sociales ilimitadas";
+                        return (
+                          t("pricing.features.socialAccountsUnlimited") ||
+                          "Cuentas sociales ilimitadas"
+                        );
                       }
                       const count = plan.limits.social_accounts;
-                      return `${count} ${count === 1 ? (t("common.socialAccount") || "red social") : (t("common.socialAccounts") || "redes sociales")}`;
+                      return `${count} ${count === 1 ? t("common.socialAccount") || "red social" : t("common.socialAccounts") || "redes sociales"}`;
                     };
 
                     const getStorageText = () => {
@@ -601,22 +657,31 @@ export default function Welcome({ auth, canLogin, canRegister, plans = [], syste
                       }
                       return `${plan.limits.storage_gb}GB ${t("common.storage") || "almacenamiento"}`;
                     };
-                    
+
                     return (
                       <motion.div
                         key={plan.id}
                         initial={{ opacity: 0, y: 40 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ duration: 0.5, delay: 0.6 + planIndex * 0.1 }}
+                        transition={{
+                          duration: 0.5,
+                          delay: 0.6 + planIndex * 0.1,
+                        }}
                         whileHover={{ scale: 1.05, y: -5 }}
                       >
                         <Link
-                          href={canRegister ? `/register?plan=${plan.id}` : canLogin ? "/pricing" : "/register"}
+                          href={
+                            canRegister
+                              ? `/register?plan=${plan.id}`
+                              : canLogin
+                                ? "/pricing"
+                                : "/register"
+                          }
                           className={`block relative rounded-lg border ${
-                            isPopular 
-                              ? 'border-primary-500 shadow-lg' 
-                              : 'border-gray-200 dark:border-gray-700 hover:border-primary-500 hover:shadow-lg'
+                            isPopular
+                              ? "border-primary-500 shadow-lg"
+                              : "border-gray-200 dark:border-gray-700 hover:border-primary-500 hover:shadow-lg"
                           } bg-white dark:bg-gray-800 p-6 transition-all cursor-pointer h-full`}
                         >
                           {isPopular && (
@@ -624,7 +689,10 @@ export default function Welcome({ auth, canLogin, canRegister, plans = [], syste
                               initial={{ opacity: 0, scale: 0 }}
                               whileInView={{ opacity: 1, scale: 1 }}
                               viewport={{ once: true }}
-                              transition={{ delay: 0.8 + planIndex * 0.1, type: "spring" }}
+                              transition={{
+                                delay: 0.8 + planIndex * 0.1,
+                                type: "spring",
+                              }}
                               className="absolute -top-4 left-1/2 transform -translate-x-1/2"
                             >
                               <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary-500 text-white">
@@ -642,30 +710,30 @@ export default function Welcome({ auth, canLogin, canRegister, plans = [], syste
                               </span>
                               <span className="text-gray-600 dark:text-gray-400">
                                 {t("pricing.perMonth") || "/mes"}
-                            </span>
+                              </span>
+                            </div>
+                            <ul className="mt-6 space-y-3 text-sm text-left">
+                              <li className="flex items-center gap-2">
+                                <div className="w-1.5 h-1.5 rounded-full bg-primary-500"></div>
+                                <span className="text-gray-700 dark:text-gray-300">
+                                  {getPublicationsText()}
+                                </span>
+                              </li>
+                              <li className="flex items-center gap-2">
+                                <div className="w-1.5 h-1.5 rounded-full bg-primary-500"></div>
+                                <span className="text-gray-700 dark:text-gray-300">
+                                  {getSocialAccountsText()}
+                                </span>
+                              </li>
+                              <li className="flex items-center gap-2">
+                                <div className="w-1.5 h-1.5 rounded-full bg-primary-500"></div>
+                                <span className="text-gray-700 dark:text-gray-300">
+                                  {getStorageText()}
+                                </span>
+                              </li>
+                            </ul>
                           </div>
-                          <ul className="mt-6 space-y-3 text-sm text-left">
-                            <li className="flex items-center gap-2">
-                              <div className="w-1.5 h-1.5 rounded-full bg-primary-500"></div>
-                              <span className="text-gray-700 dark:text-gray-300">
-                                {getPublicationsText()}
-                              </span>
-                            </li>
-                            <li className="flex items-center gap-2">
-                              <div className="w-1.5 h-1.5 rounded-full bg-primary-500"></div>
-                              <span className="text-gray-700 dark:text-gray-300">
-                                {getSocialAccountsText()}
-                              </span>
-                            </li>
-                            <li className="flex items-center gap-2">
-                              <div className="w-1.5 h-1.5 rounded-full bg-primary-500"></div>
-                              <span className="text-gray-700 dark:text-gray-300">
-                                {getStorageText()}
-                              </span>
-                            </li>
-                          </ul>
-                        </div>
-                      </Link>
+                        </Link>
                       </motion.div>
                     );
                   })}
@@ -677,7 +745,8 @@ export default function Welcome({ auth, canLogin, canRegister, plans = [], syste
                       href="/pricing"
                       className="inline-flex items-center justify-center text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
                     >
-                      {t("welcome.viewAllPlans") || "Ver todos los planes y características"}
+                      {t("welcome.viewAllPlans") ||
+                        "Ver todos los planes y características"}
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </Link>
                   ) : (
@@ -685,7 +754,8 @@ export default function Welcome({ auth, canLogin, canRegister, plans = [], syste
                       href="/register"
                       className="inline-flex items-center justify-center text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
                     >
-                      {t("welcome.viewAllPlans") || "Ver todos los planes y características"}
+                      {t("welcome.viewAllPlans") ||
+                        "Ver todos los planes y características"}
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </Link>
                   )}
@@ -736,7 +806,10 @@ export default function Welcome({ auth, canLogin, canRegister, plans = [], syste
                   <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                     <div className="flex items-center gap-2">
                       <Zap className="w-4 h-4 text-yellow-500" />
-                      <span>{t("welcome.demoAccess") || "Demo de 30 días disponible"}</span>
+                      <span>
+                        {t("welcome.demoAccess") ||
+                          "Demo de 30 días disponible"}
+                      </span>
                     </div>
                   </div>
                 </div>

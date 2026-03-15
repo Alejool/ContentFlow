@@ -63,7 +63,11 @@ export const useMediaStore = create<MediaState>((set) => ({
 
   updateFile: (tempId, updates) =>
     set((state) => {
-      console.log('📝 MediaStore updateFile:', { tempId, updates, currentFiles: state.mediaFiles.length });
+      console.log("📝 MediaStore updateFile:", {
+        tempId,
+        updates,
+        currentFiles: state.mediaFiles.length,
+      });
       return {
         mediaFiles: state.mediaFiles.map((f) =>
           f.tempId === tempId ? { ...f, ...updates } : f,

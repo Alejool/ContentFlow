@@ -39,18 +39,19 @@ const AiFieldSuggester: React.FC<AiFieldSuggesterProps> = ({
     setLoading(true);
     try {
       // Define field limits based on type
-      const fieldLimits = type === "publication" 
-        ? {
-            title: { min: 1, max: 70 },
-            description: { min: 10, max: 700 },
-            goal: { min: 5, max: 200 },
-            hashtags: { min: 1, max: 10 }
-          }
-        : {
-            name: { min: 1, max: 100 },
-            description: { min: 1, max: 500 },
-            goal: { min: 1, max: 200 }
-          };
+      const fieldLimits =
+        type === "publication"
+          ? {
+              title: { min: 1, max: 70 },
+              description: { min: 10, max: 700 },
+              goal: { min: 5, max: 200 },
+              hashtags: { min: 1, max: 10 },
+            }
+          : {
+              name: { min: 1, max: 100 },
+              description: { min: 1, max: 500 },
+              goal: { min: 1, max: 200 },
+            };
 
       const response = await axios.post(route("api.v1.ai.suggest-fields"), {
         fields,
@@ -64,7 +65,7 @@ const AiFieldSuggester: React.FC<AiFieldSuggesterProps> = ({
         toast.success(
           t("common.ai.suggestions_generated") ||
             "Sugerencias generadas con éxito",
-          { id: "ai-suggestions" }
+          { id: "ai-suggestions" },
         );
       } else {
         toast.error(

@@ -16,7 +16,7 @@ interface PollFieldsProps {
 }
 
 export default function PollFields({
-  options = ['', ''],
+  options = ["", ""],
   duration = 24,
   onChange,
   register,
@@ -24,12 +24,11 @@ export default function PollFields({
   t,
   errors = {},
 }: PollFieldsProps) {
-  
   const handleOptionChange = (index: number, value: string) => {
     const newOptions = [...options];
     newOptions[index] = value;
     onChange({ options: newOptions, duration });
-    
+
     // Update form values if setValue is available
     if (setValue) {
       setValue("poll_options", newOptions, { shouldValidate: true });
@@ -38,9 +37,9 @@ export default function PollFields({
 
   const handleAddOption = () => {
     if (options.length < 4) {
-      const newOptions = [...options, ''];
+      const newOptions = [...options, ""];
       onChange({ options: newOptions, duration });
-      
+
       if (setValue) {
         setValue("poll_options", newOptions, { shouldValidate: true });
       }
@@ -51,7 +50,7 @@ export default function PollFields({
     if (options.length > 2) {
       const newOptions = options.filter((_, i) => i !== index);
       onChange({ options: newOptions, duration });
-      
+
       if (setValue) {
         setValue("poll_options", newOptions, { shouldValidate: true });
       }
@@ -61,7 +60,7 @@ export default function PollFields({
   const handleDurationChange = (value: string) => {
     const numValue = parseInt(value) || 24;
     onChange({ options, duration: numValue });
-    
+
     if (setValue) {
       setValue("poll_duration_hours", numValue, { shouldValidate: true });
     }
@@ -80,7 +79,7 @@ export default function PollFields({
         <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
           {t("publications.modal.poll.options") || "Poll Options (2-4 options)"}
         </label>
-        
+
         {options.map((option, index) => (
           <div key={index} className="flex gap-2">
             <div className="flex-1">
@@ -104,7 +103,7 @@ export default function PollFields({
                 onClick={() => handleRemoveOption(index)}
                 className="shrink-0"
               >
-              <> </>
+                <> </>
               </Button>
             )}
           </div>
@@ -133,7 +132,7 @@ export default function PollFields({
         <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
           {t("publications.modal.poll.duration") || "Poll Duration"}
         </label>
-        
+
         <div className="flex items-center gap-3">
           <Input
             id="poll-duration"
@@ -153,7 +152,8 @@ export default function PollFields({
             <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-10">
               <div className="bg-gray-900 text-white text-xs rounded-lg py-2 px-3 whitespace-nowrap">
-                {t("publications.modal.poll.durationHint") || "Twitter: 5min-7days"}
+                {t("publications.modal.poll.durationHint") ||
+                  "Twitter: 5min-7days"}
               </div>
             </div>
           </div>
@@ -167,7 +167,7 @@ export default function PollFields({
       <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
         <p className="text-xs text-blue-700 dark:text-blue-300">
           <strong>{t("common.note") || "Note"}:</strong>{" "}
-          {t("publications.modal.poll.note") || 
+          {t("publications.modal.poll.note") ||
             "Las encuestas solo están disponibles en Twitter. Asegúrate de seleccionar plataformas compatibles."}
         </p>
       </div>

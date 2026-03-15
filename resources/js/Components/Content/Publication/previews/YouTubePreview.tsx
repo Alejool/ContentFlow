@@ -123,7 +123,14 @@ export const YouTubePreview = memo(
           {/* Description Box */}
           <div className="bg-gray-100 dark:bg-neutral-800 rounded-lg p-3 text-[13px] hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors cursor-pointer">
             <div className="font-bold mb-1">
-              0 views {publishedAt ? new Date(publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Not published yet'}
+              0 views{" "}
+              {publishedAt
+                ? new Date(publishedAt).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })
+                : "Not published yet"}
             </div>
             <div className="whitespace-pre-wrap line-clamp-3">
               {content || "Your video description will appear here..."}

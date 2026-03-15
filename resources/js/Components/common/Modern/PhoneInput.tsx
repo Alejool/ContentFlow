@@ -1,12 +1,12 @@
 import Select from "@/Components/common/Modern/Select";
 import Input from "@/Components/common/Modern/Input";
-import { 
-  getCountries, 
+import {
+  getCountries,
   getCountryCallingCode,
   parsePhoneNumber,
   isPossiblePhoneNumber,
   isValidPhoneNumber,
-  type CountryCode
+  type CountryCode,
 } from "libphonenumber-js";
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
@@ -58,7 +58,11 @@ const FlagEmoji = ({ countryCode }: { countryCode: string }) => {
     .toUpperCase()
     .split("")
     .map((char) => 127397 + char.charCodeAt(0));
-  return <span className="text-xl leading-none">{String.fromCodePoint(...codePoints)}</span>;
+  return (
+    <span className="text-xl leading-none">
+      {String.fromCodePoint(...codePoints)}
+    </span>
+  );
 };
 
 export default function PhoneInput({
@@ -69,14 +73,41 @@ export default function PhoneInput({
   label,
   placeholder,
   required = false,
-  countries = ["AR", "BO", "BR", "CL", "CO", "CR", "CU", "DO", "EC", "SV", "GT", "HT", "HN", "MX", "NI", "PA", "PY", "PE", "PR", "UY", "VE", "US", "ES"],
+  countries = [
+    "AR",
+    "BO",
+    "BR",
+    "CL",
+    "CO",
+    "CR",
+    "CU",
+    "DO",
+    "EC",
+    "SV",
+    "GT",
+    "HT",
+    "HN",
+    "MX",
+    "NI",
+    "PA",
+    "PY",
+    "PE",
+    "PR",
+    "UY",
+    "VE",
+    "US",
+    "ES",
+  ],
   defaultCountry = "CO",
   className = "",
 }: PhoneInputProps) {
   const { t } = useTranslation();
-  const [selectedCountry, setSelectedCountry] = useState<CountryCode>(defaultCountry);
+  const [selectedCountry, setSelectedCountry] =
+    useState<CountryCode>(defaultCountry);
   const [nationalNumber, setNationalNumber] = useState("");
-  const [validationError, setValidationError] = useState<string | undefined>(error);
+  const [validationError, setValidationError] = useState<string | undefined>(
+    error,
+  );
   const [isValid, setIsValid] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const onChangeRef = useRef(onChange);
@@ -117,10 +148,10 @@ export default function PhoneInput({
       try {
         const callingCode = getCountryCallingCode(selectedCountry);
         const fullNumber = `+${callingCode}${nationalNumber}`;
-        
+
         // Solo emitir si el valor cambió
         if (fullNumber === lastEmittedValue.current) return;
-        
+
         // Validar
         if (isPossiblePhoneNumber(fullNumber)) {
           if (isValidPhoneNumber(fullNumber)) {
@@ -148,7 +179,7 @@ export default function PhoneInput({
     } else {
       // Solo emitir si el valor cambió
       if ("" === lastEmittedValue.current) return;
-      
+
       setValidationError(undefined);
       setIsValid(false);
       lastEmittedValue.current = "";
@@ -165,7 +196,7 @@ export default function PhoneInput({
           ...country
             .toUpperCase()
             .split("")
-            .map((char) => 127397 + char.charCodeAt(0))
+            .map((char) => 127397 + char.charCodeAt(0)),
         );
         return {
           value: country,
@@ -177,7 +208,7 @@ export default function PhoneInput({
           ...country
             .toUpperCase()
             .split("")
-            .map((char) => 127397 + char.charCodeAt(0))
+            .map((char) => 127397 + char.charCodeAt(0)),
         );
         return {
           value: country,
@@ -248,7 +279,9 @@ export default function PhoneInput({
               value={nationalNumber}
               onChange={handleNumberChange}
               disabled={disabled}
-              placeholder={placeholder || t("profile.information.phonePlaceholder")}
+              placeholder={
+                placeholder || t("profile.information.phonePlaceholder")
+              }
               className={`
                 w-full rounded-lg transition-all duration-200
                 border focus:outline-none focus:ring-2 focus:ring-offset-2
@@ -277,7 +310,9 @@ export default function PhoneInput({
           <span>
             {(() => {
               try {
-                const phoneNumber = parsePhoneNumber(`+${callingCode}${nationalNumber}`);
+                const phoneNumber = parsePhoneNumber(
+                  `+${callingCode}${nationalNumber}`,
+                );
                 if (phoneNumber) {
                   return `${phoneNumber.formatInternational()} - ${phoneNumber.country}`;
                 }

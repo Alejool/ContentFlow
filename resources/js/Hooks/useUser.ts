@@ -164,8 +164,7 @@ export const useUser = (initialUser: any) => {
 
   const onInvalid = (errors: any) => {
     toast.error(
-      t("validation.check_errors") ||
-        "Revisa los errores en el formulario",
+      t("validation.check_errors") || "Revisa los errores en el formulario",
     );
 
     // Toast specific high-level errors if they exist

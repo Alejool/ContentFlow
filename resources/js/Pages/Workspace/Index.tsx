@@ -64,7 +64,7 @@ export default function Index({
           isOpen={showCreateModal}
           onClose={() => setShowCreateModal(false)}
           t={t}
-          />
+        />
       </div>
     </AuthenticatedLayout>
   );
