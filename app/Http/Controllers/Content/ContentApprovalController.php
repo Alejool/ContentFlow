@@ -109,6 +109,9 @@ class ContentApprovalController extends Controller
 
             $content->refresh();
 
+            // CRITICAL: Clear publication cache to ensure frontend gets updated data
+            $this->clearPublicationCache($content->workspace_id);
+
             return $this->successResponse([
                 'message' => 'Content submitted for approval successfully.',
                 'content' => $content,
@@ -256,6 +259,42 @@ class ContentApprovalController extends Controller
             ], 200);
         } catch (\Throwable $e) {
             return $this->errorResponse('Failed to retrieve approval history: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Clear publication cache for a workspace
+     * 
+     * @param int $workspaceId
+     * @return void
+     */
+    private function clearPublicationCache($workspaceId)
+    {
+        if (!$workspaceId) {
+            return;
+        }
+
+        // Increment version to effectively clear all workspace cache keys
+        try {
+            cache()->increment("publications:{$workspaceId}:version");
+        } catch (\Exception $e) {
+            cache()->put("publications:{$workspaceId}:version", time(), now()->addDays(7));
+        }
+
+        // Clear Redis pattern if using Redis
+        if (config('cache.default') === 'redis') {
+            try {
+                $pattern = "publications:{$workspaceId}:*";
+                $keys = cache()->getRedis()->keys($pattern);
+                if (!empty($keys)) {
+                    cache()->getRedis()->del($keys);
+                }
+            } catch (\Exception $e) {
+                \Log::warning('Failed to clear Redis cache pattern', [
+                    'pattern' => $pattern ?? 'unknown',
+                    'error' => $e->getMessage()
+                ]);
+            }
         }
     }
 }

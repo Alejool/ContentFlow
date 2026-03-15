@@ -19,12 +19,14 @@ class ApprovalWorkflow extends Model
         'is_active',
         'is_enabled',
         'is_multi_level',
+        'was_multi_level',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'is_enabled' => 'boolean',
         'is_multi_level' => 'boolean',
+        'was_multi_level' => 'boolean',
     ];
 
     /**

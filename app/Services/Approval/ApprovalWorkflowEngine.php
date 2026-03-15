@@ -441,37 +441,49 @@ class ApprovalWorkflowEngine
      * 
      * @param User $user
      * @param int $workspaceId
+     * @param string $type 'to_approve' (default) or 'my_requests'
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function getPendingRequestsForUser(User $user, int $workspaceId)
+    public function getPendingRequestsForUser(User $user, int $workspaceId, string $type = 'to_approve')
     {
-        return ApprovalRequest::with([
-            'publication',
-            'workflow',
+        $query = ApprovalRequest::with([
+            'publication.mediaFiles',
+            'publication.user',
+            'workflow.levels',
             'currentStep.role',
+            'currentStep.user',
             'submitter',
+            'logs.user',
         ])
         ->whereHas('publication', function ($query) use ($workspaceId) {
             $query->where('workspace_id', $workspaceId);
         })
-        ->where('status', ApprovalRequest::STATUS_PENDING)
-        ->whereHas('currentStep', function ($q) use ($user, $workspaceId) {
-            // User is directly assigned
-            $q->where('user_id', $user->id)
-                // OR user is in the step's user list
-                ->orWhereHas('users', function ($userQuery) use ($user) {
-                    $userQuery->where('users.id', $user->id);
-                })
-                // OR user has the role assigned to this step
-                ->orWhereHas('role', function ($roleQuery) use ($user, $workspaceId) {
-                    $roleQuery->whereHas('users', function ($userRoleQuery) use ($user, $workspaceId) {
-                        $userRoleQuery->where('users.id', $user->id)
-                            ->where('role_user.workspace_id', $workspaceId);
-                    });
+        ->where('status', ApprovalRequest::STATUS_PENDING);
+
+        // If type is 'my_requests', show only requests submitted by the user
+        if ($type === 'my_requests') {
+            $query->where('submitted_by', $user->id);
+        } else {
+            // Default: show requests the user can approve (not their own)
+            $query->where('submitted_by', '!=', $user->id)
+                ->whereHas('currentStep', function ($q) use ($user, $workspaceId) {
+                    // User is directly assigned
+                    $q->where('user_id', $user->id)
+                        // OR user is in the step's user list
+                        ->orWhereHas('users', function ($userQuery) use ($user) {
+                            $userQuery->where('users.id', $user->id);
+                        })
+                        // OR user has the role assigned to this step
+                        ->orWhereHas('role', function ($roleQuery) use ($user, $workspaceId) {
+                            $roleQuery->whereHas('users', function ($userRoleQuery) use ($user, $workspaceId) {
+                                $userRoleQuery->where('users.id', $user->id)
+                                    ->where('role_user.workspace_id', $workspaceId);
+                            });
+                        });
                 });
-        })
-        ->orderBy('submitted_at', 'desc')
-        ->get();
+        }
+
+        return $query->orderBy('submitted_at', 'desc')->get();
     }
 
     /**

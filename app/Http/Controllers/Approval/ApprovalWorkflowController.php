@@ -102,6 +102,11 @@ class ApprovalWorkflowController extends Controller
                 ]);
             }
 
+            // CRITICAL: Clear publication cache to ensure frontend gets updated data
+            // When publication status changes to pending_review, the cache must be invalidated
+            // so that the next API call returns the updated list without the submitted publication
+            $this->clearPublicationCache($publication->workspace_id);
+
             return $this->successResponse([
                 'message' => 'Publication submitted for approval successfully.',
                 'request' => $approvalRequest->load(['currentStep.role', 'workflow', 'submitter']),
@@ -206,11 +211,15 @@ class ApprovalWorkflowController extends Controller
                 return $this->errorResponse('No active workspace found.', 404);
             }
 
-            $pendingRequests = $this->engine->getPendingRequestsForUser($user, $workspaceId);
+            // Get type parameter: 'to_approve' (default) or 'my_requests'
+            $type = $request->query('type', 'to_approve');
+
+            $pendingRequests = $this->engine->getPendingRequestsForUser($user, $workspaceId, $type);
 
             return $this->successResponse([
                 'requests' => $pendingRequests,
                 'count' => $pendingRequests->count(),
+                'type' => $type,
             ]);
         } catch (\Throwable $e) {
             return $this->errorResponse('Failed to fetch pending approvals: ' . $e->getMessage(), 500);
@@ -299,6 +308,47 @@ class ApprovalWorkflowController extends Controller
             ]);
         } catch (\Throwable $e) {
             return $this->errorResponse('Failed to fetch approval history: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Clear publication cache for a workspace
+     * 
+     * This method invalidates all cached publication queries for a workspace
+     * by incrementing the cache version number. This ensures that any subsequent
+     * API calls will fetch fresh data from the database.
+     * 
+     * @param int $workspaceId
+     * @return void
+     */
+    private function clearPublicationCache($workspaceId)
+    {
+        if (!$workspaceId) {
+            return;
+        }
+
+        // Increment version to effectively clear all workspace cache keys across any driver
+        try {
+            cache()->increment("publications:{$workspaceId}:version");
+        } catch (\Exception $e) {
+            // If increment fails (version doesn't exist), set it
+            cache()->put("publications:{$workspaceId}:version", time(), now()->addDays(7));
+        }
+
+        // Still try Redis pattern clear if using Redis for extra cleanliness
+        if (config('cache.default') === 'redis') {
+            try {
+                $pattern = "publications:{$workspaceId}:*";
+                $keys = cache()->getRedis()->keys($pattern);
+                if (!empty($keys)) {
+                    cache()->getRedis()->del($keys);
+                }
+            } catch (\Exception $e) {
+                \Log::warning('Failed to clear Redis cache pattern', [
+                    'pattern' => $pattern ?? 'unknown',
+                    'error' => $e->getMessage()
+                ]);
+            }
         }
     }
 }

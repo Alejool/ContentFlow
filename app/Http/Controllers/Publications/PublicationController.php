@@ -117,9 +117,16 @@ class PublicationController extends Controller
           'recurrenceSettings', // Load recurrence settings
         ]);
 
+      // Status filtering with smart defaults
+      // By default, exclude pending_review publications from the main list
+      // They should only appear in the Approvals section
       if ($request->has('status') && $request->status !== 'all') {
         $statuses = explode(',', $request->status);
         $query->whereIn('status', $statuses);
+      } else {
+        // No status filter provided: exclude pending_review by default
+        // This ensures publications sent to review disappear from the main list
+        $query->where('status', '!=', 'pending_review');
       }
 
       if ($request->has('search') && !empty($request->search)) {
@@ -2278,8 +2285,9 @@ class PublicationController extends Controller
 
   /**
    * Get publications pending approval for the current user
-   * Filters based on workflow assignment - only shows publications at the user's approval level
-   * EXCLUDES publications submitted by the current user (can't approve own content)
+   * Can show either:
+   * - Publications the user can approve (type=to_approve) - DEFAULT
+   * - Publications the user submitted for approval (type=my_requests)
    * 
    * @param Request $request
    * @return \Illuminate\Http\JsonResponse
@@ -2299,6 +2307,40 @@ class PublicationController extends Controller
       return $this->errorResponse('Workspace not found.', 404);
     }
 
+    // Determinar qué tipo de lista mostrar
+    $type = $request->query('type', 'to_approve'); // 'to_approve' o 'my_requests'
+
+    // Si es 'my_requests', mostrar solo las que el usuario envió
+    if ($type === 'my_requests') {
+      $publications = Publication::where('workspace_id', $workspaceId)
+        ->where('status', 'pending_review')
+        ->where('user_id', $user->id) // Solo las que YO envié
+        ->whereHas('approvalRequest', function ($q) {
+          $q->where('status', 'pending');
+        })
+        ->with([
+          'mediaFiles' => fn($q) => $q->select('media_files.id', 'media_files.file_path', 'media_files.file_type', 'media_files.file_name'),
+          'currentApprovalStep' => fn($q) => $q->with(['role', 'workflow']),
+          'approvalRequest' => fn($q) => $q->with(['currentStep.role', 'currentStep.user', 'logs.user']),
+        ])
+        ->orderBy('updated_at', 'desc')
+        ->get();
+
+      \Log::info('pendingApprovals - My requests', [
+        'user_id' => $user->id,
+        'workspace_id' => $workspaceId,
+        'type' => 'my_requests',
+        'count' => $publications->count(),
+      ]);
+
+      return $this->successResponse([
+        'publications' => $publications,
+        'type' => 'my_requests',
+        'count' => $publications->count(),
+      ]);
+    }
+
+    // Si es 'to_approve', mostrar las que puede aprobar (lógica original)
     // Get user's role in the workspace
     $userRole = $user->workspaces()
       ->where('workspaces.id', $workspaceId)
@@ -2306,7 +2348,7 @@ class PublicationController extends Controller
       ?->pivot
       ?->role;
 
-    // Check if user is owner or admin - they can see ALL pending approvals (except their own)
+    // Check if user is owner or admin
     $isOwner = $workspace->created_by === $user->id;
     $isAdmin = $userRole && in_array($userRole->slug, ['owner', 'admin']);
 
@@ -2314,9 +2356,10 @@ class PublicationController extends Controller
     $workflow = $workspace->approvalWorkflow()->with('levels.role')->where('is_enabled', true)->first();
 
     // Base query: Get publications with pending approval_requests
+    // IMPORTANTE: Excluir publicaciones del usuario actual (no puede aprobar su propio contenido)
     $query = Publication::where('workspace_id', $workspaceId)
       ->where('status', 'pending_review')
-      ->where('user_id', '!=', $user->id) // Exclude publications created by current user
+      ->where('user_id', '!=', $user->id) // No puede aprobar su propio contenido
       ->whereHas('approvalRequest', function ($q) {
         $q->where('status', 'pending');
       })
@@ -2327,20 +2370,18 @@ class PublicationController extends Controller
         'approvalRequest' => fn($q) => $q->with(['currentStep.role', 'currentStep.user', 'submitter', 'logs.user']),
       ]);
 
-    \Log::info('pendingApprovals - Base query setup', [
+    \Log::info('pendingApprovals - To approve query setup', [
       'user_id' => $user->id,
       'workspace_id' => $workspaceId,
       'is_owner' => $isOwner,
       'is_admin' => $isAdmin,
       'user_role' => $userRole?->slug ?? 'none',
       'has_workflow' => $workflow ? true : false,
-      'sql' => $query->toSql(),
     ]);
 
     // If there's NO workflow OR user is owner/admin, show ALL pending publications
-    // Exclude: 1) Publications created by user, 2) Publications already approved by this user
     if (!$workflow || $isAdmin) {
-      // Exclude publications already approved by this user (via approval_logs through approval_request)
+      // Exclude publications already approved by this user
       $query->whereDoesntHave('approvalRequest', function ($q) use ($user) {
         $q->where('status', 'pending')
           ->whereHas('logs', function ($logQ) use ($user) {
@@ -2349,36 +2390,29 @@ class PublicationController extends Controller
           });
       });
       
-      \Log::info('pendingApprovals - No workflow or admin', [
-        'user_id' => $user->id,
-        'workspace_id' => $workspaceId,
-        'is_owner' => $isOwner,
-        'is_admin' => $isAdmin,
-        'has_workflow' => $workflow ? true : false,
-      ]);
-
       $publications = $query->orderBy('updated_at', 'desc')->get();
       
       return $this->successResponse([
         'publications' => $publications,
+        'type' => 'to_approve',
         'filter_type' => $isAdmin ? 'admin_all' : 'no_workflow',
         'user_role' => $userRole?->slug ?? 'member',
       ]);
     }
 
-    // If there IS a workflow, filter by user's assigned level in approval_requests
+    // If there IS a workflow, filter by user's assigned level
     $userRoleId = $userRole?->id;
     
     if (!$userRoleId) {
-      // User has no role, can't approve anything
       return $this->successResponse([
         'publications' => [],
+        'type' => 'to_approve',
         'filter_type' => 'no_role',
         'user_role' => null,
       ]);
     }
 
-    // Filter publications where approval_request.current_step_id is assigned to user's role OR directly to user
+    // Filter by current step assigned to user's role or directly to user
     $query->whereHas('approvalRequest', function ($q) use ($userRoleId, $user) {
       $q->where('status', 'pending')
         ->whereHas('currentStep', function ($stepQuery) use ($userRoleId, $user) {
@@ -2398,24 +2432,16 @@ class PublicationController extends Controller
         });
     });
 
-    \Log::info('pendingApprovals - Workflow filtered query', [
-      'user_id' => $user->id,
-      'workspace_id' => $workspaceId,
-      'user_role_id' => $userRoleId,
-      'sql' => $query->toSql(),
-      'bindings' => $query->getBindings(),
-    ]);
-
     $publications = $query->orderBy('updated_at', 'desc')->get();
 
-    \Log::info('pendingApprovals - Results', [
+    \Log::info('pendingApprovals - To approve results', [
       'user_id' => $user->id,
       'publications_count' => $publications->count(),
-      'publication_ids' => $publications->pluck('id')->toArray(),
     ]);
 
     return $this->successResponse([
       'publications' => $publications,
+      'type' => 'to_approve',
       'filter_type' => 'workflow_filtered',
       'user_role' => $userRole->slug,
     ]);

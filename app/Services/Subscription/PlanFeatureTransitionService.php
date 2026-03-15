@@ -97,11 +97,12 @@ class PlanFeatureTransitionService
                 ->get();
 
             foreach ($multiLevelWorkflows as $workflow) {
-                // Opción 1: Desactivar workflows multinivel
+                // Guardar que era multinivel y convertir a simple
+                // IMPORTANTE: NO desactivar el workflow, solo convertirlo a simple nivel
                 $workflow->update([
-                    'is_multi_level' => false,
-                    'is_enabled' => false,
-                    'is_active' => false,
+                    'was_multi_level' => true,  // Guardar estado anterior para restaurar después
+                    'is_multi_level' => false,  // Convertir a simple nivel
+                    // NO cambiar is_enabled ni is_active - mantener el workflow activo
                 ]);
 
                 // Mantener solo el primer nivel
@@ -117,6 +118,7 @@ class PlanFeatureTransitionService
                     'id' => $workflow->id,
                     'name' => $workflow->name,
                     'levels_removed' => $levels->count() - 1,
+                    'kept_active' => $workflow->is_enabled,
                 ];
             }
 
@@ -125,6 +127,37 @@ class PlanFeatureTransitionService
                 'old_plan' => $oldPlan,
                 'new_plan' => $newPlan,
                 'workflows_affected' => $multiLevelWorkflows->count(),
+            ]);
+        }
+        // Caso 3: Cambio de 'basic' a 'advanced' (restaurar multinivel si lo tenía)
+        elseif ($oldApprovalFeature === 'basic' && $newApprovalFeature === 'advanced') {
+            $changes['action'] = 'upgraded_to_advanced';
+            $changes['reason'] = 'Plan now supports multi-level approval workflows';
+
+            // Encontrar workflows que eran multinivel antes
+            $workflows = ApprovalWorkflow::where('workspace_id', $workspace->id)
+                ->where('was_multi_level', true)
+                ->get();
+
+            foreach ($workflows as $workflow) {
+                // Restaurar multinivel si lo tenía antes
+                $workflow->update([
+                    'is_multi_level' => true,  // Restaurar multinivel
+                    // Mantener is_enabled y is_active como están
+                ]);
+
+                $changes['workflows_restored'][] = [
+                    'id' => $workflow->id,
+                    'name' => $workflow->name,
+                    'is_enabled' => $workflow->is_enabled,
+                ];
+            }
+
+            Log::info('Multi-level approval workflows restored', [
+                'workspace_id' => $workspace->id,
+                'old_plan' => $oldPlan,
+                'new_plan' => $newPlan,
+                'workflows_restored' => $workflows->count(),
             ]);
         }
 
