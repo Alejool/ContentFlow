@@ -20,34 +20,29 @@ interface ExternalCalendarStore {
   error: string | null;
 
   setConnections: (connections: ExternalCalendarConnection[]) => void;
-  updateConnection: (
-    provider: string,
-    updates: Partial<ExternalCalendarConnection>,
-  ) => void;
+  updateConnection: (provider: string, updates: Partial<ExternalCalendarConnection>) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   clearError: () => void;
 }
 
-export const useExternalCalendarStore = create<ExternalCalendarStore>(
-  (set) => ({
-    connections: [],
-    isLoading: false,
-    error: null,
+export const useExternalCalendarStore = create<ExternalCalendarStore>((set) => ({
+  connections: [],
+  isLoading: false,
+  error: null,
 
-    setConnections: (connections) => set({ connections, error: null }),
+  setConnections: (connections) => set({ connections, error: null }),
 
-    updateConnection: (provider, updates) =>
-      set((state) => ({
-        connections: state.connections.map((conn) =>
-          conn.provider === provider ? { ...conn, ...updates } : conn,
-        ),
-      })),
+  updateConnection: (provider, updates) =>
+    set((state) => ({
+      connections: state.connections.map((conn) =>
+        conn.provider === provider ? { ...conn, ...updates } : conn,
+      ),
+    })),
 
-    setLoading: (isLoading) => set({ isLoading }),
+  setLoading: (isLoading) => set({ isLoading }),
 
-    setError: (error) => set({ error }),
+  setError: (error) => set({ error }),
 
-    clearError: () => set({ error: null }),
-  }),
-);
+  clearError: () => set({ error: null }),
+}));

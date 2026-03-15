@@ -89,9 +89,7 @@ export const useAccountsStore = create<AccountsStore>((set) => ({
       return processedAccounts;
     } catch (error: any) {
       const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "Failed to fetch accounts";
+        error.response?.data?.message || error.message || "Failed to fetch accounts";
       set({
         error: errorMessage,
         isLoading: false,

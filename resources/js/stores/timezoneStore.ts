@@ -13,10 +13,7 @@ interface TimezoneState {
 
   // Actions
   loadTimezones: () => Promise<void>;
-  initializeFromInertia: (
-    workspaceTimezone?: string,
-    userTimezone?: string,
-  ) => void;
+  initializeFromInertia: (workspaceTimezone?: string, userTimezone?: string) => void;
   updateWorkspaceTimezone: (timezone: string) => Promise<void>;
   updateUserTimezone: (timezone: string) => Promise<void>;
 }
@@ -50,10 +47,7 @@ export const useTimezoneStore = create<TimezoneState>((set, get) => ({
   },
 
   // Inicializar desde props de Inertia (más rápido)
-  initializeFromInertia: (
-    workspaceTimezone?: string,
-    userTimezone?: string,
-  ) => {
+  initializeFromInertia: (workspaceTimezone?: string, userTimezone?: string) => {
     set({
       workspaceTimezone: workspaceTimezone || null,
       userTimezone: userTimezone || null,
@@ -71,12 +65,8 @@ export const useTimezoneStore = create<TimezoneState>((set, get) => ({
   loadTimezones: async () => {
     try {
       const [workspaceRes, userRes] = await Promise.all([
-        axios
-          .get("/api/v1/workspace/timezone")
-          .catch(() => ({ data: { timezone: null } })),
-        axios
-          .get("/api/v1/timezone")
-          .catch(() => ({ data: { timezone: null } })),
+        axios.get("/api/v1/workspace/timezone").catch(() => ({ data: { timezone: null } })),
+        axios.get("/api/v1/timezone").catch(() => ({ data: { timezone: null } })),
       ]);
 
       set({

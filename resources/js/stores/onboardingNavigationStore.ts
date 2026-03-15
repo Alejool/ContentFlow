@@ -43,106 +43,104 @@ interface OnboardingNavigationState {
   setLastTourStep: (stepId: string) => void;
 }
 
-export const useOnboardingNavigationStore = create<OnboardingNavigationState>(
-  (set, get) => ({
-    // Initial state
-    currentPath: typeof window !== "undefined" ? window.location.pathname : "/",
-    isNavigating: false,
-    navigationHistory: [],
-    tourNavigationEnabled: false,
-    lastTourStep: null,
+export const useOnboardingNavigationStore = create<OnboardingNavigationState>((set, get) => ({
+  // Initial state
+  currentPath: typeof window !== "undefined" ? window.location.pathname : "/",
+  isNavigating: false,
+  navigationHistory: [],
+  tourNavigationEnabled: false,
+  lastTourStep: null,
 
-    // Actions
-    setCurrentPath: (path) => {
-      set({ currentPath: path });
-    },
+  // Actions
+  setCurrentPath: (path) => {
+    set({ currentPath: path });
+  },
 
-    setNavigating: (isNavigating) => {
-      set({ isNavigating });
-    },
+  setNavigating: (isNavigating) => {
+    set({ isNavigating });
+  },
 
-    addToHistory: (entry) => {
-      set((state) => ({
-        navigationHistory: [...state.navigationHistory, entry],
-      }));
-    },
+  addToHistory: (entry) => {
+    set((state) => ({
+      navigationHistory: [...state.navigationHistory, entry],
+    }));
+  },
 
-    clearHistory: () => {
-      set({ navigationHistory: [] });
-    },
+  clearHistory: () => {
+    set({ navigationHistory: [] });
+  },
 
-    // Navigation helpers
-    navigateToStep: (path, stepId, stepType) => {
-      const state = get();
+  // Navigation helpers
+  navigateToStep: (path, stepId, stepType) => {
+    const state = get();
 
-      // Don't navigate if already on the target path
-      if (state.currentPath === path) {
+    // Don't navigate if already on the target path
+    if (state.currentPath === path) {
+      state.setNavigating(false);
+      return;
+    }
+
+    // Add to history
+    state.addToHistory({
+      path,
+      timestamp: Date.now(),
+      stepId,
+      stepType,
+    });
+
+    // Set navigating state
+    state.setNavigating(true);
+
+    // Navigate using Inertia with preserveState to keep onboarding state
+    router.visit(path, {
+      preserveState: true,
+      preserveScroll: false,
+      replace: false,
+      onSuccess: () => {
+        state.setCurrentPath(path);
         state.setNavigating(false);
-        return;
-      }
+      },
+      onError: (errors) => {
+        state.setNavigating(false);
+      },
+    });
+  },
 
-      // Add to history
-      state.addToHistory({
-        path,
-        timestamp: Date.now(),
-        stepId,
-        stepType,
-      });
+  goBack: () => {
+    const state = get();
+    const history = state.navigationHistory;
 
-      // Set navigating state
-      state.setNavigating(true);
+    if (history.length > 1) {
+      // Get previous entry (skip current)
+      const previousEntry = history[history.length - 2];
 
-      // Navigate using Inertia with preserveState to keep onboarding state
-      router.visit(path, {
+      // Navigate back
+      router.visit(previousEntry.path, {
         preserveState: true,
         preserveScroll: false,
-        replace: false,
-        onSuccess: () => {
-          state.setCurrentPath(path);
-          state.setNavigating(false);
-        },
-        onError: (errors) => {
-          state.setNavigating(false);
-        },
       });
-    },
 
-    goBack: () => {
-      const state = get();
-      const history = state.navigationHistory;
+      // Remove last entry from history
+      set((state) => ({
+        navigationHistory: state.navigationHistory.slice(0, -1),
+      }));
+    }
+  },
 
-      if (history.length > 1) {
-        // Get previous entry (skip current)
-        const previousEntry = history[history.length - 2];
+  canGoBack: () => {
+    return get().navigationHistory.length > 1;
+  },
 
-        // Navigate back
-        router.visit(previousEntry.path, {
-          preserveState: true,
-          preserveScroll: false,
-        });
+  // Tour navigation
+  enableTourNavigation: () => {
+    set({ tourNavigationEnabled: true });
+  },
 
-        // Remove last entry from history
-        set((state) => ({
-          navigationHistory: state.navigationHistory.slice(0, -1),
-        }));
-      }
-    },
+  disableTourNavigation: () => {
+    set({ tourNavigationEnabled: false });
+  },
 
-    canGoBack: () => {
-      return get().navigationHistory.length > 1;
-    },
-
-    // Tour navigation
-    enableTourNavigation: () => {
-      set({ tourNavigationEnabled: true });
-    },
-
-    disableTourNavigation: () => {
-      set({ tourNavigationEnabled: false });
-    },
-
-    setLastTourStep: (stepId) => {
-      set({ lastTourStep: stepId });
-    },
-  }),
-);
+  setLastTourStep: (stepId) => {
+    set({ lastTourStep: stepId });
+  },
+}));

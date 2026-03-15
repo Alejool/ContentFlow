@@ -13,9 +13,7 @@ interface ContentUIState {
   isPublishModalOpen: boolean;
   isViewDetailsModalOpen: boolean;
 
-  setActiveTab: (
-    tab: "publications" | "campaigns" | "logs" | "calendar" | "approvals",
-  ) => void;
+  setActiveTab: (tab: "publications" | "campaigns" | "logs" | "calendar" | "approvals") => void;
   setSelectedItem: (item: SelectedItem) => void;
 
   openAddModal: () => void;

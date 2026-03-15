@@ -145,10 +145,7 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
 
   if (cachedState && cachedState.tourCurrentStep !== undefined) {
     // If tour step is invalid, reset it
-    if (
-      cachedState.tourCurrentStep >= MAX_TOUR_STEPS ||
-      cachedState.tourCurrentStep < 0
-    ) {
+    if (cachedState.tourCurrentStep >= MAX_TOUR_STEPS || cachedState.tourCurrentStep < 0) {
       console.error(
         "Detected corrupted tour step on initialization:",
         cachedState.tourCurrentStep,
@@ -316,8 +313,7 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
                 tourCurrentStep: response.data.state.tourCurrentStep || 0,
                 tourCompleted: response.data.state.tourCompleted || false,
                 tourSkipped: response.data.state.tourSkipped || false,
-                tourCompletedSteps:
-                  response.data.state.tourCompletedSteps || [],
+                tourCompletedSteps: response.data.state.tourCompletedSteps || [],
                 wizardCurrentStep: response.data.state.wizardCurrentStep || 0,
                 wizardCompleted: response.data.state.wizardCompleted || false,
                 wizardSkipped: response.data.state.wizardSkipped || false,
@@ -350,11 +346,9 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
       // This ensures the step is saved even if navigation happens
       if (!get().isOffline) {
         // Use axios which is already configured with CSRF token
-        axios
-          .post("/api/v1/onboarding/tour/step", { step: newStep })
-          .catch(() => {
-            // Don't block or rollback - local state is source of truth during tour
-          });
+        axios.post("/api/v1/onboarding/tour/step", { step: newStep }).catch(() => {
+          // Don't block or rollback - local state is source of truth during tour
+        });
       }
     },
 
@@ -817,43 +811,26 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
         if (response.data?.state) {
           // Transform snake_case to camelCase
           const transformedState = {
-            tourCompleted:
-              response.data.state.tourCompleted ??
-              response.data.state.tour_completed,
-            tourSkipped:
-              response.data.state.tourSkipped ??
-              response.data.state.tour_skipped,
+            tourCompleted: response.data.state.tourCompleted ?? response.data.state.tour_completed,
+            tourSkipped: response.data.state.tourSkipped ?? response.data.state.tour_skipped,
             tourCurrentStep:
-              response.data.state.tourCurrentStep ??
-              response.data.state.tour_current_step,
+              response.data.state.tourCurrentStep ?? response.data.state.tour_current_step,
             tourCompletedSteps:
-              response.data.state.tourCompletedSteps ??
-              response.data.state.tour_completed_steps,
+              response.data.state.tourCompletedSteps ?? response.data.state.tour_completed_steps,
             wizardCompleted:
-              response.data.state.wizardCompleted ??
-              response.data.state.wizard_completed,
-            wizardSkipped:
-              response.data.state.wizardSkipped ??
-              response.data.state.wizard_skipped,
+              response.data.state.wizardCompleted ?? response.data.state.wizard_completed,
+            wizardSkipped: response.data.state.wizardSkipped ?? response.data.state.wizard_skipped,
             wizardCurrentStep:
-              response.data.state.wizardCurrentStep ??
-              response.data.state.wizard_current_step,
+              response.data.state.wizardCurrentStep ?? response.data.state.wizard_current_step,
             templateSelected:
-              response.data.state.templateSelected ??
-              response.data.state.template_selected,
-            templateId:
-              response.data.state.templateId ?? response.data.state.template_id,
+              response.data.state.templateSelected ?? response.data.state.template_selected,
+            templateId: response.data.state.templateId ?? response.data.state.template_id,
             dismissedTooltips:
-              response.data.state.dismissedTooltips ??
-              response.data.state.dismissed_tooltips,
-            completedAt:
-              response.data.state.completedAt ??
-              response.data.state.completed_at,
-            startedAt:
-              response.data.state.startedAt ?? response.data.state.started_at,
+              response.data.state.dismissedTooltips ?? response.data.state.dismissed_tooltips,
+            completedAt: response.data.state.completedAt ?? response.data.state.completed_at,
+            startedAt: response.data.state.startedAt ?? response.data.state.started_at,
             completionPercentage:
-              response.data.state.completionPercentage ??
-              response.data.state.completion_percentage,
+              response.data.state.completionPercentage ?? response.data.state.completion_percentage,
           };
 
           set(transformedState);

@@ -26,54 +26,52 @@ interface ProcessingProgressState {
   cancelJob: (id: string) => void;
 }
 
-export const useProcessingProgress = create<ProcessingProgressState>(
-  (set, get) => ({
-    jobs: {},
+export const useProcessingProgress = create<ProcessingProgressState>((set, get) => ({
+  jobs: {},
 
-    addJob: (job) =>
-      set((state) => ({
+  addJob: (job) =>
+    set((state) => ({
+      jobs: {
+        ...state.jobs,
+        [job.id]: job,
+      },
+    })),
+
+  updateJob: (id, updates) =>
+    set((state) => {
+      const current = state.jobs[id];
+      if (!current) return state;
+
+      return {
         jobs: {
           ...state.jobs,
-          [job.id]: job,
+          [id]: { ...current, ...updates },
         },
-      })),
+      };
+    }),
 
-    updateJob: (id, updates) =>
-      set((state) => {
-        const current = state.jobs[id];
-        if (!current) return state;
+  removeJob: (id) =>
+    set((state) => {
+      const { [id]: _, ...rest } = state.jobs;
+      return { jobs: rest };
+    }),
 
-        return {
-          jobs: {
-            ...state.jobs,
-            [id]: { ...current, ...updates },
+  cancelJob: (id) =>
+    set((state) => {
+      const job = state.jobs[id];
+      if (!job) return state;
+
+      return {
+        jobs: {
+          ...state.jobs,
+          [id]: {
+            ...job,
+            status: "cancelled" as const,
           },
-        };
-      }),
-
-    removeJob: (id) =>
-      set((state) => {
-        const { [id]: _, ...rest } = state.jobs;
-        return { jobs: rest };
-      }),
-
-    cancelJob: (id) =>
-      set((state) => {
-        const job = state.jobs[id];
-        if (!job) return state;
-
-        return {
-          jobs: {
-            ...state.jobs,
-            [id]: {
-              ...job,
-              status: "cancelled" as const,
-            },
-          },
-        };
-      }),
-  }),
-);
+        },
+      };
+    }),
+}));
 
 // WebSocket listener initialization
 export function initProcessingProgressRealtime(userId: number) {

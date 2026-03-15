@@ -25,9 +25,7 @@ interface UserState {
   error: string | null;
   setUser: (user: User | null) => void;
   updateProfile: (data: any) => Promise<{ success: boolean; message?: string }>;
-  updatePassword: (
-    data: any,
-  ) => Promise<{ success: boolean; message?: string }>;
+  updatePassword: (data: any) => Promise<{ success: boolean; message?: string }>;
 }
 
 export const useUserStore = create<UserState>((set, get) => ({
@@ -47,8 +45,7 @@ export const useUserStore = create<UserState>((set, get) => ({
       }
       return { success: false, message: response.data.message };
     } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message || "Failed to update profile";
+      const errorMessage = error.response?.data?.message || "Failed to update profile";
       set({ error: errorMessage });
       throw error;
     } finally {
@@ -65,8 +62,7 @@ export const useUserStore = create<UserState>((set, get) => ({
       }
       return { success: false, message: response.data.message };
     } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message || "Failed to update password";
+      const errorMessage = error.response?.data?.message || "Failed to update password";
       set({ error: errorMessage });
       throw error;
     } finally {

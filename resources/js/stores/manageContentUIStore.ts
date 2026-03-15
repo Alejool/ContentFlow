@@ -16,9 +16,7 @@ interface ManageContentUIState {
   isPublishModalOpen: boolean;
   isViewDetailsModalOpen: boolean;
 
-  setActiveTab: (
-    tab: "publications" | "campaigns" | "logs" | "calendar" | "approvals",
-  ) => void;
+  setActiveTab: (tab: "publications" | "campaigns" | "logs" | "calendar" | "approvals") => void;
   setTabOrder: (order: string[]) => void;
   setSelectedItem: (item: SelectedItem) => void;
   updateSelectedItem: (updates: Partial<Campaign | Publication>) => void;
@@ -40,26 +38,19 @@ interface ManageContentUIState {
 export const useManageContentUIStore = create<ManageContentUIState>((set) => {
   // Try to load saved order from localStorage
   const savedOrder =
-    typeof window !== "undefined"
-      ? localStorage.getItem("manage_content_tab_order")
-      : null;
+    typeof window !== "undefined" ? localStorage.getItem("manage_content_tab_order") : null;
   const initialOrder = savedOrder
     ? JSON.parse(savedOrder)
     : ["publications", "campaigns", "calendar", "logs", "approvals"];
 
   // Try to load saved active tab from localStorage
   const savedActiveTab =
-    typeof window !== "undefined"
-      ? localStorage.getItem("manage_content_active_tab")
-      : null;
-  const initialActiveTab =
-    (savedActiveTab as ManageContentUIState["activeTab"]) || "publications";
+    typeof window !== "undefined" ? localStorage.getItem("manage_content_active_tab") : null;
+  const initialActiveTab = (savedActiveTab as ManageContentUIState["activeTab"]) || "publications";
 
   // Try to load saved filter visibility from localStorage
   const savedShowFilters =
-    typeof window !== "undefined"
-      ? localStorage.getItem("manage_content_show_filters")
-      : null;
+    typeof window !== "undefined" ? localStorage.getItem("manage_content_show_filters") : null;
   const initialShowFilters = savedShowFilters
     ? JSON.parse(savedShowFilters)
     : {
@@ -104,16 +95,12 @@ export const useManageContentUIStore = create<ManageContentUIState>((set) => {
       set((state) => {
         const newShowFilters = { ...state.showFilters, [tab]: show };
         if (typeof window !== "undefined") {
-          localStorage.setItem(
-            "manage_content_show_filters",
-            JSON.stringify(newShowFilters),
-          );
+          localStorage.setItem("manage_content_show_filters", JSON.stringify(newShowFilters));
         }
         return { showFilters: newShowFilters };
       }),
 
-    openAddModal: (type) =>
-      set({ isAddModalOpen: true, addType: type || null }),
+    openAddModal: (type) => set({ isAddModalOpen: true, addType: type || null }),
     closeAddModal: () => set({ isAddModalOpen: false, addType: null }),
 
     openEditModal: (item) =>

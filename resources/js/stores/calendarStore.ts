@@ -120,15 +120,11 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       const platformMatch =
         filters.platforms.length === 0 ||
         (event.platform &&
-          filters.platforms
-            .map((p) => p.toLowerCase())
-            .includes(event.platform.toLowerCase())) ||
+          filters.platforms.map((p) => p.toLowerCase()).includes(event.platform.toLowerCase())) ||
         (event.extendedProps?.platforms &&
           Array.isArray(event.extendedProps.platforms) &&
           event.extendedProps.platforms.some((p: string) =>
-            filters.platforms
-              .map((f) => f.toLowerCase())
-              .includes(p.toLowerCase()),
+            filters.platforms.map((f) => f.toLowerCase()).includes(p.toLowerCase()),
           ));
 
       // Campaign filter - check if event's campaign matches any selected campaign
@@ -136,14 +132,10 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
         filters.campaigns.length === 0 ||
         (event.extendedProps?.campaigns &&
           Array.isArray(event.extendedProps.campaigns) &&
-          event.extendedProps.campaigns.some((c: string) =>
-            filters.campaigns.includes(c),
-          ));
+          event.extendedProps.campaigns.some((c: string) => filters.campaigns.includes(c)));
 
       // Status filter
-      const statusMatch =
-        filters.statuses.length === 0 ||
-        filters.statuses.includes(event.status);
+      const statusMatch = filters.statuses.length === 0 || filters.statuses.includes(event.status);
 
       // Return true only if ALL filter types match (AND logic)
       return platformMatch && campaignMatch && statusMatch;
@@ -256,9 +248,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       });
 
       // Update local state immediately
-      const events = get().events.map((ev) =>
-        ev.id === id ? { ...ev, start: newDate } : ev,
-      );
+      const events = get().events.map((ev) => (ev.id === id ? { ...ev, start: newDate } : ev));
       set({ events });
 
       return true;
@@ -405,8 +395,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
     // Check if operation is within 5 minutes
     const now = new Date();
     const operationTime = new Date(state.lastBulkOperationTime);
-    const diffInMinutes =
-      (now.getTime() - operationTime.getTime()) / (1000 * 60);
+    const diffInMinutes = (now.getTime() - operationTime.getTime()) / (1000 * 60);
 
     return diffInMinutes < 5;
   },
@@ -437,10 +426,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
     } catch (error: any) {
       console.error("Delete event error:", error);
       set({
-        error:
-          error.response?.data?.message ||
-          error.message ||
-          "Failed to delete event",
+        error: error.response?.data?.message || error.message || "Failed to delete event",
       });
       return false;
     }
@@ -554,25 +540,18 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
     try {
       const resourceId = conflict.eventId.split("_").pop();
 
-      await axios.post(
-        `/api/v1/calendar/events/${resourceId}/resolve-conflict`,
-        {
-          resolution,
-          field: conflict.field,
-          value:
-            resolution === "local" ? conflict.localValue : conflict.serverValue,
-        },
-      );
+      await axios.post(`/api/v1/calendar/events/${resourceId}/resolve-conflict`, {
+        resolution,
+        field: conflict.field,
+        value: resolution === "local" ? conflict.localValue : conflict.serverValue,
+      });
 
       // Update local state
       const events = get().events.map((ev) =>
         ev.id === conflict.eventId
           ? {
               ...ev,
-              [conflict.field]:
-                resolution === "local"
-                  ? conflict.localValue
-                  : conflict.serverValue,
+              [conflict.field]: resolution === "local" ? conflict.localValue : conflict.serverValue,
             }
           : ev,
       );

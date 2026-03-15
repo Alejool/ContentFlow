@@ -16,13 +16,7 @@ export interface QueuedUpload {
   id: string;
   file: File;
   progress: number;
-  status:
-    | "pending"
-    | "uploading"
-    | "paused"
-    | "completed"
-    | "error"
-    | "cancelled";
+  status: "pending" | "uploading" | "paused" | "completed" | "error" | "cancelled";
   publicationId?: number;
   publicationTitle?: string;
   s3Key?: string;
@@ -81,11 +75,7 @@ interface UploadQueueState {
   resumeUpload: (id: string) => void;
   cancelUpload: (id: string) => void;
   retryUpload: (id: string) => void;
-  linkUploadToPublication: (
-    id: string,
-    publicationId: number,
-    publicationTitle?: string,
-  ) => void;
+  linkUploadToPublication: (id: string, publicationId: number, publicationTitle?: string) => void;
 
   // Persistence methods
   persistState: () => void;
@@ -378,9 +368,7 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
     const persistedUploads = Object.values(get().persistedState);
     const hasIncompleteUploads = persistedUploads.some(
       (upload) =>
-        upload.status === "uploading" ||
-        upload.status === "paused" ||
-        upload.status === "pending",
+        upload.status === "uploading" || upload.status === "paused" || upload.status === "pending",
     );
 
     set({

@@ -146,9 +146,7 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
   duplicateCampaign: async (id: number) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post(
-        route("api.v1.campaigns.duplicate", id),
-      );
+      const response = await axios.post(route("api.v1.campaigns.duplicate", id));
       const campaign = response.data?.campaign;
       if (campaign) {
         get().addCampaign(campaign);
