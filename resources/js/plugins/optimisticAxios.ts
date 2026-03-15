@@ -18,14 +18,14 @@ import type { OptimisticOperation } from '../types/optimistic';
 declare module 'axios' {
   interface InternalAxiosRequestConfig {
     optimistic?: boolean;
-    optimisticData?: any;
+    optimisticData?: unknown;
     resource?: string;
     rollbackOnError?: boolean;
-    originalData?: any;
+    originalData?: unknown;
     operationType?: 'create' | 'update' | 'delete';
     resourceId?: string | number;
     maxRetries?: number;
-    onSuccess?: (data: any) => void;
+    onSuccess?: (data: unknown) => void;
     onError?: (error: Error) => void;
     onRollback?: () => void;
   }
@@ -39,7 +39,7 @@ export interface InterceptorConfig {
   optimistic?: boolean;
 
   /** Data to show optimistically in the UI */
-  optimisticData?: any;
+  optimisticData?: unknown;
 
   /** Resource type (e.g., 'posts', 'reels', 'publications') */
   resource?: string;
@@ -48,7 +48,7 @@ export interface InterceptorConfig {
   rollbackOnError?: boolean;
 
   /** Original data before update (for rollback) */
-  originalData?: any;
+  originalData?: unknown;
 
   /** Operation type (auto-detected from HTTP method if not provided) */
   operationType?: 'create' | 'update' | 'delete';
@@ -60,7 +60,7 @@ export interface InterceptorConfig {
   maxRetries?: number;
 
   /** Callbacks */
-  onSuccess?: (data: any) => void;
+  onSuccess?: (data: unknown) => void;
   onError?: (error: Error) => void;
   onRollback?: () => void;
 }
@@ -137,6 +137,7 @@ export function setupOptimisticInterceptor(axiosInstance: AxiosInstance): () => 
 
         // Log in development mode
         if (import.meta.env.DEV) {
+          console.log(`[OptimisticAxios] Registered operation: ${operationId} for ${config.resource}`);
         }
       }
 
@@ -164,6 +165,7 @@ export function setupOptimisticInterceptor(axiosInstance: AxiosInstance): () => 
 
         // Log in development mode
         if (import.meta.env.DEV) {
+          console.log(`[OptimisticAxios] Confirmed operation: ${operationId}`);
         }
       }
 
@@ -187,6 +189,7 @@ export function setupOptimisticInterceptor(axiosInstance: AxiosInstance): () => 
 
           // Log in development mode
           if (import.meta.env.DEV) {
+            console.log(`[OptimisticAxios] Rolled back operation: ${operationId}`);
           }
         }
       }

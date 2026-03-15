@@ -44,7 +44,7 @@ const VALIDATION_RULES = {
   },
 };
 
-export const publicationSchema = (t: any, contentType: string = 'post') => {
+export const publicationSchema = (t: (key: string, ...args: unknown[]) => string, contentType: string = 'post') => {
   const rules =
     VALIDATION_RULES[contentType as keyof typeof VALIDATION_RULES] || VALIDATION_RULES.post;
 
@@ -121,7 +121,7 @@ export const publicationSchema = (t: any, contentType: string = 'post') => {
               // Check if scheduled date is more than 1 minute (60 seconds) in the future
               const diffInSeconds = (scheduledDate.getTime() - now.getTime()) / 1000;
               return diffInSeconds > 60;
-            } catch (error) {
+            } catch {
               // If there's any error parsing the date, consider it invalid
               return false;
             }

@@ -20,9 +20,9 @@ try {
   if (userTz) {
     axios.defaults.headers.common['X-User-Timezone'] = userTz;
     // expose for other code if necessary
-    (window as any).USER_TIMEZONE = userTz;
+    (window as Window & { USER_TIMEZONE?: string }).USER_TIMEZONE = userTz;
   }
-} catch (e) {
+} catch (_e) {
   // ignore in environments without Intl
 }
 

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-export const campaignSchema = (t: any) => {
+export const campaignSchema = (t: (key: string, ...args: unknown[]) => string) => {
   return z.object({
     name: z
       .string()

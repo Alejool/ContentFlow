@@ -1,7 +1,7 @@
 import { isValidPhoneNumber } from 'libphonenumber-js';
 import { z } from 'zod';
 
-export const userProfileSchema = (t: any) =>
+export const userProfileSchema = (t: (key: string, ...args: unknown[]) => string) =>
   z.object({
     name: z
       .string()
@@ -26,13 +26,13 @@ export const userProfileSchema = (t: any) =>
       .nullable()
       .optional()
       .or(z.literal('')),
-    global_platform_settings: z.any().optional().nullable(),
-    ai_settings: z.any().optional().nullable(),
+    global_platform_settings: z.unknown().optional().nullable(),
+    ai_settings: z.unknown().optional().nullable(),
   });
 
 export type UserProfileFormData = z.infer<ReturnType<typeof userProfileSchema>>;
 
-export const passwordSchema = (t: any) =>
+export const passwordSchema = (t: (key: string, ...args: unknown[]) => string) =>
   z
     .object({
       current_password: z.string().min(8, t('validation.min.string', { count: 8 })),
@@ -46,7 +46,7 @@ export const passwordSchema = (t: any) =>
 
 export type PasswordFormData = z.infer<ReturnType<typeof passwordSchema>>;
 
-export const deleteUserSchema = (t: any) =>
+export const deleteUserSchema = (t: (key: string, ...args: unknown[]) => string) =>
   z.object({
     password: z.string().min(8, t('validation.min.string', { count: 8 })),
   });

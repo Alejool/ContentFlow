@@ -33,7 +33,7 @@ export async function registerSimpleSyncOperation() {
 
   try {
     await backgroundSyncManager.registerSync(operation);
-  } catch (error) {}
+  } catch {}
 }
 
 /**
@@ -76,7 +76,7 @@ export async function registerMultipleOperations() {
   for (const operation of operations) {
     try {
       await backgroundSyncManager.registerSync(operation);
-    } catch (error) {}
+    } catch {}
   }
 }
 
@@ -89,7 +89,7 @@ export async function getPendingOperations() {
   try {
     const pending = await backgroundSyncManager.getPendingSyncs();
     return pending;
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -102,7 +102,7 @@ export async function getPendingOperations() {
 export async function retryFailedOperations() {
   try {
     await backgroundSyncManager.retryFailed();
-  } catch (error) {}
+  } catch {}
 }
 
 /**
@@ -135,7 +135,7 @@ export function listenForSyncFailures() {
 export async function clearAllOperations() {
   try {
     await backgroundSyncManager.clearAll();
-  } catch (error) {}
+  } catch {}
 }
 
 /**
@@ -157,7 +157,7 @@ function showNotification(title: string, message: string) {
  *
  * Shows how to automatically queue operations when offline.
  */
-export async function createPublicationWithSync(publicationData: any) {
+export async function createPublicationWithSync(publicationData: Record<string, unknown>) {
   const operation: SyncOperation = {
     id: `publication-${Date.now()}-${Math.random()}`,
     url: '/api/publications',
@@ -189,7 +189,7 @@ export async function createPublicationWithSync(publicationData: any) {
       }
 
       return await response.json();
-    } catch (error) {
+    } catch {
       await backgroundSyncManager.registerSync(operation);
       return { queued: true, id: operation.id };
     }

@@ -59,7 +59,7 @@ class ToastServiceClass {
     messages: {
       loading: string;
       success: string | ((data: T) => string);
-      error: string | ((error: any) => string);
+      error: string | ((error: Error) => string);
     },
     options?: ToastOptions,
   ): Promise<T> {
@@ -84,7 +84,7 @@ class ToastServiceClass {
    * Show validation errors from Laravel
    */
   validationErrors(errors: Record<string, string[]>): void {
-    Object.entries(errors).forEach(([field, messages]) => {
+    Object.entries(errors).forEach(([_field, messages]) => {
       messages.forEach((message) => {
         this.error(message);
       });

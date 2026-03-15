@@ -237,13 +237,13 @@ const theme = {
   },
 } as const;
 
-export const getColor = (color: string) => {
+export const getColor = (color: string): string => {
   const parts = color.split('.');
-  let value: any = theme.colors;
+  let value: Record<string, unknown> = theme.colors as unknown as Record<string, unknown>;
   for (const part of parts) {
-    value = value[part];
+    value = value[part] as Record<string, unknown>;
   }
-  return value;
+  return value as unknown as string;
 };
 
 // Enhanced theme with WCAG AAA compliant colors

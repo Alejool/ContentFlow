@@ -47,7 +47,7 @@ i18n
     interpolation: {
       escapeValue: false,
       // Formatos personalizados para interpolación
-      format: (value, format, lng) => {
+      format: (value: string, format?: string, _lng?: string) => {
         if (format === 'uppercase') return value.toUpperCase();
         if (format === 'lowercase') return value.toLowerCase();
         if (format === 'capitalize') {
@@ -67,10 +67,10 @@ i18n
 
 // Set global Zod error map using a dynamic call to i18n.t
 // this ensures it always uses the current language.
-z.setErrorMap(makeZodErrorMap(((key: string, options: any) => i18n.t(key, options)) as any));
+z.setErrorMap(makeZodErrorMap((key: string, options?: Record<string, unknown>) => i18n.t(key, options as Record<string, unknown>)));
 
-i18n.on('languageChanged', (lng) => {
-  axios.defaults.headers.common['Accept-Language'] = lng;
+i18n.on('languageChanged', (_lng) => {
+  axios.defaults.headers.common['Accept-Language'] = i18n.language;
 });
 
 // Set initial header

@@ -7,7 +7,7 @@ export const queryKeys = {
   publications: {
     all: ['publications'] as const,
     lists: () => ['publications', 'list'] as const,
-    list: (filters: Record<string, any>, page: number) =>
+    list: (filters: Record<string, unknown>, page: number) =>
       ['publications', 'list', filters, page] as const,
     detail: (id: number) => ['publications', 'detail', id] as const,
     platforms: (id: number) => ['publications', 'platforms', id] as const,
@@ -16,7 +16,7 @@ export const queryKeys = {
   campaigns: {
     all: ['campaigns'] as const,
     lists: () => ['campaigns', 'list'] as const,
-    list: (filters: Record<string, any>, page: number) =>
+    list: (filters: Record<string, unknown>, page: number) =>
       ['campaigns', 'list', filters, page] as const,
     detail: (id: number) => ['campaigns', 'detail', id] as const,
   },
@@ -28,7 +28,7 @@ export const queryKeys = {
   approvals: {
     all: ['approvals'] as const,
     pending: (type?: string) => ['approvals', 'pending', type] as const,
-    history: (filters?: Record<string, any>, page?: number) =>
+    history: (filters?: Record<string, unknown>, page?: number) =>
       ['approvals', 'history', filters, page] as const,
     publicationHistory: (publicationId: number) =>
       ['approvals', 'publication-history', publicationId] as const,
@@ -41,7 +41,7 @@ export const queryKeys = {
 
   calendar: {
     all: ['calendar'] as const,
-    events: (filters?: Record<string, any>) => ['calendar', 'events', filters] as const,
+    events: (filters?: Record<string, unknown>) => ['calendar', 'events', filters] as const,
   },
 
   socialAccounts: {
@@ -50,7 +50,7 @@ export const queryKeys = {
 
   logs: {
     all: ['logs'] as const,
-    list: (filters: Record<string, any>, page: number) => ['logs', 'list', filters, page] as const,
+    list: (filters: Record<string, unknown>, page: number) => ['logs', 'list', filters, page] as const,
   },
 
   members: {
@@ -80,6 +80,6 @@ export const queryKeys = {
 
   reels: {
     all: ['reels'] as const,
-    list: (filters: Record<string, any>) => ['reels', 'list', filters] as const,
+    list: (filters: Record<string, unknown>) => ['reels', 'list', filters] as const,
   },
 } as const;

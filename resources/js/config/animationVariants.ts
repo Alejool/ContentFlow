@@ -1,4 +1,4 @@
-import { Variants, Transition } from 'framer-motion';
+import { Transition, Variants } from 'framer-motion';
 
 /**
  * Animation variants configuration for Framer Motion
@@ -186,7 +186,7 @@ export const pageVariants = {
  * @param prefersReducedMotion - Whether reduced motion is preferred
  * @returns The appropriate variant for the state
  */
-export function getVariant(variants: Variants, state: string, prefersReducedMotion: boolean): any {
+export function getVariant(variants: Variants, state: string, prefersReducedMotion: boolean): Variants[string] {
   if (prefersReducedMotion && `${state}Reduced` in variants) {
     return variants[`${state}Reduced`];
   }

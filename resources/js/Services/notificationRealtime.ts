@@ -5,7 +5,7 @@ import React from 'react';
 
 export function initNotificationRealtime(userId: number) {
   if (window.Echo) {
-    window.Echo.private(`users.${userId}`).listen('.NotificationCreated', (e: any) => {
+    window.Echo.private(`users.${userId}`).listen('.NotificationCreated', (e: Record<string, unknown>) => {
       // Show toast immediately
       if (e.title || e.message) {
         const title = e.title || 'Nueva notificación';

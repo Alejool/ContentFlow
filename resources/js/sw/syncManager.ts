@@ -79,13 +79,9 @@ class BackgroundSyncManager {
 
   private async registerServiceWorkerSync(): Promise<void> {
     if ('serviceWorker' in navigator && 'sync' in ServiceWorkerRegistration.prototype) {
-      try {
-        const registration = await navigator.serviceWorker.ready;
-        await registration.sync.register('sync-operations');
-        if (import.meta.env.DEV) console.log('[BackgroundSyncManager] SW sync registered');
-      } catch (error) {
-        throw error;
-      }
+      const registration = await navigator.serviceWorker.ready;
+      await registration.sync.register('sync-operations');
+      if (import.meta.env.DEV) console.log('[BackgroundSyncManager] SW sync registered');
     }
   }
 
@@ -228,7 +224,7 @@ class BackgroundSyncManager {
 
   private notifyOperationFailed(operation: SyncOperation, error: Error): void {
     if (typeof self !== 'undefined' && 'clients' in self) {
-      (self as any).clients.matchAll().then((clients: any[]) => {
+      (self as ServiceWorkerGlobalScope).clients.matchAll().then((clients: readonly Client[]) => {
         clients.forEach((client) => {
           client.postMessage({
             type: 'SYNC_OPERATION_FAILED',

@@ -2,9 +2,9 @@ import i18n from '@/i18n';
 import { usePublicationStore } from '@/stores/publicationStore';
 import toast from 'react-hot-toast';
 
-export function initPublicationsRealtime(userId: number, workspaceId?: number) {
+export function initPublicationsRealtime(userId: number, _workspaceId?: number) {
   // Existing User channel listener for simple status updates
-  window.Echo.private(`users.${userId}`).listen('.PublicationStatusUpdated', (e: any) => {
+  window.Echo.private(`users.${userId}`).listen('.PublicationStatusUpdated', (e: { publicationId: number; status: string }) => {
     const { publicationId, status } = e;
 
     // Update store

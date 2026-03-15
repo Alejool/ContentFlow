@@ -13,6 +13,43 @@ let processingPollInterval: NodeJS.Timeout | null = null;
 // Track if WebSocket is available
 let isWebSocketAvailable = false;
 
+interface UploadProgressEvent {
+  uploadId: string;
+  progress: number;
+  stats?: {
+    eta: number;
+    speed: number;
+    startTime: number;
+    bytesUploaded: number;
+  };
+}
+
+interface ProcessingProgressEvent {
+  jobId: string;
+  publicationId: number;
+  progress: number;
+  currentStep?: string;
+  completedSteps?: number;
+  totalSteps?: number;
+  eta?: number;
+}
+
+interface VideoProcessingCompletedEvent {
+  publicationId: number;
+  status: string;
+  errorMessage?: string;
+}
+
+interface VideoProcessingFailedEvent {
+  jobId: string;
+  publicationId: number;
+  error?: string;
+}
+
+interface VideoProcessingCancelledEvent {
+  jobId: string;
+}
+
 /**
  * Initialize real-time progress tracking for uploads and processing
  * Automatically falls back to polling if WebSocket is unavailable
@@ -41,32 +78,32 @@ function initWebSocketListeners(userId: number) {
   const channel = window.Echo.private(`users.${userId}`);
 
   // Listen for upload progress updates (Requirement 1.3)
-  channel.listen('.UploadProgressUpdated', (event: any) => {
+  channel.listen('.UploadProgressUpdated', (event: UploadProgressEvent) => {
     handleUploadProgressUpdate(event);
   });
 
   // Listen for processing progress updates (Requirement 3.3)
-  channel.listen('.ProcessingProgressUpdated', (event: any) => {
+  channel.listen('.ProcessingProgressUpdated', (event: ProcessingProgressEvent) => {
     handleProcessingProgressUpdate(event);
   });
 
   // Listen for video processing completion (Requirements 8.1, 8.2)
-  channel.listen('.VideoProcessingCompleted', (event: any) => {
+  channel.listen('.VideoProcessingCompleted', (event: VideoProcessingCompletedEvent) => {
     handleVideoProcessingCompleted(event);
   });
 
   // Listen for processing failures
-  channel.listen('.VideoProcessingFailed', (event: any) => {
+  channel.listen('.VideoProcessingFailed', (event: VideoProcessingFailedEvent) => {
     handleVideoProcessingFailed(event);
   });
 
   // Listen for processing cancellations
-  channel.listen('.VideoProcessingCancelled', (event: any) => {
+  channel.listen('.VideoProcessingCancelled', (event: VideoProcessingCancelledEvent) => {
     handleVideoProcessingCancelled(event);
   });
 
   // Handle WebSocket connection errors - fallback to polling
-  channel.error((error: any) => {
+  channel.error((_error: unknown) => {
     isWebSocketAvailable = false;
     initPollingFallback();
   });
@@ -75,7 +112,7 @@ function initWebSocketListeners(userId: number) {
 /**
  * Handle upload progress update events
  */
-function handleUploadProgressUpdate(event: any) {
+function handleUploadProgressUpdate(event: UploadProgressEvent) {
   const { uploadId, progress, stats } = event;
 
   const uploadStore = useUploadQueue.getState();
@@ -101,7 +138,7 @@ function handleUploadProgressUpdate(event: any) {
 /**
  * Handle processing progress update events
  */
-function handleProcessingProgressUpdate(event: any) {
+function handleProcessingProgressUpdate(event: ProcessingProgressEvent) {
   const { jobId, publicationId, progress, currentStep, completedSteps, totalSteps, eta } = event;
 
   const processingStore = useProcessingProgress.getState();
@@ -141,7 +178,7 @@ function handleProcessingProgressUpdate(event: any) {
 /**
  * Handle video processing completion events
  */
-function handleVideoProcessingCompleted(event: any) {
+function handleVideoProcessingCompleted(event: VideoProcessingCompletedEvent) {
   const { publicationId, status, errorMessage } = event;
 
   const processingStore = useProcessingProgress.getState();
@@ -167,8 +204,8 @@ function handleVideoProcessingCompleted(event: any) {
 /**
  * Handle video processing failure events
  */
-function handleVideoProcessingFailed(event: any) {
-  const { jobId, publicationId, error } = event;
+function handleVideoProcessingFailed(event: VideoProcessingFailedEvent) {
+  const { jobId, error } = event;
 
   const processingStore = useProcessingProgress.getState();
   const job = processingStore.jobs[jobId];
@@ -185,7 +222,7 @@ function handleVideoProcessingFailed(event: any) {
 /**
  * Handle video processing cancellation events
  */
-function handleVideoProcessingCancelled(event: any) {
+function handleVideoProcessingCancelled(event: VideoProcessingCancelledEvent) {
   const { jobId } = event;
 
   const processingStore = useProcessingProgress.getState();
@@ -254,7 +291,7 @@ async function pollUploadProgress() {
     const { uploads } = response.data;
 
     // Update each upload with polled progress
-    Object.entries(uploads || {}).forEach(([uploadId, progressData]: [string, any]) => {
+    Object.entries(uploads || {}).forEach(([uploadId, progressData]: [string, Record<string, unknown>]) => {
       const upload = uploadStore.queue[uploadId];
       if (upload) {
         // Check for completion or failure
@@ -262,22 +299,22 @@ async function pollUploadProgress() {
           uploadStore.updateUpload(uploadId, {
             status: 'completed',
             progress: 100,
-            s3Key: progressData.s3_key,
+            s3Key: progressData.s3_key as string | undefined,
           });
         } else if (progressData.status === 'failed') {
           uploadStore.updateUpload(uploadId, {
             status: 'error',
             progress: 0,
-            error: progressData.error || 'Upload failed',
+            error: (progressData.error as string) || 'Upload failed',
           });
         } else {
           uploadStore.updateUpload(uploadId, {
-            progress: Math.min(100, Math.max(0, progressData.progress || 0)),
+            progress: Math.min(100, Math.max(0, (progressData.progress as number) || 0)),
             stats: {
-              eta: progressData.eta || 0,
-              speed: progressData.speed || 0,
+              eta: (progressData.eta as number) || 0,
+              speed: (progressData.speed as number) || 0,
               startTime: upload.stats?.startTime || Date.now(),
-              bytesUploaded: progressData.bytes_uploaded || 0,
+              bytesUploaded: (progressData.bytes_uploaded as number) || 0,
               lastUpdateTime: Date.now(),
             },
           });
@@ -324,21 +361,21 @@ async function pollProcessingProgress() {
     const { jobs } = response.data;
 
     // Update each job with polled progress
-    Object.entries(jobs || {}).forEach(([jobId, progressData]: [string, any]) => {
+    Object.entries(jobs || {}).forEach(([jobId, progressData]: [string, Record<string, unknown>]) => {
       const job = processingStore.jobs[jobId];
       if (job) {
-        const isCompleted = progressData.progress >= 100 || progressData.status === 'completed';
+        const isCompleted = (progressData.progress as number) >= 100 || progressData.status === 'completed';
         const isFailed = progressData.status === 'failed';
 
         processingStore.updateJob(jobId, {
-          progress: Math.min(100, Math.max(0, progressData.progress || 0)),
+          progress: Math.min(100, Math.max(0, (progressData.progress as number) || 0)),
           status: isFailed ? 'failed' : isCompleted ? 'completed' : 'processing',
-          error: progressData.error || job.error,
+          error: (progressData.error as string) || job.error,
           stats: {
-            eta: progressData.eta || 0,
-            currentStep: progressData.current_step || '',
-            totalSteps: progressData.total_steps || 0,
-            completedSteps: progressData.completed_steps || 0,
+            eta: (progressData.eta as number) || 0,
+            currentStep: (progressData.current_step as string) || '',
+            totalSteps: (progressData.total_steps as number) || 0,
+            completedSteps: (progressData.completed_steps as number) || 0,
           },
         });
 
@@ -398,6 +435,8 @@ export function cleanupProgressRealtime(userId: number) {
   if (window.Echo && isWebSocketAvailable) {
     try {
       window.Echo.leave(`users.${userId}`);
-    } catch (error) {}
+    } catch {
+      // Ignore cleanup errors
+    }
   }
 }

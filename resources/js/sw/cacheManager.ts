@@ -221,7 +221,7 @@ export class CacheManager {
       }
 
       return null;
-    } catch (error) {
+    } catch {
       return null;
     }
   }
@@ -336,7 +336,9 @@ export class CacheManager {
           `[CacheManager] Evicted ${evictedCount} entries (${evictedMB}MB) from ${cacheName}. Remaining: ${remainingMB}MB`,
         );
       }
-    } catch (error) {}
+    } catch {
+      // Ignore eviction errors
+    }
   }
 
   /**
@@ -378,7 +380,7 @@ export class CacheManager {
         oldestEntry,
         newestEntry,
       };
-    } catch (error) {
+    } catch {
       return {
         entryCount: 0,
         totalSize: 0,
@@ -426,7 +428,7 @@ export class CacheManager {
         }
         if (this.isDevelopment) console.log(`[CacheManager] Invalidated cache: ${cacheName}`);
       }
-    } catch (error) {
+    } catch {
       // Ignore errors
     }
   }
@@ -454,16 +456,16 @@ export class CacheManager {
             await cache.delete(request);
             this.metadataStore.delete(request.url);
             deletedCount++;
-
-            if (this.isDevelopment) {
-            }
           }
         }
       }
 
       if (deletedCount > 0) {
+        if (this.isDevelopment) console.log(`[CacheManager] Invalidated ${deletedCount} URL(s)`);
       }
-    } catch (error) {}
+    } catch {
+      // Ignore errors
+    }
   }
 
   /**
@@ -477,7 +479,9 @@ export class CacheManager {
         : new RegExp(`/${resource}(/|$|\\?)`);
 
       await this.invalidateByUrl(pattern);
-    } catch (error) {}
+    } catch {
+      // Ignore errors
+    }
   }
 
   /**
@@ -495,7 +499,7 @@ export class CacheManager {
       // Clear all metadata
       this.metadataStore.clear();
       console.log('[CacheManager] All caches cleared');
-    } catch (error) {
+    } catch {
       // Ignore errors
     }
   }
@@ -542,8 +546,11 @@ export class CacheManager {
       }
 
       if (deletedCount > 0) {
+        if (this.isDevelopment) console.log(`[CacheManager] Removed ${deletedCount} expired entries`);
       }
-    } catch (error) {}
+    } catch {
+      // Ignore errors
+    }
   }
 
   /**
@@ -558,7 +565,9 @@ export class CacheManager {
           await caches.delete(cacheName);
         }
       }
-    } catch (error) {}
+    } catch {
+      // Ignore errors
+    }
   }
 
   /**
@@ -759,11 +768,12 @@ export class CacheManager {
             });
 
             if (this.isDevelopment) {
+              console.log(`[CacheManager] stale-while-revalidate background update: ${request.url}`);
             }
           }
           return networkResponse;
         })
-        .catch((error) => {
+        .catch((_error) => {
           return null;
         });
 
