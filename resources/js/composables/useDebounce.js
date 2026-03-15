@@ -11,7 +11,7 @@ export function useDebounce(fn, delay = 300) {
 
   const debouncedFn = (...args) => {
     if (isDebouncing) {
-      return Promise.reject(new Error("Request is being debounced"));
+      return Promise.reject(new Error('Request is being debounced'));
     }
 
     isDebouncing = true;
@@ -76,7 +76,7 @@ export function useThrottle(fn, interval = 1000) {
     if (timeSinceLastCall < interval) {
       const remaining = interval - timeSinceLastCall;
       return Promise.reject(
-        new Error(`Please wait ${Math.ceil(remaining / 1000)} seconds before trying again`)
+        new Error(`Please wait ${Math.ceil(remaining / 1000)} seconds before trying again`),
       );
     }
 

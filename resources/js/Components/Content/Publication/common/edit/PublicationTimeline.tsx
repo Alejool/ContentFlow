@@ -1,5 +1,5 @@
-import { getDateFnsLocale } from "@/Utils/dateLocales";
-import { format } from "date-fns";
+import { getDateFnsLocale } from '@/Utils/dateLocales';
+import { format } from 'date-fns';
 import {
   Activity,
   CheckCircle,
@@ -13,8 +13,8 @@ import {
   Unlock,
   User,
   XCircle,
-} from "lucide-react";
-import { useTranslation } from "react-i18next";
+} from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface PublicationActivity {
   id: number;
@@ -42,31 +42,31 @@ export default function PublicationTimeline({ activities }: PublicationTimelineP
 
   const getActivityIcon = (type: string) => {
     switch (type) {
-      case "created":
+      case 'created':
         return <PlusCircle className="h-5 w-5 text-blue-500" />;
-      case "updated":
+      case 'updated':
         return <Edit className="h-5 w-5 text-indigo-500" />;
-      case "status_changed":
+      case 'status_changed':
         return <Activity className="h-5 w-5 text-amber-500" />;
-      case "requested_approval":
+      case 'requested_approval':
         return <Shield className="h-5 w-5 text-purple-500" />;
-      case "approved":
+      case 'approved':
         return <CheckCircle className="h-5 w-5 text-green-500" />;
-      case "rejected":
+      case 'rejected':
         return <XCircle className="h-5 w-5 text-rose-500" />;
-      case "published":
+      case 'published':
         return <CheckCircle className="h-5 w-5 text-teal-500" />;
-      case "publishing":
+      case 'publishing':
         return <Loader2 className="h-5 w-5 animate-spin text-blue-500" />;
-      case "published_on_platform":
+      case 'published_on_platform':
         return <CheckCircle className="h-5 w-5 text-green-500" />;
-      case "failed_on_platform":
+      case 'failed_on_platform':
         return <XCircle className="h-5 w-5 text-red-500" />;
-      case "locked":
+      case 'locked':
         return <Lock className="h-5 w-5 text-gray-500" />;
-      case "unlocked":
+      case 'unlocked':
         return <Unlock className="h-5 w-5 text-gray-500" />;
-      case "publication_failed":
+      case 'publication_failed':
         return <ServerCrash className="h-5 w-5 text-red-600" />;
       default:
         return <Clock className="h-5 w-5 text-gray-400" />;
@@ -75,59 +75,59 @@ export default function PublicationTimeline({ activities }: PublicationTimelineP
 
   const getActivityColor = (type: string) => {
     switch (type) {
-      case "created":
-        return "bg-blue-50 dark:bg-blue-900/10 border-blue-100 dark:border-blue-900/20";
-      case "updated":
-        return "bg-indigo-50 dark:bg-indigo-900/10 border-indigo-100 dark:border-indigo-900/20";
-      case "requested_approval":
-        return "bg-purple-50 dark:bg-purple-900/10 border-purple-100 dark:border-purple-900/20";
-      case "approved":
-        return "bg-green-50 dark:bg-green-900/10 border-green-100 dark:border-green-900/20";
-      case "rejected":
-        return "bg-rose-50 dark:bg-rose-900/10 border-rose-100 dark:border-rose-900/20";
-      case "published":
-        return "bg-teal-50 dark:bg-teal-900/10 border-teal-100 dark:border-teal-900/20";
-      case "publishing":
-        return "bg-blue-50 dark:bg-blue-900/10 border-blue-100 dark:border-blue-900/20";
-      case "published_on_platform":
-        return "bg-green-50 dark:bg-green-900/10 border-green-100 dark:border-green-900/20";
-      case "failed_on_platform":
-        return "bg-red-50 dark:bg-red-900/10 border-red-100 dark:border-red-900/20";
-      case "publication_failed":
-        return "bg-red-50 dark:bg-red-900/10 border-red-100 dark:border-red-900/20";
+      case 'created':
+        return 'bg-blue-50 dark:bg-blue-900/10 border-blue-100 dark:border-blue-900/20';
+      case 'updated':
+        return 'bg-indigo-50 dark:bg-indigo-900/10 border-indigo-100 dark:border-indigo-900/20';
+      case 'requested_approval':
+        return 'bg-purple-50 dark:bg-purple-900/10 border-purple-100 dark:border-purple-900/20';
+      case 'approved':
+        return 'bg-green-50 dark:bg-green-900/10 border-green-100 dark:border-green-900/20';
+      case 'rejected':
+        return 'bg-rose-50 dark:bg-rose-900/10 border-rose-100 dark:border-rose-900/20';
+      case 'published':
+        return 'bg-teal-50 dark:bg-teal-900/10 border-teal-100 dark:border-teal-900/20';
+      case 'publishing':
+        return 'bg-blue-50 dark:bg-blue-900/10 border-blue-100 dark:border-blue-900/20';
+      case 'published_on_platform':
+        return 'bg-green-50 dark:bg-green-900/10 border-green-100 dark:border-green-900/20';
+      case 'failed_on_platform':
+        return 'bg-red-50 dark:bg-red-900/10 border-red-100 dark:border-red-900/20';
+      case 'publication_failed':
+        return 'bg-red-50 dark:bg-red-900/10 border-red-100 dark:border-red-900/20';
       default:
-        return "bg-gray-50 dark:bg-neutral-800/50 border-gray-100 dark:border-neutral-700";
+        return 'bg-gray-50 dark:bg-neutral-800/50 border-gray-100 dark:border-neutral-700';
     }
   };
 
   const formatActivityType = (activity: PublicationActivity) => {
     switch (activity.type) {
-      case "created":
-        return t("activity.timeline.status.created") || "Creado";
-      case "updated":
-        return t("activity.timeline.status.updated") || "Actualizado";
-      case "requested_approval":
-        return t("activity.timeline.requested_approval") || "Solicitó aprobación";
-      case "approved":
-        return t("activity.timeline.status.approved") || "Aprobado";
-      case "rejected":
-        return t("activity.timeline.status.rejected") || "Rechazado";
-      case "published":
-        return t("activity.timeline.status.published") || "Publicado";
-      case "publishing":
-        return t("activity.timeline.status.publishing") || "Publicando...";
-      case "failed_on_platform":
-        return t("activity.timeline.status.failed_on_platform_detail", {
-          platform: activity.details?.platform || "Plataforma",
-          defaultValue: `Fallo en ${activity.details?.platform || "plataforma"}`,
+      case 'created':
+        return t('activity.timeline.status.created') || 'Creado';
+      case 'updated':
+        return t('activity.timeline.status.updated') || 'Actualizado';
+      case 'requested_approval':
+        return t('activity.timeline.requested_approval') || 'Solicitó aprobación';
+      case 'approved':
+        return t('activity.timeline.status.approved') || 'Aprobado';
+      case 'rejected':
+        return t('activity.timeline.status.rejected') || 'Rechazado';
+      case 'published':
+        return t('activity.timeline.status.published') || 'Publicado';
+      case 'publishing':
+        return t('activity.timeline.status.publishing') || 'Publicando...';
+      case 'failed_on_platform':
+        return t('activity.timeline.status.failed_on_platform_detail', {
+          platform: activity.details?.platform || 'Plataforma',
+          defaultValue: `Fallo en ${activity.details?.platform || 'plataforma'}`,
         });
-      case "published_on_platform":
-        return t("activity.timeline.status.published_on_platform_detail", {
-          platform: activity.details?.platform || "Plataforma",
-          defaultValue: `Publicado en ${activity.details?.platform || "plataforma"}`,
+      case 'published_on_platform':
+        return t('activity.timeline.status.published_on_platform_detail', {
+          platform: activity.details?.platform || 'Plataforma',
+          defaultValue: `Publicado en ${activity.details?.platform || 'plataforma'}`,
         });
-      case "publication_failed":
-        return t("activity.timeline.publication_failed") || "Fallo en la publicación";
+      case 'publication_failed':
+        return t('activity.timeline.publication_failed') || 'Fallo en la publicación';
       default:
         return activity.type;
     }
@@ -137,7 +137,7 @@ export default function PublicationTimeline({ activities }: PublicationTimelineP
     <div className="space-y-4">
       <h3 className="flex items-center gap-2 text-sm font-bold text-gray-900 dark:text-white">
         <Clock className="h-4 w-4 text-primary-500" />
-        {t("activity.timeline.title") || "Timeline"}
+        {t('activity.timeline.title') || 'Timeline'}
       </h3>
 
       <div className="relative space-y-6 border-l-2 border-gray-200 pl-8 dark:border-neutral-700">
@@ -153,7 +153,7 @@ export default function PublicationTimeline({ activities }: PublicationTimelineP
                   {formatActivityType(activity)}
                 </span>
                 <time className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                  {format(new Date(activity.created_at), "PPp", { locale })}
+                  {format(new Date(activity.created_at), 'PPp', { locale })}
                 </time>
               </div>
 
@@ -161,7 +161,7 @@ export default function PublicationTimeline({ activities }: PublicationTimelineP
                 <div className="flex items-center gap-1.5 opacity-80">
                   <User className="h-3.5 w-3.5" />
                   <span className="font-medium">
-                    {activity.user?.name || t("activity.timeline.system")}
+                    {activity.user?.name || t('activity.timeline.system')}
                   </span>
                 </div>
 

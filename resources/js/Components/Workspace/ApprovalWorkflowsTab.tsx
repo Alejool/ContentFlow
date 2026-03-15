@@ -1,9 +1,9 @@
-import AlertCard from "@/Components/common/Modern/AlertCard";
-import Button from "@/Components/common/Modern/Button";
-import Input from "@/Components/common/Modern/Input";
-import Select from "@/Components/common/Modern/Select";
-import ConfirmDialog from "@/Components/common/ui/ConfirmDialog";
-import axios from "axios";
+import AlertCard from '@/Components/common/Modern/AlertCard';
+import Button from '@/Components/common/Modern/Button';
+import Input from '@/Components/common/Modern/Input';
+import Select from '@/Components/common/Modern/Select';
+import ConfirmDialog from '@/Components/common/ui/ConfirmDialog';
+import axios from 'axios';
 import {
   CheckCircle,
   ChevronRight,
@@ -17,12 +17,12 @@ import {
   UserPlus,
   Users,
   X,
-} from "lucide-react";
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
-import CreateRoleModal from "./CreateRoleModal";
-import InviteMemberModal from "./InviteMemberModal";
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import CreateRoleModal from './CreateRoleModal';
+import InviteMemberModal from './InviteMemberModal';
 
 // @ts-ignore
 declare global {
@@ -60,7 +60,7 @@ export default function ApprovalWorkflowsTab({
   const { t } = useTranslation();
 
   // Get plan ID with multiple fallbacks
-  const planId = (workspace.subscription?.plan || workspace.plan || "demo").toLowerCase();
+  const planId = (workspace.subscription?.plan || workspace.plan || 'demo').toLowerCase();
 
   // Obtener características del plan desde el backend
   const planFeatures = workspace.features || {};
@@ -74,21 +74,21 @@ export default function ApprovalWorkflowsTab({
     hasBasicApprovalAccess = approvalWorkflowFeature !== false;
   } else {
     // Fallback: usar lógica basada en planId
-    hasBasicApprovalAccess = ["demo", "professional", "enterprise"].includes(planId);
+    hasBasicApprovalAccess = ['demo', 'professional', 'enterprise'].includes(planId);
   }
 
   // Determinar si tiene acceso avanzado (multinivel)
   let hasAdvancedApprovalAccess = false;
 
   if (approvalWorkflowFeature !== undefined) {
-    hasAdvancedApprovalAccess = approvalWorkflowFeature === "advanced";
+    hasAdvancedApprovalAccess = approvalWorkflowFeature === 'advanced';
   } else {
     // Fallback: Enterprise tiene acceso avanzado, o usar prop
-    hasAdvancedApprovalAccess = hasAdvancedAccess || planId === "enterprise";
+    hasAdvancedApprovalAccess = hasAdvancedAccess || planId === 'enterprise';
   }
 
   // Debug: Log access level
-  console.log("🔍 ApprovalWorkflowsTab Debug:", {
+  console.log('🔍 ApprovalWorkflowsTab Debug:', {
     hasAdvancedAccess,
     hasAdvancedApprovalAccess,
     planId,
@@ -109,32 +109,32 @@ export default function ApprovalWorkflowsTab({
             <Shield className="h-8 w-8 text-blue-600 dark:text-blue-400" />
           </div>
           <h3 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
-            {t("common.approvals.upgrade.title")}
+            {t('common.approvals.upgrade.title')}
           </h3>
           <p className="mx-auto mb-6 max-w-2xl text-gray-600 dark:text-gray-400">
-            {t("common.approvals.upgrade.description")}
+            {t('common.approvals.upgrade.description')}
           </p>
 
           <div className="mx-auto mb-6 max-w-md rounded-lg bg-white p-6 dark:bg-neutral-900">
             <p className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">
-              {t("common.approvals.upgrade.benefits_title") || "With approvals you get:"}
+              {t('common.approvals.upgrade.benefits_title') || 'With approvals you get:'}
             </p>
             <ul className="space-y-2 text-left text-sm text-gray-600 dark:text-gray-400">
               <li className="flex items-center">
                 <CheckCircle className="mr-2 h-4 w-4 flex-shrink-0 text-green-500" />
-                {t("common.approvals.upgrade.benefits.custom_workflows")}
+                {t('common.approvals.upgrade.benefits.custom_workflows')}
               </li>
               <li className="flex items-center">
                 <CheckCircle className="mr-2 h-4 w-4 flex-shrink-0 text-green-500" />
-                {t("common.approvals.upgrade.benefits.content_control")}
+                {t('common.approvals.upgrade.benefits.content_control')}
               </li>
               <li className="flex items-center">
                 <CheckCircle className="mr-2 h-4 w-4 flex-shrink-0 text-green-500" />
-                {t("common.approvals.upgrade.benefits.role_assignment")}
+                {t('common.approvals.upgrade.benefits.role_assignment')}
               </li>
               <li className="flex items-center">
                 <CheckCircle className="mr-2 h-4 w-4 flex-shrink-0 text-green-500" />
-                {t("common.approvals.upgrade.benefits.approval_history")}
+                {t('common.approvals.upgrade.benefits.approval_history')}
               </li>
             </ul>
           </div>
@@ -143,22 +143,22 @@ export default function ApprovalWorkflowsTab({
             <Button
               variant="primary"
               buttonStyle="solid"
-              onClick={() => (window.location.href = route("pricing"))}
+              onClick={() => (window.location.href = route('pricing'))}
               icon={TrendingUp}
             >
-              {t("common.view_plans")}
+              {t('common.view_plans')}
             </Button>
             <Button
               variant="secondary"
               buttonStyle="outline"
               onClick={() =>
-                (window.location.href = route("workspaces.settings", {
+                (window.location.href = route('workspaces.settings', {
                   workspace: workspace.slug,
-                  tab: "overview",
+                  tab: 'overview',
                 }))
               }
             >
-              {t("common.back_to_settings")}
+              {t('common.back_to_settings')}
             </Button>
           </div>
         </div>
@@ -180,7 +180,7 @@ export default function ApprovalWorkflowsTab({
   // Filter roles that have "approve" permission
   const rolesWithApprovePermission = roles.filter((role: any) => {
     return role.permissions?.some(
-      (permission: any) => permission.name === "approve" || permission.slug === "approve",
+      (permission: any) => permission.name === 'approve' || permission.slug === 'approve',
     );
   });
 
@@ -190,7 +190,7 @@ export default function ApprovalWorkflowsTab({
     const userRole = roles.find((role: any) => role.id === user.pivot?.role_id);
     if (
       userRole?.permissions?.some(
-        (permission: any) => permission.name === "approve" || permission.slug === "approve",
+        (permission: any) => permission.name === 'approve' || permission.slug === 'approve',
       )
     ) {
       return true;
@@ -199,7 +199,7 @@ export default function ApprovalWorkflowsTab({
     // Check if user has direct approve permission
     if (
       user.permissions?.some(
-        (permission: any) => permission.name === "approve" || permission.slug === "approve",
+        (permission: any) => permission.name === 'approve' || permission.slug === 'approve',
       )
     ) {
       return true;
@@ -208,7 +208,7 @@ export default function ApprovalWorkflowsTab({
     return false;
   });
 
-  console.log("🔍 Filtrado de permisos:", {
+  console.log('🔍 Filtrado de permisos:', {
     totalRoles: roles.length,
     rolesConApprove: rolesWithApprovePermission.length,
     totalUsuarios: workspace.users?.length || 0,
@@ -222,13 +222,13 @@ export default function ApprovalWorkflowsTab({
     try {
       setIsLoading(true);
       const response = await axios.get(
-        route("api.v1.workspaces.approval-workflows.index", workspace.id),
+        route('api.v1.workspaces.approval-workflows.index', workspace.id),
       );
       // Backend returns collections in 'data' key due to ApiResponse trait wrapping lists
       setWorkflows(response.data.data || []);
     } catch (error: any) {
-      const message = error.response?.data?.message || error.message || t("common.unknown");
-      toast.error(`${t("common.approvals.errors.fetch")}: ${message}`);
+      const message = error.response?.data?.message || error.message || t('common.unknown');
+      toast.error(`${t('common.approvals.errors.fetch')}: ${message}`);
     } finally {
       setIsLoading(false);
     }
@@ -246,11 +246,11 @@ export default function ApprovalWorkflowsTab({
   const handleCreate = () => {
     setEditingWorkflow({
       id: 0,
-      name: t("common.approvals.createFlow"),
+      name: t('common.approvals.createFlow'),
       is_active: true,
       steps: [
         {
-          name: `${t("common.approvals.level")} 1`,
+          name: `${t('common.approvals.level')} 1`,
           role_id: roles[0]?.id || null,
           user_id: null,
           step_order: 1,
@@ -269,7 +269,7 @@ export default function ApprovalWorkflowsTab({
       .filter((id) => id !== null && id !== undefined);
     const uniqueRoleIds = new Set(roleIds);
     if (roleIds.length !== uniqueRoleIds.size) {
-      toast.error("No puedes asignar el mismo rol a múltiples niveles");
+      toast.error('No puedes asignar el mismo rol a múltiples niveles');
       return;
     }
 
@@ -279,14 +279,14 @@ export default function ApprovalWorkflowsTab({
       .filter((id) => id !== null && id !== undefined);
     const uniqueUserIds = new Set(userIds);
     if (userIds.length !== uniqueUserIds.size) {
-      toast.error("No puedes asignar el mismo usuario a múltiples niveles");
+      toast.error('No puedes asignar el mismo usuario a múltiples niveles');
       return;
     }
 
     // Validation: Each step must have either role_id or user_id
     const invalidSteps = editingWorkflow.steps.filter((s) => !s.role_id && !s.user_id);
     if (invalidSteps.length > 0) {
-      toast.error("Cada nivel debe tener asignado un rol o usuario");
+      toast.error('Cada nivel debe tener asignado un rol o usuario');
       return;
     }
 
@@ -308,30 +308,30 @@ export default function ApprovalWorkflowsTab({
         steps: preparedSteps,
       };
 
-      console.log("📤 Enviando workflow:", workflowToSave);
+      console.log('📤 Enviando workflow:', workflowToSave);
 
       if (editingWorkflow.id === 0) {
         await axios.post(
-          route("api.v1.workspaces.approval-workflows.store", workspace.id),
+          route('api.v1.workspaces.approval-workflows.store', workspace.id),
           workflowToSave,
         );
-        toast.success(t("common.approvals.success.created"));
+        toast.success(t('common.approvals.success.created'));
       } else {
         await axios.put(
-          route("api.v1.workspaces.approval-workflows.update", {
+          route('api.v1.workspaces.approval-workflows.update', {
             idOrSlug: workspace.id,
             workflow: editingWorkflow.id,
           }),
           workflowToSave,
         );
-        toast.success(t("common.approvals.success.updated"));
+        toast.success(t('common.approvals.success.updated'));
       }
       setIsEditing(false);
       fetchWorkflows();
     } catch (error: any) {
-      console.error("❌ Error guardando workflow:", error.response?.data || error);
+      console.error('❌ Error guardando workflow:', error.response?.data || error);
       toast.error(
-        `${t("common.approvals.errors.save")}: ` + (error.response?.data?.message || error.message),
+        `${t('common.approvals.errors.save')}: ` + (error.response?.data?.message || error.message),
       );
     }
   };
@@ -345,16 +345,16 @@ export default function ApprovalWorkflowsTab({
     if (!workflowToDelete) return;
     try {
       await axios.delete(
-        route("api.v1.workspaces.approval-workflows.destroy", {
+        route('api.v1.workspaces.approval-workflows.destroy', {
           idOrSlug: workspace.id,
           workflow: workflowToDelete,
         }),
       );
-      toast.success(t("common.approvals.success.deleted"));
+      toast.success(t('common.approvals.success.deleted'));
       fetchWorkflows();
     } catch (error: any) {
       toast.error(
-        `${t("common.approvals.errors.delete")}: ` +
+        `${t('common.approvals.errors.delete')}: ` +
           (error.response?.data?.message || error.message),
       );
     } finally {
@@ -367,15 +367,15 @@ export default function ApprovalWorkflowsTab({
     // Verificar que el plan actual soporte multinivel
     if (!hasAdvancedApprovalAccess) {
       toast.error(
-        t("common.approvals.errors.multiLevelEnterprise") ||
-          "Los flujos multinivel solo están disponibles en el plan Enterprise",
+        t('common.approvals.errors.multiLevelEnterprise') ||
+          'Los flujos multinivel solo están disponibles en el plan Enterprise',
       );
       return;
     }
     if (!editingWorkflow) return;
     const newSteps = [...editingWorkflow.steps];
     newSteps.push({
-      name: `${t("common.approvals.level")} ${newSteps.length + 1}`,
+      name: `${t('common.approvals.level')} ${newSteps.length + 1}`,
       role_id: null,
       user_id: null,
       step_order: newSteps.length + 1,
@@ -410,10 +410,10 @@ export default function ApprovalWorkflowsTab({
           <div className="mb-6 md:mb-0">
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">
               {editingWorkflow.id === 0
-                ? t("common.approvals.createFlow")
-                : t("common.approvals.editFlow")}
+                ? t('common.approvals.createFlow')
+                : t('common.approvals.editFlow')}
             </h3>
-            <p className="text-sm text-gray-500">{t("common.approvals.configureSequence")}</p>
+            <p className="text-sm text-gray-500">{t('common.approvals.configureSequence')}</p>
           </div>
           <div className="flex gap-2">
             <Button
@@ -423,7 +423,7 @@ export default function ApprovalWorkflowsTab({
               size="md"
               onClick={() => setIsEditing(false)}
             >
-              {t("common.cancel")}
+              {t('common.cancel')}
             </Button>
             <Button
               variant="primary"
@@ -432,7 +432,7 @@ export default function ApprovalWorkflowsTab({
               size="md"
               onClick={handleSave}
             >
-              {t("common.save_changes")}
+              {t('common.save_changes')}
             </Button>
           </div>
         </div>
@@ -440,16 +440,16 @@ export default function ApprovalWorkflowsTab({
         <div className="space-y-6 p-6">
           <Input
             id="workflow-name"
-            label={t("common.approvals.workflowName")}
+            label={t('common.approvals.workflowName')}
             value={editingWorkflow.name}
             onChange={(e: any) => setEditingWorkflow({ ...editingWorkflow, name: e.target.value })}
-            placeholder={t("common.approvals.workflowName")}
+            placeholder={t('common.approvals.workflowName')}
           />
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h4 className="font-bold text-gray-900 dark:text-white">
-                {t("common.approvals.approvalLevels")}
+                {t('common.approvals.approvalLevels')}
               </h4>
               <div className="flex gap-2">
                 <Button
@@ -460,7 +460,7 @@ export default function ApprovalWorkflowsTab({
                   className="text-primary-600"
                   icon={Shield}
                 >
-                  {t("common.approvals.newRole")}
+                  {t('common.approvals.newRole')}
                 </Button>
                 {hasAdvancedApprovalAccess ? (
                   <Button
@@ -471,7 +471,7 @@ export default function ApprovalWorkflowsTab({
                     className="text-primary-600"
                     icon={Plus}
                   >
-                    {t("common.approvals.addLevel")}
+                    {t('common.approvals.addLevel')}
                   </Button>
                 ) : (
                   <Button
@@ -481,9 +481,9 @@ export default function ApprovalWorkflowsTab({
                     className="cursor-not-allowed text-gray-400 opacity-50"
                     icon={Plus}
                     disabled
-                    title={t("approvals.locked.title") || "Requiere plan Enterprise"}
+                    title={t('approvals.locked.title') || 'Requiere plan Enterprise'}
                   >
-                    {t("common.approvals.addLevel")}
+                    {t('common.approvals.addLevel')}
                   </Button>
                 )}
               </div>
@@ -540,7 +540,7 @@ export default function ApprovalWorkflowsTab({
                       <Select
                         id={`step-role-${index}`}
                         options={[
-                          { value: "", label: t("common.approvals.anyRole") },
+                          { value: '', label: t('common.approvals.anyRole') },
                           ...rolesWithApprovePermission
                             .filter((r) => {
                               // Allow current selection or roles not selected in other steps
@@ -558,13 +558,13 @@ export default function ApprovalWorkflowsTab({
                         value={
                           step.role_id !== null && step.role_id !== undefined
                             ? String(step.role_id)
-                            : ""
+                            : ''
                         }
                         size="md"
                         containerClassName="w-full sm:w-48"
                         onChange={(val: any) => {
                           const newSteps = [...editingWorkflow.steps];
-                          if (val === "" || val === null || val === undefined) {
+                          if (val === '' || val === null || val === undefined) {
                             newSteps[index].role_id = null;
                           } else {
                             newSteps[index].role_id = parseInt(val);
@@ -577,12 +577,12 @@ export default function ApprovalWorkflowsTab({
                         }}
                       />
                       <span className="px-1 text-center text-xs text-gray-400">
-                        {t("common.approvals.or")}
+                        {t('common.approvals.or')}
                       </span>
                       <Select
                         id={`step-user-${index}`}
                         options={[
-                          { value: "", label: t("common.approvals.anyUser") },
+                          { value: '', label: t('common.approvals.anyUser') },
                           ...usersWithApprovePermission
                             .filter((u: any) => {
                               // Allow current selection or users not selected in other steps
@@ -600,13 +600,13 @@ export default function ApprovalWorkflowsTab({
                         value={
                           step.user_id !== null && step.user_id !== undefined
                             ? String(step.user_id)
-                            : ""
+                            : ''
                         }
                         size="md"
                         containerClassName="w-full sm:w-48"
                         onChange={(val: any) => {
                           const newSteps = [...editingWorkflow.steps];
-                          if (val === "" || val === null || val === undefined) {
+                          if (val === '' || val === null || val === undefined) {
                             newSteps[index].user_id = null;
                           } else {
                             newSteps[index].user_id = parseInt(val);
@@ -625,7 +625,7 @@ export default function ApprovalWorkflowsTab({
                       buttonStyle="icon"
                       onClick={() => removeStep(index)}
                       className="shrink-0 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10"
-                      title={t("common.approvals.deleteLevel")}
+                      title={t('common.approvals.deleteLevel')}
                       icon={Trash2}
                     ></Button>
                   </div>
@@ -650,9 +650,9 @@ export default function ApprovalWorkflowsTab({
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-            {t("common.approvals.title")}
+            {t('common.approvals.title')}
           </h3>
-          <p className="text-sm text-gray-500">{t("common.approvals.subtitle")}</p>
+          <p className="text-sm text-gray-500">{t('common.approvals.subtitle')}</p>
         </div>
         {canManageWorkspace && (
           <div className="flex gap-2">
@@ -663,11 +663,11 @@ export default function ApprovalWorkflowsTab({
               onClick={() => setShowInviteModal(true)}
               icon={UserPlus}
             >
-              {t("common.approvals.invite")}
+              {t('common.approvals.invite')}
             </Button>
             {workflows.length === 0 || hasAdvancedApprovalAccess ? (
               <Button variant="primary" buttonStyle="solid" onClick={handleCreate} icon={Plus}>
-                {t("common.approvals.createWorkflow")}
+                {t('common.approvals.createWorkflow')}
               </Button>
             ) : null}
           </div>
@@ -680,10 +680,10 @@ export default function ApprovalWorkflowsTab({
             <CheckCircle className="h-8 w-8 text-primary-600" />
           </div>
           <h4 className="mb-2 text-lg font-bold text-gray-900 dark:text-white">
-            {t("common.approvals.noWorkflowsTitle")}
+            {t('common.approvals.noWorkflowsTitle')}
           </h4>
           <p className="mx-auto mb-6 max-w-sm text-gray-500">
-            {t("common.approvals.noWorkflowsDesc")}
+            {t('common.approvals.noWorkflowsDesc')}
           </p>
           <Button
             variant="primary"
@@ -692,7 +692,7 @@ export default function ApprovalWorkflowsTab({
             className="shadow-lg shadow-primary-500/20"
             icon={Plus}
           >
-            {t("common.approvals.configureFirstWorkflow")}
+            {t('common.approvals.configureFirstWorkflow')}
           </Button>
         </div>
       ) : (
@@ -710,7 +710,7 @@ export default function ApprovalWorkflowsTab({
                   <div>
                     <h4 className="font-bold text-gray-900 dark:text-white">{workflow.name}</h4>
                     <p className="text-xs text-gray-500">
-                      {workflow.steps.length} {t("common.approvals.levelsConfigured")}
+                      {workflow.steps.length} {t('common.approvals.levelsConfigured')}
                     </p>
                   </div>
                 </div>
@@ -755,7 +755,7 @@ export default function ApprovalWorkflowsTab({
 
       <AlertCard
         type="warning"
-        message={t("common.approvals.activeWorkflowNote")}
+        message={t('common.approvals.activeWorkflowNote')}
         className="mt-4"
       />
 
@@ -773,10 +773,10 @@ export default function ApprovalWorkflowsTab({
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={confirmDelete}
-        title={t("common.deleteConfirmTitle")}
-        message={t("common.approvals.confirmDelete")}
-        confirmText={t("common.delete")}
-        cancelText={t("common.cancel")}
+        title={t('common.deleteConfirmTitle')}
+        message={t('common.approvals.confirmDelete')}
+        confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
         type="danger"
       />
     </div>

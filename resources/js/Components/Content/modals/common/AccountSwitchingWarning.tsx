@@ -1,5 +1,5 @@
-import { AlertTriangle, Info } from "lucide-react";
-import { formatDateTimeString } from "@/Utils/dateHelpers";
+import { AlertTriangle, Info } from 'lucide-react';
+import { formatDateTimeString } from '@/Utils/dateHelpers';
 
 interface PlatformStatus {
   platform: string;
@@ -35,7 +35,7 @@ export default function AccountSwitchingWarning({
 }: AccountSwitchingWarningProps) {
   // Find all published statuses for this platform
   const platformStatuses = Object.entries(platformStatus).filter(
-    ([_, status]) => status.platform === platform && status.status === "published",
+    ([_, status]) => status.platform === platform && status.status === 'published',
   );
 
   if (platformStatuses.length === 0) {
@@ -60,20 +60,20 @@ export default function AccountSwitchingWarning({
             <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600 dark:text-amber-400" />
             <div className="flex-1">
               <h4 className="mb-2 text-sm font-bold text-amber-900 dark:text-amber-100">
-                {t("publish.publishedOnDifferentAccount") || "Publicado en otra cuenta"}
+                {t('publish.publishedOnDifferentAccount') || 'Publicado en otra cuenta'}
               </h4>
               <div className="space-y-2">
                 {otherAccountPublications.map(([accountId, status]) => (
                   <div key={accountId} className="text-xs text-amber-800 dark:text-amber-200">
                     <p className="font-semibold">
-                      {t("publish.accountName") || "Cuenta"}:{" "}
+                      {t('publish.accountName') || 'Cuenta'}:{' '}
                       <span className="rounded bg-amber-100 px-2 py-0.5 font-mono dark:bg-amber-900/40">
                         {status.account_name}
                       </span>
                     </p>
                     {status.published_at && (
                       <p className="mt-1">
-                        {t("publish.publishedAt") || "Publicado el"}:{" "}
+                        {t('publish.publishedAt') || 'Publicado el'}:{' '}
                         {formatDateTimeString(status.published_at)}
                       </p>
                     )}
@@ -84,15 +84,15 @@ export default function AccountSwitchingWarning({
                         rel="noopener noreferrer"
                         className="mt-1 inline-block text-amber-700 hover:underline dark:text-amber-300"
                       >
-                        {t("publish.viewPost") || "Ver publicación"} →
+                        {t('publish.viewPost') || 'Ver publicación'} →
                       </a>
                     )}
                   </div>
                 ))}
               </div>
               <p className="mt-3 text-xs font-medium text-amber-700 dark:text-amber-300">
-                {t("publish.cannotUnpublishDifferentAccount") ||
-                  "No puedes despublicar contenido de una cuenta diferente. Reconecta la cuenta original para gestionar estas publicaciones."}
+                {t('publish.cannotUnpublishDifferentAccount') ||
+                  'No puedes despublicar contenido de una cuenta diferente. Reconecta la cuenta original para gestionar estas publicaciones.'}
               </p>
             </div>
           </div>
@@ -106,18 +106,18 @@ export default function AccountSwitchingWarning({
             <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
             <div className="flex-1">
               <h4 className="mb-1 text-sm font-bold text-blue-900 dark:text-blue-100">
-                {t("publish.publishedOnCurrentAccount") || "Publicado en cuenta actual"}
+                {t('publish.publishedOnCurrentAccount') || 'Publicado en cuenta actual'}
               </h4>
               <p className="text-xs text-blue-800 dark:text-blue-200">
-                {t("publish.accountName") || "Cuenta"}:{" "}
+                {t('publish.accountName') || 'Cuenta'}:{' '}
                 <span className="rounded bg-blue-100 px-2 py-0.5 font-mono dark:bg-blue-900/40">
                   {currentAccountPublication[1].account_name}
                 </span>
               </p>
               {currentAccountPublication[1].can_unpublish && (
                 <p className="mt-2 text-xs text-blue-700 dark:text-blue-300">
-                  {t("publish.canUnpublish") ||
-                    "Puedes despublicar este contenido desde esta cuenta."}
+                  {t('publish.canUnpublish') ||
+                    'Puedes despublicar este contenido desde esta cuenta.'}
                 </p>
               )}
             </div>
@@ -132,11 +132,11 @@ export default function AccountSwitchingWarning({
             <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
             <div className="flex-1">
               <h4 className="mb-1 text-sm font-bold text-green-900 dark:text-green-100">
-                {t("publish.canPublishToNewAccount") || "Puedes publicar en esta cuenta"}
+                {t('publish.canPublishToNewAccount') || 'Puedes publicar en esta cuenta'}
               </h4>
               <p className="text-xs text-green-800 dark:text-green-200">
-                {t("publish.multipleAccountsAllowed") ||
-                  "Aunque el contenido ya está publicado en otra cuenta, puedes publicarlo también en la cuenta actual. Cada cuenta mantendrá su propia publicación independiente."}
+                {t('publish.multipleAccountsAllowed') ||
+                  'Aunque el contenido ya está publicado en otra cuenta, puedes publicarlo también en la cuenta actual. Cada cuenta mantendrá su propia publicación independiente.'}
               </p>
             </div>
           </div>

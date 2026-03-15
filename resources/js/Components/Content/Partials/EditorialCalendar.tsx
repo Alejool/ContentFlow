@@ -1,6 +1,6 @@
-import { useCalendar } from "@/Hooks/calendar/useCalendar";
-import { useTheme } from "@/Hooks/useTheme";
-import { formatTime } from "@/Utils/formatDate";
+import { useCalendar } from '@/Hooks/calendar/useCalendar';
+import { useTheme } from '@/Hooks/useTheme';
+import { formatTime } from '@/Utils/formatDate';
 import {
   eachDayOfInterval,
   endOfMonth,
@@ -12,7 +12,7 @@ import {
   parseISO,
   startOfMonth,
   startOfWeek,
-} from "date-fns";
+} from 'date-fns';
 import {
   Calendar as CalendarIcon,
   ChevronLeft,
@@ -20,8 +20,8 @@ import {
   Clock,
   Layers,
   Share2,
-} from "lucide-react";
-import { useTranslation } from "react-i18next";
+} from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function EditorialCalendar() {
   const { t } = useTranslation();
@@ -38,25 +38,25 @@ export default function EditorialCalendar() {
           />
         </div>
         <h2 className={`text-xl font-bold text-gray-900 dark:text-white sm:text-2xl`}>
-          {format(currentMonth, "MMMM yyyy")}
+          {format(currentMonth, 'MMMM yyyy')}
         </h2>
       </div>
       <div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-end">
         <button
           onClick={prevMonth}
-          className={`rounded-lg p-2 transition-colors ${actualTheme === "dark" ? "text-gray-400 hover:bg-neutral-800" : "text-gray-600 hover:bg-gray-100"}`}
+          className={`rounded-lg p-2 transition-colors ${actualTheme === 'dark' ? 'text-gray-400 hover:bg-neutral-800' : 'text-gray-600 hover:bg-gray-100'}`}
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
         <button
           onClick={goToToday}
-          className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${actualTheme === "dark" ? "bg-neutral-800 text-white hover:bg-neutral-700" : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50"}`}
+          className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${actualTheme === 'dark' ? 'bg-neutral-800 text-white hover:bg-neutral-700' : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50'}`}
         >
-          {t("common.today")}
+          {t('common.today')}
         </button>
         <button
           onClick={nextMonth}
-          className={`rounded-lg p-2 transition-colors ${actualTheme === "dark" ? "text-gray-400 hover:bg-neutral-800" : "text-gray-600 hover:bg-gray-100"}`}
+          className={`rounded-lg p-2 transition-colors ${actualTheme === 'dark' ? 'text-gray-400 hover:bg-neutral-800' : 'text-gray-600 hover:bg-gray-100'}`}
         >
           <ChevronRight className="h-5 w-5" />
         </button>
@@ -65,7 +65,7 @@ export default function EditorialCalendar() {
   );
 
   const renderDays = () => {
-    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     return (
       <div className="mb-2 grid grid-cols-7">
         {days.map((day) => (
@@ -90,7 +90,7 @@ export default function EditorialCalendar() {
 
     return (
       <div
-        className={`grid grid-cols-7 border-l border-t ${actualTheme === "dark" ? "border-neutral-800" : "border-gray-100"} overflow-hidden rounded-lg`}
+        className={`grid grid-cols-7 border-l border-t ${actualTheme === 'dark' ? 'border-neutral-800' : 'border-gray-100'} overflow-hidden rounded-lg`}
       >
         {days.map((day) => {
           const dayEvents = events.filter((event) => {
@@ -104,24 +104,24 @@ export default function EditorialCalendar() {
             <div
               key={day.toISOString()}
               className={`relative min-h-[80px] border-b border-r p-1 transition-colors sm:min-h-[140px] sm:p-2 ${
-                actualTheme === "dark"
-                  ? `${isCurrentMonth ? "bg-neutral-900/30" : "bg-neutral-950/50"} border-neutral-800`
-                  : `${isCurrentMonth ? "bg-white" : "bg-gray-50/50"} border-gray-100`
+                actualTheme === 'dark'
+                  ? `${isCurrentMonth ? 'bg-neutral-900/30' : 'bg-neutral-950/50'} border-neutral-800`
+                  : `${isCurrentMonth ? 'bg-white' : 'bg-gray-50/50'} border-gray-100`
               }`}
             >
               <div className="mb-1 flex justify-end">
                 <span
                   className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-medium sm:h-8 sm:w-8 sm:text-sm ${
                     isTodayDate
-                      ? "bg-primary-600 text-white shadow-lg"
+                      ? 'bg-primary-600 text-white shadow-lg'
                       : isCurrentMonth
-                        ? actualTheme === "dark"
-                          ? "text-gray-300"
-                          : "text-gray-600"
-                        : "text-gray-400"
+                        ? actualTheme === 'dark'
+                          ? 'text-gray-300'
+                          : 'text-gray-600'
+                        : 'text-gray-400'
                   }`}
                 >
-                  {format(day, "d")}
+                  {format(day, 'd')}
                 </span>
               </div>
 
@@ -134,22 +134,22 @@ export default function EditorialCalendar() {
                       handleEventClick(event);
                     }}
                     className={`group flex cursor-pointer flex-col gap-0.5 truncate rounded border-l-2 px-1 py-0.5 text-[7px] font-medium shadow-sm transition-all hover:scale-[1.02] active:scale-95 sm:px-2 sm:py-1 sm:text-[10px] ${
-                      actualTheme === "dark"
-                        ? "bg-neutral-800/80 hover:bg-neutral-700/80"
-                        : "bg-gray-50 hover:bg-gray-100"
+                      actualTheme === 'dark'
+                        ? 'bg-neutral-800/80 hover:bg-neutral-700/80'
+                        : 'bg-gray-50 hover:bg-gray-100'
                     }`}
                     style={{ borderLeftColor: event.color }}
                   >
                     <div className="flex items-center gap-1">
-                      {event.type === "publication" ? (
+                      {event.type === 'publication' ? (
                         <Layers className="h-2 w-2 sm:h-3 sm:w-3" />
                       ) : (
                         <Share2 className="h-2 w-2 sm:h-3 sm:w-3" />
                       )}
                       <span
-                        className={`truncate ${actualTheme === "dark" ? "text-gray-200" : "text-gray-700"}`}
+                        className={`truncate ${actualTheme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}
                       >
-                        {event.title.replace("[PUB] ", "")}
+                        {event.title.replace('[PUB] ', '')}
                       </span>
                     </div>
                     {event.start && (
@@ -170,7 +170,7 @@ export default function EditorialCalendar() {
 
   return (
     <div
-      className={`rounded-lg p-3 sm:p-6 ${actualTheme === "dark" ? "border border-neutral-800 bg-neutral-900/50" : "border border-gray-100 bg-white shadow-sm"}`}
+      className={`rounded-lg p-3 sm:p-6 ${actualTheme === 'dark' ? 'border border-neutral-800 bg-neutral-900/50' : 'border border-gray-100 bg-white shadow-sm'}`}
     >
       {renderHeader()}
       <div className="relative">

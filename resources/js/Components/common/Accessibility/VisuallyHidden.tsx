@@ -5,7 +5,7 @@
  * WCAG 1.3.1 - Info and Relationships (Level A)
  */
 
-import React from "react";
+import React from 'react';
 
 interface VisuallyHiddenProps {
   children: React.ReactNode;
@@ -13,5 +13,5 @@ interface VisuallyHiddenProps {
 }
 
 export const VisuallyHidden: React.FC<VisuallyHiddenProps> = ({ children, focusable = false }) => {
-  return <span className={focusable ? "sr-only-focusable" : "sr-only"}>{children}</span>;
+  return <span className={focusable ? 'sr-only-focusable' : 'sr-only'}>{children}</span>;
 };

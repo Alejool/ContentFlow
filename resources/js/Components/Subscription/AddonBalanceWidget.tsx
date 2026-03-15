@@ -1,10 +1,10 @@
-import React from "react";
-import { Link } from "@inertiajs/react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
-import Button from "@/Components/common/Modern/Button";
-import { Progress } from "@/Components/ui/progress";
-import { Sparkles, HardDrive, Plus } from "lucide-react";
-import type { AddonSummary } from "@/types/addon";
+import React from 'react';
+import { Link } from '@inertiajs/react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
+import Button from '@/Components/common/Modern/Button';
+import { Progress } from '@/Components/ui/progress';
+import { Sparkles, HardDrive, Plus } from 'lucide-react';
+import type { AddonSummary } from '@/types/addon';
 
 interface AddonBalanceWidgetProps {
   summary: AddonSummary | null;
@@ -54,10 +54,10 @@ export const AddonBalanceWidget: React.FC<AddonBalanceWidgetProps> = ({ summary,
               className="h-2"
               indicatorClassName={
                 summary.ai_credits.percentage_used >= 90
-                  ? "bg-red-500"
+                  ? 'bg-red-500'
                   : summary.ai_credits.percentage_used >= 70
-                    ? "bg-yellow-500"
-                    : "bg-blue-500"
+                    ? 'bg-yellow-500'
+                    : 'bg-blue-500'
               }
             />
           </div>
@@ -80,10 +80,10 @@ export const AddonBalanceWidget: React.FC<AddonBalanceWidgetProps> = ({ summary,
               className="h-2"
               indicatorClassName={
                 summary.storage.percentage_used >= 90
-                  ? "bg-red-500"
+                  ? 'bg-red-500'
                   : summary.storage.percentage_used >= 70
-                    ? "bg-yellow-500"
-                    : "bg-purple-500"
+                    ? 'bg-yellow-500'
+                    : 'bg-purple-500'
               }
             />
           </div>

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { PublishModal } from "./index";
+import { useState } from 'react';
+import { PublishModal } from './index';
 
 // Demo component to test our validation logic
 export default function ValidationDemo() {
@@ -8,10 +8,10 @@ export default function ValidationDemo() {
   // Mock data for testing
   const mockPollPublication = {
     id: 1,
-    content_type: "poll",
-    title: "Test Poll",
-    description: "This is a test poll",
-    poll_options: ["Option 1", "Option 2"],
+    content_type: 'poll',
+    title: 'Test Poll',
+    description: 'This is a test poll',
+    poll_options: ['Option 1', 'Option 2'],
     poll_duration_hours: 24,
     workspace_id: 1,
     mediaFiles: [],
@@ -19,18 +19,18 @@ export default function ValidationDemo() {
 
   const mockVideoPublication = {
     id: 2,
-    content_type: "reel",
-    title: "Test Video",
-    description: "This is a test video",
+    content_type: 'reel',
+    title: 'Test Video',
+    description: 'This is a test video',
     workspace_id: 1,
-    mediaFiles: [{ id: 1, filename: "video.mp4" }],
+    mediaFiles: [{ id: 1, filename: 'video.mp4' }],
   };
 
   const mockSocialAccounts = [
-    { id: 1, platform: "twitter", name: "Twitter Account" },
-    { id: 2, platform: "youtube", name: "YouTube Channel" },
-    { id: 3, platform: "facebook", name: "Facebook Page" },
-    { id: 4, platform: "instagram", name: "Instagram Account" },
+    { id: 1, platform: 'twitter', name: 'Twitter Account' },
+    { id: 2, platform: 'youtube', name: 'YouTube Channel' },
+    { id: 3, platform: 'facebook', name: 'Facebook Page' },
+    { id: 4, platform: 'instagram', name: 'Instagram Account' },
   ];
 
   const [currentPublication, setCurrentPublication] = useState(mockPollPublication);
@@ -46,9 +46,9 @@ export default function ValidationDemo() {
             <button
               onClick={() => setCurrentPublication(mockPollPublication)}
               className={`rounded px-4 py-2 ${
-                currentPublication.content_type === "poll"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-gray-700"
+                currentPublication.content_type === 'poll'
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-200 text-gray-700'
               }`}
             >
               Poll Publication
@@ -56,9 +56,9 @@ export default function ValidationDemo() {
             <button
               onClick={() => setCurrentPublication(mockVideoPublication)}
               className={`rounded px-4 py-2 ${
-                currentPublication.content_type === "reel"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-gray-700"
+                currentPublication.content_type === 'reel'
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-200 text-gray-700'
               }`}
             >
               Video Publication
@@ -74,9 +74,9 @@ export default function ValidationDemo() {
           <p>
             <strong>Title:</strong> {currentPublication.title}
           </p>
-          {currentPublication.content_type === "poll" && (
+          {currentPublication.content_type === 'poll' && (
             <p>
-              <strong>Poll Options:</strong> {(currentPublication as any).poll_options?.join(", ")}
+              <strong>Poll Options:</strong> {(currentPublication as any).poll_options?.join(', ')}
             </p>
           )}
         </div>
@@ -94,7 +94,7 @@ export default function ValidationDemo() {
 
         <div className="rounded bg-yellow-100 p-4">
           <h3 className="mb-2 font-medium">Expected Validation Results:</h3>
-          {currentPublication.content_type === "poll" ? (
+          {currentPublication.content_type === 'poll' ? (
             <ul className="list-inside list-disc text-sm">
               <li>✅ Twitter: Should allow polls</li>
               <li>❌ Facebook: No soporta encuestas nativas</li>
@@ -125,7 +125,7 @@ export default function ValidationDemo() {
         socialAccounts={mockSocialAccounts as any}
         onClose={() => setShowModal(false)}
         onPublished={(data) => {
-          console.log("Published:", data);
+          console.log('Published:', data);
           setShowModal(false);
         }}
       />

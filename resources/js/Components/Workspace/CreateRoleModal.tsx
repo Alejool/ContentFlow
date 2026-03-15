@@ -1,15 +1,15 @@
-import Button from "@/Components/common/Modern/Button";
-import Input from "@/Components/common/Modern/Input";
-import Textarea from "@/Components/common/Modern/Textarea";
-import Modal from "@/Components/common/ui/Modal";
-import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
-import { CheckSquare, Save, Shield } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
-import { z } from "zod";
+import Button from '@/Components/common/Modern/Button';
+import Input from '@/Components/common/Modern/Input';
+import Textarea from '@/Components/common/Modern/Textarea';
+import Modal from '@/Components/common/ui/Modal';
+import { zodResolver } from '@hookform/resolvers/zod';
+import axios from 'axios';
+import { CheckSquare, Save, Shield } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
 
 interface CreateRoleModalProps {
   isOpen: boolean;
@@ -19,7 +19,7 @@ interface CreateRoleModalProps {
 }
 
 const createRoleSchema = z.object({
-  name: z.string().min(1, "Name is required").max(255),
+  name: z.string().min(1, 'Name is required').max(255),
   description: z.string().optional(),
   permissions: z.array(z.number()).default([]),
   approval_participant: z.boolean().default(false),
@@ -47,14 +47,14 @@ export default function CreateRoleModal({
   } = useForm<CreateRoleFormData>({
     resolver: zodResolver(createRoleSchema),
     defaultValues: {
-      name: "",
-      description: "",
+      name: '',
+      description: '',
       permissions: [],
       approval_participant: false,
     },
   });
 
-  const selectedPermissions = watch("permissions");
+  const selectedPermissions = watch('permissions');
 
   useEffect(() => {
     if (isOpen) {
@@ -66,10 +66,10 @@ export default function CreateRoleModal({
   const fetchPermissions = async () => {
     try {
       setIsLoadingPermissions(true);
-      const response = await axios.get(route("api.v1.workspaces.permissions", workspace.id));
+      const response = await axios.get(route('api.v1.workspaces.permissions', workspace.id));
       setAllPermissions(response.data.data || []);
     } catch (error) {
-      toast.error(t("workspace.roles_management.role_created_error"));
+      toast.error(t('workspace.roles_management.role_created_error'));
     } finally {
       setIsLoadingPermissions(false);
     }
@@ -78,19 +78,19 @@ export default function CreateRoleModal({
   const handleTogglePermission = (id: number) => {
     const current = selectedPermissions || [];
     const updated = current.includes(id) ? current.filter((p) => p !== id) : [...current, id];
-    setValue("permissions", updated);
+    setValue('permissions', updated);
   };
 
   const onSubmit = async (data: CreateRoleFormData) => {
     try {
-      const response = await axios.post(route("api.v1.workspaces.roles.store", workspace.id), data);
-      toast.success(t("workspace.roles_management.role_created_success"));
+      const response = await axios.post(route('api.v1.workspaces.roles.store', workspace.id), data);
+      toast.success(t('workspace.roles_management.role_created_success'));
       onSuccess(response.data.role);
       onClose();
       reset();
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || t("workspace.roles_management.role_created_error"),
+        error.response?.data?.message || t('workspace.roles_management.role_created_error'),
       );
     }
   };
@@ -104,10 +104,10 @@ export default function CreateRoleModal({
           </div>
           <div>
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-              {t("workspace.roles_management.create_role")}
+              {t('workspace.roles_management.create_role')}
             </h2>
             <p className="text-sm text-gray-500">
-              {t("workspace.roles_management.create_role_subtitle")}
+              {t('workspace.roles_management.create_role_subtitle')}
             </p>
           </div>
         </div>
@@ -118,25 +118,25 @@ export default function CreateRoleModal({
               <div>
                 <Input
                   id="role_name"
-                  label={t("workspace.roles_management.role_name")}
-                  placeholder={t("workspace.roles_management.role_name_placeholder")}
-                  {...register("name")}
+                  label={t('workspace.roles_management.role_name')}
+                  placeholder={t('workspace.roles_management.role_name_placeholder')}
+                  {...register('name')}
                   error={errors.name?.message}
                 />
               </div>
               <Textarea
                 id="role_description"
-                label={t("workspace.roles_management.role_description")}
-                placeholder={t("workspace.roles_management.role_description_placeholder")}
+                label={t('workspace.roles_management.role_description')}
+                placeholder={t('workspace.roles_management.role_description_placeholder')}
                 rows={3}
-                {...register("description")}
+                {...register('description')}
                 error={errors.description?.message}
               />
             </div>
 
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t("workspace.roles_management.key_permissions_label")}
+                {t('workspace.roles_management.key_permissions_label')}
               </label>
               <div className="h-[200px] space-y-2 overflow-y-auto rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-neutral-800 dark:bg-neutral-800/50">
                 {isLoadingPermissions ? (
@@ -149,13 +149,13 @@ export default function CreateRoleModal({
                       key={permission.id}
                       className={`flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors ${
                         selectedPermissions?.includes(permission.id)
-                          ? "bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300"
-                          : "hover:bg-white dark:hover:bg-neutral-800"
+                          ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300'
+                          : 'hover:bg-white dark:hover:bg-neutral-800'
                       }`}
                       onClick={() => handleTogglePermission(permission.id)}
                     >
                       <CheckSquare
-                        className={`h-4 w-4 ${selectedPermissions?.includes(permission.id) ? "opacity-100" : "opacity-30"}`}
+                        className={`h-4 w-4 ${selectedPermissions?.includes(permission.id) ? 'opacity-100' : 'opacity-30'}`}
                       />
                       <div className="text-xs">
                         <div className="font-bold">{permission.name}</div>
@@ -172,10 +172,10 @@ export default function CreateRoleModal({
 
           <div className="flex justify-end gap-3 border-t border-gray-100 pt-4 dark:border-neutral-800">
             <Button variant="ghost" onClick={onClose} type="button">
-              {t("common.cancel")}
+              {t('common.cancel')}
             </Button>
             <Button type="submit" loading={isSubmitting} icon={Save}>
-              {t("workspace.roles_management.create_role")}
+              {t('workspace.roles_management.create_role')}
             </Button>
           </div>
         </form>

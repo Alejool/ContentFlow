@@ -5,7 +5,7 @@ export interface ApprovalRequest {
   publication_id: number;
   workflow_id: number;
   current_step_id: number | null;
-  status: "pending" | "approved" | "rejected" | "cancelled";
+  status: 'pending' | 'approved' | 'rejected' | 'cancelled';
   submitted_by: number;
   submitted_at: string;
   completed_at: string | null;
@@ -27,7 +27,7 @@ export interface ApprovalLog {
   approval_request_id: number;
   approval_step_id: number | null;
   user_id: number | null;
-  action: "submitted" | "approved" | "rejected" | "reassigned" | "cancelled" | "auto_advanced";
+  action: 'submitted' | 'approved' | 'rejected' | 'reassigned' | 'cancelled' | 'auto_advanced';
   level_number: number | null;
   comment: string | null;
   metadata: Record<string, any> | null;

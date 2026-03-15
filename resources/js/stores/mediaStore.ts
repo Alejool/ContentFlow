@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
 interface MediaFile {
   id?: number;
@@ -8,7 +8,7 @@ interface MediaFile {
   isNew: boolean;
   file?: File;
   thumbnailUrl?: string;
-  status?: "uploading" | "processing" | "completed" | "failed";
+  status?: 'uploading' | 'processing' | 'completed' | 'failed';
 }
 
 interface MediaState {
@@ -20,7 +20,7 @@ interface MediaState {
       width?: number;
       height?: number;
       aspectRatio?: number;
-      youtubeType: "short" | "video";
+      youtubeType: 'short' | 'video';
     }
   >;
   thumbnails: Record<string, File>;
@@ -38,7 +38,7 @@ interface MediaState {
       width?: number;
       height?: number;
       aspectRatio?: number;
-      youtubeType: "short" | "video";
+      youtubeType: 'short' | 'video';
     },
   ) => void;
   setThumbnail: (tempId: string, file: File) => void;
@@ -63,7 +63,7 @@ export const useMediaStore = create<MediaState>((set) => ({
 
   updateFile: (tempId, updates) =>
     set((state) => {
-      console.log("📝 MediaStore updateFile:", {
+      console.log('📝 MediaStore updateFile:', {
         tempId,
         updates,
         currentFiles: state.mediaFiles.length,

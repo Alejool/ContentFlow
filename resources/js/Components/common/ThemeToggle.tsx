@@ -4,19 +4,19 @@
  * Accessible theme switcher with animations and keyboard support
  */
 
-import React from "react";
-import { LazyMotion, domAnimation, m } from "framer-motion";
-import { useTheme } from "@/Hooks/useTheme";
-import { useReducedMotion } from "@/Hooks/useReducedMotion";
+import React from 'react';
+import { LazyMotion, domAnimation, m } from 'framer-motion';
+import { useTheme } from '@/Hooks/useTheme';
+import { useReducedMotion } from '@/Hooks/useReducedMotion';
 
 export const ThemeToggle: React.FC = () => {
   const { theme, setTheme, actualTheme } = useTheme();
   const reducedMotion = useReducedMotion();
 
   const themes = [
-    { value: "light", label: "Claro", icon: "☀️" },
-    { value: "dark", label: "Oscuro", icon: "🌙" },
-    { value: "system", label: "Sistema", icon: "💻" },
+    { value: 'light', label: 'Claro', icon: '☀️' },
+    { value: 'dark', label: 'Oscuro', icon: '🌙' },
+    { value: 'system', label: 'Sistema', icon: '💻' },
   ] as const;
 
   return (
@@ -37,8 +37,8 @@ export const ThemeToggle: React.FC = () => {
             onClick={() => setTheme(value)}
             className={`relative rounded-md px-3 py-2 text-sm font-medium transition-colors duration-fast focus-ring ${
               isActive
-                ? "text-theme-text-primary"
-                : "text-theme-text-tertiary hover:text-theme-text-secondary"
+                ? 'text-theme-text-primary'
+                : 'text-theme-text-tertiary hover:text-theme-text-secondary'
             } `}
           >
             {isActive && (
@@ -50,7 +50,7 @@ export const ThemeToggle: React.FC = () => {
                   transition={
                     reducedMotion
                       ? { duration: 0 }
-                      : { type: "spring", stiffness: 500, damping: 30 }
+                      : { type: 'spring', stiffness: 500, damping: 30 }
                   }
                 />
               </LazyMotion>

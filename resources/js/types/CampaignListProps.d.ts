@@ -1,9 +1,9 @@
-import { Campaign } from "@/types/Campaign";
-import { Publication } from "@/types/Publication";
+import { Campaign } from '@/types/Campaign';
+import { Publication } from '@/types/Publication';
 
 export type CampaignListProps = {
   items: (Campaign | Publication)[];
-  mode: "campaigns" | "publications";
+  mode: 'campaigns' | 'publications';
   onEdit: (item: any) => void;
   onDelete: (itemId: number) => void;
   onAdd: () => void;

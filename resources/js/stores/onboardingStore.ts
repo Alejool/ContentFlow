@@ -1,19 +1,19 @@
-import { router } from "@inertiajs/react";
-import { create } from "zustand";
-import axios from "axios";
-import type { OnboardingState } from "@/types/onboarding";
-import { offlineQueue, type QueuedAction } from "@/Utils/offlineQueue";
+import { router } from '@inertiajs/react';
+import { create } from 'zustand';
+import axios from 'axios';
+import type { OnboardingState } from '@/types/onboarding';
+import { offlineQueue, type QueuedAction } from '@/Utils/offlineQueue';
 import {
   retryWithBackoff,
   createNetworkError,
   getErrorMessage,
   isOnline,
   type RetryOptions,
-} from "@/Utils/networkErrorHandler";
+} from '@/Utils/networkErrorHandler';
 
 // LocalStorage cache key
-const CACHE_KEY = "onboarding_state_cache";
-const CACHE_TIMESTAMP_KEY = "onboarding_state_cache_timestamp";
+const CACHE_KEY = 'onboarding_state_cache';
+const CACHE_TIMESTAMP_KEY = 'onboarding_state_cache_timestamp';
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 /**
@@ -41,9 +41,9 @@ function loadCachedState(): Partial<OnboardingState> | null {
         (state.tourCurrentStep >= MAX_TOUR_STEPS || state.tourCurrentStep < 0)
       ) {
         console.error(
-          "Cached tour step is invalid:",
+          'Cached tour step is invalid:',
           state.tourCurrentStep,
-          "Valid range: 0-5. Clearing cache...",
+          'Valid range: 0-5. Clearing cache...',
         );
         clearCachedState();
         return null;
@@ -57,7 +57,7 @@ function loadCachedState(): Partial<OnboardingState> | null {
     localStorage.removeItem(CACHE_TIMESTAMP_KEY);
     return null;
   } catch (error) {
-    console.error("Failed to load cached onboarding state:", error);
+    console.error('Failed to load cached onboarding state:', error);
     return null;
   }
 }
@@ -70,7 +70,7 @@ function saveCachedState(state: Partial<OnboardingState>): void {
     localStorage.setItem(CACHE_KEY, JSON.stringify(state));
     localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
   } catch (error) {
-    console.error("Failed to save onboarding state to cache:", error);
+    console.error('Failed to save onboarding state to cache:', error);
   }
 }
 
@@ -82,7 +82,7 @@ function clearCachedState(): void {
     localStorage.removeItem(CACHE_KEY);
     localStorage.removeItem(CACHE_TIMESTAMP_KEY);
   } catch (error) {
-    console.error("Failed to clear cached onboarding state:", error);
+    console.error('Failed to clear cached onboarding state:', error);
   }
 }
 
@@ -147,9 +147,9 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
     // If tour step is invalid, reset it
     if (cachedState.tourCurrentStep >= MAX_TOUR_STEPS || cachedState.tourCurrentStep < 0) {
       console.error(
-        "Detected corrupted tour step on initialization:",
+        'Detected corrupted tour step on initialization:',
         cachedState.tourCurrentStep,
-        "Resetting to 0",
+        'Resetting to 0',
       );
       sanitizedCachedState = {
         ...cachedState,
@@ -202,18 +202,18 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
       get()._updateCache();
 
       if (get().isOffline) {
-        offlineQueue.enqueue("completeBusinessInfo", data);
+        offlineQueue.enqueue('completeBusinessInfo', data);
         set({ queuedActionsCount: offlineQueue.size() });
         return;
       }
 
       try {
-        await get()._executeAction("completeBusinessInfo", data);
+        await get()._executeAction('completeBusinessInfo', data);
       } catch (error: any) {
         get()._rollback(previousState);
         const errorMessage = getErrorMessage(error);
         set({ error: errorMessage });
-        console.error("Failed to complete business info", error);
+        console.error('Failed to complete business info', error);
       }
     },
 
@@ -231,18 +231,18 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
       get()._updateCache();
 
       if (get().isOffline) {
-        offlineQueue.enqueue("selectPlan", { planId });
+        offlineQueue.enqueue('selectPlan', { planId });
         set({ queuedActionsCount: offlineQueue.size() });
         return;
       }
 
       try {
-        await get()._executeAction("selectPlan", { planId });
+        await get()._executeAction('selectPlan', { planId });
       } catch (error: any) {
         get()._rollback(previousState);
         const errorMessage = getErrorMessage(error);
         set({ error: errorMessage });
-        console.error("Failed to select plan", error);
+        console.error('Failed to select plan', error);
       }
     },
 
@@ -251,7 +251,7 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
       set({ isLoading: true, error: null });
       try {
         router.post(
-          "/api/v1/onboarding/start",
+          '/api/v1/onboarding/start',
           {},
           {
             preserveScroll: true,
@@ -260,19 +260,19 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
             },
             onError: (errors) => {
               set({
-                error: "Failed to start tour",
+                error: 'Failed to start tour',
                 isLoading: false,
               });
-              console.error("Failed to start tour", errors);
+              console.error('Failed to start tour', errors);
             },
           },
         );
       } catch (error: any) {
         set({
-          error: error.message || "Failed to start tour",
+          error: error.message || 'Failed to start tour',
           isLoading: false,
         });
-        console.error("Failed to start tour", error);
+        console.error('Failed to start tour', error);
       }
     },
 
@@ -294,9 +294,9 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
 
       if (currentStep > 20 || newStep > 20) {
         console.error(
-          "Tour step is corrupted! Resetting via backend. Current:",
+          'Tour step is corrupted! Resetting via backend. Current:',
           currentStep,
-          "New:",
+          'New:',
           newStep,
         );
 
@@ -305,7 +305,7 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
 
         // Call backend to restart onboarding
         axios
-          .post("/api/v1/onboarding/restart")
+          .post('/api/v1/onboarding/restart')
           .then((response) => {
             // Update local state with clean state from backend
             if (response.data.state) {
@@ -346,7 +346,7 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
       // This ensures the step is saved even if navigation happens
       if (!get().isOffline) {
         // Use axios which is already configured with CSRF token
-        axios.post("/api/v1/onboarding/tour/step", { step: newStep }).catch(() => {
+        axios.post('/api/v1/onboarding/tour/step', { step: newStep }).catch(() => {
           // Don't block or rollback - local state is source of truth during tour
         });
       }
@@ -370,14 +370,14 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
 
       // Check if offline
       if (get().isOffline) {
-        offlineQueue.enqueue("skipTour", {});
+        offlineQueue.enqueue('skipTour', {});
         set({ queuedActionsCount: offlineQueue.size() });
         return;
       }
 
       try {
         // Sync with backend asynchronously
-        await get()._executeAction("skipTour", {});
+        await get()._executeAction('skipTour', {});
       } catch (error: any) {
         // Rollback on failure with user notification
         get()._rollback(previousState);
@@ -385,13 +385,13 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
         set({
           error: errorMessage,
         });
-        console.error("Failed to skip tour", error);
+        console.error('Failed to skip tour', error);
       }
     },
 
     completeTourStep: async (stepId: string) => {
       // Parse step number to check if this is the last step
-      const stepNumber = parseInt(stepId.match(/\d+/)?.[0] || "0");
+      const stepNumber = parseInt(stepId.match(/\d+/)?.[0] || '0');
       const MAX_TOUR_STEPS = 6;
       const isLastStep = stepNumber >= MAX_TOUR_STEPS;
 
@@ -413,14 +413,14 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
 
       // Check if offline
       if (get().isOffline) {
-        offlineQueue.enqueue("completeTourStep", { stepId });
+        offlineQueue.enqueue('completeTourStep', { stepId });
         set({ queuedActionsCount: offlineQueue.size() });
         return;
       }
 
       try {
         // Sync with backend asynchronously
-        await get()._executeAction("completeTourStep", { stepId });
+        await get()._executeAction('completeTourStep', { stepId });
       } catch (error: any) {
         // Rollback on failure with user notification
         get()._rollback(previousState);
@@ -428,7 +428,7 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
         set({
           error: errorMessage,
         });
-        console.error("Failed to complete tour step", error);
+        console.error('Failed to complete tour step', error);
       }
     },
 
@@ -455,14 +455,14 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
 
       // Check if offline
       if (get().isOffline) {
-        offlineQueue.enqueue("dismissTooltip", { tooltipId });
+        offlineQueue.enqueue('dismissTooltip', { tooltipId });
         set({ queuedActionsCount: offlineQueue.size() });
         return;
       }
 
       try {
         // Sync with backend asynchronously
-        await get()._executeAction("dismissTooltip", { tooltipId });
+        await get()._executeAction('dismissTooltip', { tooltipId });
       } catch (error: any) {
         // Rollback on failure with user notification
         get()._rollback(previousState);
@@ -470,7 +470,7 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
         set({
           error: errorMessage,
         });
-        console.error("Failed to dismiss tooltip", error);
+        console.error('Failed to dismiss tooltip', error);
       }
     },
 
@@ -488,9 +488,9 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
 
       // Parse step number to check if this is the final step
       const stepNumber =
-        stepId === "complete" || stepId === "step-3"
+        stepId === 'complete' || stepId === 'step-3'
           ? 3
-          : parseInt(stepId.match(/\d+/)?.[0] || "0");
+          : parseInt(stepId.match(/\d+/)?.[0] || '0');
       const totalSteps = 3; // Should match backend config
       const isLastStep = stepNumber >= totalSteps;
 
@@ -509,16 +509,16 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
 
       // Check if offline
       if (get().isOffline) {
-        offlineQueue.enqueue("completeWizardStep", { stepId, data });
+        offlineQueue.enqueue('completeWizardStep', { stepId, data });
         set({ queuedActionsCount: offlineQueue.size() });
         return;
       }
 
       try {
         // Sync with backend asynchronously
-        await get()._executeAction("completeWizardStep", { stepId, data });
+        await get()._executeAction('completeWizardStep', { stepId, data });
       } catch (error: any) {
-        console.error("Failed to complete wizard step", error);
+        console.error('Failed to complete wizard step', error);
         // Rollback on failure with user notification
         get()._rollback(previousState);
         const errorMessage = getErrorMessage(error);
@@ -546,14 +546,14 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
 
       // Check if offline
       if (get().isOffline) {
-        offlineQueue.enqueue("skipWizard", {});
+        offlineQueue.enqueue('skipWizard', {});
         set({ queuedActionsCount: offlineQueue.size() });
         return;
       }
 
       try {
         // Sync with backend asynchronously
-        await get()._executeAction("skipWizard", {});
+        await get()._executeAction('skipWizard', {});
       } catch (error: any) {
         // Rollback on failure with user notification
         get()._rollback(previousState);
@@ -561,7 +561,7 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
         set({
           error: errorMessage,
         });
-        console.error("Failed to skip wizard", error);
+        console.error('Failed to skip wizard', error);
       }
     },
 
@@ -584,14 +584,14 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
 
       // Check if offline
       if (get().isOffline) {
-        offlineQueue.enqueue("selectTemplate", { templateId });
+        offlineQueue.enqueue('selectTemplate', { templateId });
         set({ queuedActionsCount: offlineQueue.size() });
         return;
       }
 
       try {
         // Sync with backend asynchronously
-        await get()._executeAction("selectTemplate", { templateId });
+        await get()._executeAction('selectTemplate', { templateId });
       } catch (error: any) {
         // Rollback on failure with user notification
         get()._rollback(previousState);
@@ -607,7 +607,7 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
       set({ isLoading: true, error: null });
       try {
         router.post(
-          "/api/v1/onboarding/restart",
+          '/api/v1/onboarding/restart',
           {},
           {
             preserveScroll: true,
@@ -633,19 +633,19 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
             },
             onError: (errors) => {
               set({
-                error: "Failed to restart onboarding",
+                error: 'Failed to restart onboarding',
                 isLoading: false,
               });
-              console.error("Failed to restart onboarding", errors);
+              console.error('Failed to restart onboarding', errors);
             },
           },
         );
       } catch (error: any) {
         set({
-          error: error.message || "Failed to restart onboarding",
+          error: error.message || 'Failed to restart onboarding',
           isLoading: false,
         });
-        console.error("Failed to restart onboarding", error);
+        console.error('Failed to restart onboarding', error);
       }
     },
 
@@ -689,17 +689,17 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
     syncWithBackend: async () => {
       // Fetch fresh state from backend
       try {
-        const response = await fetch("/api/v1/onboarding/state", {
-          method: "GET",
+        const response = await fetch('/api/v1/onboarding/state', {
+          method: 'GET',
           headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
           },
-          credentials: "include",
+          credentials: 'include',
         });
 
         if (!response.ok) {
-          throw new Error("Failed to fetch onboarding state");
+          throw new Error('Failed to fetch onboarding state');
         }
 
         const data = await response.json();
@@ -713,7 +713,7 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
         // Update cache
         get()._updateCache();
       } catch (error) {
-        console.error("Failed to sync with backend:", error);
+        console.error('Failed to sync with backend:', error);
       }
     },
 
@@ -763,41 +763,41 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
       return retryWithBackoff(async () => {
         // Check if online before attempting
         if (!isOnline()) {
-          throw createNetworkError("No internet connection");
+          throw createNetworkError('No internet connection');
         }
 
-        let endpoint = "";
+        let endpoint = '';
         let data: any = {};
 
         switch (type) {
-          case "completeBusinessInfo":
-            endpoint = "/api/v1/onboarding/business-info/complete";
+          case 'completeBusinessInfo':
+            endpoint = '/api/v1/onboarding/business-info/complete';
             data = payload;
             break;
-          case "selectPlan":
-            endpoint = "/api/v1/onboarding/plan/select";
+          case 'selectPlan':
+            endpoint = '/api/v1/onboarding/plan/select';
             data = { plan_id: payload.planId };
             break;
-          case "skipTour":
-            endpoint = "/api/v1/onboarding/tour/skip";
+          case 'skipTour':
+            endpoint = '/api/v1/onboarding/tour/skip';
             break;
-          case "completeTourStep":
-            endpoint = "/api/v1/onboarding/tour/complete";
+          case 'completeTourStep':
+            endpoint = '/api/v1/onboarding/tour/complete';
             data = { step_id: payload.stepId };
             break;
-          case "dismissTooltip":
-            endpoint = "/api/v1/onboarding/tooltip/dismiss";
+          case 'dismissTooltip':
+            endpoint = '/api/v1/onboarding/tooltip/dismiss';
             data = { tooltip_id: payload.tooltipId };
             break;
-          case "completeWizardStep":
-            endpoint = "/api/v1/onboarding/wizard/complete";
+          case 'completeWizardStep':
+            endpoint = '/api/v1/onboarding/wizard/complete';
             data = { step_id: payload.stepId, data: payload.data };
             break;
-          case "skipWizard":
-            endpoint = "/api/v1/onboarding/wizard/skip";
+          case 'skipWizard':
+            endpoint = '/api/v1/onboarding/wizard/skip';
             break;
-          case "selectTemplate":
-            endpoint = "/api/v1/onboarding/template/select";
+          case 'selectTemplate':
+            endpoint = '/api/v1/onboarding/template/select';
             data = { template_id: payload.templateId };
             break;
           default:
@@ -836,7 +836,7 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
           set(transformedState);
           get()._updateCache();
         } else {
-          console.warn("No state in backend response for", type);
+          console.warn('No state in backend response for', type);
         }
       }, retryOptions);
     },

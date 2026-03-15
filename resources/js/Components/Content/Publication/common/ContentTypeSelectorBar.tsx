@@ -1,7 +1,7 @@
-import { CONTENT_TYPE_CONFIG, ContentType } from "@/Constants/contentTypes";
-import { AlertCircle } from "lucide-react";
-import { useMemo } from "react";
-import ContentTypeIconSelector from "./ContentTypeIconSelector";
+import { CONTENT_TYPE_CONFIG, ContentType } from '@/Constants/contentTypes';
+import { AlertCircle } from 'lucide-react';
+import { useMemo } from 'react';
+import ContentTypeIconSelector from './ContentTypeIconSelector';
 
 interface ContentTypeSelectorBarProps {
   selectedType: ContentType;
@@ -46,36 +46,36 @@ function validateMediaFiles(
 
   // Check file count
   if (rules.media.required && fileCount === 0) {
-    return { isValid: false, error: "media_required" };
+    return { isValid: false, error: 'media_required' };
   }
 
   if (fileCount < rules.media.min_count) {
-    return { isValid: false, error: "media_min_count" };
+    return { isValid: false, error: 'media_min_count' };
   }
 
   if (fileCount > rules.media.max_count) {
-    return { isValid: false, error: "media_max_count" };
+    return { isValid: false, error: 'media_max_count' };
   }
 
   // Check media types
   if (mediaFiles && mediaFiles.length > 0) {
     const hasVideo = mediaFiles.some((file) => {
-      const mimeType = file.mime_type || file.type || "";
-      return mimeType.startsWith("video/");
+      const mimeType = file.mime_type || file.type || '';
+      return mimeType.startsWith('video/');
     });
 
     const hasImage = mediaFiles.some((file) => {
-      const mimeType = file.mime_type || file.type || "";
-      return mimeType.startsWith("image/");
+      const mimeType = file.mime_type || file.type || '';
+      return mimeType.startsWith('image/');
     });
 
     // Reel requires video only
-    if (contentType === "reel" && !hasVideo) {
-      return { isValid: false, error: "reel_requires_video" };
+    if (contentType === 'reel' && !hasVideo) {
+      return { isValid: false, error: 'reel_requires_video' };
     }
 
-    if (contentType === "reel" && hasImage) {
-      return { isValid: false, error: "reel_video_only" };
+    if (contentType === 'reel' && hasImage) {
+      return { isValid: false, error: 'reel_video_only' };
     }
   }
 
@@ -117,10 +117,10 @@ export default function ContentTypeSelectorBar({
     if (!platformValidation.isValid) {
       const unsupported = platformValidation.unsupportedPlatforms
         .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
-        .join(", ");
-      return t("publications.validation.content_type_not_supported")
-        .replace(":type", selectedType)
-        .replace(":platforms", unsupported);
+        .join(', ');
+      return t('publications.validation.content_type_not_supported')
+        .replace(':type', selectedType)
+        .replace(':platforms', unsupported);
     }
 
     // Media validation warnings
@@ -128,30 +128,30 @@ export default function ContentTypeSelectorBar({
       const rules = CONTENT_TYPE_CONFIG[selectedType];
 
       switch (mediaValidation.error) {
-        case "media_required":
-          return t("publications.validation.media_required");
-        case "media_min_count":
-          if (selectedType === "reel") {
-            return t("publications.validation.reel_requires_one_video");
+        case 'media_required':
+          return t('publications.validation.media_required');
+        case 'media_min_count':
+          if (selectedType === 'reel') {
+            return t('publications.validation.reel_requires_one_video');
           }
-          if (selectedType === "carousel") {
-            return t("publications.validation.carousel_requires_multiple");
+          if (selectedType === 'carousel') {
+            return t('publications.validation.carousel_requires_multiple');
           }
-          if (selectedType === "story") {
-            return t("publications.validation.story_requires_one");
+          if (selectedType === 'story') {
+            return t('publications.validation.story_requires_one');
           }
-          return t("publications.validation.media_min_count").replace(
-            ":min",
+          return t('publications.validation.media_min_count').replace(
+            ':min',
             rules.media.min_count.toString(),
           );
-        case "media_max_count":
-          return t("publications.validation.media_max_count").replace(
-            ":max",
+        case 'media_max_count':
+          return t('publications.validation.media_max_count').replace(
+            ':max',
             rules.media.max_count.toString(),
           );
-        case "reel_requires_video":
-        case "reel_video_only":
-          return t("publications.validation.reel_requires_video_only");
+        case 'reel_requires_video':
+        case 'reel_video_only':
+          return t('publications.validation.reel_requires_video_only');
         default:
           return null;
       }
@@ -181,8 +181,8 @@ export default function ContentTypeSelectorBar({
           <div className="flex items-center justify-center gap-2 text-xs text-amber-600 dark:text-amber-400">
             <AlertCircle className="h-3.5 w-3.5" />
             <span>
-              {t("publications.modal.contentType.locked") ||
-                "Content type is locked after uploading media"}
+              {t('publications.modal.contentType.locked') ||
+                'Content type is locked after uploading media'}
             </span>
           </div>
         )}

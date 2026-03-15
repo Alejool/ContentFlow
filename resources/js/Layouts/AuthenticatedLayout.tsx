@@ -1,38 +1,38 @@
-import CommandPalette from "@/Components/CommandPalette/CommandPalette";
-import GlobalUploadIndicator from "@/Components/GlobalUploadIndicator";
-import ActiveWorkspace from "@/Components/Layout/ActiveWorkspace";
-import MobileNavbar from "@/Components/Layout/MobileNavbar";
-import NotificationButton from "@/Components/Layout/NotificationButton";
-import ProfileDropdown from "@/Components/Layout/ProfileDropdown";
-import SearchButton from "@/Components/Layout/SearchButton";
-import Sidebar from "@/Components/Layout/Sidebar";
-import MaintenanceBanner from "@/Components/MaintenanceBanner";
-import { ResumeUploadsPrompt } from "@/Components/Upload/ResumeUploadsPrompt";
-import { TimezoneInitializer } from "@/Components/common/TimezoneInitializer";
-import KeyboardShortcutsModal from "@/Components/common/ui/KeyboardShortcutsModal";
-import { AbilityProvider } from "@/Contexts/AbilityContext";
-import { OnboardingProvider } from "@/Contexts/OnboardingContext";
-import { useCompletionNotifications } from "@/Hooks/useCompletionNotifications";
-import { useWorkspaceLocks } from "@/Hooks/usePublicationLock";
-import { useSidebarState } from "@/Hooks/useSidebarState";
-import { useTheme } from "@/Hooks/useTheme";
-import { initNotificationRealtime } from "@/Services/notificationRealtime";
-import { cleanupProgressRealtime, initProgressRealtime } from "@/Services/progressRealtime";
-import { cssPropertiesManager } from "@/Utils/CSSCustomPropertiesManager";
-import { useNotificationStore } from "@/stores/notificationStore";
-import { useUploadQueue } from "@/stores/uploadQueueStore";
+import CommandPalette from '@/Components/CommandPalette/CommandPalette';
+import GlobalUploadIndicator from '@/Components/GlobalUploadIndicator';
+import ActiveWorkspace from '@/Components/Layout/ActiveWorkspace';
+import MobileNavbar from '@/Components/Layout/MobileNavbar';
+import NotificationButton from '@/Components/Layout/NotificationButton';
+import ProfileDropdown from '@/Components/Layout/ProfileDropdown';
+import SearchButton from '@/Components/Layout/SearchButton';
+import Sidebar from '@/Components/Layout/Sidebar';
+import MaintenanceBanner from '@/Components/MaintenanceBanner';
+import { ResumeUploadsPrompt } from '@/Components/Upload/ResumeUploadsPrompt';
+import { TimezoneInitializer } from '@/Components/common/TimezoneInitializer';
+import KeyboardShortcutsModal from '@/Components/common/ui/KeyboardShortcutsModal';
+import { AbilityProvider } from '@/Contexts/AbilityContext';
+import { OnboardingProvider } from '@/Contexts/OnboardingContext';
+import { useCompletionNotifications } from '@/Hooks/useCompletionNotifications';
+import { useWorkspaceLocks } from '@/Hooks/usePublicationLock';
+import { useSidebarState } from '@/Hooks/useSidebarState';
+import { useTheme } from '@/Hooks/useTheme';
+import { initNotificationRealtime } from '@/Services/notificationRealtime';
+import { cleanupProgressRealtime, initProgressRealtime } from '@/Services/progressRealtime';
+import { cssPropertiesManager } from '@/Utils/CSSCustomPropertiesManager';
+import { useNotificationStore } from '@/stores/notificationStore';
+import { useUploadQueue } from '@/stores/uploadQueueStore';
 import type {
   OnboardingState,
   PublicationTemplate,
   SocialPlatform,
   TourStep,
-} from "@/types/onboarding";
-import { usePage } from "@inertiajs/react";
-import { ReactNode, lazy, useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+} from '@/types/onboarding';
+import { usePage } from '@inertiajs/react';
+import { ReactNode, lazy, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 // Lazy load OnboardingFlow to reduce initial bundle size
-const OnboardingFlow = lazy(() => import("@/Components/Onboarding/OnboardingFlow"));
+const OnboardingFlow = lazy(() => import('@/Components/Onboarding/OnboardingFlow'));
 
 interface AuthenticatedLayoutProps {
   header?: ReactNode;
@@ -117,12 +117,12 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
     const brandingColor = auth?.current_workspace?.white_label_primary_color;
     // El color de marca es la prioridad salvo que el usuario haya elegido uno manualmente
     // Para simplificar, si hay marca blanca aplicada, usamos ese color por defecto.
-    const color = user?.theme_color || brandingColor || "orange";
+    const color = user?.theme_color || brandingColor || 'orange';
 
     cssPropertiesManager.applyPrimaryColor(color);
 
     // Dynamically update favicon
-    const faviconUrl = auth?.current_workspace?.white_label_favicon_url || "/favicon.ico";
+    const faviconUrl = auth?.current_workspace?.white_label_favicon_url || '/favicon.ico';
 
     // Find all icon links (icon, shortcut icon, apple-touch-icon)
     const existingLinks = document.querySelectorAll("link[rel*='icon']");
@@ -134,8 +134,8 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
         (link as HTMLLinkElement).href = newHref;
       });
     } else {
-      const link = document.createElement("link");
-      link.rel = "icon";
+      const link = document.createElement('link');
+      link.rel = 'icon';
       link.href = newHref;
       document.head.appendChild(link);
     }
@@ -148,14 +148,14 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
   // Keyboard shortcut: Ctrl+/ to toggle shortcuts modal
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if ((event.ctrlKey || event.metaKey) && event.key === "/") {
+      if ((event.ctrlKey || event.metaKey) && event.key === '/') {
         event.preventDefault();
         setShowShortcutsModal((prev) => !prev);
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   return (
@@ -183,13 +183,13 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
 
               <main
                 className={`min-w-0 max-w-full flex-1 overflow-y-auto overflow-x-hidden transition-all duration-500 ease-in-out ${
-                  isSidebarOpen ? "lg:ml-80" : "lg:ml-32"
+                  isSidebarOpen ? 'lg:ml-80' : 'lg:ml-32'
                 }`}
                 role="main"
                 aria-label="Main content"
               >
                 <header className="sticky top-0 z-40 flex min-w-0 flex-col border-b border-gray-200/50 bg-white/80 backdrop-blur-xl dark:border-neutral-800 dark:bg-black/80">
-                  {!route().current("workspaces.*") && (
+                  {!route().current('workspaces.*') && (
                     <div className="w-full">
                       <ActiveWorkspace />
                     </div>
@@ -208,7 +208,7 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
                         <div className="mx-1 h-6 w-px bg-gray-200 dark:bg-neutral-800"></div>
                         <ProfileDropdown
                           user={user}
-                          isProfileActive={!!route().current("profile.edit")}
+                          isProfileActive={!!route().current('profile.edit')}
                         />
                       </div>
                     </div>
@@ -253,19 +253,19 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
 
           {/* Debug: Show why onboarding is not showing */}
           {!shouldShowOnboarding && user && (
-            <div style={{ display: "none" }}>
+            <div style={{ display: 'none' }}>
               OnboardingFlow not showing: shouldShowOnboarding=
               {String(shouldShowOnboarding)}
             </div>
           )}
           {shouldShowOnboarding && !tourSteps && (
-            <div style={{ display: "none" }}>OnboardingFlow not showing: no tourSteps</div>
+            <div style={{ display: 'none' }}>OnboardingFlow not showing: no tourSteps</div>
           )}
           {shouldShowOnboarding && !availablePlatforms && (
-            <div style={{ display: "none" }}>OnboardingFlow not showing: no availablePlatforms</div>
+            <div style={{ display: 'none' }}>OnboardingFlow not showing: no availablePlatforms</div>
           )}
           {shouldShowOnboarding && !templates && (
-            <div style={{ display: "none" }}>OnboardingFlow not showing: no templates</div>
+            <div style={{ display: 'none' }}>OnboardingFlow not showing: no templates</div>
           )}
         </div>
       </OnboardingProvider>

@@ -8,7 +8,7 @@ interface ErrorLogEntry {
 }
 
 class ErrorLoggerClass {
-  private endpoint = "/api/v1/log-error";
+  private endpoint = '/api/v1/log-error';
 
   /**
    * Log an error to the backend
@@ -16,8 +16,8 @@ class ErrorLoggerClass {
   async log(error: Error | string, context?: Record<string, any>): Promise<void> {
     try {
       const entry: ErrorLogEntry = {
-        message: typeof error === "string" ? error : error.message,
-        stack: typeof error === "object" ? error.stack : undefined,
+        message: typeof error === 'string' ? error : error.message,
+        stack: typeof error === 'object' ? error.stack : undefined,
         context,
         timestamp: new Date().toISOString(),
         userAgent: navigator.userAgent,
@@ -30,10 +30,10 @@ class ErrorLoggerClass {
 
       // Send to backend (don't await to avoid blocking)
       fetch(this.endpoint, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
-          "X-Requested-With": "XMLHttpRequest",
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
         },
         body: JSON.stringify(entry),
       }).catch((err) => {
@@ -48,7 +48,7 @@ class ErrorLoggerClass {
    * Log a critical error (will also show toast)
    */
   critical(error: Error | string, context?: Record<string, any>): void {
-    this.log(error, { ...context, severity: "critical" });
+    this.log(error, { ...context, severity: 'critical' });
   }
 }
 

@@ -1,29 +1,29 @@
-import AiFieldSuggester from "@/Components/AiAssistant/AiFieldSuggester";
-import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
-import CampaignSelector from "@/Components/Content/Publication/common/CampaignSelector";
-import { ContentType } from "@/Components/Content/Publication/common/ContentTypeIconSelector";
-import ContentTypeSelectorBar from "@/Components/Content/Publication/common/ContentTypeSelectorBar";
-import PollFields from "@/Components/Content/Publication/common/PollFields";
-import SocialAccountsSection from "@/Components/Content/Publication/common/add/SocialAccountsSection";
-import MediaUploadSection from "@/Components/Content/Publication/common/edit/MediaUploadSection";
-import ModalFooter from "@/Components/Content/modals/common/ModalFooter";
-import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
-import PublicationStatusSection from "@/Components/Content/modals/common/PublicationStatusSection";
-import ScheduleSection from "@/Components/Content/modals/common/ScheduleSection";
-import Input from "@/Components/common/Modern/Input";
-import Textarea from "@/Components/common/Modern/Textarea";
-import { useCampaigns } from "@/Hooks/campaign/useCampaigns";
-import { useContentType } from "@/Hooks/publication/useContentType";
-import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
-import { useConfirm } from "@/Hooks/useConfirm";
-import { useS3Upload } from "@/Hooks/useS3Upload";
-import { useAccountsStore } from "@/stores/socialAccountsStore";
-import { usePage } from "@inertiajs/react";
-import axios from "axios";
-import { FileText, Hash, Save, Target } from "lucide-react";
-import { useMemo } from "react";
-import { useWatch } from "react-hook-form";
-import toast from "react-hot-toast";
+import AiFieldSuggester from '@/Components/AiAssistant/AiFieldSuggester';
+import PlatformSettingsModal from '@/Components/ConfigSocialMedia/PlatformSettingsModal';
+import CampaignSelector from '@/Components/Content/Publication/common/CampaignSelector';
+import { ContentType } from '@/Components/Content/Publication/common/ContentTypeIconSelector';
+import ContentTypeSelectorBar from '@/Components/Content/Publication/common/ContentTypeSelectorBar';
+import PollFields from '@/Components/Content/Publication/common/PollFields';
+import SocialAccountsSection from '@/Components/Content/Publication/common/add/SocialAccountsSection';
+import MediaUploadSection from '@/Components/Content/Publication/common/edit/MediaUploadSection';
+import ModalFooter from '@/Components/Content/modals/common/ModalFooter';
+import ModalHeader from '@/Components/Content/modals/common/ModalHeader';
+import PublicationStatusSection from '@/Components/Content/modals/common/PublicationStatusSection';
+import ScheduleSection from '@/Components/Content/modals/common/ScheduleSection';
+import Input from '@/Components/common/Modern/Input';
+import Textarea from '@/Components/common/Modern/Textarea';
+import { useCampaigns } from '@/Hooks/campaign/useCampaigns';
+import { useContentType } from '@/Hooks/publication/useContentType';
+import { usePublicationForm } from '@/Hooks/publication/usePublicationForm';
+import { useConfirm } from '@/Hooks/useConfirm';
+import { useS3Upload } from '@/Hooks/useS3Upload';
+import { useAccountsStore } from '@/stores/socialAccountsStore';
+import { usePage } from '@inertiajs/react';
+import axios from 'axios';
+import { FileText, Hash, Save, Target } from 'lucide-react';
+import { useMemo } from 'react';
+import { useWatch } from 'react-hook-form';
+import toast from 'react-hot-toast';
 
 interface AddPublicationModalProps {
   isOpen: boolean;
@@ -39,9 +39,9 @@ export default function AddPublicationModal({
   const { campaigns } = useCampaigns();
   const { accounts: socialAccounts } = useAccountsStore();
   const { auth } = usePage<any>().props;
-  const canManageAccounts = auth.current_workspace?.permissions?.includes("manage-accounts");
-  const planId = auth.current_workspace?.plan?.toLowerCase() || "demo";
-  const hasRecurrenceAccess = ["demo", "professional", "enterprise"].includes(planId);
+  const canManageAccounts = auth.current_workspace?.permissions?.includes('manage-accounts');
+  const planId = auth.current_workspace?.plan?.toLowerCase() || 'demo';
+  const hasRecurrenceAccess = ['demo', 'professional', 'enterprise'].includes(planId);
 
   const {
     t,
@@ -88,7 +88,7 @@ export default function AddPublicationModal({
     baseUpdateFile(tempId, {
       file,
       url: localUrl,
-      status: "uploading",
+      status: 'uploading',
       isNew: true,
     });
 
@@ -198,7 +198,7 @@ export default function AddPublicationModal({
     e.preventDefault();
 
     const filesToUpload = mediaFiles.filter(
-      (m) => m.file instanceof File && m.status !== "failed" && !uploadErrors?.[m.tempId],
+      (m) => m.file instanceof File && m.status !== 'failed' && !uploadErrors?.[m.tempId],
     );
 
     if (filesToUpload.length > 0) {
@@ -224,7 +224,7 @@ export default function AddPublicationModal({
         // Proceed with normal submit
         handleSubmit(e);
       } catch (err) {
-        console.error("Critical error in handleUploadAndSubmit", err);
+        console.error('Critical error in handleUploadAndSubmit', err);
         handleSubmit(e); // Proceed anyway if possible, usePublicationForm will handle missing keys
       }
     } else {
@@ -235,32 +235,32 @@ export default function AddPublicationModal({
   const { register } = form; // Keep existing destructuring
 
   // Use individual watchers to prevent unnecessary re-renders
-  const selectedSocialAccounts = useWatch({ control, name: "social_accounts" }) || [];
-  const scheduledAt = useWatch({ control, name: "scheduled_at" });
-  const useGlobalSchedule = useWatch({ control, name: "use_global_schedule" });
-  const title = useWatch({ control, name: "title" });
-  const goal = useWatch({ control, name: "goal" });
-  const hashtags = useWatch({ control, name: "hashtags" });
-  const description = useWatch({ control, name: "description" });
-  const campaign_id = useWatch({ control, name: "campaign_id" });
-  const is_recurring = useWatch({ control, name: "is_recurring" });
-  const recurrence_type = useWatch({ control, name: "recurrence_type" });
+  const selectedSocialAccounts = useWatch({ control, name: 'social_accounts' }) || [];
+  const scheduledAt = useWatch({ control, name: 'scheduled_at' });
+  const useGlobalSchedule = useWatch({ control, name: 'use_global_schedule' });
+  const title = useWatch({ control, name: 'title' });
+  const goal = useWatch({ control, name: 'goal' });
+  const hashtags = useWatch({ control, name: 'hashtags' });
+  const description = useWatch({ control, name: 'description' });
+  const campaign_id = useWatch({ control, name: 'campaign_id' });
+  const is_recurring = useWatch({ control, name: 'is_recurring' });
+  const recurrence_type = useWatch({ control, name: 'recurrence_type' });
   const recurrence_interval = useWatch({
     control,
-    name: "recurrence_interval",
+    name: 'recurrence_interval',
   });
-  const recurrence_days = useWatch({ control, name: "recurrence_days" });
+  const recurrence_days = useWatch({ control, name: 'recurrence_days' });
   const recurrence_end_date = useWatch({
     control,
-    name: "recurrence_end_date",
+    name: 'recurrence_end_date',
   });
   const recurrence_accounts = useWatch({
     control,
-    name: "recurrence_accounts",
+    name: 'recurrence_accounts',
   });
-  const content_type = (useWatch({ control, name: "content_type" }) as ContentType) || "post";
-  const poll_options = useWatch({ control, name: "poll_options" }) || ["", ""];
-  const poll_duration_hours = useWatch({ control, name: "poll_duration_hours" }) || 24;
+  const content_type = (useWatch({ control, name: 'content_type' }) as ContentType) || 'post';
+  const poll_options = useWatch({ control, name: 'poll_options' }) || ['', ''];
+  const poll_duration_hours = useWatch({ control, name: 'poll_duration_hours' }) || 24;
 
   // Use content type hook for field visibility
   const { fieldVisibility } = useContentType(content_type);
@@ -338,12 +338,12 @@ export default function AddPublicationModal({
           selectedType={content_type}
           selectedPlatforms={selectedPlatformNames}
           onChange={(type) => {
-            setValue("content_type", type, { shouldValidate: true });
+            setValue('content_type', type, { shouldValidate: true });
 
             // Reset type-specific fields when changing type
-            if (type !== "poll") {
-              setValue("poll_options", null);
-              setValue("poll_duration_hours", null);
+            if (type !== 'poll') {
+              setValue('poll_options', null);
+              setValue('poll_duration_hours', null);
             }
           }}
           t={t}
@@ -363,7 +363,7 @@ export default function AddPublicationModal({
                     <div className="flex items-center gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700">
                       <div className="h-5 w-1 rounded-full bg-primary-500"></div>
                       <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
-                        {t("publications.modal.add.mediaSection") || "Archivos Multimedia"}
+                        {t('publications.modal.add.mediaSection') || 'Archivos Multimedia'}
                       </h3>
                     </div>
 
@@ -406,7 +406,7 @@ export default function AddPublicationModal({
                   <div className="flex items-center gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700">
                     <div className="h-5 w-1 rounded-full bg-primary-500"></div>
                     <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
-                      {t("publications.modal.add.socialAccountsSection") || "Redes Sociales"}
+                      {t('publications.modal.add.socialAccountsSection') || 'Redes Sociales'}
                     </h3>
                   </div>
 
@@ -422,7 +422,7 @@ export default function AddPublicationModal({
                       setAccountSchedules((prev) => ({ ...prev, [id]: date }));
 
                       if (watched.use_global_schedule && date !== watched.scheduled_at) {
-                        setValue("use_global_schedule", false, {
+                        setValue('use_global_schedule', false, {
                           shouldDirty: true,
                         });
                       }
@@ -448,7 +448,7 @@ export default function AddPublicationModal({
                   <div className="flex items-center gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700">
                     <div className="h-5 w-1 rounded-full bg-primary-500"></div>
                     <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
-                      {t("publications.modal.add.scheduleSection") || "Programación"}
+                      {t('publications.modal.add.scheduleSection') || 'Programación'}
                     </h3>
                   </div>
 
@@ -463,10 +463,10 @@ export default function AddPublicationModal({
                         finalDate = defaultDate.toISOString();
                       }
 
-                      setValue("scheduled_at", finalDate);
+                      setValue('scheduled_at', finalDate);
                     }}
                     useGlobalSchedule={watched.use_global_schedule}
-                    onGlobalScheduleToggle={(val) => setValue("use_global_schedule", val)}
+                    onGlobalScheduleToggle={(val) => setValue('use_global_schedule', val)}
                     onClearAccountSchedules={() => {
                       setAccountSchedules({});
                     }}
@@ -505,10 +505,10 @@ export default function AddPublicationModal({
                     options={poll_options}
                     duration={poll_duration_hours}
                     onChange={(data) => {
-                      setValue("poll_options", data.options, {
+                      setValue('poll_options', data.options, {
                         shouldValidate: true,
                       });
-                      setValue("poll_duration_hours", data.duration, {
+                      setValue('poll_duration_hours', data.duration, {
                         shouldValidate: true,
                       });
                     }}
@@ -526,7 +526,7 @@ export default function AddPublicationModal({
                     <div className="flex items-center gap-2">
                       <div className="h-5 w-1 rounded-full bg-primary-500"></div>
                       <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
-                        {t("publications.modal.add.contentSection") || "Contenido"}
+                        {t('publications.modal.add.contentSection') || 'Contenido'}
                       </h3>
                     </div>
                     <AiFieldSuggester
@@ -538,16 +538,16 @@ export default function AddPublicationModal({
                       }}
                       onSuggest={(data) => {
                         if (data.title)
-                          setValue("title", data.title, {
+                          setValue('title', data.title, {
                             shouldValidate: true,
                           });
                         if (data.description)
-                          setValue("description", data.description, {
+                          setValue('description', data.description, {
                             shouldValidate: true,
                           });
-                        if (data.goal) setValue("goal", data.goal, { shouldValidate: true });
+                        if (data.goal) setValue('goal', data.goal, { shouldValidate: true });
                         if (data.hashtags) {
-                          setValue("hashtags", data.hashtags, {
+                          setValue('hashtags', data.hashtags, {
                             shouldValidate: true,
                           });
                           handleHashtagChange(data.hashtags);
@@ -559,11 +559,11 @@ export default function AddPublicationModal({
                   {fieldVisibility.showTitle && (
                     <Input
                       id="content-add-publication-title"
-                      label={t("publications.modal.add.titleField")}
+                      label={t('publications.modal.add.titleField')}
                       type="text"
                       register={register}
                       name="title"
-                      placeholder={t("publications.modal.add.placeholders.title")}
+                      placeholder={t('publications.modal.add.placeholders.title')}
                       error={errors.title?.message as string}
                       icon={FileText}
                       variant="filled"
@@ -575,37 +575,37 @@ export default function AddPublicationModal({
 
                   <Textarea
                     id="content-add-publication-description"
-                    label={t("publications.modal.add.description")}
+                    label={t('publications.modal.add.description')}
                     register={register}
                     name="description"
-                    placeholder={t("publications.modal.add.placeholders.description")}
+                    placeholder={t('publications.modal.add.placeholders.description')}
                     error={errors.description?.message as string}
                     icon={FileText}
                     variant="filled"
                     size="lg"
-                    rows={content_type === "story" ? 3 : 6}
+                    rows={content_type === 'story' ? 3 : 6}
                     maxLength={
-                      content_type === "reel"
+                      content_type === 'reel'
                         ? 300
-                        : content_type === "story"
+                        : content_type === 'story'
                           ? 150
-                          : content_type === "poll"
+                          : content_type === 'poll'
                             ? 280
                             : 700
                     }
                     required={fieldVisibility.showDescription}
                     showCharCount
-                    hint={`Maximum ${content_type === "reel" ? 300 : content_type === "story" ? 150 : content_type === "poll" ? 280 : 700} characters`}
+                    hint={`Maximum ${content_type === 'reel' ? 300 : content_type === 'story' ? 150 : content_type === 'poll' ? 280 : 700} characters`}
                   />
 
                   {fieldVisibility.showGoal && (
                     <Input
                       id="content-add-publication-goal"
-                      label={t("publications.modal.add.goal")}
+                      label={t('publications.modal.add.goal')}
                       type="text"
                       register={register}
                       name="goal"
-                      placeholder={t("publications.modal.add.placeholders.goal")}
+                      placeholder={t('publications.modal.add.placeholders.goal')}
                       error={errors.goal?.message as string}
                       icon={Target}
                       variant="filled"
@@ -618,23 +618,23 @@ export default function AddPublicationModal({
                   {fieldVisibility.showHashtags && (
                     <Input
                       id="content-add-publication-hashtags"
-                      label={t("publications.modal.add.hashtags")}
+                      label={t('publications.modal.add.hashtags')}
                       type="text"
                       register={register}
                       name="hashtags"
-                      placeholder={t("publications.modal.add.placeholders.hashtags")}
+                      placeholder={t('publications.modal.add.placeholders.hashtags')}
                       error={errors.hashtags?.message as string}
                       onChange={(e) => handleHashtagChange(e.target.value)}
                       icon={Hash}
                       variant="filled"
-                      required={content_type === "post" || content_type === "reel"}
+                      required={content_type === 'post' || content_type === 'reel'}
                       sizeType="lg"
                       hint={`${
                         watched.hashtags
-                          ? typeof watched.hashtags === "string"
+                          ? typeof watched.hashtags === 'string'
                             ? watched.hashtags
-                                .split(" ")
-                                .filter((tag: string) => tag.startsWith("#")).length
+                                .split(' ')
+                                .filter((tag: string) => tag.startsWith('#')).length
                             : Array.isArray(watched.hashtags)
                               ? (watched.hashtags as any).length
                               : 0
@@ -649,13 +649,13 @@ export default function AddPublicationModal({
                   <div className="flex items-center gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700">
                     <div className="h-5 w-1 rounded-full bg-primary-500"></div>
                     <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
-                      {t("publications.modal.add.campaignSection") || "Campaña"}
+                      {t('publications.modal.add.campaignSection') || 'Campaña'}
                     </h3>
                   </div>
 
                   <div className="space-y-2">
                     <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                      {t("publications.modal.edit.campaigns") || "Add to Campaign"}
+                      {t('publications.modal.edit.campaigns') || 'Add to Campaign'}
                     </label>
                     <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-black/20">
                       <CampaignSelector
@@ -666,7 +666,7 @@ export default function AddPublicationModal({
                         loading={false}
                         t={t}
                         onSelectCampaign={(id) => {
-                          setValue("campaign_id", id?.toString() ?? "", {
+                          setValue('campaign_id', id?.toString() ?? '', {
                             shouldValidate: true,
                           });
                         }}
@@ -689,16 +689,16 @@ export default function AddPublicationModal({
             isSubmitting={isSubmitting || uploading} // Block on upload too
             formId="add-publication-form"
             submitText={
-              uploading ? `Uploading...` : t("publications.button.add") || "Save Publication"
+              uploading ? `Uploading...` : t('publications.button.add') || 'Save Publication'
             }
             submitIcon={<Save className="h-4 w-4" />}
-            cancelText={t("common.cancel") || "Close"}
+            cancelText={t('common.cancel') || 'Close'}
           />
           {/* Progress bar could go here */}
           {uploading && (
             <div className="px-6 pb-2">
               <div className="h-2.5 w-full rounded-full bg-gray-200 dark:bg-gray-700">
-                <div className="h-2.5 rounded-full bg-blue-600" style={{ width: "50%" }}></div>
+                <div className="h-2.5 rounded-full bg-blue-600" style={{ width: '50%' }}></div>
               </div>
               <p className="mt-1 text-center text-xs text-gray-500">Uploading to S3...</p>
             </div>
@@ -714,22 +714,22 @@ export default function AddPublicationModal({
               onCancel={async () => {
                 const isConfirmed = await confirm({
                   title:
-                    t("publications.modal.cancel_confirmation.title") || "Cancelar Publicación",
+                    t('publications.modal.cancel_confirmation.title') || 'Cancelar Publicación',
                   message:
-                    t("publications.modal.cancel_confirmation.message") ||
-                    "¿Estás seguro de que deseas cancelar esta publicación? El envío a redes se detendrá.",
+                    t('publications.modal.cancel_confirmation.message') ||
+                    '¿Estás seguro de que deseas cancelar esta publicación? El envío a redes se detendrá.',
                   confirmText:
-                    t("publications.modal.cancel_confirmation.confirm") || "Sí, cancelar",
-                  cancelText: t("publications.modal.cancel_confirmation.cancel") || "No, continuar",
-                  type: "danger",
+                    t('publications.modal.cancel_confirmation.confirm') || 'Sí, cancelar',
+                  cancelText: t('publications.modal.cancel_confirmation.cancel') || 'No, continuar',
+                  type: 'danger',
                 });
 
                 if (isConfirmed) {
                   try {
                     const id = (publication as any)?.id;
                     if (id) {
-                      await axios.post(route("api.v1.publications.cancel", id));
-                      toast.success("Publicación cancelada");
+                      await axios.post(route('api.v1.publications.cancel', id));
+                      toast.success('Publicación cancelada');
                       handleClose();
                     }
                   } catch (err) {}
@@ -744,8 +744,8 @@ export default function AddPublicationModal({
         <PlatformSettingsModal
           isOpen={!!activePlatformSettings}
           onClose={() => setActivePlatformSettings(null)}
-          platform={activePlatformSettings || ""}
-          settings={platformSettings[activePlatformSettings?.toLowerCase() || ""] || {}}
+          platform={activePlatformSettings || ''}
+          settings={platformSettings[activePlatformSettings?.toLowerCase() || ''] || {}}
           onSettingsChange={(newSettings) => {
             if (activePlatformSettings) {
               setPlatformSettings((prev) => ({

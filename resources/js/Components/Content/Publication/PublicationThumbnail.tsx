@@ -1,6 +1,6 @@
-import { Publication } from "@/types/Publication";
-import { File, Loader2, PlayCircle, Video } from "lucide-react";
-import { memo } from "react";
+import { Publication } from '@/types/Publication';
+import { File, Loader2, PlayCircle, Video } from 'lucide-react';
+import { memo } from 'react';
 
 interface PublicationThumbnailProps {
   publication?: Publication | null;
@@ -28,11 +28,11 @@ const PublicationThumbnail = memo(({ publication }: PublicationThumbnailProps) =
     const firstMedia = mediaFiles[0];
     const thumbnailFile =
       firstMedia?.thumbnail?.file_path ||
-      (firstMedia?.file_type?.includes("image") ? firstMedia.file_path : null);
+      (firstMedia?.file_type?.includes('image') ? firstMedia.file_path : null);
 
     if (thumbnailFile) {
       let url = thumbnailFile;
-      if (!url.startsWith("http") && !url.startsWith("/storage/")) {
+      if (!url.startsWith('http') && !url.startsWith('/storage/')) {
         url = `/storage/${url}`;
       }
 
@@ -40,14 +40,14 @@ const PublicationThumbnail = memo(({ publication }: PublicationThumbnailProps) =
         <img
           src={url}
           className="h-full w-full object-cover"
-          alt={publication.title || "Thumbnail"}
+          alt={publication.title || 'Thumbnail'}
           loading="lazy"
           decoding="async"
         />
       );
     } else {
       // If no thumbnail but has video, return video placeholder
-      const hasVideo = mediaFiles.some((f) => f && f.file_type && f.file_type.includes("video"));
+      const hasVideo = mediaFiles.some((f) => f && f.file_type && f.file_type.includes('video'));
       if (hasVideo) {
         content = (
           <div className="relative flex h-full w-full items-center justify-center bg-gray-900">

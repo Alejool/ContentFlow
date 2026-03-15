@@ -1,5 +1,5 @@
-import { CheckCircle2, Globe, Shield, Smartphone } from "lucide-react";
-import PlatformFeatureTag from "@/Components/Auth/PlatformFeatureTag";
+import { CheckCircle2, Globe, Shield, Smartphone } from 'lucide-react';
+import PlatformFeatureTag from '@/Components/Auth/PlatformFeatureTag';
 
 export default function Loglogin() {
   return (

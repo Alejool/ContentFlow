@@ -1,4 +1,4 @@
-import type { TourStep } from "@/types/onboarding";
+import type { TourStep } from '@/types/onboarding';
 
 /**
  * Default tour steps configuration for the onboarding guided tour.
@@ -8,48 +8,48 @@ import type { TourStep } from "@/types/onboarding";
  */
 export const defaultTourSteps: TourStep[] = [
   {
-    id: "step-1",
-    title: "Welcome to ContentFlow",
+    id: 'step-1',
+    title: 'Welcome to ContentFlow',
     description:
       "Let's take a quick tour of the platform. We'll show you the key features to help you get started with social media management.",
-    targetSelector: "#dashboard",
-    position: "bottom",
+    targetSelector: '#dashboard',
+    position: 'bottom',
     highlightPadding: 8,
   },
   {
-    id: "step-2",
-    title: "Navigation Sidebar",
+    id: 'step-2',
+    title: 'Navigation Sidebar',
     description:
-      "Use the sidebar to navigate between different sections: Dashboard, Publications, Calendar, Analytics, and more.",
-    targetSelector: "aside nav",
-    position: "right",
+      'Use the sidebar to navigate between different sections: Dashboard, Publications, Calendar, Analytics, and more.',
+    targetSelector: 'aside nav',
+    position: 'right',
     highlightPadding: 8,
   },
   {
-    id: "step-3",
-    title: "Create Publications",
+    id: 'step-3',
+    title: 'Create Publications',
     description:
-      "Click here to create new social media posts. You can schedule them for multiple platforms at once.",
+      'Click here to create new social media posts. You can schedule them for multiple platforms at once.',
     targetSelector: "[href*='publications/create']",
-    position: "right",
+    position: 'right',
     highlightPadding: 8,
   },
   {
-    id: "step-4",
-    title: "Calendar View",
+    id: 'step-4',
+    title: 'Calendar View',
     description:
-      "View and manage all your scheduled posts in a calendar format. Drag and drop to reschedule.",
+      'View and manage all your scheduled posts in a calendar format. Drag and drop to reschedule.',
     targetSelector: "[href*='calendar']",
-    position: "right",
+    position: 'right',
     highlightPadding: 8,
   },
   {
-    id: "step-5",
-    title: "Analytics Dashboard",
+    id: 'step-5',
+    title: 'Analytics Dashboard',
     description:
-      "Track your social media performance with detailed analytics and insights across all connected platforms.",
+      'Track your social media performance with detailed analytics and insights across all connected platforms.',
     targetSelector: "[href*='analytics']",
-    position: "right",
+    position: 'right',
     highlightPadding: 8,
   },
 ];

@@ -1,4 +1,4 @@
-import Skeleton from "@/Components/common/ui/Skeleton";
+import Skeleton from '@/Components/common/ui/Skeleton';
 
 interface ActivityLogSkeletonProps {
   rows?: number;

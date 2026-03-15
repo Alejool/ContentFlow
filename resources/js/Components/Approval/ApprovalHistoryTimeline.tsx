@@ -1,10 +1,10 @@
-import { getDateFnsLocale } from "@/Utils/dateLocales";
-import { format } from "date-fns";
-import { CheckCircle, XCircle, Send, User, MessageSquare, Clock } from "lucide-react";
-import { useEffect, useState } from "react";
-import axios from "axios";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
+import { getDateFnsLocale } from '@/Utils/dateLocales';
+import { format } from 'date-fns';
+import { CheckCircle, XCircle, Send, User, MessageSquare, Clock } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface ApprovalAction {
   id: number;
@@ -13,7 +13,7 @@ interface ApprovalAction {
     name: string;
     photo_url?: string;
   };
-  action_type: "submitted" | "approved" | "rejected";
+  action_type: 'submitted' | 'approved' | 'rejected';
   approval_level: number | null;
   comment?: string;
   created_at: string;
@@ -42,10 +42,10 @@ export default function ApprovalHistoryTimeline({
   const fetchHistory = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get(route("api.content.approval-history", contentId));
+      const response = await axios.get(route('api.content.approval-history', contentId));
       setActions(response.data.data || []);
     } catch (error: any) {
-      toast.error(t("approval.errors.fetch_history_failed"));
+      toast.error(t('approval.errors.fetch_history_failed'));
     } finally {
       setIsLoading(false);
     }
@@ -53,11 +53,11 @@ export default function ApprovalHistoryTimeline({
 
   const getActionIcon = (actionType: string) => {
     switch (actionType) {
-      case "submitted":
+      case 'submitted':
         return Send;
-      case "approved":
+      case 'approved':
         return CheckCircle;
-      case "rejected":
+      case 'rejected':
         return XCircle;
       default:
         return Clock;
@@ -66,25 +66,25 @@ export default function ApprovalHistoryTimeline({
 
   const getActionColor = (actionType: string) => {
     switch (actionType) {
-      case "submitted":
-        return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400";
-      case "approved":
-        return "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400";
-      case "rejected":
-        return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
+      case 'submitted':
+        return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
+      case 'approved':
+        return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
+      case 'rejected':
+        return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
       default:
-        return "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400";
+        return 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400';
     }
   };
 
   const getActionLabel = (actionType: string) => {
     switch (actionType) {
-      case "submitted":
-        return t("approval.action.submitted");
-      case "approved":
-        return t("approval.action.approved");
-      case "rejected":
-        return t("approval.action.rejected");
+      case 'submitted':
+        return t('approval.action.submitted');
+      case 'approved':
+        return t('approval.action.approved');
+      case 'rejected':
+        return t('approval.action.rejected');
       default:
         return actionType;
     }
@@ -102,7 +102,7 @@ export default function ApprovalHistoryTimeline({
     return (
       <div className="rounded-xl border border-gray-200 bg-white p-8 text-center dark:border-neutral-800 dark:bg-neutral-900">
         <Clock className="mx-auto mb-3 h-12 w-12 text-gray-400" />
-        <p className="text-gray-500 dark:text-gray-400">{t("approval.no_history")}</p>
+        <p className="text-gray-500 dark:text-gray-400">{t('approval.no_history')}</p>
       </div>
     );
   }
@@ -110,7 +110,7 @@ export default function ApprovalHistoryTimeline({
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
       <h4 className="mb-6 font-bold text-gray-900 dark:text-white">
-        {t("approval.history_title")}
+        {t('approval.history_title')}
       </h4>
 
       <div className="space-y-6">
@@ -148,13 +148,13 @@ export default function ApprovalHistoryTimeline({
                         </span>
                         {action.approval_level && (
                           <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-neutral-800 dark:text-gray-400">
-                            {t("approval.level")} {action.approval_level}
+                            {t('approval.level')} {action.approval_level}
                           </span>
                         )}
                       </div>
                       <p className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
                         <Clock className="h-3 w-3" />
-                        {format(new Date(action.created_at), "PPp", { locale })}
+                        {format(new Date(action.created_at), 'PPp', { locale })}
                       </p>
                     </div>
 

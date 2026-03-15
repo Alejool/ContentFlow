@@ -1,6 +1,6 @@
-import Input from "@/Components/common/Modern/Input";
-import Select from "@/Components/common/Modern/Select";
-import { enUS, es } from "date-fns/locale";
+import Input from '@/Components/common/Modern/Input';
+import Select from '@/Components/common/Modern/Select';
+import { enUS, es } from 'date-fns/locale';
 import {
   Calendar,
   ChevronDown,
@@ -9,37 +9,37 @@ import {
   ChevronUp,
   Clock,
   X,
-} from "lucide-react";
-import { ReactNode, forwardRef, useEffect, useMemo, useState } from "react";
-import DatePicker, { registerLocale } from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { FieldValues, UseFormRegister } from "react-hook-form";
-import { useTranslation } from "react-i18next";
-import { useTimezoneStore } from "@/stores/timezoneStore";
-import { toLocalDate, toUTC } from "@/Utils/timezoneUtils";
+} from 'lucide-react';
+import { ReactNode, forwardRef, useEffect, useMemo, useState } from 'react';
+import DatePicker, { registerLocale } from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { FieldValues, UseFormRegister } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { useTimezoneStore } from '@/stores/timezoneStore';
+import { toLocalDate, toUTC } from '@/Utils/timezoneUtils';
 
-registerLocale("es", es);
-registerLocale("en", enUS);
+registerLocale('es', es);
+registerLocale('en', enUS);
 
-const getColor = (color: string, alpha: string = "1") => {
+const getColor = (color: string, alpha: string = '1') => {
   if (!color) return color;
 
   const alphaMap: Record<string, string> = {
-    dd: "0.86",
-    "60": "0.37",
-    "10": "0.06",
-    "05": "0.03",
-    "20": "0.12",
-    "50": "0.5",
-    "70": "0.7",
+    dd: '0.86',
+    '60': '0.37',
+    '10': '0.06',
+    '05': '0.03',
+    '20': '0.12',
+    '50': '0.5',
+    '70': '0.7',
   };
   const a = alphaMap[alpha] || alpha;
 
-  if (color.startsWith("primary-")) {
+  if (color.startsWith('primary-')) {
     return `rgb(var(--${color}) / ${a})`;
   }
 
-  if (color.startsWith("#") && a !== "1") {
+  if (color.startsWith('#') && a !== '1') {
     const hex =
       color.length === 4
         ? `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}`
@@ -65,11 +65,11 @@ interface DatePickerProps<T extends FieldValues> {
   className?: string;
   dateFormat?: string;
   isClearable?: boolean;
-  popperPlacement?: "top-start" | "top-end" | "bottom-start" | "bottom-end";
+  popperPlacement?: 'top-start' | 'top-end' | 'bottom-start' | 'bottom-end';
   withPortal?: boolean;
   showMonthDropdown?: boolean;
   showYearDropdown?: boolean;
-  dropdownMode?: "scroll" | "select";
+  dropdownMode?: 'scroll' | 'select';
 
   register?: UseFormRegister<T>;
   label?: string;
@@ -80,8 +80,8 @@ interface DatePickerProps<T extends FieldValues> {
   required?: boolean;
   disabled?: boolean;
   icon?: ReactNode;
-  size?: "sm" | "md" | "lg";
-  variant?: "default" | "outlined" | "filled";
+  size?: 'sm' | 'md' | 'lg';
+  variant?: 'default' | 'outlined' | 'filled';
   containerClassName?: string;
   activeColor?: string;
   id?: string;
@@ -95,16 +95,16 @@ const CustomTimeSelector = ({
   date,
   onChange,
   currentLocale,
-  activeColor = "primary-500",
+  activeColor = 'primary-500',
 }: {
   date: Date | null;
   onChange: (date: Date) => void;
   currentLocale: string;
   activeColor?: string;
 }) => {
-  const [hours, setHours] = useState(date ? date.getHours().toString().padStart(2, "0") : "12");
+  const [hours, setHours] = useState(date ? date.getHours().toString().padStart(2, '0') : '12');
   const [minutes, setMinutes] = useState(
-    date ? date.getMinutes().toString().padStart(2, "0") : "00",
+    date ? date.getMinutes().toString().padStart(2, '0') : '00',
   );
   const [isFocused, setIsFocused] = useState<{ h: boolean; m: boolean }>({
     h: false,
@@ -113,8 +113,8 @@ const CustomTimeSelector = ({
 
   useEffect(() => {
     if (date && !isFocused.h && !isFocused.m) {
-      setHours(date.getHours().toString().padStart(2, "0"));
-      setMinutes(date.getMinutes().toString().padStart(2, "0"));
+      setHours(date.getHours().toString().padStart(2, '0'));
+      setMinutes(date.getMinutes().toString().padStart(2, '0'));
     }
   }, [date, isFocused]);
 
@@ -128,7 +128,7 @@ const CustomTimeSelector = ({
   const incrementHours = () => {
     const h = parseInt(hours) || 0;
     const newHours = (h + 1) % 24;
-    const hStr = newHours.toString().padStart(2, "0");
+    const hStr = newHours.toString().padStart(2, '0');
     setHours(hStr);
     updateTime(newHours, parseInt(minutes) || 0);
   };
@@ -136,7 +136,7 @@ const CustomTimeSelector = ({
   const decrementHours = () => {
     const h = parseInt(hours) || 0;
     const newHours = h === 0 ? 23 : h - 1;
-    const hStr = newHours.toString().padStart(2, "0");
+    const hStr = newHours.toString().padStart(2, '0');
     setHours(hStr);
     updateTime(newHours, parseInt(minutes) || 0);
   };
@@ -144,7 +144,7 @@ const CustomTimeSelector = ({
   const incrementMinutes = () => {
     const m = parseInt(minutes) || 0;
     const newMinutes = (m + 1) % 60;
-    const mStr = newMinutes.toString().padStart(2, "0");
+    const mStr = newMinutes.toString().padStart(2, '0');
     setMinutes(mStr);
     updateTime(parseInt(hours) || 0, newMinutes);
   };
@@ -152,19 +152,19 @@ const CustomTimeSelector = ({
   const decrementMinutes = () => {
     const m = parseInt(minutes) || 0;
     const newMinutes = m === 0 ? 59 : m - 1;
-    const mStr = newMinutes.toString().padStart(2, "0");
+    const mStr = newMinutes.toString().padStart(2, '0');
     setMinutes(mStr);
     updateTime(parseInt(hours) || 0, newMinutes);
   };
 
   const handleHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let val = e.target.value.replace(/\D/g, "");
+    let val = e.target.value.replace(/\D/g, '');
     if (val.length > 2) val = val.slice(-2);
     setHours(val);
   };
 
   const handleMinutesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let val = e.target.value.replace(/\D/g, "");
+    let val = e.target.value.replace(/\D/g, '');
     if (val.length > 2) val = val.slice(-2);
     setMinutes(val);
   };
@@ -177,10 +177,10 @@ const CustomTimeSelector = ({
     }
   };
 
-  const handleBlur = (field: "h" | "m") => {
+  const handleBlur = (field: 'h' | 'm') => {
     setIsFocused((prev) => ({ ...prev, [field]: false }));
-    setHours((prev) => (prev === "" ? "00" : prev.padStart(2, "0")));
-    setMinutes((prev) => (prev === "" ? "00" : prev.padStart(2, "0")));
+    setHours((prev) => (prev === '' ? '00' : prev.padStart(2, '0')));
+    setMinutes((prev) => (prev === '' ? '00' : prev.padStart(2, '0')));
     setTimeout(syncTime, 0);
   };
 
@@ -189,7 +189,7 @@ const CustomTimeSelector = ({
       <div className="time-selector-header">
         <Clock className="h-4 w-4" />
         <span className="text-base font-medium">
-          {currentLocale === "es" ? "Seleccionar Hora" : "Select Time"}
+          {currentLocale === 'es' ? 'Seleccionar Hora' : 'Select Time'}
         </span>
       </div>
       <div className="time-selector-body">
@@ -203,7 +203,7 @@ const CustomTimeSelector = ({
             value={hours}
             onChange={handleHoursChange}
             onFocus={() => setIsFocused((prev) => ({ ...prev, h: true }))}
-            onBlur={() => handleBlur("h")}
+            onBlur={() => handleBlur('h')}
             className="w-16 !p-2 !text-center !text-2xl font-bold"
             sizeType="lg"
             maxLength={2}
@@ -212,7 +212,7 @@ const CustomTimeSelector = ({
           <button type="button" className="time-spinner-btn" onClick={decrementHours}>
             <ChevronDown className="h-4 w-4" />
           </button>
-          <span className="time-label">{currentLocale === "es" ? "Horas" : "Hours"}</span>
+          <span className="time-label">{currentLocale === 'es' ? 'Horas' : 'Hours'}</span>
         </div>
         <div className="time-separator">:</div>
         <div className="time-input-group">
@@ -225,7 +225,7 @@ const CustomTimeSelector = ({
             value={minutes}
             onChange={handleMinutesChange}
             onFocus={() => setIsFocused((prev) => ({ ...prev, m: true }))}
-            onBlur={() => handleBlur("m")}
+            onBlur={() => handleBlur('m')}
             className="w-16 !p-2 !text-center !text-2xl font-bold"
             sizeType="lg"
             maxLength={2}
@@ -234,7 +234,7 @@ const CustomTimeSelector = ({
           <button type="button" className="time-spinner-btn" onClick={decrementMinutes}>
             <ChevronDown className="h-4 w-4" />
           </button>
-          <span className="time-label">{currentLocale === "es" ? "Minutos" : "Minutes"}</span>
+          <span className="time-label">{currentLocale === 'es' ? 'Minutos' : 'Minutes'}</span>
         </div>
       </div>
     </div>
@@ -245,19 +245,19 @@ const DatePickerModern = <T extends FieldValues>({
   selected,
   onChange,
   showTimeSelect = false,
-  placeholder = "Select date",
+  placeholder = 'Select date',
   minDate,
   minTime,
   maxTime,
   allowPastDates = false,
-  className = "",
+  className = '',
   dateFormat,
   isClearable = true,
-  popperPlacement = "bottom-start",
+  popperPlacement = 'bottom-start',
   withPortal = false,
   showMonthDropdown = true,
   showYearDropdown = true,
-  dropdownMode = "select",
+  dropdownMode = 'select',
   register,
   label,
   error,
@@ -267,10 +267,10 @@ const DatePickerModern = <T extends FieldValues>({
   required = false,
   disabled = false,
   icon,
-  size = "md",
-  variant = "default",
-  containerClassName = "",
-  activeColor = "primary-500",
+  size = 'md',
+  variant = 'default',
+  containerClassName = '',
+  activeColor = 'primary-500',
   id,
   useUTC = false,
   showTimezone = false,
@@ -280,8 +280,8 @@ const DatePickerModern = <T extends FieldValues>({
   const [isOpen, setIsOpen] = useState(false);
   const [localDate, setLocalDate] = useState<Date | null>(null);
 
-  const currentLocale = i18n.language.startsWith("es") ? "es" : "en";
-  const defaultDateFormat = showTimeSelect ? "Pp" : "P";
+  const currentLocale = i18n.language.startsWith('es') ? 'es' : 'en';
+  const defaultDateFormat = showTimeSelect ? 'Pp' : 'P';
 
   // Convert UTC date from backend to local date for display
   useEffect(() => {
@@ -310,7 +310,7 @@ const DatePickerModern = <T extends FieldValues>({
     ({ value, onClick, onChange, placeholder: inputPlaceholder, ...props }, ref) => (
       <Input
         {...props}
-        id={id || name || "datepicker-input"}
+        id={id || name || 'datepicker-input'}
         ref={ref}
         value={value}
         onChange={onChange}
@@ -327,7 +327,7 @@ const DatePickerModern = <T extends FieldValues>({
         required={required}
         disabled={disabled}
         variant={variant}
-        sizeType={size === "md" ? "md" : size === "lg" ? "lg" : "sm"}
+        sizeType={size === 'md' ? 'md' : size === 'lg' ? 'lg' : 'sm'}
         icon={(icon as any) || (showTimeSelect ? Clock : Calendar)}
         activeColor={activeColor}
         placeholder={inputPlaceholder || placeholder}
@@ -338,7 +338,7 @@ const DatePickerModern = <T extends FieldValues>({
     ),
   );
 
-  CustomInput.displayName = "CustomDateInput";
+  CustomInput.displayName = 'CustomDateInput';
 
   return (
     <div className={`relative ${containerClassName}`}>
@@ -459,7 +459,7 @@ const DatePickerModern = <T extends FieldValues>({
             background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%) !important;
             border-bottom: 1px solid #e5e7eb;
             border-top-left-radius: 0.75rem;
-            border-top-right-radius: ${showTimeSelect ? "0" : "0.75rem"};
+            border-top-right-radius: ${showTimeSelect ? '0' : '0.75rem'};
             padding: 0.5rem 1rem !important;
             display: flex;
             flex-direction: column;
@@ -496,7 +496,7 @@ const DatePickerModern = <T extends FieldValues>({
           }
 
           .header-nav-btn:hover:not(:disabled) {
-            background: ${getColor(activeColor, "05")} !important;
+            background: ${getColor(activeColor, '05')} !important;
             border-color: ${getColor(activeColor)} !important;
             color: ${getColor(activeColor)} !important;
             transform: scale(1.05);
@@ -514,8 +514,8 @@ const DatePickerModern = <T extends FieldValues>({
           }
 
           .dark .header-nav-btn:hover:not(:disabled) {
-            background: ${getColor(activeColor, "10")} !important;
-            border-color: ${getColor(activeColor, "60")} !important;
+            background: ${getColor(activeColor, '10')} !important;
+            border-color: ${getColor(activeColor, '60')} !important;
             color: white !important;
           }
 
@@ -607,11 +607,11 @@ const DatePickerModern = <T extends FieldValues>({
           }
 
           .time-spinner-btn:hover {
-            background: linear-gradient(135deg, ${getColor(activeColor)} 0%, ${getColor(activeColor, "dd")} 100%);
+            background: linear-gradient(135deg, ${getColor(activeColor)} 0%, ${getColor(activeColor, 'dd')} 100%);
             border-color: ${getColor(activeColor)};
             color: white;
             transform: translateY(-1px);
-            box-shadow: 0 4px 6px -1px ${getColor(activeColor, "60")};
+            box-shadow: 0 4px 6px -1px ${getColor(activeColor, '60')};
           }
 
           .dark .time-spinner-btn {
@@ -621,7 +621,7 @@ const DatePickerModern = <T extends FieldValues>({
           }
 
           .dark .time-spinner-btn:hover {
-            background: linear-gradient(135deg, ${getColor(activeColor)} 0%, ${getColor(activeColor, "dd")} 100%);
+            background: linear-gradient(135deg, ${getColor(activeColor)} 0%, ${getColor(activeColor, 'dd')} 100%);
             border-color: ${getColor(activeColor)};
             color: white;
           }
@@ -642,8 +642,8 @@ const DatePickerModern = <T extends FieldValues>({
           .time-input:focus {
             outline: none;
             border-color: ${getColor(activeColor)};
-            box-shadow: 0 0 0 3px ${getColor(activeColor, "20")};
-            background-color: ${getColor(activeColor, "05")};
+            box-shadow: 0 0 0 3px ${getColor(activeColor, '20')};
+            background-color: ${getColor(activeColor, '05')};
           }
 
           .dark .time-input {
@@ -654,7 +654,7 @@ const DatePickerModern = <T extends FieldValues>({
 
           .dark .time-input:focus {
             border-color: ${getColor(activeColor)};
-            background-color: ${getColor(activeColor, "20")};
+            background-color: ${getColor(activeColor, '20')};
           }
 
           .time-label {
@@ -696,10 +696,10 @@ const DatePickerModern = <T extends FieldValues>({
           }
 
           .react-datepicker__day:hover {
-            background: ${getColor(activeColor, "10")} !important;
+            background: ${getColor(activeColor, '10')} !important;
             color: ${getColor(activeColor)} !important;
             transform: scale(1.1);
-            box-shadow: 0 4px 6px -1px ${getColor(activeColor, "20")};
+            box-shadow: 0 4px 6px -1px ${getColor(activeColor, '20')};
           }
 
           .dark .react-datepicker__day:hover {
@@ -709,23 +709,23 @@ const DatePickerModern = <T extends FieldValues>({
 
           .react-datepicker__day--selected,
           .react-datepicker__day--keyboard-selected {
-            background: ${getColor(activeColor, "70")} !important;
+            background: ${getColor(activeColor, '70')} !important;
             color: white !important;
             font-weight: 700 !important;
-            box-shadow: 0 4px 6px -1px ${getColor(activeColor, "20")};
+            box-shadow: 0 4px 6px -1px ${getColor(activeColor, '20')};
             transform: scale(1.05);
           }
 
           .react-datepicker__day--today {
             font-weight: 700;
             color: ${getColor(activeColor)} !important;
-            background: linear-gradient(135deg, ${getColor(activeColor, "10")} 0%, ${getColor(activeColor, "05")} 100%) !important;
+            background: linear-gradient(135deg, ${getColor(activeColor, '10')} 0%, ${getColor(activeColor, '05')} 100%) !important;
             border: 2px solid ${getColor(activeColor)};
           }
 
           .dark .react-datepicker__day--today {
-            background: linear-gradient(135deg, ${getColor(activeColor, "20")} 0%, ${getColor(activeColor, "10")} 100%) !important;
-            border-color: ${getColor(activeColor, "60")} !important;
+            background: linear-gradient(135deg, ${getColor(activeColor, '20')} 0%, ${getColor(activeColor, '10')} 100%) !important;
+            border-color: ${getColor(activeColor, '60')} !important;
           }
 
           .react-datepicker__day-name {
@@ -766,7 +766,7 @@ const DatePickerModern = <T extends FieldValues>({
           .react-datepicker__month-dropdown:hover,
           .react-datepicker__year-dropdown:hover {
             border-color: ${getColor(activeColor)} !important;
-            background-color: ${getColor(activeColor, "05")} !important;
+            background-color: ${getColor(activeColor, '05')} !important;
           }
 
           .dark .react-datepicker__month-dropdown,
@@ -779,7 +779,7 @@ const DatePickerModern = <T extends FieldValues>({
           .dark .react-datepicker__month-dropdown:hover,
           .dark .react-datepicker__year-dropdown:hover {
             border-color: ${getColor(activeColor)} !important;
-            background-color: ${getColor(activeColor, "20")} !important;
+            background-color: ${getColor(activeColor, '20')} !important;
           }
 
 
@@ -994,35 +994,35 @@ const DatePickerModern = <T extends FieldValues>({
           nextMonthButtonDisabled,
         }) => {
           const months = [
-            "January",
-            "February",
-            "March",
-            "April",
-            "May",
-            "June",
-            "July",
-            "August",
-            "September",
-            "October",
-            "November",
-            "December",
+            'January',
+            'February',
+            'March',
+            'April',
+            'May',
+            'June',
+            'July',
+            'August',
+            'September',
+            'October',
+            'November',
+            'December',
           ];
           const monthsEs = [
-            "Enero",
-            "Febrero",
-            "Marzo",
-            "Abril",
-            "Mayo",
-            "Junio",
-            "Julio",
-            "Agosto",
-            "Septiembre",
-            "Octubre",
-            "Noviembre",
-            "Diciembre",
+            'Enero',
+            'Febrero',
+            'Marzo',
+            'Abril',
+            'Mayo',
+            'Junio',
+            'Julio',
+            'Agosto',
+            'Septiembre',
+            'Octubre',
+            'Noviembre',
+            'Diciembre',
           ];
 
-          const monthOptions = (currentLocale === "es" ? monthsEs : months).map((m, i) => ({
+          const monthOptions = (currentLocale === 'es' ? monthsEs : months).map((m, i) => ({
             value: i,
             label: m,
           }));
@@ -1099,9 +1099,9 @@ const DatePickerModern = <T extends FieldValues>({
                 <div
                   className="react-datepicker-container"
                   style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    position: "relative",
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    position: 'relative',
                   }}
                 >
                   <div style={{ flex: 1 }}>{children}</div>
@@ -1120,15 +1120,15 @@ const DatePickerModern = <T extends FieldValues>({
                         {displayDate
                           ? showTimeSelect
                             ? displayDate.toLocaleString(currentLocale, {
-                                dateStyle: "medium",
-                                timeStyle: "short",
+                                dateStyle: 'medium',
+                                timeStyle: 'short',
                               })
                             : displayDate.toLocaleDateString(currentLocale, {
-                                dateStyle: "medium",
+                                dateStyle: 'medium',
                               })
-                          : currentLocale === "es"
-                            ? "Sin fecha seleccionada"
-                            : "No date selected"}
+                          : currentLocale === 'es'
+                            ? 'Sin fecha seleccionada'
+                            : 'No date selected'}
                       </span>
                       {showTimezone && useUTC && (
                         <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
@@ -1145,10 +1145,10 @@ const DatePickerModern = <T extends FieldValues>({
                           setIsOpen(false);
                         }}
                         className="react-datepicker__footer-clear"
-                        title={currentLocale === "es" ? "Limpiar" : "Clear"}
+                        title={currentLocale === 'es' ? 'Limpiar' : 'Clear'}
                       >
                         <X className="h-4 w-4" />
-                        {currentLocale === "es" ? "Limpiar" : "Clear"}
+                        {currentLocale === 'es' ? 'Limpiar' : 'Clear'}
                       </button>
                     )}
                   </div>

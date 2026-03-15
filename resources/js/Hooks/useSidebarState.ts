@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
-const SIDEBAR_STORAGE_KEY = "contentflow_sidebar_open";
+const SIDEBAR_STORAGE_KEY = 'contentflow_sidebar_open';
 
 /**
  * Hook personalizado para manejar el estado del sidebar con persistencia en localStorage
@@ -10,7 +10,7 @@ const SIDEBAR_STORAGE_KEY = "contentflow_sidebar_open";
 export function useSidebarState(defaultValue: boolean = true): [boolean, (value: boolean) => void] {
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(() => {
     // Intentar cargar el estado guardado en localStorage
-    if (typeof window === "undefined") return defaultValue;
+    if (typeof window === 'undefined') return defaultValue;
 
     try {
       const savedState = localStorage.getItem(SIDEBAR_STORAGE_KEY);
@@ -18,7 +18,7 @@ export function useSidebarState(defaultValue: boolean = true): [boolean, (value:
         return JSON.parse(savedState);
       }
     } catch (error) {
-      console.warn("Error al cargar el estado del sidebar desde localStorage:", error);
+      console.warn('Error al cargar el estado del sidebar desde localStorage:', error);
     }
 
     return defaultValue;
@@ -29,7 +29,7 @@ export function useSidebarState(defaultValue: boolean = true): [boolean, (value:
     try {
       localStorage.setItem(SIDEBAR_STORAGE_KEY, JSON.stringify(isSidebarOpen));
     } catch (error) {
-      console.warn("Error al guardar el estado del sidebar en localStorage:", error);
+      console.warn('Error al guardar el estado del sidebar en localStorage:', error);
     }
   }, [isSidebarOpen]);
 

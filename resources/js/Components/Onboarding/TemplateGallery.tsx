@@ -1,12 +1,12 @@
-import { useState, useMemo } from "react";
-import { useTranslation } from "react-i18next";
-import type { PublicationTemplate } from "@/types/onboarding";
-import { Search, X } from "lucide-react";
-import TemplateCard from "./TemplateCard";
-import { useTemplateIntegration } from "@/Hooks/onboarding/useTemplateIntegration";
-import EmptyState from "@/Components/common/EmptyState";
-import { getEmptyStateByKey } from "@/Utils/emptyStateMapper";
-import { useEffect } from "react";
+import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { PublicationTemplate } from '@/types/onboarding';
+import { Search, X } from 'lucide-react';
+import TemplateCard from './TemplateCard';
+import { useTemplateIntegration } from '@/Hooks/onboarding/useTemplateIntegration';
+import EmptyState from '@/Components/common/EmptyState';
+import { getEmptyStateByKey } from '@/Utils/emptyStateMapper';
+import { useEffect } from 'react';
 
 interface TemplateGalleryProps {
   templates: PublicationTemplate[];
@@ -25,8 +25,8 @@ interface TemplateGalleryProps {
  */
 export default function TemplateGallery({ templates, onSelect, onSkip }: TemplateGalleryProps) {
   const { t } = useTranslation();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [isSkipping, setIsSkipping] = useState(false);
   const { applyTemplate } = useTemplateIntegration();
 
@@ -51,18 +51,18 @@ export default function TemplateGallery({ templates, onSelect, onSkip }: Templat
   // Extract unique categories from templates
   const categories = useMemo(() => {
     const uniqueCategories = new Set(templates.map((t) => t.category));
-    return ["all", ...Array.from(uniqueCategories)];
+    return ['all', ...Array.from(uniqueCategories)];
   }, [templates]);
 
   // Filter templates based on search and category
   const filteredTemplates = useMemo(() => {
     return templates.filter((template) => {
       const matchesSearch =
-        searchQuery === "" ||
+        searchQuery === '' ||
         template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         template.description.toLowerCase().includes(searchQuery.toLowerCase());
 
-      const matchesCategory = selectedCategory === "all" || template.category === selectedCategory;
+      const matchesCategory = selectedCategory === 'all' || template.category === selectedCategory;
 
       return matchesSearch && matchesCategory;
     });
@@ -81,14 +81,14 @@ export default function TemplateGallery({ templates, onSelect, onSkip }: Templat
   // Keyboard navigation (Requirement 7.5, 7.6)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
+      if (e.key === 'Escape') {
         e.preventDefault();
         handleSkip();
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   return (
@@ -107,20 +107,20 @@ export default function TemplateGallery({ templates, onSelect, onSkip }: Templat
               id="template-gallery-title"
               className="truncate text-xl font-bold text-gray-900 dark:text-white md:text-2xl"
             >
-              {t("templates.title")}
+              {t('templates.title')}
             </h2>
             <p
               id="template-gallery-description"
               className="mt-1 line-clamp-2 text-xs text-gray-500 dark:text-gray-400 md:text-sm"
             >
-              {t("templates.description")}
+              {t('templates.description')}
             </p>
           </div>
           <button
             onClick={handleSkip}
             disabled={isSkipping}
             className="flex min-h-[44px] min-w-[44px] flex-shrink-0 items-center justify-center rounded-md p-2 text-gray-400 transition-colors hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:hover:text-gray-300"
-            aria-label={t("templates.close")}
+            aria-label={t('templates.close')}
           >
             <X className="h-5 w-5 md:h-6 md:w-6" />
           </button>
@@ -132,7 +132,7 @@ export default function TemplateGallery({ templates, onSelect, onSkip }: Templat
             {/* Search Input */}
             <div className="relative flex-1">
               <label htmlFor="template-search" className="sr-only">
-                {t("templates.search")}
+                {t('templates.search')}
               </label>
               <Search
                 className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
@@ -141,11 +141,11 @@ export default function TemplateGallery({ templates, onSelect, onSkip }: Templat
               <input
                 id="template-search"
                 type="text"
-                placeholder={t("templates.searchPlaceholder")}
+                placeholder={t('templates.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full rounded-lg border border-gray-300 bg-white py-2 pl-10 pr-4 text-gray-900 placeholder-gray-400 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-neutral-600 dark:bg-neutral-800 dark:text-white"
-                aria-label={t("templates.searchByName")}
+                aria-label={t('templates.searchByName')}
               />
             </div>
 
@@ -153,7 +153,7 @@ export default function TemplateGallery({ templates, onSelect, onSkip }: Templat
             <div
               className="scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-neutral-600 flex gap-2 overflow-x-auto pb-2 sm:pb-0"
               role="group"
-              aria-label={t("templates.filterByCategory")}
+              aria-label={t('templates.filterByCategory')}
             >
               {categories.map((category) => (
                 <button
@@ -161,11 +161,11 @@ export default function TemplateGallery({ templates, onSelect, onSkip }: Templat
                   onClick={() => setSelectedCategory(category)}
                   className={`min-h-[44px] whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 md:px-4 md:text-base ${
                     selectedCategory === category
-                      ? "bg-primary-600 text-white"
-                      : "border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 dark:border-neutral-600 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700"
+                      ? 'bg-primary-600 text-white'
+                      : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 dark:border-neutral-600 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700'
                   }`}
                   aria-pressed={selectedCategory === category}
-                  aria-label={t("templates.filterBy", { category })}
+                  aria-label={t('templates.filterBy', { category })}
                 >
                   {t(
                     `onboarding.templates.categories.${category}`,
@@ -183,7 +183,7 @@ export default function TemplateGallery({ templates, onSelect, onSkip }: Templat
             <div
               className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3"
               role="list"
-              aria-label={t("templates.list")}
+              aria-label={t('templates.list')}
             >
               {filteredTemplates.map((template) => (
                 <TemplateCard
@@ -194,7 +194,7 @@ export default function TemplateGallery({ templates, onSelect, onSkip }: Templat
               ))}
             </div>
           ) : (
-            <EmptyState config={getEmptyStateByKey("searchResults", t)!} />
+            <EmptyState config={getEmptyStateByKey('searchResults', t)!} />
           )}
         </div>
 
@@ -206,19 +206,19 @@ export default function TemplateGallery({ templates, onSelect, onSkip }: Templat
             aria-live="polite"
             aria-atomic="true"
           >
-            {t("templates.available", {
+            {t('templates.available', {
               count: filteredTemplates.length,
               templateText:
-                filteredTemplates.length === 1 ? t("templates.template") : t("templates.templates"),
+                filteredTemplates.length === 1 ? t('templates.template') : t('templates.templates'),
             })}
           </p>
           <button
             onClick={handleSkip}
             disabled={isSkipping}
             className="min-h-[44px] w-full rounded-lg px-6 py-2 font-medium text-gray-600 transition-colors hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-400 dark:hover:text-white md:w-auto"
-            aria-label={t("templates.skipAndCreate")}
+            aria-label={t('templates.skipAndCreate')}
           >
-            {isSkipping ? t("templates.skipping") : t("templates.skip")}
+            {isSkipping ? t('templates.skipping') : t('templates.skip')}
           </button>
         </div>
       </div>

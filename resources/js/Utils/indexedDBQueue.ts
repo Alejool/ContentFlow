@@ -1,4 +1,4 @@
-import type { QueuedOperation } from "../types/optimistic";
+import type { QueuedOperation } from '../types/optimistic';
 
 /**
  * IndexedDB Queue Manager
@@ -9,9 +9,9 @@ import type { QueuedOperation } from "../types/optimistic";
  * Requirements: 5.1
  */
 
-const DB_NAME = "offline-queue-db";
+const DB_NAME = 'offline-queue-db';
 const DB_VERSION = 1;
-const STORE_NAME = "operations";
+const STORE_NAME = 'operations';
 
 // Batch operation configuration for better performance
 const BATCH_CONFIG = {
@@ -55,14 +55,14 @@ class IndexedDBQueue {
         // Create object store if it doesn't exist
         if (!db.objectStoreNames.contains(STORE_NAME)) {
           const objectStore = db.createObjectStore(STORE_NAME, {
-            keyPath: "id",
+            keyPath: 'id',
           });
 
           // Create indexes for efficient querying
-          objectStore.createIndex("status", "status", { unique: false });
-          objectStore.createIndex("timestamp", "timestamp", { unique: false });
-          objectStore.createIndex("resource", "resource", { unique: false });
-          objectStore.createIndex("priority", "priority", { unique: false });
+          objectStore.createIndex('status', 'status', { unique: false });
+          objectStore.createIndex('timestamp', 'timestamp', { unique: false });
+          objectStore.createIndex('resource', 'resource', { unique: false });
+          objectStore.createIndex('priority', 'priority', { unique: false });
 
           if (import.meta.env.DEV) {
           }
@@ -87,11 +87,11 @@ class IndexedDBQueue {
 
     return new Promise((resolve, reject) => {
       if (!this.db) {
-        reject(new Error("Database not initialized"));
+        reject(new Error('Database not initialized'));
         return;
       }
 
-      const transaction = this.db.transaction([STORE_NAME], "readwrite");
+      const transaction = this.db.transaction([STORE_NAME], 'readwrite');
       const store = transaction.objectStore(STORE_NAME);
 
       let completed = 0;
@@ -150,11 +150,11 @@ class IndexedDBQueue {
 
     return new Promise((resolve, reject) => {
       if (!this.db) {
-        reject(new Error("Database not initialized"));
+        reject(new Error('Database not initialized'));
         return;
       }
 
-      const transaction = this.db.transaction([STORE_NAME], "readwrite");
+      const transaction = this.db.transaction([STORE_NAME], 'readwrite');
       const store = transaction.objectStore(STORE_NAME);
 
       let completed = 0;
@@ -186,11 +186,11 @@ class IndexedDBQueue {
 
     return new Promise((resolve, reject) => {
       if (!this.db) {
-        reject(new Error("Database not initialized"));
+        reject(new Error('Database not initialized'));
         return;
       }
 
-      const transaction = this.db.transaction([STORE_NAME], "readonly");
+      const transaction = this.db.transaction([STORE_NAME], 'readonly');
       const store = transaction.objectStore(STORE_NAME);
       const request = store.getAll();
 
@@ -207,18 +207,18 @@ class IndexedDBQueue {
   /**
    * Get operations by status
    */
-  async getByStatus(status: QueuedOperation["status"]): Promise<QueuedOperation[]> {
+  async getByStatus(status: QueuedOperation['status']): Promise<QueuedOperation[]> {
     await this.init();
 
     return new Promise((resolve, reject) => {
       if (!this.db) {
-        reject(new Error("Database not initialized"));
+        reject(new Error('Database not initialized'));
         return;
       }
 
-      const transaction = this.db.transaction([STORE_NAME], "readonly");
+      const transaction = this.db.transaction([STORE_NAME], 'readonly');
       const store = transaction.objectStore(STORE_NAME);
-      const index = store.index("status");
+      const index = store.index('status');
       const request = index.getAll(status);
 
       request.onsuccess = () => {
@@ -239,11 +239,11 @@ class IndexedDBQueue {
 
     return new Promise((resolve, reject) => {
       if (!this.db) {
-        reject(new Error("Database not initialized"));
+        reject(new Error('Database not initialized'));
         return;
       }
 
-      const transaction = this.db.transaction([STORE_NAME], "readwrite");
+      const transaction = this.db.transaction([STORE_NAME], 'readwrite');
       const store = transaction.objectStore(STORE_NAME);
       const request = store.put(operation);
 
@@ -267,11 +267,11 @@ class IndexedDBQueue {
 
     return new Promise((resolve, reject) => {
       if (!this.db) {
-        reject(new Error("Database not initialized"));
+        reject(new Error('Database not initialized'));
         return;
       }
 
-      const transaction = this.db.transaction([STORE_NAME], "readwrite");
+      const transaction = this.db.transaction([STORE_NAME], 'readwrite');
       const store = transaction.objectStore(STORE_NAME);
       const request = store.delete(id);
 
@@ -295,11 +295,11 @@ class IndexedDBQueue {
 
     return new Promise((resolve, reject) => {
       if (!this.db) {
-        reject(new Error("Database not initialized"));
+        reject(new Error('Database not initialized'));
         return;
       }
 
-      const transaction = this.db.transaction([STORE_NAME], "readwrite");
+      const transaction = this.db.transaction([STORE_NAME], 'readwrite');
       const store = transaction.objectStore(STORE_NAME);
       const request = store.clear();
 
@@ -323,11 +323,11 @@ class IndexedDBQueue {
 
     return new Promise((resolve, reject) => {
       if (!this.db) {
-        reject(new Error("Database not initialized"));
+        reject(new Error('Database not initialized'));
         return;
       }
 
-      const transaction = this.db.transaction([STORE_NAME], "readonly");
+      const transaction = this.db.transaction([STORE_NAME], 'readonly');
       const store = transaction.objectStore(STORE_NAME);
       const request = store.count();
 

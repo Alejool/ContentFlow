@@ -1,10 +1,10 @@
-import Button from "@/Components/common/Modern/Button";
-import Input from "@/Components/common/Modern/Input";
-import axios from "axios";
-import { AlertCircle, CheckCircle, Clock, Send, ThumbsDown, ThumbsUp, XCircle } from "lucide-react";
-import { useState } from "react";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
+import Button from '@/Components/common/Modern/Button';
+import Input from '@/Components/common/Modern/Input';
+import axios from 'axios';
+import { AlertCircle, CheckCircle, Clock, Send, ThumbsDown, ThumbsUp, XCircle } from 'lucide-react';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface ApprovalStatus {
   status: string;
@@ -40,35 +40,35 @@ export default function ContentApprovalStatus({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showApproveModal, setShowApproveModal] = useState(false);
-  const [comment, setComment] = useState("");
-  const [rejectionReason, setRejectionReason] = useState("");
+  const [comment, setComment] = useState('');
+  const [rejectionReason, setRejectionReason] = useState('');
 
   const getStatusBadge = () => {
     const statusConfig: Record<string, { color: string; icon: any; label: string }> = {
       draft: {
-        color: "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400",
+        color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
         icon: AlertCircle,
-        label: t("approval.status.draft"),
+        label: t('approval.status.draft'),
       },
       pending_review: {
-        color: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
+        color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
         icon: Clock,
-        label: t("approval.status.pending_review"),
+        label: t('approval.status.pending_review'),
       },
       approved: {
-        color: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+        color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
         icon: CheckCircle,
-        label: t("approval.status.approved"),
+        label: t('approval.status.approved'),
       },
       rejected: {
-        color: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+        color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
         icon: XCircle,
-        label: t("approval.status.rejected"),
+        label: t('approval.status.rejected'),
       },
       published: {
-        color: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+        color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
         icon: CheckCircle,
-        label: t("approval.status.published"),
+        label: t('approval.status.published'),
       },
     };
 
@@ -86,7 +86,7 @@ export default function ContentApprovalStatus({
   };
 
   const getProgressIndicator = () => {
-    if (!isMultiLevel || approvalStatus.status !== "pending_review") {
+    if (!isMultiLevel || approvalStatus.status !== 'pending_review') {
       return null;
     }
 
@@ -100,10 +100,10 @@ export default function ContentApprovalStatus({
             <div
               className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
                 level < currentLevel
-                  ? "bg-green-500 text-white"
+                  ? 'bg-green-500 text-white'
                   : level === currentLevel
-                    ? "animate-pulse bg-primary-500 text-white"
-                    : "bg-gray-200 text-gray-500 dark:bg-neutral-700 dark:text-gray-400"
+                    ? 'animate-pulse bg-primary-500 text-white'
+                    : 'bg-gray-200 text-gray-500 dark:bg-neutral-700 dark:text-gray-400'
               }`}
             >
               {level < currentLevel ? <CheckCircle className="h-4 w-4" /> : level}
@@ -111,7 +111,7 @@ export default function ContentApprovalStatus({
             {index < levels.length - 1 && (
               <div
                 className={`h-1 w-12 ${
-                  level < currentLevel ? "bg-green-500" : "bg-gray-200 dark:bg-neutral-700"
+                  level < currentLevel ? 'bg-green-500' : 'bg-gray-200 dark:bg-neutral-700'
                 }`}
               />
             )}
@@ -124,13 +124,13 @@ export default function ContentApprovalStatus({
   const handleSubmitForApproval = async () => {
     try {
       setIsSubmitting(true);
-      const response = await axios.post(route("api.content.submit-for-approval", content.id));
+      const response = await axios.post(route('api.content.submit-for-approval', content.id));
 
       // Update stores with fresh data
       const publication = response.data?.data?.content || response.data?.data?.publication;
       if (publication) {
-        const publicationStoreModule = await import("@/stores/publicationStore");
-        const manageContentUIStoreModule = await import("@/stores/manageContentUIStore");
+        const publicationStoreModule = await import('@/stores/publicationStore');
+        const manageContentUIStoreModule = await import('@/stores/manageContentUIStore');
 
         // CRITICAL: Update immediately with new status
         publicationStoreModule.usePublicationStore.getState().updatePublication(content.id, {
@@ -159,10 +159,10 @@ export default function ContentApprovalStatus({
         }
       }
 
-      toast.success(t("approval.success.submitted"));
+      toast.success(t('approval.success.submitted'));
       onStatusChange?.();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || t("approval.errors.submit_failed"));
+      toast.error(error.response?.data?.message || t('approval.errors.submit_failed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -171,15 +171,15 @@ export default function ContentApprovalStatus({
   const handleApprove = async () => {
     try {
       setIsSubmitting(true);
-      await axios.post(route("api.content.approve", content.id), {
+      await axios.post(route('api.content.approve', content.id), {
         comment: comment || undefined,
       });
-      toast.success(t("approval.success.approved"));
+      toast.success(t('approval.success.approved'));
       setShowApproveModal(false);
-      setComment("");
+      setComment('');
       onStatusChange?.();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || t("approval.errors.approve_failed"));
+      toast.error(error.response?.data?.message || t('approval.errors.approve_failed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -187,21 +187,21 @@ export default function ContentApprovalStatus({
 
   const handleReject = async () => {
     if (!rejectionReason.trim()) {
-      toast.error(t("approval.errors.rejection_reason_required"));
+      toast.error(t('approval.errors.rejection_reason_required'));
       return;
     }
 
     try {
       setIsSubmitting(true);
-      await axios.post(route("api.content.reject", content.id), {
+      await axios.post(route('api.content.reject', content.id), {
         reason: rejectionReason,
       });
-      toast.success(t("approval.success.rejected"));
+      toast.success(t('approval.success.rejected'));
       setShowRejectModal(false);
-      setRejectionReason("");
+      setRejectionReason('');
       onStatusChange?.();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || t("approval.errors.reject_failed"));
+      toast.error(error.response?.data?.message || t('approval.errors.reject_failed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -214,30 +214,30 @@ export default function ContentApprovalStatus({
         <div className="mb-4 flex items-center justify-between">
           <div>
             <h4 className="mb-2 font-bold text-gray-900 dark:text-white">
-              {t("approval.current_status")}
+              {t('approval.current_status')}
             </h4>
             {getStatusBadge()}
           </div>
         </div>
 
         {/* Next Approver Info */}
-        {approvalStatus.status === "pending_review" && approvalStatus.next_approver_role && (
+        {approvalStatus.status === 'pending_review' && approvalStatus.next_approver_role && (
           <div className="mt-4 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
             <p className="text-sm font-medium text-yellow-800 dark:text-yellow-400">
               {isMultiLevel
-                ? t("approval.pending_review_by_role", {
+                ? t('approval.pending_review_by_role', {
                     role: approvalStatus.next_approver_role,
                   })
-                : t("approval.pending_review_by_any_admin")}
+                : t('approval.pending_review_by_any_admin')}
             </p>
           </div>
         )}
 
         {/* Progress Indicator for Multi-Level */}
-        {isMultiLevel && approvalStatus.status === "pending_review" && (
+        {isMultiLevel && approvalStatus.status === 'pending_review' && (
           <div className="mt-4">
             <p className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-              {t("approval.progress")}
+              {t('approval.progress')}
             </p>
             {getProgressIndicator()}
           </div>
@@ -248,7 +248,7 @@ export default function ContentApprovalStatus({
       <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
         <div className="flex flex-wrap gap-3">
           {/* Submit for Approval */}
-          {canSubmit && approvalStatus.status === "draft" && (
+          {canSubmit && approvalStatus.status === 'draft' && (
             <Button
               variant="primary"
               buttonStyle="solid"
@@ -256,12 +256,12 @@ export default function ContentApprovalStatus({
               disabled={isSubmitting}
               icon={Send}
             >
-              {t("approval.submit_for_approval")}
+              {t('approval.submit_for_approval')}
             </Button>
           )}
 
           {/* Approve Button */}
-          {canApprove && approvalStatus.status === "pending_review" && (
+          {canApprove && approvalStatus.status === 'pending_review' && (
             <Button
               variant="primary"
               buttonStyle="solid"
@@ -269,12 +269,12 @@ export default function ContentApprovalStatus({
               disabled={isSubmitting}
               icon={ThumbsUp}
             >
-              {t("approval.approve")}
+              {t('approval.approve')}
             </Button>
           )}
 
           {/* Reject Button */}
-          {canReject && approvalStatus.status === "pending_review" && (
+          {canReject && approvalStatus.status === 'pending_review' && (
             <Button
               variant="danger"
               buttonStyle="outline"
@@ -282,7 +282,7 @@ export default function ContentApprovalStatus({
               disabled={isSubmitting}
               icon={ThumbsDown}
             >
-              {t("approval.reject")}
+              {t('approval.reject')}
             </Button>
           )}
         </div>
@@ -293,15 +293,15 @@ export default function ContentApprovalStatus({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-md rounded-xl bg-white p-6 dark:bg-neutral-900">
             <h3 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
-              {t("approval.approve_content")}
+              {t('approval.approve_content')}
             </h3>
 
             <Input
               id="approve-comment"
-              label={t("approval.comment_optional")}
+              label={t('approval.comment_optional')}
               value={comment}
               onChange={(e: any) => setComment(e.target.value)}
-              placeholder={t("approval.add_comment")}
+              placeholder={t('approval.add_comment')}
               multiline
               rows={3}
             />
@@ -312,11 +312,11 @@ export default function ContentApprovalStatus({
                 buttonStyle="outline"
                 onClick={() => {
                   setShowApproveModal(false);
-                  setComment("");
+                  setComment('');
                 }}
                 className="flex-1"
               >
-                {t("common.cancel")}
+                {t('common.cancel')}
               </Button>
               <Button
                 variant="primary"
@@ -326,7 +326,7 @@ export default function ContentApprovalStatus({
                 className="flex-1"
                 icon={ThumbsUp}
               >
-                {t("approval.approve")}
+                {t('approval.approve')}
               </Button>
             </div>
           </div>
@@ -338,15 +338,15 @@ export default function ContentApprovalStatus({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-md rounded-xl bg-white p-6 dark:bg-neutral-900">
             <h3 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
-              {t("approval.reject_content")}
+              {t('approval.reject_content')}
             </h3>
 
             <Input
               id="reject-reason"
-              label={t("approval.rejection_reason")}
+              label={t('approval.rejection_reason')}
               value={rejectionReason}
               onChange={(e: any) => setRejectionReason(e.target.value)}
-              placeholder={t("approval.explain_rejection")}
+              placeholder={t('approval.explain_rejection')}
               required
             />
 
@@ -356,11 +356,11 @@ export default function ContentApprovalStatus({
                 buttonStyle="outline"
                 onClick={() => {
                   setShowRejectModal(false);
-                  setRejectionReason("");
+                  setRejectionReason('');
                 }}
                 className="flex-1"
               >
-                {t("common.cancel")}
+                {t('common.cancel')}
               </Button>
               <Button
                 variant="danger"
@@ -370,7 +370,7 @@ export default function ContentApprovalStatus({
                 className="flex-1"
                 icon={ThumbsDown}
               >
-                {t("approval.reject")}
+                {t('approval.reject')}
               </Button>
             </div>
           </div>

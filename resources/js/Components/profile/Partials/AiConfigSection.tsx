@@ -1,7 +1,7 @@
-import Input from "@/Components/common/Modern/Input";
-import { useTheme } from "@/Hooks/useTheme";
-import { BrainCircuit, ExternalLink, Info, Key, ShieldCheck, Sparkles } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import Input from '@/Components/common/Modern/Input';
+import { useTheme } from '@/Hooks/useTheme';
+import { BrainCircuit, ExternalLink, Info, Key, ShieldCheck, Sparkles } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface AiConfigSectionProps {
   watchedValues: any;
@@ -23,32 +23,32 @@ export default function AiConfigSection({
 
   const providers = [
     {
-      id: "gemini",
-      name: "Google Gemini",
-      description: "Modelos Gemini 2.0 Flash y Pro.",
-      link: "https://aistudio.google.com/app/apikey",
-      placeholder: "AIzaSy...",
+      id: 'gemini',
+      name: 'Google Gemini',
+      description: 'Modelos Gemini 2.0 Flash y Pro.',
+      link: 'https://aistudio.google.com/app/apikey',
+      placeholder: 'AIzaSy...',
     },
     {
-      id: "deepseek",
-      name: "DeepSeek",
-      description: "Económico y potente, ideal para texto.",
-      link: "https://platform.deepseek.com/api_keys",
-      placeholder: "sk-...",
+      id: 'deepseek',
+      name: 'DeepSeek',
+      description: 'Económico y potente, ideal para texto.',
+      link: 'https://platform.deepseek.com/api_keys',
+      placeholder: 'sk-...',
     },
     {
-      id: "openai",
-      name: "OpenAI (ChatGPT)",
-      description: "GPT-4o y GPT-3.5 Turbo.",
-      link: "https://platform.openai.com/api-keys",
-      placeholder: "sk-...",
+      id: 'openai',
+      name: 'OpenAI (ChatGPT)',
+      description: 'GPT-4o y GPT-3.5 Turbo.',
+      link: 'https://platform.openai.com/api-keys',
+      placeholder: 'sk-...',
     },
   ];
 
   const handleToggleProvider = (providerId: string, enabled: boolean) => {
     const currentSettings = watchedValues.ai_settings || {};
     setValue(
-      "ai_settings",
+      'ai_settings',
       {
         ...currentSettings,
         [providerId]: {
@@ -63,7 +63,7 @@ export default function AiConfigSection({
   const handleKeyChange = (providerId: string, value: string) => {
     const currentSettings = watchedValues.ai_settings || {};
     setValue(
-      "ai_settings",
+      'ai_settings',
       {
         ...currentSettings,
         [providerId]: {
@@ -84,11 +84,11 @@ export default function AiConfigSection({
           </div>
           <div>
             <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-              {t("profile.ai.title") || "Configuración de IA Personal"}
+              {t('profile.ai.title') || 'Configuración de IA Personal'}
             </h2>
             <p className="text-sm text-gray-500 dark:text-neutral-400">
-              {t("profile.ai.description") ||
-                "Configura tus propias claves de API para habilitar funciones inteligentes personalizadas."}
+              {t('profile.ai.description') ||
+                'Configura tus propias claves de API para habilitar funciones inteligentes personalizadas.'}
             </p>
           </div>
         </div>
@@ -97,8 +97,8 @@ export default function AiConfigSection({
       <div className="mb-8 flex gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800/30 dark:bg-blue-900/10">
         <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
         <p className="text-sm text-blue-700 dark:text-blue-300">
-          {t("profile.ai.hint") ||
-            "Si configuras un proveedor aquí, el sistema usará tu clave personal en lugar de la predeterminada del sistema. Esto te da más control sobre el uso y las capacidades."}
+          {t('profile.ai.hint') ||
+            'Si configuras un proveedor aquí, el sistema usará tu clave personal en lugar de la predeterminada del sistema. Esto te da más control sobre el uso y las capacidades.'}
         </p>
       </div>
 
@@ -112,8 +112,8 @@ export default function AiConfigSection({
               key={provider.id}
               className={`group rounded-lg border p-6 transition-all duration-300 ${
                 isEnabled
-                  ? "border-primary-500/30 bg-white shadow-md ring-1 ring-primary-500/10 dark:bg-neutral-800/60"
-                  : "border-gray-200 bg-gray-50/50 opacity-80 dark:border-neutral-800 dark:bg-neutral-900/30"
+                  ? 'border-primary-500/30 bg-white shadow-md ring-1 ring-primary-500/10 dark:bg-neutral-800/60'
+                  : 'border-gray-200 bg-gray-50/50 opacity-80 dark:border-neutral-800 dark:bg-neutral-900/30'
               } `}
             >
               <div className="mb-6 flex flex-col justify-between gap-6 md:flex-row md:items-center">
@@ -121,8 +121,8 @@ export default function AiConfigSection({
                   <div
                     className={`rounded-lg p-3 transition-colors ${
                       isEnabled
-                        ? "bg-primary-100 text-primary-600 dark:bg-primary-900/30"
-                        : "bg-gray-200 text-gray-400 dark:bg-neutral-800"
+                        ? 'bg-primary-100 text-primary-600 dark:bg-primary-900/30'
+                        : 'bg-gray-200 text-gray-400 dark:bg-neutral-800'
                     }`}
                   >
                     <Sparkles className="h-5 w-5" />
@@ -142,14 +142,14 @@ export default function AiConfigSection({
                     rel="noopener noreferrer"
                     className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-primary-500 transition-colors hover:text-primary-600"
                   >
-                    {t("profile.ai.get_key") || "Obtener Clave"}
+                    {t('profile.ai.get_key') || 'Obtener Clave'}
                     <ExternalLink className="h-3 w-3" />
                   </a>
 
                   <button
                     type="button"
                     onClick={() => handleToggleProvider(provider.id, !isEnabled)}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isEnabled ? "bg-primary-600" : "bg-gray-300 dark:bg-neutral-700"} `}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isEnabled ? 'bg-primary-600' : 'bg-gray-300 dark:bg-neutral-700'} `}
                   >
                     <input
                       type="checkbox"
@@ -157,7 +157,7 @@ export default function AiConfigSection({
                       {...register(`ai_settings.${provider.id}.enabled`)}
                     />
                     <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isEnabled ? "translate-x-6" : "translate-x-1"} `}
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isEnabled ? 'translate-x-6' : 'translate-x-1'} `}
                     />
                   </button>
                 </div>
@@ -169,7 +169,7 @@ export default function AiConfigSection({
                     <Input
                       id={`ai_key_${provider.id}`}
                       type="password"
-                      label={t("profile.ai.api_key_label") || "API Key"}
+                      label={t('profile.ai.api_key_label') || 'API Key'}
                       placeholder={provider.placeholder}
                       register={register}
                       name={`ai_settings.${provider.id}.api_key`}
@@ -182,7 +182,7 @@ export default function AiConfigSection({
                     />
                     <div className="mt-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
                       <ShieldCheck className="h-3.5 w-3.5" />
-                      {t("profile.ai.secured_storage") || "Almacenamiento Seguro Encriptado"}
+                      {t('profile.ai.secured_storage') || 'Almacenamiento Seguro Encriptado'}
                     </div>
                   </div>
                 </div>

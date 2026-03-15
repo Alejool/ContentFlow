@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { router } from "@inertiajs/react";
-import { useTranslation } from "react-i18next";
-import { Shield, ShieldCheck, ShieldOff, RefreshCw, AlertTriangle } from "lucide-react";
-import Button from "@/Components/common/Modern/Button";
-import Input from "@/Components/common/Modern/Input";
-import Modal from "@/Components/common/Modern/Modal";
+import { useState } from 'react';
+import { router } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
+import { Shield, ShieldCheck, ShieldOff, RefreshCw, AlertTriangle } from 'lucide-react';
+import Button from '@/Components/common/Modern/Button';
+import Input from '@/Components/common/Modern/Input';
+import Modal from '@/Components/common/Modern/Modal';
 
 interface TwoFactorManagementProps {
   isEnabled: boolean;
@@ -15,8 +15,8 @@ export default function TwoFactorManagement({ isEnabled, enabledAt }: TwoFactorM
   const { t } = useTranslation();
   const [showDisableModal, setShowDisableModal] = useState(false);
   const [showRegenerateModal, setShowRegenerateModal] = useState(false);
-  const [password, setPassword] = useState("");
-  const [code, setCode] = useState("");
+  const [password, setPassword] = useState('');
+  const [code, setCode] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<{ password?: string; code?: string }>({});
 
@@ -25,12 +25,12 @@ export default function TwoFactorManagement({ isEnabled, enabledAt }: TwoFactorM
     setErrors({});
 
     router.post(
-      route("2fa.disable"),
+      route('2fa.disable'),
       { password },
       {
         onSuccess: () => {
           setShowDisableModal(false);
-          setPassword("");
+          setPassword('');
         },
         onError: (errors) => {
           setErrors(errors as any);
@@ -47,12 +47,12 @@ export default function TwoFactorManagement({ isEnabled, enabledAt }: TwoFactorM
     setErrors({});
 
     router.post(
-      route("2fa.regenerate-backup-codes"),
+      route('2fa.regenerate-backup-codes'),
       { code },
       {
         onSuccess: () => {
           setShowRegenerateModal(false);
-          setCode("");
+          setCode('');
         },
         onError: (errors) => {
           setErrors(errors as any);
@@ -65,7 +65,7 @@ export default function TwoFactorManagement({ isEnabled, enabledAt }: TwoFactorM
   };
 
   const handleSetup2FA = () => {
-    router.visit(route("2fa.setup"));
+    router.visit(route('2fa.setup'));
   };
 
   return (
@@ -87,8 +87,8 @@ export default function TwoFactorManagement({ isEnabled, enabledAt }: TwoFactorM
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               {isEnabled
-                ? "Your account is protected with 2FA"
-                : "Add an extra layer of security to your account"}
+                ? 'Your account is protected with 2FA'
+                : 'Add an extra layer of security to your account'}
             </p>
           </div>
         </div>
@@ -140,7 +140,7 @@ export default function TwoFactorManagement({ isEnabled, enabledAt }: TwoFactorM
         isOpen={showDisableModal}
         onClose={() => {
           setShowDisableModal(false);
-          setPassword("");
+          setPassword('');
           setErrors({});
         }}
         title="Disable Two-Factor Authentication"
@@ -174,7 +174,7 @@ export default function TwoFactorManagement({ isEnabled, enabledAt }: TwoFactorM
               variant="outline"
               onClick={() => {
                 setShowDisableModal(false);
-                setPassword("");
+                setPassword('');
                 setErrors({});
               }}
             >
@@ -198,7 +198,7 @@ export default function TwoFactorManagement({ isEnabled, enabledAt }: TwoFactorM
         isOpen={showRegenerateModal}
         onClose={() => {
           setShowRegenerateModal(false);
-          setCode("");
+          setCode('');
           setErrors({});
         }}
         title="Regenerate Backup Codes"
@@ -227,7 +227,7 @@ export default function TwoFactorManagement({ isEnabled, enabledAt }: TwoFactorM
               variant="outline"
               onClick={() => {
                 setShowRegenerateModal(false);
-                setCode("");
+                setCode('');
                 setErrors({});
               }}
             >

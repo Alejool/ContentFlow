@@ -1,9 +1,9 @@
-import { Package } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { useState } from "react";
-import { useActiveAddons } from "@/Hooks/useActiveAddons";
-import { CarouselPagination, CarouselDots } from "@/Components/common/CarouselPagination";
-import { AddonCard } from "./AddonCard";
+import { Package } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useState } from 'react';
+import { useActiveAddons } from '@/Hooks/useActiveAddons';
+import { CarouselPagination, CarouselDots } from '@/Components/common/CarouselPagination';
+import { AddonCard } from './AddonCard';
 
 interface ActiveAddonsCardsProps {
   showCarousel?: boolean;
@@ -49,20 +49,20 @@ export function ActiveAddonsCards({ showCarousel = true }: ActiveAddonsCardsProp
         <div>
           <h2 className="flex items-center gap-2 text-2xl font-bold text-gray-900 dark:text-white">
             <Package className="h-6 w-6 text-primary-600 dark:text-primary-400" />
-            {t("subscription.addons.additionalPackages", "Paquetes Adicionales")}
+            {t('subscription.addons.additionalPackages', 'Paquetes Adicionales')}
           </h2>
           <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            {addons.length}{" "}
+            {addons.length}{' '}
             {addons.length === 1
-              ? t("subscription.addons.activeAddon", "paquete activo")
-              : t("subscription.addons.activeAddonsPlural", "paquetes activos")}{" "}
+              ? t('subscription.addons.activeAddon', 'paquete activo')
+              : t('subscription.addons.activeAddonsPlural', 'paquetes activos')}{' '}
             •
             <span className="ml-1 font-semibold text-primary-600 dark:text-primary-400">
-              ${totalSpent.toFixed(2)} {t("subscription.addons.totalSpent", "Total Gastado")}
+              ${totalSpent.toFixed(2)} {t('subscription.addons.totalSpent', 'Total Gastado')}
             </span>
             {addons.length > 0 && (
               <span className="ml-2 text-gray-500 dark:text-gray-400">
-                • {t("subscription.addons.showingUsage", "Mostrando uso actual")}
+                • {t('subscription.addons.showingUsage', 'Mostrando uso actual')}
               </span>
             )}
           </p>

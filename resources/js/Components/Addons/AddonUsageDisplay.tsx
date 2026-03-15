@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 interface AddonUsageProps {
   type: string;
@@ -27,7 +27,7 @@ export default function AddonUsageDisplay({
   const excessUsage = isExceedingPlan ? currentUsage - planLimit : 0;
 
   const formatValue = (value: number) => {
-    if (type === "storage" && unit === "GB") {
+    if (type === 'storage' && unit === 'GB') {
       return `${value.toFixed(1)} GB`;
     }
     return `${value.toLocaleString()} ${unit}`;
@@ -45,7 +45,7 @@ export default function AddonUsageDisplay({
         <div className="mb-2 flex items-center justify-between">
           <span className="text-sm font-medium text-gray-700">Plan Base</span>
           <span className="text-sm text-gray-600">
-            {isUnlimited ? "Ilimitado" : formatValue(planLimit)}
+            {isUnlimited ? 'Ilimitado' : formatValue(planLimit)}
           </span>
         </div>
 
@@ -95,14 +95,14 @@ export default function AddonUsageDisplay({
             <p className="text-xs text-orange-800">
               {isExceedingPlan ? (
                 <>
-                  <strong>Usando addons:</strong> Has excedido tu plan base por{" "}
+                  <strong>Usando addons:</strong> Has excedido tu plan base por{' '}
                   {formatValue(excessUsage)}. Los addons se están consumiendo automáticamente.
                 </>
               ) : (
                 <>
                   <strong>Addons disponibles:</strong> Tus addons se activarán automáticamente
                   cuando excedas el límite de tu plan base (
-                  {isUnlimited ? "ilimitado" : formatValue(planLimit)}).
+                  {isUnlimited ? 'ilimitado' : formatValue(planLimit)}).
                 </>
               )}
             </p>
@@ -115,11 +115,11 @@ export default function AddonUsageDisplay({
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium text-gray-900">Uso Total Disponible</span>
           <span className="text-sm font-semibold text-gray-900">
-            {isUnlimited ? "Ilimitado" : formatValue(planLimit + addonTotal)}
+            {isUnlimited ? 'Ilimitado' : formatValue(planLimit + addonTotal)}
           </span>
         </div>
         <div className="mt-1 text-xs text-gray-500">
-          Plan: {isUnlimited ? "Ilimitado" : formatValue(planLimit)} + Addons:{" "}
+          Plan: {isUnlimited ? 'Ilimitado' : formatValue(planLimit)} + Addons:{' '}
           {formatValue(addonTotal)}
         </div>
       </div>

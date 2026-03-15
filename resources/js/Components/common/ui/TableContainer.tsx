@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 interface TableContainerProps {
   children: React.ReactNode;
@@ -10,7 +10,7 @@ interface TableContainerProps {
 
 export default function TableContainer({
   children,
-  className = "",
+  className = '',
   title,
   subtitle,
   actions,

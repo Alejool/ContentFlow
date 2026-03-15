@@ -1,10 +1,10 @@
-import { createContext, ReactNode, useContext, useEffect } from "react";
-import { usePage } from "@inertiajs/react";
-import { useOnboardingStore } from "@/stores/onboardingStore";
-import type { OnboardingState } from "@/types/onboarding";
-import { OfflineIndicator } from "@/Components/Onboarding/OfflineIndicator";
-import { OnboardingErrorBoundary } from "@/Components/Onboarding/OnboardingErrorBoundary";
-import { ErrorNotification } from "@/Components/Onboarding/ErrorNotification";
+import { createContext, ReactNode, useContext, useEffect } from 'react';
+import { usePage } from '@inertiajs/react';
+import { useOnboardingStore } from '@/stores/onboardingStore';
+import type { OnboardingState } from '@/types/onboarding';
+import { OfflineIndicator } from '@/Components/Onboarding/OfflineIndicator';
+import { OnboardingErrorBoundary } from '@/Components/Onboarding/OnboardingErrorBoundary';
+import { ErrorNotification } from '@/Components/Onboarding/ErrorNotification';
 
 /**
  * OnboardingContextValue defines the interface for the onboarding context.
@@ -98,10 +98,10 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
       store.syncWithBackend();
     };
 
-    window.addEventListener("subscription-plan-changed", handleSubscriptionChange);
+    window.addEventListener('subscription-plan-changed', handleSubscriptionChange);
 
     return () => {
-      window.removeEventListener("subscription-plan-changed", handleSubscriptionChange);
+      window.removeEventListener('subscription-plan-changed', handleSubscriptionChange);
     };
   }, []);
 
@@ -159,7 +159,7 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
 export function useOnboarding(): OnboardingContextValue {
   const context = useContext(OnboardingContext);
   if (context === undefined) {
-    throw new Error("useOnboarding must be used within an OnboardingProvider");
+    throw new Error('useOnboarding must be used within an OnboardingProvider');
   }
   return context;
 }

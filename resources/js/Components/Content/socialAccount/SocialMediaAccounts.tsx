@@ -1,12 +1,12 @@
-import SocialAccountCardSkeleton from "@/Components/common/ui/skeletons/SocialAccountCardSkeleton";
-import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
-import DisconnectBlockerModal from "@/Components/Content/modals/DisconnectBlockerModal";
-import DisconnectWarningModal from "@/Components/Content/modals/DisconnectWarningModal";
-import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatforms";
-import { useSocialMediaAuth } from "@/Hooks/useSocialMediaAuth";
-import { getPlatformSchema } from "@/schemas/platformSettings";
-import { Link, router, usePage } from "@inertiajs/react";
-import axios from "axios";
+import SocialAccountCardSkeleton from '@/Components/common/ui/skeletons/SocialAccountCardSkeleton';
+import PlatformSettingsModal from '@/Components/ConfigSocialMedia/PlatformSettingsModal';
+import DisconnectBlockerModal from '@/Components/Content/modals/DisconnectBlockerModal';
+import DisconnectWarningModal from '@/Components/Content/modals/DisconnectWarningModal';
+import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatforms';
+import { useSocialMediaAuth } from '@/Hooks/useSocialMediaAuth';
+import { getPlatformSchema } from '@/schemas/platformSettings';
+import { Link, router, usePage } from '@inertiajs/react';
+import axios from 'axios';
 import {
   BarChart3,
   Check,
@@ -17,10 +17,10 @@ import {
   Loader2,
   Settings,
   X,
-} from "lucide-react";
-import { memo, useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
+} from 'lucide-react';
+import { memo, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface Account {
   id: number; // For connected accounts, this is the DB ID. For unconnected, it might be platform index.
@@ -44,7 +44,7 @@ const SocialMediaAccounts = memo(() => {
 
   // Check if user has manage-accounts permission from current workspace
   const userPermissions = auth?.current_workspace?.permissions || [];
-  const canManageAccounts = userPermissions.includes("manage-accounts");
+  const canManageAccounts = userPermissions.includes('manage-accounts');
 
   useEffect(() => {
     setLocalSettings({});
@@ -82,7 +82,7 @@ const SocialMediaAccounts = memo(() => {
     }
 
     router.patch(
-      route("settings.social.update"),
+      route('settings.social.update'),
       {
         settings: localSettings,
       },
@@ -90,12 +90,12 @@ const SocialMediaAccounts = memo(() => {
         preserveScroll: true,
         onSuccess: () => {
           const message =
-            t("platformSettings.messages.success") + " " + activePlatform.toLowerCase();
+            t('platformSettings.messages.success') + ' ' + activePlatform.toLowerCase();
           toast.success(message);
           handleCloseSettings();
         },
         onError: () => {
-          toast.error(t("common.error") || "Error al guardar");
+          toast.error(t('common.error') || 'Error al guardar');
         },
       },
     );
@@ -116,30 +116,30 @@ const SocialMediaAccounts = memo(() => {
     fetchConnectedAccounts();
 
     const handleAuthMessage = (event: MessageEvent) => {
-      if (event.data && event.data.type === "social_auth_callback") {
+      if (event.data && event.data.type === 'social_auth_callback') {
         if (event.data.success) {
           fetchConnectedAccounts();
         }
       }
     };
 
-    window.addEventListener("message", handleAuthMessage);
+    window.addEventListener('message', handleAuthMessage);
 
     return () => {
-      window.removeEventListener("message", handleAuthMessage);
+      window.removeEventListener('message', handleAuthMessage);
     };
   }, []);
 
   const fetchConnectedAccounts = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("/social-accounts", {
+      const response = await axios.get('/social-accounts', {
         headers: {
-          "X-CSRF-TOKEN": document
+          'X-CSRF-TOKEN': document
             .querySelector('meta[name="csrf-token"]')
-            ?.getAttribute("content"),
-          Accept: "application/json",
-          "Content-Type": "application/json",
+            ?.getAttribute('content'),
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
         },
         withCredentials: true,
       });
@@ -149,9 +149,9 @@ const SocialMediaAccounts = memo(() => {
       }
     } catch (error: any) {
       if (error.response?.status === 401) {
-        toast.error(t("manageContent.socialMedia.messages.unauthorized"));
+        toast.error(t('manageContent.socialMedia.messages.unauthorized'));
       } else {
-        toast.error(t("manageContent.socialMedia.messages.loadError"));
+        toast.error(t('manageContent.socialMedia.messages.loadError'));
       }
     } finally {
       setLoading(false);
@@ -221,7 +221,7 @@ const SocialMediaAccounts = memo(() => {
   // Listen for real-time publication status updates via WebSocket
   useEffect(() => {
     if (!window.Echo || !auth?.user?.current_workspace_id) {
-      console.warn("[Publishing Check] Echo not available or no workspace ID");
+      console.warn('[Publishing Check] Echo not available or no workspace ID');
       return;
     }
 
@@ -231,7 +231,7 @@ const SocialMediaAccounts = memo(() => {
     const channel = window.Echo.private(`workspace.${workspaceId}`);
 
     const handlePublicationStatusUpdate = (event: any) => {
-      console.log("[Publishing Check] Publication status update received:", event);
+      console.log('[Publishing Check] Publication status update received:', event);
 
       // Check if any of our accounts are affected
       if (event.social_account_ids && Array.isArray(event.social_account_ids)) {
@@ -239,10 +239,10 @@ const SocialMediaAccounts = memo(() => {
           const newSet = new Set(prev);
 
           event.social_account_ids.forEach((accountId: number) => {
-            if (event.status === "publishing" || event.status === "retrying") {
+            if (event.status === 'publishing' || event.status === 'retrying') {
               console.log(`[Publishing Check] Account ${accountId} is now publishing`);
               newSet.add(accountId);
-            } else if (event.status === "published" || event.status === "failed") {
+            } else if (event.status === 'published' || event.status === 'failed') {
               console.log(`[Publishing Check] Account ${accountId} finished publishing`);
               newSet.delete(accountId);
             }
@@ -253,12 +253,12 @@ const SocialMediaAccounts = memo(() => {
       }
     };
 
-    channel.listen(".PublicationStatusUpdated", handlePublicationStatusUpdate);
+    channel.listen('.PublicationStatusUpdated', handlePublicationStatusUpdate);
 
-    console.log("[Publishing Check] WebSocket listener registered for workspace:", workspaceId);
+    console.log('[Publishing Check] WebSocket listener registered for workspace:', workspaceId);
 
     return () => {
-      channel.stopListening(".PublicationStatusUpdated", handlePublicationStatusUpdate);
+      channel.stopListening('.PublicationStatusUpdated', handlePublicationStatusUpdate);
     };
   }, [auth?.user?.current_workspace_id]);
 
@@ -274,10 +274,10 @@ const SocialMediaAccounts = memo(() => {
               `/api/v1/social-accounts/${account.accountId}/publishing-status`,
               {
                 headers: {
-                  "X-CSRF-TOKEN": document
+                  'X-CSRF-TOKEN': document
                     .querySelector('meta[name="csrf-token"]')
-                    ?.getAttribute("content"),
-                  Accept: "application/json",
+                    ?.getAttribute('content'),
+                  Accept: 'application/json',
                 },
                 withCredentials: true,
               },
@@ -297,7 +297,7 @@ const SocialMediaAccounts = memo(() => {
 
       if (publishingAccounts.size > 0) {
         console.log(
-          "[Publishing Check] Initial accounts with publishing:",
+          '[Publishing Check] Initial accounts with publishing:',
           Array.from(publishingAccounts),
         );
         setAccountsWithPublishing(publishingAccounts);
@@ -313,7 +313,7 @@ const SocialMediaAccounts = memo(() => {
     // Check permission first
     if (!canManageAccounts) {
       toast.error(
-        t("manageContent.socialMedia.messages.noPermission") ||
+        t('manageContent.socialMedia.messages.noPermission') ||
           "No tienes permiso para gestionar cuentas de redes sociales. Solo usuarios con el permiso 'manage-accounts' pueden conectar o desconectar cuentas.",
       );
       return;
@@ -327,8 +327,8 @@ const SocialMediaAccounts = memo(() => {
       // Check if account has publishing posts
       if (accountsWithPublishing.has(account.accountId as number)) {
         toast.error(
-          t("manageContent.socialMedia.messages.cannotDisconnectPublishing") ||
-            "No puedes desconectar esta cuenta mientras hay publicaciones en proceso",
+          t('manageContent.socialMedia.messages.cannotDisconnectPublishing') ||
+            'No puedes desconectar esta cuenta mientras hay publicaciones en proceso',
         );
         return;
       }
@@ -340,7 +340,7 @@ const SocialMediaAccounts = memo(() => {
           fetchConnectedAccounts(); // Refresh to regroup
           setConnectedAccountsCount((prev) => prev - 1);
           toast.success(
-            `${account.name} ${t("manageContent.socialMedia.messages.disconnectSuccess")}`,
+            `${account.name} ${t('manageContent.socialMedia.messages.disconnectSuccess')}`,
           );
         } else if (result && !result.success && result.posts) {
           // Show appropriate modal based on reason
@@ -352,13 +352,13 @@ const SocialMediaAccounts = memo(() => {
           });
         }
       } catch (error: any) {
-        toast.error(t("manageContent.socialMedia.messages.disconnectError"));
+        toast.error(t('manageContent.socialMedia.messages.disconnectError'));
       }
     } else {
       try {
         await connectAccount(account.platform);
       } catch (error: any) {
-        toast.error(t("manageContent.socialMedia.messages.connectError"));
+        toast.error(t('manageContent.socialMedia.messages.connectError'));
       }
     }
   };
@@ -370,7 +370,7 @@ const SocialMediaAccounts = memo(() => {
       fetchConnectedAccounts(); // Refresh
       setConnectedAccountsCount((prev) => prev - 1);
       setBlockerModalData(null);
-      toast.success(`${account.name} ${t("manageContent.socialMedia.messages.disconnectSuccess")}`);
+      toast.success(`${account.name} ${t('manageContent.socialMedia.messages.disconnectSuccess')}`);
     }
   };
 
@@ -386,21 +386,21 @@ const SocialMediaAccounts = memo(() => {
           </div>
           <div className="text-left">
             <h3 className="font-semibold text-gray-900 dark:text-gray-100">
-              {t("manageContent.socialMedia.title")}
+              {t('manageContent.socialMedia.title')}
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              {connectedAccountsCount} {t("manageContent.socialMedia.accounts")}{" "}
-              {t("manageContent.socialMedia.connected")}
+              {connectedAccountsCount} {t('manageContent.socialMedia.accounts')}{' '}
+              {t('manageContent.socialMedia.connected')}
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           <Link
-            href={route("profile.edit")}
+            href={route('profile.edit')}
             onClick={(e) => e.stopPropagation()}
             className="rounded-lg bg-primary-50 p-2 text-primary-600 transition-all hover:bg-primary-100 hover:text-primary-700 dark:bg-neutral-800 dark:text-primary-400 dark:hover:bg-neutral-700 dark:hover:text-primary-300"
-            title={t("nav.profile") || "Perfil"}
+            title={t('nav.profile') || 'Perfil'}
           >
             <Settings className="h-5 w-5" />
           </Link>
@@ -409,14 +409,14 @@ const SocialMediaAccounts = memo(() => {
             {isExpanded ? (
               <>
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {t("manageContent.socialMedia.hide")}
+                  {t('manageContent.socialMedia.hide')}
                 </span>
                 <ChevronUp className="h-5 w-5 text-gray-500" />
               </>
             ) : (
               <>
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {t("manageContent.socialMedia.seeAccounts")}
+                  {t('manageContent.socialMedia.seeAccounts')}
                 </span>
                 <ChevronDown className="h-5 w-5 text-gray-500" />
               </>
@@ -427,7 +427,7 @@ const SocialMediaAccounts = memo(() => {
 
       <div
         className={`overflow-hidden transition-all duration-300 ${
-          isExpanded ? "mt-2 max-h-[2000px] opacity-100" : "max-h-0 opacity-0"
+          isExpanded ? 'mt-2 max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
         }`}
       >
         <div className="space-y-8">
@@ -444,27 +444,27 @@ const SocialMediaAccounts = memo(() => {
                   key={`${account.platform}-${account.id}`}
                   className={`group relative rounded-lg border border-gray-100 bg-white p-4 transition-all duration-300 hover:border-primary-100 hover:shadow-xl dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-primary-900/30 sm:p-5 ${
                     account.isConnected
-                      ? "ring-1 ring-emerald-500/10 dark:ring-emerald-500/5"
-                      : "opacity-90 hover:opacity-100"
+                      ? 'ring-1 ring-emerald-500/10 dark:ring-emerald-500/5'
+                      : 'opacity-90 hover:opacity-100'
                   }`}
                 >
                   <div className="absolute right-4 top-4 z-10">
                     <div
                       className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-tight transition-colors ${
                         account.isConnected
-                          ? "border-emerald-100 bg-emerald-50 text-emerald-700 dark:border-emerald-900/80 dark:bg-emerald-900/30 dark:text-emerald-400"
-                          : "border-gray-100 bg-gray-50 text-gray-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-400"
+                          ? 'border-emerald-100 bg-emerald-50 text-emerald-700 dark:border-emerald-900/80 dark:bg-emerald-900/30 dark:text-emerald-400'
+                          : 'border-gray-100 bg-gray-50 text-gray-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-400'
                       }`}
                     >
                       {account.isConnected ? (
                         <>
                           <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                          {t("manageContent.socialMedia.status.connected")}
+                          {t('manageContent.socialMedia.status.connected')}
                         </>
                       ) : (
                         <>
                           <div className="h-1.5 w-1.5 rounded-full bg-gray-400" />
-                          {t("manageContent.socialMedia.status.notConnected")}
+                          {t('manageContent.socialMedia.status.notConnected')}
                         </>
                       )}
                     </div>
@@ -511,14 +511,14 @@ const SocialMediaAccounts = memo(() => {
                         </p>
                         {account.connectedBy && (
                           <p className="text-[9px] font-bold uppercase tracking-wider text-primary-500">
-                            {t("manageContent.socialMedia.connectedBy") || "Conectado por"}:{" "}
+                            {t('manageContent.socialMedia.connectedBy') || 'Conectado por'}:{' '}
                             {account.connectedBy}
                           </p>
                         )}
                       </div>
                     ) : (
                       <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                        {t("manageContent.socialMedia.status.connectToShare")}
+                        {t('manageContent.socialMedia.status.connectToShare')}
                       </p>
                     )}
                   </div>
@@ -533,14 +533,14 @@ const SocialMediaAccounts = memo(() => {
                     return (
                       <div className="mb-4 rounded-lg border border-gray-100 bg-gray-50/80 px-3 py-2.5 dark:border-neutral-700/50 dark:bg-neutral-800/50">
                         <p className="mb-1.5 text-[9px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                          {t("manageContent.socialMedia.apiLimits")}
+                          {t('manageContent.socialMedia.apiLimits')}
                         </p>
                         <div className="space-y-1">
-                          {account.platform.toLowerCase() === "facebook" && (
+                          {account.platform.toLowerCase() === 'facebook' && (
                             <>
                               <div className="flex items-center justify-between text-[10px]">
                                 <span className="text-gray-600 dark:text-gray-400">
-                                  {t("manageContent.socialMedia.limits.requestsPerHour")}:
+                                  {t('manageContent.socialMedia.limits.requestsPerHour')}:
                                 </span>
                                 <span className="font-bold text-gray-900 dark:text-gray-100">
                                   {apiLimits.requestsPerHour}
@@ -548,7 +548,7 @@ const SocialMediaAccounts = memo(() => {
                               </div>
                               <div className="flex items-center justify-between text-[10px]">
                                 <span className="text-gray-600 dark:text-gray-400">
-                                  {t("manageContent.socialMedia.limits.requestsPerMinute")}:
+                                  {t('manageContent.socialMedia.limits.requestsPerMinute')}:
                                 </span>
                                 <span className="font-bold text-gray-900 dark:text-gray-100">
                                   {apiLimits.requestsPerMinute}
@@ -556,11 +556,11 @@ const SocialMediaAccounts = memo(() => {
                               </div>
                             </>
                           )}
-                          {account.platform.toLowerCase() === "tiktok" && (
+                          {account.platform.toLowerCase() === 'tiktok' && (
                             <>
                               <div className="flex items-center justify-between text-[10px]">
                                 <span className="text-gray-600 dark:text-gray-400">
-                                  {t("manageContent.socialMedia.limits.requestsPerDay")}:
+                                  {t('manageContent.socialMedia.limits.requestsPerDay')}:
                                 </span>
                                 <span className="font-bold text-gray-900 dark:text-gray-100">
                                   {apiLimits.requestsPerDay}
@@ -568,7 +568,7 @@ const SocialMediaAccounts = memo(() => {
                               </div>
                               <div className="flex items-center justify-between text-[10px]">
                                 <span className="text-gray-600 dark:text-gray-400">
-                                  {t("manageContent.socialMedia.limits.postsPerDay")}:
+                                  {t('manageContent.socialMedia.limits.postsPerDay')}:
                                 </span>
                                 <span className="font-bold text-gray-900 dark:text-gray-100">
                                   {apiLimits.postsPerDay}
@@ -576,11 +576,11 @@ const SocialMediaAccounts = memo(() => {
                               </div>
                             </>
                           )}
-                          {account.platform.toLowerCase() === "twitter" && (
+                          {account.platform.toLowerCase() === 'twitter' && (
                             <>
                               <div className="flex items-center justify-between text-[10px]">
                                 <span className="text-gray-600 dark:text-gray-400">
-                                  {t("manageContent.socialMedia.limits.postsPerThreeHours")}:
+                                  {t('manageContent.socialMedia.limits.postsPerThreeHours')}:
                                 </span>
                                 <span className="font-bold text-gray-900 dark:text-gray-100">
                                   {apiLimits.postsPerThreeHours}
@@ -588,7 +588,7 @@ const SocialMediaAccounts = memo(() => {
                               </div>
                               <div className="flex items-center justify-between text-[10px]">
                                 <span className="text-gray-600 dark:text-gray-400">
-                                  {t("manageContent.socialMedia.limits.requestsPerDay")}:
+                                  {t('manageContent.socialMedia.limits.requestsPerDay')}:
                                 </span>
                                 <span className="font-bold text-gray-900 dark:text-gray-100">
                                   {apiLimits.requestsPerDay}
@@ -596,11 +596,11 @@ const SocialMediaAccounts = memo(() => {
                               </div>
                             </>
                           )}
-                          {account.platform.toLowerCase() === "youtube" && (
+                          {account.platform.toLowerCase() === 'youtube' && (
                             <>
                               <div className="flex items-center justify-between text-[10px]">
                                 <span className="text-gray-600 dark:text-gray-400">
-                                  {t("manageContent.socialMedia.limits.dailyQuota")}:
+                                  {t('manageContent.socialMedia.limits.dailyQuota')}:
                                 </span>
                                 <span className="font-bold text-gray-900 dark:text-gray-100">
                                   {apiLimits.quotaUnitsPerDay} units
@@ -608,7 +608,7 @@ const SocialMediaAccounts = memo(() => {
                               </div>
                               <div className="flex items-center justify-between text-[10px]">
                                 <span className="text-gray-600 dark:text-gray-400">
-                                  {t("manageContent.socialMedia.limits.uploadCost")}:
+                                  {t('manageContent.socialMedia.limits.uploadCost')}:
                                 </span>
                                 <span className="font-bold text-gray-900 dark:text-gray-100">
                                   {apiLimits.uploadCost}
@@ -635,19 +635,19 @@ const SocialMediaAccounts = memo(() => {
                         isLoading ||
                         (account.isConnected &&
                           accountsWithPublishing.has(account.accountId as number))
-                          ? "cursor-not-allowed bg-gray-100 text-gray-400 opacity-60 dark:bg-neutral-700/50"
+                          ? 'cursor-not-allowed bg-gray-100 text-gray-400 opacity-60 dark:bg-neutral-700/50'
                           : account.isConnected
-                            ? "border border-primary-200 bg-gradient-to-r from-primary-50 to-primary-50 text-primary-600 hover:bg-primary-100 dark:border-primary-900/30 dark:bg-gradient-to-r dark:from-primary-900/10 dark:to-primary-800/10 dark:text-primary-400 dark:hover:bg-primary-900/20"
+                            ? 'border border-primary-200 bg-gradient-to-r from-primary-50 to-primary-50 text-primary-600 hover:bg-primary-100 dark:border-primary-900/30 dark:bg-gradient-to-r dark:from-primary-900/10 dark:to-primary-800/10 dark:text-primary-400 dark:hover:bg-primary-900/20'
                             : `bg-gradient-to-r ${account.gradient} text-white shadow-lg hover:scale-[1.02] hover:shadow-xl`
                       }`}
                       title={
                         !canManageAccounts
-                          ? t("manageContent.socialMedia.messages.noPermission") ||
-                            "No tienes permiso para gestionar cuentas de redes sociales"
+                          ? t('manageContent.socialMedia.messages.noPermission') ||
+                            'No tienes permiso para gestionar cuentas de redes sociales'
                           : account.isConnected &&
                               accountsWithPublishing.has(account.accountId as number)
-                            ? t("manageContent.socialMedia.messages.cannotDisconnectPublishing") ||
-                              "No puedes desconectar mientras hay publicaciones en proceso"
+                            ? t('manageContent.socialMedia.messages.cannotDisconnectPublishing') ||
+                              'No puedes desconectar mientras hay publicaciones en proceso'
                             : undefined
                       }
                     >
@@ -655,28 +655,28 @@ const SocialMediaAccounts = memo(() => {
                         {!canManageAccounts ? (
                           <>
                             <X className="h-4 w-4" />
-                            {t("manageContent.socialMedia.actions.noPermission") || "Sin permiso"}
+                            {t('manageContent.socialMedia.actions.noPermission') || 'Sin permiso'}
                           </>
                         ) : isLoading ? (
                           <>
                             <Loader2 className="h-4 w-4 animate-spin" />
-                            {t("manageContent.socialMedia.actions.processing")}
+                            {t('manageContent.socialMedia.actions.processing')}
                           </>
                         ) : account.isConnected &&
                           accountsWithPublishing.has(account.accountId as number) ? (
                           <>
                             <Clock className="h-4 w-4 animate-pulse" />
-                            {t("manageContent.socialMedia.actions.publishing") || "Publicando..."}
+                            {t('manageContent.socialMedia.actions.publishing') || 'Publicando...'}
                           </>
                         ) : account.isConnected ? (
                           <>
                             <X className="h-4 w-4" />
-                            {t("manageContent.socialMedia.actions.disconnect")}
+                            {t('manageContent.socialMedia.actions.disconnect')}
                           </>
                         ) : (
                           <>
                             <ExternalLink className="h-4 w-4" />
-                            {t("manageContent.socialMedia.actions.connect")}
+                            {t('manageContent.socialMedia.actions.connect')}
                           </>
                         )}
                       </span>
@@ -696,14 +696,14 @@ const SocialMediaAccounts = memo(() => {
                         disabled={!canManageAccounts}
                         className={`flex items-center justify-center rounded-lg border p-3 shadow-sm transition-all ${
                           !canManageAccounts
-                            ? "cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400 opacity-60 dark:border-neutral-700 dark:bg-neutral-700/50"
-                            : "border-gray-200 bg-white text-primary-600 hover:border-gray-300 hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-primary-400 dark:hover:border-neutral-600 dark:hover:bg-neutral-700"
+                            ? 'cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400 opacity-60 dark:border-neutral-700 dark:bg-neutral-700/50'
+                            : 'border-gray-200 bg-white text-primary-600 hover:border-gray-300 hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-primary-400 dark:hover:border-neutral-600 dark:hover:bg-neutral-700'
                         }`}
                         title={
                           !canManageAccounts
-                            ? t("manageContent.socialMedia.messages.noPermission") ||
-                              "No tienes permiso para gestionar cuentas"
-                            : t("platformSettings.title")
+                            ? t('manageContent.socialMedia.messages.noPermission') ||
+                              'No tienes permiso para gestionar cuentas'
+                            : t('platformSettings.title')
                         }
                       >
                         <Settings className="h-5 w-5" />
@@ -722,7 +722,7 @@ const SocialMediaAccounts = memo(() => {
               onClose={() => setBlockerModalData(null)}
               accountName={blockerModalData.account.name}
               posts={blockerModalData.posts}
-              reason={blockerModalData.reason as "publishing" | "scheduled"}
+              reason={blockerModalData.reason as 'publishing' | 'scheduled'}
             />
           )}
 

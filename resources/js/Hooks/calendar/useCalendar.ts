@@ -1,9 +1,9 @@
-import { useCalendarStore } from "@/stores/calendarStore";
-import { useManageContentUIStore } from "@/stores/manageContentUIStore";
-import axios from "axios";
-import { addMonths, setMonth, setYear, subMonths } from "date-fns";
-import { useCallback, useEffect, useMemo } from "react";
-import { useShallow } from "zustand/react/shallow";
+import { useCalendarStore } from '@/stores/calendarStore';
+import { useManageContentUIStore } from '@/stores/manageContentUIStore';
+import axios from 'axios';
+import { addMonths, setMonth, setYear, subMonths } from 'date-fns';
+import { useCallback, useEffect, useMemo } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 export const useCalendar = () => {
   const {
@@ -65,13 +65,13 @@ export const useCalendar = () => {
   const filteredEvents = useMemo(() => {
     return events.filter((e) => {
       // Platform filter
-      if (platformFilter !== "all") {
-        if (platformFilter === "user_event") {
+      if (platformFilter !== 'all') {
+        if (platformFilter === 'user_event') {
           // Only show user events
-          if (e.type !== "user_event") return false;
+          if (e.type !== 'user_event') return false;
         } else {
           // Show events matching the selected platform
-          if (e.type === "user_event") return false;
+          if (e.type === 'user_event') return false;
 
           // Check both platform and extendedProps.platform for compatibility
           const eventPlatform = (e.platform || e.extendedProps?.platform)?.toLowerCase();
@@ -80,7 +80,7 @@ export const useCalendar = () => {
       }
 
       // Status filter
-      if (statusFilter !== "all" && e.status !== statusFilter) return false;
+      if (statusFilter !== 'all' && e.status !== statusFilter) return false;
 
       // Campaign filter
       if (campaignFilter && e.extendedProps.campaign_id !== campaignFilter) return false;
@@ -124,34 +124,34 @@ export const useCalendar = () => {
     async (event: any) => {
       try {
         const type = event.type;
-        const resourceId = event.id.split("_").pop();
+        const resourceId = event.id.split('_').pop();
 
-        if (!resourceId || resourceId === "undefined") {
+        if (!resourceId || resourceId === 'undefined') {
           return;
         }
 
-        if (type === "user_event") {
+        if (type === 'user_event') {
           // Detailed handling of user_event if needed elsewhere,
           // for now ModernCalendar handles its own modal locally or via prop
           return;
         }
 
-        if (type === "post") {
+        if (type === 'post') {
           const pubId = event.extendedProps?.publication_id;
           if (!pubId) {
             return;
           }
           const response = await axios.get(`/api/v1/publications/${pubId}`);
           const data = response.data.publication || response.data.data;
-          if (data) (data as any).__type = "publication";
+          if (data) (data as any).__type = 'publication';
           openEditModal(data);
           return;
         }
 
-        if (type === "publication") {
+        if (type === 'publication') {
           const response = await axios.get(`/api/v1/publications/${resourceId}`);
           const data = response.data.publication || response.data.data;
-          if (data) (data as any).__type = "publication";
+          if (data) (data as any).__type = 'publication';
           openEditModal(data);
           return;
         }
@@ -161,7 +161,7 @@ export const useCalendar = () => {
         const data = response.data.campaign || response.data.data || response.data;
 
         if (response.data.campaign) {
-          if (data) (data as any).__type = "campaign";
+          if (data) (data as any).__type = 'campaign';
           openEditModal(data);
         } else {
           openViewDetailsModal(data);

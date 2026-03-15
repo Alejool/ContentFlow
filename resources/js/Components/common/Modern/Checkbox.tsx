@@ -1,7 +1,7 @@
-import { useTheme } from "@/Hooks/useTheme";
-import { AlertCircle, Check, CheckCircle, LucideIcon } from "lucide-react";
-import { ReactNode } from "react";
-import { FieldValues, Path, UseFormRegister } from "react-hook-form";
+import { useTheme } from '@/Hooks/useTheme';
+import { AlertCircle, Check, CheckCircle, LucideIcon } from 'lucide-react';
+import { ReactNode } from 'react';
+import { FieldValues, Path, UseFormRegister } from 'react-hook-form';
 
 interface CheckboxProps<T extends FieldValues = FieldValues> {
   id: string;
@@ -15,10 +15,10 @@ interface CheckboxProps<T extends FieldValues = FieldValues> {
   className?: string;
   containerClassName?: string;
   icon?: LucideIcon;
-  theme?: "dark" | "light";
+  theme?: 'dark' | 'light';
   hint?: string;
-  size?: "sm" | "md" | "lg";
-  variant?: "default" | "filled" | "outlined";
+  size?: 'sm' | 'md' | 'lg';
+  variant?: 'default' | 'filled' | 'outlined';
   required?: boolean;
   onChange?: (checked: boolean) => void;
   value?: string | number | boolean;
@@ -34,13 +34,13 @@ export default function Checkbox<T extends FieldValues>({
   name,
   checked,
   disabled = false,
-  className = "",
-  containerClassName = "",
+  className = '',
+  containerClassName = '',
   icon: Icon,
   theme: propTheme,
   hint,
-  size = "md",
-  variant = "default",
+  size = 'md',
+  variant = 'default',
   required = false,
   onChange,
   value,
@@ -53,36 +53,36 @@ export default function Checkbox<T extends FieldValues>({
   // Configuración de tamaños
   const sizeConfig = {
     sm: {
-      checkbox: "w-4 h-4",
-      icon: "w-3 h-3",
-      label: "text-xs",
-      description: "text-xs",
+      checkbox: 'w-4 h-4',
+      icon: 'w-3 h-3',
+      label: 'text-xs',
+      description: 'text-xs',
     },
     md: {
-      checkbox: "w-5 h-5",
-      icon: "w-4 h-4",
-      label: "text-sm",
-      description: "text-xs",
+      checkbox: 'w-5 h-5',
+      icon: 'w-4 h-4',
+      label: 'text-sm',
+      description: 'text-xs',
     },
     lg: {
-      checkbox: "w-6 h-6",
-      icon: "w-5 h-5",
-      label: "text-base",
-      description: "text-sm",
+      checkbox: 'w-6 h-6',
+      icon: 'w-5 h-5',
+      label: 'text-base',
+      description: 'text-sm',
     },
   };
 
   const currentSize = sizeConfig[size];
 
   const getContainerStyles = () => {
-    const baseStyles = "flex items-start gap-3 transition-all duration-200";
+    const baseStyles = 'flex items-start gap-3 transition-all duration-200';
 
     if (disabled) {
       return `${baseStyles} opacity-60 cursor-not-allowed`;
     }
 
     if (error) {
-      return `${baseStyles} ${theme === "dark" ? "animate-pulse" : ""}`;
+      return `${baseStyles} ${theme === 'dark' ? 'animate-pulse' : ''}`;
     }
 
     return baseStyles;
@@ -95,27 +95,27 @@ export default function Checkbox<T extends FieldValues>({
       ${currentSize.checkbox}
     `;
 
-    if (theme === "dark") {
+    if (theme === 'dark') {
       switch (variant) {
-        case "filled":
+        case 'filled':
           return `
             ${baseStyles}
             ${
               checked
-                ? "bg-primary-500 border-primary-500"
-                : "bg-neutral-800 border-neutral-600 hover:border-neutral-500"
+                ? 'bg-primary-500 border-primary-500'
+                : 'bg-neutral-800 border-neutral-600 hover:border-neutral-500'
             }
             focus:ring-primary-500/30
           `;
 
-        case "outlined":
+        case 'outlined':
           return `
             ${baseStyles}
             bg-transparent
             ${
               checked
-                ? "border-primary-500 bg-primary-500/10"
-                : "border-neutral-600 hover:border-neutral-500"
+                ? 'border-primary-500 bg-primary-500/10'
+                : 'border-neutral-600 hover:border-neutral-500'
             }
             focus:ring-primary-500/30
           `;
@@ -125,31 +125,31 @@ export default function Checkbox<T extends FieldValues>({
             ${baseStyles}
             ${
               checked
-                ? "bg-primary-500 border-primary-500"
-                : "bg-neutral-800/50 border-neutral-600 hover:border-neutral-500"
+                ? 'bg-primary-500 border-primary-500'
+                : 'bg-neutral-800/50 border-neutral-600 hover:border-neutral-500'
             }
             focus:ring-primary-500/30
           `;
       }
     } else {
       switch (variant) {
-        case "filled":
+        case 'filled':
           return `
             ${baseStyles}
             ${
               checked
-                ? "bg-primary-500 border-primary-500"
-                : "bg-gray-100 border-gray-300 hover:border-gray-400"
+                ? 'bg-primary-500 border-primary-500'
+                : 'bg-gray-100 border-gray-300 hover:border-gray-400'
             }
             focus:ring-primary-500/20
           `;
 
-        case "outlined":
+        case 'outlined':
           return `
             ${baseStyles}
             bg-transparent
             ${
-              checked ? "border-primary-500 bg-primary-50" : "border-gray-300 hover:border-gray-400"
+              checked ? 'border-primary-500 bg-primary-50' : 'border-gray-300 hover:border-gray-400'
             }
             focus:ring-primary-500/20
           `;
@@ -159,8 +159,8 @@ export default function Checkbox<T extends FieldValues>({
             ${baseStyles}
             ${
               checked
-                ? "bg-primary-500 border-primary-500"
-                : "bg-white border-gray-300 hover:border-gray-400"
+                ? 'bg-primary-500 border-primary-500'
+                : 'bg-white border-gray-300 hover:border-gray-400'
             }
             focus:ring-primary-500/20
           `;
@@ -171,25 +171,25 @@ export default function Checkbox<T extends FieldValues>({
   const getLabelStyles = () => {
     const base = `font-medium cursor-pointer select-none ${currentSize.label}`;
 
-    if (theme === "dark") {
-      return `${base} ${error ? "text-primary-400" : success ? "text-green-400" : "text-gray-300"}`;
+    if (theme === 'dark') {
+      return `${base} ${error ? 'text-primary-400' : success ? 'text-green-400' : 'text-gray-300'}`;
     }
-    return `${base} ${error ? "text-primary-600" : success ? "text-green-600" : "text-gray-700"}`;
+    return `${base} ${error ? 'text-primary-600' : success ? 'text-green-600' : 'text-gray-700'}`;
   };
 
   const getDescriptionStyles = () => {
-    return theme === "dark" ? "text-gray-400 mt-1" : "text-gray-500 mt-1";
+    return theme === 'dark' ? 'text-gray-400 mt-1' : 'text-gray-500 mt-1';
   };
 
-  const getMessageStyles = (type: "error" | "success") => {
-    const base = "flex items-start gap-2 px-3 py-2 rounded-lg text-sm mt-2";
+  const getMessageStyles = (type: 'error' | 'success') => {
+    const base = 'flex items-start gap-2 px-3 py-2 rounded-lg text-sm mt-2';
 
-    if (theme === "dark") {
-      return type === "error"
+    if (theme === 'dark') {
+      return type === 'error'
         ? `${base} text-primary-300 bg-primary-900/30 border border-primary-800/50`
         : `${base} text-green-300 bg-green-900/30 border border-green-800/50`;
     }
-    return type === "error"
+    return type === 'error'
       ? `${base} text-primary-600 bg-primary-50/80 border border-primary-100`
       : `${base} text-green-600 bg-green-50/80 border border-green-100`;
   };
@@ -212,7 +212,7 @@ export default function Checkbox<T extends FieldValues>({
               }
             }}
             value={value}
-            className={`absolute h-full w-full cursor-pointer opacity-0 ${disabled ? "cursor-not-allowed" : ""} `}
+            className={`absolute h-full w-full cursor-pointer opacity-0 ${disabled ? 'cursor-not-allowed' : ''} `}
             aria-invalid={!!error}
             aria-describedby={error ? `${id}-error` : success ? `${id}-success` : undefined}
             {...props}
@@ -240,17 +240,17 @@ export default function Checkbox<T extends FieldValues>({
         {Icon && (
           <div
             className={` ${
-              theme === "dark"
+              theme === 'dark'
                 ? error
-                  ? "text-primary-400"
+                  ? 'text-primary-400'
                   : success
-                    ? "text-green-400"
-                    : "text-gray-400"
+                    ? 'text-green-400'
+                    : 'text-gray-400'
                 : error
-                  ? "text-primary-500"
+                  ? 'text-primary-500'
                   : success
-                    ? "text-green-500"
-                    : "text-gray-400"
+                    ? 'text-green-500'
+                    : 'text-gray-400'
             } `}
           >
             <Icon className={currentSize.icon} />
@@ -259,14 +259,14 @@ export default function Checkbox<T extends FieldValues>({
       </div>
 
       {error && (
-        <div id={`${id}-error`} className={getMessageStyles("error")} role="alert">
+        <div id={`${id}-error`} className={getMessageStyles('error')} role="alert">
           <AlertCircle className={`${currentSize.icon} mt-0.5 flex-shrink-0`} />
           <span>{error}</span>
         </div>
       )}
 
       {success && !error && (
-        <div id={`${id}-success`} className={getMessageStyles("success")} role="status">
+        <div id={`${id}-success`} className={getMessageStyles('success')} role="status">
           <CheckCircle className={`${currentSize.icon} mt-0.5 flex-shrink-0`} />
           <span>{success}</span>
         </div>

@@ -8,7 +8,7 @@
 export interface ErrorLog {
   id: string;
   timestamp: number;
-  type: "optimistic" | "service-worker" | "cache" | "sync" | "network" | "unknown";
+  type: 'optimistic' | 'service-worker' | 'cache' | 'sync' | 'network' | 'unknown';
   operation?: string;
   resource?: string;
   resourceId?: string | number;
@@ -18,7 +18,7 @@ export interface ErrorLog {
   data?: any;
   stackTrace?: string;
   context?: Record<string, any>;
-  severity: "error" | "warning" | "info";
+  severity: 'error' | 'warning' | 'info';
 }
 
 export interface ErrorLoggerConfig {
@@ -31,7 +31,7 @@ export interface ErrorLoggerConfig {
 class ErrorLogger {
   private logs: ErrorLog[] = [];
   private config: ErrorLoggerConfig;
-  private readonly STORAGE_KEY = "error-logs";
+  private readonly STORAGE_KEY = 'error-logs';
   private readonly isDevelopment: boolean;
 
   constructor(config: ErrorLoggerConfig = {}) {
@@ -57,18 +57,18 @@ class ErrorLogger {
   logError(
     error: Error | any,
     context?: {
-      type?: ErrorLog["type"];
+      type?: ErrorLog['type'];
       operation?: string;
       resource?: string;
       resourceId?: string | number;
       data?: any;
-      severity?: ErrorLog["severity"];
+      severity?: ErrorLog['severity'];
     },
   ): ErrorLog {
     const errorLog: ErrorLog = {
       id: `error-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       timestamp: Date.now(),
-      type: context?.type || "unknown",
+      type: context?.type || 'unknown',
       operation: context?.operation,
       resource: context?.resource,
       resourceId: context?.resourceId,
@@ -78,12 +78,12 @@ class ErrorLogger {
       data: context?.data || error?.response?.data,
       stackTrace: error?.stack,
       context: {
-        userAgent: typeof navigator !== "undefined" ? navigator.userAgent : undefined,
-        url: typeof window !== "undefined" ? window.location.href : undefined,
-        online: typeof navigator !== "undefined" ? navigator.onLine : undefined,
+        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
+        url: typeof window !== 'undefined' ? window.location.href : undefined,
+        online: typeof navigator !== 'undefined' ? navigator.onLine : undefined,
         ...context,
       },
-      severity: context?.severity || "error",
+      severity: context?.severity || 'error',
     };
 
     // Add to logs array
@@ -120,9 +120,9 @@ class ErrorLogger {
    * Output error to console with formatting
    */
   private outputToConsole(log: ErrorLog): void {
-    const emoji = log.severity === "error" ? "❌" : log.severity === "warning" ? "⚠️" : "ℹ️";
+    const emoji = log.severity === 'error' ? '❌' : log.severity === 'warning' ? '⚠️' : 'ℹ️';
     const color =
-      log.severity === "error" ? "#ef4444" : log.severity === "warning" ? "#f59e0b" : "#3b82f6";
+      log.severity === 'error' ? '#ef4444' : log.severity === 'warning' ? '#f59e0b' : '#3b82f6';
 
     console.log(
       `%c${emoji} [${log.type.toUpperCase()}] ${log.message}`,
@@ -143,9 +143,9 @@ class ErrorLogger {
    * Get all error logs
    */
   getLogs(filter?: {
-    type?: ErrorLog["type"];
+    type?: ErrorLog['type'];
     resource?: string;
-    severity?: ErrorLog["severity"];
+    severity?: ErrorLog['severity'];
     since?: number;
   }): ErrorLog[] {
     let filtered = [...this.logs];
@@ -275,31 +275,31 @@ class ErrorLogger {
    */
   exportLogsCSV(): string {
     const headers = [
-      "ID",
-      "Timestamp",
-      "Type",
-      "Severity",
-      "Operation",
-      "Resource",
-      "Message",
-      "Code",
-      "Status",
+      'ID',
+      'Timestamp',
+      'Type',
+      'Severity',
+      'Operation',
+      'Resource',
+      'Message',
+      'Code',
+      'Status',
     ];
     const rows = this.logs.map((log) => [
       log.id,
       new Date(log.timestamp).toISOString(),
       log.type,
       log.severity,
-      log.operation || "",
-      log.resource || "",
+      log.operation || '',
+      log.resource || '',
       log.message,
-      log.code || "",
-      log.status || "",
+      log.code || '',
+      log.status || '',
     ]);
 
     const csv = [headers, ...rows]
-      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
-      .join("\n");
+      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
 
     return csv;
   }

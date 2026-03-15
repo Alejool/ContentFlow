@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from 'axios';
 import {
   endOfMonth,
   endOfWeek,
@@ -10,10 +10,10 @@ import {
   subWeeks,
   addDays,
   subDays,
-} from "date-fns";
-import { create } from "zustand";
-import { CalendarEvent, CalendarView, CalendarFilters } from "@/types/calendar";
-import { DataConflict } from "@/Components/Calendar/ConflictResolutionModal";
+} from 'date-fns';
+import { create } from 'zustand';
+import { CalendarEvent, CalendarView, CalendarFilters } from '@/types/calendar';
+import { DataConflict } from '@/Components/Calendar/ConflictResolutionModal';
 
 interface CalendarState {
   events: CalendarEvent[];
@@ -53,7 +53,7 @@ interface CalendarState {
   isUndoAvailable: () => boolean;
   updateEventByResourceId: (
     resourceId: number,
-    type: "publication" | "post" | "user_event",
+    type: 'publication' | 'post' | 'user_event',
     updates: Partial<CalendarEvent>,
   ) => void;
   deleteEvent: (id: string) => Promise<boolean>;
@@ -64,7 +64,7 @@ interface CalendarState {
   navigateToToday: () => void;
   navigateToDate: (date: Date) => void;
   setConflict: (conflict: DataConflict | null) => void;
-  resolveConflict: (resolution: "local" | "server") => Promise<boolean>;
+  resolveConflict: (resolution: 'local' | 'server') => Promise<boolean>;
 }
 
 export const useCalendarStore = create<CalendarState>((set, get) => ({
@@ -72,10 +72,10 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
   currentMonth: new Date(),
   isLoading: false,
   error: null,
-  platformFilter: "all",
-  statusFilter: "all",
+  platformFilter: 'all',
+  statusFilter: 'all',
   campaignFilter: null,
-  view: "month",
+  view: 'month',
   selectedEvents: new Set(),
   filters: {
     platforms: [],
@@ -93,7 +93,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
   setCampaignFilter: (campaign) => set({ campaignFilter: campaign }),
   setView: (view) => {
     // Persist view preference to localStorage
-    localStorage.setItem("calendar_preferred_view", view);
+    localStorage.setItem('calendar_preferred_view', view);
     set({ view });
   },
 
@@ -178,16 +178,16 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       const params: any = { start, end };
 
       if (filters.platforms.length > 0) {
-        params.platforms = filters.platforms.join(",");
+        params.platforms = filters.platforms.join(',');
       }
       if (filters.campaigns.length > 0) {
-        params.campaigns = filters.campaigns.join(",");
+        params.campaigns = filters.campaigns.join(',');
       }
       if (filters.statuses.length > 0) {
-        params.statuses = filters.statuses.join(",");
+        params.statuses = filters.statuses.join(',');
       }
 
-      const response = await axios.get(route("api.v1.calendar.events"), {
+      const response = await axios.get(route('api.v1.calendar.events'), {
         params,
       });
 
@@ -197,7 +197,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       });
     } catch (error: any) {
       set({
-        error: error.message ?? "Failed to fetch calendar events",
+        error: error.message ?? 'Failed to fetch calendar events',
         isLoading: false,
       });
     }
@@ -226,16 +226,16 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
 
       // Prevent moving to past dates
       if (targetDay < today) {
-        throw new Error("No puedes mover eventos a fechas anteriores a hoy");
+        throw new Error('No puedes mover eventos a fechas anteriores a hoy');
       }
 
-      const resourceId = id.split("_").pop();
+      const resourceId = id.split('_').pop();
       let eventType = type;
 
       if (!eventType) {
-        if (id.startsWith("pub_")) eventType = "publication";
-        else if (id.startsWith("post_")) eventType = "post";
-        else if (id.startsWith("user_event_")) eventType = "user_event";
+        if (id.startsWith('pub_')) eventType = 'publication';
+        else if (id.startsWith('post_')) eventType = 'post';
+        else if (id.startsWith('user_event_')) eventType = 'user_event';
       }
 
       // Get current event for conflict detection
@@ -258,7 +258,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
         const conflictData = error.response.data.conflict;
         const conflict: DataConflict = {
           eventId: id,
-          field: conflictData.field || "start",
+          field: conflictData.field || 'start',
           localValue: newDate,
           serverValue: conflictData.server_value,
           localTimestamp: new Date(),
@@ -270,7 +270,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       }
 
       set({
-        error: error.message ?? "Failed to update event",
+        error: error.message ?? 'Failed to update event',
       });
 
       // Re-throw the error so it can be caught by the caller
@@ -297,10 +297,10 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
 
   bulkUpdateEvents: async (eventIds, newDate) => {
     try {
-      const response = await axios.post("/api/v1/calendar/bulk-update", {
+      const response = await axios.post('/api/v1/calendar/bulk-update', {
         event_ids: eventIds,
         new_date: newDate,
-        operation: "move",
+        operation: 'move',
       });
 
       if (response.data.success) {
@@ -322,7 +322,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       return false;
     } catch (error: any) {
       set({
-        error: error.response?.data?.message ?? "Failed to bulk update events",
+        error: error.response?.data?.message ?? 'Failed to bulk update events',
       });
       get().fetchEvents();
       return false;
@@ -331,10 +331,10 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
 
   bulkDeleteEvents: async (eventIds) => {
     try {
-      const response = await axios.post("/api/v1/calendar/bulk-update", {
+      const response = await axios.post('/api/v1/calendar/bulk-update', {
         event_ids: eventIds,
         new_date: new Date().toISOString(), // Not used for delete
-        operation: "delete",
+        operation: 'delete',
       });
 
       if (response.data.success) {
@@ -354,7 +354,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       return false;
     } catch (error: any) {
       set({
-        error: error.response?.data?.message ?? "Failed to bulk delete events",
+        error: error.response?.data?.message ?? 'Failed to bulk delete events',
       });
       get().fetchEvents();
       return false;
@@ -363,7 +363,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
 
   undoBulkOperation: async () => {
     try {
-      const response = await axios.post("/api/v1/calendar/bulk-undo");
+      const response = await axios.post('/api/v1/calendar/bulk-undo');
 
       if (response.data.success) {
         // Refresh events to get the restored state
@@ -380,7 +380,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       return false;
     } catch (error: any) {
       set({
-        error: error.response?.data?.message ?? "Failed to undo operation",
+        error: error.response?.data?.message ?? 'Failed to undo operation',
       });
       return false;
     }
@@ -403,14 +403,14 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
   deleteEvent: async (id) => {
     try {
       // Parse event ID to determine type
-      const parts = id.split("_");
+      const parts = id.split('_');
       const type = parts[0]; // 'post', 'user', or 'publication'
       const resourceId = parts[parts.length - 1]; // Get the last part as resource ID
 
-      if (type === "user") {
+      if (type === 'user') {
         // Delete user event
         await axios.delete(`/api/v1/calendar/user-events/${resourceId}`);
-      } else if (type === "post") {
+      } else if (type === 'post') {
         // Delete scheduled post
         await axios.delete(`/api/v1/scheduled-posts/${resourceId}`);
       } else {
@@ -424,9 +424,9 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
 
       return true;
     } catch (error: any) {
-      console.error("Delete event error:", error);
+      console.error('Delete event error:', error);
       set({
-        error: error.response?.data?.message || error.message || "Failed to delete event",
+        error: error.response?.data?.message || error.message || 'Failed to delete event',
       });
       return false;
     }
@@ -435,7 +435,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
   exportToGoogleCalendar: async () => {
     try {
       const { events } = get();
-      const response = await axios.post("/api/v1/calendar/export/google", {
+      const response = await axios.post('/api/v1/calendar/export/google', {
         events: events.map((e) => ({
           title: e.title,
           start: e.start,
@@ -445,11 +445,11 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       });
 
       if (response.data.url) {
-        window.open(response.data.url, "_blank");
+        window.open(response.data.url, '_blank');
       }
     } catch (error: any) {
       set({
-        error: error.message ?? "Failed to export to Google Calendar",
+        error: error.message ?? 'Failed to export to Google Calendar',
       });
     }
   },
@@ -457,7 +457,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
   exportToOutlook: async () => {
     try {
       const { events } = get();
-      const response = await axios.post("/api/v1/calendar/export/outlook", {
+      const response = await axios.post('/api/v1/calendar/export/outlook', {
         events: events.map((e) => ({
           title: e.title,
           start: e.start,
@@ -467,11 +467,11 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       });
 
       if (response.data.url) {
-        window.open(response.data.url, "_blank");
+        window.open(response.data.url, '_blank');
       }
     } catch (error: any) {
       set({
-        error: error.message ?? "Failed to export to Outlook",
+        error: error.message ?? 'Failed to export to Outlook',
       });
     }
   },
@@ -482,13 +482,13 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
     let newDate: Date;
 
     switch (view) {
-      case "day":
+      case 'day':
         newDate = subDays(currentMonth, 1);
         break;
-      case "week":
+      case 'week':
         newDate = subWeeks(currentMonth, 1);
         break;
-      case "month":
+      case 'month':
       default:
         newDate = subMonths(currentMonth, 1);
         break;
@@ -503,13 +503,13 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
     let newDate: Date;
 
     switch (view) {
-      case "day":
+      case 'day':
         newDate = addDays(currentMonth, 1);
         break;
-      case "week":
+      case 'week':
         newDate = addWeeks(currentMonth, 1);
         break;
-      case "month":
+      case 'month':
       default:
         newDate = addMonths(currentMonth, 1);
         break;
@@ -533,17 +533,17 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
     set({ conflict });
   },
 
-  resolveConflict: async (resolution: "local" | "server") => {
+  resolveConflict: async (resolution: 'local' | 'server') => {
     const { conflict } = get();
     if (!conflict) return false;
 
     try {
-      const resourceId = conflict.eventId.split("_").pop();
+      const resourceId = conflict.eventId.split('_').pop();
 
       await axios.post(`/api/v1/calendar/events/${resourceId}/resolve-conflict`, {
         resolution,
         field: conflict.field,
-        value: resolution === "local" ? conflict.localValue : conflict.serverValue,
+        value: resolution === 'local' ? conflict.localValue : conflict.serverValue,
       });
 
       // Update local state
@@ -551,7 +551,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
         ev.id === conflict.eventId
           ? {
               ...ev,
-              [conflict.field]: resolution === "local" ? conflict.localValue : conflict.serverValue,
+              [conflict.field]: resolution === 'local' ? conflict.localValue : conflict.serverValue,
             }
           : ev,
       );
@@ -560,7 +560,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       return true;
     } catch (error: any) {
       set({
-        error: error.message ?? "Failed to resolve conflict",
+        error: error.message ?? 'Failed to resolve conflict',
       });
       return false;
     }

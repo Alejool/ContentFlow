@@ -1,9 +1,9 @@
-import AlertCard from "@/Components/common/Modern/AlertCard";
-import { DynamicModal } from "@/Components/common/Modern/DynamicModal";
-import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
-import { formatDateString, formatDateTimeStyled } from "@/Utils/dateHelpers";
-import { useForm } from "@inertiajs/react";
-import axios from "axios";
+import AlertCard from '@/Components/common/Modern/AlertCard';
+import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
+import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
+import { formatDateString, formatDateTimeStyled } from '@/Utils/dateHelpers';
+import { useForm } from '@inertiajs/react';
+import axios from 'axios';
 import {
   AlertTriangle,
   CheckCircle2,
@@ -21,10 +21,10 @@ import {
   RefreshCw,
   Trash2,
   XCircle,
-} from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
+} from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface ApiSettingsTabProps {
   workspace: any;
@@ -40,29 +40,29 @@ function getTokenMeta(token: any): {
   isExpired: boolean;
   isRefreshToken: boolean;
 } {
-  const isProgrammaticAccess = token.name?.startsWith("api-access:");
-  const isRefresh = token.name?.startsWith("api-refresh:");
+  const isProgrammaticAccess = token.name?.startsWith('api-access:');
+  const isRefresh = token.name?.startsWith('api-refresh:');
   const isExpired = token.expires_at && new Date(token.expires_at) < new Date();
 
   if (isRefresh) {
     return {
-      label: "API · Refresh",
-      labelColor: "bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300",
+      label: 'API · Refresh',
+      labelColor: 'bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300',
       isExpired,
       isRefreshToken: true,
     };
   }
   if (isProgrammaticAccess) {
     return {
-      label: "API · Access",
-      labelColor: "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300",
+      label: 'API · Access',
+      labelColor: 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300',
       isExpired,
       isRefreshToken: false,
     };
   }
   return {
-    label: "Dashboard",
-    labelColor: "bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300",
+    label: 'Dashboard',
+    labelColor: 'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300',
     isExpired: false, // dashboard tokens never expire
     isRefreshToken: false,
   };
@@ -89,19 +89,19 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
 
-  const { data, setData, reset } = useForm({ name: "" });
+  const { data, setData, reset } = useForm({ name: '' });
 
   // ─── Data fetching ────────────────────────────────────────────────────────
   const fetchTokens = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(route("workspaces.api-tokens.index", workspace.slug));
+      const response = await axios.get(route('workspaces.api-tokens.index', workspace.slug));
       const resData = response.data;
       const fetched = resData?.data?.tokens || resData?.tokens || [];
       setTokens(fetched);
       setCurrentPage(1);
     } catch (error) {
-      console.error("Failed to fetch tokens", error);
+      console.error('Failed to fetch tokens', error);
     } finally {
       setLoading(false);
     }
@@ -126,15 +126,15 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
 
     try {
       setIsCreating(true);
-      const response = await axios.post(route("workspaces.api-tokens.store", workspace.slug), {
+      const response = await axios.post(route('workspaces.api-tokens.store', workspace.slug), {
         name: data.name,
       });
       setGeneratedToken(response.data.token || response.data.data?.token);
-      toast.success("API token creado exitosamente");
-      reset("name");
+      toast.success('API token creado exitosamente');
+      reset('name');
       fetchTokens();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Error al crear el token");
+      toast.error(error.response?.data?.message || 'Error al crear el token');
     } finally {
       setIsCreating(false);
     }
@@ -150,13 +150,13 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
     if (!tokenToRevoke) return;
     try {
       setRevoking(true);
-      await axios.delete(route("workspaces.api-tokens.destroy", [workspace.slug, tokenToRevoke]));
-      toast.success("Token revocado exitosamente");
+      await axios.delete(route('workspaces.api-tokens.destroy', [workspace.slug, tokenToRevoke]));
+      toast.success('Token revocado exitosamente');
       setIsRevokeModalOpen(false);
       setTokenToRevoke(null);
       fetchTokens();
     } catch {
-      toast.error(t("workspace.api.table.revoke_error"));
+      toast.error(t('workspace.api.table.revoke_error'));
     } finally {
       setRevoking(false);
     }
@@ -164,7 +164,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success(t("common.copied") || "Copiado al portapapeles");
+    toast.success(t('common.copied') || 'Copiado al portapapeles');
   };
 
   // ─── Expiry cell renderer ─────────────────────────────────────────────────
@@ -191,7 +191,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
     const diffMs = date.getTime() - Date.now();
     const diffH = Math.floor(diffMs / 3_600_000);
     const diffD = Math.floor(diffH / 24);
-    const relative = diffD > 0 ? `en ${diffD}d` : diffH > 0 ? `en ${diffH}h` : "pronto";
+    const relative = diffD > 0 ? `en ${diffD}d` : diffH > 0 ? `en ${diffH}h` : 'pronto';
     return (
       <span className="inline-flex items-center gap-1 text-xs text-amber-700 dark:text-amber-300">
         <Clock className="h-3 w-3" />
@@ -217,7 +217,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
               <span>
                 {showToken
                   ? generatedToken
-                  : "•".repeat(generatedToken.length > 40 ? 40 : generatedToken.length)}
+                  : '•'.repeat(generatedToken.length > 40 ? 40 : generatedToken.length)}
               </span>
               <button
                 onClick={() => setShowToken(!showToken)}
@@ -256,11 +256,11 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
               </div>
               <div>
                 <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">
-                  {t("workspace.api.title") || "API Access Tokens"}
+                  {t('workspace.api.title') || 'API Access Tokens'}
                 </h3>
                 <p className="mt-1 text-sm text-gray-500 dark:text-neutral-400">
-                  {t("workspace.api.description") ||
-                    "Gestiona todos los tokens de acceso a la API de ContentFlow."}
+                  {t('workspace.api.description') ||
+                    'Gestiona todos los tokens de acceso a la API de ContentFlow.'}
                 </p>
               </div>
             </div>
@@ -270,9 +270,9 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
                 <input
                   type="text"
                   value={data.name}
-                  onChange={(e) => setData("name", e.target.value)}
+                  onChange={(e) => setData('name', e.target.value)}
                   placeholder={
-                    t("workspace.api.token_name_placeholder") || "Ej: Marketing Automation"
+                    t('workspace.api.token_name_placeholder') || 'Ej: Marketing Automation'
                   }
                   className="block w-full rounded-md border-neutral-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-neutral-600 dark:bg-neutral-900 sm:w-64"
                   required
@@ -287,7 +287,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
                   ) : (
                     <Plus className="mr-2 h-4 w-4" />
                   )}
-                  {t("workspace.api.generate") || "Generar"}
+                  {t('workspace.api.generate') || 'Generar'}
                 </button>
               </form>
             )}
@@ -302,7 +302,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
             <div className="rounded-lg border-2 border-dashed border-neutral-200 bg-neutral-50 py-12 text-center dark:border-neutral-700 dark:bg-neutral-900/50">
               <Key className="mx-auto mb-4 h-12 w-12 text-neutral-300 dark:text-neutral-600" />
               <p className="text-gray-500 dark:text-neutral-400">
-                {t("workspace.api.no_tokens") || "No hay tokens generados aún."}
+                {t('workspace.api.no_tokens') || 'No hay tokens generados aún.'}
               </p>
             </div>
           ) : (
@@ -311,11 +311,11 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
               <div className="flex gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/30">
                 <Info className="mt-0.5 h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400" />
                 <div className="text-sm text-blue-800 dark:text-blue-300">
-                  <p className="mb-1 font-semibold">{t("workspace.api.usage_info.title")}</p>
+                  <p className="mb-1 font-semibold">{t('workspace.api.usage_info.title')}</p>
                   <p
                     className="mb-2"
                     dangerouslySetInnerHTML={{
-                      __html: t("workspace.api.usage_info.description"),
+                      __html: t('workspace.api.usage_info.description'),
                     }}
                   />
                   <div className="overflow-x-auto rounded border border-blue-200/50 bg-white/50 p-2 font-mono text-xs dark:border-blue-800/50 dark:bg-black/20">
@@ -326,7 +326,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
                   <p
                     className="mt-2 text-xs text-blue-600 dark:text-blue-400"
                     dangerouslySetInnerHTML={{
-                      __html: t("workspace.api.usage_info.refresh_token_help"),
+                      __html: t('workspace.api.usage_info.refresh_token_help'),
                     }}
                   />
                 </div>
@@ -336,21 +336,21 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
               <div className="flex flex-wrap gap-3 text-xs">
                 <span className="flex items-center gap-1.5 text-neutral-500 dark:text-neutral-400">
                   <span className="rounded bg-neutral-100 px-1.5 py-0.5 font-medium text-neutral-700 dark:bg-neutral-700 dark:text-neutral-300">
-                    {t("workspace.api.token_types.dashboard")}
+                    {t('workspace.api.token_types.dashboard')}
                   </span>
-                  — {t("workspace.api.token_types.dashboard_description")}
+                  — {t('workspace.api.token_types.dashboard_description')}
                 </span>
                 <span className="flex items-center gap-1.5 text-neutral-500 dark:text-neutral-400">
                   <span className="rounded bg-blue-100 px-1.5 py-0.5 font-medium text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
-                    {t("workspace.api.token_types.api_access")}
+                    {t('workspace.api.token_types.api_access')}
                   </span>
-                  — {t("workspace.api.token_types.api_access_description")}
+                  — {t('workspace.api.token_types.api_access_description')}
                 </span>
                 <span className="flex items-center gap-1.5 text-neutral-500 dark:text-neutral-400">
                   <span className="rounded bg-violet-100 px-1.5 py-0.5 font-medium text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">
-                    {t("workspace.api.token_types.api_refresh")}
+                    {t('workspace.api.token_types.api_refresh')}
                   </span>
-                  — {t("workspace.api.token_types.api_refresh_description")}
+                  — {t('workspace.api.token_types.api_refresh_description')}
                 </span>
               </div>
 
@@ -361,8 +361,8 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
                   disabled={loading}
                   className="inline-flex items-center gap-1.5 text-xs text-neutral-500 transition-colors hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
                 >
-                  <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
-                  {t("workspace.api.table.refresh_list")}
+                  <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
+                  {t('workspace.api.table.refresh_list')}
                 </button>
               </div>
 
@@ -373,22 +373,22 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
                     <thead className="bg-neutral-50 dark:bg-neutral-900/50">
                       <tr>
                         <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-neutral-400">
-                          {t("workspace.api.table.name")}
+                          {t('workspace.api.table.name')}
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-neutral-400">
-                          {t("workspace.api.table.type")}
+                          {t('workspace.api.table.type')}
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-neutral-400">
-                          {t("workspace.api.table.last_used")}
+                          {t('workspace.api.table.last_used')}
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-neutral-400">
-                          {t("workspace.api.table.expires_status")}
+                          {t('workspace.api.table.expires_status')}
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-neutral-400">
-                          {t("workspace.api.table.created")}
+                          {t('workspace.api.table.created')}
                         </th>
                         <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-neutral-400">
-                          {t("workspace.api.table.actions")}
+                          {t('workspace.api.table.actions')}
                         </th>
                       </tr>
                     </thead>
@@ -398,7 +398,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
                         return (
                           <tr
                             key={token.id}
-                            className={`transition-colors ${meta.isExpired ? "opacity-60" : "hover:bg-neutral-50 dark:hover:bg-neutral-700/30"}`}
+                            className={`transition-colors ${meta.isExpired ? 'opacity-60' : 'hover:bg-neutral-50 dark:hover:bg-neutral-700/30'}`}
                           >
                             {/* Name */}
                             <td className="max-w-[180px] px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
@@ -419,8 +419,8 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
                             {/* Last used */}
                             <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500 dark:text-neutral-400">
                               {token.last_used_at
-                                ? formatDateTimeStyled(token.last_used_at, "short", "short")
-                                : t("workspace.api.table.never_used")}
+                                ? formatDateTimeStyled(token.last_used_at, 'short', 'short')
+                                : t('workspace.api.table.never_used')}
                             </td>
 
                             {/* Expiry */}
@@ -430,7 +430,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
 
                             {/* Created at */}
                             <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500 dark:text-neutral-400">
-                              {formatDateTimeStyled(token.created_at, "short", "short")}
+                              {formatDateTimeStyled(token.created_at, 'short', 'short')}
                             </td>
 
                             {/* Actions */}
@@ -439,7 +439,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
                                 <button
                                   onClick={() => handleRevokeToken(token.id)}
                                   className="rounded p-1.5 text-red-500 transition-colors hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-300"
-                                  title={t("workspace.api.table.revoke_token")}
+                                  title={t('workspace.api.table.revoke_token')}
                                 >
                                   <Trash2 className="h-4 w-4" />
                                 </button>
@@ -482,10 +482,10 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
             </div>
             <div>
               <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">
-                {t("workspace.api.documentation.title")}
+                {t('workspace.api.documentation.title')}
               </h3>
               <p className="mt-1 text-sm text-gray-500 dark:text-neutral-400">
-                {t("workspace.api.documentation.description")}
+                {t('workspace.api.documentation.description')}
               </p>
             </div>
           </div>
@@ -493,7 +493,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {/* Markdown Guide */}
             <a
-              href={route("workspaces.api-docs.download", [workspace.slug, { type: "markdown" }])}
+              href={route('workspaces.api-docs.download', [workspace.slug, { type: 'markdown' }])}
               target="_blank"
               rel="noopener noreferrer"
               className="group flex cursor-pointer items-start gap-4 rounded-xl border-2 border-neutral-200 p-5 transition-all duration-200 hover:border-indigo-400 hover:bg-indigo-50 dark:border-neutral-700 dark:hover:border-indigo-500 dark:hover:bg-indigo-900/20"
@@ -504,22 +504,22 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
                   <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
-                    {t("workspace.api.documentation.enterprise_guide_title")}
+                    {t('workspace.api.documentation.enterprise_guide_title')}
                   </h4>
                   <Download className="h-4 w-4 shrink-0 text-indigo-500 opacity-0 transition-opacity group-hover:opacity-100" />
                 </div>
                 <p className="mt-1 text-xs text-gray-500 dark:text-neutral-400">
-                  {t("workspace.api.documentation.enterprise_guide_description")}
+                  {t('workspace.api.documentation.enterprise_guide_description')}
                 </p>
                 <span className="mt-2 inline-flex items-center rounded bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300">
-                  {t("workspace.api.documentation.enterprise_guide_badge")}
+                  {t('workspace.api.documentation.enterprise_guide_badge')}
                 </span>
               </div>
             </a>
 
             {/* OpenAPI JSON */}
             <a
-              href={route("workspaces.api-docs.download", [workspace.slug, { type: "openapi" }])}
+              href={route('workspaces.api-docs.download', [workspace.slug, { type: 'openapi' }])}
               target="_blank"
               rel="noopener noreferrer"
               className="group flex cursor-pointer items-start gap-4 rounded-xl border-2 border-neutral-200 p-5 transition-all duration-200 hover:border-emerald-400 hover:bg-emerald-50 dark:border-neutral-700 dark:hover:border-emerald-500 dark:hover:bg-emerald-900/20"
@@ -530,22 +530,22 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
                   <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
-                    {t("workspace.api.documentation.openapi_title")}
+                    {t('workspace.api.documentation.openapi_title')}
                   </h4>
                   <Download className="h-4 w-4 shrink-0 text-emerald-500 opacity-0 transition-opacity group-hover:opacity-100" />
                 </div>
                 <p className="mt-1 text-xs text-gray-500 dark:text-neutral-400">
-                  {t("workspace.api.documentation.openapi_description")}
+                  {t('workspace.api.documentation.openapi_description')}
                 </p>
                 <span className="mt-2 inline-flex items-center rounded bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300">
-                  {t("workspace.api.documentation.openapi_badge")}
+                  {t('workspace.api.documentation.openapi_badge')}
                 </span>
               </div>
             </a>
           </div>
 
           <p className="mt-4 text-xs text-gray-400 dark:text-neutral-500">
-            {t("workspace.api.documentation.pdf_conversion_help")}
+            {t('workspace.api.documentation.pdf_conversion_help')}
           </p>
         </div>
       </div>
@@ -553,10 +553,10 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
       {/* ── Security Notice ───────────────────────────────────── */}
       <AlertCard
         type="warning"
-        title={t("workspace.api.security_notice") || "Aviso de Seguridad"}
+        title={t('workspace.api.security_notice') || 'Aviso de Seguridad'}
         message={
-          t("workspace.api.security_help") ||
-          "Los tokens API otorgan acceso completo a este workspace. Nunca los compartas ni los incluyas en repositorios públicos."
+          t('workspace.api.security_help') ||
+          'Los tokens API otorgan acceso completo a este workspace. Nunca los compartas ni los incluyas en repositorios públicos.'
         }
       />
 
@@ -564,15 +564,15 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
       <DynamicModal
         isOpen={isRevokeModalOpen}
         onClose={() => setIsRevokeModalOpen(false)}
-        title={t("common.deleteConfirmTitle") || "Confirmar eliminación"}
+        title={t('common.deleteConfirmTitle') || 'Confirmar eliminación'}
         size="md"
       >
         <div className="space-y-4">
           <div className="flex items-center gap-3 text-amber-600 dark:text-amber-400">
             <AlertTriangle className="h-6 w-6" />
             <p className="font-medium">
-              {t("workspace.api.revoke_confirm") ||
-                "¿Estás seguro de que quieres revocar este token? Dejará de funcionar inmediatamente."}
+              {t('workspace.api.revoke_confirm') ||
+                '¿Estás seguro de que quieres revocar este token? Dejará de funcionar inmediatamente.'}
             </p>
           </div>
           <p className="text-sm text-gray-500 dark:text-neutral-400">
@@ -584,7 +584,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
               onClick={() => setIsRevokeModalOpen(false)}
               className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
             >
-              {t("common.cancel") || "Cancelar"}
+              {t('common.cancel') || 'Cancelar'}
             </button>
             <button
               onClick={confirmRevocation}
@@ -596,7 +596,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
               ) : (
                 <Trash2 className="h-4 w-4" />
               )}
-              {t("common.delete") || "Eliminar"}
+              {t('common.delete') || 'Eliminar'}
             </button>
           </div>
         </div>

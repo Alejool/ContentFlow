@@ -1,9 +1,9 @@
-import React, { useEffect } from "react";
-import { Head } from "@inertiajs/react";
-import { useTranslation } from "react-i18next";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import ExternalCalendarSettings from "@/Components/Calendar/ExternalCalendarSettings";
-import { toast } from "react-hot-toast";
+import React, { useEffect } from 'react';
+import { Head } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import ExternalCalendarSettings from '@/Components/Calendar/ExternalCalendarSettings';
+import { toast } from 'react-hot-toast';
 
 export default function CalendarSettings() {
   const { t } = useTranslation();
@@ -11,43 +11,43 @@ export default function CalendarSettings() {
   useEffect(() => {
     // Check for success/error messages in URL
     const params = new URLSearchParams(window.location.search);
-    const success = params.get("success");
-    const error = params.get("error");
-    const provider = params.get("provider");
-    const message = params.get("message");
+    const success = params.get('success');
+    const error = params.get('error');
+    const provider = params.get('provider');
+    const message = params.get('message');
 
-    if (success === "connected") {
+    if (success === 'connected') {
       toast.success(
-        t("calendar.external.connectionSuccess", {
-          provider: provider ? provider.charAt(0).toUpperCase() + provider.slice(1) : "Calendar",
+        t('calendar.external.connectionSuccess', {
+          provider: provider ? provider.charAt(0).toUpperCase() + provider.slice(1) : 'Calendar',
         }),
       );
       // Clean URL
-      window.history.replaceState({}, "", "/calendar/settings");
+      window.history.replaceState({}, '', '/calendar/settings');
     } else if (error) {
       const errorMessages: Record<string, string> = {
-        invalid_state: t("calendar.external.errors.invalidState"),
-        expired_state: t("calendar.external.errors.expiredState"),
-        provider_mismatch: t("calendar.external.errors.providerMismatch"),
-        no_code: t("calendar.external.errors.noCode"),
-        connection_failed: message || t("calendar.external.errors.connectionFailed"),
+        invalid_state: t('calendar.external.errors.invalidState'),
+        expired_state: t('calendar.external.errors.expiredState'),
+        provider_mismatch: t('calendar.external.errors.providerMismatch'),
+        no_code: t('calendar.external.errors.noCode'),
+        connection_failed: message || t('calendar.external.errors.connectionFailed'),
       };
-      toast.error(errorMessages[error] || t("calendar.external.errors.unknown"));
+      toast.error(errorMessages[error] || t('calendar.external.errors.unknown'));
       // Clean URL
-      window.history.replaceState({}, "", "/calendar/settings");
+      window.history.replaceState({}, '', '/calendar/settings');
     }
   }, [t]);
 
   return (
     <AuthenticatedLayout>
-      <Head title={t("calendar.external.settings")} />
+      <Head title={t('calendar.external.settings')} />
 
       <div className="py-12">
         <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
           <div className="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
             <div className="p-6">
               <h2 className="mb-6 text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                {t("calendar.external.title")}
+                {t('calendar.external.title')}
               </h2>
               <ExternalCalendarSettings />
             </div>

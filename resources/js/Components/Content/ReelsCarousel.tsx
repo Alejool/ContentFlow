@@ -1,8 +1,8 @@
-import { ChevronLeft, ChevronRight, Download, ExternalLink, Film, Trash2 } from "lucide-react";
-import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
-import toast from "react-hot-toast";
-import axios from "axios";
+import { ChevronLeft, ChevronRight, Download, ExternalLink, Film, Trash2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import toast from 'react-hot-toast';
+import axios from 'axios';
 
 interface MediaFile {
   id: number;
@@ -40,24 +40,24 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
 
   const getPlatformIcon = (platform?: string) => {
     const icons: Record<string, string> = {
-      instagram: "📸",
-      tiktok: "🎵",
-      youtube_shorts: "▶️",
+      instagram: '📸',
+      tiktok: '🎵',
+      youtube_shorts: '▶️',
     };
-    return icons[platform || ""] || "🎬";
+    return icons[platform || ''] || '🎬';
   };
 
   const getPlatformColor = (platform?: string) => {
     const colors: Record<string, string> = {
-      instagram: "from-pink-500 to-purple-500",
-      tiktok: "from-black to-cyan-500",
-      youtube_shorts: "from-red-500 to-red-600",
+      instagram: 'from-pink-500 to-purple-500',
+      tiktok: 'from-black to-cyan-500',
+      youtube_shorts: 'from-red-500 to-red-600',
     };
-    return colors[platform || ""] || "from-purple-500 to-purple-600";
+    return colors[platform || ''] || 'from-purple-500 to-purple-600';
   };
 
   const handleDownload = () => {
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = currentReel.file_path;
     link.download = currentReel.file_name || `reel-${currentReel.metadata?.platform}.mp4`;
     document.body.appendChild(link);
@@ -66,16 +66,16 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
   };
 
   const handleOpenInNewTab = () => {
-    window.open(currentReel.file_path, "_blank");
+    window.open(currentReel.file_path, '_blank');
   };
 
   const handleDeleteReel = async () => {
-    if (!confirm(t("reels.messages.confirmDelete"))) return;
+    if (!confirm(t('reels.messages.confirmDelete'))) return;
 
     setDeleting(true);
     try {
       await axios.delete(`/api/v1/media/${currentReel.id}`);
-      toast.success(t("reels.messages.reelDeleted"));
+      toast.success(t('reels.messages.reelDeleted'));
 
       // Move to next reel or previous if this was the last one
       if (reels.length > 1) {
@@ -86,7 +86,7 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
 
       onReelDeleted?.(currentReel.id);
     } catch (error) {
-      toast.error(t("reels.messages.deleteError"));
+      toast.error(t('reels.messages.deleteError'));
     } finally {
       setDeleting(false);
     }
@@ -111,7 +111,7 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
           className={`absolute left-4 top-4 rounded-full bg-gradient-to-r px-3 py-1.5 ${getPlatformColor(currentReel.metadata?.platform)} flex items-center gap-2 text-sm font-bold text-white shadow-lg`}
         >
           <span className="text-base">{getPlatformIcon(currentReel.metadata?.platform)}</span>
-          <span className="capitalize">{currentReel.metadata?.platform || "Reel"}</span>
+          <span className="capitalize">{currentReel.metadata?.platform || 'Reel'}</span>
         </div>
 
         {/* Duration Badge */}
@@ -148,21 +148,21 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
             onClick={handleDeleteReel}
             disabled={deleting}
             className="rounded-full bg-red-500/80 p-2.5 text-white backdrop-blur-sm transition-all hover:bg-red-600/80 disabled:opacity-50"
-            title={t("reels.actions.delete")}
+            title={t('reels.actions.delete')}
           >
             <Trash2 className="h-5 w-5" />
           </button>
           <button
             onClick={handleDownload}
             className="rounded-full bg-white/10 p-2.5 text-white backdrop-blur-sm transition-all hover:bg-white/20"
-            title={t("common.download")}
+            title={t('common.download')}
           >
             <Download className="h-5 w-5" />
           </button>
           <button
             onClick={handleOpenInNewTab}
             className="rounded-full bg-white/10 p-2.5 text-white backdrop-blur-sm transition-all hover:bg-white/20"
-            title={t("common.openInNewTab")}
+            title={t('common.openInNewTab')}
           >
             <ExternalLink className="h-5 w-5" />
           </button>
@@ -178,8 +178,8 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
               onClick={() => setCurrentIndex(index)}
               className={`relative h-28 w-20 flex-shrink-0 overflow-hidden rounded-lg transition-all ${
                 index === currentIndex
-                  ? "scale-105 ring-4 ring-purple-500"
-                  : "opacity-60 hover:opacity-100"
+                  ? 'scale-105 ring-4 ring-purple-500'
+                  : 'opacity-60 hover:opacity-100'
               }`}
             >
               <video src={reel.file_path} className="h-full w-full object-cover" muted />

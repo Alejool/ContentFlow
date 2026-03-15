@@ -1,24 +1,24 @@
-import Button from "@/Components/common/Modern/Button";
-import Textarea from "@/Components/common/Modern/Textarea";
-import { usePage } from "@inertiajs/react";
-import axios from "axios";
-import { Sparkles, Wand2 } from "lucide-react";
-import React, { useMemo, useState } from "react";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
-import { z } from "zod";
+import Button from '@/Components/common/Modern/Button';
+import Textarea from '@/Components/common/Modern/Textarea';
+import { usePage } from '@inertiajs/react';
+import axios from 'axios';
+import { Sparkles, Wand2 } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
 
 const aiPromptSchema = (t: any) =>
   z.object({
     prompt: z
       .string()
-      .min(10, t("common.ai.prompt_min") || "El prompt debe tener al menos 10 caracteres")
-      .max(500, t("common.ai.prompt_max") || "El prompt no puede exceder 500 caracteres"),
+      .min(10, t('common.ai.prompt_min') || 'El prompt debe tener al menos 10 caracteres')
+      .max(500, t('common.ai.prompt_max') || 'El prompt no puede exceder 500 caracteres'),
   });
 
 interface AiPromptSectionProps {
   onSuggest: (data: any) => void;
-  type: "publication" | "campaign";
+  type: 'publication' | 'campaign';
   currentFields: Record<string, any>;
   disabled?: boolean;
   className?: string;
@@ -29,13 +29,13 @@ const AiPromptSection: React.FC<AiPromptSectionProps> = ({
   type,
   currentFields,
   disabled = false,
-  className = "",
+  className = '',
 }) => {
   const { t } = useTranslation();
   const { auth, ai_enabled } = usePage<any>().props;
-  const [prompt, setPrompt] = useState("");
+  const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string>("");
+  const [error, setError] = useState<string>('');
 
   const isAiConfigured = useMemo(() => {
     if (!ai_enabled) return false;
@@ -46,7 +46,7 @@ const AiPromptSection: React.FC<AiPromptSectionProps> = ({
   const validatePrompt = () => {
     try {
       aiPromptSchema(t).parse({ prompt });
-      setError("");
+      setError('');
       return true;
     } catch (err: any) {
       if (err.errors && err.errors[0]) {
@@ -70,14 +70,14 @@ const AiPromptSection: React.FC<AiPromptSectionProps> = ({
 
       const formatDate = (date: Date) => {
         const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
       };
 
       // Define field limits based on type
       const fieldLimits =
-        type === "publication"
+        type === 'publication'
           ? {
               title: { min: 1, max: 70 },
               description: { min: 10, max: 700 },
@@ -90,10 +90,10 @@ const AiPromptSection: React.FC<AiPromptSectionProps> = ({
               goal: { min: 1, max: 200 },
             };
 
-      const response = await axios.post(route("api.v1.ai.suggest-fields"), {
+      const response = await axios.post(route('api.v1.ai.suggest-fields'), {
         fields: { ...currentFields, ai_prompt: prompt },
         type,
-        language: auth.user?.locale || "es",
+        language: auth.user?.locale || 'es',
         field_limits: fieldLimits,
       });
 
@@ -102,26 +102,26 @@ const AiPromptSection: React.FC<AiPromptSectionProps> = ({
 
         // Only show success message if there's actual data
         const message = response.data.message;
-        if (!message || message === "OK" || message.trim() === "") {
-          toast.success(t("common.ai.suggestions_generated") || "Sugerencias generadas con éxito", {
-            id: "ai-suggestions",
+        if (!message || message === 'OK' || message.trim() === '') {
+          toast.success(t('common.ai.suggestions_generated') || 'Sugerencias generadas con éxito', {
+            id: 'ai-suggestions',
           });
         } else {
-          toast.success(message, { id: "ai-suggestions" });
+          toast.success(message, { id: 'ai-suggestions' });
         }
 
-        setPrompt("");
-        setError("");
+        setPrompt('');
+        setError('');
       } else {
         toast.error(
           response.data.message ||
-            t("common.ai.suggestion_failed") ||
-            "No se pudieron generar sugerencias",
+            t('common.ai.suggestion_failed') ||
+            'No se pudieron generar sugerencias',
         );
       }
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || t("common.error") || "Error al procesar la solicitud",
+        error.response?.data?.message || t('common.error') || 'Error al procesar la solicitud',
       );
     } finally {
       setLoading(false);
@@ -139,7 +139,7 @@ const AiPromptSection: React.FC<AiPromptSectionProps> = ({
           <Wand2 className="h-4 w-4" />
         </div>
         <span className="text-sm font-bold text-primary-700 dark:text-primary-300">
-          {t("common.ai.idea_prompt")}
+          {t('common.ai.idea_prompt')}
         </span>
       </div>
 
@@ -149,9 +149,9 @@ const AiPromptSection: React.FC<AiPromptSectionProps> = ({
           value={prompt}
           onChange={(e) => {
             setPrompt(e.target.value);
-            if (error) setError("");
+            if (error) setError('');
           }}
-          placeholder={t("common.ai.idea_prompt_placeholder")}
+          placeholder={t('common.ai.idea_prompt_placeholder')}
           variant="filled"
           size="md"
           rows={3}
@@ -170,13 +170,13 @@ const AiPromptSection: React.FC<AiPromptSectionProps> = ({
           buttonStyle="gradient"
           size="md"
           loading={loading}
-          loadingText={t("common.ai.thinking")}
+          loadingText={t('common.ai.thinking')}
           icon={Sparkles}
           iconPosition="left"
           fullWidth
           shadow="md"
         >
-          {t("common.ai.generate")}
+          {t('common.ai.generate')}
         </Button>
       </div>
     </div>

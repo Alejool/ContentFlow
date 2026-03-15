@@ -6,7 +6,7 @@ export class SeededRandom {
   private seed: number;
 
   constructor(seed: string | number) {
-    if (typeof seed === "string") {
+    if (typeof seed === 'string') {
       // Simple string hash to number
       let hash = 0;
       for (let i = 0; i < seed.length; i++) {

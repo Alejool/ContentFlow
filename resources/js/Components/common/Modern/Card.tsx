@@ -1,13 +1,13 @@
-import { useTheme } from "@/Hooks/useTheme";
-import { LucideIcon } from "lucide-react";
-import { ReactNode } from "react";
+import { useTheme } from '@/Hooks/useTheme';
+import { LucideIcon } from 'lucide-react';
+import { ReactNode } from 'react';
 
 interface ModernCardProps {
   title: string;
   description?: string;
   icon?: LucideIcon;
   children: ReactNode;
-  headerColor?: "blue" | "red" | "green" | "orange" | "purple" | "custom";
+  headerColor?: 'blue' | 'red' | 'green' | 'orange' | 'purple' | 'custom';
   customGradient?: string;
   className?: string;
   compact?: boolean;
@@ -21,9 +21,9 @@ export default function ModernCard({
   description,
   icon: Icon,
   children,
-  headerColor = "orange",
+  headerColor = 'orange',
   customGradient,
-  className = "",
+  className = '',
   compact = false,
   noBorder = false,
   hoverEffect = true,
@@ -32,32 +32,32 @@ export default function ModernCard({
   const { actualTheme } = useTheme();
 
   const headerColors = {
-    blue: actualTheme === "dark" ? "from-blue-700 to-blue-900" : "from-blue-600 to-blue-800",
+    blue: actualTheme === 'dark' ? 'from-blue-700 to-blue-900' : 'from-blue-600 to-blue-800',
     red:
-      actualTheme === "dark"
-        ? "from-primary-700 to-primary-900"
-        : "from-primary-600 to-primary-800",
-    green: actualTheme === "dark" ? "from-green-700 to-green-900" : "from-green-600 to-green-800",
+      actualTheme === 'dark'
+        ? 'from-primary-700 to-primary-900'
+        : 'from-primary-600 to-primary-800',
+    green: actualTheme === 'dark' ? 'from-green-700 to-green-900' : 'from-green-600 to-green-800',
     orange:
-      actualTheme === "dark"
-        ? "from-primary-600 to-primary-800"
-        : "from-primary-600 to-primary-700",
+      actualTheme === 'dark'
+        ? 'from-primary-600 to-primary-800'
+        : 'from-primary-600 to-primary-700',
     purple:
-      actualTheme === "dark" ? "from-purple-700 to-purple-900" : "from-purple-600 to-purple-800",
-    custom: customGradient || "from-primary-600 to-primary-700",
+      actualTheme === 'dark' ? 'from-purple-700 to-purple-900' : 'from-purple-600 to-purple-800',
+    custom: customGradient || 'from-primary-600 to-primary-700',
   };
 
   const gradientClass =
-    headerColor === "custom" && customGradient ? customGradient : headerColors[headerColor];
+    headerColor === 'custom' && customGradient ? customGradient : headerColors[headerColor];
 
-  const padding = compact ? "px-4 py-3" : "px-6 py-5";
+  const padding = compact ? 'px-4 py-3' : 'px-6 py-5';
 
   return (
     <div
-      className={`mt-4 overflow-hidden rounded-lg transition-all duration-300 ${actualTheme === "dark" ? "bg-neutral-800/65" : "bg-white/70"} ${
+      className={`mt-4 overflow-hidden rounded-lg transition-all duration-300 ${actualTheme === 'dark' ? 'bg-neutral-800/65' : 'bg-white/70'} ${
         !noBorder &&
-        (actualTheme === "dark" ? "border border-neutral-700/70" : "border border-gray-200")
-      } ${hoverEffect && "hover:shadow-lg"} ${className}`}
+        (actualTheme === 'dark' ? 'border border-neutral-700/70' : 'border border-gray-200')
+      } ${hoverEffect && 'hover:shadow-lg'} ${className}`}
     >
       {/* Header */}
       {header && (
@@ -65,17 +65,17 @@ export default function ModernCard({
           <div className="flex items-center gap-3">
             {Icon && (
               <div
-                className={`${compact ? "h-8 w-8" : "h-10 w-10"} flex items-center justify-center rounded-lg bg-white/20`}
+                className={`${compact ? 'h-8 w-8' : 'h-10 w-10'} flex items-center justify-center rounded-lg bg-white/20`}
               >
-                <Icon className={`${compact ? "h-4 w-4" : "h-5 w-5"} text-white`} />
+                <Icon className={`${compact ? 'h-4 w-4' : 'h-5 w-5'} text-white`} />
               </div>
             )}
             <div>
-              <h2 className={`font-bold text-white ${compact ? "text-base" : "text-lg"}`}>
+              <h2 className={`font-bold text-white ${compact ? 'text-base' : 'text-lg'}`}>
                 {title}
               </h2>
               {description && (
-                <p className={`text-white/80 ${compact ? "mt-0.5 text-xs" : "mt-0.5 text-sm"}`}>
+                <p className={`text-white/80 ${compact ? 'mt-0.5 text-xs' : 'mt-0.5 text-sm'}`}>
                   {description}
                 </p>
               )}
@@ -85,7 +85,7 @@ export default function ModernCard({
       )}
 
       <div
-        className={`${padding} ${actualTheme === "dark" ? "bg-neutral-900/20" : "bg-gray-50/50"}`}
+        className={`${padding} ${actualTheme === 'dark' ? 'bg-neutral-900/20' : 'bg-gray-50/50'}`}
       >
         {children}
       </div>

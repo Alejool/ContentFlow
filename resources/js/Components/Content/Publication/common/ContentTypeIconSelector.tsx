@@ -1,9 +1,9 @@
-import Button from "@/Components/common/Modern/Button";
-import { REEL_COMPATIBLE_PLATFORMS } from "@/Constants/contentTypes";
-import { BarChart3, Clock, FileText, Images, Video } from "lucide-react";
-import { useMemo } from "react";
+import Button from '@/Components/common/Modern/Button';
+import { REEL_COMPATIBLE_PLATFORMS } from '@/Constants/contentTypes';
+import { BarChart3, Clock, FileText, Images, Video } from 'lucide-react';
+import { useMemo } from 'react';
 
-export type ContentType = "post" | "reel" | "story" | "poll" | "carousel";
+export type ContentType = 'post' | 'reel' | 'story' | 'poll' | 'carousel';
 
 interface ContentTypeOption {
   value: ContentType;
@@ -24,34 +24,34 @@ interface ContentTypeIconSelectorProps {
 // Content type platform support (mirroring backend config/content_types.php)
 const contentTypes: ContentTypeOption[] = [
   {
-    value: "post",
-    label: "Post",
+    value: 'post',
+    label: 'Post',
     icon: FileText,
-    platforms: ["instagram", "twitter", "facebook", "linkedin", "youtube", "pinterest", "tiktok"],
+    platforms: ['instagram', 'twitter', 'facebook', 'linkedin', 'youtube', 'pinterest', 'tiktok'],
   },
   {
-    value: "reel",
-    label: "Reel/Short",
+    value: 'reel',
+    label: 'Reel/Short',
     icon: Video,
     platforms: [...REEL_COMPATIBLE_PLATFORMS],
   },
   {
-    value: "story",
-    label: "Story",
+    value: 'story',
+    label: 'Story',
     icon: Clock,
-    platforms: ["instagram", "facebook", "twitter", "linkedin", "youtube", "pinterest", "tiktok"],
+    platforms: ['instagram', 'facebook', 'twitter', 'linkedin', 'youtube', 'pinterest', 'tiktok'],
   },
   {
-    value: "poll",
-    label: "Poll",
+    value: 'poll',
+    label: 'Poll',
     icon: BarChart3,
-    platforms: ["twitter", "facebook", "instagram", "linkedin", "youtube", "pinterest", "tiktok"],
+    platforms: ['twitter', 'facebook', 'instagram', 'linkedin', 'youtube', 'pinterest', 'tiktok'],
   },
   {
-    value: "carousel",
-    label: "Carousel",
+    value: 'carousel',
+    label: 'Carousel',
     icon: Images,
-    platforms: ["instagram", "facebook", "linkedin", "twitter", "youtube", "pinterest", "tiktok"],
+    platforms: ['instagram', 'facebook', 'linkedin', 'twitter', 'youtube', 'pinterest', 'tiktok'],
   },
 ];
 
@@ -89,13 +89,13 @@ export default function ContentTypeIconSelector({
         // Determine tooltip message
         let tooltipMessage = type.label;
         if (isTypeLocked && !isSelected) {
-          tooltipMessage = `${type.label} - ${t("publications.modal.contentType.locked") || "Locked after uploading media"}`;
+          tooltipMessage = `${type.label} - ${t('publications.modal.contentType.locked') || 'Locked after uploading media'}`;
         } else if (!isAvailable && selectedPlatforms.length > 0) {
           const incompatiblePlatforms = selectedPlatforms.filter(
             (p) => !type.platforms.includes(p.toLowerCase()),
           );
           if (incompatiblePlatforms.length > 0) {
-            tooltipMessage = `${type.label} - Not supported by ${incompatiblePlatforms.join(", ")}`;
+            tooltipMessage = `${type.label} - Not supported by ${incompatiblePlatforms.join(', ')}`;
           }
         }
 
@@ -108,7 +108,7 @@ export default function ContentTypeIconSelector({
               buttonStyle="icon"
               size="xl"
               icon={Icon}
-              className={`!rounded-lg !p-2 transition-all duration-200 ${isSelected ? "!bg-primary-500 !text-white shadow-sm" : ""} ${!isAvailable ? "cursor-not-allowed opacity-40" : ""} `}
+              className={`!rounded-lg !p-2 transition-all duration-200 ${isSelected ? '!bg-primary-500 !text-white shadow-sm' : ''} ${!isAvailable ? 'cursor-not-allowed opacity-40' : ''} `}
               title={tooltipMessage}
             >
               <></>

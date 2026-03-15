@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { useOffline } from "@/Hooks/useOffline";
-import { WifiOff, Wifi, ChevronDown, ChevronUp } from "lucide-react";
+import React, { useState } from 'react';
+import { useOffline } from '@/Hooks/useOffline';
+import { WifiOff, Wifi, ChevronDown, ChevronUp } from 'lucide-react';
 
 /**
  * OfflineIndicator Component
@@ -37,8 +37,8 @@ export const OfflineIndicator: React.FC = () => {
       <div
         className={`rounded-lg px-4 py-3 ${
           !isOnline
-            ? "border border-yellow-200 bg-yellow-50 text-yellow-900 dark:border-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200"
-            : "border border-green-200 bg-green-50 text-green-900 dark:border-green-800 dark:bg-green-900/20 dark:text-green-200"
+            ? 'border border-yellow-200 bg-yellow-50 text-yellow-900 dark:border-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200'
+            : 'border border-green-200 bg-green-50 text-green-900 dark:border-green-800 dark:bg-green-900/20 dark:text-green-200'
         }`}
       >
         <div className="flex items-start gap-3">
@@ -53,14 +53,14 @@ export const OfflineIndicator: React.FC = () => {
 
           {/* Content */}
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold">{!isOnline ? "You're offline" : "Back online"}</p>
+            <p className="text-sm font-semibold">{!isOnline ? "You're offline" : 'Back online'}</p>
 
             {/* Pending operations counter - Requirements: 6.2, 6.4 */}
             {pendingCount > 0 && (
               <p className="mt-1 text-xs opacity-90">
                 {!isOnline
-                  ? `${pendingCount} operation${pendingCount !== 1 ? "s" : ""} queued`
-                  : `Syncing ${pendingCount} operation${pendingCount !== 1 ? "s" : ""}...`}
+                  ? `${pendingCount} operation${pendingCount !== 1 ? 's' : ''} queued`
+                  : `Syncing ${pendingCount} operation${pendingCount !== 1 ? 's' : ''}...`}
               </p>
             )}
           </div>
@@ -70,7 +70,7 @@ export const OfflineIndicator: React.FC = () => {
             <button
               onClick={handleToggleExpand}
               className="flex-shrink-0 rounded p-1 transition-colors hover:bg-black/5 dark:hover:bg-white/5"
-              aria-label={isExpanded ? "Hide details" : "Show details"}
+              aria-label={isExpanded ? 'Hide details' : 'Show details'}
               aria-expanded={isExpanded}
             >
               {isExpanded ? (
@@ -93,7 +93,7 @@ export const OfflineIndicator: React.FC = () => {
             <p className="text-xs text-gray-600 dark:text-gray-400">
               {!isOnline
                 ? "These operations will be synced automatically when you're back online."
-                : "Syncing operations in the background..."}
+                : 'Syncing operations in the background...'}
             </p>
           </div>
         </div>

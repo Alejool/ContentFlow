@@ -1,13 +1,13 @@
-import { Avatar } from "@/Components/common/Avatar";
-import Button from "@/Components/common/Modern/Button";
-import Input from "@/Components/common/Modern/Input";
-import ConfirmDialog from "@/Components/common/ui/ConfirmDialog";
-import axios from "axios";
-import { format } from "date-fns";
-import { Send, Trash } from "lucide-react";
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
+import { Avatar } from '@/Components/common/Avatar';
+import Button from '@/Components/common/Modern/Button';
+import Input from '@/Components/common/Modern/Input';
+import ConfirmDialog from '@/Components/common/ui/ConfirmDialog';
+import axios from 'axios';
+import { format } from 'date-fns';
+import { Send, Trash } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface Comment {
   id: number;
@@ -36,11 +36,11 @@ interface CommentsSectionProps {
 
 export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionProps) => {
   const [comments, setComments] = useState<Comment[]>([]);
-  const [newComment, setNewComment] = useState("");
+  const [newComment, setNewComment] = useState('');
   const [replyTo, setReplyTo] = useState<Comment | null>(null);
   const [members, setMembers] = useState<WorkspaceMember[]>([]);
   const [showMentions, setShowMentions] = useState(false);
-  const [mentionFilter, setMentionFilter] = useState("");
+  const [mentionFilter, setMentionFilter] = useState('');
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState<number | null>(null);
@@ -50,7 +50,7 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
     try {
       if (!currentUser?.current_workspace_id) return;
       const response = await axios.get(
-        route("api.v1.workspaces.members", currentUser.current_workspace_id),
+        route('api.v1.workspaces.members', currentUser.current_workspace_id),
       );
       setMembers(response.data.members || []);
     } catch (error) {}
@@ -59,7 +59,7 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
   const fetchComments = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(route("api.v1.publications.comments.index", publicationId));
+      const response = await axios.get(route('api.v1.publications.comments.index', publicationId));
       setComments(response.data);
     } catch (error) {
     } finally {
@@ -81,7 +81,7 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
     setSubmitting(true);
     try {
       const response = await axios.post(
-        route("api.v1.publications.comments.store", publicationId),
+        route('api.v1.publications.comments.store', publicationId),
         {
           content: newComment,
           parent_id: replyTo?.id || null,
@@ -98,10 +98,10 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
         setComments((prev) => [response.data, ...prev]);
       }
 
-      setNewComment("");
+      setNewComment('');
       setReplyTo(null);
     } catch (error) {
-      toast.error(t("publications.modal.comments.postError") || "Failed to post comment");
+      toast.error(t('publications.modal.comments.postError') || 'Failed to post comment');
     } finally {
       setSubmitting(false);
     }
@@ -116,15 +116,15 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
 
     try {
       await axios.delete(
-        route("api.v1.publications.comments.destroy", {
+        route('api.v1.publications.comments.destroy', {
           publication: publicationId,
           comment: commentToDelete,
         }),
       );
       setComments((prev) => prev.filter((c) => c.id !== commentToDelete));
-      toast.success(t("publications.modal.comments.deleteSuccess") || "Comment deleted");
+      toast.success(t('publications.modal.comments.deleteSuccess') || 'Comment deleted');
     } catch (error) {
-      toast.error(t("publications.modal.comments.deleteError") || "Failed to delete comment");
+      toast.error(t('publications.modal.comments.deleteError') || 'Failed to delete comment');
     } finally {
       setCommentToDelete(null);
     }
@@ -137,12 +137,12 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
       <div className="custom-scrollbar max-h-[300px] space-y-4 overflow-y-auto pr-2">
         {loading && comments.length === 0 ? (
           <div className="py-4 text-center text-sm text-gray-500">
-            {t("publications.modal.comments.loading") || "Loading comments..."}
+            {t('publications.modal.comments.loading') || 'Loading comments...'}
           </div>
         ) : comments.length === 0 ? (
           <div className="py-4 text-center text-sm text-gray-500">
-            {t("publications.modal.comments.noComments") ||
-              "No comments yet. Start the conversation!"}
+            {t('publications.modal.comments.noComments') ||
+              'No comments yet. Start the conversation!'}
           </div>
         ) : (
           comments.map((comment) => (
@@ -156,7 +156,7 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
                         {comment.user.name}
                       </span>
                       <span className="text-[10px] text-gray-500">
-                        {format(new Date(comment.created_at), "MMM d, h:mm a")}
+                        {format(new Date(comment.created_at), 'MMM d, h:mm a')}
                       </span>
                     </div>
                     <p className="whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300">
@@ -172,7 +172,7 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
                       }}
                       className="text-[11px] font-semibold text-blue-600 transition-colors hover:text-blue-700"
                     >
-                      {t("common.reply") || "Reply"}
+                      {t('common.reply') || 'Reply'}
                     </button>
                     {currentUser.id === comment.user.id && (
                       <button
@@ -180,8 +180,8 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
                         onClick={() => handleDelete(comment.id)}
                         className="flex items-center gap-1 text-xs text-red-500 opacity-0 transition-opacity hover:text-red-700 group-hover:opacity-100"
                       >
-                        <Trash className="h-3 w-3" />{" "}
-                        {t("publications.modal.comments.delete") || "Delete"}
+                        <Trash className="h-3 w-3" />{' '}
+                        {t('publications.modal.comments.delete') || 'Delete'}
                       </button>
                     )}
                   </div>
@@ -202,7 +202,7 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
                                 {reply.user.name}
                               </span>
                               <span className="text-[10px] text-gray-500">
-                                {format(new Date(reply.created_at), "MMM d, h:mm a")}
+                                {format(new Date(reply.created_at), 'MMM d, h:mm a')}
                               </span>
                             </div>
                             <p className="whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300">
@@ -215,8 +215,8 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
                               onClick={() => handleDelete(reply.id)}
                               className="mt-1 flex items-center gap-1 text-[10px] text-red-500 opacity-0 transition-opacity hover:text-red-700 group-hover:opacity-100"
                             >
-                              <Trash className="h-2.5 w-2.5" />{" "}
-                              {t("publications.modal.comments.delete") || "Delete"}
+                              <Trash className="h-2.5 w-2.5" />{' '}
+                              {t('publications.modal.comments.delete') || 'Delete'}
                             </button>
                           )}
                         </div>
@@ -234,19 +234,19 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
         {replyTo && (
           <div className="flex items-center justify-between rounded-t-lg border-x border-t border-gray-200 bg-primary-50 px-3 py-1 text-[10px] text-primary-700 dark:border-neutral-800 dark:bg-primary-900/10 dark:text-primary-400">
             <span>
-              {t("publications.modal.comments.replyingTo") || "Respondiendo a"}{" "}
+              {t('publications.modal.comments.replyingTo') || 'Respondiendo a'}{' '}
               <span className="font-semibold">{replyTo.user.name}</span>
             </span>
             <button
               onClick={() => {
                 setReplyTo(null);
                 if (newComment.startsWith(`@${replyTo.user.name}`)) {
-                  setNewComment(newComment.replace(`@${replyTo.user.name} `, ""));
+                  setNewComment(newComment.replace(`@${replyTo.user.name} `, ''));
                 }
               }}
               className="hover:text-primary-900"
             >
-              {t("common.cancel") || "Cancelar"}
+              {t('common.cancel') || 'Cancelar'}
             </button>
           </div>
         )}
@@ -263,9 +263,9 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
                 <button
                   key={member.id}
                   onClick={() => {
-                    const parts = newComment.split("@");
+                    const parts = newComment.split('@');
                     parts.pop();
-                    setNewComment(parts.join("@") + `@${member.name} `);
+                    setNewComment(parts.join('@') + `@${member.name} `);
                     setShowMentions(false);
                   }}
                   className="flex w-full items-center gap-2 px-3 py-2 text-left transition-colors hover:bg-gray-50 dark:hover:bg-neutral-800"
@@ -288,8 +288,8 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
               const val = e.target.value;
               setNewComment(val);
 
-              const lastAt = val.lastIndexOf("@");
-              if (lastAt !== -1 && (lastAt === 0 || val[lastAt - 1] === " ")) {
+              const lastAt = val.lastIndexOf('@');
+              if (lastAt !== -1 && (lastAt === 0 || val[lastAt - 1] === ' ')) {
                 setShowMentions(true);
                 setMentionFilter(val.substring(lastAt + 1));
               } else {
@@ -297,13 +297,13 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
               }
             }}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
+              if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 handleSubmit(e as any);
               }
             }}
-            placeholder={t("publications.modal.comments.placeholder") || "Write a comment..."}
-            className={`pr-12 ${replyTo ? "rounded-t-none" : ""}`}
+            placeholder={t('publications.modal.comments.placeholder') || 'Write a comment...'}
+            className={`pr-12 ${replyTo ? 'rounded-t-none' : ''}`}
             disabled={submitting}
             variant="outlined"
             sizeType="md"
@@ -327,13 +327,13 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
         isOpen={!!commentToDelete}
         onClose={() => setCommentToDelete(null)}
         onConfirm={confirmDelete}
-        title={t("publications.modal.comments.deleteConfirmTitle") || "¿Eliminar comentario?"}
+        title={t('publications.modal.comments.deleteConfirmTitle') || '¿Eliminar comentario?'}
         message={
-          t("publications.modal.comments.deleteConfirmMessage") ||
-          "¿Estás seguro de que quieres eliminar este comentario?"
+          t('publications.modal.comments.deleteConfirmMessage') ||
+          '¿Estás seguro de que quieres eliminar este comentario?'
         }
-        confirmText={t("common.delete") || "Eliminar"}
-        cancelText={t("common.cancel") || "Cancelar"}
+        confirmText={t('common.delete') || 'Eliminar'}
+        cancelText={t('common.cancel') || 'Cancelar'}
         type="danger"
       />
     </div>

@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-import { FocusManager } from "@/Utils/FocusManager";
+import { useEffect, useRef } from 'react';
+import { FocusManager } from '@/Utils/FocusManager';
 
 /**
  * Hook to integrate FocusManager's trapFocus functionality with modal components

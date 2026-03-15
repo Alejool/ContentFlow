@@ -12,10 +12,10 @@
  * Requirements: 2.1, 2.2, 2.4
  */
 
-import { localStorageThemeManager } from "./LocalStorageThemeManager";
-import { themeAPIClient } from "./ThemeAPIClient";
+import { localStorageThemeManager } from './LocalStorageThemeManager';
+import { themeAPIClient } from './ThemeAPIClient';
 
-export type ThemePreference = "light" | "dark" | "system";
+export type ThemePreference = 'light' | 'dark' | 'system';
 
 export interface ThemeStorage {
   saveThemePreference(workspaceId: string, theme: ThemePreference): Promise<void>;
@@ -71,7 +71,7 @@ async function loadThemePreference(workspaceId: string): Promise<ThemePreference
     const backendTheme = await themeAPIClient.fetchTheme(workspaceId);
 
     // If backend has a preference, save it to localStorage for future fast access
-    if (backendTheme && backendTheme !== "system") {
+    if (backendTheme && backendTheme !== 'system') {
       localStorageThemeManager.save(workspaceId, backendTheme);
     }
 
@@ -95,7 +95,7 @@ async function deleteThemePreference(workspaceId: string): Promise<void> {
 
   // Remove from backend (best effort)
   try {
-    await themeAPIClient.updateTheme(workspaceId, "system"); // Reset to system default
+    await themeAPIClient.updateTheme(workspaceId, 'system'); // Reset to system default
   } catch (error) {
     // Failed to delete theme from backend
   }
@@ -110,10 +110,10 @@ async function getAllWorkspaceThemes(): Promise<Record<string, ThemePreference>>
 
   try {
     const keys = Object.keys(localStorage);
-    const workspaceThemeKeys = keys.filter((key) => key.startsWith("workspace_theme_"));
+    const workspaceThemeKeys = keys.filter((key) => key.startsWith('workspace_theme_'));
 
     workspaceThemeKeys.forEach((key) => {
-      const workspaceId = key.replace("workspace_theme_", "");
+      const workspaceId = key.replace('workspace_theme_', '');
       const theme = localStorageThemeManager.load(workspaceId);
 
       if (theme) {

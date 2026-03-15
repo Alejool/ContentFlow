@@ -1,5 +1,5 @@
-import { Check, ChevronDown } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { Check, ChevronDown } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
 
 interface MultiSelectProps {
   options: { value: string; label: string }[];
@@ -13,8 +13,8 @@ export default function MultiSelect({
   options,
   selected,
   onChange,
-  placeholder = "Select...",
-  className = "",
+  placeholder = 'Select...',
+  className = '',
 }: MultiSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -25,8 +25,8 @@ export default function MultiSelect({
         setIsOpen(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const toggleOption = (value: string) => {
@@ -37,7 +37,7 @@ export default function MultiSelect({
     selected.length === 0
       ? placeholder
       : selected.length === options.length
-        ? "All"
+        ? 'All'
         : `${selected.length} selected`;
 
   return (
@@ -51,7 +51,7 @@ export default function MultiSelect({
         aria-label={`Select options. ${selected.length} of ${options.length} selected`}
       >
         <span className="truncate">{displayText}</span>
-        <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+        <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (

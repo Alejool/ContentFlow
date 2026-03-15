@@ -1,4 +1,4 @@
-import { Lock } from "lucide-react";
+import { Lock } from 'lucide-react';
 
 interface LockInfo {
   user_id?: number;
@@ -17,8 +17,8 @@ export const ActiveUsersIndicator = ({ activeUsers, lockInfo }: ActiveUsersIndic
         return (
           <div
             key={user.id}
-            className={`inline-block h-7 w-7 rounded-full ring-2 ${isTheLocker ? "z-10 ring-amber-500" : "ring-white dark:ring-neutral-800"} relative flex-shrink-0 bg-gray-200 dark:bg-neutral-700`}
-            title={user.name + (isTheLocker ? " (Editando)" : " (Viendo)")}
+            className={`inline-block h-7 w-7 rounded-full ring-2 ${isTheLocker ? 'z-10 ring-amber-500' : 'ring-white dark:ring-neutral-800'} relative flex-shrink-0 bg-gray-200 dark:bg-neutral-700`}
+            title={user.name + (isTheLocker ? ' (Editando)' : ' (Viendo)')}
           >
             {user.avatar ? (
               <img
@@ -29,12 +29,12 @@ export const ActiveUsersIndicator = ({ activeUsers, lockInfo }: ActiveUsersIndic
                 onError={(e) => {
                   // Si falla, mostrar iniciales
                   const target = e.currentTarget;
-                  target.style.display = "none";
+                  target.style.display = 'none';
                   const parent = target.parentElement;
                   if (parent) {
-                    const fallback = document.createElement("div");
+                    const fallback = document.createElement('div');
                     fallback.className =
-                      "h-full w-full flex items-center justify-center text-xs font-bold text-gray-500 uppercase";
+                      'h-full w-full flex items-center justify-center text-xs font-bold text-gray-500 uppercase';
                     fallback.textContent = user.name.charAt(0);
                     parent.appendChild(fallback);
                   }

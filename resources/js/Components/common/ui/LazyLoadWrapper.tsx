@@ -1,4 +1,4 @@
-import { ComponentType, lazy, Suspense, ReactNode } from "react";
+import { ComponentType, lazy, Suspense, ReactNode } from 'react';
 
 interface LazyLoadWrapperProps {
   fallback?: ReactNode;

@@ -1,15 +1,15 @@
-import { useEffect, useState, lazy, Suspense, useCallback } from "react";
-import { useTranslation } from "react-i18next";
-import { useOnboarding } from "@/Contexts/OnboardingContext";
-import { OnboardingErrorBoundary } from "./OnboardingErrorBoundary";
-import { Building2, Gem, Target, Link2, Check } from "lucide-react";
-import type { TourStep, SocialPlatform, PublicationTemplate } from "@/types/onboarding";
+import { useEffect, useState, lazy, Suspense, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useOnboarding } from '@/Contexts/OnboardingContext';
+import { OnboardingErrorBoundary } from './OnboardingErrorBoundary';
+import { Building2, Gem, Target, Link2, Check } from 'lucide-react';
+import type { TourStep, SocialPlatform, PublicationTemplate } from '@/types/onboarding';
 
 // Lazy load onboarding components to reduce initial bundle size
-const BusinessInfoStep = lazy(() => import("./BusinessInfoStep"));
-const PlanSelectionStep = lazy(() => import("./PlanSelectionStep"));
-const TourOverlay = lazy(() => import("./TourOverlay"));
-const SetupWizard = lazy(() => import("./SetupWizard"));
+const BusinessInfoStep = lazy(() => import('./BusinessInfoStep'));
+const PlanSelectionStep = lazy(() => import('./PlanSelectionStep'));
+const TourOverlay = lazy(() => import('./TourOverlay'));
+const SetupWizard = lazy(() => import('./SetupWizard'));
 
 interface OnboardingFlowProps {
   tourSteps: TourStep[];
@@ -19,12 +19,12 @@ interface OnboardingFlowProps {
 }
 
 type OnboardingStage =
-  | "businessInfo"
-  | "planSelection"
-  | "tour"
-  | "wizard"
-  | "templates"
-  | "complete";
+  | 'businessInfo'
+  | 'planSelection'
+  | 'tour'
+  | 'wizard'
+  | 'templates'
+  | 'complete';
 
 /**
  * OnboardingFlow orchestrates the complete onboarding experience.
@@ -53,26 +53,26 @@ export default function OnboardingFlow({
   const determineCurrentStage = useCallback((): OnboardingStage => {
     // If business info not completed, show business info
     if (!state.businessInfoCompleted) {
-      return "businessInfo";
+      return 'businessInfo';
     }
 
     // If plan not selected, show plan selection
     if (!state.planSelected) {
-      return "planSelection";
+      return 'planSelection';
     }
 
     // If tour not completed or skipped, show tour
     if (!state.tourCompleted && !state.tourSkipped) {
-      return "tour";
+      return 'tour';
     }
 
     // If wizard not completed or skipped, show wizard
     if (!state.wizardCompleted && !state.wizardSkipped) {
-      return "wizard";
+      return 'wizard';
     }
 
     // All stages complete
-    return "complete";
+    return 'complete';
   }, [
     state.businessInfoCompleted,
     state.planSelected,
@@ -118,10 +118,10 @@ export default function OnboardingFlow({
    */
   const handleBusinessInfoSkip = async () => {
     await completeBusinessInfo({
-      businessName: "",
-      businessIndustry: "",
-      businessGoals: "",
-      businessSize: "",
+      businessName: '',
+      businessIndustry: '',
+      businessGoals: '',
+      businessSize: '',
     });
   };
 
@@ -136,7 +136,7 @@ export default function OnboardingFlow({
    * Handles plan selection skip
    */
   const handlePlanSkip = async () => {
-    await selectPlan("free");
+    await selectPlan('free');
   };
 
   /**
@@ -182,7 +182,7 @@ export default function OnboardingFlow({
   };
 
   // Don't render anything if onboarding is complete
-  if (currentStage === "complete") {
+  if (currentStage === 'complete') {
     return null;
   }
 
@@ -195,7 +195,7 @@ export default function OnboardingFlow({
       />
 
       {/* Business Info Stage */}
-      {currentStage === "businessInfo" && (
+      {currentStage === 'businessInfo' && (
         <OnboardingErrorBoundary>
           <Suspense fallback={<OnboardingLoadingFallback />}>
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
@@ -211,7 +211,7 @@ export default function OnboardingFlow({
       )}
 
       {/* Plan Selection Stage */}
-      {currentStage === "planSelection" && (
+      {currentStage === 'planSelection' && (
         <OnboardingErrorBoundary>
           <Suspense fallback={<OnboardingLoadingFallback />}>
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
@@ -224,7 +224,7 @@ export default function OnboardingFlow({
       )}
 
       {/* Tour Stage */}
-      {currentStage === "tour" && tourSteps.length > 0 && (
+      {currentStage === 'tour' && tourSteps.length > 0 && (
         <OnboardingErrorBoundary>
           <Suspense fallback={<OnboardingLoadingFallback />}>
             <TourOverlay
@@ -241,7 +241,7 @@ export default function OnboardingFlow({
       )}
 
       {/* Wizard Stage */}
-      {currentStage === "wizard" && (
+      {currentStage === 'wizard' && (
         <OnboardingErrorBoundary>
           <Suspense fallback={<OnboardingLoadingFallback />}>
             <SetupWizard
@@ -271,25 +271,25 @@ function OnboardingProgressIndicator({
   const { t } = useTranslation();
 
   // Don't show progress indicator during tour (tour has its own progress)
-  if (currentStage === "tour" || currentStage === "complete") {
+  if (currentStage === 'tour' || currentStage === 'complete') {
     return null;
   }
 
   const stages = [
     {
-      id: "businessInfo",
-      label: t("onboarding.progress.stages.businessInfo"),
+      id: 'businessInfo',
+      label: t('onboarding.progress.stages.businessInfo'),
       Icon: Building2,
     },
     {
-      id: "planSelection",
-      label: t("onboarding.progress.stages.plan"),
+      id: 'planSelection',
+      label: t('onboarding.progress.stages.plan'),
       Icon: Gem,
     },
-    { id: "tour", label: t("onboarding.progress.stages.tour"), Icon: Target },
+    { id: 'tour', label: t('onboarding.progress.stages.tour'), Icon: Target },
     {
-      id: "wizard",
-      label: t("onboarding.progress.stages.connect"),
+      id: 'wizard',
+      label: t('onboarding.progress.stages.connect'),
       Icon: Link2,
     },
   ];

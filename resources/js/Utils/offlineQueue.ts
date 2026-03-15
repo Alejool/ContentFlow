@@ -11,7 +11,7 @@ export interface QueuedAction {
   retries: number;
 }
 
-const QUEUE_STORAGE_KEY = "onboarding_offline_queue";
+const QUEUE_STORAGE_KEY = 'onboarding_offline_queue';
 const MAX_RETRIES = 3;
 
 class OfflineQueueManager {

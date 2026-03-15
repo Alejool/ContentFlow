@@ -1,6 +1,6 @@
-import { SeededRandom } from "@/Utils/stableMock";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useRef } from "react";
+import { SeededRandom } from '@/Utils/stableMock';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useRef } from 'react';
 import {
   Bar,
   BarChart,
@@ -12,7 +12,7 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-} from "recharts";
+} from 'recharts';
 
 interface DailyMetric {
   date: string;
@@ -38,18 +38,18 @@ interface PlatformData {
 
 interface Props {
   platforms: PlatformData[];
-  theme?: "light" | "dark";
+  theme?: 'light' | 'dark';
 }
 
-export default function DetailedPlatformChart({ platforms, theme = "light" }: Props) {
-  const isDark = theme === "dark";
+export default function DetailedPlatformChart({ platforms, theme = 'light' }: Props) {
+  const isDark = theme === 'dark';
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const mockPlatforms: PlatformData[] = [
     {
       id: 201,
-      platform: "youtube",
-      account_name: "ContentFlow Channel",
+      platform: 'youtube',
+      account_name: 'ContentFlow Channel',
       current_followers: 12500,
       total_engagement: 4500,
       avg_engagement_rate: 6.5,
@@ -57,7 +57,7 @@ export default function DetailedPlatformChart({ platforms, theme = "light" }: Pr
       follower_growth: 450,
       daily_metrics: [
         {
-          date: "01/03",
+          date: '01/03',
           followers: 12050,
           reach: 12000,
           engagement: 600,
@@ -66,7 +66,7 @@ export default function DetailedPlatformChart({ platforms, theme = "light" }: Pr
           followers_lost: 10,
         },
         {
-          date: "02/03",
+          date: '02/03',
           followers: 12100,
           reach: 13500,
           engagement: 800,
@@ -75,7 +75,7 @@ export default function DetailedPlatformChart({ platforms, theme = "light" }: Pr
           followers_lost: 5,
         },
         {
-          date: "03/03",
+          date: '03/03',
           followers: 12250,
           reach: 15000,
           engagement: 1100,
@@ -84,7 +84,7 @@ export default function DetailedPlatformChart({ platforms, theme = "light" }: Pr
           followers_lost: 10,
         },
         {
-          date: "04/03",
+          date: '04/03',
           followers: 12300,
           reach: 11000,
           engagement: 500,
@@ -93,7 +93,7 @@ export default function DetailedPlatformChart({ platforms, theme = "light" }: Pr
           followers_lost: 20,
         },
         {
-          date: "05/03",
+          date: '05/03',
           followers: 12500,
           reach: 18000,
           engagement: 1500,
@@ -105,8 +105,8 @@ export default function DetailedPlatformChart({ platforms, theme = "light" }: Pr
     },
     {
       id: 202,
-      platform: "instagram",
-      account_name: "contentflow_app",
+      platform: 'instagram',
+      account_name: 'contentflow_app',
       current_followers: 45200,
       total_engagement: 12400,
       avg_engagement_rate: 4.2,
@@ -114,7 +114,7 @@ export default function DetailedPlatformChart({ platforms, theme = "light" }: Pr
       follower_growth: 890,
       daily_metrics: [
         {
-          date: "01/03",
+          date: '01/03',
           followers: 44310,
           reach: 18000,
           engagement: 1800,
@@ -123,7 +123,7 @@ export default function DetailedPlatformChart({ platforms, theme = "light" }: Pr
           followers_lost: 30,
         },
         {
-          date: "02/03",
+          date: '02/03',
           followers: 44500,
           reach: 22000,
           engagement: 2100,
@@ -132,7 +132,7 @@ export default function DetailedPlatformChart({ platforms, theme = "light" }: Pr
           followers_lost: 40,
         },
         {
-          date: "03/03",
+          date: '03/03',
           followers: 44800,
           reach: 25000,
           engagement: 2500,
@@ -141,7 +141,7 @@ export default function DetailedPlatformChart({ platforms, theme = "light" }: Pr
           followers_lost: 20,
         },
         {
-          date: "04/03",
+          date: '04/03',
           followers: 44950,
           reach: 19000,
           engagement: 1600,
@@ -150,7 +150,7 @@ export default function DetailedPlatformChart({ platforms, theme = "light" }: Pr
           followers_lost: 50,
         },
         {
-          date: "05/03",
+          date: '05/03',
           followers: 45200,
           reach: 28000,
           engagement: 3100,
@@ -167,12 +167,12 @@ export default function DetailedPlatformChart({ platforms, theme = "light" }: Pr
       ? [...platforms, ...(platforms.length <= 1 ? mockPlatforms : [])]
       : mockPlatforms;
 
-  const scroll = (direction: "left" | "right") => {
+  const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
       const scrollAmount = window.innerWidth > 1024 ? 800 : window.innerWidth;
       scrollContainerRef.current.scrollBy({
-        left: direction === "left" ? -scrollAmount : scrollAmount,
-        behavior: "smooth",
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
       });
     }
   };
@@ -197,9 +197,9 @@ export default function DetailedPlatformChart({ platforms, theme = "light" }: Pr
       baseFollowers = baseFollowers + dailyEarned - dailyLost;
 
       defaultMetrics.push({
-        date: d.toLocaleDateString("es-ES", {
-          day: "2-digit",
-          month: "2-digit",
+        date: d.toLocaleDateString('es-ES', {
+          day: '2-digit',
+          month: '2-digit',
         }),
         followers: baseFollowers,
         reach: rng.nextInt(500, 3500),
@@ -214,14 +214,14 @@ export default function DetailedPlatformChart({ platforms, theme = "light" }: Pr
 
   const getPlatformColor = (platform: string) => {
     const colors: Record<string, string> = {
-      facebook: "#1877F2",
-      instagram: "#E4405F",
-      twitter: "#1DA1F2",
-      x: "#000000",
-      youtube: "#FF0000",
-      tiktok: "#000000",
+      facebook: '#1877F2',
+      instagram: '#E4405F',
+      twitter: '#1DA1F2',
+      x: '#000000',
+      youtube: '#FF0000',
+      tiktok: '#000000',
     };
-    return colors[platform.toLowerCase()] || "#6366f1";
+    return colors[platform.toLowerCase()] || '#6366f1';
   };
 
   return (
@@ -237,21 +237,21 @@ export default function DetailedPlatformChart({ platforms, theme = "light" }: Pr
       {displayPlatforms.length > 1 && (
         <>
           <button
-            onClick={() => scroll("left")}
+            onClick={() => scroll('left')}
             className={`absolute left-0 top-1/2 z-10 -ml-4 -translate-y-1/2 rounded-full p-2 opacity-0 shadow-lg transition-all disabled:opacity-0 group-hover:opacity-100 ${
               isDark
-                ? "bg-neutral-800 text-white hover:bg-neutral-700"
-                : "bg-white text-gray-800 hover:bg-gray-50"
+                ? 'bg-neutral-800 text-white hover:bg-neutral-700'
+                : 'bg-white text-gray-800 hover:bg-gray-50'
             }`}
           >
             <ChevronLeft className="h-6 w-6" />
           </button>
           <button
-            onClick={() => scroll("right")}
+            onClick={() => scroll('right')}
             className={`absolute right-0 top-1/2 z-10 -mr-4 -translate-y-1/2 rounded-full p-2 opacity-0 shadow-lg transition-all disabled:opacity-0 group-hover:opacity-100 ${
               isDark
-                ? "bg-neutral-800 text-white hover:bg-neutral-700"
-                : "bg-white text-gray-800 hover:bg-gray-50"
+                ? 'bg-neutral-800 text-white hover:bg-neutral-700'
+                : 'bg-white text-gray-800 hover:bg-gray-50'
             }`}
           >
             <ChevronRight className="h-6 w-6" />
@@ -261,47 +261,47 @@ export default function DetailedPlatformChart({ platforms, theme = "light" }: Pr
 
       <div
         ref={scrollContainerRef}
-        className={`hide-scrollbars flex snap-x snap-mandatory gap-6 overflow-x-auto pb-6 ${isDark ? "text-gray-100" : "text-gray-900"}`}
-        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        className={`hide-scrollbars flex snap-x snap-mandatory gap-6 overflow-x-auto pb-6 ${isDark ? 'text-gray-100' : 'text-gray-900'}`}
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
-        {" "}
+        {' '}
         {displayPlatforms.map((platform) => (
           <div
             key={platform.id}
             className={`w-full shrink-0 snap-center rounded-lg p-6 lg:w-[800px] ${
               isDark
-                ? "border border-neutral-700/50 bg-neutral-800/50"
-                : "border border-gray-100 bg-white shadow-sm"
+                ? 'border border-neutral-700/50 bg-neutral-800/50'
+                : 'border border-gray-100 bg-white shadow-sm'
             }`}
           >
             <div className="mb-6 flex items-center justify-between">
               <div>
-                <h3 className={`text-xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
+                <h3 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                   {platform.platform.toUpperCase()} - {platform.account_name}
                 </h3>
-                <p className={`text-sm ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+                <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                   {platform.current_followers.toLocaleString()} seguidores
                 </p>
               </div>
               <div className="flex gap-4 text-sm">
                 <div className="text-center">
-                  <p className={isDark ? "text-gray-400" : "text-gray-600"}>Engagement</p>
-                  <p className={`font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
+                  <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>Engagement</p>
+                  <p className={`font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                     {platform.total_engagement.toLocaleString()}
                   </p>
                 </div>
                 <div className="text-center">
-                  <p className={isDark ? "text-gray-400" : "text-gray-600"}>Tasa</p>
-                  <p className={`font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
+                  <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>Tasa</p>
+                  <p className={`font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                     {platform.avg_engagement_rate}%
                   </p>
                 </div>
                 <div className="text-center">
-                  <p className={isDark ? "text-gray-400" : "text-gray-600"}>Crecimiento</p>
+                  <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>Crecimiento</p>
                   <p
-                    className={`font-bold ${platform.follower_growth >= 0 ? "text-green-500" : "text-red-500"}`}
+                    className={`font-bold ${platform.follower_growth >= 0 ? 'text-green-500' : 'text-red-500'}`}
                   >
-                    {platform.follower_growth >= 0 ? "+" : ""}
+                    {platform.follower_growth >= 0 ? '+' : ''}
                     {platform.follower_growth}
                   </p>
                 </div>
@@ -311,26 +311,26 @@ export default function DetailedPlatformChart({ platforms, theme = "light" }: Pr
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
               <div>
                 <h4
-                  className={`mb-3 text-sm font-semibold ${isDark ? "text-gray-300" : "text-gray-700"}`}
+                  className={`mb-3 text-sm font-semibold ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
                 >
                   Seguidores y Alcance
                 </h4>
                 <ResponsiveContainer width="100%" height={250}>
                   <LineChart data={ensureMetrics(platform)}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#374151" : "#e5e7eb"} />
+                    <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#374151' : '#e5e7eb'} />
                     <XAxis
                       dataKey="date"
-                      stroke={isDark ? "#9ca3af" : "#6b7280"}
+                      stroke={isDark ? '#9ca3af' : '#6b7280'}
                       tick={{ fontSize: 12 }}
                     />
-                    <YAxis stroke={isDark ? "#9ca3af" : "#6b7280"} tick={{ fontSize: 12 }} />
+                    <YAxis stroke={isDark ? '#9ca3af' : '#6b7280'} tick={{ fontSize: 12 }} />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: isDark ? "#1f2937" : "#ffffff",
-                        border: `1px solid ${isDark ? "#374151" : "#e5e7eb"}`,
-                        borderRadius: "8px",
+                        backgroundColor: isDark ? '#1f2937' : '#ffffff',
+                        border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`,
+                        borderRadius: '8px',
                       }}
-                      labelStyle={{ color: isDark ? "#f3f4f6" : "#111827" }}
+                      labelStyle={{ color: isDark ? '#f3f4f6' : '#111827' }}
                     />
                     <Legend />
                     <Line
@@ -353,26 +353,26 @@ export default function DetailedPlatformChart({ platforms, theme = "light" }: Pr
 
               <div>
                 <h4
-                  className={`mb-3 text-sm font-semibold ${isDark ? "text-gray-300" : "text-gray-700"}`}
+                  className={`mb-3 text-sm font-semibold ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
                 >
                   Engagement Diario
                 </h4>
                 <ResponsiveContainer width="100%" height={250}>
                   <BarChart data={ensureMetrics(platform)}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#374151" : "#e5e7eb"} />
+                    <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#374151' : '#e5e7eb'} />
                     <XAxis
                       dataKey="date"
-                      stroke={isDark ? "#9ca3af" : "#6b7280"}
+                      stroke={isDark ? '#9ca3af' : '#6b7280'}
                       tick={{ fontSize: 12 }}
                     />
-                    <YAxis stroke={isDark ? "#9ca3af" : "#6b7280"} tick={{ fontSize: 12 }} />
+                    <YAxis stroke={isDark ? '#9ca3af' : '#6b7280'} tick={{ fontSize: 12 }} />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: isDark ? "#1f2937" : "#ffffff",
-                        border: `1px solid ${isDark ? "#374151" : "#e5e7eb"}`,
-                        borderRadius: "8px",
+                        backgroundColor: isDark ? '#1f2937' : '#ffffff',
+                        border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`,
+                        borderRadius: '8px',
                       }}
-                      labelStyle={{ color: isDark ? "#f3f4f6" : "#111827" }}
+                      labelStyle={{ color: isDark ? '#f3f4f6' : '#111827' }}
                     />
                     <Legend />
                     <Bar dataKey="engagement" fill="#8b5cf6" name="Engagement" />

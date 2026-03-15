@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { format } from "date-fns";
-import { useTimezoneStore } from "@/stores/timezoneStore";
-import { toLocalDate, toUTC } from "@/Utils/timezoneUtils";
+import React, { useEffect, useState } from 'react';
+import { format } from 'date-fns';
+import { useTimezoneStore } from '@/stores/timezoneStore';
+import { toLocalDate, toUTC } from '@/Utils/timezoneUtils';
 
 interface DateTimePickerProps {
   value: string | null;
@@ -22,12 +22,12 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
   min,
   max,
   disabled = false,
-  className = "",
+  className = '',
   error,
   required = false,
 }) => {
   const { timezoneLabel } = useTimezoneStore();
-  const [localValue, setLocalValue] = useState("");
+  const [localValue, setLocalValue] = useState('');
 
   // Convertir valor UTC del backend a datetime-local
   useEffect(() => {
@@ -37,18 +37,18 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
         setLocalValue(format(localDate, "yyyy-MM-dd'T'HH:mm"));
       }
     } else {
-      setLocalValue("");
+      setLocalValue('');
     }
   }, [value]);
 
   // Valores mínimo y máximo
   const minValue = min
     ? format(min instanceof Date ? min : toLocalDate(min) || new Date(), "yyyy-MM-dd'T'HH:mm")
-    : "";
+    : '';
 
   const maxValue = max
     ? format(max instanceof Date ? max : toLocalDate(max) || new Date(), "yyyy-MM-dd'T'HH:mm")
-    : "";
+    : '';
 
   // Manejar cambio
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,7 +81,7 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
         max={maxValue}
         disabled={disabled}
         required={required}
-        className={`w-full rounded-md border px-3 py-2 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:cursor-not-allowed disabled:bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-white ${error ? "border-red-500" : "border-gray-300"} `}
+        className={`w-full rounded-md border px-3 py-2 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:cursor-not-allowed disabled:bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-white ${error ? 'border-red-500' : 'border-gray-300'} `}
       />
 
       <div className="mt-1 flex items-center justify-between">

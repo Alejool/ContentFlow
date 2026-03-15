@@ -1,9 +1,9 @@
-import OptionCard from "@/Components/ConfigSocialMedia/OptionCard";
-import SectionHeader from "@/Components/ConfigSocialMedia/SectionHeader";
-import Switch from "@/Components/common/Modern/Switch";
-import { Globe, Lock, Users2 } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { useEffect, useRef } from "react";
+import OptionCard from '@/Components/ConfigSocialMedia/OptionCard';
+import SectionHeader from '@/Components/ConfigSocialMedia/SectionHeader';
+import Switch from '@/Components/common/Modern/Switch';
+import { Globe, Lock, Users2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useEffect, useRef } from 'react';
 
 interface TikTokSettingsProps {
   settings: any;
@@ -21,7 +21,7 @@ export default function TikTokSettings({
 
   // Establecer valores por defecto si no existen
   const defaultSettings = {
-    privacy: settings?.privacy || "public",
+    privacy: settings?.privacy || 'public',
     disable_comment: settings?.disable_comment ?? false,
     disable_duet: settings?.disable_duet ?? false,
     disable_stitch: settings?.disable_stitch ?? false,
@@ -47,26 +47,26 @@ export default function TikTokSettings({
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
       <div className="space-y-6">
         <div className="space-y-4">
-          <SectionHeader title={t("platformSettings.tiktok.privacy")} />
+          <SectionHeader title={t('platformSettings.tiktok.privacy')} />
           <div className="grid grid-cols-1 gap-3">
             {[
               {
-                value: "public",
+                value: 'public',
                 icon: Globe,
-                label: t("platformSettings.tiktok.public"),
-                description: t("platformSettings.tiktok.publicDescription"),
+                label: t('platformSettings.tiktok.public'),
+                description: t('platformSettings.tiktok.publicDescription'),
               },
               {
-                value: "friends",
+                value: 'friends',
                 icon: Users2,
-                label: t("platformSettings.tiktok.friends"),
-                description: t("platformSettings.tiktok.friendsDescription"),
+                label: t('platformSettings.tiktok.friends'),
+                description: t('platformSettings.tiktok.friendsDescription'),
               },
               {
-                value: "private",
+                value: 'private',
                 icon: Lock,
-                label: t("platformSettings.tiktok.private"),
-                description: t("platformSettings.tiktok.privateDescription"),
+                label: t('platformSettings.tiktok.private'),
+                description: t('platformSettings.tiktok.privateDescription'),
               },
             ].map(({ value, icon: Icon, label, description }) => (
               <OptionCard
@@ -79,7 +79,7 @@ export default function TikTokSettings({
                   settings?.privacy === value ||
                   (!settings?.privacy && defaultSettings.privacy === value)
                 }
-                onSelect={(val) => handleChange("privacy", val)}
+                onSelect={(val) => handleChange('privacy', val)}
               />
             ))}
           </div>
@@ -88,28 +88,28 @@ export default function TikTokSettings({
 
       <div className="space-y-6">
         <div className="space-y-4">
-          <SectionHeader title={t("platformSettings.tiktok.interactions")} />
+          <SectionHeader title={t('platformSettings.tiktok.interactions')} />
           <div className="space-y-3 rounded-lg border border-gray-200 p-4 dark:border-neutral-700">
             <Switch
               id="tt_comment"
-              label={t("platformSettings.tiktok.comments")}
-              description={t("platformSettings.tiktok.commentsDescription")}
+              label={t('platformSettings.tiktok.comments')}
+              description={t('platformSettings.tiktok.commentsDescription')}
               checked={!settings?.disable_comment}
-              onChange={(checked) => handleChange("disable_comment", !checked)}
+              onChange={(checked) => handleChange('disable_comment', !checked)}
             />
             <Switch
               id="tt_duet"
-              label={t("platformSettings.tiktok.duets")}
-              description={t("platformSettings.tiktok.duetsDescription")}
+              label={t('platformSettings.tiktok.duets')}
+              description={t('platformSettings.tiktok.duetsDescription')}
               checked={!settings?.disable_duet}
-              onChange={(checked) => handleChange("disable_duet", !checked)}
+              onChange={(checked) => handleChange('disable_duet', !checked)}
             />
             <Switch
               id="tt_stitch"
-              label={t("platformSettings.tiktok.stitchs")}
-              description={t("platformSettings.tiktok.stitchsDescription")}
+              label={t('platformSettings.tiktok.stitchs')}
+              description={t('platformSettings.tiktok.stitchsDescription')}
               checked={!settings?.disable_stitch}
-              onChange={(checked) => handleChange("disable_stitch", !checked)}
+              onChange={(checked) => handleChange('disable_stitch', !checked)}
             />
           </div>
         </div>

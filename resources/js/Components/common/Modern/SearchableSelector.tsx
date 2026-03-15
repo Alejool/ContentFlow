@@ -1,12 +1,12 @@
-import { Search, X } from "lucide-react";
-import React, { useMemo, useState } from "react";
+import { Search, X } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
 
 interface SearchableSelectorProps<T> {
   items: T[];
   selectedIds: number[];
   onToggle: (id: number) => void;
   loading?: boolean;
-  mode?: "single" | "multiple";
+  mode?: 'single' | 'multiple';
   searchPlaceholder?: string;
   emptyMessage?: string;
   noResultsMessage?: string;
@@ -23,18 +23,18 @@ export default function SearchableSelector<T>({
   selectedIds,
   onToggle,
   loading = false,
-  mode = "multiple",
-  searchPlaceholder = "Search...",
-  emptyMessage = "No items available",
-  noResultsMessage = "No results found",
+  mode = 'multiple',
+  searchPlaceholder = 'Search...',
+  emptyMessage = 'No items available',
+  noResultsMessage = 'No results found',
   renderItem,
   getItemId,
   getSearchableText,
-  className = "",
+  className = '',
   disabled = false,
-  maxHeight = "max-h-64",
+  maxHeight = 'max-h-64',
 }: SearchableSelectorProps<T>) {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Filter items based on search query
   const filteredItems = useMemo(() => {
@@ -49,7 +49,7 @@ export default function SearchableSelector<T>({
   const handleToggle = (id: number) => {
     if (disabled) return;
 
-    if (mode === "single") {
+    if (mode === 'single') {
       // For single mode, if clicking the same item, deselect it
       if (selectedIds.includes(id)) {
         onToggle(id);
@@ -69,7 +69,7 @@ export default function SearchableSelector<T>({
   };
 
   const clearSearch = () => {
-    setSearchQuery("");
+    setSearchQuery('');
   };
 
   if (loading) {
@@ -123,7 +123,7 @@ export default function SearchableSelector<T>({
                 key={itemId}
                 onClick={() => handleToggle(itemId)}
                 className={`cursor-pointer transition-all ${
-                  disabled ? "cursor-not-allowed opacity-60" : ""
+                  disabled ? 'cursor-not-allowed opacity-60' : ''
                 }`}
               >
                 {renderItem(item, isSelected)}

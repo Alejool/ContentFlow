@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
-import { useTranslation } from "react-i18next";
-import { Crown } from "lucide-react";
-import Button from "@/Components/common/Modern/Button";
-import PricingPlansSection from "@/Components/Pricing/PricingPlansSection";
-import axios from "axios";
+import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Crown } from 'lucide-react';
+import Button from '@/Components/common/Modern/Button';
+import PricingPlansSection from '@/Components/Pricing/PricingPlansSection';
+import axios from 'axios';
 
 interface PlanSelectionStepProps {
   onComplete: (planId: string) => void;
@@ -39,7 +39,7 @@ export default function PlanSelectionStep({ onComplete, onSkip }: PlanSelectionS
     const checkActiveSubscription = async () => {
       try {
         // First check onboarding state
-        const onboardingResponse = await axios.get("/api/v1/onboarding/state");
+        const onboardingResponse = await axios.get('/api/v1/onboarding/state');
         const onboardingState = onboardingResponse.data?.state;
 
         // If plan is already selected in onboarding, complete this step
@@ -52,18 +52,18 @@ export default function PlanSelectionStep({ onComplete, onSkip }: PlanSelectionS
 
         // Check if user has an active subscription
         try {
-          const response = await axios.get("/api/v1/subscription/current-usage");
+          const response = await axios.get('/api/v1/subscription/current-usage');
           const currentPlan = response.data?.data?.plan;
 
           // If user has an active paid plan, update onboarding and complete this step
-          if (currentPlan && currentPlan !== "free" && currentPlan !== "demo") {
+          if (currentPlan && currentPlan !== 'free' && currentPlan !== 'demo') {
             // Update onboarding state on backend
             try {
-              await axios.post("/api/v1/onboarding/plan/select", {
+              await axios.post('/api/v1/onboarding/plan/select', {
                 plan_id: currentPlan,
               });
             } catch (error) {
-              console.error("Error updating onboarding state:", error);
+              console.error('Error updating onboarding state:', error);
             }
 
             // Complete this step
@@ -75,11 +75,11 @@ export default function PlanSelectionStep({ onComplete, onSkip }: PlanSelectionS
         } catch (error) {
           // 404 means no active subscription, which is expected during onboarding
           if (error.response?.status !== 404) {
-            console.error("Error checking subscription:", error);
+            console.error('Error checking subscription:', error);
           }
         }
       } catch (error) {
-        console.error("Error checking onboarding state:", error);
+        console.error('Error checking onboarding state:', error);
       } finally {
         setCheckingSubscription(false);
       }
@@ -92,10 +92,10 @@ export default function PlanSelectionStep({ onComplete, onSkip }: PlanSelectionS
     // Fetch plans from the API
     const fetchPlans = async () => {
       try {
-        const response = await axios.get("/api/v1/plans");
+        const response = await axios.get('/api/v1/plans');
         setPlans(response.data);
       } catch (error) {
-        console.error("Error fetching plans:", error);
+        console.error('Error fetching plans:', error);
         setPlans([]);
       } finally {
         setIsLoading(false);
@@ -107,7 +107,7 @@ export default function PlanSelectionStep({ onComplete, onSkip }: PlanSelectionS
 
   const handlePlanSelected = (planId: string) => {
     // Si es plan gratuito, completar el onboarding
-    if (planId === "free" || planId === "demo") {
+    if (planId === 'free' || planId === 'demo') {
       onComplete(planId);
     }
     // Si es plan de pago, usePricing ya maneja la redirección a Stripe
@@ -121,12 +121,12 @@ export default function PlanSelectionStep({ onComplete, onSkip }: PlanSelectionS
             <Crown className="h-8 w-8 animate-pulse text-primary-600" />
           </div>
           <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-            {t("planSelection.title")}
+            {t('planSelection.title')}
           </h3>
           <p className="text-gray-600 dark:text-gray-400">
             {checkingSubscription
-              ? t("common.messages.checkingSubscription")
-              : t("common.messages.loadingPlans")}
+              ? t('common.messages.checkingSubscription')
+              : t('common.messages.loadingPlans')}
           </p>
         </div>
       </div>
@@ -140,9 +140,9 @@ export default function PlanSelectionStep({ onComplete, onSkip }: PlanSelectionS
           <Crown className="h-8 w-8 text-primary-600" />
         </div>
         <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-          {t("planSelection.title")}
+          {t('planSelection.title')}
         </h3>
-        <p className="text-gray-600 dark:text-gray-400">{t("planSelection.description")}</p>
+        <p className="text-gray-600 dark:text-gray-400">{t('planSelection.description')}</p>
       </div>
 
       {/* Usar el mismo componente que PricingPage */}
@@ -158,7 +158,7 @@ export default function PlanSelectionStep({ onComplete, onSkip }: PlanSelectionS
 
       <div className="flex justify-end pt-4 text-center">
         <Button onClick={onSkip} variant="ghost" buttonStyle="outline" size="md">
-          {t("planSelection.decideLater")}
+          {t('planSelection.decideLater')}
         </Button>
       </div>
     </div>

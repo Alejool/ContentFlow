@@ -1,4 +1,4 @@
-import { TabNavigation, Tab as TabNavigationType } from "@/Components/common/TabNavigation";
+import { TabNavigation, Tab as TabNavigationType } from '@/Components/common/TabNavigation';
 
 interface Tab {
   id: string;
@@ -27,7 +27,7 @@ export default function SettingsTabs({
   onTabOrderChange,
   tabOrder,
   isDraggable = false,
-  currentPlan = "demo",
+  currentPlan = 'demo',
 }: SettingsTabsProps) {
   // Convertir tabs al formato esperado por TabNavigation
   const navigationTabs: TabNavigationType[] = tabs.map((tab) => ({

@@ -1,5 +1,5 @@
-import React from "react";
-import Skeleton from "@/Components/common/ui/Skeleton";
+import React from 'react';
+import Skeleton from '@/Components/common/ui/Skeleton';
 
 interface GridSkeletonProps {
   items?: number;
@@ -7,11 +7,11 @@ interface GridSkeletonProps {
   cardHeight?: string;
 }
 
-const GridSkeleton = ({ items = 6, columns = 3, cardHeight = "h-64" }: GridSkeletonProps) => {
+const GridSkeleton = ({ items = 6, columns = 3, cardHeight = 'h-64' }: GridSkeletonProps) => {
   const gridCols = {
-    2: "grid-cols-1 sm:grid-cols-2",
-    3: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
-    4: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
+    2: 'grid-cols-1 sm:grid-cols-2',
+    3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
+    4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
   };
 
   return (

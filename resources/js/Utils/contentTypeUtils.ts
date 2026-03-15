@@ -1,5 +1,5 @@
-import axios from "axios";
-import { route } from "ziggy-js";
+import axios from 'axios';
+import { route } from 'ziggy-js';
 
 export interface ContentTypeSuggestion {
   current_type: string;
@@ -13,8 +13,8 @@ export interface ContentTypeSuggestion {
  */
 export const getVideoDuration = (file: File): Promise<number> => {
   return new Promise((resolve, reject) => {
-    const video = document.createElement("video");
-    video.preload = "metadata";
+    const video = document.createElement('video');
+    video.preload = 'metadata';
 
     video.onloadedmetadata = () => {
       window.URL.revokeObjectURL(video.src);
@@ -23,7 +23,7 @@ export const getVideoDuration = (file: File): Promise<number> => {
 
     video.onerror = () => {
       window.URL.revokeObjectURL(video.src);
-      reject(new Error("Failed to load video metadata"));
+      reject(new Error('Failed to load video metadata'));
     };
 
     video.src = URL.createObjectURL(file);
@@ -41,17 +41,17 @@ export const suggestContentType = async (
     let duration: number | undefined;
 
     // Only get duration for video files
-    if (file.type.startsWith("video/")) {
+    if (file.type.startsWith('video/')) {
       try {
         duration = await getVideoDuration(file);
-        console.log("🎬 Video duration extracted:", {
+        console.log('🎬 Video duration extracted:', {
           filename: file.name,
           duration: duration,
           durationMinutes: duration ? (duration / 60).toFixed(2) : null,
           currentType: currentType,
         });
       } catch (error) {
-        console.warn("Failed to get video duration:", error);
+        console.warn('Failed to get video duration:', error);
         // Continue without duration - backend will handle it
       }
     }
@@ -62,15 +62,15 @@ export const suggestContentType = async (
       current_type: currentType,
     };
 
-    console.log("🎬 Sending content type suggestion request:", requestData);
+    console.log('🎬 Sending content type suggestion request:', requestData);
 
-    const response = await axios.post(route("api.v1.uploads.suggest-content-type"), requestData);
+    const response = await axios.post(route('api.v1.uploads.suggest-content-type'), requestData);
 
-    console.log("🎬 Content type suggestion response:", response.data);
+    console.log('🎬 Content type suggestion response:', response.data);
 
     return response.data;
   } catch (error) {
-    console.error("Failed to get content type suggestion:", error);
+    console.error('Failed to get content type suggestion:', error);
     // Return no change suggestion on error
     return {
       current_type: currentType,
@@ -85,11 +85,11 @@ export const suggestContentType = async (
  */
 export const getContentTypeLimits = (contentType: string): { min: number; max: number } => {
   switch (contentType) {
-    case "story":
+    case 'story':
       return { min: 1, max: 60 }; // 1-60 seconds
-    case "reel":
+    case 'reel':
       return { min: 15, max: 90 }; // 15-90 seconds
-    case "post":
+    case 'post':
       return { min: 0, max: Infinity }; // No limit
     default:
       return { min: 0, max: Infinity };

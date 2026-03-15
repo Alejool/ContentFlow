@@ -1,12 +1,12 @@
-import Button from "@/Components/common/Modern/Button";
-import DatePickerModern from "@/Components/common/Modern/DatePicker";
-import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
-import { CONTENT_TYPE_CONFIG, ContentType } from "@/Constants/contentTypes";
-import { formatDateTimeStyled } from "@/Utils/dateHelpers";
-import { validateVideoDuration } from "@/Utils/validationUtils";
-import { parseISO } from "date-fns";
-import { AlertTriangle, Check, ChevronDown, Clock, Info, Target, X } from "lucide-react";
-import React, { memo, useMemo, useState } from "react";
+import Button from '@/Components/common/Modern/Button';
+import DatePickerModern from '@/Components/common/Modern/DatePicker';
+import YouTubeThumbnailUploader from '@/Components/common/ui/YouTubeThumbnailUploader';
+import { CONTENT_TYPE_CONFIG, ContentType } from '@/Constants/contentTypes';
+import { formatDateTimeStyled } from '@/Utils/dateHelpers';
+import { validateVideoDuration } from '@/Utils/validationUtils';
+import { parseISO } from 'date-fns';
+import { AlertTriangle, Check, ChevronDown, Clock, Info, Target, X } from 'lucide-react';
+import React, { memo, useMemo, useState } from 'react';
 
 /**
  * Check if a platform is compatible with the selected content type
@@ -54,7 +54,7 @@ interface SocialAccountsSectionProps {
   mediaFiles?: any[];
   disabled?: boolean;
   socialPostLogs?: SocialPostLog[];
-  contentType?: "post" | "reel" | "story" | "poll" | "carousel";
+  contentType?: 'post' | 'reel' | 'story' | 'poll' | 'carousel';
   // YouTube thumbnail props
   onThumbnailChange?: (videoId: number, file: File | null) => void;
   onThumbnailDelete?: (videoId: number) => void;
@@ -76,9 +76,9 @@ const VisualCheckbox = memo(
       <div
         className={`flex h-5 w-5 items-center justify-center rounded border-2 transition-all duration-200 ${
           isChecked
-            ? "border-primary-500 bg-primary-500"
-            : "border-gray-300 bg-white dark:bg-neutral-800"
-        } ${disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"} `}
+            ? 'border-primary-500 bg-primary-500'
+            : 'border-gray-300 bg-white dark:bg-neutral-800'
+        } ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} `}
         onClick={disabled ? undefined : onToggle}
         {...(disabled ? { disabled: true } : {})}
       >
@@ -116,7 +116,7 @@ const SchedulePopoverContent = memo(
             icon={X}
             className="!p-1"
           >
-            {""}
+            {''}
           </Button>
         </div>
 
@@ -181,7 +181,7 @@ const ScheduleButton = memo(
           type="button"
           onClick={onScheduleClick}
           className={`rounded-full p-1.5 hover:bg-black/5 dark:hover:bg-white/10 ${
-            customSchedule ? "text-primary-500" : "text-gray-500 dark:text-gray-400"
+            customSchedule ? 'text-primary-500' : 'text-gray-500 dark:text-gray-400'
           }`}
           title="Set individual time"
         >
@@ -275,7 +275,7 @@ const SocialAccountItem = memo(
     const isCheckedActually = isChecked || isPublished || isPublishing || isUnpublishing;
 
     const complianceInfo = React.useMemo(() => {
-      const videos = mediaFiles.filter((m) => m.type === "video");
+      const videos = mediaFiles.filter((m) => m.type === 'video');
       if (videos.length === 0 || !isCheckedActually) return null;
 
       const results = videos
@@ -300,15 +300,15 @@ const SocialAccountItem = memo(
       <>
         <div
           className={`relative flex min-h-[80px] items-start rounded-lg border p-3 transition-all ${
-            isInternalDisabled ? "cursor-default opacity-80" : ""
+            isInternalDisabled ? 'cursor-default opacity-80' : ''
           } ${
             isFailed || durationError
-              ? "border-red-500 bg-red-50 shadow-sm dark:bg-red-900/20"
+              ? 'border-red-500 bg-red-50 shadow-sm dark:bg-red-900/20'
               : isUnpublishing
-                ? "border-amber-500 bg-amber-50 shadow-sm dark:bg-amber-900/20"
+                ? 'border-amber-500 bg-amber-50 shadow-sm dark:bg-amber-900/20'
                 : isCheckedActually
                   ? `border-primary-500 bg-primary-50 shadow-sm dark:bg-primary-900/20`
-                  : "border-gray-200 hover:bg-gray-50 dark:border-neutral-600 dark:hover:bg-neutral-700/5"
+                  : 'border-gray-200 hover:bg-gray-50 dark:border-neutral-600 dark:hover:bg-neutral-700/5'
           }`}
           data-platform={account.platform}
         >
@@ -340,32 +340,32 @@ const SocialAccountItem = memo(
                 )}
                 {account.isDisconnected && (
                   <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold uppercase text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
-                    {t("common.disconnected") || "Desconectada"}
+                    {t('common.disconnected') || 'Desconectada'}
                   </span>
                 )}
                 {isCheckedActually && (
                   <span
                     className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold uppercase ${
                       isPublished
-                        ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
+                        ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300'
                         : isPublishing
-                          ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300"
+                          ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300'
                           : (customSchedule || globalSchedule) && !isPublished && !isPublishing
-                            ? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
-                            : "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
+                            ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
+                            : 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300'
                     }`}
                   >
                     {isPublished
-                      ? t("publications.modal.publish.published")
+                      ? t('publications.modal.publish.published')
                       : isPublishing
-                        ? t("publications.modal.publish.publishing")
+                        ? t('publications.modal.publish.publishing')
                         : isFailed
-                          ? t("publications.modal.publish.failed") || "Fallido"
+                          ? t('publications.modal.publish.failed') || 'Fallido'
                           : isUnpublishing
-                            ? t("publications.modal.publish.unpublishing") || "Despublicando..."
+                            ? t('publications.modal.publish.unpublishing') || 'Despublicando...'
                             : (customSchedule || globalSchedule) && !isPublished && !isPublishing
-                              ? t("publications.status.scheduled") || "Programado"
-                              : t("publications.status.instant") || "Instantáneo"}
+                              ? t('publications.status.scheduled') || 'Programado'
+                              : t('publications.status.instant') || 'Instantáneo'}
                   </span>
                 )}
               </div>
@@ -379,12 +379,12 @@ const SocialAccountItem = memo(
                   <span
                     className={`flex items-center gap-1 text-xs ${
                       customSchedule
-                        ? "text-primary-600 dark:text-primary-400"
-                        : "text-gray-500 dark:text-gray-400"
+                        ? 'text-primary-600 dark:text-primary-400'
+                        : 'text-gray-500 dark:text-gray-400'
                     }`}
                   >
                     <Clock className="h-3 w-3" />
-                    {formatDateTimeStyled(customSchedule || globalSchedule || "", "short", "short")}
+                    {formatDateTimeStyled(customSchedule || globalSchedule || '', 'short', 'short')}
                     {!customSchedule && globalSchedule && (
                       <span className="text-[10px] opacity-70">(Global)</span>
                     )}
@@ -400,9 +400,9 @@ const SocialAccountItem = memo(
                       }}
                       icon={X}
                       className="!p-1 text-primary-500 hover:text-primary-600"
-                      title={t("common.remove") || "Eliminar programación"}
+                      title={t('common.remove') || 'Eliminar programación'}
                     >
-                      {""}
+                      {''}
                     </Button>
                   )}
                 </div>
@@ -410,21 +410,21 @@ const SocialAccountItem = memo(
               {!customSchedule && !globalSchedule && !isPublished && !isPublishing && isChecked && (
                 <div className="animate-in fade-in slide-in-from-top-1 flex items-center gap-1 text-[10px] font-medium text-primary-500">
                   <Clock className="h-3 w-3" />
-                  {t("publications.modal.schedule.instantWarning") ||
-                    "Para publicar inmediatamente, configura la fecha desde el modal de programación."}
+                  {t('publications.modal.schedule.instantWarning') ||
+                    'Para publicar inmediatamente, configura la fecha desde el modal de programación.'}
                 </div>
               )}
               {isPublished && (
                 <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-green-600 dark:text-green-400">
                   <Check className="h-3 w-3" />
-                  {t("publications.modal.publish.published")}
+                  {t('publications.modal.publish.published')}
                 </div>
               )}
               {isPublishing && (
                 <div className="mt-1 flex items-center justify-between gap-1 text-[10px] font-medium text-yellow-600 dark:text-yellow-400">
                   <div className="flex items-center gap-1">
                     <div className="h-3 w-3 animate-spin rounded-full border-2 border-yellow-600 border-t-transparent" />
-                    {t("publications.modal.publish.publishing")} en {account.platform}
+                    {t('publications.modal.publish.publishing')} en {account.platform}
                   </div>
                   {onCancel && (
                     <Button
@@ -436,7 +436,7 @@ const SocialAccountItem = memo(
                       }}
                       className="uppercase"
                     >
-                      {t("common.cancel") || "Cancelar"}
+                      {t('common.cancel') || 'Cancelar'}
                     </Button>
                   )}
                 </div>
@@ -444,7 +444,7 @@ const SocialAccountItem = memo(
               {isUnpublishing && (
                 <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-amber-600 dark:text-amber-400">
                   <div className="h-3 w-3 animate-spin rounded-full border-2 border-amber-600 border-t-transparent" />
-                  {t("publications.modal.publish.unpublishing") || "Despublicando..."}
+                  {t('publications.modal.publish.unpublishing') || 'Despublicando...'}
                 </div>
               )}
               {isFailed && (
@@ -453,7 +453,7 @@ const SocialAccountItem = memo(
                     <div className="flex h-3 w-3 items-center justify-center rounded-full bg-red-500">
                       <X className="h-2 w-2 text-white" />
                     </div>
-                    {t("publications.modal.publish.failed") || "Fallido"}
+                    {t('publications.modal.publish.failed') || 'Fallido'}
                   </div>
                   {errorMessage && (
                     <div className="rounded border border-red-200 bg-red-50 px-2 py-1 text-[10px] text-red-600 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
@@ -491,9 +491,9 @@ const SocialAccountItem = memo(
 
         {/* YouTube Thumbnail Section - Fuera del card, justo debajo */}
         {isCheckedActually &&
-          account.platform.toLowerCase() === "youtube" &&
+          account.platform.toLowerCase() === 'youtube' &&
           mediaFiles &&
-          mediaFiles.some((m) => m.type === "video") &&
+          mediaFiles.some((m) => m.type === 'video') &&
           onThumbnailChange &&
           onThumbnailDelete && (
             <div className="">
@@ -507,22 +507,22 @@ const SocialAccountItem = memo(
               >
                 <span>YouTube Thumbnail</span>
                 <ChevronDown
-                  className={`h-4 w-4 transition-transform duration-200 ${isYouTubeThumbnailExpanded ? "rotate-180" : ""}`}
+                  className={`h-4 w-4 transition-transform duration-200 ${isYouTubeThumbnailExpanded ? 'rotate-180' : ''}`}
                 />
               </button>
 
               {isYouTubeThumbnailExpanded && (
                 <div className="animate-in fade-in slide-in-from-top-2 rounded-lg border border-gray-200 bg-white p-4 duration-200 dark:border-neutral-700 dark:bg-neutral-900">
                   <YouTubeThumbnailUploader
-                    videoId={mediaFiles.find((m) => m.type === "video")?.id || 0}
-                    videoPreviewUrl={mediaFiles.find((m) => m.type === "video")?.url}
+                    videoId={mediaFiles.find((m) => m.type === 'video')?.id || 0}
+                    videoPreviewUrl={mediaFiles.find((m) => m.type === 'video')?.url}
                     videoFileName={
                       publication?.media_files?.find(
-                        (m) => m.file_type === "video" || m.mime_type?.startsWith("video/"),
+                        (m) => m.file_type === 'video' || m.mime_type?.startsWith('video/'),
                       )?.file_name
                     }
                     existingThumbnail={(() => {
-                      const video = mediaFiles.find((m) => m.type === "video");
+                      const video = mediaFiles.find((m) => m.type === 'video');
                       return video?.thumbnailUrl
                         ? { url: video.thumbnailUrl, id: video.id || 0 }
                         : null;
@@ -583,15 +583,15 @@ const SocialAccountsSection = memo(
       const disconnectedPublishedAccounts = socialPostLogs
         .filter(
           (log) =>
-            (log.status === "published" ||
-              log.status === "publishing" ||
-              log.status === "failed") &&
+            (log.status === 'published' ||
+              log.status === 'publishing' ||
+              log.status === 'failed') &&
             !connectedAccountIds.has(log.social_account_id),
         )
         .map((log) => ({
           id: log.social_account_id,
           platform: log.platform,
-          name: log.account_name || "Unknown",
+          name: log.account_name || 'Unknown',
           account_name: log.account_name,
           isDisconnected: true,
         }));
@@ -613,12 +613,12 @@ const SocialAccountsSection = memo(
               <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-blue-600 dark:text-blue-400" />
               <div className="flex-1">
                 <h4 className="text-xs font-bold text-blue-800 dark:text-blue-200">
-                  {t("publications.modal.publish.alreadyPublishedBanner.title") ||
-                    "Publicación Activa"}
+                  {t('publications.modal.publish.alreadyPublishedBanner.title') ||
+                    'Publicación Activa'}
                 </h4>
                 <p className="mt-0.5 text-[11px] text-blue-700 dark:text-blue-300">
-                  {t("publications.modal.publish.alreadyPublishedBanner.message") ||
-                    "Esta publicación ya está publicada en las siguientes cuentas:"}
+                  {t('publications.modal.publish.alreadyPublishedBanner.message') ||
+                    'Esta publicación ya está publicada en las siguientes cuentas:'}
                 </p>
                 <div className="mt-1.5 flex flex-wrap gap-1.5">
                   {allAccounts
@@ -632,15 +632,15 @@ const SocialAccountsSection = memo(
                         <span className="opacity-75">@{acc.account_name || acc.name}</span>
                         {acc.isDisconnected && (
                           <span className="ml-1 rounded bg-amber-200 px-1 py-0.5 text-[9px] font-bold text-amber-800 dark:bg-amber-800 dark:text-amber-200">
-                            {t("common.disconnected") || "Desconectada"}
+                            {t('common.disconnected') || 'Desconectada'}
                           </span>
                         )}
                       </span>
                     ))}
                 </div>
                 <p className="mt-1.5 text-[11px] font-medium text-blue-600 dark:text-blue-400">
-                  {t("publications.modal.publish.alreadyPublishedBanner.hint") ||
-                    "Puedes publicar en cuentas adicionales seleccionándolas a continuación."}
+                  {t('publications.modal.publish.alreadyPublishedBanner.hint') ||
+                    'Puedes publicar en cuentas adicionales seleccionándolas a continuación.'}
                 </p>
               </div>
             </div>
@@ -650,7 +650,7 @@ const SocialAccountsSection = memo(
         <div className="flex items-center justify-between">
           <label className="flex items-center gap-2 font-semibold">
             <Target className="h-4 w-4" />
-            {t("manageContent.configureNetworks") || "Configura tus redes sociales"}
+            {t('manageContent.configureNetworks') || 'Configura tus redes sociales'}
           </label>
         </div>
 
@@ -665,7 +665,7 @@ const SocialAccountsSection = memo(
 
             // Get error message from social post logs
             const errorMessage = socialPostLogs?.find(
-              (log) => log.social_account_id === account.id && log.status === "failed",
+              (log) => log.social_account_id === account.id && log.status === 'failed',
             )?.error_message;
 
             return (

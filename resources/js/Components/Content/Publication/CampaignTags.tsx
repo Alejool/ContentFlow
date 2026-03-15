@@ -1,5 +1,5 @@
-import React, { memo } from "react";
-import { Publication } from "@/types/Publication";
+import React, { memo } from 'react';
+import { Publication } from '@/types/Publication';
 
 interface CampaignTagsProps {
   publication: Publication;
@@ -12,7 +12,7 @@ const CampaignTags = memo(({ publication, t }: CampaignTagsProps) => {
   if (campaigns.length === 0) {
     return (
       <span className="text-xs italic text-gray-400 dark:text-gray-500">
-        {t("publications.table.noCampaign")}
+        {t('publications.table.noCampaign')}
       </span>
     );
   }
@@ -25,13 +25,13 @@ const CampaignTags = memo(({ publication, t }: CampaignTagsProps) => {
         const campaignRow = document.querySelector(`[data-campaign-id="${campaignId}"]`);
         if (campaignRow) {
           campaignRow.scrollIntoView({
-            behavior: "smooth",
-            block: "center",
+            behavior: 'smooth',
+            block: 'center',
           });
           const expandButton = campaignRow.querySelector(
-            "button[data-expand]",
+            'button[data-expand]',
           ) as HTMLButtonElement;
-          if (expandButton && !expandButton.getAttribute("data-expanded")) {
+          if (expandButton && !expandButton.getAttribute('data-expanded')) {
             expandButton.click();
           }
         }

@@ -1,5 +1,5 @@
-import { useEffect, useState, useCallback } from "react";
-import { Activity, CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { useEffect, useState, useCallback } from 'react';
+import { Activity, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
 
 interface HealthStatus {
   status: string;
@@ -19,7 +19,7 @@ const useHealthCheck = (intervalMs: number = 5000) => {
 
   const checkHealth = useCallback(async () => {
     try {
-      const res = await fetch("/api/health");
+      const res = await fetch('/api/health');
       const data = await res.json();
       setHealth(data);
       setIsOnline(true);
@@ -49,7 +49,7 @@ export default function SystemHealthIndicator() {
     <div className="fixed bottom-4 right-4 z-50">
       <div
         className={`flex items-center gap-2 rounded-lg px-3 py-2 shadow-lg backdrop-blur-sm transition-all ${
-          isOnline && allServicesUp ? "bg-green-500/90 text-white" : "bg-red-500/90 text-white"
+          isOnline && allServicesUp ? 'bg-green-500/90 text-white' : 'bg-red-500/90 text-white'
         }`}
       >
         {isOnline && allServicesUp ? (

@@ -10,20 +10,20 @@ export type Publication = {
   goal?: string;
   slug?: string;
   scheduled_at?: string;
-  content_type?: "post" | "reel" | "story" | "poll" | "carousel";
+  content_type?: 'post' | 'reel' | 'story' | 'poll' | 'carousel';
   poll_options?: string[];
   poll_duration_hours?: number;
   status?:
-    | "draft"
-    | "published"
-    | "scheduled"
-    | "publishing"
-    | "processing"
-    | "pending_review"
-    | "approved"
-    | "rejected"
-    | "failed"
-    | "retrying";
+    | 'draft'
+    | 'published'
+    | 'scheduled'
+    | 'publishing'
+    | 'processing'
+    | 'pending_review'
+    | 'approved'
+    | 'rejected'
+    | 'failed'
+    | 'retrying';
   is_active?: boolean;
   media_files?: MediaFile[];
   scheduled_posts?: ScheduledPost[];
@@ -91,12 +91,12 @@ export type Publication = {
   };
   approval_logs?: ApprovalLog[];
   // Nuevo sistema simplificado: approval_request activo
-  approval_request?: import("@/types/ApprovalTypes").ApprovalRequest;
+  approval_request?: import('@/types/ApprovalTypes').ApprovalRequest;
   platform_status_summary?: Record<
     string,
     {
       platform: string;
-      status: "published" | "failed" | "pending" | "publishing" | "success" | "orphaned";
+      status: 'published' | 'failed' | 'pending' | 'publishing' | 'success' | 'orphaned';
       published_at?: string;
       error?: string;
       url?: string;
@@ -107,7 +107,7 @@ export type Publication = {
     }
   >;
   is_recurring?: boolean;
-  recurrence_type?: "daily" | "weekly" | "monthly" | "yearly";
+  recurrence_type?: 'daily' | 'weekly' | 'monthly' | 'yearly';
   recurrence_interval?: number;
   recurrence_days?: number[];
   recurrence_end_date?: string;
@@ -115,7 +115,7 @@ export type Publication = {
   recurrence_settings?: {
     id: number;
     publication_id: number;
-    recurrence_type: "daily" | "weekly" | "monthly" | "yearly";
+    recurrence_type: 'daily' | 'weekly' | 'monthly' | 'yearly';
     recurrence_interval: number;
     recurrence_days: number[] | null;
     recurrence_end_date: string | null;
@@ -132,7 +132,7 @@ export type ApprovalLog = {
   requested_at: string;
   reviewed_by: number | null;
   reviewed_at: string | null;
-  action: "approved" | "rejected" | null;
+  action: 'approved' | 'rejected' | null;
   rejection_reason: string | null;
   requester?: {
     id: number;
@@ -156,7 +156,7 @@ export type ScheduledPost = {
   id: number;
   social_account_id: number;
   scheduled_at: string;
-  status: "pending" | "posted" | "failed";
+  status: 'pending' | 'posted' | 'failed';
   social_account?: SocialAccount;
   account_name?: string;
   platform?: string;
@@ -165,7 +165,7 @@ export type ScheduledPost = {
 export type SocialPostLog = {
   id: number;
   social_account_id: number;
-  status: "published" | "failed" | "deleted" | "pending" | "publishing" | "success" | "orphaned";
+  status: 'published' | 'failed' | 'deleted' | 'pending' | 'publishing' | 'success' | 'orphaned';
   social_account?: SocialAccount;
   platform: string;
   created_at: string;

@@ -1,32 +1,32 @@
-import { FaFacebook, FaInstagram, FaLinkedin, FaTiktok, FaYoutube } from "react-icons/fa";
-import { FaXTwitter } from "react-icons/fa6";
-import IconFacebook from "../../assets/Icons/facebook.svg";
-import IconInstagram from "../../assets/Icons/instagram.svg";
-import IconTiktok from "../../assets/Icons/tiktok.svg";
-import IconTwitter from "../../assets/Icons/x.svg";
-import IconYoutube from "../../assets/Icons/youtube.svg";
+import { FaFacebook, FaInstagram, FaLinkedin, FaTiktok, FaYoutube } from 'react-icons/fa';
+import { FaXTwitter } from 'react-icons/fa6';
+import IconFacebook from '../../assets/Icons/facebook.svg';
+import IconInstagram from '../../assets/Icons/instagram.svg';
+import IconTiktok from '../../assets/Icons/tiktok.svg';
+import IconTwitter from '../../assets/Icons/x.svg';
+import IconYoutube from '../../assets/Icons/youtube.svg';
 
 export const SOCIAL_PLATFORMS = {
   facebook: {
     id: 1,
-    key: "facebook",
-    name: "Facebook",
+    key: 'facebook',
+    name: 'Facebook',
     logo: IconFacebook,
     icon: FaFacebook,
-    color: "bg-blue-600",
-    textColor: "text-blue-700",
-    borderColor: "border-blue-100",
-    darkColor: "dark:bg-blue-900/20",
-    darkTextColor: "dark:text-blue-400",
-    darkBorderColor: "dark:border-blue-900/30",
-    gradient: "from-blue-500 to-blue-700",
-    bgClass: "bg-blue-50",
+    color: 'bg-blue-600',
+    textColor: 'text-blue-700',
+    borderColor: 'border-blue-100',
+    darkColor: 'dark:bg-blue-900/20',
+    darkTextColor: 'dark:text-blue-400',
+    darkBorderColor: 'dark:border-blue-900/30',
+    gradient: 'from-blue-500 to-blue-700',
+    bgClass: 'bg-blue-50',
     maxVideoDuration: 14400, // 4 hours
     maxVideoCount: 10,
     apiLimits: {
       requestsPerHour: 200, // per user
       requestsPerMinute: 600, // per app
-      postsPerDay: "Unlimited",
+      postsPerDay: 'Unlimited',
     },
     active: true,
   },
@@ -50,70 +50,70 @@ export const SOCIAL_PLATFORMS = {
   // },
   tiktok: {
     id: 3,
-    key: "tiktok",
-    name: "TikTok",
+    key: 'tiktok',
+    name: 'TikTok',
     logo: IconTiktok,
     icon: FaTiktok,
-    color: "bg-black",
-    textColor: "text-gray-700",
-    borderColor: "border-gray-200",
-    darkColor: "dark:bg-gray-800",
-    darkTextColor: "dark:text-gray-300",
-    darkBorderColor: "dark:border-gray-700",
-    gradient: "from-neutral-900 via-neutral-800 to-rose-900",
-    bgClass: "bg-gray-100",
+    color: 'bg-black',
+    textColor: 'text-gray-700',
+    borderColor: 'border-gray-200',
+    darkColor: 'dark:bg-gray-800',
+    darkTextColor: 'dark:text-gray-300',
+    darkBorderColor: 'dark:border-gray-700',
+    gradient: 'from-neutral-900 via-neutral-800 to-rose-900',
+    bgClass: 'bg-gray-100',
     maxVideoDuration: 600, // 10 minutes
     maxVideoCount: 1,
     apiLimits: {
       requestsPerDay: 1000,
       recordsPerDay: 100000,
-      postsPerDay: "1-3 recommended",
+      postsPerDay: '1-3 recommended',
     },
     active: true,
   },
   twitter: {
     id: 4,
-    key: "twitter",
-    name: "X",
+    key: 'twitter',
+    name: 'X',
     logo: IconTwitter,
     icon: FaXTwitter,
-    color: "bg-gray-900",
-    textColor: "text-gray-700",
-    borderColor: "border-gray-100",
-    darkColor: "dark:bg-gray-900/20",
-    darkTextColor: "dark:text-gray-400",
-    darkBorderColor: "dark:border-gray-900/30",
-    gradient: "from-neutral-800 to-neutral-900",
-    bgClass: "bg-gray-50",
+    color: 'bg-gray-900',
+    textColor: 'text-gray-700',
+    borderColor: 'border-gray-100',
+    darkColor: 'dark:bg-gray-900/20',
+    darkTextColor: 'dark:text-gray-400',
+    darkBorderColor: 'dark:border-gray-900/30',
+    gradient: 'from-neutral-800 to-neutral-900',
+    bgClass: 'bg-gray-50',
     maxVideoDuration: 140, // 2m 20s for non-premium
     maxVideoCount: 4,
     apiLimits: {
       postsPerThreeHours: 300,
       requestsPerDay: 2400,
-      pricing: "Pay-as-you-go",
+      pricing: 'Pay-as-you-go',
     },
     active: true,
   },
   youtube: {
     id: 5,
-    key: "youtube",
-    name: "YouTube",
+    key: 'youtube',
+    name: 'YouTube',
     logo: IconYoutube,
     icon: FaYoutube,
-    color: "bg-red-600",
-    textColor: "text-red-700",
-    borderColor: "border-red-100",
-    darkColor: "dark:bg-red-900/20",
-    darkTextColor: "dark:text-red-400",
-    darkBorderColor: "dark:border-red-900/30",
-    gradient: "from-red-600 to-red-800",
-    bgClass: "bg-red-50",
+    color: 'bg-red-600',
+    textColor: 'text-red-700',
+    borderColor: 'border-red-100',
+    darkColor: 'dark:bg-red-900/20',
+    darkTextColor: 'dark:text-red-400',
+    darkBorderColor: 'dark:border-red-900/30',
+    gradient: 'from-red-600 to-red-800',
+    bgClass: 'bg-red-50',
     maxVideoDuration: 43200, // 12 hours
     maxVideoCount: 1,
     apiLimits: {
       quotaUnitsPerDay: 10000,
-      uploadCost: "1600 units",
-      note: "Quota resets at midnight PT",
+      uploadCost: '1600 units',
+      note: 'Quota resets at midnight PT',
     },
     active: true,
   },

@@ -8,7 +8,7 @@
  * Requirements: 7.3
  */
 
-type AnnouncementPriority = "polite" | "assertive";
+type AnnouncementPriority = 'polite' | 'assertive';
 
 interface LiveRegions {
   polite: HTMLDivElement | null;
@@ -38,13 +38,13 @@ class ARIAAnnouncer {
     }
 
     // Create polite live region
-    this.liveRegions.polite = this.createLiveRegion("polite");
+    this.liveRegions.polite = this.createLiveRegion('polite');
 
     // Create assertive live region
-    this.liveRegions.assertive = this.createLiveRegion("assertive");
+    this.liveRegions.assertive = this.createLiveRegion('assertive');
 
     // Mount to document body
-    if (typeof document !== "undefined") {
+    if (typeof document !== 'undefined') {
       document.body.appendChild(this.liveRegions.polite);
       document.body.appendChild(this.liveRegions.assertive);
       this.isInitialized = true;
@@ -55,19 +55,19 @@ class ARIAAnnouncer {
    * Create a live region element with proper ARIA attributes
    */
   private createLiveRegion(priority: AnnouncementPriority): HTMLDivElement {
-    const region = document.createElement("div");
+    const region = document.createElement('div');
 
     // Set ARIA attributes
-    region.setAttribute("role", "status");
-    region.setAttribute("aria-live", priority);
-    region.setAttribute("aria-atomic", "true");
+    region.setAttribute('role', 'status');
+    region.setAttribute('aria-live', priority);
+    region.setAttribute('aria-atomic', 'true');
 
     // Visually hidden but accessible to screen readers
-    region.style.position = "absolute";
-    region.style.left = "-10000px";
-    region.style.width = "1px";
-    region.style.height = "1px";
-    region.style.overflow = "hidden";
+    region.style.position = 'absolute';
+    region.style.left = '-10000px';
+    region.style.width = '1px';
+    region.style.height = '1px';
+    region.style.overflow = 'hidden';
 
     // Add ID for debugging
     region.id = `aria-live-region-${priority}`;
@@ -84,15 +84,15 @@ class ARIAAnnouncer {
    */
   announce(
     message: string,
-    priority: AnnouncementPriority = "polite",
+    priority: AnnouncementPriority = 'polite',
     timeout: number = 1000,
   ): void {
     if (!this.isInitialized) {
-      console.warn("ARIAAnnouncer: Not initialized. Call initialize() first.");
+      console.warn('ARIAAnnouncer: Not initialized. Call initialize() first.');
       return;
     }
 
-    if (!message || message.trim() === "") {
+    if (!message || message.trim() === '') {
       return;
     }
 
@@ -136,7 +136,7 @@ class ARIAAnnouncer {
     // Clear after timeout
     if (timeout && timeout > 0) {
       await new Promise((resolve) => setTimeout(resolve, timeout));
-      region.textContent = "";
+      region.textContent = '';
 
       // Small delay before next announcement
       await new Promise((resolve) => setTimeout(resolve, 100));
@@ -160,10 +160,10 @@ class ARIAAnnouncer {
 
     // Clear live regions
     if (this.liveRegions.polite) {
-      this.liveRegions.polite.textContent = "";
+      this.liveRegions.polite.textContent = '';
     }
     if (this.liveRegions.assertive) {
-      this.liveRegions.assertive.textContent = "";
+      this.liveRegions.assertive.textContent = '';
     }
   }
 

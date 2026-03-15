@@ -1,12 +1,12 @@
-import Button from "@/Components/common/Modern/Button";
-import { Dialog, DialogContent } from "@/Components/ui/dialog";
-import { router } from "@inertiajs/react";
-import { AlertCircle, Sparkles, TrendingUp } from "lucide-react";
+import Button from '@/Components/common/Modern/Button';
+import { Dialog, DialogContent } from '@/Components/ui/dialog';
+import { router } from '@inertiajs/react';
+import { AlertCircle, Sparkles, TrendingUp } from 'lucide-react';
 
 interface LimitReachedModalProps {
   isOpen: boolean;
   onClose: () => void;
-  limitType: "ai_credits" | "storage" | "publications" | "social_accounts";
+  limitType: 'ai_credits' | 'storage' | 'publications' | 'social_accounts';
   currentPlan: string;
 }
 
@@ -18,41 +18,41 @@ export function LimitReachedModal({
 }: LimitReachedModalProps) {
   const messages = {
     ai_credits: {
-      title: "Créditos de IA Agotados",
-      description: "Has usado todos tus créditos de IA este mes.",
-      planLimit: "10 créditos/mes",
-      suggestion: "500 créditos adicionales",
-      price: "$39.99",
-      savings: "Ahorra 20%",
+      title: 'Créditos de IA Agotados',
+      description: 'Has usado todos tus créditos de IA este mes.',
+      planLimit: '10 créditos/mes',
+      suggestion: '500 créditos adicionales',
+      price: '$39.99',
+      savings: 'Ahorra 20%',
     },
     storage: {
-      title: "Almacenamiento Lleno",
-      description: "Has alcanzado tu límite de almacenamiento.",
-      planLimit: "1 GB",
-      suggestion: "50 GB adicionales",
-      price: "$19.99",
-      savings: "Ahorra 20%",
+      title: 'Almacenamiento Lleno',
+      description: 'Has alcanzado tu límite de almacenamiento.',
+      planLimit: '1 GB',
+      suggestion: '50 GB adicionales',
+      price: '$19.99',
+      savings: 'Ahorra 20%',
     },
     publications: {
-      title: "Límite de Publicaciones Alcanzado",
-      description: "Has alcanzado el límite de publicaciones de tu plan.",
-      planLimit: "10 publicaciones/mes",
-      suggestion: "Plan Professional",
-      price: "$49/mes",
-      savings: "200 publicaciones/mes",
+      title: 'Límite de Publicaciones Alcanzado',
+      description: 'Has alcanzado el límite de publicaciones de tu plan.',
+      planLimit: '10 publicaciones/mes',
+      suggestion: 'Plan Professional',
+      price: '$49/mes',
+      savings: '200 publicaciones/mes',
     },
     social_accounts: {
-      title: "Límite de Cuentas Sociales",
-      description: "Has conectado el máximo de cuentas sociales permitidas.",
-      planLimit: "3 cuentas",
-      suggestion: "Plan Professional",
-      price: "$49/mes",
-      savings: "8 cuentas sociales",
+      title: 'Límite de Cuentas Sociales',
+      description: 'Has conectado el máximo de cuentas sociales permitidas.',
+      planLimit: '3 cuentas',
+      suggestion: 'Plan Professional',
+      price: '$49/mes',
+      savings: '8 cuentas sociales',
     },
   };
 
   const msg = messages[limitType];
-  const canBuyAddon = limitType === "ai_credits" || limitType === "storage";
+  const canBuyAddon = limitType === 'ai_credits' || limitType === 'storage';
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -109,7 +109,7 @@ export function LimitReachedModal({
                   className="w-full bg-blue-600 text-white hover:bg-blue-700"
                   onClick={() => {
                     onClose();
-                    router.visit("/subscription/addons");
+                    router.visit('/subscription/addons');
                   }}
                 >
                   <Sparkles className="mr-2 h-4 w-4" />
@@ -125,11 +125,11 @@ export function LimitReachedModal({
                   <div className="mb-1 flex items-center">
                     <TrendingUp className="mr-2 h-5 w-5 text-gray-600" />
                     <span className="font-semibold">
-                      {canBuyAddon ? "Actualizar Plan" : "Actualizar a Professional"}
+                      {canBuyAddon ? 'Actualizar Plan' : 'Actualizar a Professional'}
                     </span>
                   </div>
                   <p className="text-sm text-gray-600">
-                    {canBuyAddon ? "Límites más altos permanentes" : msg.suggestion}
+                    {canBuyAddon ? 'Límites más altos permanentes' : msg.suggestion}
                   </p>
                   {!canBuyAddon && <p className="mt-1 text-xs text-gray-500">{msg.savings}</p>}
                 </div>
@@ -145,7 +145,7 @@ export function LimitReachedModal({
                 className="w-full"
                 onClick={() => {
                   onClose();
-                  router.visit("/subscription/pricing");
+                  router.visit('/subscription/pricing');
                 }}
               >
                 Ver Planes
@@ -153,7 +153,7 @@ export function LimitReachedModal({
             </div>
 
             {/* Opción 3: Esperar (solo para límites mensuales) */}
-            {(limitType === "ai_credits" || limitType === "publications") && (
+            {(limitType === 'ai_credits' || limitType === 'publications') && (
               <button
                 onClick={onClose}
                 className="w-full py-2 text-sm text-gray-500 transition-colors hover:text-gray-700"

@@ -1,9 +1,9 @@
-import { BarChart3 } from "lucide-react";
-import { AIResponse } from "@/Hooks/useAIChat";
+import { BarChart3 } from 'lucide-react';
+import { AIResponse } from '@/Hooks/useAIChat';
 
 interface DataResponseProps {
   data: AIResponse;
-  theme: "dark" | "light";
+  theme: 'dark' | 'light';
 }
 
 export default function DataResponse({ data, theme }: DataResponseProps) {
@@ -20,20 +20,20 @@ export default function DataResponse({ data, theme }: DataResponseProps) {
             <div
               key={index}
               className={`flex items-center justify-between rounded-lg p-3 ${
-                theme === "dark" ? "bg-neutral-800/50" : "bg-gray-50"
+                theme === 'dark' ? 'bg-neutral-800/50' : 'bg-gray-50'
               }`}
             >
               <div>
                 <p className="text-sm font-medium">{item.name}</p>
                 {item.description && (
-                  <p className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
+                  <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                     {item.description}
                   </p>
                 )}
               </div>
               <div className="text-right">
                 <p
-                  className={`font-bold ${theme === "dark" ? "text-green-400" : "text-green-600"}`}
+                  className={`font-bold ${theme === 'dark' ? 'text-green-400' : 'text-green-600'}`}
                 >
                   {item.value}
                 </p>
@@ -49,7 +49,7 @@ export default function DataResponse({ data, theme }: DataResponseProps) {
             <span
               key={index}
               className={`rounded-full px-2 py-1 text-xs ${
-                theme === "dark" ? "bg-neutral-700 text-gray-300" : "bg-gray-100 text-gray-600"
+                theme === 'dark' ? 'bg-neutral-700 text-gray-300' : 'bg-gray-100 text-gray-600'
               }`}
             >
               {category}

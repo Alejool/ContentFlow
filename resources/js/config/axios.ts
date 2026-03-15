@@ -5,14 +5,14 @@
  * Import and use this configured instance for optimistic updates.
  */
 
-import axios from "axios";
-import { setupOptimisticInterceptor } from "../plugins/optimisticAxios";
+import axios from 'axios';
+import { setupOptimisticInterceptor } from '../plugins/optimisticAxios';
 
 // Create a configured axios instance
 const axiosInstance = axios.create({
   withCredentials: true,
   headers: {
-    "X-Requested-With": "XMLHttpRequest",
+    'X-Requested-With': 'XMLHttpRequest',
   },
 });
 

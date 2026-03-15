@@ -1,5 +1,5 @@
-import { Brain, Maximize2, Minimize2, X } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { Brain, Maximize2, Minimize2, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ChatHeaderProps {
   isMinimized: boolean;
@@ -20,9 +20,9 @@ export default function ChatHeader({ isMinimized, onMinimize, onClose }: ChatHea
           <Brain className="h-5 w-5" />
         </div>
         <div>
-          <span className="font-semibold">{t("aiAssistant.headerTitle")}</span>
+          <span className="font-semibold">{t('aiAssistant.headerTitle')}</span>
           <p className="text-xs text-white/90 dark:text-primary-200/80">
-            {t("aiAssistant.subtitle")}
+            {t('aiAssistant.subtitle')}
           </p>
         </div>
       </div>

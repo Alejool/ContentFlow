@@ -1,16 +1,16 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { router } from "@inertiajs/react";
-import { Building2, FileText } from "lucide-react";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
-import { z } from "zod";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { router } from '@inertiajs/react';
+import { Building2, FileText } from 'lucide-react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
+import { z } from 'zod';
 
-import Button from "@/Components/common/Modern/Button";
-import Input from "@/Components/common/Modern/Input";
-import Textarea from "@/Components/common/Modern/Textarea";
+import Button from '@/Components/common/Modern/Button';
+import Input from '@/Components/common/Modern/Input';
+import Textarea from '@/Components/common/Modern/Textarea';
 
-import { X } from "lucide-react";
+import { X } from 'lucide-react';
 
 interface CreateWorkspaceModalProps {
   isOpen: boolean;
@@ -20,8 +20,8 @@ interface CreateWorkspaceModalProps {
 
 const workspaceSchema = (t: any) =>
   z.object({
-    name: z.string().min(1, t("workspace.invite_modal.validation.nameRequired")).max(255),
-    description: z.string().max(1000).optional().or(z.literal("")),
+    name: z.string().min(1, t('workspace.invite_modal.validation.nameRequired')).max(255),
+    description: z.string().max(1000).optional().or(z.literal('')),
   });
 
 type WorkspaceFormData = z.infer<ReturnType<typeof workspaceSchema>>;
@@ -38,18 +38,18 @@ const CreateWorkspaceModal = ({ isOpen, onClose, t }: CreateWorkspaceModalProps)
   } = useForm<WorkspaceFormData>({
     resolver: zodResolver(workspaceSchema(t)),
     defaultValues: {
-      name: "",
-      description: "",
+      name: '',
+      description: '',
     },
   });
 
   const onSubmit = (data: WorkspaceFormData) => {
     setIsSubmitting(true);
-    router.post(route("workspaces.store"), data, {
+    router.post(route('workspaces.store'), data, {
       onSuccess: () => {
         onClose();
         reset();
-        toast.success(t("workspace.messages.update_success"));
+        toast.success(t('workspace.messages.update_success'));
         setIsSubmitting(false);
       },
       onError: (errors) => {
@@ -57,7 +57,7 @@ const CreateWorkspaceModal = ({ isOpen, onClose, t }: CreateWorkspaceModalProps)
         if (errors) {
           Object.keys(errors).forEach((key) => {
             setError(key as any, {
-              type: "server",
+              type: 'server',
               message: errors[key],
             });
           });
@@ -82,10 +82,10 @@ const CreateWorkspaceModal = ({ isOpen, onClose, t }: CreateWorkspaceModalProps)
             </div>
             <div>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-                {t("workspace.create_new_workspace")}
+                {t('workspace.create_new_workspace')}
               </h3>
               <p className="mt-1 text-sm text-gray-500 dark:text-neutral-500">
-                {t("workspace.modal.subtitle")}
+                {t('workspace.modal.subtitle')}
               </p>
             </div>
           </div>
@@ -101,22 +101,22 @@ const CreateWorkspaceModal = ({ isOpen, onClose, t }: CreateWorkspaceModalProps)
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <Input
             id="name"
-            label={t("workspace.name")}
+            label={t('workspace.name')}
             required
             sizeType="lg"
             register={register}
             error={errors.name?.message}
-            placeholder={t("workspace.name_placeholder")}
+            placeholder={t('workspace.name_placeholder')}
             autoFocus
           />
 
           <div className="space-y-1">
             <Textarea
               id="description"
-              label={t("workspace.description")}
+              label={t('workspace.description')}
               register={register}
               name="description"
-              placeholder={t("workspace.description_placeholder")}
+              placeholder={t('workspace.description_placeholder')}
               error={errors.description?.message as string}
               icon={FileText}
               variant="filled"
@@ -136,16 +136,16 @@ const CreateWorkspaceModal = ({ isOpen, onClose, t }: CreateWorkspaceModalProps)
               buttonStyle="outline"
               fullWidth
             >
-              {t("common.cancel")}
+              {t('common.cancel')}
             </Button>
             <Button type="submit" loading={isSubmitting} fullWidth buttonStyle="gradient" icon={X}>
-              {isSubmitting ? t("common.creating") : t("workspace.create")}
+              {isSubmitting ? t('common.creating') : t('workspace.create')}
             </Button>
           </div>
 
           <div>
             <p className="text-center text-xs text-gray-500 dark:text-neutral-500">
-              {t("workspace.modal.footer_note")}
+              {t('workspace.modal.footer_note')}
             </p>
           </div>
         </form>

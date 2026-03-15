@@ -1,29 +1,29 @@
-import React, { ButtonHTMLAttributes, forwardRef } from "react";
-import { LazyMotion, domAnimation, m, HTMLMotionProps } from "framer-motion";
-import { useReducedMotion } from "@/hooks/useReducedMotion";
+import React, { ButtonHTMLAttributes, forwardRef } from 'react';
+import { LazyMotion, domAnimation, m, HTMLMotionProps } from 'framer-motion';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 import {
   hoverVariants,
   actionVariants,
   getVariant,
   getTransition,
-} from "@/config/animationVariants";
+} from '@/config/animationVariants';
 
 /**
  * Variant types for hover effects
  */
-export type HoverVariant = "subtle" | "lift" | "scale" | "glow";
+export type HoverVariant = 'subtle' | 'lift' | 'scale' | 'glow';
 
 /**
  * Variant types for action feedback
  */
-export type ActionFeedback = "press" | "success" | "error" | "loading";
+export type ActionFeedback = 'press' | 'success' | 'error' | 'loading';
 
 /**
  * Props for MotionButton component
  */
 export interface MotionButtonProps extends Omit<
   ButtonHTMLAttributes<HTMLButtonElement>,
-  "onAnimationStart" | "onDragStart" | "onDragEnd" | "onDrag"
+  'onAnimationStart' | 'onDragStart' | 'onDragEnd' | 'onDrag'
 > {
   /**
    * Hover effect variant
@@ -46,7 +46,7 @@ export interface MotionButtonProps extends Omit<
   /**
    * Additional Framer Motion props
    */
-  motionProps?: Omit<HTMLMotionProps<"button">, "ref">;
+  motionProps?: Omit<HTMLMotionProps<'button'>, 'ref'>;
 }
 
 /**
@@ -67,8 +67,8 @@ export interface MotionButtonProps extends Omit<
 export const MotionButton = forwardRef<HTMLButtonElement, MotionButtonProps>(
   (
     {
-      variant = "subtle",
-      actionFeedback = "press",
+      variant = 'subtle',
+      actionFeedback = 'press',
       respectReducedMotion = true,
       motionProps,
       children,
@@ -87,8 +87,8 @@ export const MotionButton = forwardRef<HTMLButtonElement, MotionButtonProps>(
     const selectedActionVariant = actionVariants[actionFeedback];
 
     // Determine which hover state to use
-    const hoverState = shouldReduceMotion ? "hoverReduced" : "hover";
-    const tapState = shouldReduceMotion ? "tapReduced" : "tap";
+    const hoverState = shouldReduceMotion ? 'hoverReduced' : 'hover';
+    const tapState = shouldReduceMotion ? 'tapReduced' : 'tap';
 
     return (
       <LazyMotion features={domAnimation}>
@@ -98,7 +98,7 @@ export const MotionButton = forwardRef<HTMLButtonElement, MotionButtonProps>(
           initial="initial"
           whileHover={getVariant(selectedHoverVariant, hoverState, shouldReduceMotion)}
           whileTap={
-            actionFeedback === "press"
+            actionFeedback === 'press'
               ? getVariant(selectedActionVariant, tapState, shouldReduceMotion)
               : undefined
           }
@@ -116,6 +116,6 @@ export const MotionButton = forwardRef<HTMLButtonElement, MotionButtonProps>(
   },
 );
 
-MotionButton.displayName = "MotionButton";
+MotionButton.displayName = 'MotionButton';
 
 export default MotionButton;

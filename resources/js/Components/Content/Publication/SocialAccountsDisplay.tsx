@@ -1,9 +1,9 @@
-import { getPlatformConfig } from "@/Constants/socialPlatforms";
-import { validateVideoDuration } from "@/Utils/validationUtils";
-import { Publication } from "@/types/Publication";
-import { AlertTriangle } from "lucide-react";
-import { memo, useMemo } from "react";
-import { useTranslation } from "react-i18next";
+import { getPlatformConfig } from '@/Constants/socialPlatforms';
+import { validateVideoDuration } from '@/Utils/validationUtils';
+import { Publication } from '@/types/Publication';
+import { AlertTriangle } from 'lucide-react';
+import { memo, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface SocialAccountsDisplayProps {
   publication?: Publication | null;
@@ -42,7 +42,7 @@ const SocialAccountsDisplay = memo(
         if (p && p.social_account_id) combined.set(p.social_account_id, p);
       });
       postLogs.forEach((l) => {
-        if (l && l.social_account_id && l.status === "published")
+        if (l && l.social_account_id && l.status === 'published')
           combined.set(l.social_account_id, l);
       });
 
@@ -66,7 +66,7 @@ const SocialAccountsDisplay = memo(
       <div className="flex flex-wrap items-center gap-1.5">
         {displayItems.slice(0, 4).map((item) => {
           const account = item.social_account;
-          const platform = (account?.platform || item.platform || "social").toLowerCase();
+          const platform = (account?.platform || item.platform || 'social').toLowerCase();
           const config = getPlatformConfig(platform);
           const isConnected = item.social_account_id
             ? connectedIds.has(item.social_account_id)
@@ -76,11 +76,11 @@ const SocialAccountsDisplay = memo(
           return (
             <div
               key={`${item.id}-${platform}`}
-              className={`relative flex h-6 w-6 items-center justify-center rounded text-[10px] font-black uppercase transition-all ${config.bgClass} ${config.textColor} ${config.borderColor} ${config.darkColor} ${config.darkTextColor} ${config.darkBorderColor} ${isConnected ? "opacity-100 ring-1 ring-emerald-500/20" : "scale-95 opacity-40 grayscale"} `}
+              className={`relative flex h-6 w-6 items-center justify-center rounded text-[10px] font-black uppercase transition-all ${config.bgClass} ${config.textColor} ${config.borderColor} ${config.darkColor} ${config.darkTextColor} ${config.darkBorderColor} ${isConnected ? 'opacity-100 ring-1 ring-emerald-500/20' : 'scale-95 opacity-40 grayscale'} `}
               title={
                 isPublishing
                   ? `Publicando en ${account?.account_name || platform}...`
-                  : account?.account_name || "Social Account"
+                  : account?.account_name || 'Social Account'
               }
             >
               {platform.slice(0, 1)}
@@ -109,7 +109,7 @@ const SocialAccountsDisplay = memo(
                 </div>
               )}
               {(() => {
-                const video = publication?.media_files?.find((m) => m.file_type === "video");
+                const video = publication?.media_files?.find((m) => m.file_type === 'video');
                 if (!video) return null;
                 const duration = video.metadata?.duration || 0;
                 const validation = validateVideoDuration(platform, duration);

@@ -3,11 +3,11 @@
  * Handles caching strategies, LRU eviction, and cache invalidation
  */
 
-import { cacheLogger } from "../Utils/cacheLogger";
-import { errorLogger } from "../Utils/errorLogger";
+import { cacheLogger } from '../Utils/cacheLogger';
+import { errorLogger } from '../Utils/errorLogger';
 
 // Cache configuration
-const CACHE_VERSION = "v1";
+const CACHE_VERSION = 'v1';
 export const CACHE_NAMES = {
   STATIC: `static-${CACHE_VERSION}`,
   DYNAMIC: `dynamic-${CACHE_VERSION}`,
@@ -40,7 +40,7 @@ interface CacheMetadata {
   lastAccessed: number;
   accessCount: number;
   size: number;
-  strategy: "cache-first" | "network-first" | "stale-while-revalidate";
+  strategy: 'cache-first' | 'network-first' | 'stale-while-revalidate';
 }
 
 // Cache Manager class
@@ -51,7 +51,7 @@ export class CacheManager {
 
   constructor() {
     this.metadataStore = new Map();
-    this.isDevelopment = process.env.NODE_ENV === "development";
+    this.isDevelopment = process.env.NODE_ENV === 'development';
     this.evictionCheckInterval = null;
 
     // Start automatic eviction checks
@@ -63,7 +63,7 @@ export class CacheManager {
    * Requirements: 7.4
    */
   private startEvictionChecks(): void {
-    if (typeof self !== "undefined" && "setInterval" in self) {
+    if (typeof self !== 'undefined' && 'setInterval' in self) {
       this.evictionCheckInterval = self.setInterval(() => {
         this.checkAllCaches();
       }, LRU_CONFIG.CHECK_INTERVAL) as unknown as number;
@@ -113,7 +113,7 @@ export class CacheManager {
               lastAccessed: Date.now(),
               accessCount: 0,
               size,
-              strategy: "cache-first",
+              strategy: 'cache-first',
             });
 
             if (this.isDevelopment) {
@@ -124,21 +124,21 @@ export class CacheManager {
           // Log comprehensive error
           // Requirements: 3.5, 10.3
           errorLogger.logError(error as Error, {
-            type: "cache",
-            operation: "cache_static",
-            resource: "static_asset",
+            type: 'cache',
+            operation: 'cache_static',
+            resource: 'static_asset',
             data: { url },
-            severity: "warning",
+            severity: 'warning',
           });
         }
       }
     } catch (error) {
       // Log comprehensive error
       errorLogger.logError(error as Error, {
-        type: "cache",
-        operation: "open_cache",
-        resource: "static_cache",
-        severity: "error",
+        type: 'cache',
+        operation: 'open_cache',
+        resource: 'static_cache',
+        severity: 'error',
       });
     }
   }
@@ -164,7 +164,7 @@ export class CacheManager {
         lastAccessed: Date.now(),
         accessCount: 0,
         size,
-        strategy: "network-first",
+        strategy: 'network-first',
       });
 
       if (this.isDevelopment) {
@@ -177,11 +177,11 @@ export class CacheManager {
       // Log comprehensive error
       // Requirements: 3.5, 10.3
       errorLogger.logError(error as Error, {
-        type: "cache",
-        operation: "cache_dynamic",
-        resource: "dynamic_content",
+        type: 'cache',
+        operation: 'cache_dynamic',
+        resource: 'dynamic_content',
         data: { url: request.url },
-        severity: "warning",
+        severity: 'warning',
       });
     }
   }
@@ -392,9 +392,9 @@ export class CacheManager {
    * Invalidate cache by resource type
    * Requirements: 7.5
    */
-  async invalidateByType(type: "static" | "dynamic" | "images" | "api" | "all"): Promise<void> {
+  async invalidateByType(type: 'static' | 'dynamic' | 'images' | 'api' | 'all'): Promise<void> {
     try {
-      if (type === "all") {
+      if (type === 'all') {
         // Clear all caches
         await this.clearAllCaches();
         return;
@@ -438,8 +438,8 @@ export class CacheManager {
   async invalidateByUrl(urlPattern: string | RegExp): Promise<void> {
     try {
       const pattern =
-        typeof urlPattern === "string"
-          ? new RegExp(urlPattern.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+        typeof urlPattern === 'string'
+          ? new RegExp(urlPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
           : urlPattern;
 
       let deletedCount = 0;
@@ -494,7 +494,7 @@ export class CacheManager {
 
       // Clear all metadata
       this.metadataStore.clear();
-      console.log("[CacheManager] All caches cleared");
+      console.log('[CacheManager] All caches cleared');
     } catch (error) {
       // Ignore errors
     }
@@ -521,7 +521,7 @@ export class CacheManager {
           if (metadata) {
             const age = now - metadata.cachedAt;
             const maxAge =
-              metadata.strategy === "cache-first"
+              metadata.strategy === 'cache-first'
                 ? 30 * 24 * 60 * 60 * 1000 // 30 days for static
                 : 7 * 24 * 60 * 60 * 1000; // 7 days for dynamic
 
@@ -582,8 +582,8 @@ export class CacheManager {
         cacheLogger.logDecision({
           url: request.url,
           method: request.method,
-          strategy: "cache-first",
-          result: "cache-hit",
+          strategy: 'cache-first',
+          result: 'cache-hit',
           responseTime,
           cacheAge: metadata ? Date.now() - metadata.cachedAt : undefined,
           size: metadata?.size,
@@ -612,15 +612,15 @@ export class CacheManager {
           lastAccessed: Date.now(),
           accessCount: 0,
           size,
-          strategy: "cache-first",
+          strategy: 'cache-first',
         });
 
         // Log cache decision
         cacheLogger.logDecision({
           url: request.url,
           method: request.method,
-          strategy: "cache-first",
-          result: "cache-miss",
+          strategy: 'cache-first',
+          result: 'cache-miss',
           responseTime,
           size,
         });
@@ -639,8 +639,8 @@ export class CacheManager {
       cacheLogger.logDecision({
         url: request.url,
         method: request.method,
-        strategy: "cache-first",
-        result: "network-error",
+        strategy: 'cache-first',
+        result: 'network-error',
         responseTime,
         error: (error as Error).message,
       });
@@ -672,8 +672,8 @@ export class CacheManager {
         cacheLogger.logDecision({
           url: request.url,
           method: request.method,
-          strategy: "network-first",
-          result: "network-success",
+          strategy: 'network-first',
+          result: 'network-success',
           responseTime,
           size,
         });
@@ -697,8 +697,8 @@ export class CacheManager {
         cacheLogger.logDecision({
           url: request.url,
           method: request.method,
-          strategy: "network-first",
-          result: "fallback",
+          strategy: 'network-first',
+          result: 'fallback',
           responseTime,
           cacheAge: metadata ? Date.now() - metadata.cachedAt : undefined,
           size: metadata?.size,
@@ -716,13 +716,13 @@ export class CacheManager {
       cacheLogger.logDecision({
         url: request.url,
         method: request.method,
-        strategy: "network-first",
-        result: "network-error",
+        strategy: 'network-first',
+        result: 'network-error',
         responseTime,
         error: (error as Error).message,
       });
 
-      console.error("[CacheManager] network-first failed:", error);
+      console.error('[CacheManager] network-first failed:', error);
       throw error;
     }
   }
@@ -755,7 +755,7 @@ export class CacheManager {
               lastAccessed: Date.now(),
               accessCount: this.metadataStore.get(request.url)?.accessCount || 0,
               size,
-              strategy: "stale-while-revalidate",
+              strategy: 'stale-while-revalidate',
             });
 
             if (this.isDevelopment) {
@@ -777,8 +777,8 @@ export class CacheManager {
         cacheLogger.logDecision({
           url: request.url,
           method: request.method,
-          strategy: "stale-while-revalidate",
-          result: "cache-hit",
+          strategy: 'stale-while-revalidate',
+          result: 'cache-hit',
           responseTime,
           cacheAge: metadata ? Date.now() - metadata.cachedAt : undefined,
           size: metadata?.size,
@@ -802,8 +802,8 @@ export class CacheManager {
         cacheLogger.logDecision({
           url: request.url,
           method: request.method,
-          strategy: "stale-while-revalidate",
-          result: "cache-miss",
+          strategy: 'stale-while-revalidate',
+          result: 'cache-miss',
           responseTime,
           size,
         });
@@ -817,7 +817,7 @@ export class CacheManager {
         return networkResponse;
       }
 
-      throw new Error("No cached response and network failed");
+      throw new Error('No cached response and network failed');
     } catch (error) {
       const responseTime = Date.now() - startTime;
 
@@ -825,8 +825,8 @@ export class CacheManager {
       cacheLogger.logDecision({
         url: request.url,
         method: request.method,
-        strategy: "stale-while-revalidate",
-        result: "network-error",
+        strategy: 'stale-while-revalidate',
+        result: 'network-error',
         responseTime,
         error: (error as Error).message,
       });
@@ -865,7 +865,7 @@ export class CacheManager {
    * Check if request is for static asset
    */
   private isStaticAsset(url: URL): boolean {
-    const staticExtensions = [".js", ".css", ".woff", ".woff2", ".ttf", ".eot"];
+    const staticExtensions = ['.js', '.css', '.woff', '.woff2', '.ttf', '.eot'];
     const pathname = url.pathname.toLowerCase();
 
     // Check if has hash in filename (e.g., app.abc123.js)
@@ -879,9 +879,9 @@ export class CacheManager {
    */
   private isApiRequest(url: URL): boolean {
     return (
-      url.pathname.startsWith("/api/") ||
-      url.pathname.startsWith("/sanctum/") ||
-      url.pathname.includes("/api/")
+      url.pathname.startsWith('/api/') ||
+      url.pathname.startsWith('/sanctum/') ||
+      url.pathname.includes('/api/')
     );
   }
 
@@ -890,15 +890,15 @@ export class CacheManager {
    */
   private isImageOrMedia(url: URL): boolean {
     const mediaExtensions = [
-      ".jpg",
-      ".jpeg",
-      ".png",
-      ".gif",
-      ".webp",
-      ".svg",
-      ".mp4",
-      ".webm",
-      ".mp3",
+      '.jpg',
+      '.jpeg',
+      '.png',
+      '.gif',
+      '.webp',
+      '.svg',
+      '.mp4',
+      '.webm',
+      '.mp3',
     ];
     const pathname = url.pathname.toLowerCase();
 

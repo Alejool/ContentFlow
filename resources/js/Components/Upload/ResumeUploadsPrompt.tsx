@@ -1,8 +1,8 @@
-import { useUploadQueue } from "@/stores/uploadQueueStore";
-import { AlertCircle, Upload, X } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { router } from "@inertiajs/react";
-import toast from "react-hot-toast";
+import { useUploadQueue } from '@/stores/uploadQueueStore';
+import { AlertCircle, Upload, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { router } from '@inertiajs/react';
+import toast from 'react-hot-toast';
 
 export function ResumeUploadsPrompt() {
   const persistedState = useUploadQueue((state) => state.persistedState);
@@ -14,7 +14,7 @@ export function ResumeUploadsPrompt() {
 
   const incompleteUploads = Object.values(persistedState).filter(
     (upload) =>
-      upload.status === "uploading" || upload.status === "paused" || upload.status === "pending",
+      upload.status === 'uploading' || upload.status === 'paused' || upload.status === 'pending',
   );
 
   if (!showResumePrompt || incompleteUploads.length === 0) {
@@ -23,13 +23,13 @@ export function ResumeUploadsPrompt() {
 
   const handleGoToContent = () => {
     // Navigate to content page where user can manage publications
-    router.visit("/content");
+    router.visit('/content');
     dismissResumePrompt();
   };
 
   const handleDiscard = () => {
     clearAllPersistedUploads();
-    toast.success(t("common.upload.resume_prompt.discarded"));
+    toast.success(t('common.upload.resume_prompt.discarded'));
   };
 
   return (
@@ -42,14 +42,14 @@ export function ResumeUploadsPrompt() {
             </div>
             <div>
               <h3 className="text-sm font-semibold text-gray-900 dark:text-neutral-100">
-                {t("common.upload.resume_prompt.title")}
+                {t('common.upload.resume_prompt.title')}
               </h3>
               <p className="mt-1 text-xs text-gray-600 dark:text-neutral-400">
                 {incompleteUploads.length === 1
-                  ? t("common.upload.resume_prompt.description", {
+                  ? t('common.upload.resume_prompt.description', {
                       count: incompleteUploads.length,
                     })
-                  : t("common.upload.resume_prompt.description_plural", {
+                  : t('common.upload.resume_prompt.description_plural', {
                       count: incompleteUploads.length,
                     })}
               </p>
@@ -58,7 +58,7 @@ export function ResumeUploadsPrompt() {
           <button
             onClick={handleDiscard}
             className="text-gray-400 transition-colors hover:text-gray-600 dark:text-neutral-500 dark:hover:text-neutral-300"
-            aria-label={t("common.close")}
+            aria-label={t('common.close')}
           >
             <X className="h-4 w-4" />
           </button>
@@ -81,7 +81,7 @@ export function ResumeUploadsPrompt() {
           ))}
           {incompleteUploads.length > 3 && (
             <div className="text-center text-xs text-gray-500 dark:text-neutral-400">
-              {t("common.upload.resume_prompt.more", {
+              {t('common.upload.resume_prompt.more', {
                 count: incompleteUploads.length - 3,
               })}
             </div>
@@ -90,7 +90,7 @@ export function ResumeUploadsPrompt() {
 
         <div className="mb-3 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-900/20">
           <p className="text-xs text-amber-800 dark:text-amber-200">
-            {t("common.upload.resume_prompt.info")}
+            {t('common.upload.resume_prompt.info')}
           </p>
         </div>
 
@@ -99,13 +99,13 @@ export function ResumeUploadsPrompt() {
             onClick={handleGoToContent}
             className="flex-1 rounded-lg bg-primary-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-600 dark:bg-primary-600 dark:hover:bg-primary-700"
           >
-            {t("common.upload.resume_prompt.go_to_content")}
+            {t('common.upload.resume_prompt.go_to_content')}
           </button>
           <button
             onClick={handleDiscard}
             className="rounded-lg bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-300 dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-600"
           >
-            {t("common.upload.resume_prompt.discard")}
+            {t('common.upload.resume_prompt.discard')}
           </button>
         </div>
       </div>

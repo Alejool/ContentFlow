@@ -1,4 +1,4 @@
-import { SOCIAL_PLATFORMS } from "../Constants/socialPlatformsConfig";
+import { SOCIAL_PLATFORMS } from '../Constants/socialPlatformsConfig';
 
 export interface DurationValidationResult {
   isValid: boolean;
@@ -16,7 +16,7 @@ export const formatDuration = (seconds: number): string => {
   const minutes = Math.floor((seconds % 3600) / 60);
   const remainingSeconds = seconds % 60;
 
-  let result = "";
+  let result = '';
   if (hours > 0) result += `${hours}h `;
   if (minutes > 0) result += `${minutes}m `;
   if (remainingSeconds > 0 && hours === 0) result += `${remainingSeconds}s`;
@@ -37,7 +37,7 @@ export const validateVideoDuration = (
     return {
       isValid: true,
       maxDuration: Infinity,
-      formattedMax: "N/A",
+      formattedMax: 'N/A',
     };
   }
 
@@ -61,7 +61,7 @@ export const checkPublicationDurationErrors = (
   videoMetadata: Record<string, any>,
 ): Record<number, string> => {
   const errors: Record<number, string> = {};
-  const videos = mediaFiles.filter((m) => m.type === "video");
+  const videos = mediaFiles.filter((m) => m.type === 'video');
 
   if (videos.length === 0) return errors;
 

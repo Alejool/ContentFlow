@@ -1,8 +1,8 @@
-import { Campaign } from "@/types/Campaign";
-import { usePage } from "@inertiajs/react";
-import { format } from "date-fns";
-import { getDateFnsLocale } from "@/Utils/dateLocales";
-import { useTranslation } from "react-i18next";
+import { Campaign } from '@/types/Campaign';
+import { usePage } from '@inertiajs/react';
+import { format } from 'date-fns';
+import { getDateFnsLocale } from '@/Utils/dateLocales';
+import { useTranslation } from 'react-i18next';
 import {
   Calendar,
   ChevronDown,
@@ -13,9 +13,9 @@ import {
   Eye,
   Target,
   Trash2,
-} from "lucide-react";
+} from 'lucide-react';
 
-import PublicationThumbnail from "@/Components/Content/Publication/PublicationThumbnail";
+import PublicationThumbnail from '@/Components/Content/Publication/PublicationThumbnail';
 
 interface CampaignMobileTableProps {
   items: Campaign[];
@@ -43,7 +43,7 @@ export default function CampaignMobileTable({
   getStatusColor,
 }: CampaignMobileTableProps) {
   const { auth } = usePage<any>().props;
-  const canManageContent = auth.current_workspace?.permissions?.includes("manage-content");
+  const canManageContent = auth.current_workspace?.permissions?.includes('manage-content');
 
   const { i18n } = useTranslation();
   const locale = getDateFnsLocale(i18n.language);
@@ -63,7 +63,7 @@ export default function CampaignMobileTable({
                   <p className="mt-1 line-clamp-2 text-sm text-gray-500 dark:text-gray-400">
                     {item.description && item.description.length > 100
                       ? `${item.description.substring(0, 100)}...`
-                      : item.description || "Sin descripción"}
+                      : item.description || 'Sin descripción'}
                   </p>
                 </div>
                 <div
@@ -71,7 +71,7 @@ export default function CampaignMobileTable({
                     item.status,
                   )}`}
                 >
-                  {t(`campaigns.filters.${item.status || "active"}`)}
+                  {t(`campaigns.filters.${item.status || 'active'}`)}
                 </div>
               </div>
 
@@ -88,9 +88,9 @@ export default function CampaignMobileTable({
                     <div className="flex items-center gap-1 rounded-md bg-green-50 px-2 py-1 text-xs text-gray-500 dark:bg-green-900/10 dark:text-gray-400">
                       <DollarSign className="h-3 w-3 text-green-600 dark:text-green-400" />
                       <span>
-                        {new Intl.NumberFormat("es-ES", {
-                          style: "currency",
-                          currency: "USD",
+                        {new Intl.NumberFormat('es-ES', {
+                          style: 'currency',
+                          currency: 'USD',
                         }).format(item.budget)}
                       </span>
                     </div>
@@ -103,16 +103,16 @@ export default function CampaignMobileTable({
                   <Calendar className="h-4 w-4" />
                   <span>
                     {item.start_date
-                      ? format(new Date(item.start_date), "d MMM", {
+                      ? format(new Date(item.start_date), 'd MMM', {
                           locale,
                         })
-                      : "..."}
-                    {" - "}
+                      : '...'}
+                    {' - '}
                     {item.end_date
-                      ? format(new Date(item.end_date), "d MMM yyyy", {
+                      ? format(new Date(item.end_date), 'd MMM yyyy', {
                           locale,
                         })
-                      : "..."}
+                      : '...'}
                   </span>
                 </div>
                 {item.publications && item.publications.length > 0 && (
@@ -130,19 +130,19 @@ export default function CampaignMobileTable({
                       onClick={() => toggleExpand(item.id)}
                       className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[10px] font-bold uppercase transition-all active:scale-95 ${
                         expandedCampaigns.includes(item.id)
-                          ? "bg-primary-50 text-primary-700 ring-1 ring-primary-200 dark:bg-primary-900/40 dark:text-primary-400 dark:ring-primary-800"
-                          : "bg-gray-50 text-gray-600 ring-1 ring-gray-100 hover:bg-gray-100 dark:bg-neutral-800 dark:text-gray-300 dark:ring-neutral-700 dark:hover:bg-neutral-700"
+                          ? 'bg-primary-50 text-primary-700 ring-1 ring-primary-200 dark:bg-primary-900/40 dark:text-primary-400 dark:ring-primary-800'
+                          : 'bg-gray-50 text-gray-600 ring-1 ring-gray-100 hover:bg-gray-100 dark:bg-neutral-800 dark:text-gray-300 dark:ring-neutral-700 dark:hover:bg-neutral-700'
                       }`}
                     >
                       {expandedCampaigns.includes(item.id) ? (
                         <>
                           <ChevronDown className="h-3 w-3" />
-                          {t("campaigns.actions.hidePublications")}
+                          {t('campaigns.actions.hidePublications')}
                         </>
                       ) : (
                         <>
                           <ChevronRight className="h-3 w-3" />
-                          {t("campaigns.actions.showPublications")}
+                          {t('campaigns.actions.showPublications')}
                           <span className="ml-0.5 opacity-60">({item.publications?.length})</span>
                         </>
                       )}
@@ -156,7 +156,7 @@ export default function CampaignMobileTable({
                   <button
                     onClick={() => onViewDetails(item)}
                     className="rounded-lg p-2 text-gray-500 transition-all hover:bg-white hover:text-primary-600 dark:hover:bg-neutral-800 dark:hover:text-primary-400"
-                    title={t("common.view")}
+                    title={t('common.view')}
                   >
                     <Eye className="h-4 w-4" />
                   </button>
@@ -172,14 +172,14 @@ export default function CampaignMobileTable({
                       <button
                         onClick={() => onEdit(item)}
                         className="rounded-lg p-2 text-blue-500 transition-all hover:bg-white dark:hover:bg-neutral-800"
-                        title={t("common.edit")}
+                        title={t('common.edit')}
                       >
                         <Edit className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => onDelete(item.id)}
                         className="rounded-lg p-2 text-rose-500 transition-all hover:bg-white dark:hover:bg-neutral-800"
-                        title={t("common.delete")}
+                        title={t('common.delete')}
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -194,7 +194,7 @@ export default function CampaignMobileTable({
               item.publications.length > 0 && (
                 <div className="border-t border-gray-200 p-4 dark:border-neutral-700">
                   <div className="mb-3 border-l-2 border-primary-500 pl-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
-                    {t("campaigns.modal.view.associatedPublications")}
+                    {t('campaigns.modal.view.associatedPublications')}
                   </div>
                   <div className="space-y-2">
                     {item.publications.map((pub) => (
@@ -214,8 +214,8 @@ export default function CampaignMobileTable({
                             </div>
                             <div className="text-xs text-gray-500">
                               {pub.created_at
-                                ? format(new Date(pub.created_at), "MMM d, yyyy")
-                                : "N/A"}
+                                ? format(new Date(pub.created_at), 'MMM d, yyyy')
+                                : 'N/A'}
                             </div>
                           </div>
                         </div>
@@ -224,7 +224,7 @@ export default function CampaignMobileTable({
                             pub.status,
                           )}`}
                         >
-                          {t(`publications.status.${pub.status || "draft"}`)}
+                          {t(`publications.status.${pub.status || 'draft'}`)}
                         </div>
                       </div>
                     ))}

@@ -1,25 +1,25 @@
-import Button from "@/Components/common/Modern/Button";
-import ModernCard from "@/Components/common/Modern/Card";
-import Input from "@/Components/common/Modern/Input";
-import Select from "@/Components/common/Modern/Select";
-import Textarea from "@/Components/common/Modern/Textarea";
-import { useForm } from "@inertiajs/react";
-import { AlertTriangle, Bell, CheckCircle, Info, Send, XCircle } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import Button from '@/Components/common/Modern/Button';
+import ModernCard from '@/Components/common/Modern/Card';
+import Input from '@/Components/common/Modern/Input';
+import Select from '@/Components/common/Modern/Select';
+import Textarea from '@/Components/common/Modern/Textarea';
+import { useForm } from '@inertiajs/react';
+import { AlertTriangle, Bell, CheckCircle, Info, Send, XCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function SystemNotifications() {
   const { t } = useTranslation();
   const { data, setData, post, processing, errors, reset } = useForm({
-    title: "",
-    message: "",
-    description: "",
-    type: "info",
-    icon: "Bell",
+    title: '',
+    message: '',
+    description: '',
+    type: 'info',
+    icon: 'Bell',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    post(route("admin.notifications.send"), {
+    post(route('admin.notifications.send'), {
       onSuccess: () => {
         reset();
       },
@@ -28,31 +28,31 @@ export default function SystemNotifications() {
 
   const notificationTypes = [
     {
-      value: "info",
-      label: t("notifications.admin.form.types.info"),
+      value: 'info',
+      label: t('notifications.admin.form.types.info'),
       icon: <Info className="h-4 w-4" />,
     },
     {
-      value: "success",
-      label: t("notifications.admin.form.types.success"),
+      value: 'success',
+      label: t('notifications.admin.form.types.success'),
       icon: <CheckCircle className="h-4 w-4" />,
     },
     {
-      value: "warning",
-      label: t("notifications.admin.form.types.warning"),
+      value: 'warning',
+      label: t('notifications.admin.form.types.warning'),
       icon: <AlertTriangle className="h-4 w-4" />,
     },
     {
-      value: "error",
-      label: t("notifications.admin.form.types.error"),
+      value: 'error',
+      label: t('notifications.admin.form.types.error'),
       icon: <XCircle className="h-4 w-4" />,
     },
   ];
 
   return (
     <ModernCard
-      title={t("notifications.admin.card_title")}
-      description={t("notifications.admin.card_description")}
+      title={t('notifications.admin.card_title')}
+      description={t('notifications.admin.card_description')}
       icon={Bell}
       headerColor="orange"
       className="mb-6"
@@ -62,20 +62,20 @@ export default function SystemNotifications() {
           <div className="space-y-4">
             <Input
               id="title"
-              label={t("notifications.admin.form.title")}
+              label={t('notifications.admin.form.title')}
               value={data.title}
-              onChange={(e) => setData("title", e.target.value)}
+              onChange={(e) => setData('title', e.target.value)}
               error={errors.title}
-              placeholder={t("notifications.admin.form.title_placeholder")}
+              placeholder={t('notifications.admin.form.title_placeholder')}
               required
             />
 
             <Select
               id="type"
-              label={t("notifications.admin.form.type")}
+              label={t('notifications.admin.form.type')}
               value={data.type}
               onChange={(value: string | number | string[]) =>
-                setData("type", String(Array.isArray(value) ? value[0] : value))
+                setData('type', String(Array.isArray(value) ? value[0] : value))
               }
               error={errors.type}
               options={notificationTypes}
@@ -86,39 +86,39 @@ export default function SystemNotifications() {
           <div className="space-y-4">
             <Input
               id="icon"
-              label={t("notifications.admin.form.icon")}
+              label={t('notifications.admin.form.icon')}
               value={data.icon}
-              onChange={(e) => setData("icon", e.target.value)}
+              onChange={(e) => setData('icon', e.target.value)}
               error={errors.icon}
-              placeholder={t("notifications.admin.form.icon_placeholder")}
+              placeholder={t('notifications.admin.form.icon_placeholder')}
             />
           </div>
         </div>
 
         <Textarea
           id="message"
-          label={t("notifications.admin.form.message")}
+          label={t('notifications.admin.form.message')}
           value={data.message}
-          onChange={(e) => setData("message", e.target.value)}
+          onChange={(e) => setData('message', e.target.value)}
           error={errors.message}
-          placeholder={t("notifications.admin.form.message_placeholder")}
+          placeholder={t('notifications.admin.form.message_placeholder')}
           required
           rows={3}
         />
 
         <Textarea
           id="description"
-          label={t("notifications.admin.form.description")}
+          label={t('notifications.admin.form.description')}
           value={data.description}
-          onChange={(e) => setData("description", e.target.value)}
+          onChange={(e) => setData('description', e.target.value)}
           error={errors.description}
-          placeholder={t("notifications.admin.form.description_placeholder")}
+          placeholder={t('notifications.admin.form.description_placeholder')}
           rows={4}
         />
 
         <div className="flex justify-end pt-4">
           <Button type="submit" variant="primary" loading={processing} icon={Send}>
-            {t("notifications.admin.form.submit")}
+            {t('notifications.admin.form.submit')}
           </Button>
         </div>
       </form>

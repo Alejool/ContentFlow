@@ -1,6 +1,6 @@
-import { Publication } from "@/types/Publication";
-import axios from "axios";
-import { useEffect, useState } from "react";
+import { Publication } from '@/types/Publication';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 
 interface ValidationResult {
   can_publish?: boolean;
@@ -33,11 +33,11 @@ export function usePublishValidation(publication: Publication, selectedPlatforms
         platform_ids: selectedPlatforms,
       });
 
-      console.log("Validation response:", response.data);
+      console.log('Validation response:', response.data);
       setValidationResult(response.data);
     } catch (error: any) {
-      console.error("Validation error:", error);
-      const errorMessage = error.response?.data?.message || "Error al validar contenido";
+      console.error('Validation error:', error);
+      const errorMessage = error.response?.data?.message || 'Error al validar contenido';
       setValidationError(errorMessage);
       setValidationResult(null);
     } finally {

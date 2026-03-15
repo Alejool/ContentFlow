@@ -1,13 +1,13 @@
-import React, { useEffect } from "react";
-import { Calendar, CalendarDays, CalendarRange } from "lucide-react";
-import { CalendarView } from "@/types/calendar";
+import React, { useEffect } from 'react';
+import { Calendar, CalendarDays, CalendarRange } from 'lucide-react';
+import { CalendarView } from '@/types/calendar';
 
 interface CalendarViewSelectorProps {
   currentView: CalendarView;
   onViewChange: (view: CalendarView) => void;
 }
 
-const VIEW_STORAGE_KEY = "calendar_preferred_view";
+const VIEW_STORAGE_KEY = 'calendar_preferred_view';
 
 export const CalendarViewSelector: React.FC<CalendarViewSelectorProps> = ({
   currentView,
@@ -16,7 +16,7 @@ export const CalendarViewSelector: React.FC<CalendarViewSelectorProps> = ({
   // Load preferred view from localStorage on mount
   useEffect(() => {
     const savedView = localStorage.getItem(VIEW_STORAGE_KEY) as CalendarView | null;
-    if (savedView && ["month", "week", "day"].includes(savedView)) {
+    if (savedView && ['month', 'week', 'day'].includes(savedView)) {
       onViewChange(savedView);
     }
   }, []);
@@ -33,16 +33,16 @@ export const CalendarViewSelector: React.FC<CalendarViewSelectorProps> = ({
     icon: React.ReactNode;
   }> = [
     {
-      value: "month",
-      label: "Mes",
+      value: 'month',
+      label: 'Mes',
       icon: <CalendarRange className="h-4 w-4" />,
     },
     {
-      value: "week",
-      label: "Semana",
+      value: 'week',
+      label: 'Semana',
       icon: <CalendarDays className="h-4 w-4" />,
     },
-    { value: "day", label: "Día", icon: <Calendar className="h-4 w-4" /> },
+    { value: 'day', label: 'Día', icon: <Calendar className="h-4 w-4" /> },
   ];
 
   return (
@@ -53,8 +53,8 @@ export const CalendarViewSelector: React.FC<CalendarViewSelectorProps> = ({
           onClick={() => handleViewChange(view.value)}
           className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
             currentView === view.value
-              ? "bg-white text-primary-600 shadow dark:bg-gray-700 dark:text-primary-400"
-              : "text-gray-600 hover:bg-white/50 dark:text-gray-300 dark:hover:bg-gray-700/50"
+              ? 'bg-white text-primary-600 shadow dark:bg-gray-700 dark:text-primary-400'
+              : 'text-gray-600 hover:bg-white/50 dark:text-gray-300 dark:hover:bg-gray-700/50'
           } `}
           aria-label={`Vista ${view.label}`}
           aria-pressed={currentView === view.value}

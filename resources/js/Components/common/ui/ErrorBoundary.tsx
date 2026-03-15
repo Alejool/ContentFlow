@@ -1,6 +1,6 @@
-import { ErrorLogger } from "@/Services/ErrorLogger";
-import { ToastService } from "@/Services/ToastService";
-import { Component, ErrorInfo, ReactNode } from "react";
+import { ErrorLogger } from '@/Services/ErrorLogger';
+import { ToastService } from '@/Services/ToastService';
+import { Component, ErrorInfo, ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
@@ -35,7 +35,7 @@ export class ErrorBoundary extends Component<Props, State> {
     }
 
     // Show toast notification
-    ToastService.error("An unexpected error occurred. The page will reload.");
+    ToastService.error('An unexpected error occurred. The page will reload.');
   }
 
   handleReload = () => {

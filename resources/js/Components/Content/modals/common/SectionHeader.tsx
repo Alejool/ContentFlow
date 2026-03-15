@@ -3,7 +3,7 @@ interface SectionHeaderProps {
   className?: string;
 }
 
-export const SectionHeader = ({ title, className = "" }: SectionHeaderProps) => {
+export const SectionHeader = ({ title, className = '' }: SectionHeaderProps) => {
   return (
     <div
       className={`flex items-start gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700 ${className}`}

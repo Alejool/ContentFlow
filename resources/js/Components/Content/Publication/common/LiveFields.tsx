@@ -1,5 +1,5 @@
-import Input from "@/Components/common/Modern/Input";
-import { Calendar, Clock } from "lucide-react";
+import Input from '@/Components/common/Modern/Input';
+import { Calendar, Clock } from 'lucide-react';
 
 interface LiveFieldsProps {
   startTime: string;
@@ -33,13 +33,13 @@ export default function LiveFields({
       <div className="flex items-center gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700">
         <div className="h-5 w-1 rounded-full bg-primary-500"></div>
         <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
-          {t("publications.modal.live.title") || "Live Stream Settings"}
+          {t('publications.modal.live.title') || 'Live Stream Settings'}
         </h3>
       </div>
 
       <div className="space-y-2">
         <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-          {t("publications.modal.live.startTime") || "Start Time"}
+          {t('publications.modal.live.startTime') || 'Start Time'}
         </label>
         <Input
           id="live-start-time"
@@ -55,7 +55,7 @@ export default function LiveFields({
 
       <div className="space-y-2">
         <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-          {t("publications.modal.live.duration") || "Expected Duration"}
+          {t('publications.modal.live.duration') || 'Expected Duration'}
         </label>
         <div className="flex items-center gap-3">
           <Input
@@ -71,7 +71,7 @@ export default function LiveFields({
             icon={Clock}
           />
           <span className="text-sm text-gray-600 dark:text-gray-400">
-            {t("publications.modal.live.minutes") || "minutes"}
+            {t('publications.modal.live.minutes') || 'minutes'}
           </span>
         </div>
         {errors.duration && <p className="text-xs text-red-500">{errors.duration}</p>}
@@ -79,8 +79,8 @@ export default function LiveFields({
 
       <div className="rounded-lg border border-purple-200 bg-purple-50 p-3 dark:border-purple-800 dark:bg-purple-900/20">
         <p className="text-xs text-purple-700 dark:text-purple-300">
-          <strong>{t("common.note") || "Note"}:</strong>{" "}
-          {t("publications.modal.live.note") ||
+          <strong>{t('common.note') || 'Note'}:</strong>{' '}
+          {t('publications.modal.live.note') ||
             "Live streaming is supported on YouTube and Facebook. You'll need to configure streaming settings on each platform."}
         </p>
       </div>

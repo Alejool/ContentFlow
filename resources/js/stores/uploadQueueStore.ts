@@ -1,6 +1,6 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
-const STORAGE_KEY = "upload_queue_state";
+const STORAGE_KEY = 'upload_queue_state';
 const STATE_VERSION = 1;
 const STATE_EXPIRY_DAYS = 7;
 
@@ -16,7 +16,7 @@ export interface QueuedUpload {
   id: string;
   file: File;
   progress: number;
-  status: "pending" | "uploading" | "paused" | "completed" | "error" | "cancelled";
+  status: 'pending' | 'uploading' | 'paused' | 'completed' | 'error' | 'cancelled';
   publicationId?: number;
   publicationTitle?: string;
   s3Key?: string;
@@ -100,7 +100,7 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
           id,
           file,
           progress: 0,
-          status: "pending",
+          status: 'pending',
           isPausable: false, // Will be set to true when multipart upload starts
           retryCount: 0,
           canRetry: true,
@@ -141,7 +141,7 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
   pauseUpload: (id) =>
     set((state) => {
       const upload = state.queue[id];
-      if (!upload || !upload.isPausable || upload.status !== "uploading") {
+      if (!upload || !upload.isPausable || upload.status !== 'uploading') {
         return state;
       }
 
@@ -155,7 +155,7 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
           ...state.queue,
           [id]: {
             ...upload,
-            status: "paused" as const,
+            status: 'paused' as const,
           },
         },
       };
@@ -168,7 +168,7 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
   resumeUpload: (id) =>
     set((state) => {
       const upload = state.queue[id];
-      if (!upload || upload.status !== "paused") {
+      if (!upload || upload.status !== 'paused') {
         return state;
       }
 
@@ -177,7 +177,7 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
           ...state.queue,
           [id]: {
             ...upload,
-            status: "uploading" as const,
+            status: 'uploading' as const,
             abortController: new AbortController(), // Create new controller for resumed upload
           },
         },
@@ -199,7 +199,7 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
           ...state.queue,
           [id]: {
             ...upload,
-            status: "cancelled" as const,
+            status: 'cancelled' as const,
           },
         },
       };
@@ -212,7 +212,7 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
   retryUpload: (id) =>
     set((state) => {
       const upload = state.queue[id];
-      if (!upload || upload.status !== "error") {
+      if (!upload || upload.status !== 'error') {
         return state;
       }
 
@@ -224,7 +224,7 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
           ...state.queue,
           [id]: {
             ...upload,
-            status: "pending" as const,
+            status: 'pending' as const,
             error: undefined,
             lastError: upload.error,
             retryCount,
@@ -254,9 +254,9 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
     // Only persist uploads that are in progress or paused
     Object.values(state.queue).forEach((upload) => {
       if (
-        upload.status === "uploading" ||
-        upload.status === "paused" ||
-        upload.status === "pending"
+        upload.status === 'uploading' ||
+        upload.status === 'paused' ||
+        upload.status === 'pending'
       ) {
         uploads[upload.id] = {
           id: upload.id,
@@ -313,8 +313,8 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
         if (
           !upload.id ||
           !upload.fileName ||
-          typeof upload.fileSize !== "number" ||
-          typeof upload.progress !== "number"
+          typeof upload.fileSize !== 'number' ||
+          typeof upload.progress !== 'number'
         ) {
           return;
         }
@@ -322,7 +322,7 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
         restoredUploads[upload.id] = {
           id: upload.id,
           progress: upload.progress,
-          status: upload.status as QueuedUpload["status"],
+          status: upload.status as QueuedUpload['status'],
           s3Key: upload.s3Key,
           uploadId: upload.uploadId,
           uploadedParts: upload.uploadedParts,
@@ -368,7 +368,7 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
     const persistedUploads = Object.values(get().persistedState);
     const hasIncompleteUploads = persistedUploads.some(
       (upload) =>
-        upload.status === "uploading" || upload.status === "paused" || upload.status === "pending",
+        upload.status === 'uploading' || upload.status === 'paused' || upload.status === 'pending',
     );
 
     set({

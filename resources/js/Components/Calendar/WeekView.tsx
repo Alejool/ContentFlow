@@ -1,4 +1,4 @@
-import { formatTime } from "@/Utils/formatDate";
+import { formatTime } from '@/Utils/formatDate';
 import {
   addDays,
   eachDayOfInterval,
@@ -7,10 +7,10 @@ import {
   isToday,
   parseISO,
   startOfWeek,
-} from "date-fns";
-import { Clock } from "lucide-react";
-import React, { useState } from "react";
-import { CalendarEvent } from "@/types/calendar";
+} from 'date-fns';
+import { Clock } from 'lucide-react';
+import React, { useState } from 'react';
+import { CalendarEvent } from '@/types/calendar';
 import {
   DndContext,
   DragEndEvent,
@@ -21,7 +21,7 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-} from "@dnd-kit/core";
+} from '@dnd-kit/core';
 
 interface WeekViewProps {
   currentDate: Date;
@@ -60,9 +60,9 @@ const DraggableWeekEvent: React.FC<DraggableWeekEventProps> = ({
       {...listeners}
       {...attributes}
       onClick={() => onEventClick?.(event)}
-      className={`relative mb-1 cursor-grab rounded-lg p-2 active:cursor-grabbing ${isSelected ? "ring-2 ring-primary-500" : ""} ${isDragging ? "opacity-50" : ""} transition-all hover:shadow-md`}
+      className={`relative mb-1 cursor-grab rounded-lg p-2 active:cursor-grabbing ${isSelected ? 'ring-2 ring-primary-500' : ''} ${isDragging ? 'opacity-50' : ''} transition-all hover:shadow-md`}
       style={{
-        backgroundColor: event.color + "20",
+        backgroundColor: event.color + '20',
         borderLeft: `3px solid ${event.color}`,
       }}
     >
@@ -111,7 +111,7 @@ const DroppableTimeSlot: React.FC<DroppableTimeSlotProps> = ({
   onEventClick,
   PlatformIcon,
 }) => {
-  const slotId = `${format(day, "yyyy-MM-dd")}-${hour}`;
+  const slotId = `${format(day, 'yyyy-MM-dd')}-${hour}`;
   const { setNodeRef, isOver } = useDroppable({
     id: slotId,
     data: { day, hour },
@@ -120,7 +120,7 @@ const DroppableTimeSlot: React.FC<DroppableTimeSlotProps> = ({
   return (
     <div
       ref={setNodeRef}
-      className={`border-r border-gray-100 p-1 transition-colors hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-900/30 ${isOver ? "bg-primary-100/50 ring-1 ring-primary-500 dark:bg-primary-900/20" : ""} `}
+      className={`border-r border-gray-100 p-1 transition-colors hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-900/30 ${isOver ? 'bg-primary-100/50 ring-1 ring-primary-500 dark:bg-primary-900/20' : ''} `}
     >
       {events.map((event) => (
         <DraggableWeekEvent
@@ -171,7 +171,7 @@ export const WeekView: React.FC<WeekViewProps> = ({
     return events.filter((event) => {
       const eventDate = parseISO(event.start);
       return (
-        format(eventDate, "yyyy-MM-dd") === format(day, "yyyy-MM-dd") &&
+        format(eventDate, 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd') &&
         eventDate.getHours() === hour
       );
     });
@@ -211,20 +211,20 @@ export const WeekView: React.FC<WeekViewProps> = ({
             <div
               key={day.toISOString()}
               className={`border-r border-gray-200 p-4 text-center dark:border-gray-700 ${
-                isToday(day) ? "bg-primary-50 dark:bg-primary-900/20" : "bg-white dark:bg-black"
+                isToday(day) ? 'bg-primary-50 dark:bg-primary-900/20' : 'bg-white dark:bg-black'
               }`}
             >
               <div className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                {format(day, "EEE")}
+                {format(day, 'EEE')}
               </div>
               <div
                 className={`mt-1 text-2xl font-bold ${
                   isToday(day)
-                    ? "text-primary-600 dark:text-primary-400"
-                    : "text-gray-900 dark:text-white"
+                    ? 'text-primary-600 dark:text-primary-400'
+                    : 'text-gray-900 dark:text-white'
                 }`}
               >
-                {format(day, "d")}
+                {format(day, 'd')}
               </div>
             </div>
           ))}
@@ -238,7 +238,7 @@ export const WeekView: React.FC<WeekViewProps> = ({
               className="grid min-h-[80px] grid-cols-8 border-b border-gray-100 dark:border-gray-800"
             >
               <div className="border-r border-gray-100 bg-gray-50 p-2 text-xs text-gray-400 dark:border-gray-800 dark:bg-gray-900/50">
-                {format(new Date().setHours(hour, 0, 0, 0), "HH:mm")}
+                {format(new Date().setHours(hour, 0, 0, 0), 'HH:mm')}
               </div>
               {days.map((day) => {
                 const dayEvents = getEventsForDayAndHour(day, hour);

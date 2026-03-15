@@ -1,4 +1,4 @@
-import { UnifiedAvatar } from "@/Components/common/UnifiedAvatar";
+import { UnifiedAvatar } from '@/Components/common/UnifiedAvatar';
 
 interface AvatarStackProps {
   users: any[];
@@ -7,7 +7,7 @@ interface AvatarStackProps {
   className?: string;
 }
 
-const AvatarStack = ({ users, roles, max = 4, className = "" }: AvatarStackProps) => {
+const AvatarStack = ({ users, roles, max = 4, className = '' }: AvatarStackProps) => {
   const displayUsers = Array.isArray(users) ? users.slice(0, max) : [];
   const remaining = users.length > max ? users.length - max : 0;
 
@@ -16,7 +16,7 @@ const AvatarStack = ({ users, roles, max = 4, className = "" }: AvatarStackProps
       {displayUsers.map((user) => {
         const roleId = user.pivot?.role_id;
         const role = roles.find((r) => r.id === roleId);
-        const roleName = role ? role.name : "Member";
+        const roleName = role ? role.name : 'Member';
 
         return (
           <div

@@ -68,9 +68,9 @@ class FocusManagerClass {
     // Handle scroll if explicitly requested
     if (options.scroll === true) {
       element.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-        inline: "nearest",
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'nearest',
       });
     }
   }
@@ -80,7 +80,7 @@ class FocusManagerClass {
    * @param direction - 'forward' for next, 'backward' for previous
    * @returns The next focusable element or null
    */
-  getNextFocusable(direction: "forward" | "backward" = "forward"): HTMLElement | null {
+  getNextFocusable(direction: 'forward' | 'backward' = 'forward'): HTMLElement | null {
     const focusableElements = this.getAllFocusableElements();
 
     if (focusableElements.length === 0) {
@@ -93,14 +93,14 @@ class FocusManagerClass {
 
     if (currentIndex === -1) {
       // No current focus, return first or last element
-      return direction === "forward"
+      return direction === 'forward'
         ? focusableElements[0]
         : focusableElements[focusableElements.length - 1];
     }
 
     // Calculate next index
     const nextIndex =
-      direction === "forward"
+      direction === 'forward'
         ? (currentIndex + 1) % focusableElements.length
         : (currentIndex - 1 + focusableElements.length) % focusableElements.length;
 
@@ -131,7 +131,7 @@ class FocusManagerClass {
 
     // Handle tab key to trap focus
     const handleKeyDown = (event: KeyboardEvent): void => {
-      if (event.key !== "Tab") {
+      if (event.key !== 'Tab') {
         return;
       }
 
@@ -163,7 +163,7 @@ class FocusManagerClass {
     };
 
     // Add event listener
-    container.addEventListener("keydown", handleKeyDown);
+    container.addEventListener('keydown', handleKeyDown);
 
     // Focus the first focusable element
     const focusableElements = getFocusableElements();
@@ -173,7 +173,7 @@ class FocusManagerClass {
 
     // Create cleanup function
     const cleanup: FocusTrapCleanup = () => {
-      container.removeEventListener("keydown", handleKeyDown);
+      container.removeEventListener('keydown', handleKeyDown);
       this.focusTrapCleanups.delete(container);
 
       // Restore focus to previously focused element
@@ -208,7 +208,7 @@ class FocusManagerClass {
     }
 
     // Check if element is visible
-    if (element.offsetParent === null && element.tagName !== "BODY") {
+    if (element.offsetParent === null && element.tagName !== 'BODY') {
       return false;
     }
 
@@ -218,19 +218,19 @@ class FocusManagerClass {
     }
 
     // Check tabindex
-    const tabindex = element.getAttribute("tabindex");
-    if (tabindex === "-1") {
+    const tabindex = element.getAttribute('tabindex');
+    if (tabindex === '-1') {
       return false;
     }
 
     // Check if element is naturally focusable or has tabindex
     const focusableSelectors = [
-      "a[href]",
-      "button",
-      "input",
-      "textarea",
-      "select",
-      "[tabindex]",
+      'a[href]',
+      'button',
+      'input',
+      'textarea',
+      'select',
+      '[tabindex]',
       '[contenteditable="true"]',
     ];
 
@@ -260,7 +260,7 @@ class FocusManagerClass {
    */
   initialize(): void {
     // Track focus changes globally
-    document.addEventListener("focusin", (event) => {
+    document.addEventListener('focusin', (event) => {
       const target = event.target as HTMLElement;
       if (target && this.isFocusable(target)) {
         if (this.currentFocusElement && this.currentFocusElement !== target) {
@@ -271,7 +271,7 @@ class FocusManagerClass {
     });
 
     // Track focus loss
-    document.addEventListener("focusout", () => {
+    document.addEventListener('focusout', () => {
       // Small delay to allow new focus to be set
       setTimeout(() => {
         if (!document.activeElement || document.activeElement === document.body) {

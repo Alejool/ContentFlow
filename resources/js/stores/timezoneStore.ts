@@ -1,6 +1,6 @@
-import { create } from "zustand";
-import axios from "axios";
-import { router } from "@inertiajs/react";
+import { create } from 'zustand';
+import axios from 'axios';
+import { router } from '@inertiajs/react';
 
 interface TimezoneState {
   workspaceTimezone: string | null;
@@ -30,7 +30,7 @@ export const useTimezoneStore = create<TimezoneState>((set, get) => ({
       state.workspaceTimezone ||
       state.userTimezone ||
       Intl.DateTimeFormat().resolvedOptions().timeZone ||
-      "UTC"
+      'UTC'
     );
   },
 
@@ -43,7 +43,7 @@ export const useTimezoneStore = create<TimezoneState>((set, get) => ({
     if (state.userTimezone) {
       return `${state.userTimezone} (Personal)`;
     }
-    return "UTC";
+    return 'UTC';
   },
 
   // Inicializar desde props de Inertia (más rápido)
@@ -54,7 +54,7 @@ export const useTimezoneStore = create<TimezoneState>((set, get) => ({
       isLoaded: true,
     });
 
-    console.log("✅ Timezones initialized from Inertia:", {
+    console.log('✅ Timezones initialized from Inertia:', {
       workspace: workspaceTimezone,
       user: userTimezone,
       effective: get().effectiveTimezone(),
@@ -65,8 +65,8 @@ export const useTimezoneStore = create<TimezoneState>((set, get) => ({
   loadTimezones: async () => {
     try {
       const [workspaceRes, userRes] = await Promise.all([
-        axios.get("/api/v1/workspace/timezone").catch(() => ({ data: { timezone: null } })),
-        axios.get("/api/v1/timezone").catch(() => ({ data: { timezone: null } })),
+        axios.get('/api/v1/workspace/timezone').catch(() => ({ data: { timezone: null } })),
+        axios.get('/api/v1/timezone').catch(() => ({ data: { timezone: null } })),
       ]);
 
       set({
@@ -75,13 +75,13 @@ export const useTimezoneStore = create<TimezoneState>((set, get) => ({
         isLoaded: true,
       });
 
-      console.log("✅ Timezones loaded from API:", {
+      console.log('✅ Timezones loaded from API:', {
         workspace: workspaceRes.data.timezone,
         user: userRes.data.timezone,
         effective: get().effectiveTimezone(),
       });
     } catch (error) {
-      console.error("❌ Error loading timezones:", error);
+      console.error('❌ Error loading timezones:', error);
       set({ isLoaded: true }); // Continuar con fallback
     }
   },
@@ -89,13 +89,13 @@ export const useTimezoneStore = create<TimezoneState>((set, get) => ({
   // Actualizar timezone del workspace (solo admin)
   updateWorkspaceTimezone: async (timezone: string) => {
     try {
-      await axios.patch("/api/v1/workspace/timezone", { timezone });
+      await axios.patch('/api/v1/workspace/timezone', { timezone });
       set({ workspaceTimezone: timezone });
 
       // Recargar la página para aplicar cambios en toda la app
       router.reload();
     } catch (error) {
-      console.error("Error updating workspace timezone:", error);
+      console.error('Error updating workspace timezone:', error);
       throw error;
     }
   },
@@ -103,10 +103,10 @@ export const useTimezoneStore = create<TimezoneState>((set, get) => ({
   // Actualizar timezone del usuario
   updateUserTimezone: async (timezone: string) => {
     try {
-      await axios.patch("/api/v1/timezone", { timezone });
+      await axios.patch('/api/v1/timezone', { timezone });
       set({ userTimezone: timezone });
     } catch (error) {
-      console.error("Error updating user timezone:", error);
+      console.error('Error updating user timezone:', error);
       throw error;
     }
   },

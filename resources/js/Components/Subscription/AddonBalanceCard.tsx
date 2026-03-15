@@ -1,8 +1,8 @@
-import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
-import { Progress } from "@/Components/ui/progress";
-import type { AddonBalance } from "@/types/addon";
-import { Sparkles, HardDrive } from "lucide-react";
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
+import { Progress } from '@/Components/ui/progress';
+import type { AddonBalance } from '@/types/addon';
+import { Sparkles, HardDrive } from 'lucide-react';
 
 interface AddonBalanceCardProps {
   balance: AddonBalance;
@@ -10,15 +10,15 @@ interface AddonBalanceCardProps {
 }
 
 export const AddonBalanceCard: React.FC<AddonBalanceCardProps> = ({ balance, onBuyMore }) => {
-  const isAI = balance.type === "ai_credits";
+  const isAI = balance.type === 'ai_credits';
   const Icon = isAI ? Sparkles : HardDrive;
-  const unit = isAI ? "créditos" : "GB";
-  const title = isAI ? "Créditos IA" : "Almacenamiento";
+  const unit = isAI ? 'créditos' : 'GB';
+  const title = isAI ? 'Créditos IA' : 'Almacenamiento';
 
   const getProgressColor = () => {
-    if (balance.percentage_used >= 90) return "bg-red-500";
-    if (balance.percentage_used >= 70) return "bg-yellow-500";
-    return "bg-blue-500";
+    if (balance.percentage_used >= 90) return 'bg-red-500';
+    if (balance.percentage_used >= 70) return 'bg-yellow-500';
+    return 'bg-blue-500';
   };
 
   return (
@@ -55,8 +55,8 @@ export const AddonBalanceCard: React.FC<AddonBalanceCardProps> = ({ balance, onB
           {balance.addons_count > 0 && (
             <p className="text-muted-foreground text-xs">
               {balance.addons_count} paquete
-              {balance.addons_count !== 1 ? "s" : ""} activo
-              {balance.addons_count !== 1 ? "s" : ""}
+              {balance.addons_count !== 1 ? 's' : ''} activo
+              {balance.addons_count !== 1 ? 's' : ''}
             </p>
           )}
 

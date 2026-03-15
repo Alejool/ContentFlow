@@ -1,5 +1,5 @@
-import axios from "axios";
-import { create } from "zustand";
+import axios from 'axios';
+import { create } from 'zustand';
 
 interface LogState {
   logs: any[];
@@ -34,12 +34,12 @@ export const useLogStore = create<LogState>((set) => ({
       const cleanFilters = Object.entries(filters).reduce((acc, [key, value]) => {
         if (Array.isArray(value) && value.length > 0) {
           acc[key] = value;
-        } else if (value && !Array.isArray(value) && value !== "all") {
+        } else if (value && !Array.isArray(value) && value !== 'all') {
           acc[key] = value;
         }
         return acc;
       }, {} as any);
-      const response = await axios.get("/api/v1/logs", {
+      const response = await axios.get('/api/v1/logs', {
         params: { ...cleanFilters, page },
         paramsSerializer: {
           indexes: null,
@@ -69,7 +69,7 @@ export const useLogStore = create<LogState>((set) => ({
       }
     } catch (error: any) {
       set({
-        error: error.message ?? "Failed to fetch logs",
+        error: error.message ?? 'Failed to fetch logs',
       });
     } finally {
       set({ isLoading: false });

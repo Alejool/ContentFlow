@@ -1,5 +1,5 @@
-import React from "react";
-import { useTheme } from "@/Hooks/useTheme";
+import React from 'react';
+import { useTheme } from '@/Hooks/useTheme';
 
 /**
  * SkipLink component - Provides a skip to main content link for keyboard users
@@ -32,8 +32,8 @@ interface SkipLinkProps {
 }
 
 export const SkipLink: React.FC<SkipLinkProps> = ({
-  targetId = "main-content",
-  text = "Skip to main content",
+  targetId = 'main-content',
+  text = 'Skip to main content',
 }) => {
   const { actualTheme } = useTheme();
 
@@ -46,14 +46,14 @@ export const SkipLink: React.FC<SkipLinkProps> = ({
       target.focus();
 
       // If the element is not naturally focusable, set tabindex
-      if (!target.hasAttribute("tabindex")) {
-        target.setAttribute("tabindex", "-1");
+      if (!target.hasAttribute('tabindex')) {
+        target.setAttribute('tabindex', '-1');
       }
 
       // Scroll to the target
       target.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
+        behavior: 'smooth',
+        block: 'start',
       });
     }
   };
@@ -63,9 +63,9 @@ export const SkipLink: React.FC<SkipLinkProps> = ({
       href={`#${targetId}`}
       onClick={handleClick}
       className={`/* Hidden by default, on focus */ /* Focus styles with high contrast */ visible fixed left-0 top-0 z-[9999] m-2 -translate-y-full rounded-md px-4 py-2 font-medium opacity-0 transition-all duration-200 skip-link focus:translate-y-0 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-        actualTheme === "dark"
-          ? "bg-orange-500 text-white focus:ring-orange-400 focus:ring-offset-neutral-900"
-          : "bg-orange-600 text-white focus:ring-orange-500 focus:ring-offset-white"
+        actualTheme === 'dark'
+          ? 'bg-orange-500 text-white focus:ring-orange-400 focus:ring-offset-neutral-900'
+          : 'bg-orange-600 text-white focus:ring-orange-500 focus:ring-offset-white'
       } `}
       style={{
         // Ensure the skip link is always on top

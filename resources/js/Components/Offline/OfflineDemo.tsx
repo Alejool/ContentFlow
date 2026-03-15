@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import { OfflineIndicator } from "./OfflineIndicator";
-import { PendingOperationsList } from "./PendingOperationsList";
-import { OfflineDisabledWrapper } from "./OfflineDisabledWrapper";
-import { useOfflineDisable } from "@/Hooks/useOfflineDisable";
-import { X } from "lucide-react";
+import React, { useState } from 'react';
+import { OfflineIndicator } from './OfflineIndicator';
+import { PendingOperationsList } from './PendingOperationsList';
+import { OfflineDisabledWrapper } from './OfflineDisabledWrapper';
+import { useOfflineDisable } from '@/Hooks/useOfflineDisable';
+import { X } from 'lucide-react';
 
 /**
  * OfflineDemo Component
@@ -21,12 +21,12 @@ export const OfflineDemo: React.FC = () => {
 
   const { offlineProps: submitProps } = useOfflineDisable({
     requiresConnection: true,
-    offlineMessage: "Submit requires internet connection",
+    offlineMessage: 'Submit requires internet connection',
   });
 
   const { offlineProps: streamProps } = useOfflineDisable({
     requiresConnection: true,
-    offlineMessage: "Streaming requires internet connection",
+    offlineMessage: 'Streaming requires internet connection',
   });
 
   return (

@@ -1,5 +1,5 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import Button from "@/Components/common/Modern/Button";
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import Button from '@/Components/common/Modern/Button';
 
 interface CarouselPaginationProps {
   currentSlide: number;
@@ -14,7 +14,7 @@ export function CarouselPagination({
   totalSlides,
   onPrevious,
   onNext,
-  className = "",
+  className = '',
 }: CarouselPaginationProps) {
   return (
     <div className={`flex items-center gap-2 ${className}`}>
@@ -58,7 +58,7 @@ export function CarouselDots({
   totalSlides,
   currentSlide,
   onDotClick,
-  className = "",
+  className = '',
 }: CarouselDotsProps) {
   return (
     <div className={`flex justify-center gap-2 ${className}`}>
@@ -67,7 +67,7 @@ export function CarouselDots({
           key={index}
           onClick={() => onDotClick(index)}
           className={`h-2 rounded-full transition-all ${
-            currentSlide === index ? "w-6 bg-primary-600" : "w-2 bg-gray-300 dark:bg-gray-600"
+            currentSlide === index ? 'w-6 bg-primary-600' : 'w-2 bg-gray-300 dark:bg-gray-600'
           }`}
           aria-label={`Ir a slide ${index + 1}`}
         />

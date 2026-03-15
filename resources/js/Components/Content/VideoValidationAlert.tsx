@@ -1,6 +1,6 @@
-import { AlertCircle, AlertTriangle, CheckCircle, Info } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { ValidationResult } from "@/Utils/videoValidation";
+import { AlertCircle, AlertTriangle, CheckCircle, Info } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { ValidationResult } from '@/Utils/videoValidation';
 
 interface VideoValidationAlertProps {
   validation: ValidationResult;
@@ -23,10 +23,10 @@ export default function VideoValidationAlert({
         <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
         <div className="flex-1">
           <p className="text-sm font-medium text-green-800 dark:text-green-300">
-            {t("videoValidation.valid")}
+            {t('videoValidation.valid')}
           </p>
           <p className="mt-1 text-xs text-green-700 dark:text-green-400">
-            {t("videoValidation.readyToPublish", {
+            {t('videoValidation.readyToPublish', {
               platform,
               type: currentType,
             })}
@@ -43,7 +43,7 @@ export default function VideoValidationAlert({
           <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600 dark:text-red-400" />
           <div className="flex-1">
             <p className="text-sm font-medium text-red-800 dark:text-red-300">
-              {t("videoValidation.invalid")}
+              {t('videoValidation.invalid')}
             </p>
             <ul className="mt-2 space-y-1">
               {validation.errors.map((error, index) => (
@@ -60,10 +60,10 @@ export default function VideoValidationAlert({
             <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
             <div className="flex-1">
               <p className="text-sm font-medium text-blue-800 dark:text-blue-300">
-                {t("videoValidation.suggestion")}
+                {t('videoValidation.suggestion')}
               </p>
               <p className="mt-1 text-xs text-blue-700 dark:text-blue-400">
-                {t("videoValidation.suggestedType", {
+                {t('videoValidation.suggestedType', {
                   type: validation.suggestedType,
                 })}
               </p>
@@ -71,7 +71,7 @@ export default function VideoValidationAlert({
                 onClick={() => onTypeChange(validation.suggestedType!)}
                 className="mt-2 rounded-md bg-blue-100 px-3 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:hover:bg-blue-900/60"
               >
-                {t("videoValidation.changeTo", {
+                {t('videoValidation.changeTo', {
                   type: validation.suggestedType,
                 })}
               </button>
@@ -88,7 +88,7 @@ export default function VideoValidationAlert({
         <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600 dark:text-amber-400" />
         <div className="flex-1">
           <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
-            {t("videoValidation.warnings")}
+            {t('videoValidation.warnings')}
           </p>
           <ul className="mt-2 space-y-1">
             {validation.warnings.map((warning, index) => (

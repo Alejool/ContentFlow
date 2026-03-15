@@ -1,9 +1,9 @@
-import { Head, Link } from "@inertiajs/react";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { XCircle, ArrowLeft, HelpCircle } from "lucide-react";
-import Button from "@/Components/common/Modern/Button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card";
-import { useTranslation } from "react-i18next";
+import { Head, Link } from '@inertiajs/react';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { XCircle, ArrowLeft, HelpCircle } from 'lucide-react';
+import Button from '@/Components/common/Modern/Button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   auth: any;
@@ -14,7 +14,7 @@ export default function Cancel({ auth }: Props) {
 
   return (
     <AuthenticatedLayout user={auth.user}>
-      <Head title={t("subscription.cancel.title")} />
+      <Head title={t('subscription.cancel.title')} />
 
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 py-16 text-black dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 dark:text-white">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
@@ -25,24 +25,24 @@ export default function Cancel({ auth }: Props) {
             </div>
 
             <h1 className="mb-4 text-4xl font-bold text-gray-900 dark:text-white md:text-5xl">
-              {t("subscription.cancel.heading")}
+              {t('subscription.cancel.heading')}
             </h1>
 
             <p className="text-xl text-gray-600 dark:text-gray-400">
-              {t("subscription.cancel.message")}
+              {t('subscription.cancel.message')}
             </p>
           </div>
 
           {/* Info Card */}
           <Card className="mb-8">
             <CardHeader>
-              <CardTitle>{t("subscription.cancel.whatHappened")}</CardTitle>
-              <CardDescription>{t("subscription.cancel.processWasCanceled")}</CardDescription>
+              <CardTitle>{t('subscription.cancel.whatHappened')}</CardTitle>
+              <CardDescription>{t('subscription.cancel.processWasCanceled')}</CardDescription>
             </CardHeader>
 
             <CardContent>
               <p className="mb-4 text-gray-700 dark:text-gray-300">
-                {t("subscription.cancel.noChargeDescription")}
+                {t('subscription.cancel.noChargeDescription')}
               </p>
 
               <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
@@ -50,10 +50,10 @@ export default function Cancel({ auth }: Props) {
                   <HelpCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
                   <div>
                     <h3 className="mb-1 font-semibold text-blue-900 dark:text-blue-300">
-                      {t("subscription.cancel.hadProblem")}
+                      {t('subscription.cancel.hadProblem')}
                     </h3>
                     <p className="text-sm text-blue-800 dark:text-blue-400">
-                      {t("subscription.cancel.problemDescription")}
+                      {t('subscription.cancel.problemDescription')}
                     </p>
                   </div>
                 </div>
@@ -64,7 +64,7 @@ export default function Cancel({ auth }: Props) {
           {/* Options Card */}
           <Card className="mb-8">
             <CardHeader>
-              <CardTitle>{t("subscription.cancel.whatCanYouDo")}</CardTitle>
+              <CardTitle>{t('subscription.cancel.whatCanYouDo')}</CardTitle>
             </CardHeader>
 
             <CardContent>
@@ -76,7 +76,7 @@ export default function Cancel({ auth }: Props) {
                     </span>
                   </div>
                   <span className="text-gray-700 dark:text-gray-300">
-                    {t("subscription.cancel.option1")}
+                    {t('subscription.cancel.option1')}
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
@@ -86,7 +86,7 @@ export default function Cancel({ auth }: Props) {
                     </span>
                   </div>
                   <span className="text-gray-700 dark:text-gray-300">
-                    {t("subscription.cancel.option2")}
+                    {t('subscription.cancel.option2')}
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
@@ -96,7 +96,7 @@ export default function Cancel({ auth }: Props) {
                     </span>
                   </div>
                   <span className="text-gray-700 dark:text-gray-300">
-                    {t("subscription.cancel.option3")}
+                    {t('subscription.cancel.option3')}
                   </span>
                 </li>
               </ul>
@@ -112,14 +112,14 @@ export default function Cancel({ auth }: Props) {
               >
                 <span className="flex items-center gap-2">
                   <ArrowLeft className="h-4 w-4" />
-                  {t("subscription.cancel.viewPlans")}
+                  {t('subscription.cancel.viewPlans')}
                 </span>
               </Button>
             </Link>
 
             <Link href="/dashboard">
               <Button size="lg" variant="ghost" className="w-full sm:w-auto">
-                {t("subscription.cancel.backToDashboard")}
+                {t('subscription.cancel.backToDashboard')}
               </Button>
             </Link>
           </div>
@@ -127,13 +127,13 @@ export default function Cancel({ auth }: Props) {
           {/* Support Info */}
           <div className="mt-12 text-center">
             <p className="mb-2 text-sm text-gray-600 dark:text-gray-400">
-              {t("subscription.cancel.needHelp")}
+              {t('subscription.cancel.needHelp')}
             </p>
             <a
               href="mailto:support@contentflow.com"
               className="font-medium text-primary-600 hover:underline dark:text-primary-400"
             >
-              {t("subscription.cancel.contactSupport")}
+              {t('subscription.cancel.contactSupport')}
             </a>
           </div>
         </div>

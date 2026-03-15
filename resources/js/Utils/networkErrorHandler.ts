@@ -141,8 +141,8 @@ export async function fetchWithRetry(
       return response;
     } catch (error) {
       // Handle network errors (no response)
-      if (error instanceof TypeError && error.message.includes("fetch")) {
-        throw createNetworkError("Network request failed. Please check your connection.");
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw createNetworkError('Network request failed. Please check your connection.');
       }
       throw error;
     }
@@ -153,35 +153,35 @@ export async function fetchWithRetry(
  * User-friendly error messages for different error types
  */
 export function getErrorMessage(error: unknown): string {
-  if (!error) return "An unknown error occurred";
+  if (!error) return 'An unknown error occurred';
 
   const networkError = error as NetworkError;
 
   if (networkError.isNetworkError) {
     if (!networkError.status) {
-      return "Unable to connect. Please check your internet connection.";
+      return 'Unable to connect. Please check your internet connection.';
     }
 
     switch (networkError.status) {
       case 400:
-        return "Invalid request. Please try again.";
+        return 'Invalid request. Please try again.';
       case 401:
-        return "You need to log in to continue.";
+        return 'You need to log in to continue.';
       case 403:
         return "You don't have permission to perform this action.";
       case 404:
-        return "The requested resource was not found.";
+        return 'The requested resource was not found.';
       case 408:
-        return "Request timed out. Please try again.";
+        return 'Request timed out. Please try again.';
       case 429:
-        return "Too many requests. Please wait a moment and try again.";
+        return 'Too many requests. Please wait a moment and try again.';
       case 500:
       case 502:
       case 503:
       case 504:
-        return "Server error. Please try again later.";
+        return 'Server error. Please try again later.';
       default:
-        return networkError.message || "An error occurred. Please try again.";
+        return networkError.message || 'An error occurred. Please try again.';
     }
   }
 
@@ -189,7 +189,7 @@ export function getErrorMessage(error: unknown): string {
     return error.message;
   }
 
-  return "An unexpected error occurred";
+  return 'An unexpected error occurred';
 }
 
 /**
@@ -210,11 +210,11 @@ export function waitForOnline(): Promise<void> {
     }
 
     const handleOnline = () => {
-      window.removeEventListener("online", handleOnline);
+      window.removeEventListener('online', handleOnline);
       resolve();
     };
 
-    window.addEventListener("online", handleOnline);
+    window.addEventListener('online', handleOnline);
   });
 }
 
@@ -281,8 +281,8 @@ class OfflineQueue {
 export const offlineQueue = new OfflineQueue();
 
 // Listen for online event to process queue
-if (typeof window !== "undefined") {
-  window.addEventListener("online", () => {
-    offlineQueue["processQueue"]();
+if (typeof window !== 'undefined') {
+  window.addEventListener('online', () => {
+    offlineQueue['processQueue']();
   });
 }

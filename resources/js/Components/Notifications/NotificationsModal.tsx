@@ -1,8 +1,8 @@
-import { VirtualList } from "@/Components/common/ui/VirtualList";
-import NotificationItem from "@/Components/Notifications/NotificationItem";
-import { useNotifications } from "@/Hooks/useNotifications";
-import { useTheme } from "@/Hooks/useTheme";
-import { type NotificationTypeFilter } from "@/stores/notificationStore";
+import { VirtualList } from '@/Components/common/ui/VirtualList';
+import NotificationItem from '@/Components/Notifications/NotificationItem';
+import { useNotifications } from '@/Hooks/useNotifications';
+import { useTheme } from '@/Hooks/useTheme';
+import { type NotificationTypeFilter } from '@/stores/notificationStore';
 import {
   Dialog,
   DialogPanel,
@@ -13,8 +13,8 @@ import {
   MenuItems,
   Transition,
   TransitionChild,
-} from "@headlessui/react";
-import { AnimatePresence, motion } from "framer-motion";
+} from '@headlessui/react';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   Bell,
   CheckCheck,
@@ -26,9 +26,9 @@ import {
   ShieldCheck,
   User,
   X,
-} from "lucide-react";
-import { Fragment, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
+} from 'lucide-react';
+import { Fragment, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface NotificationsModalProps {
   isOpen: boolean;
@@ -36,15 +36,15 @@ interface NotificationsModalProps {
 }
 
 const TYPE_OPTIONS: { key: NotificationTypeFilter; icon: any }[] = [
-  { key: "all", icon: Bell },
-  { key: "publications", icon: FileText },
-  { key: "approvals", icon: ShieldCheck },
-  { key: "campaigns", icon: Megaphone },
-  { key: "account", icon: User },
-  { key: "system", icon: Settings },
+  { key: 'all', icon: Bell },
+  { key: 'publications', icon: FileText },
+  { key: 'approvals', icon: ShieldCheck },
+  { key: 'campaigns', icon: Megaphone },
+  { key: 'account', icon: User },
+  { key: 'system', icon: Settings },
 ];
 
-const PRIORITY_OPTIONS = ["all", "critical", "high", "normal", "low"] as const;
+const PRIORITY_OPTIONS = ['all', 'critical', 'high', 'normal', 'low'] as const;
 
 const listVariants = {
   visible: { transition: { staggerChildren: 0.04 } },
@@ -55,7 +55,7 @@ const itemVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.18, ease: "easeOut" as const },
+    transition: { duration: 0.18, ease: 'easeOut' as const },
   },
 };
 
@@ -72,59 +72,59 @@ export default function NotificationsModal({ isOpen, onClose }: NotificationsMod
     countByType,
   } = useNotifications();
 
-  const [activeCategory, setActiveCategory] = useState<"application" | "system">("application");
-  const [selectedType, setSelectedType] = useState<NotificationTypeFilter>("all");
-  const [selectedPriority, setSelectedPriority] = useState<string>("all");
+  const [activeCategory, setActiveCategory] = useState<'application' | 'system'>('application');
+  const [selectedType, setSelectedType] = useState<NotificationTypeFilter>('all');
+  const [selectedPriority, setSelectedPriority] = useState<string>('all');
 
-  const isDark = actualTheme === "dark";
+  const isDark = actualTheme === 'dark';
 
   const c = {
-    bg: isDark ? "bg-neutral-900" : "bg-white",
-    text: isDark ? "text-white" : "text-gray-900",
-    textMuted: isDark ? "text-gray-400" : "text-gray-500",
-    border: isDark ? "border-neutral-700" : "border-gray-200",
-    overlay: isDark ? "bg-black/70" : "bg-gray-500/60",
-    closeBtn: isDark ? "hover:bg-neutral-800 text-gray-400" : "hover:bg-gray-100 text-gray-400",
+    bg: isDark ? 'bg-neutral-900' : 'bg-white',
+    text: isDark ? 'text-white' : 'text-gray-900',
+    textMuted: isDark ? 'text-gray-400' : 'text-gray-500',
+    border: isDark ? 'border-neutral-700' : 'border-gray-200',
+    overlay: isDark ? 'bg-black/70' : 'bg-gray-500/60',
+    closeBtn: isDark ? 'hover:bg-neutral-800 text-gray-400' : 'hover:bg-gray-100 text-gray-400',
     tabActive: isDark
-      ? "border-primary-500 text-primary-400"
-      : "border-primary-500 text-primary-600",
+      ? 'border-primary-500 text-primary-400'
+      : 'border-primary-500 text-primary-600',
     tabInactive: isDark
-      ? "border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500"
-      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300",
-    dropdownBg: isDark ? "bg-neutral-800 border-neutral-700" : "bg-white border-gray-200",
+      ? 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500'
+      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+    dropdownBg: isDark ? 'bg-neutral-800 border-neutral-700' : 'bg-white border-gray-200',
     dropdownItem: isDark
-      ? "text-gray-300 hover:bg-neutral-700 hover:text-white"
-      : "text-gray-700 hover:bg-gray-50 hover:text-gray-900",
+      ? 'text-gray-300 hover:bg-neutral-700 hover:text-white'
+      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900',
     dropdownActive: isDark
-      ? "bg-primary-900/40 text-primary-300"
-      : "bg-primary-50 text-primary-700",
+      ? 'bg-primary-900/40 text-primary-300'
+      : 'bg-primary-50 text-primary-700',
     chipActive: isDark
-      ? "bg-primary-900/50 text-primary-300 ring-1 ring-primary-700"
-      : "bg-primary-50 text-primary-700 ring-1 ring-primary-200",
-    emptyBg: isDark ? "bg-neutral-800" : "bg-gray-100",
-    emptyText: isDark ? "text-gray-500" : "text-gray-400",
+      ? 'bg-primary-900/50 text-primary-300 ring-1 ring-primary-700'
+      : 'bg-primary-50 text-primary-700 ring-1 ring-primary-200',
+    emptyBg: isDark ? 'bg-neutral-800' : 'bg-gray-100',
+    emptyText: isDark ? 'text-gray-500' : 'text-gray-400',
   };
 
   const categories = [
     {
-      key: "application",
-      label: t("notifications.modal.categories.application"),
+      key: 'application',
+      label: t('notifications.modal.categories.application'),
       count: applicationNotifications.length,
     },
     {
-      key: "system",
-      label: t("notifications.modal.categories.system"),
+      key: 'system',
+      label: t('notifications.modal.categories.system'),
       count: systemNotifications.length,
     },
   ];
 
   const currentSource =
-    activeCategory === "application" ? applicationNotifications : systemNotifications;
+    activeCategory === 'application' ? applicationNotifications : systemNotifications;
 
   const filteredList = useMemo(() => {
     let list = filterByType(selectedType, currentSource);
-    if (selectedPriority !== "all") {
-      list = list.filter((n) => (n.data.priority ?? "normal") === selectedPriority);
+    if (selectedPriority !== 'all') {
+      list = list.filter((n) => (n.data.priority ?? 'normal') === selectedPriority);
     }
     return list;
   }, [currentSource, selectedType, selectedPriority]);
@@ -138,16 +138,16 @@ export default function NotificationsModal({ isOpen, onClose }: NotificationsMod
     </motion.div>
   );
 
-  const hasFilters = selectedType !== "all" || selectedPriority !== "all";
+  const hasFilters = selectedType !== 'all' || selectedPriority !== 'all';
 
   const typeLabel =
-    selectedType === "all"
-      ? t("notifications.types.all")
+    selectedType === 'all'
+      ? t('notifications.types.all')
       : t(`notifications.types.${selectedType}`);
 
   const priorityLabel =
-    selectedPriority === "all"
-      ? t("notifications.priorities.all")
+    selectedPriority === 'all'
+      ? t('notifications.priorities.all')
       : t(`notifications.priorities.${selectedPriority}`);
 
   return (
@@ -187,11 +187,11 @@ export default function NotificationsModal({ isOpen, onClose }: NotificationsMod
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2.5">
                           <DialogTitle className={`text-base font-semibold ${c.text}`}>
-                            {t("notifications.title")}
+                            {t('notifications.title')}
                           </DialogTitle>
                           {unreadCount > 0 && (
                             <span className="bg-main-color/10 text-main-color ring-main-color/20 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset">
-                              {unreadCount} {t("notifications.new")}
+                              {unreadCount} {t('notifications.new')}
                             </span>
                           )}
                         </div>
@@ -203,7 +203,7 @@ export default function NotificationsModal({ isOpen, onClose }: NotificationsMod
                               className={`text-main-color hover:text-main-color/80 flex items-center gap-1 text-xs font-medium transition-colors`}
                             >
                               <CheckCheck className="h-3.5 w-3.5" />
-                              {t("notifications.mark_all_read")}
+                              {t('notifications.mark_all_read')}
                             </button>
                           )}
                           <button
@@ -211,7 +211,7 @@ export default function NotificationsModal({ isOpen, onClose }: NotificationsMod
                             className={`rounded-md p-1 transition-colors ${c.closeBtn}`}
                             onClick={onClose}
                           >
-                            <span className="sr-only">{t("common.close")}</span>
+                            <span className="sr-only">{t('common.close')}</span>
                             <X className="h-5 w-5" />
                           </button>
                         </div>
@@ -234,10 +234,10 @@ export default function NotificationsModal({ isOpen, onClose }: NotificationsMod
                               <span
                                 className={`rounded-full px-1.5 py-0.5 text-xs font-medium ${
                                   activeCategory === cat.key
-                                    ? "bg-primary-500/15 text-primary-500"
+                                    ? 'bg-primary-500/15 text-primary-500'
                                     : isDark
-                                      ? "bg-neutral-700 text-gray-400"
-                                      : "bg-gray-100 text-gray-500"
+                                      ? 'bg-neutral-700 text-gray-400'
+                                      : 'bg-gray-100 text-gray-500'
                                 }`}
                               >
                                 {cat.count}
@@ -250,15 +250,15 @@ export default function NotificationsModal({ isOpen, onClose }: NotificationsMod
 
                     {/* ── Filters bar (only for Application tab) ── */}
                     <AnimatePresence initial={false}>
-                      {activeCategory === "application" && (
+                      {activeCategory === 'application' && (
                         <motion.div
                           key="filters"
                           initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
+                          animate={{ height: 'auto', opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.2, ease: "easeInOut" }}
+                          transition={{ duration: 0.2, ease: 'easeInOut' }}
                           className="shrink-0"
-                          style={{ overflow: "visible" }}
+                          style={{ overflow: 'visible' }}
                         >
                           <div
                             className={`border-b px-4 py-2.5 sm:px-6 ${c.border} relative z-30 flex flex-wrap items-center gap-2`}
@@ -269,11 +269,11 @@ export default function NotificationsModal({ isOpen, onClose }: NotificationsMod
                             <Menu as="div" className="relative">
                               <MenuButton
                                 className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors ${
-                                  selectedType !== "all"
+                                  selectedType !== 'all'
                                     ? c.chipActive
                                     : isDark
-                                      ? "border-neutral-600 text-gray-400 hover:border-neutral-500 hover:text-gray-300"
-                                      : "border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                                      ? 'border-neutral-600 text-gray-400 hover:border-neutral-500 hover:text-gray-300'
+                                      : 'border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700'
                                 }`}
                               >
                                 {typeLabel}
@@ -302,8 +302,8 @@ export default function NotificationsModal({ isOpen, onClose }: NotificationsMod
                                               ? c.dropdownActive
                                               : focus
                                                 ? isDark
-                                                  ? "bg-neutral-700 text-white"
-                                                  : "bg-gray-50 text-gray-900"
+                                                  ? 'bg-neutral-700 text-white'
+                                                  : 'bg-gray-50 text-gray-900'
                                                 : c.dropdownItem
                                           }`}
                                         >
@@ -324,11 +324,11 @@ export default function NotificationsModal({ isOpen, onClose }: NotificationsMod
                             <Menu as="div" className="relative">
                               <MenuButton
                                 className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors ${
-                                  selectedPriority !== "all"
+                                  selectedPriority !== 'all'
                                     ? c.chipActive
                                     : isDark
-                                      ? "border-neutral-600 text-gray-400 hover:border-neutral-500 hover:text-gray-300"
-                                      : "border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                                      ? 'border-neutral-600 text-gray-400 hover:border-neutral-500 hover:text-gray-300'
+                                      : 'border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700'
                                 }`}
                               >
                                 {priorityLabel}
@@ -357,21 +357,21 @@ export default function NotificationsModal({ isOpen, onClose }: NotificationsMod
                                               ? c.dropdownActive
                                               : focus
                                                 ? isDark
-                                                  ? "bg-neutral-700 text-white"
-                                                  : "bg-gray-50 text-gray-900"
+                                                  ? 'bg-neutral-700 text-white'
+                                                  : 'bg-gray-50 text-gray-900'
                                                 : c.dropdownItem
                                           }`}
                                         >
-                                          {p === "critical" && (
+                                          {p === 'critical' && (
                                             <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />
                                           )}
-                                          {p === "high" && (
+                                          {p === 'high' && (
                                             <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" />
                                           )}
-                                          {p === "normal" && (
+                                          {p === 'normal' && (
                                             <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" />
                                           )}
-                                          {p === "low" && (
+                                          {p === 'low' && (
                                             <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-gray-400" />
                                           )}
                                           {t(`notifications.priorities.${p}`)}
@@ -390,8 +390,8 @@ export default function NotificationsModal({ isOpen, onClose }: NotificationsMod
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.8 }}
                                 onClick={() => {
-                                  setSelectedType("all");
-                                  setSelectedPriority("all");
+                                  setSelectedType('all');
+                                  setSelectedPriority('all');
                                 }}
                                 className={`text-xs ${c.textMuted} transition-colors hover:text-red-400`}
                               >
@@ -410,7 +410,7 @@ export default function NotificationsModal({ isOpen, onClose }: NotificationsMod
                           key={activeCategory}
                           initial={{
                             opacity: 0,
-                            x: activeCategory === "system" ? -8 : 8,
+                            x: activeCategory === 'system' ? -8 : 8,
                           }}
                           animate={{ opacity: 1, x: 0 }}
                           exit={{ opacity: 0 }}
@@ -428,7 +428,7 @@ export default function NotificationsModal({ isOpen, onClose }: NotificationsMod
                                 items={filteredList.slice(0, 100)}
                                 estimatedItemSize={80}
                                 overscan={5}
-                                style={{ height: "100%" }}
+                                style={{ height: '100%' }}
                                 renderItem={renderItem}
                               />
                             </motion.div>
@@ -438,7 +438,7 @@ export default function NotificationsModal({ isOpen, onClose }: NotificationsMod
                                 <Bell className={`h-7 w-7 ${c.emptyText}`} />
                               </div>
                               <p className={`text-sm ${c.textMuted}`}>
-                                {t("notifications.no_notifications_filtered")}
+                                {t('notifications.no_notifications_filtered')}
                               </p>
                             </div>
                           )}

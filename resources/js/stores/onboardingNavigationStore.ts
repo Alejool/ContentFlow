@@ -1,5 +1,5 @@
-import { create } from "zustand";
-import { router } from "@inertiajs/react";
+import { create } from 'zustand';
+import { router } from '@inertiajs/react';
 
 /**
  * Store for managing onboarding navigation state and history
@@ -9,7 +9,7 @@ interface NavigationHistoryEntry {
   path: string;
   timestamp: number;
   stepId?: string;
-  stepType?: "tour" | "wizard" | "template";
+  stepType?: 'tour' | 'wizard' | 'template';
 }
 
 interface OnboardingNavigationState {
@@ -32,7 +32,7 @@ interface OnboardingNavigationState {
   navigateToStep: (
     path: string,
     stepId?: string,
-    stepType?: "tour" | "wizard" | "template",
+    stepType?: 'tour' | 'wizard' | 'template',
   ) => void;
   goBack: () => void;
   canGoBack: () => boolean;
@@ -45,7 +45,7 @@ interface OnboardingNavigationState {
 
 export const useOnboardingNavigationStore = create<OnboardingNavigationState>((set, get) => ({
   // Initial state
-  currentPath: typeof window !== "undefined" ? window.location.pathname : "/",
+  currentPath: typeof window !== 'undefined' ? window.location.pathname : '/',
   isNavigating: false,
   navigationHistory: [],
   tourNavigationEnabled: false,

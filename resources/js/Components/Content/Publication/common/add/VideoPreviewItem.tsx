@@ -1,16 +1,16 @@
-import { AlertTriangle, FileImage, X } from "lucide-react";
-import React, { useState } from "react";
+import { AlertTriangle, FileImage, X } from 'lucide-react';
+import React, { useState } from 'react';
 
 interface VideoPreviewItemProps {
   preview: string;
   index: number;
   duration?: number;
-  youtubeType: "short" | "video";
+  youtubeType: 'short' | 'video';
   thumbnail?: File;
   thumbnailUrl?: string;
   onRemove: () => void;
   onThumbnailChange: (file: File) => void;
-  onYoutubeTypeChange: (type: "short" | "video") => void;
+  onYoutubeTypeChange: (type: 'short' | 'video') => void;
 }
 
 const VideoPreviewItem: React.FC<VideoPreviewItemProps> = ({
@@ -24,16 +24,16 @@ const VideoPreviewItem: React.FC<VideoPreviewItemProps> = ({
   onThumbnailChange,
   onYoutubeTypeChange,
 }) => {
-  const [isTooLong, setIsTooLong] = useState(duration && duration > 60 && youtubeType === "short");
+  const [isTooLong, setIsTooLong] = useState(duration && duration > 60 && youtubeType === 'short');
 
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const handleTypeChange = (type: "short" | "video") => {
-    if (duration && duration > 60 && type === "short") {
+  const handleTypeChange = (type: 'short' | 'video') => {
+    if (duration && duration > 60 && type === 'short') {
       setIsTooLong(true);
     } else {
       setIsTooLong(false);
@@ -66,7 +66,7 @@ const VideoPreviewItem: React.FC<VideoPreviewItemProps> = ({
             onClick={(e) => e.stopPropagation()}
           >
             <FileImage className="h-3 w-3" />
-            {thumbnail || thumbnailUrl ? "Change Thumb" : "Add Thumb"}
+            {thumbnail || thumbnailUrl ? 'Change Thumb' : 'Add Thumb'}
           </label>
         </div>
       </div>
@@ -101,17 +101,17 @@ const VideoPreviewItem: React.FC<VideoPreviewItemProps> = ({
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleTypeChange("short");
+                  handleTypeChange('short');
                 }}
                 disabled={duration > 60}
                 className={`rounded px-2 py-0.5 text-[10px] font-medium transition-colors ${
-                  youtubeType === "short"
-                    ? "bg-primary-500 text-white"
+                  youtubeType === 'short'
+                    ? 'bg-primary-500 text-white'
                     : duration > 60
-                      ? "cursor-not-allowed bg-gray-600/50 text-gray-400"
-                      : "bg-white/20 text-white hover:bg-white/30"
+                      ? 'cursor-not-allowed bg-gray-600/50 text-gray-400'
+                      : 'bg-white/20 text-white hover:bg-white/30'
                 }`}
-                title={duration > 60 ? `Video too long for Short (${duration}s > 60s)` : ""}
+                title={duration > 60 ? `Video too long for Short (${duration}s > 60s)` : ''}
               >
                 Short
               </button>
@@ -119,12 +119,12 @@ const VideoPreviewItem: React.FC<VideoPreviewItemProps> = ({
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleTypeChange("video");
+                  handleTypeChange('video');
                 }}
                 className={`rounded px-2 py-0.5 text-[10px] font-medium transition-colors ${
-                  youtubeType === "video"
-                    ? "bg-primary-500 text-white"
-                    : "bg-white/20 text-white hover:bg-white/30"
+                  youtubeType === 'video'
+                    ? 'bg-primary-500 text-white'
+                    : 'bg-white/20 text-white hover:bg-white/30'
                 }`}
               >
                 Video

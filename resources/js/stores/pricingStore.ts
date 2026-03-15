@@ -1,7 +1,7 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
-type BillingCycle = "monthly" | "yearly";
+type BillingCycle = 'monthly' | 'yearly';
 
 interface PricingState {
   billingCycle: BillingCycle;
@@ -11,11 +11,11 @@ interface PricingState {
 export const usePricingStore = create<PricingState>()(
   persist(
     (set) => ({
-      billingCycle: "monthly",
+      billingCycle: 'monthly',
       setBillingCycle: (cycle) => set({ billingCycle: cycle }),
     }),
     {
-      name: "pricing-storage",
+      name: 'pricing-storage',
     },
   ),
 );

@@ -1,6 +1,6 @@
-import { ref, computed } from "vue";
-import { useDebounce, useThrottle } from "./useDebounce";
-import axios from "axios";
+import { ref, computed } from 'vue';
+import { useDebounce, useThrottle } from './useDebounce';
+import axios from 'axios';
 
 /**
  * Composable for reel generation with debouncing and rate limiting
@@ -35,10 +35,10 @@ export function useReelGeneration() {
 
     return JSON.stringify({
       media_file_id,
-      publication_id: publication_id || "none",
-      platforms: (platforms || ["instagram"]).sort(),
+      publication_id: publication_id || 'none',
+      platforms: (platforms || ['instagram']).sort(),
       add_subtitles: add_subtitles ?? true,
-      language: language || "es",
+      language: language || 'es',
       generate_clips: generate_clips ?? false,
     });
   };
@@ -62,7 +62,7 @@ export function useReelGeneration() {
   const generateReelsInternal = async (params) => {
     // Check for duplicate
     if (isDuplicateRequest(params)) {
-      throw new Error("Esta solicitud ya fue enviada. Por favor espera a que termine.");
+      throw new Error('Esta solicitud ya fue enviada. Por favor espera a que termine.');
     }
 
     isGenerating.value = true;
@@ -73,24 +73,24 @@ export function useReelGeneration() {
       // Store request signature
       lastRequestSignature.value = getRequestSignature(params);
 
-      const response = await axios.post("/api/reels/generate", params);
+      const response = await axios.post('/api/reels/generate', params);
 
       // Simulate progress (actual progress would come from websockets/polling)
       simulateProgress();
 
       return response.data;
     } catch (err) {
-      error.value = err.response?.data?.error || err.message || "Error al generar reels";
+      error.value = err.response?.data?.error || err.message || 'Error al generar reels';
 
       // Handle rate limiting
       if (err.response?.status === 429) {
-        const retryAfter = err.response.data?.retry_after_human || "unos minutos";
+        const retryAfter = err.response.data?.retry_after_human || 'unos minutos';
         error.value = `Demasiadas solicitudes. Intenta de nuevo en ${retryAfter}.`;
       }
 
       // Handle duplicate job
       if (err.response?.status === 409) {
-        error.value = err.response.data?.error || "Ya hay una generación en proceso.";
+        error.value = err.response.data?.error || 'Ya hay una generación en proceso.';
       }
 
       throw err;
@@ -120,8 +120,8 @@ export function useReelGeneration() {
       return await debouncedGenerate(params);
     } catch (err) {
       // Handle debounce/throttle errors gracefully
-      if (err.message.includes("debounced") || err.message.includes("wait")) {
-        error.value = "Por favor espera antes de enviar otra solicitud.";
+      if (err.message.includes('debounced') || err.message.includes('wait')) {
+        error.value = 'Por favor espera antes de enviar otra solicitud.';
       }
       throw err;
     }

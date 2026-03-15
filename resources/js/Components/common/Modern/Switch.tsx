@@ -40,12 +40,12 @@ export default function Switch({ id, label, description, checked, onChange }: Sw
         />
         <div
           className={`block h-6 w-12 rounded-full transition-colors duration-200 ${
-            checked ? "bg-primary-500" : "bg-gray-300 dark:bg-gray-700"
+            checked ? 'bg-primary-500' : 'bg-gray-300 dark:bg-gray-700'
           }`}
         >
           <div
             className={`absolute left-1 top-1 h-4 w-4 rounded-full bg-white transition-transform duration-200 ${
-              checked ? "translate-x-6" : ""
+              checked ? 'translate-x-6' : ''
             }`}
           ></div>
         </div>

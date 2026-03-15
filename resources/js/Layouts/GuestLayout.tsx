@@ -1,11 +1,11 @@
-import Logo from "@/../assets/logo.png";
-import ForgotPasswordSection from "@/Components/Auth/ForgotPasswordSection";
-import LoginSection from "@/Components/Auth/LoginSection";
-import RegisterSection from "@/Components/Auth/RegisterSection";
-import ReturnToLogin from "@/Components/common/ReturnToLogin";
-import ThemeLanguageContainer from "@/Components/common/ThemeLanguageContainer";
-import { ReactNode, useEffect } from "react";
-import { useTranslation } from "react-i18next";
+import Logo from '@/../assets/logo.png';
+import ForgotPasswordSection from '@/Components/Auth/ForgotPasswordSection';
+import LoginSection from '@/Components/Auth/LoginSection';
+import RegisterSection from '@/Components/Auth/RegisterSection';
+import ReturnToLogin from '@/Components/common/ReturnToLogin';
+import ThemeLanguageContainer from '@/Components/common/ThemeLanguageContainer';
+import { ReactNode, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 interface GuestLayoutProps {
   children: ReactNode;
   section?: string;
@@ -16,7 +16,7 @@ export default function GuestLayout({ children, section }: GuestLayoutProps) {
 
   useEffect(() => {
     // Force orange theme for guest pages
-    document.documentElement.setAttribute("data-theme-color", "orange");
+    document.documentElement.setAttribute('data-theme-color', 'orange');
 
     // Clear any custom color properties that might persist from authenticated session
     const root = document.documentElement;
@@ -27,7 +27,7 @@ export default function GuestLayout({ children, section }: GuestLayoutProps) {
 
   return (
     <div>
-      {section !== "login" && <ReturnToLogin />}
+      {section !== 'login' && <ReturnToLogin />}
       <ThemeLanguageContainer />
       <div className="flex min-h-screen flex-col bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 lg:flex-row">
         <div className="relative w-full overflow-hidden bg-primary-500 lg:w-1/2">
@@ -41,16 +41,16 @@ export default function GuestLayout({ children, section }: GuestLayoutProps) {
                     ? t(`auth.${section}.welcome`, {
                         defaultValue: t(`auth.${section}.title`),
                       })
-                    : t("auth.login.welcome")}
+                    : t('auth.login.welcome')}
                 </h1>
                 <p className="mb-8 text-lg opacity-90">
-                  {section ? t(`auth.${section}.subtitle`) : t("auth.login.subtitle")}
+                  {section ? t(`auth.${section}.subtitle`) : t('auth.login.subtitle')}
                 </p>
               </div>
 
-              {section === "login" && <LoginSection />}
-              {section === "register" && <RegisterSection />}
-              {section === "forgot-password" && <ForgotPasswordSection />}
+              {section === 'login' && <LoginSection />}
+              {section === 'register' && <RegisterSection />}
+              {section === 'forgot-password' && <ForgotPasswordSection />}
             </div>
           </div>
         </div>

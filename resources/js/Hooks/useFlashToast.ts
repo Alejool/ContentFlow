@@ -1,6 +1,6 @@
-import { ToastService } from "@/Services/ToastService";
-import { usePage } from "@inertiajs/react";
-import { useEffect } from "react";
+import { ToastService } from '@/Services/ToastService';
+import { usePage } from '@inertiajs/react';
+import { useEffect } from 'react';
 
 /**
  * Hook to automatically show toast notifications from flash messages

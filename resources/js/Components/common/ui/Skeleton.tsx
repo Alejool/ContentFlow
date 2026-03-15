@@ -1,18 +1,18 @@
-import React from "react";
+import React from 'react';
 
 interface SkeletonProps {
   className?: string;
-  variant?: "rectangle" | "circle" | "text";
+  variant?: 'rectangle' | 'circle' | 'text';
   shimmer?: boolean;
 }
 
-const Skeleton = ({ className = "", variant = "rectangle", shimmer = true }: SkeletonProps) => {
-  const baseClasses = "bg-gray-200 dark:bg-neutral-700 overflow-hidden relative";
+const Skeleton = ({ className = '', variant = 'rectangle', shimmer = true }: SkeletonProps) => {
+  const baseClasses = 'bg-gray-200 dark:bg-neutral-700 overflow-hidden relative';
 
   const variantClasses = {
-    rectangle: "rounded-lg",
-    circle: "rounded-full",
-    text: "rounded h-3 w-full",
+    rectangle: 'rounded-lg',
+    circle: 'rounded-full',
+    text: 'rounded h-3 w-full',
   };
 
   return (

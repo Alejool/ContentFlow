@@ -1,6 +1,6 @@
-import React from "react";
-import { useOnlineStatus } from "@/Hooks/useOnlineStatus";
-import { useOnboardingStore } from "@/stores/onboardingStore";
+import React from 'react';
+import { useOnlineStatus } from '@/Hooks/useOnlineStatus';
+import { useOnboardingStore } from '@/stores/onboardingStore';
 
 /**
  * OfflineIndicator component
@@ -21,8 +21,8 @@ export const OfflineIndicator: React.FC = () => {
     <div
       className={`fixed bottom-4 right-4 z-50 rounded-lg px-4 py-3 shadow-lg transition-all ${
         isOffline
-          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-          : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+          ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+          : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
       }`}
       role="alert"
       aria-live="polite"
@@ -48,12 +48,12 @@ export const OfflineIndicator: React.FC = () => {
           )}
         </div>
         <div className="flex-1">
-          <p className="text-sm font-medium">{isOffline ? "You're offline" : "Back online"}</p>
+          <p className="text-sm font-medium">{isOffline ? "You're offline" : 'Back online'}</p>
           {queuedActionsCount > 0 && (
             <p className="mt-1 text-xs">
               {isOffline
-                ? `${queuedActionsCount} action${queuedActionsCount > 1 ? "s" : ""} queued`
-                : `Syncing ${queuedActionsCount} action${queuedActionsCount > 1 ? "s" : ""}...`}
+                ? `${queuedActionsCount} action${queuedActionsCount > 1 ? 's' : ''} queued`
+                : `Syncing ${queuedActionsCount} action${queuedActionsCount > 1 ? 's' : ''}...`}
             </p>
           )}
         </div>

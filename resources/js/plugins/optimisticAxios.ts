@@ -10,9 +10,9 @@
  * Requirements: 9.3, 3.3
  */
 
-import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from "axios";
-import useOptimisticStore from "../stores/optimisticStore";
-import type { OptimisticOperation } from "../types/optimistic";
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import useOptimisticStore from '../stores/optimisticStore';
+import type { OptimisticOperation } from '../types/optimistic';
 
 /**
  * Configuration interface for the optimistic interceptor
@@ -34,7 +34,7 @@ export interface InterceptorConfig {
   originalData?: any;
 
   /** Operation type (auto-detected from HTTP method if not provided) */
-  operationType?: "create" | "update" | "delete";
+  operationType?: 'create' | 'update' | 'delete';
 
   /** Resource ID (for update/delete operations) */
   resourceId?: string | number;
@@ -64,12 +64,12 @@ function getRequestKey(config: AxiosRequestConfig): string {
 /**
  * Detect operation type from HTTP method
  */
-function detectOperationType(method?: string): "create" | "update" | "delete" {
+function detectOperationType(method?: string): 'create' | 'update' | 'delete' {
   const m = method?.toUpperCase();
-  if (m === "POST") return "create";
-  if (m === "PUT" || m === "PATCH") return "update";
-  if (m === "DELETE") return "delete";
-  return "create"; // default
+  if (m === 'POST') return 'create';
+  if (m === 'PUT' || m === 'PATCH') return 'update';
+  if (m === 'DELETE') return 'delete';
+  return 'create'; // default
 }
 
 /**
@@ -106,7 +106,7 @@ export function setupOptimisticInterceptor(axiosInstance: AxiosInstance): () => 
           optimisticData: config.optimisticData,
           originalData: config.originalData || null,
           request: Promise.resolve(config.optimisticData), // Placeholder promise
-          status: "pending",
+          status: 'pending',
           timestamp: Date.now(),
           retryCount: 0,
           maxRetries: config.maxRetries || 3,

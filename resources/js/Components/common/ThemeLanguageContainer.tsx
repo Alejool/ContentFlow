@@ -1,9 +1,9 @@
-import LanguageSwitcher from "@/Components/common/ui/LanguageSwitcher";
-import ThemeSwitcher from "@/Components/common/ui/ThemeSwitcher";
-import { Link } from "@inertiajs/react";
-import { Menu, X } from "lucide-react";
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import LanguageSwitcher from '@/Components/common/ui/LanguageSwitcher';
+import ThemeSwitcher from '@/Components/common/ui/ThemeSwitcher';
+import { Link } from '@inertiajs/react';
+import { Menu, X } from 'lucide-react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface ThemeLanguageContainerProps {
   isWelcome?: boolean;
@@ -38,7 +38,7 @@ export default function ThemeLanguageContainer({
               href="/login"
               className="px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400"
             >
-              {t("welcome.login")}
+              {t('welcome.login')}
             </Link>
           )}
 
@@ -47,7 +47,7 @@ export default function ThemeLanguageContainer({
               href="/register"
               className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-700"
             >
-              {t("welcome.getStarted")}
+              {t('welcome.getStarted')}
             </Link>
           )}
         </div>
@@ -84,7 +84,7 @@ export default function ThemeLanguageContainer({
                     className="px-4 py-2 text-center text-sm font-medium text-gray-700 transition-colors hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    {t("welcome.login")}
+                    {t('welcome.login')}
                   </Link>
                 )}
 
@@ -94,7 +94,7 @@ export default function ThemeLanguageContainer({
                     className="rounded-lg bg-primary-600 px-4 py-2 text-center text-sm font-medium text-white transition-colors hover:bg-primary-700"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    {t("welcome.getStarted")}
+                    {t('welcome.getStarted')}
                   </Link>
                 )}
 

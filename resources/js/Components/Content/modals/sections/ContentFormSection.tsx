@@ -1,7 +1,7 @@
-import { TFunction } from "i18next";
-import ContentSection from "@/Components/Content/Publication/common/edit/ContentSection";
-import { SectionHeader } from "../common/SectionHeader";
-import { UseFormRegister, UseFormSetValue, FieldErrors } from "react-hook-form";
+import { TFunction } from 'i18next';
+import ContentSection from '@/Components/Content/Publication/common/edit/ContentSection';
+import { SectionHeader } from '../common/SectionHeader';
+import { UseFormRegister, UseFormSetValue, FieldErrors } from 'react-hook-form';
 
 interface ContentFormSectionProps {
   t: TFunction;
@@ -32,7 +32,7 @@ export const ContentFormSection = ({
 }: ContentFormSectionProps) => {
   return (
     <div className="space-y-4">
-      <SectionHeader title={t("publications.modal.edit.contentSection") || "Contenido"} />
+      <SectionHeader title={t('publications.modal.edit.contentSection') || 'Contenido'} />
 
       <ContentSection
         register={register}

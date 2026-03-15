@@ -1,6 +1,6 @@
-import { queryKeys } from "@/lib/queryKeys";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
+import { queryKeys } from '@/lib/queryKeys';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 
 export interface Campaign {
   id: number;
@@ -11,7 +11,7 @@ export interface Campaign {
   budget?: string;
   start_date?: string;
   end_date?: string;
-  status?: "active" | "paused" | "completed";
+  status?: 'active' | 'paused' | 'completed';
   created_at?: string;
   updated_at?: string;
 }
@@ -28,7 +28,7 @@ async function fetchCampaignsFn(
   filters: Record<string, any>,
   page: number,
 ): Promise<CampaignListResponse> {
-  const response = await axios.get(route("api.v1.campaigns.index"), {
+  const response = await axios.get(route('api.v1.campaigns.index'), {
     params: { ...filters, page },
   });
 
@@ -74,7 +74,7 @@ export function useDeleteCampaign() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: number) => axios.delete(route("api.v1.campaigns.destroy", id)),
+    mutationFn: (id: number) => axios.delete(route('api.v1.campaigns.destroy', id)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.campaigns.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.calendar.all });
@@ -90,7 +90,7 @@ export function useDuplicateCampaign() {
 
   return useMutation({
     mutationFn: (id: number) =>
-      axios.post(route("api.v1.campaigns.duplicate", id)).then((r) => r.data?.campaign),
+      axios.post(route('api.v1.campaigns.duplicate', id)).then((r) => r.data?.campaign),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.campaigns.all });
     },

@@ -1,19 +1,19 @@
-import React, { HTMLAttributes, forwardRef } from "react";
-import { LazyMotion, domAnimation, m, HTMLMotionProps } from "framer-motion";
-import { useReducedMotion } from "@/hooks/useReducedMotion";
-import { hoverVariants, getVariant, getTransition } from "@/config/animationVariants";
+import React, { HTMLAttributes, forwardRef } from 'react';
+import { LazyMotion, domAnimation, m, HTMLMotionProps } from 'framer-motion';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { hoverVariants, getVariant, getTransition } from '@/config/animationVariants';
 
 /**
  * Hover effect variants for cards
  */
-export type CardHoverEffect = "lift" | "glow" | "scale";
+export type CardHoverEffect = 'lift' | 'glow' | 'scale';
 
 /**
  * Props for MotionCard component
  */
 export interface MotionCardProps extends Omit<
   HTMLAttributes<HTMLDivElement>,
-  "onAnimationStart" | "onDragStart" | "onDragEnd" | "onDrag"
+  'onAnimationStart' | 'onDragStart' | 'onDragEnd' | 'onDrag'
 > {
   /**
    * Hover effect to apply
@@ -30,7 +30,7 @@ export interface MotionCardProps extends Omit<
   /**
    * Additional Framer Motion props
    */
-  motionProps?: Omit<HTMLMotionProps<"div">, "ref">;
+  motionProps?: Omit<HTMLMotionProps<'div'>, 'ref'>;
 }
 
 /**
@@ -52,7 +52,7 @@ export interface MotionCardProps extends Omit<
 export const MotionCard = forwardRef<HTMLDivElement, MotionCardProps>(
   (
     {
-      hoverEffect = "lift",
+      hoverEffect = 'lift',
       respectReducedMotion = true,
       motionProps,
       children,
@@ -68,7 +68,7 @@ export const MotionCard = forwardRef<HTMLDivElement, MotionCardProps>(
     const selectedHoverVariant = hoverVariants[hoverEffect];
 
     // Determine which hover state to use
-    const hoverState = shouldReduceMotion ? "hoverReduced" : "hover";
+    const hoverState = shouldReduceMotion ? 'hoverReduced' : 'hover';
 
     return (
       <LazyMotion features={domAnimation}>
@@ -91,6 +91,6 @@ export const MotionCard = forwardRef<HTMLDivElement, MotionCardProps>(
   },
 );
 
-MotionCard.displayName = "MotionCard";
+MotionCard.displayName = 'MotionCard';
 
 export default MotionCard;

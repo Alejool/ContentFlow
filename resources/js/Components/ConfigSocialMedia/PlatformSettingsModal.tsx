@@ -1,7 +1,7 @@
-import PlatformModalContent from "@/Components/ConfigSocialMedia/PlatformModalContent";
-import PlatformModalFooter from "@/Components/ConfigSocialMedia/PlatformModalFooter";
-import PlatformModalHeader from "@/Components/ConfigSocialMedia/PlatformModalHeader";
-import Modal from "@/Components/common/ui/Modal";
+import PlatformModalContent from '@/Components/ConfigSocialMedia/PlatformModalContent';
+import PlatformModalFooter from '@/Components/ConfigSocialMedia/PlatformModalFooter';
+import PlatformModalHeader from '@/Components/ConfigSocialMedia/PlatformModalHeader';
+import Modal from '@/Components/common/ui/Modal';
 
 interface PlatformSettingsModalProps {
   isOpen: boolean;
@@ -33,7 +33,7 @@ export default function PlatformSettingsModal({
   allSettings = {},
   onAllSettingsChange,
 }: PlatformSettingsModalProps) {
-  const isAllPlatforms = platform.toLowerCase() === "all" || allPlatforms.length > 0;
+  const isAllPlatforms = platform.toLowerCase() === 'all' || allPlatforms.length > 0;
 
   return (
     <Modal show={isOpen} onClose={onClose} maxWidth="lg">

@@ -1,5 +1,5 @@
-import { Combobox, Dialog, Transition } from "@headlessui/react";
-import { router } from "@inertiajs/react";
+import { Combobox, Dialog, Transition } from '@headlessui/react';
+import { router } from '@inertiajs/react';
 import {
   Calendar,
   Command,
@@ -10,17 +10,17 @@ import {
   Search,
   Settings,
   Target,
-} from "lucide-react";
-import { Fragment, useEffect, useState } from "react";
+} from 'lucide-react';
+import { Fragment, useEffect, useState } from 'react';
 
 export default function CommandPalette() {
   const [isOpen, setIsOpen] = useState(false);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
 
   // Toggle with Cmd+K or Ctrl+K or custom event
   useEffect(() => {
     const onKeydown = (event: KeyboardEvent) => {
-      if (event.key === "k" && (event.metaKey || event.ctrlKey)) {
+      if (event.key === 'k' && (event.metaKey || event.ctrlKey)) {
         event.preventDefault();
         setIsOpen(!isOpen);
       }
@@ -28,47 +28,47 @@ export default function CommandPalette() {
 
     const onOpenEvent = () => setIsOpen(true);
 
-    window.addEventListener("keydown", onKeydown);
-    window.addEventListener("open-command-palette", onOpenEvent);
+    window.addEventListener('keydown', onKeydown);
+    window.addEventListener('open-command-palette', onOpenEvent);
 
     return () => {
-      window.removeEventListener("keydown", onKeydown);
-      window.removeEventListener("open-command-palette", onOpenEvent);
+      window.removeEventListener('keydown', onKeydown);
+      window.removeEventListener('open-command-palette', onOpenEvent);
     };
   }, [isOpen]);
 
   const navigation = [
-    { name: "Dashboard", href: route("dashboard"), icon: LayoutDashboard },
-    { name: "Gestionar Contenido", href: "/content", icon: FileText },
+    { name: 'Dashboard', href: route('dashboard'), icon: LayoutDashboard },
+    { name: 'Gestionar Contenido', href: '/content', icon: FileText },
     {
-      name: "Planificador",
-      href: "/content?tab=calendar",
+      name: 'Planificador',
+      href: '/content?tab=calendar',
       icon: Calendar,
     },
     {
-      name: "Espacios de Trabajo",
-      href: route("workspaces.index"),
+      name: 'Espacios de Trabajo',
+      href: route('workspaces.index'),
       icon: Target,
     },
-    { name: "Configuración", href: route("profile.edit"), icon: Settings },
+    { name: 'Configuración', href: route('profile.edit'), icon: Settings },
   ];
 
   const actions = [
     {
-      name: "Crear publicación",
-      action: () => router.visit("/content?action=create"),
+      name: 'Crear publicación',
+      action: () => router.visit('/content?action=create'),
       icon: Plus,
     },
     {
-      name: "Cerrar sesión",
-      action: () => router.post(route("logout")),
+      name: 'Cerrar sesión',
+      action: () => router.post(route('logout')),
       icon: LogOut,
     },
   ];
 
   // Combine and filter
   const filteredItems =
-    query === ""
+    query === ''
       ? [...navigation, ...actions]
       : [...navigation, ...actions].filter((item) =>
           item.name.toLowerCase().includes(query.toLowerCase()),
@@ -76,7 +76,7 @@ export default function CommandPalette() {
 
   const handleSelect = (item: any) => {
     setIsOpen(false);
-    setQuery("");
+    setQuery('');
 
     if (item.href) {
       router.visit(item.href);
@@ -86,7 +86,7 @@ export default function CommandPalette() {
   };
 
   return (
-    <Transition.Root show={isOpen} as={Fragment} afterLeave={() => setQuery("")} appear>
+    <Transition.Root show={isOpen} as={Fragment} afterLeave={() => setQuery('')} appear>
       <Dialog as="div" className="relative z-50" onClose={setIsOpen}>
         <Transition.Child
           as={Fragment}
@@ -133,30 +133,30 @@ export default function CommandPalette() {
                         value={item}
                         className={({ active }) =>
                           `flex cursor-default select-none rounded-lg p-3 px-3 py-2 transition-colors ${
-                            active ? "bg-gray-100 dark:bg-gray-800" : ""
+                            active ? 'bg-gray-100 dark:bg-gray-800' : ''
                           }`
                         }
                       >
                         {({ active }) => (
                           <>
                             <div
-                              className={`flex h-10 w-10 flex-none items-center justify-center rounded-lg ${active ? "bg-white dark:bg-gray-700" : "bg-gray-50 dark:bg-gray-800"}`}
+                              className={`flex h-10 w-10 flex-none items-center justify-center rounded-lg ${active ? 'bg-white dark:bg-gray-700' : 'bg-gray-50 dark:bg-gray-800'}`}
                             >
                               <item.icon
-                                className={`h-5 w-5 ${active ? "text-primary-600 dark:text-primary-400" : "text-gray-500 dark:text-gray-400"}`}
+                                className={`h-5 w-5 ${active ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400'}`}
                                 aria-hidden="true"
                               />
                             </div>
                             <div className="my-auto ml-4 flex-auto">
                               <p
-                                className={`text-sm font-medium ${active ? "text-gray-900 dark:text-white" : "text-gray-700 dark:text-gray-300"}`}
+                                className={`text-sm font-medium ${active ? 'text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-300'}`}
                               >
                                 {item.name}
                               </p>
                               <p
-                                className={`text-xs ${active ? "text-gray-500 dark:text-gray-400" : "text-gray-500 dark:text-gray-500"}`}
+                                className={`text-xs ${active ? 'text-gray-500 dark:text-gray-400' : 'text-gray-500 dark:text-gray-500'}`}
                               >
-                                {item.href ? "Ir a..." : "Acción"}
+                                {item.href ? 'Ir a...' : 'Acción'}
                               </p>
                             </div>
                           </>
@@ -166,7 +166,7 @@ export default function CommandPalette() {
                   </Combobox.Options>
                 )}
 
-                {query !== "" && filteredItems.length === 0 && (
+                {query !== '' && filteredItems.length === 0 && (
                   <div className="px-6 py-14 text-center text-sm sm:px-14">
                     <Command className="mx-auto h-6 w-6 text-gray-400" aria-hidden="true" />
                     <p className="mt-4 font-semibold text-gray-900 dark:text-white">

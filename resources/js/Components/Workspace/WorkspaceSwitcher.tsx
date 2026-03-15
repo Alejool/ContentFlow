@@ -1,5 +1,5 @@
-import { useForm, usePage } from "@inertiajs/react";
-import WorkspaceDropdown from "./WorkspaceDropdown";
+import { useForm, usePage } from '@inertiajs/react';
+import WorkspaceDropdown from './WorkspaceDropdown';
 
 export default function WorkspaceSwitcher({ isSidebarOpen }: { isSidebarOpen: boolean }) {
   const { auth } = usePage().props as any;
@@ -8,7 +8,7 @@ export default function WorkspaceSwitcher({ isSidebarOpen }: { isSidebarOpen: bo
   const { post } = useForm();
 
   const handleSwitch = (slug: string) => {
-    post(route("workspaces.switch", slug));
+    post(route('workspaces.switch', slug));
   };
 
   if (!current_workspace) return null;

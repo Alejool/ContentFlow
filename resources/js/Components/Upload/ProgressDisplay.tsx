@@ -1,12 +1,12 @@
-import { Pause, Play, X } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { formatSpeed, formatTime } from "@/Utils/formatters";
+import { Pause, Play, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { formatSpeed, formatTime } from '@/Utils/formatters';
 
 export interface ProgressDisplayProps {
   percentage: number;
   eta?: number;
   speed?: number;
-  status: "pending" | "uploading" | "paused" | "completed" | "error" | "cancelled" | "processing";
+  status: 'pending' | 'uploading' | 'paused' | 'completed' | 'error' | 'cancelled' | 'processing';
   onPause?: () => void;
   onResume?: () => void;
   onCancel?: () => void;
@@ -40,47 +40,47 @@ export function ProgressDisplay({
 
   const getProgressColor = () => {
     switch (status) {
-      case "error":
-        return "bg-red-500 dark:bg-red-600";
-      case "completed":
-        return "bg-green-500 dark:bg-green-600";
-      case "cancelled":
-        return "bg-gray-400 dark:bg-neutral-500";
-      case "paused":
-        return "bg-yellow-500 dark:bg-yellow-600";
-      case "uploading":
-      case "processing":
-        return "bg-gradient-to-r from-primary-400 via-primary-500 to-primary-400 dark:from-primary-500 dark:via-primary-600 dark:to-primary-500 animate-pulse";
+      case 'error':
+        return 'bg-red-500 dark:bg-red-600';
+      case 'completed':
+        return 'bg-green-500 dark:bg-green-600';
+      case 'cancelled':
+        return 'bg-gray-400 dark:bg-neutral-500';
+      case 'paused':
+        return 'bg-yellow-500 dark:bg-yellow-600';
+      case 'uploading':
+      case 'processing':
+        return 'bg-gradient-to-r from-primary-400 via-primary-500 to-primary-400 dark:from-primary-500 dark:via-primary-600 dark:to-primary-500 animate-pulse';
       default:
-        return "bg-primary-500 dark:bg-primary-600";
+        return 'bg-primary-500 dark:bg-primary-600';
     }
   };
 
   const getStatusText = () => {
-    if (status === "error" && error) {
+    if (status === 'error' && error) {
       return error;
     }
-    if (status === "uploading" && eta) {
-      return `~${formatTime(eta)} ${t("common.upload.left")}`;
+    if (status === 'uploading' && eta) {
+      return `~${formatTime(eta)} ${t('common.upload.left')}`;
     }
-    if (status === "processing") {
-      return t("common.upload.processing");
+    if (status === 'processing') {
+      return t('common.upload.processing');
     }
-    if (status === "completed") {
-      return t("common.upload.done");
+    if (status === 'completed') {
+      return t('common.upload.done');
     }
-    if (status === "paused") {
-      return t("common.upload.paused");
+    if (status === 'paused') {
+      return t('common.upload.paused');
     }
-    if (status === "cancelled") {
-      return t("common.upload.cancelled");
+    if (status === 'cancelled') {
+      return t('common.upload.cancelled');
     }
-    return t("common.upload.pending");
+    return t('common.upload.pending');
   };
 
-  const showControls = status === "uploading" || status === "paused";
-  const showRetry = status === "error" && canRetry && onRetry;
-  const showMaxRetriesMessage = status === "error" && !canRetry && retryCount && retryCount >= 3;
+  const showControls = status === 'uploading' || status === 'paused';
+  const showRetry = status === 'error' && canRetry && onRetry;
+  const showMaxRetriesMessage = status === 'error' && !canRetry && retryCount && retryCount >= 3;
 
   return (
     <div className="space-y-2">
@@ -91,11 +91,11 @@ export function ProgressDisplay({
         aria-valuenow={validPercentage}
         aria-valuemin={0}
         aria-valuemax={100}
-        aria-label={t("common.upload.progress")}
+        aria-label={t('common.upload.progress')}
       >
         <div
           className={`absolute h-full transition-all duration-300 ${getProgressColor()} ${
-            status === "uploading" || status === "processing" ? "shadow-lg" : ""
+            status === 'uploading' || status === 'processing' ? 'shadow-lg' : ''
           }`}
           style={{ width: `${validPercentage}%` }}
         />
@@ -110,20 +110,20 @@ export function ProgressDisplay({
         >
           {validPercentage}%
         </span>
-        {eta !== undefined && status === "uploading" && (
+        {eta !== undefined && status === 'uploading' && (
           <span
             className="text-gray-500 dark:text-neutral-400"
             aria-live="polite"
-            aria-label={t("common.upload.eta")}
+            aria-label={t('common.upload.eta')}
           >
-            {formatTime(eta)} {t("common.upload.left")}
+            {formatTime(eta)} {t('common.upload.left')}
           </span>
         )}
-        {speed !== undefined && status === "uploading" && (
+        {speed !== undefined && status === 'uploading' && (
           <span
             className="text-gray-500 dark:text-neutral-400"
             aria-live="polite"
-            aria-label={t("common.upload.speed")}
+            aria-label={t('common.upload.speed')}
           >
             {formatSpeed(speed)}
           </span>
@@ -140,16 +140,16 @@ export function ProgressDisplay({
       </div>
 
       {/* Error details and retry info */}
-      {status === "error" && (
+      {status === 'error' && (
         <div className="space-y-2">
           {retryCount !== undefined && retryCount > 0 && (
             <div className="text-xs text-gray-500 dark:text-neutral-500">
-              {t("common.upload.retryAttempt", { count: retryCount })}
+              {t('common.upload.retryAttempt', { count: retryCount })}
             </div>
           )}
           {showMaxRetriesMessage && (
             <div className="rounded bg-amber-50 p-2 text-xs text-amber-600 dark:bg-amber-900/20 dark:text-amber-400">
-              {t("common.upload.maxRetriesReached")}
+              {t('common.upload.maxRetriesReached')}
             </div>
           )}
         </div>
@@ -162,33 +162,33 @@ export function ProgressDisplay({
             <button
               onClick={onPause}
               className="focus:ring-primary inline-flex items-center gap-1.5 rounded bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:bg-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-600 dark:focus:ring-offset-neutral-800"
-              aria-label={t("common.upload.pause")}
+              aria-label={t('common.upload.pause')}
               type="button"
             >
               <Pause className="h-3 w-3" aria-hidden="true" />
-              {t("common.upload.pause")}
+              {t('common.upload.pause')}
             </button>
           )}
           {isPaused && onResume && (
             <button
               onClick={onResume}
               className="focus:ring-primary inline-flex items-center gap-1.5 rounded bg-primary-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:bg-primary-500 dark:text-white dark:hover:bg-primary-600 dark:focus:ring-offset-neutral-800"
-              aria-label={t("common.upload.resume")}
+              aria-label={t('common.upload.resume')}
               type="button"
             >
               <Play className="h-3 w-3" aria-hidden="true" />
-              {t("common.upload.resume")}
+              {t('common.upload.resume')}
             </button>
           )}
           {onCancel && (
             <button
               onClick={onCancel}
               className="inline-flex items-center gap-1.5 rounded bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 transition-colors hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30 dark:focus:ring-offset-neutral-800"
-              aria-label={t("common.cancel")}
+              aria-label={t('common.cancel')}
               type="button"
             >
               <X className="h-3 w-3" aria-hidden="true" />
-              {t("common.cancel")}
+              {t('common.cancel')}
             </button>
           )}
         </div>
@@ -200,21 +200,21 @@ export function ProgressDisplay({
           <button
             onClick={onRetry}
             className="focus:ring-primary inline-flex items-center gap-1.5 rounded bg-primary-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:bg-primary-500 dark:text-white dark:hover:bg-primary-600 dark:focus:ring-offset-neutral-800"
-            aria-label={t("common.upload.retry")}
+            aria-label={t('common.upload.retry')}
             type="button"
           >
             <Play className="h-3 w-3" aria-hidden="true" />
-            {t("common.upload.retry")}
+            {t('common.upload.retry')}
           </button>
           {onCancel && (
             <button
               onClick={onCancel}
               className="inline-flex items-center gap-1.5 rounded bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:bg-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-600 dark:focus:ring-offset-neutral-800"
-              aria-label={t("common.upload.dismiss")}
+              aria-label={t('common.upload.dismiss')}
               type="button"
             >
               <X className="h-3 w-3" aria-hidden="true" />
-              {t("common.upload.dismiss")}
+              {t('common.upload.dismiss')}
             </button>
           )}
         </div>

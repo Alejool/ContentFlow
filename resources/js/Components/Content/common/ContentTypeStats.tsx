@@ -1,6 +1,6 @@
-import { CONTENT_TYPES } from "@/constants/contentTypes";
-import { BarChart3, Circle, FileText, Images, TrendingUp, Video } from "lucide-react";
-import { memo, useMemo } from "react";
+import { CONTENT_TYPES } from '@/constants/contentTypes';
+import { BarChart3, Circle, FileText, Images, TrendingUp, Video } from 'lucide-react';
+import { memo, useMemo } from 'react';
 
 interface ContentTypeStatsProps {
   publications: any[];
@@ -10,34 +10,34 @@ interface ContentTypeStatsProps {
 // Configuración visual local
 const CONTENT_TYPE_DISPLAY = {
   post: {
-    label: "Post",
-    icon: "FileText",
-    color: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
-    borderColor: "border-blue-200 dark:border-blue-800",
+    label: 'Post',
+    icon: 'FileText',
+    color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+    borderColor: 'border-blue-200 dark:border-blue-800',
   },
   reel: {
-    label: "Reel",
-    icon: "Video",
-    color: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
-    borderColor: "border-purple-200 dark:border-purple-800",
+    label: 'Reel',
+    icon: 'Video',
+    color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+    borderColor: 'border-purple-200 dark:border-purple-800',
   },
   story: {
-    label: "Story",
-    icon: "Circle",
-    color: "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-400",
-    borderColor: "border-pink-200 dark:border-pink-800",
+    label: 'Story',
+    icon: 'Circle',
+    color: 'bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-400',
+    borderColor: 'border-pink-200 dark:border-pink-800',
   },
   carousel: {
-    label: "Carousel",
-    icon: "Images",
-    color: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400",
-    borderColor: "border-indigo-200 dark:border-indigo-800",
+    label: 'Carousel',
+    icon: 'Images',
+    color: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400',
+    borderColor: 'border-indigo-200 dark:border-indigo-800',
   },
   poll: {
-    label: "Encuesta",
-    icon: "BarChart3",
-    color: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-    borderColor: "border-green-200 dark:border-green-800",
+    label: 'Encuesta',
+    icon: 'BarChart3',
+    color: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+    borderColor: 'border-green-200 dark:border-green-800',
   },
 } as const;
 
@@ -52,42 +52,42 @@ const iconMap = {
 
 // Función local para detectar tipo de contenido
 const detectContentType = (platformSettings: any, mediaFiles: any[]): string => {
-  if (!platformSettings || typeof platformSettings !== "object") {
-    return "post";
+  if (!platformSettings || typeof platformSettings !== 'object') {
+    return 'post';
   }
 
   // Buscar en las configuraciones de plataforma
   for (const [platform, settings] of Object.entries(platformSettings)) {
-    if (settings && typeof settings === "object" && (settings as any).type) {
+    if (settings && typeof settings === 'object' && (settings as any).type) {
       const type = (settings as any).type;
-      if (type === "poll") return "poll";
-      if (type === "reel" || type === "short") return "reel";
-      if (type === "story") return "story";
-      if (type === "carousel") return "carousel";
+      if (type === 'poll') return 'poll';
+      if (type === 'reel' || type === 'short') return 'reel';
+      if (type === 'story') return 'story';
+      if (type === 'carousel') return 'carousel';
     }
   }
 
   // Detectar basado en archivos multimedia
   if (mediaFiles && Array.isArray(mediaFiles)) {
-    const videoCount = mediaFiles.filter((f) => f?.file_type?.includes("video")).length;
-    const imageCount = mediaFiles.filter((f) => f?.file_type?.includes("image")).length;
+    const videoCount = mediaFiles.filter((f) => f?.file_type?.includes('video')).length;
+    const imageCount = mediaFiles.filter((f) => f?.file_type?.includes('image')).length;
 
     if (videoCount === 1 && imageCount === 0) {
-      const video = mediaFiles.find((f) => f?.file_type?.includes("video"));
+      const video = mediaFiles.find((f) => f?.file_type?.includes('video'));
       if (video?.metadata?.duration && video.metadata.duration <= 90) {
-        return "reel";
+        return 'reel';
       }
     }
 
     if (imageCount > 1) {
-      return "carousel";
+      return 'carousel';
     }
   }
 
-  return "post";
+  return 'post';
 };
 
-const ContentTypeStats = memo(({ publications, className = "" }: ContentTypeStatsProps) => {
+const ContentTypeStats = memo(({ publications, className = '' }: ContentTypeStatsProps) => {
   const stats = useMemo(() => {
     const typeCount = {
       [CONTENT_TYPES.POST]: 0,
@@ -149,7 +149,7 @@ const ContentTypeStats = memo(({ publications, className = "" }: ContentTypeStat
 
                 <div className="h-2 flex-1 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
                   <div
-                    className={`h-full transition-all duration-500 ${display.color.replace("text-", "bg-").replace("100", "500")}`}
+                    className={`h-full transition-all duration-500 ${display.color.replace('text-', 'bg-').replace('100', '500')}`}
                     style={{ width: `${percentage}%` }}
                   />
                 </div>
@@ -179,6 +179,6 @@ const ContentTypeStats = memo(({ publications, className = "" }: ContentTypeStat
   );
 });
 
-ContentTypeStats.displayName = "ContentTypeStats";
+ContentTypeStats.displayName = 'ContentTypeStats';
 
 export default ContentTypeStats;

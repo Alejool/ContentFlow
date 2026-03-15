@@ -1,6 +1,6 @@
-import { Avatar } from "@/Components/common/Avatar";
-import { MessageSquare, MoreHorizontal, Share2, ThumbsUp } from "lucide-react";
-import { memo } from "react";
+import { Avatar } from '@/Components/common/Avatar';
+import { MessageSquare, MoreHorizontal, Share2, ThumbsUp } from 'lucide-react';
+import { memo } from 'react';
 
 interface FacebookPreviewProps {
   content: string;
@@ -21,7 +21,7 @@ export const FacebookPreview = memo(
     mediaUrls,
     user,
     publishedAt,
-    contentType = "post",
+    contentType = 'post',
     pollOptions = [],
     pollDuration = 24,
   }: FacebookPreviewProps) => {
@@ -30,20 +30,20 @@ export const FacebookPreview = memo(
         {/* Header */}
         <div className="flex items-center justify-between p-3">
           <div className="flex items-center gap-2">
-            <Avatar src={user?.avatar} name={user?.name || "User"} size="md" />
+            <Avatar src={user?.avatar} name={user?.name || 'User'} size="md" />
             <div>
               <div className="cursor-pointer text-[15px] font-semibold leading-tight hover:underline">
-                {user?.name || "ContentFlow User"}
+                {user?.name || 'ContentFlow User'}
               </div>
               <div className="flex items-center gap-1 text-[13px] leading-tight text-gray-500 dark:text-[#b0b3b8]">
                 {publishedAt
-                  ? new Date(publishedAt).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
+                  ? new Date(publishedAt).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
                     })
-                  : "Just now"}{" "}
-                ·{" "}
+                  : 'Just now'}{' '}
+                ·{' '}
                 <span className="inline-block h-3 w-3 rounded-full bg-gray-400 dark:bg-[#b0b3b8]" />
               </div>
             </div>
@@ -58,13 +58,13 @@ export const FacebookPreview = memo(
 
         {/* Content */}
         <div className="whitespace-pre-wrap break-words px-3 pb-3 text-[15px]">
-          {content || "Your Facebook post content will appear here..."}
+          {content || 'Your Facebook post content will appear here...'}
         </div>
 
         {/* Media */}
-        {mediaUrls.length > 0 && contentType !== "poll" && (
+        {mediaUrls.length > 0 && contentType !== 'poll' && (
           <div className="relative border-y border-gray-100 bg-black dark:border-[#3e4042]">
-            {contentType === "carousel" && mediaUrls.length > 1 ? (
+            {contentType === 'carousel' && mediaUrls.length > 1 ? (
               // Carousel layout for multiple images
               <div className="relative">
                 <div className="grid grid-cols-2 gap-0.5">
@@ -72,10 +72,10 @@ export const FacebookPreview = memo(
                     <div
                       key={index}
                       className={`relative aspect-square overflow-hidden bg-gray-200 dark:bg-[#3a3b3c] ${
-                        mediaUrls.length === 3 && index === 0 ? "row-span-2 aspect-auto" : ""
+                        mediaUrls.length === 3 && index === 0 ? 'row-span-2 aspect-auto' : ''
                       }`}
                     >
-                      {url.includes("video") || url.includes(".mp4") ? (
+                      {url.includes('video') || url.includes('.mp4') ? (
                         <video src={url} className="h-full w-full object-cover" />
                       ) : (
                         <img
@@ -102,7 +102,7 @@ export const FacebookPreview = memo(
                       <div
                         key={index}
                         className={`h-2 w-2 rounded-full ${
-                          index === 0 ? "bg-white" : "bg-white/50"
+                          index === 0 ? 'bg-white' : 'bg-white/50'
                         }`}
                       />
                     ))}
@@ -112,16 +112,16 @@ export const FacebookPreview = memo(
             ) : (
               // Single media or regular post layout
               <div
-                className={`grid gap-0.5 ${mediaUrls.length > 1 ? "grid-cols-2" : "grid-cols-1"}`}
+                className={`grid gap-0.5 ${mediaUrls.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}
               >
                 {mediaUrls.slice(0, 4).map((url, index) => (
                   <div
                     key={index}
                     className={`relative aspect-square overflow-hidden bg-gray-200 dark:bg-[#3a3b3c] ${
-                      mediaUrls.length === 3 && index === 0 ? "row-span-2 aspect-auto" : ""
+                      mediaUrls.length === 3 && index === 0 ? 'row-span-2 aspect-auto' : ''
                     }`}
                   >
-                    {url.includes("video") || url.includes(".mp4") ? (
+                    {url.includes('video') || url.includes('.mp4') ? (
                       <video src={url} className="h-full w-full object-cover" />
                     ) : (
                       <img
@@ -138,7 +138,7 @@ export const FacebookPreview = memo(
         )}
 
         {/* Poll */}
-        {contentType === "poll" && pollOptions.length >= 2 && (
+        {contentType === 'poll' && pollOptions.length >= 2 && (
           <div className="mx-3 mb-3 overflow-hidden rounded-lg border border-gray-200 bg-gray-50 dark:border-[#3e4042] dark:bg-[#3a3b3c]">
             <div className="border-b border-gray-200 bg-white p-3 dark:border-[#3e4042] dark:bg-[#242526]">
               <div className="flex items-center gap-2">
@@ -147,8 +147,8 @@ export const FacebookPreview = memo(
                 </span>
                 <div className="text-xs text-gray-500 dark:text-[#b0b3b8]">
                   {pollDuration < 24
-                    ? `${pollDuration} hora${pollDuration !== 1 ? "s" : ""} restante${pollDuration !== 1 ? "s" : ""}`
-                    : `${Math.floor(pollDuration / 24)} día${Math.floor(pollDuration / 24) !== 1 ? "s" : ""} restante${Math.floor(pollDuration / 24) !== 1 ? "s" : ""}`}{" "}
+                    ? `${pollDuration} hora${pollDuration !== 1 ? 's' : ''} restante${pollDuration !== 1 ? 's' : ''}`
+                    : `${Math.floor(pollDuration / 24)} día${Math.floor(pollDuration / 24) !== 1 ? 's' : ''} restante${Math.floor(pollDuration / 24) !== 1 ? 's' : ''}`}{' '}
                   · 0 votos
                 </div>
               </div>

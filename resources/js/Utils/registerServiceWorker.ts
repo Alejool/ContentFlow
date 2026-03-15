@@ -16,7 +16,7 @@ export interface ServiceWorkerConfig {
  */
 export async function registerServiceWorker(config: ServiceWorkerConfig = {}): Promise<void> {
   // Check if service workers are supported
-  if (!("serviceWorker" in navigator)) {
+  if (!('serviceWorker' in navigator)) {
     return;
   }
 
@@ -28,18 +28,18 @@ export async function registerServiceWorker(config: ServiceWorkerConfig = {}): P
 
   try {
     // Register the service worker
-    const registration = await navigator.serviceWorker.register("/sw.js", {
-      scope: "/",
+    const registration = await navigator.serviceWorker.register('/sw.js', {
+      scope: '/',
     });
 
     // Check for updates
-    registration.addEventListener("updatefound", () => {
+    registration.addEventListener('updatefound', () => {
       const newWorker = registration.installing;
 
       if (!newWorker) return;
 
-      newWorker.addEventListener("statechange", () => {
-        if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+      newWorker.addEventListener('statechange', () => {
+        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
           // New service worker available
           config.onUpdate?.(registration);
         }
@@ -63,11 +63,11 @@ export async function registerServiceWorker(config: ServiceWorkerConfig = {}): P
   }
 
   // Listen for online/offline events
-  window.addEventListener("online", () => {
+  window.addEventListener('online', () => {
     config.onOnline?.();
   });
 
-  window.addEventListener("offline", () => {
+  window.addEventListener('offline', () => {
     config.onOffline?.();
   });
 }
@@ -76,7 +76,7 @@ export async function registerServiceWorker(config: ServiceWorkerConfig = {}): P
  * Unregister the service worker
  */
 export async function unregisterServiceWorker(): Promise<boolean> {
-  if (!("serviceWorker" in navigator)) {
+  if (!('serviceWorker' in navigator)) {
     return false;
   }
 
@@ -94,13 +94,13 @@ export async function unregisterServiceWorker(): Promise<boolean> {
  * Skip waiting and activate new service worker immediately
  */
 export function skipWaiting(): void {
-  if (!("serviceWorker" in navigator)) {
+  if (!('serviceWorker' in navigator)) {
     return;
   }
 
   navigator.serviceWorker.ready.then((registration) => {
     if (registration.waiting) {
-      registration.waiting.postMessage({ type: "SKIP_WAITING" });
+      registration.waiting.postMessage({ type: 'SKIP_WAITING' });
     }
   });
 }
@@ -109,7 +109,7 @@ export function skipWaiting(): void {
  * Clear all caches
  */
 export async function clearAllCaches(): Promise<void> {
-  if (!("caches" in window)) {
+  if (!('caches' in window)) {
     return;
   }
 
@@ -130,7 +130,7 @@ export async function getServiceWorkerStatus(): Promise<{
   active: boolean;
   waiting: boolean;
 }> {
-  const supported = "serviceWorker" in navigator;
+  const supported = 'serviceWorker' in navigator;
 
   if (!supported) {
     return {
@@ -165,7 +165,7 @@ export async function getServiceWorkerStatus(): Promise<{
  */
 export function isStandalone(): boolean {
   return (
-    window.matchMedia("(display-mode: standalone)").matches ||
+    window.matchMedia('(display-mode: standalone)').matches ||
     (window.navigator as any).standalone === true
   );
 }
@@ -174,5 +174,5 @@ export function isStandalone(): boolean {
  * Check if the app can be installed as PWA
  */
 export function canInstallPWA(): boolean {
-  return "BeforeInstallPromptEvent" in window;
+  return 'BeforeInstallPromptEvent' in window;
 }

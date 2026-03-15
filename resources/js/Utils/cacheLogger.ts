@@ -11,8 +11,8 @@ export interface CacheDecisionLog {
   timestamp: number;
   url: string;
   method: string;
-  strategy: "cache-first" | "network-first" | "stale-while-revalidate" | "network-only";
-  result: "cache-hit" | "cache-miss" | "network-success" | "network-error" | "fallback";
+  strategy: 'cache-first' | 'network-first' | 'stale-while-revalidate' | 'network-only';
+  result: 'cache-hit' | 'cache-miss' | 'network-success' | 'network-error' | 'fallback';
   responseTime: number;
   cacheAge?: number;
   size?: number;
@@ -28,7 +28,7 @@ export interface CacheLoggerConfig {
 class CacheLogger {
   private logs: CacheDecisionLog[] = [];
   private config: CacheLoggerConfig;
-  private readonly STORAGE_KEY = "cache-decision-logs";
+  private readonly STORAGE_KEY = 'cache-decision-logs';
   private readonly isDevelopment: boolean;
 
   constructor(config: CacheLoggerConfig = {}) {
@@ -53,8 +53,8 @@ class CacheLogger {
   logDecision(decision: {
     url: string;
     method?: string;
-    strategy: CacheDecisionLog["strategy"];
-    result: CacheDecisionLog["result"];
+    strategy: CacheDecisionLog['strategy'];
+    result: CacheDecisionLog['result'];
     responseTime: number;
     cacheAge?: number;
     size?: number;
@@ -69,7 +69,7 @@ class CacheLogger {
       id: `cache-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       timestamp: Date.now(),
       url: decision.url,
-      method: decision.method || "GET",
+      method: decision.method || 'GET',
       strategy: decision.strategy,
       result: decision.result,
       responseTime: decision.responseTime,
@@ -110,8 +110,8 @@ class CacheLogger {
    * Get all cache decision logs
    */
   getLogs(filter?: {
-    strategy?: CacheDecisionLog["strategy"];
-    result?: CacheDecisionLog["result"];
+    strategy?: CacheDecisionLog['strategy'];
+    result?: CacheDecisionLog['result'];
     url?: string;
     since?: number;
   }): CacheDecisionLog[] {
@@ -174,12 +174,12 @@ class CacheLogger {
       totalResponseTime += log.responseTime;
 
       // Count cache hits
-      if (log.result === "cache-hit") {
+      if (log.result === 'cache-hit') {
         cacheHits++;
       }
 
       // Count network errors
-      if (log.result === "network-error") {
+      if (log.result === 'network-error') {
         networkErrors++;
       }
     });
@@ -210,8 +210,8 @@ class CacheLogger {
     });
 
     const averageByStrategy: Record<string, number> = {};
-    let fastestStrategy = "";
-    let slowestStrategy = "";
+    let fastestStrategy = '';
+    let slowestStrategy = '';
     let fastestTime = Infinity;
     let slowestTime = 0;
 
@@ -231,7 +231,7 @@ class CacheLogger {
     });
 
     // Calculate cache efficiency (cache hits vs total requests)
-    const cacheHits = this.logs.filter((log) => log.result === "cache-hit").length;
+    const cacheHits = this.logs.filter((log) => log.result === 'cache-hit').length;
     const cacheEfficiency = this.logs.length > 0 ? (cacheHits / this.logs.length) * 100 : 0;
 
     return {
@@ -307,15 +307,15 @@ class CacheLogger {
    */
   exportLogsCSV(): string {
     const headers = [
-      "ID",
-      "Timestamp",
-      "URL",
-      "Method",
-      "Strategy",
-      "Result",
-      "Response Time (ms)",
-      "Cache Age (ms)",
-      "Size (bytes)",
+      'ID',
+      'Timestamp',
+      'URL',
+      'Method',
+      'Strategy',
+      'Result',
+      'Response Time (ms)',
+      'Cache Age (ms)',
+      'Size (bytes)',
     ];
     const rows = this.logs.map((log) => [
       log.id,
@@ -325,13 +325,13 @@ class CacheLogger {
       log.strategy,
       log.result,
       log.responseTime,
-      log.cacheAge || "",
-      log.size || "",
+      log.cacheAge || '',
+      log.size || '',
     ]);
 
     const csv = [headers, ...rows]
-      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
-      .join("\n");
+      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
 
     return csv;
   }

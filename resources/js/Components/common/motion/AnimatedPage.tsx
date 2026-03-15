@@ -1,7 +1,7 @@
-import React, { ReactNode } from "react";
-import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
-import { useReducedMotion } from "@/hooks/useReducedMotion";
-import { pageVariants, getVariant, getTransition } from "@/config/animationVariants";
+import React, { ReactNode } from 'react';
+import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { pageVariants, getVariant, getTransition } from '@/config/animationVariants';
 
 /**
  * AnimatedPage wrapper component for page transitions
@@ -11,7 +11,7 @@ import { pageVariants, getVariant, getTransition } from "@/config/animationVaria
  * Requirements: 4.1, 4.2, 4.4
  */
 
-export type PageTransitionVariant = "fade" | "slide" | "scale";
+export type PageTransitionVariant = 'fade' | 'slide' | 'scale';
 
 export interface AnimatedPageProps {
   children: ReactNode;
@@ -37,7 +37,7 @@ export interface AnimatedPageProps {
  */
 export const AnimatedPage: React.FC<AnimatedPageProps> = ({
   children,
-  variant = "fade",
+  variant = 'fade',
   duration = 300, // Default 300ms (within 300-500ms requirement for page transitions)
   respectReducedMotion = true,
   pageKey,
@@ -58,15 +58,15 @@ export const AnimatedPage: React.FC<AnimatedPageProps> = ({
 
   // Get the appropriate animation states based on reduced motion preference
   const initial = shouldReduceMotion
-    ? getVariant(selectedVariant, "animateReduced", true)
+    ? getVariant(selectedVariant, 'animateReduced', true)
     : selectedVariant.initial;
 
   const animate = shouldReduceMotion
-    ? getVariant(selectedVariant, "animateReduced", true)
+    ? getVariant(selectedVariant, 'animateReduced', true)
     : selectedVariant.animate;
 
   const exit = shouldReduceMotion
-    ? getVariant(selectedVariant, "exitReduced", true)
+    ? getVariant(selectedVariant, 'exitReduced', true)
     : selectedVariant.exit;
 
   // Adjust transition duration based on reduced motion preference
@@ -86,7 +86,7 @@ export const AnimatedPage: React.FC<AnimatedPageProps> = ({
           animate={animate}
           exit={exit}
           transition={transition}
-          style={{ width: "100%", height: "100%" }}
+          style={{ width: '100%', height: '100%' }}
         >
           {children}
         </m.div>

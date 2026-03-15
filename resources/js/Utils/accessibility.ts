@@ -18,7 +18,7 @@
  */
 export const handleKeyboardClick = (callback: () => void) => {
   return (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" || e.key === " ") {
+    if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       callback();
     }
@@ -35,7 +35,7 @@ export const handleKeyboardClick = (callback: () => void) => {
  */
 export const makeClickable = (onClick: () => void) => {
   return {
-    role: "button" as const,
+    role: 'button' as const,
     tabIndex: 0,
     onClick,
     onKeyDown: handleKeyboardClick(onClick),

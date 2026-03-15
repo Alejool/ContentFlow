@@ -1,9 +1,9 @@
-import PricingPlansSection from "@/Components/Pricing/PricingPlansSection";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head } from "@inertiajs/react";
-import { ArrowRight } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import PricingPlansSection from '@/Components/Pricing/PricingPlansSection';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { Head } from '@inertiajs/react';
+import { ArrowRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface Plan {
   id: string;
@@ -53,11 +53,11 @@ export default function PricingPage({
   const isOwner =
     currentWorkspace &&
     (Number(currentWorkspace.created_by) === Number(auth.user?.id) ||
-      currentWorkspace.user_role_slug === "owner");
+      currentWorkspace.user_role_slug === 'owner');
 
   return (
     <AuthenticatedLayout user={auth.user}>
-      <Head title={t("pricing.title")} />
+      <Head title={t('pricing.title')} />
 
       <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-gray-50 via-white to-orange-50/30 py-16 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 dark:text-white">
         {/* Decorative background elements */}
@@ -82,10 +82,10 @@ export default function PricingPage({
             <Card className="">
               <CardHeader className="pb-6 text-center">
                 <CardTitle className="mb-3 text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">
-                  {t("pricing.faq", "¿Tienes preguntas?")}
+                  {t('pricing.faq', '¿Tienes preguntas?')}
                 </CardTitle>
                 <CardDescription className="text-lg text-gray-600 dark:text-gray-400">
-                  {t("pricing.faqSubtitle", "Estamos aquí para ayudarte")}
+                  {t('pricing.faqSubtitle', 'Estamos aquí para ayudarte')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="pb-8 text-center">

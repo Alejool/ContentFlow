@@ -1,17 +1,17 @@
-import { useLockStore } from "@/stores/lockStore";
-import { usePublicationStore } from "@/stores/publicationStore";
-import { Publication } from "@/types/Publication";
-import { usePage } from "@inertiajs/react";
-import axios from "axios";
-import { useCallback, useEffect, useRef, useState } from "react";
-import toast from "react-hot-toast";
+import { useLockStore } from '@/stores/lockStore';
+import { usePublicationStore } from '@/stores/publicationStore';
+import { Publication } from '@/types/Publication';
+import { usePage } from '@inertiajs/react';
+import axios from 'axios';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
 
 interface LockInfo {
   user_id: number;
   user_name: string;
   avatar?: string;
   expires_at: string;
-  locked_by?: "session" | "user";
+  locked_by?: 'session' | 'user';
   ip_address?: string;
   user_agent?: string;
 }
@@ -26,7 +26,7 @@ interface User {
 const syncAllUIStores = async (pubId: number, freshData: Publication) => {
   // 1. Sync useContentUIStore
   try {
-    const { useContentUIStore } = await import("@/stores/contentUIStore");
+    const { useContentUIStore } = await import('@/stores/contentUIStore');
     const store = useContentUIStore.getState();
     if (store.selectedItem?.id === pubId) {
       store.setSelectedItem(freshData);
@@ -35,7 +35,7 @@ const syncAllUIStores = async (pubId: number, freshData: Publication) => {
 
   // 2. Sync useManageContentUIStore
   try {
-    const { useManageContentUIStore } = await import("@/stores/manageContentUIStore");
+    const { useManageContentUIStore } = await import('@/stores/manageContentUIStore');
     const store = useManageContentUIStore.getState();
     if (store.selectedItem?.id === pubId) {
       store.setSelectedItem(freshData);
@@ -62,12 +62,12 @@ const refreshPublicationInAllStores = async (pubId: number, providedData?: Publi
 
       // 3. Update Calendar Store if it exists in the grid
       try {
-        const { useCalendarStore } = await import("@/stores/calendarStore");
+        const { useCalendarStore } = await import('@/stores/calendarStore');
         const calStore = useCalendarStore.getState();
         const mainMedia = (freshData as any).media_files?.[0];
         const thumb = mainMedia?.thumbnail?.file_path || (freshData as any).image;
 
-        calStore.updateEventByResourceId(pubId, "publication", {
+        calStore.updateEventByResourceId(pubId, 'publication', {
           title: freshData.title,
           status: (freshData as any).status,
           extendedProps: {
@@ -139,7 +139,7 @@ export const usePublicationLock = (publicationId: number | null, isEditing: bool
           if (!wasAlreadyLockedByMe || force) {
             await refreshPublicationInAllStores(publicationId);
             if (force)
-              toast.success("Has tomado el control de la edición.", {
+              toast.success('Has tomado el control de la edición.', {
                 id: `lock-takeover-${publicationId}`,
               });
           }
@@ -243,8 +243,8 @@ export const usePublicationLock = (publicationId: number | null, isEditing: bool
         startPolling();
       }
 
-      if (channel && typeof channel.listen === "function") {
-        channel.listen(".publication.lock.changed", (data: any) => {
+      if (channel && typeof channel.listen === 'function') {
+        channel.listen('.publication.lock.changed', (data: any) => {
           if (data.publicationId !== publicationId) return;
 
           if (data.lock) {
@@ -313,7 +313,7 @@ export const useWorkspaceLocks = () => {
       if (data.lock) {
         if (data.lock.user_id !== wsUserId) {
           updateLock(pubId, data.lock);
-          const userName = data.lock.user_name || data.lock.user?.name || "Usuario";
+          const userName = data.lock.user_name || data.lock.user?.name || 'Usuario';
           toast(`${userName} ha empezado a editar.`, {
             id: `lock-${pubId}`,
           });
@@ -322,7 +322,7 @@ export const useWorkspaceLocks = () => {
         updateLock(pubId, null);
         toast.dismiss(`lock-${pubId}`);
 
-        import("@/stores/publicationStore").then(({ usePublicationStore }) => {
+        import('@/stores/publicationStore').then(({ usePublicationStore }) => {
           const pub = usePublicationStore.getState().publications.find((p) => p.id === pubId);
           if (pub) {
             toast.success(`"${pub.title}" ya está disponible.`, {
@@ -346,7 +346,7 @@ export const useWorkspaceLocks = () => {
 
     const fetchLocks = async () => {
       try {
-        const { data } = await axios.get("/api/v1/publication-locks");
+        const { data } = await axios.get('/api/v1/publication-locks');
         const locks = data.data?.locks || data.locks || [];
         const lockMap: Record<number, LockInfo> = {};
 
@@ -354,9 +354,9 @@ export const useWorkspaceLocks = () => {
           if (lock.user_id !== wsUserId) {
             lockMap[lock.publication_id] = {
               user_id: lock.user_id,
-              user_name: lock.user?.name || "Unknown User",
+              user_name: lock.user?.name || 'Unknown User',
               expires_at: lock.expires_at,
-              locked_by: "user",
+              locked_by: 'user',
             };
           }
         });
@@ -367,12 +367,12 @@ export const useWorkspaceLocks = () => {
     fetchLocks();
 
     const channel = window.Echo.private(`workspace.${workspaceId}`);
-    channel.listen(".publication.lock.changed", handleLockChange);
-    channel.listen(".publication.updated", handlePublicationUpdate);
+    channel.listen('.publication.lock.changed', handleLockChange);
+    channel.listen('.publication.updated', handlePublicationUpdate);
 
     return () => {
-      channel.stopListening(".publication.lock.changed", handleLockChange);
-      channel.stopListening(".publication.updated", handlePublicationUpdate);
+      channel.stopListening('.publication.lock.changed', handleLockChange);
+      channel.stopListening('.publication.updated', handlePublicationUpdate);
       // We do NOT call window.Echo.leave here because this hook is used in AuthenticatedLayout
       // If we leave, we might break sub-channels if they depend on this root connection.
       // But typically leave is okay if it's the intended navigation behavior.

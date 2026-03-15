@@ -1,22 +1,22 @@
-import { ErrorBoundary } from "@/Components/common/ui/ErrorBoundary";
-import ThemedToaster from "@/Components/common/ui/ThemedToaster";
-import { ThemeProvider } from "@/Contexts/ThemeContext";
-import { ErrorInterceptor } from "@/Services/ErrorInterceptor";
-import { PageProps } from "@/types";
-import { createInertiaApp } from "@inertiajs/react";
-import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
-import { createRoot } from "react-dom/client";
-import { lazy, Suspense } from "react";
-import { ServiceWorkerUpdate } from "./components/ServiceWorkerUpdate";
-import { AnimatedPage } from "@/Components/common/motion/AnimatedPage";
-import { InertiaProgressIndicator } from "@/Components/common/motion/InertiaProgressIndicator";
-import { FocusVisibleManager } from "@/Utils/FocusVisibleManager";
-import { FocusManager } from "@/Utils/FocusManager";
-import { ariaAnnouncer } from "@/Utils/ARIAAnnouncer";
-import { QueryProvider } from "@/providers/QueryProvider";
-import "../css/app.css";
-import "./bootstrap";
-import "./i18n";
+import { ErrorBoundary } from '@/Components/common/ui/ErrorBoundary';
+import ThemedToaster from '@/Components/common/ui/ThemedToaster';
+import { ThemeProvider } from '@/Contexts/ThemeContext';
+import { ErrorInterceptor } from '@/Services/ErrorInterceptor';
+import { PageProps } from '@/types';
+import { createInertiaApp } from '@inertiajs/react';
+import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import { createRoot } from 'react-dom/client';
+import { lazy, Suspense } from 'react';
+import { ServiceWorkerUpdate } from './components/ServiceWorkerUpdate';
+import { AnimatedPage } from '@/Components/common/motion/AnimatedPage';
+import { InertiaProgressIndicator } from '@/Components/common/motion/InertiaProgressIndicator';
+import { FocusVisibleManager } from '@/Utils/FocusVisibleManager';
+import { FocusManager } from '@/Utils/FocusManager';
+import { ariaAnnouncer } from '@/Utils/ARIAAnnouncer';
+import { QueryProvider } from '@/providers/QueryProvider';
+import '../css/app.css';
+import './bootstrap';
+import './i18n';
 
 ErrorInterceptor.initialize();
 
@@ -27,17 +27,17 @@ FocusManager.initialize();
 // Initialize ARIA announcer for screen reader support
 ariaAnnouncer.initialize();
 
-const appName = import.meta.env.VITE_APP_NAME || "contentFlow";
+const appName = import.meta.env.VITE_APP_NAME || 'contentFlow';
 
 // Lazy load i18n
-const loadI18n = () => import("./i18n");
+const loadI18n = () => import('./i18n');
 
 createInertiaApp<PageProps>({
   title: (title) => `${title} - ${appName}`,
   resolve: (name) => {
-    const cleanName = name.startsWith("/") ? name.slice(1) : name;
+    const cleanName = name.startsWith('/') ? name.slice(1) : name;
     // Lazy loading agresivo por rutas
-    return resolvePageComponent(`./Pages/${cleanName}.tsx`, import.meta.glob("./Pages/**/*.tsx"));
+    return resolvePageComponent(`./Pages/${cleanName}.tsx`, import.meta.glob('./Pages/**/*.tsx'));
   },
 
   setup({ el, App, props }) {
@@ -57,7 +57,7 @@ createInertiaApp<PageProps>({
         <QueryProvider>
           <ThemeProvider
             isAuthenticated={!!user}
-            initialTheme={user?.theme as "light" | "dark" | undefined}
+            initialTheme={user?.theme as 'light' | 'dark' | undefined}
             workspaceId={user?.current_workspace_id}
           >
             <Suspense

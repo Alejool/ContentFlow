@@ -1,30 +1,30 @@
-import ConfirmDialog from "@/Components/common/ui/ConfirmDialog";
-import React, { useState } from "react";
+import ConfirmDialog from '@/Components/common/ui/ConfirmDialog';
+import React, { useState } from 'react';
 
 interface ConfirmOptions {
   title: string;
   message: string;
   confirmText?: string;
   cancelText?: string;
-  type?: "danger" | "warning" | "info";
+  type?: 'danger' | 'warning' | 'info';
 }
 
 export function useConfirm() {
   const [isOpen, setIsOpen] = useState(false);
   const [options, setOptions] = useState<ConfirmOptions>({
-    title: "",
-    message: "",
-    confirmText: "Confirm",
-    cancelText: "Cancel",
-    type: "danger",
+    title: '',
+    message: '',
+    confirmText: 'Confirm',
+    cancelText: 'Cancel',
+    type: 'danger',
   });
   const [resolvePromise, setResolvePromise] = useState<((value: boolean) => void) | null>(null);
 
   const confirm = (opts: ConfirmOptions): Promise<boolean> => {
     setOptions({
-      confirmText: "Confirm",
-      cancelText: "Cancel",
-      type: "danger",
+      confirmText: 'Confirm',
+      cancelText: 'Cancel',
+      type: 'danger',
       ...opts,
     });
     setIsOpen(true);

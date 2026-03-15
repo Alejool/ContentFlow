@@ -1,7 +1,7 @@
-import { TFunction } from "i18next";
-import MediaUploadSection from "@/Components/Content/Publication/common/edit/MediaUploadSection";
-import MediaUploadSkeleton from "@/Components/Content/Publication/common/edit/MediaUploadSkeleton";
-import { SectionHeader } from "../common/SectionHeader";
+import { TFunction } from 'i18next';
+import MediaUploadSection from '@/Components/Content/Publication/common/edit/MediaUploadSection';
+import MediaUploadSkeleton from '@/Components/Content/Publication/common/edit/MediaUploadSkeleton';
+import { SectionHeader } from '../common/SectionHeader';
 
 interface MediaSectionProps {
   t: TFunction;
@@ -54,7 +54,7 @@ export const MediaSection = ({
 }: MediaSectionProps) => {
   return (
     <div className="space-y-4">
-      <SectionHeader title={t("publications.modal.edit.mediaSection") || "Archivos Multimedia"} />
+      <SectionHeader title={t('publications.modal.edit.mediaSection') || 'Archivos Multimedia'} />
 
       {!isDataReady ? (
         <MediaUploadSkeleton />

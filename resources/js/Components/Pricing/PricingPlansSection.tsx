@@ -1,11 +1,11 @@
-import PlanGrid from "@/Components/Pricing/PlanGrid";
-import { DynamicModal } from "@/Components/common/Modern/DynamicModal";
-import { Badge } from "@/Components/ui/badge";
-import { usePricing } from "@/Hooks/usePricing";
-import { cn } from "@/lib/utils";
-import { AlertTriangle, CheckCircle, Info, RefreshCw, Sparkles, XCircle, Zap } from "lucide-react";
-import React from "react";
-import { useTranslation } from "react-i18next";
+import PlanGrid from '@/Components/Pricing/PlanGrid';
+import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
+import { Badge } from '@/Components/ui/badge';
+import { usePricing } from '@/Hooks/usePricing';
+import { cn } from '@/lib/utils';
+import { AlertTriangle, CheckCircle, Info, RefreshCw, Sparkles, XCircle, Zap } from 'lucide-react';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface Plan {
   id: string;
@@ -31,7 +31,7 @@ interface PricingPlansSectionProps {
   isAuthenticated?: boolean;
   showBillingToggle?: boolean;
   showHeader?: boolean;
-  variant?: "default" | "compact";
+  variant?: 'default' | 'compact';
   onPlanSelected?: (planId: string) => void;
   isOwner?: boolean;
   hasActiveSubscription?: boolean;
@@ -50,27 +50,27 @@ interface PricingPlansSectionProps {
 const MODAL_META = {
   error: {
     icon: XCircle,
-    iconClass: "text-red-500",
-    bgClass: "bg-red-100 dark:bg-red-900/30",
-    actionClass: "bg-red-600 hover:bg-red-700 text-white",
+    iconClass: 'text-red-500',
+    bgClass: 'bg-red-100 dark:bg-red-900/30',
+    actionClass: 'bg-red-600 hover:bg-red-700 text-white',
   },
   warning: {
     icon: AlertTriangle,
-    iconClass: "text-amber-500",
-    bgClass: "bg-amber-100 dark:bg-amber-900/30",
-    actionClass: "bg-amber-500 hover:bg-amber-600 text-white",
+    iconClass: 'text-amber-500',
+    bgClass: 'bg-amber-100 dark:bg-amber-900/30',
+    actionClass: 'bg-amber-500 hover:bg-amber-600 text-white',
   },
   info: {
     icon: Info,
-    iconClass: "text-blue-500",
-    bgClass: "bg-blue-100 dark:bg-blue-900/30",
-    actionClass: "bg-blue-600 hover:bg-blue-700 text-white",
+    iconClass: 'text-blue-500',
+    bgClass: 'bg-blue-100 dark:bg-blue-900/30',
+    actionClass: 'bg-blue-600 hover:bg-blue-700 text-white',
   },
   confirm: {
     icon: Info,
-    iconClass: "text-primary-500",
-    bgClass: "bg-primary-100 dark:bg-primary-900/30",
-    actionClass: "bg-primary-600 hover:bg-primary-700 text-white",
+    iconClass: 'text-primary-500',
+    bgClass: 'bg-primary-100 dark:bg-primary-900/30',
+    actionClass: 'bg-primary-600 hover:bg-primary-700 text-white',
   },
 } as const;
 
@@ -85,7 +85,7 @@ export default function PricingPlansSection({
   isAuthenticated = false,
   showBillingToggle = true,
   showHeader = true,
-  variant = "default",
+  variant = 'default',
   onPlanSelected,
   isOwner = true,
   hasActiveSubscription: propHasActiveSubscription,
@@ -136,7 +136,7 @@ export default function PricingPlansSection({
   // CRITICAL: Determinar si tiene plan de pago activo
   // Esto bloquea Free/Demo cuando tienes Starter, Growth, Professional o Enterprise activo
   const hasPaidPlanActive = React.useMemo(() => {
-    const paidPlans = ["starter", "growth", "professional", "enterprise"];
+    const paidPlans = ['starter', 'growth', 'professional', 'enterprise'];
 
     // Verificar si el plan actual es de pago
     const currentIsPaid = currentPlan && paidPlans.includes(currentPlan);
@@ -146,7 +146,7 @@ export default function PricingPlansSection({
 
     // Verificar si tiene suscripciones activas de pago
     const hasActivePaidSubscription = activeSubscriptions.some(
-      (sub) => paidPlans.includes(sub.plan) && sub.status === "active",
+      (sub) => paidPlans.includes(sub.plan) && sub.status === 'active',
     );
 
     return currentIsPaid || hasActivePaidPlan || hasActivePaidSubscription;
@@ -157,11 +157,11 @@ export default function PricingPlansSection({
 
   // Plans purchased + still active (not current) → can switch for free
   const switchablePlans = effectiveActivePlans.filter(
-    (id) => id !== currentPlan && ["starter", "growth", "professional", "enterprise"].includes(id),
+    (id) => id !== currentPlan && ['starter', 'growth', 'professional', 'enterprise'].includes(id),
   );
   // Plans purchased but now expired → need Stripe renewal
   const renewablePlans = expiredPlans.filter((id) =>
-    ["starter", "growth", "professional", "enterprise"].includes(id),
+    ['starter', 'growth', 'professional', 'enterprise'].includes(id),
   );
 
   const meta = MODAL_META[modal.type as keyof typeof MODAL_META] ?? MODAL_META.info;
@@ -174,15 +174,15 @@ export default function PricingPlansSection({
         <div className="text-center">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary-50 px-4 py-2 text-sm font-medium text-primary-600 dark:bg-primary-900/20 dark:text-primary-400">
             <Sparkles className="h-4 w-4" />
-            {t("pricing.flexiblePlans", "Planes flexibles para cada necesidad")}
+            {t('pricing.flexiblePlans', 'Planes flexibles para cada necesidad')}
           </div>
 
           <h1 className="mb-6 font-heading text-5xl font-bold text-gray-900 dark:text-white md:text-6xl">
-            {t("pricing.title")}
+            {t('pricing.title')}
           </h1>
 
           <p className="mx-auto mb-10 max-w-2xl text-xl text-gray-600 dark:text-gray-400">
-            {t("pricing.subtitle")}
+            {t('pricing.subtitle')}
           </p>
 
           {/* ── Active subscription banner ─────────────────────────────────── */}
@@ -197,7 +197,7 @@ export default function PricingPlansSection({
                   </div>
                   <div className="flex-1 text-left">
                     <h3 className="mb-2 text-lg font-bold text-blue-900 dark:text-blue-100">
-                      {t("pricing.activeSubscription.title", "Ya tienes una suscripción activa")}
+                      {t('pricing.activeSubscription.title', 'Ya tienes una suscripción activa')}
                     </h3>
                     <div className="mb-3 space-y-2">
                       {activeSubscriptions.length > 0 ? (
@@ -208,30 +208,30 @@ export default function PricingPlansSection({
                           >
                             <div>
                               <p className="font-semibold text-blue-900 dark:text-blue-100">
-                                {t("pricing.currentPlanLabel")}: {sub.name}
+                                {t('pricing.currentPlanLabel')}: {sub.name}
                               </p>
                               <p className="text-xs text-blue-700 dark:text-blue-300">
                                 {sub.cancel_at_period_end
-                                  ? t("pricing.endsOn", {
+                                  ? t('pricing.endsOn', {
                                       date: new Date(sub.ends_at).toLocaleDateString(),
                                     })
-                                  : t("pricing.autoRenewal")}
+                                  : t('pricing.autoRenewal')}
                               </p>
                             </div>
                             <Badge
                               className={cn(
-                                sub.status === "active"
-                                  ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                                  : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+                                sub.status === 'active'
+                                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                  : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
                               )}
                             >
-                              {sub.status === "active" ? t("pricing.statusActive") : sub.status}
+                              {sub.status === 'active' ? t('pricing.statusActive') : sub.status}
                             </Badge>
                           </div>
                         ))
                       ) : (
                         <p className="text-sm text-blue-800 dark:text-blue-200">
-                          <span className="font-bold">{t("pricing.currentPlanLabel")}: </span>
+                          <span className="font-bold">{t('pricing.currentPlanLabel')}: </span>
                           <span className="font-bold capitalize text-blue-600 dark:text-blue-400">
                             {currentPlan}
                           </span>
@@ -241,17 +241,17 @@ export default function PricingPlansSection({
                     <div className="mb-4 rounded-lg border border-blue-200 bg-blue-100 p-4 dark:border-blue-800 dark:bg-blue-900/40">
                       <p className="text-sm leading-relaxed text-blue-900 dark:text-blue-100">
                         {t(
-                          "pricing.activeSubscription.prorationExplanation",
-                          "Puedes cambiar a cualquier plan disponible. El cambio se aplicará inmediatamente y la facturación se ajustará automáticamente de forma prorrateada según el tiempo restante de tu suscripción.",
+                          'pricing.activeSubscription.prorationExplanation',
+                          'Puedes cambiar a cualquier plan disponible. El cambio se aplicará inmediatamente y la facturación se ajustará automáticamente de forma prorrateada según el tiempo restante de tu suscripción.',
                         )}
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-3">
                       <a
-                        href={route("subscription.billing")}
+                        href={route('subscription.billing')}
                         className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700"
                       >
-                        {t("pricing.activeSubscription.manageBilling", "Gestionar Facturación")}
+                        {t('pricing.activeSubscription.manageBilling', 'Gestionar Facturación')}
                       </a>
                     </div>
                   </div>
@@ -264,15 +264,15 @@ export default function PricingPlansSection({
           {showBillingToggle && (
             <div className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white p-1.5 shadow-lg dark:border-neutral-700 dark:bg-neutral-800">
               <button
-                onClick={() => setBillingCycle("monthly")}
+                onClick={() => setBillingCycle('monthly')}
                 className={cn(
-                  "rounded-lg px-6 py-2.5 font-medium transition-all duration-200",
-                  billingCycle === "monthly"
-                    ? "bg-primary-600 text-white shadow-sm"
-                    : "text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white",
+                  'rounded-lg px-6 py-2.5 font-medium transition-all duration-200',
+                  billingCycle === 'monthly'
+                    ? 'bg-primary-600 text-white shadow-sm'
+                    : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white',
                 )}
               >
-                {t("pricing.monthly")}
+                {t('pricing.monthly')}
               </button>
             </div>
           )}
@@ -286,12 +286,12 @@ export default function PricingPlansSection({
                   <Zap className="h-5 w-5 flex-shrink-0 text-white" />
                   <div className="flex-1">
                     <p className="text-xs font-semibold uppercase tracking-wider text-primary-200">
-                      {t("pricing.activePlanNow")}
+                      {t('pricing.activePlanNow')}
                     </p>
                     <p className="text-lg font-bold capitalize leading-tight text-white">
                       {getPlanName(currentPlan, plans)}
                       <span className="ml-2 text-sm font-normal text-primary-200">
-                        ${getPlanPrice(currentPlan, plans)}/{t("pricing.billing.month")}
+                        ${getPlanPrice(currentPlan, plans)}/{t('pricing.billing.month')}
                       </span>
                     </p>
                   </div>
@@ -302,7 +302,7 @@ export default function PricingPlansSection({
                 {switchablePlans.length > 0 && (
                   <div className="border-t border-neutral-100 px-5 py-4 dark:border-neutral-800">
                     <p className="mb-3 text-xs font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
-                      {t("pricing.purchasedPlansAvailable", "Planes comprados — cambiar sin pago")}
+                      {t('pricing.purchasedPlansAvailable', 'Planes comprados — cambiar sin pago')}
                     </p>
                     <div className="flex flex-col gap-2">
                       {switchablePlans.map((id) => (
@@ -317,8 +317,8 @@ export default function PricingPlansSection({
                                 {getPlanName(id, plans)}
                               </p>
                               <p className="text-xs text-green-600 dark:text-green-500">
-                                {t("pricing.timeAvailable", "Tiempo disponible")} · $
-                                {getPlanPrice(id, plans)}/{t("pricing.billing.month")}
+                                {t('pricing.timeAvailable', 'Tiempo disponible')} · $
+                                {getPlanPrice(id, plans)}/{t('pricing.billing.month')}
                               </p>
                             </div>
                           </div>
@@ -327,7 +327,7 @@ export default function PricingPlansSection({
                             disabled={!!isLoading}
                             className="flex-shrink-0 rounded-lg bg-green-600 px-4 py-1.5 text-xs font-bold text-white transition-colors hover:bg-green-700 disabled:opacity-50"
                           >
-                            {isLoading === id ? t("pricing.changing") : t("pricing.use")}
+                            {isLoading === id ? t('pricing.changing') : t('pricing.use')}
                           </button>
                         </div>
                       ))}
@@ -339,7 +339,7 @@ export default function PricingPlansSection({
                 {renewablePlans.length > 0 && (
                   <div className="border-t border-neutral-100 px-5 py-4 dark:border-neutral-800">
                     <p className="mb-3 text-xs font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
-                      {t("pricing.expiredPlans")}
+                      {t('pricing.expiredPlans')}
                     </p>
                     <div className="flex flex-col gap-2">
                       {renewablePlans.map((id) => (
@@ -354,8 +354,8 @@ export default function PricingPlansSection({
                                 {getPlanName(id, plans)}
                               </p>
                               <p className="text-xs text-amber-600 dark:text-amber-500">
-                                {t("pricing.expired")} · ${getPlanPrice(id, plans)}/
-                                {t("pricing.billing.month")}
+                                {t('pricing.expired')} · ${getPlanPrice(id, plans)}/
+                                {t('pricing.billing.month')}
                               </p>
                             </div>
                           </div>
@@ -364,7 +364,7 @@ export default function PricingPlansSection({
                             disabled={!!isLoading}
                             className="flex-shrink-0 rounded-lg bg-amber-500 px-4 py-1.5 text-xs font-bold text-white transition-colors hover:bg-amber-600 disabled:opacity-50"
                           >
-                            {isLoading === id ? "..." : t("pricing.renew")}
+                            {isLoading === id ? '...' : t('pricing.renew')}
                           </button>
                         </div>
                       ))}
@@ -398,9 +398,9 @@ export default function PricingPlansSection({
       <DynamicModal isOpen={modal.open} onClose={closeModal} title={modal.title} size="md">
         <div className="flex flex-col items-center gap-4 text-center">
           <div
-            className={cn("flex h-14 w-14 items-center justify-center rounded-full", meta.bgClass)}
+            className={cn('flex h-14 w-14 items-center justify-center rounded-full', meta.bgClass)}
           >
-            <ModalIcon className={cn("h-7 w-7", meta.iconClass)} />
+            <ModalIcon className={cn('h-7 w-7', meta.iconClass)} />
           </div>
           <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">
             {modal.message}
@@ -413,7 +413,7 @@ export default function PricingPlansSection({
                   modal.onAction?.();
                 }}
                 className={cn(
-                  "flex-1 rounded-lg px-4 py-2.5 text-sm font-semibold shadow-sm transition-colors",
+                  'flex-1 rounded-lg px-4 py-2.5 text-sm font-semibold shadow-sm transition-colors',
                   meta.actionClass,
                 )}
               >
@@ -423,13 +423,13 @@ export default function PricingPlansSection({
             <button
               onClick={closeModal}
               className={cn(
-                "rounded-lg border px-4 py-2.5 text-sm font-semibold transition-colors",
-                "bg-white text-gray-700 dark:bg-neutral-800 dark:text-gray-200",
-                "border-gray-200 hover:bg-gray-50 dark:border-neutral-700 dark:hover:bg-neutral-700",
-                !modal.actionLabel && "flex-1",
+                'rounded-lg border px-4 py-2.5 text-sm font-semibold transition-colors',
+                'bg-white text-gray-700 dark:bg-neutral-800 dark:text-gray-200',
+                'border-gray-200 hover:bg-gray-50 dark:border-neutral-700 dark:hover:bg-neutral-700',
+                !modal.actionLabel && 'flex-1',
               )}
             >
-              {modal.closeLabel ?? t("pricing.close")}
+              {modal.closeLabel ?? t('pricing.close')}
             </button>
           </div>
         </div>

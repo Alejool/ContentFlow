@@ -1,7 +1,7 @@
-import Loader from "@/Components/common/Loader";
-import SearchableSelector from "@/Components/common/Modern/SearchableSelector";
-import { Check } from "lucide-react";
-import React from "react";
+import Loader from '@/Components/common/Loader';
+import SearchableSelector from '@/Components/common/Modern/SearchableSelector';
+import { Check } from 'lucide-react';
+import React from 'react';
 
 interface PublicationSelectorProps {
   publications: any[];
@@ -10,7 +10,7 @@ interface PublicationSelectorProps {
   t: (key: string) => string;
   getThumbnail: (pub: any) => { url: string | null; type: string } | null;
   onTogglePublication: (id: number) => void;
-  mode?: "add" | "edit";
+  mode?: 'add' | 'edit';
   disabled?: boolean;
   maxHeight?: string;
 }
@@ -22,7 +22,7 @@ const PublicationSelector: React.FC<PublicationSelectorProps> = ({
   t,
   getThumbnail,
   onTogglePublication,
-  mode = "add",
+  mode = 'add',
   disabled = false,
   maxHeight,
 }) => {
@@ -30,7 +30,7 @@ const PublicationSelector: React.FC<PublicationSelectorProps> = ({
     return (
       <div className="py-4 text-center text-sm text-gray-500">
         <Loader />
-        {t("campaigns.modal.add.loadingPublications")}
+        {t('campaigns.modal.add.loadingPublications')}
       </div>
     );
   }
@@ -38,9 +38,9 @@ const PublicationSelector: React.FC<PublicationSelectorProps> = ({
   if (publications.length === 0) {
     return (
       <div className="py-4 text-center text-sm text-gray-500">
-        {mode === "edit"
-          ? t("campaigns.modal.edit.noPublications")
-          : t("campaigns.modal.add.noPublications")}
+        {mode === 'edit'
+          ? t('campaigns.modal.edit.noPublications')
+          : t('campaigns.modal.add.noPublications')}
       </div>
     );
   }
@@ -52,15 +52,15 @@ const PublicationSelector: React.FC<PublicationSelectorProps> = ({
       onToggle={onTogglePublication}
       loading={loading}
       mode="multiple"
-      searchPlaceholder={t("common.search") || "Search publications..."}
+      searchPlaceholder={t('common.search') || 'Search publications...'}
       emptyMessage={
-        mode === "edit"
-          ? t("campaigns.modal.edit.noPublications")
-          : t("campaigns.modal.add.noPublications")
+        mode === 'edit'
+          ? t('campaigns.modal.edit.noPublications')
+          : t('campaigns.modal.add.noPublications')
       }
-      noResultsMessage={t("common.noResults") || "No publications found"}
+      noResultsMessage={t('common.noResults') || 'No publications found'}
       getItemId={(pub) => pub.id}
-      getSearchableText={(pub) => pub.title || pub.name || ""}
+      getSearchableText={(pub) => pub.title || pub.name || ''}
       disabled={disabled}
       maxHeight={maxHeight}
       renderItem={(pub, isSelected) => {
@@ -69,11 +69,11 @@ const PublicationSelector: React.FC<PublicationSelectorProps> = ({
         return (
           <div
             className={`flex cursor-pointer items-center gap-3 rounded border p-2 transition-all ${
-              disabled ? "cursor-default opacity-60" : ""
+              disabled ? 'cursor-default opacity-60' : ''
             } ${
               isSelected
-                ? "border-primary-500 bg-primary-50 shadow-sm dark:bg-primary-900/20"
-                : "border-gray-200 bg-white hover:border-primary-300 hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:bg-neutral-700/50"
+                ? 'border-primary-500 bg-primary-50 shadow-sm dark:bg-primary-900/20'
+                : 'border-gray-200 bg-white hover:border-primary-300 hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:bg-neutral-700/50'
             }`}
           >
             <Checkbox isSelected={isSelected} disabled={disabled} />
@@ -82,7 +82,7 @@ const PublicationSelector: React.FC<PublicationSelectorProps> = ({
 
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">
-                {pub.title || pub.name || "Untitled"}
+                {pub.title || pub.name || 'Untitled'}
               </p>
             </div>
           </div>
@@ -99,10 +99,10 @@ const Checkbox: React.FC<{ isSelected: boolean; disabled?: boolean }> = ({
   <div
     className={`flex h-4 w-4 items-center justify-center rounded border transition-colors ${
       isSelected
-        ? "border-primary-500 bg-primary-500"
+        ? 'border-primary-500 bg-primary-500'
         : disabled
-          ? "border-gray-300 bg-gray-50"
-          : "border-gray-400"
+          ? 'border-gray-300 bg-gray-50'
+          : 'border-gray-400'
     }`}
   >
     {isSelected && <Check className="h-3 w-3 stroke-[3] text-white" />}
@@ -114,11 +114,11 @@ const PublicationThumbnail: React.FC<{
 }> = ({ thumbnail }) => {
   if (!thumbnail) return null;
 
-  if (thumbnail.type === "image" && thumbnail.url) {
+  if (thumbnail.type === 'image' && thumbnail.url) {
     return <img src={thumbnail.url} className="h-8 w-8 rounded object-cover" alt="Thumbnail" />;
   }
 
-  if (thumbnail.type === "video") {
+  if (thumbnail.type === 'video') {
     return (
       <div className="flex h-8 w-8 items-center justify-center rounded bg-gradient-to-br from-primary-500 to-primary-700">
         <svg className="h-4 w-4 text-white" fill="currentColor" viewBox="0 0 20 20">

@@ -1,11 +1,11 @@
-import { useEffect, useRef } from "react";
-import { UseFormSetValue } from "react-hook-form";
+import { useEffect, useRef } from 'react';
+import { UseFormSetValue } from 'react-hook-form';
 import {
   getTemplateFromSession,
   clearTemplateFromSession,
   applyTemplateToForm,
-} from "@/Utils/templateUtils";
-import type { PublicationFormData } from "@/schemas/publication";
+} from '@/Utils/templateUtils';
+import type { PublicationFormData } from '@/schemas/publication';
 
 /**
  * Hook that automatically applies a template from session storage

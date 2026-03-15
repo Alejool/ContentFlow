@@ -1,12 +1,12 @@
-import Button from "@/Components/common/Modern/Button";
-import Textarea from "@/Components/common/Modern/Textarea";
-import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { AlertCircle, X } from "lucide-react";
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import Button from '@/Components/common/Modern/Button';
+import Textarea from '@/Components/common/Modern/Textarea';
+import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
+import { AlertCircle, X } from 'lucide-react';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
 interface RejectionReasonModalProps {
   isOpen: boolean;
@@ -30,8 +30,8 @@ export default function RejectionReasonModal({
   const rejectionSchema = z.object({
     reason: z
       .string()
-      .min(10, t("approvals.validation.reasonMin") || "La razón debe tener al menos 10 caracteres")
-      .max(500, t("approvals.validation.reasonMax") || "La razón no puede exceder 500 caracteres"),
+      .min(10, t('approvals.validation.reasonMin') || 'La razón debe tener al menos 10 caracteres')
+      .max(500, t('approvals.validation.reasonMax') || 'La razón no puede exceder 500 caracteres'),
   });
 
   const {
@@ -43,11 +43,11 @@ export default function RejectionReasonModal({
   } = useForm<RejectionForm>({
     resolver: zodResolver(rejectionSchema),
     defaultValues: {
-      reason: "",
+      reason: '',
     },
   });
 
-  const reason = watch("reason", "");
+  const reason = watch('reason', '');
 
   const onFormSubmit = (data: RejectionForm) => {
     onSubmit(data.reason);
@@ -75,7 +75,7 @@ export default function RejectionReasonModal({
           <div className="flex items-center justify-between border-b border-gray-100 p-6 dark:border-neutral-700/50">
             <DialogTitle className="flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-white">
               <AlertCircle className="h-6 w-6 text-red-500" />
-              {t("approvals.rejectPublication") || "Rechazar Publicación"}
+              {t('approvals.rejectPublication') || 'Rechazar Publicación'}
             </DialogTitle>
             <button
               onClick={handleClose}
@@ -88,14 +88,14 @@ export default function RejectionReasonModal({
           <form onSubmit={handleSubmit(onFormSubmit)}>
             <div className="p-6">
               <p className="mb-6 text-sm leading-relaxed text-gray-600 dark:text-gray-400">
-                {t("approvals.rejectionReasonDescription") ||
-                  "Proporciona una razón detallada para el rechazo de"}{" "}
+                {t('approvals.rejectionReasonDescription') ||
+                  'Proporciona una razón detallada para el rechazo de'}{' '}
                 <span className="font-bold text-gray-900 dark:text-white">
                   "{publicationTitle}"
                 </span>
-                {". "}
+                {'. '}
                 <span className="font-medium text-red-500 dark:text-red-400">
-                  {t("common.required") || "Requerido"}
+                  {t('common.required') || 'Requerido'}
                 </span>
               </p>
 
@@ -103,11 +103,11 @@ export default function RejectionReasonModal({
                 <Textarea
                   id="reason"
                   name="reason"
-                  label={t("approvals.rejectionReason") || "Razón del Rechazo"}
+                  label={t('approvals.rejectionReason') || 'Razón del Rechazo'}
                   register={register}
                   placeholder={
-                    t("approvals.rejectionReasonPlaceholder") ||
-                    "Ej. El contenido necesita ajustes en el tono, revisa las imágenes y vuelve a enviar para aprobación..."
+                    t('approvals.rejectionReasonPlaceholder') ||
+                    'Ej. El contenido necesita ajustes en el tono, revisa las imágenes y vuelve a enviar para aprobación...'
                   }
                   maxLength={500}
                   showCharCount
@@ -127,7 +127,7 @@ export default function RejectionReasonModal({
                 className="px-6"
                 rounded="lg"
               >
-                {t("common.cancel")}
+                {t('common.cancel')}
               </Button>
               <Button
                 type="submit"
@@ -138,7 +138,7 @@ export default function RejectionReasonModal({
                 icon={AlertCircle}
                 rounded="lg"
               >
-                {t("approvals.reject") || "Rechazar"}
+                {t('approvals.reject') || 'Rechazar'}
               </Button>
             </div>
           </form>

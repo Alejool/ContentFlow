@@ -1,11 +1,11 @@
-import { useTheme } from "@/Hooks/useTheme";
+import { useTheme } from '@/Hooks/useTheme';
 
 interface StatCardProps {
   icon: any;
   label: string;
   value: string | number;
   trend?: number;
-  color?: "blue" | "purple" | "green" | "orange" | "primary";
+  color?: 'blue' | 'purple' | 'green' | 'orange' | 'primary';
 }
 
 export default function StatCard({
@@ -13,46 +13,46 @@ export default function StatCard({
   label,
   value,
   trend,
-  color = "blue",
+  color = 'blue',
 }: StatCardProps) {
   const { actualTheme } = useTheme();
-  const isDark = actualTheme === "dark";
+  const isDark = actualTheme === 'dark';
 
   const colorMap = {
     blue: {
-      gradient: isDark ? "from-blue-600 to-blue-800" : "from-blue-500 to-blue-600",
-      iconBg: isDark ? "bg-blue-500/20" : "bg-blue-50",
-      border: isDark ? "border-blue-700/50" : "border-blue-200",
-      text: isDark ? "text-blue-300" : "text-blue-600",
-      glow: "from-blue-600/20",
+      gradient: isDark ? 'from-blue-600 to-blue-800' : 'from-blue-500 to-blue-600',
+      iconBg: isDark ? 'bg-blue-500/20' : 'bg-blue-50',
+      border: isDark ? 'border-blue-700/50' : 'border-blue-200',
+      text: isDark ? 'text-blue-300' : 'text-blue-600',
+      glow: 'from-blue-600/20',
     },
     purple: {
-      gradient: isDark ? "from-purple-600 to-purple-800" : "from-purple-500 to-purple-600",
-      iconBg: isDark ? "bg-purple-500/20" : "bg-purple-50",
-      border: isDark ? "border-purple-700/50" : "border-purple-200",
-      text: isDark ? "text-purple-300" : "text-purple-600",
-      glow: "from-purple-600/20",
+      gradient: isDark ? 'from-purple-600 to-purple-800' : 'from-purple-500 to-purple-600',
+      iconBg: isDark ? 'bg-purple-500/20' : 'bg-purple-50',
+      border: isDark ? 'border-purple-700/50' : 'border-purple-200',
+      text: isDark ? 'text-purple-300' : 'text-purple-600',
+      glow: 'from-purple-600/20',
     },
     green: {
-      gradient: isDark ? "from-emerald-600 to-emerald-800" : "from-emerald-500 to-emerald-600",
-      iconBg: isDark ? "bg-emerald-500/20" : "bg-emerald-50",
-      border: isDark ? "border-emerald-700/50" : "border-emerald-200",
-      text: isDark ? "text-emerald-300" : "text-emerald-600",
-      glow: "from-emerald-600/20",
+      gradient: isDark ? 'from-emerald-600 to-emerald-800' : 'from-emerald-500 to-emerald-600',
+      iconBg: isDark ? 'bg-emerald-500/20' : 'bg-emerald-50',
+      border: isDark ? 'border-emerald-700/50' : 'border-emerald-200',
+      text: isDark ? 'text-emerald-300' : 'text-emerald-600',
+      glow: 'from-emerald-600/20',
     },
     orange: {
-      gradient: isDark ? "from-orange-600 to-orange-800" : "from-orange-500 to-orange-600",
-      iconBg: isDark ? "bg-orange-500/20" : "bg-orange-50",
-      border: isDark ? "border-orange-700/50" : "border-orange-200",
-      text: isDark ? "text-orange-300" : "text-orange-600",
-      glow: "from-orange-600/20",
+      gradient: isDark ? 'from-orange-600 to-orange-800' : 'from-orange-500 to-orange-600',
+      iconBg: isDark ? 'bg-orange-500/20' : 'bg-orange-50',
+      border: isDark ? 'border-orange-700/50' : 'border-orange-200',
+      text: isDark ? 'text-orange-300' : 'text-orange-600',
+      glow: 'from-orange-600/20',
     },
     primary: {
-      gradient: isDark ? "from-primary-600 to-primary-800" : "from-primary-500 to-primary-600",
-      iconBg: isDark ? "bg-primary-500/20" : "bg-primary-50",
-      border: isDark ? "border-primary-700/50" : "border-primary-200",
-      text: isDark ? "text-primary-300" : "text-primary-600",
-      glow: "from-primary-600/20",
+      gradient: isDark ? 'from-primary-600 to-primary-800' : 'from-primary-500 to-primary-600',
+      iconBg: isDark ? 'bg-primary-500/20' : 'bg-primary-50',
+      border: isDark ? 'border-primary-700/50' : 'border-primary-200',
+      text: isDark ? 'text-primary-300' : 'text-primary-600',
+      glow: 'from-primary-600/20',
     },
   };
 

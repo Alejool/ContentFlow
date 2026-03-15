@@ -1,7 +1,7 @@
-import { TFunction } from "i18next";
-import { i18n } from "i18next";
-import ScheduleSection from "@/Components/Content/modals/common/ScheduleSection";
-import { SectionHeader } from "../common/SectionHeader";
+import { TFunction } from 'i18next';
+import { i18n } from 'i18next';
+import ScheduleSection from '@/Components/Content/modals/common/ScheduleSection';
+import { SectionHeader } from '../common/SectionHeader';
 
 interface SchedulingFormSectionProps {
   t: TFunction;
@@ -63,9 +63,9 @@ export const SchedulingFormSection = ({
 }: SchedulingFormSectionProps) => {
   return (
     <div
-      className={`space-y-4 transition-opacity duration-200 ${!allowConfiguration || isContentSectionDisabled ? "pointer-events-none opacity-50 grayscale-[0.5]" : ""}`}
+      className={`space-y-4 transition-opacity duration-200 ${!allowConfiguration || isContentSectionDisabled ? 'pointer-events-none opacity-50 grayscale-[0.5]' : ''}`}
     >
-      <SectionHeader title={t("publications.modal.edit.scheduleSection") || "Programación"} />
+      <SectionHeader title={t('publications.modal.edit.scheduleSection') || 'Programación'} />
 
       <ScheduleSection
         scheduledAt={scheduledAt}

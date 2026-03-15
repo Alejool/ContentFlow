@@ -1,8 +1,8 @@
-import { useEffect } from "react";
-import { useCalendarStore } from "@/stores/calendarStore";
-import { useCalendarEvents } from "@/hooks/useCalendarEvents";
-import ModernCalendar from "./ModernCalendar";
-import { CalendarSkeleton, LoadingOverlay } from "./CalendarSkeleton";
+import { useEffect } from 'react';
+import { useCalendarStore } from '@/stores/calendarStore';
+import { useCalendarEvents } from '@/hooks/useCalendarEvents';
+import ModernCalendar from './ModernCalendar';
+import { CalendarSkeleton, LoadingOverlay } from './CalendarSkeleton';
 
 interface CalendarWithCacheProps {
   onEventClick: (event: any) => void;
@@ -43,7 +43,7 @@ export function CalendarWithCache({ onEventClick }: CalendarWithCacheProps) {
     setLoading(isLoading);
 
     if (isError && error) {
-      setError(error instanceof Error ? error.message : "Failed to fetch calendar events");
+      setError(error instanceof Error ? error.message : 'Failed to fetch calendar events');
     } else {
       setError(null);
     }

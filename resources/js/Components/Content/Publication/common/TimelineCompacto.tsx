@@ -1,6 +1,6 @@
-import PublicationTimeline from "@/Components/Content/Publication/common/edit/PublicationTimeline";
-import { ChevronDown, ChevronUp, History } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import PublicationTimeline from '@/Components/Content/Publication/common/edit/PublicationTimeline';
+import { ChevronDown, ChevronUp, History } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface TimelineCompactoProps {
   activities: any[];
@@ -20,7 +20,7 @@ const TimelineCompacto = ({ activities, isExpanded, onToggle }: TimelineCompacto
     const relevantActivities = sortedActivities.filter(
       (activity) =>
         activity.status &&
-        ["published", "scheduled", "draft", "rejected", "approved"].includes(activity.status),
+        ['published', 'scheduled', 'draft', 'rejected', 'approved'].includes(activity.status),
     );
 
     return relevantActivities[0] || sortedActivities[0];
@@ -31,24 +31,24 @@ const TimelineCompacto = ({ activities, isExpanded, onToggle }: TimelineCompacto
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      published: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-      scheduled: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-      draft: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300",
-      rejected: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-      approved: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
-      pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+      published: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+      scheduled: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+      draft: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
+      rejected: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+      approved: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
+      pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
     };
-    return colors[status] || "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
+    return colors[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
   };
 
   const getStatusText = (status: string) => {
     const texts: Record<string, string> = {
-      published: t("activity.timeline.status.published"),
-      scheduled: t("activity.timeline.status.scheduled"),
-      draft: t("activity.timeline.status.draft"),
-      rejected: t("activity.timeline.status.rejected"),
-      approved: t("activity.timeline.status.approved"),
-      pending: t("activity.timeline.status.pending"),
+      published: t('activity.timeline.status.published'),
+      scheduled: t('activity.timeline.status.scheduled'),
+      draft: t('activity.timeline.status.draft'),
+      rejected: t('activity.timeline.status.rejected'),
+      approved: t('activity.timeline.status.approved'),
+      pending: t('activity.timeline.status.pending'),
     };
     return texts[status] || status;
   };
@@ -69,7 +69,7 @@ const TimelineCompacto = ({ activities, isExpanded, onToggle }: TimelineCompacto
           <div className="text-left">
             <div className="flex items-center gap-2">
               <span className="font-medium text-gray-900 dark:text-white">
-                {t("activity.timeline.title")}
+                {t('activity.timeline.title')}
               </span>
               {lastActivity && (
                 <span
@@ -80,13 +80,13 @@ const TimelineCompacto = ({ activities, isExpanded, onToggle }: TimelineCompacto
               )}
             </div>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              {totalActivities + " " + t("activity.timeline.total")}
+              {totalActivities + ' ' + t('activity.timeline.total')}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-500 dark:text-gray-400">
-            {isExpanded ? t("common.collapse") : t("common.expand")}
+            {isExpanded ? t('common.collapse') : t('common.expand')}
           </span>
           {isExpanded ? (
             <ChevronUp className="h-5 w-5 text-gray-500 dark:text-gray-400" />

@@ -102,18 +102,18 @@ export default function ValidationPanel({
                   key={platform}
                   className={`flex items-start gap-3 rounded-lg border p-3 ${
                     result.compatible
-                      ? "border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20"
-                      : "border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20"
+                      ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20'
+                      : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20'
                   }`}
                 >
-                  <span className="mt-0.5 text-lg">{result.compatible ? "✅" : "❌"}</span>
+                  <span className="mt-0.5 text-lg">{result.compatible ? '✅' : '❌'}</span>
                   <div className="flex-1">
                     <div className="mb-1 flex items-center gap-2">
                       <span
                         className={`font-medium ${
                           result.compatible
-                            ? "text-green-800 dark:text-green-200"
-                            : "text-red-800 dark:text-red-200"
+                            ? 'text-green-800 dark:text-green-200'
+                            : 'text-red-800 dark:text-red-200'
                         }`}
                       >
                         {platform.charAt(0).toUpperCase() + platform.slice(1)}

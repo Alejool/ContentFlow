@@ -1,10 +1,10 @@
-import { CarouselDots, CarouselPagination } from "@/Components/common/CarouselPagination";
-import Button from "@/Components/common/Modern/Button";
-import { getPlatformConfig } from "@/Constants/socialPlatforms";
-import { MediaFile, Publication } from "@/types";
-import { formatDateTimeString } from "@/Utils/dateHelpers";
-import { Head, useForm } from "@inertiajs/react";
-import { AnimatePresence, motion } from "framer-motion";
+import { CarouselDots, CarouselPagination } from '@/Components/common/CarouselPagination';
+import Button from '@/Components/common/Modern/Button';
+import { getPlatformConfig } from '@/Constants/socialPlatforms';
+import { MediaFile, Publication } from '@/types';
+import { formatDateTimeString } from '@/Utils/dateHelpers';
+import { Head, useForm } from '@inertiajs/react';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   AlertCircle,
   Calendar,
@@ -14,9 +14,9 @@ import {
   MessageSquare,
   Share2,
   X,
-} from "lucide-react";
-import React, { useState } from "react";
-import toast from "react-hot-toast";
+} from 'lucide-react';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 
 interface Props {
   publication: Publication & { media_files: MediaFile[] };
@@ -29,7 +29,7 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
 
   const { post, processing, data, setData, errors } = useForm({
-    reason: "",
+    reason: '',
   });
 
   const mediaFiles = publication.media_files || [];
@@ -48,14 +48,14 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
   };
 
   const handleApprove = () => {
-    if (confirm("¿Estás seguro de que deseas aprobar este contenido?")) {
-      post(route("api.v1.portal.approve", { token }), {
+    if (confirm('¿Estás seguro de que deseas aprobar este contenido?')) {
+      post(route('api.v1.portal.approve', { token }), {
         onSuccess: () => {
           setIsSuccess(true);
-          toast.success("Contenido aprobado correctamente");
+          toast.success('Contenido aprobado correctamente');
         },
         onError: () => {
-          toast.error("Error al aprobar el contenido");
+          toast.error('Error al aprobar el contenido');
         },
       });
     }
@@ -64,17 +64,17 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
   const handleReject = (e: React.FormEvent) => {
     e.preventDefault();
     if (!data.reason) {
-      toast.error("Por favor, indica un motivo de rechazo");
+      toast.error('Por favor, indica un motivo de rechazo');
       return;
     }
 
-    post(route("api.v1.portal.reject", { token }), {
+    post(route('api.v1.portal.reject', { token }), {
       onSuccess: () => {
         setIsSuccess(true);
-        toast.success("Contenido rechazado correctamente");
+        toast.success('Contenido rechazado correctamente');
       },
       onError: () => {
-        toast.error("Error al rechazar el contenido");
+        toast.error('Error al rechazar el contenido');
       },
     });
   };
@@ -83,7 +83,7 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
   const getTargetPlatforms = () => {
     if (
       !publication.platform_settings ||
-      typeof publication.platform_settings !== "object" ||
+      typeof publication.platform_settings !== 'object' ||
       Array.isArray(publication.platform_settings)
     ) {
       return [];
@@ -105,7 +105,7 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
             ¡Acción Completada!
           </h1>
           <p className="mb-6 text-gray-500 dark:text-zinc-400">
-            Tu respuesta ha sido registrada correctamente para{" "}
+            Tu respuesta ha sido registrada correctamente para{' '}
             <strong>{publication.workspace?.name}</strong>. Ya puedes cerrar esta ventana.
           </p>
           <p className="text-sm text-gray-400 dark:text-zinc-500">Gracias por usar ContentFlow.</p>
@@ -152,8 +152,8 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
           <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-500" />
           <div className="text-sm text-blue-800 dark:text-blue-300">
             <p className="mb-0.5 font-bold">Revisión de Contenido</p>
-            Has recibido este enlace para revisar y aprobar el contenido preparado por{" "}
-            <strong>{publication.user?.name || "tu gestor"}</strong> para el workspace{" "}
+            Has recibido este enlace para revisar y aprobar el contenido preparado por{' '}
+            <strong>{publication.user?.name || 'tu gestor'}</strong> para el workspace{' '}
             <strong>{publication.workspace?.name}</strong>.
           </div>
         </div>
@@ -167,8 +167,8 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
                 <span className="relative inline-flex h-3 w-3 rounded-full bg-orange-500"></span>
               </span>
               <span className="text-xs font-bold uppercase tracking-wider text-orange-600 dark:text-orange-400">
-                {publication.status === "pending_review"
-                  ? "Pendiente de tu revisión"
+                {publication.status === 'pending_review'
+                  ? 'Pendiente de tu revisión'
                   : publication.status}
               </span>
             </div>
@@ -217,11 +217,11 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
                       exit={{ opacity: 0, x: -100 }}
                       transition={{
                         duration: 0.3,
-                        ease: "easeInOut",
+                        ease: 'easeInOut',
                       }}
                       className="flex h-full w-full items-center justify-center"
                     >
-                      {mediaFiles[currentMediaIndex].file_type.startsWith("image/") ? (
+                      {mediaFiles[currentMediaIndex].file_type.startsWith('image/') ? (
                         <div className="relative max-h-[600px] max-w-full">
                           <img
                             src={mediaFiles[currentMediaIndex].file_path}
@@ -230,12 +230,12 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
                             className="max-h-[600px] max-w-full object-contain transition-all duration-500 group-hover:scale-[1.02]"
                             onError={(e) => {
                               const target = e.currentTarget;
-                              target.style.display = "none";
+                              target.style.display = 'none';
                               const parent = target.parentElement;
                               if (parent) {
-                                const fallback = document.createElement("div");
+                                const fallback = document.createElement('div');
                                 fallback.className =
-                                  "flex flex-col items-center gap-4 p-12 text-center text-neutral-400";
+                                  'flex flex-col items-center gap-4 p-12 text-center text-neutral-400';
                                 fallback.innerHTML = `
                                   <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -247,7 +247,7 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
                             }}
                           />
                         </div>
-                      ) : mediaFiles[currentMediaIndex].file_type.startsWith("video/") ? (
+                      ) : mediaFiles[currentMediaIndex].file_type.startsWith('video/') ? (
                         <video
                           src={mediaFiles[currentMediaIndex].file_path}
                           controls
@@ -327,7 +327,7 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
                   className="h-16 flex-[2] rounded-lg bg-green-600 text-lg font-bold text-white shadow-lg shadow-green-500/20 transition-all hover:bg-green-700 active:scale-95"
                   icon={<Check className="h-6 w-6" />}
                 >
-                  {processing ? <Loader2 className="animate-spin" /> : "Aprobar Contenido"}
+                  {processing ? <Loader2 className="animate-spin" /> : 'Aprobar Contenido'}
                 </Button>
                 <Button
                   onClick={() => setShowRejectReason(true)}
@@ -351,7 +351,7 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
                 </div>
                 <textarea
                   value={data.reason}
-                  onChange={(e) => setData("reason", e.target.value)}
+                  onChange={(e) => setData('reason', e.target.value)}
                   className="dark:bg-zinc-850 h-40 w-full rounded-lg border-gray-200 p-5 text-lg text-gray-700 shadow-inner transition-all focus:border-red-500 focus:ring-2 focus:ring-red-500 dark:border-zinc-700 dark:text-zinc-200"
                   placeholder="Por favor, describe detalladamente qué cambios te gustaría ver..."
                   required
@@ -365,7 +365,7 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
                     {processing ? (
                       <Loader2 className="animate-spin" />
                     ) : (
-                      "Enviar Comentarios de Rechazo"
+                      'Enviar Comentarios de Rechazo'
                     )}
                   </Button>
                   <Button
@@ -384,7 +384,7 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
 
         <footer className="mt-12 text-center">
           <p className="text-sm text-gray-400 dark:text-zinc-600">
-            Este es un enlace seguro generado por <strong>ContentFlow</strong> para{" "}
+            Este es un enlace seguro generado por <strong>ContentFlow</strong> para{' '}
             <strong>{publication.workspace?.name}</strong>.
           </p>
           <p className="mt-2 text-xs text-gray-300 dark:text-zinc-700">

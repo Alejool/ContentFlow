@@ -1,18 +1,18 @@
-import axios from "axios";
-import { create } from "zustand";
+import axios from 'axios';
+import { create } from 'zustand';
 
 export type NotificationTypeFilter =
-  | "all"
-  | "publications"
-  | "approvals"
-  | "campaigns"
-  | "account"
-  | "system";
+  | 'all'
+  | 'publications'
+  | 'approvals'
+  | 'campaigns'
+  | 'account'
+  | 'system';
 
 export interface NotificationData {
   id: string;
   type: string;
-  category: "application" | "system";
+  category: 'application' | 'system';
   data: {
     message?: string;
     description?: string;
@@ -29,19 +29,19 @@ export interface NotificationData {
 
 /** Derive a semantic type from the Laravel notification class name */
 export function getNotificationType(n: NotificationData): NotificationTypeFilter {
-  const cls = n.type ?? "";
-  const notifType = n.data?.notification_type ?? "";
+  const cls = n.type ?? '';
+  const notifType = n.data?.notification_type ?? '';
 
   if (notifType) return notifType as NotificationTypeFilter;
 
   if (/Approval|Awaiting|Approved|Rejected|Reassigned|MissingApprovers/i.test(cls))
-    return "approvals";
-  if (/Publication|Playlist|Reels|Video|Media/i.test(cls)) return "publications";
-  if (/Campaign/i.test(cls) || n.data?.campaign_id) return "campaigns";
-  if (/Social|Workspace|Role|TwoFactor|Verify/i.test(cls)) return "account";
-  if (/System|Trial|Usage|API|Error/i.test(cls)) return "system";
+    return 'approvals';
+  if (/Publication|Playlist|Reels|Video|Media/i.test(cls)) return 'publications';
+  if (/Campaign/i.test(cls) || n.data?.campaign_id) return 'campaigns';
+  if (/Social|Workspace|Role|TwoFactor|Verify/i.test(cls)) return 'account';
+  if (/System|Trial|Usage|API|Error/i.test(cls)) return 'system';
 
-  return n.data?.category === "system" ? "system" : "publications";
+  return n.data?.category === 'system' ? 'system' : 'publications';
 }
 
 interface NotificationState {
@@ -71,7 +71,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
   fetchNotifications: async () => {
     set({ isLoading: true });
     try {
-      const response = await axios.get("/api/v1/notifications");
+      const response = await axios.get('/api/v1/notifications');
       const notifications = response.data.notifications.sort(
         (a: NotificationData, b: NotificationData) => {
           // Sort by read status (unread first)
@@ -86,12 +86,12 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
       const unreadCount = response.data.unread_count;
 
       const applicationNotifications = notifications.filter(
-        (n: NotificationData) => n.category === "application" || n.data.category === "application",
+        (n: NotificationData) => n.category === 'application' || n.data.category === 'application',
       );
 
       const systemNotifications = notifications.filter(
         (n: NotificationData) =>
-          (n.category === "system" || !n.category) && n.data.category !== "application",
+          (n.category === 'system' || !n.category) && n.data.category !== 'application',
       );
 
       set({
@@ -121,10 +121,10 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
           notifications: updatedNotifications,
           unreadCount,
           applicationNotifications: updatedNotifications.filter(
-            (n) => n.category === "application" || n.data.category === "application",
+            (n) => n.category === 'application' || n.data.category === 'application',
           ),
           systemNotifications: updatedNotifications.filter(
-            (n) => (n.category === "system" || !n.category) && n.data.category !== "application",
+            (n) => (n.category === 'system' || !n.category) && n.data.category !== 'application',
           ),
         };
       });
@@ -133,7 +133,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
 
   markAllAsRead: async () => {
     try {
-      await axios.post("/api/v1/notifications/read-all");
+      await axios.post('/api/v1/notifications/read-all');
       set((state) => {
         const updatedNotifications = state.notifications.map((n) => ({
           ...n,
@@ -144,10 +144,10 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
           notifications: updatedNotifications,
           unreadCount: 0,
           applicationNotifications: updatedNotifications.filter(
-            (n) => n.category === "application" || n.data.category === "application",
+            (n) => n.category === 'application' || n.data.category === 'application',
           ),
           systemNotifications: updatedNotifications.filter(
-            (n) => (n.category === "system" || !n.category) && n.data.category !== "application",
+            (n) => (n.category === 'system' || !n.category) && n.data.category !== 'application',
           ),
         };
       });
@@ -170,10 +170,10 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
           notifications: updatedNotifications,
           unreadCount,
           applicationNotifications: updatedNotifications.filter(
-            (n) => n.category === "application" || n.data.category === "application",
+            (n) => n.category === 'application' || n.data.category === 'application',
           ),
           systemNotifications: updatedNotifications.filter(
-            (n) => (n.category === "system" || !n.category) && n.data.category !== "application",
+            (n) => (n.category === 'system' || !n.category) && n.data.category !== 'application',
           ),
         };
       });
@@ -188,13 +188,13 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
 
   filterByType: (type: NotificationTypeFilter, source?: NotificationData[]) => {
     const list = source ?? get().notifications;
-    if (type === "all") return list;
+    if (type === 'all') return list;
     return list.filter((n) => getNotificationType(n) === type);
   },
 
   countByType: (type: NotificationTypeFilter, source?: NotificationData[]) => {
     const list = source ?? get().notifications;
-    if (type === "all") return list.length;
+    if (type === 'all') return list.length;
     return list.filter((n) => getNotificationType(n) === type).length;
   },
 }));

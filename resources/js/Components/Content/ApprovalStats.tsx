@@ -1,7 +1,7 @@
-import axios from "axios";
-import { CheckCircle, Clock, Timer, XCircle } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import axios from 'axios';
+import { CheckCircle, Clock, Timer, XCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface ApprovalStats {
   pending_requests: number;
@@ -27,7 +27,7 @@ export default function ApprovalStats({ refreshTrigger }: ApprovalStatsProps) {
   const fetchStats = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get("/api/v1/approvals/stats");
+      const response = await axios.get('/api/v1/approvals/stats');
       const json = response.data;
       if (json.success) {
         setStats(json);
@@ -63,36 +63,36 @@ export default function ApprovalStats({ refreshTrigger }: ApprovalStatsProps) {
 
   const statCards = [
     {
-      label: t("approvals.stats.pendingRequests"),
+      label: t('approvals.stats.pendingRequests'),
       value: stats.pending_for_me ?? stats.pending_requests,
       icon: Clock,
-      color: "text-amber-600 dark:text-amber-400",
-      bgColor: "bg-amber-50 dark:bg-amber-900/20",
-      borderColor: "border-amber-100 dark:border-amber-900/30",
+      color: 'text-amber-600 dark:text-amber-400',
+      bgColor: 'bg-amber-50 dark:bg-amber-900/20',
+      borderColor: 'border-amber-100 dark:border-amber-900/30',
     },
     {
-      label: t("approvals.stats.approvedToday"),
+      label: t('approvals.stats.approvedToday'),
       value: stats.approved_today,
       icon: CheckCircle,
-      color: "text-emerald-600 dark:text-emerald-400",
-      bgColor: "bg-emerald-50 dark:bg-emerald-900/20",
-      borderColor: "border-emerald-100 dark:border-emerald-900/30",
+      color: 'text-emerald-600 dark:text-emerald-400',
+      bgColor: 'bg-emerald-50 dark:bg-emerald-900/20',
+      borderColor: 'border-emerald-100 dark:border-emerald-900/30',
     },
     {
-      label: t("approvals.stats.rejectedToday"),
+      label: t('approvals.stats.rejectedToday'),
       value: stats.rejected_today,
       icon: XCircle,
-      color: "text-rose-600 dark:text-rose-400",
-      bgColor: "bg-rose-50 dark:bg-rose-900/20",
-      borderColor: "border-rose-100 dark:border-rose-900/30",
+      color: 'text-rose-600 dark:text-rose-400',
+      bgColor: 'bg-rose-50 dark:bg-rose-900/20',
+      borderColor: 'border-rose-100 dark:border-rose-900/30',
     },
     {
-      label: t("approvals.stats.avgApprovalTime"),
-      value: stats.avg_approval_time_hours != null ? `${stats.avg_approval_time_hours}h` : "—",
+      label: t('approvals.stats.avgApprovalTime'),
+      value: stats.avg_approval_time_hours != null ? `${stats.avg_approval_time_hours}h` : '—',
       icon: Timer,
-      color: "text-blue-600 dark:text-blue-400",
-      bgColor: "bg-blue-50 dark:bg-blue-900/20",
-      borderColor: "border-blue-100 dark:border-blue-900/30",
+      color: 'text-blue-600 dark:text-blue-400',
+      bgColor: 'bg-blue-50 dark:bg-blue-900/20',
+      borderColor: 'border-blue-100 dark:border-blue-900/30',
     },
   ];
 

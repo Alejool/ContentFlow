@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { Head } from "@inertiajs/react";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Sparkles, Film, Download, ExternalLink, Play, Filter } from "lucide-react";
-import axios from "axios";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
-import ReelCardSkeleton from "@/Components/common/ui/skeletons/ReelCardSkeleton";
-import EmptyState from "@/Components/common/EmptyState";
-import { getEmptyStateByKey } from "@/Utils/emptyStateMapper";
+import React, { useState, useEffect } from 'react';
+import { Head } from '@inertiajs/react';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { Sparkles, Film, Download, ExternalLink, Play, Filter } from 'lucide-react';
+import axios from 'axios';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import ReelCardSkeleton from '@/Components/common/ui/skeletons/ReelCardSkeleton';
+import EmptyState from '@/Components/common/EmptyState';
+import { getEmptyStateByKey } from '@/Utils/emptyStateMapper';
 
 interface MediaFile {
   id: number;
@@ -41,8 +41,8 @@ export default function AiReelsGallery() {
   const [reels, setReels] = useState<MediaFile[]>([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState<PaginationData | null>(null);
-  const [selectedPlatform, setSelectedPlatform] = useState<string>("all");
-  const [selectedStatus, setSelectedStatus] = useState<string>("all");
+  const [selectedPlatform, setSelectedPlatform] = useState<string>('all');
+  const [selectedStatus, setSelectedStatus] = useState<string>('all');
 
   useEffect(() => {
     fetchReels();
@@ -52,14 +52,14 @@ export default function AiReelsGallery() {
     setLoading(true);
     try {
       const params: any = { page };
-      if (selectedPlatform !== "all") params.platform = selectedPlatform;
-      if (selectedStatus !== "all") params.status = selectedStatus;
+      if (selectedPlatform !== 'all') params.platform = selectedPlatform;
+      if (selectedStatus !== 'all') params.status = selectedStatus;
 
-      const response = await axios.get("/api/v1/reels", { params });
+      const response = await axios.get('/api/v1/reels', { params });
       setReels(response.data.data.reels);
       setPagination(response.data.data.pagination);
     } catch (error) {
-      toast.error("Error al cargar los reels");
+      toast.error('Error al cargar los reels');
     } finally {
       setLoading(false);
     }
@@ -67,24 +67,24 @@ export default function AiReelsGallery() {
 
   const getPlatformIcon = (platform?: string) => {
     const icons: Record<string, string> = {
-      instagram: "📸",
-      tiktok: "🎵",
-      youtube_shorts: "▶️",
+      instagram: '📸',
+      tiktok: '🎵',
+      youtube_shorts: '▶️',
     };
-    return icons[platform || ""] || "🎬";
+    return icons[platform || ''] || '🎬';
   };
 
   const getPlatformColor = (platform?: string) => {
     const colors: Record<string, string> = {
-      instagram: "from-pink-500 to-purple-500",
-      tiktok: "from-black to-cyan-500",
-      youtube_shorts: "from-red-500 to-red-600",
+      instagram: 'from-pink-500 to-purple-500',
+      tiktok: 'from-black to-cyan-500',
+      youtube_shorts: 'from-red-500 to-red-600',
     };
-    return colors[platform || ""] || "from-purple-500 to-purple-600";
+    return colors[platform || ''] || 'from-purple-500 to-purple-600';
   };
 
   const handleDownload = (reel: MediaFile) => {
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = reel.file_path;
     link.download = reel.file_name || `reel-${reel.metadata?.platform}.mp4`;
     document.body.appendChild(link);
@@ -93,7 +93,7 @@ export default function AiReelsGallery() {
   };
 
   const handleOpenInNewTab = (reel: MediaFile) => {
-    window.open(reel.file_path, "_blank");
+    window.open(reel.file_path, '_blank');
   };
 
   return (
@@ -157,7 +157,7 @@ export default function AiReelsGallery() {
               ))}
             </div>
           ) : reels.length === 0 ? (
-            <EmptyState config={getEmptyStateByKey("reels", t)!} />
+            <EmptyState config={getEmptyStateByKey('reels', t)!} />
           ) : (
             <>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -177,7 +177,7 @@ export default function AiReelsGallery() {
                       <div
                         className={`absolute left-3 top-3 rounded-lg bg-gradient-to-r px-2.5 py-1 text-xs font-bold text-white ${getPlatformColor(reel.metadata?.platform)} shadow-lg`}
                       >
-                        {getPlatformIcon(reel.metadata?.platform)}{" "}
+                        {getPlatformIcon(reel.metadata?.platform)}{' '}
                         {reel.metadata?.platform?.toUpperCase()}
                       </div>
 
@@ -202,10 +202,10 @@ export default function AiReelsGallery() {
                           {reel.publication?.title || reel.file_name}
                         </h3>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {new Date(reel.created_at).toLocaleDateString("es-ES", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
+                          {new Date(reel.created_at).toLocaleDateString('es-ES', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
                           })}
                         </p>
                       </div>

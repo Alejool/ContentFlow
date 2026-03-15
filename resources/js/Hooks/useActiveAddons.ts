@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 export interface ActiveAddon {
   id?: number;
   sku: string;
   name: string;
-  type: "ai_credits" | "storage" | "publications" | "team_members";
+  type: 'ai_credits' | 'storage' | 'publications' | 'team_members';
   amount: number;
   used: number;
   remaining: number;
@@ -17,7 +17,7 @@ export interface ActiveAddon {
   first_purchased_at?: string;
   last_purchased_at?: string;
   expires_at: string | null;
-  status: "active" | "expired" | "depleted";
+  status: 'active' | 'expired' | 'depleted';
 }
 
 interface UseActiveAddonsReturn {
@@ -39,15 +39,15 @@ export function useActiveAddons(): UseActiveAddonsReturn {
       setLoading(true);
       setError(null);
 
-      console.log("[useActiveAddons] Fetching from /api/v1/addons/active...");
-      const response = await axios.get("/api/v1/addons/active");
+      console.log('[useActiveAddons] Fetching from /api/v1/addons/active...');
+      const response = await axios.get('/api/v1/addons/active');
 
-      console.log("[useActiveAddons] Response:", response.data);
+      console.log('[useActiveAddons] Response:', response.data);
       setAddons(response.data.addons || []);
       setTotalSpent(response.data.total_spent || 0);
     } catch (err: any) {
-      console.error("[useActiveAddons] Error fetching active addons:", err);
-      console.error("[useActiveAddons] Error response:", err.response);
+      console.error('[useActiveAddons] Error fetching active addons:', err);
+      console.error('[useActiveAddons] Error response:', err.response);
 
       // Si hay error de autenticación o la ruta no existe, NO usar datos de ejemplo
       // Simplemente mostrar vacío
@@ -55,13 +55,13 @@ export function useActiveAddons(): UseActiveAddonsReturn {
       setTotalSpent(0);
 
       if (err.response?.status === 401) {
-        setError("No autenticado");
+        setError('No autenticado');
       } else if (err.response?.status === 404) {
-        setError("Ruta no encontrada");
+        setError('Ruta no encontrada');
       } else if (!err.response) {
-        setError("Error de red");
+        setError('Error de red');
       } else {
-        setError(err.response?.data?.message || "Error al cargar add-ons activos");
+        setError(err.response?.data?.message || 'Error al cargar add-ons activos');
       }
     } finally {
       setLoading(false);

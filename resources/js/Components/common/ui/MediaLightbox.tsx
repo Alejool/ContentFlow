@@ -1,10 +1,10 @@
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 interface MediaItem {
   url: string;
-  type: "image" | "video";
+  type: 'image' | 'video';
   title?: string;
 }
 
@@ -34,12 +34,12 @@ export default function MediaLightbox({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-      if (e.key === "ArrowLeft") handlePrev();
-      if (e.key === "ArrowRight") handleNext();
+      if (e.key === 'Escape') onClose();
+      if (e.key === 'ArrowLeft') handlePrev();
+      if (e.key === 'ArrowRight') handleNext();
     };
-    if (isOpen) window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    if (isOpen) window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose, currentIndex]);
 
   const handleNext = () => {
@@ -92,9 +92,9 @@ export default function MediaLightbox({
       >
         <div
           key={currentIndex}
-          className={`absolute inset-0 flex items-center justify-center p-4 transition-all duration-300 ease-out ${isAnimating ? "scale-95 opacity-50" : "scale-100 opacity-100"}`}
+          className={`absolute inset-0 flex items-center justify-center p-4 transition-all duration-300 ease-out ${isAnimating ? 'scale-95 opacity-50' : 'scale-100 opacity-100'}`}
         >
-          {currentMedia.type === "video" ? (
+          {currentMedia.type === 'video' ? (
             <video
               src={currentMedia.url}
               className="max-h-full max-w-full rounded-lg bg-black shadow-[0_0_50px_rgba(0,0,0,0.5)]"
@@ -104,7 +104,7 @@ export default function MediaLightbox({
           ) : (
             <img
               src={currentMedia.url}
-              alt={currentMedia.title || "Media preview"}
+              alt={currentMedia.title || 'Media preview'}
               className="max-h-full max-w-full rounded-lg object-contain shadow-[0_0_50px_rgba(0,0,0,0.5)]"
             />
           )}
@@ -124,7 +124,7 @@ export default function MediaLightbox({
                 }}
                 aria-label={`Go to media ${idx + 1} of ${mediaArray.length}`}
                 className={`h-2.5 w-2.5 rounded-full transition-all duration-300 ${
-                  idx === currentIndex ? "w-8 bg-primary-500" : "bg-white/40 hover:bg-white/60"
+                  idx === currentIndex ? 'w-8 bg-primary-500' : 'bg-white/40 hover:bg-white/60'
                 }`}
               />
             ))}

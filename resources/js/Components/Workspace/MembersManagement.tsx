@@ -1,14 +1,14 @@
-import Button from "@/Components/common/Modern/Button";
-import Select from "@/Components/common/Modern/Select";
-import ConfirmDialog from "@/Components/common/ui/ConfirmDialog";
-import InviteMemberModal from "@/Components/Workspace/InviteMemberModal";
-import { getRoleStyle, ROLE_STYLES } from "@/Constants/RoleConstants";
-import { usePage } from "@inertiajs/react";
-import axios from "axios";
-import { Trash2, UserPlus, Users } from "lucide-react";
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
+import Button from '@/Components/common/Modern/Button';
+import Select from '@/Components/common/Modern/Select';
+import ConfirmDialog from '@/Components/common/ui/ConfirmDialog';
+import InviteMemberModal from '@/Components/Workspace/InviteMemberModal';
+import { getRoleStyle, ROLE_STYLES } from '@/Constants/RoleConstants';
+import { usePage } from '@inertiajs/react';
+import axios from 'axios';
+import { Trash2, UserPlus, Users } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface MembersManagementProps {
   roles?: any[];
@@ -32,10 +32,10 @@ export default function MembersManagement({ roles = [], workspace }: MembersMana
 
     try {
       setIsLoading(true);
-      const response = await axios.get(route("api.v1.workspaces.members", current_workspace.id));
+      const response = await axios.get(route('api.v1.workspaces.members', current_workspace.id));
       setMembers(response.data.members || []);
     } catch (error) {
-      toast.error(t("workspace.invite_modal.messages.error"));
+      toast.error(t('workspace.invite_modal.messages.error'));
     } finally {
       setIsLoading(false);
     }
@@ -58,14 +58,14 @@ export default function MembersManagement({ roles = [], workspace }: MembersMana
   const currentUser = members.find((u: any) => Number(u.id) === Number(auth.user.id));
   const userRoleSlug = currentUser?.pivot?.role?.slug || currentUser?.role?.slug;
   const canManageMembers =
-    ["owner", "admin"].includes(userRoleSlug) ||
+    ['owner', 'admin'].includes(userRoleSlug) ||
     Number(current_workspace.created_by) === Number(auth.user.id);
 
   const handleRoleChange = async (userId: number, newRoleId: number) => {
     if (!canManageMembers) return;
     try {
       await axios.put(
-        route("api.v1.workspaces.members.update-role", {
+        route('api.v1.workspaces.members.update-role', {
           idOrSlug: current_workspace.id,
           user: userId,
         }),
@@ -73,10 +73,10 @@ export default function MembersManagement({ roles = [], workspace }: MembersMana
           role_id: newRoleId,
         },
       );
-      toast.success(t("workspace.invite_modal.messages.success"));
+      toast.success(t('workspace.invite_modal.messages.success'));
       fetchMembers();
     } catch (error) {
-      toast.error(t("workspace.invite_modal.messages.error"));
+      toast.error(t('workspace.invite_modal.messages.error'));
     }
   };
 
@@ -90,19 +90,19 @@ export default function MembersManagement({ roles = [], workspace }: MembersMana
 
     try {
       const response = await axios.delete(
-        route("api.v1.workspaces.members.remove", {
+        route('api.v1.workspaces.members.remove', {
           idOrSlug: current_workspace.id,
           user: userToRemove,
         }),
       );
-      toast.success(t("workspace.invite_modal.messages.success"));
+      toast.success(t('workspace.invite_modal.messages.success'));
       if (response.data.members) {
         setMembers(response.data.members);
       } else {
         fetchMembers();
       }
     } catch (error) {
-      toast.error(t("workspace.invite_modal.messages.error"));
+      toast.error(t('workspace.invite_modal.messages.error'));
     } finally {
       setUserToRemove(null);
     }
@@ -110,40 +110,40 @@ export default function MembersManagement({ roles = [], workspace }: MembersMana
 
   const stats = [
     {
-      label: t("workspace.stats.total_members"),
+      label: t('workspace.stats.total_members'),
       value: members.length,
       icon: Users,
-      color: "text-primary-600",
+      color: 'text-primary-600',
     },
     {
-      label: t("workspace.owners"),
-      value: roleDistribution[roles.find((r) => r.slug === "owner")?.id] || 0,
+      label: t('workspace.owners'),
+      value: roleDistribution[roles.find((r) => r.slug === 'owner')?.id] || 0,
       icon: ROLE_STYLES.owner.icon,
       color: ROLE_STYLES.owner.color,
     },
     {
-      label: t("workspace.admins"),
-      value: roleDistribution[roles.find((r) => r.slug === "admin")?.id] || 0,
+      label: t('workspace.admins'),
+      value: roleDistribution[roles.find((r) => r.slug === 'admin')?.id] || 0,
       icon: ROLE_STYLES.admin.icon,
       color: ROLE_STYLES.admin.color,
     },
     {
-      label: t("workspace.members"),
-      value: roleDistribution[roles.find((r) => r.slug === "member")?.id] || 0,
+      label: t('workspace.members'),
+      value: roleDistribution[roles.find((r) => r.slug === 'member')?.id] || 0,
       icon: ROLE_STYLES.member.icon,
       color: ROLE_STYLES.member.color,
     },
   ];
 
   const roleOptions = roles
-    .filter((r) => r.slug !== "owner")
+    .filter((r) => r.slug !== 'owner')
     .map((r) => ({ value: r.id, label: r.name }));
 
   if (isLoading) {
     return (
       <div className="p-12 text-center">
         <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-b-2 border-primary-600"></div>
-        <p className="text-gray-500">{t("workspace.loading")}</p>
+        <p className="text-gray-500">{t('workspace.loading')}</p>
       </div>
     );
   }
@@ -174,12 +174,12 @@ export default function MembersManagement({ roles = [], workspace }: MembersMana
       <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
         <div className="flex items-center justify-between border-b border-gray-200 bg-gray-50/50 p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            {t("workspace.workspace_members")}
+            {t('workspace.workspace_members')}
           </h3>
           {canManageMembers && (
             <Button onClick={() => setIsInviteModalOpen(true)} size="sm" icon={UserPlus}>
-              <span className="hidden md:inline">{t("workspace.invite_member")}</span>
-              <span className="md:hidden">{t("workspace.invite")}</span>
+              <span className="hidden md:inline">{t('workspace.invite_member')}</span>
+              <span className="md:hidden">{t('workspace.invite')}</span>
             </Button>
           )}
         </div>
@@ -190,8 +190,8 @@ export default function MembersManagement({ roles = [], workspace }: MembersMana
             const isCreator = Number(current_workspace.created_by) === Number(member.id);
             const roleId = member.pivot?.role_id;
             const currentRole = roles.find((r) => r.id === roleId) || {
-              name: "Member",
-              slug: "member",
+              name: 'Member',
+              slug: 'member',
             };
 
             return (
@@ -218,7 +218,7 @@ export default function MembersManagement({ roles = [], workspace }: MembersMana
                       {member.name}
                       {isMe && (
                         <span className="shrink-0 rounded-full bg-primary-100 px-2 py-0.5 text-[10px] font-bold uppercase text-primary-700 dark:bg-primary-900/30 dark:text-primary-400">
-                          {t("workspace.you")}
+                          {t('workspace.you')}
                         </span>
                       )}
                     </div>
@@ -235,7 +235,7 @@ export default function MembersManagement({ roles = [], workspace }: MembersMana
                         getRoleStyle(currentRole.slug).badge
                       }`}
                     >
-                      {isCreator ? t("workspace.owners") : currentRole.name}
+                      {isCreator ? t('workspace.owners') : currentRole.name}
                     </span>
                   ) : (
                     <div className="w-32 md:w-36">
@@ -257,7 +257,7 @@ export default function MembersManagement({ roles = [], workspace }: MembersMana
                       variant="ghost"
                       size="xs"
                       className="flex-shrink-0 rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
-                      title={t("workspace.remove_member")}
+                      title={t('workspace.remove_member')}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -268,7 +268,7 @@ export default function MembersManagement({ roles = [], workspace }: MembersMana
           })}
 
           {members.length === 0 && !isLoading && (
-            <div className="p-8 text-center text-gray-500">{t("workspace.activity.empty")}</div>
+            <div className="p-8 text-center text-gray-500">{t('workspace.activity.empty')}</div>
           )}
         </div>
       </div>
@@ -285,10 +285,10 @@ export default function MembersManagement({ roles = [], workspace }: MembersMana
         isOpen={isConfirmDialogOpen}
         onClose={() => setIsConfirmDialogOpen(false)}
         onConfirm={handleRemoveMember}
-        title={t("workspace.remove_member")}
-        message={t("workspace.remove_confirm")}
-        confirmText={t("common.confirm")}
-        cancelText={t("common.cancel")}
+        title={t('workspace.remove_member')}
+        message={t('workspace.remove_confirm')}
+        confirmText={t('common.confirm')}
+        cancelText={t('common.cancel')}
         type="danger"
       />
     </div>

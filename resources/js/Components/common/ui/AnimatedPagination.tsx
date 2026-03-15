@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion';
 
 interface AnimatedPaginationProps {
   total: number;
@@ -23,8 +23,8 @@ export default function AnimatedPagination({
           onClick={() => onPageChange(index)}
           className={`relative h-3 rounded-full transition-all duration-300 ${
             index === current
-              ? "w-12 bg-primary-600"
-              : "w-3 bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500"
+              ? 'w-12 bg-primary-600'
+              : 'w-3 bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500'
           }`}
           whileHover={{ scale: 1.2 }}
           whileTap={{ scale: 0.9 }}
@@ -34,8 +34,8 @@ export default function AnimatedPagination({
             <motion.div
               className="absolute inset-0 rounded-full bg-primary-600"
               initial={{ width: 0 }}
-              animate={{ width: "100%" }}
-              transition={{ duration: autoAdvanceDuration, ease: "linear" }}
+              animate={{ width: '100%' }}
+              transition={{ duration: autoAdvanceDuration, ease: 'linear' }}
               key={`progress-${current}`}
             />
           )}

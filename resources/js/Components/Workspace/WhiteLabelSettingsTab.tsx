@@ -1,11 +1,11 @@
-import Button from "@/Components/common/Modern/Button";
-import { useS3Upload } from "@/Hooks/useS3Upload";
-import { router, useForm } from "@inertiajs/react";
-import axios from "axios";
-import { Image as ImageIcon, Palette, ShieldCheck, Upload } from "lucide-react";
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
+import Button from '@/Components/common/Modern/Button';
+import { useS3Upload } from '@/Hooks/useS3Upload';
+import { router, useForm } from '@inertiajs/react';
+import axios from 'axios';
+import { Image as ImageIcon, Palette, ShieldCheck, Upload } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface WhiteLabelSettingsTabProps {
   workspace: any;
@@ -33,13 +33,13 @@ export default function WhiteLabelSettingsTab({
   const { data, setData, post, processing, errors } = useForm({
     logo_key: null as string | null,
     favicon_key: null as string | null,
-    primary_color: workspace.white_label_primary_color || "#4f46e5",
+    primary_color: workspace.white_label_primary_color || '#4f46e5',
   });
 
   useEffect(() => {
     setLogoPreview(workspace.white_label_logo_url || null);
     setFaviconPreview(workspace.white_label_favicon_url || null);
-    setData("primary_color", workspace.white_label_primary_color || "#4f46e5");
+    setData('primary_color', workspace.white_label_primary_color || '#4f46e5');
   }, [workspace]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -53,14 +53,14 @@ export default function WhiteLabelSettingsTab({
       faviconTempId && progress[faviconTempId] !== undefined && progress[faviconTempId] < 100;
 
     if (logoUploading || faviconUploading) {
-      toast.error("Por favor espera a que terminen de subirse las imágenes");
+      toast.error('Por favor espera a que terminen de subirse las imágenes');
       return;
     }
 
     // Enviar el formulario con las claves S3 ya establecidas
-    post(route("workspaces.white-label.update", workspace.slug), {
+    post(route('workspaces.white-label.update', workspace.slug), {
       onSuccess: async (page) => {
-        toast.success(t("workspace.white_label.update_success") || "Branding updated successfully");
+        toast.success(t('workspace.white_label.update_success') || 'Branding updated successfully');
 
         const auth = page.props.auth as any;
         const currentWorkspace = auth?.current_workspace;
@@ -69,8 +69,8 @@ export default function WhiteLabelSettingsTab({
         if (currentWorkspace?.white_label_favicon_url) {
           let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
           if (!link) {
-            link = document.createElement("link");
-            link.rel = "icon";
+            link = document.createElement('link');
+            link.rel = 'icon';
             document.head.appendChild(link);
           }
           link.href = `${currentWorkspace.white_label_favicon_url}?v=${new Date().getTime()}`;
@@ -78,7 +78,7 @@ export default function WhiteLabelSettingsTab({
 
         // Update sidebar logo immediately
         if (currentWorkspace?.white_label_logo_url) {
-          const logoImg = document.getElementById("sidebar-logo") as HTMLImageElement;
+          const logoImg = document.getElementById('sidebar-logo') as HTMLImageElement;
           if (logoImg) {
             logoImg.src = currentWorkspace.white_label_logo_url;
           }
@@ -87,11 +87,11 @@ export default function WhiteLabelSettingsTab({
         // Apply the branding color to the user's theme
         if (data.primary_color) {
           try {
-            await axios.patch(route("api.v1.profile.theme.update"), {
+            await axios.patch(route('api.v1.profile.theme.update'), {
               theme_color: data.primary_color,
             });
           } catch (error) {
-            console.error("Error updating user theme:", error);
+            console.error('Error updating user theme:', error);
           }
         }
 
@@ -104,7 +104,7 @@ export default function WhiteLabelSettingsTab({
         router.reload(); // Still reload to sync everything else
       },
       onError: () => {
-        toast.error(t("workspace.white_label.update_error") || "Failed to update branding");
+        toast.error(t('workspace.white_label.update_error') || 'Failed to update branding');
       },
       forceFormData: true,
     });
@@ -126,12 +126,12 @@ export default function WhiteLabelSettingsTab({
       try {
         const result = await uploadFile(file, tempId);
         if (result?.key) {
-          setData("logo_key", result.key);
-          toast.success("Logo subido correctamente");
+          setData('logo_key', result.key);
+          toast.success('Logo subido correctamente');
         }
       } catch (error) {
-        console.error("Error uploading logo:", error);
-        toast.error("Error al subir el logo");
+        console.error('Error uploading logo:', error);
+        toast.error('Error al subir el logo');
       }
     }
   };
@@ -152,12 +152,12 @@ export default function WhiteLabelSettingsTab({
       try {
         const result = await uploadFile(file, tempId);
         if (result?.key) {
-          setData("favicon_key", result.key);
-          toast.success("Favicon subido correctamente");
+          setData('favicon_key', result.key);
+          toast.success('Favicon subido correctamente');
         }
       } catch (error) {
-        console.error("Error uploading favicon:", error);
-        toast.error("Error al subir el favicon");
+        console.error('Error uploading favicon:', error);
+        toast.error('Error al subir el favicon');
       }
     }
   };
@@ -172,11 +172,11 @@ export default function WhiteLabelSettingsTab({
           </div>
           <div>
             <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-              {t("workspace.white_label.title") || "Branding Personalizado"}
+              {t('workspace.white_label.title') || 'Branding Personalizado'}
             </h3>
             <p className="text-gray-500 dark:text-neutral-400">
-              {t("workspace.white_label.description") ||
-                "Define la identidad visual de tu plataforma."}
+              {t('workspace.white_label.description') ||
+                'Define la identidad visual de tu plataforma.'}
             </p>
           </div>
         </div>
@@ -200,11 +200,11 @@ export default function WhiteLabelSettingsTab({
                 <div className="space-y-4">
                   <div>
                     <label className="block text-base font-bold text-gray-900 dark:text-white">
-                      {t("workspace.white_label.logo") || "Logotipo"}
+                      {t('workspace.white_label.logo') || 'Logotipo'}
                     </label>
                     <p className="mt-1 text-sm text-gray-500 dark:text-neutral-500">
-                      {t("workspace.white_label.logo_help") ||
-                        "Recomendado: PNG/SVG fondo transparente."}
+                      {t('workspace.white_label.logo_help') ||
+                        'Recomendado: PNG/SVG fondo transparente.'}
                     </p>
                   </div>
 
@@ -218,11 +218,11 @@ export default function WhiteLabelSettingsTab({
                         onError={(e) => {
                           // Si falla, mostrar el icono por defecto
                           const target = e.currentTarget;
-                          target.style.display = "none";
+                          target.style.display = 'none';
                           const parent = target.parentElement;
                           if (parent) {
-                            const fallback = document.createElement("div");
-                            fallback.className = "text-center";
+                            const fallback = document.createElement('div');
+                            fallback.className = 'text-center';
                             fallback.innerHTML = `
                               <svg class="w-12 h-12 text-neutral-300 dark:text-neutral-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -237,7 +237,7 @@ export default function WhiteLabelSettingsTab({
                       <div className="text-center">
                         <ImageIcon className="mx-auto mb-2 h-12 w-12 text-neutral-300 dark:text-neutral-600" />
                         <span className="text-xs font-medium text-neutral-400">
-                          {t("workspace.white_label.no_logo") || "Sin Logo"}
+                          {t('workspace.white_label.no_logo') || 'Sin Logo'}
                         </span>
                       </div>
                     )}
@@ -290,7 +290,7 @@ export default function WhiteLabelSettingsTab({
                         <div className="flex translate-y-4 transform flex-col items-center gap-2 transition-transform duration-300 group-hover:translate-y-0">
                           <Upload className="h-6 w-6 text-white" />
                           <span className="text-sm font-bold text-white">
-                            {t("common.change", "Cambiar")}
+                            {t('common.change', 'Cambiar')}
                           </span>
                         </div>
                       </label>
@@ -308,10 +308,10 @@ export default function WhiteLabelSettingsTab({
                 <div className="space-y-4">
                   <div>
                     <label className="block text-base font-bold text-gray-900 dark:text-white">
-                      {t("workspace.white_label.favicon") || "Favicon"}
+                      {t('workspace.white_label.favicon') || 'Favicon'}
                     </label>
                     <p className="mt-1 text-sm text-gray-500 dark:text-neutral-500">
-                      {t("workspace.white_label.favicon_help") || "Formato 32x32px o 64x64px."}
+                      {t('workspace.white_label.favicon_help') || 'Formato 32x32px o 64x64px.'}
                     </p>
                   </div>
 
@@ -390,11 +390,11 @@ export default function WhiteLabelSettingsTab({
               <div className="space-y-6">
                 <div>
                   <label className="block text-base font-bold text-gray-900 dark:text-white">
-                    {t("workspace.white_label.primary_color") || "Color de Marca"}
+                    {t('workspace.white_label.primary_color') || 'Color de Marca'}
                   </label>
                   <p className="mt-1 text-sm text-gray-500 dark:text-neutral-500">
-                    {t("workspace.white_label.color_help") ||
-                      "Este color se aplicará a botones, enlaces e indicadores."}
+                    {t('workspace.white_label.color_help') ||
+                      'Este color se aplicará a botones, enlaces e indicadores.'}
                   </p>
                 </div>
 
@@ -403,7 +403,7 @@ export default function WhiteLabelSettingsTab({
                     <input
                       type="color"
                       value={data.primary_color}
-                      onChange={(e) => setData("primary_color", e.target.value)}
+                      onChange={(e) => setData('primary_color', e.target.value)}
                       disabled={!canManageWorkspace}
                       className="h-14 w-14 cursor-pointer overflow-hidden rounded-lg border-0 p-0 shadow-lg"
                     />
@@ -412,7 +412,7 @@ export default function WhiteLabelSettingsTab({
                     <input
                       type="text"
                       value={data.primary_color}
-                      onChange={(e) => setData("primary_color", e.target.value)}
+                      onChange={(e) => setData('primary_color', e.target.value)}
                       disabled={!canManageWorkspace}
                       className="block h-14 w-full rounded-lg border-transparent bg-neutral-100 pl-10 pr-4 font-mono text-lg font-bold text-black focus:ring-2 focus:ring-primary-500 dark:bg-neutral-800 dark:text-white"
                       placeholder="#000000"
@@ -433,7 +433,7 @@ export default function WhiteLabelSettingsTab({
                   disabled={!canManageWorkspace || uploading}
                   loading={processing || uploading}
                   loadingText={
-                    uploading ? "Subiendo archivos..." : t("common.saving") || "Guardando..."
+                    uploading ? 'Subiendo archivos...' : t('common.saving') || 'Guardando...'
                   }
                   variant="primary"
                   size="lg"
@@ -441,7 +441,7 @@ export default function WhiteLabelSettingsTab({
                   animation="scale"
                   className="w-full md:w-auto"
                 >
-                  {t("common.save_changes") || "Guardar Cambios"}
+                  {t('common.save_changes') || 'Guardar Cambios'}
                 </Button>
               </div>
             </form>
@@ -452,14 +452,14 @@ export default function WhiteLabelSettingsTab({
         <div className="space-y-6">
           <div className="sticky top-24">
             <h4 className="mb-4 ml-2 text-sm font-bold uppercase tracking-widest text-gray-500 dark:text-neutral-500">
-              {t("workspace.white_label.live_preview") || "Vista Previa en Vivo"}
+              {t('workspace.white_label.live_preview') || 'Vista Previa en Vivo'}
             </h4>
 
             <div className="space-y-6">
               {/* Button Preview */}
               <div className="rounded-lg border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
                 <p className="mb-4 text-xs font-bold text-gray-400 dark:text-neutral-500">
-                  {t("workspace.white_label.buttons_actions") || "BOTONES Y ACCIONES"}
+                  {t('workspace.white_label.buttons_actions') || 'BOTONES Y ACCIONES'}
                 </p>
                 <div className="flex flex-col gap-3">
                   <button
@@ -469,7 +469,7 @@ export default function WhiteLabelSettingsTab({
                       boxShadow: `0 10px 15px -3px ${data.primary_color}40`,
                     }}
                   >
-                    {t("workspace.white_label.primary_button") || "Botón Principal"}
+                    {t('workspace.white_label.primary_button') || 'Botón Principal'}
                   </button>
                   <button
                     className="w-full rounded-lg border py-2.5 text-sm font-bold transition-all"
@@ -478,7 +478,7 @@ export default function WhiteLabelSettingsTab({
                       color: data.primary_color,
                     }}
                   >
-                    {t("workspace.white_label.secondary_button") || "Botón Secundario"}
+                    {t('workspace.white_label.secondary_button') || 'Botón Secundario'}
                   </button>
                   <div className="mt-2 flex items-center gap-2">
                     <div
@@ -486,7 +486,7 @@ export default function WhiteLabelSettingsTab({
                       style={{ backgroundColor: data.primary_color }}
                     />
                     <span className="text-xs font-medium text-gray-500">
-                      {t("workspace.white_label.activity_indicator") || "Indicador de actividad"}
+                      {t('workspace.white_label.activity_indicator') || 'Indicador de actividad'}
                     </span>
                   </div>
                 </div>
@@ -495,7 +495,7 @@ export default function WhiteLabelSettingsTab({
               {/* Sidebar Header Preview */}
               <div className="relative overflow-hidden rounded-lg border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
                 <p className="mb-4 text-xs font-bold uppercase text-gray-400 dark:text-neutral-500">
-                  {t("workspace.white_label.sidebar_header") || "Cabecera del Menú"}
+                  {t('workspace.white_label.sidebar_header') || 'Cabecera del Menú'}
                 </p>
 
                 <div className="flex items-center gap-3 rounded-lg border bg-neutral-50 p-4 dark:border-neutral-800 dark:bg-black/20">
@@ -516,7 +516,7 @@ export default function WhiteLabelSettingsTab({
                       {workspace.name}
                     </p>
                     <p className="text-[10px] font-bold uppercase tracking-tighter opacity-60">
-                      {t("workspace.white_label.workspace_branding") || "Workspace Branding"}
+                      {t('workspace.white_label.workspace_branding') || 'Workspace Branding'}
                     </p>
                   </div>
                 </div>
@@ -527,8 +527,8 @@ export default function WhiteLabelSettingsTab({
                 <div className="flex gap-3">
                   <ShieldCheck className="h-5 w-5 text-emerald-600 dark:text-emerald-500" />
                   <p className="text-sm font-medium leading-relaxed text-emerald-800 dark:text-emerald-400">
-                    {t("workspace.white_label.impact_notice") ||
-                      "Los cambios se aplican inmediatamente para todos los usuarios de este espacio de trabajo."}
+                    {t('workspace.white_label.impact_notice') ||
+                      'Los cambios se aplican inmediatamente para todos los usuarios de este espacio de trabajo.'}
                   </p>
                 </div>
               </div>

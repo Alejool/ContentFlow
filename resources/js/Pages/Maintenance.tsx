@@ -1,5 +1,5 @@
-import { Head } from "@inertiajs/react";
-import { Construction, Clock, RefreshCw } from "lucide-react";
+import { Head } from '@inertiajs/react';
+import { Construction, Clock, RefreshCw } from 'lucide-react';
 
 interface Props {
   message?: string;
@@ -31,7 +31,7 @@ export default function Maintenance({ message, estimatedTime }: Props) {
 
             {/* Mensaje */}
             <p className="mb-6 text-lg text-gray-600 dark:text-gray-300">
-              {message || "Estamos realizando mejoras en el sistema."}
+              {message || 'Estamos realizando mejoras en el sistema.'}
             </p>
 
             {/* Tiempo estimado */}

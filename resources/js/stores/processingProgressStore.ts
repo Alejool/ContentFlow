@@ -1,11 +1,11 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
 export interface ProcessingJob {
   id: string;
   publicationId: number;
-  type: "video_processing" | "reel_generation" | "thumbnail_generation";
+  type: 'video_processing' | 'reel_generation' | 'thumbnail_generation';
   progress: number;
-  status: "queued" | "processing" | "completed" | "failed" | "cancelled";
+  status: 'queued' | 'processing' | 'completed' | 'failed' | 'cancelled';
   stats?: {
     eta: number;
     currentStep: string;
@@ -66,7 +66,7 @@ export const useProcessingProgress = create<ProcessingProgressState>((set, get) 
           ...state.jobs,
           [id]: {
             ...job,
-            status: "cancelled" as const,
+            status: 'cancelled' as const,
           },
         },
       };
@@ -82,7 +82,7 @@ export function initProcessingProgressRealtime(userId: number) {
   const channel = window.Echo.private(`users.${userId}`);
 
   // Listen for processing progress updates
-  channel.listen(".ProcessingProgressUpdated", (e: any) => {
+  channel.listen('.ProcessingProgressUpdated', (e: any) => {
     const { jobId, publicationId, progress, stats } = e;
 
     const store = useProcessingProgress.getState();
@@ -99,9 +99,9 @@ export function initProcessingProgressRealtime(userId: number) {
       store.addJob({
         id: jobId,
         publicationId,
-        type: "video_processing",
+        type: 'video_processing',
         progress,
-        status: "processing",
+        status: 'processing',
         stats,
         startTime: Date.now(),
       });
@@ -109,7 +109,7 @@ export function initProcessingProgressRealtime(userId: number) {
   });
 
   // Listen for processing completion
-  channel.listen(".VideoProcessingCompleted", (e: any) => {
+  channel.listen('.VideoProcessingCompleted', (e: any) => {
     const { jobId, publicationId } = e;
 
     const store = useProcessingProgress.getState();
@@ -117,7 +117,7 @@ export function initProcessingProgressRealtime(userId: number) {
 
     if (job) {
       store.updateJob(jobId, {
-        status: "completed",
+        status: 'completed',
         progress: 100,
         completedTime: Date.now(),
       });
@@ -130,7 +130,7 @@ export function initProcessingProgressRealtime(userId: number) {
   });
 
   // Listen for processing failures
-  channel.listen(".VideoProcessingFailed", (e: any) => {
+  channel.listen('.VideoProcessingFailed', (e: any) => {
     const { jobId, error } = e;
 
     const store = useProcessingProgress.getState();
@@ -138,15 +138,15 @@ export function initProcessingProgressRealtime(userId: number) {
 
     if (job) {
       store.updateJob(jobId, {
-        status: "failed",
-        error: error || "Processing failed",
+        status: 'failed',
+        error: error || 'Processing failed',
         completedTime: Date.now(),
       });
     }
   });
 
   // Listen for processing cancellations
-  channel.listen(".VideoProcessingCancelled", (e: any) => {
+  channel.listen('.VideoProcessingCancelled', (e: any) => {
     const { jobId } = e;
 
     const store = useProcessingProgress.getState();

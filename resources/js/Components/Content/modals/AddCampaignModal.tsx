@@ -1,25 +1,25 @@
-import { useCampaignStore } from "@/stores/campaignStore";
-import axios from "axios";
-import { Target } from "lucide-react";
-import { useState } from "react";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
+import { useCampaignStore } from '@/stores/campaignStore';
+import axios from 'axios';
+import { Target } from 'lucide-react';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
-import AiFieldSuggester from "@/Components/AiAssistant/AiFieldSuggester";
-import AiPromptSection from "@/Components/AiAssistant/AiPromptSection";
-import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
-import Input from "@/Components/common/Modern/Input";
-import Textarea from "@/Components/common/Modern/Textarea";
+import AiFieldSuggester from '@/Components/AiAssistant/AiFieldSuggester';
+import AiPromptSection from '@/Components/AiAssistant/AiPromptSection';
+import ModalHeader from '@/Components/Content/modals/common/ModalHeader';
+import Input from '@/Components/common/Modern/Input';
+import Textarea from '@/Components/common/Modern/Textarea';
 
-import CampaignDateFields from "@/Components/Content/Campaign/common/CampaignDateFields";
-import PublicationSelector from "@/Components/Content/Campaign/common/PublicationSelector";
+import CampaignDateFields from '@/Components/Content/Campaign/common/CampaignDateFields';
+import PublicationSelector from '@/Components/Content/Campaign/common/PublicationSelector';
 
-import { useAddCampaignForm } from "@/Hooks/campaign/useAddCampaignForm";
-import { usePublicationsForCampaign } from "@/Hooks/campaign/usePublicationsForCampaign";
-import { useModalFocusTrap } from "@/Hooks/useModalFocusTrap";
+import { useAddCampaignForm } from '@/Hooks/campaign/useAddCampaignForm';
+import { usePublicationsForCampaign } from '@/Hooks/campaign/usePublicationsForCampaign';
+import { useModalFocusTrap } from '@/Hooks/useModalFocusTrap';
 
-import { DollarSign, FileText } from "lucide-react";
-import ModalFooter from "./common/ModalFooter";
+import { DollarSign, FileText } from 'lucide-react';
+import ModalFooter from './common/ModalFooter';
 
 interface AddCampaignModalProps {
   isOpen: boolean;
@@ -48,34 +48,34 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
 
   const handleAiSuggestion = (data: any) => {
     if (data.name || data.title) {
-      setValue("name", data.name || data.title, {
+      setValue('name', data.name || data.title, {
         shouldValidate: true,
         shouldDirty: true,
       });
     }
     if (data.description) {
-      setValue("description", data.description, {
+      setValue('description', data.description, {
         shouldValidate: true,
         shouldDirty: true,
       });
     }
     if (data.goal) {
-      setValue("goal", data.goal, { shouldValidate: true, shouldDirty: true });
+      setValue('goal', data.goal, { shouldValidate: true, shouldDirty: true });
     }
     if (data.budget !== undefined) {
-      setValue("budget", data.budget.toString(), {
+      setValue('budget', data.budget.toString(), {
         shouldValidate: true,
         shouldDirty: true,
       });
     }
     if (data.start_date) {
-      setValue("start_date", data.start_date, {
+      setValue('start_date', data.start_date, {
         shouldValidate: true,
         shouldDirty: true,
       });
     }
     if (data.end_date) {
-      setValue("end_date", data.end_date, {
+      setValue('end_date', data.end_date, {
         shouldValidate: true,
         shouldDirty: true,
       });
@@ -101,13 +101,13 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
       if (response.data && response.data.campaign) {
         addCampaign(response.data.campaign);
         handleClose();
-        toast.success(t("campaigns.messages.success") || "Campaign created successfully");
+        toast.success(t('campaigns.messages.success') || 'Campaign created successfully');
         if (onSubmit) {
           onSubmit(true);
         }
       }
     } catch (error: any) {
-      toast.error(error.response?.data?.message || t("campaigns.messages.error"));
+      toast.error(error.response?.data?.message || t('campaigns.messages.error'));
     } finally {
       setIsSubmitting(false);
     }
@@ -123,11 +123,11 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
     const current = watchedFields.publication_ids || [];
     if (current.includes(id)) {
       setValue(
-        "publication_ids",
+        'publication_ids',
         current.filter((pid: number) => pid !== id),
       );
     } else {
-      setValue("publication_ids", [...current, id]);
+      setValue('publication_ids', [...current, id]);
     }
   };
 
@@ -174,11 +174,11 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
             <div className="form-group">
               <Input
                 id="manage-add-campaign-name"
-                label={t("campaigns.modal.add.name") || "Campaign Name"}
+                label={t('campaigns.modal.add.name') || 'Campaign Name'}
                 register={register}
                 name="name"
                 required
-                placeholder={t("campaigns.modal.add.placeholders.name") || "e.g. Summer Sale 2024"}
+                placeholder={t('campaigns.modal.add.placeholders.name') || 'e.g. Summer Sale 2024'}
                 sizeType="lg"
                 variant="filled"
                 error={errors.name?.message as string}
@@ -188,10 +188,10 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
             <div className="form-group">
               <Textarea
                 id="manage-add-campaign-description"
-                label={t("campaigns.modal.add.description")}
+                label={t('campaigns.modal.add.description')}
                 register={register}
                 name="description"
-                placeholder={t("campaigns.modal.add.placeholders.description")}
+                placeholder={t('campaigns.modal.add.placeholders.description')}
                 error={errors.description?.message as string}
                 icon={FileText}
                 variant="filled"
@@ -199,7 +199,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
                 maxLength={200}
                 showCharCount
                 hint={
-                  t("campaigns.modal.add.placeholders.description_hint") || "Maximum 200 characters"
+                  t('campaigns.modal.add.placeholders.description_hint') || 'Maximum 200 characters'
                 }
                 size="lg"
               />
@@ -209,11 +209,11 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
               <div className="form-group">
                 <Input
                   id="goal"
-                  label={t("campaigns.modal.add.goal")}
+                  label={t('campaigns.modal.add.goal')}
                   type="text"
                   register={register}
                   name="goal"
-                  placeholder={t("campaigns.modal.add.placeholders.goal")}
+                  placeholder={t('campaigns.modal.add.placeholders.goal')}
                   error={errors.goal?.message as string}
                   icon={Target}
                   variant="filled"
@@ -225,11 +225,11 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
               <div className="form-group">
                 <Input
                   id="budget"
-                  label={t("campaigns.modal.add.budget")}
+                  label={t('campaigns.modal.add.budget')}
                   type="number"
                   register={register}
                   name="budget"
-                  placeholder={t("campaigns.modal.add.placeholders.budget")}
+                  placeholder={t('campaigns.modal.add.placeholders.budget')}
                   error={errors.budget?.message as string}
                   icon={DollarSign}
                   variant="filled"
@@ -249,7 +249,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
 
             <div className="form-group">
               <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                {t("campaigns.modal.add.publications") || "Publications"}
+                {t('campaigns.modal.add.publications') || 'Publications'}
               </label>
 
               <div className="rounded-lg border border-gray-200 bg-gray-50 p-2 dark:border-neutral-700 dark:bg-black/20">
@@ -265,16 +265,16 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
               </div>
 
               <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-                {t("campaigns.modal.add.associatedPublicationsRequired") ||
-                  "Associated Publications is required"}
+                {t('campaigns.modal.add.associatedPublicationsRequired') ||
+                  'Associated Publications is required'}
               </p>
             </div>
           </form>
         </div>
         <ModalFooter
           onClose={handleClose}
-          submitText={t("campaigns.button.add")}
-          cancelText={t("common.cancel")}
+          submitText={t('campaigns.button.add')}
+          cancelText={t('common.cancel')}
           formId="campaign-form"
         />
       </div>

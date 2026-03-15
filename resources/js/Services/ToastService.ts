@@ -1,4 +1,4 @@
-import toast, { ToastOptions } from "react-hot-toast";
+import toast, { ToastOptions } from 'react-hot-toast';
 
 interface CustomToastOptions extends ToastOptions {
   action?: {

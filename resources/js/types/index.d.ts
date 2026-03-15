@@ -15,4 +15,4 @@ export type PageProps<T extends Record<string, unknown> = Record<string, unknown
   };
 };
 
-export * from "./Publication";
+export * from './Publication';

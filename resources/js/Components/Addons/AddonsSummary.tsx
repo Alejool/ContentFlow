@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import AddonUsageDisplay from "./AddonUsageDisplay";
+import React, { useState, useEffect } from 'react';
+import AddonUsageDisplay from './AddonUsageDisplay';
 
 interface AddonSummary {
   total: number;
@@ -35,11 +35,11 @@ export default function AddonsSummary() {
 
   const fetchAddonsSummary = async () => {
     try {
-      const response = await fetch("/api/v1/addons/summary");
+      const response = await fetch('/api/v1/addons/summary');
       const result = await response.json();
       setData(result);
     } catch (error) {
-      console.error("Error fetching addons summary:", error);
+      console.error('Error fetching addons summary:', error);
     } finally {
       setLoading(false);
     }
@@ -67,35 +67,35 @@ export default function AddonsSummary() {
 
   const addonTypes = [
     {
-      key: "ai_credits",
-      name: "Créditos de IA",
-      unit: "créditos",
+      key: 'ai_credits',
+      name: 'Créditos de IA',
+      unit: 'créditos',
     },
     {
-      key: "storage",
-      name: "Almacenamiento",
-      unit: "GB",
+      key: 'storage',
+      name: 'Almacenamiento',
+      unit: 'GB',
     },
     {
-      key: "publications",
-      name: "Publicaciones",
-      unit: "publicaciones",
+      key: 'publications',
+      name: 'Publicaciones',
+      unit: 'publicaciones',
     },
     {
-      key: "team_members",
-      name: "Miembros del Equipo",
-      unit: "miembros",
+      key: 'team_members',
+      name: 'Miembros del Equipo',
+      unit: 'miembros',
     },
   ];
 
   const formatDate = (dateString?: string) => {
-    if (!dateString) return "No disponible";
-    return new Date(dateString).toLocaleDateString("es-ES", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+    if (!dateString) return 'No disponible';
+    return new Date(dateString).toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
@@ -104,7 +104,7 @@ export default function AddonsSummary() {
       {/* Plan Info Header */}
       <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
         <h2 className="mb-2 text-lg font-semibold text-blue-900">
-          Plan Actual:{" "}
+          Plan Actual:{' '}
           {data.plan_info.current_plan.charAt(0).toUpperCase() +
             data.plan_info.current_plan.slice(1)}
         </h2>
@@ -184,7 +184,7 @@ export default function AddonsSummary() {
             • <strong>Uso independiente por plan:</strong> Cada plan empieza desde 0
           </li>
           <li>
-            • <strong>Fecha de inicio:</strong> El uso se cuenta desde{" "}
+            • <strong>Fecha de inicio:</strong> El uso se cuenta desde{' '}
             {formatDate(data.plan_info.plan_started_at)}
           </li>
           <li>

@@ -1,16 +1,16 @@
-import DatePickerModern from "@/Components/common/Modern/DatePicker";
-import Label from "@/Components/common/Modern/Label";
-import { useTimezoneStore } from "@/stores/timezoneStore";
-import { addDays, addMonths, addWeeks, addYears, format, parseISO } from "date-fns";
-import { es } from "date-fns/locale";
+import DatePickerModern from '@/Components/common/Modern/DatePicker';
+import Label from '@/Components/common/Modern/Label';
+import { useTimezoneStore } from '@/stores/timezoneStore';
+import { addDays, addMonths, addWeeks, addYears, format, parseISO } from 'date-fns';
+import { es } from 'date-fns/locale';
 import {
   AlertCircle,
   Calendar as CalendarIcon,
   Clock,
   ChevronLeft,
   ChevronRight,
-} from "lucide-react";
-import React, { useMemo, useState } from "react";
+} from 'lucide-react';
+import React, { useMemo, useState } from 'react';
 
 interface ScheduleSectionProps {
   scheduledAt?: string;
@@ -24,7 +24,7 @@ interface ScheduleSectionProps {
   disabled?: boolean;
   hasRecurrenceAccess?: boolean;
   isRecurring?: boolean;
-  recurrenceType?: "daily" | "weekly" | "monthly" | "yearly";
+  recurrenceType?: 'daily' | 'weekly' | 'monthly' | 'yearly';
   recurrenceInterval?: number;
   recurrenceDays?: number[];
   recurrenceEndDate?: string;
@@ -71,7 +71,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
   disabled = false,
   hasRecurrenceAccess = true,
   isRecurring = false,
-  recurrenceType = "daily",
+  recurrenceType = 'daily',
   recurrenceInterval = 1,
   recurrenceDays = [],
   recurrenceEndDate,
@@ -95,15 +95,15 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
   // - ISO format with timezone (YYYY-MM-DDTHH:mm:ss.sssZ)
   const parseUTCDate = (dateString: string): Date => {
     // If it's just a date (YYYY-MM-DD), append UTC time
-    if (dateString.length === 10 && !dateString.includes("T")) {
-      return new Date(dateString + "T00:00:00.000Z");
+    if (dateString.length === 10 && !dateString.includes('T')) {
+      return new Date(dateString + 'T00:00:00.000Z');
     }
 
     // If it's datetime without timezone (YYYY-MM-DD HH:mm:ss), convert to UTC
     // This format comes from Laravel's published_at field
-    if (dateString.includes(" ") && !dateString.includes("T")) {
+    if (dateString.includes(' ') && !dateString.includes('T')) {
       // Replace space with 'T' and append 'Z' to indicate UTC
-      return new Date(dateString.replace(" ", "T") + "Z");
+      return new Date(dateString.replace(' ', 'T') + 'Z');
     }
 
     // Otherwise, parse as ISO (already includes timezone info)
@@ -113,8 +113,8 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
   // Helper function to format Date to YYYY-MM-DD in UTC
   const formatUTCDate = (date: Date): string => {
     const year = date.getUTCFullYear();
-    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
-    const day = String(date.getUTCDate()).padStart(2, "0");
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(date.getUTCDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
 
@@ -142,13 +142,13 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
   };
 
   const daysOfWeek = [
-    { label: t("common.days.sun") || "D", value: 0 },
-    { label: t("common.days.mon") || "L", value: 1 },
-    { label: t("common.days.tue") || "M", value: 2 },
-    { label: t("common.days.wed") || "M", value: 3 },
-    { label: t("common.days.thu") || "J", value: 4 },
-    { label: t("common.days.fri") || "V", value: 5 },
-    { label: t("common.days.sat") || "S", value: 6 },
+    { label: t('common.days.sun') || 'D', value: 0 },
+    { label: t('common.days.mon') || 'L', value: 1 },
+    { label: t('common.days.tue') || 'M', value: 2 },
+    { label: t('common.days.wed') || 'M', value: 3 },
+    { label: t('common.days.thu') || 'J', value: 4 },
+    { label: t('common.days.fri') || 'V', value: 5 },
+    { label: t('common.days.sat') || 'S', value: 6 },
   ];
 
   // Calculate recurrence dates PER ACCOUNT
@@ -162,7 +162,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
     // Add accounts from existing scheduled/published posts
     if (existingScheduledPosts && existingScheduledPosts.length > 0) {
       existingScheduledPosts.forEach((post) => {
-        if (post.status === "published" || post.status === "pending") {
+        if (post.status === 'published' || post.status === 'pending') {
           accounts.add(post.social_account_id);
         }
       });
@@ -171,7 +171,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
     // Add accounts from social post logs (for posts published directly without scheduling)
     if (socialPostLogs && socialPostLogs.length > 0) {
       socialPostLogs.forEach((log) => {
-        if (log.status === "published" && log.social_account_id) {
+        if (log.status === 'published' && log.social_account_id) {
           accounts.add(log.social_account_id);
         }
       });
@@ -193,7 +193,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
       const hasScheduledDates = existingScheduledPosts.some(
         (post) =>
           allAvailableAccounts.includes(post.social_account_id) &&
-          (post.status === "published" || post.status === "pending") &&
+          (post.status === 'published' || post.status === 'pending') &&
           (post.published_at || post.scheduled_at),
       );
       if (hasScheduledDates) return true;
@@ -204,7 +204,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
       return socialPostLogs.some(
         (log) =>
           allAvailableAccounts.includes(log.social_account_id) &&
-          log.status === "published" &&
+          log.status === 'published' &&
           log.published_at,
       );
     }
@@ -231,7 +231,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
     }
 
     // For weekly recurrence, we need days
-    if (recurrenceType === "weekly" && (!recurrenceDays || recurrenceDays.length === 0)) {
+    if (recurrenceType === 'weekly' && (!recurrenceDays || recurrenceDays.length === 0)) {
       return {};
     }
 
@@ -242,7 +242,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
     // IMPORTANT: null or empty array means ALL available accounts get recurrence
     const recurrenceAccountsNumbers =
       recurrenceAccounts && recurrenceAccounts.length > 0
-        ? recurrenceAccounts.map((id) => (typeof id === "string" ? parseInt(id) : id))
+        ? recurrenceAccounts.map((id) => (typeof id === 'string' ? parseInt(id) : id))
         : [];
 
     // If recurrenceAccounts is null/empty, ALL available accounts get recurrence
@@ -264,7 +264,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
       // If no account-specific schedule, check social_post_logs first (most accurate for published posts)
       if (!baseDate && socialPostLogs && socialPostLogs.length > 0) {
         const publishedLog = socialPostLogs.find(
-          (log) => log.social_account_id === accountId && log.status === "published",
+          (log) => log.social_account_id === accountId && log.status === 'published',
         );
         if (publishedLog?.published_at) {
           baseDate = publishedLog.published_at;
@@ -277,12 +277,12 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
         const existingPost = existingScheduledPosts.find(
           (post) =>
             post.social_account_id === accountId &&
-            (post.status === "pending" || post.status === "published"),
+            (post.status === 'pending' || post.status === 'published'),
         );
         // For published posts, use published_at; for pending, use scheduled_at
         if (existingPost) {
           baseDate =
-            existingPost.status === "published"
+            existingPost.status === 'published'
               ? existingPost.published_at
               : existingPost.scheduled_at;
         }
@@ -307,7 +307,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
       }
 
       // For weekly recurrence, skip if no days are selected
-      if (recurrenceType === "weekly" && (!recurrenceDays || recurrenceDays.length === 0)) {
+      if (recurrenceType === 'weekly' && (!recurrenceDays || recurrenceDays.length === 0)) {
         return;
       }
 
@@ -323,7 +323,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
 
       try {
         // Handle different date formats - ALWAYS parse in UTC
-        if (typeof baseDate === "string") {
+        if (typeof baseDate === 'string') {
           // If it's an ISO string with time, parse it as UTC
           currentDate = new Date(baseDate);
         } else {
@@ -341,17 +341,17 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
 
       // Convert recurrenceDays to numbers for comparison
       const recurrenceDaysNumbers = recurrenceDays
-        ? recurrenceDays.map((d) => (typeof d === "string" ? parseInt(d) : d))
+        ? recurrenceDays.map((d) => (typeof d === 'string' ? parseInt(d) : d))
         : [];
 
       // Calculate the FIRST recurrence date after the base date
       // IMPORTANT: If base date's day is in the selected days, use it as first recurrence
       // Otherwise, find the next selected day
       switch (recurrenceType) {
-        case "daily":
+        case 'daily':
           currentDate = addDaysUTC(currentDate, interval);
           break;
-        case "weekly":
+        case 'weekly':
           if (recurrenceDaysNumbers.length > 0) {
             const currentDay = currentDate.getUTCDay();
             const sortedDays = [...recurrenceDaysNumbers].sort((a, b) => a - b);
@@ -390,10 +390,10 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
             currentDate = addWeeksUTC(currentDate, interval);
           }
           break;
-        case "monthly":
+        case 'monthly':
           currentDate = addMonthsUTC(currentDate, interval);
           break;
-        case "yearly":
+        case 'yearly':
           currentDate = addYearsUTC(currentDate, interval);
           break;
         default:
@@ -426,10 +426,10 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
 
         // Calculate next date
         switch (recurrenceType) {
-          case "daily":
+          case 'daily':
             currentDate = addDaysUTC(currentDate, interval);
             break;
-          case "weekly":
+          case 'weekly':
             if (recurrenceDaysNumbers.length > 0) {
               const currentDay = currentDate.getUTCDay();
               let nextDayMatch = null;
@@ -458,10 +458,10 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
               currentDate = addWeeksUTC(currentDate, interval);
             }
             break;
-          case "monthly":
+          case 'monthly':
             currentDate = addMonthsUTC(currentDate, interval);
             break;
-          case "yearly":
+          case 'yearly':
             currentDate = addYearsUTC(currentDate, interval);
             break;
           default:
@@ -571,7 +571,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
 
       <div className="">
         <Label htmlFor="recurrence" icon={Clock} size="lg" className="mb-2">
-          {t("publications.modal.schedule.recurrence.title") || "Repetir publicación (Recurrencia)"}
+          {t('publications.modal.schedule.recurrence.title') || 'Repetir publicación (Recurrencia)'}
         </Label>
 
         {!hasRecurrenceAccess ? (
@@ -594,28 +594,28 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
               </div>
               <div>
                 <p className="text-sm font-medium text-primary-800 dark:text-primary-300">
-                  {t("publications.modal.schedule.recurrence.locked_title") ||
-                    "Recurrencia bloqueada"}
+                  {t('publications.modal.schedule.recurrence.locked_title') ||
+                    'Recurrencia bloqueada'}
                 </p>
                 <p className="mt-0.5 text-xs text-primary-600 dark:text-primary-400">
-                  {t("publications.modal.schedule.recurrence.locked_desc") ||
-                    "Sube de plan para configurar repeticiones automáticas (cada X días/semanas) en tus publicaciones."}
+                  {t('publications.modal.schedule.recurrence.locked_desc') ||
+                    'Sube de plan para configurar repeticiones automáticas (cada X días/semanas) en tus publicaciones.'}
                 </p>
               </div>
             </div>
             <button
               type="button"
-              onClick={() => (window.location.href = route("pricing"))}
+              onClick={() => (window.location.href = route('pricing'))}
               className="shrink-0 whitespace-nowrap rounded-md bg-primary-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors hover:bg-primary-700"
             >
-              {t("common.upgradePlan") || "Ver Planes"}
+              {t('common.upgradePlan') || 'Ver Planes'}
             </button>
           </div>
         ) : (
           <div className="animate-in fade-in slide-in-from-top-2 space-y-4 duration-300">
             <div className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-neutral-800/50">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t("publications.modal.schedule.recurrence.enable") || "Activar repetición"}
+                {t('publications.modal.schedule.recurrence.enable') || 'Activar repetición'}
               </span>
               <label className="relative inline-flex cursor-pointer items-center">
                 <input
@@ -647,12 +647,12 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                   <div className="space-y-3 border-b border-gray-100 pb-4 dark:border-neutral-800">
                     <div>
                       <Label size="sm">
-                        {t("publications.modal.schedule.recurrence.select_accounts") ||
-                          "Redes con recurrencia"}
+                        {t('publications.modal.schedule.recurrence.select_accounts') ||
+                          'Redes con recurrencia'}
                       </Label>
                       <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                        {t("publications.modal.schedule.recurrence.select_accounts_desc") ||
-                          "Selecciona qué redes publicarán de forma recurrente. Las demás solo publicarán una vez."}
+                        {t('publications.modal.schedule.recurrence.select_accounts_desc') ||
+                          'Selecciona qué redes publicarán de forma recurrente. Las demás solo publicarán una vez.'}
                       </p>
                     </div>
 
@@ -682,8 +682,8 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                         />
                         <div className="flex-1">
                           <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                            {t("publications.modal.schedule.recurrence.all_accounts") ||
-                              "Aplicar a todas"}
+                            {t('publications.modal.schedule.recurrence.all_accounts') ||
+                              'Aplicar a todas'}
                           </span>
                           <div className="mt-1.5 flex flex-wrap gap-1.5">
                             {socialAccounts
@@ -694,34 +694,34 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                                   { bg: string; text: string; border: string }
                                 > = {
                                   youtube: {
-                                    bg: "bg-red-50 dark:bg-red-900/20",
-                                    text: "text-red-700 dark:text-red-400",
-                                    border: "border-red-200 dark:border-red-800",
+                                    bg: 'bg-red-50 dark:bg-red-900/20',
+                                    text: 'text-red-700 dark:text-red-400',
+                                    border: 'border-red-200 dark:border-red-800',
                                   },
                                   facebook: {
-                                    bg: "bg-blue-50 dark:bg-blue-900/20",
-                                    text: "text-blue-700 dark:text-blue-400",
-                                    border: "border-blue-200 dark:border-blue-800",
+                                    bg: 'bg-blue-50 dark:bg-blue-900/20',
+                                    text: 'text-blue-700 dark:text-blue-400',
+                                    border: 'border-blue-200 dark:border-blue-800',
                                   },
                                   instagram: {
-                                    bg: "bg-pink-50 dark:bg-pink-900/20",
-                                    text: "text-pink-700 dark:text-pink-400",
-                                    border: "border-pink-200 dark:border-pink-800",
+                                    bg: 'bg-pink-50 dark:bg-pink-900/20',
+                                    text: 'text-pink-700 dark:text-pink-400',
+                                    border: 'border-pink-200 dark:border-pink-800',
                                   },
                                   twitter: {
-                                    bg: "bg-sky-50 dark:bg-sky-900/20",
-                                    text: "text-sky-700 dark:text-sky-400",
-                                    border: "border-sky-200 dark:border-sky-800",
+                                    bg: 'bg-sky-50 dark:bg-sky-900/20',
+                                    text: 'text-sky-700 dark:text-sky-400',
+                                    border: 'border-sky-200 dark:border-sky-800',
                                   },
                                   linkedin: {
-                                    bg: "bg-blue-50 dark:bg-blue-900/20",
-                                    text: "text-blue-700 dark:text-blue-400",
-                                    border: "border-blue-200 dark:border-blue-800",
+                                    bg: 'bg-blue-50 dark:bg-blue-900/20',
+                                    text: 'text-blue-700 dark:text-blue-400',
+                                    border: 'border-blue-200 dark:border-blue-800',
                                   },
                                   tiktok: {
-                                    bg: "bg-gray-50 dark:bg-gray-900/20",
-                                    text: "text-gray-700 dark:text-gray-400",
-                                    border: "border-gray-200 dark:border-gray-800",
+                                    bg: 'bg-gray-50 dark:bg-gray-900/20',
+                                    text: 'text-gray-700 dark:text-gray-400',
+                                    border: 'border-gray-200 dark:border-gray-800',
                                   },
                                 };
                                 const colors =
@@ -764,40 +764,40 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                                 }
                               > = {
                                 youtube: {
-                                  bg: "bg-red-50 dark:bg-red-900/20",
-                                  text: "text-red-700 dark:text-red-400",
-                                  border: "border-red-200 dark:border-red-800",
-                                  hover: "hover:bg-red-100 dark:hover:bg-red-900/30",
+                                  bg: 'bg-red-50 dark:bg-red-900/20',
+                                  text: 'text-red-700 dark:text-red-400',
+                                  border: 'border-red-200 dark:border-red-800',
+                                  hover: 'hover:bg-red-100 dark:hover:bg-red-900/30',
                                 },
                                 facebook: {
-                                  bg: "bg-blue-50 dark:bg-blue-900/20",
-                                  text: "text-blue-700 dark:text-blue-400",
-                                  border: "border-blue-200 dark:border-blue-800",
-                                  hover: "hover:bg-blue-100 dark:hover:bg-blue-900/30",
+                                  bg: 'bg-blue-50 dark:bg-blue-900/20',
+                                  text: 'text-blue-700 dark:text-blue-400',
+                                  border: 'border-blue-200 dark:border-blue-800',
+                                  hover: 'hover:bg-blue-100 dark:hover:bg-blue-900/30',
                                 },
                                 instagram: {
-                                  bg: "bg-pink-50 dark:bg-pink-900/20",
-                                  text: "text-pink-700 dark:text-pink-400",
-                                  border: "border-pink-200 dark:border-pink-800",
-                                  hover: "hover:bg-pink-100 dark:hover:bg-pink-900/30",
+                                  bg: 'bg-pink-50 dark:bg-pink-900/20',
+                                  text: 'text-pink-700 dark:text-pink-400',
+                                  border: 'border-pink-200 dark:border-pink-800',
+                                  hover: 'hover:bg-pink-100 dark:hover:bg-pink-900/30',
                                 },
                                 twitter: {
-                                  bg: "bg-sky-50 dark:bg-sky-900/20",
-                                  text: "text-sky-700 dark:text-sky-400",
-                                  border: "border-sky-200 dark:border-sky-800",
-                                  hover: "hover:bg-sky-100 dark:hover:bg-sky-900/30",
+                                  bg: 'bg-sky-50 dark:bg-sky-900/20',
+                                  text: 'text-sky-700 dark:text-sky-400',
+                                  border: 'border-sky-200 dark:border-sky-800',
+                                  hover: 'hover:bg-sky-100 dark:hover:bg-sky-900/30',
                                 },
                                 linkedin: {
-                                  bg: "bg-blue-50 dark:bg-blue-900/20",
-                                  text: "text-blue-700 dark:text-blue-400",
-                                  border: "border-blue-200 dark:border-blue-800",
-                                  hover: "hover:bg-blue-100 dark:hover:bg-blue-900/30",
+                                  bg: 'bg-blue-50 dark:bg-blue-900/20',
+                                  text: 'text-blue-700 dark:text-blue-400',
+                                  border: 'border-blue-200 dark:border-blue-800',
+                                  hover: 'hover:bg-blue-100 dark:hover:bg-blue-900/30',
                                 },
                                 tiktok: {
-                                  bg: "bg-gray-50 dark:bg-gray-900/20",
-                                  text: "text-gray-700 dark:text-gray-400",
-                                  border: "border-gray-200 dark:border-gray-800",
-                                  hover: "hover:bg-gray-100 dark:hover:bg-gray-900/30",
+                                  bg: 'bg-gray-50 dark:bg-gray-900/20',
+                                  text: 'text-gray-700 dark:text-gray-400',
+                                  border: 'border-gray-200 dark:border-gray-800',
+                                  hover: 'hover:bg-gray-100 dark:hover:bg-gray-900/30',
                                 },
                               };
                               const colors =
@@ -808,7 +808,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                               return (
                                 <label
                                   key={account.id}
-                                  className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-all ${colors.bg} ${colors.border} ${colors.hover} ${isChecked ? "ring-2 ring-primary-500 dark:ring-primary-600" : ""}`}
+                                  className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-all ${colors.bg} ${colors.border} ${colors.hover} ${isChecked ? 'ring-2 ring-primary-500 dark:ring-primary-600' : ''}`}
                                 >
                                   <input
                                     type="checkbox"
@@ -874,34 +874,34 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                         { bg: string; text: string; border: string }
                       > = {
                         youtube: {
-                          bg: "bg-red-50 dark:bg-red-900/20",
-                          text: "text-red-700 dark:text-red-400",
-                          border: "border-red-200 dark:border-red-800",
+                          bg: 'bg-red-50 dark:bg-red-900/20',
+                          text: 'text-red-700 dark:text-red-400',
+                          border: 'border-red-200 dark:border-red-800',
                         },
                         facebook: {
-                          bg: "bg-blue-50 dark:bg-blue-900/20",
-                          text: "text-blue-700 dark:text-blue-400",
-                          border: "border-blue-200 dark:border-blue-800",
+                          bg: 'bg-blue-50 dark:bg-blue-900/20',
+                          text: 'text-blue-700 dark:text-blue-400',
+                          border: 'border-blue-200 dark:border-blue-800',
                         },
                         instagram: {
-                          bg: "bg-pink-50 dark:bg-pink-900/20",
-                          text: "text-pink-700 dark:text-pink-400",
-                          border: "border-pink-200 dark:border-pink-800",
+                          bg: 'bg-pink-50 dark:bg-pink-900/20',
+                          text: 'text-pink-700 dark:text-pink-400',
+                          border: 'border-pink-200 dark:border-pink-800',
                         },
                         twitter: {
-                          bg: "bg-sky-50 dark:bg-sky-900/20",
-                          text: "text-sky-700 dark:text-sky-400",
-                          border: "border-sky-200 dark:border-sky-800",
+                          bg: 'bg-sky-50 dark:bg-sky-900/20',
+                          text: 'text-sky-700 dark:text-sky-400',
+                          border: 'border-sky-200 dark:border-sky-800',
                         },
                         linkedin: {
-                          bg: "bg-blue-50 dark:bg-blue-900/20",
-                          text: "text-blue-700 dark:text-blue-400",
-                          border: "border-blue-200 dark:border-blue-800",
+                          bg: 'bg-blue-50 dark:bg-blue-900/20',
+                          text: 'text-blue-700 dark:text-blue-400',
+                          border: 'border-blue-200 dark:border-blue-800',
                         },
                         tiktok: {
-                          bg: "bg-gray-50 dark:bg-gray-900/20",
-                          text: "text-gray-700 dark:text-gray-400",
-                          border: "border-gray-200 dark:border-gray-800",
+                          bg: 'bg-gray-50 dark:bg-gray-900/20',
+                          text: 'text-gray-700 dark:text-gray-400',
+                          border: 'border-gray-200 dark:border-gray-800',
                         },
                       };
                       const colors =
@@ -927,8 +927,8 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                               </span>
                             </div>
                             <p className={`text-xs ${colors.text} opacity-90`}>
-                              {t("publications.modal.schedule.recurrence.single_account_note") ||
-                                "Esta red publicará de forma recurrente según la configuración."}
+                              {t('publications.modal.schedule.recurrence.single_account_note') ||
+                                'Esta red publicará de forma recurrente según la configuración.'}
                             </p>
                           </div>
                         </div>
@@ -940,7 +940,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <Label size="sm">
-                      {t("publications.modal.schedule.recurrence.frequency") || "Frecuencia"}
+                      {t('publications.modal.schedule.recurrence.frequency') || 'Frecuencia'}
                     </Label>
                     <select
                       className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-neutral-600 dark:bg-neutral-800 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
@@ -953,7 +953,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
 
                         // CRITICAL: If switching AWAY from weekly, clear the recurrence days
                         // to avoid validation errors for days that are no longer relevant.
-                        if (newType !== "weekly") {
+                        if (newType !== 'weekly') {
                           updateData.recurrence_days = [];
                         }
 
@@ -961,18 +961,18 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                       }}
                       disabled={disabled}
                     >
-                      <option value="daily">{t("common.frequencies.daily") || "Diario"}</option>
-                      <option value="weekly">{t("common.frequencies.weekly") || "Semanal"}</option>
+                      <option value="daily">{t('common.frequencies.daily') || 'Diario'}</option>
+                      <option value="weekly">{t('common.frequencies.weekly') || 'Semanal'}</option>
                       <option value="monthly">
-                        {t("common.frequencies.monthly") || "Mensual"}
+                        {t('common.frequencies.monthly') || 'Mensual'}
                       </option>
-                      <option value="yearly">{t("common.frequencies.yearly") || "Anual"}</option>
+                      <option value="yearly">{t('common.frequencies.yearly') || 'Anual'}</option>
                     </select>
                   </div>
 
                   <div className="space-y-1.5">
                     <Label size="sm">
-                      {t("publications.modal.schedule.recurrence.interval") || "Cada"}
+                      {t('publications.modal.schedule.recurrence.interval') || 'Cada'}
                     </Label>
                     <div className="flex items-center gap-2">
                       <input
@@ -988,22 +988,22 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                         disabled={disabled}
                       />
                       <span className="whitespace-nowrap text-xs text-gray-500 dark:text-gray-400">
-                        {recurrenceType === "daily"
-                          ? t("common.units.days") || "días"
-                          : recurrenceType === "weekly"
-                            ? t("common.units.weeks") || "semanas"
-                            : recurrenceType === "monthly"
-                              ? t("common.units.months") || "meses"
-                              : t("common.units.years") || "años"}
+                        {recurrenceType === 'daily'
+                          ? t('common.units.days') || 'días'
+                          : recurrenceType === 'weekly'
+                            ? t('common.units.weeks') || 'semanas'
+                            : recurrenceType === 'monthly'
+                              ? t('common.units.months') || 'meses'
+                              : t('common.units.years') || 'años'}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                {recurrenceType === "weekly" && (
+                {recurrenceType === 'weekly' && (
                   <div className="space-y-2">
                     <Label size="sm">
-                      {t("publications.modal.schedule.recurrence.days") || "Repetir los días"}
+                      {t('publications.modal.schedule.recurrence.days') || 'Repetir los días'}
                     </Label>
                     <div className="flex flex-wrap gap-2">
                       {daysOfWeek.map((day) => (
@@ -1020,8 +1020,8 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                           disabled={disabled}
                           className={`flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold transition-all ${
                             recurrenceDays.includes(day.value)
-                              ? "bg-primary-600 text-white shadow-md ring-2 ring-primary-100 dark:ring-primary-900/30"
-                              : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-neutral-800 dark:text-gray-400 dark:hover:bg-neutral-700"
+                              ? 'bg-primary-600 text-white shadow-md ring-2 ring-primary-100 dark:ring-primary-900/30'
+                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-neutral-800 dark:text-gray-400 dark:hover:bg-neutral-700'
                           }`}
                         >
                           {day.label}
@@ -1036,7 +1036,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
 
                 <div className="space-y-1.5 border-t border-gray-100 pt-2 dark:border-neutral-800">
                   <Label size="sm" required>
-                    {t("publications.modal.schedule.recurrence.ends") || "Fecha de finalización"}
+                    {t('publications.modal.schedule.recurrence.ends') || 'Fecha de finalización'}
                   </Label>
                   <DatePickerModern
                     selected={
@@ -1044,7 +1044,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                         ? (() => {
                             // Parse the UTC date string (YYYY-MM-DD) and create a Date in LOCAL timezone
                             // so the DatePicker shows the correct day
-                            const [year, month, day] = recurrenceEndDate.split("T")[0].split("-");
+                            const [year, month, day] = recurrenceEndDate.split('T')[0].split('-');
                             return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
                           })()
                         : null
@@ -1058,15 +1058,15 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                       }
                       // Get the date components in LOCAL timezone (what user selected)
                       const year = date.getFullYear();
-                      const month = String(date.getMonth() + 1).padStart(2, "0");
-                      const day = String(date.getDate()).padStart(2, "0");
+                      const month = String(date.getMonth() + 1).padStart(2, '0');
+                      const day = String(date.getDate()).padStart(2, '0');
                       // Format as YYYY-MM-DD (the date the user actually selected)
                       const dateString = `${year}-${month}-${day}`;
                       onRecurrenceChange?.({ recurrence_end_date: dateString });
                     }}
                     placeholder={
-                      t("publications.modal.schedule.recurrence.ends_placeholder") ||
-                      "Selecciona cuándo termina la recurrencia"
+                      t('publications.modal.schedule.recurrence.ends_placeholder') ||
+                      'Selecciona cuándo termina la recurrencia'
                     }
                     dateFormat="dd/MM/yyyy"
                     minDate={new Date()}
@@ -1075,8 +1075,8 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                   />
                   {isRecurring && !recurrenceEndDate && (
                     <p className="mt-1 text-xs text-red-500">
-                      {t("publications.modal.schedule.recurrence.end_date_required") ||
-                        "La fecha de fin es obligatoria para publicaciones recurrentes"}
+                      {t('publications.modal.schedule.recurrence.end_date_required') ||
+                        'La fecha de fin es obligatoria para publicaciones recurrentes'}
                     </p>
                   )}
                 </div>
@@ -1088,8 +1088,8 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                       <div className="flex items-center gap-2 text-primary-700 dark:text-primary-400">
                         <CalendarIcon className="h-4 w-4" />
                         <span className="text-sm font-semibold">
-                          {t("publications.modal.schedule.recurrence.preview_title") ||
-                            "Próximas fechas de publicación"}
+                          {t('publications.modal.schedule.recurrence.preview_title') ||
+                            'Próximas fechas de publicación'}
                         </span>
                       </div>
                       {Object.keys(nextDatesByAccount).length > 1 && (
@@ -1139,34 +1139,34 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                               { bg: string; text: string; border: string }
                             > = {
                               youtube: {
-                                bg: "bg-red-50 dark:bg-red-900/20",
-                                text: "text-red-700 dark:text-red-400",
-                                border: "border-red-200 dark:border-red-800",
+                                bg: 'bg-red-50 dark:bg-red-900/20',
+                                text: 'text-red-700 dark:text-red-400',
+                                border: 'border-red-200 dark:border-red-800',
                               },
                               facebook: {
-                                bg: "bg-blue-50 dark:bg-blue-900/20",
-                                text: "text-blue-700 dark:text-blue-400",
-                                border: "border-blue-200 dark:border-blue-800",
+                                bg: 'bg-blue-50 dark:bg-blue-900/20',
+                                text: 'text-blue-700 dark:text-blue-400',
+                                border: 'border-blue-200 dark:border-blue-800',
                               },
                               instagram: {
-                                bg: "bg-pink-50 dark:bg-pink-900/20",
-                                text: "text-pink-700 dark:text-pink-400",
-                                border: "border-pink-200 dark:border-pink-800",
+                                bg: 'bg-pink-50 dark:bg-pink-900/20',
+                                text: 'text-pink-700 dark:text-pink-400',
+                                border: 'border-pink-200 dark:border-pink-800',
                               },
                               twitter: {
-                                bg: "bg-sky-50 dark:bg-sky-900/20",
-                                text: "text-sky-700 dark:text-sky-400",
-                                border: "border-sky-200 dark:border-sky-800",
+                                bg: 'bg-sky-50 dark:bg-sky-900/20',
+                                text: 'text-sky-700 dark:text-sky-400',
+                                border: 'border-sky-200 dark:border-sky-800',
                               },
                               linkedin: {
-                                bg: "bg-blue-50 dark:bg-blue-900/20",
-                                text: "text-blue-700 dark:text-blue-400",
-                                border: "border-blue-200 dark:border-blue-800",
+                                bg: 'bg-blue-50 dark:bg-blue-900/20',
+                                text: 'text-blue-700 dark:text-blue-400',
+                                border: 'border-blue-200 dark:border-blue-800',
                               },
                               tiktok: {
-                                bg: "bg-gray-50 dark:bg-gray-900/20",
-                                text: "text-gray-700 dark:text-gray-400",
-                                border: "border-gray-200 dark:border-gray-800",
+                                bg: 'bg-gray-50 dark:bg-gray-900/20',
+                                text: 'text-gray-700 dark:text-gray-400',
+                                border: 'border-gray-200 dark:border-gray-800',
                               },
                             };
                             const colors =
@@ -1195,27 +1195,27 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                                       const timezone = useTimezoneStore
                                         .getState()
                                         .effectiveTimezone();
-                                      const locale = i18n?.language === "es" ? "es-ES" : "en-US";
+                                      const locale = i18n?.language === 'es' ? 'es-ES' : 'en-US';
 
                                       const dayName = new Intl.DateTimeFormat(locale, {
-                                        weekday: "long",
+                                        weekday: 'long',
                                         timeZone: timezone,
                                       }).format(date);
                                       const dayNumber = new Intl.DateTimeFormat(locale, {
-                                        day: "numeric",
+                                        day: 'numeric',
                                         timeZone: timezone,
                                       }).format(date);
                                       const monthName = new Intl.DateTimeFormat(locale, {
-                                        month: "long",
+                                        month: 'long',
                                         timeZone: timezone,
                                       }).format(date);
                                       const timeStr = new Intl.DateTimeFormat(locale, {
-                                        hour: "2-digit",
-                                        minute: "2-digit",
+                                        hour: '2-digit',
+                                        minute: '2-digit',
                                         hour12: false,
                                         timeZone: timezone,
                                       }).format(date);
-                                      const [hours, minutes] = timeStr.split(":");
+                                      const [hours, minutes] = timeStr.split(':');
 
                                       return (
                                         <div
@@ -1229,7 +1229,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                                               {idx + 1}
                                             </span>
                                             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                              {dayName.charAt(0).toUpperCase() + dayName.slice(1)},{" "}
+                                              {dayName.charAt(0).toUpperCase() + dayName.slice(1)},{' '}
                                               {dayNumber} de {monthName}
                                             </span>
                                           </div>
@@ -1253,19 +1253,19 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                         <AlertCircle className="mx-auto mb-2 h-8 w-8 text-amber-500 dark:text-amber-400" />
                         <p className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
                           {!hasAnyDates
-                            ? "Configura una fecha para ver el preview"
-                            : recurrenceType === "weekly" &&
+                            ? 'Configura una fecha para ver el preview'
+                            : recurrenceType === 'weekly' &&
                                 (!recurrenceDays || recurrenceDays.length === 0)
-                              ? "Selecciona al menos un día de la semana"
-                              : "Configura los parámetros de recurrencia"}
+                              ? 'Selecciona al menos un día de la semana'
+                              : 'Configura los parámetros de recurrencia'}
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
                           {!hasAnyDates
                             ? "Activa la 'Programación Global' arriba o configura fechas individuales por red social"
-                            : recurrenceType === "weekly" &&
+                            : recurrenceType === 'weekly' &&
                                 (!recurrenceDays || recurrenceDays.length === 0)
-                              ? "Marca los días en los que quieres que se repita la publicación"
-                              : "Verifica que todos los campos estén completos"}
+                              ? 'Marca los días en los que quieres que se repita la publicación'
+                              : 'Verifica que todos los campos estén completos'}
                         </p>
                       </div>
                     )}
@@ -1273,8 +1273,8 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                     <p className="mt-3 flex items-start gap-1.5 text-[10px] italic text-gray-500 dark:text-gray-400">
                       <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" />
                       <span>
-                        {t("publications.modal.schedule.recurrence.preview_note") ||
-                          "Estas fechas son estimadas y se reflejarán en el calendario al guardar."}
+                        {t('publications.modal.schedule.recurrence.preview_note') ||
+                          'Estas fechas son estimadas y se reflejarán en el calendario al guardar.'}
                       </span>
                     </p>
                   </div>

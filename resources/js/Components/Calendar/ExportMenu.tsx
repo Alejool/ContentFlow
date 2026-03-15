@@ -1,9 +1,9 @@
-import Button from "@/Components/common/Modern/Button";
-import axios from "axios";
-import { Calendar as CalendarIcon, Download } from "lucide-react";
-import React, { useState } from "react";
-import toast from "react-hot-toast";
-import { FaGoogle, FaMicrosoft } from "react-icons/fa";
+import Button from '@/Components/common/Modern/Button';
+import axios from 'axios';
+import { Calendar as CalendarIcon, Download } from 'lucide-react';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
+import { FaGoogle, FaMicrosoft } from 'react-icons/fa';
 
 interface ExportMenuProps {
   events: any[];
@@ -13,7 +13,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ events }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
 
-  const handleExport = async (type: "google" | "outlook") => {
+  const handleExport = async (type: 'google' | 'outlook') => {
     setIsExporting(true);
     try {
       const response = await axios.post(route(`api.v1.calendar.export.${type}`), {
@@ -26,15 +26,15 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ events }) => {
       });
 
       if (response.data.data?.url) {
-        window.open(response.data.data.url, "_blank");
+        window.open(response.data.data.url, '_blank');
         toast.success(
-          `Calendario exportado exitosamente a ${type === "google" ? "Google Calendar" : "Outlook"}`,
+          `Calendario exportado exitosamente a ${type === 'google' ? 'Google Calendar' : 'Outlook'}`,
         );
       }
     } catch (error: any) {
       toast.error(
         error.response?.data?.message ||
-          `Error al exportar a ${type === "google" ? "Google Calendar" : "Outlook"}`,
+          `Error al exportar a ${type === 'google' ? 'Google Calendar' : 'Outlook'}`,
       );
     } finally {
       setIsExporting(false);
@@ -69,7 +69,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ events }) => {
 
             <div className="p-2">
               <button
-                onClick={() => handleExport("google")}
+                onClick={() => handleExport('google')}
                 disabled={isExporting}
                 className="flex w-full items-center gap-3 rounded-lg p-3 text-left transition-colors hover:bg-gray-100 disabled:opacity-50 dark:hover:bg-gray-700"
               >
@@ -87,7 +87,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ events }) => {
               </button>
 
               <button
-                onClick={() => handleExport("outlook")}
+                onClick={() => handleExport('outlook')}
                 disabled={isExporting}
                 className="flex w-full items-center gap-3 rounded-lg p-3 text-left transition-colors hover:bg-gray-100 disabled:opacity-50 dark:hover:bg-gray-700"
               >

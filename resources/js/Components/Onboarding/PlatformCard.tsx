@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from "react";
-import { router } from "@inertiajs/react";
-import { useTranslation } from "react-i18next";
-import type { SocialPlatform } from "@/types/onboarding";
-import { Loader2, Check, AlertCircle } from "lucide-react";
+import { useState, useEffect, useRef } from 'react';
+import { router } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
+import type { SocialPlatform } from '@/types/onboarding';
+import { Loader2, Check, AlertCircle } from 'lucide-react';
 
 interface PlatformCardProps {
   platform: SocialPlatform;
@@ -77,7 +77,7 @@ export default function PlatformCard({
         return;
       }
 
-      if (event.data.type === "social_auth_callback") {
+      if (event.data.type === 'social_auth_callback') {
         cleanupOAuthFlow();
 
         if (event.data.success) {
@@ -89,29 +89,29 @@ export default function PlatformCard({
           onConnectionSuccess?.();
 
           // Reload to get updated account list
-          router.reload({ only: ["connectedAccounts"] });
+          router.reload({ only: ['connectedAccounts'] });
         } else {
           // OAuth failed - handle different error types
           setIsConnecting(false);
 
-          const errorMessage = event.data.message || "Failed to connect account";
+          const errorMessage = event.data.message || 'Failed to connect account';
           const errorType = event.data.errorType;
 
           // Reload accounts even on error (account might have been partially created)
-          router.reload({ only: ["connectedAccounts"] });
+          router.reload({ only: ['connectedAccounts'] });
 
           switch (errorType) {
-            case "denied":
-              setError("You denied access. Please try again if you want to connect.");
+            case 'denied':
+              setError('You denied access. Please try again if you want to connect.');
               break;
-            case "timeout":
-              setError("Connection timed out. Please try again.");
+            case 'timeout':
+              setError('Connection timed out. Please try again.');
               break;
-            case "invalid_state":
-              setError("Invalid authentication state. Please try again.");
+            case 'invalid_state':
+              setError('Invalid authentication state. Please try again.');
               break;
-            case "network":
-              setError("Network error. Please check your connection and try again.");
+            case 'network':
+              setError('Network error. Please check your connection and try again.');
               break;
             default:
               setError(errorMessage);
@@ -120,9 +120,9 @@ export default function PlatformCard({
       }
     };
 
-    window.addEventListener("message", handleMessage);
+    window.addEventListener('message', handleMessage);
     return () => {
-      window.removeEventListener("message", handleMessage);
+      window.removeEventListener('message', handleMessage);
       cleanupOAuthFlow();
     };
   }, [onConnectionSuccess]);
@@ -134,10 +134,10 @@ export default function PlatformCard({
     try {
       // Get the OAuth URL from the backend
       const response = await fetch(`/social-accounts/auth-url/${platform.id.toLowerCase()}`, {
-        method: "GET",
+        method: 'GET',
         headers: {
-          "Content-Type": "application/json",
-          "X-Requested-With": "XMLHttpRequest",
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
         },
       });
 
@@ -162,7 +162,7 @@ export default function PlatformCard({
 
         if (!popup) {
           throw new Error(
-            "Failed to open authentication window. Please allow popups and try again.",
+            'Failed to open authentication window. Please allow popups and try again.',
           );
         }
 
@@ -173,7 +173,7 @@ export default function PlatformCard({
           if (isConnectingRef.current) {
             cleanupOAuthFlow();
             setIsConnecting(false);
-            setError("Authentication timed out. Please try again.");
+            setError('Authentication timed out. Please try again.');
           }
         }, OAUTH_TIMEOUT);
 
@@ -185,23 +185,23 @@ export default function PlatformCard({
             // If still connecting after popup closed, assume it was cancelled
             if (isConnectingRef.current) {
               setIsConnecting(false);
-              setError("Authentication was cancelled. Click Connect to try again.");
+              setError('Authentication was cancelled. Click Connect to try again.');
             }
           }
         }, POPUP_CHECK_INTERVAL);
       } else {
-        throw new Error(data.message || "Failed to get OAuth URL");
+        throw new Error(data.message || 'Failed to get OAuth URL');
       }
     } catch (err: any) {
       cleanupOAuthFlow();
 
       // Provide user-friendly error messages
-      let errorMessage = "Failed to connect account. Please try again.";
+      let errorMessage = 'Failed to connect account. Please try again.';
 
-      if (err.message.includes("popup")) {
-        errorMessage = "Please allow popups for this site and try again.";
-      } else if (err.message.includes("network") || err.message.includes("fetch")) {
-        errorMessage = "Network error. Please check your connection and try again.";
+      if (err.message.includes('popup')) {
+        errorMessage = 'Please allow popups for this site and try again.';
+      } else if (err.message.includes('network') || err.message.includes('fetch')) {
+        errorMessage = 'Network error. Please check your connection and try again.';
       } else if (err.message) {
         errorMessage = err.message;
       }
@@ -220,15 +220,15 @@ export default function PlatformCard({
     <div
       className={`relative rounded-xl border-2 p-6 transition-all ${
         isConnected
-          ? "border-green-500 bg-green-50 dark:bg-green-900/10"
-          : "border-gray-200 bg-white hover:border-primary-500 hover:shadow-md dark:border-neutral-700 dark:border-neutral-900 dark:bg-gradient-to-b dark:from-neutral-800 dark:to-neutral-900"
+          ? 'border-green-500 bg-green-50 dark:bg-green-900/10'
+          : 'border-gray-200 bg-white hover:border-primary-500 hover:shadow-md dark:border-neutral-700 dark:border-neutral-900 dark:bg-gradient-to-b dark:from-neutral-800 dark:to-neutral-900'
       }`}
     >
       {/* Platform Icon */}
       <div
         className={`mb-4 flex h-14 w-14 items-center justify-center rounded-xl ${
           isConnected
-            ? "bg-green-100 dark:bg-green-900/20"
+            ? 'bg-green-100 dark:bg-green-900/20'
             : `bg-${platform.color}-100 dark:bg-${platform.color}-900/20`
         }`}
         style={{
@@ -240,7 +240,7 @@ export default function PlatformCard({
         ) : (
           <span
             className={`text-2xl font-bold ${
-              isConnected ? "text-green-600" : `text-${platform.color}-600`
+              isConnected ? 'text-green-600' : `text-${platform.color}-600`
             }`}
             style={{
               color: isConnected ? undefined : platform.color,
@@ -264,7 +264,7 @@ export default function PlatformCard({
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
             <Check className="h-5 w-5" />
-            <span className="font-medium">{t("platform.connected")}</span>
+            <span className="font-medium">{t('platform.connected')}</span>
           </div>
           {connectedAccount && (
             <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -278,15 +278,15 @@ export default function PlatformCard({
             onClick={handleConnect}
             disabled={isConnecting}
             className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 py-2 font-medium text-white transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
-            aria-label={t("platform.connectTo", { platform: platform.name })}
+            aria-label={t('platform.connectTo', { platform: platform.name })}
           >
             {isConnecting ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                {t("platform.connecting")}
+                {t('platform.connecting')}
               </>
             ) : (
-              t("platform.connect")
+              t('platform.connect')
             )}
           </button>
 
@@ -301,7 +301,7 @@ export default function PlatformCard({
                 className="w-full rounded-lg border border-red-300 px-3 py-1.5 text-sm text-red-600 transition-colors hover:text-red-700 dark:border-red-700 dark:text-red-400 dark:hover:text-red-300"
                 aria-label={`Retry connecting ${platform.name}`}
               >
-                {t("errors.retry")}
+                {t('errors.retry')}
               </button>
             </div>
           )}

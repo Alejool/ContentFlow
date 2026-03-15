@@ -1,6 +1,6 @@
-import Button from "@/Components/common/Modern/Button";
-import { Shield } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import Button from '@/Components/common/Modern/Button';
+import { Shield } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ApprovalUpgradeBannerProps {
   currentPlan?: string;
@@ -13,8 +13,8 @@ interface ApprovalUpgradeBannerProps {
  * a características de multinivel que solo están disponibles en Enterprise.
  */
 export default function ApprovalUpgradeBanner({
-  currentPlan = "professional",
-  className = "",
+  currentPlan = 'professional',
+  className = '',
 }: ApprovalUpgradeBannerProps) {
   const { t } = useTranslation();
 
@@ -31,10 +31,10 @@ export default function ApprovalUpgradeBanner({
         </div>
         <div>
           <p className="text-sm font-bold text-primary-900 dark:text-primary-300">
-            {t("common.approvals.basic_enabled.title")}
+            {t('common.approvals.basic_enabled.title')}
           </p>
           <p className="mt-1 max-w-xl text-xs leading-relaxed text-primary-700 dark:text-primary-400">
-            {t("common.approvals.basic_enabled.description")}
+            {t('common.approvals.basic_enabled.description')}
           </p>
         </div>
       </div>
@@ -42,10 +42,10 @@ export default function ApprovalUpgradeBanner({
         size="sm"
         variant="primary"
         buttonStyle="solid"
-        onClick={() => (window.location.href = route("pricing"))}
+        onClick={() => (window.location.href = route('pricing'))}
         className="shrink-0 whitespace-nowrap shadow-md shadow-primary-500/20"
       >
-        {t("common.upgrade_plan") || "Upgrade Plan"}
+        {t('common.upgrade_plan') || 'Upgrade Plan'}
       </Button>
     </div>
   );

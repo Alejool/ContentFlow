@@ -1,11 +1,11 @@
-import { Sparkles } from "lucide-react";
-import { Link } from "@inertiajs/react";
-import { useTranslation } from "react-i18next";
-import { useState, useEffect } from "react";
-import { useSubscriptionUsage } from "@/Hooks/useSubscriptionUsage";
-import { PlanUsageCards } from "@/Components/Subscription/PlanUsageCards";
-import { useActiveAddons } from "@/Hooks/useActiveAddons";
-import { AddonCard } from "@/Components/Subscription/AddonCard";
+import { Sparkles } from 'lucide-react';
+import { Link } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
+import { useState, useEffect } from 'react';
+import { useSubscriptionUsage } from '@/Hooks/useSubscriptionUsage';
+import { PlanUsageCards } from '@/Components/Subscription/PlanUsageCards';
+import { useActiveAddons } from '@/Hooks/useActiveAddons';
+import { AddonCard } from '@/Components/Subscription/AddonCard';
 
 interface AddonsPromotionCardProps {
   showCarousel?: boolean;
@@ -23,7 +23,7 @@ export function AddonsPromotionCard({
 
   // Obtener el addon más barato para mostrar en el banner
   useEffect(() => {
-    fetch("/api/v1/addons/")
+    fetch('/api/v1/addons/')
       .then((res) => res.json())
       .then((data) => {
         if (data.success && data.data) {
@@ -31,7 +31,7 @@ export function AddonsPromotionCard({
 
           // Recopilar todos los paquetes
           Object.keys(data.data).forEach((type) => {
-            if (data.data[type] && typeof data.data[type] === "object") {
+            if (data.data[type] && typeof data.data[type] === 'object') {
               Object.values(data.data[type]).forEach((pkg: any) => {
                 if (pkg.enabled) {
                   allPackages.push(pkg);
@@ -50,7 +50,7 @@ export function AddonsPromotionCard({
         }
       })
       .catch((error) => {
-        console.error("Error loading addons:", error);
+        console.error('Error loading addons:', error);
       });
   }, []);
 
@@ -76,12 +76,12 @@ export function AddonsPromotionCard({
             <div>
               <h3 className="mb-2 flex items-center text-xl font-bold">
                 <Sparkles className="mr-2 h-6 w-6" />
-                {t("subscription.addons.powerUpWorkspace", "Potencia tu Workspace")}
+                {t('subscription.addons.powerUpWorkspace', 'Potencia tu Workspace')}
               </h3>
               <p className="text-sm">
                 {t(
-                  "subscription.addons.highUsageMessage",
-                  "Estás usando mucho tu plan. ¡Expande tu capacidad!",
+                  'subscription.addons.highUsageMessage',
+                  'Estás usando mucho tu plan. ¡Expande tu capacidad!',
                 )}
               </p>
             </div>
@@ -93,12 +93,12 @@ export function AddonsPromotionCard({
             <div className="space-y-1.5 text-xs">
               {[
                 cheapestAddon
-                  ? t("subscription.addons.packagesFrom", "Paquetes desde") +
-                    " " +
+                  ? t('subscription.addons.packagesFrom', 'Paquetes desde') +
+                    ' ' +
                     (cheapestAddon.formatted_price || `$${cheapestAddon.price}`)
-                  : t("subscription.addons.packagesFrom", "Paquetes desde $9.99"),
-                t("subscription.addons.upToDiscount", "Hasta 40% de descuento"),
-                t("subscription.addons.instantAvailable", "Disponible al instante"),
+                  : t('subscription.addons.packagesFrom', 'Paquetes desde $9.99'),
+                t('subscription.addons.upToDiscount', 'Hasta 40% de descuento'),
+                t('subscription.addons.instantAvailable', 'Disponible al instante'),
               ].map((benefit, index) => (
                 <div key={index} className="flex items-center">
                   <span className="mr-2">✓</span>
@@ -114,12 +114,12 @@ export function AddonsPromotionCard({
             className="block w-full transform rounded-lg bg-primary-500 py-3 text-center font-semibold text-white shadow-lg transition-all hover:bg-primary-600"
           >
             <Sparkles className="mr-2 inline h-4 w-4" />
-            {t("subscription.addons.viewPackages", "Ver Paquetes Disponibles")}
+            {t('subscription.addons.viewPackages', 'Ver Paquetes Disponibles')}
           </Link>
 
           {/* Footer */}
           <p className="mt-3 text-center text-xs">
-            {t("subscription.addons.noCommitment", "Sin compromisos • Cancela cuando quieras")}
+            {t('subscription.addons.noCommitment', 'Sin compromisos • Cancela cuando quieras')}
           </p>
         </div>
       )}

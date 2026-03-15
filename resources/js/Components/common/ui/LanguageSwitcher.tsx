@@ -1,9 +1,9 @@
-import enFlag from "@/../assets/Icons/Flags/en.svg";
-import esFlag from "@/../assets/Icons/Flags/es.svg";
-import { usePage } from "@inertiajs/react";
-import axios from "axios";
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import enFlag from '@/../assets/Icons/Flags/en.svg';
+import esFlag from '@/../assets/Icons/Flags/es.svg';
+import { usePage } from '@inertiajs/react';
+import axios from 'axios';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function LanguageSwitcher() {
   const { i18n } = useTranslation();
@@ -11,11 +11,11 @@ export default function LanguageSwitcher() {
   const [isAnimating, setIsAnimating] = useState(false);
 
   const languages = [
-    { code: "en", name: "English", flag: enFlag },
-    { code: "es", name: "Español", flag: esFlag },
+    { code: 'en', name: 'English', flag: enFlag },
+    { code: 'es', name: 'Español', flag: esFlag },
   ];
 
-  const getBaseLang = (lang: string) => lang.split("-")[0];
+  const getBaseLang = (lang: string) => lang.split('-')[0];
   const currentLangCode = getBaseLang(i18n.resolvedLanguage || i18n.language);
 
   const currentLanguage = languages.find((lang) => lang.code === currentLangCode) || languages[0];
@@ -35,7 +35,7 @@ export default function LanguageSwitcher() {
 
     if (auth?.user) {
       try {
-        await axios.patch(route("settings.locale"), { locale: newLang });
+        await axios.patch(route('settings.locale'), { locale: newLang });
       } catch (error) {}
     }
   };
@@ -56,7 +56,7 @@ export default function LanguageSwitcher() {
         </div>
 
         <div
-          className={`absolute -bottom-1 -right-1 h-3.5 w-5 overflow-hidden rounded-sm border border-gray-200 bg-white p-0.5 shadow-sm transition-all duration-300 dark:border-neutral-700 dark:bg-neutral-900 ${isAnimating ? "scale-0 opacity-0" : "scale-100 opacity-100"}`}
+          className={`absolute -bottom-1 -right-1 h-3.5 w-5 overflow-hidden rounded-sm border border-gray-200 bg-white p-0.5 shadow-sm transition-all duration-300 dark:border-neutral-700 dark:bg-neutral-900 ${isAnimating ? 'scale-0 opacity-0' : 'scale-100 opacity-100'}`}
         >
           <img
             src={nextLanguage.flag}

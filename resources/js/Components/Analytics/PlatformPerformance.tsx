@@ -1,6 +1,6 @@
-import BarChart from "@/Components/Statistics/BarChart";
-import { LayoutPanelLeft } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import BarChart from '@/Components/Statistics/BarChart';
+import { LayoutPanelLeft } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface PlatformPerformanceProps {
   data: {
@@ -12,10 +12,10 @@ interface PlatformPerformanceProps {
     total_reach: number;
     follower_growth: number;
   }[];
-  theme?: "light" | "dark";
+  theme?: 'light' | 'dark';
 }
 
-export default function PlatformPerformance({ data, theme = "light" }: PlatformPerformanceProps) {
+export default function PlatformPerformance({ data, theme = 'light' }: PlatformPerformanceProps) {
   const { t } = useTranslation();
 
   const chartData = data.map((item) => ({
@@ -26,44 +26,44 @@ export default function PlatformPerformance({ data, theme = "light" }: PlatformP
 
   const bars = [
     {
-      dataKey: "engagement",
-      name: t("analytics.platform.engagement") || "Engagement Total",
-      color: theme === "dark" ? "#818cf8" : "#4f46e5",
+      dataKey: 'engagement',
+      name: t('analytics.platform.engagement') || 'Engagement Total',
+      color: theme === 'dark' ? '#818cf8' : '#4f46e5',
     },
     {
-      dataKey: "growth",
-      name: t("analytics.platform.growth") || "Crecimiento",
-      color: theme === "dark" ? "#34d399" : "#10b981",
+      dataKey: 'growth',
+      name: t('analytics.platform.growth') || 'Crecimiento',
+      color: theme === 'dark' ? '#34d399' : '#10b981',
     },
   ];
 
   const getCardBg = () => {
-    return theme === "dark"
-      ? "bg-neutral-800/70 backdrop-blur-sm border border-neutral-700/50"
-      : "bg-white/60 backdrop-blur-lg border border-gray-100 shadow-sm";
+    return theme === 'dark'
+      ? 'bg-neutral-800/70 backdrop-blur-sm border border-neutral-700/50'
+      : 'bg-white/60 backdrop-blur-lg border border-gray-100 shadow-sm';
   };
 
-  const getTextColor = (type: "primary" | "title" = "primary") => {
-    if (theme === "dark") {
-      return type === "title" ? "text-white" : "text-gray-400";
+  const getTextColor = (type: 'primary' | 'title' = 'primary') => {
+    if (theme === 'dark') {
+      return type === 'title' ? 'text-white' : 'text-gray-400';
     }
-    return type === "title" ? "text-gray-900" : "text-gray-600";
+    return type === 'title' ? 'text-gray-900' : 'text-gray-600';
   };
 
   return (
     <div className={`rounded-lg p-6 transition-all duration-300 ${getCardBg()}`}>
       <div className="mb-6 flex items-center justify-between">
-        <h2 className={`flex items-center gap-2 text-xl font-bold ${getTextColor("title")}`}>
+        <h2 className={`flex items-center gap-2 text-xl font-bold ${getTextColor('title')}`}>
           <div
             className={`rounded-lg p-2 ${
-              theme === "dark" ? "bg-primary-900/20" : "bg-primary-100"
+              theme === 'dark' ? 'bg-primary-900/20' : 'bg-primary-100'
             }`}
           >
             <LayoutPanelLeft
-              className={`h-5 w-5 ${theme === "dark" ? "text-primary-400" : "text-primary-600"}`}
+              className={`h-5 w-5 ${theme === 'dark' ? 'text-primary-400' : 'text-primary-600'}`}
             />
           </div>
-          {t("dashboard.platformPerformance") || "Rendimiento Global por Plataforma"}
+          {t('dashboard.platformPerformance') || 'Rendimiento Global por Plataforma'}
         </h2>
       </div>
 

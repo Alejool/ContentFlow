@@ -1,6 +1,6 @@
-import { Sparkles, TrendingUp, AlertCircle } from "lucide-react";
-import { Link } from "@inertiajs/react";
-import { useAddons } from "@/Hooks/useAddons";
+import { Sparkles, TrendingUp, AlertCircle } from 'lucide-react';
+import { Link } from '@inertiajs/react';
+import { useAddons } from '@/Hooks/useAddons';
 
 export function AICreditCounter() {
   const { summary, loading } = useAddons();
@@ -18,26 +18,26 @@ export function AICreditCounter() {
   const { used, limit, remaining, percentage } = summary.ai_credits;
 
   // Determinar estado
-  const status = percentage >= 95 ? "critical" : percentage >= 80 ? "warning" : "normal";
+  const status = percentage >= 95 ? 'critical' : percentage >= 80 ? 'warning' : 'normal';
 
   const statusConfig = {
     critical: {
-      color: "text-red-600",
-      bgColor: "bg-red-500",
+      color: 'text-red-600',
+      bgColor: 'bg-red-500',
       icon: AlertCircle,
-      message: "¡Créditos casi agotados!",
+      message: '¡Créditos casi agotados!',
     },
     warning: {
-      color: "text-amber-600",
-      bgColor: "bg-amber-500",
+      color: 'text-amber-600',
+      bgColor: 'bg-amber-500',
       icon: TrendingUp,
-      message: "Considera comprar más",
+      message: 'Considera comprar más',
     },
     normal: {
-      color: "text-blue-600",
-      bgColor: "bg-blue-500",
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-500',
       icon: Sparkles,
-      message: "Todo bien",
+      message: 'Todo bien',
     },
   };
 
@@ -68,14 +68,14 @@ export function AICreditCounter() {
         </div>
         <div className="mt-1.5 flex items-center justify-between">
           <span className="text-xs text-gray-600">
-            {used} / {limit === -1 ? "∞" : limit} usados
+            {used} / {limit === -1 ? '∞' : limit} usados
           </span>
           <span className={`text-xs font-medium ${config.color}`}>{percentage.toFixed(0)}%</span>
         </div>
       </div>
 
       {/* Mensaje y CTA */}
-      {status !== "normal" && (
+      {status !== 'normal' && (
         <div className="border-t border-blue-100 pt-3">
           <p className="mb-2 text-xs text-gray-600">{config.message}</p>
           <Link
@@ -89,7 +89,7 @@ export function AICreditCounter() {
       )}
 
       {/* Info adicional */}
-      {status === "normal" && remaining < 50 && (
+      {status === 'normal' && remaining < 50 && (
         <div className="border-t border-blue-100 pt-3">
           <Link
             href="/subscription/addons"

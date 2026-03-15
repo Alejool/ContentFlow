@@ -1,7 +1,7 @@
-import axios from "axios";
+import axios from 'axios';
 
 export interface PublicationActionResponse {
-  action: "publish" | "review";
+  action: 'publish' | 'review';
   can_bypass_workflow: boolean;
   workflow_enabled: boolean;
   button_text: string;
@@ -19,17 +19,17 @@ class PublicationActionService {
    */
   async getPublicationAction(): Promise<PublicationActionResponse> {
     try {
-      const response = await axios.get("/api/v1/publications/action");
+      const response = await axios.get('/api/v1/publications/action');
       return response.data.data;
     } catch (error) {
-      console.error("Error fetching publication action:", error);
+      console.error('Error fetching publication action:', error);
       // Default to review if there's an error (safer)
       return {
-        action: "review",
+        action: 'review',
         can_bypass_workflow: false,
         workflow_enabled: true,
-        button_text: "Enviar a revisión",
-        button_text_en: "Send to Review",
+        button_text: 'Enviar a revisión',
+        button_text_en: 'Send to Review',
       };
     }
   }
@@ -39,7 +39,7 @@ class PublicationActionService {
    */
   async canPublishDirectly(): Promise<boolean> {
     const actionData = await this.getPublicationAction();
-    return actionData.action === "publish";
+    return actionData.action === 'publish';
   }
 
   /**
@@ -47,7 +47,7 @@ class PublicationActionService {
    */
   async mustSendToReview(): Promise<boolean> {
     const actionData = await this.getPublicationAction();
-    return actionData.action === "review";
+    return actionData.action === 'review';
   }
 }
 

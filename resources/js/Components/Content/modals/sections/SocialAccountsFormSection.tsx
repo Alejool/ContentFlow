@@ -1,6 +1,6 @@
-import { TFunction } from "i18next";
-import SocialAccountsSection from "@/Components/Content/Publication/common/add/SocialAccountsSection";
-import { SectionHeader } from "../common/SectionHeader";
+import { TFunction } from 'i18next';
+import SocialAccountsSection from '@/Components/Content/Publication/common/add/SocialAccountsSection';
+import { SectionHeader } from '../common/SectionHeader';
 
 interface SocialAccountsFormSectionProps {
   t: TFunction;
@@ -59,10 +59,10 @@ export const SocialAccountsFormSection = ({
 }: SocialAccountsFormSectionProps) => {
   return (
     <div
-      className={`space-y-4 transition-opacity duration-200 ${!allowConfiguration || isContentSectionDisabled ? "pointer-events-none opacity-50 grayscale-[0.5]" : ""}`}
+      className={`space-y-4 transition-opacity duration-200 ${!allowConfiguration || isContentSectionDisabled ? 'pointer-events-none opacity-50 grayscale-[0.5]' : ''}`}
     >
       <SectionHeader
-        title={t("publications.modal.edit.socialAccountsSection") || "Redes Sociales"}
+        title={t('publications.modal.edit.socialAccountsSection') || 'Redes Sociales'}
       />
 
       <SocialAccountsSection

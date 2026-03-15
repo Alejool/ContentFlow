@@ -1,11 +1,11 @@
-import Label from "@/Components/common/Modern/Label";
+import Label from '@/Components/common/Modern/Label';
 import {
   getMediaRulesForContentType,
   type ContentType,
-} from "@/Components/Content/Publication/common/ContentTypeSelector";
-import ImageCropper from "@/Components/Content/Publication/common/edit/ImageCropper";
-import { AlertTriangle, Crop, FileImage, Info, Loader2, Upload, Video, X } from "lucide-react";
-import React, { memo, useMemo, useRef, useState } from "react";
+} from '@/Components/Content/Publication/common/ContentTypeSelector';
+import ImageCropper from '@/Components/Content/Publication/common/edit/ImageCropper';
+import { AlertTriangle, Crop, FileImage, Info, Loader2, Upload, Video, X } from 'lucide-react';
+import React, { memo, useMemo, useRef, useState } from 'react';
 
 interface MediaUploadSectionProps {
   mediaPreviews: {
@@ -71,7 +71,7 @@ const MediaUploadSection = memo(
     videoMetadata,
     publicationId,
     allMediaFiles = [],
-    contentType = "post",
+    contentType = 'post',
   }: MediaUploadSectionProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [croppingImage, setCroppingImage] = useState<{
@@ -84,8 +84,8 @@ const MediaUploadSection = memo(
 
     // Calcular contadores de medios actuales
     const mediaCounts = useMemo(() => {
-      const images = mediaPreviews.filter((m) => m.type.includes("image")).length;
-      const videos = mediaPreviews.filter((m) => m.type.includes("video")).length;
+      const images = mediaPreviews.filter((m) => m.type.includes('image')).length;
+      const videos = mediaPreviews.filter((m) => m.type.includes('video')).length;
       return { images, videos, total: images + videos };
     }, [mediaPreviews]);
 
@@ -95,28 +95,28 @@ const MediaUploadSection = memo(
 
       if (mediaRules.videoOnly) {
         // Solo videos (para reels)
-        types.push("video/mp4", "video/mov", "video/avi");
+        types.push('video/mp4', 'video/mov', 'video/avi');
       } else if (mediaRules.imageOnly) {
         // Solo imágenes
-        types.push("image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp");
+        types.push('image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp');
       } else {
         // Verificar si aún se pueden agregar imágenes
         if (
           mediaRules.maxImages === undefined ||
           (mediaRules.maxImages > 0 && mediaCounts.images < mediaRules.maxImages)
         ) {
-          types.push("image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp");
+          types.push('image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp');
         }
         // Verificar si aún se pueden agregar videos
         if (
           mediaRules.maxVideos === undefined ||
           (mediaRules.maxVideos > 0 && mediaCounts.videos < mediaRules.maxVideos)
         ) {
-          types.push("video/mp4", "video/mov", "video/avi");
+          types.push('video/mp4', 'video/mov', 'video/avi');
         }
       }
 
-      return types.join(",");
+      return types.join(',');
     }, [mediaRules, mediaCounts]);
 
     // Verificar si se puede agregar más contenido
@@ -162,8 +162,8 @@ const MediaUploadSection = memo(
     const handleCropComplete = (croppedBlob: Blob) => {
       if (!croppingImage || !onUpdateFile) return;
 
-      const file = new File([croppedBlob], "cropped-image.jpg", {
-        type: "image/jpeg",
+      const file = new File([croppedBlob], 'cropped-image.jpg', {
+        type: 'image/jpeg',
       });
 
       onUpdateFile(croppingImage.tempId, file);
@@ -172,20 +172,20 @@ const MediaUploadSection = memo(
 
     const getUploadAreaStyles = () => {
       if (disabled || isAnyMediaProcessing || (lockedBy && !lockedBy.isSelf)) {
-        return "bg-gray-100 dark:bg-neutral-800/90 cursor-not-allowed opacity-60 border-gray-300 dark:border-neutral-700";
+        return 'bg-gray-100 dark:bg-neutral-800/90 cursor-not-allowed opacity-60 border-gray-300 dark:border-neutral-700';
       }
       if (imageError) {
-        return "border-primary-300 dark:border-primary-500 bg-primary-50 dark:bg-primary-900/20";
+        return 'border-primary-300 dark:border-primary-500 bg-primary-50 dark:bg-primary-900/20';
       }
       if (isDragOver) {
-        return "bg-primary-50 dark:bg-primary-900/20 border-primary-500 dark:border-primary-400";
+        return 'bg-primary-50 dark:bg-primary-900/20 border-primary-500 dark:border-primary-400';
       }
-      return "border-gray-200 dark:border-neutral-600 hover:border-primary-300 dark:hover:border-primary-400 bg-gray-50 dark:bg-neutral-900/90";
+      return 'border-gray-200 dark:border-neutral-600 hover:border-primary-300 dark:hover:border-primary-400 bg-gray-50 dark:bg-neutral-900/90';
     };
 
     return (
       <>
-        <div className={`space-y-4 ${disabled ? "pointer-events-none select-none" : ""}`}>
+        <div className={`space-y-4 ${disabled ? 'pointer-events-none select-none' : ''}`}>
           <div className="flex items-center justify-between">
             <Label htmlFor="media-upload" icon={FileImage} required variant="bold" size="lg">
               Media
@@ -199,7 +199,7 @@ const MediaUploadSection = memo(
                   {mediaRules.videoOnly
                     ? `${mediaCounts.videos}/1 video`
                     : mediaRules.imageOnly
-                      ? `${mediaCounts.images}/${mediaRules.maxImages || "∞"} imágenes`
+                      ? `${mediaCounts.images}/${mediaRules.maxImages || '∞'} imágenes`
                       : mediaRules.maxCount
                         ? `${mediaCounts.total}/${mediaRules.maxCount} archivos`
                         : `${mediaCounts.total}/${(mediaRules.maxImages || 0) + (mediaRules.maxVideos || 0)} archivos`}
@@ -211,9 +211,9 @@ const MediaUploadSection = memo(
           <div
             className={`group relative block transition-all duration-300 ${
               isDragOver && !disabled
-                ? "scale-[1.02] ring-2 ring-primary-500 ring-offset-2 dark:ring-primary-900"
-                : ""
-            } ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
+                ? 'scale-[1.02] ring-2 ring-primary-500 ring-offset-2 dark:ring-primary-900'
+                : ''
+            } ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
             onDrop={disabled ? undefined : onDrop}
             onDragOver={disabled ? undefined : onDragOver}
             onDragLeave={disabled ? undefined : onDragLeave}
@@ -237,7 +237,7 @@ const MediaUploadSection = memo(
                         progress={uploadProgress?.[preview.tempId]}
                         stats={uploadStats?.[preview.tempId]}
                         error={uploadErrors?.[preview.tempId]}
-                        isExternalProcessing={preview.status === "processing"}
+                        isExternalProcessing={preview.status === 'processing'}
                         metadata={videoMetadata?.[preview.tempId]}
                       />
                     </div>
@@ -246,7 +246,7 @@ const MediaUploadSection = memo(
                 </div>
               ) : (
                 <label
-                  htmlFor={disabled || isAnyMediaProcessing ? undefined : "media-file-input"}
+                  htmlFor={disabled || isAnyMediaProcessing ? undefined : 'media-file-input'}
                   className="cursor-pointer"
                 >
                   <EmptyUploadState
@@ -277,8 +277,8 @@ const MediaUploadSection = memo(
                     </div>
                     <span className="whitespace-nowrap text-[10px] font-bold uppercase text-primary-600 dark:text-primary-400">
                       {Object.values(uploadProgress || {}).length > 0
-                        ? "Subiendo..."
-                        : "Procesando S3..."}
+                        ? 'Subiendo...'
+                        : 'Procesando S3...'}
                     </span>
                   </div>
                 </div>
@@ -313,7 +313,7 @@ const MediaUploadSection = memo(
               <Info className="h-4 w-4" />
               <span>
                 {mediaRules.videoOnly
-                  ? "Los Reels/Shorts solo permiten 1 video"
+                  ? 'Los Reels/Shorts solo permiten 1 video'
                   : `Límite alcanzado para este tipo de contenido`}
               </span>
             </div>
@@ -366,7 +366,7 @@ const MediaPreviewItem = memo(
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const formatETA = (seconds?: number) => {
-      if (!seconds || typeof seconds !== "number" || isNaN(seconds)) return "";
+      if (!seconds || typeof seconds !== 'number' || isNaN(seconds)) return '';
       const roundedSeconds = Math.round(seconds);
       if (roundedSeconds < 60) return `${roundedSeconds}s`;
       const mins = Math.floor(roundedSeconds / 60);
@@ -375,33 +375,33 @@ const MediaPreviewItem = memo(
     };
 
     const isProcessing =
-      preview.status === "processing" ||
-      (progress !== undefined && progress >= 100 && preview.status !== "completed") ||
+      preview.status === 'processing' ||
+      (progress !== undefined && progress >= 100 && preview.status !== 'completed') ||
       isExternalProcessing;
     const isUploading =
-      !error && (preview.status === "uploading" || (progress !== undefined && progress < 100));
+      !error && (preview.status === 'uploading' || (progress !== undefined && progress < 100));
 
     return (
       <div
         className={`group/item relative aspect-video overflow-hidden rounded-lg bg-gray-900 ${
-          disabled ? "opacity-90" : ""
-        } ${error ? "border-red-500 ring-2 ring-red-500/20" : ""} ${isProcessing || isUploading ? "animate-pulse" : ""}`}
+          disabled ? 'opacity-90' : ''
+        } ${error ? 'border-red-500 ring-2 ring-red-500/20' : ''} ${isProcessing || isUploading ? 'animate-pulse' : ''}`}
         onClick={(e) => e.stopPropagation()}
       >
         {isProcessing || isUploading ? (
           <div className="flex h-full w-full flex-col items-center justify-center bg-gray-800 p-4 text-white">
             <div className="mb-2 rounded-full bg-white/10 p-3">
-              {preview.type.includes("video") ? (
+              {preview.type.includes('video') ? (
                 <Video className="h-8 w-8 text-white/50" />
               ) : (
                 <FileImage className="h-8 w-8 text-white/50" />
               )}
             </div>
             <span className="text-xs font-bold uppercase tracking-wider opacity-70">
-              {isUploading ? "Uploading..." : "Processing..."}
+              {isUploading ? 'Uploading...' : 'Processing...'}
             </span>
           </div>
-        ) : preview.type.includes("video") ? (
+        ) : preview.type.includes('video') ? (
           <VideoPreview
             preview={preview}
             thumbnail={thumbnail}
@@ -426,7 +426,7 @@ const MediaPreviewItem = memo(
             </div>
             <div className="flex w-full justify-between text-[10px] font-bold uppercase tracking-tighter text-white/90">
               <span>{Math.round(progress || 0)}%</span>
-              {stats?.eta && typeof stats.eta === "number" && !isNaN(stats.eta) && (
+              {stats?.eta && typeof stats.eta === 'number' && !isNaN(stats.eta) && (
                 <span>~{formatETA(stats.eta)}</span>
               )}
             </div>
@@ -455,7 +455,7 @@ const MediaPreviewItem = memo(
           </button>
         )}
 
-        {!disabled && !preview.type.includes("video") && !isProcessing && (
+        {!disabled && !preview.type.includes('video') && !isProcessing && (
           <button
             type="button"
             onClick={(e) => {
@@ -496,8 +496,8 @@ const VideoPreview = memo(
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
         <span className="rounded bg-black/50 px-2 py-1 text-xs font-medium text-white/80">
           {duration
-            ? `${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, "0")}`
-            : "Video"}
+            ? `${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, '0')}`
+            : 'Video'}
         </span>
         <div className="relative" onClick={(e) => e.stopPropagation()}>
           <input
@@ -512,10 +512,10 @@ const VideoPreview = memo(
           />
           <label
             htmlFor={disabled ? undefined : `edit-thumb-${preview.tempId}`}
-            className={`flex items-center gap-1 rounded-full border border-white/20 px-3 py-1.5 text-xs text-white backdrop-blur-sm transition-colors ${disabled ? "cursor-default opacity-50" : "cursor-pointer bg-white/10 hover:bg-white/20"}`}
+            className={`flex items-center gap-1 rounded-full border border-white/20 px-3 py-1.5 text-xs text-white backdrop-blur-sm transition-colors ${disabled ? 'cursor-default opacity-50' : 'cursor-pointer bg-white/10 hover:bg-white/20'}`}
           >
             <FileImage className="h-3 w-3" />
-            {thumbnail || preview.thumbnailUrl ? "Change Thumb" : "Set Thumb"}
+            {thumbnail || preview.thumbnailUrl ? 'Change Thumb' : 'Set Thumb'}
           </label>
           {(thumbnail || preview.thumbnailUrl) && !disabled && (
             <button
@@ -578,36 +578,36 @@ const EmptyUploadState = memo(
     };
   }) => {
     const getMediaHint = () => {
-      if (!mediaRules) return "Arrastra imágenes o videos aquí";
+      if (!mediaRules) return 'Arrastra imágenes o videos aquí';
 
-      if (mediaRules.videoOnly) return "Solo 1 video vertical";
+      if (mediaRules.videoOnly) return 'Solo 1 video vertical';
       if (mediaRules.imageOnly)
-        return `Hasta ${mediaRules.maxImages || 1} imagen${(mediaRules.maxImages || 1) > 1 ? "es" : ""}`;
+        return `Hasta ${mediaRules.maxImages || 1} imagen${(mediaRules.maxImages || 1) > 1 ? 'es' : ''}`;
 
       // Para carousel, usar maxCount si está definido
       if (mediaRules.maxCount) {
-        const minText = mediaRules.minCount ? `${mediaRules.minCount}-` : "";
+        const minText = mediaRules.minCount ? `${mediaRules.minCount}-` : '';
         return `${minText}${mediaRules.maxCount} archivos (imágenes o videos)`;
       }
 
       const parts: string[] = [];
       if (mediaRules.maxImages && mediaRules.maxImages > 0) {
-        parts.push(`${mediaRules.maxImages} imagen${mediaRules.maxImages > 1 ? "es" : ""}`);
+        parts.push(`${mediaRules.maxImages} imagen${mediaRules.maxImages > 1 ? 'es' : ''}`);
       }
       if (mediaRules.maxVideos && mediaRules.maxVideos > 0) {
-        parts.push(`${mediaRules.maxVideos} video${mediaRules.maxVideos > 1 ? "s" : ""}`);
+        parts.push(`${mediaRules.maxVideos} video${mediaRules.maxVideos > 1 ? 's' : ''}`);
       }
 
-      if (parts.length === 0) return "Arrastra archivos aquí";
+      if (parts.length === 0) return 'Arrastra archivos aquí';
 
-      const result = parts.join(" o ");
+      const result = parts.join(' o ');
       return mediaRules.allowMixed ? `Hasta ${result} (puedes mezclar)` : `Hasta ${result}`;
     };
 
     return (
       <div className="space-y-4">
         <div
-          className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full transition-all duration-300 ${isProcessing || (lockedBy && !lockedBy.isSelf) ? "bg-gray-200 dark:bg-gray-800" : "bg-primary-100 group-hover:scale-110 dark:bg-primary-900/30"}`}
+          className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full transition-all duration-300 ${isProcessing || (lockedBy && !lockedBy.isSelf) ? 'bg-gray-200 dark:bg-gray-800' : 'bg-primary-100 group-hover:scale-110 dark:bg-primary-900/30'}`}
         >
           {isProcessing ? (
             <Loader2 className="h-8 w-8 animate-spin text-white" />
@@ -620,16 +620,16 @@ const EmptyUploadState = memo(
         <div>
           <p className="text-lg font-medium">
             {isProcessing
-              ? "Procesando archivos..."
+              ? 'Procesando archivos...'
               : lockedBy && !lockedBy.isSelf
                 ? `Subida bloqueada por ${lockedBy.name}`
-                : t("publications.modal.edit.dragDrop.title")}
+                : t('publications.modal.edit.dragDrop.title')}
           </p>
           <p className="mt-1 text-sm opacity-70">
             {isProcessing
-              ? "Por favor, espera a que termine la subida actual."
+              ? 'Por favor, espera a que termine la subida actual.'
               : lockedBy && !lockedBy.isSelf
-                ? "Solo una persona puede subir archivos a la vez."
+                ? 'Solo una persona puede subir archivos a la vez.'
                 : getMediaHint()}
           </p>
         </div>

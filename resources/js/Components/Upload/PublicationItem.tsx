@@ -1,7 +1,7 @@
-import { Publication } from "@/types/Publication";
-import { AlertTriangle, CheckCircle2, Loader2, X } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { PlatformProgress } from "./PlatformProgress";
+import { Publication } from '@/types/Publication';
+import { AlertTriangle, CheckCircle2, Loader2, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { PlatformProgress } from './PlatformProgress';
 
 interface PublicationItemProps {
   publication: Publication;
@@ -25,10 +25,10 @@ export function PublicationItem({
 
     const platforms = Object.values(platformSummary);
     const total = platforms.length;
-    const published = platforms.filter((p) => p.status === "published").length;
-    const failed = platforms.filter((p) => p.status === "failed").length;
+    const published = platforms.filter((p) => p.status === 'published').length;
+    const failed = platforms.filter((p) => p.status === 'failed').length;
     const publishing = platforms.filter(
-      (p) => p.status === "publishing" || p.status === "pending" || p.status === "retrying",
+      (p) => p.status === 'publishing' || p.status === 'pending' || p.status === 'retrying',
     ).length;
 
     return { total, published, failed, publishing };
@@ -38,13 +38,13 @@ export function PublicationItem({
     const stats = getPlatformStats();
 
     switch (publication.status) {
-      case "failed":
+      case 'failed':
         return <AlertTriangle className="h-3.5 w-3.5 text-red-500" />;
-      case "publishing":
-      case "processing":
-      case "retrying":
+      case 'publishing':
+      case 'processing':
+      case 'retrying':
         return <Loader2 className="text-primary h-3.5 w-3.5 animate-spin" />;
-      case "published":
+      case 'published':
         // Show warning icon if some platforms failed
         if (stats && stats.failed > 0) {
           return <AlertTriangle className="h-3.5 w-3.5 text-orange-500" />;
@@ -61,45 +61,45 @@ export function PublicationItem({
     const badges = {
       publishing: {
         text: stats
-          ? t("publications.status.publishingProgress", {
+          ? t('publications.status.publishingProgress', {
               current: stats.published,
               total: stats.total,
               defaultValue: `${stats.published}/${stats.total}`,
             })
-          : t("common.publishing") || "Publicando",
-        className: "bg-primary/10 text-primary dark:bg-primary/20",
+          : t('common.publishing') || 'Publicando',
+        className: 'bg-primary/10 text-primary dark:bg-primary/20',
       },
       retrying: {
         text: stats
-          ? t("publications.status.retryingProgress", {
+          ? t('publications.status.retryingProgress', {
               current: stats.published,
               total: stats.total,
               defaultValue: `Reintentando ${stats.published}/${stats.total}`,
             })
-          : t("common.retrying") || "Reintentando",
-        className: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
+          : t('common.retrying') || 'Reintentando',
+        className: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
       },
       published: {
         text: stats
           ? stats.failed > 0
-            ? t("publications.status.partialSuccess", {
+            ? t('publications.status.partialSuccess', {
                 success: stats.published,
                 total: stats.total,
                 defaultValue: `${stats.published}/${stats.total} publicado`,
               })
-            : t("publications.status.allPublished", {
+            : t('publications.status.allPublished', {
                 total: stats.total,
                 defaultValue: `${stats.total}/${stats.total} publicado`,
               })
-          : t("common.success") || "Éxito",
+          : t('common.success') || 'Éxito',
         className:
           stats && stats.failed > 0
-            ? "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300"
-            : "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
+            ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300'
+            : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
       },
       failed: {
-        text: t("common.failed") || "Falló",
-        className: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
+        text: t('common.failed') || 'Falló',
+        className: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
       },
     };
 
@@ -116,10 +116,10 @@ export function PublicationItem({
   };
 
   const canCancel =
-    publication.status === "publishing" ||
-    publication.status === "processing" ||
-    publication.status === "retrying";
-  const canDismiss = publication.status === "failed" || publication.status === "published";
+    publication.status === 'publishing' ||
+    publication.status === 'processing' ||
+    publication.status === 'retrying';
+  const canDismiss = publication.status === 'failed' || publication.status === 'published';
 
   return (
     <div className="group border-b border-gray-100 p-3 last:border-0 dark:border-neutral-700">
@@ -136,7 +136,7 @@ export function PublicationItem({
             <button
               onClick={(e) => onDismiss(e, publication.id)}
               className="text-gray-400 opacity-0 transition-opacity hover:text-green-500 group-hover:opacity-100"
-              title={t("common.dismiss") || "Descartar"}
+              title={t('common.dismiss') || 'Descartar'}
             >
               <X className="h-3.5 w-3.5" />
             </button>
@@ -145,7 +145,7 @@ export function PublicationItem({
             <button
               onClick={(e) => onCancel(e, publication.id)}
               className="text-gray-400 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
-              title={t("publications.publish.button.cancel") || "Cancelar"}
+              title={t('publications.publish.button.cancel') || 'Cancelar'}
             >
               <X className="h-3.5 w-3.5" />
             </button>

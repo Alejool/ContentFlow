@@ -1,7 +1,7 @@
-import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { X, Keyboard } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import Button from "@/Components/common/Modern/Button";
+import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
+import { X, Keyboard } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import Button from '@/Components/common/Modern/Button';
 
 interface KeyboardShortcutsModalProps {
   isOpen: boolean;
@@ -26,27 +26,27 @@ interface ShortcutDefinition {
 const SHORTCUTS_CONFIG: ShortcutDefinition[] = [
   // Apariencia
   {
-    macKeys: ["⌘", "⌥", "T"],
-    winKeys: ["Ctrl", "Alt", "T"],
-    translationKey: "shortcuts.theme.toggle",
-    fallbackText: "Cambiar tema (Claro/Oscuro)",
-    category: "appearance",
+    macKeys: ['⌘', '⌥', 'T'],
+    winKeys: ['Ctrl', 'Alt', 'T'],
+    translationKey: 'shortcuts.theme.toggle',
+    fallbackText: 'Cambiar tema (Claro/Oscuro)',
+    category: 'appearance',
   },
   // Navegación
   {
-    macKeys: ["⌘", "K"],
-    winKeys: ["Ctrl", "K"],
-    translationKey: "shortcuts.search.open",
-    fallbackText: "Abrir búsqueda rápida",
-    category: "navigation",
+    macKeys: ['⌘', 'K'],
+    winKeys: ['Ctrl', 'K'],
+    translationKey: 'shortcuts.search.open',
+    fallbackText: 'Abrir búsqueda rápida',
+    category: 'navigation',
   },
   // Ayuda
   {
-    macKeys: ["⌘", "/"],
-    winKeys: ["Ctrl", "/"],
-    translationKey: "shortcuts.help.show",
-    fallbackText: "Mostrar atajos de teclado",
-    category: "help",
+    macKeys: ['⌘', '/'],
+    winKeys: ['Ctrl', '/'],
+    translationKey: 'shortcuts.help.show',
+    fallbackText: 'Mostrar atajos de teclado',
+    category: 'help',
   },
 ];
 
@@ -54,16 +54,16 @@ export default function KeyboardShortcutsModal({ isOpen, onClose }: KeyboardShor
   const { t } = useTranslation();
 
   const isMac =
-    typeof navigator !== "undefined" &&
-    (navigator.userAgent.toUpperCase().indexOf("MAC") >= 0 ||
-      navigator.userAgent.toUpperCase().indexOf("IPHONE") >= 0 ||
-      navigator.userAgent.toUpperCase().indexOf("IPAD") >= 0);
+    typeof navigator !== 'undefined' &&
+    (navigator.userAgent.toUpperCase().indexOf('MAC') >= 0 ||
+      navigator.userAgent.toUpperCase().indexOf('IPHONE') >= 0 ||
+      navigator.userAgent.toUpperCase().indexOf('IPAD') >= 0);
 
   // Mapeo de categorías a sus traducciones
   const categoryTranslations: Record<string, string> = {
-    appearance: t("shortcuts.category.appearance", "Apariencia"),
-    navigation: t("shortcuts.category.navigation", "Navegación"),
-    help: t("shortcuts.category.help", "Ayuda"),
+    appearance: t('shortcuts.category.appearance', 'Apariencia'),
+    navigation: t('shortcuts.category.navigation', 'Navegación'),
+    help: t('shortcuts.category.help', 'Ayuda'),
   };
 
   // Convertir la configuración a shortcuts con las teclas apropiadas
@@ -96,7 +96,7 @@ export default function KeyboardShortcutsModal({ isOpen, onClose }: KeyboardShor
                 <div className="rounded-lg bg-gradient-to-r from-primary-500 to-primary-600 p-1.5">
                   <Keyboard className="h-5 w-5 text-white" />
                 </div>
-                {t("shortcuts.title", "Atajos de Teclado")}
+                {t('shortcuts.title', 'Atajos de Teclado')}
               </div>
             </DialogTitle>
             <button
@@ -145,7 +145,7 @@ export default function KeyboardShortcutsModal({ isOpen, onClose }: KeyboardShor
 
           <div className="flex justify-end gap-3 border-t border-gray-200 p-4 dark:border-neutral-700">
             <Button onClick={onClose} variant="secondary" buttonStyle="ghost" size="md">
-              {t("common.close", "Cerrar")}
+              {t('common.close', 'Cerrar')}
             </Button>
           </div>
         </DialogPanel>

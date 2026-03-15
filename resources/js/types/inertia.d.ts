@@ -1,5 +1,5 @@
-declare module "@inertiajs/react" {
-  import { ComponentType, ReactNode } from "react";
+declare module '@inertiajs/react' {
+  import { ComponentType, ReactNode } from 'react';
 
   export interface PageProps {
     [key: string]: any;

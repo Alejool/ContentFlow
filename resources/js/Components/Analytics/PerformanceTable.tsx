@@ -1,6 +1,6 @@
-import Input from "@/Components/common/Modern/Input";
-import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
-import { useTheme } from "@/Hooks/useTheme";
+import Input from '@/Components/common/Modern/Input';
+import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
+import { useTheme } from '@/Hooks/useTheme';
 import {
   ArrowUpDown,
   ChevronDown,
@@ -11,9 +11,9 @@ import {
   MousePointer2,
   Search,
   TrendingUp,
-} from "lucide-react";
-import React, { useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
+} from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export interface PublicationStat {
   id: number;
@@ -41,8 +41,8 @@ interface PerformanceTableProps {
   hideSearch?: boolean;
 }
 
-type SortField = "title" | "total_views" | "total_clicks" | "total_engagement";
-type SortDirection = "asc" | "desc";
+type SortField = 'title' | 'total_views' | 'total_clicks' | 'total_engagement';
+type SortDirection = 'asc' | 'desc';
 
 export default function PerformanceTable({
   campaigns,
@@ -52,9 +52,9 @@ export default function PerformanceTable({
 }: PerformanceTableProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  const [sortField, setSortField] = useState<SortField>("total_engagement");
-  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
-  const [internalSearchTerm, setInternalSearchTerm] = useState("");
+  const [sortField, setSortField] = useState<SortField>('total_engagement');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const [internalSearchTerm, setInternalSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
 
@@ -63,16 +63,16 @@ export default function PerformanceTable({
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
       setSortField(field);
-      setSortDirection("desc");
+      setSortDirection('desc');
     }
   };
 
   const getSortIcon = (field: SortField) => {
     if (sortField !== field) return <ArrowUpDown className="h-3 w-3 text-gray-400 opacity-50" />;
-    return sortDirection === "asc" ? (
+    return sortDirection === 'asc' ? (
       <ChevronUp className="h-3 w-3 text-primary-600" />
     ) : (
       <ChevronDown className="h-3 w-3 text-primary-600" />
@@ -84,7 +84,7 @@ export default function PerformanceTable({
     return campaigns
       .map((campaign) => {
         const campaignTitle = (
-          campaign.id === 0 ? t("analytics.drilldown.standalone") : campaign.title
+          campaign.id === 0 ? t('analytics.drilldown.standalone') : campaign.title
         ).toLowerCase();
 
         const matchesCampaign = campaignTitle.includes(term);
@@ -109,11 +109,11 @@ export default function PerformanceTable({
       let valA = a[sortField];
       let valB = b[sortField];
 
-      if (typeof valA === "string" && typeof valB === "string") {
-        return sortDirection === "asc" ? valA.localeCompare(valB) : valB.localeCompare(valA);
+      if (typeof valA === 'string' && typeof valB === 'string') {
+        return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
       }
 
-      return sortDirection === "asc"
+      return sortDirection === 'asc'
         ? (valA as number) - (valB as number)
         : (valB as number) - (valA as number);
     });
@@ -142,7 +142,7 @@ export default function PerformanceTable({
           <div className="w-full md:w-64">
             <Input
               id="search"
-              placeholder={t("common.search") || "Buscar..."}
+              placeholder={t('common.search') || 'Buscar...'}
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
@@ -157,45 +157,45 @@ export default function PerformanceTable({
 
       <div className="overflow-x-auto rounded-lg border border-gray-100 shadow-sm dark:border-neutral-800">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-800">
-          <thead className={theme === "dark" ? "bg-neutral-900/50" : "bg-gray-50"}>
+          <thead className={theme === 'dark' ? 'bg-neutral-900/50' : 'bg-gray-50'}>
             <tr>
               <th
-                onClick={() => handleSort("title")}
+                onClick={() => handleSort('title')}
                 className="group cursor-pointer px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-neutral-800"
               >
                 <div className="flex items-center gap-2">
-                  {t("common.item") || "Elemento"}
-                  {getSortIcon("title")}
+                  {t('common.item') || 'Elemento'}
+                  {getSortIcon('title')}
                 </div>
               </th>
               <th
-                onClick={() => handleSort("total_views")}
+                onClick={() => handleSort('total_views')}
                 className="cursor-pointer px-6 py-3 text-center text-xs font-bold uppercase tracking-wider text-gray-500 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-neutral-800"
               >
                 <div className="flex items-center justify-center gap-1">
                   <Eye className="h-3 w-3" />
-                  {t("analytics.vistas") || "Vistas"}
-                  {getSortIcon("total_views")}
+                  {t('analytics.vistas') || 'Vistas'}
+                  {getSortIcon('total_views')}
                 </div>
               </th>
               <th
-                onClick={() => handleSort("total_clicks")}
+                onClick={() => handleSort('total_clicks')}
                 className="cursor-pointer px-6 py-3 text-center text-xs font-bold uppercase tracking-wider text-gray-500 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-neutral-800"
               >
                 <div className="flex items-center justify-center gap-1">
                   <MousePointer2 className="h-3 w-3" />
-                  {t("analytics.clics") || "Clics"}
-                  {getSortIcon("total_clicks")}
+                  {t('analytics.clics') || 'Clics'}
+                  {getSortIcon('total_clicks')}
                 </div>
               </th>
               <th
-                onClick={() => handleSort("total_engagement")}
+                onClick={() => handleSort('total_engagement')}
                 className="cursor-pointer px-6 py-3 text-center text-xs font-bold uppercase tracking-wider text-purple-600 transition-colors hover:bg-gray-100 dark:text-purple-400 dark:hover:bg-neutral-800"
               >
                 <div className="flex items-center justify-center gap-1">
                   <TrendingUp className="h-3 w-3" />
-                  {t("analytics.engagement") || "Engagement"}
-                  {getSortIcon("total_engagement")}
+                  {t('analytics.engagement') || 'Engagement'}
+                  {getSortIcon('total_engagement')}
                 </div>
               </th>
             </tr>
@@ -208,7 +208,7 @@ export default function PerformanceTable({
               return (
                 <React.Fragment key={`${item.campaign.id}-${item.publication.id}`}>
                   {showCampaignHeader && (
-                    <tr className={theme === "dark" ? "bg-neutral-800/30" : "bg-primary-50/10"}>
+                    <tr className={theme === 'dark' ? 'bg-neutral-800/30' : 'bg-primary-50/10'}>
                       <td className="whitespace-nowrap px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded bg-primary-100 dark:bg-primary-900/30">
@@ -217,7 +217,7 @@ export default function PerformanceTable({
                           <div>
                             <div className="text-sm font-bold text-gray-900 dark:text-white">
                               {item.campaign.id === 0
-                                ? t("analytics.drilldown.standalone")
+                                ? t('analytics.drilldown.standalone')
                                 : item.campaign.title}
                             </div>
                             <div className="text-[10px] font-bold tracking-tight text-gray-500">
@@ -230,8 +230,8 @@ export default function PerformanceTable({
                                   <span className="mx-1">•</span>
                                 </>
                               )}
-                              {item.campaign.publications.length}{" "}
-                              {t("common.publications") || "Publicaciones"}
+                              {item.campaign.publications.length}{' '}
+                              {t('common.publications') || 'Publicaciones'}
                             </div>
                           </div>
                         </div>
@@ -286,7 +286,7 @@ export default function PerformanceTable({
             {paginatedItems.length === 0 && (
               <tr>
                 <td colSpan={4} className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
-                  {searchTerm ? t("common.noResults") : t("analytics.emptyState.title")}
+                  {searchTerm ? t('common.noResults') : t('analytics.emptyState.title')}
                 </td>
               </tr>
             )}

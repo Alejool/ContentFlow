@@ -1,6 +1,6 @@
-import { Avatar } from "@/Components/common/Avatar";
-import { format } from "date-fns";
-import { Heart, MessageCircle, Repeat, Share } from "lucide-react";
+import { Avatar } from '@/Components/common/Avatar';
+import { format } from 'date-fns';
+import { Heart, MessageCircle, Repeat, Share } from 'lucide-react';
 
 interface TwitterPreviewProps {
   content: string;
@@ -22,8 +22,8 @@ export const TwitterPreview = ({
   mediaUrls,
   user,
   date = new Date(),
-  className = "",
-  contentType = "post",
+  className = '',
+  contentType = 'post',
   pollOptions = [],
   pollDuration = 24,
 }: TwitterPreviewProps) => {
@@ -38,15 +38,15 @@ export const TwitterPreview = ({
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5 text-[15px] leading-5">
             <span className="truncate font-bold text-gray-900 dark:text-white">
-              {user?.name || "User Name"}
+              {user?.name || 'User Name'}
             </span>
             {/* Verified badge could go here */}
             <span className="truncate text-gray-500 dark:text-gray-500">
-              @{user?.username || "username"}
+              @{user?.username || 'username'}
             </span>
             <span className="text-gray-500 dark:text-gray-500">·</span>
             <span className="text-gray-500 hover:underline dark:text-gray-500">
-              {date ? format(date, "MMM d") : "Now"}
+              {date ? format(date, 'MMM d') : 'Now'}
             </span>
           </div>
 
@@ -54,14 +54,14 @@ export const TwitterPreview = ({
             {content || <span className="italic text-gray-400">Start typing to preview...</span>}
           </div>
 
-          {mediaUrls.length > 0 && contentType !== "poll" && (
+          {mediaUrls.length > 0 && contentType !== 'poll' && (
             <div
               className={`mt-3 grid gap-0.5 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800 ${
                 mediaUrls.length === 1
-                  ? "grid-cols-1"
+                  ? 'grid-cols-1'
                   : mediaUrls.length === 2
-                    ? "grid-cols-2"
-                    : "grid-cols-2"
+                    ? 'grid-cols-2'
+                    : 'grid-cols-2'
               }`}
             >
               {mediaUrls.slice(0, 4).map((url, index) => (
@@ -77,7 +77,7 @@ export const TwitterPreview = ({
             </div>
           )}
 
-          {contentType === "poll" && pollOptions.length >= 2 && (
+          {contentType === 'poll' && pollOptions.length >= 2 && (
             <div className="mt-3 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800">
               <div className="border-b border-gray-200 bg-gray-50 px-3 py-2 dark:border-gray-800 dark:bg-gray-900/30">
                 <div className="flex items-center gap-2">
@@ -86,8 +86,8 @@ export const TwitterPreview = ({
                   </span>
                   <span className="text-xs text-gray-500 dark:text-gray-400">
                     {pollDuration < 24
-                      ? `${pollDuration} hora${pollDuration !== 1 ? "s" : ""} restante${pollDuration !== 1 ? "s" : ""}`
-                      : `${Math.floor(pollDuration / 24)} día${Math.floor(pollDuration / 24) !== 1 ? "s" : ""} restante${Math.floor(pollDuration / 24) !== 1 ? "s" : ""}`}{" "}
+                      ? `${pollDuration} hora${pollDuration !== 1 ? 's' : ''} restante${pollDuration !== 1 ? 's' : ''}`
+                      : `${Math.floor(pollDuration / 24)} día${Math.floor(pollDuration / 24) !== 1 ? 's' : ''} restante${Math.floor(pollDuration / 24) !== 1 ? 's' : ''}`}{' '}
                     · 0 votos
                   </span>
                 </div>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 interface MediaInfo {
   extension?: string;
@@ -55,12 +55,12 @@ export default function ContentValidationPanel({
 
   const formatPlatform = (platform: string): string => {
     const names: Record<string, string> = {
-      facebook: "Facebook",
-      instagram: "Instagram",
-      tiktok: "TikTok",
-      youtube: "YouTube",
-      twitter: "Twitter",
-      linkedin: "LinkedIn",
+      facebook: 'Facebook',
+      instagram: 'Instagram',
+      tiktok: 'TikTok',
+      youtube: 'YouTube',
+      twitter: 'Twitter',
+      linkedin: 'LinkedIn',
     };
     return names[platform] || platform;
   };
@@ -72,18 +72,18 @@ export default function ContentValidationPanel({
   };
 
   const formatFileSize = (bytes: number): string => {
-    if (bytes < 1024) return bytes + " B";
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + " KB";
-    if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(2) + " MB";
-    return (bytes / (1024 * 1024 * 1024)).toFixed(2) + " GB";
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+    if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
   };
 
   const compatiblePlatformsText = (): string => {
     const platforms = compatiblePlatforms.map(([p]) => formatPlatform(p));
-    if (platforms.length === 0) return "";
+    if (platforms.length === 0) return '';
     if (platforms.length === 1) return platforms[0];
-    if (platforms.length === 2) return platforms.join(" y ");
-    return platforms.slice(0, -1).join(", ") + " y " + platforms[platforms.length - 1];
+    if (platforms.length === 2) return platforms.join(' y ');
+    return platforms.slice(0, -1).join(', ') + ' y ' + platforms[platforms.length - 1];
   };
 
   return (
@@ -181,7 +181,7 @@ export default function ContentValidationPanel({
             onClick={() => setMediaInfoExpanded(!mediaInfoExpanded)}
             className="flex items-center gap-1.5 text-xs text-gray-600 transition-colors hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
           >
-            <span>{mediaInfoExpanded ? "▼" : "▶"}</span>
+            <span>{mediaInfoExpanded ? '▼' : '▶'}</span>
             <span>Detalles técnicos</span>
           </button>
           {mediaInfoExpanded && (

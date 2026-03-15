@@ -1,28 +1,28 @@
-import { useState } from "react";
-import { CreditCard, Loader2 } from "lucide-react";
-import axios from "axios";
+import { useState } from 'react';
+import { CreditCard, Loader2 } from 'lucide-react';
+import axios from 'axios';
 
 interface CheckoutButtonProps {
   className?: string;
   children?: React.ReactNode;
 }
 
-export default function CheckoutButton({ className = "", children }: CheckoutButtonProps) {
+export default function CheckoutButton({ className = '', children }: CheckoutButtonProps) {
   const [loading, setLoading] = useState(false);
 
   const handleCheckout = async () => {
     setLoading(true);
 
     try {
-      const response = await axios.post("/checkout/create-session");
+      const response = await axios.post('/checkout/create-session');
 
       // Redirigir a la página de checkout de Stripe
       if (response.data.url) {
         window.location.href = response.data.url;
       }
     } catch (error) {
-      console.error("Error al crear sesión de checkout:", error);
-      alert("Hubo un error al procesar tu solicitud. Por favor intenta de nuevo.");
+      console.error('Error al crear sesión de checkout:', error);
+      alert('Hubo un error al procesar tu solicitud. Por favor intenta de nuevo.');
       setLoading(false);
     }
   };
@@ -41,7 +41,7 @@ export default function CheckoutButton({ className = "", children }: CheckoutBut
       ) : (
         <>
           <CreditCard className="h-5 w-5" />
-          {children || "Comprar Plan Premium"}
+          {children || 'Comprar Plan Premium'}
         </>
       )}
     </button>

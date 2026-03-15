@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 /**
  * Hook genérico para persistir cualquier estado en localStorage
@@ -12,7 +12,7 @@ export function usePersistedState<T>(
 ): [T, (value: T | ((prev: T) => T)) => void] {
   const [state, setState] = useState<T>(() => {
     // Intentar cargar el estado guardado en localStorage
-    if (typeof window === "undefined") return defaultValue;
+    if (typeof window === 'undefined') return defaultValue;
 
     try {
       const savedState = localStorage.getItem(key);
@@ -41,15 +41,15 @@ export function usePersistedState<T>(
 /**
  * Hook para persistir el estado de vista del calendario
  */
-export function useCalendarViewState(defaultView: "month" | "week" | "day" = "month") {
-  return usePersistedState<"month" | "week" | "day">("contentflow_calendar_view", defaultView);
+export function useCalendarViewState(defaultView: 'month' | 'week' | 'day' = 'month') {
+  return usePersistedState<'month' | 'week' | 'day'>('contentflow_calendar_view', defaultView);
 }
 
 /**
  * Hook para persistir el estado de filtros visibles
  */
 export function useFiltersVisibilityState(defaultVisible: boolean = false) {
-  return usePersistedState<boolean>("contentflow_filters_visible", defaultVisible);
+  return usePersistedState<boolean>('contentflow_filters_visible', defaultVisible);
 }
 
 /**
@@ -58,10 +58,10 @@ export function useFiltersVisibilityState(defaultVisible: boolean = false) {
 export function useSortState<T extends string>(
   storageKey: string,
   defaultField: T,
-  defaultDirection: "asc" | "desc" = "desc",
+  defaultDirection: 'asc' | 'desc' = 'desc',
 ) {
   const [sortField, setSortField] = usePersistedState<T>(`${storageKey}_sort_field`, defaultField);
-  const [sortDirection, setSortDirection] = usePersistedState<"asc" | "desc">(
+  const [sortDirection, setSortDirection] = usePersistedState<'asc' | 'desc'>(
     `${storageKey}_sort_direction`,
     defaultDirection,
   );

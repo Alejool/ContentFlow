@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 /**
  * Configuration interface for EmptyState component
@@ -42,7 +42,7 @@ interface EmptyStateProps {
  * @param config - Configuration object defining the empty state content
  * @param className - Optional additional CSS classes
  */
-const EmptyState: React.FC<EmptyStateProps> = ({ config, className = "" }) => {
+const EmptyState: React.FC<EmptyStateProps> = ({ config, className = '' }) => {
   return (
     <div
       className={`flex flex-col items-center justify-center px-4 py-12 text-center ${className}`}

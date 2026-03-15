@@ -4,21 +4,21 @@
  * Input with focus animations and accessibility features
  */
 
-import React, { InputHTMLAttributes, forwardRef, useState } from "react";
-import { LazyMotion, domAnimation, m } from "framer-motion";
-import { prefersReducedMotion } from "@/Utils/themeTransition";
+import React, { InputHTMLAttributes, forwardRef, useState } from 'react';
+import { LazyMotion, domAnimation, m } from 'framer-motion';
+import { prefersReducedMotion } from '@/Utils/themeTransition';
 
 interface AnimatedInputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   helperText?: string;
   icon?: React.ReactNode;
-  iconPosition?: "left" | "right";
+  iconPosition?: 'left' | 'right';
 }
 
 export const AnimatedInput = forwardRef<HTMLInputElement, AnimatedInputProps>(
   (
-    { label, error, helperText, icon, iconPosition = "left", id, className = "", ...props },
+    { label, error, helperText, icon, iconPosition = 'left', id, className = '', ...props },
     ref,
   ) => {
     const [isFocused, setIsFocused] = useState(false);
@@ -35,8 +35,8 @@ export const AnimatedInput = forwardRef<HTMLInputElement, AnimatedInputProps>(
       transition-all duration-fast
       focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20
       disabled:opacity-50 disabled:cursor-not-allowed
-      ${error ? "border-error-500 focus:border-error-500 focus:ring-error-500/20" : ""}
-      ${icon ? (iconPosition === "left" ? "pl-10" : "pr-10") : ""}
+      ${error ? 'border-error-500 focus:border-error-500 focus:ring-error-500/20' : ''}
+      ${icon ? (iconPosition === 'left' ? 'pl-10' : 'pr-10') : ''}
       ${className}
     `;
 
@@ -53,8 +53,8 @@ export const AnimatedInput = forwardRef<HTMLInputElement, AnimatedInputProps>(
                   ? {}
                   : {
                       color: isFocused
-                        ? "var(--theme-text-primary)"
-                        : "var(--theme-text-secondary)",
+                        ? 'var(--theme-text-primary)'
+                        : 'var(--theme-text-secondary)',
                     }
               }
               transition={{ duration: 0.15 }}
@@ -72,7 +72,7 @@ export const AnimatedInput = forwardRef<HTMLInputElement, AnimatedInputProps>(
             {icon && (
               <div
                 className={`absolute top-1/2 -translate-y-1/2 ${
-                  iconPosition === "left" ? "left-3" : "right-3"
+                  iconPosition === 'left' ? 'left-3' : 'right-3'
                 } pointer-events-none text-theme-text-tertiary`}
                 aria-hidden="true"
               >
@@ -124,4 +124,4 @@ export const AnimatedInput = forwardRef<HTMLInputElement, AnimatedInputProps>(
   },
 );
 
-AnimatedInput.displayName = "AnimatedInput";
+AnimatedInput.displayName = 'AnimatedInput';

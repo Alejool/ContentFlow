@@ -1,10 +1,10 @@
-import Button from "@/Components/common/Modern/Button";
-import { DynamicModal } from "@/Components/common/Modern/DynamicModal";
-import { Calendar, X, Undo2, Trash2 } from "lucide-react";
-import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import Button from '@/Components/common/Modern/Button';
+import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
+import { Calendar, X, Undo2, Trash2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 interface BulkActionsBarProps {
   selectedCount: number;
@@ -86,12 +86,12 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
               </div>
               <div>
                 <div className="text-sm font-semibold text-gray-900 dark:text-white">
-                  {selectedCount}{" "}
-                  {t(selectedCount === 1 ? "calendar.event" : "calendar.events.count")}{" "}
-                  {t("calendar.selected")}
+                  {selectedCount}{' '}
+                  {t(selectedCount === 1 ? 'calendar.event' : 'calendar.events.count')}{' '}
+                  {t('calendar.selected')}
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-400">
-                  {t("calendar.of")} {totalEvents} {t("calendar.total")}
+                  {t('calendar.of')} {totalEvents} {t('calendar.total')}
                 </div>
               </div>
             </div>
@@ -106,7 +106,7 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
                   onClick={onSelectAll}
                   className="whitespace-nowrap"
                 >
-                  {t("calendar.selectAll")}
+                  {t('calendar.selectAll')}
                 </Button>
               )}
 
@@ -116,10 +116,10 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
                   size="sm"
                   onClick={onUndo}
                   className="whitespace-nowrap"
-                  title={t("calendar.undoLastOperation")}
+                  title={t('calendar.undoLastOperation')}
                 >
                   <Undo2 className="mr-2 h-4 w-4" />
-                  {t("calendar.undo")}
+                  {t('calendar.undo')}
                 </Button>
               )}
 
@@ -130,12 +130,12 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
                 className="whitespace-nowrap"
                 icon={Calendar}
               >
-                {t("calendar.moveEvents")}
+                {t('calendar.moveEvents')}
               </Button>
               <button
                 onClick={onClearSelection}
                 className="rounded-lg p-2 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
-                title={t("calendar.clearSelection")}
+                title={t('calendar.clearSelection')}
               >
                 <X className="h-5 w-5 text-gray-500" />
               </button>
@@ -147,7 +147,7 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
       <DynamicModal
         isOpen={showMoveModal}
         onClose={() => setShowMoveModal(false)}
-        title={t("calendar.moveSelectedEvents")}
+        title={t('calendar.moveSelectedEvents')}
         size="md"
       >
         <div className="space-y-6">
@@ -158,10 +158,10 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
               </div>
               <div className="flex-1">
                 <h4 className="mb-1 text-sm font-semibold text-blue-900 dark:text-blue-100">
-                  {t("calendar.movingEvents", { count: selectedCount })}
+                  {t('calendar.movingEvents', { count: selectedCount })}
                 </h4>
                 <p className="text-sm text-blue-700 dark:text-blue-300">
-                  {t("calendar.selectNewDateTime")}
+                  {t('calendar.selectNewDateTime')}
                 </p>
               </div>
             </div>
@@ -169,7 +169,7 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
 
           <div className="space-y-3">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              {t("calendar.newDateAndTime")}
+              {t('calendar.newDateAndTime')}
             </label>
             <div className="flex justify-center">
               <DatePicker
@@ -190,25 +190,25 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
             </div>
             <div className="text-center">
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                {t("calendar.selected_date")}
+                {t('calendar.selected_date')}
               </p>
               <p className="mt-1 text-sm font-medium text-gray-900 dark:text-white">
-                {selectedDate.toLocaleDateString("es-ES", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
+                {selectedDate.toLocaleDateString('es-ES', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
                 })}
               </p>
               <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                {t("calendar.preserveOriginalTime")}
+                {t('calendar.preserveOriginalTime')}
               </p>
             </div>
           </div>
 
           <div className="flex justify-end gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">
             <Button variant="ghost" onClick={() => setShowMoveModal(false)} disabled={isMoving}>
-              {t("common.cancel")}
+              {t('common.cancel')}
             </Button>
             <Button
               variant="primary"
@@ -217,7 +217,7 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
               loading={isMoving}
               icon={Calendar}
             >
-              {t("calendar.moveCount", { count: selectedCount })}
+              {t('calendar.moveCount', { count: selectedCount })}
             </Button>
           </div>
         </div>
@@ -226,7 +226,7 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
       <DynamicModal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
-        title={t("calendar.deleteSelectedEvents")}
+        title={t('calendar.deleteSelectedEvents')}
         size="md"
       >
         <div className="space-y-6">
@@ -237,10 +237,10 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
               </div>
               <div className="flex-1">
                 <h4 className="mb-1 text-sm font-semibold text-red-900 dark:text-red-100">
-                  {t("calendar.confirmDelete")}
+                  {t('calendar.confirmDelete')}
                 </h4>
                 <p className="text-sm text-red-700 dark:text-red-300">
-                  {t("calendar.deleteWarning", { count: selectedCount })}
+                  {t('calendar.deleteWarning', { count: selectedCount })}
                 </p>
               </div>
             </div>
@@ -252,7 +252,7 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
               onClick={() => setShowDeleteModal(false)}
               disabled={isDeleting}
             >
-              {t("common.cancel")}
+              {t('common.cancel')}
             </Button>
             <Button
               variant="danger"
@@ -261,7 +261,7 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
               loading={isDeleting}
             >
               <Trash2 className="mr-2 h-4 w-4" />
-              {t("calendar.deleteCount", { count: selectedCount })}
+              {t('calendar.deleteCount', { count: selectedCount })}
             </Button>
           </div>
         </div>

@@ -1,9 +1,9 @@
-import { usePublicationActionsStore } from "@/stores/publicationActionsStore";
-import { Publication } from "@/types/Publication";
-import { useCallback } from "react";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
-import { usePublicationPermissions } from "./usePublicationPermissions";
+import { usePublicationActionsStore } from '@/stores/publicationActionsStore';
+import { Publication } from '@/types/Publication';
+import { useCallback } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { usePublicationPermissions } from './usePublicationPermissions';
 
 interface UsePublicationActionsProps {
   onEdit?: (item: Publication) => void;
@@ -49,12 +49,12 @@ export function usePublicationActions({
         if (approvalInfo) {
           const approversList =
             approvalInfo.approvers.length > 0
-              ? approvalInfo.approvers.join(", ")
-              : t("approvals.unknownApprover");
+              ? approvalInfo.approvers.join(', ')
+              : t('approvals.unknownApprover');
 
-          const message = t("approvals.sentToReview", {
+          const message = t('approvals.sentToReview', {
             level:
-              approvalInfo.level_name || `${t("approvals.level")} ${approvalInfo.current_level}`,
+              approvalInfo.level_name || `${t('approvals.level')} ${approvalInfo.current_level}`,
             approvers: approversList,
             defaultValue: `Enviado a revisión - ${approvalInfo.level_name || `Nivel ${approvalInfo.current_level}`}. Revisores: ${approversList}`,
           });
@@ -62,13 +62,13 @@ export function usePublicationActions({
           toast.success(message);
         } else {
           toast.success(
-            t("approvals.sentToReviewGeneric", {
-              defaultValue: "Enviado a revisión exitosamente",
+            t('approvals.sentToReviewGeneric', {
+              defaultValue: 'Enviado a revisión exitosamente',
             }),
           );
         }
       } else {
-        toast.error(result.message || t("approvals.errors.submit_failed"));
+        toast.error(result.message || t('approvals.errors.submit_failed'));
       }
     },
     [submitForApproval, t],
@@ -89,8 +89,8 @@ export function usePublicationActions({
       if (!onEdit || !item.id) return;
 
       if (remoteLock) {
-        const lockedByName = remoteLock.user_name || remoteLock.user?.name || t("common.unknown");
-        toast.error(`${t("publications.table.lockedBy")} ${lockedByName}`);
+        const lockedByName = remoteLock.user_name || remoteLock.user?.name || t('common.unknown');
+        toast.error(`${t('publications.table.lockedBy')} ${lockedByName}`);
         return;
       }
 
@@ -111,16 +111,16 @@ export function usePublicationActions({
       if (isUserEvent) {
         if (
           confirm(
-            t("calendar.userEvents.modal.messages.confirmDelete") ||
-              "¿Estás seguro de que deseas eliminar este evento?",
+            t('calendar.userEvents.modal.messages.confirmDelete') ||
+              '¿Estás seguro de que deseas eliminar este evento?',
           )
         ) {
           const result = await deleteUserEvent(item.id);
 
           if (result.success) {
-            toast.success(result.message || t("calendar.userEvents.modal.messages.successDelete"));
+            toast.success(result.message || t('calendar.userEvents.modal.messages.successDelete'));
           } else {
-            toast.error(result.message || t("common.deleteError"));
+            toast.error(result.message || t('common.deleteError'));
           }
         }
       } else {

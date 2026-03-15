@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
-import Modal from "@/Components/common/ui/Modal";
-import PlatformConfigCard from "./PlatformConfigCard";
-import ValidationLimitsCard from "./ValidationLimitsCard";
-import { Publication } from "@/types/Publication";
-import { DateTimePicker } from "@/Components/common/DateTimePicker";
-import axios from "axios";
-import { useTranslation } from "react-i18next";
-import { formatDateString } from "@/Utils/dateHelpers";
-import SocialMediaLimitsService, { ValidationResponse } from "@/Services/SocialMediaLimitsService";
+import React, { useState, useEffect } from 'react';
+import Modal from '@/Components/common/ui/Modal';
+import PlatformConfigCard from './PlatformConfigCard';
+import ValidationLimitsCard from './ValidationLimitsCard';
+import { Publication } from '@/types/Publication';
+import { DateTimePicker } from '@/Components/common/DateTimePicker';
+import axios from 'axios';
+import { useTranslation } from 'react-i18next';
+import { formatDateString } from '@/Utils/dateHelpers';
+import SocialMediaLimitsService, { ValidationResponse } from '@/Services/SocialMediaLimitsService';
 
 interface MediaInfo {
   duration?: number;
@@ -73,7 +73,7 @@ export default function PublishPreviewModal({
   const [isPublishing, setIsPublishing] = useState(false);
   const [isSimpleMode, setIsSimpleMode] = useState(simpleMode);
   const [isScheduled, setIsScheduled] = useState(false);
-  const [scheduledAt, setScheduledAt] = useState("");
+  const [scheduledAt, setScheduledAt] = useState('');
   const [showValidationDetails, setShowValidationDetails] = useState(true);
 
   useEffect(() => {
@@ -86,7 +86,7 @@ export default function PublishPreviewModal({
   useEffect(() => {
     if (!show) {
       setIsScheduled(false);
-      setScheduledAt("");
+      setScheduledAt('');
       setValidationData(null);
     }
   }, [show]);
@@ -100,7 +100,7 @@ export default function PublishPreviewModal({
       );
       setValidationData(validation);
     } catch (error) {
-      console.error("Error validating content:", error);
+      console.error('Error validating content:', error);
     } finally {
       setIsValidating(false);
     }
@@ -160,7 +160,7 @@ export default function PublishPreviewModal({
 
       if (summary.compatible === 0) {
         alert(
-          "No se puede publicar en ninguna plataforma seleccionada. Por favor, ajusta el contenido según las recomendaciones.",
+          'No se puede publicar en ninguna plataforma seleccionada. Por favor, ajusta el contenido según las recomendaciones.',
         );
         return;
       }
@@ -178,7 +178,7 @@ export default function PublishPreviewModal({
     }
 
     if (isScheduled && !scheduledAt) {
-      alert("Por favor selecciona una fecha y hora");
+      alert('Por favor selecciona una fecha y hora');
       return;
     }
 
@@ -216,9 +216,9 @@ export default function PublishPreviewModal({
           recommendations: backendValidation.recommendations || [],
           message: error.response.data.message,
         });
-        alert("Error de validación: " + error.response.data.message);
+        alert('Error de validación: ' + error.response.data.message);
       } else {
-        alert("Error al publicar: " + (error.response?.data?.message || "Error desconocido"));
+        alert('Error al publicar: ' + (error.response?.data?.message || 'Error desconocido'));
       }
     } finally {
       setIsPublishing(false);
@@ -246,7 +246,7 @@ export default function PublishPreviewModal({
 
   const handleClose = () => {
     setIsScheduled(false);
-    setScheduledAt("");
+    setScheduledAt('');
     setValidationData(null);
     onClose();
   };
@@ -259,22 +259,22 @@ export default function PublishPreviewModal({
 
   const formatType = (type: string): string => {
     const types: Record<string, string> = {
-      reel: t("common.videoTypes.reel"),
-      short: t("common.videoTypes.short"),
-      standard: t("common.videoTypes.standard"),
-      feed: t("common.videoTypes.feed"),
-      story: t("common.videoTypes.story"),
+      reel: t('common.videoTypes.reel'),
+      short: t('common.videoTypes.short'),
+      standard: t('common.videoTypes.standard'),
+      feed: t('common.videoTypes.feed'),
+      story: t('common.videoTypes.story'),
     };
     return types[type] || type;
   };
 
   const formatScheduledDate = (dateString: string): string => {
     return formatDateString(dateString, {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
@@ -411,7 +411,7 @@ export default function PublishPreviewModal({
                         onClick={() => setShowValidationDetails(!showValidationDetails)}
                         className="text-sm text-blue-600 hover:underline dark:text-blue-400"
                       >
-                        {showValidationDetails ? "Ocultar detalles" : "Mostrar detalles"}
+                        {showValidationDetails ? 'Ocultar detalles' : 'Mostrar detalles'}
                       </button>
                     </div>
 
@@ -430,7 +430,7 @@ export default function PublishPreviewModal({
                                 </div>
                                 <div className="text-xs text-gray-600 dark:text-gray-400">
                                   Compatible
-                                  {summary.compatible !== 1 ? "s" : ""}
+                                  {summary.compatible !== 1 ? 's' : ''}
                                 </div>
                               </div>
                               <div>
@@ -439,7 +439,7 @@ export default function PublishPreviewModal({
                                 </div>
                                 <div className="text-xs text-gray-600 dark:text-gray-400">
                                   Incompatible
-                                  {summary.incompatible !== 1 ? "s" : ""}
+                                  {summary.incompatible !== 1 ? 's' : ''}
                                 </div>
                               </div>
                               <div>
@@ -601,8 +601,8 @@ export default function PublishPreviewModal({
                         className="rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-2.5 text-sm font-semibold text-white shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         {isOptimizing
-                          ? `⏳ ${t("common.optimizing")}`
-                          : `⚡ ${t("common.optimize_automatically")}`}
+                          ? `⏳ ${t('common.optimizing')}`
+                          : `⚡ ${t('common.optimize_automatically')}`}
                       </button>
                     )}
                   </div>
@@ -638,7 +638,7 @@ export default function PublishPreviewModal({
                       <div className="ml-7">
                         <DateTimePicker
                           value={scheduledAt}
-                          onChange={(value) => setScheduledAt(value || "")}
+                          onChange={(value) => setScheduledAt(value || '')}
                           min={minDateTime()}
                           required
                         />
@@ -653,7 +653,7 @@ export default function PublishPreviewModal({
                     onClick={toggleMode}
                     className="rounded-md border border-gray-300 bg-white px-4 py-2 text-xs text-gray-600 transition-all hover:border-gray-400 hover:bg-gray-50 dark:border-neutral-600 dark:bg-neutral-800 dark:text-gray-400 dark:hover:border-neutral-500 dark:hover:bg-neutral-700"
                   >
-                    {isSimpleMode ? "⚙ Modo avanzado" : "⚡ Modo simplificado"}
+                    {isSimpleMode ? '⚙ Modo avanzado' : '⚡ Modo simplificado'}
                   </button>
                 </div>
               </div>
@@ -665,15 +665,15 @@ export default function PublishPreviewModal({
                   <div
                     className={`rounded-lg border p-3 ${
                       validationSummary.compatible === 0
-                        ? "border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20"
-                        : "border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-900/20"
+                        ? 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20'
+                        : 'border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-900/20'
                     }`}
                   >
                     <p
                       className={`text-sm font-medium ${
                         validationSummary.compatible === 0
-                          ? "text-red-800 dark:text-red-300"
-                          : "text-yellow-800 dark:text-yellow-300"
+                          ? 'text-red-800 dark:text-red-300'
+                          : 'text-yellow-800 dark:text-yellow-300'
                       }`}
                     >
                       {validationSummary.compatible === 0 ? (
@@ -720,26 +720,26 @@ export default function PublishPreviewModal({
                     disabled={!canPublish || isPublishing}
                     className={`rounded-lg px-6 py-3 text-sm font-semibold text-white shadow-md transition-all ${
                       !canPublish
-                        ? "cursor-not-allowed bg-gray-400 dark:bg-gray-600"
-                        : "bg-gradient-to-r from-green-600 to-green-700 hover:-translate-y-0.5 hover:shadow-lg"
+                        ? 'cursor-not-allowed bg-gray-400 dark:bg-gray-600'
+                        : 'bg-gradient-to-r from-green-600 to-green-700 hover:-translate-y-0.5 hover:shadow-lg'
                     } disabled:cursor-not-allowed disabled:opacity-50`}
                     title={
                       !canPublishWithValidation
-                        ? "No hay plataformas compatibles con el contenido"
+                        ? 'No hay plataformas compatibles con el contenido'
                         : !canPublish
-                          ? "Verifica que el contenido cumpla con los requisitos"
-                          : ""
+                          ? 'Verifica que el contenido cumpla con los requisitos'
+                          : ''
                     }
                   >
                     {isPublishing
-                      ? "⏳ Publicando..."
+                      ? '⏳ Publicando...'
                       : !canPublishWithValidation
-                        ? "🚫 No se puede publicar"
+                        ? '🚫 No se puede publicar'
                         : !canPublish
-                          ? "⚠️ Contenido no compatible"
+                          ? '⚠️ Contenido no compatible'
                           : isScheduled
-                            ? "📅 Programar"
-                            : "🚀 Publicar ahora"}
+                            ? '📅 Programar'
+                            : '🚀 Publicar ahora'}
                   </button>
                 </div>
               </div>

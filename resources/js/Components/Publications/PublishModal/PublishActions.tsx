@@ -1,4 +1,4 @@
-import { usePublicationAction } from "@/Hooks/usePublicationAction";
+import { usePublicationAction } from '@/Hooks/usePublicationAction';
 
 interface PublishActionsProps {
   canPublish: boolean;
@@ -27,10 +27,10 @@ export default function PublishActions({
   const primaryAction = mustSendToReview ? onRequestReview : onPublish;
   const primaryButtonText = mustSendToReview
     ? isPublishing
-      ? "Enviando..."
+      ? 'Enviando...'
       : buttonText
     : isPublishing
-      ? "Publicando..."
+      ? 'Publicando...'
       : buttonText;
 
   return (
@@ -56,12 +56,12 @@ export default function PublishActions({
         onClick={primaryAction}
         disabled={!canPublish || isPublishing || isLoading}
         className={`rounded-md px-5 py-2.5 text-sm font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
-          mustSendToReview ? "bg-purple-600 hover:bg-purple-700" : "bg-blue-600 hover:bg-blue-700"
+          mustSendToReview ? 'bg-purple-600 hover:bg-purple-700' : 'bg-blue-600 hover:bg-blue-700'
         }`}
         title={
           mustSendToReview
-            ? "Enviar contenido a revisión para aprobación"
-            : "Publicar contenido directamente"
+            ? 'Enviar contenido a revisión para aprobación'
+            : 'Publicar contenido directamente'
         }
       >
         {primaryButtonText}

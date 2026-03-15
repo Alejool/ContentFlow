@@ -1,9 +1,9 @@
-import { AIResponse } from "@/Hooks/useAIChat";
-import { Clock, Edit, List, PlayCircle, PlusCircle, TrendingUp, Zap } from "lucide-react";
+import { AIResponse } from '@/Hooks/useAIChat';
+import { Clock, Edit, List, PlayCircle, PlusCircle, TrendingUp, Zap } from 'lucide-react';
 
 interface QuickTipResponseProps {
   data: AIResponse;
-  theme: "dark" | "light";
+  theme: 'dark' | 'light';
 }
 
 export default function QuickTipResponse({ data, theme }: QuickTipResponseProps) {
@@ -11,15 +11,15 @@ export default function QuickTipResponse({ data, theme }: QuickTipResponseProps)
     <div className="space-y-4">
       <div className="mb-3 flex items-center gap-2">
         <Zap className="h-5 w-5 text-primary-500" />
-        <h3 className="text-lg font-semibold">{data.title || "Consejo rápido"}</h3>
+        <h3 className="text-lg font-semibold">{data.title || 'Consejo rápido'}</h3>
       </div>
 
       {data.tip && (
         <div
           className={`rounded-lg p-4 ${
-            theme === "dark"
-              ? "bg-gradient-to-r from-primary-900/20 to-yellow-900/20"
-              : "bg-gradient-to-r from-primary-50 to-yellow-50"
+            theme === 'dark'
+              ? 'bg-gradient-to-r from-primary-900/20 to-yellow-900/20'
+              : 'bg-gradient-to-r from-primary-50 to-yellow-50'
           }`}
         >
           <p className="text-sm leading-relaxed">{data.tip}</p>
@@ -27,7 +27,7 @@ export default function QuickTipResponse({ data, theme }: QuickTipResponseProps)
       )}
 
       {data.response?.message && (
-        <div className={`rounded-lg p-4 ${theme === "dark" ? "bg-blue-900/20" : "bg-blue-50"}`}>
+        <div className={`rounded-lg p-4 ${theme === 'dark' ? 'bg-blue-900/20' : 'bg-blue-50'}`}>
           <p className="text-sm leading-relaxed">{data.response.message}</p>
         </div>
       )}
@@ -70,7 +70,7 @@ interface CampaignOptionsProps {
     status: string;
     description: string;
   }>;
-  theme: "dark" | "light";
+  theme: 'dark' | 'light';
 }
 
 function CampaignOptions({ campaigns, theme }: CampaignOptionsProps) {
@@ -85,9 +85,9 @@ function CampaignOptions({ campaigns, theme }: CampaignOptionsProps) {
           <div
             key={index}
             className={`rounded-lg border p-3 ${
-              theme === "dark"
-                ? "border-neutral-700 bg-neutral-800/50"
-                : "border-gray-200 bg-gray-50"
+              theme === 'dark'
+                ? 'border-neutral-700 bg-neutral-800/50'
+                : 'border-gray-200 bg-gray-50'
             }`}
           >
             <div className="flex items-start justify-between">
@@ -96,13 +96,13 @@ function CampaignOptions({ campaigns, theme }: CampaignOptionsProps) {
                 <div className="mt-1 flex items-center gap-2">
                   <span
                     className={`rounded-full px-2 py-0.5 text-xs ${
-                      campaign.status === "active"
-                        ? theme === "dark"
-                          ? "bg-green-900/30 text-green-400"
-                          : "bg-green-100 text-green-700"
-                        : theme === "dark"
-                          ? "bg-yellow-900/30 text-yellow-400"
-                          : "bg-yellow-100 text-yellow-700"
+                      campaign.status === 'active'
+                        ? theme === 'dark'
+                          ? 'bg-green-900/30 text-green-400'
+                          : 'bg-green-100 text-green-700'
+                        : theme === 'dark'
+                          ? 'bg-yellow-900/30 text-yellow-400'
+                          : 'bg-yellow-100 text-yellow-700'
                     }`}
                   >
                     {campaign.status}
@@ -111,7 +111,7 @@ function CampaignOptions({ campaigns, theme }: CampaignOptionsProps) {
               </div>
             </div>
             {campaign.description && (
-              <p className={`mt-2 text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+              <p className={`mt-2 text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                 {campaign.description}
               </p>
             )}
@@ -127,17 +127,17 @@ interface ActionOptionsProps {
     type: string;
     description: string;
   }>;
-  theme: "dark" | "light";
+  theme: 'dark' | 'light';
 }
 
 function ActionOptions({ actions, theme }: ActionOptionsProps) {
   const getActionIcon = (type: string) => {
     switch (type) {
-      case "edit_campaign":
+      case 'edit_campaign':
         return <Edit className="h-4 w-4" />;
-      case "activate_campaign":
+      case 'activate_campaign':
         return <PlayCircle className="h-4 w-4" />;
-      case "create_new_campaign":
+      case 'create_new_campaign':
         return <PlusCircle className="h-4 w-4" />;
       default:
         return null;
@@ -146,12 +146,12 @@ function ActionOptions({ actions, theme }: ActionOptionsProps) {
 
   const getActionLabel = (type: string) => {
     switch (type) {
-      case "edit_campaign":
-        return "Editar campaña";
-      case "activate_campaign":
-        return "Activar campaña";
-      case "create_new_campaign":
-        return "Crear nueva campaña";
+      case 'edit_campaign':
+        return 'Editar campaña';
+      case 'activate_campaign':
+        return 'Activar campaña';
+      case 'create_new_campaign':
+        return 'Crear nueva campaña';
       default:
         return type;
     }
@@ -159,14 +159,14 @@ function ActionOptions({ actions, theme }: ActionOptionsProps) {
 
   const getIconColor = (type: string) => {
     switch (type) {
-      case "edit_campaign":
-        return theme === "dark" ? "text-blue-400" : "text-blue-600";
-      case "activate_campaign":
-        return theme === "dark" ? "text-green-400" : "text-green-600";
-      case "create_new_campaign":
-        return theme === "dark" ? "text-purple-400" : "text-purple-600";
+      case 'edit_campaign':
+        return theme === 'dark' ? 'text-blue-400' : 'text-blue-600';
+      case 'activate_campaign':
+        return theme === 'dark' ? 'text-green-400' : 'text-green-600';
+      case 'create_new_campaign':
+        return theme === 'dark' ? 'text-purple-400' : 'text-purple-600';
       default:
-        return "";
+        return '';
     }
   };
 
@@ -180,9 +180,9 @@ function ActionOptions({ actions, theme }: ActionOptionsProps) {
           <div
             key={index}
             className={`flex items-start gap-3 rounded-lg p-3 ${
-              theme === "dark"
-                ? "bg-gradient-to-r from-blue-900/10 to-purple-900/10"
-                : "bg-gradient-to-r from-blue-50 to-purple-50"
+              theme === 'dark'
+                ? 'bg-gradient-to-r from-blue-900/10 to-purple-900/10'
+                : 'bg-gradient-to-r from-blue-50 to-purple-50'
             }`}
           >
             <div className={`flex-shrink-0 ${getIconColor(action.type)}`}>
@@ -190,7 +190,7 @@ function ActionOptions({ actions, theme }: ActionOptionsProps) {
             </div>
             <div>
               <p className="text-sm font-medium">{getActionLabel(action.type)}</p>
-              <p className={`mt-1 text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+              <p className={`mt-1 text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                 {action.description}
               </p>
             </div>
@@ -203,7 +203,7 @@ function ActionOptions({ actions, theme }: ActionOptionsProps) {
 
 interface StepsListProps {
   steps: string[];
-  theme: "dark" | "light";
+  theme: 'dark' | 'light';
 }
 
 function StepsList({ steps, theme }: StepsListProps) {
@@ -215,17 +215,17 @@ function StepsList({ steps, theme }: StepsListProps) {
           <div
             key={index}
             className={`flex gap-3 rounded-lg p-3 ${
-              theme === "dark" ? "bg-neutral-800/50" : "bg-gray-50"
+              theme === 'dark' ? 'bg-neutral-800/50' : 'bg-gray-50'
             }`}
           >
             <div
               className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full ${
-                theme === "dark" ? "bg-primary-900/30" : "bg-primary-100"
+                theme === 'dark' ? 'bg-primary-900/30' : 'bg-primary-100'
               }`}
             >
               <span
                 className={`text-xs font-bold ${
-                  theme === "dark" ? "text-primary-400" : "text-primary-600"
+                  theme === 'dark' ? 'text-primary-400' : 'text-primary-600'
                 }`}
               >
                 {index + 1}

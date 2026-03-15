@@ -1,9 +1,9 @@
-import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatformsConfig";
-import { router } from "@inertiajs/react";
-import axios from "axios";
-import { CheckCircle, Settings, XCircle } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatformsConfig';
+import { router } from '@inertiajs/react';
+import axios from 'axios';
+import { CheckCircle, Settings, XCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 declare function route(name: string, params?: any): string;
 
@@ -21,7 +21,7 @@ interface ConnectedAccount {
   darkTextColor: string;
 }
 
-export default function ConnectedAccounts({ className = "" }) {
+export default function ConnectedAccounts({ className = '' }) {
   const { t } = useTranslation();
   const [accounts, setAccounts] = useState<ConnectedAccount[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,12 +50,12 @@ export default function ConnectedAccounts({ className = "" }) {
   const fetchConnectedAccounts = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("/social-accounts");
+      const response = await axios.get('/social-accounts');
       if (response.data && response.data.accounts) {
         updateAccountsStatus(response.data.accounts);
       }
     } catch (error) {
-      console.error("Error fetching connected accounts:", error);
+      console.error('Error fetching connected accounts:', error);
     } finally {
       setLoading(false);
     }
@@ -83,7 +83,7 @@ export default function ConnectedAccounts({ className = "" }) {
 
   const handleAccountClick = (account: ConnectedAccount) => {
     // Redirigir a la configuración de redes sociales
-    router.visit(route("settings.social"));
+    router.visit(route('settings.social'));
   };
 
   return (
@@ -101,7 +101,7 @@ export default function ConnectedAccounts({ className = "" }) {
               className={`group relative flex flex-col items-center rounded-lg border-2 p-5 transition-all duration-200 ${
                 account.isConnected
                   ? `${account.bgClass} ${account.darkColor} border-transparent hover:scale-105 hover:shadow-lg`
-                  : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-md dark:border-neutral-700 dark:bg-neutral-800 dark:hover:border-neutral-600"
+                  : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md dark:border-neutral-700 dark:bg-neutral-800 dark:hover:border-neutral-600'
               } cursor-pointer`}
             >
               {/* Logo */}
@@ -120,19 +120,19 @@ export default function ConnectedAccounts({ className = "" }) {
               <div
                 className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold ${
                   account.isConnected
-                    ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                    : "bg-gray-100 text-gray-600 dark:bg-neutral-700 dark:text-gray-400"
+                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                    : 'bg-gray-100 text-gray-600 dark:bg-neutral-700 dark:text-gray-400'
                 } `}
               >
                 {account.isConnected ? (
                   <>
                     <CheckCircle className="h-3.5 w-3.5" />
-                    {t("profile.connectedAccounts.active", "Activa")}
+                    {t('profile.connectedAccounts.active', 'Activa')}
                   </>
                 ) : (
                   <>
                     <XCircle className="h-3.5 w-3.5" />
-                    {t("profile.connectedAccounts.inactive", "No conectada")}
+                    {t('profile.connectedAccounts.inactive', 'No conectada')}
                   </>
                 )}
               </div>
@@ -161,11 +161,11 @@ export default function ConnectedAccounts({ className = "" }) {
       {/* Link para gestionar */}
       <div className="mt-6 border-t border-gray-200 pt-6 dark:border-neutral-700">
         <button
-          onClick={() => router.visit(route("settings.social"))}
+          onClick={() => router.visit(route('settings.social'))}
           className="flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-primary-600 transition-colors hover:bg-primary-50 hover:text-primary-700 dark:text-primary-400 dark:hover:bg-primary-900/20 dark:hover:text-primary-300"
         >
           <Settings className="h-4 w-4" />
-          {t("profile.connectedAccounts.manageLink", "Gestionar cuentas conectadas")}
+          {t('profile.connectedAccounts.manageLink', 'Gestionar cuentas conectadas')}
         </button>
       </div>
     </div>

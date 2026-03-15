@@ -1,4 +1,4 @@
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 
 interface AddonPriceDisplayProps {
   priceUsd: number;
@@ -6,7 +6,7 @@ interface AddonPriceDisplayProps {
   currency: string;
   formattedPrice: string;
   showUsdEquivalent?: boolean;
-  size?: "sm" | "md" | "lg";
+  size?: 'sm' | 'md' | 'lg';
 }
 
 /**
@@ -18,20 +18,20 @@ export function AddonPriceDisplay({
   currency,
   formattedPrice,
   showUsdEquivalent = true,
-  size = "md",
+  size = 'md',
 }: AddonPriceDisplayProps) {
   const { t } = useTranslation();
 
   const sizeClasses = {
-    sm: "text-lg",
-    md: "text-2xl",
-    lg: "text-3xl",
+    sm: 'text-lg',
+    md: 'text-2xl',
+    lg: 'text-3xl',
   };
 
   const subTextClasses = {
-    sm: "text-xs",
-    md: "text-sm",
-    lg: "text-base",
+    sm: 'text-xs',
+    md: 'text-sm',
+    lg: 'text-base',
   };
 
   return (
@@ -42,14 +42,14 @@ export function AddonPriceDisplay({
       </div>
 
       {/* Equivalente en USD (si no es USD) */}
-      {showUsdEquivalent && currency !== "USD" && (
+      {showUsdEquivalent && currency !== 'USD' && (
         <div className={`${subTextClasses[size]} mt-1 text-gray-500 dark:text-gray-400`}>
           ≈ USD ${priceUsd.toFixed(2)}
         </div>
       )}
 
       {/* Badge de moneda */}
-      {currency !== "USD" && (
+      {currency !== 'USD' && (
         <div className="mt-2">
           <span className="inline-flex items-center rounded-full bg-primary-100 px-2 py-1 text-xs font-medium text-primary-800 dark:bg-primary-900/30 dark:text-primary-300">
             {currency}

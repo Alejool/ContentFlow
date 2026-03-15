@@ -1,6 +1,6 @@
-import { useAccountsStore } from "@/stores/socialAccountsStore";
-import axios from "axios";
-import toast from "react-hot-toast";
+import { useAccountsStore } from '@/stores/socialAccountsStore';
+import axios from 'axios';
+import toast from 'react-hot-toast';
 
 export const useSocialMediaAuth = () => {
   const accounts = useAccountsStore((s) => s.accounts);
@@ -19,10 +19,10 @@ export const useSocialMediaAuth = () => {
 
         const response = await axios.get(`/api/v1/social-accounts/auth-url/${platform}`, {
           headers: {
-            "X-CSRF-TOKEN": document
+            'X-CSRF-TOKEN': document
               .querySelector('meta[name="csrf-token"]')
-              ?.getAttribute("content"),
-            Accept: "application/json",
+              ?.getAttribute('content'),
+            Accept: 'application/json',
           },
           withCredentials: true,
         });
@@ -41,44 +41,44 @@ export const useSocialMediaAuth = () => {
 
           if (!authWindow) {
             setLoading(false);
-            toast.error("El navegador bloqueó la ventana emergente.");
+            toast.error('El navegador bloqueó la ventana emergente.');
             resolve(false);
             return;
           }
 
           const handleMessage = async (event: MessageEvent) => {
             const isSuccessEvent =
-              event.data === "social-auth-success" ||
-              event.data?.type === "SOCIAL_AUTH_SUCCESS" ||
-              (event.data?.type === "social_auth_callback" && event.data?.success === true);
+              event.data === 'social-auth-success' ||
+              event.data?.type === 'SOCIAL_AUTH_SUCCESS' ||
+              (event.data?.type === 'social_auth_callback' && event.data?.success === true);
 
             const isErrorEvent =
-              event.data?.type === "social_auth_callback" && event.data?.success === false;
+              event.data?.type === 'social_auth_callback' && event.data?.success === false;
 
             if (isSuccessEvent) {
-              window.removeEventListener("message", handleMessage);
+              window.removeEventListener('message', handleMessage);
               authWindow.close();
 
               await fetchAccounts();
 
               setLoading(false);
-              toast.success("Cuenta conectada exitosamente");
+              toast.success('Cuenta conectada exitosamente');
               resolve(true);
             } else if (isErrorEvent) {
-              window.removeEventListener("message", handleMessage);
+              window.removeEventListener('message', handleMessage);
               authWindow.close();
 
               setLoading(false);
-              const errorMsg = event.data?.message || "Error al conectar la cuenta";
+              const errorMsg = event.data?.message || 'Error al conectar la cuenta';
 
               // Detectar errores específicos de rate limit
               if (
-                errorMsg.includes("429") ||
-                errorMsg.toLowerCase().includes("rate limit") ||
-                errorMsg.toLowerCase().includes("too many requests")
+                errorMsg.includes('429') ||
+                errorMsg.toLowerCase().includes('rate limit') ||
+                errorMsg.toLowerCase().includes('too many requests')
               ) {
                 toast.error(
-                  "Twitter/X: Límite de solicitudes excedido. Por favor, intenta de nuevo en unos minutos.",
+                  'Twitter/X: Límite de solicitudes excedido. Por favor, intenta de nuevo en unos minutos.',
                 );
               } else {
                 toast.error(errorMsg);
@@ -88,12 +88,12 @@ export const useSocialMediaAuth = () => {
             }
           };
 
-          window.addEventListener("message", handleMessage);
+          window.addEventListener('message', handleMessage);
 
           const checkWindowClosed = setInterval(() => {
             if (authWindow.closed) {
               clearInterval(checkWindowClosed);
-              window.removeEventListener("message", handleMessage);
+              window.removeEventListener('message', handleMessage);
               setLoading(false);
               setTimeout(async () => {
                 await fetchAccounts();
@@ -103,13 +103,13 @@ export const useSocialMediaAuth = () => {
           }, 1000);
         } else {
           setLoading(false);
-          toast.error("No se pudo obtener la URL de autenticación");
+          toast.error('No se pudo obtener la URL de autenticación');
           resolve(false);
         }
       } catch (error: any) {
         setLoading(false);
         const msg = error.response?.data?.message || error.message;
-        toast.error("Error al conectar: " + msg);
+        toast.error('Error al conectar: ' + msg);
         setError(msg);
         resolve(false);
       }
@@ -120,12 +120,12 @@ export const useSocialMediaAuth = () => {
     setLoading(true);
     setError(null);
     try {
-      await axios.delete(`/api/v1/social-accounts/${id}${force ? "?force=true" : ""}`, {
+      await axios.delete(`/api/v1/social-accounts/${id}${force ? '?force=true' : ''}`, {
         headers: {
-          "X-CSRF-TOKEN": document
+          'X-CSRF-TOKEN': document
             .querySelector('meta[name="csrf-token"]')
-            ?.getAttribute("content"),
-          Accept: "application/json",
+            ?.getAttribute('content'),
+          Accept: 'application/json',
         },
         withCredentials: true,
       });
@@ -146,7 +146,7 @@ export const useSocialMediaAuth = () => {
           reason: responseData.reason, // 'publishing', 'scheduled', or 'published'
         };
       }
-      const errorMessage = err.response?.data?.message || "Failed to disconnect account";
+      const errorMessage = err.response?.data?.message || 'Failed to disconnect account';
       setError(errorMessage);
       toast.error(errorMessage);
       return { success: false, error: errorMessage };

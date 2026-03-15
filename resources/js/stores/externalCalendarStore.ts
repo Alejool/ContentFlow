@@ -1,11 +1,11 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
 export interface ExternalCalendarConnection {
-  provider: "google" | "outlook";
+  provider: 'google' | 'outlook';
   connected: boolean;
   email?: string;
   lastSync?: string;
-  status: "connected" | "disconnected" | "error";
+  status: 'connected' | 'disconnected' | 'error';
   errorMessage?: string;
   syncEnabled?: boolean;
   syncConfig?: {

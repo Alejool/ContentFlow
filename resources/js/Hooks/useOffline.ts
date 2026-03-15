@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
-import type { OfflineOptions, QueuedOperation } from "../types/optimistic";
-import { indexedDBQueue } from "../Utils/indexedDBQueue";
+import { useCallback, useEffect, useState } from 'react';
+import type { OfflineOptions, QueuedOperation } from '../types/optimistic';
+import { indexedDBQueue } from '../Utils/indexedDBQueue';
 
 /**
  * useOffline Hook - Manages offline state and operation queue
@@ -17,7 +17,7 @@ export function useOffline(options?: OfflineOptions) {
   // State: Track online/offline status
   // Requirements: 6.1, 6.2
   const [isOnline, setIsOnline] = useState<boolean>(
-    typeof navigator !== "undefined" ? navigator.onLine : true,
+    typeof navigator !== 'undefined' ? navigator.onLine : true,
   );
 
   // State: Track pending operations count
@@ -28,7 +28,7 @@ export function useOffline(options?: OfflineOptions) {
   const updatePendingCount = useCallback(async () => {
     try {
       const operations = await indexedDBQueue.getAll();
-      const pending = operations.filter((op) => op.status === "queued" || op.status === "syncing");
+      const pending = operations.filter((op) => op.status === 'queued' || op.status === 'syncing');
       setPendingCount(pending.length);
     } catch (error) {
       setPendingCount(0);
@@ -64,16 +64,16 @@ export function useOffline(options?: OfflineOptions) {
     };
 
     // Add event listeners
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("offline", handleOffline);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
 
     // Initialize pending count
     updatePendingCount();
 
     // Cleanup
     return () => {
-      window.removeEventListener("online", handleOnline);
-      window.removeEventListener("offline", handleOffline);
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
     };
   }, [options, updatePendingCount]);
 
@@ -87,7 +87,7 @@ export function useOffline(options?: OfflineOptions) {
         // Ensure operation has required fields
         const queuedOp: QueuedOperation = {
           ...operation,
-          status: operation.status || "queued",
+          status: operation.status || 'queued',
           timestamp: operation.timestamp || Date.now(),
           retryCount: operation.retryCount || 0,
           maxRetries: operation.maxRetries || 3,
@@ -137,7 +137,7 @@ export function useOffline(options?: OfflineOptions) {
 
     try {
       // Get all queued operations
-      const operations = await indexedDBQueue.getByStatus("queued");
+      const operations = await indexedDBQueue.getByStatus('queued');
 
       if (operations.length === 0) {
         if (import.meta.env.DEV) {
@@ -149,7 +149,7 @@ export function useOffline(options?: OfflineOptions) {
       }
 
       // Import axios dynamically to avoid circular dependencies
-      const { default: axiosInstance } = await import("../config/axios");
+      const { default: axiosInstance } = await import('../config/axios');
 
       // Process operations in order (FIFO)
       for (const operation of operations) {
@@ -157,7 +157,7 @@ export function useOffline(options?: OfflineOptions) {
           // Mark as syncing
           await indexedDBQueue.update({
             ...operation,
-            status: "syncing",
+            status: 'syncing',
           });
 
           // Execute the API call
@@ -178,21 +178,21 @@ export function useOffline(options?: OfflineOptions) {
           const updatedOp: QueuedOperation = {
             ...operation,
             retryCount: operation.retryCount + 1,
-            lastError: error instanceof Error ? error.message : "Unknown error",
+            lastError: error instanceof Error ? error.message : 'Unknown error',
             failedAt: Date.now(),
           };
 
           // Check if max retries reached
           if (updatedOp.retryCount >= updatedOp.maxRetries) {
             // Mark as failed
-            updatedOp.status = "failed";
+            updatedOp.status = 'failed';
             await indexedDBQueue.update(updatedOp);
 
             if (import.meta.env.DEV) {
             }
           } else {
             // Reset to queued for retry
-            updatedOp.status = "queued";
+            updatedOp.status = 'queued';
             await indexedDBQueue.update(updatedOp);
 
             if (import.meta.env.DEV) {
@@ -219,7 +219,7 @@ export function useOffline(options?: OfflineOptions) {
   const clearFailed = useCallback(async (): Promise<void> => {
     try {
       // Get all failed operations
-      const failedOps = await indexedDBQueue.getByStatus("failed");
+      const failedOps = await indexedDBQueue.getByStatus('failed');
 
       if (import.meta.env.DEV) {
       }

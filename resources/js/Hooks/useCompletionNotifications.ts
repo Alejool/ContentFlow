@@ -1,8 +1,8 @@
-import { useEffect, useRef, useCallback } from "react";
-import { router } from "@inertiajs/react";
-import { useUploadQueue } from "@/stores/uploadQueueStore";
-import { useProcessingProgress } from "@/stores/processingProgressStore";
-import { useNotificationStore } from "@/stores/notificationStore";
+import { useEffect, useRef, useCallback } from 'react';
+import { router } from '@inertiajs/react';
+import { useUploadQueue } from '@/stores/uploadQueueStore';
+import { useProcessingProgress } from '@/stores/processingProgressStore';
+import { useNotificationStore } from '@/stores/notificationStore';
 
 /**
  * Notification preferences interface
@@ -25,7 +25,7 @@ const DEFAULT_PREFERENCES: NotificationPreferences = {
   notifyOnProcessingComplete: true,
 };
 
-const PREFERENCES_KEY = "completion_notification_preferences";
+const PREFERENCES_KEY = 'completion_notification_preferences';
 
 /**
  * Hook for managing completion notifications for uploads and processing jobs
@@ -49,7 +49,7 @@ export function useCompletionNotifications() {
 
   // Browser notification permission state
   const browserNotificationPermission = useRef<NotificationPermission>(
-    typeof Notification !== "undefined" ? Notification.permission : "denied",
+    typeof Notification !== 'undefined' ? Notification.permission : 'denied',
   );
 
   /**
@@ -82,24 +82,24 @@ export function useCompletionNotifications() {
    * Requirement 8.3, 8.4: Browser notification support with permission checking
    */
   const requestBrowserNotificationPermission = useCallback(async (): Promise<boolean> => {
-    if (typeof Notification === "undefined") {
+    if (typeof Notification === 'undefined') {
       return false;
     }
 
-    if (Notification.permission === "granted") {
-      browserNotificationPermission.current = "granted";
+    if (Notification.permission === 'granted') {
+      browserNotificationPermission.current = 'granted';
       return true;
     }
 
-    if (Notification.permission === "denied") {
-      browserNotificationPermission.current = "denied";
+    if (Notification.permission === 'denied') {
+      browserNotificationPermission.current = 'denied';
       return false;
     }
 
     try {
       const permission = await Notification.requestPermission();
       browserNotificationPermission.current = permission;
-      return permission === "granted";
+      return permission === 'granted';
     } catch (error) {
       return false;
     }
@@ -112,8 +112,8 @@ export function useCompletionNotifications() {
   const showBrowserNotification = useCallback(
     (title: string, body: string, onClick?: () => void) => {
       if (
-        typeof Notification === "undefined" ||
-        browserNotificationPermission.current !== "granted"
+        typeof Notification === 'undefined' ||
+        browserNotificationPermission.current !== 'granted'
       ) {
         return;
       }
@@ -121,8 +121,8 @@ export function useCompletionNotifications() {
       try {
         const notification = new Notification(title, {
           body,
-          icon: "/favicon.ico",
-          badge: "/favicon.ico",
+          icon: '/favicon.ico',
+          badge: '/favicon.ico',
           tag: `completion-${Date.now()}`,
         });
 
@@ -162,7 +162,7 @@ export function useCompletionNotifications() {
     if (publicationId) {
       router.visit(`/content`);
     } else {
-      router.visit("/content");
+      router.visit('/content');
     }
   }, []);
 
@@ -179,10 +179,10 @@ export function useCompletionNotifications() {
 
       completedUploadsRef.current.add(uploadId);
 
-      const title = "Upload Complete";
+      const title = 'Upload Complete';
       const message = upload.publicationTitle
         ? `"${upload.publicationTitle}" has been uploaded successfully`
-        : "Your file has been uploaded successfully";
+        : 'Your file has been uploaded successfully';
 
       // Show in-app notification
       if (preferences.enableInAppNotifications && preferences.notifyOnUploadComplete) {
@@ -193,7 +193,7 @@ export function useCompletionNotifications() {
       if (
         preferences.enableBrowserNotifications &&
         preferences.notifyOnUploadComplete &&
-        browserNotificationPermission.current === "granted"
+        browserNotificationPermission.current === 'granted'
       ) {
         showBrowserNotification(title, message, () => {
           navigateToContent(upload.publicationId);
@@ -216,8 +216,8 @@ export function useCompletionNotifications() {
 
       completedJobsRef.current.add(jobId);
 
-      const title = "Processing Complete";
-      const message = `Your ${job.type.replace("_", " ")} has been completed successfully`;
+      const title = 'Processing Complete';
+      const message = `Your ${job.type.replace('_', ' ')} has been completed successfully`;
 
       // Show in-app notification
       if (preferences.enableInAppNotifications && preferences.notifyOnProcessingComplete) {
@@ -228,7 +228,7 @@ export function useCompletionNotifications() {
       if (
         preferences.enableBrowserNotifications &&
         preferences.notifyOnProcessingComplete &&
-        browserNotificationPermission.current === "granted"
+        browserNotificationPermission.current === 'granted'
       ) {
         showBrowserNotification(title, message, () => {
           navigateToContent(job.publicationId);
@@ -246,7 +246,7 @@ export function useCompletionNotifications() {
 
     // Check for completed uploads
     Object.entries(uploadQueue.queue).forEach(([id, upload]) => {
-      if (upload.status === "completed" && !completedUploadsRef.current.has(id)) {
+      if (upload.status === 'completed' && !completedUploadsRef.current.has(id)) {
         handleUploadCompletion(id, upload, preferences);
       }
     });
@@ -260,7 +260,7 @@ export function useCompletionNotifications() {
 
     // Check for completed jobs
     Object.entries(processingProgress.jobs).forEach(([id, job]) => {
-      if (job.status === "completed" && !completedJobsRef.current.has(id)) {
+      if (job.status === 'completed' && !completedJobsRef.current.has(id)) {
         handleProcessingCompletion(id, job, preferences);
       }
     });

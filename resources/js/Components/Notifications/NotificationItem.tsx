@@ -1,9 +1,9 @@
-import DynamicIcon from "@/Components/Notifications/DynamicIcon";
-import { formatDistanceToNow } from "date-fns";
-import { AnimatePresence, motion } from "framer-motion";
-import { AlertCircle, AlertTriangle, CheckCircle, ImageOff, Info, X, XCircle } from "lucide-react";
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import DynamicIcon from '@/Components/Notifications/DynamicIcon';
+import { formatDistanceToNow } from 'date-fns';
+import { AnimatePresence, motion } from 'framer-motion';
+import { AlertCircle, AlertTriangle, CheckCircle, ImageOff, Info, X, XCircle } from 'lucide-react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface NotificationItemProps {
   notification: any;
@@ -27,21 +27,21 @@ export default function NotificationItem({ notification, onMarkAsRead }: Notific
     const status = data.status || data.type;
 
     switch (status) {
-      case "success":
-      case "published":
-        return "text-green-600 dark:text-green-400";
-      case "deleted":
-        return "text-gray-600 dark:text-gray-400";
-      case "rejected":
-      case "failed":
-      case "error":
-        return "text-red-600 dark:text-red-400";
-      case "warning":
-      case "restricted":
-      case "copyright_claim":
-        return "text-amber-600 dark:text-amber-400";
+      case 'success':
+      case 'published':
+        return 'text-green-600 dark:text-green-400';
+      case 'deleted':
+        return 'text-gray-600 dark:text-gray-400';
+      case 'rejected':
+      case 'failed':
+      case 'error':
+        return 'text-red-600 dark:text-red-400';
+      case 'warning':
+      case 'restricted':
+      case 'copyright_claim':
+        return 'text-amber-600 dark:text-amber-400';
       default:
-        return "text-blue-600 dark:text-blue-400";
+        return 'text-blue-600 dark:text-blue-400';
     }
   };
 
@@ -57,22 +57,22 @@ export default function NotificationItem({ notification, onMarkAsRead }: Notific
     }
 
     switch (data.status) {
-      case "success":
-      case "published":
+      case 'success':
+      case 'published':
         return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case "deleted":
+      case 'deleted':
         return <X className="h-4 w-4 text-gray-500" />;
-      case "rejected":
-      case "failed":
-      case "error":
+      case 'rejected':
+      case 'failed':
+      case 'error':
         return <XCircle className="h-4 w-4 text-red-500" />;
-      case "restricted":
-      case "copyright_claim":
+      case 'restricted':
+      case 'copyright_claim':
         return <AlertCircle className="h-4 w-4 text-amber-500" />;
       default:
-        if (data.type === "success") return <CheckCircle className="h-4 w-4 text-green-500" />;
-        if (data.type === "error") return <XCircle className="h-4 w-4 text-red-500" />;
-        if (data.type === "warning") return <AlertTriangle className="h-4 w-4 text-amber-500" />;
+        if (data.type === 'success') return <CheckCircle className="h-4 w-4 text-green-500" />;
+        if (data.type === 'error') return <XCircle className="h-4 w-4 text-red-500" />;
+        if (data.type === 'warning') return <AlertTriangle className="h-4 w-4 text-amber-500" />;
         return <Info className="h-4 w-4 text-blue-500" />;
     }
   };
@@ -81,7 +81,7 @@ export default function NotificationItem({ notification, onMarkAsRead }: Notific
     <motion.div
       layout
       className={`group relative cursor-pointer border-b border-gray-200 p-3 transition-colors duration-200 hover:bg-gray-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50 sm:p-4 ${
-        !isRead ? "bg-primary-50/50 dark:bg-primary-900/10" : ""
+        !isRead ? 'bg-primary-50/50 dark:bg-primary-900/10' : ''
       }`}
       onClick={() => onMarkAsRead(notification.id)}
     >
@@ -104,12 +104,12 @@ export default function NotificationItem({ notification, onMarkAsRead }: Notific
             {data.message && (
               <AnimatePresence initial={false}>
                 <motion.p
-                  key={isExpanded ? "expanded" : "collapsed"}
+                  key={isExpanded ? 'expanded' : 'collapsed'}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.15 }}
                   className={`mb-1 break-words text-sm text-gray-700 dark:text-gray-200 ${
-                    isExpanded ? "" : "line-clamp-2"
+                    isExpanded ? '' : 'line-clamp-2'
                   }`}
                 >
                   {data.message}
@@ -119,7 +119,7 @@ export default function NotificationItem({ notification, onMarkAsRead }: Notific
 
             {data.message && data.message.length > 100 && (
               <span className="cursor-pointer text-xs text-primary-600 hover:underline dark:text-primary-400">
-                {isExpanded ? t("common.show_less") : t("common.read_more")}
+                {isExpanded ? t('common.show_less') : t('common.read_more')}
               </span>
             )}
           </div>
@@ -161,14 +161,14 @@ export default function NotificationItem({ notification, onMarkAsRead }: Notific
             <span className="text-xs text-gray-400 dark:text-gray-500">
               {created_at && !isNaN(new Date(created_at).getTime())
                 ? formatDistanceToNow(new Date(created_at), { addSuffix: true })
-                : ""}
+                : ''}
             </span>
           </div>
 
           {data.orphaned_posts_list && data.orphaned_posts_list.length > 0 && (
             <div className="mt-2 rounded bg-gray-100 p-2 text-xs dark:bg-neutral-800">
               <p className="mb-1 font-semibold text-gray-700 dark:text-gray-300">
-                {t("common.affected_publications")}
+                {t('common.affected_publications')}
               </p>
               <ul className="list-inside list-disc text-gray-600 dark:text-gray-400">
                 {data.orphaned_posts_list.slice(0, 3).map((title: string, index: number) => (
@@ -178,7 +178,7 @@ export default function NotificationItem({ notification, onMarkAsRead }: Notific
                 ))}
                 {data.orphaned_posts_list.length > 3 && (
                   <li className="list-none pt-1 opacity-75">
-                    + {data.orphaned_posts_list.length - 3} {t("common.more_items")}
+                    + {data.orphaned_posts_list.length - 3} {t('common.more_items')}
                   </li>
                 )}
               </ul>
@@ -190,7 +190,7 @@ export default function NotificationItem({ notification, onMarkAsRead }: Notific
           <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-md bg-gray-100 dark:bg-neutral-800 sm:h-16 sm:w-16">
             <img
               src={data.thumbnail_url}
-              alt={data.publication_title || "Thumbnail"}
+              alt={data.publication_title || 'Thumbnail'}
               className="h-full w-full object-cover"
               onError={() => setImageError(true)}
               loading="lazy"

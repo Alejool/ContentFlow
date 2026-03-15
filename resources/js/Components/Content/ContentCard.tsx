@@ -1,7 +1,7 @@
-import Button from "@/Components/common/Modern/Button";
-import SimpleContentTypeBadge from "@/Components/Content/common/SimpleContentTypeBadge";
-import { usePublicationActions } from "@/Hooks/publication/usePublicationActions";
-import { formatDateString } from "@/Utils/dateHelpers";
+import Button from '@/Components/common/Modern/Button';
+import SimpleContentTypeBadge from '@/Components/Content/common/SimpleContentTypeBadge';
+import { usePublicationActions } from '@/Hooks/publication/usePublicationActions';
+import { formatDateString } from '@/Utils/dateHelpers';
 import {
   countMediaFiles,
   getLockedByFirstName,
@@ -12,7 +12,7 @@ import {
   isProcessing,
   isVideoMedia,
   prepareMediaForPreview,
-} from "@/Utils/publicationHelpers";
+} from '@/Utils/publicationHelpers';
 import {
   Calendar,
   CheckCircle,
@@ -29,9 +29,9 @@ import {
   Trash2,
   Users,
   Video,
-} from "lucide-react";
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
+} from 'lucide-react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface ContentCardProps {
   item: any;
@@ -40,7 +40,7 @@ interface ContentCardProps {
   onViewDetails?: (item: any) => void;
   onPublish?: (item: any) => void;
   onDuplicate?: (id: number) => void;
-  type: "publication" | "campaign";
+  type: 'publication' | 'campaign';
   permissions?: string[];
   remoteLock?: {
     user_id: number;
@@ -50,7 +50,7 @@ interface ContentCardProps {
   onPreviewMedia?: (
     media: {
       url: string;
-      type: "image" | "video";
+      type: 'image' | 'video';
       title?: string;
     }[],
     initialIndex?: number,
@@ -120,7 +120,7 @@ export default function ContentCard({
       approved: CheckCircle,
       rejected: Clock,
       publishing: Clock,
-    }[item.status || "draft"] || Edit;
+    }[item.status || 'draft'] || Edit;
 
   // Get platform icons for publication
   const getPlatformIcons = () => {
@@ -183,13 +183,13 @@ export default function ContentCard({
                   <Clock className="h-6 w-6 animate-spin" />
                 </div>
                 <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                  {t("common.processing")}...
+                  {t('common.processing')}...
                 </span>
               </div>
             ) : !imageError && mediaUrl ? (
               <img
                 src={mediaUrl}
-                alt={item.title || "Media"}
+                alt={item.title || 'Media'}
                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
                 onError={() => setImageError(true)}
@@ -201,7 +201,7 @@ export default function ContentCard({
                     {isVideo ? <Video className="h-6 w-6" /> : <ImageIcon className="h-6 w-6" />}
                   </div>
                   <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {isVideo ? t("common.videoTypes.video") : t("common.videoTypes.post")}
+                    {isVideo ? t('common.videoTypes.video') : t('common.videoTypes.post')}
                   </span>
                 </div>
               </div>
@@ -216,7 +216,7 @@ export default function ContentCard({
           </div>
           <div className="absolute left-3 top-3 z-10 flex flex-col items-start gap-2">
             {/* Content Type Badge - Solo para publicaciones */}
-            {type === "publication" && !remoteLock && (
+            {type === 'publication' && !remoteLock && (
               <SimpleContentTypeBadge
                 contentType={item.content_type}
                 mediaFiles={item.media_files}
@@ -225,7 +225,7 @@ export default function ContentCard({
               />
             )}
             {/* Content Type Badge cuando hay remoteLock - posición ajustada */}
-            {type === "publication" && remoteLock && (
+            {type === 'publication' && remoteLock && (
               <div className="mt-12">
                 <SimpleContentTypeBadge
                   contentType={item.content_type}
@@ -243,9 +243,9 @@ export default function ContentCard({
             >
               <StatusIcon className="h-3 w-3" />
               <span className="capitalize">
-                {type === "campaign"
-                  ? t(`campaigns.filters.${item.status || "active"}`)
-                  : t(`publications.status.${item.status || "draft"}`)}
+                {type === 'campaign'
+                  ? t(`campaigns.filters.${item.status || 'active'}`)
+                  : t(`publications.status.${item.status || 'draft'}`)}
               </span>
             </span>
           </div>
@@ -268,9 +268,9 @@ export default function ContentCard({
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div
-                className={`rounded-lg p-2 ${type === "campaign" ? "bg-orange-100 dark:bg-orange-900/30" : "bg-blue-100 dark:bg-blue-900/30"}`}
+                className={`rounded-lg p-2 ${type === 'campaign' ? 'bg-orange-100 dark:bg-orange-900/30' : 'bg-blue-100 dark:bg-blue-900/30'}`}
               >
-                {type === "campaign" ? (
+                {type === 'campaign' ? (
                   <Users className="h-4 w-4 text-orange-600 dark:text-orange-400" />
                 ) : (
                   <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
@@ -278,7 +278,7 @@ export default function ContentCard({
               </div>
               <div className="flex flex-col">
                 <span className="text-xs font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-300">
-                  {type === "campaign" ? "Campaña" : "Publicación"}
+                  {type === 'campaign' ? 'Campaña' : 'Publicación'}
                 </span>
                 {remoteLock && (
                   <span className="flex items-center gap-1 text-[10px] font-bold text-amber-600 dark:text-amber-400">
@@ -294,23 +294,23 @@ export default function ContentCard({
             >
               <StatusIcon className="h-3 w-3" />
               <span className="capitalize">
-                {type === "campaign"
-                  ? t(`campaigns.filters.${item.status || "active"}`)
-                  : t(`publications.status.${item.status || "draft"}`)}
+                {type === 'campaign'
+                  ? t(`campaigns.filters.${item.status || 'active'}`)
+                  : t(`publications.status.${item.status || 'draft'}`)}
               </span>
             </span>
           </div>
 
           <h3 className="line-clamp-2 text-base font-bold text-gray-900 transition-colors group-hover:text-primary-600 dark:text-white dark:group-hover:text-primary-400">
-            {item.title ? item.title : (item.name ?? t("publications.table.untitled"))}
+            {item.title ? item.title : (item.name ?? t('publications.table.untitled'))}
           </h3>
         </div>
       )}
 
-      <div className={`${itemHasMedia ? "p-4" : "px-4 pb-4"} flex flex-1 flex-col`}>
+      <div className={`${itemHasMedia ? 'p-4' : 'px-4 pb-4'} flex flex-1 flex-col`}>
         {itemHasMedia && (
           <h3 className="mb-2 line-clamp-2 text-base font-bold text-gray-900 transition-colors group-hover:text-primary-600 dark:text-white dark:group-hover:text-primary-400">
-            {item.title ? item.title : (item.name ?? "Sin título")}
+            {item.title ? item.title : (item.name ?? 'Sin título')}
           </h3>
         )}
 
@@ -318,13 +318,13 @@ export default function ContentCard({
           <p className="line-clamp-2 break-words text-sm text-gray-600 dark:text-gray-300">
             {item.description ||
               item.content?.substring(0, 120) ||
-              t("publications.table.description")}
-            {!item.description && (item.content?.length || 0) > 120 && "..."}
+              t('publications.table.description')}
+            {!item.description && (item.content?.length || 0) > 120 && '...'}
           </p>
         </div>
 
         <div className="mt-auto space-y-2">
-          {remoteLock && item.status !== "pending_review" && (
+          {remoteLock && item.status !== 'pending_review' && (
             <div className="flex items-center gap-2 rounded-lg border border-amber-100 bg-amber-50 p-2 dark:border-amber-800/30 dark:bg-amber-900/20">
               <div className="relative flex h-5 w-5 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-800 dark:text-amber-400">
                 <Lock className="h-3 w-3" />
@@ -338,44 +338,44 @@ export default function ContentCard({
               </span>
             </div>
           )}
-          {item.status === "pending_review" && (
+          {item.status === 'pending_review' && (
             <div className="flex items-center gap-2 rounded-lg border border-yellow-100 bg-yellow-50 p-2 dark:border-yellow-800/30 dark:bg-yellow-900/20">
               <div className="relative flex h-5 w-5 items-center justify-center rounded-full bg-yellow-100 text-yellow-600 dark:bg-yellow-800 dark:text-yellow-400">
                 <Clock className="h-3 w-3" />
               </div>
               <div className="flex flex-col">
                 <span className="text-xs font-semibold text-yellow-700 dark:text-yellow-400">
-                  {t("publications.table.pendingAdminReview") || "Pendiente de revisión"}
+                  {t('publications.table.pendingAdminReview') || 'Pendiente de revisión'}
                 </span>
                 {item.currentApprovalStep?.role?.name && (
                   <span className="text-[10px] text-yellow-600 dark:text-yellow-500">
-                    {t("approvals.approver_role")}: {item.currentApprovalStep.role.name}
+                    {t('approvals.approver_role')}: {item.currentApprovalStep.role.name}
                   </span>
                 )}
               </div>
             </div>
           )}
 
-          {type === "publication" && item.accounts && item.accounts.length > 0 && (
+          {type === 'publication' && item.accounts && item.accounts.length > 0 && (
             <div className="flex items-center justify-between">
               <div className="absolute inset-0 flex items-center justify-center bg-black/50">
                 <span className="flex items-center gap-1 rounded-full bg-black/50 px-2 py-1 text-xs font-medium text-white">
-                  <Loader2 className="h-3 w-3 animate-spin" />{" "}
-                  {t("publications.gallery.processing", {
-                    defaultValue: "Generating Preview...",
+                  <Loader2 className="h-3 w-3 animate-spin" />{' '}
+                  {t('publications.gallery.processing', {
+                    defaultValue: 'Generating Preview...',
                   })}
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-gray-500 dark:text-gray-400">
-                  {t("publications.modal.publish.platforms")}:
+                  {t('publications.modal.publish.platforms')}:
                 </span>
                 {getPlatformIcons()}
               </div>
             </div>
           )}
 
-          {type === "campaign" && (
+          {type === 'campaign' && (
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Users className="h-3.5 w-3.5 text-gray-400" />
@@ -397,10 +397,10 @@ export default function ContentCard({
                 <Calendar className="h-3.5 w-3.5 text-gray-400" />
                 <span className="text-xs text-gray-600 dark:text-gray-300">
                   {formatDateString(item.scheduled_at, {
-                    day: "numeric",
-                    month: "short",
-                    hour: "2-digit",
-                    minute: "2-digit",
+                    day: 'numeric',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit',
                   })}
                 </span>
               </div>
@@ -410,16 +410,16 @@ export default function ContentCard({
                   <Clock className="h-3.5 w-3.5 text-gray-400" />
                   <span className="text-xs text-gray-600 dark:text-gray-300">
                     {formatDateString(item.created_at, {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
                     })}
                   </span>
                 </div>
               )
             )}
 
-            {type === "publication" && itemHasMedia && (
+            {type === 'publication' && itemHasMedia && (
               <div className="flex items-center gap-1">
                 {isVideo ? (
                   <Video className="h-3.5 w-3.5 text-gray-400" />
@@ -427,7 +427,7 @@ export default function ContentCard({
                   <ImageIcon className="h-3.5 w-3.5 text-gray-400" />
                 )}
                 <span className="text-xs text-gray-500 dark:text-gray-400">
-                  {mediaCount.total} {mediaCount.total === 1 ? t("common.item") : t("common.files")}
+                  {mediaCount.total} {mediaCount.total === 1 ? t('common.item') : t('common.files')}
                 </span>
               </div>
             )}
@@ -437,7 +437,7 @@ export default function ContentCard({
 
       <div className="border-t border-gray-100 bg-gray-50/50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
         <div className="flex items-center gap-2">
-          {type === "publication" && canManageContent && (
+          {type === 'publication' && canManageContent && (
             <>
               {shouldShowPublish(item) ? (
                 <Button
@@ -452,7 +452,7 @@ export default function ContentCard({
                   icon={Rocket}
                   className="flex-1"
                 >
-                  <span className="hidden sm:inline">{t("publications.button.publish")}</span>
+                  <span className="hidden sm:inline">{t('publications.button.publish')}</span>
                 </Button>
               ) : shouldShowSendToReview(item) ? (
                 <Button
@@ -469,15 +469,15 @@ export default function ContentCard({
                 >
                   <span className="hidden sm:inline">
                     {isLoading?.submitting
-                      ? t("publications.button.sending")
-                      : t("publications.button.sendForReview")}
+                      ? t('publications.button.sending')
+                      : t('publications.button.sendForReview')}
                   </span>
                 </Button>
-              ) : item.status === "pending_review" ? (
+              ) : item.status === 'pending_review' ? (
                 <Button disabled buttonStyle="gradient" size="md" icon={Clock} className="flex-1">
-                  <span className="hidden sm:inline">{t("publications.button.inReview")}</span>
+                  <span className="hidden sm:inline">{t('publications.button.inReview')}</span>
                 </Button>
-              ) : item.status === "published" ? (
+              ) : item.status === 'published' ? (
                 <Button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -489,7 +489,7 @@ export default function ContentCard({
                   icon={Eye}
                   className="flex-1"
                 >
-                  <span>{t("publications.button.view")}</span>
+                  <span>{t('publications.button.view')}</span>
                 </Button>
               ) : (
                 <Button
@@ -503,13 +503,13 @@ export default function ContentCard({
                   icon={Eye}
                   className="flex-1"
                 >
-                  <span>{t("publications.button.view")}</span>
+                  <span>{t('publications.button.view')}</span>
                 </Button>
               )}
             </>
           )}
 
-          {(!canManageContent || type === "campaign") && (
+          {(!canManageContent || type === 'campaign') && (
             <Button
               onClick={(e) => {
                 e.stopPropagation();
@@ -521,7 +521,7 @@ export default function ContentCard({
               icon={Eye}
               className="flex-1"
             >
-              <span>{t("publications.button.view")}</span>
+              <span>{t('publications.button.view')}</span>
             </Button>
           )}
 
@@ -531,13 +531,13 @@ export default function ContentCard({
                 e.stopPropagation();
                 handleEdit(item, remoteLock);
               }}
-              variant={remoteLock ? "ghost" : "secondary"}
+              variant={remoteLock ? 'ghost' : 'secondary'}
               buttonStyle="icon"
               size="md"
               icon={remoteLock ? Lock : Edit}
               disabled={!!remoteLock}
             >
-              <span className="sr-only">{t("common.edit")}</span>
+              <span className="sr-only">{t('common.edit')}</span>
             </Button>
           )}
 
@@ -554,7 +554,7 @@ export default function ContentCard({
               size="md"
               icon={Copy}
             >
-              <span className="sr-only">{t("publications.button.duplicate")}</span>
+              <span className="sr-only">{t('publications.button.duplicate')}</span>
             </Button>
           )}
 
@@ -563,7 +563,7 @@ export default function ContentCard({
               onClick={(e) => {
                 e.stopPropagation();
                 if (item?.id) {
-                  handleDelete(item, (item as any).type === "user_event");
+                  handleDelete(item, (item as any).type === 'user_event');
                 }
               }}
               buttonStyle="icon"
@@ -572,7 +572,7 @@ export default function ContentCard({
               disabled={isLoading?.deleting}
               loading={isLoading?.deleting}
             >
-              <span className="sr-only">{t("common.delete")}</span>
+              <span className="sr-only">{t('common.delete')}</span>
             </Button>
           )}
         </div>

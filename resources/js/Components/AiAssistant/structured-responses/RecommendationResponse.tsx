@@ -1,9 +1,9 @@
-import { AIResponse } from "@/Hooks/useAIChat";
-import { Sparkles } from "lucide-react";
+import { AIResponse } from '@/Hooks/useAIChat';
+import { Sparkles } from 'lucide-react';
 
 interface RecommendationResponseProps {
   data: AIResponse;
-  theme: "dark" | "light";
+  theme: 'dark' | 'light';
 }
 
 export default function RecommendationResponse({ data, theme }: RecommendationResponseProps) {
@@ -20,20 +20,20 @@ export default function RecommendationResponse({ data, theme }: RecommendationRe
             <div
               key={index}
               className={`rounded-lg p-3 ${
-                theme === "dark"
-                  ? "bg-gradient-to-r from-yellow-900/10 to-primary-900/10"
-                  : "bg-gradient-to-r from-yellow-50 to-primary-50"
+                theme === 'dark'
+                  ? 'bg-gradient-to-r from-yellow-900/10 to-primary-900/10'
+                  : 'bg-gradient-to-r from-yellow-50 to-primary-50'
               }`}
             >
               <div className="flex items-start gap-3">
                 <div
                   className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${
-                    theme === "dark" ? "bg-yellow-900/30" : "bg-yellow-100"
+                    theme === 'dark' ? 'bg-yellow-900/30' : 'bg-yellow-100'
                   }`}
                 >
                   <span
                     className={`text-xs font-bold ${
-                      theme === "dark" ? "text-yellow-400" : "text-yellow-600"
+                      theme === 'dark' ? 'text-yellow-400' : 'text-yellow-600'
                     }`}
                   >
                     {index + 1}
@@ -44,7 +44,7 @@ export default function RecommendationResponse({ data, theme }: RecommendationRe
                   {rec.reason && (
                     <p
                       className={`mt-1 text-xs ${
-                        theme === "dark" ? "text-gray-300" : "text-gray-600"
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
                       }`}
                     >
                       <span className="font-semibold">Por qué:</span> {rec.reason}
@@ -53,7 +53,7 @@ export default function RecommendationResponse({ data, theme }: RecommendationRe
                   {rec.implementation && (
                     <p
                       className={`mt-1 text-xs ${
-                        theme === "dark" ? "text-gray-300" : "text-gray-600"
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
                       }`}
                     >
                       <span className="font-semibold">Cómo implementar:</span> {rec.implementation}
@@ -70,7 +70,7 @@ export default function RecommendationResponse({ data, theme }: RecommendationRe
         <div className="mt-4">
           <h4
             className={`mb-2 text-sm font-medium ${
-              theme === "dark" ? "text-gray-400" : "text-gray-500"
+              theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
             }`}
           >
             Criterios de selección:
@@ -80,7 +80,7 @@ export default function RecommendationResponse({ data, theme }: RecommendationRe
               <span
                 key={index}
                 className={`rounded-full px-2 py-1 text-xs ${
-                  theme === "dark" ? "bg-neutral-700 text-gray-300" : "bg-gray-100 text-gray-600"
+                  theme === 'dark' ? 'bg-neutral-700 text-gray-300' : 'bg-gray-100 text-gray-600'
                 }`}
               >
                 {criterion}

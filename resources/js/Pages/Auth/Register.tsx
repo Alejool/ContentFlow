@@ -1,14 +1,14 @@
-import { useRegister } from "@/Hooks/useRegister";
-import GuestLayout from "@/Layouts/GuestLayout";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Head, Link } from "@inertiajs/react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { useRegister } from '@/Hooks/useRegister';
+import GuestLayout from '@/Layouts/GuestLayout';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Head, Link } from '@inertiajs/react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
-import Button from "@/Components/common/Modern/Button";
-import Input from "@/Components/common/Modern/Input";
-import { AlertCircle, CheckCircle2, Lock, LogIn, Mail, User, UserPlus } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import Button from '@/Components/common/Modern/Button';
+import Input from '@/Components/common/Modern/Input';
+import { AlertCircle, CheckCircle2, Lock, LogIn, Mail, User, UserPlus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function Register() {
   const { t } = useTranslation();
@@ -16,17 +16,17 @@ export default function Register() {
 
   const registerSchema = z
     .object({
-      name: z.string().min(1, t("validation.required")).max(255),
+      name: z.string().min(1, t('validation.required')).max(255),
       email: z.preprocess(
-        (val) => (typeof val === "string" ? val.trim() : val),
-        z.string().min(1, t("validation.required")).email(t("validation.email")).max(255),
+        (val) => (typeof val === 'string' ? val.trim() : val),
+        z.string().min(1, t('validation.required')).email(t('validation.email')).max(255),
       ),
-      password: z.string().min(8, t("validation.min.string", { count: 8 })),
-      password_confirmation: z.string().min(8, t("validation.min.string", { count: 8 })),
+      password: z.string().min(8, t('validation.min.string', { count: 8 })),
+      password_confirmation: z.string().min(8, t('validation.min.string', { count: 8 })),
     })
     .refine((data) => data.password === data.password_confirmation, {
-      message: t("validation.passwords_do_not_match"),
-      path: ["password_confirmation"],
+      message: t('validation.passwords_do_not_match'),
+      path: ['password_confirmation'],
     });
 
   type RegisterFormData = z.infer<typeof registerSchema>;
@@ -39,10 +39,10 @@ export default function Register() {
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-      password_confirmation: "",
+      name: '',
+      email: '',
+      password: '',
+      password_confirmation: '',
     },
   });
 
@@ -50,10 +50,10 @@ export default function Register() {
     try {
       await submitRegister(data);
     } catch (errorData: any) {
-      if (typeof errorData === "object") {
+      if (typeof errorData === 'object') {
         Object.keys(errorData).forEach((key) => {
           setError(key as any, {
-            type: "server",
+            type: 'server',
             message: errorData[key][0],
           });
         });
@@ -63,15 +63,15 @@ export default function Register() {
 
   return (
     <GuestLayout section="register">
-      <Head title={t("auth.register.title")} />
+      <Head title={t('auth.register.title')} />
 
       <div className="flex w-full items-center justify-center p-4 sm:p-8 lg:w-1/2">
         <div className="w-full max-w-md">
           <div className="mb-8 text-center">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-              {t("auth.register.title")}
+              {t('auth.register.title')}
             </h2>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">{t("auth.register.subtitle")}</p>
+            <p className="mt-2 text-gray-600 dark:text-gray-400">{t('auth.register.subtitle')}</p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -98,13 +98,13 @@ export default function Register() {
                 <Input
                   sizeType="lg"
                   id="name"
-                  label={t("auth.register.inputs.name")}
+                  label={t('auth.register.inputs.name')}
                   type="text"
-                  placeholder={t("auth.register.placeholders.name")}
+                  placeholder={t('auth.register.placeholders.name')}
                   autoComplete="name"
                   icon={User}
                   error={errors.name?.message}
-                  {...register("name")}
+                  {...register('name')}
                 />
               </div>
             </div>
@@ -114,13 +114,13 @@ export default function Register() {
                 <Input
                   sizeType="lg"
                   id="email"
-                  label={t("auth.register.inputs.email")}
+                  label={t('auth.register.inputs.email')}
                   type="email"
-                  placeholder={t("auth.register.placeholders.email")}
+                  placeholder={t('auth.register.placeholders.email')}
                   autoComplete="username"
                   icon={Mail}
                   error={errors.email?.message}
-                  {...register("email")}
+                  {...register('email')}
                 />
               </div>
             </div>
@@ -131,13 +131,13 @@ export default function Register() {
                   sizeType="lg"
                   id="password"
                   type="password"
-                  label={t("auth.register.inputs.password")}
-                  placeholder={t("auth.register.placeholders.password")}
+                  label={t('auth.register.inputs.password')}
+                  placeholder={t('auth.register.placeholders.password')}
                   autoComplete="new-password"
                   icon={Lock}
                   showPasswordToggle
                   error={errors.password?.message}
-                  {...register("password")}
+                  {...register('password')}
                 />
               </div>
             </div>
@@ -148,13 +148,13 @@ export default function Register() {
                   sizeType="lg"
                   id="password_confirmation"
                   type="password"
-                  label={t("auth.register.inputs.confirmPassword")}
-                  placeholder={t("auth.register.placeholders.confirmPassword")}
+                  label={t('auth.register.inputs.confirmPassword')}
+                  placeholder={t('auth.register.placeholders.confirmPassword')}
                   autoComplete="new-password"
                   icon={Lock}
                   showPasswordToggle
                   error={errors.password_confirmation?.message}
-                  {...register("password_confirmation")}
+                  {...register('password_confirmation')}
                 />
               </div>
             </div>
@@ -167,19 +167,19 @@ export default function Register() {
                 required
               />
               <label htmlFor="terms" className="text-sm text-gray-600 dark:text-gray-400">
-                {t("auth.register.agreeWith")}{" "}
+                {t('auth.register.agreeWith')}{' '}
                 <Link
                   href="/terms"
                   className="text-primary-600 hover:text-primary-500 dark:text-primary-400"
                 >
-                  {t("auth.register.buttons.termsAndConditions")}{" "}
-                </Link>{" "}
-                {t("auth.register.and")}{" "}
+                  {t('auth.register.buttons.termsAndConditions')}{' '}
+                </Link>{' '}
+                {t('auth.register.and')}{' '}
                 <Link
                   href="/privacy"
                   className="text-primary-600 hover:text-primary-500 dark:text-primary-400"
                 >
-                  {t("auth.register.buttons.privacyPolicy")}
+                  {t('auth.register.buttons.privacyPolicy')}
                 </Link>
               </label>
             </div>
@@ -187,22 +187,22 @@ export default function Register() {
             <Button
               type="submit"
               loading={isSubmitting} // Use RHF loading state or hook loading
-              loadingText={t("auth.register.buttons.registering")}
+              loadingText={t('auth.register.buttons.registering')}
               fullWidth
               icon={UserPlus as any}
             >
-              {t("auth.register.buttons.register")}
+              {t('auth.register.buttons.register')}
             </Button>
 
             <div className="text-center">
               <p className="flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                {t("auth.register.alreadyRegistered")}{" "}
+                {t('auth.register.alreadyRegistered')}{' '}
                 <Link
-                  href={route("login")}
+                  href={route('login')}
                   className="inline-flex items-center gap-1 font-semibold text-primary-600 transition-colors hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
                 >
                   <LogIn className="h-5 w-5" />
-                  {t("auth.register.buttons.login")}
+                  {t('auth.register.buttons.login')}
                 </Link>
               </p>
             </div>
@@ -213,7 +213,7 @@ export default function Register() {
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="bg-white px-4 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
-                  {t("auth.register.orContinueWith")}
+                  {t('auth.register.orContinueWith')}
                 </span>
               </div>
             </div>
@@ -243,7 +243,7 @@ export default function Register() {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   />
                 </svg>
-                <span className="font-medium">{t("auth.register.buttons.google")}</span>
+                <span className="font-medium">{t('auth.register.buttons.google')}</span>
               </button>
             </div>
           </form>

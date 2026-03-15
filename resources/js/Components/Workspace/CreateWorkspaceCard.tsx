@@ -1,6 +1,6 @@
-import { ChevronRight, Plus } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { useKeyboardClick } from "@/Hooks/useKeyboardClick";
+import { ChevronRight, Plus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useKeyboardClick } from '@/Hooks/useKeyboardClick';
 
 interface CreateWorkspaceCardProps {
   onClick: () => void;
@@ -20,13 +20,13 @@ const CreateWorkspaceCard = ({ onClick }: CreateWorkspaceCardProps) => {
           <Plus className="h-8 w-8 text-primary-600 dark:text-primary-400" />
         </div>
         <h3 className="mb-2 text-lg font-bold text-gray-700 dark:text-neutral-300">
-          {t("workspace.create_new_workspace")}
+          {t('workspace.create_new_workspace')}
         </h3>
         <p className="mb-6 text-sm text-gray-500 dark:text-neutral-500">
-          {t("workspace.create_card.subtitle")}
+          {t('workspace.create_card.subtitle')}
         </p>
         <div className="flex items-center gap-2 font-semibold text-primary-600 dark:text-primary-400">
-          <span>{t("workspace.create_button_subtitle")}</span>
+          <span>{t('workspace.create_button_subtitle')}</span>
           <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
         </div>
       </div>

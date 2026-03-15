@@ -1,6 +1,6 @@
-import { useProcessingProgress } from "@/stores/processingProgressStore";
-import { useUploadQueue } from "@/stores/uploadQueueStore";
-import axios from "axios";
+import { useProcessingProgress } from '@/stores/processingProgressStore';
+import { useUploadQueue } from '@/stores/uploadQueueStore';
+import axios from 'axios';
 
 // Polling intervals
 const UPLOAD_POLL_INTERVAL = 500; // 500ms for uploads (Requirement 1.3)
@@ -41,27 +41,27 @@ function initWebSocketListeners(userId: number) {
   const channel = window.Echo.private(`users.${userId}`);
 
   // Listen for upload progress updates (Requirement 1.3)
-  channel.listen(".UploadProgressUpdated", (event: any) => {
+  channel.listen('.UploadProgressUpdated', (event: any) => {
     handleUploadProgressUpdate(event);
   });
 
   // Listen for processing progress updates (Requirement 3.3)
-  channel.listen(".ProcessingProgressUpdated", (event: any) => {
+  channel.listen('.ProcessingProgressUpdated', (event: any) => {
     handleProcessingProgressUpdate(event);
   });
 
   // Listen for video processing completion (Requirements 8.1, 8.2)
-  channel.listen(".VideoProcessingCompleted", (event: any) => {
+  channel.listen('.VideoProcessingCompleted', (event: any) => {
     handleVideoProcessingCompleted(event);
   });
 
   // Listen for processing failures
-  channel.listen(".VideoProcessingFailed", (event: any) => {
+  channel.listen('.VideoProcessingFailed', (event: any) => {
     handleVideoProcessingFailed(event);
   });
 
   // Listen for processing cancellations
-  channel.listen(".VideoProcessingCancelled", (event: any) => {
+  channel.listen('.VideoProcessingCancelled', (event: any) => {
     handleVideoProcessingCancelled(event);
   });
 
@@ -111,10 +111,10 @@ function handleProcessingProgressUpdate(event: any) {
     // Update existing job
     processingStore.updateJob(jobId, {
       progress: Math.min(100, Math.max(0, progress)),
-      status: "processing",
+      status: 'processing',
       stats: {
         eta: eta || 0,
-        currentStep: currentStep || "",
+        currentStep: currentStep || '',
         totalSteps: totalSteps || 0,
         completedSteps: completedSteps || 0,
       },
@@ -124,12 +124,12 @@ function handleProcessingProgressUpdate(event: any) {
     processingStore.addJob({
       id: jobId,
       publicationId,
-      type: "video_processing",
+      type: 'video_processing',
       progress: Math.min(100, Math.max(0, progress)),
-      status: "processing",
+      status: 'processing',
       stats: {
         eta: eta || 0,
-        currentStep: currentStep || "",
+        currentStep: currentStep || '',
         totalSteps: totalSteps || 0,
         completedSteps: completedSteps || 0,
       },
@@ -151,7 +151,7 @@ function handleVideoProcessingCompleted(event: any) {
 
   if (job) {
     processingStore.updateJob(job.id, {
-      status: status === "completed" ? "completed" : "failed",
+      status: status === 'completed' ? 'completed' : 'failed',
       progress: 100,
       error: errorMessage,
       completedTime: Date.now(),
@@ -175,8 +175,8 @@ function handleVideoProcessingFailed(event: any) {
 
   if (job) {
     processingStore.updateJob(jobId, {
-      status: "failed",
-      error: error || "Processing failed",
+      status: 'failed',
+      error: error || 'Processing failed',
       completedTime: Date.now(),
     });
   }
@@ -224,7 +224,7 @@ function initPollingFallback() {
 async function pollUploadProgress() {
   const uploadStore = useUploadQueue.getState();
   const activeUploads = Object.values(uploadStore.queue).filter(
-    (upload) => upload.status === "uploading" || upload.status === "pending",
+    (upload) => upload.status === 'uploading' || upload.status === 'pending',
   );
 
   if (activeUploads.length === 0) {
@@ -244,9 +244,9 @@ async function pollUploadProgress() {
   const uploadIds = serverUploads.map((upload) => upload.id);
 
   try {
-    const response = await axios.get("/api/v1/uploads/progress", {
+    const response = await axios.get('/api/v1/uploads/progress', {
       params: {
-        upload_ids: uploadIds.join(","),
+        upload_ids: uploadIds.join(','),
       },
       timeout: 5000, // 5 second timeout
     });
@@ -258,17 +258,17 @@ async function pollUploadProgress() {
       const upload = uploadStore.queue[uploadId];
       if (upload) {
         // Check for completion or failure
-        if (progressData.status === "completed") {
+        if (progressData.status === 'completed') {
           uploadStore.updateUpload(uploadId, {
-            status: "completed",
+            status: 'completed',
             progress: 100,
             s3Key: progressData.s3_key,
           });
-        } else if (progressData.status === "failed") {
+        } else if (progressData.status === 'failed') {
           uploadStore.updateUpload(uploadId, {
-            status: "error",
+            status: 'error',
             progress: 0,
-            error: progressData.error || "Upload failed",
+            error: progressData.error || 'Upload failed',
           });
         } else {
           uploadStore.updateUpload(uploadId, {
@@ -287,12 +287,12 @@ async function pollUploadProgress() {
   } catch (error) {
     // Check for timeout or network errors
     if (axios.isAxiosError(error)) {
-      if (error.code === "ECONNABORTED" || error.message.includes("timeout")) {
-        console.warn("Upload progress polling timed out, will retry");
+      if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+        console.warn('Upload progress polling timed out, will retry');
       } else if (error.response?.status === 404) {
         // Upload not found on server - this is expected for S3 direct uploads
         // Don't mark as failed, just log
-        console.debug("Upload not found on server (expected for S3 direct uploads)");
+        console.debug('Upload not found on server (expected for S3 direct uploads)');
       }
     }
   }
@@ -304,7 +304,7 @@ async function pollUploadProgress() {
 async function pollProcessingProgress() {
   const processingStore = useProcessingProgress.getState();
   const activeJobs = Object.values(processingStore.jobs).filter(
-    (job) => job.status === "processing" || job.status === "queued",
+    (job) => job.status === 'processing' || job.status === 'queued',
   );
 
   if (activeJobs.length === 0) {
@@ -314,9 +314,9 @@ async function pollProcessingProgress() {
   const jobIds = activeJobs.map((job) => job.id);
 
   try {
-    const response = await axios.get("/api/v1/processing/progress", {
+    const response = await axios.get('/api/v1/processing/progress', {
       params: {
-        job_ids: jobIds.join(","),
+        job_ids: jobIds.join(','),
       },
       timeout: 5000, // 5 second timeout
     });
@@ -327,16 +327,16 @@ async function pollProcessingProgress() {
     Object.entries(jobs || {}).forEach(([jobId, progressData]: [string, any]) => {
       const job = processingStore.jobs[jobId];
       if (job) {
-        const isCompleted = progressData.progress >= 100 || progressData.status === "completed";
-        const isFailed = progressData.status === "failed";
+        const isCompleted = progressData.progress >= 100 || progressData.status === 'completed';
+        const isFailed = progressData.status === 'failed';
 
         processingStore.updateJob(jobId, {
           progress: Math.min(100, Math.max(0, progressData.progress || 0)),
-          status: isFailed ? "failed" : isCompleted ? "completed" : "processing",
+          status: isFailed ? 'failed' : isCompleted ? 'completed' : 'processing',
           error: progressData.error || job.error,
           stats: {
             eta: progressData.eta || 0,
-            currentStep: progressData.current_step || "",
+            currentStep: progressData.current_step || '',
             totalSteps: progressData.total_steps || 0,
             completedSteps: progressData.completed_steps || 0,
           },
@@ -353,13 +353,13 @@ async function pollProcessingProgress() {
   } catch (error) {
     // Handle timeout or network errors
     if (axios.isAxiosError(error)) {
-      if (error.code === "ECONNABORTED" || error.message.includes("timeout")) {
-        console.warn("Processing progress polling timed out, will retry");
+      if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+        console.warn('Processing progress polling timed out, will retry');
       } else if (error.response?.status === 404) {
         // Jobs not found, they may have completed
         activeJobs.forEach((job) => {
           processingStore.updateJob(job.id, {
-            status: "completed",
+            status: 'completed',
             progress: 100,
           });
           setTimeout(() => {

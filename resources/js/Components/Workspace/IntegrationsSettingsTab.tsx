@@ -1,11 +1,11 @@
-import FilterSection from "@/Components/Content/common/FilterSection";
-import StatCard from "@/Components/Workspace/StatCard";
-import Button from "@/Components/common/Modern/Button";
-import Input from "@/Components/common/Modern/Input";
-import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
-import { formatDateString, formatTimeString } from "@/Utils/dateHelpers";
-import { router } from "@inertiajs/react";
-import axios from "axios";
+import FilterSection from '@/Components/Content/common/FilterSection';
+import StatCard from '@/Components/Workspace/StatCard';
+import Button from '@/Components/common/Modern/Button';
+import Input from '@/Components/common/Modern/Input';
+import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
+import { formatDateString, formatTimeString } from '@/Utils/dateHelpers';
+import { router } from '@inertiajs/react';
+import axios from 'axios';
 import {
   Activity,
   Bell,
@@ -18,12 +18,12 @@ import {
   Share2,
   ShieldCheck,
   XCircle,
-} from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
-import ActivityLogSkeleton from "./ActivityLogSkeleton";
+} from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import ActivityLogSkeleton from './ActivityLogSkeleton';
 
 interface IntegrationsSettingsTabProps {
   workspace: any;
@@ -35,13 +35,13 @@ interface IntegrationCardProps {
   title: string;
   description: string;
   icon: any;
-  type: "slack" | "discord";
+  type: 'slack' | 'discord';
   color: string;
   currentUrl: string;
   isConnected: boolean;
   canManageWorkspace: boolean;
   testing: string | null;
-  testConnection: (type: "slack" | "discord") => void;
+  testConnection: (type: 'slack' | 'discord') => void;
   register: any;
   t: any;
 }
@@ -60,14 +60,14 @@ const IntegrationCard = ({
   register,
   t,
 }: IntegrationCardProps) => {
-  const isDiscord = type === "discord";
+  const isDiscord = type === 'discord';
 
   return (
     <div
       className={`border bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 ${
         isConnected
-          ? "border-emerald-200 dark:border-emerald-800/50"
-          : "border-gray-200 dark:border-neutral-800"
+          ? 'border-emerald-200 dark:border-emerald-800/50'
+          : 'border-gray-200 dark:border-neutral-800'
       } rounded-lg p-6 transition-all duration-300 hover:shadow-lg`}
     >
       <div className="mb-4 flex items-start justify-between">
@@ -85,21 +85,21 @@ const IntegrationCard = ({
         {isConnected && (
           <div className="flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400">
             <CheckCircle className="h-3 w-3" />
-            {t("common.connected")}
+            {t('common.connected')}
           </div>
         )}
       </div>
 
       <div className="space-y-4">
         <Input
-          id={type === "slack" ? "slack_webhook_url" : "discord_webhook_url"}
-          label={t("workspace.integrations.webhook_url")}
+          id={type === 'slack' ? 'slack_webhook_url' : 'discord_webhook_url'}
+          label={t('workspace.integrations.webhook_url')}
           register={register}
           disabled={!canManageWorkspace}
           placeholder={
-            type === "slack"
-              ? t("workspace.integrations.slack_placeholder")
-              : "https://discord.com/api/webhooks/..."
+            type === 'slack'
+              ? t('workspace.integrations.slack_placeholder')
+              : 'https://discord.com/api/webhooks/...'
           }
           className="bg-white dark:bg-neutral-900"
         />
@@ -114,7 +114,7 @@ const IntegrationCard = ({
             className="gap-2"
             icon={ExternalLink}
           >
-            {isConnected ? t("workspace.integrations.test_connection") : t("common.connect")}
+            {isConnected ? t('workspace.integrations.test_connection') : t('common.connect')}
           </Button>
         </div>
       </div>
@@ -128,7 +128,7 @@ export default function IntegrationsSettingsTab({
   canManageWorkspace,
 }: IntegrationsSettingsTabProps) {
   const { t } = useTranslation();
-  const [activeSubTab, setActiveSubTab] = useState<"config" | "activity">("config");
+  const [activeSubTab, setActiveSubTab] = useState<'config' | 'activity'>('config');
   const [isSaving, setIsSaving] = useState(false);
   const [testing, setTesting] = useState<string | null>(null);
   const [activityData, setActivityData] = useState<any>({
@@ -140,37 +140,37 @@ export default function IntegrationsSettingsTab({
   });
   const [loadingActivity, setLoadingActivity] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [channelFilter, setChannelFilter] = useState<string>("");
-  const [statusFilter, setStatusFilter] = useState<string>("");
-  const [searchFilter, setSearchFilter] = useState<string>("");
+  const [channelFilter, setChannelFilter] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [searchFilter, setSearchFilter] = useState<string>('');
 
   const { register, handleSubmit, setValue, getValues } = useForm({
     defaultValues: {
-      slack_webhook_url: workspace?.slack_webhook_url || "",
-      discord_webhook_url: workspace?.discord_webhook_url || "",
-      webhook_secret: workspace?.webhook_secret || "",
+      slack_webhook_url: workspace?.slack_webhook_url || '',
+      discord_webhook_url: workspace?.discord_webhook_url || '',
+      webhook_secret: workspace?.webhook_secret || '',
     },
   });
 
   const generateSecret = () => {
     const secret = Array.from(crypto.getRandomValues(new Uint8Array(32)))
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
-    setValue("webhook_secret", secret);
-    toast.success(t("workspace.secret_generated"));
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+    setValue('webhook_secret', secret);
+    toast.success(t('workspace.secret_generated'));
   };
 
   const handleFilterChange = (key: string, value: string | string[]) => {
     // Convert array to string if needed (take first value or empty string)
-    const stringValue = Array.isArray(value) ? value[0] || "" : value;
+    const stringValue = Array.isArray(value) ? value[0] || '' : value;
 
-    if (key === "channel") {
+    if (key === 'channel') {
       setChannelFilter(stringValue);
       fetchActivity(1, activityData?.per_page || 5, stringValue, statusFilter);
-    } else if (key === "status") {
+    } else if (key === 'status') {
       setStatusFilter(stringValue);
       fetchActivity(1, activityData?.per_page || 5, channelFilter, stringValue);
-    } else if (key === "search") {
+    } else if (key === 'search') {
       setSearchFilter(stringValue);
     }
   };
@@ -182,7 +182,7 @@ export default function IntegrationsSettingsTab({
         const channel = channelOverride !== undefined ? channelOverride : channelFilter;
         const status = statusOverride !== undefined ? statusOverride : statusFilter;
 
-        const response = await axios.get(route("api.v1.workspaces.activity", workspace.id), {
+        const response = await axios.get(route('api.v1.workspaces.activity', workspace.id), {
           params: {
             page,
             per_page: perPage,
@@ -211,37 +211,37 @@ export default function IntegrationsSettingsTab({
 
   const onSubmit = (data: any) => {
     if (!canManageWorkspace) {
-      toast.error(t("workspace.permissions_required"));
+      toast.error(t('workspace.permissions_required'));
       return;
     }
 
     setIsSaving(true);
-    router.put(route("workspaces.update", workspace.id), data, {
+    router.put(route('workspaces.update', workspace.id), data, {
       preserveScroll: true,
       onSuccess: () => {
-        toast.success(t("workspace.integrations.messages.success"));
+        toast.success(t('workspace.integrations.messages.success'));
         setIsSaving(false);
       },
       onError: () => setIsSaving(false),
     });
   };
 
-  const testConnection = async (type: "slack" | "discord") => {
+  const testConnection = async (type: 'slack' | 'discord') => {
     if (!canManageWorkspace) {
-      toast.error(t("workspace.permissions_required"));
+      toast.error(t('workspace.permissions_required'));
       return;
     }
 
-    const currentUrl = getValues(type === "slack" ? "slack_webhook_url" : "discord_webhook_url");
+    const currentUrl = getValues(type === 'slack' ? 'slack_webhook_url' : 'discord_webhook_url');
     if (!currentUrl) {
-      toast.error(t("workspace.integrations.messages.enter_url", { type: type }));
+      toast.error(t('workspace.integrations.messages.enter_url', { type: type }));
       return;
     }
 
     setTesting(type);
     try {
       await axios.post(
-        route("api.v1.workspaces.webhooks.test", {
+        route('api.v1.workspaces.webhooks.test', {
           workspace: workspace.id,
         }),
         {
@@ -249,16 +249,16 @@ export default function IntegrationsSettingsTab({
           url: currentUrl,
         },
       );
-      toast.success(t("workspace.integrations.messages.test_success"));
+      toast.success(t('workspace.integrations.messages.test_success'));
       router.reload({
-        only: ["workspace"],
+        only: ['workspace'],
       } as any);
       fetchActivity(1, activityData.per_page);
     } catch (error: any) {
       const message =
         error.response?.data?.message ||
         error.message ||
-        t("workspace.integrations.messages.test_error");
+        t('workspace.integrations.messages.test_error');
       toast.error(message, { duration: 6000 });
     } finally {
       setTesting(null);
@@ -266,7 +266,7 @@ export default function IntegrationsSettingsTab({
   };
 
   useEffect(() => {
-    if (activeSubTab === "activity") {
+    if (activeSubTab === 'activity') {
       fetchActivity(1, activityData?.per_page || 5, channelFilter, statusFilter);
     }
   }, [activeSubTab, channelFilter, statusFilter, fetchActivity]);
@@ -286,7 +286,7 @@ export default function IntegrationsSettingsTab({
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <StatCard
           icon={Bell}
-          label={t("workspace.active_integrations")}
+          label={t('workspace.active_integrations')}
           value={
             [workspace?.slack_webhook_url, workspace?.discord_webhook_url].filter(Boolean).length
           }
@@ -294,7 +294,7 @@ export default function IntegrationsSettingsTab({
         />
         <StatCard
           icon={Activity}
-          label={t("workspace.total_notifications")}
+          label={t('workspace.total_notifications')}
           value={activityData?.total || 0}
           color="blue"
         />
@@ -302,37 +302,37 @@ export default function IntegrationsSettingsTab({
 
       <div className="flex w-fit items-center gap-1 rounded-lg bg-gray-100 p-1 dark:bg-neutral-800/50">
         <button
-          onClick={() => setActiveSubTab("config")}
+          onClick={() => setActiveSubTab('config')}
           className={`rounded-lg px-6 py-2.5 text-sm font-semibold transition-all duration-200 ${
-            activeSubTab === "config"
-              ? "bg-white text-primary-500 shadow-sm dark:bg-neutral-900"
-              : "text-gray-500 hover:bg-white/50 hover:text-gray-700 dark:text-neutral-400 dark:hover:bg-neutral-800/50 dark:hover:text-neutral-200"
+            activeSubTab === 'config'
+              ? 'bg-white text-primary-500 shadow-sm dark:bg-neutral-900'
+              : 'text-gray-500 hover:bg-white/50 hover:text-gray-700 dark:text-neutral-400 dark:hover:bg-neutral-800/50 dark:hover:text-neutral-200'
           }`}
         >
-          {t("workspace.integrations.title")}
+          {t('workspace.integrations.title')}
         </button>
         <button
-          onClick={() => setActiveSubTab("activity")}
+          onClick={() => setActiveSubTab('activity')}
           className={`rounded-lg px-6 py-2.5 text-sm font-semibold transition-all duration-200 ${
-            activeSubTab === "activity"
-              ? "bg-white text-primary-500 shadow-sm dark:bg-neutral-900"
-              : "text-gray-500 hover:bg-white/50 hover:text-gray-700 dark:text-neutral-400 dark:hover:bg-neutral-800/50 dark:hover:text-neutral-200"
+            activeSubTab === 'activity'
+              ? 'bg-white text-primary-500 shadow-sm dark:bg-neutral-900'
+              : 'text-gray-500 hover:bg-white/50 hover:text-gray-700 dark:text-neutral-400 dark:hover:bg-neutral-800/50 dark:hover:text-neutral-200'
           }`}
         >
-          {t("workspace.activity_log")}
+          {t('workspace.activity_log')}
         </button>
       </div>
 
-      {activeSubTab === "config" ? (
+      {activeSubTab === 'config' ? (
         <div className="animate-in fade-in slide-in-from-bottom-2 space-y-8 duration-300">
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                  {t("workspace.integrations.communication")}
+                  {t('workspace.integrations.communication')}
                 </h3>
                 <p className="text-sm text-gray-500 dark:text-neutral-500">
-                  {t("workspace.integrations.communication_description")}
+                  {t('workspace.integrations.communication_description')}
                 </p>
               </div>
               {canManageWorkspace && (
@@ -343,7 +343,7 @@ export default function IntegrationsSettingsTab({
                   className="gap-2"
                   icon={ChevronRight}
                 >
-                  {showAdvanced ? t("common.hide_advanced") : t("common.show_advanced")}
+                  {showAdvanced ? t('common.hide_advanced') : t('common.show_advanced')}
                 </Button>
               )}
             </div>
@@ -351,12 +351,12 @@ export default function IntegrationsSettingsTab({
             <div className="grid grid-cols-1 gap-6">
               <IntegrationCard
                 title="Discord"
-                description={t("workspace.integrations.discord_description")}
+                description={t('workspace.integrations.discord_description')}
                 icon={Server}
                 type="discord"
                 color="from-blue-500 to-indigo-500"
-                currentUrl={getValues("discord_webhook_url")}
-                isConnected={!!getValues("discord_webhook_url")}
+                currentUrl={getValues('discord_webhook_url')}
+                isConnected={!!getValues('discord_webhook_url')}
                 canManageWorkspace={canManageWorkspace}
                 testing={testing}
                 testConnection={testConnection}
@@ -369,12 +369,12 @@ export default function IntegrationsSettingsTab({
             <div className="hidden">
               <IntegrationCard
                 title="Slack"
-                description={t("workspace.integrations.slack_description")}
+                description={t('workspace.integrations.slack_description')}
                 icon={Share2}
                 type="slack"
                 color="from-purple-500 to-pink-500"
-                currentUrl={getValues("slack_webhook_url")}
-                isConnected={!!getValues("slack_webhook_url")}
+                currentUrl={getValues('slack_webhook_url')}
+                isConnected={!!getValues('slack_webhook_url')}
                 canManageWorkspace={canManageWorkspace}
                 testing={testing}
                 testConnection={testConnection}
@@ -392,10 +392,10 @@ export default function IntegrationsSettingsTab({
                 </div>
                 <div>
                   <h4 className="font-bold text-gray-900 dark:text-white">
-                    {t("workspace.integrations.webhook_security")}
+                    {t('workspace.integrations.webhook_security')}
                   </h4>
                   <p className="text-sm text-gray-500 dark:text-neutral-500">
-                    {t("workspace.integrations.webhook_security_description")}
+                    {t('workspace.integrations.webhook_security_description')}
                   </p>
                 </div>
               </div>
@@ -403,15 +403,15 @@ export default function IntegrationsSettingsTab({
               <div className="space-y-4">
                 <div>
                   <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {t("workspace.integrations.webhook_secret")}
+                    {t('workspace.integrations.webhook_secret')}
                   </label>
                   <div className="flex items-center gap-2">
                     <input
                       type="text"
-                      {...register("webhook_secret")}
+                      {...register('webhook_secret')}
                       disabled={!canManageWorkspace}
                       className="flex-1 rounded-lg border border-gray-300 px-4 py-2 font-mono text-sm disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
-                      placeholder={t("workspace.integrations.secret_placeholder")}
+                      placeholder={t('workspace.integrations.secret_placeholder')}
                     />
                     <Button
                       type="button"
@@ -422,11 +422,11 @@ export default function IntegrationsSettingsTab({
                       className="gap-2"
                       icon={Key}
                     >
-                      {t("common.generate")}
+                      {t('common.generate')}
                     </Button>
                   </div>
                   <p className="mt-2 text-xs text-gray-500 dark:text-neutral-500">
-                    {t("workspace.integrations.secret_description")}
+                    {t('workspace.integrations.secret_description')}
                   </p>
                 </div>
                 <div className="flex justify-end">
@@ -436,7 +436,7 @@ export default function IntegrationsSettingsTab({
                     loading={isSaving}
                     disabled={!canManageWorkspace}
                   >
-                    {t("common.save_changes")}
+                    {t('common.save_changes')}
                   </Button>
                 </div>
               </div>
@@ -453,10 +453,10 @@ export default function IntegrationsSettingsTab({
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                    {t("workspace.activity_log")}
+                    {t('workspace.activity_log')}
                   </h3>
                   <p className="text-sm text-gray-500 dark:text-neutral-500">
-                    {t("workspace.recent_webhook_activity")}
+                    {t('workspace.recent_webhook_activity')}
                   </p>
                 </div>
               </div>
@@ -473,7 +473,7 @@ export default function IntegrationsSettingsTab({
                   icon={RefreshCw}
                   className="gap-2"
                 >
-                  {t("common.refresh")}
+                  {t('common.refresh')}
                 </Button>
               </div>
             </div>
@@ -482,7 +482,7 @@ export default function IntegrationsSettingsTab({
               mode="integrations"
               t={t}
               search={searchFilter}
-              setSearch={(value) => handleFilterChange("search", value)}
+              setSearch={(value) => handleFilterChange('search', value)}
               statusFilter={statusFilter}
               platformFilter={channelFilter}
               handleFilterChange={handleFilterChange}
@@ -494,11 +494,11 @@ export default function IntegrationsSettingsTab({
               <thead className="bg-gray-50 dark:bg-neutral-900/50">
                 <tr>
                   {[
-                    t("workspace.activity.time"),
-                    t("workspace.activity.channel"),
-                    t("workspace.activity.event"),
-                    t("workspace.activity.status"),
-                    t("workspace.activity.response"),
+                    t('workspace.activity.time'),
+                    t('workspace.activity.channel'),
+                    t('workspace.activity.event'),
+                    t('workspace.activity.status'),
+                    t('workspace.activity.response'),
                   ].map((header) => (
                     <th
                       key={header}
@@ -521,8 +521,8 @@ export default function IntegrationsSettingsTab({
                       <td className="whitespace-nowrap px-6 py-4">
                         <div className="text-sm font-medium text-gray-900 dark:text-white">
                           {formatDateString(log.created_at, {
-                            month: "short",
-                            day: "numeric",
+                            month: 'short',
+                            day: 'numeric',
                           })}
                         </div>
                         <div className="text-xs text-gray-500 dark:text-neutral-500">
@@ -533,16 +533,16 @@ export default function IntegrationsSettingsTab({
                         <div className="flex items-center gap-2">
                           <div
                             className={`flex h-8 w-8 items-center justify-center rounded-lg ${
-                              log.channel === "slack"
-                                ? "bg-purple-100 dark:bg-purple-900/30"
-                                : log.channel === "discord"
-                                  ? "bg-blue-100 dark:bg-blue-900/30"
-                                  : "bg-gray-100 dark:bg-neutral-800"
+                              log.channel === 'slack'
+                                ? 'bg-purple-100 dark:bg-purple-900/30'
+                                : log.channel === 'discord'
+                                  ? 'bg-blue-100 dark:bg-blue-900/30'
+                                  : 'bg-gray-100 dark:bg-neutral-800'
                             }`}
                           >
-                            {log.channel === "slack" ? (
+                            {log.channel === 'slack' ? (
                               <Share2 className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                            ) : log.channel === "discord" ? (
+                            ) : log.channel === 'discord' ? (
                               <Server className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                             ) : (
                               <Bell className="h-4 w-4 text-gray-600 dark:text-gray-400" />
@@ -573,8 +573,8 @@ export default function IntegrationsSettingsTab({
                         <span
                           className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${
                             log.success
-                              ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-                              : "bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                              : 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400'
                           }`}
                         >
                           {log.success ? (
@@ -582,7 +582,7 @@ export default function IntegrationsSettingsTab({
                           ) : (
                             <XCircle className="h-3 w-3" />
                           )}
-                          {log.success ? t("common.sent") : t("common.failed")}
+                          {log.success ? t('common.sent') : t('common.failed')}
                         </span>
                       </td>
                       <td className="px-6 py-4">
@@ -590,8 +590,8 @@ export default function IntegrationsSettingsTab({
                           className="max-w-[250px] truncate font-mono text-sm text-gray-500 dark:text-neutral-500"
                           title={log.response}
                         >
-                          {log.status_code ? `[${log.status_code}] ` : ""}
-                          {log.response || "—"}
+                          {log.status_code ? `[${log.status_code}] ` : ''}
+                          {log.response || '—'}
                         </div>
                       </td>
                     </tr>
@@ -601,8 +601,8 @@ export default function IntegrationsSettingsTab({
                     <td colSpan={5} className="px-6 py-12 text-center">
                       <div className="flex flex-col items-center justify-center text-gray-500 dark:text-neutral-500">
                         <Bell className="mb-4 h-12 w-12 opacity-20" />
-                        <p className="font-medium">{t("workspace.no_activity")}</p>
-                        <p className="mt-1 text-sm">{t("workspace.activity_will_appear")}</p>
+                        <p className="font-medium">{t('workspace.no_activity')}</p>
+                        <p className="mt-1 text-sm">{t('workspace.activity_will_appear')}</p>
                       </div>
                     </td>
                   </tr>

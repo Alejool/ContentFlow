@@ -1,4 +1,4 @@
-import React, { Component, ErrorInfo, ReactNode } from "react";
+import React, { Component, ErrorInfo, ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
@@ -57,14 +57,14 @@ export class OnboardingErrorBoundary extends Component<Props, State> {
         stack: error.stack,
         componentStack: errorInfo.componentStack,
         timestamp: new Date().toISOString(),
-        context: "onboarding",
+        context: 'onboarding',
       };
 
       // Send to backend logging endpoint if available
-      fetch("/api/logs/client-error", {
-        method: "POST",
+      fetch('/api/logs/client-error', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(errorData),
       }).catch(() => {
@@ -133,7 +133,7 @@ export class OnboardingErrorBoundary extends Component<Props, State> {
               </button>
 
               <button
-                onClick={() => (window.location.href = "/dashboard")}
+                onClick={() => (window.location.href = '/dashboard')}
                 className="flex-1 rounded-lg bg-gray-200 px-4 py-2 font-medium text-gray-900 transition-colors hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
               >
                 Go to Dashboard

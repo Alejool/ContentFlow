@@ -1,11 +1,11 @@
-import { Campaign } from "@/types/Campaign";
-import { Publication } from "@/types/Publication";
-import { create } from "zustand";
+import { Campaign } from '@/types/Campaign';
+import { Publication } from '@/types/Publication';
+import { create } from 'zustand';
 
 type SelectedItem = Campaign | Publication | null;
 
 interface ContentUIState {
-  activeTab: "publications" | "campaigns" | "logs" | "calendar" | "approvals";
+  activeTab: 'publications' | 'campaigns' | 'logs' | 'calendar' | 'approvals';
   selectedItem: SelectedItem;
 
   isAddModalOpen: boolean;
@@ -13,7 +13,7 @@ interface ContentUIState {
   isPublishModalOpen: boolean;
   isViewDetailsModalOpen: boolean;
 
-  setActiveTab: (tab: "publications" | "campaigns" | "logs" | "calendar" | "approvals") => void;
+  setActiveTab: (tab: 'publications' | 'campaigns' | 'logs' | 'calendar' | 'approvals') => void;
   setSelectedItem: (item: SelectedItem) => void;
 
   openAddModal: () => void;
@@ -30,7 +30,7 @@ interface ContentUIState {
 }
 
 export const useContentUIStore = create<ContentUIState>((set) => ({
-  activeTab: "publications",
+  activeTab: 'publications',
   selectedItem: null,
 
   isAddModalOpen: false,

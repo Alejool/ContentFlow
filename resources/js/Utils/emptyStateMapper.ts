@@ -1,6 +1,6 @@
-import { TFunction } from "i18next";
-import { EmptyStateConfig } from "@/Components/common/EmptyState";
-import { emptyStateConfigs, getEmptyStateConfigs } from "@/Constants/emptyStateConfigs";
+import { TFunction } from 'i18next';
+import { EmptyStateConfig } from '@/Components/common/EmptyState';
+import { emptyStateConfigs, getEmptyStateConfigs } from '@/Constants/emptyStateConfigs';
 
 /**
  * Empty State Context Mapping
@@ -31,24 +31,24 @@ interface EmptyStateContext {
  */
 export const emptyStateContexts: EmptyStateContext[] = [
   {
-    route: "reels.gallery",
-    dataKey: "reels",
-    configKey: "reels",
+    route: 'reels.gallery',
+    dataKey: 'reels',
+    configKey: 'reels',
   },
   {
-    route: "content.index",
-    dataKey: "publications",
-    configKey: "scheduledPosts",
+    route: 'content.index',
+    dataKey: 'publications',
+    configKey: 'scheduledPosts',
   },
   {
-    route: "analytics.index",
-    dataKey: "analytics",
-    configKey: "analytics",
+    route: 'analytics.index',
+    dataKey: 'analytics',
+    configKey: 'analytics',
   },
   {
-    route: "calendar.index",
-    dataKey: "events",
-    configKey: "calendarView",
+    route: 'calendar.index',
+    dataKey: 'events',
+    configKey: 'calendarView',
   },
 ];
 
@@ -99,7 +99,7 @@ export function getEmptyStateConfig(
     return null;
   }
 
-  if (data && typeof data === "object" && !Array.isArray(data)) {
+  if (data && typeof data === 'object' && !Array.isArray(data)) {
     // For object data, check if it has any meaningful content
     const hasContent = Object.keys(data).length > 0;
     if (hasContent) {
@@ -166,7 +166,7 @@ export function isDataEmpty(data: any): boolean {
   }
 
   // Empty object (no keys)
-  if (typeof data === "object") {
+  if (typeof data === 'object') {
     return Object.keys(data).length === 0;
   }
 

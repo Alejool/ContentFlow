@@ -1,8 +1,8 @@
-import { PageProps } from "@/../../app/Types/inertia";
-import { Link, usePage } from "@inertiajs/react";
-import { Calendar, CheckCircle, Clock, LucideIcon, MailWarning, Shield } from "lucide-react";
-import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { PageProps } from '@/../../app/Types/inertia';
+import { Link, usePage } from '@inertiajs/react';
+import { Calendar, CheckCircle, Clock, LucideIcon, MailWarning, Shield } from 'lucide-react';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface User {
   id: number;
@@ -29,7 +29,7 @@ interface StatItem {
 }
 
 export default function AccountStatistics({
-  className = "",
+  className = '',
   status = null,
 }: AccountStatisticsProps) {
   const { t, i18n } = useTranslation();
@@ -38,15 +38,15 @@ export default function AccountStatistics({
   const [recentlySent, setRecentlySent] = useState<boolean>(false);
 
   const formatDate = (dateString: string | null): string => {
-    if (!dateString) return t("profile.statistics.notAvailable");
+    if (!dateString) return t('profile.statistics.notAvailable');
     try {
       return new Date(dateString).toLocaleDateString(i18n.language, {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
       });
     } catch {
-      return t("profile.statistics.notAvailable");
+      return t('profile.statistics.notAvailable');
     }
   };
 
@@ -65,24 +65,24 @@ export default function AccountStatistics({
   const statisticsItems = [
     {
       icon: Calendar,
-      title: t("profile.statistics.memberSince"),
+      title: t('profile.statistics.memberSince'),
       value: formatDate(user?.created_at || null),
-      iconColor: "text-blue-600 dark:text-blue-400",
+      iconColor: 'text-blue-600 dark:text-blue-400',
     },
     {
       icon: Clock,
-      title: t("profile.statistics.daysActive"),
-      value: `${getDaysSinceJoining(user?.created_at || null)} ${t("profile.statistics.days")}`,
-      iconColor: "text-primary-600 dark:text-primary-400",
+      title: t('profile.statistics.daysActive'),
+      value: `${getDaysSinceJoining(user?.created_at || null)} ${t('profile.statistics.days')}`,
+      iconColor: 'text-primary-600 dark:text-primary-400',
     },
     {
       icon: Shield,
-      title: t("profile.statistics.accountStatus"),
-      value: t("profile.statistics.active"),
+      title: t('profile.statistics.accountStatus'),
+      value: t('profile.statistics.active'),
       iconElement: user?.email_verified_at ? (
         <div className="mr-1.5 h-2 w-2 rounded-full bg-green-500"></div>
       ) : null,
-      iconColor: "text-green-600 dark:text-green-400",
+      iconColor: 'text-green-600 dark:text-green-400',
     },
   ];
 
@@ -118,22 +118,22 @@ export default function AccountStatistics({
             <MailWarning className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600 dark:text-amber-400" />
             <div className="min-w-0 flex-1">
               <p className="mb-3 text-sm text-amber-800 dark:text-amber-300">
-                {t("profile.information.emailUnverified")}
+                {t('profile.information.emailUnverified')}
               </p>
               <div className="flex flex-wrap items-center gap-3">
                 <Link
-                  href={route("verification.send")}
+                  href={route('verification.send')}
                   method="post"
                   as="button"
                   onClick={() => setRecentlySent(true)}
                   className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700"
                 >
-                  {t("profile.information.sendVerification")}
+                  {t('profile.information.sendVerification')}
                 </Link>
-                {(status === "verification-link-sent" || recentlySent) && (
+                {(status === 'verification-link-sent' || recentlySent) && (
                   <div className="flex items-center gap-2 text-sm text-green-700 dark:text-green-400">
                     <CheckCircle className="h-4 w-4" />
-                    {t("profile.information.verificationSent")}
+                    {t('profile.information.verificationSent')}
                   </div>
                 )}
               </div>

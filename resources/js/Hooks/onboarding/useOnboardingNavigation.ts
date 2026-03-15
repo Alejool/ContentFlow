@@ -1,6 +1,6 @@
-import { useEffect, useCallback } from "react";
-import { router } from "@inertiajs/react";
-import { useOnboardingNavigationStore } from "@/stores/onboardingNavigationStore";
+import { useEffect, useCallback } from 'react';
+import { router } from '@inertiajs/react';
+import { useOnboardingNavigationStore } from '@/stores/onboardingNavigationStore';
 
 /**
  * Hook for managing onboarding navigation
@@ -35,7 +35,7 @@ export function useOnboardingNavigation() {
     };
 
     // Listen to Inertia navigation events
-    const removeListener = router.on("navigate", handleLocationChange);
+    const removeListener = router.on('navigate', handleLocationChange);
 
     return () => {
       removeListener();
@@ -46,7 +46,7 @@ export function useOnboardingNavigation() {
    * Navigate to a specific step in the onboarding flow
    */
   const navigateToOnboardingStep = useCallback(
-    (path: string, stepId?: string, stepType?: "tour" | "wizard" | "template") => {
+    (path: string, stepId?: string, stepType?: 'tour' | 'wizard' | 'template') => {
       navigateToStep(path, stepId, stepType);
     },
     [navigateToStep],
@@ -62,7 +62,7 @@ export function useOnboardingNavigation() {
       }
 
       setLastTourStep(stepId);
-      navigateToStep(path, stepId, "tour");
+      navigateToStep(path, stepId, 'tour');
     },
     [tourNavigationEnabled, setLastTourStep, navigateToStep],
   );
@@ -93,7 +93,7 @@ export function useOnboardingNavigation() {
   const resetNavigation = useCallback(() => {
     clearHistory();
     disableTourNavigation();
-    setLastTourStep("");
+    setLastTourStep('');
   }, [clearHistory, disableTourNavigation, setLastTourStep]);
 
   return {

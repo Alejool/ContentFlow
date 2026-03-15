@@ -1,19 +1,19 @@
-import React, { AnchorHTMLAttributes, forwardRef } from "react";
-import { LazyMotion, domAnimation, m, HTMLMotionProps } from "framer-motion";
-import { useReducedMotion } from "@/hooks/useReducedMotion";
-import { hoverVariants, getVariant, getTransition } from "@/config/animationVariants";
+import React, { AnchorHTMLAttributes, forwardRef } from 'react';
+import { LazyMotion, domAnimation, m, HTMLMotionProps } from 'framer-motion';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { hoverVariants, getVariant, getTransition } from '@/config/animationVariants';
 
 /**
  * Hover effect variants for links
  */
-export type LinkHoverEffect = "subtle" | "underline" | "glow";
+export type LinkHoverEffect = 'subtle' | 'underline' | 'glow';
 
 /**
  * Props for MotionLink component
  */
 export interface MotionLinkProps extends Omit<
   AnchorHTMLAttributes<HTMLAnchorElement>,
-  "onAnimationStart" | "onDragStart" | "onDragEnd" | "onDrag"
+  'onAnimationStart' | 'onDragStart' | 'onDragEnd' | 'onDrag'
 > {
   /**
    * Hover effect to apply
@@ -30,7 +30,7 @@ export interface MotionLinkProps extends Omit<
   /**
    * Additional Framer Motion props
    */
-  motionProps?: Omit<HTMLMotionProps<"a">, "ref">;
+  motionProps?: Omit<HTMLMotionProps<'a'>, 'ref'>;
 }
 
 /**
@@ -51,7 +51,7 @@ export interface MotionLinkProps extends Omit<
 export const MotionLink = forwardRef<HTMLAnchorElement, MotionLinkProps>(
   (
     {
-      hoverEffect = "subtle",
+      hoverEffect = 'subtle',
       respectReducedMotion = true,
       motionProps,
       children,
@@ -66,19 +66,19 @@ export const MotionLink = forwardRef<HTMLAnchorElement, MotionLinkProps>(
     // Map link hover effects to available hover variants
     // 'underline' maps to 'subtle' with additional CSS for underline effect
     const variantMap: Record<LinkHoverEffect, keyof typeof hoverVariants> = {
-      subtle: "subtle",
-      underline: "subtle",
-      glow: "glow",
+      subtle: 'subtle',
+      underline: 'subtle',
+      glow: 'glow',
     };
 
     const selectedHoverVariant = hoverVariants[variantMap[hoverEffect]];
 
     // Determine which hover state to use
-    const hoverState = shouldReduceMotion ? "hoverReduced" : "hover";
+    const hoverState = shouldReduceMotion ? 'hoverReduced' : 'hover';
 
     // Add underline effect via className if needed
     const linkClassName =
-      hoverEffect === "underline" ? `${className || ""} hover:underline`.trim() : className;
+      hoverEffect === 'underline' ? `${className || ''} hover:underline`.trim() : className;
 
     return (
       <LazyMotion features={domAnimation}>
@@ -101,6 +101,6 @@ export const MotionLink = forwardRef<HTMLAnchorElement, MotionLinkProps>(
   },
 );
 
-MotionLink.displayName = "MotionLink";
+MotionLink.displayName = 'MotionLink';
 
 export default MotionLink;

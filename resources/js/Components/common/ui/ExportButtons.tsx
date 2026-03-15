@@ -1,8 +1,8 @@
-import { Download, FileSpreadsheet, FileText } from "lucide-react";
-import { useState } from "react";
-import Button from "@/Components/common/Modern/Button";
-import axios from "axios";
-import toast from "@/Utils/toast";
+import { Download, FileSpreadsheet, FileText } from 'lucide-react';
+import { useState } from 'react';
+import Button from '@/Components/common/Modern/Button';
+import axios from 'axios';
+import toast from '@/Utils/toast';
 
 interface ExportButtonsProps {
   endpoint: string;
@@ -13,24 +13,24 @@ interface ExportButtonsProps {
 export default function ExportButtons({
   endpoint,
   filters = {},
-  className = "",
+  className = '',
 }: ExportButtonsProps) {
   const [isExporting, setIsExporting] = useState(false);
 
-  const handleExport = async (format: "xlsx" | "csv" | "pdf") => {
+  const handleExport = async (format: 'xlsx' | 'csv' | 'pdf') => {
     setIsExporting(true);
 
     try {
       const response = await axios.get(endpoint, {
         params: { ...filters, format },
-        responseType: "blob",
+        responseType: 'blob',
       });
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
+      const link = document.createElement('a');
       link.href = url;
 
-      const contentDisposition = response.headers["content-disposition"];
+      const contentDisposition = response.headers['content-disposition'];
       let filename = `export_${Date.now()}.${format}`;
 
       if (contentDisposition) {
@@ -40,13 +40,13 @@ export default function ExportButtons({
         }
       }
 
-      link.setAttribute("download", filename);
+      link.setAttribute('download', filename);
       document.body.appendChild(link);
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      toast.error("Error al exportar. Por favor, intenta de nuevo.");
+      toast.error('Error al exportar. Por favor, intenta de nuevo.');
     } finally {
       setIsExporting(false);
     }
@@ -55,7 +55,7 @@ export default function ExportButtons({
   return (
     <div className={`flex gap-2 ${className}`}>
       <Button
-        onClick={() => handleExport("xlsx")}
+        onClick={() => handleExport('xlsx')}
         disabled={isExporting}
         variant="ghost"
         buttonStyle="outline"
@@ -67,7 +67,7 @@ export default function ExportButtons({
       </Button>
 
       <Button
-        onClick={() => handleExport("csv")}
+        onClick={() => handleExport('csv')}
         disabled={isExporting}
         variant="ghost"
         buttonStyle="outline"
@@ -79,7 +79,7 @@ export default function ExportButtons({
       </Button>
 
       <Button
-        onClick={() => handleExport("pdf")}
+        onClick={() => handleExport('pdf')}
         disabled={isExporting}
         variant="ghost"
         buttonStyle="outline"

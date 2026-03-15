@@ -1,6 +1,6 @@
-import { Avatar } from "@/Components/common/Avatar";
-import { Bookmark, Heart, MessageCircle, Music, Share2 } from "lucide-react";
-import { memo } from "react";
+import { Avatar } from '@/Components/common/Avatar';
+import { Bookmark, Heart, MessageCircle, Music, Share2 } from 'lucide-react';
+import { memo } from 'react';
 
 interface TikTokPreviewProps {
   content: string;
@@ -13,8 +13,8 @@ interface TikTokPreviewProps {
 }
 
 export const TikTokPreview = memo(({ content, mediaUrls, user }: TikTokPreviewProps) => {
-  const videoUrl = mediaUrls.find((url) => url.includes("video") || url.includes(".mp4"));
-  const imageUrl = mediaUrls.find((url) => !url.includes("video") && !url.includes(".mp4"));
+  const videoUrl = mediaUrls.find((url) => url.includes('video') || url.includes('.mp4'));
+  const imageUrl = mediaUrls.find((url) => !url.includes('video') && !url.includes('.mp4'));
 
   return (
     <div className="group relative h-[560px] w-[320px] overflow-hidden rounded-[32px] border-[8px] border-neutral-900 bg-black shadow-2xl">
@@ -39,7 +39,7 @@ export const TikTokPreview = memo(({ content, mediaUrls, user }: TikTokPreviewPr
         <div className="relative mb-2">
           <Avatar
             src={user?.avatar}
-            name={user?.name || "User"}
+            name={user?.name || 'User'}
             size="md"
             className="border-2 border-white"
           />
@@ -81,7 +81,7 @@ export const TikTokPreview = memo(({ content, mediaUrls, user }: TikTokPreviewPr
           <div className="absolute inset-0 rounded-full border-4 border-neutral-700 bg-neutral-800 p-1">
             <Avatar
               src={user?.avatar}
-              name={user?.name || ""}
+              name={user?.name || ''}
               size="xs"
               className="h-full w-full rounded-full"
             />
@@ -92,14 +92,14 @@ export const TikTokPreview = memo(({ content, mediaUrls, user }: TikTokPreviewPr
       {/* Bottom Info */}
       <div className="absolute bottom-6 left-3 right-16 z-10 flex flex-col gap-2">
         <div className="text-base font-bold text-white">
-          @{user?.username || "contentflow_user"}
+          @{user?.username || 'contentflow_user'}
         </div>
         <div className="line-clamp-2 whitespace-pre-wrap text-sm text-white">
-          {content || "Your TikTok caption goes here..."}
+          {content || 'Your TikTok caption goes here...'}
         </div>
         <div className="flex items-center gap-2 text-xs text-white">
           <Music className="h-3 w-3 animate-pulse" />
-          <span className="truncate">Original Sound - {user?.name || "ContentFlow User"}</span>
+          <span className="truncate">Original Sound - {user?.name || 'ContentFlow User'}</span>
         </div>
       </div>
 

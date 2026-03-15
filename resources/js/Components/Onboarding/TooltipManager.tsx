@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { Tooltip } from "./Tooltip";
-import { useOnboardingStore } from "@/stores/onboardingStore";
-import type { TooltipDefinition } from "@/types/onboarding";
+import React, { useEffect, useState, useCallback } from 'react';
+import { Tooltip } from './Tooltip';
+import { useOnboardingStore } from '@/stores/onboardingStore';
+import type { TooltipDefinition } from '@/types/onboarding';
 
 export interface TooltipManagerProps {
   tooltips: TooltipDefinition[];

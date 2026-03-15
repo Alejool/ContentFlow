@@ -1,4 +1,4 @@
-import type { PublicationTemplate } from "@/types/onboarding";
+import type { PublicationTemplate } from '@/types/onboarding';
 
 /**
  * Utility functions for working with publication templates.
@@ -12,7 +12,7 @@ import type { PublicationTemplate } from "@/types/onboarding";
  */
 export function storeTemplateInSession(template: PublicationTemplate): void {
   try {
-    sessionStorage.setItem("selectedTemplate", JSON.stringify(template));
+    sessionStorage.setItem('selectedTemplate', JSON.stringify(template));
   } catch (error) {
     // Failed to store template in session
   }
@@ -25,7 +25,7 @@ export function storeTemplateInSession(template: PublicationTemplate): void {
  */
 export function getTemplateFromSession(): PublicationTemplate | null {
   try {
-    const stored = sessionStorage.getItem("selectedTemplate");
+    const stored = sessionStorage.getItem('selectedTemplate');
     if (!stored) return null;
     return JSON.parse(stored) as PublicationTemplate;
   } catch (error) {
@@ -38,7 +38,7 @@ export function getTemplateFromSession(): PublicationTemplate | null {
  */
 export function clearTemplateFromSession(): void {
   try {
-    sessionStorage.removeItem("selectedTemplate");
+    sessionStorage.removeItem('selectedTemplate');
   } catch (error) {
     // Failed to clear template from session
   }
@@ -51,7 +51,7 @@ export function clearTemplateFromSession(): void {
  */
 export function hasTemplateInSession(): boolean {
   try {
-    return sessionStorage.getItem("selectedTemplate") !== null;
+    return sessionStorage.getItem('selectedTemplate') !== null;
   } catch (error) {
     return false;
   }
@@ -64,7 +64,7 @@ export function hasTemplateInSession(): boolean {
  * @returns Formatted hashtag string
  */
 export function formatHashtags(hashtags: string[]): string {
-  return hashtags.map((tag) => (tag.startsWith("#") ? tag : `#${tag}`)).join(" ");
+  return hashtags.map((tag) => (tag.startsWith('#') ? tag : `#${tag}`)).join(' ');
 }
 
 /**
@@ -78,13 +78,13 @@ export function applyTemplateToForm(
   setValue: (name: string, value: any, options?: any) => void,
 ): void {
   // Populate title
-  setValue("title", template.name, {
+  setValue('title', template.name, {
     shouldValidate: true,
     shouldDirty: true,
   });
 
   // Populate description
-  setValue("description", template.content.text, {
+  setValue('description', template.content.text, {
     shouldValidate: true,
     shouldDirty: true,
   });
@@ -92,7 +92,7 @@ export function applyTemplateToForm(
   // Populate hashtags
   if (template.content.hashtags && template.content.hashtags.length > 0) {
     const hashtagString = formatHashtags(template.content.hashtags);
-    setValue("hashtags", hashtagString, {
+    setValue('hashtags', hashtagString, {
       shouldValidate: true,
       shouldDirty: true,
     });

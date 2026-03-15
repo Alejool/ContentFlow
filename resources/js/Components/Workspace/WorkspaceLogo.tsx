@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
 interface WorkspaceLogoProps {
   src: string;
@@ -9,29 +9,29 @@ interface WorkspaceLogoProps {
 }
 
 export function WorkspaceLogo({ src, alt, fallback, timeoutMs = 5000 }: WorkspaceLogoProps) {
-  const [status, setStatus] = useState<"loading" | "loaded" | "error">("loading");
+  const [status, setStatus] = useState<'loading' | 'loaded' | 'error'>('loading');
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const initial = (fallback ?? alt).charAt(0).toUpperCase();
 
   useEffect(() => {
     // Reset on src change
-    setStatus("loading");
+    setStatus('loading');
 
     const img = new Image();
 
     timerRef.current = setTimeout(() => {
-      setStatus("error");
+      setStatus('error');
     }, timeoutMs);
 
     img.onload = () => {
       if (timerRef.current) clearTimeout(timerRef.current);
-      setStatus("loaded");
+      setStatus('loaded');
     };
 
     img.onerror = () => {
       if (timerRef.current) clearTimeout(timerRef.current);
-      setStatus("error");
+      setStatus('error');
     };
 
     img.src = src;
@@ -41,7 +41,7 @@ export function WorkspaceLogo({ src, alt, fallback, timeoutMs = 5000 }: Workspac
     };
   }, [src, timeoutMs]);
 
-  if (status === "error") {
+  if (status === 'error') {
     return (
       <span className="absolute inset-0 flex items-center justify-center font-bold text-inherit">
         {initial}
@@ -51,7 +51,7 @@ export function WorkspaceLogo({ src, alt, fallback, timeoutMs = 5000 }: Workspac
 
   return (
     <>
-      {status === "loading" && (
+      {status === 'loading' && (
         <div className="absolute inset-0 overflow-hidden bg-gray-200 dark:bg-neutral-700">
           <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/40 to-transparent dark:via-white/10" />
         </div>
@@ -60,7 +60,7 @@ export function WorkspaceLogo({ src, alt, fallback, timeoutMs = 5000 }: Workspac
         src={src}
         alt={alt}
         className={`h-full w-full object-cover transition-opacity duration-300 ${
-          status === "loaded" ? "opacity-100" : "opacity-0"
+          status === 'loaded' ? 'opacity-100' : 'opacity-0'
         }`}
       />
     </>

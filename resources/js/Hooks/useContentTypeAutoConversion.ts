@@ -1,7 +1,7 @@
-import { suggestContentType, type ContentTypeSuggestion } from "@/Utils/contentTypeUtils";
-import { useCallback, useState } from "react";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
+import { suggestContentType, type ContentTypeSuggestion } from '@/Utils/contentTypeUtils';
+import { useCallback, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface AutoConversionState {
   isChecking: boolean;
@@ -33,7 +33,7 @@ export const useContentTypeAutoConversion = ({
   const checkContentType = useCallback(
     async (file: File) => {
       // Only check video files
-      if (!file.type.startsWith("video/")) {
+      if (!file.type.startsWith('video/')) {
         setState((prev) => ({ ...prev, hasChecked: true }));
         return;
       }
@@ -56,7 +56,7 @@ export const useContentTypeAutoConversion = ({
 
           // Show toast notification about the change
           toast.success(
-            t("publications.modal.contentType.autoChanged", {
+            t('publications.modal.contentType.autoChanged', {
               defaultValue: `Content type changed to ${suggestion.suggested_type.toUpperCase()}`,
               from: suggestion.current_type.toUpperCase(),
               to: suggestion.suggested_type.toUpperCase(),
@@ -70,29 +70,29 @@ export const useContentTypeAutoConversion = ({
           // Show suggestion toast without auto-applying
           toast(
             (toastInstance) => {
-              const container = document.createElement("div");
-              container.className = "flex flex-col gap-2";
+              const container = document.createElement('div');
+              container.className = 'flex flex-col gap-2';
 
-              const reasonEl = document.createElement("div");
-              reasonEl.className = "font-medium";
-              reasonEl.textContent = suggestion.reason || "Content type suggestion available";
+              const reasonEl = document.createElement('div');
+              reasonEl.className = 'font-medium';
+              reasonEl.textContent = suggestion.reason || 'Content type suggestion available';
               container.appendChild(reasonEl);
 
-              const buttonsEl = document.createElement("div");
-              buttonsEl.className = "flex gap-2";
+              const buttonsEl = document.createElement('div');
+              buttonsEl.className = 'flex gap-2';
 
-              const applyBtn = document.createElement("button");
+              const applyBtn = document.createElement('button');
               applyBtn.className =
-                "px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600";
+                'px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600';
               applyBtn.textContent = `Change to ${suggestion.suggested_type.toUpperCase()}`;
               applyBtn.onclick = () => {
                 onContentTypeChange(suggestion.suggested_type, suggestion.reason);
                 toast.dismiss(toastInstance.id);
               };
 
-              const keepBtn = document.createElement("button");
+              const keepBtn = document.createElement('button');
               keepBtn.className =
-                "px-3 py-1 bg-gray-300 text-gray-700 rounded text-sm hover:bg-gray-400";
+                'px-3 py-1 bg-gray-300 text-gray-700 rounded text-sm hover:bg-gray-400';
               keepBtn.textContent = `Keep ${suggestion.current_type.toUpperCase()}`;
               keepBtn.onclick = () => toast.dismiss(toastInstance.id);
 
@@ -110,7 +110,7 @@ export const useContentTypeAutoConversion = ({
 
         return suggestion;
       } catch (error) {
-        console.error("Failed to check content type:", error);
+        console.error('Failed to check content type:', error);
         setState((prev) => ({
           ...prev,
           isChecking: false,
@@ -140,7 +140,7 @@ export const useContentTypeAutoConversion = ({
       onContentTypeChange(state.suggestion.suggested_type, state.suggestion.reason);
 
       toast.success(
-        t("publications.modal.contentType.changed", {
+        t('publications.modal.contentType.changed', {
           defaultValue: `Content type changed to ${state.suggestion.suggested_type.toUpperCase()}`,
           to: state.suggestion.suggested_type.toUpperCase(),
         }),

@@ -1,5 +1,5 @@
-import React, { ReactNode, ComponentProps } from "react";
-import { Link } from "@inertiajs/react";
+import React, { ReactNode, ComponentProps } from 'react';
+import { Link } from '@inertiajs/react';
 
 interface ResponsiveNavLinkProps extends ComponentProps<typeof Link> {
   active?: boolean;
@@ -9,7 +9,7 @@ interface ResponsiveNavLinkProps extends ComponentProps<typeof Link> {
 
 export default function ResponsiveNavLink({
   active = false,
-  className = "",
+  className = '',
   children,
   ...props
 }: ResponsiveNavLinkProps) {

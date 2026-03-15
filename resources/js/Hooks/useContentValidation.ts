@@ -1,6 +1,6 @@
-import { useState } from "react";
-import axios, { type AxiosError } from "axios";
-import type { ContentValidationResult } from "@/types/validation";
+import { useState } from 'react';
+import axios, { type AxiosError } from 'axios';
+import type { ContentValidationResult } from '@/types/validation';
 
 export function useContentValidation() {
   const [validationResult, setValidationResult] = useState<ContentValidationResult | null>(null);
@@ -17,7 +17,7 @@ export function useContentValidation() {
     platformIds: number[],
   ): Promise<ContentValidationResult | null> => {
     if (!publicationId || !platformIds || platformIds.length === 0) {
-      setValidationError("Datos de validación incompletos");
+      setValidationError('Datos de validación incompletos');
       return null;
     }
 
@@ -35,7 +35,7 @@ export function useContentValidation() {
       return response.data.data;
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string }>;
-      setValidationError(axiosError.response?.data?.message || "Error al validar el contenido");
+      setValidationError(axiosError.response?.data?.message || 'Error al validar el contenido');
       return null;
     } finally {
       setIsValidating(false);

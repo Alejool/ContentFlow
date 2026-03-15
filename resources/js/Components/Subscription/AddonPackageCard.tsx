@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Card,
   CardContent,
@@ -6,11 +6,11 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/Components/ui/card";
-import Button from "@/Components/common/Modern/Button";
-import { Badge } from "@/Components/ui/badge";
-import type { AddonPackage } from "@/types/addon";
-import { Sparkles, HardDrive, Minus, Plus } from "lucide-react";
+} from '@/Components/ui/card';
+import Button from '@/Components/common/Modern/Button';
+import { Badge } from '@/Components/ui/badge';
+import type { AddonPackage } from '@/types/addon';
+import { Sparkles, HardDrive, Minus, Plus } from 'lucide-react';
 
 interface AddonPackageCardProps {
   package: AddonPackage;
@@ -25,9 +25,9 @@ export const AddonPackageCard: React.FC<AddonPackageCardProps> = ({
 }) => {
   const [quantity, setQuantity] = useState(1);
 
-  const isAI = pkg.sku.startsWith("ai_");
+  const isAI = pkg.sku.startsWith('ai_');
   const Icon = isAI ? Sparkles : HardDrive;
-  const unit = isAI ? "créditos" : "GB";
+  const unit = isAI ? 'créditos' : 'GB';
 
   const totalPrice = pkg.price * quantity;
   const totalAmount = pkg.amount * quantity;
@@ -46,7 +46,7 @@ export const AddonPackageCard: React.FC<AddonPackageCardProps> = ({
 
   return (
     <Card
-      className={`relative transition-all hover:shadow-lg ${pkg.popular ? "border-2 border-blue-500" : ""}`}
+      className={`relative transition-all hover:shadow-lg ${pkg.popular ? 'border-2 border-blue-500' : ''}`}
     >
       {pkg.popular && <Badge className="absolute -top-3 right-4 bg-blue-600">Más Popular</Badge>}
 
@@ -116,7 +116,7 @@ export const AddonPackageCard: React.FC<AddonPackageCardProps> = ({
           disabled={loading}
           className="w-full bg-blue-600 hover:bg-blue-700"
         >
-          {loading ? "Procesando..." : "Comprar Ahora"}
+          {loading ? 'Procesando...' : 'Comprar Ahora'}
         </Button>
       </CardFooter>
     </Card>

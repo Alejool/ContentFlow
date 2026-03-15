@@ -1,5 +1,5 @@
-import { Publication, SocialAccount } from "@/types/Publication";
-import PlatformCard from "./PlatformCard";
+import { Publication, SocialAccount } from '@/types/Publication';
+import PlatformCard from './PlatformCard';
 
 interface PlatformSelectorProps {
   socialAccounts: SocialAccount[];
@@ -26,16 +26,16 @@ export default function PlatformSelector({
 
   const getSupportedContentTypes = (platform: string): string[] => {
     const supportedTypes: Record<string, string[]> = {
-      instagram: ["post", "reel", "story", "carousel"],
-      twitter: ["post", "poll"],
-      tiktok: ["reel"],
-      youtube: ["post", "reel"],
-      facebook: ["post", "story"], // Facebook no soporta encuestas nativas
-      linkedin: ["post", "carousel"],
-      pinterest: ["post", "carousel"],
+      instagram: ['post', 'reel', 'story', 'carousel'],
+      twitter: ['post', 'poll'],
+      tiktok: ['reel'],
+      youtube: ['post', 'reel'],
+      facebook: ['post', 'story'], // Facebook no soporta encuestas nativas
+      linkedin: ['post', 'carousel'],
+      pinterest: ['post', 'carousel'],
     };
 
-    return supportedTypes[platform.toLowerCase()] || ["post"];
+    return supportedTypes[platform.toLowerCase()] || ['post'];
   };
 
   const compatibleAccounts = getCompatibleAccounts();
@@ -72,7 +72,7 @@ export default function PlatformSelector({
                 Plataformas no compatibles con {publication.content_type}:
               </p>
               <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
-                {incompatibleAccounts.map((account) => account.platform).join(", ")}
+                {incompatibleAccounts.map((account) => account.platform).join(', ')}
               </p>
             </div>
           </div>

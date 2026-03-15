@@ -1,5 +1,5 @@
-import React from "react";
-import Skeleton from "@/Components/common/ui/Skeleton";
+import React from 'react';
+import Skeleton from '@/Components/common/ui/Skeleton';
 
 interface TableRowSkeletonProps {
   columns?: number;

@@ -1,6 +1,6 @@
-import React from "react";
-import { formatDate, DATE_FORMATS } from "@/Utils/timezoneUtils";
-import { useTimezoneStore } from "@/stores/timezoneStore";
+import React from 'react';
+import { formatDate, DATE_FORMATS } from '@/Utils/timezoneUtils';
+import { useTimezoneStore } from '@/stores/timezoneStore';
 
 interface DateDisplayProps {
   date: string | null | undefined;
@@ -20,10 +20,10 @@ interface DateDisplayProps {
  */
 export const DateDisplay: React.FC<DateDisplayProps> = ({
   date,
-  format = "FULL",
+  format = 'FULL',
   showTimezone = false,
-  className = "",
-  fallback = "-",
+  className = '',
+  fallback = '-',
 }) => {
   const { timezoneLabel } = useTimezoneStore();
 

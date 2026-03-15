@@ -1,16 +1,16 @@
-import { Head } from "@inertiajs/react";
-import { ArrowLeft, Shield } from "lucide-react";
-import { Trans, useTranslation } from "react-i18next";
+import { Head } from '@inertiajs/react';
+import { ArrowLeft, Shield } from 'lucide-react';
+import { Trans, useTranslation } from 'react-i18next';
 
 export default function PrivacyPolicy() {
   const { t } = useTranslation();
   // In a real app, this date might come from a processing file or config, but we keep it static for now
   // passing it as a variable to the translation
-  const date = "15/01/2026";
+  const date = '15/01/2026';
 
   return (
     <>
-      <Head title={`${t("legal.privacyPolicy.title")} - ContentFlow`} />
+      <Head title={`${t('legal.privacyPolicy.title')} - ContentFlow`} />
 
       <div className="min-h-screen bg-white px-4 py-12 dark:bg-gray-900 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl">
@@ -20,7 +20,7 @@ export default function PrivacyPolicy() {
               className="inline-flex items-center text-sm font-medium text-gray-500 transition-colors hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              {t("legal.common.back")}
+              {t('legal.common.back')}
             </button>
           </div>
 
@@ -31,31 +31,31 @@ export default function PrivacyPolicy() {
                 <Shield className="h-10 w-10 text-primary-600 dark:text-primary-400" />
               </div>
               <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
-                {t("legal.privacyPolicy.title")}
+                {t('legal.privacyPolicy.title')}
               </h1>
               <p className="mx-auto mt-4 max-w-2xl text-xl text-gray-600 dark:text-gray-300">
-                {t("legal.privacyPolicy.subtitle")}
+                {t('legal.privacyPolicy.subtitle')}
               </p>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {t("legal.common.lastUpdated", { date })}
+                {t('legal.common.lastUpdated', { date })}
               </p>
             </div>
 
             <div className="prose prose-lg dark:prose-invert max-w-none text-gray-600 dark:text-gray-300">
-              <Section title={t("legal.privacyPolicy.sections.intro.title")}>
-                <p>{t("legal.privacyPolicy.sections.intro.content.0")}</p>
-                <p>{t("legal.privacyPolicy.sections.intro.content.1")}</p>
+              <Section title={t('legal.privacyPolicy.sections.intro.title')}>
+                <p>{t('legal.privacyPolicy.sections.intro.content.0')}</p>
+                <p>{t('legal.privacyPolicy.sections.intro.content.1')}</p>
               </Section>
 
-              <Section title={t("legal.privacyPolicy.sections.infoCollected.title")}>
-                <p>{t("legal.privacyPolicy.sections.infoCollected.subtitle")}</p>
+              <Section title={t('legal.privacyPolicy.sections.infoCollected.title')}>
+                <p>{t('legal.privacyPolicy.sections.infoCollected.subtitle')}</p>
 
                 <h4 className="mb-2 mt-4 font-semibold text-gray-900 dark:text-white">
-                  {t("legal.privacyPolicy.sections.infoCollected.provided.title")}
+                  {t('legal.privacyPolicy.sections.infoCollected.provided.title')}
                 </h4>
                 <ul className="list-disc space-y-1 pl-5">
                   {(
-                    t("legal.privacyPolicy.sections.infoCollected.provided.items", {
+                    t('legal.privacyPolicy.sections.infoCollected.provided.items', {
                       returnObjects: true,
                     }) as string[]
                   ).map((item, index) => (
@@ -68,11 +68,11 @@ export default function PrivacyPolicy() {
                 </ul>
 
                 <h4 className="mb-2 mt-4 font-semibold text-gray-900 dark:text-white">
-                  {t("legal.privacyPolicy.sections.infoCollected.auto.title")}
+                  {t('legal.privacyPolicy.sections.infoCollected.auto.title')}
                 </h4>
                 <ul className="list-disc space-y-1 pl-5">
                   {(
-                    t("legal.privacyPolicy.sections.infoCollected.auto.items", {
+                    t('legal.privacyPolicy.sections.infoCollected.auto.items', {
                       returnObjects: true,
                     }) as string[]
                   ).map((item, index) => (
@@ -85,12 +85,12 @@ export default function PrivacyPolicy() {
                 </ul>
 
                 <h4 className="mb-2 mt-4 font-semibold text-gray-900 dark:text-white">
-                  {t("legal.privacyPolicy.sections.infoCollected.thirdParty.title")}
+                  {t('legal.privacyPolicy.sections.infoCollected.thirdParty.title')}
                 </h4>
-                <p>{t("legal.privacyPolicy.sections.infoCollected.thirdParty.description")}</p>
+                <p>{t('legal.privacyPolicy.sections.infoCollected.thirdParty.description')}</p>
                 <ul className="list-disc space-y-1 pl-5">
                   {(
-                    t("legal.privacyPolicy.sections.infoCollected.thirdParty.items", {
+                    t('legal.privacyPolicy.sections.infoCollected.thirdParty.items', {
                       returnObjects: true,
                     }) as string[]
                   ).map((item, index) => (
@@ -103,11 +103,11 @@ export default function PrivacyPolicy() {
                 </ul>
               </Section>
 
-              <Section title={t("legal.privacyPolicy.sections.usage.title")}>
-                <p>{t("legal.privacyPolicy.sections.usage.subtitle")}</p>
+              <Section title={t('legal.privacyPolicy.sections.usage.title')}>
+                <p>{t('legal.privacyPolicy.sections.usage.subtitle')}</p>
                 <ul className="list-disc space-y-1 pl-5">
                   {(
-                    t("legal.privacyPolicy.sections.usage.items", {
+                    t('legal.privacyPolicy.sections.usage.items', {
                       returnObjects: true,
                     }) as string[]
                   ).map((item, index) => (
@@ -118,11 +118,11 @@ export default function PrivacyPolicy() {
                 </ul>
               </Section>
 
-              <Section title={t("legal.privacyPolicy.sections.sharing.title")}>
-                <p>{t("legal.privacyPolicy.sections.sharing.subtitle")}</p>
+              <Section title={t('legal.privacyPolicy.sections.sharing.title')}>
+                <p>{t('legal.privacyPolicy.sections.sharing.subtitle')}</p>
                 <ul className="list-disc space-y-1 pl-5">
                   {(
-                    t("legal.privacyPolicy.sections.sharing.items", {
+                    t('legal.privacyPolicy.sections.sharing.items', {
                       returnObjects: true,
                     }) as string[]
                   ).map((item, index) => (
@@ -133,15 +133,15 @@ export default function PrivacyPolicy() {
                 </ul>
               </Section>
 
-              <Section title={t("legal.privacyPolicy.sections.security.title")}>
-                <p>{t("legal.privacyPolicy.sections.security.content")}</p>
+              <Section title={t('legal.privacyPolicy.sections.security.title')}>
+                <p>{t('legal.privacyPolicy.sections.security.content')}</p>
               </Section>
 
-              <Section title={t("legal.privacyPolicy.sections.rights.title")}>
-                <p>{t("legal.privacyPolicy.sections.rights.subtitle")}</p>
+              <Section title={t('legal.privacyPolicy.sections.rights.title')}>
+                <p>{t('legal.privacyPolicy.sections.rights.subtitle')}</p>
                 <ul className="list-disc space-y-1 pl-5">
                   {(
-                    t("legal.privacyPolicy.sections.rights.items", {
+                    t('legal.privacyPolicy.sections.rights.items', {
                       returnObjects: true,
                     }) as string[]
                   ).map((item, index) => (
@@ -150,23 +150,23 @@ export default function PrivacyPolicy() {
                     </li>
                   ))}
                 </ul>
-                <p className="mt-2">{t("legal.privacyPolicy.sections.rights.contactNote")}</p>
+                <p className="mt-2">{t('legal.privacyPolicy.sections.rights.contactNote')}</p>
               </Section>
 
-              <Section title={t("legal.privacyPolicy.sections.kids.title")}>
-                <p>{t("legal.privacyPolicy.sections.kids.content")}</p>
+              <Section title={t('legal.privacyPolicy.sections.kids.title')}>
+                <p>{t('legal.privacyPolicy.sections.kids.content')}</p>
               </Section>
 
-              <Section title={t("legal.privacyPolicy.sections.changes.title")}>
-                <p>{t("legal.privacyPolicy.sections.changes.content")}</p>
+              <Section title={t('legal.privacyPolicy.sections.changes.title')}>
+                <p>{t('legal.privacyPolicy.sections.changes.content')}</p>
               </Section>
 
-              <Section title={t("legal.privacyPolicy.sections.contact.title")}>
-                <p>{t("legal.privacyPolicy.sections.contact.content")}</p>
+              <Section title={t('legal.privacyPolicy.sections.contact.title')}>
+                <p>{t('legal.privacyPolicy.sections.contact.content')}</p>
                 <div className="mt-4 rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
-                  <p className="font-medium">{t("legal.common.team")}</p>
+                  <p className="font-medium">{t('legal.common.team')}</p>
                   <p>
-                    Email:{" "}
+                    Email:{' '}
                     <a
                       href="mailto:soporte@contentflow.app"
                       className="text-primary-600 hover:text-primary-500"

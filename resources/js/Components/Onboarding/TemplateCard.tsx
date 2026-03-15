@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
-import type { PublicationTemplate } from "@/types/onboarding";
-import { Check } from "lucide-react";
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { PublicationTemplate } from '@/types/onboarding';
+import { Check } from 'lucide-react';
 
 interface TemplateCardProps {
   template: PublicationTemplate;
@@ -26,35 +26,35 @@ export default function TemplateCard({ template, onSelect }: TemplateCardProps) 
 
   // Category-specific colors
   const categoryColors = {
-    promotional: "from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20",
-    educational: "from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20",
-    engagement: "from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20",
+    promotional: 'from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20',
+    educational: 'from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20',
+    engagement: 'from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20',
   };
 
   const categoryBorderColors = {
-    promotional: "border-purple-200 dark:border-purple-700",
-    educational: "border-blue-200 dark:border-blue-700",
-    engagement: "border-green-200 dark:border-green-700",
+    promotional: 'border-purple-200 dark:border-purple-700',
+    educational: 'border-blue-200 dark:border-blue-700',
+    engagement: 'border-green-200 dark:border-green-700',
   };
 
   const categoryBadgeColors = {
     promotional:
-      "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-700",
+      'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-700',
     educational:
-      "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-700",
+      'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-700',
     engagement:
-      "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-700",
+      'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-700',
   };
 
   const bgGradient =
     categoryColors[template.category as keyof typeof categoryColors] ||
-    "from-gray-50 to-gray-100 dark:from-neutral-900 dark:to-neutral-800";
+    'from-gray-50 to-gray-100 dark:from-neutral-900 dark:to-neutral-800';
   const borderColor =
     categoryBorderColors[template.category as keyof typeof categoryBorderColors] ||
-    "border-gray-200 dark:border-neutral-700";
+    'border-gray-200 dark:border-neutral-700';
   const badgeColor =
     categoryBadgeColors[template.category as keyof typeof categoryBadgeColors] ||
-    "bg-white/90 dark:bg-neutral-800/90 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-neutral-600";
+    'bg-white/90 dark:bg-neutral-800/90 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-neutral-600';
 
   const handleSelect = async () => {
     setIsSelecting(true);
@@ -107,24 +107,24 @@ export default function TemplateCard({ template, onSelect }: TemplateCardProps) 
         {/* Hover Overlay */}
         <div
           className={`absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${
-            isHovered ? "opacity-100" : "opacity-0"
+            isHovered ? 'opacity-100' : 'opacity-0'
           }`}
         >
           <button
             onClick={handleSelect}
             disabled={isSelecting}
             className="flex transform items-center gap-2 rounded-lg bg-primary-600 px-6 py-3 font-medium text-white transition-all duration-300 hover:scale-105 hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
-            aria-label={t("templates.select", { name: template.name })}
+            aria-label={t('templates.select', { name: template.name })}
           >
             {isSelecting ? (
               <>
                 <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                {t("templates.selecting")}
+                {t('templates.selecting')}
               </>
             ) : (
               <>
                 <Check className="h-5 w-5" />
-                {t("templates.useTemplate")}
+                {t('templates.useTemplate')}
               </>
             )}
           </button>
@@ -163,7 +163,7 @@ export default function TemplateCard({ template, onSelect }: TemplateCardProps) 
       {/* Bottom Border Accent on Hover */}
       <div
         className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 to-primary-600 transition-transform duration-300 ${
-          isHovered ? "scale-x-100" : "scale-x-0"
+          isHovered ? 'scale-x-100' : 'scale-x-0'
         }`}
       />
     </div>

@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
-import { router } from "@inertiajs/react";
-import { useReducedMotion } from "@/Hooks/useReducedMotion";
+import React, { useEffect, useState } from 'react';
+import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
+import { router } from '@inertiajs/react';
+import { useReducedMotion } from '@/Hooks/useReducedMotion';
 
 /**
  * Enhanced Inertia progress indicator with smooth transitions
@@ -49,8 +49,8 @@ export const InertiaProgressIndicator: React.FC<InertiaProgressIndicatorProps> =
   // Use CSS variable for primary color if no color is provided
   const progressColor =
     color ||
-    getComputedStyle(document.documentElement).getPropertyValue("--primary-600").trim() ||
-    "#ad421e";
+    getComputedStyle(document.documentElement).getPropertyValue('--primary-600').trim() ||
+    '#ad421e';
 
   useEffect(() => {
     // Listen to Inertia navigation events
@@ -109,10 +109,10 @@ export const InertiaProgressIndicator: React.FC<InertiaProgressIndicatorProps> =
     };
 
     // Register event listeners - router.on() returns cleanup functions
-    const removeStartListener = router.on("start", startHandler);
-    const removeFinishListener = router.on("finish", finishHandler);
-    const removeErrorListener = router.on("error", errorHandler);
-    const removeExceptionListener = router.on("exception", errorHandler);
+    const removeStartListener = router.on('start', startHandler);
+    const removeFinishListener = router.on('finish', finishHandler);
+    const removeErrorListener = router.on('error', errorHandler);
+    const removeExceptionListener = router.on('exception', errorHandler);
 
     // Cleanup
     return () => {
@@ -168,13 +168,13 @@ export const InertiaProgressIndicator: React.FC<InertiaProgressIndicatorProps> =
             animate="animate"
             exit="exit"
             style={{
-              position: "fixed",
+              position: 'fixed',
               top: 0,
               left: 0,
               right: 0,
               height: `${height}px`,
               backgroundColor: progressColor,
-              transformOrigin: "left",
+              transformOrigin: 'left',
               zIndex: 9999,
             }}
           />
@@ -191,20 +191,20 @@ export const InertiaProgressIndicator: React.FC<InertiaProgressIndicatorProps> =
               animate="animate"
               exit="exit"
               style={{
-                position: "fixed",
-                top: "20px",
-                right: "20px",
+                position: 'fixed',
+                top: '20px',
+                right: '20px',
                 zIndex: 9999,
               }}
             >
               <div
                 style={{
-                  width: "24px",
-                  height: "24px",
+                  width: '24px',
+                  height: '24px',
                   border: `3px solid ${progressColor}`,
-                  borderTopColor: "transparent",
-                  borderRadius: "50%",
-                  animation: shouldReduceMotion ? "none" : "spin 0.8s linear infinite",
+                  borderTopColor: 'transparent',
+                  borderRadius: '50%',
+                  animation: shouldReduceMotion ? 'none' : 'spin 0.8s linear infinite',
                 }}
               />
             </m.div>

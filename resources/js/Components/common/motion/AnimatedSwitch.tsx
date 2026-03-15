@@ -4,11 +4,11 @@
  * Toggle switch with animations and full accessibility support
  */
 
-import React, { forwardRef, InputHTMLAttributes } from "react";
-import { LazyMotion, domAnimation, m } from "framer-motion";
-import { prefersReducedMotion } from "@/Utils/themeTransition";
+import React, { forwardRef, InputHTMLAttributes } from 'react';
+import { LazyMotion, domAnimation, m } from 'framer-motion';
+import { prefersReducedMotion } from '@/Utils/themeTransition';
 
-interface AnimatedSwitchProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
+interface AnimatedSwitchProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
   label?: string;
   description?: string;
   onCheckedChange?: (checked: boolean) => void;
@@ -24,7 +24,7 @@ export const AnimatedSwitch = forwardRef<HTMLInputElement, AnimatedSwitchProps>(
       onChange,
       disabled,
       id,
-      className = "",
+      className = '',
       ...props
     },
     ref,
@@ -38,7 +38,7 @@ export const AnimatedSwitch = forwardRef<HTMLInputElement, AnimatedSwitchProps>(
     };
 
     const spring = {
-      type: "spring",
+      type: 'spring',
       stiffness: 700,
       damping: 30,
     };
@@ -62,7 +62,7 @@ export const AnimatedSwitch = forwardRef<HTMLInputElement, AnimatedSwitchProps>(
 
           <label
             htmlFor={switchId}
-            className={`relative inline-flex h-6 w-11 cursor-pointer items-center rounded-full transition-colors duration-fast peer-focus-visible:ring-2 peer-focus-visible:ring-primary-500 peer-focus-visible:ring-offset-2 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 ${checked ? "bg-primary-600" : "bg-theme-border-strong"} `}
+            className={`relative inline-flex h-6 w-11 cursor-pointer items-center rounded-full transition-colors duration-fast peer-focus-visible:ring-2 peer-focus-visible:ring-primary-500 peer-focus-visible:ring-offset-2 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 ${checked ? 'bg-primary-600' : 'bg-theme-border-strong'} `}
           >
             <LazyMotion features={domAnimation}>
               <m.span
@@ -99,4 +99,4 @@ export const AnimatedSwitch = forwardRef<HTMLInputElement, AnimatedSwitchProps>(
   },
 );
 
-AnimatedSwitch.displayName = "AnimatedSwitch";
+AnimatedSwitch.displayName = 'AnimatedSwitch';

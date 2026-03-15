@@ -2,19 +2,19 @@ interface EmptyStateProps {
   title: string;
   description: string;
   className?: string;
-  imageSize?: "sm" | "md" | "lg";
+  imageSize?: 'sm' | 'md' | 'lg';
 }
 
 export default function EmptyState({
   title,
   description,
-  className = "",
-  imageSize = "md",
+  className = '',
+  imageSize = 'md',
 }: EmptyStateProps) {
   const sizeMap = {
-    sm: "w-24 h-24",
-    md: "w-40 h-40",
-    lg: "w-64 h-64",
+    sm: 'w-24 h-24',
+    md: 'w-40 h-40',
+    lg: 'w-64 h-64',
   };
 
   return (

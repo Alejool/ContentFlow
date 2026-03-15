@@ -1,9 +1,9 @@
-import ModernButton from "@/Components/common/Modern/Button";
-import ModernInput from "@/Components/common/Modern/Input";
-import { useUpdatePassword } from "@/Hooks/profile/useUpdatePassword";
-import { Transition } from "@headlessui/react";
-import { AlertTriangle, Check, Key, Lock, Shield } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import ModernButton from '@/Components/common/Modern/Button';
+import ModernInput from '@/Components/common/Modern/Input';
+import { useUpdatePassword } from '@/Hooks/profile/useUpdatePassword';
+import { Transition } from '@headlessui/react';
+import { AlertTriangle, Check, Key, Lock, Shield } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface UpdatePasswordFormProps {
   className?: string;
@@ -15,7 +15,7 @@ interface IconProps {
 
 const LockIcon = ({ className }: IconProps) => <Lock className={className} />;
 
-const CheckIcon = ({ className = "w-5 h-5" }: IconProps) => <Check className={className} />;
+const CheckIcon = ({ className = 'w-5 h-5' }: IconProps) => <Check className={className} />;
 
 interface SuccessAlertProps {
   show: boolean;
@@ -38,17 +38,17 @@ const SuccessAlert = ({ show, t }: SuccessAlertProps) => (
       </div>
       <div>
         <p className="text-sm font-bold uppercase tracking-wide text-green-800 dark:text-green-300">
-          {t("profile.password.successTitle")}
+          {t('profile.password.successTitle')}
         </p>
         <p className="text-sm font-medium text-green-600 dark:text-green-400/80">
-          {t("profile.password.successMessage")}
+          {t('profile.password.successMessage')}
         </p>
       </div>
     </div>
   </Transition>
 );
 
-const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
+const UpdatePasswordForm = ({ className = '' }: UpdatePasswordFormProps) => {
   const { t } = useTranslation();
 
   const { register, handleSubmit, errors, isSubmitting, isSuccess } = useUpdatePassword();
@@ -62,10 +62,10 @@ const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
           </div>
           <div>
             <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-              {t("profile.password.title")}
+              {t('profile.password.title')}
             </h2>
             <p className="text-sm text-gray-500 dark:text-neutral-400">
-              {t("profile.password.description")}
+              {t('profile.password.description')}
             </p>
           </div>
         </div>
@@ -79,7 +79,7 @@ const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
                 <AlertTriangle className="h-5 w-5 text-primary-600 dark:text-primary-400" />
               </div>
               <h3 className="text-sm font-bold uppercase tracking-wide text-primary-800 dark:text-primary-300">
-                {t("profile.password.errorTitle")}
+                {t('profile.password.errorTitle')}
               </h3>
             </div>
             <ul className="ml-11 list-disc space-y-1.5 text-sm font-medium leading-relaxed text-primary-700 dark:text-primary-400">
@@ -95,9 +95,9 @@ const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
         <form onSubmit={handleSubmit} className="space-y-6">
           <ModernInput
             id="current_password"
-            label={t("profile.password.currentPassword")}
+            label={t('profile.password.currentPassword')}
             type="password"
-            placeholder={t("profile.password.placeholders.current")}
+            placeholder={t('profile.password.placeholders.current')}
             register={register}
             error={errors.current_password?.message}
             showPasswordToggle
@@ -106,9 +106,9 @@ const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
 
           <ModernInput
             id="password"
-            label={t("profile.password.newPassword")}
+            label={t('profile.password.newPassword')}
             type="password"
-            placeholder={t("profile.password.placeholders.new")}
+            placeholder={t('profile.password.placeholders.new')}
             register={register}
             error={errors.password?.message}
             showPasswordToggle
@@ -117,9 +117,9 @@ const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
 
           <ModernInput
             id="password_confirmation"
-            label={t("profile.password.confirmPassword")}
+            label={t('profile.password.confirmPassword')}
             type="password"
-            placeholder={t("profile.password.placeholders.confirm")}
+            placeholder={t('profile.password.placeholders.confirm')}
             register={register}
             error={errors.password_confirmation?.message}
             showPasswordToggle
@@ -135,13 +135,13 @@ const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
               loading={isSubmitting}
               className="w-full min-w-[200px] rounded-lg font-bold uppercase tracking-wider shadow-lg shadow-primary-500/20 transition-transform active:scale-95 sm:w-auto"
             >
-              {isSubmitting ? t("common.updating") : t("profile.password.updateButton")}
+              {isSubmitting ? t('common.updating') : t('profile.password.updateButton')}
             </ModernButton>
 
             {isSubmitting && (
               <div className="mt-4 flex items-center gap-3 text-sm font-bold text-gray-500 dark:text-gray-400">
                 <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary-500 border-t-transparent"></div>
-                {t("common.processing")}
+                {t('common.processing')}
               </div>
             )}
           </div>

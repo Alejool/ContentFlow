@@ -1,7 +1,7 @@
-import { useMemo } from "react";
-import useOptimisticStore from "../stores/optimisticStore";
-import type { OptimisticOptions } from "../types/optimistic";
-import { performanceMetrics } from "../Utils/performanceMetrics";
+import { useMemo } from 'react';
+import useOptimisticStore from '../stores/optimisticStore';
+import type { OptimisticOptions } from '../types/optimistic';
+import { performanceMetrics } from '../Utils/performanceMetrics';
 
 /**
  * Error type detection utilities
@@ -21,15 +21,15 @@ interface ErrorWithResponse extends Error {
  */
 function detectErrorType(
   error: ErrorWithResponse,
-): "network" | "validation" | "server" | "unknown" {
+): 'network' | 'validation' | 'server' | 'unknown' {
   // Network errors (no response or connection issues)
   if (
     !error.response &&
-    (error.message?.includes("network") ||
-      error.message?.includes("fetch") ||
-      error.code === "ECONNABORTED")
+    (error.message?.includes('network') ||
+      error.message?.includes('fetch') ||
+      error.code === 'ECONNABORTED')
   ) {
-    return "network";
+    return 'network';
   }
 
   // Check response status
@@ -38,16 +38,16 @@ function detectErrorType(
   if (status) {
     // Validation errors (4xx client errors)
     if (status >= 400 && status < 500) {
-      return "validation";
+      return 'validation';
     }
 
     // Server errors (5xx)
     if (status >= 500) {
-      return "server";
+      return 'server';
     }
   }
 
-  return "unknown";
+  return 'unknown';
 }
 
 /**
@@ -56,12 +56,12 @@ function detectErrorType(
  */
 function isRetryableError(errorType: string, status?: number): boolean {
   // Network errors are always retryable
-  if (errorType === "network") {
+  if (errorType === 'network') {
     return true;
   }
 
   // Server errors are retryable
-  if (errorType === "server") {
+  if (errorType === 'server') {
     return true;
   }
 
@@ -113,7 +113,7 @@ export function useOptimistic(options: OptimisticOptions) {
     const allOps = Array.from(store.operations.values());
     const resourceOps = allOps.filter((op) => op.resource === options.resource);
     const completedOps = resourceOps.filter(
-      (op) => op.status === "success" || op.status === "failed",
+      (op) => op.status === 'success' || op.status === 'failed',
     );
 
     if (completedOps.length === 0) {
@@ -127,8 +127,8 @@ export function useOptimistic(options: OptimisticOptions) {
       };
     }
 
-    const successOps = completedOps.filter((op) => op.status === "success");
-    const failedOps = completedOps.filter((op) => op.status === "failed");
+    const successOps = completedOps.filter((op) => op.status === 'success');
+    const failedOps = completedOps.filter((op) => op.status === 'failed');
 
     // Calculate average response time (server response)
     const totalResponseTime = completedOps.reduce((sum, op) => {
@@ -191,7 +191,7 @@ export function useOptimistic(options: OptimisticOptions) {
     const id = `${options.resource}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
     // Determine operation type based on presence of originalData
-    const operationType = originalData ? "update" : "create";
+    const operationType = originalData ? 'update' : 'create';
 
     // Get max retries from options or default to 3
     const maxRetries = options.maxRetries || 3;
@@ -213,7 +213,7 @@ export function useOptimistic(options: OptimisticOptions) {
       optimisticData,
       originalData: originalData || null,
       request: Promise.resolve(optimisticData), // Placeholder promise
-      status: "pending",
+      status: 'pending',
       timestamp: Date.now(),
       retryCount: 0,
       maxRetries,
@@ -292,7 +292,7 @@ export function useOptimistic(options: OptimisticOptions) {
 
         // No more retries or error is not retryable
         // Move to failed operations queue if max retries exceeded
-        if (retryCount >= maxRetries && errorType === "network") {
+        if (retryCount >= maxRetries && errorType === 'network') {
           if (import.meta.env.DEV) {
           }
         }
@@ -319,7 +319,7 @@ export function useOptimistic(options: OptimisticOptions) {
     }
 
     // This should never be reached, but TypeScript needs it
-    throw lastError || new Error("Operation failed");
+    throw lastError || new Error('Operation failed');
   }
 
   return {

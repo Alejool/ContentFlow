@@ -1,5 +1,5 @@
-import Button from "@/Components/common/Modern/Button";
-import { Badge } from "@/Components/ui/badge";
+import Button from '@/Components/common/Modern/Button';
+import { Badge } from '@/Components/ui/badge';
 import {
   Card,
   CardContent,
@@ -7,11 +7,11 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/Components/ui/card";
-import { PLAN_FEATURES, type PlanId } from "@/Constants/plans";
-import { cn } from "@/lib/utils";
-import { ArrowRight, Award, Check, Lock, Shield, Sparkles, Star, Zap } from "lucide-react";
-import { useTranslation } from "react-i18next";
+} from '@/Components/ui/card';
+import { PLAN_FEATURES, type PlanId } from '@/Constants/plans';
+import { cn } from '@/lib/utils';
+import { ArrowRight, Award, Check, Lock, Shield, Sparkles, Star, Zap } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface Plan {
   id: string;
@@ -36,9 +36,9 @@ interface PlanCardProps {
   isCurrentPlan?: boolean;
   isLoading?: boolean;
   onSelectPlan: (planId: string) => void;
-  billingCycle?: "monthly" | "yearly";
+  billingCycle?: 'monthly' | 'yearly';
   showCurrentBadge?: boolean;
-  variant?: "default" | "compact";
+  variant?: 'default' | 'compact';
   hasActiveSubscription?: boolean;
   activePlans?: string[];
   activeSubscriptions?: any[];
@@ -60,9 +60,9 @@ export default function PlanCard({
   isCurrentPlan = false,
   isLoading = false,
   onSelectPlan,
-  billingCycle = "monthly",
+  billingCycle = 'monthly',
   showCurrentBadge = true,
-  variant = "default",
+  variant = 'default',
   hasActiveSubscription = false,
   activePlans = [],
   activeSubscriptions = [],
@@ -73,18 +73,18 @@ export default function PlanCard({
   const { t } = useTranslation();
 
   const getPlanIcon = (planId: string) => {
-    const iconClass = variant === "compact" ? "w-8 h-8" : "w-8 h-8";
+    const iconClass = variant === 'compact' ? 'w-8 h-8' : 'w-8 h-8';
     switch (planId) {
-      case "demo":
-        return <Sparkles className={cn(iconClass, "text-white")} />;
-      case "free":
-        return <Zap className={cn(iconClass, "")} />;
-      case "starter":
-        return <Star className={cn(iconClass, "")} />;
-      case "professional":
-        return <Award className={cn(iconClass, "")} />;
-      case "enterprise":
-        return <Shield className={cn(iconClass, "")} />;
+      case 'demo':
+        return <Sparkles className={cn(iconClass, 'text-white')} />;
+      case 'free':
+        return <Zap className={cn(iconClass, '')} />;
+      case 'starter':
+        return <Star className={cn(iconClass, '')} />;
+      case 'professional':
+        return <Award className={cn(iconClass, '')} />;
+      case 'enterprise':
+        return <Shield className={cn(iconClass, '')} />;
       default:
         return null;
     }
@@ -113,8 +113,8 @@ export default function PlanCard({
 
     // Jerarquías de features para no mostrar versiones inferiores si ya tienes la superior
     const featureHierarchies: Record<string, string[]> = {
-      analytics: ["basicAnalytics", "advancedAnalytics"],
-      support: ["emailSupport", "prioritySupport", "dedicatedSupport"],
+      analytics: ['basicAnalytics', 'advancedAnalytics'],
+      support: ['emailSupport', 'prioritySupport', 'dedicatedSupport'],
     };
 
     // Todas las features de planes SUPERIORES
@@ -127,7 +127,7 @@ export default function PlanCard({
             !/^(publications|socialAccounts|storage|aiRequests)\d/.test(f) &&
             !/^(publications|socialAccounts|storage|aiRequests)Unlimited/.test(f) &&
             !/^(storage)1TB/.test(f) &&
-            f !== "fullAccessDays"
+            f !== 'fullAccessDays'
           ) {
             superiorFeatures.add(f);
           }
@@ -158,19 +158,19 @@ export default function PlanCard({
 
   const features = getFeaturesList(plan.id);
   const missingFeatures = getMissingFeatures(plan.id);
-  const isPopular = plan.popular || plan.id === "professional";
+  const isPopular = plan.popular || plan.id === 'professional';
   const displayPrice = plan.price;
 
   // Tagline — one-liner benefit per plan
   const getPlanTagline = (planId: string): string => {
     const taglines: Record<string, string> = {
-      demo: t("pricing.taglines.demo", "Explora todo sin compromisos"),
-      free: t("pricing.taglines.free", "Empieza gratis, sin tarjeta"),
-      starter: t("pricing.taglines.starter", "Para creadores individuales"),
-      professional: t("pricing.taglines.professional", "Escala tu contenido con tu equipo"),
-      enterprise: t("pricing.taglines.enterprise", "Control total de tu marca"),
+      demo: t('pricing.taglines.demo', 'Explora todo sin compromisos'),
+      free: t('pricing.taglines.free', 'Empieza gratis, sin tarjeta'),
+      starter: t('pricing.taglines.starter', 'Para creadores individuales'),
+      professional: t('pricing.taglines.professional', 'Escala tu contenido con tu equipo'),
+      enterprise: t('pricing.taglines.enterprise', 'Control total de tu marca'),
     };
-    return taglines[planId] || "";
+    return taglines[planId] || '';
   };
 
   // Annual savings (20% off)
@@ -180,18 +180,18 @@ export default function PlanCard({
   // Social proof — chosen by X users
   const getUserCount = (planId: string): string => {
     const counts: Record<string, string> = {
-      starter: "2,400+",
-      professional: "8,100+",
-      enterprise: "340+",
+      starter: '2,400+',
+      professional: '8,100+',
+      enterprise: '340+',
     };
-    return counts[planId] || "";
+    return counts[planId] || '';
   };
   const userCount = getUserCount(plan.id);
 
   // Determinar si este plan es un downgrade no permitido
   const isPaidPlan = plan.requires_stripe && plan.price > 0;
-  const isFreePlan = plan.id === "free";
-  const isDemoPlan = plan.id === "demo";
+  const isFreePlan = plan.id === 'free';
+  const isDemoPlan = plan.id === 'demo';
   // Bloquear cambio a Free o Demo si hay suscripción activa de pago
   const isPlanActive = activePlans.includes(plan.id) || isCurrentPlan;
   const isPlanExpired = (expiredPlans || []).includes(plan.id);
@@ -204,9 +204,9 @@ export default function PlanCard({
   const getButtonConfig = () => {
     if (isCurrentPlan) {
       return {
-        label: t("pricing.currentPlan", "Plan Actual"),
+        label: t('pricing.currentPlan', 'Plan Actual'),
         disabled: true,
-        variant: "current" as const,
+        variant: 'current' as const,
       };
     }
 
@@ -216,35 +216,35 @@ export default function PlanCard({
     if (isDowngradeBlocked) {
       return {
         label: t(
-          "pricing.cancelRequired",
-          "Debes cancelar tu suscripción actual para cambiar a este plan.",
+          'pricing.cancelRequired',
+          'Debes cancelar tu suscripción actual para cambiar a este plan.',
         ),
         disabled: true,
-        variant: "blocked" as const,
+        variant: 'blocked' as const,
       };
     }
 
     if (!plan.enabled && plan.requires_stripe) {
       return {
-        label: t("pricing.comingSoon", "Próximamente"),
+        label: t('pricing.comingSoon', 'Próximamente'),
         disabled: true,
-        variant: "disabled" as const,
+        variant: 'disabled' as const,
       };
     }
 
     if (isFreePlan || isDemoPlan) {
       return {
-        label: t("pricing.selectPlan", "Seleccionar plan"),
+        label: t('pricing.selectPlan', 'Seleccionar plan'),
         disabled: false,
-        variant: "free" as const,
+        variant: 'free' as const,
       };
     }
 
     // Para planes de pago, siempre mostrar "Seleccionar plan" (comprar/renovar)
     return {
-      label: t("pricing.selectPlan", "Seleccionar plan"),
+      label: t('pricing.selectPlan', 'Seleccionar plan'),
       disabled: false,
-      variant: "paid" as const,
+      variant: 'paid' as const,
     };
   };
 
@@ -258,33 +258,33 @@ export default function PlanCard({
   const getPlanStatus = () => {
     if (isCurrentPlan) {
       return {
-        label: t("pricing.status.active", "Activo"),
-        variant: "default" as const,
+        label: t('pricing.status.active', 'Activo'),
+        variant: 'default' as const,
         className:
-          "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-green-200 dark:border-green-800",
+          'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-green-200 dark:border-green-800',
       };
     }
     if (isPlanActive && !isCurrentPlan) {
       return {
-        label: t("pricing.status.purchased", "Comprado"),
-        variant: "default" as const,
+        label: t('pricing.status.purchased', 'Comprado'),
+        variant: 'default' as const,
         className:
-          "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-green-200 dark:border-green-800",
+          'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-green-200 dark:border-green-800',
       };
     }
     if (isPlanExpired) {
       return {
-        label: t("pricing.status.expired", "Expirado"),
-        variant: "secondary" as const,
+        label: t('pricing.status.expired', 'Expirado'),
+        variant: 'secondary' as const,
         className:
-          "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800",
+          'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800',
       };
     }
     if (activePlans.length > 0 && !isPlanActive && isPaidPlan) {
       return {
-        label: t("pricing.status.available", "Disponible"),
-        variant: "outline" as const,
-        className: "border-primary-200 dark:border-primary-800 text-primary-600",
+        label: t('pricing.status.available', 'Disponible'),
+        variant: 'outline' as const,
+        className: 'border-primary-200 dark:border-primary-800 text-primary-600',
       };
     }
     return null;
@@ -292,15 +292,15 @@ export default function PlanCard({
 
   const status = getPlanStatus();
 
-  if (variant === "compact") {
+  if (variant === 'compact') {
     return (
       <Card
         className={cn(
-          "relative flex h-full flex-col transition-all duration-300 hover:shadow-lg",
+          'relative flex h-full flex-col transition-all duration-300 hover:shadow-lg',
           isPopular
-            ? "border-2 border-primary-600 bg-white shadow-xl dark:bg-neutral-900"
-            : "border border-neutral-200 bg-white hover:border-primary-400 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-primary-800",
-          isCurrentPlan && "ring-2 ring-primary-200 dark:ring-primary-900/50",
+            ? 'border-2 border-primary-600 bg-white shadow-xl dark:bg-neutral-900'
+            : 'border border-neutral-200 bg-white hover:border-primary-400 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-primary-800',
+          isCurrentPlan && 'ring-2 ring-primary-200 dark:ring-primary-900/50',
         )}
       >
         {/* Badge superior */}
@@ -308,15 +308,15 @@ export default function PlanCard({
           <div className="absolute -top-3 left-1/2 z-20 -translate-x-1/2">
             <div className="flex items-center gap-1 rounded-full bg-primary-600 px-3 py-1 text-xs font-bold text-white shadow-md">
               <Star className="h-3 w-3 fill-current" />
-              {t("pricing.mostPopular")}
+              {t('pricing.mostPopular')}
             </div>
           </div>
         )}
 
-        {plan.id === "demo" && !isPopular && (
+        {plan.id === 'demo' && !isPopular && (
           <div className="absolute -top-3 left-1/2 z-20 -translate-x-1/2">
             <Badge className="border-0 bg-purple-500 text-xs text-white shadow-md">
-              {t("pricing.demoTemporal", "Demo Temporal")}
+              {t('pricing.demoTemporal', 'Demo Temporal')}
             </Badge>
           </div>
         )}
@@ -324,7 +324,7 @@ export default function PlanCard({
         {isCurrentPlan && showCurrentBadge && (
           <div className="absolute -top-3 right-4 z-20">
             <Badge className="border-0 bg-green-500 text-xs text-white shadow-md">
-              {t("pricing.currentPlan", "Plan Actual")}
+              {t('pricing.currentPlan', 'Plan Actual')}
             </Badge>
           </div>
         )}
@@ -333,7 +333,7 @@ export default function PlanCard({
           <div className="absolute -top-3 right-4 z-20">
             <Badge
               variant={status.variant}
-              className={cn("border text-xs shadow-md", status.className)}
+              className={cn('border text-xs shadow-md', status.className)}
             >
               {status.label}
             </Badge>
@@ -345,12 +345,12 @@ export default function PlanCard({
           <div className="mb-3 flex items-center gap-3">
             <div
               className={cn(
-                "rounded-lg p-2.5 transition-all",
+                'rounded-lg p-2.5 transition-all',
                 isPopular
-                  ? "bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400"
-                  : plan.id === "demo"
-                    ? "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
-                    : "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400",
+                  ? 'bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400'
+                  : plan.id === 'demo'
+                    ? 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400'
+                    : 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400',
               )}
             >
               {getPlanIcon(plan.id)}
@@ -370,10 +370,10 @@ export default function PlanCard({
           <div className="flex items-baseline gap-1.5">
             <span
               className={cn(
-                "text-3xl font-extrabold",
+                'text-3xl font-extrabold',
                 isPopular
-                  ? "text-primary-600 dark:text-primary-400"
-                  : "text-neutral-900 dark:text-white",
+                  ? 'text-primary-600 dark:text-primary-400'
+                  : 'text-neutral-900 dark:text-white',
               )}
             >
               ${displayPrice}
@@ -381,15 +381,15 @@ export default function PlanCard({
             <span className="text-sm text-gray-500 dark:text-gray-400">
               /
               {plan.price === 0
-                ? t("planSelection.intervals.forever")
-                : billingCycle === "monthly"
-                  ? t("planSelection.intervals.month")
-                  : t("planSelection.intervals.year")}
+                ? t('planSelection.intervals.forever')
+                : billingCycle === 'monthly'
+                  ? t('planSelection.intervals.month')
+                  : t('planSelection.intervals.year')}
             </span>
           </div>
 
           {/* Ahorro anual compacto */}
-          {plan.price > 0 && billingCycle === "monthly" && (
+          {plan.price > 0 && billingCycle === 'monthly' && (
             <div className="mt-2">
               <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400">
                 ${annualMonthlyPrice}/mes anual (ahorra ${annualSavings}/año)
@@ -408,7 +408,7 @@ export default function PlanCard({
           {plan.trial_days && (
             <p className="mt-2 flex items-center gap-1 text-xs text-purple-600 dark:text-purple-400">
               <Sparkles className="h-3.5 w-3.5" />
-              {plan.trial_days} {t("pricing.plans.demo.trialDays")}
+              {plan.trial_days} {t('pricing.plans.demo.trialDays')}
             </p>
           )}
         </CardHeader>
@@ -420,18 +420,18 @@ export default function PlanCard({
               <li key={index} className="flex items-start gap-2.5">
                 <div
                   className={cn(
-                    "mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full",
+                    'mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full',
                     isPopular
-                      ? "bg-primary-100 dark:bg-primary-900/30"
-                      : "bg-green-100 dark:bg-green-900/30",
+                      ? 'bg-primary-100 dark:bg-primary-900/30'
+                      : 'bg-green-100 dark:bg-green-900/30',
                   )}
                 >
                   <Check
                     className={cn(
-                      "h-2.5 w-2.5",
+                      'h-2.5 w-2.5',
                       isPopular
-                        ? "text-primary-600 dark:text-primary-400"
-                        : "text-green-600 dark:text-green-400",
+                        ? 'text-primary-600 dark:text-primary-400'
+                        : 'text-green-600 dark:text-green-400',
                     )}
                   />
                 </div>
@@ -446,7 +446,7 @@ export default function PlanCard({
           {missingFeatures.length > 0 && (
             <div className="mt-4 border-t border-gray-100 pt-4 dark:border-neutral-800/50">
               <p className="mb-2.5 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-neutral-500">
-                {t("pricing.missingFeatures", "Te estás perdiendo")}
+                {t('pricing.missingFeatures', 'Te estás perdiendo')}
               </p>
               <ul className="space-y-2">
                 {missingFeatures.slice(0, 3).map((feature, index) => (
@@ -470,42 +470,42 @@ export default function PlanCard({
         <CardFooter className="flex flex-col gap-2 pt-4">
           {isDowngradeBlocked && (
             <p className="mb-1 text-center text-xs text-amber-600 dark:text-amber-400">
-              {t("pricing.cancelSubscriptionFirst", "Cancela tu suscripción actual primero")}
+              {t('pricing.cancelSubscriptionFirst', 'Cancela tu suscripción actual primero')}
             </p>
           )}
           {!plan.enabled && plan.requires_stripe && (
             <p className="mb-1 text-center text-xs text-gray-500 dark:text-gray-400">
-              {t("pricing.paymentSetup", "Configuración en proceso")}
+              {t('pricing.paymentSetup', 'Configuración en proceso')}
             </p>
           )}
 
           <Button
             onClick={() => onSelectPlan(plan.id)}
             disabled={buttonConfig.disabled || isLoading || (!plan.enabled && plan.requires_stripe)}
-            variant={isPopular ? "primary" : "ghost"}
+            variant={isPopular ? 'primary' : 'ghost'}
             buttonStyle={
-              buttonConfig.variant === "current" || buttonConfig.variant === "blocked"
-                ? "outline"
+              buttonConfig.variant === 'current' || buttonConfig.variant === 'blocked'
+                ? 'outline'
                 : isPopular
-                  ? "solid"
-                  : "outline"
+                  ? 'solid'
+                  : 'outline'
             }
             fullWidth
             size="md"
             loading={isLoading}
-            loadingText={t("pricing.processing")}
+            loadingText={t('pricing.processing')}
             icon={
               !buttonConfig.disabled &&
-              buttonConfig.variant !== "current" &&
-              buttonConfig.variant !== "blocked"
+              buttonConfig.variant !== 'current' &&
+              buttonConfig.variant !== 'blocked'
                 ? ArrowRight
                 : undefined
             }
             iconPosition="right"
             className={cn(
-              "group transition-all",
-              buttonConfig.variant === "current" && "cursor-not-allowed opacity-60",
-              buttonConfig.variant === "blocked" && "cursor-not-allowed opacity-60",
+              'group transition-all',
+              buttonConfig.variant === 'current' && 'cursor-not-allowed opacity-60',
+              buttonConfig.variant === 'blocked' && 'cursor-not-allowed opacity-60',
             )}
           >
             {getButtonText()}
@@ -519,11 +519,11 @@ export default function PlanCard({
     <div className="relative">
       <Card
         className={cn(
-          "relative flex h-full flex-col transition-all duration-300",
+          'relative flex h-full flex-col transition-all duration-300',
           isPopular
-            ? "border-2 border-primary-600 bg-white shadow-xl dark:bg-neutral-900"
-            : "border border-neutral-200 bg-white hover:border-primary-400 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-primary-800",
-          isCurrentPlan && "border-green-500",
+            ? 'border-2 border-primary-600 bg-white shadow-xl dark:bg-neutral-900'
+            : 'border border-neutral-200 bg-white hover:border-primary-400 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-primary-800',
+          isCurrentPlan && 'border-green-500',
         )}
       >
         {/* Badge superior */}
@@ -531,15 +531,15 @@ export default function PlanCard({
           <div className="absolute -top-4 left-1/2 z-20 -translate-x-1/2 transform">
             <div className="flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-1 text-xs font-bold text-white shadow-md">
               <Star className="h-3.5 w-3.5 fill-current" />
-              {t("pricing.mostPopular")}
+              {t('pricing.mostPopular')}
             </div>
           </div>
         )}
 
-        {plan.id === "demo" && !isPopular && (
+        {plan.id === 'demo' && !isPopular && (
           <div className="absolute -top-4 left-1/2 -translate-x-1/2 transform">
             <Badge className="border-0 bg-purple-500 text-white shadow-md">
-              {t("pricing.demoTemporal", "Demo Temporal")}
+              {t('pricing.demoTemporal', 'Demo Temporal')}
             </Badge>
           </div>
         )}
@@ -547,14 +547,14 @@ export default function PlanCard({
         {isCurrentPlan && showCurrentBadge && (
           <div className="absolute -top-4 right-4 z-20">
             <Badge className="border-0 bg-green-500 text-white shadow-md">
-              {t("pricing.currentPlan", "Plan Actual")}
+              {t('pricing.currentPlan', 'Plan Actual')}
             </Badge>
           </div>
         )}
 
         {!isCurrentPlan && status && (
           <div className="absolute -top-4 right-4 z-20">
-            <Badge variant={status.variant} className={cn("border shadow-md", status.className)}>
+            <Badge variant={status.variant} className={cn('border shadow-md', status.className)}>
               {status.label}
             </Badge>
           </div>
@@ -564,12 +564,12 @@ export default function PlanCard({
           <div className="my-4 flex items-center justify-center">
             <div
               className={cn(
-                "mr-2 rounded-lg p-3.5 transition-all duration-300",
+                'mr-2 rounded-lg p-3.5 transition-all duration-300',
                 isPopular
-                  ? "text-primary-500"
-                  : plan.id === "demo"
-                    ? "bg-neutral-900 text-white"
-                    : "",
+                  ? 'text-primary-500'
+                  : plan.id === 'demo'
+                    ? 'bg-neutral-900 text-white'
+                    : '',
               )}
             >
               {getPlanIcon(plan.id)}
@@ -595,15 +595,15 @@ export default function PlanCard({
             <div className="flex items-baseline gap-2">
               <span
                 className={cn(
-                  "text-4xl font-extrabold",
-                  isPopular ? "text-primary-600" : "text-neutral-900 dark:text-white",
+                  'text-4xl font-extrabold',
+                  isPopular ? 'text-primary-600' : 'text-neutral-900 dark:text-white',
                 )}
               >
                 ${displayPrice}
               </span>
               {plan.price > 0 && (
                 <span className="text-lg text-gray-600 dark:text-gray-400">
-                  /{billingCycle === "monthly" ? "mes" : "año"}
+                  /{billingCycle === 'monthly' ? 'mes' : 'año'}
                 </span>
               )}
             </div>
@@ -612,7 +612,7 @@ export default function PlanCard({
             {plan.price > 0 && (
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400">
-                  {t("pricing.annualPricing", {
+                  {t('pricing.annualPricing', {
                     price: annualMonthlyPrice,
                     savings: annualSavings,
                   })}
@@ -630,7 +630,7 @@ export default function PlanCard({
             {plan.trial_days && (
               <p className="mt-3 flex items-center gap-1 text-sm text-purple-600 dark:text-purple-400">
                 <Sparkles className="h-4 w-4" />
-                {plan.trial_days} {t("pricing.plans.demo.trialDays")}
+                {plan.trial_days} {t('pricing.plans.demo.trialDays')}
               </p>
             )}
           </div>
@@ -642,18 +642,18 @@ export default function PlanCard({
               <li key={index} className="flex items-start gap-3">
                 <div
                   className={cn(
-                    "mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full",
+                    'mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full',
                     isPopular
-                      ? "bg-primary-100 dark:bg-primary-900/30"
-                      : "bg-green-100 dark:bg-green-900/30",
+                      ? 'bg-primary-100 dark:bg-primary-900/30'
+                      : 'bg-green-100 dark:bg-green-900/30',
                   )}
                 >
                   <Check
                     className={cn(
-                      "h-3 w-3",
+                      'h-3 w-3',
                       isPopular
-                        ? "text-primary-600 dark:text-primary-400"
-                        : "text-green-600 dark:text-green-400",
+                        ? 'text-primary-600 dark:text-primary-400'
+                        : 'text-green-600 dark:text-green-400',
                     )}
                   />
                 </div>
@@ -665,7 +665,7 @@ export default function PlanCard({
           {missingFeatures.length > 0 && (
             <div className="mt-8 border-t border-gray-100 pt-6 dark:border-neutral-800/50">
               <p className="mb-4 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-neutral-500">
-                {t("pricing.missingFeatures", "Lo que te estás perdiendo")}
+                {t('pricing.missingFeatures', 'Lo que te estás perdiendo')}
               </p>
               <ul className="space-y-3">
                 {missingFeatures.map((feature, index) => (
@@ -688,44 +688,44 @@ export default function PlanCard({
             {isDowngradeBlocked && (
               <p className="mt-2 text-center text-xs text-amber-600 dark:text-amber-400">
                 {t(
-                  "pricing.cancelSubscriptionFirst",
-                  "Para cambiar a un plan gratuito, cancela tu suscripción de pago actual y espera a que termine el período de facturación.",
+                  'pricing.cancelSubscriptionFirst',
+                  'Para cambiar a un plan gratuito, cancela tu suscripción de pago actual y espera a que termine el período de facturación.',
                 )}
               </p>
             )}
             {!plan.enabled && plan.requires_stripe && (
               <p className="mt-2 text-center text-xs text-gray-500 dark:text-gray-400">
-                {t("pricing.paymentSetup", "Configuración de pagos en proceso")}
+                {t('pricing.paymentSetup', 'Configuración de pagos en proceso')}
               </p>
             )}
           </div>
           <Button
             onClick={() => onSelectPlan(plan.id)}
             disabled={buttonConfig.disabled || isLoading || (!plan.enabled && plan.requires_stripe)}
-            variant={isPopular ? "primary" : "ghost"}
+            variant={isPopular ? 'primary' : 'ghost'}
             buttonStyle={
-              buttonConfig.variant === "current" || buttonConfig.variant === "blocked"
-                ? "gradient"
+              buttonConfig.variant === 'current' || buttonConfig.variant === 'blocked'
+                ? 'gradient'
                 : isPopular
-                  ? "solid"
-                  : "outline"
+                  ? 'solid'
+                  : 'outline'
             }
             size="lg"
             fullWidth
             loading={isLoading}
-            loadingText={t("pricing.processing")}
+            loadingText={t('pricing.processing')}
             icon={
               !buttonConfig.disabled &&
-              buttonConfig.variant !== "current" &&
-              buttonConfig.variant !== "blocked"
+              buttonConfig.variant !== 'current' &&
+              buttonConfig.variant !== 'blocked'
                 ? ArrowRight
                 : undefined
             }
             iconPosition="right"
             className={cn(
-              "group transition-all",
-              buttonConfig.variant === "current" && "cursor-not-allowed opacity-60",
-              buttonConfig.variant === "blocked" && "cursor-not-allowed opacity-60",
+              'group transition-all',
+              buttonConfig.variant === 'current' && 'cursor-not-allowed opacity-60',
+              buttonConfig.variant === 'blocked' && 'cursor-not-allowed opacity-60',
             )}
           >
             {getButtonText()}

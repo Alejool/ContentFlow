@@ -1,14 +1,14 @@
-import CampaignMobileRowSkeleton from "@/Components/Content/Campaign/CampaignMobileRowSkeleton";
-import CampaignMobileTable from "@/Components/Content/Campaign/CampaignMobileTable";
-import CampaignPublications from "@/Components/Content/Campaign/CampaignPublications";
-import CampaignRow from "@/Components/Content/Campaign/CampaignRow";
-import CampaignRowSkeleton from "@/Components/Content/Campaign/CampaignRowSkeleton";
-import { TableHeader } from "@/Components/Content/Publication/TableHeader";
-import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
-import EmptyState from "@/Components/common/ui/EmptyState";
-import TableContainer from "@/Components/common/ui/TableContainer";
-import { Campaign } from "@/types/Campaign";
-import React, { Fragment, memo } from "react";
+import CampaignMobileRowSkeleton from '@/Components/Content/Campaign/CampaignMobileRowSkeleton';
+import CampaignMobileTable from '@/Components/Content/Campaign/CampaignMobileTable';
+import CampaignPublications from '@/Components/Content/Campaign/CampaignPublications';
+import CampaignRow from '@/Components/Content/Campaign/CampaignRow';
+import CampaignRowSkeleton from '@/Components/Content/Campaign/CampaignRowSkeleton';
+import { TableHeader } from '@/Components/Content/Publication/TableHeader';
+import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
+import EmptyState from '@/Components/common/ui/EmptyState';
+import TableContainer from '@/Components/common/ui/TableContainer';
+import { Campaign } from '@/types/Campaign';
+import React, { Fragment, memo } from 'react';
 
 interface CampaignTableProps {
   items: Campaign[];
@@ -56,32 +56,32 @@ const CampaignTable = memo(
     }, [isLoading]);
     const getStatusColor = (status?: string) => {
       switch (status) {
-        case "active":
-          return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400";
-        case "inactive":
-          return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
-        case "completed":
-          return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400";
-        case "deleted":
-          return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400";
-        case "paused":
-          return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400";
+        case 'active':
+          return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+        case 'inactive':
+          return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+        case 'completed':
+          return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+        case 'deleted':
+          return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+        case 'paused':
+          return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
         default:
-          return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
+          return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
       }
     };
 
     return (
       <TableContainer
         className="w-full"
-        title={t("campaigns.title") || "Campañas"}
-        subtitle={t("campaigns.subtitle") || "Gestiona tus agrupaciones de publicaciones"}
+        title={t('campaigns.title') || 'Campañas'}
+        subtitle={t('campaigns.subtitle') || 'Gestiona tus agrupaciones de publicaciones'}
       >
         <div className="scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700 hidden overflow-x-auto lg:block">
           <div className="grid grid-cols-1 grid-rows-1">
             {/* Data Table */}
             <div
-              className={`col-start-1 row-start-1 transition-all duration-500 ${smoothLoading ? "invisible opacity-0" : "visible opacity-100"}`}
+              className={`col-start-1 row-start-1 transition-all duration-500 ${smoothLoading ? 'invisible opacity-0' : 'visible opacity-100'}`}
             >
               <table className="z-0 w-full border-collapse whitespace-nowrap text-left">
                 {items.length > 0 && (
@@ -96,10 +96,10 @@ const CampaignTable = memo(
                     <tr>
                       <td colSpan={100} className="p-0">
                         <EmptyState
-                          title={t("campaigns.table.emptyState.title")}
+                          title={t('campaigns.table.emptyState.title')}
                           description={
-                            t("campaigns.table.emptyState.description") ||
-                            "No se encontraron campañas."
+                            t('campaigns.table.emptyState.description') ||
+                            'No se encontraron campañas.'
                           }
                           className="border-none bg-transparent shadow-none"
                         />
@@ -152,9 +152,9 @@ const CampaignTable = memo(
         <div className="relative lg:hidden">
           {!smoothLoading && items.length === 0 ? (
             <EmptyState
-              title={t("campaigns.table.emptyState.title")}
+              title={t('campaigns.table.emptyState.title')}
               description={
-                t("campaigns.table.emptyState.description") || "No se encontraron campañas."
+                t('campaigns.table.emptyState.description') || 'No se encontraron campañas.'
               }
               imageSize="sm"
             />
@@ -162,7 +162,7 @@ const CampaignTable = memo(
             <div className="grid grid-cols-1 grid-rows-1">
               {/* Data Layer */}
               <div
-                className={`col-start-1 row-start-1 transition-all duration-500 ${smoothLoading ? "invisible opacity-0" : "visible opacity-100"}`}
+                className={`col-start-1 row-start-1 transition-all duration-500 ${smoothLoading ? 'invisible opacity-0' : 'visible opacity-100'}`}
               >
                 <CampaignMobileTable
                   items={items}

@@ -1,23 +1,23 @@
-import ApprovalSuccessModal from "@/Components/Content/modals/ApprovalSuccessModal";
-import RejectionReasonModal from "@/Components/Content/modals/RejectionReasonModal";
-import AlertCard from "@/Components/common/Modern/AlertCard";
-import Button from "@/Components/common/Modern/Button";
-import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
-import EmptyState from "@/Components/common/ui/EmptyState";
-import { VirtualList } from "@/Components/common/ui/VirtualList";
-import { formatDateTimeString } from "@/Utils/dateHelpers";
-import { getDateFnsLocale } from "@/Utils/dateLocales";
-import { useManageContentUIStore } from "@/stores/manageContentUIStore";
-import { usePublicationStore } from "@/stores/publicationStore";
-import { ApprovalRequest } from "@/types/ApprovalTypes";
-import { Publication } from "@/types/Publication";
-import { usePage } from "@inertiajs/react";
-import axios from "axios";
-import { Locale, formatDistanceToNow } from "date-fns";
-import { Check, Clock, Eye, FileText, Layers, User, X } from "lucide-react";
-import { useState } from "react";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
+import ApprovalSuccessModal from '@/Components/Content/modals/ApprovalSuccessModal';
+import RejectionReasonModal from '@/Components/Content/modals/RejectionReasonModal';
+import AlertCard from '@/Components/common/Modern/AlertCard';
+import Button from '@/Components/common/Modern/Button';
+import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
+import EmptyState from '@/Components/common/ui/EmptyState';
+import { VirtualList } from '@/Components/common/ui/VirtualList';
+import { formatDateTimeString } from '@/Utils/dateHelpers';
+import { getDateFnsLocale } from '@/Utils/dateLocales';
+import { useManageContentUIStore } from '@/stores/manageContentUIStore';
+import { usePublicationStore } from '@/stores/publicationStore';
+import { ApprovalRequest } from '@/types/ApprovalTypes';
+import { Publication } from '@/types/Publication';
+import { usePage } from '@inertiajs/react';
+import axios from 'axios';
+import { Locale, formatDistanceToNow } from 'date-fns';
+import { Check, Clock, Eye, FileText, Layers, User, X } from 'lucide-react';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface ApprovalListProps {
   requests: ApprovalRequest[] | undefined;
@@ -73,8 +73,8 @@ function ApprovalRequestItem({
           <span
             className="ml-auto flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs text-gray-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-gray-400"
             title={formatDateTimeString(request.submitted_at, {
-              dateStyle: "long",
-              timeStyle: "short",
+              dateStyle: 'long',
+              timeStyle: 'short',
             })}
           >
             <Clock className="h-3.5 w-3.5" />
@@ -128,10 +128,10 @@ function ApprovalRequestItem({
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                    {t("approvals.historyTable.submittedBy")}
+                    {t('approvals.historyTable.submittedBy')}
                   </p>
                   <p className="truncate text-sm font-semibold text-gray-900 dark:text-white">
-                    {request.submitter?.name || "User"}
+                    {request.submitter?.name || 'User'}
                   </p>
                 </div>
               </div>
@@ -144,7 +144,7 @@ function ApprovalRequestItem({
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                      {t("common.type") || "Tipo"}
+                      {t('common.type') || 'Tipo'}
                     </p>
                     <p className="text-sm font-semibold capitalize text-gray-900 dark:text-white">
                       {publication.content_type}
@@ -159,7 +159,7 @@ function ApprovalRequestItem({
               <div className="border-t border-gray-200 pt-3 dark:border-neutral-700">
                 <div className="mb-2 flex items-center justify-between">
                   <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                    {t("approvals.progress") || "Progreso de Aprobación"}
+                    {t('approvals.progress') || 'Progreso de Aprobación'}
                   </span>
                   <span className="text-xs font-bold text-primary-600 dark:text-primary-400">
                     {request.currentStep.level_number} / {request.workflow.levels.length}
@@ -190,7 +190,7 @@ function ApprovalRequestItem({
             icon={Eye}
             rounded="lg"
           >
-            {t("common.viewDetails") || "Ver Detalles"}
+            {t('common.viewDetails') || 'Ver Detalles'}
           </Button>
 
           <div className="flex flex-1 gap-3">
@@ -202,7 +202,7 @@ function ApprovalRequestItem({
               icon={Check}
               rounded="lg"
             >
-              {t("approvals.approve") || "Aprobar"}
+              {t('approvals.approve') || 'Aprobar'}
             </Button>
 
             <Button
@@ -213,7 +213,7 @@ function ApprovalRequestItem({
               icon={X}
               rounded="lg"
             >
-              {t("approvals.reject") || "Rechazar"}
+              {t('approvals.reject') || 'Rechazar'}
             </Button>
           </div>
         </div>
@@ -249,20 +249,20 @@ export default function ApprovalList({
 
   // Check if user has admin permission
   const { auth } = usePage<any>().props;
-  const hasAdminPermission = auth.current_workspace?.permissions?.includes("approve") || false;
+  const hasAdminPermission = auth.current_workspace?.permissions?.includes('approve') || false;
 
   const handleApprove = async (request: ApprovalRequest) => {
     try {
-      const response = await axios.post(route("api.v1.approvals.approve", request.id), {
+      const response = await axios.post(route('api.v1.approvals.approve', request.id), {
         comment: null, // Opcional: agregar modal para comentario
       });
 
       if (response.data.success) {
         const updatedRequest = response.data.request;
 
-        if (updatedRequest.status === "approved") {
+        if (updatedRequest.status === 'approved') {
           // Aprobación final
-          toast.success(t("approvals.approvedSuccess"));
+          toast.success(t('approvals.approvedSuccess'));
           setSelectedRequest(updatedRequest);
           setApprovalData({
             approverName: updatedRequest.completedBy?.name || auth.user.name,
@@ -272,8 +272,8 @@ export default function ApprovalList({
         } else {
           // Aprobación parcial - avanzó al siguiente nivel
           toast.success(
-            t("approvals.levelApproved", {
-              level: updatedRequest.currentStep?.level_name || "Siguiente nivel",
+            t('approvals.levelApproved', {
+              level: updatedRequest.currentStep?.level_name || 'Siguiente nivel',
             }),
           );
 
@@ -292,7 +292,7 @@ export default function ApprovalList({
         onRefresh();
       }
     } catch (error: any) {
-      toast.error(error.response?.data?.message || t("approvals.errors.approveFailed"));
+      toast.error(error.response?.data?.message || t('approvals.errors.approveFailed'));
     }
   };
 
@@ -305,12 +305,12 @@ export default function ApprovalList({
     if (!selectedRequest) return;
 
     try {
-      const response = await axios.post(route("api.v1.approvals.reject", selectedRequest.id), {
+      const response = await axios.post(route('api.v1.approvals.reject', selectedRequest.id), {
         reason: reason,
       });
 
       if (response.data.success) {
-        toast.success(t("approvals.rejectedSuccess") || "Request rejected");
+        toast.success(t('approvals.rejectedSuccess') || 'Request rejected');
         setRejectionModalOpen(false);
         setSelectedRequest(null);
 
@@ -321,23 +321,23 @@ export default function ApprovalList({
       const errorMessage =
         error.response?.data?.message ||
         error.response?.data?.errors?.reason?.[0] ||
-        t("approvals.errors.rejectFailed");
+        t('approvals.errors.rejectFailed');
       toast.error(errorMessage);
     }
   };
 
   const getStatusColor = (status?: string) => {
     switch (status) {
-      case "pending":
-        return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 border-yellow-200 dark:border-yellow-700";
-      case "approved":
-        return "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-green-200 dark:border-green-700";
-      case "rejected":
-        return "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400 border-rose-200 dark:border-rose-700";
-      case "cancelled":
-        return "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400 border-gray-200 dark:border-gray-700";
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 border-yellow-200 dark:border-yellow-700';
+      case 'approved':
+        return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-green-200 dark:border-green-700';
+      case 'rejected':
+        return 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400 border-rose-200 dark:border-rose-700';
+      case 'cancelled':
+        return 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400 border-gray-200 dark:border-gray-700';
       default:
-        return "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400 border-gray-200 dark:border-gray-700";
+        return 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400 border-gray-200 dark:border-gray-700';
     }
   };
 
@@ -402,7 +402,7 @@ export default function ApprovalList({
 
   if (!safeRequests.length && !isLoading) {
     return (
-      <EmptyState title={t("approvals.noPending")} description={t("approvals.noPendingDesc")} />
+      <EmptyState title={t('approvals.noPending')} description={t('approvals.noPendingDesc')} />
     );
   }
 
@@ -429,10 +429,10 @@ export default function ApprovalList({
       {!hasAdminPermission && (
         <AlertCard
           type="info"
-          title={t("approvals.workflowAssignment.title") || "Aprobaciones asignadas"}
+          title={t('approvals.workflowAssignment.title') || 'Aprobaciones asignadas'}
           message={
-            t("approvals.workflowAssignment.description") ||
-            "Estás viendo solo las solicitudes que requieren tu aprobación según tu rol o asignación en el flujo de trabajo."
+            t('approvals.workflowAssignment.description') ||
+            'Estás viendo solo las solicitudes que requieren tu aprobación según tu rol o asignación en el flujo de trabajo.'
           }
           className="mb-4"
         />
@@ -447,8 +447,8 @@ export default function ApprovalList({
             renderItem={renderItem}
             emptyState={
               <EmptyState
-                title={t("approvals.noPending")}
-                description={t("approvals.noPendingDesc")}
+                title={t('approvals.noPending')}
+                description={t('approvals.noPendingDesc')}
               />
             }
           />
@@ -479,7 +479,7 @@ export default function ApprovalList({
             setSelectedRequest(null);
           }}
           onSubmit={handleRejectSubmit}
-          publicationTitle={selectedRequest.publication?.title || ""}
+          publicationTitle={selectedRequest.publication?.title || ''}
         />
       )}
 
@@ -492,7 +492,7 @@ export default function ApprovalList({
             setSelectedRequest(null);
             setApprovalData(null);
           }}
-          publicationTitle={selectedRequest.publication?.title || ""}
+          publicationTitle={selectedRequest.publication?.title || ''}
           approverName={approvalData.approverName}
           approvedAt={approvalData.approvedAt}
         />

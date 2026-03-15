@@ -1,4 +1,4 @@
-import { SeededRandom } from "@/Utils/stableMock";
+import { SeededRandom } from '@/Utils/stableMock';
 import {
   ChevronLeft,
   ChevronRight,
@@ -8,8 +8,8 @@ import {
   Search,
   TrendingUp,
   Users,
-} from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+} from 'lucide-react';
+import { useMemo, useRef, useState } from 'react';
 import {
   Bar,
   BarChart,
@@ -21,7 +21,7 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-} from "recharts";
+} from 'recharts';
 
 interface PlatformBreakdown {
   platform: string;
@@ -57,16 +57,16 @@ interface Publication {
 
 interface Props {
   publications: Publication[];
-  theme?: "light" | "dark";
+  theme?: 'light' | 'dark';
 }
 
 const PLATFORM_COLORS: Record<string, string> = {
-  facebook: "#1877F2",
-  instagram: "#E4405F",
-  twitter: "#1DA1F2",
-  x: "#000000",
-  youtube: "#FF0000",
-  tiktok: "#000000",
+  facebook: '#1877F2',
+  instagram: '#E4405F',
+  twitter: '#1DA1F2',
+  x: '#000000',
+  youtube: '#FF0000',
+  tiktok: '#000000',
 };
 
 interface StatCardProps {
@@ -78,20 +78,20 @@ interface StatCardProps {
 }
 
 const StatCard = ({ icon: Icon, label, value, color, isDark }: StatCardProps) => (
-  <div className={`rounded-lg p-3 ${isDark ? "bg-neutral-700/50" : "bg-gray-50"}`}>
+  <div className={`rounded-lg p-3 ${isDark ? 'bg-neutral-700/50' : 'bg-gray-50'}`}>
     <div className="mb-1 flex items-center gap-2">
       <Icon className={`h-4 w-4 ${color}`} />
-      <span className={`text-xs ${isDark ? "text-gray-400" : "text-gray-600"}`}>{label}</span>
+      <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{label}</span>
     </div>
-    <p className={`text-lg font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
-      {typeof value === "number" ? value.toLocaleString() : value}
+    <p className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+      {typeof value === 'number' ? value.toLocaleString() : value}
     </p>
   </div>
 );
 
-export default function DetailedPublicationPerformance({ publications, theme = "light" }: Props) {
-  const isDark = theme === "dark";
-  const [searchTerm, setSearchTerm] = useState("");
+export default function DetailedPublicationPerformance({ publications, theme = 'light' }: Props) {
+  const isDark = theme === 'dark';
+  const [searchTerm, setSearchTerm] = useState('');
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const filteredPublications = useMemo(() => {
@@ -102,8 +102,8 @@ export default function DetailedPublicationPerformance({ publications, theme = "
   const mockPublications: Publication[] = [
     {
       id: 301,
-      title: "Campaña de Verano - Lanzamiento",
-      published_at: "hace 2 días",
+      title: 'Campaña de Verano - Lanzamiento',
+      published_at: 'hace 2 días',
       total_views: 12500,
       total_clicks: 850,
       total_conversions: 120,
@@ -112,7 +112,7 @@ export default function DetailedPublicationPerformance({ publications, theme = "
       avg_engagement_rate: 3.2,
       platform_breakdown: [
         {
-          platform: "instagram",
+          platform: 'instagram',
           views: 5000,
           clicks: 400,
           conversions: 50,
@@ -121,7 +121,7 @@ export default function DetailedPublicationPerformance({ publications, theme = "
           avg_engagement_rate: 4.4,
         },
         {
-          platform: "facebook",
+          platform: 'facebook',
           views: 7500,
           clicks: 450,
           conversions: 70,
@@ -132,14 +132,14 @@ export default function DetailedPublicationPerformance({ publications, theme = "
       ],
       daily_performance: [
         {
-          date: "Día 1",
+          date: 'Día 1',
           views: 4000,
           clicks: 300,
           engagement: 500,
           reach: 15000,
         },
         {
-          date: "Día 2",
+          date: 'Día 2',
           views: 8500,
           clicks: 550,
           engagement: 950,
@@ -149,8 +149,8 @@ export default function DetailedPublicationPerformance({ publications, theme = "
     },
     {
       id: 302,
-      title: "Tutorial de Producto: Nuevas Funciones",
-      published_at: "hace 5 días",
+      title: 'Tutorial de Producto: Nuevas Funciones',
+      published_at: 'hace 5 días',
       total_views: 8900,
       total_clicks: 1200,
       total_conversions: 450,
@@ -159,7 +159,7 @@ export default function DetailedPublicationPerformance({ publications, theme = "
       avg_engagement_rate: 8.4,
       platform_breakdown: [
         {
-          platform: "youtube",
+          platform: 'youtube',
           views: 6000,
           clicks: 900,
           conversions: 350,
@@ -168,7 +168,7 @@ export default function DetailedPublicationPerformance({ publications, theme = "
           avg_engagement_rate: 10.0,
         },
         {
-          platform: "x",
+          platform: 'x',
           views: 2900,
           clicks: 300,
           conversions: 100,
@@ -179,35 +179,35 @@ export default function DetailedPublicationPerformance({ publications, theme = "
       ],
       daily_performance: [
         {
-          date: "Día 1",
+          date: 'Día 1',
           views: 2000,
           clicks: 200,
           engagement: 400,
           reach: 5000,
         },
         {
-          date: "Día 2",
+          date: 'Día 2',
           views: 3500,
           clicks: 400,
           engagement: 800,
           reach: 10000,
         },
         {
-          date: "Día 3",
+          date: 'Día 3',
           views: 1500,
           clicks: 300,
           engagement: 400,
           reach: 5000,
         },
         {
-          date: "Día 4",
+          date: 'Día 4',
           views: 1000,
           clicks: 150,
           engagement: 300,
           reach: 3000,
         },
         {
-          date: "Día 5",
+          date: 'Día 5',
           views: 900,
           clicks: 150,
           engagement: 200,
@@ -220,12 +220,12 @@ export default function DetailedPublicationPerformance({ publications, theme = "
   const displayPublications =
     filteredPublications.length > 0 || searchTerm ? filteredPublications : mockPublications;
 
-  const scroll = (direction: "left" | "right") => {
+  const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
       const scrollAmount = window.innerWidth > 1024 ? 800 : window.innerWidth;
       scrollContainerRef.current.scrollBy({
-        left: direction === "left" ? -scrollAmount : scrollAmount,
-        behavior: "smooth",
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
       });
     }
   };
@@ -241,9 +241,9 @@ export default function DetailedPublicationPerformance({ publications, theme = "
       const d = new Date();
       d.setDate(d.getDate() - i);
       defaultMetrics.push({
-        date: d.toLocaleDateString("es-ES", {
-          day: "2-digit",
-          month: "2-digit",
+        date: d.toLocaleDateString('es-ES', {
+          day: '2-digit',
+          month: '2-digit',
         }),
         views: rng.nextInt(500, 2000),
         clicks: rng.nextInt(50, 300),
@@ -261,7 +261,7 @@ export default function DetailedPublicationPerformance({ publications, theme = "
 
     return [
       {
-        platform: "general",
+        platform: 'general',
         views: pub.total_views || 0,
         clicks: pub.total_clicks || 0,
         conversions: pub.total_conversions || 0,
@@ -273,18 +273,18 @@ export default function DetailedPublicationPerformance({ publications, theme = "
   };
 
   return (
-    <div className={`space-y-6 ${isDark ? "text-gray-100" : "text-gray-900"}`}>
+    <div className={`space-y-6 ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
       <div className="mb-6 flex w-full max-w-md items-center gap-3">
         <div className="relative w-full">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <Search className={`h-5 w-5 ${isDark ? "text-gray-500" : "text-gray-400"}`} />
+            <Search className={`h-5 w-5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`} />
           </div>
           <input
             type="text"
             className={`block w-full rounded-lg border py-2 pl-10 pr-3 leading-5 transition-colors duration-150 focus:outline-none sm:text-sm ${
               isDark
-                ? "border-neutral-700 bg-neutral-800/50 text-gray-200 placeholder-gray-500 focus:border-primary-500 focus:ring-primary-500"
-                : "border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:border-primary-500 focus:ring-primary-500"
+                ? 'border-neutral-700 bg-neutral-800/50 text-gray-200 placeholder-gray-500 focus:border-primary-500 focus:ring-primary-500'
+                : 'border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:border-primary-500 focus:ring-primary-500'
             }`}
             placeholder="Buscar publicación..."
             value={searchTerm}
@@ -305,21 +305,21 @@ export default function DetailedPublicationPerformance({ publications, theme = "
         {displayPublications.length > 1 && (
           <>
             <button
-              onClick={() => scroll("left")}
+              onClick={() => scroll('left')}
               className={`absolute left-0 top-1/2 z-10 -ml-4 -translate-y-1/2 rounded-full p-2 opacity-0 shadow-lg transition-all disabled:opacity-0 group-hover:opacity-100 ${
                 isDark
-                  ? "bg-neutral-800 text-white hover:bg-neutral-700"
-                  : "bg-white text-gray-800 hover:bg-gray-50"
+                  ? 'bg-neutral-800 text-white hover:bg-neutral-700'
+                  : 'bg-white text-gray-800 hover:bg-gray-50'
               }`}
             >
               <ChevronLeft className="h-6 w-6" />
             </button>
             <button
-              onClick={() => scroll("right")}
+              onClick={() => scroll('right')}
               className={`absolute right-0 top-1/2 z-10 -mr-4 -translate-y-1/2 rounded-full p-2 opacity-0 shadow-lg transition-all disabled:opacity-0 group-hover:opacity-100 ${
                 isDark
-                  ? "bg-neutral-800 text-white hover:bg-neutral-700"
-                  : "bg-white text-gray-800 hover:bg-gray-50"
+                  ? 'bg-neutral-800 text-white hover:bg-neutral-700'
+                  : 'bg-white text-gray-800 hover:bg-gray-50'
               }`}
             >
               <ChevronRight className="h-6 w-6" />
@@ -330,25 +330,25 @@ export default function DetailedPublicationPerformance({ publications, theme = "
         <div
           ref={scrollContainerRef}
           className="hide-scrollbars flex snap-x snap-mandatory gap-6 overflow-x-auto pb-6"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {displayPublications.map((pub) => (
             <div
               key={pub.id}
               className={`w-full shrink-0 snap-center rounded-lg p-6 lg:w-[800px] ${
                 isDark
-                  ? "border border-neutral-700/50 bg-neutral-800/50"
-                  : "border border-gray-100 bg-white shadow-sm"
+                  ? 'border border-neutral-700/50 bg-neutral-800/50'
+                  : 'border border-gray-100 bg-white shadow-sm'
               }`}
             >
               <div className="mb-6">
                 <h3
-                  className={`mb-1 truncate text-xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}
+                  className={`mb-1 truncate text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}
                   title={pub.title}
                 >
                   {pub.title}
                 </h3>
-                <p className={`text-sm ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+                <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                   Publicado: {pub.published_at}
                 </p>
               </div>
@@ -394,7 +394,7 @@ export default function DetailedPublicationPerformance({ publications, theme = "
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <div>
                   <h4
-                    className={`mb-3 text-sm font-semibold ${isDark ? "text-gray-300" : "text-gray-700"}`}
+                    className={`mb-3 text-sm font-semibold ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
                   >
                     Rendimiento por Plataforma
                   </h4>
@@ -402,21 +402,21 @@ export default function DetailedPublicationPerformance({ publications, theme = "
                     <BarChart data={ensurePlatformBreakdown(pub)}>
                       <CartesianGrid
                         strokeDasharray="3 3"
-                        stroke={isDark ? "#374151" : "#e5e7eb"}
+                        stroke={isDark ? '#374151' : '#e5e7eb'}
                       />
                       <XAxis
                         dataKey="platform"
-                        stroke={isDark ? "#9ca3af" : "#6b7280"}
+                        stroke={isDark ? '#9ca3af' : '#6b7280'}
                         tick={{ fontSize: 12 }}
                       />
-                      <YAxis stroke={isDark ? "#9ca3af" : "#6b7280"} tick={{ fontSize: 12 }} />
+                      <YAxis stroke={isDark ? '#9ca3af' : '#6b7280'} tick={{ fontSize: 12 }} />
                       <Tooltip
                         contentStyle={{
-                          backgroundColor: isDark ? "#1f2937" : "#ffffff",
-                          border: `1px solid ${isDark ? "#374151" : "#e5e7eb"}`,
-                          borderRadius: "8px",
+                          backgroundColor: isDark ? '#1f2937' : '#ffffff',
+                          border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`,
+                          borderRadius: '8px',
                         }}
-                        labelStyle={{ color: isDark ? "#f3f4f6" : "#111827" }}
+                        labelStyle={{ color: isDark ? '#f3f4f6' : '#111827' }}
                       />
                       <Legend />
                       <Bar dataKey="views" fill="#3b82f6" name="Vistas" />
@@ -430,14 +430,14 @@ export default function DetailedPublicationPerformance({ publications, theme = "
                       <div
                         key={platform.platform}
                         className={`flex items-center justify-between rounded p-2 ${
-                          isDark ? "bg-neutral-700/30" : "bg-gray-50"
+                          isDark ? 'bg-neutral-700/30' : 'bg-gray-50'
                         }`}
                       >
                         <div className="flex items-center gap-2">
                           <div
                             className="h-3 w-3 rounded-full"
                             style={{
-                              backgroundColor: PLATFORM_COLORS[platform.platform] || "#6366f1",
+                              backgroundColor: PLATFORM_COLORS[platform.platform] || '#6366f1',
                             }}
                           />
                           <span className="text-sm font-medium capitalize">
@@ -456,7 +456,7 @@ export default function DetailedPublicationPerformance({ publications, theme = "
 
                 <div>
                   <h4
-                    className={`mb-3 text-sm font-semibold ${isDark ? "text-gray-300" : "text-gray-700"}`}
+                    className={`mb-3 text-sm font-semibold ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
                   >
                     Rendimiento Diario
                   </h4>
@@ -464,21 +464,21 @@ export default function DetailedPublicationPerformance({ publications, theme = "
                     <LineChart data={ensureDailyPerformance(pub)}>
                       <CartesianGrid
                         strokeDasharray="3 3"
-                        stroke={isDark ? "#374151" : "#e5e7eb"}
+                        stroke={isDark ? '#374151' : '#e5e7eb'}
                       />
                       <XAxis
                         dataKey="date"
-                        stroke={isDark ? "#9ca3af" : "#6b7280"}
+                        stroke={isDark ? '#9ca3af' : '#6b7280'}
                         tick={{ fontSize: 12 }}
                       />
-                      <YAxis stroke={isDark ? "#9ca3af" : "#6b7280"} tick={{ fontSize: 12 }} />
+                      <YAxis stroke={isDark ? '#9ca3af' : '#6b7280'} tick={{ fontSize: 12 }} />
                       <Tooltip
                         contentStyle={{
-                          backgroundColor: isDark ? "#1f2937" : "#ffffff",
-                          border: `1px solid ${isDark ? "#374151" : "#e5e7eb"}`,
-                          borderRadius: "8px",
+                          backgroundColor: isDark ? '#1f2937' : '#ffffff',
+                          border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`,
+                          borderRadius: '8px',
                         }}
-                        labelStyle={{ color: isDark ? "#f3f4f6" : "#111827" }}
+                        labelStyle={{ color: isDark ? '#f3f4f6' : '#111827' }}
                       />
                       <Legend />
                       <Line
@@ -510,9 +510,9 @@ export default function DetailedPublicationPerformance({ publications, theme = "
           ))}
           {displayPublications.length === 0 && (
             <div
-              className={`w-full py-12 text-center ${isDark ? "text-gray-400" : "text-gray-500"}`}
+              className={`w-full py-12 text-center ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
             >
-              {t("publications.table.emptyState.searchEmpty")}
+              {t('publications.table.emptyState.searchEmpty')}
             </div>
           )}
         </div>

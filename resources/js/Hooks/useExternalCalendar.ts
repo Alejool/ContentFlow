@@ -1,7 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
-import { useExternalCalendarStore } from "@/stores/externalCalendarStore";
-import type { ExternalCalendarConnection } from "@/stores/externalCalendarStore";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
+import { useExternalCalendarStore } from '@/stores/externalCalendarStore';
+import type { ExternalCalendarConnection } from '@/stores/externalCalendarStore';
 
 interface SyncSettings {
   syncEnabled: boolean;
@@ -14,10 +14,10 @@ export function useExternalCalendarStatus() {
   const { setConnections, setLoading, setError } = useExternalCalendarStore();
 
   return useQuery({
-    queryKey: ["external-calendar-status"],
+    queryKey: ['external-calendar-status'],
     queryFn: async () => {
       try {
-        const response = await axios.get("/api/v1/external-calendar/status");
+        const response = await axios.get('/api/v1/external-calendar/status');
         const connections = (response.data.connections || []).map((conn: any) => ({
           provider: conn.provider,
           connected: conn.connected,
@@ -35,7 +35,7 @@ export function useExternalCalendarStatus() {
         setConnections(connections);
         return connections;
       } catch (error: any) {
-        const errorMessage = error.response?.data?.message || "Failed to fetch connection status";
+        const errorMessage = error.response?.data?.message || 'Failed to fetch connection status';
         setError(errorMessage);
         throw error;
       }
@@ -52,47 +52,47 @@ export function useConnectCalendar() {
   const { setError } = useExternalCalendarStore();
 
   return useMutation({
-    mutationFn: async (provider: "google" | "outlook") => {
+    mutationFn: async (provider: 'google' | 'outlook') => {
       const response = await axios.post(`/api/v1/external-calendar/${provider}/connect`);
       return response.data;
     },
     onSuccess: (data) => {
       // Open OAuth window in popup (like social networks)
       if (data.auth_url) {
-        const authWindow = window.open(data.auth_url, "oauth", "width=600,height=700");
+        const authWindow = window.open(data.auth_url, 'oauth', 'width=600,height=700');
 
         // Listen for messages from the popup
         const handleMessage = (event: MessageEvent) => {
           if (event.origin !== window.location.origin) return;
 
-          if (event.data.type === "external_calendar_callback") {
+          if (event.data.type === 'external_calendar_callback') {
             // Refetch connection status
             queryClient.invalidateQueries({
-              queryKey: ["external-calendar-status"],
+              queryKey: ['external-calendar-status'],
             });
 
             // Clean up listener
-            window.removeEventListener("message", handleMessage);
+            window.removeEventListener('message', handleMessage);
           }
         };
 
-        window.addEventListener("message", handleMessage);
+        window.addEventListener('message', handleMessage);
 
         // Fallback: Poll for window close (in case postMessage fails)
         const pollTimer = setInterval(() => {
           if (authWindow?.closed) {
             clearInterval(pollTimer);
-            window.removeEventListener("message", handleMessage);
+            window.removeEventListener('message', handleMessage);
             // Refetch connection status after OAuth completes
             queryClient.invalidateQueries({
-              queryKey: ["external-calendar-status"],
+              queryKey: ['external-calendar-status'],
             });
           }
         }, 500);
       }
     },
     onError: (error: any) => {
-      const errorMessage = error.response?.data?.message || "Failed to connect calendar";
+      const errorMessage = error.response?.data?.message || 'Failed to connect calendar';
       setError(errorMessage);
     },
   });
@@ -104,14 +104,14 @@ export function useDisconnectCalendar() {
   const { setError } = useExternalCalendarStore();
 
   return useMutation({
-    mutationFn: async (provider: "google" | "outlook") => {
+    mutationFn: async (provider: 'google' | 'outlook') => {
       await axios.delete(`/api/v1/external-calendar/${provider}/disconnect`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["external-calendar-status"] });
+      queryClient.invalidateQueries({ queryKey: ['external-calendar-status'] });
     },
     onError: (error: any) => {
-      const errorMessage = error.response?.data?.message || "Failed to disconnect calendar";
+      const errorMessage = error.response?.data?.message || 'Failed to disconnect calendar';
       setError(errorMessage);
     },
   });
@@ -132,10 +132,10 @@ export function useUpdateSyncSettings() {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["external-calendar-status"] });
+      queryClient.invalidateQueries({ queryKey: ['external-calendar-status'] });
     },
     onError: (error: any) => {
-      const errorMessage = error.response?.data?.message || "Failed to save sync settings";
+      const errorMessage = error.response?.data?.message || 'Failed to save sync settings';
       setError(errorMessage);
     },
   });
@@ -152,10 +152,10 @@ export function useRetrySync() {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["external-calendar-status"] });
+      queryClient.invalidateQueries({ queryKey: ['external-calendar-status'] });
     },
     onError: (error: any) => {
-      const errorMessage = error.response?.data?.message || "Failed to trigger sync";
+      const errorMessage = error.response?.data?.message || 'Failed to trigger sync';
       setError(errorMessage);
     },
   });

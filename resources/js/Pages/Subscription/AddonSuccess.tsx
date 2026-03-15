@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, Link } from "@inertiajs/react";
+import React, { useEffect } from 'react';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { Head, Link } from '@inertiajs/react';
 import {
   Card,
   CardContent,
@@ -8,10 +8,10 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/Components/ui/card";
-import Button from "@/Components/common/Modern/Button";
-import { CheckCircle, Sparkles, ArrowRight } from "lucide-react";
-import confetti from "canvas-confetti";
+} from '@/Components/ui/card';
+import Button from '@/Components/common/Modern/Button';
+import { CheckCircle, Sparkles, ArrowRight } from 'lucide-react';
+import confetti from 'canvas-confetti';
 
 export default function AddonSuccess() {
   useEffect(() => {

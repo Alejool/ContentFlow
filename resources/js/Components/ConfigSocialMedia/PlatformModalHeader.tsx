@@ -1,7 +1,7 @@
-import Button from "@/Components/common/Modern/Button";
-import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatformsConfig";
-import { Settings2, X } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import Button from '@/Components/common/Modern/Button';
+import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatformsConfig';
+import { Settings2, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface PlatformModalHeaderProps {
   platform: string;
@@ -24,7 +24,7 @@ export default function PlatformModalHeader({
       return <img src={platformConfig.logo} alt={platformConfig.name} className="h-8 w-8" />;
     }
 
-    if (platformKey === "all") {
+    if (platformKey === 'all') {
       return <Settings2 className="h-6 w-6 text-primary-500" />;
     }
 
@@ -38,13 +38,13 @@ export default function PlatformModalHeader({
         <div>
           <h2 className="text-xl font-black uppercase tracking-tight">
             {isAllPlatforms
-              ? t("platformSettings.all.title") || "All Platforms"
+              ? t('platformSettings.all.title') || 'All Platforms'
               : platform && platform.trim()
                 ? t(`platformSettings.${platform.toLowerCase()}.title`) || `${platform} Defaults`
-                : "Platform Defaults"}
+                : 'Platform Defaults'}
           </h2>
           <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400">
-            {t("common.adjustOptions") || "Personaliza las opciones predeterminadas"}
+            {t('common.adjustOptions') || 'Personaliza las opciones predeterminadas'}
           </p>
         </div>
       </div>
@@ -55,9 +55,9 @@ export default function PlatformModalHeader({
         icon={X}
         size="md"
         className="hover:bg-neutral-100 dark:hover:bg-neutral-800"
-        aria-label={t("common.close") || "Cerrar"}
+        aria-label={t('common.close') || 'Cerrar'}
       >
-        <span className="sr-only">{t("common.close") || "Cerrar"}</span>
+        <span className="sr-only">{t('common.close') || 'Cerrar'}</span>
       </Button>
     </div>
   );

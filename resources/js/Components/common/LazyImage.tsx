@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
 interface LazyImageProps {
   src?: string | null;
@@ -7,7 +7,7 @@ interface LazyImageProps {
   className?: string;
   onError?: () => void;
   onLoad?: () => void;
-  loading?: "lazy" | "eager";
+  loading?: 'lazy' | 'eager';
   showLoader?: boolean;
   loaderClassName?: string;
 }
@@ -24,14 +24,14 @@ interface LazyImageProps {
  */
 export function LazyImage({
   src,
-  fallbackSrc = "/images/placeholder.png",
+  fallbackSrc = '/images/placeholder.png',
   alt,
-  className = "",
+  className = '',
   onError,
   onLoad,
-  loading = "lazy",
+  loading = 'lazy',
   showLoader = true,
-  loaderClassName = "",
+  loaderClassName = '',
 }: LazyImageProps) {
   const [imageSrc, setImageSrc] = useState<string | null>(src || null);
   const [isLoading, setIsLoading] = useState(true);
@@ -108,7 +108,7 @@ export function LazyImage({
         loading={loading}
         onLoad={handleLoad}
         onError={handleError}
-        className={`h-full w-full object-cover transition-opacity duration-300 ease-in-out ${isLoading ? "opacity-0" : "opacity-100"} ${hasError ? "hidden" : ""} `}
+        className={`h-full w-full object-cover transition-opacity duration-300 ease-in-out ${isLoading ? 'opacity-0' : 'opacity-100'} ${hasError ? 'hidden' : ''} `}
       />
 
       {/* Fallback visual si todo falla */}

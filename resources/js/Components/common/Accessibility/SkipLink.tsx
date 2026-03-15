@@ -5,7 +5,7 @@
  * WCAG 2.4.1 - Bypass Blocks (Level A)
  */
 
-import React from "react";
+import React from 'react';
 
 interface SkipLinkProps {
   href?: string;
@@ -13,8 +13,8 @@ interface SkipLinkProps {
 }
 
 export const SkipLink: React.FC<SkipLinkProps> = ({
-  href = "#main-content",
-  children = "Saltar al contenido principal",
+  href = '#main-content',
+  children = 'Saltar al contenido principal',
 }) => {
   return (
     <a
@@ -25,7 +25,7 @@ export const SkipLink: React.FC<SkipLinkProps> = ({
         const target = document.querySelector(href);
         if (target) {
           (target as HTMLElement).focus();
-          (target as HTMLElement).scrollIntoView({ behavior: "smooth" });
+          (target as HTMLElement).scrollIntoView({ behavior: 'smooth' });
         }
       }}
     >

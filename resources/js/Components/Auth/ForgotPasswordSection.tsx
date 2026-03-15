@@ -1,6 +1,6 @@
-import { CheckCircle, Key, Mail, Shield } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import PlatformFeatureTag from "./PlatformFeatureTag";
+import { CheckCircle, Key, Mail, Shield } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import PlatformFeatureTag from './PlatformFeatureTag';
 
 export default function ForgotPasswordSection() {
   const { t } = useTranslation();

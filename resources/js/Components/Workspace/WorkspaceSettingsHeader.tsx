@@ -1,7 +1,7 @@
-import WorkspaceInfoBadge from "@/Components/Workspace/WorkspaceInfoBadge";
-import { WorkspaceLogo } from "@/Components/Workspace/WorkspaceLogo";
-import { Globe, Lock } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import WorkspaceInfoBadge from '@/Components/Workspace/WorkspaceInfoBadge';
+import { WorkspaceLogo } from '@/Components/Workspace/WorkspaceLogo';
+import { Globe, Lock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface WorkspaceSettingsHeaderProps {
   workspace: any;
@@ -15,7 +15,7 @@ export default function WorkspaceSettingsHeader({ workspace }: WorkspaceSettings
       <div className="flex-1">
         <div className="flex items-center justify-start gap-4">
           <div
-            className={`relative h-10 w-10 bg-primary-500 ${!workspace.white_label_logo_url ? "bg-primary-500" : ""} flex items-center justify-center overflow-hidden rounded-lg text-lg font-bold text-white`}
+            className={`relative h-10 w-10 bg-primary-500 ${!workspace.white_label_logo_url ? 'bg-primary-500' : ''} flex items-center justify-center overflow-hidden rounded-lg text-lg font-bold text-white`}
           >
             {workspace.white_label_logo_url ? (
               <WorkspaceLogo
@@ -37,14 +37,14 @@ export default function WorkspaceSettingsHeader({ workspace }: WorkspaceSettings
                   <>
                     <Globe className="h-4 w-4 text-emerald-500" />
                     <span className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
-                      {t("workspace.public_workspace")}
+                      {t('workspace.public_workspace')}
                     </span>
                   </>
                 ) : (
                   <>
                     <Lock className="h-4 w-4 text-blue-500" />
                     <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
-                      {t("workspace.private_workspace")}
+                      {t('workspace.private_workspace')}
                     </span>
                   </>
                 )}
@@ -53,7 +53,7 @@ export default function WorkspaceSettingsHeader({ workspace }: WorkspaceSettings
           </div>
         </div>
         <p className="flex justify-start text-gray-600 dark:text-gray-400">
-          {workspace.description || t("workspace.no_description")}
+          {workspace.description || t('workspace.no_description')}
         </p>
       </div>
 

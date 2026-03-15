@@ -36,10 +36,10 @@ class UsageLimitsService {
     }
 
     try {
-      const response = await fetch("/api/v1/subscription/limits/usage", {
+      const response = await fetch('/api/v1/subscription/limits/usage', {
         headers: {
-          Accept: "application/json",
-          "X-Requested-With": "XMLHttpRequest",
+          Accept: 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
         },
       });
 
@@ -51,11 +51,11 @@ class UsageLimitsService {
       this.lastFetch = Date.now();
 
       // Notify listeners about initial data
-      this.notifyListeners("initial_load");
+      this.notifyListeners('initial_load');
 
       return this.limits;
     } catch (error) {
-      console.error("Failed to load usage limits:", error);
+      console.error('Failed to load usage limits:', error);
       throw error;
     }
   }
@@ -65,15 +65,15 @@ class UsageLimitsService {
    */
   connectToWebSocket() {
     if (!window.Echo || !this.workspaceId) {
-      console.warn("Echo not available or workspace ID missing");
+      console.warn('Echo not available or workspace ID missing');
       return;
     }
 
     try {
       this.channel = window.Echo.private(`workspace.${this.workspaceId}.limits`);
 
-      this.channel.listen("usage.limits.updated", (data) => {
-        console.log("Usage limits updated via WebSocket:", data);
+      this.channel.listen('usage.limits.updated', (data) => {
+        console.log('Usage limits updated via WebSocket:', data);
 
         // Update local limits data
         this.limits = data.limits;
@@ -85,15 +85,15 @@ class UsageLimitsService {
 
       this.channel.subscribed(() => {
         this.isConnected = true;
-        console.log("Connected to usage limits WebSocket channel");
+        console.log('Connected to usage limits WebSocket channel');
       });
 
       this.channel.error((error) => {
-        console.error("WebSocket channel error:", error);
+        console.error('WebSocket channel error:', error);
         this.isConnected = false;
       });
     } catch (error) {
-      console.error("Failed to connect to WebSocket:", error);
+      console.error('Failed to connect to WebSocket:', error);
     }
   }
 
@@ -150,12 +150,12 @@ class UsageLimitsService {
    */
   async forceRefresh() {
     try {
-      const response = await fetch("/api/v1/subscription/limits/refresh", {
-        method: "POST",
+      const response = await fetch('/api/v1/subscription/limits/refresh', {
+        method: 'POST',
         headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "X-Requested-With": "XMLHttpRequest",
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
         },
       });
 
@@ -164,12 +164,12 @@ class UsageLimitsService {
       }
 
       const result = await response.json();
-      console.log("Limits refresh triggered:", result);
+      console.log('Limits refresh triggered:', result);
 
       // The updated data will come via WebSocket
       return result;
     } catch (error) {
-      console.error("Failed to force refresh limits:", error);
+      console.error('Failed to force refresh limits:', error);
       throw error;
     }
   }
@@ -182,7 +182,7 @@ class UsageLimitsService {
 
     // If we already have data, call the listener immediately
     if (this.limits) {
-      callback(this.limits, "initial_load");
+      callback(this.limits, 'initial_load');
     }
   }
 
@@ -201,7 +201,7 @@ class UsageLimitsService {
       try {
         callback(this.limits, action, data);
       } catch (error) {
-        console.error("Error in limits listener:", error);
+        console.error('Error in limits listener:', error);
       }
     });
   }

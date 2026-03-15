@@ -1,13 +1,13 @@
-import { useState } from "react";
-import { Head, router } from "@inertiajs/react";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import AdminNavigation from "@/Components/Admin/AdminNavigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card";
-import Button from "@/Components/common/Modern/Button";
-import { Badge } from "@/Components/ui/badge";
-import Switch from "@/Components/common/Modern/Switch";
-import SettingsTabs from "@/Components/Workspace/SettingsTabs";
-import AlertCard from "@/Components/common/Modern/AlertCard";
+import { useState } from 'react';
+import { Head, router } from '@inertiajs/react';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AdminNavigation from '@/Components/Admin/AdminNavigation';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import Button from '@/Components/common/Modern/Button';
+import { Badge } from '@/Components/ui/badge';
+import Switch from '@/Components/common/Modern/Switch';
+import SettingsTabs from '@/Components/Workspace/SettingsTabs';
+import AlertCard from '@/Components/common/Modern/AlertCard';
 import {
   Settings,
   Package,
@@ -17,8 +17,8 @@ import {
   Save,
   CheckCircle2,
   CreditCard,
-} from "lucide-react";
-import { useTranslation } from "react-i18next";
+} from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface Setting {
   id: number;
@@ -50,7 +50,7 @@ export default function SystemSettings({ settings, categories }: Props) {
   const [localSettings, setLocalSettings] = useState<SettingsByCategory>(settings);
   const [hasChanges, setHasChanges] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState("plans");
+  const [activeTab, setActiveTab] = useState('plans');
 
   const handleToggle = (
     category: keyof SettingsByCategory,
@@ -83,7 +83,7 @@ export default function SystemSettings({ settings, categories }: Props) {
       }));
 
     router.post(
-      "/admin/system-settings/bulk-update",
+      '/admin/system-settings/bulk-update',
       {
         settings: changedSettings,
       },
@@ -101,17 +101,17 @@ export default function SystemSettings({ settings, categories }: Props) {
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
-      case "plans":
+      case 'plans':
         return Package;
-      case "addons":
+      case 'addons':
         return Zap;
-      case "features":
+      case 'features':
         return Puzzle;
-      case "integrations":
+      case 'integrations':
         return Globe;
-      case "payment_methods":
+      case 'payment_methods':
         return CreditCard;
-      case "general":
+      case 'general':
         return Settings;
       default:
         return Settings;
@@ -124,23 +124,23 @@ export default function SystemSettings({ settings, categories }: Props) {
   };
 
   const getImpactBadge = (key: string) => {
-    if (key.includes("ai") || key.includes("maintenance_mode")) {
+    if (key.includes('ai') || key.includes('maintenance_mode')) {
       return (
         <Badge
           variant="destructive"
           className="ml-2 border-red-200 bg-red-100 text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-400"
         >
-          {t("admin.system_settings.badges.high_impact")}
+          {t('admin.system_settings.badges.high_impact')}
         </Badge>
       );
     }
-    if (key.includes("plan") || key.includes("new_registrations")) {
+    if (key.includes('plan') || key.includes('new_registrations')) {
       return (
         <Badge
           variant="default"
           className="ml-2 border-amber-200 bg-amber-100 text-amber-700 dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-400"
         >
-          {t("admin.system_settings.badges.medium_impact")}
+          {t('admin.system_settings.badges.medium_impact')}
         </Badge>
       );
     }
@@ -166,8 +166,8 @@ export default function SystemSettings({ settings, categories }: Props) {
             <p className="mb-3 text-sm text-gray-600 dark:text-gray-400">{setting.description}</p>
             {setting.updated_by && (
               <p className="text-xs text-gray-500 dark:text-gray-500">
-                {t("admin.system_settings.last_updated", {
-                  date: new Date(setting.updated_at).toLocaleString(t("common.locale") || "es-ES"),
+                {t('admin.system_settings.last_updated', {
+                  date: new Date(setting.updated_at).toLocaleString(t('common.locale') || 'es-ES'),
                   user: setting.updated_by,
                 })}
               </p>
@@ -191,20 +191,20 @@ export default function SystemSettings({ settings, categories }: Props) {
       header={
         <div className="flex items-center justify-between text-gray-900 dark:text-gray-100">
           <div>
-            <h2 className="text-3xl font-bold">{t("admin.system_settings.page_title")}</h2>
+            <h2 className="text-3xl font-bold">{t('admin.system_settings.page_title')}</h2>
             <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-              {t("admin.system_settings.page_description")}
+              {t('admin.system_settings.page_description')}
             </p>
           </div>
           {hasChanges && (
             <Button onClick={handleSave} disabled={saving} icon={Save} iconPosition="left">
-              {saving ? t("admin.system_settings.saving") : t("admin.system_settings.save_changes")}
+              {saving ? t('admin.system_settings.saving') : t('admin.system_settings.save_changes')}
             </Button>
           )}
         </div>
       }
     >
-      <Head title={t("admin.system_settings.page_title")} />
+      <Head title={t('admin.system_settings.page_title')} />
 
       <AdminNavigation currentRoute="/admin/system-settings" />
 
@@ -213,15 +213,15 @@ export default function SystemSettings({ settings, categories }: Props) {
           {hasChanges && (
             <AlertCard
               type="info"
-              message={t("admin.system_settings.unsaved_changes")}
+              message={t('admin.system_settings.unsaved_changes')}
               className="mb-6"
             />
           )}
 
           <AlertCard
             type="warning"
-            title={t("admin.system_settings.warning_title")}
-            message={t("admin.system_settings.warning_message")}
+            title={t('admin.system_settings.warning_title')}
+            message={t('admin.system_settings.warning_message')}
             className="mb-6"
           />
 
@@ -267,48 +267,48 @@ export default function SystemSettings({ settings, categories }: Props) {
             <CardHeader className="border-b border-gray-200 dark:border-gray-700">
               <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-gray-100">
                 <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
-                {t("admin.system_settings.info_section.title")}
+                {t('admin.system_settings.info_section.title')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 pt-6">
               <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900/50">
                 <h4 className="mb-2 font-semibold text-gray-900 dark:text-gray-100">
-                  {t("admin.system_settings.info_section.plans_title")}
+                  {t('admin.system_settings.info_section.plans_title')}
                 </h4>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {t("admin.system_settings.info_section.plans_description")}
+                  {t('admin.system_settings.info_section.plans_description')}
                 </p>
               </div>
               <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900/50">
                 <h4 className="mb-2 font-semibold text-gray-900 dark:text-gray-100">
-                  {t("admin.system_settings.info_section.features_title")}
+                  {t('admin.system_settings.info_section.features_title')}
                 </h4>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {t("admin.system_settings.info_section.features_description")}
+                  {t('admin.system_settings.info_section.features_description')}
                 </p>
               </div>
               <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900/50">
                 <h4 className="mb-2 font-semibold text-gray-900 dark:text-gray-100">
-                  {t("admin.system_settings.info_section.addons_title")}
+                  {t('admin.system_settings.info_section.addons_title')}
                 </h4>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {t("admin.system_settings.info_section.addons_description")}
+                  {t('admin.system_settings.info_section.addons_description')}
                 </p>
               </div>
               <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900/50">
                 <h4 className="mb-2 font-semibold text-gray-900 dark:text-gray-100">
-                  {t("admin.system_settings.info_section.integrations_title")}
+                  {t('admin.system_settings.info_section.integrations_title')}
                 </h4>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {t("admin.system_settings.info_section.integrations_description")}
+                  {t('admin.system_settings.info_section.integrations_description')}
                 </p>
               </div>
               <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900/50">
                 <h4 className="mb-2 font-semibold text-gray-900 dark:text-gray-100">
-                  {t("admin.system_settings.info_section.payment_methods_title")}
+                  {t('admin.system_settings.info_section.payment_methods_title')}
                 </h4>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {t("admin.system_settings.info_section.payment_methods_description")}
+                  {t('admin.system_settings.info_section.payment_methods_description')}
                 </p>
               </div>
             </CardContent>

@@ -1,20 +1,20 @@
-import { useContentManagement } from "@/Hooks/useContentManagement";
-import { Campaign } from "@/types/Campaign";
-import { AlertTriangle, Target } from "lucide-react";
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
+import { useContentManagement } from '@/Hooks/useContentManagement';
+import { Campaign } from '@/types/Campaign';
+import { AlertTriangle, Target } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
-import CampaignDateFields from "@/Components/Content/Campaign/common/CampaignDateFields";
-import CampaignFormFields from "@/Components/Content/Campaign/common/CampaignFormFields";
-import PublicationSelector from "@/Components/Content/Campaign/common/PublicationSelector";
-import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
+import CampaignDateFields from '@/Components/Content/Campaign/common/CampaignDateFields';
+import CampaignFormFields from '@/Components/Content/Campaign/common/CampaignFormFields';
+import PublicationSelector from '@/Components/Content/Campaign/common/PublicationSelector';
+import ModalHeader from '@/Components/Content/modals/common/ModalHeader';
 
-import { useEditCampaignForm } from "@/Hooks/campaign/useEditCampaignForm";
-import { usePublicationsForCampaignEdit } from "@/Hooks/campaign/usePublicationsForCampaignEdit";
-import { useModalFocusTrap } from "@/Hooks/useModalFocusTrap";
-import { usePage } from "@inertiajs/react";
-import ModalFooter from "./common/ModalFooter";
+import { useEditCampaignForm } from '@/Hooks/campaign/useEditCampaignForm';
+import { usePublicationsForCampaignEdit } from '@/Hooks/campaign/usePublicationsForCampaignEdit';
+import { useModalFocusTrap } from '@/Hooks/useModalFocusTrap';
+import { usePage } from '@inertiajs/react';
+import ModalFooter from './common/ModalFooter';
 
 interface EditCampaignModalProps {
   isOpen: boolean;
@@ -33,7 +33,7 @@ export default function EditCampaignModal({
   const { updateItem: updateCampaign } = useContentManagement();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { auth } = usePage<any>().props;
-  const canManage = auth.current_workspace?.permissions?.includes("manage-content");
+  const canManage = auth.current_workspace?.permissions?.includes('manage-content');
   const isDisabled = !canManage;
 
   // Integrate focus trap for modal accessibility
@@ -56,12 +56,12 @@ export default function EditCampaignModal({
   useEffect(() => {
     if (isOpen && campaign) {
       reset({
-        name: campaign.name || campaign.title || "",
-        description: campaign.description || "",
-        goal: campaign.goal || "",
-        budget: campaign.budget ? campaign.budget.toString() : "",
-        start_date: campaign.start_date || "",
-        end_date: campaign.end_date || "",
+        name: campaign.name || campaign.title || '',
+        description: campaign.description || '',
+        goal: campaign.goal || '',
+        budget: campaign.budget ? campaign.budget.toString() : '',
+        start_date: campaign.start_date || '',
+        end_date: campaign.end_date || '',
         publication_ids: campaign.publications?.map((p: any) => p.id) || [],
       });
     }
@@ -82,18 +82,18 @@ export default function EditCampaignModal({
         publication_ids: data.publication_ids || [],
       };
 
-      const success = await updateCampaign(campaign.id, payload, "campaigns");
+      const success = await updateCampaign(campaign.id, payload, 'campaigns');
       if (success) {
-        toast.success(t("campaigns.messages.updateSuccess") || "Campaign updated successfully");
+        toast.success(t('campaigns.messages.updateSuccess') || 'Campaign updated successfully');
         if (onSubmit) {
           onSubmit(true);
         }
         handleClose();
       } else {
-        toast.error(t("campaigns.messages.updateError") || "Failed to update campaign");
+        toast.error(t('campaigns.messages.updateError') || 'Failed to update campaign');
       }
     } catch (error) {
-      toast.error(t("campaigns.messages.updateError") || "Failed to update campaign");
+      toast.error(t('campaigns.messages.updateError') || 'Failed to update campaign');
     } finally {
       setIsSubmitting(false);
     }
@@ -109,11 +109,11 @@ export default function EditCampaignModal({
     const current = watchedFields.publication_ids || [];
     if (current.includes(id)) {
       setValue(
-        "publication_ids",
+        'publication_ids',
         current.filter((pid: number) => pid !== id),
       );
     } else {
-      setValue("publication_ids", [...current, id]);
+      setValue('publication_ids', [...current, id]);
     }
   };
 
@@ -133,8 +133,8 @@ export default function EditCampaignModal({
         <ModalHeader
           t={t}
           onClose={handleClose}
-          title={canManage ? "campaigns.modal.edit.title" : "campaigns.modal.view.title"}
-          subtitle={canManage ? "campaigns.modal.edit.subtitle" : "campaigns.modal.view.subtitle"}
+          title={canManage ? 'campaigns.modal.edit.title' : 'campaigns.modal.view.title'}
+          subtitle={canManage ? 'campaigns.modal.edit.subtitle' : 'campaigns.modal.view.subtitle'}
           icon={Target}
           iconColor="text-primary-500"
           size="xl"
@@ -174,7 +174,7 @@ export default function EditCampaignModal({
 
             <div className="form-group">
               <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                {t("campaigns.modal.edit.associatedPublications")}
+                {t('campaigns.modal.edit.associatedPublications')}
               </label>
 
               <div className="rounded-lg border border-gray-200 bg-gray-50 p-2 dark:border-neutral-700 dark:bg-black/20">
@@ -194,8 +194,8 @@ export default function EditCampaignModal({
         </div>
         <ModalFooter
           onClose={handleClose}
-          submitText={t("campaigns.button.edit")}
-          cancelText={t("common.cancel")}
+          submitText={t('campaigns.button.edit')}
+          cancelText={t('common.cancel')}
           formId="edit-campaign-form"
           hideSubmit={!canManage}
           isSubmitting={isSubmitting || isDisabled}

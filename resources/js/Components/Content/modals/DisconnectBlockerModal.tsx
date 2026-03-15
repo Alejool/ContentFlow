@@ -1,14 +1,14 @@
-import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { AlertTriangle, Calendar, Clock, X } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { formatDateTime } from "@/Utils/formatDate";
+import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
+import { AlertTriangle, Calendar, Clock, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { formatDateTime } from '@/Utils/formatDate';
 
 interface DisconnectBlockerModalProps {
   isOpen: boolean;
   onClose: () => void;
   accountName: string;
   posts: any[];
-  reason: "publishing" | "scheduled";
+  reason: 'publishing' | 'scheduled';
 }
 
 export default function DisconnectBlockerModal({
@@ -23,24 +23,24 @@ export default function DisconnectBlockerModal({
   if (!isOpen) return null;
 
   const getTitle = () => {
-    if (reason === "publishing") {
+    if (reason === 'publishing') {
       return (
-        t("manageContent.socialMedia.blockerModal.titlePublishing") || "No se puede desconectar"
+        t('manageContent.socialMedia.blockerModal.titlePublishing') || 'No se puede desconectar'
       );
     }
-    return t("manageContent.socialMedia.blockerModal.titleScheduled") || "No se puede desconectar";
+    return t('manageContent.socialMedia.blockerModal.titleScheduled') || 'No se puede desconectar';
   };
 
   const getMessage = () => {
-    if (reason === "publishing") {
+    if (reason === 'publishing') {
       return (
-        t("manageContent.socialMedia.blockerModal.messagePublishing") ||
-        "Esta cuenta tiene publicaciones que se están publicando en este momento. Por favor, espera a que terminen antes de desconectar."
+        t('manageContent.socialMedia.blockerModal.messagePublishing') ||
+        'Esta cuenta tiene publicaciones que se están publicando en este momento. Por favor, espera a que terminen antes de desconectar.'
       );
     }
     return (
-      t("manageContent.socialMedia.blockerModal.messageScheduled") ||
-      "Esta cuenta tiene publicaciones programadas. Debes eliminarlas de las publicaciones antes de poder desconectar esta cuenta."
+      t('manageContent.socialMedia.blockerModal.messageScheduled') ||
+      'Esta cuenta tiene publicaciones programadas. Debes eliminarlas de las publicaciones antes de poder desconectar esta cuenta.'
     );
   };
 
@@ -78,14 +78,14 @@ export default function DisconnectBlockerModal({
                       <thead className="sticky top-0 bg-gray-100 text-gray-600 dark:bg-neutral-800 dark:text-gray-400">
                         <tr>
                           <th className="px-4 py-2 font-medium">
-                            {t("manageContent.socialMedia.blockerModal.table.publication") ||
-                              "Publicación"}
+                            {t('manageContent.socialMedia.blockerModal.table.publication') ||
+                              'Publicación'}
                           </th>
                           <th className="px-4 py-2 font-medium">
-                            {reason === "publishing"
-                              ? t("manageContent.socialMedia.blockerModal.table.status") || "Estado"
-                              : t("manageContent.socialMedia.blockerModal.table.scheduledDate") ||
-                                "Fecha programada"}
+                            {reason === 'publishing'
+                              ? t('manageContent.socialMedia.blockerModal.table.status') || 'Estado'
+                              : t('manageContent.socialMedia.blockerModal.table.scheduledDate') ||
+                                'Fecha programada'}
                           </th>
                         </tr>
                       </thead>
@@ -93,14 +93,14 @@ export default function DisconnectBlockerModal({
                         {posts.map((post) => (
                           <tr key={post.id}>
                             <td className="px-4 py-2">
-                              {post.title || t("common.untitled", "Sin título")}
+                              {post.title || t('common.untitled', 'Sin título')}
                             </td>
                             <td className="whitespace-nowrap px-4 py-2">
-                              {reason === "publishing" ? (
+                              {reason === 'publishing' ? (
                                 <div className="flex items-center gap-2">
                                   <Clock className="h-3 w-3 animate-pulse opacity-60" />
                                   <span className="text-xs font-semibold text-blue-500 dark:text-blue-400">
-                                    {t("status.publishing") || "Publicando..."}
+                                    {t('status.publishing') || 'Publicando...'}
                                   </span>
                                 </div>
                               ) : (
@@ -112,7 +112,7 @@ export default function DisconnectBlockerModal({
                                     </span>
                                   ) : (
                                     <span className="text-xs opacity-50">
-                                      {t("common.noDate") || "Sin fecha"}
+                                      {t('common.noDate') || 'Sin fecha'}
                                     </span>
                                   )}
                                 </div>
@@ -128,13 +128,13 @@ export default function DisconnectBlockerModal({
                 <div className="mt-4 rounded-lg border border-orange-200 bg-orange-50 p-3 dark:border-orange-900/30 dark:bg-orange-900/20">
                   <p className="text-xs text-orange-700 dark:text-orange-300">
                     <strong>
-                      {t("manageContent.socialMedia.blockerModal.action") || "Acción requerida"}:
-                    </strong>{" "}
-                    {reason === "publishing"
-                      ? t("manageContent.socialMedia.blockerModal.waitForPublishing") ||
-                        "Espera a que las publicaciones terminen de publicarse."
-                      : t("manageContent.socialMedia.blockerModal.removeScheduled") ||
-                        "Ve a la sección de Contenido y elimina estas publicaciones de la programación."}
+                      {t('manageContent.socialMedia.blockerModal.action') || 'Acción requerida'}:
+                    </strong>{' '}
+                    {reason === 'publishing'
+                      ? t('manageContent.socialMedia.blockerModal.waitForPublishing') ||
+                        'Espera a que las publicaciones terminen de publicarse.'
+                      : t('manageContent.socialMedia.blockerModal.removeScheduled') ||
+                        'Ve a la sección de Contenido y elimina estas publicaciones de la programación.'}
                   </p>
                 </div>
               </div>
@@ -145,7 +145,7 @@ export default function DisconnectBlockerModal({
                   className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-700"
                   onClick={onClose}
                 >
-                  {t("common.understood") || "Entendido"}
+                  {t('common.understood') || 'Entendido'}
                 </button>
               </div>
             </div>

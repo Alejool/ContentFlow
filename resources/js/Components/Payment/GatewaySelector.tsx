@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
-import { CreditCard, X } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useState, useEffect } from 'react';
+import { CreditCard, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface Gateway {
   name: string;
@@ -20,7 +20,7 @@ interface GatewaySelectorProps {
 export function GatewaySelector({
   selectedGateway,
   onGatewayChange,
-  className = "",
+  className = '',
   showModal = false,
   onModalClose,
 }: GatewaySelectorProps) {
@@ -30,7 +30,7 @@ export function GatewaySelector({
   const [isModalOpen, setIsModalOpen] = useState(showModal);
 
   useEffect(() => {
-    fetch("/api/payment/gateways")
+    fetch('/api/payment/gateways')
       .then((res) => res.json())
       .then((data) => {
         // Filtrar solo gateways disponibles (habilitados en el sistema)
@@ -47,7 +47,7 @@ export function GatewaySelector({
         setLoading(false);
       })
       .catch((error) => {
-        console.error("Error loading gateways:", error);
+        console.error('Error loading gateways:', error);
         setLoading(false);
       });
   }, []);
@@ -93,17 +93,17 @@ export function GatewaySelector({
   const selectorContent = (
     <>
       <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-        {t("payment.paymentMethod") || "Método de pago"}
+        {t('payment.paymentMethod') || 'Método de pago'}
       </label>
       <div
         className={`grid gap-3 ${
           gateways.length === 1
-            ? "grid-cols-1"
+            ? 'grid-cols-1'
             : gateways.length === 2
-              ? "grid-cols-2"
+              ? 'grid-cols-2'
               : gateways.length === 3
-                ? "grid-cols-3"
-                : "grid-cols-2 md:grid-cols-4"
+                ? 'grid-cols-3'
+                : 'grid-cols-2 md:grid-cols-4'
         }`}
       >
         {gateways.map((gateway) => (
@@ -113,9 +113,9 @@ export function GatewaySelector({
             disabled={!gateway.available}
             className={`relative flex min-h-[100px] flex-col items-center justify-center rounded-lg border-2 p-4 transition-all ${
               selectedGateway === gateway.name
-                ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20"
-                : "border-gray-200 hover:border-primary-300 dark:border-gray-700 dark:hover:border-primary-600"
-            } ${!gateway.available ? "cursor-not-allowed opacity-50" : "cursor-pointer"} `}
+                ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                : 'border-gray-200 hover:border-primary-300 dark:border-gray-700 dark:hover:border-primary-600'
+            } ${!gateway.available ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} `}
           >
             {gateway.logo ? (
               <img
@@ -179,7 +179,7 @@ export function GatewaySelector({
 
             {/* Modal content */}
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              {t("payment.selectPaymentMethod") || "Selecciona un método de pago"}
+              {t('payment.selectPaymentMethod') || 'Selecciona un método de pago'}
             </h3>
 
             {selectorContent}

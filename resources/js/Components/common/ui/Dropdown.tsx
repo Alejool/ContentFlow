@@ -1,4 +1,4 @@
-import { Transition } from "@headlessui/react";
+import { Transition } from '@headlessui/react';
 import {
   ComponentProps,
   Dispatch,
@@ -7,9 +7,9 @@ import {
   createContext,
   useContext,
   useState,
-} from "react";
+} from 'react';
 
-import { Link as InertiaLink } from "@inertiajs/react";
+import { Link as InertiaLink } from '@inertiajs/react';
 
 interface DropDownContextType {
   open: boolean;
@@ -44,7 +44,7 @@ interface TriggerProps {
 const Trigger = ({ children }: TriggerProps) => {
   const context = useContext(DropDownContext);
   if (!context) {
-    throw new Error("Trigger must be used within a DropdownProvider");
+    throw new Error('Trigger must be used within a DropdownProvider');
   }
   const { toggleOpen, open, setOpen } = context;
 
@@ -57,7 +57,7 @@ const Trigger = ({ children }: TriggerProps) => {
         aria-haspopup="true"
         tabIndex={0}
         onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
+          if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
             toggleOpen();
           }
@@ -73,36 +73,36 @@ const Trigger = ({ children }: TriggerProps) => {
 };
 
 interface ContentProps {
-  align?: "left" | "right";
-  width?: "48" | string;
+  align?: 'left' | 'right';
+  width?: '48' | string;
   contentClasses?: string;
   className?: string;
   children: ReactNode;
 }
 
 const Content = ({
-  align = "right",
-  width = "86",
-  contentClasses = "py-4 mt-3 bg-gray-50 font-bold block text-center",
-  className = "",
+  align = 'right',
+  width = '86',
+  contentClasses = 'py-4 mt-3 bg-gray-50 font-bold block text-center',
+  className = '',
   children,
 }: ContentProps) => {
   const context = useContext(DropDownContext);
   if (!context) {
-    throw new Error("Content must be used within a DropdownProvider");
+    throw new Error('Content must be used within a DropdownProvider');
   }
   const { open, setOpen } = context;
 
-  let alignmentClasses = "origin-top";
-  if (align === "left") {
-    alignmentClasses = "origin-top-left left-0";
-  } else if (align === "right") {
-    alignmentClasses = "origin-top-right right-0";
+  let alignmentClasses = 'origin-top';
+  if (align === 'left') {
+    alignmentClasses = 'origin-top-left left-0';
+  } else if (align === 'right') {
+    alignmentClasses = 'origin-top-right right-0';
   }
 
-  let widthClasses = "";
-  if (width === "48") {
-    widthClasses = "w-48";
+  let widthClasses = '';
+  if (width === '48') {
+    widthClasses = 'w-48';
   } else if (width) {
     widthClasses = `w-${width}`;
   }
@@ -136,12 +136,12 @@ interface DropdownLinkProps extends ComponentProps<typeof InertiaLink> {
   children: ReactNode;
 }
 
-const DropdownLink = ({ className = "", children, ...props }: DropdownLinkProps) => {
+const DropdownLink = ({ className = '', children, ...props }: DropdownLinkProps) => {
   return (
     <InertiaLink
       {...props}
       className={
-        "block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 transition duration-150 ease-in-out hover:bg-gray-100 focus:bg-gray-100 focus:outline-none " +
+        'block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 transition duration-150 ease-in-out hover:bg-gray-100 focus:bg-gray-100 focus:outline-none ' +
         className
       }
     >

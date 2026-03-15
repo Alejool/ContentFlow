@@ -1,15 +1,15 @@
-import { type ContentType } from "@/Components/Content/Publication/common/ContentTypeSelector";
-import { FacebookPreview } from "@/Components/Content/Publication/previews/FacebookPreview";
-import { InstagramPreview } from "@/Components/Content/Publication/previews/InstagramPreview";
-import { LinkedInPreview } from "@/Components/Content/Publication/previews/LinkedInPreview";
-import { TikTokPreview } from "@/Components/Content/Publication/previews/TikTokPreview";
-import { TwitterPreview } from "@/Components/Content/Publication/previews/TwitterPreview";
-import { YouTubePreview } from "@/Components/Content/Publication/previews/YouTubePreview";
-import { REEL_COMPATIBLE_PLATFORMS } from "@/Constants/contentTypes";
-import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatformsConfig";
-import { Facebook, Instagram, Linkedin, Music2, Twitter, Youtube } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { type ContentType } from '@/Components/Content/Publication/common/ContentTypeSelector';
+import { FacebookPreview } from '@/Components/Content/Publication/previews/FacebookPreview';
+import { InstagramPreview } from '@/Components/Content/Publication/previews/InstagramPreview';
+import { LinkedInPreview } from '@/Components/Content/Publication/previews/LinkedInPreview';
+import { TikTokPreview } from '@/Components/Content/Publication/previews/TikTokPreview';
+import { TwitterPreview } from '@/Components/Content/Publication/previews/TwitterPreview';
+import { YouTubePreview } from '@/Components/Content/Publication/previews/YouTubePreview';
+import { REEL_COMPATIBLE_PLATFORMS } from '@/Constants/contentTypes';
+import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatformsConfig';
+import { Facebook, Instagram, Linkedin, Music2, Twitter, Youtube } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -30,8 +30,8 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
   }
 
   switch (platform) {
-    case "twitter":
-      const tweetId = url.split("/status/")[1]?.split("?")[0];
+    case 'twitter':
+      const tweetId = url.split('/status/')[1]?.split('?')[0];
       return (
         <iframe
           src={`https://platform.twitter.com/embed/Tweet.html?id=${tweetId}&theme=light`}
@@ -41,8 +41,8 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
         />
       );
 
-    case "instagram":
-      const igUrl = url.endsWith("/") ? url : `${url}/`;
+    case 'instagram':
+      const igUrl = url.endsWith('/') ? url : `${url}/`;
       return (
         <iframe
           src={`${igUrl}embed`}
@@ -53,7 +53,7 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
         />
       );
 
-    case "facebook":
+    case 'facebook':
       return (
         <div className="space-y-3 py-8 text-center">
           <div className="flex flex-col items-center gap-3">
@@ -90,7 +90,7 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
         </div>
       );
 
-    case "youtube":
+    case 'youtube':
       const videoId = url.match(
         /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([^&?\s]+)/,
       )?.[1];
@@ -104,10 +104,10 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
         />
       );
 
-    case "tiktok":
+    case 'tiktok':
       return (
         <iframe
-          src={`https://www.tiktok.com/embed/v2/${url.split("/video/")[1]?.split("?")[0]}`}
+          src={`https://www.tiktok.com/embed/v2/${url.split('/video/')[1]?.split('?')[0]}`}
           className="h-[730px] w-full max-w-[325px] border-0"
           scrolling="no"
           sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
@@ -115,7 +115,7 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
         />
       );
 
-    case "linkedin":
+    case 'linkedin':
       return (
         <div className="space-y-3 py-8 text-center">
           <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -163,7 +163,7 @@ interface LivePreviewSectionProps {
   pollDuration?: number; // Nuevo: duración de encuesta
 }
 
-type Platform = "twitter" | "instagram" | "linkedin" | "facebook" | "tiktok" | "youtube";
+type Platform = 'twitter' | 'instagram' | 'linkedin' | 'facebook' | 'tiktok' | 'youtube';
 
 export const LivePreviewSection = ({
   content,
@@ -173,7 +173,7 @@ export const LivePreviewSection = ({
   className,
   title,
   publishedAt,
-  contentType = "post",
+  contentType = 'post',
   selectedPlatforms = [],
   pollOptions = [],
   pollDuration = 24,
@@ -184,24 +184,24 @@ export const LivePreviewSection = ({
   const compatiblePlatforms = useMemo(() => {
     const contentTypes = [
       {
-        value: "post",
-        platforms: ["instagram", "twitter", "facebook", "linkedin", "youtube", "pinterest"],
+        value: 'post',
+        platforms: ['instagram', 'twitter', 'facebook', 'linkedin', 'youtube', 'pinterest'],
       },
       {
-        value: "reel",
+        value: 'reel',
         platforms: [...REEL_COMPATIBLE_PLATFORMS],
       },
       {
-        value: "story",
-        platforms: ["instagram", "facebook"],
+        value: 'story',
+        platforms: ['instagram', 'facebook'],
       },
       {
-        value: "poll",
-        platforms: ["twitter"], // Solo Twitter soporta encuestas nativas
+        value: 'poll',
+        platforms: ['twitter'], // Solo Twitter soporta encuestas nativas
       },
       {
-        value: "carousel",
-        platforms: ["instagram", "facebook", "linkedin"],
+        value: 'carousel',
+        platforms: ['instagram', 'facebook', 'linkedin'],
       },
     ];
 
@@ -211,12 +211,12 @@ export const LivePreviewSection = ({
 
   const tabs = useMemo(() => {
     const allTabs: { id: Platform; label: string; icon: any }[] = [
-      { id: "twitter", label: "Twitter", icon: Twitter },
-      { id: "instagram", label: "Instagram", icon: Instagram },
-      { id: "linkedin", label: "LinkedIn", icon: Linkedin },
-      { id: "facebook", label: "Facebook", icon: Facebook },
-      { id: "youtube", label: "YouTube", icon: Youtube },
-      { id: "tiktok", label: "TikTok", icon: Music2 },
+      { id: 'twitter', label: 'Twitter', icon: Twitter },
+      { id: 'instagram', label: 'Instagram', icon: Instagram },
+      { id: 'linkedin', label: 'LinkedIn', icon: Linkedin },
+      { id: 'facebook', label: 'Facebook', icon: Facebook },
+      { id: 'youtube', label: 'YouTube', icon: Youtube },
+      { id: 'tiktok', label: 'TikTok', icon: Music2 },
     ];
 
     return allTabs.filter((tab) => {
@@ -235,7 +235,7 @@ export const LivePreviewSection = ({
   }, [compatiblePlatforms, selectedPlatforms]);
 
   const [activePlatform, setActivePlatform] = useState<Platform>(
-    tabs.length > 0 ? tabs[0].id : "twitter",
+    tabs.length > 0 ? tabs[0].id : 'twitter',
   );
 
   // Actualizar plataforma activa si ya no es válida
@@ -246,7 +246,7 @@ export const LivePreviewSection = ({
   }, [tabs, activePlatform]);
 
   return (
-    <div className={`space-y-4 ${className || ""}`}>
+    <div className={`space-y-4 ${className || ''}`}>
       <div className="flex space-x-1 rounded-lg bg-gray-100 p-1 dark:bg-neutral-800">
         {tabs.map((tab) => {
           const Icon = tab.icon;
@@ -258,8 +258,8 @@ export const LivePreviewSection = ({
               onClick={() => setActivePlatform(tab.id)}
               className={`relative flex flex-1 items-center justify-center gap-2 rounded-md py-2 text-sm font-medium transition-all duration-200 ${
                 activePlatform === tab.id
-                  ? "bg-white text-primary-600 shadow-sm dark:bg-neutral-700 dark:text-primary-400"
-                  : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  ? 'bg-white text-primary-600 shadow-sm dark:bg-neutral-700 dark:text-primary-400'
+                  : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
               }`}
             >
               <Icon className="h-4 w-4" />
@@ -312,7 +312,7 @@ export const LivePreviewSection = ({
           </div>
         ) : (
           <div className="flex items-center justify-center">
-            {activePlatform === "twitter" && (
+            {activePlatform === 'twitter' && (
               <TwitterPreview
                 content={content}
                 mediaUrls={mediaUrls}
@@ -322,13 +322,13 @@ export const LivePreviewSection = ({
                 pollDuration={pollDuration}
               />
             )}
-            {activePlatform === "instagram" && (
+            {activePlatform === 'instagram' && (
               <InstagramPreview content={content} mediaUrls={mediaUrls} user={user} />
             )}
-            {activePlatform === "linkedin" && (
+            {activePlatform === 'linkedin' && (
               <LinkedInPreview content={content} mediaUrls={mediaUrls} user={user} />
             )}
-            {activePlatform === "facebook" && (
+            {activePlatform === 'facebook' && (
               <FacebookPreview
                 content={content}
                 mediaUrls={mediaUrls}
@@ -339,10 +339,10 @@ export const LivePreviewSection = ({
                 pollDuration={pollDuration}
               />
             )}
-            {activePlatform === "tiktok" && (
+            {activePlatform === 'tiktok' && (
               <TikTokPreview content={content} mediaUrls={mediaUrls} user={user} />
             )}
-            {activePlatform === "youtube" && (
+            {activePlatform === 'youtube' && (
               <YouTubePreview
                 content={content}
                 mediaUrls={mediaUrls}
@@ -356,8 +356,8 @@ export const LivePreviewSection = ({
       </div>
 
       <p className="text-center text-xs text-gray-500 dark:text-gray-400">
-        {t("publications.modal.preview.disclaimer") ||
-          "Preview is an approximation. Actual appearance may vary by platform."}
+        {t('publications.modal.preview.disclaimer') ||
+          'Preview is an approximation. Actual appearance may vary by platform.'}
       </p>
     </div>
   );

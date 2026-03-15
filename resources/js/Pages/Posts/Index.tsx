@@ -1,24 +1,24 @@
-import EmptyState from "@/Components/common/EmptyState";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { getEmptyStateByKey } from "@/Utils/emptyStateMapper";
-import { Head } from "@inertiajs/react";
-import { BarChart3, Calendar, TrendingUp } from "lucide-react";
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
-import { Line } from "recharts";
+import EmptyState from '@/Components/common/EmptyState';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { getEmptyStateByKey } from '@/Utils/emptyStateMapper';
+import { Head } from '@inertiajs/react';
+import { BarChart3, Calendar, TrendingUp } from 'lucide-react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Line } from 'recharts';
 
 const postStats = [
-  { time: "08:00", instagram: 200, twitter: 150, facebook: 180 },
-  { time: "12:00", instagram: 350, twitter: 220, facebook: 300 },
-  { time: "16:00", instagram: 500, twitter: 330, facebook: 420 },
-  { time: "20:00", instagram: 620, twitter: 410, facebook: 500 },
-  { time: "23:00", instagram: 450, twitter: 380, facebook: 390 },
+  { time: '08:00', instagram: 200, twitter: 150, facebook: 180 },
+  { time: '12:00', instagram: 350, twitter: 220, facebook: 300 },
+  { time: '16:00', instagram: 500, twitter: 330, facebook: 420 },
+  { time: '20:00', instagram: 620, twitter: 410, facebook: 500 },
+  { time: '23:00', instagram: 450, twitter: 380, facebook: 390 },
 ];
 
 const PLATFORM_COLORS = {
-  instagram: "#E1306C",
-  twitter: "#1DA1F2",
-  facebook: "#1877F2",
+  instagram: '#E1306C',
+  twitter: '#1DA1F2',
+  facebook: '#1877F2',
 };
 
 interface Post {
@@ -35,34 +35,34 @@ interface Post {
 const posts: Post[] = [
   {
     id: 1,
-    title: "New Feature Release",
-    description: "Announcing our latest update!",
+    title: 'New Feature Release',
+    description: 'Announcing our latest update!',
     image:
-      "https://www.elegantthemes.com/blog/wp-content/uploads/2021/02/social-media-books-featured-image.jpg",
-    date: "2025-03-09 20:00",
-    platform: "Instagram",
+      'https://www.elegantthemes.com/blog/wp-content/uploads/2021/02/social-media-books-featured-image.jpg',
+    date: '2025-03-09 20:00',
+    platform: 'Instagram',
     engagement: 620,
-    growth: "+15%",
+    growth: '+15%',
   },
   {
     id: 2,
-    title: "Tech Tips",
-    description: "Improve your workflow with these tips.",
-    image: "https://dlvrit.com/wp-content/uploads/2022/09/dlvr.it-social-media-posting-2.png",
-    date: "2025-03-09 16:00",
-    platform: "Twitter",
+    title: 'Tech Tips',
+    description: 'Improve your workflow with these tips.',
+    image: 'https://dlvrit.com/wp-content/uploads/2022/09/dlvr.it-social-media-posting-2.png',
+    date: '2025-03-09 16:00',
+    platform: 'Twitter',
     engagement: 330,
-    growth: "+10%",
+    growth: '+10%',
   },
   {
     id: 3,
-    title: "Community Update",
-    description: "We reached 10k followers!",
-    image: "https://media.wiley.com/product_data/coverImage300/19/11190416/1119041619.jpg",
-    date: "2025-03-09 12:00",
-    platform: "Facebook",
+    title: 'Community Update',
+    description: 'We reached 10k followers!',
+    image: 'https://media.wiley.com/product_data/coverImage300/19/11190416/1119041619.jpg',
+    date: '2025-03-09 12:00',
+    platform: 'Facebook',
     engagement: 300,
-    growth: "+12%",
+    growth: '+12%',
   },
 ];
 
@@ -85,7 +85,7 @@ function ContentCard({ post }: { post: Post }) {
             alt="Content Thumbnail"
             loading="lazy"
             className={`h-full w-full object-cover transition-opacity duration-300 ${
-              imageLoaded ? "opacity-100" : "opacity-0"
+              imageLoaded ? 'opacity-100' : 'opacity-0'
             }`}
             onLoad={() => setImageLoaded(true)}
             onError={() => setImageError(true)}
@@ -181,7 +181,7 @@ export default function SchedulePosts() {
           <div className="mt-8 rounded-lg bg-white p-6 shadow-md">
             <h3 className="text-xl font-semibold text-gray-800">Recent Posts</h3>
             {posts.length === 0 ? (
-              <EmptyState config={getEmptyStateByKey("scheduledPosts", t)!} />
+              <EmptyState config={getEmptyStateByKey('scheduledPosts', t)!} />
             ) : (
               <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-3">
                 {posts.map((post) => (

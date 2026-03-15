@@ -1,8 +1,8 @@
-import PublicationThumbnail from "@/Components/Content/Publication/PublicationThumbnail";
-import { formatDate } from "@/Utils/i18nHelpers";
-import { Campaign } from "@/types/Campaign";
-import { format } from "date-fns";
-import { useTranslation } from "react-i18next";
+import PublicationThumbnail from '@/Components/Content/Publication/PublicationThumbnail';
+import { formatDate } from '@/Utils/i18nHelpers';
+import { Campaign } from '@/types/Campaign';
+import { format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 interface CampaignPublicationsProps {
   campaign: Campaign;
@@ -21,7 +21,7 @@ export default function CampaignPublications({
       <td colSpan={5} className="bg-gray-50/50 px-0 dark:bg-neutral-900/30">
         <div className="px-4 py-4 lg:px-12">
           <div className="mb-3 border-l-2 border-primary-500 pl-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
-            {t("campaigns.modal.view.associatedPublications")}
+            {t('campaigns.modal.view.associatedPublications')}
           </div>
           {publications.length > 0 ? (
             <div className="grid grid-cols-1 gap-2">
@@ -41,7 +41,7 @@ export default function CampaignPublications({
                           {pub.title}
                         </div>
                         <div className="text-xs text-gray-500">
-                          {formatDate(new Date(pub.created_at), "medium")}
+                          {formatDate(new Date(pub.created_at), 'medium')}
                         </div>
                       </div>
                     </div>
@@ -57,7 +57,7 @@ export default function CampaignPublications({
               })}
             </div>
           ) : (
-            <div className="text-sm italic text-gray-500">{t("campaigns.noPublications")}</div>
+            <div className="text-sm italic text-gray-500">{t('campaigns.noPublications')}</div>
           )}
         </div>
       </td>

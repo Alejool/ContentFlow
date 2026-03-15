@@ -6,17 +6,17 @@ import {
   closestCenter,
   useSensor,
   useSensors,
-} from "@dnd-kit/core";
+} from '@dnd-kit/core';
 import {
   SortableContext,
   arrayMove,
   horizontalListSortingStrategy,
   sortableKeyboardCoordinates,
   useSortable,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { GripHorizontal, LucideIcon } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { GripHorizontal, LucideIcon } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 
 export interface DraggableTab {
   id: string;
@@ -44,13 +44,13 @@ const SortableTab = ({ tab, isActive, onTabChange, isDraggable }: SortableTabPro
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    zIndex: isDragging ? 50 : "auto",
+    zIndex: isDragging ? 50 : 'auto',
     opacity: isDragging ? 0.5 : 1,
   };
 
   const Icon = tab.icon;
   const hasBadge = tab.badge !== undefined && tab.badge !== null;
-  const badgeValue = typeof tab.badge === "number" && tab.badge > 99 ? "99+" : tab.badge;
+  const badgeValue = typeof tab.badge === 'number' && tab.badge > 99 ? '99+' : tab.badge;
 
   return (
     <div ref={setNodeRef} style={style} className="group/tab flex items-center">
@@ -60,25 +60,25 @@ const SortableTab = ({ tab, isActive, onTabChange, isDraggable }: SortableTabPro
         {...(isDraggable && !tab.locked ? listeners : {})}
         className={`flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-lg px-5 py-2.5 text-sm font-bold transition-all duration-200 ${
           isActive
-            ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
-            : "text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-neutral-700/50 dark:hover:text-gray-200"
+            ? 'bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50'
+            : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-neutral-700/50 dark:hover:text-gray-200'
         }`}
       >
         {isDraggable && !tab.locked && (
           <GripHorizontal
             className={`h-3 w-3 cursor-grab opacity-0 transition-opacity active:cursor-grabbing group-hover/tab:opacity-60 ${
-              isActive ? "text-white" : "text-gray-400"
+              isActive ? 'text-white' : 'text-gray-400'
             }`}
           />
         )}
-        {Icon && <Icon className={`h-4 w-4 ${isActive ? "text-white" : "opacity-70"}`} />}
+        {Icon && <Icon className={`h-4 w-4 ${isActive ? 'text-white' : 'opacity-70'}`} />}
         <span>{tab.label}</span>
         {hasBadge && (
           <span
             className={`rounded-full px-2 py-0.5 text-xs font-bold ${
               isActive
-                ? "bg-white/20 text-white"
-                : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+                ? 'bg-white/20 text-white'
+                : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
             }`}
           >
             {badgeValue}
@@ -107,8 +107,8 @@ export default function DraggableTabs({
   onTabOrderChange,
   tabOrder,
   isDraggable = false,
-  currentPlan = "demo",
-  className = "",
+  currentPlan = 'demo',
+  className = '',
 }: DraggableTabsProps) {
   // Si hay un tabOrder externo, usarlo para ordenar los tabs
   const getOrderedTabs = useMemo(() => {
@@ -139,8 +139,8 @@ export default function DraggableTabs({
   useEffect(() => {
     const newOrderedTabs = getOrderedTabs(initialTabs, tabOrder);
     // Solo actualizar si realmente cambió el orden
-    const currentIds = orderedTabs.map((t) => t.id).join(",");
-    const newIds = newOrderedTabs.map((t) => t.id).join(",");
+    const currentIds = orderedTabs.map((t) => t.id).join(',');
+    const newIds = newOrderedTabs.map((t) => t.id).join(',');
 
     if (currentIds !== newIds) {
       setOrderedTabs(newOrderedTabs);

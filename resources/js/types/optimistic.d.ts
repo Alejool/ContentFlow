@@ -2,13 +2,13 @@
 
 export interface OptimisticOperation {
   id: string;
-  type: "create" | "update" | "delete";
+  type: 'create' | 'update' | 'delete';
   resource: string;
   resourceId?: string | number;
   optimisticData: any;
   originalData: any | null;
   request: Promise<any>;
-  status: "pending" | "success" | "failed" | "rolled_back";
+  status: 'pending' | 'success' | 'failed' | 'rolled_back';
   timestamp: number;
   completedAt?: number;
   retryCount: number;
@@ -47,7 +47,7 @@ export interface OptimisticOptions {
 export interface QueuedOperation {
   id: string;
   url: string;
-  method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   headers: Record<string, string>;
   body?: any;
   resource: string;
@@ -57,7 +57,7 @@ export interface QueuedOperation {
   priority: number;
   retryCount: number;
   maxRetries: number;
-  status: "queued" | "syncing" | "failed" | "completed";
+  status: 'queued' | 'syncing' | 'failed' | 'completed';
   lastError?: string;
   failedAt?: number;
 }
@@ -75,7 +75,7 @@ export interface CacheEntry {
   expiresAt?: number;
   lastAccessed: number;
   accessCount: number;
-  strategy: "cache-first" | "network-first" | "stale-while-revalidate";
+  strategy: 'cache-first' | 'network-first' | 'stale-while-revalidate';
   size: number;
   response: Response;
 }
@@ -97,7 +97,7 @@ export interface InterceptorConfig {
   rollbackOnError?: boolean;
 }
 
-declare module "axios" {
+declare module 'axios' {
   export interface AxiosRequestConfig {
     optimistic?: boolean;
     optimisticData?: any;

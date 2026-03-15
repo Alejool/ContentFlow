@@ -1,6 +1,6 @@
-import { TFunction } from "i18next";
-import { AlertCircle, Lock } from "lucide-react";
-import { Trans } from "react-i18next";
+import { TFunction } from 'i18next';
+import { AlertCircle, Lock } from 'lucide-react';
+import { Trans } from 'react-i18next';
 
 interface LockInfo {
   locked_by?: string;
@@ -41,17 +41,17 @@ export const AlertsSection = ({
         isLockedByOther &&
         !hasPublishedPlatform &&
         allowConfiguration &&
-        publicationStatus !== "pending_review" && (
+        publicationStatus !== 'pending_review' && (
           <div className="animate-in shake flex gap-3 rounded-lg border border-amber-500 bg-amber-50 p-4 text-sm text-amber-700 duration-500 dark:bg-amber-900/20 dark:text-amber-300">
             <AlertCircle className="h-5 w-5 shrink-0 text-amber-500" />
             <div>
               <p className="mb-1 font-semibold">
-                {lockInfo?.locked_by === "session"
-                  ? t("publications.modal.edit.lockedBySession") || "Sesión Duplicada"
-                  : t("publications.modal.edit.lockedByOther") || "En cola de espera"}
+                {lockInfo?.locked_by === 'session'
+                  ? t('publications.modal.edit.lockedBySession') || 'Sesión Duplicada'
+                  : t('publications.modal.edit.lockedByOther') || 'En cola de espera'}
               </p>
               <div className="opacity-80">
-                {lockInfo?.locked_by === "session" ? (
+                {lockInfo?.locked_by === 'session' ? (
                   <>
                     <Trans
                       i18nKey="publications.modal.edit.locking.sessionMessage"
@@ -64,7 +64,7 @@ export const AlertsSection = ({
                     />
                     {lockInfo?.ip_address && (
                       <span className="text-xs opacity-70">
-                        {" "}
+                        {' '}
                         ({maskIpAddress(lockInfo.ip_address)})
                       </span>
                     )}
@@ -97,9 +97,9 @@ export const AlertsSection = ({
           <Lock className="h-4 w-4 shrink-0" />
           <p>
             <strong>
-              {t("publications.modal.edit.locking.youAreEditor") || "Eres el editor actual."}
-            </strong>{" "}
-            {t("publications.modal.edit.locking.usersWaiting", {
+              {t('publications.modal.edit.locking.youAreEditor') || 'Eres el editor actual.'}
+            </strong>{' '}
+            {t('publications.modal.edit.locking.usersWaiting', {
               count: activeUsers.length - 1,
             }) || `Hay ${activeUsers.length - 1} usuario(s) en espera para cuando termines.`}
           </p>
@@ -107,31 +107,31 @@ export const AlertsSection = ({
       )}
 
       {/* Alerta: Pendiente de revisión */}
-      {publicationStatus === "pending_review" && (
+      {publicationStatus === 'pending_review' && (
         <div className="animate-in fade-in slide-in-from-top-4 flex gap-3 rounded-lg border border-yellow-500 bg-yellow-50 p-4 text-sm text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-300">
           <AlertCircle className="h-5 w-5 shrink-0 text-yellow-500" />
           <div>
             <p className="mb-1 font-semibold">
-              {t("publications.modal.edit.pendingReviewWarning") || "Publicación en Revisión"}
+              {t('publications.modal.edit.pendingReviewWarning') || 'Publicación en Revisión'}
             </p>
             <p className="opacity-90">
-              {t("publications.modal.edit.pendingReviewWarningHint") ||
-                "Esta publicación está esperando aprobación. Debes aprobarla o rechazarla antes de poder editarla. Si la rechazas, el creador podrá hacer cambios y volver a solicitar aprobación."}
+              {t('publications.modal.edit.pendingReviewWarningHint') ||
+                'Esta publicación está esperando aprobación. Debes aprobarla o rechazarla antes de poder editarla. Si la rechazas, el creador podrá hacer cambios y volver a solicitar aprobación.'}
             </p>
           </div>
         </div>
       )}
 
       {/* Alerta: Publicación aprobada */}
-      {publicationStatus === "approved" && !hasPublishedPlatform && (
+      {publicationStatus === 'approved' && !hasPublishedPlatform && (
         <div className="animate-in fade-in slide-in-from-top-4 flex gap-3 rounded-lg border border-blue-500 bg-blue-50/50 p-4 text-sm text-blue-700 dark:bg-blue-900/20 dark:text-blue-300">
           <AlertCircle className="h-5 w-5 shrink-0 text-blue-500" />
           <div>
             <p className="mb-1 font-semibold">
-              {t("publications.modal.edit.approvedEditWarning") || "Publicación Aprobada"}
+              {t('publications.modal.edit.approvedEditWarning') || 'Publicación Aprobada'}
             </p>
             <p className="opacity-80">
-              {t("publications.modal.edit.approvedEditWarningHint") ||
+              {t('publications.modal.edit.approvedEditWarningHint') ||
                 "Esta publicación ya fue aprobada. Si realizas cambios, volverá a estado 'Pendiente' y requerirá una nueva aprobación."}
             </p>
           </div>
@@ -142,10 +142,10 @@ export const AlertsSection = ({
       {hasPublishedPlatform && (
         <AlertCard
           type="info"
-          title={t("publications.modal.edit.contentLocked") || "Publication partially live"}
+          title={t('publications.modal.edit.contentLocked') || 'Publication partially live'}
           message={
-            t("publications.modal.edit.contentLockedHint") ||
-            "This publication is live on some platforms. Changes will apply to pending and future uploads."
+            t('publications.modal.edit.contentLockedHint') ||
+            'This publication is live on some platforms. Changes will apply to pending and future uploads.'
           }
           className="animate-in fade-in slide-in-from-top-4"
         />

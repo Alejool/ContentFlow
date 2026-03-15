@@ -1,12 +1,12 @@
-import { CampaignStat } from "@/Components/Analytics/PerformanceTable";
-import { AddonsPromotionCard } from "@/Components/Dashboard/AddonsPromotionCard";
-import StatCard from "@/Components/Statistics/StatCard";
-import Skeleton from "@/Components/common/ui/Skeleton";
-import { useTheme } from "@/Hooks/useTheme";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, Link, router } from "@inertiajs/react";
-import axios from "axios";
-import { motion } from "framer-motion";
+import { CampaignStat } from '@/Components/Analytics/PerformanceTable';
+import { AddonsPromotionCard } from '@/Components/Dashboard/AddonsPromotionCard';
+import StatCard from '@/Components/Statistics/StatCard';
+import Skeleton from '@/Components/common/ui/Skeleton';
+import { useTheme } from '@/Hooks/useTheme';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { Head, Link, router } from '@inertiajs/react';
+import axios from 'axios';
+import { motion } from 'framer-motion';
 import {
   BarChart3,
   Calendar,
@@ -20,9 +20,9 @@ import {
   TrendingUp,
   Users,
   X,
-} from "lucide-react";
-import { Suspense, lazy, useCallback, useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+} from 'lucide-react';
+import { Suspense, lazy, useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 // Custom hook to fetch publication stats (avoids fetch in useEffect warning)
 const useFetchPublicationStats = (shouldFetch: boolean) => {
@@ -33,7 +33,7 @@ const useFetchPublicationStats = (shouldFetch: boolean) => {
     if (!shouldFetch) return;
 
     axios
-      .get(route("api.v1.publications.stats"))
+      .get(route('api.v1.publications.stats'))
       .then((res) => setData(res.data || {}))
       .catch((error) => {
         if (error.response?.status !== 401) {
@@ -50,9 +50,9 @@ const useFetchPublicationStats = (shouldFetch: boolean) => {
   return { data, loading, refetch: fetchStats };
 };
 
-const PlatformPerformance = lazy(() => import("@/Components/Analytics/PlatformPerformance"));
-const SocialMediaAccounts = lazy(() => import("@/Components/Analytics/SocialMediaAccounts"));
-const EngagementChart = lazy(() => import("@/Components/Statistics/EngagementChart"));
+const PlatformPerformance = lazy(() => import('@/Components/Analytics/PlatformPerformance'));
+const SocialMediaAccounts = lazy(() => import('@/Components/Analytics/SocialMediaAccounts'));
+const EngagementChart = lazy(() => import('@/Components/Statistics/EngagementChart'));
 
 interface DashboardProps {
   auth: {
@@ -89,17 +89,17 @@ export default function Dashboard({ auth, stats, status, period = 30 }: Dashboar
   } = useFetchPublicationStats(shouldFetch);
   const pubStats = stats.publicationStats || fetchedStats;
   const [sending, setSending] = useState(false);
-  const [successMessage, setSuccessMessage] = useState(status === "verification-link-sent");
+  const [successMessage, setSuccessMessage] = useState(status === 'verification-link-sent');
 
   useEffect(() => {
     if (!auth?.user?.id) return;
 
     const channel = window.Echo.private(`users.${auth.user.id}`);
 
-    channel.listen(".PublicationStatusUpdated", refetchStats);
+    channel.listen('.PublicationStatusUpdated', refetchStats);
 
     return () => {
-      channel.stopListening(".PublicationStatusUpdated");
+      channel.stopListening('.PublicationStatusUpdated');
     };
   }, [auth?.user?.id, refetchStats]);
 
@@ -110,12 +110,12 @@ export default function Dashboard({ auth, stats, status, period = 30 }: Dashboar
 
   const handlePeriodChange = (days: number) => {
     router.get(
-      route("dashboard"),
+      route('dashboard'),
       { days },
       {
         preserveState: true,
         preserveScroll: true,
-        only: ["stats", "period"],
+        only: ['stats', 'period'],
       },
     );
   };
@@ -123,7 +123,7 @@ export default function Dashboard({ auth, stats, status, period = 30 }: Dashboar
   const handleResendVerification = () => {
     setSending(true);
     axios
-      .post(route("verification.send"))
+      .post(route('verification.send'))
       .then(() => {
         setSuccessMessage(true);
         setSending(false);
@@ -138,7 +138,7 @@ export default function Dashboard({ auth, stats, status, period = 30 }: Dashboar
 
   return (
     <AuthenticatedLayout>
-      <Head title={t("dashboard.title")} />
+      <Head title={t('dashboard.title')} />
 
       <div
         id="dashboard"
@@ -148,14 +148,14 @@ export default function Dashboard({ auth, stats, status, period = 30 }: Dashboar
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          data-theme-color={auth.user?.theme_color || "orange"}
+          data-theme-color={auth.user?.theme_color || 'orange'}
           className="mb-8 flex flex-col items-center justify-between gap-6 rounded-lg border border-white/70 bg-gradient-to-r from-white/90 to-white/95 p-8 shadow-sm transition-colors duration-300 dark:border-neutral-700 dark:bg-gradient-to-r dark:from-neutral-800 dark:to-neutral-900 md:flex-row"
         >
           <div>
             <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">
-              {t("dashboard.welcomeMessage", { name: auth.user.name })}
+              {t('dashboard.welcomeMessage', { name: auth.user.name })}
             </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-400">{t("dashboard.systemStats")}</p>
+            <p className="text-lg text-gray-600 dark:text-gray-400">{t('dashboard.systemStats')}</p>
           </div>
 
           <div className="flex rounded-lg bg-neutral-100 p-1 dark:bg-neutral-800">
@@ -165,11 +165,11 @@ export default function Dashboard({ auth, stats, status, period = 30 }: Dashboar
                 onClick={() => handlePeriodChange(days)}
                 className={`rounded-md px-4 py-2 text-sm font-medium transition-all ${
                   period === days
-                    ? "bg-white text-gray-900 shadow-sm dark:bg-neutral-900 dark:text-white"
-                    : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                    ? 'bg-white text-gray-900 shadow-sm dark:bg-neutral-900 dark:text-white'
+                    : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
                 }`}
               >
-                {days} {t("common.units.days", "Days")}
+                {days} {t('common.units.days', 'Days')}
               </button>
             ))}
           </div>
@@ -182,7 +182,7 @@ export default function Dashboard({ auth, stats, status, period = 30 }: Dashboar
             transition={{ duration: 0.5, delay: 0.2 }}
             className="mb-8 rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-colors duration-300 dark:border-neutral-700 dark:bg-gradient-to-r dark:from-neutral-800 dark:to-neutral-900"
           >
-            {" "}
+            {' '}
             <div className="flex items-start justify-between">
               <div className="flex flex-1 items-start gap-4">
                 <div className="flex-shrink-0">
@@ -192,15 +192,15 @@ export default function Dashboard({ auth, stats, status, period = 30 }: Dashboar
                 </div>
                 <div className="flex-1">
                   <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-white">
-                    {t("auth.verification.banner.title")}
+                    {t('auth.verification.banner.title')}
                   </h3>
                   <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-                    {t("auth.verification.banner.message")}
+                    {t('auth.verification.banner.message')}
                   </p>
                   {successMessage && (
                     <div className="mb-3 rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-800/30 dark:bg-green-900/20">
                       <p className="text-sm font-medium text-green-800 dark:text-green-300">
-                        ✓ {t("auth.verification.banner.successMessage")}
+                        ✓ {t('auth.verification.banner.successMessage')}
                       </p>
                     </div>
                   )}
@@ -210,8 +210,8 @@ export default function Dashboard({ auth, stats, status, period = 30 }: Dashboar
                     className="group relative transform overflow-hidden rounded-lg bg-gradient-to-r from-purple-600 to-purple-700 p-2 font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl disabled:transform-none disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {sending
-                      ? t("auth.verification.banner.sending")
-                      : t("auth.verification.banner.resendButton")}
+                      ? t('auth.verification.banner.sending')
+                      : t('auth.verification.banner.resendButton')}
                   </button>
                 </div>
               </div>
@@ -228,25 +228,25 @@ export default function Dashboard({ auth, stats, status, period = 30 }: Dashboar
         <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {[
             {
-              title: t("dashboard.totalViews"),
+              title: t('dashboard.totalViews'),
               value: stats.totalViews,
               icon: <Eye className="h-6 w-6" />,
               variant: 1 as const,
             },
             {
-              title: t("dashboard.totalClicks"),
+              title: t('dashboard.totalClicks'),
               value: stats.totalClicks,
               icon: <MousePointer2 className="h-6 w-6" />,
               variant: 2 as const,
             },
             {
-              title: t("dashboard.conversions"),
+              title: t('dashboard.conversions'),
               value: stats.totalConversions,
               icon: <TrendingUp className="h-6 w-6" />,
               variant: 3 as const,
             },
             {
-              title: t("dashboard.totalReach"),
+              title: t('dashboard.totalReach'),
               value: stats.totalReach,
               icon: <Users className="h-6 w-6" />,
               variant: 4 as const,
@@ -273,18 +273,18 @@ export default function Dashboard({ auth, stats, status, period = 30 }: Dashboar
         <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
           {[
             {
-              title: t("dashboard.totalEngagement"),
+              title: t('dashboard.totalEngagement'),
               value: stats.totalEngagement,
               icon: <Heart className="h-6 w-6" />,
               variant: 1 as const,
               format: undefined,
             },
             {
-              title: t("dashboard.avgEngagementRate"),
+              title: t('dashboard.avgEngagementRate'),
               value: stats.avgEngagementRate.toFixed(2),
               icon: <TrendingUp className="h-6 w-6" />,
               variant: 2 as const,
-              format: "percentage" as const,
+              format: 'percentage' as const,
             },
           ].map((stat, index) => (
             <motion.div
@@ -309,47 +309,47 @@ export default function Dashboard({ auth, stats, status, period = 30 }: Dashboar
         <div className="mb-8 grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-4 lg:grid-cols-7">
           {[
             {
-              key: "draft",
-              color: "gray",
+              key: 'draft',
+              color: 'gray',
               icon: FileText,
             },
             {
-              key: "pending_review",
-              color: "primary",
+              key: 'pending_review',
+              color: 'primary',
               icon: Eye,
             },
             {
-              key: "approved",
-              color: "purple",
+              key: 'approved',
+              color: 'purple',
               icon: Sparkles,
             },
             {
-              key: "scheduled",
-              color: "sky",
+              key: 'scheduled',
+              color: 'sky',
               icon: Calendar,
             },
             {
-              key: "publishing",
-              color: "blue",
+              key: 'publishing',
+              color: 'blue',
               icon: TrendingUp,
             },
             {
-              key: "published",
-              color: "green",
+              key: 'published',
+              color: 'green',
               icon: Target,
             },
-            { key: "failed", color: "red", icon: X },
+            { key: 'failed', color: 'red', icon: X },
           ].map((status) => (
             <div
               key={status.key}
               className="flex flex-col items-center rounded-lg border border-gray-100 bg-white p-3 text-center shadow-sm transition-all dark:border-neutral-700 dark:bg-neutral-800/50 sm:p-4"
             >
               <div
-                className={`mb-1.5 rounded-full p-1.5 sm:mb-2 sm:p-2 bg-${status.color === "sky" ? "sky" : status.color}-50 dark:bg-${status.color === "sky" ? "sky" : status.color}-900/20`}
+                className={`mb-1.5 rounded-full p-1.5 sm:mb-2 sm:p-2 bg-${status.color === 'sky' ? 'sky' : status.color}-50 dark:bg-${status.color === 'sky' ? 'sky' : status.color}-900/20`}
               >
                 <status.icon
                   className={`h-3 w-3 sm:h-4 sm:w-4 text-${
-                    status.color === "sky" ? "sky" : status.color
+                    status.color === 'sky' ? 'sky' : status.color
                   }-500`}
                 />
               </div>
@@ -357,7 +357,7 @@ export default function Dashboard({ auth, stats, status, period = 30 }: Dashboar
                 {t(`publications.status.${status.key}`)}
               </p>
               <p className="text-lg font-bold text-gray-900 dark:text-white sm:text-xl">
-                {loadingPubStats ? "..." : pubStats[status.key] || 0}
+                {loadingPubStats ? '...' : pubStats[status.key] || 0}
               </p>
             </div>
           ))}
@@ -375,7 +375,7 @@ export default function Dashboard({ auth, stats, status, period = 30 }: Dashboar
                 <div className="rounded-lg bg-primary-100 p-2 dark:bg-primary-900/20">
                   <TrendingUp className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                 </div>
-                {t("dashboard.engagementTrends")}
+                {t('dashboard.engagementTrends')}
               </h2>
               <Suspense fallback={<Skeleton className="h-[400px] w-full rounded-lg" />}>
                 <EngagementChart data={stats.engagementTrends} theme={theme as any} />
@@ -407,25 +407,25 @@ export default function Dashboard({ auth, stats, status, period = 30 }: Dashboar
         <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-3">
           {[
             {
-              href: "/content?tab=campaigns",
+              href: '/content?tab=campaigns',
               icon: Calendar,
-              title: t("dashboard.quickActions.campaigns.title"),
-              desc: t("dashboard.quickActions.campaigns.description"),
-              color: "blue",
+              title: t('dashboard.quickActions.campaigns.title'),
+              desc: t('dashboard.quickActions.campaigns.description'),
+              color: 'blue',
             },
             {
-              href: "/analytics",
+              href: '/analytics',
               icon: BarChart3,
-              title: t("dashboard.quickActions.analytics.title"),
-              desc: t("dashboard.quickActions.analytics.description"),
-              color: "purple",
+              title: t('dashboard.quickActions.analytics.title'),
+              desc: t('dashboard.quickActions.analytics.description'),
+              color: 'purple',
             },
             {
-              href: "/content",
+              href: '/content',
               icon: FileText,
-              title: t("dashboard.quickActions.content.title"),
-              desc: t("dashboard.quickActions.content.description"),
-              color: "green",
+              title: t('dashboard.quickActions.content.title'),
+              desc: t('dashboard.quickActions.content.description'),
+              color: 'green',
             },
           ].map((action) => (
             <Link

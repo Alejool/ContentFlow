@@ -1,6 +1,6 @@
-import { Avatar } from "@/Components/common/Avatar";
-import { Scissors, Share2, ThumbsDown, ThumbsUp } from "lucide-react";
-import { memo } from "react";
+import { Avatar } from '@/Components/common/Avatar';
+import { Scissors, Share2, ThumbsDown, ThumbsUp } from 'lucide-react';
+import { memo } from 'react';
 
 interface YouTubePreviewProps {
   content: string;
@@ -15,8 +15,8 @@ interface YouTubePreviewProps {
 
 export const YouTubePreview = memo(
   ({ content, mediaUrls, user, title, publishedAt }: YouTubePreviewProps) => {
-    const videoUrl = mediaUrls.find((url) => url.includes("video") || url.includes(".mp4"));
-    const imageUrl = mediaUrls.find((url) => !url.includes("video") && !url.includes(".mp4"));
+    const videoUrl = mediaUrls.find((url) => url.includes('video') || url.includes('.mp4'));
+    const imageUrl = mediaUrls.find((url) => !url.includes('video') && !url.includes('.mp4'));
 
     return (
       <div className="w-full max-w-[640px] overflow-hidden rounded-lg border border-gray-200 bg-white text-gray-900 shadow-sm dark:border-neutral-800 dark:bg-[#0f0f0f] dark:text-white">
@@ -51,15 +51,15 @@ export const YouTubePreview = memo(
         {/* Info Area */}
         <div className="space-y-3 p-4">
           <h1 className="line-clamp-2 text-lg font-bold leading-tight">
-            {title || "Your YouTube video title will appear here..."}
+            {title || 'Your YouTube video title will appear here...'}
           </h1>
 
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             {/* Channel Info */}
             <div className="flex items-center gap-3">
-              <Avatar src={user?.avatar} name={user?.name || "User"} size="md" />
+              <Avatar src={user?.avatar} name={user?.name || 'User'} size="md" />
               <div className="flex flex-col">
-                <span className="text-[15px] font-bold">{user?.name || "ContentFlow User"}</span>
+                <span className="text-[15px] font-bold">{user?.name || 'ContentFlow User'}</span>
                 <span className="text-xs text-gray-500 dark:text-neutral-400">0 subscribers</span>
               </div>
               <button
@@ -104,17 +104,17 @@ export const YouTubePreview = memo(
           {/* Description Box */}
           <div className="cursor-pointer rounded-lg bg-gray-100 p-3 text-[13px] transition-colors hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700">
             <div className="mb-1 font-bold">
-              0 views{" "}
+              0 views{' '}
               {publishedAt
-                ? new Date(publishedAt).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
+                ? new Date(publishedAt).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
                   })
-                : "Not published yet"}
+                : 'Not published yet'}
             </div>
             <div className="line-clamp-3 whitespace-pre-wrap">
-              {content || "Your video description will appear here..."}
+              {content || 'Your video description will appear here...'}
             </div>
             <button type="button" className="mt-2 font-bold text-gray-900 dark:text-white">
               Show more

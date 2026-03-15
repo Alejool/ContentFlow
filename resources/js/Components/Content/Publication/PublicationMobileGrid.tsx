@@ -1,13 +1,13 @@
-import Button from "@/Components/common/Modern/Button";
-import SimpleContentTypeBadge from "@/Components/Content/common/SimpleContentTypeBadge";
-import PublicationThumbnail from "@/Components/Content/Publication/PublicationThumbnail";
-import SocialAccountsDisplay from "@/Components/Content/Publication/SocialAccountsDisplay";
-import { Publication } from "@/types/Publication";
-import { usePage } from "@inertiajs/react";
-import axios from "axios";
-import { Clock, Copy, Edit, Eye, Folder, Image, Rocket, Send, Trash2, Video } from "lucide-react";
-import { memo, useState } from "react";
-import toast from "react-hot-toast";
+import Button from '@/Components/common/Modern/Button';
+import SimpleContentTypeBadge from '@/Components/Content/common/SimpleContentTypeBadge';
+import PublicationThumbnail from '@/Components/Content/Publication/PublicationThumbnail';
+import SocialAccountsDisplay from '@/Components/Content/Publication/SocialAccountsDisplay';
+import { Publication } from '@/types/Publication';
+import { usePage } from '@inertiajs/react';
+import axios from 'axios';
+import { Clock, Copy, Edit, Eye, Folder, Image, Rocket, Send, Trash2, Video } from 'lucide-react';
+import { memo, useState } from 'react';
+import toast from 'react-hot-toast';
 
 interface PublicationMobileGridProps {
   items: Publication[];
@@ -48,13 +48,13 @@ const PublicationMobileGrid = memo(
     );
 
     // Verificar permisos usando la misma lógica que ContentCard
-    const canManageContent = permissions?.includes("publish");
+    const canManageContent = permissions?.includes('publish');
 
     // Verificar si hay workflow habilitado
     const hasWorkflow = currentWorkspace?.approval_workflow?.is_enabled === true;
 
     // Verificar si el usuario es Owner (puede saltarse el workflow)
-    const isOwner = currentWorkspace?.user_role_slug === "owner";
+    const isOwner = currentWorkspace?.user_role_slug === 'owner';
 
     // Función para enviar a revisión
     const handleSubmitForApproval = async (item: Publication, e: React.MouseEvent) => {
@@ -68,8 +68,8 @@ const PublicationMobileGrid = memo(
         // Update stores with fresh data
         const publication = response.data?.data?.content || response.data?.data?.publication;
         if (publication) {
-          const publicationStoreModule = await import("@/stores/publicationStore");
-          const manageContentUIStoreModule = await import("@/stores/manageContentUIStore");
+          const publicationStoreModule = await import('@/stores/publicationStore');
+          const manageContentUIStoreModule = await import('@/stores/manageContentUIStore');
 
           // CRITICAL: Update immediately with new status
           publicationStoreModule.usePublicationStore.getState().updatePublication(item.id, {
@@ -98,13 +98,13 @@ const PublicationMobileGrid = memo(
           }
         }
 
-        toast.success("Enviado a revisión exitosamente");
+        toast.success('Enviado a revisión exitosamente');
 
         // Recargar la página para actualizar el estado
         window.location.reload();
       } catch (error: any) {
-        console.error("Error submitting for approval:", error);
-        toast.error(error.response?.data?.message || "Error al enviar a revisión");
+        console.error('Error submitting for approval:', error);
+        toast.error(error.response?.data?.message || 'Error al enviar a revisión');
       } finally {
         setIsSubmittingForApproval((prev) => ({ ...prev, [item.id]: false }));
       }
@@ -118,8 +118,8 @@ const PublicationMobileGrid = memo(
       let videos = 0;
       pub.media_files.forEach((f) => {
         if (!f || !f.file_type) return;
-        if (f.file_type.includes("image")) images++;
-        else if (f.file_type.includes("video")) videos++;
+        if (f.file_type.includes('image')) images++;
+        else if (f.file_type.includes('video')) videos++;
       });
       return { images, videos, total: pub.media_files.length };
     };
@@ -153,7 +153,7 @@ const PublicationMobileGrid = memo(
                       <span
                         className={`inline-flex items-center rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase tracking-tight ${getStatusColor(item.status)}`}
                       >
-                        {item.status || "Draft"}
+                        {item.status || 'Draft'}
                       </span>
                       {mediaCount.total > 0 && (
                         <div className="flex items-center gap-1.5 opacity-60">
@@ -164,12 +164,12 @@ const PublicationMobileGrid = memo(
                     </div>
                     <h3
                       className="truncate text-lg font-bold leading-snug text-gray-900 dark:text-white"
-                      title={item.title || t("publications.table.untitled")}
+                      title={item.title || t('publications.table.untitled')}
                     >
-                      {item.title || t("publications.table.untitled")}
+                      {item.title || t('publications.table.untitled')}
                     </h3>
                     <p className="mt-1 line-clamp-2 text-[11px] font-medium leading-relaxed text-gray-500 dark:text-gray-400">
-                      {item.description || "Sin descripción"}
+                      {item.description || 'Sin descripción'}
                     </p>
                   </div>
                 </div>
@@ -212,7 +212,7 @@ const PublicationMobileGrid = memo(
                   <>
                     {/* Si es Owner, puede publicar directamente sin workflow */}
                     {isOwner &&
-                    ["draft", "rejected", "approved"].includes(item.status || "draft") ? (
+                    ['draft', 'rejected', 'approved'].includes(item.status || 'draft') ? (
                       <Button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -224,26 +224,26 @@ const PublicationMobileGrid = memo(
                         className="flex-[2]"
                         icon={Rocket}
                       >
-                        {t("publications.button.publish") || "Publicar"}
+                        {t('publications.button.publish') || 'Publicar'}
                       </Button>
                     ) : hasWorkflow &&
                       !isOwner &&
-                      ["draft", "rejected"].includes(item.status || "draft") ? (
+                      ['draft', 'rejected'].includes(item.status || 'draft') ? (
                       /* Si hay workflow y NO es Owner, mostrar "Enviar a Revisión" */
                       <Button
                         onClick={(e) => handleSubmitForApproval(item, e)}
                         disabled={isSubmitting}
                         loading={isSubmitting}
-                        loadingText={t("publications.button.submitting") || "Enviando..."}
+                        loadingText={t('publications.button.submitting') || 'Enviando...'}
                         variant="primary"
                         buttonStyle="gradient"
                         size="sm"
                         className="flex-[2]"
                         icon={Send}
                       >
-                        {t("publications.button.submitForReview") || "Enviar a Revisión"}
+                        {t('publications.button.submitForReview') || 'Enviar a Revisión'}
                       </Button>
-                    ) : hasWorkflow && item.status === "pending_review" ? (
+                    ) : hasWorkflow && item.status === 'pending_review' ? (
                       /* Si está en revisión, mostrar botón disabled */
                       <Button
                         disabled
@@ -253,9 +253,9 @@ const PublicationMobileGrid = memo(
                         className="flex-[2]"
                         icon={Clock}
                       >
-                        {t("publications.status.pending_review") || "En Revisión"}
+                        {t('publications.status.pending_review') || 'En Revisión'}
                       </Button>
-                    ) : hasWorkflow && item.status === "approved" ? (
+                    ) : hasWorkflow && item.status === 'approved' ? (
                       /* Si está aprobado, mostrar botón de publicar */
                       <Button
                         onClick={(e) => {
@@ -268,7 +268,7 @@ const PublicationMobileGrid = memo(
                         className="flex-[2]"
                         icon={Rocket}
                       >
-                        {t("publications.button.publish") || "Publicar"}
+                        {t('publications.button.publish') || 'Publicar'}
                       </Button>
                     ) : (
                       /* Sin workflow, botón normal de publicar */
@@ -283,7 +283,7 @@ const PublicationMobileGrid = memo(
                         className="flex-[2]"
                         icon={Rocket}
                       >
-                        {t("publications.button.publish") || "Publicar"}
+                        {t('publications.button.publish') || 'Publicar'}
                       </Button>
                     )}
 

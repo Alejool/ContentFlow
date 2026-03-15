@@ -1,6 +1,6 @@
-import { ContentType } from "@/Constants/contentTypes";
-import { Publication } from "@/types/Publication";
-import { useCallback, useRef, useState } from "react";
+import { ContentType } from '@/Constants/contentTypes';
+import { Publication } from '@/types/Publication';
+import { useCallback, useRef, useState } from 'react';
 
 interface TypeSpecificState {
   selectedPlatforms: number[];
@@ -117,56 +117,56 @@ export const usePublicationTypeState = (): UsePublicationTypeStateReturn => {
       typeState: TypeSpecificState,
     ): { valid: boolean; errors: string[] } => {
       const errors: string[] = [];
-      const type = publication.content_type || "post";
+      const type = publication.content_type || 'post';
 
       // Validaciones por tipo
       switch (type) {
-        case "poll":
+        case 'poll':
           if (!publication.poll_options || publication.poll_options.length < 2) {
-            errors.push("Poll must have at least 2 options");
+            errors.push('Poll must have at least 2 options');
           }
           if (!publication.poll_duration_hours || publication.poll_duration_hours < 1) {
-            errors.push("Poll duration must be at least 1 hour");
+            errors.push('Poll duration must be at least 1 hour');
           }
           // Polls no requieren media
           break;
 
-        case "story":
+        case 'story':
           if (!publication.media_files || publication.media_files.length === 0) {
-            errors.push("Story requires at least 1 media file");
+            errors.push('Story requires at least 1 media file');
           }
           if (publication.media_files && publication.media_files.length > 1) {
-            errors.push("Story can only have 1 media file");
+            errors.push('Story can only have 1 media file');
           }
           break;
 
-        case "reel":
+        case 'reel':
           if (!publication.media_files || publication.media_files.length === 0) {
-            errors.push("Reel requires 1 video file");
+            errors.push('Reel requires 1 video file');
           }
-          const videoFiles = publication.media_files?.filter((m) => m.file_type === "video") || [];
+          const videoFiles = publication.media_files?.filter((m) => m.file_type === 'video') || [];
           if (videoFiles.length !== 1) {
-            errors.push("Reel must have exactly 1 video file");
+            errors.push('Reel must have exactly 1 video file');
           }
           break;
 
-        case "carousel":
+        case 'carousel':
           if (!publication.media_files || publication.media_files.length < 2) {
-            errors.push("Carousel requires at least 2 media files");
+            errors.push('Carousel requires at least 2 media files');
           }
           if (publication.media_files && publication.media_files.length > 10) {
-            errors.push("Carousel can have maximum 10 media files");
+            errors.push('Carousel can have maximum 10 media files');
           }
           break;
 
-        case "post":
+        case 'post':
           // Post es flexible, no requiere validaciones específicas
           break;
       }
 
       // Validar que hay plataformas seleccionadas
       if (typeState.selectedPlatforms.length === 0) {
-        errors.push("At least one platform must be selected");
+        errors.push('At least one platform must be selected');
       }
 
       return {

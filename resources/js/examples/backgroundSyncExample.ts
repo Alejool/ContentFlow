@@ -5,8 +5,8 @@
  * to queue operations for background synchronization.
  */
 
-import { backgroundSyncManager } from "../sw/syncManager";
-import type { SyncOperation } from "../types/optimistic";
+import { backgroundSyncManager } from '../sw/syncManager';
+import type { SyncOperation } from '../types/optimistic';
 
 /**
  * Example 1: Register a simple sync operation
@@ -17,15 +17,15 @@ import type { SyncOperation } from "../types/optimistic";
 export async function registerSimpleSyncOperation() {
   const operation: SyncOperation = {
     id: `sync-${Date.now()}-${Math.random()}`,
-    url: "/api/publications",
-    method: "POST",
+    url: '/api/publications',
+    method: 'POST',
     body: {
-      title: "New Publication",
-      content: "This was created offline",
+      title: 'New Publication',
+      content: 'This was created offline',
     },
     headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
     },
     timestamp: Date.now(),
     retryCount: 0,
@@ -46,28 +46,28 @@ export async function registerMultipleOperations() {
   const operations: SyncOperation[] = [
     {
       id: `sync-1-${Date.now()}`,
-      url: "/api/publications",
-      method: "POST",
-      body: { title: "First Publication" },
-      headers: { "Content-Type": "application/json" },
+      url: '/api/publications',
+      method: 'POST',
+      body: { title: 'First Publication' },
+      headers: { 'Content-Type': 'application/json' },
       timestamp: Date.now(),
       retryCount: 0,
     },
     {
       id: `sync-2-${Date.now()}`,
-      url: "/api/publications",
-      method: "POST",
-      body: { title: "Second Publication" },
-      headers: { "Content-Type": "application/json" },
+      url: '/api/publications',
+      method: 'POST',
+      body: { title: 'Second Publication' },
+      headers: { 'Content-Type': 'application/json' },
       timestamp: Date.now() + 1,
       retryCount: 0,
     },
     {
       id: `sync-3-${Date.now()}`,
-      url: "/api/publications",
-      method: "POST",
-      body: { title: "Third Publication" },
-      headers: { "Content-Type": "application/json" },
+      url: '/api/publications',
+      method: 'POST',
+      body: { title: 'Third Publication' },
+      headers: { 'Content-Type': 'application/json' },
       timestamp: Date.now() + 2,
       retryCount: 0,
     },
@@ -112,14 +112,14 @@ export async function retryFailedOperations() {
  * about failed sync operations.
  */
 export function listenForSyncFailures() {
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.addEventListener("message", (event) => {
-      if (event.data && event.data.type === "SYNC_OPERATION_FAILED") {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', (event) => {
+      if (event.data && event.data.type === 'SYNC_OPERATION_FAILED') {
         const { operation, error } = event.data;
 
         // Show user notification
         showNotification(
-          "Sync Failed",
+          'Sync Failed',
           `Operation ${operation.id} failed after 3 retries: ${error.message}`,
         );
       }
@@ -142,10 +142,10 @@ export async function clearAllOperations() {
  * Helper function to show notifications
  */
 function showNotification(title: string, message: string) {
-  if ("Notification" in window && Notification.permission === "granted") {
+  if ('Notification' in window && Notification.permission === 'granted') {
     new Notification(title, {
       body: message,
-      icon: "/icons/icon-192x192.png",
+      icon: '/icons/icon-192x192.png',
     });
   } else {
     // Fallback to console or UI notification
@@ -160,12 +160,12 @@ function showNotification(title: string, message: string) {
 export async function createPublicationWithSync(publicationData: any) {
   const operation: SyncOperation = {
     id: `publication-${Date.now()}-${Math.random()}`,
-    url: "/api/publications",
-    method: "POST",
+    url: '/api/publications',
+    method: 'POST',
     body: publicationData,
     headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
     },
     timestamp: Date.now(),
     retryCount: 0,

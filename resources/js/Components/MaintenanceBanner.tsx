@@ -1,5 +1,5 @@
-import { AlertTriangle, X } from "lucide-react";
-import { useState } from "react";
+import { AlertTriangle, X } from 'lucide-react';
+import { useState } from 'react';
 
 interface Props {
   message?: string;
@@ -16,7 +16,7 @@ export default function MaintenanceBanner({ message }: Props) {
         <div className="flex items-center gap-3">
           <AlertTriangle className="h-5 w-5 flex-shrink-0" />
           <p className="font-semibold">
-            {message || "Modo Mantenimiento Activo - Solo super admins pueden acceder"}
+            {message || 'Modo Mantenimiento Activo - Solo super admins pueden acceder'}
           </p>
         </div>
         <button

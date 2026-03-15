@@ -1,10 +1,10 @@
-import axios from "axios";
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import axios from 'axios';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 export interface NotificationData {
   id: string;
   type: string;
-  category: "application" | "system";
+  category: 'application' | 'system';
   data: {
     message?: string;
     description?: string;
@@ -49,7 +49,7 @@ export const NotificationProvider = ({
 
   const fetchNotifications = useCallback(async () => {
     try {
-      const response = await axios.get("/api/v1/notifications");
+      const response = await axios.get('/api/v1/notifications');
       const sortedNotifications = response.data.notifications.sort(
         (a: NotificationData, b: NotificationData) => {
           // Sort by read status (unread first)
@@ -78,7 +78,7 @@ export const NotificationProvider = ({
 
   const markAllAsRead = async () => {
     try {
-      await axios.post("/api/v1/notifications/read-all");
+      await axios.post('/api/v1/notifications/read-all');
       setNotifications((prev) => prev.map((n) => ({ ...n, read_at: new Date().toISOString() })));
       setUnreadCount(0);
     } catch (error) {}
@@ -97,7 +97,7 @@ export const NotificationProvider = ({
 
   const deleteAllRead = async () => {
     try {
-      await axios.delete("/api/v1/notifications/read");
+      await axios.delete('/api/v1/notifications/read');
       setNotifications((prev) => prev.filter((n) => !n.read_at));
     } catch (error) {}
   };
@@ -126,24 +126,24 @@ export const NotificationProvider = ({
     if (user?.id && (window as any).Echo) {
       const channel = (window as any).Echo.private(`users.${user.id}`);
 
-      channel.listen(".NotificationCreated", (e: any) => {
+      channel.listen('.NotificationCreated', (e: any) => {
         fetchNotifications();
       });
 
       return () => {
         if ((window as any).Echo) {
-          channel.stopListening(".NotificationCreated");
+          channel.stopListening('.NotificationCreated');
         }
       };
     }
   }, [user, fetchNotifications]);
 
   const applicationNotifications = notifications.filter(
-    (n) => n.category === "application" || n.data.category === "application",
+    (n) => n.category === 'application' || n.data.category === 'application',
   );
 
   const systemNotifications = notifications.filter(
-    (n) => (n.category === "system" || !n.category) && n.data.category !== "application",
+    (n) => (n.category === 'system' || !n.category) && n.data.category !== 'application',
   );
 
   return (
@@ -173,7 +173,7 @@ export const NotificationProvider = ({
 export const useNotificationContext = () => {
   const context = useContext(NotificationContext);
   if (!context) {
-    throw new Error("useNotificationContext must be used within a NotificationProvider");
+    throw new Error('useNotificationContext must be used within a NotificationProvider');
   }
   return context;
 };

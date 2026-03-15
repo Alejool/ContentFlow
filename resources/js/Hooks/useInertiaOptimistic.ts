@@ -1,8 +1,8 @@
-import { usePage } from "@inertiajs/react";
-import { useMemo } from "react";
-import type { OptimisticOptions } from "../types/optimistic";
-import { getInertiaPageComponent, isInertiaPage } from "../utils/inertiaOptimisticSync";
-import { useOptimistic } from "./useOptimistic";
+import { usePage } from '@inertiajs/react';
+import { useMemo } from 'react';
+import type { OptimisticOptions } from '../types/optimistic';
+import { getInertiaPageComponent, isInertiaPage } from '../utils/inertiaOptimisticSync';
+import { useOptimistic } from './useOptimistic';
 
 /**
  * useInertiaOptimistic Hook - Inertia.js aware optimistic updates
@@ -76,7 +76,7 @@ export function useInertiaOptimistic(options: OptimisticOptions) {
 
   // Log Inertia context in development mode
   if (import.meta.env.DEV && isInertia) {
-    console.log("[useInertiaOptimistic] Inertia context:", {
+    console.log('[useInertiaOptimistic] Inertia context:', {
       pageComponent,
       hasResourceProps,
       resource: options.resource,
@@ -107,15 +107,15 @@ export function useShouldUseOptimistic(resource: string): boolean {
 
   // Pages where optimistic updates are beneficial
   const optimisticPages = [
-    "Content/Partials/ContentPage",
-    "Content/Publication",
-    "Content/Campaign",
-    "Reels/Index",
-    "Calendar/Index",
+    'Content/Partials/ContentPage',
+    'Content/Publication',
+    'Content/Campaign',
+    'Reels/Index',
+    'Calendar/Index',
   ];
 
   // Resources that benefit from optimistic updates
-  const optimisticResources = ["publications", "campaigns", "reels", "calendar", "social-accounts"];
+  const optimisticResources = ['publications', 'campaigns', 'reels', 'calendar', 'social-accounts'];
 
   // Check if current page is in the optimistic pages list
   const isOptimisticPage = pageComponent

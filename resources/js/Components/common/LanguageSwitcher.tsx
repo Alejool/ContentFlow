@@ -1,6 +1,6 @@
-import { useLocalization } from "@/Hooks/useLocalization";
-import { Globe } from "lucide-react";
-import { useState } from "react";
+import { useLocalization } from '@/Hooks/useLocalization';
+import { Globe } from 'lucide-react';
+import { useState } from 'react';
 
 interface Language {
   code: string;
@@ -9,8 +9,8 @@ interface Language {
 }
 
 const languages: Language[] = [
-  { code: "es", name: "Español", flag: "🇪🇸" },
-  { code: "en", name: "English", flag: "🇺🇸" },
+  { code: 'es', name: 'Español', flag: '🇪🇸' },
+  { code: 'en', name: 'English', flag: '🇺🇸' },
 ];
 
 export const LanguageSwitcher = () => {
@@ -47,8 +47,8 @@ export const LanguageSwitcher = () => {
                 onClick={() => handleLanguageChange(lang.code)}
                 className={`flex w-full items-center gap-3 px-4 py-3 text-left transition-colors first:rounded-t-lg last:rounded-b-lg hover:bg-gray-50 dark:hover:bg-gray-700 ${
                   currentLanguage === lang.code
-                    ? "bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400"
-                    : ""
+                    ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400'
+                    : ''
                 }`}
               >
                 <span className="text-2xl">{lang.flag}</span>

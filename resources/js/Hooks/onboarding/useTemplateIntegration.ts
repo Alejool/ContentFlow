@@ -1,11 +1,11 @@
-import { useCallback } from "react";
-import { router } from "@inertiajs/react";
-import type { PublicationTemplate } from "@/types/onboarding";
-import { useOnboardingStore } from "@/stores/onboardingStore";
+import { useCallback } from 'react';
+import { router } from '@inertiajs/react';
+import type { PublicationTemplate } from '@/types/onboarding';
+import { useOnboardingStore } from '@/stores/onboardingStore';
 import {
   storeTemplateInSession,
   applyTemplateToForm as applyTemplateToFormUtil,
-} from "@/Utils/templateUtils";
+} from '@/Utils/templateUtils';
 
 /**
  * Hook for integrating publication templates with the publication editor.
@@ -34,7 +34,7 @@ export function useTemplateIntegration() {
         selectTemplate(template.id).catch((err) => {});
 
         // Navigate to content page immediately
-        router.visit("/content", {
+        router.visit('/content', {
           preserveState: false,
           onSuccess: () => {
             onSuccess?.();

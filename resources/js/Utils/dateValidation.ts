@@ -1,4 +1,4 @@
-import { isValid, isPast, isFuture, parseISO, isDate } from "date-fns";
+import { isValid, isPast, isFuture, parseISO, isDate } from 'date-fns';
 
 export interface DateValidationResult {
   isValid: boolean;
@@ -18,21 +18,21 @@ export function validateDate(date: string | Date | null | undefined): DateValida
     return {
       isValid: false,
       isPastDate: false,
-      error: "Date is required",
+      error: 'Date is required',
     };
   }
 
   let dateObj: Date;
 
   // Parse string to Date if needed
-  if (typeof date === "string") {
+  if (typeof date === 'string') {
     try {
       dateObj = parseISO(date);
     } catch (error) {
       return {
         isValid: false,
         isPastDate: false,
-        error: "Invalid date format. Please use a valid date.",
+        error: 'Invalid date format. Please use a valid date.',
       };
     }
   } else if (isDate(date)) {
@@ -41,7 +41,7 @@ export function validateDate(date: string | Date | null | undefined): DateValida
     return {
       isValid: false,
       isPastDate: false,
-      error: "Invalid date type",
+      error: 'Invalid date type',
     };
   }
 
@@ -50,7 +50,7 @@ export function validateDate(date: string | Date | null | undefined): DateValida
     return {
       isValid: false,
       isPastDate: false,
-      error: "Invalid date. Please enter a valid date.",
+      error: 'Invalid date. Please enter a valid date.',
     };
   }
 
@@ -62,7 +62,7 @@ export function validateDate(date: string | Date | null | undefined): DateValida
     return {
       isValid: false,
       isPastDate: true,
-      error: "Cannot schedule for a past date. Please select a future date.",
+      error: 'Cannot schedule for a past date. Please select a future date.',
     };
   }
 
@@ -99,15 +99,15 @@ export function validateDateRange(
   }
 
   // Parse dates for comparison
-  const start = typeof startDate === "string" ? parseISO(startDate) : (startDate as Date);
-  const end = typeof endDate === "string" ? parseISO(endDate) : (endDate as Date);
+  const start = typeof startDate === 'string' ? parseISO(startDate) : (startDate as Date);
+  const end = typeof endDate === 'string' ? parseISO(endDate) : (endDate as Date);
 
   // Check if end date is after start date
   if (end <= start) {
     return {
       isValid: false,
       isPastDate: false,
-      error: "End date must be after start date",
+      error: 'End date must be after start date',
     };
   }
 
@@ -124,7 +124,7 @@ export function validateDateRange(
  * @returns true if format is valid
  */
 export function isValidDateFormat(dateString: string): boolean {
-  if (!dateString || typeof dateString !== "string") {
+  if (!dateString || typeof dateString !== 'string') {
     return false;
   }
 
@@ -155,6 +155,6 @@ export function sanitizeDateForServer(date: string | Date | null | undefined): s
     return null;
   }
 
-  const dateObj = typeof date === "string" ? parseISO(date) : (date as Date);
+  const dateObj = typeof date === 'string' ? parseISO(date) : (date as Date);
   return dateObj.toISOString();
 }

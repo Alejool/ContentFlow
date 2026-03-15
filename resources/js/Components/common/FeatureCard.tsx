@@ -1,8 +1,8 @@
-import { Link } from "@inertiajs/react";
-import { ChevronRight } from "lucide-react";
-import { ReactNode } from "react";
+import { Link } from '@inertiajs/react';
+import { ChevronRight } from 'lucide-react';
+import { ReactNode } from 'react';
 
-const CustomIcon = ({ children, className = "" }: { children: ReactNode; className?: string }) => (
+const CustomIcon = ({ children, className = '' }: { children: ReactNode; className?: string }) => (
   <div
     className={`flex items-center justify-center rounded-full bg-gradient-to-br from-primary-50 to-primary-50 p-3 dark:from-primary-900/20 dark:to-primary-900/20 ${className}`}
   >
@@ -25,7 +25,7 @@ export default function FeatureCard({
   title,
   description,
   tags,
-  className = "",
+  className = '',
 }: FeatureCardProps) {
   return (
     <Link

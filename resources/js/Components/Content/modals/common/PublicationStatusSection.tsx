@@ -1,5 +1,5 @@
-import { Check, ChevronDown, ChevronUp, Loader2, X } from "lucide-react";
-import { useState } from "react";
+import { Check, ChevronDown, ChevronUp, Loader2, X } from 'lucide-react';
+import { useState } from 'react';
 
 interface SocialAccount {
   id: number;
@@ -57,21 +57,21 @@ export default function PublicationStatusSection({
                 <div>
                   <h3 className="text-base font-bold text-gray-900 dark:text-white">
                     {totalInProgress > 0
-                      ? t("publish.publishingSocial", {
+                      ? t('publish.publishingSocial', {
                           count: totalInProgress,
                         }) || `Publicando en redes (${totalInProgress})...`
-                      : t("publish.allPublished") || "Todas las publicaciones completadas"}
+                      : t('publish.allPublished') || 'Todas las publicaciones completadas'}
                   </h3>
                   <p className="mt-0.5 text-xs text-gray-600 dark:text-gray-400">
                     {totalCompleted > 0 && (
                       <span className="font-medium text-green-600 dark:text-green-400">
-                        {totalCompleted} {t("publish.completed") || "completadas"}
+                        {totalCompleted} {t('publish.completed') || 'completadas'}
                       </span>
                     )}
                     {totalCompleted > 0 && totalInProgress > 0 && <span className="mx-1.5">•</span>}
                     {totalInProgress > 0 && (
                       <span className="font-medium text-blue-600 dark:text-blue-400">
-                        {totalInProgress} {t("publish.inProgress") || "en curso"}
+                        {totalInProgress} {t('publish.inProgress') || 'en curso'}
                       </span>
                     )}
                   </p>
@@ -86,14 +86,14 @@ export default function PublicationStatusSection({
                     className="group flex items-center gap-1.5 rounded-lg bg-red-500 px-3 py-1.5 text-white shadow-sm transition-all hover:bg-red-600 hover:shadow-md"
                   >
                     <X className="h-3.5 w-3.5 transition-transform group-hover:rotate-90" />
-                    <span className="text-xs font-bold">{t("common.cancel") || "Cancelar"}</span>
+                    <span className="text-xs font-bold">{t('common.cancel') || 'Cancelar'}</span>
                   </button>
                 )}
                 <button
                   type="button"
                   onClick={() => setIsExpanded(!isExpanded)}
                   className="rounded-lg p-2 transition-colors hover:bg-white/50 dark:hover:bg-black/20"
-                  aria-label={isExpanded ? "Contraer" : "Expandir"}
+                  aria-label={isExpanded ? 'Contraer' : 'Expandir'}
                 >
                   {isExpanded ? (
                     <ChevronUp className="h-4 w-4 text-gray-700 dark:text-gray-300" />
@@ -116,7 +116,7 @@ export default function PublicationStatusSection({
                   />
                 </div>
                 <p className="mt-1.5 text-right text-xs text-gray-600 dark:text-gray-400">
-                  {totalCompleted} / {totalAccounts} {t("publish.platforms") || "plataformas"}
+                  {totalCompleted} / {totalAccounts} {t('publish.platforms') || 'plataformas'}
                 </p>
               </div>
             )}
@@ -131,7 +131,7 @@ export default function PublicationStatusSection({
               <div className="space-y-2">
                 <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-700 dark:text-gray-300">
                   <div className="h-2 w-2 animate-pulse rounded-full bg-blue-500" />
-                  {t("publish.inProgress") || "En Curso"}
+                  {t('publish.inProgress') || 'En Curso'}
                 </h4>
                 <div className="space-y-2">
                   {publishingAccounts.map((account) => (
@@ -153,7 +153,7 @@ export default function PublicationStatusSection({
                         )}
                       </div>
                       <span className="rounded-full bg-blue-50 px-2 py-1 text-xs font-bold uppercase tracking-tight text-blue-600 dark:bg-blue-900/20 dark:text-blue-400">
-                        {t("publish.sending") || "Enviando"}
+                        {t('publish.sending') || 'Enviando'}
                       </span>
                     </div>
                   ))}
@@ -166,7 +166,7 @@ export default function PublicationStatusSection({
               <div className="space-y-2">
                 <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-700 dark:text-gray-300">
                   <div className="h-2 w-2 rounded-full bg-green-500" />
-                  {t("publish.completed") || "Completadas"}
+                  {t('publish.completed') || 'Completadas'}
                 </h4>
                 <div className="space-y-2">
                   {publishedAccounts.map((account) => (
@@ -188,7 +188,7 @@ export default function PublicationStatusSection({
                         )}
                       </div>
                       <span className="rounded-full bg-green-50 px-2 py-1 text-xs font-bold uppercase tracking-tight text-green-600 dark:bg-green-900/20 dark:text-green-400">
-                        {t("publish.published") || "Publicado"}
+                        {t('publish.published') || 'Publicado'}
                       </span>
                     </div>
                   ))}

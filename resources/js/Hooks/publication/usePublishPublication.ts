@@ -1,11 +1,11 @@
-import { useCampaignStore } from "@/stores/campaignStore";
-import { usePublicationStore } from "@/stores/publicationStore";
-import { useAccountsStore } from "@/stores/socialAccountsStore";
-import { Publication } from "@/types/Publication";
-import { SocialAccount } from "@/types/SocialAccount";
-import axios from "axios";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import toast from "react-hot-toast";
+import { useCampaignStore } from '@/stores/campaignStore';
+import { usePublicationStore } from '@/stores/publicationStore';
+import { useAccountsStore } from '@/stores/socialAccountsStore';
+import { Publication } from '@/types/Publication';
+import { SocialAccount } from '@/types/SocialAccount';
+import axios from 'axios';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import toast from 'react-hot-toast';
 
 /* -------------------------------------------------------------------------- */
 /*                                   TYPES                                    */
@@ -138,10 +138,10 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
       fetchPublishedPlatformsFromStore(currentPublicationId);
     };
 
-    window.addEventListener("publication-started", handlePublicationUpdate);
+    window.addEventListener('publication-started', handlePublicationUpdate);
 
     return () => {
-      window.removeEventListener("publication-started", handlePublicationUpdate);
+      window.removeEventListener('publication-started', handlePublicationUpdate);
     };
   }, [currentPublicationId]);
 
@@ -209,7 +209,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     try {
       const thumbnails: Record<number, { url: string; id: number }> = {};
 
-      const videoFiles = publication.media_files.filter((m) => m.file_type?.includes("video"));
+      const videoFiles = publication.media_files.filter((m) => m.file_type?.includes('video'));
 
       for (const video of videoFiles) {
         if (video.metadata?.thumbnail_url) {
@@ -219,12 +219,12 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
           };
         } else if (Array.isArray(video.derivatives)) {
           const thumbnail = video.derivatives.find(
-            (d: any) => d.derivative_type === "thumbnail" || d.file_type === "image",
+            (d: any) => d.derivative_type === 'thumbnail' || d.file_type === 'image',
           );
 
           if (thumbnail?.file_path) {
             thumbnails[video.id] = {
-              url: thumbnail.file_path.startsWith("http")
+              url: thumbnail.file_path.startsWith('http')
                 ? thumbnail.file_path
                 : `/storage/${thumbnail.file_path}`,
               id: thumbnail.id || video.id,
@@ -295,7 +295,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
           );
           return true;
         } else {
-          toast.error(data || "Error unpublishing");
+          toast.error(data || 'Error unpublishing');
           return false;
         }
       } finally {
@@ -317,7 +317,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
       // Prevent toggling if platform has duplicate attempts
       if (duplicatePlatforms.includes(accountId)) {
         toast.error(
-          "Esta plataforma tiene un intento de publicación duplicado. Espera a que termine el proceso actual.",
+          'Esta plataforma tiene un intento de publicación duplicado. Espera a que termine el proceso actual.',
         );
         return;
       }
@@ -372,7 +372,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
 
   const isYoutubeSelected = useCallback(() => {
     return activeAccounts.some(
-      (acc) => acc.platform.toLowerCase() === "youtube" && selectedPlatforms.includes(acc.id),
+      (acc) => acc.platform.toLowerCase() === 'youtube' && selectedPlatforms.includes(acc.id),
     );
   }, [activeAccounts, selectedPlatforms]);
 
@@ -381,7 +381,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
   const handlePublish = useCallback(
     async (publication: Publication, platformSettings?: Record<string, any>): Promise<boolean> => {
       if (selectedPlatforms.length === 0) {
-        toast.error("Please select at least one platform");
+        toast.error('Please select at least one platform');
         return false;
       }
 
@@ -389,7 +389,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
       try {
         const formData = new FormData();
 
-        selectedPlatforms.forEach((id) => formData.append("platforms[]", id.toString()));
+        selectedPlatforms.forEach((id) => formData.append('platforms[]', id.toString()));
 
         Object.entries(youtubeThumbnails).forEach(([videoId, file]) => {
           if (file) {
@@ -416,27 +416,27 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
           });
 
           if (Object.keys(filteredSettings).length > 0) {
-            formData.append("platform_settings", JSON.stringify(filteredSettings));
+            formData.append('platform_settings', JSON.stringify(filteredSettings));
           }
         }
 
         const { success, data } = await publishPublication(publication.id, formData);
 
         if (!success) {
-          toast.error(data || "Publishing failed");
+          toast.error(data || 'Publishing failed');
           return false;
         }
 
-        toast.success("Publishing started");
+        toast.success('Publishing started');
 
         // Immediate local state update for faster UI response
         usePublicationStore.getState().setPublishingPlatforms(publication.id, selectedPlatforms);
 
-        window.dispatchEvent(new CustomEvent("publication-started"));
+        window.dispatchEvent(new CustomEvent('publication-started'));
         setYoutubeThumbnails({});
         return true;
       } catch {
-        toast.error("Publishing failed");
+        toast.error('Publishing failed');
         return false;
       } finally {
         setPublishing(false);
@@ -450,60 +450,60 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
   const handleRequestReview = useCallback(async (publicationId: number, settings?: any) => {
     try {
       const response = await axios.post(
-        route("api.v1.publications.request-review", publicationId),
+        route('api.v1.publications.request-review', publicationId),
         {
           platform_settings: settings,
         },
       );
       if (response.data.success) {
-        toast.success("Publication sent for review");
+        toast.success('Publication sent for review');
         return true;
       }
       return false;
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to request review");
+      toast.error(error.response?.data?.message || 'Failed to request review');
       return false;
     }
   }, []);
 
   const handleApprove = useCallback(async (publicationId: number) => {
     try {
-      const response = await axios.post(route("api.v1.publications.approve", publicationId));
+      const response = await axios.post(route('api.v1.publications.approve', publicationId));
       if (response.data.success) {
-        toast.success("Publication approved");
+        toast.success('Publication approved');
         return response.data.data; // Return the whole updated data
       }
       return null;
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to approve");
+      toast.error(error.response?.data?.message || 'Failed to approve');
       return null;
     }
   }, []);
 
   const handleReject = useCallback(async (publicationId: number, reason?: string) => {
     try {
-      const response = await axios.post(route("api.v1.publications.reject", publicationId), {
+      const response = await axios.post(route('api.v1.publications.reject', publicationId), {
         rejection_reason: reason,
       });
       if (response.data.success) {
-        toast.success("Publication rejected and moved to draft");
+        toast.success('Publication rejected and moved to draft');
         return true;
       }
       return false;
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to reject");
+      toast.error(error.response?.data?.message || 'Failed to reject');
       return false;
     }
   }, []);
 
   const handleCancelPublication = useCallback(async (publicationId: number) => {
     try {
-      await axios.post(route("api.v1.publications.cancel", publicationId));
-      toast.success("Publicación cancelada");
+      await axios.post(route('api.v1.publications.cancel', publicationId));
+      toast.success('Publicación cancelada');
       usePublicationStore.getState().fetchPublicationById(publicationId);
     } catch (err) {
-      console.error("Failed to cancel publication", err);
-      toast.error("Error al cancelar la publicación");
+      console.error('Failed to cancel publication', err);
+      toast.error('Error al cancelar la publicación');
     }
   }, []);
 
@@ -515,14 +515,14 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         };
 
         const response = await axios.post(
-          route("api.v1.publications.cancel", publicationId),
+          route('api.v1.publications.cancel', publicationId),
           payload,
         );
-        toast.success("Plataforma cancelada");
+        toast.success('Plataforma cancelada');
 
         // Dispatch event to update UI
         window.dispatchEvent(
-          new CustomEvent("publication-cancelled", {
+          new CustomEvent('publication-cancelled', {
             detail: { publicationId, platformId },
           }),
         );
@@ -530,9 +530,9 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         await fetchPublishedPlatformsFromStore(publicationId);
         usePublicationStore.getState().fetchPublicationById(publicationId);
       } catch (err: any) {
-        console.error("Failed to cancel platform", err);
-        console.error("Error response:", err.response?.data);
-        toast.error("Error al cancelar la plataforma");
+        console.error('Failed to cancel platform', err);
+        console.error('Error response:', err.response?.data);
+        toast.error('Error al cancelar la plataforma');
       }
     },
     [fetchPublishedPlatformsFromStore],

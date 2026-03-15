@@ -1,5 +1,5 @@
-import { LucideIcon, Sparkles, X } from "lucide-react";
-import React from "react";
+import { LucideIcon, Sparkles, X } from 'lucide-react';
+import React from 'react';
 
 interface ModalHeaderProps {
   t: (key: string) => string;
@@ -8,7 +8,7 @@ interface ModalHeaderProps {
   subtitle?: string;
   icon?: LucideIcon;
   iconColor?: string;
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   style?: React.CSSProperties;
   rightElement?: React.ReactNode;
 }
@@ -19,16 +19,16 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({
   title,
   subtitle,
   icon: Icon = Sparkles,
-  iconColor = "text-primary-500",
-  size = "lg",
+  iconColor = 'text-primary-500',
+  size = 'lg',
   style,
   rightElement,
 }) => {
   const sizeClasses = {
-    sm: { title: "text-base", icon: "w-4 h-4" },
-    md: { title: "text-lg", icon: "w-5 h-5" },
-    lg: { title: "text-xl", icon: "w-5 h-5" },
-    xl: { title: "text-2xl", icon: "w-6 h-6" },
+    sm: { title: 'text-base', icon: 'w-4 h-4' },
+    md: { title: 'text-lg', icon: 'w-5 h-5' },
+    lg: { title: 'text-xl', icon: 'w-5 h-5' },
+    xl: { title: 'text-2xl', icon: 'w-6 h-6' },
   };
 
   const currentSize = sizeClasses[size];

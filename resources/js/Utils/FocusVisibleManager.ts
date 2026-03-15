@@ -11,7 +11,7 @@
 class FocusVisibleManagerClass {
   private isKeyboardMode: boolean = false;
   private isInitialized: boolean = false;
-  private readonly FOCUS_VISIBLE_CLASS = "focus-visible";
+  private readonly FOCUS_VISIBLE_CLASS = 'focus-visible';
 
   /**
    * Initialize the focus-visible detection system
@@ -40,10 +40,10 @@ class FocusVisibleManagerClass {
    */
   private setupKeyboardDetection(): void {
     document.addEventListener(
-      "keydown",
+      'keydown',
       (event: KeyboardEvent) => {
         // Tab key indicates keyboard navigation
-        if (event.key === "Tab") {
+        if (event.key === 'Tab') {
           this.isKeyboardMode = true;
         }
       },
@@ -57,7 +57,7 @@ class FocusVisibleManagerClass {
    */
   private setupMouseDetection(): void {
     document.addEventListener(
-      "mousedown",
+      'mousedown',
       () => {
         this.isKeyboardMode = false;
       },
@@ -66,10 +66,10 @@ class FocusVisibleManagerClass {
 
     // Also detect pointer events for touch devices
     document.addEventListener(
-      "pointerdown",
+      'pointerdown',
       (event: PointerEvent) => {
         // Only switch to mouse mode for mouse/touch, not pen
-        if (event.pointerType === "mouse" || event.pointerType === "touch") {
+        if (event.pointerType === 'mouse' || event.pointerType === 'touch') {
           this.isKeyboardMode = false;
         }
       },
@@ -84,7 +84,7 @@ class FocusVisibleManagerClass {
   private setupFocusHandling(): void {
     // Handle focus events
     document.addEventListener(
-      "focus",
+      'focus',
       (event: FocusEvent) => {
         const target = event.target as HTMLElement;
 
@@ -104,7 +104,7 @@ class FocusVisibleManagerClass {
 
     // Handle blur events to clean up
     document.addEventListener(
-      "blur",
+      'blur',
       (event: FocusEvent) => {
         const target = event.target as HTMLElement;
 
@@ -143,7 +143,7 @@ class FocusVisibleManagerClass {
     element.classList.add(this.FOCUS_VISIBLE_CLASS);
 
     // Also set data attribute for CSS selectors
-    element.setAttribute("data-focus-visible", "true");
+    element.setAttribute('data-focus-visible', 'true');
   }
 
   /**
@@ -156,7 +156,7 @@ class FocusVisibleManagerClass {
     }
 
     element.classList.remove(this.FOCUS_VISIBLE_CLASS);
-    element.removeAttribute("data-focus-visible");
+    element.removeAttribute('data-focus-visible');
   }
 
   /**
@@ -175,7 +175,7 @@ class FocusVisibleManagerClass {
       'input[type="tel"]',
       'input[type="url"]',
       'input[type="number"]',
-      "textarea",
+      'textarea',
       '[contenteditable="true"]',
     ];
 
@@ -200,8 +200,8 @@ class FocusVisibleManagerClass {
    * Get the current input mode
    * @returns 'keyboard' or 'mouse'
    */
-  getInputMode(): "keyboard" | "mouse" {
-    return this.isKeyboardMode ? "keyboard" : "mouse";
+  getInputMode(): 'keyboard' | 'mouse' {
+    return this.isKeyboardMode ? 'keyboard' : 'mouse';
   }
 
   /**

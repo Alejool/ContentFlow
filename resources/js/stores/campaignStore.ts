@@ -1,6 +1,6 @@
-import axios from "axios";
-import { create } from "zustand";
-import { useCalendarStore } from "@/stores/calendarStore";
+import axios from 'axios';
+import { create } from 'zustand';
+import { useCalendarStore } from '@/stores/calendarStore';
 
 export interface Campaign {
   id: number;
@@ -11,7 +11,7 @@ export interface Campaign {
   budget?: string;
   start_date?: string;
   end_date?: string;
-  status?: "active" | "paused" | "completed";
+  status?: 'active' | 'paused' | 'completed';
   created_at?: string;
   updated_at?: string;
 }
@@ -54,7 +54,7 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
 
     try {
       const params = { ...filters, page };
-      const response = await axios.get(route("api.v1.campaigns.index"), {
+      const response = await axios.get(route('api.v1.campaigns.index'), {
         params,
       });
 
@@ -96,7 +96,7 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
       });
     } catch (error: any) {
       set({
-        error: error.message || "Failed to fetch campaigns",
+        error: error.message || 'Failed to fetch campaigns',
         isLoading: false,
       });
     }
@@ -129,14 +129,14 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
   deleteCampaign: async (id) => {
     set({ isLoading: true, error: null });
     try {
-      await axios.delete(route("api.v1.campaigns.destroy", id));
+      await axios.delete(route('api.v1.campaigns.destroy', id));
       get().removeCampaign(id);
       set({ isLoading: false });
       useCalendarStore.getState().fetchEvents();
       return true;
     } catch (error: any) {
       set({
-        error: error.response?.data?.message ?? "Failed to delete campaign",
+        error: error.response?.data?.message ?? 'Failed to delete campaign',
         isLoading: false,
       });
       return false;
@@ -146,7 +146,7 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
   duplicateCampaign: async (id: number) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post(route("api.v1.campaigns.duplicate", id));
+      const response = await axios.post(route('api.v1.campaigns.duplicate', id));
       const campaign = response.data?.campaign;
       if (campaign) {
         get().addCampaign(campaign);
@@ -156,7 +156,7 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
       return true;
     } catch (error: any) {
       set({
-        error: error.response?.data?.message ?? "Failed to duplicate campaign",
+        error: error.response?.data?.message ?? 'Failed to duplicate campaign',
         isLoading: false,
       });
       return false;

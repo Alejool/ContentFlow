@@ -1,5 +1,5 @@
-import { TFunction } from "i18next";
-import PollFields from "@/Components/Content/Publication/common/PollFields";
+import { TFunction } from 'i18next';
+import PollFields from '@/Components/Content/Publication/common/PollFields';
 
 interface PollSectionProps {
   t: TFunction;

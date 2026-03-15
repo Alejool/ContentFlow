@@ -1,6 +1,6 @@
-import { Avatar } from "@/Components/common/Avatar";
-import { format } from "date-fns";
-import { Bookmark, Heart, MessageCircle, MoreHorizontal, Send } from "lucide-react";
+import { Avatar } from '@/Components/common/Avatar';
+import { format } from 'date-fns';
+import { Bookmark, Heart, MessageCircle, MoreHorizontal, Send } from 'lucide-react';
 
 interface InstagramPreviewProps {
   content: string;
@@ -19,7 +19,7 @@ export const InstagramPreview = ({
   mediaUrls,
   user,
   date = new Date(),
-  className = "",
+  className = '',
 }: InstagramPreviewProps) => {
   return (
     <div
@@ -31,7 +31,7 @@ export const InstagramPreview = ({
           <div className="rounded-full ring-2 ring-pink-500 ring-offset-1">
             <Avatar src={user?.avatar} name={user?.name} size="sm" />
           </div>
-          <div className="text-sm font-semibold">{user?.username || "username"}</div>
+          <div className="text-sm font-semibold">{user?.username || 'username'}</div>
         </div>
         <MoreHorizontal className="h-5 w-5 text-gray-900" />
       </div>
@@ -94,13 +94,13 @@ export const InstagramPreview = ({
 
         {/* Caption */}
         <div className="text-sm">
-          <span className="mr-2 font-semibold">{user?.username || "username"}</span>
+          <span className="mr-2 font-semibold">{user?.username || 'username'}</span>
           <span className="whitespace-pre-wrap">{content}</span>
         </div>
 
         {/* Date */}
         <div className="mt-2 text-[10px] uppercase text-gray-500">
-          {date ? format(date, "MMMM d") : "Just now"}
+          {date ? format(date, 'MMMM d') : 'Just now'}
         </div>
       </div>
     </div>

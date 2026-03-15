@@ -1,13 +1,13 @@
-import { Sparkles, HardDrive, FileText, Users, Info } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { useState, useEffect } from "react";
-import Button from "@/Components/common/Modern/Button";
-import Input from "@/Components/common/Modern/Input";
-import { CarouselPagination, CarouselDots } from "@/Components/common/CarouselPagination";
-import { GatewaySelector } from "@/Components/Payment/GatewaySelector";
-import { ActiveAddonsCards } from "./ActiveAddonsCards";
-import { TabNavigation, Tab } from "@/Components/common/TabNavigation";
-import { AddonPriceDisplay } from "./AddonPriceDisplay";
+import { Sparkles, HardDrive, FileText, Users, Info } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useState, useEffect } from 'react';
+import Button from '@/Components/common/Modern/Button';
+import Input from '@/Components/common/Modern/Input';
+import { CarouselPagination, CarouselDots } from '@/Components/common/CarouselPagination';
+import { GatewaySelector } from '@/Components/Payment/GatewaySelector';
+import { ActiveAddonsCards } from './ActiveAddonsCards';
+import { TabNavigation, Tab } from '@/Components/common/TabNavigation';
+import { AddonPriceDisplay } from './AddonPriceDisplay';
 
 interface AddonPackage {
   sku: string;
@@ -55,36 +55,36 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
   // Encontrar el primer tab habilitado
   const firstEnabledTab = (
     addons.ai_credits?.enabled
-      ? "ai_credits"
+      ? 'ai_credits'
       : addons.storage?.enabled
-        ? "storage"
+        ? 'storage'
         : addons.publications?.enabled
-          ? "publications"
+          ? 'publications'
           : addons.team_members?.enabled
-            ? "team_members"
-            : "ai_credits"
-  ) as "ai_credits" | "storage" | "publications" | "team_members";
+            ? 'team_members'
+            : 'ai_credits'
+  ) as 'ai_credits' | 'storage' | 'publications' | 'team_members';
 
   const [activeTab, setActiveTab] = useState<
-    "ai_credits" | "storage" | "publications" | "team_members"
+    'ai_credits' | 'storage' | 'publications' | 'team_members'
   >(firstEnabledTab);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [currentPackageSlide, setCurrentPackageSlide] = useState(0);
-  const [selectedGateway, setSelectedGateway] = useState<string>("");
-  const [currency, setCurrency] = useState<string>("USD");
+  const [selectedGateway, setSelectedGateway] = useState<string>('');
+  const [currency, setCurrency] = useState<string>('USD');
   const [exchangeRate, setExchangeRate] = useState<number>(1);
 
   // Cargar información de gateways y precios
   useEffect(() => {
-    fetch("/api/payment/gateways")
+    fetch('/api/payment/gateways')
       .then((res) => res.json())
       .then((data) => {
-        setSelectedGateway(data.default_gateway || "stripe");
-        setCurrency(data.currency || "USD");
+        setSelectedGateway(data.default_gateway || 'stripe');
+        setCurrency(data.currency || 'USD');
         setExchangeRate(data.exchange_rate || 1);
       })
       .catch((error) => {
-        console.error("Error loading payment info:", error);
+        console.error('Error loading payment info:', error);
       });
   }, []);
 
@@ -116,26 +116,26 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
 
   const tabs = [
     {
-      key: "ai_credits" as const,
-      label: t("subscription.addons.aiCredits", "Créditos IA"),
+      key: 'ai_credits' as const,
+      label: t('subscription.addons.aiCredits', 'Créditos IA'),
       icon: Sparkles,
       enabled: addons.ai_credits?.enabled ?? false,
     },
     {
-      key: "storage" as const,
-      label: t("subscription.addons.storage", "Almacenamiento"),
+      key: 'storage' as const,
+      label: t('subscription.addons.storage', 'Almacenamiento'),
       icon: HardDrive,
       enabled: addons.storage?.enabled ?? false,
     },
     {
-      key: "publications" as const,
-      label: t("subscription.addons.publications", "Publicaciones"),
+      key: 'publications' as const,
+      label: t('subscription.addons.publications', 'Publicaciones'),
       icon: FileText,
       enabled: addons.publications?.enabled ?? false,
     },
     {
-      key: "team_members" as const,
-      label: t("subscription.addons.teamMembers", "Miembros del Equipo"),
+      key: 'team_members' as const,
+      label: t('subscription.addons.teamMembers', 'Miembros del Equipo'),
       icon: Users,
       enabled: addons.team_members?.enabled ?? false,
     },
@@ -153,12 +153,12 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
     const quantity = getQuantity(sku);
 
     try {
-      const response = await fetch("/api/payment/checkout/addon", {
-        method: "POST",
+      const response = await fetch('/api/payment/checkout/addon', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
-          "X-CSRF-TOKEN":
-            document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || "",
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN':
+            document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
         },
         body: JSON.stringify({
           sku,
@@ -175,15 +175,15 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
       } else if (data.client_secret) {
         // Para Stripe Payment Intent, usar el client_secret con Stripe Elements
         // Por ahora, mostrar un mensaje
-        console.error("Payment Intent flow not implemented yet. Use Checkout Session instead.");
-        alert("Por favor configura los Price IDs de Stripe para usar el checkout completo.");
+        console.error('Payment Intent flow not implemented yet. Use Checkout Session instead.');
+        alert('Por favor configura los Price IDs de Stripe para usar el checkout completo.');
       } else {
-        console.error("Invalid response from payment API");
-        alert("Error al crear la sesión de pago. Por favor intenta de nuevo.");
+        console.error('Invalid response from payment API');
+        alert('Error al crear la sesión de pago. Por favor intenta de nuevo.');
       }
     } catch (error) {
-      console.error("Error creating checkout:", error);
-      alert("Error al procesar el pago. Por favor intenta de nuevo.");
+      console.error('Error creating checkout:', error);
+      alert('Error al procesar el pago. Por favor intenta de nuevo.');
     }
   };
 
@@ -196,14 +196,14 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
       <div
         className={`relative rounded-xl border-2 bg-white p-6 transition-all dark:bg-gray-800 ${
           pkg.popular
-            ? "scale-105 border-primary-500 shadow-lg"
-            : "border-gray-200 hover:border-primary-300 dark:border-gray-700 dark:hover:border-primary-600"
+            ? 'scale-105 border-primary-500 shadow-lg'
+            : 'border-gray-200 hover:border-primary-300 dark:border-gray-700 dark:hover:border-primary-600'
         }`}
       >
         {pkg.popular && (
           <div className="absolute -top-2 left-3">
             <span className="backdrop-2xl rounded-full bg-primary-500/90 px-3 py-2 text-xs font-bold text-white">
-              {t("subscription.addons.mostPopular", "Más Popular")}
+              {t('subscription.addons.mostPopular', 'Más Popular')}
             </span>
           </div>
         )}
@@ -211,16 +211,16 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
         {pkg.savings_percentage > 0 && (
           <div className="absolute -top-2 right-3">
             <span className="backdrop-2xl rounded-full bg-green-500/90 px-3 py-2 text-xs font-bold text-white">
-              {t("subscription.addons.save", "Ahorra")} {pkg.savings_percentage}%
+              {t('subscription.addons.save', 'Ahorra')} {pkg.savings_percentage}%
             </span>
           </div>
         )}
 
         <div className="mb-4 flex justify-center">
-          {activeTab === "ai_credits" && <Sparkles className="h-12 w-12 text-primary-500" />}
-          {activeTab === "storage" && <HardDrive className="h-12 w-12 text-primary-500" />}
-          {activeTab === "publications" && <FileText className="h-12 w-12 text-primary-500" />}
-          {activeTab === "team_members" && <Users className="h-12 w-12 text-primary-500" />}
+          {activeTab === 'ai_credits' && <Sparkles className="h-12 w-12 text-primary-500" />}
+          {activeTab === 'storage' && <HardDrive className="h-12 w-12 text-primary-500" />}
+          {activeTab === 'publications' && <FileText className="h-12 w-12 text-primary-500" />}
+          {activeTab === 'team_members' && <Users className="h-12 w-12 text-primary-500" />}
         </div>
 
         <h3 className="mb-2 text-center text-xl font-bold text-gray-900 dark:text-white">
@@ -236,10 +236,10 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
             {pkg.amount.toLocaleString()}
           </div>
           <div className="text-sm text-gray-600 dark:text-gray-400">
-            {activeTab === "ai_credits" && t("subscription.addons.credits", "créditos")}
-            {activeTab === "storage" && "GB"}
-            {activeTab === "publications" && t("subscription.addons.posts", "publicaciones")}
-            {activeTab === "team_members" && t("subscription.addons.members", "miembros")}
+            {activeTab === 'ai_credits' && t('subscription.addons.credits', 'créditos')}
+            {activeTab === 'storage' && 'GB'}
+            {activeTab === 'publications' && t('subscription.addons.posts', 'publicaciones')}
+            {activeTab === 'team_members' && t('subscription.addons.members', 'miembros')}
           </div>
         </div>
 
@@ -247,7 +247,7 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
           <AddonPriceDisplay
             priceUsd={pkg.price_usd || pkg.price}
             priceLocal={pkg.price_local || pkg.price}
-            currency={pkg.currency || "USD"}
+            currency={pkg.currency || 'USD'}
             formattedPrice={pkg.formatted_price || `$${pkg.price.toFixed(2)}`}
             showUsdEquivalent={true}
             size="lg"
@@ -297,13 +297,13 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
         {quantity > 1 && (
           <div className="mb-4 rounded-lg border border-primary-200 bg-primary-50 p-3 text-center dark:border-primary-800 dark:bg-primary-900/20">
             <div className="mb-2 text-sm text-gray-600 dark:text-gray-400">
-              {t("subscription.addons.total", "Total")} ({quantity}x):
+              {t('subscription.addons.total', 'Total')} ({quantity}x):
             </div>
             <AddonPriceDisplay
               priceUsd={totalPriceUsd}
               priceLocal={totalPriceLocal}
-              currency={pkg.currency || "USD"}
-              formattedPrice={formatPrice(totalPriceLocal, pkg.currency || "USD")}
+              currency={pkg.currency || 'USD'}
+              formattedPrice={formatPrice(totalPriceLocal, pkg.currency || 'USD')}
               showUsdEquivalent={true}
               size="md"
             />
@@ -314,13 +314,13 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
           onClick={() => handlePurchase(pkg.sku)}
           disabled={!pkg.enabled}
           variant="primary"
-          buttonStyle={pkg.popular ? "gradient" : "solid"}
+          buttonStyle={pkg.popular ? 'gradient' : 'solid'}
           size="md"
           fullWidth
-          shadow={pkg.popular ? "primary" : "md"}
+          shadow={pkg.popular ? 'primary' : 'md'}
           animation="scale"
         >
-          {t("subscription.addons.buyNow", "Comprar Ahora")}
+          {t('subscription.addons.buyNow', 'Comprar Ahora')}
         </Button>
       </div>
     );
@@ -328,27 +328,27 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
 
   const getCurrencySymbol = (curr: string): string => {
     const symbols: Record<string, string> = {
-      USD: "$",
-      COP: "$",
-      MXN: "$",
-      ARS: "$",
-      BRL: "R$",
-      CLP: "$",
-      PEN: "S/",
-      EUR: "€",
-      GBP: "£",
-      CAD: "CA$",
-      AUD: "A$",
-      JPY: "¥",
-      INR: "₹",
+      USD: '$',
+      COP: '$',
+      MXN: '$',
+      ARS: '$',
+      BRL: 'R$',
+      CLP: '$',
+      PEN: 'S/',
+      EUR: '€',
+      GBP: '£',
+      CAD: 'CA$',
+      AUD: 'A$',
+      JPY: '¥',
+      INR: '₹',
     };
-    return symbols[curr] || curr + " ";
+    return symbols[curr] || curr + ' ';
   };
 
   const formatPrice = (price: number, curr: string): string => {
     const symbol = getCurrencySymbol(curr);
     // Monedas sin decimales
-    if (["COP", "CLP", "JPY"].includes(curr)) {
+    if (['COP', 'CLP', 'JPY'].includes(curr)) {
       return `${symbol}${Math.round(price).toLocaleString()}`;
     }
     return `${symbol}${price.toFixed(2)}`;
@@ -357,7 +357,7 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
   // Detectar si hay precios convertidos
   const firstPackage = currentPackages[0];
   const hasCurrencyConversion =
-    firstPackage && firstPackage.currency && firstPackage.currency !== "USD";
+    firstPackage && firstPackage.currency && firstPackage.currency !== 'USD';
 
   return (
     <div className="space-y-6">
@@ -393,7 +393,7 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
                 <div className="flex-1">
                   <p className="text-sm text-blue-800 dark:text-blue-200">
                     {t(
-                      "subscription.addons.currencyInfo",
+                      'subscription.addons.currencyInfo',
                       `Los precios se muestran en ${firstPackage.currency} según tu ubicación. El equivalente en USD se muestra como referencia.`,
                     )}
                   </p>
@@ -432,8 +432,8 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
                 <div className="col-span-full py-12 text-center">
                   <p className="text-gray-500 dark:text-gray-400">
                     {t(
-                      "subscription.addons.noPackages",
-                      "No hay paquetes disponibles en esta categoría",
+                      'subscription.addons.noPackages',
+                      'No hay paquetes disponibles en esta categoría',
                     )}
                   </p>
                 </div>

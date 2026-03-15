@@ -1,8 +1,8 @@
-import { Head } from "@inertiajs/react";
-import { CheckCircle, Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import axios from "axios";
+import { Head } from '@inertiajs/react';
+import { CheckCircle, Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import axios from 'axios';
 
 interface SuccessProps {
   session: {
@@ -24,7 +24,7 @@ export default function Success({ session }: SuccessProps) {
 
     const checkSubscriptionUpdate = async () => {
       try {
-        const response = await axios.get(route("api.v1.subscription.current-usage"), {
+        const response = await axios.get(route('api.v1.subscription.current-usage'), {
           params: { _t: Date.now() },
         });
 
@@ -33,7 +33,7 @@ export default function Success({ session }: SuccessProps) {
           setIsUpdating(false);
 
           // Disparar evento para actualizar UI
-          window.dispatchEvent(new Event("subscription-plan-changed"));
+          window.dispatchEvent(new Event('subscription-plan-changed'));
 
           return true;
         }
@@ -42,7 +42,7 @@ export default function Success({ session }: SuccessProps) {
         if (error.response?.status === 404) {
           return false;
         }
-        console.error("Error checking subscription:", error);
+        console.error('Error checking subscription:', error);
       }
       return false;
     };
@@ -81,7 +81,7 @@ export default function Success({ session }: SuccessProps) {
 
   return (
     <>
-      <Head title={t("checkout.success.title", "Pago Exitoso")} />
+      <Head title={t('checkout.success.title', 'Pago Exitoso')} />
 
       <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
         <div className="w-full max-w-md rounded-lg bg-white p-8 text-center shadow-lg">
@@ -90,20 +90,20 @@ export default function Success({ session }: SuccessProps) {
           </div>
 
           <h1 className="mb-4 text-2xl font-bold text-gray-900">
-            {t("checkout.success.title", "¡Pago Exitoso!")}
+            {t('checkout.success.title', '¡Pago Exitoso!')}
           </h1>
 
           <p className="mb-8 text-gray-600">
             {isUpdating
-              ? t("checkout.success.activating", "Estamos activando tu suscripción...")
-              : t("checkout.success.activated", "Tu suscripción ha sido activada correctamente.")}
+              ? t('checkout.success.activating', 'Estamos activando tu suscripción...')
+              : t('checkout.success.activated', 'Tu suscripción ha sido activada correctamente.')}
           </p>
 
           {isUpdating && (
             <div className="mb-6">
               <div className="inline-flex items-center gap-2 text-sm text-blue-600">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                {t("checkout.success.updating", "Actualizando tu cuenta...")}
+                {t('checkout.success.updating', 'Actualizando tu cuenta...')}
               </div>
             </div>
           )}
@@ -113,15 +113,15 @@ export default function Success({ session }: SuccessProps) {
               href="/dashboard"
               className="block w-full rounded-lg bg-blue-600 px-6 py-3 text-white transition-colors hover:bg-blue-700"
             >
-              {t("checkout.success.goToDashboard", "Ir al Dashboard")}
+              {t('checkout.success.goToDashboard', 'Ir al Dashboard')}
             </a>
           </div>
 
           {isUpdating && (
             <p className="mt-4 text-xs text-gray-400">
               {t(
-                "checkout.success.pleaseWait",
-                "Por favor espera mientras activamos tu suscripción...",
+                'checkout.success.pleaseWait',
+                'Por favor espera mientras activamos tu suscripción...',
               )}
             </p>
           )}

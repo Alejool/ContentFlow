@@ -1,5 +1,5 @@
-import { Head } from "@inertiajs/react";
-import { XCircle } from "lucide-react";
+import { Head } from '@inertiajs/react';
+import { XCircle } from 'lucide-react';
 
 export default function Cancel() {
   return (

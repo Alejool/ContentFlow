@@ -1,11 +1,11 @@
-import Button from "@/Components/common/Modern/Button";
-import { cssPropertiesManager } from "@/Utils/CSSCustomPropertiesManager";
-import { router, useForm } from "@inertiajs/react";
-import axios from "axios";
-import { Check, Crown, Lock, Palette } from "lucide-react";
-import { useState } from "react";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
+import Button from '@/Components/common/Modern/Button';
+import { cssPropertiesManager } from '@/Utils/CSSCustomPropertiesManager';
+import { router, useForm } from '@inertiajs/react';
+import axios from 'axios';
+import { Check, Crown, Lock, Palette } from 'lucide-react';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface UpdateThemeFormProps {
   user: any;
@@ -16,11 +16,11 @@ export default function UpdateThemeForm({ user, workspace }: UpdateThemeFormProp
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const { data, setData } = useForm({
-    theme_color: user.theme_color || "orange",
+    theme_color: user.theme_color || 'orange',
   });
 
   const applyTheme = (color: string) => {
-    setData("theme_color", color);
+    setData('theme_color', color);
     cssPropertiesManager.applyPrimaryColor(color);
   };
 
@@ -33,15 +33,15 @@ export default function UpdateThemeForm({ user, workspace }: UpdateThemeFormProp
     // Para JSON puro, usamos axios.
 
     try {
-      const response = await axios.patch(route("api.v1.profile.theme.update"), data);
+      const response = await axios.patch(route('api.v1.profile.theme.update'), data);
 
       if (response.data.success) {
-        toast.success(t("profile.theme.success_message") || response.data.message);
+        toast.success(t('profile.theme.success_message') || response.data.message);
       } else {
-        toast.error(response.data.message || t("common.error"));
+        toast.error(response.data.message || t('common.error'));
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || t("common.error");
+      const errorMessage = error.response?.data?.message || t('common.error');
       toast.error(errorMessage);
     } finally {
       setLoading(false);
@@ -49,22 +49,22 @@ export default function UpdateThemeForm({ user, workspace }: UpdateThemeFormProp
   };
 
   const brandingColor = workspace?.white_label_primary_color;
-  const planId = workspace?.plan?.toLowerCase() || "demo";
-  const hasBrandingAccess = ["professional", "enterprise"].includes(planId);
+  const planId = workspace?.plan?.toLowerCase() || 'demo';
+  const hasBrandingAccess = ['professional', 'enterprise'].includes(planId);
 
   const colors = [
-    { name: "orange", value: "orange", bg: "bg-warning-500" },
-    { name: "blue", value: "blue", bg: "bg-blue-500" },
-    { name: "purple", value: "purple", bg: "bg-purple-500" },
-    { name: "green", value: "green", bg: "bg-green-500" },
-    { name: "pink", value: "pink", bg: "bg-pink-500" },
+    { name: 'orange', value: 'orange', bg: 'bg-warning-500' },
+    { name: 'blue', value: 'blue', bg: 'bg-blue-500' },
+    { name: 'purple', value: 'purple', bg: 'bg-purple-500' },
+    { name: 'green', value: 'green', bg: 'bg-green-500' },
+    { name: 'pink', value: 'pink', bg: 'bg-pink-500' },
   ];
 
-  if (brandingColor && brandingColor.startsWith("#")) {
+  if (brandingColor && brandingColor.startsWith('#')) {
     colors.unshift({
-      name: "custom",
+      name: 'custom',
       value: brandingColor,
-      bg: "",
+      bg: '',
       isCustom: true,
     } as any);
   }
@@ -76,11 +76,11 @@ export default function UpdateThemeForm({ user, workspace }: UpdateThemeFormProp
         <header>
           <h2 className="flex items-center gap-2 text-lg font-medium text-gray-900 dark:text-gray-100">
             <Palette className="h-5 w-5 text-primary-500" />
-            {t("profile.theme.title") || "Apariencia del Sistema"}
+            {t('profile.theme.title') || 'Apariencia del Sistema'}
           </h2>
           <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            {t("profile.theme.description") ||
-              "Selecciona el color principal del sistema. Esto afectará a botones, enlaces y otros elementos destacados."}
+            {t('profile.theme.description') ||
+              'Selecciona el color principal del sistema. Esto afectará a botones, enlaces y otros elementos destacados.'}
           </p>
         </header>
 
@@ -93,8 +93,8 @@ export default function UpdateThemeForm({ user, workspace }: UpdateThemeFormProp
                 onClick={() => applyTheme(color.value)}
                 className={`group relative flex flex-col items-center justify-center rounded-lg border-2 p-4 transition-all duration-200 ${
                   data.theme_color === color.value
-                    ? "border-primary-500 bg-primary-50 dark:bg-primary-900/10"
-                    : "border-gray-200 bg-white hover:border-gray-300 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:border-neutral-600"
+                    ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/10'
+                    : 'border-gray-200 bg-white hover:border-gray-300 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:border-neutral-600'
                 }`}
               >
                 <div
@@ -111,7 +111,7 @@ export default function UpdateThemeForm({ user, workspace }: UpdateThemeFormProp
           </div>
           <div className="flex items-center gap-4">
             <Button type="submit" disabled={loading} loading={loading} icon={Check}>
-              {t("common.save")}
+              {t('common.save')}
             </Button>
           </div>
         </form>
@@ -143,7 +143,7 @@ export default function UpdateThemeForm({ user, workspace }: UpdateThemeFormProp
             </p>
             <Button
               type="button"
-              onClick={() => router.visit(route("workspace.settings", { tab: "branding" }))}
+              onClick={() => router.visit(route('workspace.settings', { tab: 'branding' }))}
               icon={Palette}
               variant="outline"
             >
@@ -154,7 +154,7 @@ export default function UpdateThemeForm({ user, workspace }: UpdateThemeFormProp
           <div className="relative overflow-hidden rounded-xl border border-amber-200 bg-amber-50/50 p-5 dark:border-amber-800/30 dark:bg-amber-900/10">
             {/* Blurred mock */}
             <div className="pointer-events-none flex select-none gap-4 opacity-60 blur-sm">
-              {["#f97316", "#3b82f6", "#a855f7"].map((c) => (
+              {['#f97316', '#3b82f6', '#a855f7'].map((c) => (
                 <div key={c} className="flex flex-col items-center gap-2">
                   <div
                     className="h-12 w-12 rounded-full border-2 border-white shadow-sm"
@@ -178,7 +178,7 @@ export default function UpdateThemeForm({ user, workspace }: UpdateThemeFormProp
               </p>
               <button
                 type="button"
-                onClick={() => router.visit("/pricing")}
+                onClick={() => router.visit('/pricing')}
                 className="rounded-lg bg-amber-500 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-amber-600"
               >
                 Ver planes

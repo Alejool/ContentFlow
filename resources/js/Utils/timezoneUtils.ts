@@ -1,14 +1,14 @@
-import { format, parseISO } from "date-fns";
-import { toZonedTime, fromZonedTime } from "date-fns-tz";
-import { es, enUS } from "date-fns/locale";
-import { useTimezoneStore } from "@/stores/timezoneStore";
+import { format, parseISO } from 'date-fns';
+import { toZonedTime, fromZonedTime } from 'date-fns-tz';
+import { es, enUS } from 'date-fns/locale';
+import { useTimezoneStore } from '@/stores/timezoneStore';
 
 /**
  * Obtiene el locale de date-fns según el idioma actual
  */
 const getDateLocale = () => {
-  const currentLocale = localStorage.getItem("locale") || "en";
-  return currentLocale === "es" ? es : enUS;
+  const currentLocale = localStorage.getItem('locale') || 'en';
+  return currentLocale === 'es' ? es : enUS;
 };
 
 /**
@@ -24,9 +24,9 @@ const getDateLocale = () => {
  */
 export function formatDate(
   utcDateString: string | null | undefined,
-  formatStr: string = "PPpp",
+  formatStr: string = 'PPpp',
 ): string {
-  if (!utcDateString) return "";
+  if (!utcDateString) return '';
 
   try {
     const timezone = useTimezoneStore.getState().effectiveTimezone();
@@ -40,7 +40,7 @@ export function formatDate(
     // Formatear
     return format(zonedDate, formatStr, { locale: getDateLocale() });
   } catch (error) {
-    console.error("Error formatting date:", error);
+    console.error('Error formatting date:', error);
     return utcDateString;
   }
 }
@@ -62,7 +62,7 @@ export function toUTC(localDate: Date | string | null | undefined): string | nul
     const timezone = useTimezoneStore.getState().effectiveTimezone();
 
     // Convertir a Date si es string
-    const date = typeof localDate === "string" ? new Date(localDate) : localDate;
+    const date = typeof localDate === 'string' ? new Date(localDate) : localDate;
 
     // Convertir a UTC
     const utcDate = fromZonedTime(date, timezone);
@@ -70,7 +70,7 @@ export function toUTC(localDate: Date | string | null | undefined): string | nul
     // Retornar en formato ISO 8601
     return utcDate.toISOString();
   } catch (error) {
-    console.error("Error converting to UTC:", error);
+    console.error('Error converting to UTC:', error);
     return null;
   }
 }
@@ -89,7 +89,7 @@ export function toLocalDate(utcDateString: string | null | undefined): Date | nu
     const utcDate = parseISO(utcDateString);
     return toZonedTime(utcDate, timezone);
   } catch (error) {
-    console.error("Error converting to local date:", error);
+    console.error('Error converting to local date:', error);
     return null;
   }
 }
@@ -108,10 +108,10 @@ export function getNow(): Date {
  * Formatos predefinidos comunes
  */
 export const DATE_FORMATS = {
-  FULL: "PPpp", // "8 de marzo de 2026, 15:30"
-  DATE_ONLY: "PP", // "8 de marzo de 2026"
-  TIME_ONLY: "p", // "15:30"
-  SHORT: "Pp", // "08/03/2026, 15:30"
-  SHORT_DATE: "P", // "08/03/2026"
+  FULL: 'PPpp', // "8 de marzo de 2026, 15:30"
+  DATE_ONLY: 'PP', // "8 de marzo de 2026"
+  TIME_ONLY: 'p', // "15:30"
+  SHORT: 'Pp', // "08/03/2026, 15:30"
+  SHORT_DATE: 'P', // "08/03/2026"
   ISO: "yyyy-MM-dd'T'HH:mm", // "2026-03-08T15:30"
 } as const;

@@ -1,5 +1,5 @@
-import React, { ComponentType } from "react";
-import { useOffline } from "@/Hooks/useOffline";
+import React, { ComponentType } from 'react';
+import { useOffline } from '@/Hooks/useOffline';
 
 /**
  * Props for components wrapped with withOfflineDisable
@@ -31,8 +31,8 @@ export function withOfflineDisable<P extends object>(
     const { isOnline } = useOffline();
     const {
       requiresConnection = false,
-      offlineTooltip = "This feature requires an internet connection",
-      disabledClassName = "opacity-50 cursor-not-allowed",
+      offlineTooltip = 'This feature requires an internet connection',
+      disabledClassName = 'opacity-50 cursor-not-allowed',
       ...restProps
     } = props;
 
@@ -46,7 +46,7 @@ export function withOfflineDisable<P extends object>(
 
     // Merge className with disabled styles
     const className = shouldDisable
-      ? `${(restProps as any).className || ""} ${disabledClassName}`.trim()
+      ? `${(restProps as any).className || ''} ${disabledClassName}`.trim()
       : (restProps as any).className;
 
     return (

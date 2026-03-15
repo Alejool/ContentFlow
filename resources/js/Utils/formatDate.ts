@@ -1,5 +1,5 @@
-import { parseISO } from "date-fns";
-import { useTimezoneStore } from "@/stores/timezoneStore";
+import { parseISO } from 'date-fns';
+import { useTimezoneStore } from '@/stores/timezoneStore';
 
 // Small helper to format UTC ISO timestamps into the workspace timezone
 const getWorkspaceTimezone = () => {
@@ -12,56 +12,56 @@ const getUserLocale = () =>
   Intl.DateTimeFormat().resolvedOptions().locale;
 
 export function formatTime(iso?: string | null) {
-  if (!iso) return "";
+  if (!iso) return '';
   try {
     const date = parseISO(iso);
     const tz = getWorkspaceTimezone();
     const locale = getUserLocale();
     return date.toLocaleString(locale || undefined, {
-      hour: "2-digit",
-      minute: "2-digit",
+      hour: '2-digit',
+      minute: '2-digit',
       hour12: false,
       timeZone: tz,
     });
   } catch (e) {
-    return "";
+    return '';
   }
 }
 
 export function formatDate(iso?: string | null) {
-  if (!iso) return "";
+  if (!iso) return '';
   try {
     const date = parseISO(iso);
     const tz = getWorkspaceTimezone();
     const locale = getUserLocale();
     return date.toLocaleString(locale || undefined, {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
       timeZone: tz,
     });
   } catch (e) {
-    return "";
+    return '';
   }
 }
 
 export function formatDateTime(iso?: string | null) {
-  if (!iso) return "";
+  if (!iso) return '';
   try {
     const date = parseISO(iso);
     const tz = getWorkspaceTimezone();
     const locale = getUserLocale();
     return date.toLocaleString(locale || undefined, {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
       hour12: false,
       timeZone: tz,
     });
   } catch (e) {
-    return "";
+    return '';
   }
 }
 

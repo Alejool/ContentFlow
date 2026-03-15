@@ -1,7 +1,7 @@
-import { Campaign } from "@/types/Campaign";
-import { usePage } from "@inertiajs/react";
-import { format } from "date-fns";
-import { getDateFnsLocale } from "@/Utils/dateLocales";
+import { Campaign } from '@/types/Campaign';
+import { usePage } from '@inertiajs/react';
+import { format } from 'date-fns';
+import { getDateFnsLocale } from '@/Utils/dateLocales';
 import {
   Calendar,
   ChevronDown,
@@ -13,9 +13,9 @@ import {
   Layers,
   Target,
   Trash2,
-} from "lucide-react";
-import { memo } from "react";
-import { useTranslation } from "react-i18next";
+} from 'lucide-react';
+import { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface CampaignRowProps {
   item: Campaign;
@@ -44,18 +44,18 @@ const CampaignRow = memo(
     const { t, i18n } = useTranslation();
     const locale = getDateFnsLocale(i18n.language);
     const { auth } = usePage<any>().props;
-    const canManage = auth.current_workspace?.permissions?.includes("manage-content");
+    const canManage = auth.current_workspace?.permissions?.includes('manage-content');
     return (
       <tr
         data-campaign-id={item.id}
         className={`group transition-colors hover:bg-gray-50/50 dark:hover:bg-neutral-700/30 ${
-          expandedCampaigns.includes(item.id) ? "bg-gray-50 dark:bg-neutral-800" : ""
+          expandedCampaigns.includes(item.id) ? 'bg-gray-50 dark:bg-neutral-800' : ''
         }`}
       >
         <td className="px-2 py-4 text-center">
           <button
             data-expand="true"
-            data-expanded={expandedCampaigns.includes(item.id) ? "true" : "false"}
+            data-expanded={expandedCampaigns.includes(item.id) ? 'true' : 'false'}
             onClick={() => toggleExpand(item.id)}
             className="rounded-full p-1 transition-colors hover:bg-black/5 dark:hover:bg-white/10"
           >
@@ -78,7 +78,7 @@ const CampaignRow = memo(
               <p className="mt-0.5 max-w-md truncate text-xs text-gray-500 dark:text-gray-400">
                 {item.description && item.description.length > 80
                   ? `${item.description.substring(0, 80)}...`
-                  : item.description || "No description"}
+                  : item.description || 'No description'}
               </p>
 
               {/* Goal & Dates */}
@@ -88,16 +88,16 @@ const CampaignRow = memo(
                     <Calendar className="h-3 w-3" />
                     <span>
                       {item.start_date
-                        ? format(new Date(item.start_date), "d MMM", {
+                        ? format(new Date(item.start_date), 'd MMM', {
                             locale,
                           })
-                        : "..."}
-                      {" - "}
+                        : '...'}
+                      {' - '}
                       {item.end_date
-                        ? format(new Date(item.end_date), "d MMM yyyy", {
+                        ? format(new Date(item.end_date), 'd MMM yyyy', {
                             locale,
                           })
-                        : "..."}
+                        : '...'}
                     </span>
                   </div>
                 )}
@@ -111,9 +111,9 @@ const CampaignRow = memo(
                   <div className="flex items-center gap-1 rounded bg-green-50 px-1.5 py-0.5 text-xs text-gray-500 dark:bg-green-900/10 dark:text-gray-400">
                     <DollarSign className="h-3 w-3 text-green-600 dark:text-green-400" />
                     <span>
-                      {new Intl.NumberFormat("es-ES", {
-                        style: "currency",
-                        currency: "USD",
+                      {new Intl.NumberFormat('es-ES', {
+                        style: 'currency',
+                        currency: 'USD',
                       }).format(item.budget)}
                     </span>
                   </div>
@@ -152,7 +152,7 @@ const CampaignRow = memo(
               item.status,
             )}`}
           >
-            {t(`campaigns.filters.${item.status || "active"}`)}
+            {t(`campaigns.filters.${item.status || 'active'}`)}
           </span>
         </td>
         <td className="px-6 py-4 text-sm text-gray-500">

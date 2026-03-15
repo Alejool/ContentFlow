@@ -7,7 +7,7 @@
  * - new Date().toLocaleTimeString()
  */
 
-import { useTimezoneStore } from "@/stores/timezoneStore";
+import { useTimezoneStore } from '@/stores/timezoneStore';
 
 /**
  * Obtiene el timezone del workspace
@@ -24,7 +24,7 @@ const getUserLocale = (): string => {
     (window as any).APP_LOCALE ||
     document.documentElement.lang ||
     Intl.DateTimeFormat().resolvedOptions().locale ||
-    "es-ES"
+    'es-ES'
   );
 };
 
@@ -43,22 +43,22 @@ export function formatDateTimeString(
   date: Date | string | number | null | undefined,
   options?: Intl.DateTimeFormatOptions,
 ): string {
-  if (!date) return "";
+  if (!date) return '';
 
   try {
-    const dateObj = typeof date === "string" || typeof date === "number" ? new Date(date) : date;
+    const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
 
-    if (isNaN(dateObj.getTime())) return "";
+    if (isNaN(dateObj.getTime())) return '';
 
     const timezone = getWorkspaceTimezone();
     const locale = getUserLocale();
 
     const defaultOptions: Intl.DateTimeFormatOptions = {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
       hour12: false,
       timeZone: timezone,
     };
@@ -66,17 +66,17 @@ export function formatDateTimeString(
     // Filter out invalid options
     const validOptions: Intl.DateTimeFormatOptions = {};
     const validKeys = [
-      "year",
-      "month",
-      "day",
-      "hour",
-      "minute",
-      "second",
-      "hour12",
-      "timeZone",
-      "weekday",
-      "era",
-      "timeZoneName",
+      'year',
+      'month',
+      'day',
+      'hour',
+      'minute',
+      'second',
+      'hour12',
+      'timeZone',
+      'weekday',
+      'era',
+      'timeZoneName',
     ];
 
     if (options) {
@@ -94,8 +94,8 @@ export function formatDateTimeString(
       timeZone: timezone, // Siempre usar timezone del workspace
     });
   } catch (error) {
-    console.error("Error formatting datetime:", error);
-    return "";
+    console.error('Error formatting datetime:', error);
+    return '';
   }
 }
 
@@ -114,20 +114,20 @@ export function formatDateString(
   date: Date | string | number | null | undefined,
   options?: Intl.DateTimeFormatOptions,
 ): string {
-  if (!date) return "";
+  if (!date) return '';
 
   try {
-    const dateObj = typeof date === "string" || typeof date === "number" ? new Date(date) : date;
+    const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
 
-    if (isNaN(dateObj.getTime())) return "";
+    if (isNaN(dateObj.getTime())) return '';
 
     const timezone = getWorkspaceTimezone();
     const locale = getUserLocale();
 
     const defaultOptions: Intl.DateTimeFormatOptions = {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
       timeZone: timezone,
     };
 
@@ -137,8 +137,8 @@ export function formatDateString(
       timeZone: timezone,
     });
   } catch (error) {
-    console.error("Error formatting date:", error);
-    return "";
+    console.error('Error formatting date:', error);
+    return '';
   }
 }
 
@@ -157,19 +157,19 @@ export function formatTimeString(
   date: Date | string | number | null | undefined,
   options?: Intl.DateTimeFormatOptions,
 ): string {
-  if (!date) return "";
+  if (!date) return '';
 
   try {
-    const dateObj = typeof date === "string" || typeof date === "number" ? new Date(date) : date;
+    const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
 
-    if (isNaN(dateObj.getTime())) return "";
+    if (isNaN(dateObj.getTime())) return '';
 
     const timezone = getWorkspaceTimezone();
     const locale = getUserLocale();
 
     const defaultOptions: Intl.DateTimeFormatOptions = {
-      hour: "2-digit",
-      minute: "2-digit",
+      hour: '2-digit',
+      minute: '2-digit',
       hour12: false,
       timeZone: timezone,
     };
@@ -180,8 +180,8 @@ export function formatTimeString(
       timeZone: timezone,
     });
   } catch (error) {
-    console.error("Error formatting time:", error);
-    return "";
+    console.error('Error formatting time:', error);
+    return '';
   }
 }
 
@@ -199,15 +199,15 @@ export function formatTimeString(
  */
 export function formatDateTimeStyled(
   date: Date | string | number | null | undefined,
-  dateStyle: "short" | "medium" | "long" | "full" = "short",
-  timeStyle: "short" | "medium" | "long" | "full" = "short",
+  dateStyle: 'short' | 'medium' | 'long' | 'full' = 'short',
+  timeStyle: 'short' | 'medium' | 'long' | 'full' = 'short',
 ): string {
-  if (!date) return "";
+  if (!date) return '';
 
   try {
-    const dateObj = typeof date === "string" || typeof date === "number" ? new Date(date) : date;
+    const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
 
-    if (isNaN(dateObj.getTime())) return "";
+    if (isNaN(dateObj.getTime())) return '';
 
     const timezone = getWorkspaceTimezone();
     const locale = getUserLocale();
@@ -218,8 +218,8 @@ export function formatDateTimeStyled(
       timeZone: timezone,
     });
   } catch (error) {
-    console.error("Error formatting datetime styled:", error);
-    return "";
+    console.error('Error formatting datetime styled:', error);
+    return '';
   }
 }
 
@@ -228,14 +228,14 @@ export function formatDateTimeStyled(
  */
 export function formatDateStyled(
   date: Date | string | number | null | undefined,
-  dateStyle: "short" | "medium" | "long" | "full" = "medium",
+  dateStyle: 'short' | 'medium' | 'long' | 'full' = 'medium',
 ): string {
-  if (!date) return "";
+  if (!date) return '';
 
   try {
-    const dateObj = typeof date === "string" || typeof date === "number" ? new Date(date) : date;
+    const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
 
-    if (isNaN(dateObj.getTime())) return "";
+    if (isNaN(dateObj.getTime())) return '';
 
     const timezone = getWorkspaceTimezone();
     const locale = getUserLocale();
@@ -245,7 +245,7 @@ export function formatDateStyled(
       timeZone: timezone,
     });
   } catch (error) {
-    console.error("Error formatting date styled:", error);
-    return "";
+    console.error('Error formatting date styled:', error);
+    return '';
   }
 }

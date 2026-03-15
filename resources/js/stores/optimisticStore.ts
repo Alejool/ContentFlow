@@ -1,7 +1,7 @@
-import { create } from "zustand";
-import type { OptimisticOperation, OptimisticState } from "../types/optimistic";
-import { errorLogger } from "../Utils/errorLogger";
-import { syncWithInertia } from "../utils/inertiaOptimisticSync";
+import { create } from 'zustand';
+import type { OptimisticOperation, OptimisticState } from '../types/optimistic';
+import { errorLogger } from '../Utils/errorLogger';
+import { syncWithInertia } from '../utils/inertiaOptimisticSync';
 
 /**
  * Optimistic Store - Manages optimistic updates with rollback capability
@@ -18,7 +18,7 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
   // State
   operations: new Map<string, OptimisticOperation>(),
   failedOperations: [],
-  isOnline: typeof navigator !== "undefined" ? navigator.onLine : true,
+  isOnline: typeof navigator !== 'undefined' ? navigator.onLine : true,
 
   // Actions
 
@@ -42,7 +42,7 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
     });
 
     // Sync with Inertia.js state (Requirements: 9.4)
-    syncWithInertia(operation, "pending");
+    syncWithInertia(operation, 'pending');
 
     // Auto-persist after adding operation
     get().persist();
@@ -60,7 +60,7 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
       if (op) {
         const updatedOp: OptimisticOperation = {
           ...op,
-          status: "success",
+          status: 'success',
           completedAt: Date.now(),
         };
         newOps.set(id, updatedOp);
@@ -71,14 +71,14 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
         }
 
         // Sync with Inertia.js state (Requirements: 9.4)
-        syncWithInertia(updatedOp, "success", serverData);
+        syncWithInertia(updatedOp, 'success', serverData);
 
         // Execute success callback if provided
         if (op.onSuccess) {
           try {
             op.onSuccess(serverData);
           } catch (error) {
-            console.warn("[OptimisticStore] onSuccess callback error:", error);
+            console.warn('[OptimisticStore] onSuccess callback error:', error);
           }
         }
       }
@@ -106,7 +106,7 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
         // Create failed operation record
         const failedOp: OptimisticOperation = {
           ...op,
-          status: "failed",
+          status: 'failed',
           completedAt: Date.now(),
           error: {
             message: error.message,
@@ -118,7 +118,7 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
         // Log comprehensive error details
         // Requirements: 3.5, 10.3
         errorLogger.logError(error, {
-          type: "optimistic",
+          type: 'optimistic',
           operation: `${op.type}_${op.resource}`,
           resource: op.resource,
           resourceId: op.resourceId,
@@ -128,7 +128,7 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
             retryCount: op.retryCount,
             duration: failedOp.completedAt! - op.timestamp,
           },
-          severity: "error",
+          severity: 'error',
         });
 
         // Log in development mode
@@ -142,10 +142,10 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
             op.onError(error);
           } catch (callbackError) {
             errorLogger.logError(callbackError as Error, {
-              type: "optimistic",
-              operation: "callback_error",
+              type: 'optimistic',
+              operation: 'callback_error',
               resource: op.resource,
-              severity: "warning",
+              severity: 'warning',
             });
           }
         }
@@ -156,10 +156,10 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
             op.onRollback();
           } catch (callbackError) {
             errorLogger.logError(callbackError as Error, {
-              type: "optimistic",
-              operation: "callback_error",
+              type: 'optimistic',
+              operation: 'callback_error',
               resource: op.resource,
-              severity: "warning",
+              severity: 'warning',
             });
           }
         }
@@ -183,7 +183,7 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
    */
   getPendingOperations: (resource: string) => {
     const ops = Array.from(get().operations.values());
-    return ops.filter((op) => op.resource === resource && op.status === "pending");
+    return ops.filter((op) => op.resource === resource && op.status === 'pending');
   },
 
   /**
@@ -236,7 +236,7 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
         timestamp: Date.now(),
       };
 
-      localStorage.setItem("optimistic-operations", JSON.stringify(dataToStore));
+      localStorage.setItem('optimistic-operations', JSON.stringify(dataToStore));
 
       if (import.meta.env.DEV) {
         console.log(`[OptimisticStore] Persisted ${state.operations.size} operations`);
@@ -252,7 +252,7 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
    */
   restore: () => {
     try {
-      const stored = localStorage.getItem("optimistic-operations");
+      const stored = localStorage.getItem('optimistic-operations');
 
       if (stored) {
         const data = JSON.parse(stored);
@@ -286,7 +286,7 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
 }));
 
 // Restore state on initialization
-if (typeof window !== "undefined") {
+if (typeof window !== 'undefined') {
   useOptimisticStore.getState().restore();
 }
 

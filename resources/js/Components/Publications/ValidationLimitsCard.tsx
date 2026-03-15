@@ -1,6 +1,6 @@
-import React from "react";
-import { ValidationResult } from "@/Services/SocialMediaLimitsService";
-import SocialMediaLimitsService from "@/Services/SocialMediaLimitsService";
+import React from 'react';
+import { ValidationResult } from '@/Services/SocialMediaLimitsService';
+import SocialMediaLimitsService from '@/Services/SocialMediaLimitsService';
 
 interface ValidationLimitsCardProps {
   result: ValidationResult;
@@ -17,36 +17,36 @@ export default function ValidationLimitsCard({
 
   // Determinar el color del borde y fondo según el estado
   const getBorderColor = () => {
-    if (hasErrors) return "border-red-300 dark:border-red-800";
-    if (hasWarnings) return "border-yellow-300 dark:border-yellow-800";
-    return "border-green-300 dark:border-green-800";
+    if (hasErrors) return 'border-red-300 dark:border-red-800';
+    if (hasWarnings) return 'border-yellow-300 dark:border-yellow-800';
+    return 'border-green-300 dark:border-green-800';
   };
 
   const getBgColor = () => {
-    if (hasErrors) return "bg-red-50 dark:bg-red-900/10";
-    if (hasWarnings) return "bg-yellow-50 dark:bg-yellow-900/10";
-    return "bg-green-50 dark:bg-green-900/10";
+    if (hasErrors) return 'bg-red-50 dark:bg-red-900/10';
+    if (hasWarnings) return 'bg-yellow-50 dark:bg-yellow-900/10';
+    return 'bg-green-50 dark:bg-green-900/10';
   };
 
   const getStatusIcon = () => {
-    if (hasErrors) return "❌";
-    if (hasWarnings) return "⚠️";
-    return "✅";
+    if (hasErrors) return '❌';
+    if (hasWarnings) return '⚠️';
+    return '✅';
   };
 
   const getStatusText = () => {
-    if (hasErrors) return "No compatible";
-    if (hasWarnings) return "Compatible con advertencias";
-    return "Compatible";
+    if (hasErrors) return 'No compatible';
+    if (hasWarnings) return 'Compatible con advertencias';
+    return 'Compatible';
   };
 
   const platformIcons: Record<string, string> = {
-    twitter: "𝕏",
-    x: "𝕏",
-    facebook: "📘",
-    instagram: "📷",
-    youtube: "▶️",
-    tiktok: "🎵",
+    twitter: '𝕏',
+    x: '𝕏',
+    facebook: '📘',
+    instagram: '📷',
+    youtube: '▶️',
+    tiktok: '🎵',
   };
 
   return (
@@ -54,7 +54,7 @@ export default function ValidationLimitsCard({
       {/* Header */}
       <div className="mb-3 flex items-start justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-2xl">{platformIcons[result.platform.toLowerCase()] || "📱"}</span>
+          <span className="text-2xl">{platformIcons[result.platform.toLowerCase()] || '📱'}</span>
           <div>
             <h4 className="font-semibold text-gray-900 dark:text-gray-100">
               {result.account_name}
@@ -68,8 +68,8 @@ export default function ValidationLimitsCard({
                   result.is_verified,
                 )}`}
               >
-                {SocialMediaLimitsService.getVerificationIcon(result.is_verified)}{" "}
-                {result.is_verified ? "Verificada" : "No verificada"}
+                {SocialMediaLimitsService.getVerificationIcon(result.is_verified)}{' '}
+                {result.is_verified ? 'Verificada' : 'No verificada'}
               </span>
             </div>
           </div>
@@ -84,10 +84,10 @@ export default function ValidationLimitsCard({
         <span
           className={`inline-block rounded-md px-3 py-1 text-sm font-medium ${
             hasErrors
-              ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
+              ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
               : hasWarnings
-                ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300"
-                : "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
+                ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
+                : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
           }`}
         >
           {getStatusText()}
@@ -117,7 +117,7 @@ export default function ValidationLimitsCard({
               <span className="text-gray-500 dark:text-gray-400">Imágenes por post:</span>
               <span className="ml-1 font-medium text-gray-700 dark:text-gray-300">
                 {result.limits.max_images_per_post === 0
-                  ? "No soporta imágenes"
+                  ? 'No soporta imágenes'
                   : `Máximo ${result.limits.max_images_per_post}`}
               </span>
             </div>
@@ -142,8 +142,8 @@ export default function ValidationLimitsCard({
                   <div
                     className={`rounded p-2 ${
                       isCritical
-                        ? "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300"
-                        : "bg-red-50 text-red-700 dark:bg-red-900/10 dark:text-red-400"
+                        ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300'
+                        : 'bg-red-50 text-red-700 dark:bg-red-900/10 dark:text-red-400'
                     }`}
                   >
                     <p className="font-medium">{error}</p>

@@ -1,7 +1,7 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card";
-import { Badge } from "@/Components/ui/badge";
-import { CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import { Badge } from '@/Components/ui/badge';
+import { CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface SystemStatus {
   plans: Record<string, boolean>;
@@ -31,9 +31,9 @@ export default function SystemStatusCard({ status }: Props) {
 
   const getStatusColor = (enabled: number, total: number) => {
     const percentage = (enabled / total) * 100;
-    if (percentage === 100) return "text-green-600 dark:text-green-400";
-    if (percentage >= 50) return "text-yellow-600 dark:text-yellow-400";
-    return "text-red-600 dark:text-red-400";
+    if (percentage === 100) return 'text-green-600 dark:text-green-400';
+    if (percentage >= 50) return 'text-yellow-600 dark:text-yellow-400';
+    return 'text-red-600 dark:text-red-400';
   };
 
   const StatusItem = ({
@@ -55,7 +55,7 @@ export default function SystemStatusCard({ status }: Props) {
           <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{label}</span>
         </div>
         <Badge
-          variant={enabled === total ? "default" : enabled === 0 ? "destructive" : "secondary"}
+          variant={enabled === total ? 'default' : enabled === 0 ? 'destructive' : 'secondary'}
         >
           {enabled}/{total}
         </Badge>
@@ -67,10 +67,10 @@ export default function SystemStatusCard({ status }: Props) {
     <Card className="border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
       <CardHeader>
         <CardTitle className="text-gray-900 dark:text-gray-100">
-          {t("admin.system_status.title")}
+          {t('admin.system_status.title')}
         </CardTitle>
         <CardDescription className="text-gray-600 dark:text-gray-400">
-          {t("admin.system_status.description")}
+          {t('admin.system_status.description')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -79,10 +79,10 @@ export default function SystemStatusCard({ status }: Props) {
             <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
             <div>
               <p className="text-sm font-semibold text-red-900 dark:text-red-100">
-                {t("admin.system_status.maintenance_mode.title")}
+                {t('admin.system_status.maintenance_mode.title')}
               </p>
               <p className="text-xs text-red-700 dark:text-red-300">
-                {t("admin.system_status.maintenance_mode.description")}
+                {t('admin.system_status.maintenance_mode.description')}
               </p>
             </div>
           </div>
@@ -93,10 +93,10 @@ export default function SystemStatusCard({ status }: Props) {
             <AlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
             <div>
               <p className="text-sm font-semibold text-yellow-900 dark:text-yellow-100">
-                {t("admin.system_status.registrations_disabled.title")}
+                {t('admin.system_status.registrations_disabled.title')}
               </p>
               <p className="text-xs text-yellow-700 dark:text-yellow-300">
-                {t("admin.system_status.registrations_disabled.description")}
+                {t('admin.system_status.registrations_disabled.description')}
               </p>
             </div>
           </div>
@@ -104,22 +104,22 @@ export default function SystemStatusCard({ status }: Props) {
 
         <div className="space-y-1">
           <StatusItem
-            label={t("admin.system_status.categories.plans")}
+            label={t('admin.system_status.categories.plans')}
             enabled={countEnabled(status.plans)}
             total={countTotal(status.plans)}
           />
           <StatusItem
-            label={t("admin.system_status.categories.addons")}
+            label={t('admin.system_status.categories.addons')}
             enabled={countEnabled(status.addons)}
             total={countTotal(status.addons)}
           />
           <StatusItem
-            label={t("admin.system_status.categories.features")}
+            label={t('admin.system_status.categories.features')}
             enabled={countEnabled(status.features)}
             total={countTotal(status.features)}
           />
           <StatusItem
-            label={t("admin.system_status.categories.integrations")}
+            label={t('admin.system_status.categories.integrations')}
             enabled={countEnabled(status.integrations)}
             total={countTotal(status.integrations)}
           />
@@ -132,7 +132,7 @@ export default function SystemStatusCard({ status }: Props) {
                 {countEnabled(status.features)}
               </p>
               <p className="text-xs text-gray-600 dark:text-gray-400">
-                {t("admin.system_status.stats.active_features")}
+                {t('admin.system_status.stats.active_features')}
               </p>
             </div>
             <div>
@@ -140,7 +140,7 @@ export default function SystemStatusCard({ status }: Props) {
                 {countEnabled(status.plans)}
               </p>
               <p className="text-xs text-gray-600 dark:text-gray-400">
-                {t("admin.system_status.stats.available_plans")}
+                {t('admin.system_status.stats.available_plans')}
               </p>
             </div>
           </div>

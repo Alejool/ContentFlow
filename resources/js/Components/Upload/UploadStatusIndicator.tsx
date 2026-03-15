@@ -1,13 +1,13 @@
-import { Badge } from "@/Components/ui/badge";
-import { Button } from "@/Components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
-import { Progress } from "@/Components/ui/progress";
-import { useProcessingProgress } from "@/stores/processingProgressStore";
-import { useUploadQueue } from "@/stores/uploadQueueStore";
-import { AlertCircle, CheckCircle, Clock, RotateCcw, Upload, X } from "lucide-react";
-import React, { useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
+import { Badge } from '@/Components/ui/badge';
+import { Button } from '@/Components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
+import { Progress } from '@/Components/ui/progress';
+import { useProcessingProgress } from '@/stores/processingProgressStore';
+import { useUploadQueue } from '@/stores/uploadQueueStore';
+import { AlertCircle, CheckCircle, Clock, RotateCcw, Upload, X } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface UploadStatusIndicatorProps {
   className?: string;
@@ -15,7 +15,7 @@ interface UploadStatusIndicatorProps {
 }
 
 export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
-  className = "",
+  className = '',
   showDetails = false,
 }) => {
   const { t } = useTranslation();
@@ -27,14 +27,14 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
   const uploads = Object.values(queue);
   const processingJobs = Object.values(jobs);
 
-  const activeUploads = uploads.filter((u) => u.status === "uploading" || u.status === "pending");
-  const failedUploads = uploads.filter((u) => u.status === "error");
-  const completedUploads = uploads.filter((u) => u.status === "completed");
+  const activeUploads = uploads.filter((u) => u.status === 'uploading' || u.status === 'pending');
+  const failedUploads = uploads.filter((u) => u.status === 'error');
+  const completedUploads = uploads.filter((u) => u.status === 'completed');
 
   const activeProcessing = processingJobs.filter(
-    (j) => j.status === "processing" || j.status === "queued",
+    (j) => j.status === 'processing' || j.status === 'queued',
   );
-  const failedProcessing = processingJobs.filter((j) => j.status === "failed");
+  const failedProcessing = processingJobs.filter((j) => j.status === 'failed');
 
   const totalActive = activeUploads.length + activeProcessing.length;
   const totalFailed = failedUploads.length + failedProcessing.length;
@@ -63,16 +63,16 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "uploading":
-      case "processing":
+      case 'uploading':
+      case 'processing':
         return <Upload className="h-4 w-4 animate-spin" />;
-      case "pending":
-      case "queued":
+      case 'pending':
+      case 'queued':
         return <Clock className="h-4 w-4" />;
-      case "completed":
+      case 'completed':
         return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case "error":
-      case "failed":
+      case 'error':
+      case 'failed':
         return <AlertCircle className="h-4 w-4 text-red-500" />;
       default:
         return <Clock className="h-4 w-4" />;
@@ -81,32 +81,32 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "uploading":
-      case "processing":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400";
-      case "pending":
-      case "queued":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400";
-      case "completed":
-        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400";
-      case "error":
-      case "failed":
-        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400";
+      case 'uploading':
+      case 'processing':
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+      case 'pending':
+      case 'queued':
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
+      case 'completed':
+        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+      case 'error':
+      case 'failed':
+        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
       default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400";
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
     }
   };
 
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return "0 B";
+    if (bytes === 0) return '0 B';
     const k = 1024;
-    const sizes = ["B", "KB", "MB", "GB"];
+    const sizes = ['B', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
   };
 
   const formatSpeed = (bytesPerSecond: number) => {
-    return formatFileSize(bytesPerSecond) + "/s";
+    return formatFileSize(bytesPerSecond) + '/s';
   };
 
   const formatETA = (seconds: number) => {
@@ -117,12 +117,12 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
 
   const handleRetry = (uploadId: string) => {
     retryUpload(uploadId);
-    toast.success("Retrying upload...");
+    toast.success('Retrying upload...');
   };
 
   const handleCancel = (uploadId: string) => {
     cancelUpload(uploadId);
-    toast.success("Upload cancelled");
+    toast.success('Upload cancelled');
   };
 
   const handleRemove = (uploadId: string) => {
@@ -192,7 +192,7 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
                 </div>
 
                 <div className="mt-2 flex justify-end gap-1">
-                  {upload.isPausable && upload.status === "uploading" && (
+                  {upload.isPausable && upload.status === 'uploading' && (
                     <Button
                       variant="outline"
                       size="sm"

@@ -1,13 +1,13 @@
-import Button from "@/Components/common/Modern/Button";
-import { DynamicModal } from "@/Components/common/Modern/DynamicModal";
-import Select from "@/Components/common/Modern/Select";
-import { router } from "@inertiajs/react";
-import axios from "axios";
-import { Edit2, Shield, User, UserCheck, UserX } from "lucide-react";
-import { useState } from "react";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
-import { route } from "ziggy-js";
+import Button from '@/Components/common/Modern/Button';
+import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
+import Select from '@/Components/common/Modern/Select';
+import { router } from '@inertiajs/react';
+import axios from 'axios';
+import { Edit2, Shield, User, UserCheck, UserX } from 'lucide-react';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { route } from 'ziggy-js';
 
 interface Role {
   id: number;
@@ -59,21 +59,21 @@ export default function RoleManagement({
 
   const handleRoleAssignment = async (userId: number, roleId: number) => {
     if (!canManageRoles) {
-      toast.error(t("roles.errors.insufficient_permissions"));
+      toast.error(t('roles.errors.insufficient_permissions'));
       return;
     }
 
     try {
       setIsLoading(true);
-      await axios.post(route("api.v1.workspaces.roles.assign", { idOrSlug: workspace.id }), {
+      await axios.post(route('api.v1.workspaces.roles.assign', { idOrSlug: workspace.id }), {
         user_id: userId,
         role_id: roleId,
       });
 
-      toast.success(t("roles.success.assigned"));
-      router.reload({ only: ["users"] });
+      toast.success(t('roles.success.assigned'));
+      router.reload({ only: ['users'] });
     } catch (error: any) {
-      const message = error.response?.data?.message || t("roles.errors.assignment_failed");
+      const message = error.response?.data?.message || t('roles.errors.assignment_failed');
       toast.error(message);
     } finally {
       setIsLoading(false);
@@ -90,7 +90,7 @@ export default function RoleManagement({
     try {
       setIsLoading(true);
       await axios.put(
-        route("api.v1.workspaces.roles.update", {
+        route('api.v1.workspaces.roles.update', {
           idOrSlug: workspace.id,
           role: roleId,
         }),
@@ -99,13 +99,13 @@ export default function RoleManagement({
         },
       );
 
-      toast.success(t("roles.success.updated"));
-      router.reload({ only: ["roles"] });
+      toast.success(t('roles.success.updated'));
+      router.reload({ only: ['roles'] });
       setIsEditModalOpen(false);
       setEditingRole(null);
       setSelectedPermissions([]);
     } catch (error: any) {
-      const message = error.response?.data?.message || t("roles.errors.update_failed");
+      const message = error.response?.data?.message || t('roles.errors.update_failed');
       toast.error(message);
     } finally {
       setIsLoading(false);
@@ -118,10 +118,10 @@ export default function RoleManagement({
 
   const getRoleBadgeColor = (roleName: string) => {
     const colors: Record<string, string> = {
-      owner: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
-      admin: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-      editor: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-      viewer: "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400",
+      owner: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+      admin: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+      editor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+      viewer: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
     };
     return colors[roleName.toLowerCase()] || colors.viewer;
   };
@@ -136,10 +136,10 @@ export default function RoleManagement({
           </div>
           <div>
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-              {t("roles.management.title")}
+              {t('roles.management.title')}
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              {t("roles.management.subtitle")}
+              {t('roles.management.subtitle')}
             </p>
           </div>
         </div>
@@ -160,7 +160,7 @@ export default function RoleManagement({
                 >
                   {users.filter((u) => u.pivot?.role_id === role.id).length}
                 </span>
-                {canManageRoles && !role.name.toLowerCase().includes("owner") && (
+                {canManageRoles && !role.name.toLowerCase().includes('owner') && (
                   <Button
                     size="sm"
                     variant="ghost"
@@ -170,9 +170,9 @@ export default function RoleManagement({
                       handleEditRole(role);
                     }}
                     icon={Edit2}
-                    title={t("common.edit")}
+                    title={t('common.edit')}
                   >
-                    {""}
+                    {''}
                   </Button>
                 )}
               </div>
@@ -191,7 +191,7 @@ export default function RoleManagement({
               {expandedPermissions === role.id && (
                 <div className="mt-3 border-t border-gray-200 pt-3 dark:border-neutral-700">
                   <p className="mb-2 text-xs font-semibold text-gray-700 dark:text-gray-300">
-                    {t("roles.permissions")}:
+                    {t('roles.permissions')}:
                   </p>
                   <div className="space-y-1">
                     {role.permissions.map((permission) => (
@@ -214,9 +214,9 @@ export default function RoleManagement({
       {/* Users List */}
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
         <div className="border-b border-gray-200 p-6 dark:border-neutral-800">
-          <h4 className="font-bold text-gray-900 dark:text-white">{t("roles.users_list")}</h4>
+          <h4 className="font-bold text-gray-900 dark:text-white">{t('roles.users_list')}</h4>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {t("roles.users_list_subtitle")}
+            {t('roles.users_list_subtitle')}
           </p>
         </div>
 
@@ -225,17 +225,17 @@ export default function RoleManagement({
             <thead className="border-b border-gray-200 bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800/50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                  {t("roles.table.user")}
+                  {t('roles.table.user')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                  {t("roles.table.current_role")}
+                  {t('roles.table.current_role')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                  {t("roles.table.permissions")}
+                  {t('roles.table.permissions')}
                 </th>
                 {canManageRoles && (
                   <th className="px-6 py-3 text-right text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                    {t("roles.table.actions")}
+                    {t('roles.table.actions')}
                   </th>
                 )}
               </tr>
@@ -302,7 +302,7 @@ export default function RoleManagement({
                             value: r.id.toString(),
                             label: r.display_name,
                           }))}
-                          value={user.pivot?.role_id?.toString() || ""}
+                          value={user.pivot?.role_id?.toString() || ''}
                           onChange={(value) => handleRoleAssignment(user.id, parseInt(value))}
                           size="sm"
                           containerClassName="inline-block w-40"
@@ -324,10 +324,10 @@ export default function RoleManagement({
             <UserX className="mt-0.5 h-5 w-5 text-yellow-600 dark:text-yellow-400" />
             <div>
               <p className="text-sm font-medium text-yellow-800 dark:text-yellow-400">
-                {t("roles.insufficient_permissions_title")}
+                {t('roles.insufficient_permissions_title')}
               </p>
               <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
-                {t("roles.insufficient_permissions_message")}
+                {t('roles.insufficient_permissions_message')}
               </p>
             </div>
           </div>
@@ -342,16 +342,16 @@ export default function RoleManagement({
           setEditingRole(null);
           setSelectedPermissions([]);
         }}
-        title={editingRole ? `${t("roles.edit_role")} - ${editingRole.display_name}` : ""}
+        title={editingRole ? `${t('roles.edit_role')} - ${editingRole.display_name}` : ''}
         size="2xl"
       >
         <div className="space-y-6">
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            {t("roles.edit_role_subtitle")}
+            {t('roles.edit_role_subtitle')}
           </p>
 
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            {t("roles.select_permissions")}
+            {t('roles.select_permissions')}
           </p>
 
           <div className="grid max-h-[50vh] grid-cols-1 gap-3 overflow-y-auto md:grid-cols-2">
@@ -400,7 +400,7 @@ export default function RoleManagement({
               }}
               disabled={isLoading}
             >
-              {t("common.cancel")}
+              {t('common.cancel')}
             </Button>
             <Button
               variant="primary"
@@ -410,7 +410,7 @@ export default function RoleManagement({
               disabled={isLoading || selectedPermissions.length === 0}
               icon={Shield}
             >
-              {isLoading ? t("common.saving") : t("common.save_changes")}
+              {isLoading ? t('common.saving') : t('common.save_changes')}
             </Button>
           </div>
         </div>

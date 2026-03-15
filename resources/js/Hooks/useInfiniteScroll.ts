@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 interface UseInfiniteScrollOptions<T> {
   fetchFn: (page: number) => Promise<{ data: T[]; hasMore: boolean }>;
@@ -25,7 +25,7 @@ export function useInfiniteScroll<T>({
   fetchFn,
   initialPage = 1,
   threshold = 0.5,
-  rootMargin = "100px",
+  rootMargin = '100px',
 }: UseInfiniteScrollOptions<T>): UseInfiniteScrollReturn<T> {
   const [items, setItems] = useState<T[]>([]);
   const [page, setPage] = useState(initialPage);
@@ -50,7 +50,7 @@ export function useInfiniteScroll<T>({
       setPage((prev) => prev + 1);
     } catch (err) {
       setError(err as Error);
-      console.error("Failed to load more items:", err);
+      console.error('Failed to load more items:', err);
     } finally {
       setIsLoading(false);
       isLoadingRef.current = false;

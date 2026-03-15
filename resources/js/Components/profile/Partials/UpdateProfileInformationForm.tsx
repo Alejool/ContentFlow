@@ -1,41 +1,41 @@
-import Button from "@/Components/common/Modern/Button";
-import Input from "@/Components/common/Modern/Input";
-import Textarea from "@/Components/common/Modern/Textarea";
-import PhoneInput from "@/Components/common/Modern/PhoneInput";
-import ConnectedAccounts from "@/Components/profile/Partials/ConnectedAccounts";
-import AvatarSettings from "@/Pages/Profile/AvatarSettings";
-import { useUser } from "@/Hooks/useUser";
-import { Link } from "@inertiajs/react";
-import { CheckCircle, Mail, MailWarning, Send, User as UserIcon } from "lucide-react";
-import { Controller } from "react-hook-form";
-import { useTranslation } from "react-i18next";
-import type { CountryCode } from "libphonenumber-js";
+import Button from '@/Components/common/Modern/Button';
+import Input from '@/Components/common/Modern/Input';
+import Textarea from '@/Components/common/Modern/Textarea';
+import PhoneInput from '@/Components/common/Modern/PhoneInput';
+import ConnectedAccounts from '@/Components/profile/Partials/ConnectedAccounts';
+import AvatarSettings from '@/Pages/Profile/AvatarSettings';
+import { useUser } from '@/Hooks/useUser';
+import { Link } from '@inertiajs/react';
+import { CheckCircle, Mail, MailWarning, Send, User as UserIcon } from 'lucide-react';
+import { Controller } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import type { CountryCode } from 'libphonenumber-js';
 
 // List of supported countries (LatAm + US + España)
 const SUPPORTED_COUNTRIES: CountryCode[] = [
-  "AR",
-  "BO",
-  "BR",
-  "CL",
-  "CO",
-  "CR",
-  "CU",
-  "DO",
-  "EC",
-  "SV",
-  "GT",
-  "HT",
-  "HN",
-  "MX",
-  "NI",
-  "PA",
-  "PY",
-  "PE",
-  "PR",
-  "UY",
-  "VE",
-  "US",
-  "ES",
+  'AR',
+  'BO',
+  'BR',
+  'CL',
+  'CO',
+  'CR',
+  'CU',
+  'DO',
+  'EC',
+  'SV',
+  'GT',
+  'HT',
+  'HN',
+  'MX',
+  'NI',
+  'PA',
+  'PY',
+  'PE',
+  'PR',
+  'UY',
+  'VE',
+  'US',
+  'ES',
 ];
 
 interface UpdateProfileInformationProps {
@@ -49,7 +49,7 @@ export default function UpdateProfileInformation({
   mustVerifyEmail,
   user: initialUser,
   status,
-  className = "",
+  className = '',
 }: UpdateProfileInformationProps) {
   const { t } = useTranslation();
 
@@ -72,15 +72,15 @@ export default function UpdateProfileInformation({
             <div>
               <div className="flex items-center gap-3 pb-4">
                 <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  {t("profile.information.sections.personal")}
+                  {t('profile.information.sections.personal')}
                 </h3>
               </div>
 
               <div className="grid grid-cols-1 gap-6">
                 <Input
                   id="name"
-                  label={t("profile.information.nameLabel")}
-                  placeholder={t("profile.information.namePlaceholder")}
+                  label={t('profile.information.nameLabel')}
+                  placeholder={t('profile.information.namePlaceholder')}
                   register={register}
                   error={errors.name?.message}
                   sizeType="lg"
@@ -92,11 +92,11 @@ export default function UpdateProfileInformation({
                 <div className="relative">
                   <Input
                     id="email"
-                    label={t("profile.information.emailLabel")}
+                    label={t('profile.information.emailLabel')}
                     type="email"
                     register={register}
                     error={errors.email?.message}
-                    placeholder={t("profile.information.emailPlaceholder")}
+                    placeholder={t('profile.information.emailPlaceholder')}
                     sizeType="lg"
                     variant="filled"
                     icon={Mail}
@@ -111,7 +111,7 @@ export default function UpdateProfileInformation({
             <div className="border-t border-gray-100 pt-8 dark:border-neutral-800">
               <div className="flex items-center gap-3 pb-4">
                 <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  {t("profile.information.sections.contact")}
+                  {t('profile.information.sections.contact')}
                 </h3>
               </div>
 
@@ -121,10 +121,10 @@ export default function UpdateProfileInformation({
                   control={control}
                   render={({ field }) => (
                     <PhoneInput
-                      value={field.value || ""}
+                      value={field.value || ''}
                       onChange={field.onChange}
-                      label={t("profile.information.phoneLabel")}
-                      placeholder={t("profile.information.phonePlaceholder")}
+                      label={t('profile.information.phoneLabel')}
+                      placeholder={t('profile.information.phonePlaceholder')}
                       error={errors.phone?.message}
                       disabled={isSubmitting}
                       countries={SUPPORTED_COUNTRIES}
@@ -136,8 +136,8 @@ export default function UpdateProfileInformation({
 
                 <Textarea
                   id="bio"
-                  label={t("profile.information.bioLabel")}
-                  placeholder={t("profile.information.bioPlaceholder")}
+                  label={t('profile.information.bioLabel')}
+                  placeholder={t('profile.information.bioPlaceholder')}
                   register={register}
                   name="bio"
                   error={errors.bio?.message}
@@ -156,29 +156,29 @@ export default function UpdateProfileInformation({
                 <MailWarning className="h-5 w-5 text-amber-600 dark:text-amber-400" />
               </div>
               <span className="text-lg">
-                {t("profile.statistics.emailStatus")}: {t("profile.statistics.unverified")}
+                {t('profile.statistics.emailStatus')}: {t('profile.statistics.unverified')}
               </span>
             </div>
 
             <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
               <p className="flex-1 text-sm font-medium leading-relaxed text-amber-700 dark:text-amber-200/70">
-                {t("profile.information.emailUnverified")}
+                {t('profile.information.emailUnverified')}
               </p>
               <Link
-                href={route("verification.send")}
+                href={route('verification.send')}
                 method="post"
                 as="button"
                 className="flex items-center justify-center gap-2 rounded-lg border-0 bg-primary-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-primary-500/20 transition-all duration-300 hover:bg-primary-500"
               >
                 <Send className="h-4 w-4" />
-                {t("profile.information.sendVerification")}
+                {t('profile.information.sendVerification')}
               </Link>
             </div>
 
-            {status === "verification-link-sent" && (
+            {status === 'verification-link-sent' && (
               <div className="mt-4 flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-4 text-sm font-bold text-green-700 dark:border-green-800/30 dark:bg-green-900/10 dark:text-green-400">
                 <CheckCircle className="h-5 w-5" />
-                {t("profile.information.verificationSent")}
+                {t('profile.information.verificationSent')}
               </div>
             )}
           </div>

@@ -1,6 +1,6 @@
-import ApprovalHistorySection from "@/Components/Content/Publication/common/edit/ApprovalHistorySection";
-import { AlertCircle, CheckCircle, ChevronDown, ChevronUp, Shield } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import ApprovalHistorySection from '@/Components/Content/Publication/common/edit/ApprovalHistorySection';
+import { AlertCircle, CheckCircle, ChevronDown, ChevronUp, Shield } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ApprovalHistoryCompactoProps {
   logs: any[];
@@ -8,7 +8,7 @@ interface ApprovalHistoryCompactoProps {
   onToggle: () => void;
   workflow?: any;
   currentStepNumber?: number;
-  approvalStatus?: "pending" | "approved" | "rejected" | "cancelled";
+  approvalStatus?: 'pending' | 'approved' | 'rejected' | 'cancelled';
 }
 
 const ApprovalHistoryCompacto = ({
@@ -31,9 +31,9 @@ const ApprovalHistoryCompacto = ({
   };
 
   const getApprovalStats = () => {
-    const approved = logs.filter((log) => log.action === "approved").length;
-    const rejected = logs.filter((log) => log.action === "rejected").length;
-    const pending = logs.filter((log) => log.action === "submitted" || !log.action).length;
+    const approved = logs.filter((log) => log.action === 'approved').length;
+    const rejected = logs.filter((log) => log.action === 'rejected').length;
+    const pending = logs.filter((log) => log.action === 'submitted' || !log.action).length;
 
     return { approved, rejected, pending };
   };
@@ -44,25 +44,25 @@ const ApprovalHistoryCompacto = ({
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      approved: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-      rejected: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-      pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+      approved: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+      rejected: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+      pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
     };
-    return colors[status] || "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
+    return colors[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
   };
 
   const getStatusText = (status: string) => {
     const texts: Record<string, string> = {
-      approved: "Aprobado",
-      rejected: "Rechazado",
-      pending: "Pendiente",
+      approved: 'Aprobado',
+      rejected: 'Rechazado',
+      pending: 'Pendiente',
     };
     return texts[status] || status;
   };
 
   const getStatusIcon = (status: string) => {
-    if (status === "approved") return <CheckCircle className="h-4 w-4" />;
-    if (status === "rejected") return <AlertCircle className="h-4 w-4" />;
+    if (status === 'approved') return <CheckCircle className="h-4 w-4" />;
+    if (status === 'rejected') return <AlertCircle className="h-4 w-4" />;
     return <Shield className="h-4 w-4" />;
   };
 
@@ -82,7 +82,7 @@ const ApprovalHistoryCompacto = ({
           <div className="text-left">
             <div className="flex items-center gap-2">
               <span className="font-medium text-gray-900 dark:text-white">
-                {t("approvals.historyTitle")}
+                {t('approvals.historyTitle')}
               </span>
               {latestLog && (
                 <span
@@ -97,7 +97,7 @@ const ApprovalHistoryCompacto = ({
         </div>
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-500 dark:text-gray-400">
-            {isExpanded ? t("common.collapse") : t("common.expand")}
+            {isExpanded ? t('common.collapse') : t('common.expand')}
           </span>
           {isExpanded ? (
             <ChevronUp className="h-5 w-5 text-gray-500 dark:text-gray-400" />

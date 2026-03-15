@@ -1,15 +1,15 @@
-import { Briefcase, Crown, Heart, Smile, Sparkles, Star, User, Zap } from "lucide-react";
-import { useState } from "react";
+import { Briefcase, Crown, Heart, Smile, Sparkles, Star, User, Zap } from 'lucide-react';
+import { useState } from 'react';
 
 interface UnifiedAvatarProps {
   src?: string | null;
   defaultIcon?: string | null;
   name?: string;
-  size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   className?: string;
   showStatus?: boolean;
   statusColor?: string;
-  loading?: "lazy" | "eager";
+  loading?: 'lazy' | 'eager';
 }
 
 // Iconos disponibles por defecto
@@ -27,12 +27,12 @@ const DEFAULT_ICONS = {
 export function UnifiedAvatar({
   src,
   defaultIcon,
-  name = "User",
-  size = "md",
-  className = "",
+  name = 'User',
+  size = 'md',
+  className = '',
   showStatus = false,
-  statusColor = "bg-emerald-500",
-  loading = "lazy",
+  statusColor = 'bg-emerald-500',
+  loading = 'lazy',
 }: UnifiedAvatarProps) {
   const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -43,16 +43,16 @@ export function UnifiedAvatar({
     const timer = setTimeout(() => {
       if (!imageLoaded) setImageError(true);
     }, 5000);
-    img.addEventListener("load", () => clearTimeout(timer), { once: true });
-    img.addEventListener("error", () => clearTimeout(timer), { once: true });
+    img.addEventListener('load', () => clearTimeout(timer), { once: true });
+    img.addEventListener('error', () => clearTimeout(timer), { once: true });
   };
   const sizeClasses = {
-    xs: "w-6 h-6 text-[10px]",
-    sm: "w-8 h-8 text-xs",
-    md: "w-10 h-10 text-sm",
-    lg: "w-12 h-12 text-base",
-    xl: "w-16 h-16 text-xl",
-    "2xl": "w-24 h-24 text-2xl",
+    xs: 'w-6 h-6 text-[10px]',
+    sm: 'w-8 h-8 text-xs',
+    md: 'w-10 h-10 text-sm',
+    lg: 'w-12 h-12 text-base',
+    xl: 'w-16 h-16 text-xl',
+    '2xl': 'w-24 h-24 text-2xl',
   };
 
   const iconSizes = {
@@ -61,15 +61,15 @@ export function UnifiedAvatar({
     md: 20,
     lg: 24,
     xl: 32,
-    "2xl": 48,
+    '2xl': 48,
   };
 
   const getInitials = (name: string) => {
-    if (!name.trim()) return "?";
+    if (!name.trim()) return '?';
     return name
-      .split(" ")
+      .split(' ')
       .map((n) => n[0])
-      .join("")
+      .join('')
       .toUpperCase()
       .slice(0, 2);
   };
@@ -93,7 +93,7 @@ export function UnifiedAvatar({
             loading={loading}
             ref={handleImageRef}
             className={`h-full w-full object-cover transition-opacity duration-300 ${
-              imageLoaded ? "opacity-100" : "opacity-0"
+              imageLoaded ? 'opacity-100' : 'opacity-0'
             }`}
             onLoad={() => setImageLoaded(true)}
             onError={() => {
@@ -133,11 +133,11 @@ export function UnifiedAvatar({
       {showStatus && (
         <div
           className={`absolute bottom-0 right-0 ${
-            size === "xs" || size === "sm"
-              ? "h-2 w-2"
-              : size === "md" || size === "lg"
-                ? "h-3 w-3"
-                : "h-4 w-4"
+            size === 'xs' || size === 'sm'
+              ? 'h-2 w-2'
+              : size === 'md' || size === 'lg'
+                ? 'h-3 w-3'
+                : 'h-4 w-4'
           } ${statusColor} rounded-full border-2 border-white shadow-sm dark:border-neutral-900`}
         ></div>
       )}

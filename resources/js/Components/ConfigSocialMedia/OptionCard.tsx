@@ -1,5 +1,5 @@
-import RadioInput from "@/Components/common/Modern/RadioInput";
-import { Check, LucideIcon } from "lucide-react";
+import RadioInput from '@/Components/common/Modern/RadioInput';
+import { Check, LucideIcon } from 'lucide-react';
 
 interface OptionCardProps {
   value: string;
@@ -19,8 +19,8 @@ export default function OptionCard({
   icon: Icon,
   selected = false,
   onSelect,
-  iconColor = "text-primary-500",
-  iconBgColor = "bg-primary-50 dark:bg-primary-900/20",
+  iconColor = 'text-primary-500',
+  iconBgColor = 'bg-primary-50 dark:bg-primary-900/20',
 }: OptionCardProps) {
   const inputId = `option-card-${value}`;
 
@@ -42,7 +42,7 @@ export default function OptionCard({
       </div>
       <div
         className={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${
-          selected ? "border-primary-500 bg-primary-500" : "border-gray-300 dark:border-gray-600"
+          selected ? 'border-primary-500 bg-primary-500' : 'border-gray-300 dark:border-gray-600'
         }`}
       >
         {selected && <Check className="h-3 w-3 text-white" />}

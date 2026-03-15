@@ -8,9 +8,9 @@
  * Requirements: 2.4
  */
 
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError } from 'axios';
 
-export type ThemePreference = "light" | "dark" | "system";
+export type ThemePreference = 'light' | 'dark' | 'system';
 
 export interface ThemeAPIClient {
   updateTheme(workspaceId: string, theme: ThemePreference): Promise<void>;
@@ -28,12 +28,12 @@ async function updateTheme(workspaceId: string, theme: ThemePreference): Promise
   }
 
   try {
-    await axios.patch(route("api.v1.profile.theme.update"), {
+    await axios.patch(route('api.v1.profile.theme.update'), {
       theme,
       workspace_id: workspaceId,
     });
   } catch (error) {
-    handleAPIError("updateTheme", error);
+    handleAPIError('updateTheme', error);
     throw error; // Re-throw to allow caller to handle
   }
 }
@@ -44,24 +44,24 @@ async function updateTheme(workspaceId: string, theme: ThemePreference): Promise
  */
 async function fetchTheme(workspaceId: string): Promise<ThemePreference> {
   if (!workspaceId) {
-    return "system";
+    return 'system';
   }
 
   try {
-    const response = await axios.get(route("api.v1.profile.theme.fetch"), {
+    const response = await axios.get(route('api.v1.profile.theme.fetch'), {
       params: { workspace_id: workspaceId },
     });
 
     const theme = response.data?.theme;
 
-    if (theme === "light" || theme === "dark" || theme === "system") {
+    if (theme === 'light' || theme === 'dark' || theme === 'system') {
       return theme;
     }
 
-    return "system";
+    return 'system';
   } catch (error) {
-    handleAPIError("fetchTheme", error);
-    return "system"; // Return default on error
+    handleAPIError('fetchTheme', error);
+    return 'system'; // Return default on error
   }
 }
 
@@ -74,7 +74,7 @@ async function syncThemes(): Promise<void> {
     // Future implementation: sync all workspace themes between local and remote
     // For now, this is a no-op as sync happens on individual save/load
   } catch (error) {
-    handleAPIError("syncThemes", error);
+    handleAPIError('syncThemes', error);
   }
 }
 

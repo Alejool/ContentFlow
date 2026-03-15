@@ -1,7 +1,7 @@
-import { useTheme } from "@/Hooks/useTheme";
-import { Moon, Sun, Monitor, Sparkles } from "lucide-react";
-import { useState } from "react";
-import { flushSync } from "react-dom";
+import { useTheme } from '@/Hooks/useTheme';
+import { Moon, Sun, Monitor, Sparkles } from 'lucide-react';
+import { useState } from 'react';
+import { flushSync } from 'react-dom';
 
 /**
  * Componente de demostración para probar la animación de cambio de tema
@@ -15,7 +15,7 @@ export default function ThemeAnimationDemo() {
     y: number;
   } | null>(null);
 
-  const handleThemeChange = (newTheme: "light" | "dark" | "system", e: React.MouseEvent) => {
+  const handleThemeChange = (newTheme: 'light' | 'dark' | 'system', e: React.MouseEvent) => {
     if (isAnimating) return;
 
     const x = e.clientX;
@@ -43,10 +43,10 @@ export default function ThemeAnimationDemo() {
       return;
     }
 
-    document.documentElement.style.setProperty("--x", `${x}px`);
-    document.documentElement.style.setProperty("--y", `${y}px`);
-    document.documentElement.style.setProperty("--r", `${endRadius}px`);
-    document.documentElement.setAttribute("data-theme-transition", "true");
+    document.documentElement.style.setProperty('--x', `${x}px`);
+    document.documentElement.style.setProperty('--y', `${y}px`);
+    document.documentElement.style.setProperty('--r', `${endRadius}px`);
+    document.documentElement.setAttribute('data-theme-transition', 'true');
 
     const transition = (document as any).startViewTransition(async () => {
       flushSync(() => {
@@ -55,7 +55,7 @@ export default function ThemeAnimationDemo() {
     });
 
     transition.finished.finally(() => {
-      document.documentElement.removeAttribute("data-theme-transition");
+      document.documentElement.removeAttribute('data-theme-transition');
       setIsAnimating(false);
       setTimeout(() => setLastClickPosition(null), 1000);
     });
@@ -63,27 +63,27 @@ export default function ThemeAnimationDemo() {
 
   const themeOptions = [
     {
-      value: "light" as const,
-      label: "Light Mode",
+      value: 'light' as const,
+      label: 'Light Mode',
       icon: Sun,
-      gradient: "from-amber-400 to-orange-500",
+      gradient: 'from-amber-400 to-orange-500',
       bgColor:
-        "bg-gradient-to-br from-amber-50 to-orange-100 dark:from-amber-900/20 dark:to-orange-900/20",
+        'bg-gradient-to-br from-amber-50 to-orange-100 dark:from-amber-900/20 dark:to-orange-900/20',
     },
     {
-      value: "dark" as const,
-      label: "Dark Mode",
+      value: 'dark' as const,
+      label: 'Dark Mode',
       icon: Moon,
-      gradient: "from-indigo-500 to-purple-600",
+      gradient: 'from-indigo-500 to-purple-600',
       bgColor:
-        "bg-gradient-to-br from-indigo-50 to-purple-100 dark:from-indigo-900/20 dark:to-purple-900/20",
+        'bg-gradient-to-br from-indigo-50 to-purple-100 dark:from-indigo-900/20 dark:to-purple-900/20',
     },
     {
-      value: "system" as const,
-      label: "System",
+      value: 'system' as const,
+      label: 'System',
       icon: Monitor,
-      gradient: "from-gray-500 to-gray-700",
-      bgColor: "bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900",
+      gradient: 'from-gray-500 to-gray-700',
+      bgColor: 'bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900',
     },
   ];
 
@@ -104,7 +104,7 @@ export default function ThemeAnimationDemo() {
           <div className="inline-flex items-center gap-2 rounded-full bg-primary-100 px-4 py-2 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300">
             <span className="text-sm font-medium">Tema actual:</span>
             <span className="font-bold">{theme}</span>
-            {theme === "system" && <span className="text-xs opacity-70">({actualTheme})</span>}
+            {theme === 'system' && <span className="text-xs opacity-70">({actualTheme})</span>}
           </div>
         </div>
 
@@ -121,13 +121,13 @@ export default function ThemeAnimationDemo() {
                 disabled={isAnimating}
                 className={`relative rounded-2xl p-8 ${option.bgColor} border-2 transition-all duration-300 ${
                   isActive
-                    ? "scale-105 border-primary-500 shadow-xl"
-                    : "hover:scale-102 border-gray-200 shadow-lg hover:border-primary-300 dark:border-gray-700 dark:hover:border-primary-700"
+                    ? 'scale-105 border-primary-500 shadow-xl'
+                    : 'hover:scale-102 border-gray-200 shadow-lg hover:border-primary-300 dark:border-gray-700 dark:hover:border-primary-700'
                 } group disabled:cursor-not-allowed disabled:opacity-50`}
               >
                 <div className="flex flex-col items-center gap-4">
                   <div
-                    className={`h-20 w-20 rounded-full bg-gradient-to-br ${option.gradient} flex items-center justify-center transition-transform duration-300 ${isActive ? "scale-110" : "group-hover:scale-110"} `}
+                    className={`h-20 w-20 rounded-full bg-gradient-to-br ${option.gradient} flex items-center justify-center transition-transform duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110'} `}
                   >
                     <Icon className="h-10 w-10 text-white" />
                   </div>
@@ -155,7 +155,7 @@ export default function ThemeAnimationDemo() {
 
           {/* Esquina superior izquierda */}
           <button
-            onClick={(e) => handleThemeChange(theme === "dark" ? "light" : "dark", e)}
+            onClick={(e) => handleThemeChange(theme === 'dark' ? 'light' : 'dark', e)}
             disabled={isAnimating}
             className="absolute left-4 top-4 rounded-full bg-primary-500 p-4 text-white shadow-lg transition-all hover:bg-primary-600 hover:shadow-xl disabled:opacity-50"
           >
@@ -164,7 +164,7 @@ export default function ThemeAnimationDemo() {
 
           {/* Esquina superior derecha */}
           <button
-            onClick={(e) => handleThemeChange(theme === "dark" ? "light" : "dark", e)}
+            onClick={(e) => handleThemeChange(theme === 'dark' ? 'light' : 'dark', e)}
             disabled={isAnimating}
             className="absolute right-4 top-4 rounded-full bg-indigo-500 p-4 text-white shadow-lg transition-all hover:bg-indigo-600 hover:shadow-xl disabled:opacity-50"
           >
@@ -173,7 +173,7 @@ export default function ThemeAnimationDemo() {
 
           {/* Esquina inferior izquierda */}
           <button
-            onClick={(e) => handleThemeChange("system", e)}
+            onClick={(e) => handleThemeChange('system', e)}
             disabled={isAnimating}
             className="absolute bottom-4 left-4 rounded-full bg-gray-500 p-4 text-white shadow-lg transition-all hover:bg-gray-600 hover:shadow-xl disabled:opacity-50"
           >
@@ -182,7 +182,7 @@ export default function ThemeAnimationDemo() {
 
           {/* Esquina inferior derecha */}
           <button
-            onClick={(e) => handleThemeChange(theme === "light" ? "dark" : "light", e)}
+            onClick={(e) => handleThemeChange(theme === 'light' ? 'dark' : 'light', e)}
             disabled={isAnimating}
             className="absolute bottom-4 right-4 rounded-full bg-purple-500 p-4 text-white shadow-lg transition-all hover:bg-purple-600 hover:shadow-xl disabled:opacity-50"
           >
@@ -196,7 +196,7 @@ export default function ThemeAnimationDemo() {
               style={{
                 left: `${lastClickPosition.x}px`,
                 top: `${lastClickPosition.y}px`,
-                transform: "translate(-50%, -50%)",
+                transform: 'translate(-50%, -50%)',
               }}
             />
           )}

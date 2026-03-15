@@ -1,13 +1,13 @@
-import Button from "@/Components/common/Modern/Button";
-import BarChart from "@/Components/Statistics/BarChart";
-import PieChart from "@/Components/Statistics/PieChart";
-import { useTheme } from "@/Hooks/useTheme";
-import axios from "axios";
-import { AlertCircle, BarChart3, Clock, Download, FileText, TrendingUp, Users } from "lucide-react";
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
-import { route } from "ziggy-js";
+import Button from '@/Components/common/Modern/Button';
+import BarChart from '@/Components/Statistics/BarChart';
+import PieChart from '@/Components/Statistics/PieChart';
+import { useTheme } from '@/Hooks/useTheme';
+import axios from 'axios';
+import { AlertCircle, BarChart3, Clock, Download, FileText, TrendingUp, Users } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { route } from 'ziggy-js';
 
 interface AnalyticsData {
   average_approval_times: Record<number, number>;
@@ -50,12 +50,12 @@ export default function ApprovalAnalyticsDashboard({
   const [isExporting, setIsExporting] = useState(false);
 
   const COLORS = {
-    primary: "#3b82f6",
-    success: "#10b981",
-    warning: "#f59e0b",
-    danger: "#ef4444",
-    purple: "#8b5cf6",
-    teal: "#14b8a6",
+    primary: '#3b82f6',
+    success: '#10b981',
+    warning: '#f59e0b',
+    danger: '#ef4444',
+    purple: '#8b5cf6',
+    teal: '#14b8a6',
   };
 
   useEffect(() => {
@@ -68,53 +68,53 @@ export default function ApprovalAnalyticsDashboard({
     try {
       setIsLoading(true);
       const response = await axios.get(
-        route("api.v1.workspaces.approval-analytics.index", {
+        route('api.v1.workspaces.approval-analytics.index', {
           idOrSlug: workspace.id,
         }),
       );
       setAnalytics(response.data.data);
     } catch (error: any) {
-      toast.error(t("approval.analytics.errors.fetch_failed"));
+      toast.error(t('approval.analytics.errors.fetch_failed'));
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleExport = async (format: "csv" | "json") => {
+  const handleExport = async (format: 'csv' | 'json') => {
     try {
       setIsExporting(true);
       const response = await axios.get(
-        route("api.v1.workspaces.approval-analytics.export", {
+        route('api.v1.workspaces.approval-analytics.export', {
           idOrSlug: workspace.id,
         }),
         {
           params: { format },
-          responseType: "blob",
+          responseType: 'blob',
         },
       );
 
       const blob = new Blob([response.data], {
-        type: format === "csv" ? "text/csv" : "application/json",
+        type: format === 'csv' ? 'text/csv' : 'application/json',
       });
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
+      const link = document.createElement('a');
       link.href = url;
-      link.download = `approval-analytics-${workspace.id}-${new Date().toISOString().split("T")[0]}.${format}`;
+      link.download = `approval-analytics-${workspace.id}-${new Date().toISOString().split('T')[0]}.${format}`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
 
-      toast.success(t("approval.analytics.success.exported"));
+      toast.success(t('approval.analytics.success.exported'));
     } catch (error: any) {
-      toast.error(t("approval.analytics.errors.export_failed"));
+      toast.error(t('approval.analytics.errors.export_failed'));
     } finally {
       setIsExporting(false);
     }
   };
 
   const formatTime = (seconds: number): string => {
-    if (seconds === 0) return "0s";
+    if (seconds === 0) return '0s';
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
     const s = Math.floor(seconds % 60);
@@ -135,7 +135,7 @@ export default function ApprovalAnalyticsDashboard({
   // Prepare chart data
   const approvalTimeData = Object.entries(analytics.average_approval_times || {}).map(
     ([level, time]) => ({
-      name: `${t("approval.analytics.level")} ${level}`,
+      name: `${t('approval.analytics.level')} ${level}`,
       time: Math.round((time as number) / 60), // Convert to minutes
     }),
   );
@@ -153,7 +153,7 @@ export default function ApprovalAnalyticsDashboard({
 
   const pendingByLevelData = Object.entries(analytics.pending_content_by_level || {}).map(
     ([level, count]) => ({
-      name: `${t("approval.analytics.level")} ${level}`,
+      name: `${t('approval.analytics.level')} ${level}`,
       count: count,
     }),
   );
@@ -174,10 +174,10 @@ export default function ApprovalAnalyticsDashboard({
             </div>
             <div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                {t("approval.analytics.title")}
+                {t('approval.analytics.title')}
               </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {t("approval.analytics.subtitle")}
+                {t('approval.analytics.subtitle')}
               </p>
             </div>
           </div>
@@ -186,22 +186,22 @@ export default function ApprovalAnalyticsDashboard({
             <Button
               variant="ghost"
               buttonStyle="outline"
-              onClick={() => handleExport("csv")}
+              onClick={() => handleExport('csv')}
               disabled={isExporting}
               icon={Download}
               size="sm"
             >
-              {t("approval.analytics.export_csv")}
+              {t('approval.analytics.export_csv')}
             </Button>
             <Button
               variant="ghost"
               buttonStyle="outline"
-              onClick={() => handleExport("json")}
+              onClick={() => handleExport('json')}
               disabled={isExporting}
               icon={FileText}
               size="sm"
             >
-              {t("approval.analytics.export_json")}
+              {t('approval.analytics.export_json')}
             </Button>
           </div>
         </div>
@@ -216,14 +216,14 @@ export default function ApprovalAnalyticsDashboard({
               <Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             </div>
             <h4 className="font-semibold text-gray-900 dark:text-white">
-              {t("approval.analytics.avg_publication_time")}
+              {t('approval.analytics.avg_publication_time')}
             </h4>
           </div>
           <p className="text-3xl font-bold text-gray-900 dark:text-white">
             {formatTime(analytics.average_publication_time)}
           </p>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            {t("approval.analytics.from_submission_to_publish")}
+            {t('approval.analytics.from_submission_to_publish')}
           </p>
         </div>
 
@@ -234,7 +234,7 @@ export default function ApprovalAnalyticsDashboard({
               <FileText className="h-5 w-5 text-orange-600 dark:text-orange-400" />
             </div>
             <h4 className="font-semibold text-gray-900 dark:text-white">
-              {t("approval.analytics.total_pending")}
+              {t('approval.analytics.total_pending')}
             </h4>
           </div>
           <p className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -244,7 +244,7 @@ export default function ApprovalAnalyticsDashboard({
             )}
           </p>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            {t("approval.analytics.across_all_levels")}
+            {t('approval.analytics.across_all_levels')}
           </p>
         </div>
 
@@ -255,14 +255,14 @@ export default function ApprovalAnalyticsDashboard({
               <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
             </div>
             <h4 className="font-semibold text-gray-900 dark:text-white">
-              {t("approval.analytics.stale_content")}
+              {t('approval.analytics.stale_content')}
             </h4>
           </div>
           <p className="text-3xl font-bold text-gray-900 dark:text-white">
             {analytics.stale_pending_content.length}
           </p>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            {t("approval.analytics.pending_over_7_days")}
+            {t('approval.analytics.pending_over_7_days')}
           </p>
         </div>
       </div>
@@ -274,7 +274,7 @@ export default function ApprovalAnalyticsDashboard({
           <div className="mb-4 flex items-center gap-2">
             <Clock className="h-5 w-5 text-primary-600 dark:text-primary-400" />
             <h4 className="font-bold text-gray-900 dark:text-white">
-              {t("approval.analytics.avg_time_per_level")}
+              {t('approval.analytics.avg_time_per_level')}
             </h4>
           </div>
           {approvalTimeData.length > 0 ? (
@@ -282,9 +282,9 @@ export default function ApprovalAnalyticsDashboard({
               data={approvalTimeData}
               bars={[
                 {
-                  dataKey: "time",
-                  name: t("approval.analytics.minutes"),
-                  color: "#3b82f6",
+                  dataKey: 'time',
+                  name: t('approval.analytics.minutes'),
+                  color: '#3b82f6',
                 },
               ]}
               xAxisKey="name"
@@ -293,7 +293,7 @@ export default function ApprovalAnalyticsDashboard({
             />
           ) : (
             <div className="flex h-[300px] items-center justify-center text-gray-500 dark:text-gray-400">
-              {t("approval.analytics.no_data_available")}
+              {t('approval.analytics.no_data_available')}
             </div>
           )}
         </div>
@@ -303,7 +303,7 @@ export default function ApprovalAnalyticsDashboard({
           <div className="mb-4 flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-primary-600 dark:text-primary-400" />
             <h4 className="font-bold text-gray-900 dark:text-white">
-              {t("approval.analytics.approval_rejection_rates")}
+              {t('approval.analytics.approval_rejection_rates')}
             </h4>
           </div>
           {approvalRatesData.length > 0 ? (
@@ -311,14 +311,14 @@ export default function ApprovalAnalyticsDashboard({
               data={approvalRatesData}
               bars={[
                 {
-                  dataKey: "approvals",
-                  name: t("approval.analytics.approvals"),
-                  color: "#10b981",
+                  dataKey: 'approvals',
+                  name: t('approval.analytics.approvals'),
+                  color: '#10b981',
                 },
                 {
-                  dataKey: "rejections",
-                  name: t("approval.analytics.rejections"),
-                  color: "#ef4444",
+                  dataKey: 'rejections',
+                  name: t('approval.analytics.rejections'),
+                  color: '#ef4444',
                 },
               ]}
               xAxisKey="name"
@@ -327,7 +327,7 @@ export default function ApprovalAnalyticsDashboard({
             />
           ) : (
             <div className="flex h-[300px] items-center justify-center text-gray-500 dark:text-gray-400">
-              {t("approval.analytics.no_data_available")}
+              {t('approval.analytics.no_data_available')}
             </div>
           )}
         </div>
@@ -340,7 +340,7 @@ export default function ApprovalAnalyticsDashboard({
           <div className="mb-4 flex items-center gap-2">
             <FileText className="h-5 w-5 text-primary-600 dark:text-primary-400" />
             <h4 className="font-bold text-gray-900 dark:text-white">
-              {t("approval.analytics.pending_by_level")}
+              {t('approval.analytics.pending_by_level')}
             </h4>
           </div>
           {pendingByLevelData.length > 0 ? (
@@ -348,9 +348,9 @@ export default function ApprovalAnalyticsDashboard({
               data={pendingByLevelData}
               bars={[
                 {
-                  dataKey: "count",
-                  name: t("approval.analytics.pending_count"),
-                  color: "#f59e0b",
+                  dataKey: 'count',
+                  name: t('approval.analytics.pending_count'),
+                  color: '#f59e0b',
                 },
               ]}
               xAxisKey="name"
@@ -359,7 +359,7 @@ export default function ApprovalAnalyticsDashboard({
             />
           ) : (
             <div className="flex h-[300px] items-center justify-center text-gray-500 dark:text-gray-400">
-              {t("approval.analytics.no_data_available")}
+              {t('approval.analytics.no_data_available')}
             </div>
           )}
         </div>
@@ -369,14 +369,14 @@ export default function ApprovalAnalyticsDashboard({
           <div className="mb-4 flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-primary-600 dark:text-primary-400" />
             <h4 className="font-bold text-gray-900 dark:text-white">
-              {t("approval.analytics.approval_rate_distribution")}
+              {t('approval.analytics.approval_rate_distribution')}
             </h4>
           </div>
           {approvalRatesPieData.length > 0 ? (
             <PieChart data={approvalRatesPieData} height={300} theme={actualTheme} />
           ) : (
             <div className="flex h-[300px] items-center justify-center text-gray-500 dark:text-gray-400">
-              {t("approval.analytics.no_data_available")}
+              {t('approval.analytics.no_data_available')}
             </div>
           )}
         </div>
@@ -387,7 +387,7 @@ export default function ApprovalAnalyticsDashboard({
         <div className="mb-4 flex items-center gap-2">
           <Users className="h-5 w-5 text-primary-600 dark:text-primary-400" />
           <h4 className="font-bold text-gray-900 dark:text-white">
-            {t("approval.analytics.approver_workload")}
+            {t('approval.analytics.approver_workload')}
           </h4>
         </div>
         {workloadData.length > 0 ? (
@@ -395,9 +395,9 @@ export default function ApprovalAnalyticsDashboard({
             data={workloadData}
             bars={[
               {
-                dataKey: "pending",
-                name: t("approval.analytics.pending_tasks"),
-                color: "#8b5cf6",
+                dataKey: 'pending',
+                name: t('approval.analytics.pending_tasks'),
+                color: '#8b5cf6',
               },
             ]}
             xAxisKey="name"
@@ -407,7 +407,7 @@ export default function ApprovalAnalyticsDashboard({
           />
         ) : (
           <div className="flex h-[300px] items-center justify-center text-gray-500 dark:text-gray-400">
-            {t("approval.analytics.no_data_available")}
+            {t('approval.analytics.no_data_available')}
           </div>
         )}
       </div>
@@ -418,7 +418,7 @@ export default function ApprovalAnalyticsDashboard({
           <div className="mb-4 flex items-center gap-2">
             <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
             <h4 className="font-bold text-gray-900 dark:text-white">
-              {t("approval.analytics.stale_content_details")}
+              {t('approval.analytics.stale_content_details')}
             </h4>
           </div>
           <div className="overflow-x-auto">
@@ -426,16 +426,16 @@ export default function ApprovalAnalyticsDashboard({
               <thead>
                 <tr className="border-b border-gray-200 dark:border-neutral-800">
                   <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    {t("approval.analytics.content_title")}
+                    {t('approval.analytics.content_title')}
                   </th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    {t("approval.analytics.submitted_at")}
+                    {t('approval.analytics.submitted_at')}
                   </th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    {t("approval.analytics.days_pending")}
+                    {t('approval.analytics.days_pending')}
                   </th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    {t("approval.analytics.current_level")}
+                    {t('approval.analytics.current_level')}
                   </th>
                 </tr>
               </thead>
@@ -453,11 +453,11 @@ export default function ApprovalAnalyticsDashboard({
                     </td>
                     <td className="px-4 py-3">
                       <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900/20 dark:text-red-400">
-                        {content.days_pending} {t("approval.analytics.days")}
+                        {content.days_pending} {t('approval.analytics.days')}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
-                      {t("approval.analytics.level")} {content.current_level}
+                      {t('approval.analytics.level')} {content.current_level}
                     </td>
                   </tr>
                 ))}
@@ -473,7 +473,7 @@ export default function ApprovalAnalyticsDashboard({
           <div className="mb-4 flex items-center gap-2">
             <BarChart3 className="h-5 w-5 text-primary-600 dark:text-primary-400" />
             <h4 className="font-bold text-gray-900 dark:text-white">
-              {t("approval.analytics.detailed_stats")}
+              {t('approval.analytics.detailed_stats')}
             </h4>
           </div>
           <div className="overflow-x-auto">
@@ -481,19 +481,19 @@ export default function ApprovalAnalyticsDashboard({
               <thead>
                 <tr className="border-b border-gray-200 dark:border-neutral-800">
                   <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    {t("approval.analytics.role")}
+                    {t('approval.analytics.role')}
                   </th>
                   <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
-                    {t("approval.analytics.total_actions")}
+                    {t('approval.analytics.total_actions')}
                   </th>
                   <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
-                    {t("approval.analytics.approvals")}
+                    {t('approval.analytics.approvals')}
                   </th>
                   <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
-                    {t("approval.analytics.rejections")}
+                    {t('approval.analytics.rejections')}
                   </th>
                   <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
-                    {t("approval.analytics.approval_rate")}
+                    {t('approval.analytics.approval_rate')}
                   </th>
                 </tr>
               </thead>

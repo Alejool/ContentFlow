@@ -4,12 +4,12 @@
  * Accessible modal with animations, focus trap, and keyboard navigation
  */
 
-import React, { useEffect, useRef } from "react";
-import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
-import { createPortal } from "react-dom";
-import { useFocusTrap, useKeyboardNavigation } from "@/Hooks/useKeyboardNavigation";
-import { useReducedMotion } from "@/Hooks/useReducedMotion";
-import { VisuallyHidden } from "../Accessibility/VisuallyHidden";
+import React, { useEffect, useRef } from 'react';
+import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
+import { createPortal } from 'react-dom';
+import { useFocusTrap, useKeyboardNavigation } from '@/Hooks/useKeyboardNavigation';
+import { useReducedMotion } from '@/Hooks/useReducedMotion';
+import { VisuallyHidden } from '../Accessibility/VisuallyHidden';
 
 interface AnimatedModalProps {
   isOpen: boolean;
@@ -17,16 +17,16 @@ interface AnimatedModalProps {
   title: string;
   description?: string;
   children: React.ReactNode;
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   closeOnOverlayClick?: boolean;
   closeOnEscape?: boolean;
 }
 
 const sizeStyles = {
-  sm: "max-w-md",
-  md: "max-w-lg",
-  lg: "max-w-2xl",
-  xl: "max-w-4xl",
+  sm: 'max-w-md',
+  md: 'max-w-lg',
+  lg: 'max-w-2xl',
+  xl: 'max-w-4xl',
 };
 
 export const AnimatedModal: React.FC<AnimatedModalProps> = ({
@@ -35,7 +35,7 @@ export const AnimatedModal: React.FC<AnimatedModalProps> = ({
   title,
   description,
   children,
-  size = "md",
+  size = 'md',
   closeOnOverlayClick = true,
   closeOnEscape = true,
 }) => {
@@ -69,13 +69,13 @@ export const AnimatedModal: React.FC<AnimatedModalProps> = ({
   // Prevent body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = "hidden";
+      document.body.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = "";
+      document.body.style.overflow = '';
     }
 
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow = '';
     };
   }, [isOpen]);
 
@@ -120,11 +120,11 @@ export const AnimatedModal: React.FC<AnimatedModalProps> = ({
               initial="hidden"
               animate="visible"
               exit="exit"
-              transition={{ duration: 0.25, ease: "easeInOut" }}
+              transition={{ duration: 0.25, ease: 'easeInOut' }}
               role="dialog"
               aria-modal="true"
               aria-labelledby="modal-title"
-              aria-describedby={description ? "modal-description" : undefined}
+              aria-describedby={description ? 'modal-description' : undefined}
             >
               {/* Header */}
               <div className="border-b border-theme-border-default px-6 py-4">

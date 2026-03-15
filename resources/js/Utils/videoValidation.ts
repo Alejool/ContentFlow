@@ -47,7 +47,7 @@ export interface ValidationResult {
 // Requisitos de cada plataforma
 export const PLATFORM_REQUIREMENTS: Record<string, PlatformRequirements> = {
   youtube: {
-    name: "YouTube",
+    name: 'YouTube',
     short: {
       maxDuration: 60,
       minDuration: 1,
@@ -60,7 +60,7 @@ export const PLATFORM_REQUIREMENTS: Record<string, PlatformRequirements> = {
     },
   },
   facebook: {
-    name: "Facebook",
+    name: 'Facebook',
     reel: {
       maxDuration: 90,
       minDuration: 3,
@@ -79,7 +79,7 @@ export const PLATFORM_REQUIREMENTS: Record<string, PlatformRequirements> = {
     },
   },
   instagram: {
-    name: "Instagram",
+    name: 'Instagram',
     reel: {
       maxDuration: 90,
       minDuration: 3,
@@ -92,7 +92,7 @@ export const PLATFORM_REQUIREMENTS: Record<string, PlatformRequirements> = {
     },
   },
   tiktok: {
-    name: "TikTok",
+    name: 'TikTok',
     video: {
       maxDuration: 600, // 10 minutos
       minDuration: 3,
@@ -107,8 +107,8 @@ export const PLATFORM_REQUIREMENTS: Record<string, PlatformRequirements> = {
  */
 export async function getVideoMetadata(file: File): Promise<VideoMetadata> {
   return new Promise((resolve, reject) => {
-    const video = document.createElement("video");
-    video.preload = "metadata";
+    const video = document.createElement('video');
+    video.preload = 'metadata';
 
     video.onloadedmetadata = () => {
       const metadata: VideoMetadata = {
@@ -126,7 +126,7 @@ export async function getVideoMetadata(file: File): Promise<VideoMetadata> {
 
     video.onerror = () => {
       URL.revokeObjectURL(video.src);
-      reject(new Error("No se pudo cargar el video"));
+      reject(new Error('No se pudo cargar el video'));
     };
 
     video.src = URL.createObjectURL(file);
@@ -148,7 +148,7 @@ export function validateVideoForPlatform(
     return {
       isValid: false,
       warnings: [],
-      errors: [t("videoValidation.platformNotSupported", { platform })],
+      errors: [t('videoValidation.platformNotSupported', { platform })],
       meetsShortRequirements: false,
       meetsReelRequirements: false,
       meetsVideoRequirements: false,
@@ -165,14 +165,14 @@ export function validateVideoForPlatform(
   };
 
   // Validar según el tipo seleccionado
-  if (type === "short" && requirements.short) {
-    validateAgainstRequirements(metadata, requirements.short, result, "Short", t);
+  if (type === 'short' && requirements.short) {
+    validateAgainstRequirements(metadata, requirements.short, result, 'Short', t);
     result.meetsShortRequirements = result.isValid;
-  } else if (type === "reel" && requirements.reel) {
-    validateAgainstRequirements(metadata, requirements.reel, result, "Reel", t);
+  } else if (type === 'reel' && requirements.reel) {
+    validateAgainstRequirements(metadata, requirements.reel, result, 'Reel', t);
     result.meetsReelRequirements = result.isValid;
-  } else if (type === "video" && requirements.video) {
-    validateAgainstRequirements(metadata, requirements.video, result, "Video", t);
+  } else if (type === 'video' && requirements.video) {
+    validateAgainstRequirements(metadata, requirements.video, result, 'Video', t);
     result.meetsVideoRequirements = result.isValid;
   }
 
@@ -193,11 +193,11 @@ export function validateVideoForPlatform(
   // Sugerir tipo alternativo si el actual no es válido
   if (!result.isValid) {
     if (result.meetsShortRequirements) {
-      result.suggestedType = "short";
+      result.suggestedType = 'short';
     } else if (result.meetsReelRequirements) {
-      result.suggestedType = "reel";
+      result.suggestedType = 'reel';
     } else if (result.meetsVideoRequirements) {
-      result.suggestedType = "video";
+      result.suggestedType = 'video';
     }
   }
 
@@ -218,7 +218,7 @@ function validateAgainstRequirements(
   if (reqs.maxDuration && metadata.duration > reqs.maxDuration) {
     result.isValid = false;
     result.errors.push(
-      t("videoValidation.durationTooLong", {
+      t('videoValidation.durationTooLong', {
         type: typeName,
         max: formatDuration(reqs.maxDuration),
         current: formatDuration(metadata.duration),
@@ -229,7 +229,7 @@ function validateAgainstRequirements(
   if (reqs.minDuration && metadata.duration < reqs.minDuration) {
     result.isValid = false;
     result.errors.push(
-      t("videoValidation.durationTooShort", {
+      t('videoValidation.durationTooShort', {
         type: typeName,
         min: formatDuration(reqs.minDuration),
         current: formatDuration(metadata.duration),
@@ -243,7 +243,7 @@ function validateAgainstRequirements(
     if (metadata.aspectRatio < min || metadata.aspectRatio > max) {
       result.isValid = false;
       result.errors.push(
-        t("videoValidation.invalidAspectRatio", {
+        t('videoValidation.invalidAspectRatio', {
           type: typeName,
           expected: formatAspectRatio(min, max),
           current: formatAspectRatio(metadata.aspectRatio, metadata.aspectRatio),
@@ -257,7 +257,7 @@ function validateAgainstRequirements(
     const { minWidth, minHeight } = reqs.resolution;
     if (metadata.width < minWidth || metadata.height < minHeight) {
       result.warnings.push(
-        t("videoValidation.lowResolution", {
+        t('videoValidation.lowResolution', {
           type: typeName,
           min: `${minWidth}x${minHeight}`,
           current: `${metadata.width}x${metadata.height}`,
@@ -300,9 +300,9 @@ function formatDuration(seconds: number): string {
 function formatAspectRatio(min: number, max: number): string {
   if (min === max) {
     // Convertir a ratio común
-    if (Math.abs(min - 0.5625) < 0.01) return "9:16";
-    if (Math.abs(min - 1.0) < 0.01) return "1:1";
-    if (Math.abs(min - 1.7778) < 0.01) return "16:9";
+    if (Math.abs(min - 0.5625) < 0.01) return '9:16';
+    if (Math.abs(min - 1.0) < 0.01) return '1:1';
+    if (Math.abs(min - 1.7778) < 0.01) return '16:9';
     return min.toFixed(2);
   }
   return `${formatAspectRatio(min, min)} - ${formatAspectRatio(max, max)}`;
@@ -317,13 +317,13 @@ export function suggestPublicationType(metadata: VideoMetadata, platform: string
 
   // Prioridad: Short/Reel > Video
   if (requirements.short && checkRequirements(metadata, requirements.short)) {
-    return "short";
+    return 'short';
   }
   if (requirements.reel && checkRequirements(metadata, requirements.reel)) {
-    return "reel";
+    return 'reel';
   }
   if (requirements.video && checkRequirements(metadata, requirements.video)) {
-    return "video";
+    return 'video';
   }
 
   return null;

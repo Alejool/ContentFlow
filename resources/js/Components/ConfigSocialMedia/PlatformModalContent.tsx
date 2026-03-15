@@ -1,11 +1,11 @@
-import FacebookSettings from "@/Components/ConfigSocialMedia/FacebookSettings";
-import InstagramSettings from "@/Components/ConfigSocialMedia/InstagramSettings";
-import TikTokSettings from "@/Components/ConfigSocialMedia/TikTokSettings";
-import TwitterSettings from "@/Components/ConfigSocialMedia/TwitterSettings";
-import YoutubeSettings from "@/Components/ConfigSocialMedia/YoutubeSettings";
-import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatformsConfig";
-import { Settings2 } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import FacebookSettings from '@/Components/ConfigSocialMedia/FacebookSettings';
+import InstagramSettings from '@/Components/ConfigSocialMedia/InstagramSettings';
+import TikTokSettings from '@/Components/ConfigSocialMedia/TikTokSettings';
+import TwitterSettings from '@/Components/ConfigSocialMedia/TwitterSettings';
+import YoutubeSettings from '@/Components/ConfigSocialMedia/YoutubeSettings';
+import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatformsConfig';
+import { Settings2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface PlatformModalContentProps {
   platform: string;
@@ -32,7 +32,7 @@ export default function PlatformModalContent({
   onAllSettingsChange,
 }: PlatformModalContentProps) {
   const { t } = useTranslation();
-  const isAllPlatforms = platform.toLowerCase() === "all" || allPlatforms.length > 0;
+  const isAllPlatforms = platform.toLowerCase() === 'all' || allPlatforms.length > 0;
 
   const renderPlatformSettings = (
     platformName: string,
@@ -40,7 +40,7 @@ export default function PlatformModalContent({
     onChange: (newSettings: any) => void,
   ) => {
     switch (platformName.toLowerCase()) {
-      case "youtube":
+      case 'youtube':
         return (
           <YoutubeSettings
             settings={platformSettings}
@@ -48,13 +48,13 @@ export default function PlatformModalContent({
             videoMetadata={videoMetadata}
           />
         );
-      case "facebook":
+      case 'facebook':
         return <FacebookSettings settings={platformSettings} onSettingsChange={onChange} />;
-      case "instagram":
+      case 'instagram':
         return <InstagramSettings settings={platformSettings} onSettingsChange={onChange} />;
-      case "tiktok":
+      case 'tiktok':
         return <TikTokSettings settings={platformSettings} onSettingsChange={onChange} />;
-      case "twitter":
+      case 'twitter':
         return <TwitterSettings settings={platformSettings} onSettingsChange={onChange} />;
       default:
         return null;

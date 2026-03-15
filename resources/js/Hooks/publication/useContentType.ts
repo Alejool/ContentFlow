@@ -1,5 +1,5 @@
-import { ContentType } from "@/Components/Content/Publication/common/ContentTypeIconSelector";
-import { useMemo } from "react";
+import { ContentType } from '@/Components/Content/Publication/common/ContentTypeIconSelector';
+import { useMemo } from 'react';
 
 interface ContentTypeConfig {
   requiresVideo: boolean;
@@ -107,7 +107,7 @@ const contentTypeConfigs: Record<ContentType, ContentTypeConfig> = {
   },
 };
 
-export function useContentType(contentType: ContentType = "post") {
+export function useContentType(contentType: ContentType = 'post') {
   const config = useMemo(() => contentTypeConfigs[contentType], [contentType]);
 
   const getFieldVisibility = useMemo(
@@ -127,32 +127,32 @@ export function useContentType(contentType: ContentType = "post") {
 
     // Validar que no se permitan archivos si maxMediaCount es 0 (ej: poll)
     if (config.maxMediaCount === 0 && mediaFiles.length > 0) {
-      errors.push("This content type does not allow media files");
+      errors.push('This content type does not allow media files');
       return errors;
     }
 
     // Validar tipo de archivo requerido
     if (config.requiresVideo) {
-      const hasVideo = mediaFiles.some((m) => m.type?.startsWith("video/"));
+      const hasVideo = mediaFiles.some((m) => m.type?.startsWith('video/'));
       if (!hasVideo) {
-        errors.push("This content type requires a video file");
+        errors.push('This content type requires a video file');
       }
       // Reel solo permite videos
-      const hasNonVideo = mediaFiles.some((m) => !m.type?.startsWith("video/"));
+      const hasNonVideo = mediaFiles.some((m) => !m.type?.startsWith('video/'));
       if (hasNonVideo) {
-        errors.push("Reels only accept video files");
+        errors.push('Reels only accept video files');
       }
     }
 
     if (config.requiresImage) {
-      const hasImage = mediaFiles.some((m) => m.type?.startsWith("image/"));
+      const hasImage = mediaFiles.some((m) => m.type?.startsWith('image/'));
       if (!hasImage) {
-        errors.push("This content type requires at least one image");
+        errors.push('This content type requires at least one image');
       }
       // Carousel solo permite imágenes
-      const hasNonImage = mediaFiles.some((m) => !m.type?.startsWith("image/"));
+      const hasNonImage = mediaFiles.some((m) => !m.type?.startsWith('image/'));
       if (hasNonImage) {
-        errors.push("Carousels only accept image files");
+        errors.push('Carousels only accept image files');
       }
     }
 
@@ -166,8 +166,8 @@ export function useContentType(contentType: ContentType = "post") {
     }
 
     // Story: solo 1 archivo (imagen o video)
-    if (contentType === "story" && mediaFiles.length > 1) {
-      errors.push("Stories only allow 1 media file (image or video)");
+    if (contentType === 'story' && mediaFiles.length > 1) {
+      errors.push('Stories only allow 1 media file (image or video)');
     }
 
     return errors;

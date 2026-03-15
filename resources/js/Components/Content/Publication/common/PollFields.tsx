@@ -1,6 +1,6 @@
-import Button from "@/Components/common/Modern/Button";
-import Input from "@/Components/common/Modern/Input";
-import { HelpCircle, Plus, Trash2 } from "lucide-react";
+import Button from '@/Components/common/Modern/Button';
+import Input from '@/Components/common/Modern/Input';
+import { HelpCircle, Plus, Trash2 } from 'lucide-react';
 
 interface PollFieldsProps {
   options: string[];
@@ -16,7 +16,7 @@ interface PollFieldsProps {
 }
 
 export default function PollFields({
-  options = ["", ""],
+  options = ['', ''],
   duration = 24,
   onChange,
   register,
@@ -31,17 +31,17 @@ export default function PollFields({
 
     // Update form values if setValue is available
     if (setValue) {
-      setValue("poll_options", newOptions, { shouldValidate: true });
+      setValue('poll_options', newOptions, { shouldValidate: true });
     }
   };
 
   const handleAddOption = () => {
     if (options.length < 4) {
-      const newOptions = [...options, ""];
+      const newOptions = [...options, ''];
       onChange({ options: newOptions, duration });
 
       if (setValue) {
-        setValue("poll_options", newOptions, { shouldValidate: true });
+        setValue('poll_options', newOptions, { shouldValidate: true });
       }
     }
   };
@@ -52,7 +52,7 @@ export default function PollFields({
       onChange({ options: newOptions, duration });
 
       if (setValue) {
-        setValue("poll_options", newOptions, { shouldValidate: true });
+        setValue('poll_options', newOptions, { shouldValidate: true });
       }
     }
   };
@@ -62,7 +62,7 @@ export default function PollFields({
     onChange({ options, duration: numValue });
 
     if (setValue) {
-      setValue("poll_duration_hours", numValue, { shouldValidate: true });
+      setValue('poll_duration_hours', numValue, { shouldValidate: true });
     }
   };
 
@@ -71,13 +71,13 @@ export default function PollFields({
       <div className="flex items-center gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700">
         <div className="h-5 w-1 rounded-full bg-primary-500"></div>
         <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
-          {t("publications.modal.poll.title") || "Poll Options"}
+          {t('publications.modal.poll.title') || 'Poll Options'}
         </h3>
       </div>
 
       <div className="space-y-3">
         <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-          {t("publications.modal.poll.options") || "Poll Options (2-4 options)"}
+          {t('publications.modal.poll.options') || 'Poll Options (2-4 options)'}
         </label>
 
         {options.map((option, index) => (
@@ -88,7 +88,7 @@ export default function PollFields({
                 type="text"
                 value={option}
                 onChange={(e) => handleOptionChange(index, e.target.value)}
-                placeholder={`${t("publications.modal.poll.optionPlaceholder") || "Option"} ${index + 1}`}
+                placeholder={`${t('publications.modal.poll.optionPlaceholder') || 'Option'} ${index + 1}`}
                 variant="filled"
                 sizeType="md"
                 maxLength={25}
@@ -121,14 +121,14 @@ export default function PollFields({
             onClick={handleAddOption}
             fullWidth
           >
-            {t("publications.modal.poll.addOption") || "Add Option"}
+            {t('publications.modal.poll.addOption') || 'Add Option'}
           </Button>
         )}
       </div>
 
       <div className="space-y-2">
         <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-          {t("publications.modal.poll.duration") || "Poll Duration"}
+          {t('publications.modal.poll.duration') || 'Poll Duration'}
         </label>
 
         <div className="flex items-center gap-3">
@@ -144,13 +144,13 @@ export default function PollFields({
             className="w-24"
           />
           <span className="text-sm text-gray-600 dark:text-gray-400">
-            {t("publications.modal.poll.hours") || "hours"}
+            {t('publications.modal.poll.hours') || 'hours'}
           </span>
           <div className="group relative">
             <HelpCircle className="h-4 w-4 cursor-help text-gray-400" />
             <div className="absolute bottom-full left-1/2 z-10 mb-2 hidden -translate-x-1/2 group-hover:block">
               <div className="whitespace-nowrap rounded-lg bg-gray-900 px-3 py-2 text-xs text-white">
-                {t("publications.modal.poll.durationHint") || "Twitter: 5min-7days"}
+                {t('publications.modal.poll.durationHint') || 'Twitter: 5min-7days'}
               </div>
             </div>
           </div>
@@ -161,9 +161,9 @@ export default function PollFields({
 
       <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-900/20">
         <p className="text-xs text-blue-700 dark:text-blue-300">
-          <strong>{t("common.note") || "Note"}:</strong>{" "}
-          {t("publications.modal.poll.note") ||
-            "Las encuestas solo están disponibles en Twitter. Asegúrate de seleccionar plataformas compatibles."}
+          <strong>{t('common.note') || 'Note'}:</strong>{' '}
+          {t('publications.modal.poll.note') ||
+            'Las encuestas solo están disponibles en Twitter. Asegúrate de seleccionar plataformas compatibles.'}
         </p>
       </div>
     </div>

@@ -1,10 +1,10 @@
-import { UserProfileFormData, userProfileSchema } from "@/schemas/user";
-import { useUserStore } from "@/stores/userStore";
-import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
-import { useForm as useHookForm } from "react-hook-form";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
+import { UserProfileFormData, userProfileSchema } from '@/schemas/user';
+import { useUserStore } from '@/stores/userStore';
+import { zodResolver } from '@hookform/resolvers/zod';
+import axios from 'axios';
+import { useForm as useHookForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 export const useUpdateProfile = () => {
   const { t } = useTranslation();
@@ -19,23 +19,23 @@ export const useUpdateProfile = () => {
   } = useHookForm<UserProfileFormData>({
     resolver: zodResolver(userProfileSchema(t)),
     defaultValues: {
-      name: user?.name || "",
-      email: user?.email || "",
-      phone: user?.phone || "",
-      bio: user?.bio || "",
+      name: user?.name || '',
+      email: user?.email || '',
+      phone: user?.phone || '',
+      bio: user?.bio || '',
     },
   });
 
-  const watchedName = watch("name");
-  const watchedEmail = watch("email");
+  const watchedName = watch('name');
+  const watchedEmail = watch('email');
 
   const handleProfileUpdate = async (data: UserProfileFormData) => {
     try {
       const result = await updateProfile(data);
       if (result.success) {
-        toast.success(result.message || t("profile.update_success"));
+        toast.success(result.message || t('profile.update_success'));
       } else {
-        toast.error(result.message || t("profile.update_error"));
+        toast.error(result.message || t('profile.update_error'));
       }
     } catch (error: any) {
       if (axios.isAxiosError(error) && error.response?.data?.errors) {
@@ -45,7 +45,7 @@ export const useUpdateProfile = () => {
           toast.error(value[0]);
         });
       } else {
-        toast.error(error.message || t("profile.update_error"));
+        toast.error(error.message || t('profile.update_error'));
       }
     }
   };

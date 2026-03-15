@@ -1,8 +1,8 @@
 // @ts-ignore - CASL React module resolution issue in Docker environment
-import { createContextualCan } from "@casl/react";
-import { usePage } from "@inertiajs/react";
-import { createContext, ReactNode, useContext } from "react";
-import { AppAbility, defineAbilityFor } from "./ability";
+import { createContextualCan } from '@casl/react';
+import { usePage } from '@inertiajs/react';
+import { createContext, ReactNode, useContext } from 'react';
+import { AppAbility, defineAbilityFor } from './ability';
 
 // Create context
 export const AbilityContext = createContext<AppAbility>(undefined!);
@@ -52,7 +52,7 @@ export function useAbility() {
   const context = useContext(AbilityContext);
 
   if (context === undefined) {
-    throw new Error("useAbility must be used within an AbilityProvider");
+    throw new Error('useAbility must be used within an AbilityProvider');
   }
 
   return context;

@@ -1,19 +1,19 @@
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Head, router } from "@inertiajs/react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Head, router } from '@inertiajs/react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
-import Button from "@/Components/common/Modern/Button";
-import Input from "@/Components/common/Modern/Input";
-import { AlertCircle, Key, Shield } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import Button from '@/Components/common/Modern/Button';
+import Input from '@/Components/common/Modern/Input';
+import { AlertCircle, Key, Shield } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function Verify() {
   const { t } = useTranslation();
 
   const verifySchema = z.object({
-    code: z.string().min(1, { message: "Verification code is required" }),
+    code: z.string().min(1, { message: 'Verification code is required' }),
   });
 
   type VerifyFormData = z.infer<typeof verifySchema>;
@@ -26,16 +26,16 @@ export default function Verify() {
   } = useForm<VerifyFormData>({
     resolver: zodResolver(verifySchema),
     defaultValues: {
-      code: "",
+      code: '',
     },
   });
 
   const onSubmit = async (data: VerifyFormData) => {
-    router.post(route("2fa.verify.store"), data, {
+    router.post(route('2fa.verify.store'), data, {
       onError: (errors) => {
         if (errors.code) {
-          setError("code", {
-            type: "server",
+          setError('code', {
+            type: 'server',
             message: errors.code as string,
           });
         }
@@ -86,7 +86,7 @@ export default function Verify() {
                 icon={Key}
                 error={errors.code?.message}
                 autoFocus
-                {...register("code")}
+                {...register('code')}
               />
             </div>
 
@@ -102,7 +102,7 @@ export default function Verify() {
 
             <div className="text-center">
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Lost your device?{" "}
+                Lost your device?{' '}
                 <span className="font-medium text-primary-600 dark:text-primary-400">
                   Use a backup code
                 </span>

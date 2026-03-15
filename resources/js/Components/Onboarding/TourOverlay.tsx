@@ -1,9 +1,9 @@
-import { useEffect, useState, useRef, useCallback } from "react";
-import { X, ChevronRight, SkipForward } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import Button from "@/Components/common/Modern/Button";
-import type { TourStep } from "@/types/onboarding";
-import { useOnboardingNavigation } from "@/Hooks/onboarding/useOnboardingNavigation";
+import { useEffect, useState, useRef, useCallback } from 'react';
+import { X, ChevronRight, SkipForward } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import Button from '@/Components/common/Modern/Button';
+import type { TourStep } from '@/types/onboarding';
+import { useOnboardingNavigation } from '@/Hooks/onboarding/useOnboardingNavigation';
 
 interface TourOverlayProps {
   currentStep: TourStep;
@@ -97,7 +97,7 @@ export default function TourOverlay({
     // Try to check if target exists without throwing error
     let targetExists = false;
     try {
-      const selectors = currentStep.targetSelector.split(",").map((s) => s.trim());
+      const selectors = currentStep.targetSelector.split(',').map((s) => s.trim());
       for (const selector of selectors) {
         try {
           if (document.querySelector(selector)) {
@@ -118,16 +118,16 @@ export default function TourOverlay({
     const isMobile = window.innerWidth < 1024; // lg breakpoint
 
     // Try multiple selectors (comma-separated)
-    const selectors = currentStep.targetSelector.split(",").map((s) => s.trim());
+    const selectors = currentStep.targetSelector.split(',').map((s) => s.trim());
     let targetElement: Element | null = null;
 
     for (const selector of selectors) {
       try {
         // For mobile on step-2, we want to target the mobile menu dropdown, not the navbar
-        if (isMobile && currentStep.id === "step-2") {
+        if (isMobile && currentStep.id === 'step-2') {
           // Look for the mobile menu dropdown content
-          const mobileMenuDropdown = document.querySelector("nav.lg\\:hidden > div:last-child");
-          if (mobileMenuDropdown && !mobileMenuDropdown.classList.contains("hidden")) {
+          const mobileMenuDropdown = document.querySelector('nav.lg\\:hidden > div:last-child');
+          if (mobileMenuDropdown && !mobileMenuDropdown.classList.contains('hidden')) {
             // Menu is open, target the dropdown content
             targetElement = mobileMenuDropdown;
             break;
@@ -137,10 +137,10 @@ export default function TourOverlay({
         }
 
         // For mobile on step-4 (Calendar), look for the Calendar link in the mobile menu
-        if (isMobile && currentStep.id === "step-4") {
+        if (isMobile && currentStep.id === 'step-4') {
           // First check if mobile menu is open
-          const mobileMenuDropdown = document.querySelector("nav.lg\\:hidden > div:last-child");
-          if (mobileMenuDropdown && !mobileMenuDropdown.classList.contains("hidden")) {
+          const mobileMenuDropdown = document.querySelector('nav.lg\\:hidden > div:last-child');
+          if (mobileMenuDropdown && !mobileMenuDropdown.classList.contains('hidden')) {
             // Menu is open, look for Calendar link inside it
             const calendarLink = mobileMenuDropdown.querySelector('a[href*="/calendar"]');
             if (calendarLink) {
@@ -153,10 +153,10 @@ export default function TourOverlay({
         }
 
         // For mobile on step-5 (Analytics), look for the Analytics link in the mobile menu
-        if (isMobile && currentStep.id === "step-5") {
+        if (isMobile && currentStep.id === 'step-5') {
           // First check if mobile menu is open
-          const mobileMenuDropdown = document.querySelector("nav.lg\\:hidden > div:last-child");
-          if (mobileMenuDropdown && !mobileMenuDropdown.classList.contains("hidden")) {
+          const mobileMenuDropdown = document.querySelector('nav.lg\\:hidden > div:last-child');
+          if (mobileMenuDropdown && !mobileMenuDropdown.classList.contains('hidden')) {
             // Menu is open, look for Analytics link inside it
             const analyticsLink = mobileMenuDropdown.querySelector('a[href*="/analytics"]');
             if (analyticsLink) {
@@ -169,7 +169,7 @@ export default function TourOverlay({
         }
 
         // For mobile, skip sidebar selectors
-        if (isMobile && (selector.includes("aside") || selector.includes("lg\\:block"))) {
+        if (isMobile && (selector.includes('aside') || selector.includes('lg\\:block'))) {
           continue;
         }
 
@@ -220,19 +220,19 @@ export default function TourOverlay({
 
       // Desktop: Determine position based on currentStep.position and available space
       switch (currentStep.position) {
-        case "top":
+        case 'top':
           top = targetPos.top - cardRect.height - spacing;
           left = targetPos.left + targetPos.width / 2 - cardRect.width / 2;
           break;
-        case "bottom":
+        case 'bottom':
           top = targetPos.top + targetPos.height + spacing;
           left = targetPos.left + targetPos.width / 2 - cardRect.width / 2;
           break;
-        case "left":
+        case 'left':
           top = targetPos.top + targetPos.height / 2 - cardRect.height / 2;
           left = targetPos.left - cardRect.width - spacing;
           break;
-        case "right":
+        case 'right':
           top = targetPos.top + targetPos.height / 2 - cardRect.height / 2;
           left = targetPos.left + targetPos.width + spacing;
           break;
@@ -268,19 +268,19 @@ export default function TourOverlay({
 
       // Special handling for step-2, step-4, and step-5 on mobile: open mobile menu if closed
       if (
-        (currentStep.id === "step-2" ||
-          currentStep.id === "step-4" ||
-          currentStep.id === "step-5") &&
+        (currentStep.id === 'step-2' ||
+          currentStep.id === 'step-4' ||
+          currentStep.id === 'step-5') &&
         isMobile
       ) {
-        const mobileMenuButton = document.querySelector("nav.lg\\:hidden button");
-        const mobileMenuContent = document.querySelector("nav.lg\\:hidden > div:last-child");
+        const mobileMenuButton = document.querySelector('nav.lg\\:hidden button');
+        const mobileMenuContent = document.querySelector('nav.lg\\:hidden > div:last-child');
 
         // Check if menu is closed (hidden class)
         if (
           mobileMenuButton &&
           mobileMenuContent &&
-          mobileMenuContent.classList.contains("hidden")
+          mobileMenuContent.classList.contains('hidden')
         ) {
           // Click the button to open the menu
           (mobileMenuButton as HTMLButtonElement).click();
@@ -327,13 +327,13 @@ export default function TourOverlay({
     const timer = setTimeout(updatePositions, 100);
 
     // Update on window resize
-    window.addEventListener("resize", updatePositions);
-    window.addEventListener("scroll", updatePositions);
+    window.addEventListener('resize', updatePositions);
+    window.addEventListener('scroll', updatePositions);
 
     return () => {
       clearTimeout(timer);
-      window.removeEventListener("resize", updatePositions);
-      window.removeEventListener("scroll", updatePositions);
+      window.removeEventListener('resize', updatePositions);
+      window.removeEventListener('scroll', updatePositions);
     };
   }, [currentStep, calculateTargetPosition, calculateCardPosition]);
 
@@ -351,8 +351,8 @@ export default function TourOverlay({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       switch (e.key) {
-        case "ArrowRight":
-        case "Enter":
+        case 'ArrowRight':
+        case 'Enter':
           e.preventDefault();
           if (isLastStep) {
             handleComplete();
@@ -360,15 +360,15 @@ export default function TourOverlay({
             handleNext();
           }
           break;
-        case "Escape":
+        case 'Escape':
           e.preventDefault();
           handleSkip();
           break;
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isLastStep, handleNext, handleSkip, handleComplete]);
 
   // If navigating, show loading state
@@ -379,7 +379,7 @@ export default function TourOverlay({
           <div className="flex items-center gap-3">
             <div className="border-3 h-6 w-6 animate-spin rounded-full border-primary-200 border-t-primary-600" />
             <p className="text-gray-700 dark:text-gray-300">
-              {t("tour.navigating", "Navigating to next section...")}
+              {t('tour.navigating', 'Navigating to next section...')}
             </p>
           </div>
         </div>
@@ -410,8 +410,8 @@ export default function TourOverlay({
                   {currentStep.title}
                 </h3>
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                  {t("tour.step", {
-                    current: currentStep.id.split("-")[1] || 1,
+                  {t('tour.step', {
+                    current: currentStep.id.split('-')[1] || 1,
                     total: totalSteps,
                   })}
                 </p>
@@ -419,7 +419,7 @@ export default function TourOverlay({
               <button
                 onClick={handleSkip}
                 className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-neutral-700 dark:hover:text-gray-300"
-                aria-label={t("tour.close")}
+                aria-label={t('tour.close')}
               >
                 <X size={20} />
               </button>
@@ -441,9 +441,9 @@ export default function TourOverlay({
                   <div
                     key={index}
                     className={`h-1.5 rounded-full transition-all duration-300 ${
-                      index < parseInt(currentStep.id.split("-")[1] || "1")
-                        ? "w-8 bg-primary-600"
-                        : "w-1.5 bg-gray-300 dark:bg-neutral-600"
+                      index < parseInt(currentStep.id.split('-')[1] || '1')
+                        ? 'w-8 bg-primary-600'
+                        : 'w-1.5 bg-gray-300 dark:bg-neutral-600'
                     }`}
                   />
                 ))}
@@ -458,7 +458,7 @@ export default function TourOverlay({
                   iconPosition="left"
                   className="w-full justify-center text-gray-600 dark:text-gray-400 md:w-auto"
                 >
-                  {t("tour.skipTour")}
+                  {t('tour.skipTour')}
                 </Button>
                 <Button
                   variant="primary"
@@ -468,7 +468,7 @@ export default function TourOverlay({
                   iconPosition="right"
                   className="w-full justify-center md:w-auto"
                 >
-                  {isLastStep ? t("tour.complete") : t("tour.next")}
+                  {isLastStep ? t('tour.complete') : t('tour.next')}
                 </Button>
               </div>
             </div>
@@ -500,8 +500,8 @@ export default function TourOverlay({
             width: `${targetPosition.width}px`,
             height: `${targetPosition.height}px`,
             boxShadow: `0 0 0 9999px rgba(0, 0, 0, 0.6)`,
-            borderRadius: "8px",
-            pointerEvents: "none",
+            borderRadius: '8px',
+            pointerEvents: 'none',
           }}
         />
       </div>
@@ -513,8 +513,8 @@ export default function TourOverlay({
         style={{
           top: `${cardPosition.top}px`,
           left: `${cardPosition.left}px`,
-          right: window.innerWidth < 768 ? "16px" : "auto",
-          maxWidth: window.innerWidth < 768 ? `calc(100vw - 32px)` : "28rem",
+          right: window.innerWidth < 768 ? '16px' : 'auto',
+          maxWidth: window.innerWidth < 768 ? `calc(100vw - 32px)` : '28rem',
         }}
         role="document"
       >
@@ -527,13 +527,13 @@ export default function TourOverlay({
               </h3>
               <p
                 className="mt-1 text-sm text-gray-500 dark:text-gray-400"
-                aria-label={t("tour.step", {
-                  current: currentStep.id.split("-")[1] || 1,
+                aria-label={t('tour.step', {
+                  current: currentStep.id.split('-')[1] || 1,
                   total: totalSteps,
                 })}
               >
-                {t("tour.step", {
-                  current: currentStep.id.split("-")[1] || 1,
+                {t('tour.step', {
+                  current: currentStep.id.split('-')[1] || 1,
                   total: totalSteps,
                 })}
               </p>
@@ -541,7 +541,7 @@ export default function TourOverlay({
             <button
               onClick={handleSkip}
               className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:hover:bg-neutral-700 dark:hover:text-gray-300"
-              aria-label={t("tour.close")}
+              aria-label={t('tour.close')}
             >
               <X size={20} />
             </button>
@@ -562,18 +562,18 @@ export default function TourOverlay({
             <div
               className="flex justify-center gap-1.5 md:justify-start"
               role="progressbar"
-              aria-valuenow={parseInt(currentStep.id.split("-")[1] || "1")}
+              aria-valuenow={parseInt(currentStep.id.split('-')[1] || '1')}
               aria-valuemin={1}
               aria-valuemax={totalSteps}
-              aria-label={t("tour.progress")}
+              aria-label={t('tour.progress')}
             >
               {Array.from({ length: totalSteps }).map((_, index) => (
                 <div
                   key={index}
                   className={`h-1.5 rounded-full transition-all duration-300 ${
-                    index < parseInt(currentStep.id.split("-")[1] || "1")
-                      ? "w-8 bg-primary-600"
-                      : "w-1.5 bg-gray-300 dark:bg-neutral-600"
+                    index < parseInt(currentStep.id.split('-')[1] || '1')
+                      ? 'w-8 bg-primary-600'
+                      : 'w-1.5 bg-gray-300 dark:bg-neutral-600'
                   }`}
                   aria-hidden="true"
                 />
@@ -584,7 +584,7 @@ export default function TourOverlay({
             <div
               className="flex w-full flex-col gap-2 md:w-auto md:flex-row"
               role="group"
-              aria-label={t("tour.title")}
+              aria-label={t('tour.title')}
             >
               <Button
                 variant="ghost"
@@ -593,9 +593,9 @@ export default function TourOverlay({
                 icon={SkipForward}
                 iconPosition="left"
                 className="w-full justify-center text-gray-600 dark:text-gray-400 md:w-auto"
-                aria-label={t("tour.skipGuidedTour")}
+                aria-label={t('tour.skipGuidedTour')}
               >
-                {t("tour.skipTour")}
+                {t('tour.skipTour')}
               </Button>
               <Button
                 variant="primary"
@@ -604,9 +604,9 @@ export default function TourOverlay({
                 icon={ChevronRight}
                 iconPosition="right"
                 className="w-full justify-center md:w-auto"
-                aria-label={isLastStep ? t("tour.completeTour") : t("tour.nextStep")}
+                aria-label={isLastStep ? t('tour.completeTour') : t('tour.nextStep')}
               >
-                {isLastStep ? t("tour.complete") : t("tour.next")}
+                {isLastStep ? t('tour.complete') : t('tour.next')}
               </Button>
             </div>
           </div>

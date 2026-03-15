@@ -1,12 +1,12 @@
-import { InputHTMLAttributes, forwardRef } from "react";
+import { InputHTMLAttributes, forwardRef } from 'react';
 
-interface RadioInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
+interface RadioInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
   label?: string;
   description?: string;
 }
 
 const RadioInput = forwardRef<HTMLInputElement, RadioInputProps>(
-  ({ label, description, className = "", id, ...props }, ref) => {
+  ({ label, description, className = '', id, ...props }, ref) => {
     return (
       <div className="flex items-start">
         <input ref={ref} type="radio" id={id} className={`peer sr-only ${className} `} {...props} />
@@ -29,6 +29,6 @@ const RadioInput = forwardRef<HTMLInputElement, RadioInputProps>(
   },
 );
 
-RadioInput.displayName = "RadioInput";
+RadioInput.displayName = 'RadioInput';
 
 export default RadioInput;

@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from 'axios';
 
 export interface TranslationRequest {
   text: string;
@@ -38,7 +38,7 @@ export class AITranslationService {
     }
 
     try {
-      const response = await axios.post<TranslationResponse>("/api/ai/translate", {
+      const response = await axios.post<TranslationResponse>('/api/ai/translate', {
         text,
         target_language: targetLanguage,
         source_language: sourceLanguage,
@@ -66,7 +66,7 @@ export class AITranslationService {
     sourceLanguage?: string,
   ): Promise<string[]> {
     try {
-      const response = await axios.post<{ translations: string[] }>("/api/ai/translate-batch", {
+      const response = await axios.post<{ translations: string[] }>('/api/ai/translate-batch', {
         texts,
         target_language: targetLanguage,
         source_language: sourceLanguage,
@@ -83,11 +83,11 @@ export class AITranslationService {
    */
   static async detectLanguage(text: string): Promise<string> {
     try {
-      const response = await axios.post<{ language: string }>("/api/ai/detect-language", { text });
+      const response = await axios.post<{ language: string }>('/api/ai/detect-language', { text });
 
       return response.data.language;
     } catch (error) {
-      return "unknown";
+      return 'unknown';
     }
   }
 

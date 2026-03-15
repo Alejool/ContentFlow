@@ -1,11 +1,11 @@
-import Button from "@/Components/common/Modern/Button";
-import { Publication } from "@/types/Publication";
-import { getDateFnsLocale } from "@/Utils/dateLocales";
-import { format } from "date-fns";
-import { Check, CheckCircle, Clock, Info, User, X, XCircle } from "lucide-react";
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
-import RejectionReasonModal from "./modals/RejectionReasonModal";
+import Button from '@/Components/common/Modern/Button';
+import { Publication } from '@/types/Publication';
+import { getDateFnsLocale } from '@/Utils/dateLocales';
+import { format } from 'date-fns';
+import { Check, CheckCircle, Clock, Info, User, X, XCircle } from 'lucide-react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import RejectionReasonModal from './modals/RejectionReasonModal';
 
 interface ApprovalLevelCardProps {
   level: {
@@ -43,7 +43,7 @@ interface ApprovalLevelCardProps {
       created_at: string;
     };
     can_user_approve: boolean;
-    status: "approved" | "rejected" | "in_review" | "pending" | "skipped";
+    status: 'approved' | 'rejected' | 'in_review' | 'pending' | 'skipped';
   };
   publication: Publication;
   onApprove: (comment?: string) => Promise<void>;
@@ -62,30 +62,30 @@ export default function ApprovalLevelCard({
   const [isApproving, setIsApproving] = useState(false);
 
   // Determine visual status
-  let statusColor = "gray";
+  let statusColor = 'gray';
   let statusIcon = Clock;
-  let statusText = t("approvals.status.pending") || "Pendiente";
-  let borderColor = "border-gray-300 dark:border-gray-700";
-  let bgColor = "bg-gray-50 dark:bg-gray-800/50";
+  let statusText = t('approvals.status.pending') || 'Pendiente';
+  let borderColor = 'border-gray-300 dark:border-gray-700';
+  let bgColor = 'bg-gray-50 dark:bg-gray-800/50';
 
-  if (level.status === "approved") {
-    statusColor = "green";
+  if (level.status === 'approved') {
+    statusColor = 'green';
     statusIcon = CheckCircle;
-    statusText = t("approvals.status.approved") || "Aprobado";
-    borderColor = "border-green-500 dark:border-green-600";
-    bgColor = "bg-green-50 dark:bg-green-900/20";
-  } else if (level.status === "rejected") {
-    statusColor = "red";
+    statusText = t('approvals.status.approved') || 'Aprobado';
+    borderColor = 'border-green-500 dark:border-green-600';
+    bgColor = 'bg-green-50 dark:bg-green-900/20';
+  } else if (level.status === 'rejected') {
+    statusColor = 'red';
     statusIcon = XCircle;
-    statusText = t("approvals.status.rejected") || "Rechazado";
-    borderColor = "border-red-500 dark:border-red-600";
-    bgColor = "bg-red-50 dark:bg-red-900/20";
+    statusText = t('approvals.status.rejected') || 'Rechazado';
+    borderColor = 'border-red-500 dark:border-red-600';
+    bgColor = 'bg-red-50 dark:bg-red-900/20';
   } else if (level.is_current_level) {
-    statusColor = "yellow";
+    statusColor = 'yellow';
     statusIcon = Clock;
-    statusText = t("approvals.status.inReview") || "En Revisión";
-    borderColor = "border-yellow-500 dark:border-yellow-600";
-    bgColor = "bg-yellow-50 dark:bg-yellow-900/20";
+    statusText = t('approvals.status.inReview') || 'En Revisión';
+    borderColor = 'border-yellow-500 dark:border-yellow-600';
+    bgColor = 'bg-yellow-50 dark:bg-yellow-900/20';
   }
 
   const StatusIcon = statusIcon;
@@ -122,7 +122,7 @@ export default function ApprovalLevelCard({
 
             <div>
               <h4 className="font-semibold text-gray-900 dark:text-white">
-                {t("approvals.level.title", {
+                {t('approvals.level.title', {
                   number: level.level_number,
                   name: level.level_name,
                 })}
@@ -151,14 +151,14 @@ export default function ApprovalLevelCard({
               <div className="min-w-0 flex-1">
                 <div className="mb-1 flex items-center gap-2">
                   <span className="text-sm font-medium text-gray-900 dark:text-white">
-                    {t("approvals.level.approvedBy") || "Aprobado por"}:
+                    {t('approvals.level.approvedBy') || 'Aprobado por'}:
                   </span>
                   <span className="text-sm text-gray-700 dark:text-gray-300">
                     {level.approved_action.user.name}
                   </span>
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {format(new Date(level.approved_action.created_at), "PPp", {
+                  {format(new Date(level.approved_action.created_at), 'PPp', {
                     locale,
                   })}
                 </p>
@@ -182,14 +182,14 @@ export default function ApprovalLevelCard({
               <div className="min-w-0 flex-1">
                 <div className="mb-1 flex items-center gap-2">
                   <span className="text-sm font-medium text-gray-900 dark:text-white">
-                    {t("approvals.level.rejectedBy") || "Rechazado por"}:
+                    {t('approvals.level.rejectedBy') || 'Rechazado por'}:
                   </span>
                   <span className="text-sm text-gray-700 dark:text-gray-300">
                     {level.rejected_action.user.name}
                   </span>
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {format(new Date(level.rejected_action.created_at), "PPp", {
+                  {format(new Date(level.rejected_action.created_at), 'PPp', {
                     locale,
                   })}
                 </p>
@@ -220,8 +220,8 @@ export default function ApprovalLevelCard({
               disabled={isApproving}
             >
               {isApproving
-                ? t("common.processing") || "Procesando..."
-                : t("approvals.approve") || "Aprobar"}
+                ? t('common.processing') || 'Procesando...'
+                : t('approvals.approve') || 'Aprobar'}
             </Button>
             <Button
               variant="danger"
@@ -231,7 +231,7 @@ export default function ApprovalLevelCard({
               className="flex-1"
               disabled={isApproving}
             >
-              {t("approvals.reject") || "Rechazar"}
+              {t('approvals.reject') || 'Rechazar'}
             </Button>
           </div>
         )}
@@ -242,7 +242,7 @@ export default function ApprovalLevelCard({
             <div className="flex items-start gap-2">
               <Info className="mt-0.5 h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
               <p className="text-sm text-blue-700 dark:text-blue-300">
-                {t("approvals.level.requiresRole") || "Este nivel requiere aprobación del rol"}:{" "}
+                {t('approvals.level.requiresRole') || 'Este nivel requiere aprobación del rol'}:{' '}
                 <strong>{level.role.display_name}</strong>
               </p>
             </div>
@@ -255,7 +255,7 @@ export default function ApprovalLevelCard({
             <div className="flex items-start gap-2">
               <Clock className="mt-0.5 h-4 w-4 shrink-0 text-gray-500 dark:text-gray-400" />
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {t("approvals.level.waitingFor") || "Esperando aprobación de"}:{" "}
+                {t('approvals.level.waitingFor') || 'Esperando aprobación de'}:{' '}
                 <strong>{level.role.display_name}</strong>
               </p>
             </div>

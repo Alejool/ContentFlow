@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   eachDayOfInterval,
   endOfMonth,
@@ -8,12 +8,12 @@ import {
   isToday,
   parseISO,
   startOfMonth,
-} from "date-fns";
-import { Clock, Trash2 } from "lucide-react";
-import { CalendarEvent } from "@/types/calendar";
-import { formatTime } from "@/Utils/formatDate";
-import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatformsConfig";
-import { useTranslation } from "react-i18next";
+} from 'date-fns';
+import { Clock, Trash2 } from 'lucide-react';
+import { CalendarEvent } from '@/types/calendar';
+import { formatTime } from '@/Utils/formatDate';
+import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatformsConfig';
+import { useTranslation } from 'react-i18next';
 import {
   DndContext,
   DragEndEvent,
@@ -24,7 +24,7 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-} from "@dnd-kit/core";
+} from '@dnd-kit/core';
 
 interface MonthViewProps {
   currentDate: Date;
@@ -68,12 +68,12 @@ const DraggableEvent: React.FC<DraggableEventProps> = ({
   // Check if publication has no platforms assigned
   const hasNoPlatforms =
     event.hasNoPlatforms ||
-    (event.type === "post" &&
+    (event.type === 'post' &&
       (!event.extendedProps?.platforms || event.extendedProps.platforms.length === 0));
 
   // Get platforms array - for posts, use the single platform, for publications use all platforms
   const platforms =
-    event.type === "post"
+    event.type === 'post'
       ? [event.platform?.toLowerCase()].filter(Boolean)
       : (event.extendedProps?.platforms || []).map((p: string) => p.toLowerCase());
 
@@ -85,7 +85,7 @@ const DraggableEvent: React.FC<DraggableEventProps> = ({
   // Determine if delete button should be shown
   const canDelete =
     onEventDelete &&
-    (["user_event", "event"].includes(String(event.type))
+    (['user_event', 'event'].includes(String(event.type))
       ? !event.extendedProps?.is_public || event.extendedProps?.user_name === currentUser?.name
       : false); // Don't allow delete for posts from calendar
 
@@ -95,11 +95,11 @@ const DraggableEvent: React.FC<DraggableEventProps> = ({
       {...listeners}
       {...attributes}
       onClick={() => onEventClick?.(event)}
-      className={`group/card relative cursor-grab overflow-hidden rounded-lg border-2 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg active:cursor-grabbing ${isSelected ? "ring-2 ring-primary-500 ring-offset-2" : ""} ${isDragging ? "scale-95 opacity-50" : ""} ${hasNoPlatforms ? "border-orange-300 bg-orange-50 dark:border-orange-600 dark:bg-orange-900/10" : ""} ${platformConfig && !hasNoPlatforms ? `${platformConfig.borderColor} ${platformConfig.darkBorderColor} ${platformConfig.bgClass} ${platformConfig.darkColor}` : !hasNoPlatforms ? "border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800" : ""} `}
+      className={`group/card relative cursor-grab overflow-hidden rounded-lg border-2 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg active:cursor-grabbing ${isSelected ? 'ring-2 ring-primary-500 ring-offset-2' : ''} ${isDragging ? 'scale-95 opacity-50' : ''} ${hasNoPlatforms ? 'border-orange-300 bg-orange-50 dark:border-orange-600 dark:bg-orange-900/10' : ''} ${platformConfig && !hasNoPlatforms ? `${platformConfig.borderColor} ${platformConfig.darkBorderColor} ${platformConfig.bgClass} ${platformConfig.darkColor}` : !hasNoPlatforms ? 'border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800' : ''} `}
     >
       {/* Status Indicator Bar with platform color */}
       <div
-        className={`absolute bottom-0 left-0 top-0 w-1.5 ${platformConfig ? platformConfig.color : hasNoPlatforms ? "bg-orange-500" : "bg-gray-400"}`}
+        className={`absolute bottom-0 left-0 top-0 w-1.5 ${platformConfig ? platformConfig.color : hasNoPlatforms ? 'bg-orange-500' : 'bg-gray-400'}`}
       />
 
       {/* Warning indicator for publications without platforms */}
@@ -147,7 +147,7 @@ const DraggableEvent: React.FC<DraggableEventProps> = ({
             // Fallback for user events
             <PlatformIcon
               platform={
-                ["user_event", "event"].includes(String(event.type)) ? "user_event" : event.platform
+                ['user_event', 'event'].includes(String(event.type)) ? 'user_event' : event.platform
               }
               className="h-4 w-4 text-gray-400 dark:text-gray-500"
             />
@@ -169,14 +169,14 @@ const DraggableEvent: React.FC<DraggableEventProps> = ({
 
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
             <span
-              className={`flex items-center gap-1 text-[11px] font-medium ${platformConfig ? platformConfig.textColor + " " + platformConfig.darkTextColor : "text-gray-500 dark:text-gray-400"}`}
+              className={`flex items-center gap-1 text-[11px] font-medium ${platformConfig ? platformConfig.textColor + ' ' + platformConfig.darkTextColor : 'text-gray-500 dark:text-gray-400'}`}
             >
               <Clock className="h-3 w-3" />
               {formatTime(event.start)}
             </span>
             {event.status && (
               <span
-                className={`rounded px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide ${event.status === "published" || event.status === "posted" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : ""} ${event.status === "scheduled" || event.status === "pending" ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" : ""} ${event.status === "draft" ? "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400" : ""} ${event.status === "failed" ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" : ""} ${event.status === "event" ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400" : ""} `}
+                className={`rounded px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide ${event.status === 'published' || event.status === 'posted' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : ''} ${event.status === 'scheduled' || event.status === 'pending' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' : ''} ${event.status === 'draft' ? 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400' : ''} ${event.status === 'failed' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : ''} ${event.status === 'event' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' : ''} `}
               >
                 {t(`status.${event.status}`, event.status)}
               </span>
@@ -242,7 +242,7 @@ const DroppableDay: React.FC<DroppableDayProps> = ({
   return (
     <div
       ref={setNodeRef}
-      className={`group relative min-h-[140px] border p-3 transition-all ${isCurrentMonth ? "border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900" : "border-gray-100 bg-gray-50 dark:border-gray-800/50 dark:bg-gray-900/50"} ${isTodayDay ? "ring-2 ring-inset ring-primary-500" : ""} ${isOver ? "bg-primary-50 ring-2 ring-inset ring-primary-500 dark:bg-primary-900/20" : ""} hover:bg-gray-50 dark:hover:bg-gray-800/50`}
+      className={`group relative min-h-[140px] border p-3 transition-all ${isCurrentMonth ? 'border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900' : 'border-gray-100 bg-gray-50 dark:border-gray-800/50 dark:bg-gray-900/50'} ${isTodayDay ? 'ring-2 ring-inset ring-primary-500' : ''} ${isOver ? 'bg-primary-50 ring-2 ring-inset ring-primary-500 dark:bg-primary-900/20' : ''} hover:bg-gray-50 dark:hover:bg-gray-800/50`}
     >
       {/* Date Header */}
       <div className="mb-2.5 flex items-start justify-between">
@@ -250,19 +250,19 @@ const DroppableDay: React.FC<DroppableDayProps> = ({
           <span
             className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold transition-all ${
               isTodayDay
-                ? "scale-110 bg-primary-600 text-white shadow-lg shadow-primary-500/30"
+                ? 'scale-110 bg-primary-600 text-white shadow-lg shadow-primary-500/30'
                 : isCurrentMonth
-                  ? "text-gray-700 group-hover:bg-gray-100 dark:text-gray-300 dark:group-hover:bg-gray-800"
-                  : "text-gray-400 dark:text-gray-600"
+                  ? 'text-gray-700 group-hover:bg-gray-100 dark:text-gray-300 dark:group-hover:bg-gray-800'
+                  : 'text-gray-400 dark:text-gray-600'
             } `}
           >
-            {format(day, "d")}
+            {format(day, 'd')}
           </span>
           {/* Show weekday on mobile/tablet */}
           <span
-            className={`text-xs font-medium uppercase lg:hidden ${isTodayDay ? "text-primary-600 dark:text-primary-400" : "text-gray-500 dark:text-gray-400"}`}
+            className={`text-xs font-medium uppercase lg:hidden ${isTodayDay ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400'}`}
           >
-            {format(day, "EEE")}
+            {format(day, 'EEE')}
           </span>
         </div>
 
@@ -367,7 +367,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
       <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
         {/* Weekday Headers - Desktop Only */}
         <div className="hidden grid-cols-7 border-b border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 lg:grid">
-          {["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"].map((day) => (
+          {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map((day) => (
             <div
               key={day}
               className="py-3 text-center text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-400"
@@ -418,7 +418,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
         {activeEvent
           ? (() => {
               const platforms =
-                activeEvent.type === "post"
+                activeEvent.type === 'post'
                   ? [activeEvent.platform?.toLowerCase()].filter(Boolean)
                   : (activeEvent.extendedProps?.platforms || []).map((p: string) =>
                       p.toLowerCase(),
@@ -431,7 +431,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
 
               return (
                 <div
-                  className={`cursor-grabbing rounded-lg border-2 p-3 opacity-95 shadow-2xl ${platformConfig ? `${platformConfig.borderColor} ${platformConfig.bgClass}` : "border-primary-500 bg-white dark:bg-gray-800"}`}
+                  className={`cursor-grabbing rounded-lg border-2 p-3 opacity-95 shadow-2xl ${platformConfig ? `${platformConfig.borderColor} ${platformConfig.bgClass}` : 'border-primary-500 bg-white dark:bg-gray-800'}`}
                 >
                   <div className="flex items-center gap-2">
                     {/* Show all platform icons */}
@@ -452,8 +452,8 @@ export const MonthView: React.FC<MonthViewProps> = ({
                       ) : (
                         <PlatformIcon
                           platform={
-                            ["user_event", "event"].includes(String(activeEvent.type))
-                              ? "user_event"
+                            ['user_event', 'event'].includes(String(activeEvent.type))
+                              ? 'user_event'
                               : activeEvent.platform
                           }
                           className="h-5 w-5"

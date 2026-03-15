@@ -1,13 +1,13 @@
-import { X } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { formatSpeed, formatTime } from "@/Utils/formatters";
+import { X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { formatSpeed, formatTime } from '@/Utils/formatters';
 
 interface UploadItemProps {
   upload: {
     id: string;
     file: { name: string };
     progress: number;
-    status: "uploading" | "pending" | "paused" | "completed" | "error" | "cancelled";
+    status: 'uploading' | 'pending' | 'paused' | 'completed' | 'error' | 'cancelled';
     error?: string;
     stats?: { speed?: number; eta?: number };
   };
@@ -22,34 +22,34 @@ export function UploadItem({ upload, onRemove }: UploadItemProps) {
 
   const getProgressColor = () => {
     switch (upload.status) {
-      case "error":
-        return "bg-red-500";
-      case "completed":
-        return "bg-green-500";
-      case "cancelled":
-        return "bg-gray-400";
-      case "paused":
-        return "bg-yellow-500";
+      case 'error':
+        return 'bg-red-500';
+      case 'completed':
+        return 'bg-green-500';
+      case 'cancelled':
+        return 'bg-gray-400';
+      case 'paused':
+        return 'bg-yellow-500';
       default:
-        return "bg-primary";
+        return 'bg-primary';
     }
   };
 
   const getStatusText = () => {
-    if (upload.status === "uploading" && upload.stats?.eta) {
-      return `~${formatTime(upload.stats.eta)} ${t("publications.modal.upload.left", { defaultValue: "restante" })}`;
+    if (upload.status === 'uploading' && upload.stats?.eta) {
+      return `~${formatTime(upload.stats.eta)} ${t('publications.modal.upload.left', { defaultValue: 'restante' })}`;
     }
-    if (upload.status === "error") return upload.error;
-    if (upload.status === "completed")
-      return t("publications.modal.upload.done", { defaultValue: "Listo" });
-    if (upload.status === "paused")
-      return t("publications.modal.upload.paused", { defaultValue: "Pausado" });
-    if (upload.status === "cancelled")
-      return t("publications.modal.upload.cancelled", {
-        defaultValue: "Cancelado",
+    if (upload.status === 'error') return upload.error;
+    if (upload.status === 'completed')
+      return t('publications.modal.upload.done', { defaultValue: 'Listo' });
+    if (upload.status === 'paused')
+      return t('publications.modal.upload.paused', { defaultValue: 'Pausado' });
+    if (upload.status === 'cancelled')
+      return t('publications.modal.upload.cancelled', {
+        defaultValue: 'Cancelado',
       });
-    return t("publications.modal.upload.pending", {
-      defaultValue: "Pendiente",
+    return t('publications.modal.upload.pending', {
+      defaultValue: 'Pendiente',
     });
   };
 
@@ -87,9 +87,9 @@ export function UploadItem({ upload, onRemove }: UploadItemProps) {
 
       <div className="flex justify-between text-[10px] text-gray-500 dark:text-neutral-400">
         <span>
-          {upload.status === "uploading" && upload.stats?.speed
+          {upload.status === 'uploading' && upload.stats?.speed
             ? formatSpeed(upload.stats.speed)
-            : ""}
+            : ''}
         </span>
         <span>{getStatusText()}</span>
       </div>

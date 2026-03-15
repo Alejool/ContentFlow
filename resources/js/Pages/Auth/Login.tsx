@@ -1,15 +1,15 @@
-import { useAuth } from "@/Hooks/useAuth";
-import GuestLayout from "@/Layouts/GuestLayout";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Head, Link } from "@inertiajs/react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { useAuth } from '@/Hooks/useAuth';
+import GuestLayout from '@/Layouts/GuestLayout';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Head, Link } from '@inertiajs/react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
-import Button from "@/Components/common/Modern/Button";
-import Input from "@/Components/common/Modern/Input";
-import { AlertCircle, CheckCircle2, Lock, LogIn, Mail, UserPlus } from "lucide-react";
-import { useEffect } from "react";
-import { useTranslation } from "react-i18next";
+import Button from '@/Components/common/Modern/Button';
+import Input from '@/Components/common/Modern/Input';
+import { AlertCircle, CheckCircle2, Lock, LogIn, Mail, UserPlus } from 'lucide-react';
+import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function Login() {
   const { t } = useTranslation();
@@ -18,9 +18,9 @@ export default function Login() {
   const loginSchema = z.object({
     email: z
       .string()
-      .min(1, { message: t("validation.required") })
-      .email({ message: t("validation.email") }),
-    password: z.string().min(1, { message: t("validation.required") }),
+      .min(1, { message: t('validation.required') })
+      .email({ message: t('validation.email') }),
+    password: z.string().min(1, { message: t('validation.required') }),
     remember: z.boolean().default(false),
   });
 
@@ -34,8 +34,8 @@ export default function Login() {
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
       remember: false,
     },
   });
@@ -44,10 +44,10 @@ export default function Login() {
     try {
       await submitLogin(data);
     } catch (errorData: any) {
-      if (typeof errorData === "object") {
+      if (typeof errorData === 'object') {
         Object.keys(errorData).forEach((key) => {
           setError(key as any, {
-            type: "server",
+            type: 'server',
             message: errorData[key][0],
           });
         });
@@ -59,14 +59,14 @@ export default function Login() {
 
   return (
     <GuestLayout section="login">
-      <Head title={t("auth.login.title")} />
+      <Head title={t('auth.login.title')} />
       <div className="flex w-full items-center justify-center p-4 sm:p-8 lg:w-1/2">
         <div className="w-full max-w-md">
           <div className="mb-8 text-center">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-              {t("auth.login.title")}
+              {t('auth.login.title')}
             </h2>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">{t("auth.login.subtitle")}</p>
+            <p className="mt-2 text-gray-600 dark:text-gray-400">{t('auth.login.subtitle')}</p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -91,13 +91,13 @@ export default function Login() {
             <div>
               <Input
                 id="login_email"
-                label={t("auth.login.inputs.email")}
+                label={t('auth.login.inputs.email')}
                 type="email"
                 sizeType="lg"
-                placeholder={t("auth.login.placeholders.email")}
+                placeholder={t('auth.login.placeholders.email')}
                 icon={Mail}
                 error={errors.email?.message}
-                {...register("email")}
+                {...register('email')}
               />
             </div>
 
@@ -105,14 +105,14 @@ export default function Login() {
               <div className="relative">
                 <Input
                   id="login_password"
-                  label={t("auth.login.inputs.password")}
+                  label={t('auth.login.inputs.password')}
                   type="password"
                   sizeType="lg"
-                  placeholder={t("auth.login.placeholders.password")}
+                  placeholder={t('auth.login.placeholders.password')}
                   icon={Lock}
                   showPasswordToggle
                   error={errors.password?.message}
-                  {...register("password")}
+                  {...register('password')}
                 />
               </div>
             </div>
@@ -122,35 +122,35 @@ export default function Login() {
                 <input
                   type="checkbox"
                   className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 focus:ring-offset-0"
-                  {...register("remember")}
+                  {...register('remember')}
                 />
                 <span className="text-sm text-gray-700 dark:text-gray-300">
-                  {t("auth.login.buttons.rememberMe")}
+                  {t('auth.login.buttons.rememberMe')}
                 </span>
               </label>
 
               <Link
-                href={route("password.request")}
+                href={route('password.request')}
                 className="text-sm font-medium text-primary-600 transition-colors hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
               >
-                {t("auth.login.buttons.forgotPassword")}
+                {t('auth.login.buttons.forgotPassword')}
               </Link>
             </div>
 
             <Button
               type="submit"
               loading={isSubmitting}
-              loadingText={t("auth.login.buttons.loggingIn")}
+              loadingText={t('auth.login.buttons.loggingIn')}
               fullWidth
               icon={LogIn as any}
             >
-              {t("auth.login.buttons.login")}
+              {t('auth.login.buttons.login')}
             </Button>
 
             <div className="relative">
               <div className="relative flex justify-center text-sm">
                 <span className="bg-white px-4 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
-                  {t("auth.login.orContinueWith")}
+                  {t('auth.login.orContinueWith')}
                 </span>
               </div>
             </div>
@@ -180,19 +180,19 @@ export default function Login() {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   />
                 </svg>
-                <span className="font-medium">{t("auth.login.buttons.google")}</span>
+                <span className="font-medium">{t('auth.login.buttons.google')}</span>
               </button>
             </div>
 
             <div className="text-center">
               <p className="flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                {t("auth.login.noAccount")}{" "}
+                {t('auth.login.noAccount')}{' '}
                 <Link
-                  href={route("register")}
+                  href={route('register')}
                   className="inline-flex items-center gap-1 font-semibold text-primary-600 transition-colors hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
                 >
                   <UserPlus className="h-5 w-5" />
-                  {t("auth.login.buttons.registerLink")}
+                  {t('auth.login.buttons.registerLink')}
                 </Link>
               </p>
             </div>

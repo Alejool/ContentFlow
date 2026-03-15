@@ -1,6 +1,6 @@
-import { router } from "@inertiajs/react";
-import axios from "axios";
-import { create } from "zustand";
+import { router } from '@inertiajs/react';
+import axios from 'axios';
+import { create } from 'zustand';
 
 interface LoadingStates {
   [key: number]: {
@@ -49,11 +49,11 @@ export const usePublicationActionsStore = create<PublicationActionsStore>((set, 
 
   submitForApproval: async (itemId) => {
     const { setItemLoading } = get();
-    setItemLoading(itemId, "submitting", true);
+    setItemLoading(itemId, 'submitting', true);
 
     try {
       // Nuevo endpoint del sistema simplificado
-      const response = await axios.post(route("api.v1.approvals.submit"), {
+      const response = await axios.post(route('api.v1.approvals.submit'), {
         publication_id: itemId,
       });
 
@@ -63,8 +63,8 @@ export const usePublicationActionsStore = create<PublicationActionsStore>((set, 
 
       // Actualizar el store de publicaciones con el nuevo estado
       if (publication) {
-        const { usePublicationStore } = await import("@/stores/publicationStore");
-        const { useManageContentUIStore } = await import("@/stores/manageContentUIStore");
+        const { usePublicationStore } = await import('@/stores/publicationStore');
+        const { useManageContentUIStore } = await import('@/stores/manageContentUIStore');
 
         const updateData = {
           ...publication,
@@ -89,7 +89,7 @@ export const usePublicationActionsStore = create<PublicationActionsStore>((set, 
         // The backend has already invalidated the cache, so the next API call
         // will return fresh data without this publication (now in pending_review status)
         window.dispatchEvent(
-          new CustomEvent("publication-submitted-for-approval", {
+          new CustomEvent('publication-submitted-for-approval', {
             detail: { publicationId: itemId, publication: updateData },
           }),
         );
@@ -100,7 +100,7 @@ export const usePublicationActionsStore = create<PublicationActionsStore>((set, 
         approvalInfo: approvalRequest
           ? {
               current_level: approvalRequest.currentStep?.level_number ?? 1,
-              level_name: approvalRequest.currentStep?.level_name ?? "",
+              level_name: approvalRequest.currentStep?.level_name ?? '',
               approvers: [],
               approver_count: 0,
             }
@@ -109,67 +109,67 @@ export const usePublicationActionsStore = create<PublicationActionsStore>((set, 
     } catch (error: any) {
       return {
         success: false,
-        message: error.response?.data?.message || "Error al enviar a revisión",
+        message: error.response?.data?.message || 'Error al enviar a revisión',
       };
     } finally {
-      setItemLoading(itemId, "submitting", false);
+      setItemLoading(itemId, 'submitting', false);
     }
   },
 
   deletePublication: async (itemId) => {
     const { setItemLoading } = get();
-    setItemLoading(itemId, "deleting", true);
+    setItemLoading(itemId, 'deleting', true);
 
     try {
       // La eliminación se maneja a través del callback onDelete
       // que viene del componente padre
       return { success: true };
     } catch (error: any) {
-      console.error("Error deleting publication:", error);
+      console.error('Error deleting publication:', error);
       return {
         success: false,
-        message: error.response?.data?.message || "Error al eliminar",
+        message: error.response?.data?.message || 'Error al eliminar',
       };
     } finally {
-      setItemLoading(itemId, "deleting", false);
+      setItemLoading(itemId, 'deleting', false);
     }
   },
 
   deleteUserEvent: async (itemId) => {
     const { setItemLoading } = get();
-    setItemLoading(itemId, "deleting", true);
+    setItemLoading(itemId, 'deleting', true);
 
     try {
       await axios.delete(`/api/v1/calendar/user-events/${itemId}`);
-      router.reload({ only: ["publications"] });
-      return { success: true, message: "Evento eliminado" };
+      router.reload({ only: ['publications'] });
+      return { success: true, message: 'Evento eliminado' };
     } catch (error: any) {
-      console.error("Error deleting user event:", error);
+      console.error('Error deleting user event:', error);
       return {
         success: false,
-        message: error.response?.data?.message || "Error al eliminar evento",
+        message: error.response?.data?.message || 'Error al eliminar evento',
       };
     } finally {
-      setItemLoading(itemId, "deleting", false);
+      setItemLoading(itemId, 'deleting', false);
     }
   },
 
   duplicatePublication: async (itemId) => {
     const { setItemLoading } = get();
-    setItemLoading(itemId, "duplicating", true);
+    setItemLoading(itemId, 'duplicating', true);
 
     try {
       // La duplicación se maneja a través del callback onDuplicate
       // que viene del componente padre
       return { success: true };
     } catch (error: any) {
-      console.error("Error duplicating publication:", error);
+      console.error('Error duplicating publication:', error);
       return {
         success: false,
-        message: error.response?.data?.message || "Error al duplicar",
+        message: error.response?.data?.message || 'Error al duplicar',
       };
     } finally {
-      setItemLoading(itemId, "duplicating", false);
+      setItemLoading(itemId, 'duplicating', false);
     }
   },
 }));

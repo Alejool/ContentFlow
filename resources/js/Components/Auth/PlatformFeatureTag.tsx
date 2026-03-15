@@ -1,5 +1,5 @@
-import { Globe } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { Globe } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface PlatformFeatureTagProps {
   titleKey: string;

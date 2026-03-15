@@ -1,9 +1,9 @@
-import { Head, Link } from "@inertiajs/react";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import AdminNavigation from "@/Components/Admin/AdminNavigation";
-import SystemStatusCard from "@/Components/Admin/SystemStatusCard";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card";
-import Button from "@/Components/common/Modern/Button";
+import { Head, Link } from '@inertiajs/react';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AdminNavigation from '@/Components/Admin/AdminNavigation';
+import SystemStatusCard from '@/Components/Admin/SystemStatusCard';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import Button from '@/Components/common/Modern/Button';
 import {
   Settings,
   Bell,
@@ -13,8 +13,8 @@ import {
   Database,
   Zap,
   ArrowRight,
-} from "lucide-react";
-import { useTranslation } from "react-i18next";
+} from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface SystemStatus {
   plans: Record<string, boolean>;
@@ -31,7 +31,7 @@ interface Stats {
   total_users: number;
   active_subscriptions: number;
   total_publications: number;
-  system_health: "healthy" | "warning" | "critical";
+  system_health: 'healthy' | 'warning' | 'critical';
 }
 
 interface Props {
@@ -44,69 +44,69 @@ export default function AdminDashboard({ systemStatus, stats }: Props) {
 
   const quickActions = [
     {
-      title: t("admin.navigation.system_settings"),
-      description: t("admin.system_settings.page_description"),
+      title: t('admin.navigation.system_settings'),
+      description: t('admin.system_settings.page_description'),
       icon: Settings,
-      href: "/admin/system-settings",
-      gradient: "from-blue-500 to-blue-600",
-      iconBg: "bg-blue-100 dark:bg-blue-900/30",
-      iconColor: "text-blue-600 dark:text-blue-400",
+      href: '/admin/system-settings',
+      gradient: 'from-blue-500 to-blue-600',
+      iconBg: 'bg-blue-100 dark:bg-blue-900/30',
+      iconColor: 'text-blue-600 dark:text-blue-400',
     },
     {
-      title: t("admin.navigation.system_notifications"),
-      description: t("admin.system_notifications.page_subtitle"),
+      title: t('admin.navigation.system_notifications'),
+      description: t('admin.system_notifications.page_subtitle'),
       icon: Bell,
-      href: "/admin/system-notifications",
-      gradient: "from-purple-500 to-purple-600",
-      iconBg: "bg-purple-100 dark:bg-purple-900/30",
-      iconColor: "text-purple-600 dark:text-purple-400",
+      href: '/admin/system-notifications',
+      gradient: 'from-purple-500 to-purple-600',
+      iconBg: 'bg-purple-100 dark:bg-purple-900/30',
+      iconColor: 'text-purple-600 dark:text-purple-400',
     },
   ];
 
   const systemMetrics = [
     {
-      title: t("admin.dashboard.metrics.total_users"),
+      title: t('admin.dashboard.metrics.total_users'),
       value: stats?.total_users || 0,
       icon: Users,
-      color: "text-blue-600 dark:text-blue-400",
-      bgColor: "bg-blue-100 dark:bg-blue-900/30",
-      borderColor: "border-blue-200 dark:border-blue-800",
+      color: 'text-blue-600 dark:text-blue-400',
+      bgColor: 'bg-blue-100 dark:bg-blue-900/30',
+      borderColor: 'border-blue-200 dark:border-blue-800',
     },
     {
-      title: t("admin.dashboard.metrics.active_subscriptions"),
+      title: t('admin.dashboard.metrics.active_subscriptions'),
       value: stats?.active_subscriptions || 0,
       icon: TrendingUp,
-      color: "text-green-600 dark:text-green-400",
-      bgColor: "bg-green-100 dark:bg-green-900/30",
-      borderColor: "border-green-200 dark:border-green-800",
+      color: 'text-green-600 dark:text-green-400',
+      bgColor: 'bg-green-100 dark:bg-green-900/30',
+      borderColor: 'border-green-200 dark:border-green-800',
     },
     {
-      title: t("admin.dashboard.metrics.publications"),
+      title: t('admin.dashboard.metrics.publications'),
       value: stats?.total_publications || 0,
       icon: Database,
-      color: "text-purple-600 dark:text-purple-400",
-      bgColor: "bg-purple-100 dark:bg-purple-900/30",
-      borderColor: "border-purple-200 dark:border-purple-800",
+      color: 'text-purple-600 dark:text-purple-400',
+      bgColor: 'bg-purple-100 dark:bg-purple-900/30',
+      borderColor: 'border-purple-200 dark:border-purple-800',
     },
     {
-      title: t("admin.dashboard.metrics.system_health"),
+      title: t('admin.dashboard.metrics.system_health'),
       value:
-        stats?.system_health === "healthy"
-          ? t("admin.dashboard.metrics.healthy")
-          : t("admin.dashboard.metrics.review"),
+        stats?.system_health === 'healthy'
+          ? t('admin.dashboard.metrics.healthy')
+          : t('admin.dashboard.metrics.review'),
       icon: Activity,
       color:
-        stats?.system_health === "healthy"
-          ? "text-green-600 dark:text-green-400"
-          : "text-yellow-600 dark:text-yellow-400",
+        stats?.system_health === 'healthy'
+          ? 'text-green-600 dark:text-green-400'
+          : 'text-yellow-600 dark:text-yellow-400',
       bgColor:
-        stats?.system_health === "healthy"
-          ? "bg-green-100 dark:bg-green-900/30"
-          : "bg-yellow-100 dark:bg-yellow-900/30",
+        stats?.system_health === 'healthy'
+          ? 'bg-green-100 dark:bg-green-900/30'
+          : 'bg-yellow-100 dark:bg-yellow-900/30',
       borderColor:
-        stats?.system_health === "healthy"
-          ? "border-green-200 dark:border-green-800"
-          : "border-yellow-200 dark:border-yellow-800",
+        stats?.system_health === 'healthy'
+          ? 'border-green-200 dark:border-green-800'
+          : 'border-yellow-200 dark:border-yellow-800',
     },
   ];
 
@@ -116,16 +116,16 @@ export default function AdminDashboard({ systemStatus, stats }: Props) {
         <div className="mt-2 flex items-center justify-center text-3xl text-gray-900 dark:text-gray-100">
           <div>
             <h2 className="font-bold text-gray-900 dark:text-gray-100">
-              {t("admin.dashboard.title")}
+              {t('admin.dashboard.title')}
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              {t("admin.dashboard.subtitle")}
+              {t('admin.dashboard.subtitle')}
             </p>
           </div>
         </div>
       }
     >
-      <Head title={t("admin.dashboard.title")} />
+      <Head title={t('admin.dashboard.title')} />
 
       <AdminNavigation currentRoute="/admin/dashboard" />
 
@@ -162,7 +162,7 @@ export default function AdminDashboard({ systemStatus, stats }: Props) {
             {/* Quick Actions */}
             <div className="space-y-4 lg:col-span-2">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                {t("admin.dashboard.quick_actions")}
+                {t('admin.dashboard.quick_actions')}
               </h3>
               {quickActions.map((action) => {
                 const Icon = action.icon;
@@ -194,7 +194,7 @@ export default function AdminDashboard({ systemStatus, stats }: Props) {
                             icon={ArrowRight}
                             iconPosition="right"
                           >
-                            {t("admin.dashboard.access")}
+                            {t('admin.dashboard.access')}
                           </Button>
                         </Link>
                       </div>
@@ -207,7 +207,7 @@ export default function AdminDashboard({ systemStatus, stats }: Props) {
               <Card className="mt-6 border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
                 <CardHeader>
                   <CardTitle className="text-gray-900 dark:text-gray-100">
-                    {t("admin.dashboard.recent_activity")}
+                    {t('admin.dashboard.recent_activity')}
                   </CardTitle>
                   <CardDescription className="text-gray-600 dark:text-gray-400">
                     Últimos cambios en la configuración del sistema
@@ -218,19 +218,19 @@ export default function AdminDashboard({ systemStatus, stats }: Props) {
                     <div className="flex items-center gap-3 text-sm">
                       <div className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
                       <span className="text-gray-700 dark:text-gray-300">
-                        {t("admin.dashboard.activity.system_started")}
+                        {t('admin.dashboard.activity.system_started')}
                       </span>
                     </div>
                     <div className="flex items-center gap-3 text-sm">
                       <div className="h-2 w-2 rounded-full bg-blue-500" />
                       <span className="text-gray-700 dark:text-gray-300">
-                        {t("admin.dashboard.activity.config_loaded")}
+                        {t('admin.dashboard.activity.config_loaded')}
                       </span>
                     </div>
                     <div className="flex items-center gap-3 text-sm">
                       <div className="h-2 w-2 rounded-full bg-purple-500" />
                       <span className="text-gray-700 dark:text-gray-300">
-                        {t("admin.dashboard.activity.cache_optimized")}
+                        {t('admin.dashboard.activity.cache_optimized')}
                       </span>
                     </div>
                   </div>
@@ -241,7 +241,7 @@ export default function AdminDashboard({ systemStatus, stats }: Props) {
             {/* System Status */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                {t("admin.dashboard.system_status")}
+                {t('admin.dashboard.system_status')}
               </h3>
               <SystemStatusCard status={systemStatus} />
 
@@ -250,32 +250,32 @@ export default function AdminDashboard({ systemStatus, stats }: Props) {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-gray-100">
                     <Zap className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
-                    {t("admin.dashboard.quick_info")}
+                    {t('admin.dashboard.quick_info')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm">
                   <div className="rounded-lg bg-white/50 p-3 dark:bg-gray-800/50">
                     <p className="font-semibold text-gray-900 dark:text-gray-100">
-                      {t("admin.dashboard.info.exclusive_access")}
+                      {t('admin.dashboard.info.exclusive_access')}
                     </p>
                     <p className="text-gray-700 dark:text-gray-300">
-                      {t("admin.dashboard.info.exclusive_description")}
+                      {t('admin.dashboard.info.exclusive_description')}
                     </p>
                   </div>
                   <div className="rounded-lg bg-white/50 p-3 dark:bg-gray-800/50">
                     <p className="font-semibold text-gray-900 dark:text-gray-100">
-                      {t("admin.dashboard.info.realtime_changes")}
+                      {t('admin.dashboard.info.realtime_changes')}
                     </p>
                     <p className="text-gray-700 dark:text-gray-300">
-                      {t("admin.dashboard.info.realtime_description")}
+                      {t('admin.dashboard.info.realtime_description')}
                     </p>
                   </div>
                   <div className="rounded-lg bg-white/50 p-3 dark:bg-gray-800/50">
                     <p className="font-semibold text-gray-900 dark:text-gray-100">
-                      {t("admin.dashboard.info.full_audit")}
+                      {t('admin.dashboard.info.full_audit')}
                     </p>
                     <p className="text-gray-700 dark:text-gray-300">
-                      {t("admin.dashboard.info.audit_description")}
+                      {t('admin.dashboard.info.audit_description')}
                     </p>
                   </div>
                 </CardContent>

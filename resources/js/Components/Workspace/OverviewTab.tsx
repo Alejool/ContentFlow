@@ -1,4 +1,4 @@
-import StatCard from "@/Components/Workspace/StatCard";
+import StatCard from '@/Components/Workspace/StatCard';
 import {
   Activity,
   Clock,
@@ -8,10 +8,10 @@ import {
   UserPlus,
   Users,
   Zap,
-} from "lucide-react";
-import { useState } from "react";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
+} from 'lucide-react';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface OverviewTabProps {
   workspace: any;
@@ -26,35 +26,35 @@ export default function OverviewTab({ workspace, auth, onTabChange }: OverviewTa
   const quickActions = [
     {
       icon: UserPlus,
-      label: t("workspace.quick_actions.invite_members"),
-      description: t("workspace.quick_actions.invite_members_description"),
-      action: () => onTabChange("members"),
-      color: "from-blue-500 to-cyan-500",
+      label: t('workspace.quick_actions.invite_members'),
+      description: t('workspace.quick_actions.invite_members_description'),
+      action: () => onTabChange('members'),
+      color: 'from-blue-500 to-cyan-500',
     },
     {
       icon: Share2,
-      label: t("workspace.quick_actions.share_workspace"),
-      description: t("workspace.quick_actions.share_workspace_description"),
+      label: t('workspace.quick_actions.share_workspace'),
+      description: t('workspace.quick_actions.share_workspace_description'),
       action: () => {
-        onTabChange("general");
+        onTabChange('general');
         // Scroll to public invites if possible or just show general
-        toast.success(t("workspace.quick_actions.share_workspace_description"));
+        toast.success(t('workspace.quick_actions.share_workspace_description'));
       },
-      color: "from-purple-500 to-pink-500",
+      color: 'from-purple-500 to-pink-500',
     },
     {
       icon: SettingsIcon,
-      label: t("workspace.quick_actions.settings"),
-      description: t("workspace.quick_actions.settings_description"),
-      action: () => onTabChange("general"),
-      color: "from-emerald-500 to-green-500",
+      label: t('workspace.quick_actions.settings'),
+      description: t('workspace.quick_actions.settings_description'),
+      action: () => onTabChange('general'),
+      color: 'from-emerald-500 to-green-500',
     },
     {
       icon: Zap,
-      label: t("workspace.quick_actions.integrations"),
-      description: t("workspace.quick_actions.integrations_description"),
-      action: () => onTabChange("integrations"),
-      color: "from-amber-500 to-orange-500",
+      label: t('workspace.quick_actions.integrations'),
+      description: t('workspace.quick_actions.integrations_description'),
+      action: () => onTabChange('integrations'),
+      color: 'from-amber-500 to-orange-500',
     },
   ];
 
@@ -72,13 +72,13 @@ export default function OverviewTab({ workspace, auth, onTabChange }: OverviewTa
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           icon={Users}
-          label={t("workspace.stats.total_members")}
+          label={t('workspace.stats.total_members')}
           value={workspace.users?.length || 0}
           color="blue"
         />
         <StatCard
           icon={Activity}
-          label={t("workspace.stats.active_integrations")}
+          label={t('workspace.stats.active_integrations')}
           value={activeIntegrationsCount}
           color="green"
         />
@@ -86,7 +86,7 @@ export default function OverviewTab({ workspace, auth, onTabChange }: OverviewTa
 
       <div className="rounded-lg border border-white/70 bg-gradient-to-br from-white/90 to-white/95 p-6 dark:border-black/70 dark:from-black/90 dark:to-black/95">
         <h3 className="mb-6 text-xl font-bold text-gray-900 dark:text-white">
-          {t("workspace.quick_actions.title")}
+          {t('workspace.quick_actions.title')}
         </h3>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           {quickActions.map((action) => (

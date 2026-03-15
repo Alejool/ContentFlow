@@ -1,4 +1,4 @@
-import { Publication, SocialAccount } from "@/types/Publication";
+import { Publication, SocialAccount } from '@/types/Publication';
 
 interface PublishModalExampleProps {
   show: boolean;

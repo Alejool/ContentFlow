@@ -7,10 +7,10 @@
  * Requirements: 2.1, 2.4
  */
 
-export type ThemePreference = "light" | "dark" | "system";
+export type ThemePreference = 'light' | 'dark' | 'system';
 
-const STORAGE_KEY_PREFIX = "workspace_theme_";
-const FALLBACK_KEY = "theme"; // Fallback for non-workspace usage
+const STORAGE_KEY_PREFIX = 'workspace_theme_';
+const FALLBACK_KEY = 'theme'; // Fallback for non-workspace usage
 
 export interface LocalStorageThemeManager {
   save(workspaceId: string, theme: ThemePreference): void;
@@ -40,7 +40,7 @@ function save(workspaceId: string, theme: ThemePreference): void {
     // Handle quota exceeded error
     if (
       error instanceof DOMException &&
-      (error.name === "QuotaExceededError" || error.name === "NS_ERROR_DOM_QUOTA_REACHED")
+      (error.name === 'QuotaExceededError' || error.name === 'NS_ERROR_DOM_QUOTA_REACHED')
     ) {
       try {
         // Clear all workspace themes and retry
@@ -67,7 +67,7 @@ function load(workspaceId: string): ThemePreference | null {
   try {
     const stored = localStorage.getItem(key);
 
-    if (stored === "light" || stored === "dark" || stored === "system") {
+    if (stored === 'light' || stored === 'dark' || stored === 'system') {
       return stored;
     }
 

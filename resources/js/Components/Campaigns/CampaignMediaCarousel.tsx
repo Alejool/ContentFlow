@@ -1,7 +1,7 @@
-import { useTheme } from "@/Hooks/useTheme";
-import { Dialog, DialogPanel } from "@headlessui/react";
-import { ChevronLeft, ChevronRight, File, Film, Image as ImageIcon, Play, X } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import { useTheme } from '@/Hooks/useTheme';
+import { Dialog, DialogPanel } from '@headlessui/react';
+import { ChevronLeft, ChevronRight, File, Film, Image as ImageIcon, Play, X } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface MediaFile {
   id: number;
@@ -34,38 +34,38 @@ export default function CampaignMediaCarousel({ mediaFiles }: CampaignMediaCarou
     };
 
     handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const images = mediaFiles.filter(
     (file) =>
-      file.file_type.startsWith("image/") ||
-      file.file_type === "image" ||
+      file.file_type.startsWith('image/') ||
+      file.file_type === 'image' ||
       file.file_path?.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i),
   );
 
   const videos = mediaFiles.filter(
     (file) =>
-      file.file_type.startsWith("video/") ||
-      file.file_type === "video" ||
+      file.file_type.startsWith('video/') ||
+      file.file_type === 'video' ||
       file.file_path?.match(/\.(mp4|avi|mov|wmv|flv|webm)$/i),
   );
 
   const otherFiles = mediaFiles.filter(
     (file) =>
-      !file.file_type.startsWith("image/") &&
-      !file.file_type.startsWith("video/") &&
+      !file.file_type.startsWith('image/') &&
+      !file.file_type.startsWith('video/') &&
       !file.file_path?.match(/\.(jpg|jpeg|png|gif|webp|svg|mp4|avi|mov|wmv|flv|webm)$/i),
   );
 
   if (mediaFiles.length === 1) {
     const media = mediaFiles[0];
     const isImage =
-      media.file_type.startsWith("image/") ||
+      media.file_type.startsWith('image/') ||
       media.file_path?.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i);
     const isVideo =
-      media.file_type.startsWith("video/") ||
+      media.file_type.startsWith('video/') ||
       media.file_path?.match(/\.(mp4|avi|mov|wmv|flv|webm)$/i);
 
     return (
@@ -78,11 +78,11 @@ export default function CampaignMediaCarousel({ mediaFiles }: CampaignMediaCarou
             <div className="relative aspect-video">
               <img
                 src={media.file_path}
-                alt={media.file_name || "Media"}
+                alt={media.file_name || 'Media'}
                 className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                 onError={(e) => {
                   e.currentTarget.src =
-                    "https://images.unsplash.com/photo-1579546929662-711aa81148cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80";
+                    'https://images.unsplash.com/photo-1579546929662-711aa81148cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80';
                 }}
                 loading="lazy"
               />
@@ -105,10 +105,10 @@ export default function CampaignMediaCarousel({ mediaFiles }: CampaignMediaCarou
             <div className="flex aspect-video flex-col items-center justify-center rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 p-8 dark:from-gray-800 dark:to-gray-900">
               <File className="mb-4 h-16 w-16 text-gray-400 dark:text-gray-600" />
               <span className="font-medium text-gray-600 dark:text-gray-400">
-                {media.file_name || "Archivo adjunto"}
+                {media.file_name || 'Archivo adjunto'}
               </span>
               <span className="mt-1 text-sm text-gray-500 dark:text-gray-500">
-                {media.file_type || "Tipo desconocido"}
+                {media.file_type || 'Tipo desconocido'}
               </span>
             </div>
           )}
@@ -168,7 +168,7 @@ export default function CampaignMediaCarousel({ mediaFiles }: CampaignMediaCarou
           <div className="flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1.5 dark:bg-blue-900/30">
             <ImageIcon className="h-4 w-4 text-blue-600 dark:text-blue-400" />
             <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
-              {images.length} {images.length === 1 ? "imagen" : "imágenes"}
+              {images.length} {images.length === 1 ? 'imagen' : 'imágenes'}
             </span>
           </div>
         )}
@@ -176,7 +176,7 @@ export default function CampaignMediaCarousel({ mediaFiles }: CampaignMediaCarou
           <div className="flex items-center gap-2 rounded-full bg-purple-50 px-3 py-1.5 dark:bg-purple-900/30">
             <Film className="h-4 w-4 text-purple-600 dark:text-purple-400" />
             <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
-              {videos.length} {videos.length === 1 ? "video" : "videos"}
+              {videos.length} {videos.length === 1 ? 'video' : 'videos'}
             </span>
           </div>
         )}
@@ -204,15 +204,15 @@ export default function CampaignMediaCarousel({ mediaFiles }: CampaignMediaCarou
   function getGridClass(count: number): string {
     switch (count) {
       case 1:
-        return "grid-cols-1";
+        return 'grid-cols-1';
       case 2:
-        return "grid-cols-2";
+        return 'grid-cols-2';
       case 3:
-        return "grid-cols-2 grid-rows-2";
+        return 'grid-cols-2 grid-rows-2';
       case 4:
-        return "grid-cols-2 grid-rows-2";
+        return 'grid-cols-2 grid-rows-2';
       default:
-        return "grid-cols-3 grid-rows-2";
+        return 'grid-cols-3 grid-rows-2';
     }
   }
 
@@ -238,7 +238,7 @@ function ImageGridItem({
   return (
     <div
       className={`group relative cursor-pointer overflow-hidden rounded-lg ${
-        isLarge ? "row-span-2" : ""
+        isLarge ? 'row-span-2' : ''
       }`}
       onClick={onClick}
     >
@@ -249,7 +249,7 @@ function ImageGridItem({
           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           onError={(e) => {
             e.currentTarget.src =
-              "https://images.unsplash.com/photo-1579546929662-711aa81148cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80";
+              'https://images.unsplash.com/photo-1579546929662-711aa81148cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80';
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
@@ -303,18 +303,18 @@ function ModernCarousel({
         {visibleSlides.map((media, idx) => {
           const actualIndex = currentIndex + idx;
           const isImage =
-            media.file_type.startsWith("image/") ||
+            media.file_type.startsWith('image/') ||
             media.file_path?.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i);
           const isVideo =
-            media.file_type.startsWith("video/") ||
+            media.file_type.startsWith('video/') ||
             media.file_path?.match(/\.(mp4|avi|mov|wmv|flv|webm)$/i);
 
           return (
             <div
               key={media.id}
               className={`flex-shrink-0 transition-all duration-300 ${
-                slidesToShow > 1 ? "w-1/2" : "w-full"
-              } ${slidesToShow === 2 ? "lg:w-1/2" : slidesToShow === 3 ? "lg:w-1/3" : ""}`}
+                slidesToShow > 1 ? 'w-1/2' : 'w-full'
+              } ${slidesToShow === 2 ? 'lg:w-1/2' : slidesToShow === 3 ? 'lg:w-1/3' : ''}`}
               onClick={() => onItemClick(actualIndex)}
             >
               <div className="group/card relative cursor-pointer overflow-hidden rounded-lg">
@@ -326,7 +326,7 @@ function ModernCarousel({
                       className="h-full w-full object-cover transition-transform duration-300 group-hover/card:scale-105"
                       onError={(e) => {
                         e.currentTarget.src =
-                          "https://images.unsplash.com/photo-1579546929662-711aa81148cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80";
+                          'https://images.unsplash.com/photo-1579546929662-711aa81148cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80';
                       }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 transition-opacity duration-300 group-hover/card:opacity-100" />
@@ -353,10 +353,10 @@ function ModernCarousel({
                   <div className="flex aspect-video flex-col items-center justify-center rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 p-6 dark:from-gray-800 dark:to-gray-900">
                     <File className="mb-3 h-12 w-12 text-gray-400 dark:text-gray-600" />
                     <span className="max-w-full truncate text-center text-sm font-medium text-gray-600 dark:text-gray-400">
-                      {media.file_name || "Archivo"}
+                      {media.file_name || 'Archivo'}
                     </span>
                     <span className="mt-1 text-xs text-gray-500 dark:text-gray-500">
-                      {media.file_type || "Tipo desconocido"}
+                      {media.file_type || 'Tipo desconocido'}
                     </span>
                   </div>
                 )}
@@ -414,7 +414,7 @@ function Lightbox({
 }) {
   const currentMedia = mediaFiles[selectedIndex];
   const isImage =
-    currentMedia?.file_type.startsWith("image/") ||
+    currentMedia?.file_type.startsWith('image/') ||
     currentMedia?.file_path?.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i);
 
   const nextSlide = () => {
@@ -427,19 +427,19 @@ function Lightbox({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-      if (e.key === "ArrowLeft") prevSlide();
-      if (e.key === "ArrowRight") nextSlide();
+      if (e.key === 'Escape') onClose();
+      if (e.key === 'ArrowLeft') prevSlide();
+      if (e.key === 'ArrowRight') nextSlide();
     };
 
     if (isOpen) {
-      document.addEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "hidden";
+      document.addEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'hidden';
     }
 
     return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "unset";
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset';
     };
   }, [isOpen, selectedIndex]);
 
@@ -482,7 +482,7 @@ function Lightbox({
                   className="max-h-[70vh] w-auto max-w-full rounded-lg object-contain"
                   onError={(e) => {
                     e.currentTarget.src =
-                      "https://images.unsplash.com/photo-1579546929662-711aa81148cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80";
+                      'https://images.unsplash.com/photo-1579546929662-711aa81148cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80';
                   }}
                 />
               ) : (
@@ -527,8 +527,8 @@ function Lightbox({
                   key={media.id}
                   className={`h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-200 ${
                     idx === selectedIndex
-                      ? "scale-105 border-blue-500 dark:border-blue-400"
-                      : "border-transparent hover:border-gray-400"
+                      ? 'scale-105 border-blue-500 dark:border-blue-400'
+                      : 'border-transparent hover:border-gray-400'
                   }`}
                   onClick={() => setSelectedIndex(idx)}
                 >
@@ -538,7 +538,7 @@ function Lightbox({
                     className="h-full w-full object-cover"
                     onError={(e) => {
                       e.currentTarget.src =
-                        "https://images.unsplash.com/photo-1579546929662-711aa81148cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80";
+                        'https://images.unsplash.com/photo-1579546929662-711aa81148cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80';
                     }}
                   />
                 </button>

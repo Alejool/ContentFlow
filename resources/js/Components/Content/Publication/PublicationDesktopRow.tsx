@@ -1,11 +1,11 @@
-import Button from "@/Components/common/Modern/Button";
-import SimpleContentTypeBadge from "@/Components/Content/common/SimpleContentTypeBadge";
-import PublicationThumbnail from "@/Components/Content/Publication/PublicationThumbnail";
-import SocialAccountsDisplay from "@/Components/Content/Publication/SocialAccountsDisplay";
-import { usePublicationActions } from "@/Hooks/publication/usePublicationActions";
-import { usePublicationStore } from "@/stores/publicationStore";
-import { Publication } from "@/types/Publication";
-import { countMediaFiles, getLockedByName } from "@/Utils/publicationHelpers";
+import Button from '@/Components/common/Modern/Button';
+import SimpleContentTypeBadge from '@/Components/Content/common/SimpleContentTypeBadge';
+import PublicationThumbnail from '@/Components/Content/Publication/PublicationThumbnail';
+import SocialAccountsDisplay from '@/Components/Content/Publication/SocialAccountsDisplay';
+import { usePublicationActions } from '@/Hooks/publication/usePublicationActions';
+import { usePublicationStore } from '@/stores/publicationStore';
+import { Publication } from '@/types/Publication';
+import { countMediaFiles, getLockedByName } from '@/Utils/publicationHelpers';
 import {
   Calendar,
   Clock,
@@ -18,9 +18,9 @@ import {
   Send,
   Trash2,
   Video,
-} from "lucide-react";
-import React, { memo, useMemo } from "react";
-import toast from "react-hot-toast";
+} from 'lucide-react';
+import React, { memo, useMemo } from 'react';
+import toast from 'react-hot-toast';
 
 // ... (skipping interface to save tokens if possible, or just targeting the specific blocks)
 
@@ -50,7 +50,7 @@ interface PublicationRowProps {
   onPreviewMedia?: (
     media: {
       url: string;
-      type: "image" | "video";
+      type: 'image' | 'video';
       title?: string;
     }[],
     initialIndex?: number,
@@ -118,22 +118,22 @@ const PublicationRow = memo(
                 const hasMedia = item.media_files && item.media_files.length > 0;
                 if (hasMedia && onPreviewMedia) {
                   const allMedia = (item.media_files || []).map((media: any) => {
-                    const isV = media.file_type?.includes("video");
+                    const isV = media.file_type?.includes('video');
                     let mUrl = media.thumbnail?.file_path || media.file_path;
 
-                    if (!mUrl && media.file_type === "image") {
+                    if (!mUrl && media.file_type === 'image') {
                       mUrl = media.file_path;
                     }
 
                     return {
                       url: isV
-                        ? media.file_path.startsWith("http")
+                        ? media.file_path.startsWith('http')
                           ? media.file_path
                           : `/storage/${media.file_path}`
-                        : mUrl.startsWith("http")
+                        : mUrl.startsWith('http')
                           ? mUrl
                           : `/storage/${mUrl}`,
-                      type: (isV ? "video" : "image") as "image" | "video",
+                      type: (isV ? 'video' : 'image') as 'image' | 'video',
                       title: item.title,
                     };
                   });
@@ -142,7 +142,7 @@ const PublicationRow = memo(
                 }
               }}
             >
-              {(item as any).type === "user_event" ? (
+              {(item as any).type === 'user_event' ? (
                 <Calendar className="h-6 w-6 text-primary-500" />
               ) : (
                 <PublicationThumbnail publication={item} t={t} />
@@ -151,9 +151,9 @@ const PublicationRow = memo(
             <div className="min-w-0 max-w-md">
               <h3
                 className="truncate text-sm font-medium text-gray-900 dark:text-white"
-                title={item.title || "Untitled"}
+                title={item.title || 'Untitled'}
               >
-                {item.title || "Untitled"}
+                {item.title || 'Untitled'}
               </h3>
 
               {/* Content Type Badge */}
@@ -166,10 +166,10 @@ const PublicationRow = memo(
               </div>
 
               <p className="mt-0.5 truncate text-xs text-gray-500 dark:text-gray-400">
-                {item.description || t("publications.table.noDescription")}
+                {item.description || t('publications.table.noDescription')}
               </p>
               {item.platform_settings &&
-                typeof item.platform_settings === "object" &&
+                typeof item.platform_settings === 'object' &&
                 !Array.isArray(item.platform_settings) &&
                 Object.keys(item.platform_settings).length > 0 && (
                   <div className="mt-1 flex flex-wrap gap-1">
@@ -179,21 +179,21 @@ const PublicationRow = memo(
                         if (!settings || !settings.type) return null;
 
                         const typeLabel =
-                          settings.type === "poll"
-                            ? "Poll"
-                            : settings.type === "thread"
-                              ? "Thread"
-                              : settings.type === "reel"
-                                ? "Reel"
-                                : settings.type === "short"
-                                  ? "Short"
-                                  : "Post";
+                          settings.type === 'poll'
+                            ? 'Poll'
+                            : settings.type === 'thread'
+                              ? 'Thread'
+                              : settings.type === 'reel'
+                                ? 'Reel'
+                                : settings.type === 'short'
+                                  ? 'Short'
+                                  : 'Post';
                         const colorClass =
-                          platform === "twitter"
-                            ? "bg-sky-50 text-sky-800 dark:bg-sky-900/20 dark:text-sky-400"
-                            : platform === "youtube"
-                              ? "bg-red-50 text-red-800 dark:bg-red-900/20 dark:text-red-400"
-                              : "bg-blue-50 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400";
+                          platform === 'twitter'
+                            ? 'bg-sky-50 text-sky-800 dark:bg-sky-900/20 dark:text-sky-400'
+                            : platform === 'youtube'
+                              ? 'bg-red-50 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+                              : 'bg-blue-50 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400';
 
                         return (
                           <span
@@ -211,7 +211,7 @@ const PublicationRow = memo(
                     )}
                   </div>
                 )}
-              {remoteLock && item.status !== "pending_review" && (
+              {remoteLock && item.status !== 'pending_review' && (
                 <div className="animate-in fade-in slide-in-from-top-1 mt-2 flex w-fit items-center gap-2 rounded-lg border border-amber-100 bg-amber-50 p-1.5 dark:border-amber-800/30 dark:bg-amber-900/20">
                   <div className="relative flex h-4 w-4 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-800 dark:text-amber-400">
                     <Lock className="h-2.5 w-2.5" />
@@ -221,28 +221,28 @@ const PublicationRow = memo(
                     </span>
                   </div>
                   <span className="text-[10px] font-bold uppercase tracking-tight text-amber-700 dark:text-amber-400">
-                    {t("publications.table.editingBy")} {lockedByName}
+                    {t('publications.table.editingBy')} {lockedByName}
                   </span>
                 </div>
               )}
-              {item.status === "pending_review" && (
+              {item.status === 'pending_review' && (
                 <div className="animate-in fade-in slide-in-from-top-1 mt-2 flex w-fit items-center gap-2 rounded-lg border border-yellow-100 bg-yellow-50 p-1.5 dark:border-yellow-800/30 dark:bg-yellow-900/20">
                   <div className="relative flex h-4 w-4 items-center justify-center rounded-full bg-yellow-100 text-yellow-600 dark:bg-yellow-800 dark:text-yellow-400">
                     <Clock className="h-2.5 w-2.5" />
                   </div>
                   <div className="flex flex-col">
                     <span className="text-[10px] font-bold uppercase tracking-tight text-yellow-700 dark:text-yellow-400">
-                      {t("publications.table.pendingAdminReview") || "Pendiente de revisión"}
+                      {t('publications.table.pendingAdminReview') || 'Pendiente de revisión'}
                     </span>
                     {item.currentApprovalStep?.role?.name && (
                       <span className="text-[9px] text-yellow-600 dark:text-yellow-500">
-                        {t("approvals.approver_role")}: {item.currentApprovalStep.role.name}
+                        {t('approvals.approver_role')}: {item.currentApprovalStep.role.name}
                       </span>
                     )}
                   </div>
                 </div>
               )}
-              {item.status === "publishing" && item.publisher && (
+              {item.status === 'publishing' && item.publisher && (
                 <div className="mt-1 flex items-center gap-1.5">
                   <span className="h-2 w-2 flex-shrink-0 animate-pulse rounded-full bg-emerald-500"></span>
                   <span className="text-[10px] font-bold uppercase tracking-tight text-emerald-600 dark:text-emerald-400">
@@ -259,35 +259,35 @@ const PublicationRow = memo(
                         return `Publicando en ${publishingAccounts.length} redes por ${item.publisher.name}`;
                       }
                       return (
-                        (t("publications.table.publishingBy") || "Publicando por") +
-                        " " +
+                        (t('publications.table.publishingBy') || 'Publicando por') +
+                        ' ' +
                         item.publisher.name
                       );
                     })()}
                   </span>
                 </div>
               )}
-              {item.status === "rejected" && item.rejector && (
+              {item.status === 'rejected' && item.rejector && (
                 <div className="mt-1 flex items-center gap-1.5">
                   <span className="h-2 w-2 flex-shrink-0 rounded-full bg-rose-500"></span>
                   <span className="text-[10px] font-bold uppercase tracking-tight text-rose-600 dark:text-rose-400">
-                    {t("publications.table.rejectedBy") || "Rejected by"} {item.rejector.name}
+                    {t('publications.table.rejectedBy') || 'Rejected by'} {item.rejector.name}
                   </span>
                 </div>
               )}
-              {((item as any).type === "user_event" || item.scheduled_at) && (
+              {((item as any).type === 'user_event' || item.scheduled_at) && (
                 <div className="mt-1 flex flex-col gap-0.5">
                   <div className="flex items-center gap-1.5">
                     <Calendar className="h-3 w-3 text-primary-500" />
                     <span className="text-[10px] font-bold uppercase tracking-tight text-primary-500">
-                      {(item as any).type === "user_event"
-                        ? t("publications.table.manualEvent")
-                        : t("publications.table.socialNetworkEvent")}
+                      {(item as any).type === 'user_event'
+                        ? t('publications.table.manualEvent')
+                        : t('publications.table.socialNetworkEvent')}
                     </span>
                   </div>
-                  {(item as any).type === "user_event" && item.user && (
+                  {(item as any).type === 'user_event' && item.user && (
                     <span className="ml-4 text-[9px] font-medium italic text-gray-500 dark:text-gray-400">
-                      {t("publications.table.createdBy")}: {item.user.name}
+                      {t('publications.table.createdBy')}: {item.user.name}
                     </span>
                   )}
                 </div>
@@ -326,7 +326,7 @@ const PublicationRow = memo(
               item.status,
             )}`}
           >
-            {t(`publications.status.${item.status || "draft"}`)}
+            {t(`publications.status.${item.status || 'draft'}`)}
           </span>
         </td>
         <td className="px-6 py-4 text-sm text-gray-500">
@@ -343,7 +343,7 @@ const PublicationRow = memo(
             )}
             {mediaCount.total === 0 && (
               <span className="text-[10px] text-gray-400">
-                {t("publications.table.noMedia") || "Sin multimedia"}
+                {t('publications.table.noMedia') || 'Sin multimedia'}
               </span>
             )}
           </div>
@@ -352,12 +352,12 @@ const PublicationRow = memo(
           {item.campaigns && item.campaigns.length > 0 ? (
             <div className="flex flex-wrap gap-1">
               <span className="rounded border border-indigo-100 bg-indigo-50 px-1.5 py-0.5 text-[10px] font-medium text-indigo-700 dark:border-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-400">
-                {item.campaigns.length} {item.campaigns.length === 1 ? "Campaign" : "Campaigns"}
+                {item.campaigns.length} {item.campaigns.length === 1 ? 'Campaign' : 'Campaigns'}
               </span>
             </div>
           ) : (
             <span className="text-[10px] italic text-gray-400">
-              {t("common.none") || "Ninguna"}
+              {t('common.none') || 'Ninguna'}
             </span>
           )}
         </td>
@@ -388,7 +388,7 @@ const PublicationRow = memo(
                     size="sm"
                     icon={Rocket}
                   >
-                    <span className="sr-only">{t("publications.button.publish")}</span>
+                    <span className="sr-only">{t('publications.button.publish')}</span>
                   </Button>
                 ) : shouldShowSendToReview(item) ? (
                   <Button
@@ -403,18 +403,18 @@ const PublicationRow = memo(
                     size="sm"
                     icon={Send}
                   >
-                    <span className="sr-only">{t("publications.button.sendForReview")}</span>
+                    <span className="sr-only">{t('publications.button.sendForReview')}</span>
                   </Button>
-                ) : item.status === "pending_review" ? (
+                ) : item.status === 'pending_review' ? (
                   <Button disabled variant="warning" buttonStyle="icon" size="sm" icon={Clock}>
-                    <span className="sr-only">{t("publications.button.inReview")}</span>
+                    <span className="sr-only">{t('publications.button.inReview')}</span>
                   </Button>
                 ) : null}
               </>
             )}
 
             {/* View Details button */}
-            {(!canManageContent || item.status === "published") && (
+            {(!canManageContent || item.status === 'published') && (
               <Button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -425,7 +425,7 @@ const PublicationRow = memo(
                 size="sm"
                 icon={Eye}
               >
-                <span className="sr-only">{t("publications.button.view")}</span>
+                <span className="sr-only">{t('publications.button.view')}</span>
               </Button>
             )}
 
@@ -436,7 +436,7 @@ const PublicationRow = memo(
                   e.stopPropagation();
                   if (remoteLock) {
                     (toast.error as any)(
-                      `${t("publications.table.lockedBy") || "Editando por"} ${lockedByName}`,
+                      `${t('publications.table.lockedBy') || 'Editando por'} ${lockedByName}`,
                     );
                     return;
                   }
@@ -450,12 +450,12 @@ const PublicationRow = memo(
                   isLoading?.publishing || isLoading?.editing || isLoading?.deleting || !!remoteLock
                 }
                 loading={isLoading?.editing}
-                variant={item.status === "published" ? "warning" : "primary"}
+                variant={item.status === 'published' ? 'warning' : 'primary'}
                 buttonStyle="icon"
                 size="sm"
                 icon={remoteLock ? Lock : Edit}
               >
-                <span className="sr-only">{t("common.edit")}</span>
+                <span className="sr-only">{t('common.edit')}</span>
               </Button>
             )}
 
@@ -473,7 +473,7 @@ const PublicationRow = memo(
                 size="sm"
                 icon={Copy}
               >
-                <span className="sr-only">{t("publications.button.duplicate")}</span>
+                <span className="sr-only">{t('publications.button.duplicate')}</span>
               </Button>
             )}
 
@@ -482,7 +482,7 @@ const PublicationRow = memo(
               <Button
                 onClick={async (e) => {
                   e.stopPropagation();
-                  const isUserEvent = (item as any).type === "user_event";
+                  const isUserEvent = (item as any).type === 'user_event';
                   await handleDelete(item, isUserEvent);
                 }}
                 disabled={isLoading?.publishing || isLoading?.editing || isLoading?.deleting}
@@ -492,7 +492,7 @@ const PublicationRow = memo(
                 size="sm"
                 icon={Trash2}
               >
-                <span className="sr-only">{t("common.delete")}</span>
+                <span className="sr-only">{t('common.delete')}</span>
               </Button>
             )}
           </div>

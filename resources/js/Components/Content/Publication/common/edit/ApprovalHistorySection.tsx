@@ -1,10 +1,10 @@
-import { Avatar } from "@/Components/common/Avatar";
-import type { ApprovalLog as ApprovalLogType } from "@/types/ApprovalTypes";
-import { formatDateTime } from "@/Utils/formatDate";
-import { CheckCircle, Clock, MessageSquare, User, XCircle } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { Avatar } from '@/Components/common/Avatar';
+import type { ApprovalLog as ApprovalLogType } from '@/types/ApprovalTypes';
+import { formatDateTime } from '@/Utils/formatDate';
+import { CheckCircle, Clock, MessageSquare, User, XCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
-interface ApprovalLog extends Omit<ApprovalLogType, "approvalStep"> {
+interface ApprovalLog extends Omit<ApprovalLogType, 'approvalStep'> {
   approvalStep?: {
     id: number;
     level_name: string;
@@ -51,7 +51,7 @@ interface ApprovalHistorySectionProps {
     }>;
   };
   currentStepNumber?: number;
-  approvalStatus?: "pending" | "approved" | "rejected" | "cancelled";
+  approvalStatus?: 'pending' | 'approved' | 'rejected' | 'cancelled';
 }
 
 export default function ApprovalHistorySection({
@@ -75,7 +75,7 @@ export default function ApprovalHistorySection({
     [];
 
   // DEBUG: Ver qué datos llegan
-  console.log("ApprovalHistorySection - DEBUG:", {
+  console.log('ApprovalHistorySection - DEBUG:', {
     approvalStatus,
     hasWorkflow: !!workflow,
     workflowStepsCount: workflowSteps.length,
@@ -86,13 +86,13 @@ export default function ApprovalHistorySection({
 
   // Filtrar solo logs de acciones completadas (approved, rejected)
   const completedLogs = logs.filter(
-    (log) => log.action === "approved" || log.action === "rejected",
+    (log) => log.action === 'approved' || log.action === 'rejected',
   );
 
   // Determinar si hay una solicitud activa (en revisión)
-  const hasActiveRequest = approvalStatus === "pending";
+  const hasActiveRequest = approvalStatus === 'pending';
 
-  console.log("ApprovalHistorySection - Condiciones:", {
+  console.log('ApprovalHistorySection - Condiciones:', {
     hasActiveRequest,
     shouldShowWorkflow: hasActiveRequest && workflow && workflowSteps.length > 0,
   });
@@ -103,15 +103,15 @@ export default function ApprovalHistorySection({
   const shouldShow = (hasActiveRequest && workflow) || completedLogs.length > 0;
 
   if (!shouldShow) {
-    console.log("ApprovalHistorySection - NO SHOW: shouldShow =", shouldShow);
+    console.log('ApprovalHistorySection - NO SHOW: shouldShow =', shouldShow);
     return null;
   }
 
   const getStatusIcon = (action: string | null) => {
     switch (action) {
-      case "approved":
+      case 'approved':
         return <CheckCircle className="h-5 w-5 text-green-500" />;
-      case "rejected":
+      case 'rejected':
         return <XCircle className="h-5 w-5 text-rose-500" />;
       default:
         return <Clock className="h-5 w-5 text-amber-500" />;
@@ -120,12 +120,12 @@ export default function ApprovalHistorySection({
 
   const getStatusStyle = (action: string | null) => {
     switch (action) {
-      case "approved":
-        return "bg-green-50 dark:bg-green-900/10 border-green-100 dark:border-green-900/20";
-      case "rejected":
-        return "bg-rose-50 dark:bg-rose-900/10 border-rose-100 dark:border-rose-900/20";
+      case 'approved':
+        return 'bg-green-50 dark:bg-green-900/10 border-green-100 dark:border-green-900/20';
+      case 'rejected':
+        return 'bg-rose-50 dark:bg-rose-900/10 border-rose-100 dark:border-rose-900/20';
       default:
-        return "bg-amber-50 dark:bg-amber-900/10 border-amber-100 dark:border-amber-900/20";
+        return 'bg-amber-50 dark:bg-amber-900/10 border-amber-100 dark:border-amber-900/20';
     }
   };
 
@@ -143,14 +143,14 @@ export default function ApprovalHistorySection({
                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
               />
             </svg>
-            {t("approvals.workflow_flow") || "Flujo de Aprobación"}: {workflow.name}
+            {t('approvals.workflow_flow') || 'Flujo de Aprobación'}: {workflow.name}
           </h4>
 
           <div className="space-y-2">
             {workflowSteps.map((step) => {
               // Verificar si este nivel está completado (tiene log de aprobación)
               const stepLog = completedLogs.find((log) => log.approval_step_id === step.id);
-              const isCompleted = stepLog?.action === "approved";
+              const isCompleted = stepLog?.action === 'approved';
 
               // Verificar si es el nivel actual
               const isCurrent =
@@ -168,10 +168,10 @@ export default function ApprovalHistorySection({
                   key={step.id}
                   className={`flex items-center gap-3 rounded-lg p-3 transition-all ${
                     isCurrent
-                      ? "border-2 border-blue-400 bg-blue-100 shadow-sm dark:border-blue-600 dark:bg-blue-900/40"
+                      ? 'border-2 border-blue-400 bg-blue-100 shadow-sm dark:border-blue-600 dark:bg-blue-900/40'
                       : isPast
-                        ? "border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20"
-                        : "border border-gray-200 bg-white/50 dark:border-neutral-700 dark:bg-neutral-800/50"
+                        ? 'border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20'
+                        : 'border border-gray-200 bg-white/50 dark:border-neutral-700 dark:bg-neutral-800/50'
                   }`}
                 >
                   {/* Step Number/Status Icon or User Avatar */}
@@ -192,13 +192,13 @@ export default function ApprovalHistorySection({
                     <div
                       className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
                         isCurrent
-                          ? "bg-blue-500 text-white ring-2 ring-blue-300 dark:ring-blue-700"
+                          ? 'bg-blue-500 text-white ring-2 ring-blue-300 dark:ring-blue-700'
                           : isPast || isCompleted
-                            ? "bg-green-500 text-white"
-                            : "bg-gray-300 text-gray-600 dark:bg-gray-600 dark:text-gray-300"
+                            ? 'bg-green-500 text-white'
+                            : 'bg-gray-300 text-gray-600 dark:bg-gray-600 dark:text-gray-300'
                       }`}
                     >
-                      {isPast || isCompleted ? "✓" : step.level_number}
+                      {isPast || isCompleted ? '✓' : step.level_number}
                     </div>
                   )}
 
@@ -218,7 +218,7 @@ export default function ApprovalHistorySection({
                         // Mostrar rol
                         <>
                           <User className="h-3 w-3" />
-                          {step.role?.name || t("approvals.no_role_assigned") || "Sin rol asignado"}
+                          {step.role?.name || t('approvals.no_role_assigned') || 'Sin rol asignado'}
                         </>
                       )}
                       {stepLog?.user && !step.user && (
@@ -232,17 +232,17 @@ export default function ApprovalHistorySection({
                   {/* Status Badge */}
                   {isCurrent && (
                     <span className="rounded-full bg-blue-200 px-2 py-1 text-xs font-bold text-blue-600 dark:bg-blue-800 dark:text-blue-400">
-                      {t("approvals.in_progress") || "En Proceso"}
+                      {t('approvals.in_progress') || 'En Proceso'}
                     </span>
                   )}
-                  {(isPast || isCompleted) && stepLog?.action === "approved" && (
+                  {(isPast || isCompleted) && stepLog?.action === 'approved' && (
                     <span className="text-xs font-bold text-green-600 dark:text-green-400">
-                      ✓ {t("common.approved") || "Aprobado"}
+                      ✓ {t('common.approved') || 'Aprobado'}
                     </span>
                   )}
-                  {stepLog?.action === "rejected" && (
+                  {stepLog?.action === 'rejected' && (
                     <span className="text-xs font-bold text-rose-600 dark:text-rose-400">
-                      ✗ {t("common.rejected") || "Rechazado"}
+                      ✗ {t('common.rejected') || 'Rechazado'}
                     </span>
                   )}
                 </div>
@@ -257,7 +257,7 @@ export default function ApprovalHistorySection({
         <div>
           <h3 className="mb-4 flex items-center gap-2 text-sm font-bold text-gray-900 dark:text-white">
             <Clock className="h-4 w-4 text-primary-500" />
-            {t("approvals.historyTitle") || "Historial de Aprobación"}
+            {t('approvals.historyTitle') || 'Historial de Aprobación'}
           </h3>
 
           <div className="space-y-3">
@@ -273,15 +273,15 @@ export default function ApprovalHistorySection({
                     <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
                       <div className="flex flex-col gap-1">
                         <span className="text-sm font-bold text-gray-900 dark:text-gray-100">
-                          {log.action === "approved"
-                            ? t("approvals.status.approved") || "Aprobado"
-                            : log.action === "rejected"
-                              ? t("approvals.status.rejected") || "Rechazado"
-                              : t("approvals.status.pending") || "Pendiente de revisión"}
+                          {log.action === 'approved'
+                            ? t('approvals.status.approved') || 'Aprobado'
+                            : log.action === 'rejected'
+                              ? t('approvals.status.rejected') || 'Rechazado'
+                              : t('approvals.status.pending') || 'Pendiente de revisión'}
                         </span>
                         {log.approvalStep && (
                           <span className="text-xs text-gray-500 dark:text-gray-400">
-                            {t("approvals.step") || "Nivel"} {log.approvalStep.level_number}:{" "}
+                            {t('approvals.step') || 'Nivel'} {log.approvalStep.level_number}:{' '}
                             {log.approvalStep.level_name}
                           </span>
                         )}
@@ -298,9 +298,9 @@ export default function ApprovalHistorySection({
                         <div className="flex items-center gap-1.5">
                           <CheckCircle className="h-3.5 w-3.5 opacity-70" />
                           <span>
-                            {log.action === "approved"
-                              ? t("approvals.approvedBy") || "Aprobado por"
-                              : t("approvals.rejectedBy") || "Rechazado por"}
+                            {log.action === 'approved'
+                              ? t('approvals.approvedBy') || 'Aprobado por'
+                              : t('approvals.rejectedBy') || 'Rechazado por'}
                             :
                           </span>
                           <span className="font-bold text-gray-700 dark:text-gray-300">
@@ -310,12 +310,12 @@ export default function ApprovalHistorySection({
                       )}
                     </div>
 
-                    {log.action === "rejected" && log.comment && (
+                    {log.action === 'rejected' && log.comment && (
                       <div className="mt-3 rounded-lg border border-rose-200/50 bg-white/50 p-3 dark:border-rose-900/30 dark:bg-black/20">
                         <div className="mb-1 flex items-center gap-2">
                           <MessageSquare className="h-3.5 w-3.5 text-rose-500 opacity-70" />
                           <span className="text-[10px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">
-                            {t("approvals.rejectionReason") || "Motivo del rechazo"}
+                            {t('approvals.rejectionReason') || 'Motivo del rechazo'}
                           </span>
                         </div>
                         <p className="text-sm italic text-gray-700 dark:text-gray-300">

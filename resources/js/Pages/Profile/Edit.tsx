@@ -1,18 +1,18 @@
-import Button from "@/Components/common/Modern/Button";
-import TabNavigation from "@/Components/common/TabNavigation";
-import AccountStatistics from "@/Components/profile/Partials/AccountStatistics";
-import OnboardingSection from "@/Components/profile/Partials/OnboardingSection";
-import SubscriptionSection from "@/Components/profile/Partials/SubscriptionSection";
-import UpdatePasswordForm from "@/Components/profile/Partials/UpdatePasswordForm";
-import UpdateProfileInformationForm from "@/Components/profile/Partials/UpdateProfileInformationForm";
-import UpdateThemeForm from "@/Components/profile/Partials/UpdateThemeForm";
+import Button from '@/Components/common/Modern/Button';
+import TabNavigation from '@/Components/common/TabNavigation';
+import AccountStatistics from '@/Components/profile/Partials/AccountStatistics';
+import OnboardingSection from '@/Components/profile/Partials/OnboardingSection';
+import SubscriptionSection from '@/Components/profile/Partials/SubscriptionSection';
+import UpdatePasswordForm from '@/Components/profile/Partials/UpdatePasswordForm';
+import UpdateProfileInformationForm from '@/Components/profile/Partials/UpdateProfileInformationForm';
+import UpdateThemeForm from '@/Components/profile/Partials/UpdateThemeForm';
 
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { useUserStore } from "@/stores/userStore";
-import { Head, usePage } from "@inertiajs/react";
-import { CreditCard, Lock, Save, User } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { useUserStore } from '@/stores/userStore';
+import { Head, usePage } from '@inertiajs/react';
+import { CreditCard, Lock, Save, User } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface EditProps {
   mustVerifyEmail: boolean;
@@ -48,30 +48,30 @@ export default function Edit({ mustVerifyEmail, status, subscription, usage }: E
   const { auth } = usePage<any>().props;
   const setUser = useUserStore((state) => state.setUser);
 
-  const [activeTab, setActiveTab] = useState("profile");
+  const [activeTab, setActiveTab] = useState('profile');
   const formRef = useRef<HTMLFormElement | null>(null);
 
   const currentWorkspace = auth?.current_workspace;
   const isOwner =
     currentWorkspace &&
     (Number(currentWorkspace.created_by) === Number(user.id) ||
-      currentWorkspace.user_role_slug === "owner");
+      currentWorkspace.user_role_slug === 'owner');
 
   const tabs = [
     {
-      key: "profile",
-      label: t("profile.tabs.general") || "General",
+      key: 'profile',
+      label: t('profile.tabs.general') || 'General',
       icon: User,
     },
     {
-      key: "password",
-      label: t("profile.tabs.security") || "Seguridad",
+      key: 'password',
+      label: t('profile.tabs.security') || 'Seguridad',
       icon: Lock,
       hidden: user.provider !== null,
     },
     {
-      key: "subscription",
-      label: t("profile.tabs.subscription") || "Suscripción y Plan",
+      key: 'subscription',
+      label: t('profile.tabs.subscription') || 'Suscripción y Plan',
       icon: CreditCard,
       hidden: !isOwner,
     },
@@ -86,9 +86,9 @@ export default function Edit({ mustVerifyEmail, status, subscription, usage }: E
   // Sync tab with localStorage and URL
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const tabParam = params.get("tab");
-    const storedTab = localStorage.getItem("profile_active_tab");
-    const initialTab = tabParam || storedTab || "profile";
+    const tabParam = params.get('tab');
+    const storedTab = localStorage.getItem('profile_active_tab');
+    const initialTab = tabParam || storedTab || 'profile';
 
     const validTab = tabs.find((t) => t.key === initialTab && !t.hidden);
     if (validTab) {
@@ -97,12 +97,12 @@ export default function Edit({ mustVerifyEmail, status, subscription, usage }: E
   }, [isOwner, user.provider]);
 
   useEffect(() => {
-    localStorage.setItem("profile_active_tab", activeTab);
+    localStorage.setItem('profile_active_tab', activeTab);
   }, [activeTab]);
 
   const handleSaveClick = () => {
-    if (formRef.current && activeTab === "profile") {
-      formRef.current.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
+    if (formRef.current && activeTab === 'profile') {
+      formRef.current.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
     }
   };
 
@@ -116,28 +116,28 @@ export default function Edit({ mustVerifyEmail, status, subscription, usage }: E
             </div>
             <div>
               <h2 className="text-xl font-bold leading-tight text-gray-900 dark:text-white">
-                {t("nav.profile")}
+                {t('nav.profile')}
               </h2>
               <p className="text-xs font-medium text-gray-500 dark:text-neutral-500">
-                {t("profile.settings_description")}
+                {t('profile.settings_description')}
               </p>
             </div>
           </div>
 
-          {activeTab === "profile" && (
+          {activeTab === 'profile' && (
             <Button
               onClick={handleSaveClick}
               icon={Save}
               size="md"
               className="shadow-md hover:shadow-lg"
             >
-              {t("profile.actions.saveChanges")}
+              {t('profile.actions.saveChanges')}
             </Button>
           )}
         </div>
       }
     >
-      <Head title={t("nav.profile")} />
+      <Head title={t('nav.profile')} />
 
       <div className="min-h-screen w-full min-w-0 max-w-full overflow-x-hidden bg-gray-50/30 dark:bg-neutral-900/10">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -161,11 +161,11 @@ export default function Edit({ mustVerifyEmail, status, subscription, usage }: E
             <div
               className={`dark:border-neutral-800"bg-white border-gray-100" } rounded-lg p-6 shadow-sm dark:bg-neutral-900 md:p-10`}
             >
-              {activeTab === "profile" && (
+              {activeTab === 'profile' && (
                 <div
                   ref={(el) => {
                     if (el) {
-                      const form = el.querySelector("form");
+                      const form = el.querySelector('form');
                       // @ts-ignore - Asignación directa a ref.current es válida aquí
                       formRef.current = form;
                     }
@@ -179,19 +179,19 @@ export default function Edit({ mustVerifyEmail, status, subscription, usage }: E
                 </div>
               )}
 
-              {activeTab === "theme" && (
+              {activeTab === 'theme' && (
                 <div>
                   <UpdateThemeForm user={user} workspace={currentWorkspace} />
                 </div>
               )}
 
-              {activeTab === "password" && user.provider === null && (
+              {activeTab === 'password' && user.provider === null && (
                 <div>
                   <UpdatePasswordForm />
                 </div>
               )}
 
-              {activeTab === "subscription" && (
+              {activeTab === 'subscription' && (
                 <div>
                   <SubscriptionSection
                     subscription={subscription}
@@ -201,7 +201,7 @@ export default function Edit({ mustVerifyEmail, status, subscription, usage }: E
                 </div>
               )}
 
-              {activeTab === "onboarding" && (
+              {activeTab === 'onboarding' && (
                 <div>
                   <OnboardingSection />
                 </div>

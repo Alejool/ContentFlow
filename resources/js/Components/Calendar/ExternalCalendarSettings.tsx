@@ -1,13 +1,13 @@
-import Button from "@/Components/common/Modern/Button";
-import ConfirmDialog from "@/Components/common/ui/ConfirmDialog";
+import Button from '@/Components/common/Modern/Button';
+import ConfirmDialog from '@/Components/common/ui/ConfirmDialog';
 import {
   useConnectCalendar,
   useDisconnectCalendar,
   useExternalCalendarStatus,
   useRetrySync,
-} from "@/Hooks/useExternalCalendar";
-import type { ExternalCalendarConnection } from "@/stores/externalCalendarStore";
-import { formatDateTimeString } from "@/Utils/dateHelpers";
+} from '@/Hooks/useExternalCalendar';
+import type { ExternalCalendarConnection } from '@/stores/externalCalendarStore';
+import { formatDateTimeString } from '@/Utils/dateHelpers';
 import {
   AlertCircle,
   Calendar,
@@ -16,10 +16,10 @@ import {
   RefreshCw,
   XCircle,
   X as XIcon,
-} from "lucide-react";
-import { useState } from "react";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
+} from 'lucide-react';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface Campaign {
   id: number;
@@ -63,18 +63,18 @@ const StatusBadge = ({ status }: { status: string }) => {
   const statusConfig = {
     connected: {
       icon: CheckCircle2,
-      text: t("calendar.external.connected"),
-      className: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+      text: t('calendar.external.connected'),
+      className: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
     },
     error: {
       icon: XCircle,
-      text: t("calendar.external.error"),
-      className: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
+      text: t('calendar.external.error'),
+      className: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
     },
     disconnected: {
       icon: AlertCircle,
-      text: t("calendar.external.disconnected"),
-      className: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300",
+      text: t('calendar.external.disconnected'),
+      className: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
     },
   };
 
@@ -101,26 +101,26 @@ export default function ExternalCalendarSettings({
   const disconnectCalendar = useDisconnectCalendar();
   const retrySync = useRetrySync();
   const [showDisconnectDialog, setShowDisconnectDialog] = useState(false);
-  const [providerToDisconnect, setProviderToDisconnect] = useState<"google" | "outlook" | null>(
+  const [providerToDisconnect, setProviderToDisconnect] = useState<'google' | 'outlook' | null>(
     null,
   );
 
-  const handleConnect = async (provider: "google" | "outlook") => {
+  const handleConnect = async (provider: 'google' | 'outlook') => {
     try {
       await connectCalendar.mutateAsync(provider);
     } catch (error: any) {
       const data = error?.response?.data;
       if (data?.upgrade_required) {
         toast.error(
-          data.error || "Tu plan no incluye sincronización de calendario. Actualiza tu plan.",
+          data.error || 'Tu plan no incluye sincronización de calendario. Actualiza tu plan.',
         );
       } else {
-        toast.error(t("calendar.external.connectError"));
+        toast.error(t('calendar.external.connectError'));
       }
     }
   };
 
-  const initiateDisconnect = (provider: "google" | "outlook") => {
+  const initiateDisconnect = (provider: 'google' | 'outlook') => {
     setProviderToDisconnect(provider);
     setShowDisconnectDialog(true);
   };
@@ -130,9 +130,9 @@ export default function ExternalCalendarSettings({
 
     try {
       await disconnectCalendar.mutateAsync(providerToDisconnect);
-      toast.success(t("calendar.external.disconnectSuccess"));
+      toast.success(t('calendar.external.disconnectSuccess'));
     } catch (error) {
-      toast.error(t("calendar.external.disconnectError"));
+      toast.error(t('calendar.external.disconnectError'));
     } finally {
       setShowDisconnectDialog(false);
       setProviderToDisconnect(null);
@@ -142,9 +142,9 @@ export default function ExternalCalendarSettings({
   const handleSync = async (provider: string) => {
     try {
       await retrySync.mutateAsync(provider);
-      toast.success(t("calendar.external.syncSuccess"));
+      toast.success(t('calendar.external.syncSuccess'));
     } catch (error) {
-      toast.error(t("calendar.external.syncError"));
+      toast.error(t('calendar.external.syncError'));
     }
   };
 
@@ -161,23 +161,23 @@ export default function ExternalCalendarSettings({
       <div className="space-y-4">
         <div>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            {t("calendar.external.description")}
+            {t('calendar.external.description')}
           </p>
         </div>
 
         <div className="space-y-3">
           <CalendarConnectionCard
             connection={
-              connections?.find((c: ExternalCalendarConnection) => c.provider === "google") || {
-                provider: "google" as const,
+              connections?.find((c: ExternalCalendarConnection) => c.provider === 'google') || {
+                provider: 'google' as const,
                 connected: false,
-                status: "disconnected" as const,
+                status: 'disconnected' as const,
               }
             }
             icon={<GoogleIcon />}
-            onConnect={() => handleConnect("google")}
-            onDisconnect={() => initiateDisconnect("google")}
-            onSync={() => handleSync("google")}
+            onConnect={() => handleConnect('google')}
+            onDisconnect={() => initiateDisconnect('google')}
+            onSync={() => handleSync('google')}
             isConnecting={connectCalendar.isPending}
             isDisconnecting={disconnectCalendar.isPending}
             isSyncing={retrySync.isPending}
@@ -192,10 +192,10 @@ export default function ExternalCalendarSettings({
           setProviderToDisconnect(null);
         }}
         onConfirm={handleDisconnect}
-        title={t("calendar.external.disconnectConfirm.title")}
-        message={t("calendar.external.disconnectConfirm.message")}
-        confirmText={t("calendar.external.disconnectConfirm.confirm")}
-        cancelText={t("calendar.external.disconnectConfirm.cancel")}
+        title={t('calendar.external.disconnectConfirm.title')}
+        message={t('calendar.external.disconnectConfirm.message')}
+        confirmText={t('calendar.external.disconnectConfirm.confirm')}
+        cancelText={t('calendar.external.disconnectConfirm.cancel')}
         type="warning"
       />
     </>
@@ -239,7 +239,7 @@ const CalendarConnectionCard = ({
             )}
             {connection.lastSync && (
               <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-500">
-                {t("calendar.external.lastSync")}: {formatDateTimeString(connection.lastSync)}
+                {t('calendar.external.lastSync')}: {formatDateTimeString(connection.lastSync)}
               </p>
             )}
           </div>
@@ -264,7 +264,7 @@ const CalendarConnectionCard = ({
               onClick={onSync}
               loading={isSyncing}
             >
-              {t("calendar.external.syncNow")}
+              {t('calendar.external.syncNow')}
             </Button>
             <Button
               variant="danger"
@@ -274,7 +274,7 @@ const CalendarConnectionCard = ({
               onClick={onDisconnect}
               loading={isDisconnecting}
             >
-              {t("calendar.external.disconnect")}
+              {t('calendar.external.disconnect')}
             </Button>
           </>
         ) : (
@@ -284,9 +284,9 @@ const CalendarConnectionCard = ({
             icon={Calendar}
             onClick={onConnect}
             loading={isConnecting}
-            loadingText={t("calendar.external.connecting")}
+            loadingText={t('calendar.external.connecting')}
           >
-            {t("calendar.external.connect")}
+            {t('calendar.external.connect')}
           </Button>
         )}
       </div>

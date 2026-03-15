@@ -1,17 +1,17 @@
-import ApiSettingsTab from "@/Components/Workspace/ApiSettingsTab";
-import ApprovalWorkflowsTab from "@/Components/Workspace/ApprovalWorkflowsTab";
-import GeneralSettingsTab from "@/Components/Workspace/GeneralSettingsTab";
-import IntegrationsSettingsTab from "@/Components/Workspace/IntegrationsSettingsTab";
-import MembersManagement from "@/Components/Workspace/MembersManagement";
-import OverviewTab from "@/Components/Workspace/OverviewTab";
-import PlanUsageTab from "@/Components/Workspace/PlanUsageTab";
-import RolesManagementTab from "@/Components/Workspace/RolesManagementTab";
-import SettingsTabs from "@/Components/Workspace/SettingsTabs";
-import WhiteLabelSettingsTab from "@/Components/Workspace/WhiteLabelSettingsTab";
-import WorkspaceSettingsHeader from "@/Components/Workspace/WorkspaceSettingsHeader";
-import AlertCard from "@/Components/common/Modern/AlertCard";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head } from "@inertiajs/react";
+import ApiSettingsTab from '@/Components/Workspace/ApiSettingsTab';
+import ApprovalWorkflowsTab from '@/Components/Workspace/ApprovalWorkflowsTab';
+import GeneralSettingsTab from '@/Components/Workspace/GeneralSettingsTab';
+import IntegrationsSettingsTab from '@/Components/Workspace/IntegrationsSettingsTab';
+import MembersManagement from '@/Components/Workspace/MembersManagement';
+import OverviewTab from '@/Components/Workspace/OverviewTab';
+import PlanUsageTab from '@/Components/Workspace/PlanUsageTab';
+import RolesManagementTab from '@/Components/Workspace/RolesManagementTab';
+import SettingsTabs from '@/Components/Workspace/SettingsTabs';
+import WhiteLabelSettingsTab from '@/Components/Workspace/WhiteLabelSettingsTab';
+import WorkspaceSettingsHeader from '@/Components/Workspace/WorkspaceSettingsHeader';
+import AlertCard from '@/Components/common/Modern/AlertCard';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { Head } from '@inertiajs/react';
 import {
   CheckCircle,
   Key,
@@ -22,9 +22,9 @@ import {
   Sparkles,
   TrendingUp,
   Users,
-} from "lucide-react";
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
+} from 'lucide-react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface WorkspaceSettingsProps {
   workspace: any;
@@ -49,23 +49,23 @@ export default function WorkspaceSettings({
   const current_workspace = workspace || globalWorkspace;
 
   const params = new URLSearchParams(window.location.search);
-  const initialTab = params.get("tab");
+  const initialTab = params.get('tab');
   const [activeTab, setActiveTab] = useState<
-    | "general"
-    | "members"
-    | "roles"
-    | "integrations"
-    | "overview"
-    | "usage"
-    | "white-label"
-    | "api"
-    | "support"
-    | "approvals"
-  >((initialTab as any) || "overview");
+    | 'general'
+    | 'members'
+    | 'roles'
+    | 'integrations'
+    | 'overview'
+    | 'usage'
+    | 'white-label'
+    | 'api'
+    | 'support'
+    | 'approvals'
+  >((initialTab as any) || 'overview');
 
   // Cargar el orden de tabs guardado
   const [tabOrder, setTabOrder] = useState<string[]>(() => {
-    if (typeof window !== "undefined" && current_workspace?.id) {
+    if (typeof window !== 'undefined' && current_workspace?.id) {
       const saved = localStorage.getItem(`workspace_${current_workspace.id}_tab_order`);
       return saved ? JSON.parse(saved) : [];
     }
@@ -75,20 +75,20 @@ export default function WorkspaceSettings({
   if (!current_workspace || !roles) {
     return (
       <AuthenticatedLayout>
-        <Head title={t("workspace.settings")} />
+        <Head title={t('workspace.settings')} />
         <div className="flex min-h-[60vh] flex-col items-center justify-center">
           <div className="mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-primary-600"></div>
           <p className="text-lg font-medium text-gray-700 dark:text-neutral-300">
-            {t("common.loading")}
+            {t('common.loading')}
           </p>
           <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
             Cargando configuración del workspace...
           </p>
           <div className="mt-4 rounded-lg bg-yellow-50 p-4 text-sm dark:bg-yellow-900/20">
             <p>Debug info:</p>
-            <p>Workspace: {current_workspace ? "✓" : "✗"}</p>
-            <p>Roles: {roles ? "✓" : "✗"}</p>
-            <p>Auth: {auth ? "✓" : "✗"}</p>
+            <p>Workspace: {current_workspace ? '✓' : '✗'}</p>
+            <p>Roles: {roles ? '✓' : '✗'}</p>
+            <p>Auth: {auth ? '✓' : '✗'}</p>
           </div>
         </div>
       </AuthenticatedLayout>
@@ -104,20 +104,20 @@ export default function WorkspaceSettings({
         )
     : null;
 
-  const userRole = currentUser?.pivot?.role?.slug || currentUser?.role?.slug || "member";
+  const userRole = currentUser?.pivot?.role?.slug || currentUser?.role?.slug || 'member';
   const isOwner =
-    Number(current_workspace.created_by) === Number(auth.user.id) || userRole === "owner";
+    Number(current_workspace.created_by) === Number(auth.user.id) || userRole === 'owner';
 
-  const canManageWorkspace = isOwner || userRole === "admin";
+  const canManageWorkspace = isOwner || userRole === 'admin';
 
   // Get plan ID with multiple fallbacks
   const planId = (
     current_workspace.subscription?.plan ||
     current_workspace.plan ||
-    "demo"
+    'demo'
   ).toLowerCase();
 
-  const isEnterprise = planId === "enterprise" || current_workspace.features?.white_label;
+  const isEnterprise = planId === 'enterprise' || current_workspace.features?.white_label;
 
   const tabs: Array<{
     id: string;
@@ -127,34 +127,34 @@ export default function WorkspaceSettings({
     planRequired?: string[];
   }> = [
     {
-      id: "overview",
-      label: t("workspace.tabs.overview") || "Overview",
+      id: 'overview',
+      label: t('workspace.tabs.overview') || 'Overview',
       icon: Sparkles,
       locked: true,
     },
     {
-      id: "usage",
-      label: "Uso del Plan",
+      id: 'usage',
+      label: 'Uso del Plan',
       icon: TrendingUp,
     },
     {
-      id: "general",
-      label: t("workspace.tabs.general") || "General",
+      id: 'general',
+      label: t('workspace.tabs.general') || 'General',
       icon: SettingsIcon,
     },
     {
-      id: "members",
-      label: t("workspace.tabs.members") || "Members",
+      id: 'members',
+      label: t('workspace.tabs.members') || 'Members',
       icon: Users,
     },
     {
-      id: "roles",
-      label: t("workspace.tabs.roles") || "Roles",
+      id: 'roles',
+      label: t('workspace.tabs.roles') || 'Roles',
       icon: Shield,
     },
     {
-      id: "integrations",
-      label: t("workspace.tabs.integrations") || "Integrations",
+      id: 'integrations',
+      label: t('workspace.tabs.integrations') || 'Integrations',
       icon: Share2,
     },
   ];
@@ -169,17 +169,17 @@ export default function WorkspaceSettings({
 
   if (approvalWorkflowFeature !== undefined) {
     // Si tenemos features del backend, solo 'advanced' tiene acceso
-    hasApprovalAccess = approvalWorkflowFeature === "advanced";
+    hasApprovalAccess = approvalWorkflowFeature === 'advanced';
   } else {
     // Fallback: SOLO Enterprise tiene acceso
-    hasApprovalAccess = planId === "enterprise";
+    hasApprovalAccess = planId === 'enterprise';
   }
 
   // Determinar nivel de acceso a aprobaciones (siempre advanced si tiene acceso)
   const hasAdvancedApprovalAccess = hasApprovalAccess;
 
   // Debug: verificar qué está llegando
-  console.log("🔍 Settings.tsx - Plan Features Debug:", {
+  console.log('🔍 Settings.tsx - Plan Features Debug:', {
     workspace_id: current_workspace.id,
     workspace_name: current_workspace.name,
     planId,
@@ -194,26 +194,26 @@ export default function WorkspaceSettings({
   // Solo mostrar el tab de aprobaciones si es Enterprise
   if (canManageWorkspace && hasApprovalAccess) {
     tabs.splice(4, 0, {
-      id: "approvals",
-      label: t("workspace.tabs.approvals") || "Aprobaciones",
+      id: 'approvals',
+      label: t('workspace.tabs.approvals') || 'Aprobaciones',
       icon: CheckCircle,
-      planRequired: ["enterprise"], // SOLO Enterprise
+      planRequired: ['enterprise'], // SOLO Enterprise
     });
   }
 
   if (isEnterprise && isOwner) {
     tabs.push(
       {
-        id: "white-label",
-        label: t("workspace.tabs.white_label") || "White-label",
+        id: 'white-label',
+        label: t('workspace.tabs.white_label') || 'White-label',
         icon: Palette,
-        planRequired: ["enterprise"], // Solo para enterprise
+        planRequired: ['enterprise'], // Solo para enterprise
       },
       {
-        id: "api",
-        label: t("workspace.tabs.api") || "API Access",
+        id: 'api',
+        label: t('workspace.tabs.api') || 'API Access',
         icon: Key,
-        planRequired: ["enterprise"], // Solo para enterprise
+        planRequired: ['enterprise'], // Solo para enterprise
       },
       // {
       //   id: "support",
@@ -226,7 +226,7 @@ export default function WorkspaceSettings({
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case "overview":
+      case 'overview':
         return (
           <OverviewTab
             workspace={current_workspace}
@@ -234,18 +234,18 @@ export default function WorkspaceSettings({
             onTabChange={(tab: any) => setActiveTab(tab)}
           />
         );
-      case "usage":
+      case 'usage':
         return <PlanUsageTab workspace={current_workspace} />;
-      case "general":
+      case 'general':
         return (
           <GeneralSettingsTab
             workspace={current_workspace}
             canManageWorkspace={canManageWorkspace}
           />
         );
-      case "members":
+      case 'members':
         return <MembersManagement roles={roles} workspace={current_workspace} />;
-      case "roles":
+      case 'roles':
         return (
           <RolesManagementTab
             roles={roles}
@@ -255,7 +255,7 @@ export default function WorkspaceSettings({
             canManageWorkspace={canManageWorkspace}
           />
         );
-      case "integrations":
+      case 'integrations':
         return (
           <IntegrationsSettingsTab
             workspace={current_workspace}
@@ -263,18 +263,18 @@ export default function WorkspaceSettings({
             canManageWorkspace={canManageWorkspace}
           />
         );
-      case "white-label":
+      case 'white-label':
         return (
           <WhiteLabelSettingsTab
             workspace={current_workspace}
             canManageWorkspace={canManageWorkspace}
           />
         );
-      case "api":
+      case 'api':
         return (
           <ApiSettingsTab workspace={current_workspace} canManageWorkspace={canManageWorkspace} />
         );
-      case "approvals":
+      case 'approvals':
         if (!canManageWorkspace || !hasApprovalAccess) {
           return (
             <OverviewTab
@@ -307,7 +307,7 @@ export default function WorkspaceSettings({
 
   return (
     <AuthenticatedLayout header={<WorkspaceSettingsHeader workspace={current_workspace} />}>
-      <Head title={`${current_workspace.name} - ${t("workspace.settings")}`} />
+      <Head title={`${current_workspace.name} - ${t('workspace.settings')}`} />
 
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
         <SettingsTabs
@@ -328,11 +328,11 @@ export default function WorkspaceSettings({
           }}
         />
 
-        {activeTab === "integrations" && !isOwner && (
+        {activeTab === 'integrations' && !isOwner && (
           <AlertCard
             type="warning"
-            title={t("workspace.integrations.owner_permissions_required")}
-            message={t("workspace.integrations.owner_exclusive_description")}
+            title={t('workspace.integrations.owner_permissions_required')}
+            message={t('workspace.integrations.owner_exclusive_description')}
             className="mb-6"
           />
         )}

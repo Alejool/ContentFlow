@@ -1,7 +1,7 @@
-import Button from "@/Components/common/Modern/Button";
-import { Badge } from "@/Components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card";
-import { router, usePage } from "@inertiajs/react";
+import Button from '@/Components/common/Modern/Button';
+import { Badge } from '@/Components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import { router, usePage } from '@inertiajs/react';
 import {
   AlertCircle,
   ArrowUpCircle,
@@ -18,10 +18,10 @@ import {
   TrendingUp,
   Users,
   Zap,
-} from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { formatDateString } from "@/Utils/dateHelpers";
-import { useSubscriptionUsage } from "@/Hooks/useSubscriptionUsage";
+} from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { formatDateString } from '@/Utils/dateHelpers';
+import { useSubscriptionUsage } from '@/Hooks/useSubscriptionUsage';
 
 interface Invoice {
   id: string;
@@ -77,24 +77,24 @@ function UsageStatsWithAddons({ usage: legacyUsage }: { usage?: any }) {
   }
 
   const formatBytes = (bytes: number, decimals = 2) => {
-    if (bytes === 0) return "0 Bytes";
+    if (bytes === 0) return '0 Bytes';
     const k = 1024;
     const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
   };
 
   const getProgressBarColor = (percentage: number) => {
-    if (percentage >= 90) return "bg-red-500";
-    if (percentage >= 70) return "bg-yellow-500";
-    return "bg-primary-500";
+    if (percentage >= 90) return 'bg-red-500';
+    if (percentage >= 70) return 'bg-yellow-500';
+    return 'bg-primary-500';
   };
 
   const metrics = [
     {
-      key: "publications",
-      label: t("subscription.usage.publications", "Publicaciones"),
+      key: 'publications',
+      label: t('subscription.usage.publications', 'Publicaciones'),
       icon: FileText,
       used: usage.publications.used,
       limit: usage.publications.limit,
@@ -104,8 +104,8 @@ function UsageStatsWithAddons({ usage: legacyUsage }: { usage?: any }) {
       show: true,
     },
     {
-      key: "storage",
-      label: t("subscription.usage.storage", "Almacenamiento"),
+      key: 'storage',
+      label: t('subscription.usage.storage', 'Almacenamiento'),
       icon: HardDrive,
       used: formatBytes(usage.storage.used_bytes),
       limit: `${usage.storage.limit_gb} GB`,
@@ -115,45 +115,45 @@ function UsageStatsWithAddons({ usage: legacyUsage }: { usage?: any }) {
       show: true,
     },
     {
-      key: "ai_requests",
-      label: t("subscription.addons.aiCredits", "Créditos IA"),
+      key: 'ai_requests',
+      label: t('subscription.addons.aiCredits', 'Créditos IA'),
       icon: Sparkles,
       used: usage.ai_requests.used,
       limit:
         usage.ai_requests.limit === -1 || usage.ai_requests.limit === null
-          ? "∞"
+          ? '∞'
           : usage.ai_requests.limit,
       total_available:
         usage.ai_requests.total_available === -1 || usage.ai_requests.total_available === null
-          ? "∞"
+          ? '∞'
           : usage.ai_requests.total_available,
       percentage: usage.ai_requests.percentage || 0,
       addon_info: usage.ai_requests.addon_info,
       show: usage.ai_requests.limit !== null && usage.ai_requests.limit !== -1,
     },
     {
-      key: "social_accounts",
-      label: t("subscription.addons.socialAccounts", "Cuentas Sociales"),
+      key: 'social_accounts',
+      label: t('subscription.addons.socialAccounts', 'Cuentas Sociales'),
       icon: Share2,
       used: usage.social_accounts.used,
-      limit: usage.social_accounts.limit === -1 ? "∞" : usage.social_accounts.limit,
+      limit: usage.social_accounts.limit === -1 ? '∞' : usage.social_accounts.limit,
       total_available:
-        usage.social_accounts.total_available === -1 ? "∞" : usage.social_accounts.total_available,
+        usage.social_accounts.total_available === -1 ? '∞' : usage.social_accounts.total_available,
       percentage: usage.social_accounts.percentage,
       show: true,
     },
     {
-      key: "team_members",
-      label: t("subscription.addons.teamMembers", "Miembros del Equipo"),
+      key: 'team_members',
+      label: t('subscription.addons.teamMembers', 'Miembros del Equipo'),
       icon: Users,
       used: usage.team_members?.used || 0,
       limit:
         usage.team_members?.limit === -1 || !usage.team_members?.limit
-          ? "∞"
+          ? '∞'
           : usage.team_members.limit,
       total_available:
         usage.team_members?.total_available === -1 || !usage.team_members?.total_available
-          ? "∞"
+          ? '∞'
           : usage.team_members.total_available,
       percentage: usage.team_members?.percentage || 0,
       show: usage.team_members?.limit !== undefined,
@@ -174,13 +174,13 @@ function UsageStatsWithAddons({ usage: legacyUsage }: { usage?: any }) {
                 </span>
               </div>
               <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                {metric.limit === "∞" || metric.limit === -1
+                {metric.limit === '∞' || metric.limit === -1
                   ? `${metric.used} / ∞`
                   : `${metric.used} / ${metric.total_available || metric.limit}`}
               </span>
             </div>
 
-            {metric.limit !== "∞" && metric.limit !== -1 && (
+            {metric.limit !== '∞' && metric.limit !== -1 && (
               <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
                 <div
                   className={`h-2 rounded-full transition-all ${getProgressBarColor(metric.percentage)}`}
@@ -195,7 +195,7 @@ function UsageStatsWithAddons({ usage: legacyUsage }: { usage?: any }) {
                 <span className="font-medium">Plan:</span> {metric.limit} +
                 <span className="font-medium"> Addons:</span> {metric.addon_info.remaining}/
                 {metric.addon_info.total}
-                {metric.key === "storage" && " GB"}
+                {metric.key === 'storage' && ' GB'}
               </div>
             )}
           </div>
@@ -220,18 +220,18 @@ export default function SubscriptionSection({
   const hasWhiteLabel =
     subscription?.features?.white_label ||
     globalWorkspace?.features?.white_label ||
-    subscription?.plan_id?.toLowerCase() === "enterprise" ||
-    globalWorkspace?.plan?.toLowerCase() === "enterprise";
+    subscription?.plan_id?.toLowerCase() === 'enterprise' ||
+    globalWorkspace?.plan?.toLowerCase() === 'enterprise';
 
   const getPlanIcon = (planId: string) => {
     switch (planId) {
-      case "free":
-      case "demo":
+      case 'free':
+      case 'demo':
         return <Zap className="h-5 w-5" />;
-      case "starter":
+      case 'starter':
         return <TrendingUp className="h-5 w-5" />;
-      case "professional":
-      case "enterprise":
+      case 'professional':
+      case 'enterprise':
         return <Crown className="h-5 w-5" />;
       default:
         return <Zap className="h-5 w-5" />;
@@ -240,43 +240,43 @@ export default function SubscriptionSection({
 
   const getPlanColor = (planId: string) => {
     switch (planId) {
-      case "free":
-        return "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
-      case "demo":
-        return "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300";
-      case "starter":
-        return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300";
-      case "professional":
-        return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300";
-      case "enterprise":
-        return "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300";
+      case 'free':
+        return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
+      case 'demo':
+        return 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300';
+      case 'starter':
+        return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300';
+      case 'professional':
+        return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300';
+      case 'enterprise':
+        return 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300';
       default:
-        return "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
+        return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
     }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "active":
+      case 'active':
         return (
           <Badge variant="default" className="bg-green-500 text-white">
             <CheckCircle className="mr-1 h-3 w-3" />
-            {t("subscription.status.active")}
+            {t('subscription.status.active')}
           </Badge>
         );
-      case "trialing":
+      case 'trialing':
         return (
           <Badge variant="default" className="bg-blue-500">
             <Calendar className="mr-1 h-3 w-3" />
-            {t("subscription.status.trialing")}
+            {t('subscription.status.trialing')}
           </Badge>
         );
-      case "canceled":
-      case "past_due":
+      case 'canceled':
+      case 'past_due':
         return (
           <Badge variant="destructive">
             <AlertCircle className="mr-1 h-3 w-3" />
-            {t("subscription.status.canceled")}
+            {t('subscription.status.canceled')}
           </Badge>
         );
       default:
@@ -285,20 +285,20 @@ export default function SubscriptionSection({
   };
 
   const formatDate = (dateString?: string) => {
-    if (!dateString) return "";
+    if (!dateString) return '';
     return formatDateString(dateString, {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
     });
   };
 
   const handleUpgrade = () => {
-    router.visit("/pricing");
+    router.visit('/pricing');
   };
 
   const handleManageBilling = () => {
-    router.visit(route("subscription.billing"));
+    router.visit(route('subscription.billing'));
   };
 
   if (!subscription) {
@@ -307,15 +307,15 @@ export default function SubscriptionSection({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Zap className="h-5 w-5" />
-            {t("subscription.billing.title")}
+            {t('subscription.billing.title')}
           </CardTitle>
           <CardDescription>
-            {t("subscription.billing.noSubscription", "No tienes una suscripción activa")}
+            {t('subscription.billing.noSubscription', 'No tienes una suscripción activa')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Button onClick={handleUpgrade} className="w-full">
-            {t("subscription.billing.choosePlan", "Elegir un Plan")}
+            {t('subscription.billing.choosePlan', 'Elegir un Plan')}
           </Button>
         </CardContent>
       </Card>
@@ -336,8 +336,8 @@ export default function SubscriptionSection({
                 <CardTitle className="text-xl">{subscription.plan_name}</CardTitle>
                 <CardDescription>
                   {subscription.is_trial
-                    ? t("subscription.usage.trialEndsOn", "Plan de prueba")
-                    : t("subscription.billing.currentPlan")}
+                    ? t('subscription.usage.trialEndsOn', 'Plan de prueba')
+                    : t('subscription.billing.currentPlan')}
                 </CardDescription>
               </div>
             </div>
@@ -350,7 +350,7 @@ export default function SubscriptionSection({
             <div className="flex items-center gap-2 rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20">
               <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
               <span className="text-sm text-blue-700 dark:text-blue-300">
-                {t("subscription.usage.trialEndsOn")}: {formatDate(subscription.trial_ends_at)}
+                {t('subscription.usage.trialEndsOn')}: {formatDate(subscription.trial_ends_at)}
               </span>
             </div>
           )}
@@ -359,7 +359,7 @@ export default function SubscriptionSection({
             <div className="flex items-center gap-2 rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
               <Calendar className="h-4 w-4 text-gray-600 dark:text-gray-400" />
               <span className="text-sm text-gray-700 dark:text-gray-300">
-                {t("subscription.billing.renewsOn")}: {formatDate(subscription.current_period_end)}
+                {t('subscription.billing.renewsOn')}: {formatDate(subscription.current_period_end)}
               </span>
             </div>
           )}
@@ -385,7 +385,7 @@ export default function SubscriptionSection({
                   <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
                     <span className="font-medium">Periodo de facturación</span>
                     <span className="font-semibold">
-                      {daysLeft} {daysLeft === 1 ? "día" : "días"} restantes
+                      {daysLeft} {daysLeft === 1 ? 'día' : 'días'} restantes
                     </span>
                   </div>
                   <div className="h-1.5 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
@@ -404,7 +404,7 @@ export default function SubscriptionSection({
 
           {/* Action Buttons */}
           <div className="flex flex-wrap gap-2 pt-2">
-            {(subscription.plan_id === "free" || subscription.plan_id === "demo") && (
+            {(subscription.plan_id === 'free' || subscription.plan_id === 'demo') && (
               <Button
                 onClick={handleUpgrade}
                 variant="primary"
@@ -412,11 +412,11 @@ export default function SubscriptionSection({
                 icon={ArrowUpCircle}
                 className="shadow-md"
               >
-                {t("subscription.actions.upgrade", "Actualizar Plan")}
+                {t('subscription.actions.upgrade', 'Actualizar Plan')}
               </Button>
             )}
 
-            {subscription.plan_id !== "free" && subscription.plan_id !== "demo" && (
+            {subscription.plan_id !== 'free' && subscription.plan_id !== 'demo' && (
               <Button
                 onClick={handleManageBilling}
                 variant="primary"
@@ -424,7 +424,7 @@ export default function SubscriptionSection({
                 icon={CreditCard}
                 className="shadow-md"
               >
-                {t("subscription.actions.manageBilling", "Gestionar Facturación")}
+                {t('subscription.actions.manageBilling', 'Gestionar Facturación')}
               </Button>
             )}
 
@@ -436,7 +436,7 @@ export default function SubscriptionSection({
               icon={TrendingUp}
               className="shadow-md"
             >
-              {t("subscription.actions.viewPlans", "Ver Todos los Planes")}
+              {t('subscription.actions.viewPlans', 'Ver Todos los Planes')}
             </Button>
           </div>
         </CardContent>
@@ -447,10 +447,10 @@ export default function SubscriptionSection({
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
             <Zap className="h-5 w-5 text-primary-500" />
-            {t("subscription.usage.planUsage", "Uso del Plan")}
+            {t('subscription.usage.planUsage', 'Uso del Plan')}
           </CardTitle>
           <CardDescription>
-            {t("subscription.usage.monitorConsumption", "Monitorea tu consumo mensual")}
+            {t('subscription.usage.monitorConsumption', 'Monitorea tu consumo mensual')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -464,12 +464,12 @@ export default function SubscriptionSection({
           <CardHeader className="border-b border-primary-500/10 bg-primary-500/5">
             <CardTitle className="flex items-center gap-2 text-lg text-primary-700 dark:text-primary-400">
               <Sparkles className="h-5 w-5" />
-              {t("subscription.enterprise.title", "Características Enterprise")}
+              {t('subscription.enterprise.title', 'Características Enterprise')}
             </CardTitle>
             <CardDescription className="text-primary-600/70 dark:text-primary-400/60">
               {t(
-                "subscription.enterprise.description",
-                "Gestiona las funciones exclusivas de tu plan corporativo",
+                'subscription.enterprise.description',
+                'Gestiona las funciones exclusivas de tu plan corporativo',
               )}
             </CardDescription>
           </CardHeader>
@@ -478,9 +478,9 @@ export default function SubscriptionSection({
               <div
                 onClick={() =>
                   router.get(
-                    route("workspaces.settings", {
+                    route('workspaces.settings', {
                       workspace: currentWorkspace?.slug,
-                      tab: "white-label",
+                      tab: 'white-label',
                     }),
                   )
                 }
@@ -491,13 +491,13 @@ export default function SubscriptionSection({
                     <Palette className="h-5 w-5" />
                   </div>
                   <h4 className="font-bold text-gray-900 transition-colors group-hover:text-primary-600 dark:text-white dark:group-hover:text-primary-400">
-                    {t("workspace.tabs.white_label", "Marca Blanca")}
+                    {t('workspace.tabs.white_label', 'Marca Blanca')}
                   </h4>
                 </div>
                 <p className="text-xs leading-relaxed text-gray-500 dark:text-gray-400">
                   {t(
-                    "workspace.white_label.description",
-                    "Personaliza los reportes y correos con tu propio logotipo y colores corporativos.",
+                    'workspace.white_label.description',
+                    'Personaliza los reportes y correos con tu propio logotipo y colores corporativos.',
                   )}
                 </p>
               </div>
@@ -505,9 +505,9 @@ export default function SubscriptionSection({
               <div
                 onClick={() =>
                   router.get(
-                    route("workspaces.settings", {
+                    route('workspaces.settings', {
                       workspace: currentWorkspace?.slug,
-                      tab: "api",
+                      tab: 'api',
                     }),
                   )
                 }
@@ -518,13 +518,13 @@ export default function SubscriptionSection({
                     <Key className="h-5 w-5" />
                   </div>
                   <h4 className="font-bold text-gray-900 transition-colors group-hover:text-primary-600 dark:text-white dark:group-hover:text-primary-400">
-                    {t("workspace.tabs.api", "Acceso API")}
+                    {t('workspace.tabs.api', 'Acceso API')}
                   </h4>
                 </div>
                 <p className="text-xs leading-relaxed text-gray-500 dark:text-gray-400">
                   {t(
-                    "workspace.api.description",
-                    "Conecta tus aplicaciones externas y automatiza publicaciones mediante nuestra API segura.",
+                    'workspace.api.description',
+                    'Conecta tus aplicaciones externas y automatiza publicaciones mediante nuestra API segura.',
                   )}
                 </p>
               </div>
@@ -539,10 +539,10 @@ export default function SubscriptionSection({
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
               <CreditCard className="h-5 w-5 text-gray-500" />
-              {t("subscription.usage.billingHistory", "Historial de Facturación")}
+              {t('subscription.usage.billingHistory', 'Historial de Facturación')}
             </CardTitle>
             <CardDescription>
-              {t("subscription.usage.billingHistoryDescription", "Tus últimas facturas y pagos")}
+              {t('subscription.usage.billingHistoryDescription', 'Tus últimas facturas y pagos')}
             </CardDescription>
           </CardHeader>
           <CardContent>

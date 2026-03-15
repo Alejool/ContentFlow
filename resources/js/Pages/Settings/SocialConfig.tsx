@@ -1,14 +1,14 @@
-import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
-import Button from "@/Components/common/Modern/Button";
-import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatformsConfig";
-import { useKeyboardClick } from "@/Hooks/useKeyboardClick";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head } from "@inertiajs/react";
-import axios from "axios";
-import { Save, Settings2 } from "lucide-react";
-import { useState } from "react";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
+import PlatformSettingsModal from '@/Components/ConfigSocialMedia/PlatformSettingsModal';
+import Button from '@/Components/common/Modern/Button';
+import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatformsConfig';
+import { useKeyboardClick } from '@/Hooks/useKeyboardClick';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { Head } from '@inertiajs/react';
+import axios from 'axios';
+import { Save, Settings2 } from 'lucide-react';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface SocialConfigProps {
   settings: Record<string, any>;
@@ -52,14 +52,14 @@ function PlatformCard({
           <div
             className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold ${
               hasSettings
-                ? "bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400"
-                : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400'
+                : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
             }`}
           >
             <div
-              className={`h-2 w-2 rounded-full ${hasSettings ? "bg-primary-600" : "bg-amber-500"}`}
+              className={`h-2 w-2 rounded-full ${hasSettings ? 'bg-primary-600' : 'bg-amber-500'}`}
             />
-            {hasSettings ? t("common.configured") : t("common.notConfigured")}
+            {hasSettings ? t('common.configured') : t('common.notConfigured')}
           </div>
         </div>
       </div>
@@ -70,17 +70,17 @@ function PlatformCard({
               .slice(0, 3)
               .map(([key, value]) => {
                 const label = t(`modal.platformSettings.labels.${key}`, {
-                  defaultValue: key.replace(/_/g, " "),
+                  defaultValue: key.replace(/_/g, ' '),
                 });
 
                 let displayValue = String(value);
 
                 // Traducir valores booleanos
-                if (typeof value === "boolean") {
-                  displayValue = value ? t("common.yes") : t("common.no");
+                if (typeof value === 'boolean') {
+                  displayValue = value ? t('common.yes') : t('common.no');
                 }
                 // Traducir valores específicos de plataforma
-                else if (typeof value === "string") {
+                else if (typeof value === 'string') {
                   const translationKey = `platformSettings.${platform.key}.${value}`;
                   const translated = t(translationKey);
                   // Solo usar la traducción si existe (no devuelve la key)
@@ -115,10 +115,10 @@ function PlatformCard({
               <Settings2 className="h-6 w-6 text-amber-600 dark:text-amber-400" />
             </div>
             <p className="mb-1 text-center text-sm font-semibold text-amber-700 dark:text-amber-400">
-              {t("common.notConfigured")}
+              {t('common.notConfigured')}
             </p>
             <p className="text-center text-xs text-amber-600 dark:text-amber-500">
-              {t("platformSettings.clickToConfigure")}
+              {t('platformSettings.clickToConfigure')}
             </p>
           </div>
         )}
@@ -131,7 +131,7 @@ function PlatformCard({
         className="w-full shadow-sm hover:shadow-md"
         size="md"
       >
-        {hasSettings ? t("common.edit") : t("common.configure")}
+        {hasSettings ? t('common.edit') : t('common.configure')}
       </Button>
     </div>
   );
@@ -158,13 +158,13 @@ export default function SocialConfig({ settings: initialSettings }: SocialConfig
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await axios.patch(route("api.v1.profile.social-settings.update"), {
+      await axios.patch(route('api.v1.profile.social-settings.update'), {
         settings: globalSettings,
       });
-      toast.success(t("platformSettings.success") || "Configuración guardada");
+      toast.success(t('platformSettings.success') || 'Configuración guardada');
       setIsSaving(false);
     } catch (error) {
-      toast.error(t("platformSettings.error") || "Error al guardar");
+      toast.error(t('platformSettings.error') || 'Error al guardar');
       setIsSaving(false);
     }
   };
@@ -179,10 +179,10 @@ export default function SocialConfig({ settings: initialSettings }: SocialConfig
             </div>
             <div>
               <h2 className="text-xl font-bold leading-tight text-gray-900 dark:text-white">
-                {t("platformSettings.title")}
+                {t('platformSettings.title')}
               </h2>
               <p className="text-xs font-medium text-gray-500 dark:text-neutral-500">
-                {t("platformSettings.subtitle")}
+                {t('platformSettings.subtitle')}
               </p>
             </div>
           </div>
@@ -192,16 +192,16 @@ export default function SocialConfig({ settings: initialSettings }: SocialConfig
             disabled={isSaving}
             loading={isSaving}
             icon={Save}
-            loadingText={t("common.saving")}
+            loadingText={t('common.saving')}
             className="shadow-md hover:shadow-lg"
             size="md"
           >
-            {t("common.save")}
+            {t('common.save')}
           </Button>
         </div>
       }
     >
-      <Head title={t("platformSettings.title")} />
+      <Head title={t('platformSettings.title')} />
 
       <div className="min-h-screen w-full min-w-0 max-w-full overflow-x-hidden bg-gray-50/30 dark:bg-neutral-900/10">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">

@@ -1,5 +1,5 @@
-import { CalendarEvent } from "@/types/calendar";
-import { useMemo } from "react";
+import { CalendarEvent } from '@/types/calendar';
+import { useMemo } from 'react';
 
 interface VirtualizedEventListProps {
   events: CalendarEvent[];

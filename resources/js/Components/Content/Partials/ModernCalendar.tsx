@@ -1,18 +1,18 @@
-import { BulkActionsBar } from "@/Components/Calendar/BulkActionsBar";
-import { CalendarErrorBoundary } from "@/Components/Calendar/CalendarErrorBoundary";
-import { CalendarViewSelector } from "@/Components/Calendar/CalendarViewSelector";
-import ExternalCalendarSettings from "@/Components/Calendar/ExternalCalendarSettings";
-import UserEventModal from "@/Components/Content/Partials/UserEventModal";
-import ModalFooter from "@/Components/Content/modals/common/ModalFooter";
-import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
-import Modal from "@/Components/common/ui/Modal";
-import { getActivePlatformKeys, getPlatformConfig } from "@/Constants/socialPlatforms";
-import { useCalendar } from "@/Hooks/calendar/useCalendar";
-import { validateDate } from "@/Utils/dateValidation";
-import { formatTime } from "@/Utils/formatDate";
-import { formatDate } from "@/Utils/i18nHelpers";
-import { useLockStore } from "@/stores/lockStore";
-import { CalendarView } from "@/types/calendar";
+import { BulkActionsBar } from '@/Components/Calendar/BulkActionsBar';
+import { CalendarErrorBoundary } from '@/Components/Calendar/CalendarErrorBoundary';
+import { CalendarViewSelector } from '@/Components/Calendar/CalendarViewSelector';
+import ExternalCalendarSettings from '@/Components/Calendar/ExternalCalendarSettings';
+import UserEventModal from '@/Components/Content/Partials/UserEventModal';
+import ModalFooter from '@/Components/Content/modals/common/ModalFooter';
+import ModalHeader from '@/Components/Content/modals/common/ModalHeader';
+import Modal from '@/Components/common/ui/Modal';
+import { getActivePlatformKeys, getPlatformConfig } from '@/Constants/socialPlatforms';
+import { useCalendar } from '@/Hooks/calendar/useCalendar';
+import { validateDate } from '@/Utils/dateValidation';
+import { formatTime } from '@/Utils/formatDate';
+import { formatDate } from '@/Utils/i18nHelpers';
+import { useLockStore } from '@/stores/lockStore';
+import { CalendarView } from '@/types/calendar';
 import {
   DndContext,
   DragEndEvent,
@@ -21,8 +21,8 @@ import {
   useDroppable,
   useSensor,
   useSensors,
-} from "@dnd-kit/core";
-import { usePage } from "@inertiajs/react";
+} from '@dnd-kit/core';
+import { usePage } from '@inertiajs/react';
 import {
   addDays,
   eachDayOfInterval,
@@ -38,7 +38,7 @@ import {
   startOfDay,
   startOfMonth,
   startOfWeek,
-} from "date-fns";
+} from 'date-fns';
 import {
   Calendar as CalendarIcon,
   CheckSquare,
@@ -52,15 +52,15 @@ import {
   Square,
   Trash2,
   X,
-} from "lucide-react";
-import React, { useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
+} from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface ModernCalendarProps {
   onEventClick?: (
     id: number,
-    type: "publication" | "post" | "user_event",
+    type: 'publication' | 'post' | 'user_event',
     event?: CalendarEvent,
   ) => void;
 }
@@ -69,7 +69,7 @@ interface CalendarEvent {
   id: string;
   resourceId: number;
   publicationId?: number;
-  type: "publication" | "post" | "user_event";
+  type: 'publication' | 'post' | 'user_event';
   title: string;
   start: string;
   end?: string;
@@ -92,7 +92,7 @@ interface CalendarEvent {
 }
 
 const PlatformIcon = ({ platform, className }: { platform?: string; className?: string }) => {
-  const config = getPlatformConfig(platform || "");
+  const config = getPlatformConfig(platform || '');
   const Icon = config.icon;
   return <Icon className={`${config.textColor} ${className}`} />;
 };
@@ -115,7 +115,7 @@ const DraggableEvent = ({
   onToggleSelect?: (e: React.MouseEvent) => void;
 }) => {
   const isDraggable =
-    event.type !== "user_event" ||
+    event.type !== 'user_event' ||
     (event.user?.id && Number(event.user.id) === Number(currentUser?.id)) ||
     (!event.user?.id && event.extendedProps?.user_name === currentUser?.name);
 
@@ -143,9 +143,9 @@ const DraggableEvent = ({
       onClick={onClick}
       className={`flex items-center gap-1.5 rounded-md border px-1.5 py-1 text-[10px] font-medium ${
         isSelected
-          ? "border-primary-500 bg-primary-50 ring-2 ring-primary-500 dark:bg-primary-900/20"
-          : "border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-800"
-      } truncate shadow-sm transition-transform hover:scale-[1.02] ${isDragging ? "cursor-grabbing opacity-50" : "cursor-pointer"}`}
+          ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-500 dark:bg-primary-900/20'
+          : 'border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-800'
+      } truncate shadow-sm transition-transform hover:scale-[1.02] ${isDragging ? 'cursor-grabbing opacity-50' : 'cursor-pointer'}`}
     >
       {onToggleSelect && (
         <button
@@ -202,19 +202,19 @@ const DroppableDay = ({
     <div
       ref={setNodeRef}
       onClick={onSelect}
-      className={`group relative h-24 cursor-pointer overflow-hidden p-2 transition-all sm:h-32 lg:h-40 ${isSelected ? "z-10 bg-primary-50/50 ring-2 ring-inset ring-primary-500 dark:bg-primary-900/20" : "bg-white hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-800/50"} ${!isSameMonth(day, currentMonth) ? "opacity-40" : ""} ${isOver ? "bg-primary-50/50 ring-2 ring-inset ring-primary-500 dark:bg-primary-900/20" : ""} `}
+      className={`group relative h-24 cursor-pointer overflow-hidden p-2 transition-all sm:h-32 lg:h-40 ${isSelected ? 'z-10 bg-primary-50/50 ring-2 ring-inset ring-primary-500 dark:bg-primary-900/20' : 'bg-white hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-800/50'} ${!isSameMonth(day, currentMonth) ? 'opacity-40' : ''} ${isOver ? 'bg-primary-50/50 ring-2 ring-inset ring-primary-500 dark:bg-primary-900/20' : ''} `}
     >
       <div className="mb-1 flex items-start justify-between">
         <span
           className={`flex h-6 w-6 items-center justify-center rounded-lg text-xs font-bold transition-all sm:h-8 sm:w-8 sm:text-sm ${
             isTodayDay
-              ? "bg-primary-500 text-white shadow-lg shadow-primary-500/30"
+              ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/30'
               : isSelected
-                ? "bg-primary-50 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400"
-                : "text-gray-700 group-hover:bg-gray-100 dark:text-gray-300 dark:group-hover:bg-gray-800"
+                ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400'
+                : 'text-gray-700 group-hover:bg-gray-100 dark:text-gray-300 dark:group-hover:bg-gray-800'
           } `}
         >
-          {format(day, "d")}
+          {format(day, 'd')}
         </span>
 
         <button
@@ -251,7 +251,7 @@ const DroppableTimeSlot = ({
   return (
     <div
       ref={setNodeRef}
-      className={`border-r border-gray-100 p-1 transition-colors hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-900/30 ${isOver ? "bg-primary-100/50 ring-1 ring-primary-500 dark:bg-primary-900/20" : ""} `}
+      className={`border-r border-gray-100 p-1 transition-colors hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-900/30 ${isOver ? 'bg-primary-100/50 ring-1 ring-primary-500 dark:bg-primary-900/20' : ''} `}
     >
       {children}
       {isOver && !children && (
@@ -301,7 +301,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
   const [showMonthPicker, setShowMonthPicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showExternalCalendars, setShowExternalCalendars] = useState(false);
-  const [view, setView] = useState<CalendarView>("month");
+  const [view, setView] = useState<CalendarView>('month');
 
   // State for bulk actions
   const [selectedEvents, setSelectedEvents] = useState<Set<string>>(new Set());
@@ -357,7 +357,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
       clearSelection();
       refreshEvents();
     } catch (error: any) {
-      toast.error(error.message || "Error al mover los eventos");
+      toast.error(error.message || 'Error al mover los eventos');
     }
   };
 
@@ -372,7 +372,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
       clearSelection();
       refreshEvents();
     } catch (error: any) {
-      toast.error(error.message || "Error al eliminar los eventos");
+      toast.error(error.message || 'Error al eliminar los eventos');
     }
   };
 
@@ -380,29 +380,29 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element;
-      if (showMonthPicker && !target.closest(".month-picker-container")) {
+      if (showMonthPicker && !target.closest('.month-picker-container')) {
         setShowMonthPicker(false);
       }
-      if (showDatePicker && !target.closest(".date-picker-container")) {
+      if (showDatePicker && !target.closest('.date-picker-container')) {
         setShowDatePicker(false);
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showMonthPicker, showDatePicker]);
 
   // Navigation functions for different views
   const navigatePrevious = () => {
     switch (view) {
-      case "day":
+      case 'day':
         calendarGoToMonth(currentMonth.getMonth(), currentMonth.getFullYear());
         setSelectedDate(addDays(selectedDate, -1));
         break;
-      case "week":
+      case 'week':
         setSelectedDate(addDays(selectedDate, -7));
         break;
-      case "month":
+      case 'month':
       default:
         prevMonth();
         break;
@@ -411,13 +411,13 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
 
   const navigateNext = () => {
     switch (view) {
-      case "day":
+      case 'day':
         setSelectedDate(addDays(selectedDate, 1));
         break;
-      case "week":
+      case 'week':
         setSelectedDate(addDays(selectedDate, 7));
         break;
-      case "month":
+      case 'month':
       default:
         nextMonth();
         break;
@@ -429,7 +429,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
     calendarGoToMonth(date.getMonth(), date.getFullYear());
 
     // Si estamos en vista de día o semana, actualizar también
-    if (view === "day" || view === "week") {
+    if (view === 'day' || view === 'week') {
       // La fecha seleccionada ya se actualizó arriba
     }
   };
@@ -476,9 +476,9 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
     if (!validation.isValid) {
       // Show error message for invalid dates (including past dates)
       if (validation.isPastDate) {
-        toast.error(t("calendar.validation.past_date_message"));
+        toast.error(t('calendar.validation.past_date_message'));
       } else {
-        toast.error(validation.error || t("calendar.validation.invalid_date"));
+        toast.error(validation.error || t('calendar.validation.invalid_date'));
       }
       return;
     }
@@ -488,10 +488,10 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
 
     try {
       await handleEventDrop(eventData.id, newDateTime.toISOString(), eventData.type);
-      toast.success(t("calendar.bulkActions.moveSuccess") || "Evento movido exitosamente");
+      toast.success(t('calendar.bulkActions.moveSuccess') || 'Evento movido exitosamente');
     } catch (error: any) {
       toast.error(
-        error.message || t("calendar.bulkActions.moveError") || "Error al mover el evento",
+        error.message || t('calendar.bulkActions.moveError') || 'Error al mover el evento',
       );
     }
   };
@@ -508,24 +508,24 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
     const success = await deleteEvent(event.id);
     if (success) {
       toast.success(
-        t("calendar.userEvents.modal.messages.successDelete") || "Evento eliminado correctamente",
+        t('calendar.userEvents.modal.messages.successDelete') || 'Evento eliminado correctamente',
       );
       setDeleteConfirmation({ isOpen: false, event: null });
     } else {
       toast.error(
-        t("calendar.userEvents.modal.messages.errorDelete") || "Error al eliminar el evento",
+        t('calendar.userEvents.modal.messages.errorDelete') || 'Error al eliminar el evento',
       );
     }
   };
 
-  const platforms = ["all", "user_event", ...getActivePlatformKeys()];
+  const platforms = ['all', 'user_event', ...getActivePlatformKeys()];
 
   // Helper functions for week and day views
   const getEventsForDayAndHour = (day: Date, hour: number) => {
     return filteredEvents.filter((event) => {
       const eventDate = parseISO(event.start);
       return (
-        format(eventDate, "yyyy-MM-dd") === format(day, "yyyy-MM-dd") &&
+        format(eventDate, 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd') &&
         eventDate.getHours() === hour
       );
     });
@@ -535,7 +535,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
     return filteredEvents.filter((event) => {
       const eventDate = parseISO(event.start);
       return (
-        format(eventDate, "yyyy-MM-dd") === format(selectedDate, "yyyy-MM-dd") &&
+        format(eventDate, 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd') &&
         eventDate.getHours() === hour
       );
     });
@@ -544,11 +544,11 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
   // Render different calendar views
   const renderCalendarView = () => {
     switch (view) {
-      case "week":
+      case 'week':
         return renderWeekView();
-      case "day":
+      case 'day':
         return renderDayView();
-      case "month":
+      case 'month':
       default:
         return renderMonthView();
     }
@@ -572,20 +572,20 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
               <div
                 key={day.toString()}
                 className={`border-r border-gray-200 p-3 text-center dark:border-gray-800 ${
-                  isToday(day) ? "bg-primary-50 dark:bg-primary-900/20" : ""
+                  isToday(day) ? 'bg-primary-50 dark:bg-primary-900/20' : ''
                 }`}
               >
                 <div className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
-                  {format(day, "EEE")}
+                  {format(day, 'EEE')}
                 </div>
                 <div
                   className={`mt-1 text-lg font-bold ${
                     isToday(day)
-                      ? "text-primary-600 dark:text-primary-400"
-                      : "text-gray-900 dark:text-white"
+                      ? 'text-primary-600 dark:text-primary-400'
+                      : 'text-gray-900 dark:text-white'
                   }`}
                 >
-                  {format(day, "d")}
+                  {format(day, 'd')}
                 </div>
               </div>
             ))}
@@ -600,12 +600,12 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
               >
                 <div className="border-r border-gray-200 bg-gray-100 p-2 text-right dark:border-gray-800 dark:bg-gray-900">
                   <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
-                    {format(setHours(new Date(), hour), "HH:mm")}
+                    {format(setHours(new Date(), hour), 'HH:mm')}
                   </span>
                 </div>
                 {days.map((day) => {
                   const dayEvents = getEventsForDayAndHour(day, hour);
-                  const dropId = `${format(day, "yyyy-MM-dd")}-${hour}`;
+                  const dropId = `${format(day, 'yyyy-MM-dd')}-${hour}`;
 
                   return (
                     <DroppableTimeSlot key={dropId} id={dropId} day={day} hour={hour}>
@@ -623,7 +623,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                           }}
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (event.type === "user_event") {
+                            if (event.type === 'user_event') {
                               setSelectedEventForModal(event);
                               setShowEventModal(true);
                             } else {
@@ -660,7 +660,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
             >
               <div className="w-24 border-r border-gray-100 bg-gray-50 p-4 text-right dark:border-gray-800 dark:bg-gray-900/50">
                 <div className="text-sm font-semibold text-gray-900 dark:text-white">
-                  {format(setHours(new Date(), hour), "HH:mm")}
+                  {format(setHours(new Date(), hour), 'HH:mm')}
                 </div>
               </div>
 
@@ -686,7 +686,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                         <div className="min-w-0 flex-1">
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex items-center gap-2">
-                              {event.type === "user_event" ? (
+                              {event.type === 'user_event' ? (
                                 <CalendarIcon className="h-5 w-5" style={{ color: event.color }} />
                               ) : event.platform ? (
                                 <PlatformIcon platform={event.platform} className="h-5 w-5" />
@@ -696,7 +696,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                               <h3
                                 className="cursor-pointer text-base font-semibold text-gray-900 hover:text-primary-600 dark:text-white"
                                 onClick={() => {
-                                  if (event.type === "user_event") {
+                                  if (event.type === 'user_event') {
                                     setSelectedEventForModal(event);
                                     setShowEventModal(true);
                                   } else {
@@ -758,13 +758,13 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
       <>
         <div className="grid grid-cols-7 border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
           {[
-            { key: "sun", label: t("calendar.weekdays.sun") },
-            { key: "mon", label: t("calendar.weekdays.mon") },
-            { key: "tue", label: t("calendar.weekdays.tue") },
-            { key: "wed", label: t("calendar.weekdays.wed") },
-            { key: "thu", label: t("calendar.weekdays.thu") },
-            { key: "fri", label: t("calendar.weekdays.fri") },
-            { key: "sat", label: t("calendar.weekdays.sat") },
+            { key: 'sun', label: t('calendar.weekdays.sun') },
+            { key: 'mon', label: t('calendar.weekdays.mon') },
+            { key: 'tue', label: t('calendar.weekdays.tue') },
+            { key: 'wed', label: t('calendar.weekdays.wed') },
+            { key: 'thu', label: t('calendar.weekdays.thu') },
+            { key: 'fri', label: t('calendar.weekdays.fri') },
+            { key: 'sat', label: t('calendar.weekdays.sat') },
           ].map((day) => (
             <div
               key={day.key}
@@ -800,7 +800,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                 onAddClick={(e) => {
                   e.stopPropagation();
                   if (isBefore(startOfDay(day), startOfDay(new Date()))) {
-                    toast.error(t("calendar.userEvents.modal.validation.pastDate"));
+                    toast.error(t('calendar.userEvents.modal.validation.pastDate'));
                     return;
                   }
                   setSelectedDate(day);
@@ -822,7 +822,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                     }}
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (event.type === "user_event") {
+                      if (event.type === 'user_event') {
                         setSelectedEventForModal(event);
                         setShowEventModal(true);
                       } else {
@@ -865,9 +865,9 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                   onClick={() => setShowMonthPicker(!showMonthPicker)}
                   className="flex items-center gap-3 text-lg font-bold capitalize text-gray-900 transition-colors hover:text-primary-600 dark:text-white dark:hover:text-primary-400 sm:text-2xl"
                 >
-                  {formatDate(currentMonth, "monthYear")}
+                  {formatDate(currentMonth, 'monthYear')}
                   <ChevronDown
-                    className={`h-4 w-4 transition-transform sm:h-5 sm:w-5 ${showMonthPicker ? "rotate-180" : ""}`}
+                    className={`h-4 w-4 transition-transform sm:h-5 sm:w-5 ${showMonthPicker ? 'rotate-180' : ''}`}
                   />
                   {isLoading && (
                     <Loader2 className="h-4 w-4 animate-spin text-primary-500 sm:h-5 sm:w-5" />
@@ -883,11 +883,11 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                           onClick={() => goToMonth(i, currentMonth.getFullYear())}
                           className={`rounded-lg p-2 text-sm transition-colors ${
                             currentMonth.getMonth() === i
-                              ? "bg-primary-500 text-white"
-                              : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                              ? 'bg-primary-500 text-white'
+                              : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
                           }`}
                         >
-                          {formatDate(new Date(2024, i, 1), "monthShort")}
+                          {formatDate(new Date(2024, i, 1), 'monthShort')}
                         </button>
                       ))}
                     </div>
@@ -927,8 +927,8 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                   onClick={() => setShowExternalCalendars(!showExternalCalendars)}
                   className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-all ${
                     showExternalCalendars
-                      ? "border-primary-200 bg-primary-50 text-primary-600 dark:border-primary-800 dark:bg-primary-900/20 dark:text-primary-400"
-                      : "border-gray-200 bg-gray-100 text-gray-600 hover:bg-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                      ? 'border-primary-200 bg-primary-50 text-primary-600 dark:border-primary-800 dark:bg-primary-900/20 dark:text-primary-400'
+                      : 'border-gray-200 bg-gray-100 text-gray-600 hover:bg-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
                   }`}
                   title="Calendarios Externos"
                 >
@@ -942,18 +942,18 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                   <button
                     key={p}
                     onClick={() => setPlatformFilter(p)}
-                    className={`rounded-full p-1.5 transition-all sm:p-2 ${platformFilter === p ? "bg-white text-primary-600 shadow dark:bg-gray-700" : "text-gray-400 hover:text-gray-600"}`}
+                    className={`rounded-full p-1.5 transition-all sm:p-2 ${platformFilter === p ? 'bg-white text-primary-600 shadow dark:bg-gray-700' : 'text-gray-400 hover:text-gray-600'}`}
                     title={
-                      p === "all"
-                        ? t("calendar.filters.all")
-                        : p === "user_event"
-                          ? t("calendar.filters.events")
+                      p === 'all'
+                        ? t('calendar.filters.all')
+                        : p === 'user_event'
+                          ? t('calendar.filters.events')
                           : getPlatformConfig(p).name
                     }
                   >
-                    {p === "all" ? (
+                    {p === 'all' ? (
                       <Filter className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                    ) : p === "user_event" ? (
+                    ) : p === 'user_event' ? (
                       <CalendarIcon className="h-3.5 w-3.5 text-primary-500 sm:h-4 sm:w-4" />
                     ) : (
                       <PlatformIcon platform={p} className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -973,7 +973,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                   onClick={goToToday}
                   className="rounded-lg px-3 py-1.5 text-xs font-semibold text-gray-700 transition-all hover:bg-white dark:text-gray-200 dark:hover:bg-gray-700 sm:px-4 sm:py-2 sm:text-sm"
                 >
-                  {t("calendar.actions.today")}
+                  {t('calendar.actions.today')}
                 </button>
 
                 <button
@@ -992,7 +992,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
               <div className="mb-4 flex items-center justify-between">
                 <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white">
                   <CalendarIcon className="h-5 w-5 text-primary-500" />
-                  {t("calendar.external.title")}
+                  {t('calendar.external.title')}
                 </h3>
                 <button
                   onClick={() => setShowExternalCalendars(false)}
@@ -1022,15 +1022,15 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                 <div className="mb-6">
                   <h4 className="flex items-center gap-2 text-xl font-black text-gray-900 dark:text-white">
                     <CalendarIcon className="h-6 w-6 text-primary-500" />
-                    {formatDate(selectedDate, "dayMonth")}
+                    {formatDate(selectedDate, 'dayMonth')}
                   </h4>
                   <div className="mt-2 flex items-center gap-2">
                     <span className="rounded-full bg-primary-50 px-2 py-0.5 text-[10px] font-black uppercase tracking-widest text-primary-500 dark:bg-primary-900/30">
                       {
                         filteredEvents.filter((e) => isSameDay(parseISO(e.start), selectedDate))
                           .length
-                      }{" "}
-                      {t("calendar.events.count")}
+                      }{' '}
+                      {t('calendar.events.count')}
                     </span>
                   </div>
                 </div>
@@ -1045,7 +1045,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                         <div
                           key={event.id}
                           onClick={() => {
-                            if (event.type === "user_event") {
+                            if (event.type === 'user_event') {
                               setSelectedEventForModal(event);
                               setShowEventModal(true);
                             } else {
@@ -1060,7 +1060,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                           }}
                         >
                           <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg border border-gray-100 bg-white shadow-sm transition-transform group-hover:scale-110 dark:border-neutral-700 dark:bg-neutral-900">
-                            {event.type === "user_event" ? (
+                            {event.type === 'user_event' ? (
                               <CalendarIcon className="h-6 w-6" style={{ color: event.color }} />
                             ) : event.platform ? (
                               <PlatformIcon platform={event.platform} className="h-6 w-6" />
@@ -1077,15 +1077,15 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                             </h5>
                             {event.user?.name && (
                               <p className="text-[10px] font-medium text-gray-500 dark:text-gray-400">
-                                {t("common.creator")}:{" "}
+                                {t('common.creator')}:{' '}
                                 {Number(event.user.id) === Number(currentUser?.id)
-                                  ? t("common.me") || "Yo"
+                                  ? t('common.me') || 'Yo'
                                   : event.user.name}
                               </p>
                             )}
                             {!event.user?.name && event.extendedProps?.user_name && (
                               <p className="text-[10px] font-medium text-gray-500 dark:text-gray-400">
-                                {t("common.creator")}: {event.extendedProps.user_name}
+                                {t('common.creator')}: {event.extendedProps.user_name}
                               </p>
                             )}
                             <div className="mt-1 flex items-center gap-2">
@@ -1105,12 +1105,12 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                               className="h-10 w-1.5 rounded-full opacity-50 transition-opacity group-hover:opacity-100"
                               style={{ backgroundColor: event.color }}
                             />
-                            {event.type === "user_event" &&
+                            {event.type === 'user_event' &&
                               Number(event.user?.id) === Number(currentUser?.id) && (
                                 <button
                                   onClick={(e) => handleDeleteEvent(e, event)}
                                   className="rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
-                                  title={t("common.delete") || "Eliminar"}
+                                  title={t('common.delete') || 'Eliminar'}
                                 >
                                   <Trash2 className="h-4 w-4" />
                                 </button>
@@ -1124,7 +1124,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                         <CalendarIcon className="h-6 w-6 text-gray-300" />
                       </div>
                       <p className="text-sm font-medium text-gray-400">
-                        {t("calendar.events.empty")}
+                        {t('calendar.events.empty')}
                       </p>
                     </div>
                   )}
@@ -1161,17 +1161,17 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
 
           <div className="p-6">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              {t("calendar.userEvents.modal.messages.confirmDelete") ||
-                t("common.deleteConfirm") ||
-                "¿Estás seguro de que deseas eliminar este elemento? Esta acción no se puede deshacer."}
+              {t('calendar.userEvents.modal.messages.confirmDelete') ||
+                t('common.deleteConfirm') ||
+                '¿Estás seguro de que deseas eliminar este elemento? Esta acción no se puede deshacer.'}
             </p>
           </div>
 
           <ModalFooter
             onClose={() => setDeleteConfirmation({ isOpen: false, event: null })}
             onPrimarySubmit={confirmDelete}
-            submitText={t("common.delete") || "Eliminar"}
-            cancelText={t("common.cancel") || "Cancelar"}
+            submitText={t('common.delete') || 'Eliminar'}
+            cancelText={t('common.cancel') || 'Cancelar'}
             submitVariant="danger"
             submitIcon={<Trash2 className="h-4 w-4" />}
             cancelStyle="outline"

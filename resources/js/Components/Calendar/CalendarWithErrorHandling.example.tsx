@@ -5,13 +5,13 @@
  * into a calendar view.
  */
 
-import React, { useState, useEffect } from "react";
-import { CalendarErrorBoundary } from "./CalendarErrorBoundary";
-import { ConflictResolutionModal, DataConflict } from "./ConflictResolutionModal";
-import { SyncErrorList } from "./SyncErrorDisplay";
-import { useCalendarStore } from "@/stores/calendarStore";
-import { validateDate } from "@/Utils/dateValidation";
-import { SyncError } from "@/types/errors";
+import React, { useState, useEffect } from 'react';
+import { CalendarErrorBoundary } from './CalendarErrorBoundary';
+import { ConflictResolutionModal, DataConflict } from './ConflictResolutionModal';
+import { SyncErrorList } from './SyncErrorDisplay';
+import { useCalendarStore } from '@/stores/calendarStore';
+import { validateDate } from '@/Utils/dateValidation';
+import { SyncError } from '@/types/errors';
 
 export const CalendarWithErrorHandling: React.FC = () => {
   const { events, conflict, setConflict, resolveConflict, updateEvent } = useCalendarStore();
@@ -25,7 +25,7 @@ export const CalendarWithErrorHandling: React.FC = () => {
 
     if (!validation.isValid) {
       // Show error toast or message
-      console.error("Invalid date:", validation.error);
+      console.error('Invalid date:', validation.error);
       return;
     }
 
@@ -42,7 +42,7 @@ export const CalendarWithErrorHandling: React.FC = () => {
   };
 
   // Handle conflict resolution
-  const handleConflictResolve = async (resolution: "local" | "server") => {
+  const handleConflictResolve = async (resolution: 'local' | 'server') => {
     const success = await resolveConflict(resolution);
   };
 

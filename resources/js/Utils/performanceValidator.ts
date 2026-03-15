@@ -61,20 +61,20 @@ class PerformanceValidator {
    * Initialize performance observers
    */
   private initializeObservers(): void {
-    if (typeof window === "undefined") return;
+    if (typeof window === 'undefined') return;
 
     // Observe paint timing
-    if ("PerformanceObserver" in window) {
+    if ('PerformanceObserver' in window) {
       try {
         // First Contentful Paint
         const paintObserver = new PerformanceObserver((list) => {
           for (const entry of list.getEntries()) {
-            if (entry.name === "first-contentful-paint") {
+            if (entry.name === 'first-contentful-paint') {
               this.metrics.firstContentfulPaint = entry.startTime;
             }
           }
         });
-        paintObserver.observe({ entryTypes: ["paint"] });
+        paintObserver.observe({ entryTypes: ['paint'] });
 
         // Largest Contentful Paint
         const lcpObserver = new PerformanceObserver((list) => {
@@ -82,7 +82,7 @@ class PerformanceValidator {
           const lastEntry = entries[entries.length - 1];
           this.metrics.largestContentfulPaint = lastEntry.startTime;
         });
-        lcpObserver.observe({ entryTypes: ["largest-contentful-paint"] });
+        lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
 
         // Layout Shift
         let clsValue = 0;
@@ -94,7 +94,7 @@ class PerformanceValidator {
             }
           }
         });
-        clsObserver.observe({ entryTypes: ["layout-shift"] });
+        clsObserver.observe({ entryTypes: ['layout-shift'] });
       } catch (error) {
         // Failed to initialize observers
       }
@@ -135,7 +135,7 @@ class PerformanceValidator {
 
     try {
       // Try to get from cache
-      const cache = await caches.open("dynamic-cache");
+      const cache = await caches.open('dynamic-cache');
       const response = await cache.match(request);
       const duration = performance.now() - start;
 
@@ -151,9 +151,9 @@ class PerformanceValidator {
    * Get Time to Interactive (TTI)
    */
   private getTimeToInteractive(): number {
-    if (typeof window === "undefined") return 0;
+    if (typeof window === 'undefined') return 0;
 
-    const navigation = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming;
+    const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
     if (!navigation) return 0;
 
     // Approximate TTI as domInteractive
@@ -164,10 +164,10 @@ class PerformanceValidator {
    * Get Total Blocking Time (TBT)
    */
   private getTotalBlockingTime(): number {
-    if (typeof window === "undefined") return 0;
+    if (typeof window === 'undefined') return 0;
 
     // Get long tasks
-    const longTasks = performance.getEntriesByType("longtask");
+    const longTasks = performance.getEntriesByType('longtask');
     let tbt = 0;
 
     for (const task of longTasks) {
@@ -190,57 +190,57 @@ class PerformanceValidator {
 
     const validations: ValidationResult[] = [
       {
-        metric: "Optimistic Update Time",
+        metric: 'Optimistic Update Time',
         value: this.metrics.optimisticUpdateTime || 0,
         target: PERFORMANCE_TARGETS.OPTIMISTIC_UPDATE_TIME,
         passed:
           (this.metrics.optimisticUpdateTime || 0) < PERFORMANCE_TARGETS.OPTIMISTIC_UPDATE_TIME,
-        unit: "ms",
+        unit: 'ms',
       },
       {
-        metric: "Cache Response Time",
+        metric: 'Cache Response Time',
         value: this.metrics.cacheResponseTime || 0,
         target: PERFORMANCE_TARGETS.CACHE_RESPONSE_TIME,
         passed: (this.metrics.cacheResponseTime || 0) < PERFORMANCE_TARGETS.CACHE_RESPONSE_TIME,
-        unit: "ms",
+        unit: 'ms',
       },
       {
-        metric: "First Contentful Paint",
+        metric: 'First Contentful Paint',
         value: this.metrics.firstContentfulPaint || 0,
         target: PERFORMANCE_TARGETS.FIRST_CONTENTFUL_PAINT,
         passed:
           (this.metrics.firstContentfulPaint || 0) < PERFORMANCE_TARGETS.FIRST_CONTENTFUL_PAINT,
-        unit: "ms",
+        unit: 'ms',
       },
       {
-        metric: "Largest Contentful Paint",
+        metric: 'Largest Contentful Paint',
         value: this.metrics.largestContentfulPaint || 0,
         target: PERFORMANCE_TARGETS.LARGEST_CONTENTFUL_PAINT,
         passed:
           (this.metrics.largestContentfulPaint || 0) < PERFORMANCE_TARGETS.LARGEST_CONTENTFUL_PAINT,
-        unit: "ms",
+        unit: 'ms',
       },
       {
-        metric: "Time to Interactive",
+        metric: 'Time to Interactive',
         value: this.metrics.timeToInteractive || 0,
         target: PERFORMANCE_TARGETS.TIME_TO_INTERACTIVE,
         passed: (this.metrics.timeToInteractive || 0) < PERFORMANCE_TARGETS.TIME_TO_INTERACTIVE,
-        unit: "ms",
+        unit: 'ms',
       },
       {
-        metric: "Total Blocking Time",
+        metric: 'Total Blocking Time',
         value: this.metrics.totalBlockingTime || 0,
         target: PERFORMANCE_TARGETS.TOTAL_BLOCKING_TIME,
         passed: (this.metrics.totalBlockingTime || 0) < PERFORMANCE_TARGETS.TOTAL_BLOCKING_TIME,
-        unit: "ms",
+        unit: 'ms',
       },
       {
-        metric: "Cumulative Layout Shift",
+        metric: 'Cumulative Layout Shift',
         value: this.metrics.cumulativeLayoutShift || 0,
         target: PERFORMANCE_TARGETS.CUMULATIVE_LAYOUT_SHIFT,
         passed:
           (this.metrics.cumulativeLayoutShift || 0) < PERFORMANCE_TARGETS.CUMULATIVE_LAYOUT_SHIFT,
-        unit: "score",
+        unit: 'score',
       },
     ];
 
@@ -297,10 +297,10 @@ class PerformanceValidator {
    * Check if PWA is installable
    */
   async checkPWAInstallability(): Promise<boolean> {
-    if (typeof window === "undefined") return false;
+    if (typeof window === 'undefined') return false;
 
     // Check for service worker
-    const hasServiceWorker = "serviceWorker" in navigator;
+    const hasServiceWorker = 'serviceWorker' in navigator;
 
     // Check for manifest
     const manifestLink = document.querySelector('link[rel="manifest"]');
@@ -308,7 +308,7 @@ class PerformanceValidator {
 
     // Check if HTTPS (or localhost)
     const isSecure =
-      window.location.protocol === "https:" || window.location.hostname === "localhost";
+      window.location.protocol === 'https:' || window.location.hostname === 'localhost';
 
     const installable = hasServiceWorker && hasManifest && isSecure;
 
@@ -319,7 +319,7 @@ class PerformanceValidator {
    * Run Lighthouse audit programmatically (requires lighthouse npm package)
    */
   async runLighthouseAudit(): Promise<any> {
-    if (typeof window === "undefined") {
+    if (typeof window === 'undefined') {
       return null;
     }
 

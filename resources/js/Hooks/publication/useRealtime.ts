@@ -1,6 +1,6 @@
-import { initPublicationsRealtime } from "@/Services/publicationRealtime";
-import { usePage } from "@inertiajs/react";
-import { useEffect } from "react";
+import { initPublicationsRealtime } from '@/Services/publicationRealtime';
+import { usePage } from '@inertiajs/react';
+import { useEffect } from 'react';
 
 export function useRealtime(userId?: number) {
   const { props } = usePage<any>();

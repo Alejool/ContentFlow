@@ -1,6 +1,6 @@
-import { Avatar } from "@/Components/common/Avatar";
-import { format } from "date-fns";
-import { Globe, MessageSquare, MoreHorizontal, Send, Share2, ThumbsUp } from "lucide-react";
+import { Avatar } from '@/Components/common/Avatar';
+import { format } from 'date-fns';
+import { Globe, MessageSquare, MoreHorizontal, Send, Share2, ThumbsUp } from 'lucide-react';
 
 interface LinkedInPreviewProps {
   content: string;
@@ -20,7 +20,7 @@ export const LinkedInPreview = ({
   mediaUrls,
   user,
   date = new Date(),
-  className = "",
+  className = '',
 }: LinkedInPreviewProps) => {
   return (
     <div
@@ -33,13 +33,13 @@ export const LinkedInPreview = ({
           <div>
             <div className="flex flex-col">
               <span className="cursor-pointer text-sm font-semibold leading-tight hover:text-blue-600 hover:underline">
-                {user?.name || "User Name"}
+                {user?.name || 'User Name'}
               </span>
               <span className="mt-0.5 text-xs leading-tight text-gray-500">
-                {user?.headline || "Software Engineer at Tech Company"}
+                {user?.headline || 'Software Engineer at Tech Company'}
               </span>
               <div className="mt-0.5 flex items-center gap-1 text-xs text-gray-500">
-                <span>{date ? format(date, "d 'mo'") : "now"}</span>
+                <span>{date ? format(date, "d 'mo'") : 'now'}</span>
                 <span>•</span>
                 <Globe className="h-3 w-3" />
               </div>

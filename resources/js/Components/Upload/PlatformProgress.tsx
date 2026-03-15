@@ -1,6 +1,6 @@
-import { Publication } from "@/types/Publication";
-import { AlertTriangle, CheckCircle2, Loader2, X } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { Publication } from '@/types/Publication';
+import { AlertTriangle, CheckCircle2, Loader2, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface PlatformProgressProps {
   publication: Publication;
@@ -18,18 +18,18 @@ export function PlatformProgress({ publication, onCancelPlatform }: PlatformProg
           <div className="bg-primary/50 h-full w-full animate-pulse" />
         </div>
         <span className="block text-center text-[10px] italic text-gray-500 dark:text-neutral-400">
-          {publication.status === "publishing"
-            ? t("publications.gallery.sendingToSocial", {
-                defaultValue: "Iniciando envío...",
+          {publication.status === 'publishing'
+            ? t('publications.gallery.sendingToSocial', {
+                defaultValue: 'Iniciando envío...',
               })
-            : publication.status === "retrying"
-              ? t("publications.gallery.retrying", {
-                  defaultValue: "Reintentando...",
+            : publication.status === 'retrying'
+              ? t('publications.gallery.retrying', {
+                  defaultValue: 'Reintentando...',
                 })
-              : publication.status === "failed"
-                ? "Error en el procesamiento"
-                : t("publications.gallery.processing", {
-                    defaultValue: "Procesando...",
+              : publication.status === 'failed'
+                ? 'Error en el procesamiento'
+                : t('publications.gallery.processing', {
+                    defaultValue: 'Procesando...',
                   })}
         </span>
       </div>
@@ -39,13 +39,13 @@ export function PlatformProgress({ publication, onCancelPlatform }: PlatformProg
   const platforms = Object.values(platformSummary).filter((platform: any) => {
     const logDate = platform.published_at
       ? new Date(platform.published_at)
-      : new Date(publication.updated_at || "");
+      : new Date(publication.updated_at || '');
     const fiveMinsAgo = new Date(Date.now() - 5 * 60 * 1000);
 
     return (
-      platform.status === "publishing" ||
-      platform.status === "retrying" ||
-      platform.status === "pending" ||
+      platform.status === 'publishing' ||
+      platform.status === 'retrying' ||
+      platform.status === 'pending' ||
       logDate > fiveMinsAgo
     );
   });
@@ -53,12 +53,12 @@ export function PlatformProgress({ publication, onCancelPlatform }: PlatformProg
   return (
     <div className="mt-2 space-y-2">
       {platforms.map((platform: any) => {
-        const isDone = platform.status === "published";
-        const isFailed = platform.status === "failed";
+        const isDone = platform.status === 'published';
+        const isFailed = platform.status === 'failed';
         const isPublishing =
-          platform.status === "publishing" ||
-          platform.status === "pending" ||
-          platform.status === "retrying";
+          platform.status === 'publishing' ||
+          platform.status === 'pending' ||
+          platform.status === 'retrying';
         const progress = isDone ? 100 : isFailed ? 100 : isPublishing ? 50 : 0;
         const canCancel = isPublishing && onCancelPlatform;
 
@@ -92,7 +92,7 @@ export function PlatformProgress({ publication, onCancelPlatform }: PlatformProg
                       );
                     }}
                     className="text-gray-400 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
-                    title={t("common.cancel") || "Cancelar"}
+                    title={t('common.cancel') || 'Cancelar'}
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -100,17 +100,17 @@ export function PlatformProgress({ publication, onCancelPlatform }: PlatformProg
                 <span
                   className={`rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider ${
                     isDone
-                      ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400"
+                      ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400'
                       : isFailed
-                        ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400"
-                        : "bg-primary/10 text-primary dark:bg-primary/20"
+                        ? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400'
+                        : 'bg-primary/10 text-primary dark:bg-primary/20'
                   }`}
                 >
                   {isDone
-                    ? t("common.sent") || "Enviado"
+                    ? t('common.sent') || 'Enviado'
                     : isFailed
-                      ? t("publications.modal.publish.failed") || "Falló"
-                      : t("common.sending") || "Enviando"}
+                      ? t('publications.modal.publish.failed') || 'Falló'
+                      : t('common.sending') || 'Enviando'}
                 </span>
               </div>
             </div>
@@ -118,13 +118,13 @@ export function PlatformProgress({ publication, onCancelPlatform }: PlatformProg
               <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-gray-200 dark:bg-neutral-600">
                 <div
                   className={`h-full transition-all duration-500 ${
-                    isFailed ? "bg-red-500" : isDone ? "bg-green-500" : "bg-primary"
-                  } ${isPublishing ? "animate-pulse" : ""}`}
+                    isFailed ? 'bg-red-500' : isDone ? 'bg-green-500' : 'bg-primary'
+                  } ${isPublishing ? 'animate-pulse' : ''}`}
                   style={{ width: `${progress}%` }}
                 />
               </div>
               <span className="w-10 text-right text-[10px] font-semibold text-neutral-600 dark:text-neutral-300">
-                {isDone || isFailed ? "100%" : "..."}
+                {isDone || isFailed ? '100%' : '...'}
               </span>
             </div>
             {isFailed && platform.error && (
@@ -139,8 +139,8 @@ export function PlatformProgress({ publication, onCancelPlatform }: PlatformProg
                 rel="noopener noreferrer"
                 className="mt-1.5 flex items-center gap-1 text-[10px] text-primary-500 hover:underline"
               >
-                {t("publications.viewPost", {
-                  defaultValue: "Ver publicación",
+                {t('publications.viewPost', {
+                  defaultValue: 'Ver publicación',
                 })}
                 <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path

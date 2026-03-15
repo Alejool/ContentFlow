@@ -1,5 +1,5 @@
-import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { AlertTriangle, X } from "lucide-react";
+import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
+import { AlertTriangle, X } from 'lucide-react';
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -9,7 +9,7 @@ interface ConfirmDialogProps {
   message: string;
   confirmText?: string;
   cancelText?: string;
-  type?: "danger" | "warning" | "info";
+  type?: 'danger' | 'warning' | 'info';
 }
 
 export default function ConfirmDialog({
@@ -18,9 +18,9 @@ export default function ConfirmDialog({
   onConfirm,
   title,
   message,
-  confirmText = "Confirm",
-  cancelText = "Cancel",
-  type = "danger",
+  confirmText = 'Confirm',
+  cancelText = 'Cancel',
+  type = 'danger',
 }: ConfirmDialogProps) {
   const handleConfirm = () => {
     onConfirm();
@@ -29,23 +29,23 @@ export default function ConfirmDialog({
 
   const getTypeStyles = () => {
     switch (type) {
-      case "danger":
+      case 'danger':
         return {
-          iconBg: "bg-primary-100 dark:bg-primary-900/30",
-          iconColor: "text-primary-600 dark:text-primary-400",
-          confirmBtn: "bg-primary-600 hover:bg-primary-700 text-white",
+          iconBg: 'bg-primary-100 dark:bg-primary-900/30',
+          iconColor: 'text-primary-600 dark:text-primary-400',
+          confirmBtn: 'bg-primary-600 hover:bg-primary-700 text-white',
         };
-      case "warning":
+      case 'warning':
         return {
-          iconBg: "bg-primary-100 dark:bg-primary-900/30",
-          iconColor: "text-primary-600 dark:text-primary-400",
-          confirmBtn: "bg-primary-600 hover:bg-primary-700 text-white",
+          iconBg: 'bg-primary-100 dark:bg-primary-900/30',
+          iconColor: 'text-primary-600 dark:text-primary-400',
+          confirmBtn: 'bg-primary-600 hover:bg-primary-700 text-white',
         };
-      case "info":
+      case 'info':
         return {
-          iconBg: "bg-blue-100 dark:bg-blue-900/30",
-          iconColor: "text-blue-600 dark:text-blue-400",
-          confirmBtn: "bg-blue-600 hover:bg-blue-700 text-white",
+          iconBg: 'bg-blue-100 dark:bg-blue-900/30',
+          iconColor: 'text-blue-600 dark:text-blue-400',
+          confirmBtn: 'bg-blue-600 hover:bg-blue-700 text-white',
         };
     }
   };

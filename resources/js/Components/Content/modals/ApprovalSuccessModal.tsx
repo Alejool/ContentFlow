@@ -1,8 +1,8 @@
-import Button from "@/Components/common/Modern/Button";
-import { formatDateTime } from "@/Utils/formatDate";
-import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { CheckCircle, User, X } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import Button from '@/Components/common/Modern/Button';
+import { formatDateTime } from '@/Utils/formatDate';
+import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
+import { CheckCircle, User, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ApprovalSuccessModalProps {
   isOpen: boolean;
@@ -30,7 +30,7 @@ export default function ApprovalSuccessModal({
           <div className="flex items-center justify-between border-b border-gray-100 p-6 dark:border-neutral-700/50">
             <DialogTitle className="flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-white">
               <CheckCircle className="h-6 w-6 text-green-500" />
-              {t("approvals.approvalSuccess") || "¡Publicación Aprobada!"}
+              {t('approvals.approvalSuccess') || '¡Publicación Aprobada!'}
             </DialogTitle>
             <button
               onClick={onClose}
@@ -43,15 +43,15 @@ export default function ApprovalSuccessModal({
           <div className="p-6">
             <div className="mb-6 rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
               <p className="text-sm font-medium leading-relaxed text-green-800 dark:text-green-300">
-                {t("approvals.approvalSuccessMessage") ||
-                  "La publicación ha sido aprobada exitosamente y está lista para ser publicada."}
+                {t('approvals.approvalSuccessMessage') ||
+                  'La publicación ha sido aprobada exitosamente y está lista para ser publicada.'}
               </p>
             </div>
 
             <div className="space-y-4">
               <div>
                 <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
-                  {t("common.publication") || "Publicación"}
+                  {t('common.publication') || 'Publicación'}
                 </label>
                 <p className="text-sm font-bold text-gray-900 dark:text-white">
                   {publicationTitle}
@@ -66,7 +66,7 @@ export default function ApprovalSuccessModal({
                 </div>
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
-                    {t("approvals.approvedBy") || "Aprobado por"}
+                    {t('approvals.approvedBy') || 'Aprobado por'}
                   </p>
                   <p className="text-sm font-bold text-gray-900 dark:text-white">{approverName}</p>
                   <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
@@ -86,7 +86,7 @@ export default function ApprovalSuccessModal({
               icon={CheckCircle}
               rounded="lg"
             >
-              {t("common.done") || "Entendido"}
+              {t('common.done') || 'Entendido'}
             </Button>
           </div>
         </DialogPanel>

@@ -5,8 +5,8 @@
  * Usado en: Settings, Content, y cualquier lugar que necesite tabs reorganizables.
  */
 
-import { useState } from "react";
-import DraggableTabs, { DraggableTab } from "./DraggableTabs";
+import { useState } from 'react';
+import DraggableTabs, { DraggableTab } from './DraggableTabs';
 import {
   Folder,
   Calendar,
@@ -20,52 +20,52 @@ import {
   Share2,
   Palette,
   Key,
-} from "lucide-react";
+} from 'lucide-react';
 
 // ============================================
 // EJEMPLO 1: Tabs de Content (con drag & drop y badges)
 // ============================================
 export function ContentTabsExample() {
-  const [activeTab, setActiveTab] = useState("publications");
+  const [activeTab, setActiveTab] = useState('publications');
   const [tabOrder, setTabOrder] = useState<string[]>([]);
 
   const tabs: DraggableTab[] = [
     {
-      id: "publications",
-      label: "Publicaciones",
+      id: 'publications',
+      label: 'Publicaciones',
       icon: Folder,
       badge: 12, // Número de publicaciones
     },
     {
-      id: "calendar",
-      label: "Calendario",
+      id: 'calendar',
+      label: 'Calendario',
       icon: Calendar,
     },
     {
-      id: "logs",
-      label: "Registros",
+      id: 'logs',
+      label: 'Registros',
       icon: FileText,
       badge: 5, // Publicaciones fallidas
     },
     {
-      id: "campaigns",
-      label: "Campañas",
+      id: 'campaigns',
+      label: 'Campañas',
       icon: Target,
       badge: 3,
     },
     {
-      id: "approvals",
-      label: "Aprobaciones",
+      id: 'approvals',
+      label: 'Aprobaciones',
       icon: CheckCircle,
       badge: 8, // Pendientes de aprobación
-      planRequired: ["professional", "enterprise"], // Solo en estos planes
+      planRequired: ['professional', 'enterprise'], // Solo en estos planes
     },
   ];
 
   const handleTabOrderChange = (newOrder: string[]) => {
     setTabOrder(newOrder);
     // Guardar en localStorage o backend
-    localStorage.setItem("content_tab_order", JSON.stringify(newOrder));
+    localStorage.setItem('content_tab_order', JSON.stringify(newOrder));
   };
 
   return (
@@ -84,53 +84,53 @@ export function ContentTabsExample() {
 // EJEMPLO 2: Tabs de Settings (con restricciones por plan)
 // ============================================
 export function SettingsTabsExample() {
-  const [activeTab, setActiveTab] = useState("overview");
-  const currentPlan = "enterprise"; // Puede ser: demo, professional, enterprise
+  const [activeTab, setActiveTab] = useState('overview');
+  const currentPlan = 'enterprise'; // Puede ser: demo, professional, enterprise
 
   const tabs: DraggableTab[] = [
     {
-      id: "overview",
-      label: "Vista General",
+      id: 'overview',
+      label: 'Vista General',
       icon: Sparkles,
       locked: true, // No se puede reorganizar (siempre primero)
     },
     {
-      id: "usage",
-      label: "Uso del Plan",
+      id: 'usage',
+      label: 'Uso del Plan',
       icon: Sparkles,
     },
     {
-      id: "general",
-      label: "General",
+      id: 'general',
+      label: 'General',
       icon: Settings,
     },
     {
-      id: "members",
-      label: "Miembros",
+      id: 'members',
+      label: 'Miembros',
       icon: Users,
       badge: 5, // Número de miembros
     },
     {
-      id: "roles",
-      label: "Roles",
+      id: 'roles',
+      label: 'Roles',
       icon: Shield,
     },
     {
-      id: "integrations",
-      label: "Integraciones",
+      id: 'integrations',
+      label: 'Integraciones',
       icon: Share2,
     },
     {
-      id: "white-label",
-      label: "White-label",
+      id: 'white-label',
+      label: 'White-label',
       icon: Palette,
-      planRequired: ["enterprise"], // Solo enterprise
+      planRequired: ['enterprise'], // Solo enterprise
     },
     {
-      id: "api",
-      label: "API Access",
+      id: 'api',
+      label: 'API Access',
       icon: Key,
-      planRequired: ["enterprise"], // Solo enterprise
+      planRequired: ['enterprise'], // Solo enterprise
     },
   ];
 
@@ -142,7 +142,7 @@ export function SettingsTabsExample() {
       isDraggable={true}
       currentPlan={currentPlan}
       onTabOrderChange={(newOrder) => {
-        console.log("Nuevo orden:", newOrder);
+        console.log('Nuevo orden:', newOrder);
       }}
     />
   );
@@ -152,13 +152,13 @@ export function SettingsTabsExample() {
 // EJEMPLO 3: Tabs estáticos (sin drag & drop)
 // ============================================
 export function StaticTabsExample() {
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeTab, setActiveTab] = useState('all');
 
   const tabs: DraggableTab[] = [
-    { id: "all", label: "Todas", icon: Folder, badge: 50 },
-    { id: "scheduled", label: "Programadas", icon: Calendar, badge: 12 },
-    { id: "published", label: "Publicadas", icon: CheckCircle, badge: 35 },
-    { id: "failed", label: "Fallidas", icon: FileText, badge: 3 },
+    { id: 'all', label: 'Todas', icon: Folder, badge: 50 },
+    { id: 'scheduled', label: 'Programadas', icon: Calendar, badge: 12 },
+    { id: 'published', label: 'Publicadas', icon: CheckCircle, badge: 35 },
+    { id: 'failed', label: 'Fallidas', icon: FileText, badge: 3 },
   ];
 
   return (
@@ -175,24 +175,24 @@ export function StaticTabsExample() {
 // EJEMPLO 4: Tabs con algunos deshabilitados
 // ============================================
 export function DisabledTabsExample() {
-  const [activeTab, setActiveTab] = useState("basic");
+  const [activeTab, setActiveTab] = useState('basic');
 
   const tabs: DraggableTab[] = [
     {
-      id: "basic",
-      label: "Básico",
+      id: 'basic',
+      label: 'Básico',
       icon: Folder,
       enabled: true,
     },
     {
-      id: "advanced",
-      label: "Avanzado",
+      id: 'advanced',
+      label: 'Avanzado',
       icon: Settings,
       enabled: false, // Este tab no se mostrará
     },
     {
-      id: "premium",
-      label: "Premium",
+      id: 'premium',
+      label: 'Premium',
       icon: Sparkles,
       enabled: true,
     },
@@ -205,33 +205,33 @@ export function DisabledTabsExample() {
 // EJEMPLO 5: Tabs con filtrado por plan
 // ============================================
 export function PlanFilteredTabsExample() {
-  const [activeTab, setActiveTab] = useState("basic");
-  const [currentPlan, setCurrentPlan] = useState<"demo" | "professional" | "enterprise">("demo");
+  const [activeTab, setActiveTab] = useState('basic');
+  const [currentPlan, setCurrentPlan] = useState<'demo' | 'professional' | 'enterprise'>('demo');
 
   const tabs: DraggableTab[] = [
     {
-      id: "basic",
-      label: "Básico",
+      id: 'basic',
+      label: 'Básico',
       icon: Folder,
       // Disponible en todos los planes
     },
     {
-      id: "analytics",
-      label: "Analytics",
+      id: 'analytics',
+      label: 'Analytics',
       icon: Target,
-      planRequired: ["professional", "enterprise"], // Solo pro y enterprise
+      planRequired: ['professional', 'enterprise'], // Solo pro y enterprise
     },
     {
-      id: "advanced",
-      label: "Avanzado",
+      id: 'advanced',
+      label: 'Avanzado',
       icon: Settings,
-      planRequired: ["enterprise"], // Solo enterprise
+      planRequired: ['enterprise'], // Solo enterprise
     },
     {
-      id: "api",
-      label: "API",
+      id: 'api',
+      label: 'API',
       icon: Key,
-      planRequired: ["enterprise"], // Solo enterprise
+      planRequired: ['enterprise'], // Solo enterprise
     },
   ];
 
@@ -239,9 +239,9 @@ export function PlanFilteredTabsExample() {
     <div>
       {/* Selector de plan para demo */}
       <div className="mb-4 flex gap-2">
-        <button onClick={() => setCurrentPlan("demo")}>Demo</button>
-        <button onClick={() => setCurrentPlan("professional")}>Professional</button>
-        <button onClick={() => setCurrentPlan("enterprise")}>Enterprise</button>
+        <button onClick={() => setCurrentPlan('demo')}>Demo</button>
+        <button onClick={() => setCurrentPlan('professional')}>Professional</button>
+        <button onClick={() => setCurrentPlan('enterprise')}>Enterprise</button>
       </div>
 
       <DraggableTabs
@@ -260,7 +260,7 @@ export function PlanFilteredTabsExample() {
 // EJEMPLO 6: Tabs con badges dinámicos
 // ============================================
 export function DynamicBadgesExample() {
-  const [activeTab, setActiveTab] = useState("pending");
+  const [activeTab, setActiveTab] = useState('pending');
   const [counts, setCounts] = useState({
     pending: 12,
     approved: 45,
@@ -269,20 +269,20 @@ export function DynamicBadgesExample() {
 
   const tabs: DraggableTab[] = [
     {
-      id: "pending",
-      label: "Pendientes",
+      id: 'pending',
+      label: 'Pendientes',
       icon: FileText,
       badge: counts.pending,
     },
     {
-      id: "approved",
-      label: "Aprobados",
+      id: 'approved',
+      label: 'Aprobados',
       icon: CheckCircle,
       badge: counts.approved,
     },
     {
-      id: "rejected",
-      label: "Rechazados",
+      id: 'rejected',
+      label: 'Rechazados',
       icon: Target,
       badge: counts.rejected,
     },
@@ -312,17 +312,17 @@ export function DynamicBadgesExample() {
 // EJEMPLO 7: Persistir orden en localStorage
 // ============================================
 export function PersistentOrderExample() {
-  const [activeTab, setActiveTab] = useState("tab1");
+  const [activeTab, setActiveTab] = useState('tab1');
 
   // Cargar orden guardado
-  const savedOrder = localStorage.getItem("my_tab_order");
+  const savedOrder = localStorage.getItem('my_tab_order');
   const initialOrder = savedOrder ? JSON.parse(savedOrder) : null;
 
   const tabs: DraggableTab[] = [
-    { id: "tab1", label: "Tab 1", icon: Folder },
-    { id: "tab2", label: "Tab 2", icon: Calendar },
-    { id: "tab3", label: "Tab 3", icon: FileText },
-    { id: "tab4", label: "Tab 4", icon: Target },
+    { id: 'tab1', label: 'Tab 1', icon: Folder },
+    { id: 'tab2', label: 'Tab 2', icon: Calendar },
+    { id: 'tab3', label: 'Tab 3', icon: FileText },
+    { id: 'tab4', label: 'Tab 4', icon: Target },
   ];
 
   // Reordenar tabs según el orden guardado
@@ -331,7 +331,7 @@ export function PersistentOrderExample() {
     : tabs;
 
   const handleTabOrderChange = (newOrder: string[]) => {
-    localStorage.setItem("my_tab_order", JSON.stringify(newOrder));
+    localStorage.setItem('my_tab_order', JSON.stringify(newOrder));
   };
 
   return (

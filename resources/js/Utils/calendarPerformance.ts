@@ -98,7 +98,7 @@ export function useRenderTimeMonitor(componentName: string, eventCount: number) 
 
     performanceMonitor.recordRender(eventCount, renderTime);
 
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV === 'development') {
       console.log(
         `${componentName} rendered in ${renderTime.toFixed(2)}ms with ${eventCount} events`,
       );

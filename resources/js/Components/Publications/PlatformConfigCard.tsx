@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useTranslation } from "react-i18next";
+import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface Quality {
   resolution?: string;
@@ -54,63 +54,63 @@ export default function PlatformConfigCard({
 
   const getPlatformIcon = (platform: string): string => {
     const icons: Record<string, string> = {
-      facebook: "📘",
-      instagram: "📷",
-      tiktok: "🎵",
-      youtube: "📺",
-      twitter: "🐦",
-      linkedin: "💼",
+      facebook: '📘',
+      instagram: '📷',
+      tiktok: '🎵',
+      youtube: '📺',
+      twitter: '🐦',
+      linkedin: '💼',
     };
-    return icons[platform] || "📱";
+    return icons[platform] || '📱';
   };
 
   const formatPlatformName = (platform: string): string => {
     const names: Record<string, string> = {
-      facebook: "Facebook",
-      instagram: "Instagram",
-      tiktok: "TikTok",
-      youtube: "YouTube",
-      twitter: "Twitter",
-      linkedin: "LinkedIn",
+      facebook: 'Facebook',
+      instagram: 'Instagram',
+      tiktok: 'TikTok',
+      youtube: 'YouTube',
+      twitter: 'Twitter',
+      linkedin: 'LinkedIn',
     };
     return names[platform] || platform;
   };
 
   const formatType = (type: string): string => {
     const types: Record<string, string> = {
-      feed: t("common.videoTypes.feed"),
-      reel: t("common.videoTypes.reel"),
-      story: t("common.videoTypes.story"),
-      short: t("common.videoTypes.short"),
-      standard: t("common.videoTypes.standard"),
-      video: t("common.videoTypes.video"),
-      tweet: t("common.videoTypes.tweet"),
-      post: t("common.videoTypes.post"),
+      feed: t('common.videoTypes.feed'),
+      reel: t('common.videoTypes.reel'),
+      story: t('common.videoTypes.story'),
+      short: t('common.videoTypes.short'),
+      standard: t('common.videoTypes.standard'),
+      video: t('common.videoTypes.video'),
+      tweet: t('common.videoTypes.tweet'),
+      post: t('common.videoTypes.post'),
     };
     return types[type] || type;
   };
 
   const formatSettingKey = (key: string): string => {
-    return key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+    return key.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
   };
 
   const formatSettingValue = (value: any): string => {
-    if (typeof value === "boolean") return value ? t("common.yes") : t("common.no");
-    if (typeof value === "object") return JSON.stringify(value);
+    if (typeof value === 'boolean') return value ? t('common.yes') : t('common.no');
+    if (typeof value === 'object') return JSON.stringify(value);
     return String(value);
   };
 
   const statusClass = !config.is_compatible
-    ? "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400"
+    ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
     : config.warnings?.length
-      ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400"
-      : "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400";
+      ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400'
+      : 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400';
 
-  const statusIcon = !config.is_compatible ? "✗" : config.warnings?.length ? "⚠" : "✓";
+  const statusIcon = !config.is_compatible ? '✗' : config.warnings?.length ? '⚠' : '✓';
 
   const cardBorderClass = config.is_compatible
-    ? "border-gray-200 dark:border-neutral-700 hover:border-blue-500 dark:hover:border-blue-500"
-    : "border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-900/10";
+    ? 'border-gray-200 dark:border-neutral-700 hover:border-blue-500 dark:hover:border-blue-500'
+    : 'border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-900/10';
 
   return (
     <div
@@ -129,7 +129,7 @@ export default function PlatformConfigCard({
         </div>
         <div className="flex items-center gap-2">
           <span className={`rounded-md px-2.5 py-1 text-xs font-semibold ${statusClass}`}>
-            {!config.is_compatible ? "Fallido" : config.warnings?.length ? "Advertencia" : "Listo"}
+            {!config.is_compatible ? 'Fallido' : config.warnings?.length ? 'Advertencia' : 'Listo'}
           </span>
           <button className="text-gray-400 transition-colors hover:text-gray-600 dark:hover:text-gray-300">
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -264,7 +264,7 @@ export default function PlatformConfigCard({
               onClick={() => setSettingsExpanded(!settingsExpanded)}
               className="flex items-center gap-1 text-xs text-gray-600 transition-colors hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
             >
-              <span>{settingsExpanded ? "▼" : "▶"}</span>
+              <span>{settingsExpanded ? '▼' : '▶'}</span>
               <span>Configuración aplicada</span>
             </button>
             {settingsExpanded && (

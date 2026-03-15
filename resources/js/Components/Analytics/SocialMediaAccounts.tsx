@@ -1,8 +1,8 @@
-import PieChart from "@/Components/Statistics/PieChart";
-import { SeededRandom } from "@/Utils/stableMock";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useRef } from "react";
-import { useTranslation } from "react-i18next";
+import PieChart from '@/Components/Statistics/PieChart';
+import { SeededRandom } from '@/Utils/stableMock';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface SocialMediaAccount {
   id: number;
@@ -16,13 +16,13 @@ interface SocialMediaAccount {
 
 interface SocialMediaAccountsProps {
   accounts: SocialMediaAccount[];
-  theme?: "light" | "dark";
+  theme?: 'light' | 'dark';
   showChart?: boolean;
 }
 
 export default function SocialMediaAccounts({
   accounts,
-  theme = "light",
+  theme = 'light',
   showChart = true,
 }: SocialMediaAccountsProps) {
   const { t } = useTranslation();
@@ -31,8 +31,8 @@ export default function SocialMediaAccounts({
   const mockAccounts: SocialMediaAccount[] = [
     {
       id: 101,
-      platform: "instagram",
-      account_name: "contentflow_oficial (Imaginaria)",
+      platform: 'instagram',
+      account_name: 'contentflow_oficial (Imaginaria)',
       followers: 15420,
       engagement_rate: 4.2,
       reach: 45000,
@@ -40,8 +40,8 @@ export default function SocialMediaAccounts({
     },
     {
       id: 102,
-      platform: "tiktok",
-      account_name: "contentflow.app (Imaginaria)",
+      platform: 'tiktok',
+      account_name: 'contentflow.app (Imaginaria)',
       followers: 54000,
       engagement_rate: 8.5,
       reach: 154000,
@@ -71,12 +71,12 @@ export default function SocialMediaAccounts({
         ]
       : mockAccounts;
 
-  const scroll = (direction: "left" | "right") => {
+  const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
       const scrollAmount = window.innerWidth > 1024 ? 400 : window.innerWidth;
       scrollContainerRef.current.scrollBy({
-        left: direction === "left" ? -scrollAmount : scrollAmount,
-        behavior: "smooth",
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
       });
     }
   };
@@ -87,7 +87,7 @@ export default function SocialMediaAccounts({
     >
       <div className="mb-8 flex flex-col items-center justify-between gap-4 md:flex-row">
         <h2 className={`text-xl font-bold text-gray-900 dark:text-gray-100`}>
-          {t("analytics.socialMedia.title")}
+          {t('analytics.socialMedia.title')}
         </h2>
       </div>
 
@@ -96,13 +96,13 @@ export default function SocialMediaAccounts({
           <h3
             className={`mb-4 text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400`}
           >
-            {t("analytics.charts.followersByPlatform")}
+            {t('analytics.charts.followersByPlatform')}
           </h3>
           <div
             className={`rounded-lg p-4 transition-colors duration-300 ${
-              theme === "dark"
-                ? "border border-neutral-700/30 bg-neutral-800/30"
-                : "border border-gray-100 bg-gray-50/50"
+              theme === 'dark'
+                ? 'border border-neutral-700/30 bg-neutral-800/30'
+                : 'border border-gray-100 bg-gray-50/50'
             }`}
           >
             <PieChart
@@ -129,21 +129,21 @@ export default function SocialMediaAccounts({
         {displayAccounts.length > 2 && (
           <>
             <button
-              onClick={() => scroll("left")}
+              onClick={() => scroll('left')}
               className={`absolute left-0 top-1/2 z-10 -ml-4 -translate-y-1/2 rounded-full p-2 opacity-0 shadow-lg transition-all disabled:opacity-0 group-hover:opacity-100 ${
-                theme === "dark"
-                  ? "bg-neutral-800 text-white hover:bg-neutral-700"
-                  : "bg-white text-gray-800 hover:bg-gray-50"
+                theme === 'dark'
+                  ? 'bg-neutral-800 text-white hover:bg-neutral-700'
+                  : 'bg-white text-gray-800 hover:bg-gray-50'
               }`}
             >
               <ChevronLeft className="h-6 w-6" />
             </button>
             <button
-              onClick={() => scroll("right")}
+              onClick={() => scroll('right')}
               className={`absolute right-0 top-1/2 z-10 -mr-4 -translate-y-1/2 rounded-full p-2 opacity-0 shadow-lg transition-all disabled:opacity-0 group-hover:opacity-100 ${
-                theme === "dark"
-                  ? "bg-neutral-800 text-white hover:bg-neutral-700"
-                  : "bg-white text-gray-800 hover:bg-gray-50"
+                theme === 'dark'
+                  ? 'bg-neutral-800 text-white hover:bg-neutral-700'
+                  : 'bg-white text-gray-800 hover:bg-gray-50'
               }`}
             >
               <ChevronRight className="h-6 w-6" />
@@ -154,21 +154,21 @@ export default function SocialMediaAccounts({
         <div
           ref={scrollContainerRef}
           className="hide-scrollbars flex snap-x snap-mandatory gap-6 overflow-x-auto pb-6"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {displayAccounts.map((account) => (
             <div
               key={account.id}
               className={`w-[85vw] shrink-0 snap-center rounded-lg p-6 transition-all duration-300 hover:scale-[1.02] sm:w-[350px] md:w-[400px] ${
-                theme === "dark"
-                  ? "border border-neutral-700/30 bg-neutral-800/30 hover:border-neutral-600/50"
-                  : "border border-gray-200 hover:border-gray-300 hover:shadow-md"
+                theme === 'dark'
+                  ? 'border border-neutral-700/30 bg-neutral-800/30 hover:border-neutral-600/50'
+                  : 'border border-gray-200 hover:border-gray-300 hover:shadow-md'
               }`}
             >
               <div className="mb-4 flex items-center justify-between">
                 <h3
                   className={`text-lg font-semibold ${
-                    theme === "dark" ? "text-gray-100" : "text-gray-900"
+                    theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
                   }`}
                 >
                   <span className="capitalize">{account.platform}</span>
@@ -181,50 +181,50 @@ export default function SocialMediaAccounts({
                 <span
                   className={`rounded-full px-3 py-1 text-xs font-medium ${
                     account.follower_growth_30d > 0
-                      ? theme === "dark"
-                        ? "bg-green-900/30 text-green-300"
-                        : "bg-green-100 text-green-800"
-                      : theme === "dark"
-                        ? "bg-primary-900/30 text-primary-300"
-                        : "bg-primary-100 text-primary-800"
+                      ? theme === 'dark'
+                        ? 'bg-green-900/30 text-green-300'
+                        : 'bg-green-100 text-green-800'
+                      : theme === 'dark'
+                        ? 'bg-primary-900/30 text-primary-300'
+                        : 'bg-primary-100 text-primary-800'
                   }`}
                 >
-                  {account.follower_growth_30d > 0 ? "+" : ""}
+                  {account.follower_growth_30d > 0 ? '+' : ''}
                   {account.follower_growth_30d}
                 </span>
               </div>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className={theme === "dark" ? "text-gray-400" : "text-gray-600"}>
-                    {t("analytics.socialMedia.followers")}
+                  <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                    {t('analytics.socialMedia.followers')}
                   </span>
                   <span
                     className={`font-semibold ${
-                      theme === "dark" ? "text-gray-100" : "text-gray-900"
+                      theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
                     }`}
                   >
                     {account.followers.toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className={theme === "dark" ? "text-gray-400" : "text-gray-600"}>
-                    {t("analytics.socialMedia.engagementRate")}
+                  <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                    {t('analytics.socialMedia.engagementRate')}
                   </span>
                   <span
                     className={`font-semibold ${
-                      theme === "dark" ? "text-gray-100" : "text-gray-900"
+                      theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
                     }`}
                   >
                     {account.engagement_rate}%
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className={theme === "dark" ? "text-gray-400" : "text-gray-600"}>
-                    {t("analytics.socialMedia.reach")}
+                  <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                    {t('analytics.socialMedia.reach')}
                   </span>
                   <span
                     className={`font-semibold ${
-                      theme === "dark" ? "text-gray-100" : "text-gray-900"
+                      theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
                     }`}
                   >
                     {account.reach.toLocaleString()}

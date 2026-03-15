@@ -1,9 +1,9 @@
-import { useMediaStore } from "@/stores/mediaStore";
-import { useUploadQueue } from "@/stores/uploadQueueStore";
-import axios, { AxiosError } from "axios";
-import { useCallback } from "react";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
+import { useMediaStore } from '@/stores/mediaStore';
+import { useUploadQueue } from '@/stores/uploadQueueStore';
+import axios, { AxiosError } from 'axios';
+import { useCallback } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Extract video metadata from file
@@ -17,8 +17,8 @@ const extractVideoMetadata = (
   aspectRatio: number;
 }> => {
   return new Promise((resolve, reject) => {
-    const video = document.createElement("video");
-    video.preload = "metadata";
+    const video = document.createElement('video');
+    video.preload = 'metadata';
 
     video.onloadedmetadata = () => {
       const duration = Math.floor(video.duration);
@@ -38,7 +38,7 @@ const extractVideoMetadata = (
 
     video.onerror = () => {
       URL.revokeObjectURL(video.src);
-      reject(new Error("Failed to load video metadata"));
+      reject(new Error('Failed to load video metadata'));
     };
 
     video.src = URL.createObjectURL(file);
@@ -67,7 +67,7 @@ export const useS3Upload = () => {
     progress[item.id] = item.progress;
     if (item.stats) stats[item.id] = item.stats;
     if (item.error) errors[item.id] = item.error;
-    if (item.status === "uploading") isUploading = true;
+    if (item.status === 'uploading') isUploading = true;
   });
 
   // Threshold for switching to Multipart Upload
@@ -102,12 +102,12 @@ export const useS3Upload = () => {
     }
 
     // Timeout errors are retryable
-    if (error.code === "ECONNABORTED" || error.message?.includes("timeout")) {
+    if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
       return true;
     }
 
     // Network errors are retryable
-    if (error.code === "NETWORK_ERROR" || error.message?.includes("Network Error")) {
+    if (error.code === 'NETWORK_ERROR' || error.message?.includes('Network Error')) {
       return true;
     }
 
@@ -121,11 +121,11 @@ export const useS3Upload = () => {
 
       if (axiosError.response?.status === 402) {
         const data = axiosError.response.data as any;
-        return data?.error || "Storage limit exceeded";
+        return data?.error || 'Storage limit exceeded';
       }
 
       if (axiosError.response?.status === 413) {
-        return "File too large for upload";
+        return 'File too large for upload';
       }
 
       if (axiosError.response?.status === 429) {
@@ -135,17 +135,17 @@ export const useS3Upload = () => {
       if (!axiosError.response) {
         return retryCount < MAX_RETRIES
           ? `Network error. Retrying in ${getRetryDelay(retryCount) / 1000}s...`
-          : "Network error. Please check your connection.";
+          : 'Network error. Please check your connection.';
       }
     }
 
-    if (error.code === "ECONNABORTED" || error.message?.includes("timeout")) {
+    if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
       return retryCount < MAX_RETRIES
         ? `Upload timed out. Retrying in ${getRetryDelay(retryCount) / 1000}s...`
-        : "Upload timed out. Please try again.";
+        : 'Upload timed out. Please try again.';
     }
 
-    return error.message || "Upload failed";
+    return error.message || 'Upload failed';
   };
 
   // Helper to calculate pending bytes from queue
@@ -154,7 +154,7 @@ export const useS3Upload = () => {
     return Object.values(currentQueue)
       .filter(
         (item) =>
-          item.id !== excludeId && (item.status === "uploading" || item.status === "pending"),
+          item.id !== excludeId && (item.status === 'uploading' || item.status === 'pending'),
       )
       .reduce((total, item) => total + item.file.size, 0);
   };
@@ -195,7 +195,7 @@ export const useS3Upload = () => {
       const pendingBytes = calculatePendingBytes(id);
 
       const { data: signData } = await axios.post(
-        route("api.v1.uploads.sign"),
+        route('api.v1.uploads.sign'),
         {
           filename: file.name,
           content_type: file.type,
@@ -215,7 +215,7 @@ export const useS3Upload = () => {
       const uploadTimeout = Math.max(60000, Math.ceil(file.size / (10 * 1024 * 1024)) * 30000);
 
       await axios.put(upload_url, file, {
-        headers: { "Content-Type": file.type },
+        headers: { 'Content-Type': file.type },
         withCredentials: false,
         signal: abortController?.signal,
         timeout: uploadTimeout,
@@ -230,7 +230,7 @@ export const useS3Upload = () => {
       };
     } catch (error: any) {
       // Check if error is due to cancellation
-      if (axios.isCancel(error) || error.name === "CanceledError") {
+      if (axios.isCancel(error) || error.name === 'CanceledError') {
         throw error; // Re-throw to be handled by caller
       }
       throw error;
@@ -250,7 +250,7 @@ export const useS3Upload = () => {
       const pendingBytes = calculatePendingBytes(id);
 
       const { data: initData } = await axios.post(
-        route("api.v1.uploads.multipart.init"),
+        route('api.v1.uploads.multipart.init'),
         {
           filename: file.name,
           content_type: file.type,
@@ -296,7 +296,7 @@ export const useS3Upload = () => {
 
       // Get presigned URL for this part
       const { data: partData } = await axios.post(
-        route("api.v1.uploads.multipart.sign-part"),
+        route('api.v1.uploads.multipart.sign-part'),
         {
           uploadId,
           partNumber,
@@ -310,7 +310,7 @@ export const useS3Upload = () => {
 
       // Upload the part
       const response = await axios.put(partData.upload_url, chunk, {
-        headers: { "Content-Type": "application/octet-stream" },
+        headers: { 'Content-Type': 'application/octet-stream' },
         withCredentials: false,
         signal: abortController?.signal,
         timeout: 120000, // 2 minute timeout per part
@@ -339,7 +339,7 @@ export const useS3Upload = () => {
         },
       });
 
-      const etag = response.headers.etag?.replace(/"/g, "");
+      const etag = response.headers.etag?.replace(/"/g, '');
       if (!etag) {
         throw new Error(`No ETag received for part ${partNumber}`);
       }
@@ -364,7 +364,7 @@ export const useS3Upload = () => {
 
     // Complete multipart upload
     const { data: completeData } = await axios.post(
-      route("api.v1.uploads.multipart.complete"),
+      route('api.v1.uploads.multipart.complete'),
       {
         uploadId,
         key,
@@ -387,9 +387,9 @@ export const useS3Upload = () => {
       const existingItem = useUploadQueue.getState().queue[tempId];
       if (
         existingItem &&
-        (existingItem.status === "uploading" || existingItem.status === "completed")
+        (existingItem.status === 'uploading' || existingItem.status === 'completed')
       ) {
-        if (existingItem.status === "completed" && existingItem.s3Key) {
+        if (existingItem.status === 'completed' && existingItem.s3Key) {
           return {
             key: existingItem.s3Key,
             filename: file.name,
@@ -403,7 +403,7 @@ export const useS3Upload = () => {
       // Add to global queue
       addUpload(tempId, file);
       updateUpload(tempId, {
-        status: "uploading",
+        status: 'uploading',
         progress: 0,
         abortController: new AbortController(),
       });
@@ -413,7 +413,7 @@ export const useS3Upload = () => {
       try {
         let result;
         // Apply optimization primarily to videos or files over threshold
-        const isVideo = file.type.startsWith("video/");
+        const isVideo = file.type.startsWith('video/');
         if (file.size >= MULTIPART_THRESHOLD || isVideo) {
           result = await uploadMultipart(file, tempId, startTime);
         } else {
@@ -422,20 +422,20 @@ export const useS3Upload = () => {
 
         // Success!
         updateUpload(tempId, {
-          status: "completed",
+          status: 'completed',
           progress: 100,
           s3Key: result.key,
         });
 
         // Sync status back to mediaStore
-        console.log("✅ Upload completed, updating mediaStore:", {
+        console.log('✅ Upload completed, updating mediaStore:', {
           tempId,
           key: result.key,
           filename: file.name,
         });
 
         useMediaStore.getState().updateFile(tempId, {
-          status: "completed",
+          status: 'completed',
           file: {
             key: result.key,
             filename: file.name,
@@ -447,7 +447,7 @@ export const useS3Upload = () => {
         // CRITICAL: If this upload is linked to a publication, attach it automatically
         const currentUpload = useUploadQueue.getState().queue[tempId];
         if (currentUpload?.publicationId) {
-          console.log("🔗 Auto-attaching media to publication:", {
+          console.log('🔗 Auto-attaching media to publication:', {
             publicationId: currentUpload.publicationId,
             key: result.key,
             filename: file.name,
@@ -455,7 +455,7 @@ export const useS3Upload = () => {
 
           // Call attach-media endpoint in background (fire and forget)
           axios
-            .post(route("api.v1.publications.attach-media", currentUpload.publicationId), {
+            .post(route('api.v1.publications.attach-media', currentUpload.publicationId), {
               key: result.key,
               filename: file.name,
               mime_type: file.type,
@@ -463,7 +463,7 @@ export const useS3Upload = () => {
             })
             .then(() => {
               console.log(
-                "✅ Media attached successfully to publication",
+                '✅ Media attached successfully to publication',
                 currentUpload.publicationId,
               );
               toast.success(`${file.name} vinculado correctamente`, {
@@ -471,7 +471,7 @@ export const useS3Upload = () => {
               });
             })
             .catch((error) => {
-              console.error("❌ Failed to attach media to publication:", error);
+              console.error('❌ Failed to attach media to publication:', error);
               toast.error(`Error al vincular ${file.name}. Intenta refrescar la página.`);
             });
         }
@@ -479,18 +479,18 @@ export const useS3Upload = () => {
         return result;
       } catch (error: any) {
         // Check if error is due to cancellation/pause
-        if (axios.isCancel(error) || error.name === "CanceledError") {
+        if (axios.isCancel(error) || error.name === 'CanceledError') {
           const currentUpload = useUploadQueue.getState().queue[tempId];
-          if (currentUpload?.status === "paused") {
+          if (currentUpload?.status === 'paused') {
             return;
-          } else if (currentUpload?.status === "cancelled") {
+          } else if (currentUpload?.status === 'cancelled') {
             removeUpload(tempId);
             useMediaStore.getState().removeFile(tempId);
             return;
           }
         }
 
-        console.error("Upload failed", error);
+        console.error('Upload failed', error);
 
         const currentUpload = useUploadQueue.getState().queue[tempId];
         const retryCount = currentUpload?.retryCount || 0;
@@ -498,7 +498,7 @@ export const useS3Upload = () => {
         const errorMessage = getErrorMessage(error, retryCount);
 
         updateUpload(tempId, {
-          status: "error",
+          status: 'error',
           error: errorMessage,
           lastError: error.message,
           canRetry,
@@ -506,7 +506,7 @@ export const useS3Upload = () => {
 
         // Sync error back to mediaStore
         useMediaStore.getState().updateFile(tempId, {
-          status: "failed",
+          status: 'failed',
         });
 
         // Show toast for non-retryable errors

@@ -1,8 +1,8 @@
-import { Dialog, Transition } from "@headlessui/react";
-import { Check, X, ZoomIn, ZoomOut } from "lucide-react";
-import { Fragment, useCallback, useState } from "react";
-import Cropper, { Area } from "react-easy-crop";
-import { useTranslation } from "react-i18next";
+import { Dialog, Transition } from '@headlessui/react';
+import { Check, X, ZoomIn, ZoomOut } from 'lucide-react';
+import { Fragment, useCallback, useState } from 'react';
+import Cropper, { Area } from 'react-easy-crop';
+import { useTranslation } from 'react-i18next';
 
 interface ImageCropperProps {
   isOpen: boolean;
@@ -39,19 +39,19 @@ export default function ImageCropper({
   const createImage = (url: string): Promise<HTMLImageElement> =>
     new Promise((resolve, reject) => {
       const image = new Image();
-      image.addEventListener("load", () => resolve(image));
-      image.addEventListener("error", (error) => reject(error));
-      image.setAttribute("crossOrigin", "anonymous");
+      image.addEventListener('load', () => resolve(image));
+      image.addEventListener('error', (error) => reject(error));
+      image.setAttribute('crossOrigin', 'anonymous');
       image.src = url;
     });
 
   const getCroppedImg = async (imageSrc: string, pixelCrop: Area): Promise<Blob> => {
     const image = await createImage(imageSrc);
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
 
     if (!ctx) {
-      throw new Error("No 2d context");
+      throw new Error('No 2d context');
     }
 
     canvas.width = pixelCrop.width;
@@ -72,11 +72,11 @@ export default function ImageCropper({
     return new Promise((resolve, reject) => {
       canvas.toBlob((blob) => {
         if (!blob) {
-          reject(new Error("Canvas is empty"));
+          reject(new Error('Canvas is empty'));
           return;
         }
         resolve(blob);
-      }, "image/jpeg");
+      }, 'image/jpeg');
     });
   };
 
@@ -121,7 +121,7 @@ export default function ImageCropper({
                   as="h3"
                   className="mb-4 flex items-center justify-between text-lg font-medium leading-6 text-gray-900 dark:text-white"
                 >
-                  {t("media.crop.title") || "Crop Image"}
+                  {t('media.crop.title') || 'Crop Image'}
                   <button
                     onClick={onClose}
                     className="text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
@@ -162,14 +162,14 @@ export default function ImageCropper({
                     onClick={onClose}
                     className="rounded-md bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700"
                   >
-                    {t("common.cancel") || "Cancel"}
+                    {t('common.cancel') || 'Cancel'}
                   </button>
                   <button
                     onClick={handleSave}
                     className="flex items-center gap-2 rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
                   >
                     <Check className="h-4 w-4" />
-                    {t("common.apply") || "Apply"}
+                    {t('common.apply') || 'Apply'}
                   </button>
                 </div>
               </Dialog.Panel>

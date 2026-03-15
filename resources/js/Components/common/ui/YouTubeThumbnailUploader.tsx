@@ -1,6 +1,6 @@
-import { Play, Trash2, Upload, X, ZoomIn } from "lucide-react";
-import { memo, useCallback, useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { Play, Trash2, Upload, X, ZoomIn } from 'lucide-react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface YouTubeThumbnailUploaderProps {
   videoId: number;
@@ -37,13 +37,13 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
 
   const validateThumbnail = useCallback((file: File): Promise<string | null> => {
     return new Promise((resolve) => {
-      if (!file.type.startsWith("image/")) {
-        resolve("Only image files are allowed");
+      if (!file.type.startsWith('image/')) {
+        resolve('Only image files are allowed');
         return;
       }
 
       if (file.size > 2 * 1024 * 1024) {
-        resolve("Image must be smaller than 2MB");
+        resolve('Image must be smaller than 2MB');
         return;
       }
 
@@ -53,14 +53,14 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
       img.onload = () => {
         URL.revokeObjectURL(objectUrl);
         if (img.width < 1280 || img.height < 720) {
-          resolve("Image must be at least 1280x720 pixels");
+          resolve('Image must be at least 1280x720 pixels');
         } else {
           resolve(null);
         }
       };
       img.onerror = () => {
         URL.revokeObjectURL(objectUrl);
-        resolve("Failed to load image");
+        resolve('Failed to load image');
       };
       img.src = objectUrl;
     });
@@ -115,7 +115,7 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
       onThumbnailDelete(videoId);
     }
     if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      fileInputRef.current.value = '';
     }
   }, [onThumbnailChange, onThumbnailDelete, videoId]);
 
@@ -222,7 +222,7 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
             onClick={handleInputClick}
             className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-opacity-80 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-300"
           >
-            {t("publications.modal.publish.button.change")}
+            {t('publications.modal.publish.button.change')}
           </button>
         </div>
       ) : (
@@ -233,18 +233,18 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
           onClick={handleInputClick}
           className={`cursor-pointer rounded-lg border-2 border-dashed p-6 text-center transition-all ${
             isDragging
-              ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20"
-              : "border-gray-200 bg-gray-50 hover:border-primary-400 dark:border-neutral-700 dark:bg-neutral-800"
+              ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+              : 'border-gray-200 bg-gray-50 hover:border-primary-400 dark:border-neutral-700 dark:bg-neutral-800'
           }`}
         >
           <Upload
-            className={`mx-auto mb-2 h-8 w-8 ${isDragging ? "text-primary-500" : "text-gray-400"}`}
+            className={`mx-auto mb-2 h-8 w-8 ${isDragging ? 'text-primary-500' : 'text-gray-400'}`}
           />
           <p className="mb-1 text-sm text-gray-700 dark:text-gray-300">
-            {t("publications.modal.publish.dragDrop.title")}
+            {t('publications.modal.publish.dragDrop.title')}
           </p>
           <p className="text-xs text-gray-500">
-            {t("publications.modal.publish.dragDrop.subtitle")}
+            {t('publications.modal.publish.dragDrop.subtitle')}
           </p>
         </div>
       )}
@@ -319,7 +319,7 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
 };
 
 // Comparación personalizada para React.memo
-YouTubeThumbnailUploader.displayName = "YouTubeThumbnailUploader";
+YouTubeThumbnailUploader.displayName = 'YouTubeThumbnailUploader';
 
 // Función de comparación que verifica si las props realmente cambiaron
 const arePropsEqual = (

@@ -1,5 +1,5 @@
-import React from "react";
-import { Upload } from "lucide-react";
+import React from 'react';
+import { Upload } from 'lucide-react';
 
 interface AddMoreButtonProps {
   onClick: () => void;
@@ -7,7 +7,7 @@ interface AddMoreButtonProps {
 
 const AddMoreButton: React.FC<AddMoreButtonProps> = ({ onClick }) => {
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" || e.key === " ") {
+    if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       onClick();
     }

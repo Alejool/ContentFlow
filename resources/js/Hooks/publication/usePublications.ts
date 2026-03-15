@@ -1,19 +1,19 @@
-import { useRealtime } from "@/Hooks/publication/useRealtime";
-import { useConfirm } from "@/Hooks/useConfirm";
-import { useSocialMediaAuth } from "@/Hooks/useSocialMediaAuth";
-import { ToastService } from "@/Services/ToastService";
-import { useCampaignStore } from "@/stores/campaignStore";
-import { useLogStore } from "@/stores/logStore";
-import { useManageContentUIStore } from "@/stores/manageContentUIStore";
-import { usePublicationStore } from "@/stores/publicationStore";
-import { PageProps } from "@/types";
-import { Publication } from "@/types/Publication";
-import { usePage } from "@inertiajs/react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { useShallow } from "zustand/react/shallow";
+import { useRealtime } from '@/Hooks/publication/useRealtime';
+import { useConfirm } from '@/Hooks/useConfirm';
+import { useSocialMediaAuth } from '@/Hooks/useSocialMediaAuth';
+import { ToastService } from '@/Services/ToastService';
+import { useCampaignStore } from '@/stores/campaignStore';
+import { useLogStore } from '@/stores/logStore';
+import { useManageContentUIStore } from '@/stores/manageContentUIStore';
+import { usePublicationStore } from '@/stores/publicationStore';
+import { PageProps } from '@/types';
+import { Publication } from '@/types/Publication';
+import { usePage } from '@inertiajs/react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useShallow } from 'zustand/react/shallow';
 
-export type ContentTab = "publications" | "campaigns" | "logs" | "calendar" | "approvals";
+export type ContentTab = 'publications' | 'campaigns' | 'logs' | 'calendar' | 'approvals';
 
 export const usePublications = () => {
   const { t } = useTranslation();
@@ -117,7 +117,7 @@ export const usePublications = () => {
   const [itemsPerPage, setItemsPerPage] = useState(12);
 
   // Use a ref to prevent loops from effect triggers
-  const lastFetchRef = useRef<string>("");
+  const lastFetchRef = useRef<string>('');
 
   const fetchData = useCallback(
     async (page = 1) => {
@@ -129,16 +129,16 @@ export const usePublications = () => {
       lastFetchRef.current = fetchKey;
 
       switch (activeTab) {
-        case "publications":
+        case 'publications':
           await fetchPublications({ ...filters, per_page: itemsPerPage }, page);
           break;
-        case "campaigns":
+        case 'campaigns':
           await fetchCampaigns({ ...filters, per_page: itemsPerPage }, page);
           break;
-        case "logs":
+        case 'logs':
           await fetchLogs({ ...filters, per_page: itemsPerPage }, page);
           break;
-        case "approvals":
+        case 'approvals':
           // Approvals tab uses its own hook (usePendingApprovals) — no fetch needed here
           break;
       }
@@ -159,7 +159,7 @@ export const usePublications = () => {
   const handlePerPageChange = useCallback((val: number) => {
     setItemsPerPage(val);
     // Scroll to top to prevent blank spaces in virtualized table
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     // fetchData will be called by useEffect when itemsPerPage changes
   }, []);
 
@@ -173,11 +173,11 @@ export const usePublications = () => {
 
   const items = (() => {
     switch (activeTab) {
-      case "publications":
+      case 'publications':
         return publications;
-      case "campaigns":
+      case 'campaigns':
         return campaigns;
-      case "logs":
+      case 'logs':
         return logs;
       default:
         return [];
@@ -186,11 +186,11 @@ export const usePublications = () => {
 
   const pagination = (() => {
     switch (activeTab) {
-      case "publications":
+      case 'publications':
         return pubPagination;
-      case "campaigns":
+      case 'campaigns':
         return campPagination;
-      case "logs":
+      case 'logs':
         return logPagination;
       default:
         return { current_page: 1, last_page: 1, total: 0, per_page: 10 };
@@ -199,12 +199,12 @@ export const usePublications = () => {
 
   const isLoading = (() => {
     switch (activeTab) {
-      case "publications":
-      case "approvals":
+      case 'publications':
+      case 'approvals':
         return isPubLoading;
-      case "campaigns":
+      case 'campaigns':
         return isCampLoading;
-      case "logs":
+      case 'logs':
         return isLogsLoading;
       default:
         return false;
@@ -248,7 +248,7 @@ export const usePublications = () => {
   const handleRefresh = useCallback(async () => {
     await fetchData(pagination.current_page);
     // If there is a selected item, refresh it from the new publications list
-    if (selectedItem && activeTab === "approvals") {
+    if (selectedItem && activeTab === 'approvals') {
       const updated = usePublicationStore
         .getState()
         .publications.find((p) => p.id === selectedItem.id);
@@ -260,14 +260,14 @@ export const usePublications = () => {
 
   const handleDeleteItem = useCallback(
     async (id: number) => {
-      const isCampaign = activeTab === "campaigns";
+      const isCampaign = activeTab === 'campaigns';
       const confirmed = await confirm({
-        title: isCampaign ? "Campaign" : "Publication",
+        title: isCampaign ? 'Campaign' : 'Publication',
         message: isCampaign
-          ? "Are you sure you want to delete this campaign? All associated publications will be unlinked"
-          : "Are you sure you want to delete this publication?",
-        confirmText: "Delete",
-        type: "danger",
+          ? 'Are you sure you want to delete this campaign? All associated publications will be unlinked'
+          : 'Are you sure you want to delete this publication?',
+        confirmText: 'Delete',
+        type: 'danger',
       });
 
       if (confirmed) {
@@ -295,7 +295,7 @@ export const usePublications = () => {
 
   const handleDuplicateItem = useCallback(
     async (id: number) => {
-      const isCampaign = activeTab === "campaigns";
+      const isCampaign = activeTab === 'campaigns';
       let success = false;
       if (isCampaign) {
         success = await duplicateCampaignAction(id);
@@ -307,14 +307,14 @@ export const usePublications = () => {
         ToastService.success(
           t(
             isCampaign
-              ? "campaigns.messages.duplicateSuccess"
-              : "publications.messages.duplicateSuccess",
+              ? 'campaigns.messages.duplicateSuccess'
+              : 'publications.messages.duplicateSuccess',
           ),
         );
         fetchData(pagination.current_page);
       } else {
         ToastService.error(
-          t(isCampaign ? "campaigns.messages.error" : "publications.messages.error"),
+          t(isCampaign ? 'campaigns.messages.error' : 'publications.messages.error'),
         );
       }
     },

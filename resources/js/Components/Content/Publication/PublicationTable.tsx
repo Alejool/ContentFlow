@@ -1,13 +1,13 @@
-import PublicationDesktopRow from "@/Components/Content/Publication/PublicationDesktopRow";
-import PublicationMobileRow from "@/Components/Content/Publication/PublicationMobileRow";
-import PublicationMobileRowSkeleton from "@/Components/Content/Publication/PublicationMobileRowSkeleton";
-import PublicationRowSkeleton from "@/Components/Content/Publication/PublicationRowSkeleton";
-import { TableHeader } from "@/Components/Content/Publication/TableHeader";
-import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
-import EmptyState from "@/Components/common/ui/EmptyState";
-import TableContainer from "@/Components/common/ui/TableContainer";
-import { Publication } from "@/types/Publication";
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import PublicationDesktopRow from '@/Components/Content/Publication/PublicationDesktopRow';
+import PublicationMobileRow from '@/Components/Content/Publication/PublicationMobileRow';
+import PublicationMobileRowSkeleton from '@/Components/Content/Publication/PublicationMobileRowSkeleton';
+import PublicationRowSkeleton from '@/Components/Content/Publication/PublicationRowSkeleton';
+import { TableHeader } from '@/Components/Content/Publication/TableHeader';
+import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
+import EmptyState from '@/Components/common/ui/EmptyState';
+import TableContainer from '@/Components/common/ui/TableContainer';
+import { Publication } from '@/types/Publication';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
 interface PublicationTableProps {
   items: Publication[];
@@ -28,7 +28,7 @@ interface PublicationTableProps {
   onPreviewMedia?: (
     media: {
       url: string;
-      type: "image" | "video";
+      type: 'image' | 'video';
       title?: string;
     }[],
     initialIndex?: number,
@@ -70,7 +70,7 @@ const PublicationTable = memo(
     }, [isLoading]);
 
     useEffect(() => {
-      const main = document.getElementsByTagName("main")[0];
+      const main = document.getElementsByTagName('main')[0];
       if (main) {
         setScrollContainer(main);
       }
@@ -78,24 +78,24 @@ const PublicationTable = memo(
 
     const getStatusColor = useCallback((status?: string) => {
       switch (status) {
-        case "published":
-          return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400";
-        case "publishing":
-          return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400";
-        case "draft":
-          return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
-        case "scheduled":
-          return "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-400";
-        case "failed":
-          return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400";
-        case "pending_review":
-          return "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400";
-        case "approved":
-          return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400";
-        case "rejected":
-          return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400";
+        case 'published':
+          return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+        case 'publishing':
+          return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+        case 'draft':
+          return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+        case 'scheduled':
+          return 'bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-400';
+        case 'failed':
+          return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+        case 'pending_review':
+          return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400';
+        case 'approved':
+          return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+        case 'rejected':
+          return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
         default:
-          return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
+          return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
       }
     }, []);
 
@@ -127,21 +127,21 @@ const PublicationTable = memo(
 
     return (
       <TableContainer
-        title={t("publications.title") || "Publicaciones"}
-        subtitle={t("publications.subtitle") || "Gestiona tu contenido en redes sociales"}
+        title={t('publications.title') || 'Publicaciones'}
+        subtitle={t('publications.subtitle') || 'Gestiona tu contenido en redes sociales'}
       >
         <div className="transition-opacity duration-300">
           <div className="hidden lg:block">
             <div className="grid grid-cols-1 grid-rows-1">
               <div
-                className={`col-start-1 row-start-1 transition-all duration-500 ${smoothLoading ? "invisible opacity-0" : "visible opacity-100"}`}
+                className={`col-start-1 row-start-1 transition-all duration-500 ${smoothLoading ? 'invisible opacity-0' : 'visible opacity-100'}`}
               >
                 {items.length === 0 ? (
                   <EmptyState
-                    title={t("publications.table.emptyState.title")}
+                    title={t('publications.table.emptyState.title')}
                     description={
-                      t("publications.table.emptyState.description") ||
-                      "No se encontraron publicaciones."
+                      t('publications.table.emptyState.description') ||
+                      'No se encontraron publicaciones.'
                     }
                     className="border-none bg-transparent shadow-none"
                   />
@@ -205,17 +205,17 @@ const PublicationTable = memo(
           <div className="lg:hidden">
             {!smoothLoading && items.length === 0 ? (
               <EmptyState
-                title={t("publications.table.emptyState.title")}
+                title={t('publications.table.emptyState.title')}
                 description={
-                  t("publications.table.emptyState.description") ||
-                  "No se encontraron publicaciones."
+                  t('publications.table.emptyState.description') ||
+                  'No se encontraron publicaciones.'
                 }
                 imageSize="sm"
               />
             ) : (
               <div className="grid grid-cols-1 grid-rows-1">
                 <div
-                  className={`col-start-1 row-start-1 transition-all duration-500 ${smoothLoading ? "invisible opacity-0" : "visible opacity-100"}`}
+                  className={`col-start-1 row-start-1 transition-all duration-500 ${smoothLoading ? 'invisible opacity-0' : 'visible opacity-100'}`}
                 >
                   <PublicationMobileRow
                     items={items}

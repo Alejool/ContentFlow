@@ -1,7 +1,7 @@
-import { router } from "@inertiajs/react";
-import { Settings, Bell, LayoutDashboard } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import SettingsTabs from "@/Components/Workspace/SettingsTabs";
+import { router } from '@inertiajs/react';
+import { Settings, Bell, LayoutDashboard } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import SettingsTabs from '@/Components/Workspace/SettingsTabs';
 
 interface AdminNavigationProps {
   currentRoute?: string;
@@ -12,26 +12,26 @@ export default function AdminNavigation({ currentRoute }: AdminNavigationProps) 
 
   const navItems = [
     {
-      id: "dashboard",
-      label: t("admin.navigation.dashboard"),
-      href: "/admin/dashboard",
+      id: 'dashboard',
+      label: t('admin.navigation.dashboard'),
+      href: '/admin/dashboard',
       icon: LayoutDashboard,
     },
     {
-      id: "system-settings",
-      label: t("admin.navigation.system_settings"),
-      href: "/admin/system-settings",
+      id: 'system-settings',
+      label: t('admin.navigation.system_settings'),
+      href: '/admin/system-settings',
       icon: Settings,
     },
     {
-      id: "system-notifications",
-      label: t("admin.navigation.system_notifications"),
-      href: "/admin/system-notifications",
+      id: 'system-notifications',
+      label: t('admin.navigation.system_notifications'),
+      href: '/admin/system-notifications',
       icon: Bell,
     },
   ];
 
-  const activeTab = navItems.find((item) => item.href === currentRoute)?.id || "dashboard";
+  const activeTab = navItems.find((item) => item.href === currentRoute)?.id || 'dashboard';
 
   const handleTabChange = (tabId: string) => {
     const item = navItems.find((nav) => nav.id === tabId);

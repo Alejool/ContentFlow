@@ -1,7 +1,7 @@
-import { useTheme } from "@/Hooks/useTheme";
-import { Moon, Sun, Monitor } from "lucide-react";
-import { useState } from "react";
-import { transitionTheme } from "@/Utils/themeTransition";
+import { useTheme } from '@/Hooks/useTheme';
+import { Moon, Sun, Monitor } from 'lucide-react';
+import { useState } from 'react';
+import { transitionTheme } from '@/Utils/themeTransition';
 
 export default function ThemeSwitcher() {
   const { theme, toggleTheme, actualTheme } = useTheme();
@@ -20,20 +20,20 @@ export default function ThemeSwitcher() {
   };
 
   const getThemeInfo = () => {
-    if (theme === "system") {
+    if (theme === 'system') {
       return {
         Icon: Monitor,
-        NextIcon: actualTheme === "dark" ? Sun : Moon,
-        nextTheme: "Light",
-        label: "System",
+        NextIcon: actualTheme === 'dark' ? Sun : Moon,
+        nextTheme: 'Light',
+        label: 'System',
       };
     }
-    const isDark = theme === "dark";
+    const isDark = theme === 'dark';
     return {
       Icon: isDark ? Moon : Sun,
       NextIcon: isDark ? Monitor : Moon,
-      nextTheme: isDark ? "System" : "Dark",
-      label: isDark ? "Dark" : "Light",
+      nextTheme: isDark ? 'System' : 'Dark',
+      label: isDark ? 'Dark' : 'Light',
     };
   };
 
@@ -51,16 +51,16 @@ export default function ThemeSwitcher() {
         <Icon
           className={`h-6 w-6 transition-all duration-500 ease-out ${
             isAnimating
-              ? "rotate-180 scale-0 opacity-0"
-              : "scale-100 opacity-100 group-hover:rotate-12 group-hover:scale-110"
+              ? 'rotate-180 scale-0 opacity-0'
+              : 'scale-100 opacity-100 group-hover:rotate-12 group-hover:scale-110'
           }`}
         />
 
         <div
           className={`absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full border border-gray-300 bg-gradient-to-br from-gray-50 to-gray-100 shadow-sm transition-all duration-500 ease-out dark:border-gray-600 dark:from-gray-800 dark:to-gray-900 ${
             isAnimating
-              ? "-rotate-90 scale-0 opacity-0"
-              : "scale-100 opacity-100 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:scale-110"
+              ? '-rotate-90 scale-0 opacity-0'
+              : 'scale-100 opacity-100 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:scale-110'
           }`}
         >
           <NextIcon className="h-3 w-3 text-gray-700 dark:text-gray-300" />

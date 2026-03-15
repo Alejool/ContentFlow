@@ -1,9 +1,9 @@
-import { useTheme } from "@/Hooks/useTheme";
-import { Moon, Sun, Monitor, Check } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
-import { transitionTheme } from "@/Utils/themeTransition";
+import { useTheme } from '@/Hooks/useTheme';
+import { Moon, Sun, Monitor, Check } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { transitionTheme } from '@/Utils/themeTransition';
 
-type ThemeOption = "light" | "dark" | "system";
+type ThemeOption = 'light' | 'dark' | 'system';
 
 export default function ThemeSelectorDropdown() {
   const { theme, setTheme, actualTheme } = useTheme();
@@ -19,11 +19,11 @@ export default function ThemeSelectorDropdown() {
     };
 
     if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isOpen]);
 
@@ -50,22 +50,22 @@ export default function ThemeSelectorDropdown() {
     description: string;
   }> = [
     {
-      value: "light",
-      label: "Light",
+      value: 'light',
+      label: 'Light',
       icon: Sun,
-      description: "Bright and clear",
+      description: 'Bright and clear',
     },
     {
-      value: "dark",
-      label: "Dark",
+      value: 'dark',
+      label: 'Dark',
       icon: Moon,
-      description: "Easy on the eyes",
+      description: 'Easy on the eyes',
     },
     {
-      value: "system",
-      label: "System",
+      value: 'system',
+      label: 'System',
       icon: Monitor,
-      description: "Follow system preference",
+      description: 'Follow system preference',
     },
   ];
 
@@ -84,7 +84,7 @@ export default function ThemeSelectorDropdown() {
         <CurrentIcon className="h-5 w-5 transition-transform duration-300 group-hover:scale-110" />
         <span className="text-sm font-medium">{currentOption?.label}</span>
         <svg
-          className={`h-4 w-4 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+          className={`h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -106,13 +106,13 @@ export default function ThemeSelectorDropdown() {
                   onClick={(e) => handleThemeChange(option.value, e)}
                   className={`flex w-full items-center gap-3 rounded-md px-3 py-2.5 transition-all duration-200 ${
                     isActive
-                      ? "bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300"
-                      : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                      ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
+                      : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
                   } group`}
                 >
                   <Icon
                     className={`h-5 w-5 transition-transform duration-200 group-hover:scale-110 ${
-                      isActive ? "text-primary-600 dark:text-primary-400" : ""
+                      isActive ? 'text-primary-600 dark:text-primary-400' : ''
                     }`}
                   />
                   <div className="flex-1 text-left">

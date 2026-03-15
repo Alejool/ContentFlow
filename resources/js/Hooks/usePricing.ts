@@ -1,6 +1,6 @@
-import { usePricingStore } from "@/stores/pricingStore";
-import { router, usePage } from "@inertiajs/react";
-import { useCallback, useEffect, useState } from "react";
+import { usePricingStore } from '@/stores/pricingStore';
+import { router, usePage } from '@inertiajs/react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface UsePricingOptions {
   isAuthenticated: boolean;
@@ -8,7 +8,7 @@ interface UsePricingOptions {
   workspaceId?: number;
 }
 
-export type ModalType = "error" | "info" | "warning" | "confirm";
+export type ModalType = 'error' | 'info' | 'warning' | 'confirm';
 
 export interface PricingModal {
   open: boolean;
@@ -22,9 +22,9 @@ export interface PricingModal {
 
 const MODAL_CLOSED: PricingModal = {
   open: false,
-  type: "info",
-  title: "",
-  message: "",
+  type: 'info',
+  title: '',
+  message: '',
 };
 
 export function usePricing({ isAuthenticated, currentPlan, workspaceId }: UsePricingOptions) {
@@ -46,16 +46,16 @@ export function usePricing({ isAuthenticated, currentPlan, workspaceId }: UsePri
 
     const channel = window.Echo.channel(`user.${auth.user.id}`);
 
-    channel.listen(".subscription.updated", (event: any) => {
+    channel.listen('.subscription.updated', (event: any) => {
       // Refresh subscription data
       checkActiveSubscription().then(() => {
         // Reload Inertia props to update UI with new subscription data
-        router.reload({ only: ["auth", "subscription", "currentPlan"] });
+        router.reload({ only: ['auth', 'subscription', 'currentPlan'] });
       });
     });
 
     return () => {
-      channel.stopListening(".subscription.updated");
+      channel.stopListening('.subscription.updated');
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, auth?.user?.id]);
@@ -67,7 +67,7 @@ export function usePricing({ isAuthenticated, currentPlan, workspaceId }: UsePri
       type: ModalType,
       title: string,
       message: string,
-      opts?: Pick<PricingModal, "actionLabel" | "onAction" | "closeLabel">,
+      opts?: Pick<PricingModal, 'actionLabel' | 'onAction' | 'closeLabel'>,
     ) => setModal({ open: true, type, title, message, ...opts }),
     [],
   );
@@ -75,33 +75,33 @@ export function usePricing({ isAuthenticated, currentPlan, workspaceId }: UsePri
   const redirectToDashboard = () => {
     // A full page reload is best here since auth props (like current_plan) are server-generated
     // and this ensures all global layouts (like the profile dropdown) reflect the new plan correctly
-    window.location.href = "/dashboard";
+    window.location.href = '/dashboard';
   };
 
   const handleSelectPlan = async (planId: string, forceCheckout: boolean = false) => {
     if (!isAuthenticated) {
-      router.visit("/register", { data: { plan: planId }, method: "get" });
+      router.visit('/register', { data: { plan: planId }, method: 'get' });
       return;
     }
 
     if (planId === currentPlan) return;
 
     // ── Free / Demo ──────────────────────────────────────────────────────
-    if (planId === "free" || planId === "demo") {
-      const PAID = ["starter", "growth", "professional", "enterprise"];
+    if (planId === 'free' || planId === 'demo') {
+      const PAID = ['starter', 'growth', 'professional', 'enterprise'];
       const hasActivePaid =
         activePlans.some((id) => PAID.includes(id)) ||
-        activeSubscriptions.some((s) => PAID.includes(s.plan) && s.status === "active");
+        activeSubscriptions.some((s) => PAID.includes(s.plan) && s.status === 'active');
 
       if (hasActivePaid) {
         showModal(
-          "warning",
-          "Cambio bloqueado",
-          "No puedes cambiar a un plan gratuito mientras tengas una suscripción de pago activa.\nPrimero debes cancelar tu suscripción actual.",
+          'warning',
+          'Cambio bloqueado',
+          'No puedes cambiar a un plan gratuito mientras tengas una suscripción de pago activa.\nPrimero debes cancelar tu suscripción actual.',
           {
-            actionLabel: "Ir a Facturación",
-            onAction: () => router.visit("/subscription/billing"),
-            closeLabel: "Cerrar",
+            actionLabel: 'Ir a Facturación',
+            onAction: () => router.visit('/subscription/billing'),
+            closeLabel: 'Cerrar',
           },
         );
         return;
@@ -109,18 +109,18 @@ export function usePricing({ isAuthenticated, currentPlan, workspaceId }: UsePri
 
       setIsLoading(planId);
       router.post(
-        "/api/v1/subscription/activate-free-plan",
+        '/api/v1/subscription/activate-free-plan',
         { plan: planId },
         {
           onSuccess: () => {
-            window.dispatchEvent(new CustomEvent("subscription-plan-changed"));
+            window.dispatchEvent(new CustomEvent('subscription-plan-changed'));
             redirectToDashboard();
           },
           onError: () => {
             showModal(
-              "error",
-              "Error al activar plan",
-              "No se pudo activar el plan. Por favor, inténtalo de nuevo.",
+              'error',
+              'Error al activar plan',
+              'No se pudo activar el plan. Por favor, inténtalo de nuevo.',
             );
           },
           onFinish: () => setIsLoading(null),
@@ -134,13 +134,13 @@ export function usePricing({ isAuthenticated, currentPlan, workspaceId }: UsePri
     if (forceCheckout) {
       setIsLoading(planId);
       try {
-        const checkoutResponse = await fetch("/api/v1/subscription/checkout", {
-          method: "POST",
+        const checkoutResponse = await fetch('/api/v1/subscription/checkout', {
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            "X-CSRF-TOKEN":
-              document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || "",
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            'X-CSRF-TOKEN':
+              document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
           },
           body: JSON.stringify({ plan: planId, workspace_id: workspaceId }),
         });
@@ -150,11 +150,11 @@ export function usePricing({ isAuthenticated, currentPlan, workspaceId }: UsePri
 
         if (!checkoutResponse.ok) {
           showModal(
-            "error",
-            "Error al procesar el pago",
-            checkoutData.error === "Invalid plan configuration"
-              ? "Este plan requiere configuración de Stripe. Contacta al administrador."
-              : checkoutData.message || checkoutData.error || "Error al procesar el pago.",
+            'error',
+            'Error al procesar el pago',
+            checkoutData.error === 'Invalid plan configuration'
+              ? 'Este plan requiere configuración de Stripe. Contacta al administrador.'
+              : checkoutData.message || checkoutData.error || 'Error al procesar el pago.',
           );
           return;
         }
@@ -163,14 +163,14 @@ export function usePricing({ isAuthenticated, currentPlan, workspaceId }: UsePri
           window.location.href = checkoutData.url;
         } else {
           showModal(
-            "error",
-            "Error al crear sesión de pago",
-            "No se pudo crear la sesión de pago.",
+            'error',
+            'Error al crear sesión de pago',
+            'No se pudo crear la sesión de pago.',
           );
         }
       } catch {
         setIsLoading(null);
-        showModal("error", "Error de conexión", "No se pudo conectar con el servidor.");
+        showModal('error', 'Error de conexión', 'No se pudo conectar con el servidor.');
       }
       return;
     }
@@ -178,13 +178,13 @@ export function usePricing({ isAuthenticated, currentPlan, workspaceId }: UsePri
     // Si NO es forceCheckout, intentar cambio automático (desde la tabla)
     setIsLoading(planId);
     try {
-      const changeResponse = await fetch("/api/v1/subscription/change-plan", {
-        method: "POST",
+      const changeResponse = await fetch('/api/v1/subscription/change-plan', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "X-CSRF-TOKEN":
-            document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || "",
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          'X-CSRF-TOKEN':
+            document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
         },
         body: JSON.stringify({ plan: planId, workspace_id: workspaceId }),
       });
@@ -194,7 +194,7 @@ export function usePricing({ isAuthenticated, currentPlan, workspaceId }: UsePri
       // ── Success → reload data and redirect ─────────────────────────
       if (changeResponse.ok && changeData.success) {
         // Dispatch event FIRST
-        window.dispatchEvent(new CustomEvent("subscription-plan-changed"));
+        window.dispatchEvent(new CustomEvent('subscription-plan-changed'));
 
         // Wait a bit for WebSocket to propagate
         await new Promise((resolve) => setTimeout(resolve, 500));
@@ -209,11 +209,11 @@ export function usePricing({ isAuthenticated, currentPlan, workspaceId }: UsePri
           onSuccess: () => {
             // Show success message after reload
             showModal(
-              "info",
-              "Plan actualizado",
+              'info',
+              'Plan actualizado',
               `Tu plan ha sido cambiado exitosamente a ${changeData.plan}.`,
               {
-                closeLabel: "Entendido",
+                closeLabel: 'Entendido',
               },
             );
           },
@@ -227,14 +227,14 @@ export function usePricing({ isAuthenticated, currentPlan, workspaceId }: UsePri
       // ── 403 — cancellation required ──────────────────────────────────
       if (changeResponse.status === 403 && changeData.requires_cancellation) {
         showModal(
-          "warning",
-          "Cancelación requerida",
+          'warning',
+          'Cancelación requerida',
           changeData.message ||
-            "No puedes cambiar manualmente a ese plan mientras tengas una suscripción activa.",
+            'No puedes cambiar manualmente a ese plan mientras tengas una suscripción activa.',
           {
-            actionLabel: "Ir a Facturación",
-            onAction: () => router.visit("/subscription/billing"),
-            closeLabel: "Entendido",
+            actionLabel: 'Ir a Facturación',
+            onAction: () => router.visit('/subscription/billing'),
+            closeLabel: 'Entendido',
           },
         );
         return;
@@ -249,13 +249,13 @@ export function usePricing({ isAuthenticated, currentPlan, workspaceId }: UsePri
 
       if (changeResponse.status === 402 && changeData.requires_checkout) {
         setIsLoading(planId); // keep spinner while redirecting to Stripe
-        const checkoutResponse = await fetch("/api/v1/subscription/checkout", {
-          method: "POST",
+        const checkoutResponse = await fetch('/api/v1/subscription/checkout', {
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            "X-CSRF-TOKEN":
-              document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || "",
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            'X-CSRF-TOKEN':
+              document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
           },
           body: JSON.stringify({ plan: planId, workspace_id: workspaceId }),
         });
@@ -265,11 +265,11 @@ export function usePricing({ isAuthenticated, currentPlan, workspaceId }: UsePri
 
         if (!checkoutResponse.ok) {
           showModal(
-            "error",
-            "Error al procesar el pago",
-            checkoutData.error === "Invalid plan configuration"
-              ? "Este plan requiere configuración de Stripe. Contacta al administrador."
-              : checkoutData.message || checkoutData.error || "Error al procesar el pago.",
+            'error',
+            'Error al procesar el pago',
+            checkoutData.error === 'Invalid plan configuration'
+              ? 'Este plan requiere configuración de Stripe. Contacta al administrador.'
+              : checkoutData.message || checkoutData.error || 'Error al procesar el pago.',
           );
           return;
         }
@@ -278,36 +278,36 @@ export function usePricing({ isAuthenticated, currentPlan, workspaceId }: UsePri
           window.location.href = checkoutData.url;
         } else {
           showModal(
-            "error",
-            "Error al crear sesión de pago",
-            "No se pudo crear la sesión de pago.",
+            'error',
+            'Error al crear sesión de pago',
+            'No se pudo crear la sesión de pago.',
           );
         }
         return;
       }
 
       showModal(
-        "error",
-        "Error al cambiar el plan",
-        changeData.message || changeData.error || "Error inesperado.",
+        'error',
+        'Error al cambiar el plan',
+        changeData.message || changeData.error || 'Error inesperado.',
       );
     } catch {
       setIsLoading(null);
-      showModal("error", "Error de conexión", "No se pudo conectar con el servidor.");
+      showModal('error', 'Error de conexión', 'No se pudo conectar con el servidor.');
     }
   };
 
   const checkActiveSubscription = async (): Promise<boolean> => {
     try {
-      const url = new URL("/api/v1/subscription/check-active", window.location.origin);
-      if (workspaceId) url.searchParams.append("workspace_id", workspaceId.toString());
+      const url = new URL('/api/v1/subscription/check-active', window.location.origin);
+      if (workspaceId) url.searchParams.append('workspace_id', workspaceId.toString());
 
       const response = await fetch(url.toString(), {
-        method: "GET",
+        method: 'GET',
         headers: {
-          Accept: "application/json",
-          "X-CSRF-TOKEN":
-            document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || "",
+          Accept: 'application/json',
+          'X-CSRF-TOKEN':
+            document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
         },
       });
 
@@ -319,13 +319,13 @@ export function usePricing({ isAuthenticated, currentPlan, workspaceId }: UsePri
         return data.has_active_subscription || false;
       }
     } catch (err) {
-      console.error("Error checking subscription:", err);
+      console.error('Error checking subscription:', err);
     }
     return false;
   };
 
   const formatPrice = (price: number) =>
-    billingCycle === "yearly" ? Math.floor(price * 12 * 0.8) : price;
+    billingCycle === 'yearly' ? Math.floor(price * 12 * 0.8) : price;
 
   const isPlanCurrent = (planId: string) => currentPlan === planId;
 

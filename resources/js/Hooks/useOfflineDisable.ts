@@ -1,4 +1,4 @@
-import { useOffline } from "./useOffline";
+import { useOffline } from './useOffline';
 
 /**
  * Options for useOfflineDisable hook
@@ -17,8 +17,8 @@ interface UseOfflineDisableReturn {
   offlineProps: {
     disabled: boolean;
     title?: string;
-    "aria-disabled"?: boolean;
-    "data-offline-disabled"?: boolean;
+    'aria-disabled'?: boolean;
+    'data-offline-disabled'?: boolean;
   };
 }
 
@@ -43,7 +43,7 @@ export function useOfflineDisable(options: UseOfflineDisableOptions = {}): UseOf
   const { isOnline } = useOffline();
   const {
     requiresConnection = false,
-    offlineMessage = "This feature requires an internet connection",
+    offlineMessage = 'This feature requires an internet connection',
   } = options;
 
   // Determine if should be disabled
@@ -55,8 +55,8 @@ export function useOfflineDisable(options: UseOfflineDisableOptions = {}): UseOf
     disabled: isDisabled,
     ...(isDisabled && {
       title: offlineMessage,
-      "aria-disabled": true,
-      "data-offline-disabled": true,
+      'aria-disabled': true,
+      'data-offline-disabled': true,
     }),
   };
 

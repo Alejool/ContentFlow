@@ -1,40 +1,35 @@
-import { ApprovalRequest } from "@/types/ApprovalTypes";
-import axios from "axios";
-import { useCallback, useEffect, useState } from "react";
+import { queryKeys } from '@/lib/queryKeys';
+import { ApprovalRequest } from '@/types/ApprovalTypes';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 
-interface UsePendingApprovalsReturn {
-  requests: ApprovalRequest[];
-  isLoading: boolean;
-  refresh: () => void;
+async function fetchPendingApprovalsFn(type = 'to_approve'): Promise<ApprovalRequest[]> {
+  const response = await axios.get(route('api.v1.approvals.pending'), { params: { type } });
+  return response.data.requests ?? [];
 }
 
-export function usePendingApprovals(refreshTrigger?: number): UsePendingApprovalsReturn {
-  const [requests, setRequests] = useState<ApprovalRequest[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+/**
+ * Fetch pending approval requests.
+ * `refreshTrigger` kept for backward compat — incrementing it forces a refetch.
+ */
+export function usePendingApprovals(refreshTrigger?: number) {
+  const queryClient = useQueryClient();
 
-  const fetchPending = useCallback(async () => {
-    console.log("[usePendingApprovals] Fetching pending approvals...");
-    setIsLoading(true);
-    try {
-      const response = await axios.get(route("api.v1.approvals.pending"), {
-        params: {
-          type: "to_approve", // Explicitly request approvals to review
-        },
-      });
-      console.log("[usePendingApprovals] Received:", response.data);
-      setRequests(response.data.requests ?? []);
-    } catch (error) {
-      console.error("[usePendingApprovals] Error fetching:", error);
-      setRequests([]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const query = useQuery({
+    queryKey: queryKeys.approvals.pending('to_approve'),
+    queryFn: () => fetchPendingApprovalsFn('to_approve'),
+    staleTime: 60 * 1000, // 1 min
+  });
 
-  useEffect(() => {
-    console.log("[usePendingApprovals] Effect triggered, refreshTrigger:", refreshTrigger);
-    fetchPending();
-  }, [fetchPending, refreshTrigger]);
+  // When refreshTrigger changes, invalidate so the query refetches
+  // (replaces the old useEffect pattern)
+  if (refreshTrigger !== undefined) {
+    queryClient.invalidateQueries({ queryKey: queryKeys.approvals.all });
+  }
 
-  return { requests, isLoading, refresh: fetchPending };
+  return {
+    requests: query.data ?? [],
+    isLoading: query.isLoading,
+    refresh: query.refetch,
+  };
 }

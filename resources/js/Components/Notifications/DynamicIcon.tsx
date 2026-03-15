@@ -10,8 +10,8 @@ import {
   Settings,
   X,
   XCircle,
-} from "lucide-react";
-import React from "react";
+} from 'lucide-react';
+import React from 'react';
 
 export const ICON_MAP: Record<string, any> = {
   Bell,

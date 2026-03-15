@@ -1,9 +1,9 @@
-import CampaignTags from "@/Components/Content/Publication/CampaignTags";
-import PublicationThumbnail from "@/Components/Content/Publication/PublicationThumbnail";
-import SocialAccountsDisplay from "@/Components/Content/Publication/SocialAccountsDisplay";
-import { Publication } from "@/types/Publication";
-import { usePage } from "@inertiajs/react";
-import { Copy, Edit, Eye, Image, Repeat, Rocket, Trash2, Video } from "lucide-react";
+import CampaignTags from '@/Components/Content/Publication/CampaignTags';
+import PublicationThumbnail from '@/Components/Content/Publication/PublicationThumbnail';
+import SocialAccountsDisplay from '@/Components/Content/Publication/SocialAccountsDisplay';
+import { Publication } from '@/types/Publication';
+import { usePage } from '@inertiajs/react';
+import { Copy, Edit, Eye, Image, Repeat, Rocket, Trash2, Video } from 'lucide-react';
 
 interface PublicationRowProps {
   item: Publication;
@@ -31,14 +31,14 @@ export default function PublicationRow({
   onDuplicate,
 }: PublicationRowProps) {
   const { auth } = usePage<any>().props;
-  const canManageContent = auth.current_workspace?.permissions?.includes("manage-content");
+  const canManageContent = auth.current_workspace?.permissions?.includes('manage-content');
 
   const countMediaFiles = (pub: Publication) => {
     if (!pub.media_files || pub.media_files.length === 0) {
       return { images: 0, videos: 0, total: 0 };
     }
-    const images = pub.media_files.filter((f) => f.file_type.includes("image")).length;
-    const videos = pub.media_files.filter((f) => f.file_type.includes("video")).length;
+    const images = pub.media_files.filter((f) => f.file_type.includes('image')).length;
+    const videos = pub.media_files.filter((f) => f.file_type.includes('video')).length;
     return { images, videos, total: pub.media_files.length };
   };
 
@@ -54,10 +54,10 @@ export default function PublicationRow({
           </div>
           <div>
             <h3 className="flex items-center gap-1.5 text-sm font-medium text-gray-900 dark:text-white">
-              {item.title || "Untitled"}
+              {item.title || 'Untitled'}
               {item.is_recurring && (
                 <span
-                  title={t("publications.recurring") || "Recurrente"}
+                  title={t('publications.recurring') || 'Recurrente'}
                   className="flex items-center"
                 >
                   <Repeat className="h-3.5 w-3.5 text-primary-500" />
@@ -65,10 +65,10 @@ export default function PublicationRow({
               )}
             </h3>
             <p className="mt-0.5 line-clamp-1 text-xs text-gray-500 dark:text-gray-400">
-              {item.description || "No description"}
+              {item.description || 'No description'}
             </p>
             {item.platform_settings &&
-              typeof item.platform_settings === "object" &&
+              typeof item.platform_settings === 'object' &&
               !Array.isArray(item.platform_settings) &&
               Object.keys(item.platform_settings).length > 0 && (
                 <div className="mt-1 flex flex-wrap gap-1">
@@ -77,40 +77,40 @@ export default function PublicationRow({
                       if (!settings) return null;
 
                       // For Twitter polls/threads
-                      if (platform === "twitter" && settings.type) {
+                      if (platform === 'twitter' && settings.type) {
                         return (
                           <span
                             key={platform}
                             className="inline-flex items-center rounded border border-sky-200 bg-sky-100 px-1.5 py-0.5 text-[10px] font-medium text-sky-800 dark:border-sky-800 dark:bg-sky-900/30 dark:text-sky-400"
                           >
-                            Twitter:{" "}
-                            {settings.type === "poll"
-                              ? "Poll"
-                              : settings.type === "thread"
-                                ? "Thread"
-                                : "Tweet"}
+                            Twitter:{' '}
+                            {settings.type === 'poll'
+                              ? 'Poll'
+                              : settings.type === 'thread'
+                                ? 'Thread'
+                                : 'Tweet'}
                           </span>
                         );
                       }
-                      if (platform === "youtube" && settings.type) {
+                      if (platform === 'youtube' && settings.type) {
                         return (
                           <span
                             key={platform}
                             className="inline-flex items-center rounded border border-red-200 bg-red-100 px-1.5 py-0.5 text-[10px] font-medium text-red-800 dark:border-red-800 dark:bg-red-900/30 dark:text-red-400"
                           >
-                            YouTube: {settings.type === "short" ? "Short" : "Video"}
+                            YouTube: {settings.type === 'short' ? 'Short' : 'Video'}
                           </span>
                         );
                       }
 
                       // For Facebook Reels
-                      if (platform === "facebook" && settings.type) {
+                      if (platform === 'facebook' && settings.type) {
                         return (
                           <span
                             key={platform}
                             className="inline-flex items-center rounded border border-blue-200 bg-blue-100 px-1.5 py-0.5 text-[10px] font-medium text-blue-800 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-400"
                           >
-                            FB: {settings.type === "reel" ? "Reel" : "Post"}
+                            FB: {settings.type === 'reel' ? 'Reel' : 'Post'}
                           </span>
                         );
                       }
@@ -129,7 +129,7 @@ export default function PublicationRow({
             item.status,
           )}`}
         >
-          {t(`publications.status.${item.status || "draft"}`)}
+          {t(`publications.status.${item.status || 'draft'}`)}
         </span>
       </td>
       <td className="px-6 py-4 text-sm text-gray-500">
@@ -180,9 +180,9 @@ export default function PublicationRow({
                   }
                 }}
                 className={`p-2 ${
-                  item.status === "published" ? "text-amber-500" : "text-blue-500"
+                  item.status === 'published' ? 'text-amber-500' : 'text-blue-500'
                 } rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20`}
-                title={item.status === "published" ? "Unpublish to Edit" : "Edit"}
+                title={item.status === 'published' ? 'Unpublish to Edit' : 'Edit'}
               >
                 <Edit className="h-4 w-4" />
               </button>

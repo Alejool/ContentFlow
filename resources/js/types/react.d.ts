@@ -1,7 +1,7 @@
 /// <reference types="react" />
 /// <reference types="react-dom" />
 
-import "react";
+import 'react';
 
 declare global {
   namespace JSX {
