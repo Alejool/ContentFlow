@@ -1,201 +1,193 @@
-import { Combobox, Dialog, Transition } from '@headlessui/react';
-import { router } from '@inertiajs/react';
-import {
-    Calendar,
-    Command,
-    FileText,
-    LayoutDashboard,
-    LogOut,
-    Plus,
-    Search,
-    Settings,
-    Target,
-} from 'lucide-react';
-import { Fragment, useEffect, useState } from 'react';
-
-interface CommandItem {
-  name: string;
-  href?: string;
-  action?: () => void;
-  icon: React.ComponentType<{ className?: string; 'aria-hidden'?: string }>;
-}
+import { useCommandPalette, type CommandItem } from '@/Hooks/useCommandPalette';
+import { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions, Dialog, DialogPanel } from '@headlessui/react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Command, Search } from 'lucide-react';
+import { Fragment } from 'react';
+import { CATEGORY_LABELS, COMMAND_PALETTE_COMMANDS } from './commandPaletteCommands';
 
 export default function CommandPalette() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [query, setQuery] = useState('');
+    const {
+        isOpen,
+        query,
+        setQuery,
+        groupedCommands,
+        handleSelect,
+        setIsOpen,
+    } = useCommandPalette(COMMAND_PALETTE_COMMANDS);
 
-  // Toggle with Cmd+K or Ctrl+K or custom event
-  useEffect(() => {
-    const onKeydown = (event: KeyboardEvent) => {
-      if (event.key === 'k' && (event.metaKey || event.ctrlKey)) {
-        event.preventDefault();
-        setIsOpen(!isOpen);
-      }
-    };
+    const hasResults = Object.keys(groupedCommands).length > 0;
 
-    const onOpenEvent = () => setIsOpen(true);
+    return (
+        <AnimatePresence>
+            {isOpen && (
+                <Dialog
+                    as="div"
+                    className="relative z-50"
+                    onClose={setIsOpen}
+                    open={isOpen}
+                >
+                    {/* Backdrop */}
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="fixed inset-0 bg-gray-500/25 backdrop-blur-sm dark:bg-black/50"
+                    />
 
-    window.addEventListener('keydown', onKeydown);
-    window.addEventListener('open-command-palette', onOpenEvent);
+                    {/* Dialog container */}
+                    <div className="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-20">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: -20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: -20 }}
+                            transition={{ duration: 0.2, ease: 'easeOut' }}
+                            className="mx-auto max-w-2xl"
+                        >
+                            <DialogPanel className="transform divide-y divide-gray-100 overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black/5 dark:divide-gray-800 dark:bg-gray-900">
+                                <Combobox
+                                    onChange={(item: CommandItem | null) => {
+                                        if (item) handleSelect(item);
+                                    }}
+                                >
+                                    {/* Search Input */}
+                                    <div className="relative">
+                                        <Search
+                                            className="pointer-events-none absolute left-4 top-3.5 h-5 w-5 text-gray-400"
+                                            aria-hidden="true"
+                                        />
+                                        <ComboboxInput
+                                            className="h-12 w-full border-0 bg-transparent pl-11 pr-4 text-gray-900 placeholder:text-gray-400 focus:ring-0 dark:text-gray-100 sm:text-sm"
+                                            placeholder="Escribe un comando o busca..."
+                                            onChange={(event) => setQuery(event.target.value)}
+                                            value={query}
+                                            autoComplete="off"
+                                        />
+                                    </div>
 
-    return () => {
-      window.removeEventListener('keydown', onKeydown);
-      window.removeEventListener('open-command-palette', onOpenEvent);
-    };
-  }, [isOpen]);
+                                    {/* Results */}
+                                    {hasResults && (
+                                        <ComboboxOptions
+                                            static
+                                            className="max-h-[28rem] scroll-py-2 overflow-y-auto p-2"
+                                        >
+                                            {Object.entries(groupedCommands).map(([category, items]) => (
+                                                <div key={category} className="mb-2">
+                                                    {/* Category Label */}
+                                                    <div className="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400">
+                                                        {CATEGORY_LABELS[category] || category}
+                                                    </div>
 
-  const navigation = [
-    { name: 'Dashboard', href: route('dashboard'), icon: LayoutDashboard },
-    { name: 'Gestionar Contenido', href: '/content', icon: FileText },
-    {
-      name: 'Planificador',
-      href: '/content?tab=calendar',
-      icon: Calendar,
-    },
-    {
-      name: 'Espacios de Trabajo',
-      href: route('workspaces.index'),
-      icon: Target,
-    },
-    { name: 'Configuración', href: route('profile.edit'), icon: Settings },
-  ];
+                                                    {/* Category Items */}
+                                                    {items.map((item) => (
+                                                        <ComboboxOption
+                                                            key={item.id}
+                                                            value={item}
+                                                            as={Fragment}
+                                                        >
+                                                            {({ focus }) => (
+                                                                <div
+                                                                    className={`flex cursor-pointer select-none items-center rounded-lg p-3 transition-colors ${
+                                                                        focus
+                                                                            ? 'bg-gray-100 dark:bg-gray-800'
+                                                                            : ''
+                                                                    }`}
+                                                                >
+                                                                    {/* Icon */}
+                                                                    <div
+                                                                        className={`flex h-10 w-10 flex-none items-center justify-center rounded-lg transition-colors ${
+                                                                            focus
+                                                                                ? 'bg-white dark:bg-gray-700'
+                                                                                : 'bg-gray-50 dark:bg-gray-800'
+                                                                        }`}
+                                                                    >
+                                                                        <item.icon
+                                                                            className={`h-5 w-5 transition-colors ${
+                                                                                focus
+                                                                                    ? 'text-primary-600 dark:text-primary-400'
+                                                                                    : 'text-gray-500 dark:text-gray-400'
+                                                                            }`}
+                                                                            aria-hidden="true"
+                                                                        />
+                                                                    </div>
 
-  const actions = [
-    {
-      name: 'Crear publicación',
-      action: () => router.visit('/content?action=create'),
-      icon: Plus,
-    },
-    {
-      name: 'Cerrar sesión',
-      action: () => router.post(route('logout')),
-      icon: LogOut,
-    },
-  ];
+                                                                    {/* Text */}
+                                                                    <div className="ml-4 flex-auto">
+                                                                        <p
+                                                                            className={`text-sm font-medium transition-colors ${
+                                                                                focus
+                                                                                    ? 'text-gray-900 dark:text-white'
+                                                                                    : 'text-gray-700 dark:text-gray-300'
+                                                                            }`}
+                                                                        >
+                                                                            {item.name}
+                                                                        </p>
+                                                                        {item.description && (
+                                                                            <p
+                                                                                className={`text-xs transition-colors ${
+                                                                                    focus
+                                                                                        ? 'text-gray-500 dark:text-gray-400'
+                                                                                        : 'text-gray-500 dark:text-gray-500'
+                                                                                }`}
+                                                                            >
+                                                                                {item.description}
+                                                                            </p>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </ComboboxOption>
+                                                    ))}
+                                                </div>
+                                            ))}
+                                        </ComboboxOptions>
+                                    )}
 
-  // Combine and filter
-  const filteredItems =
-    query === ''
-      ? [...navigation, ...actions]
-      : [...navigation, ...actions].filter((item) =>
-          item.name.toLowerCase().includes(query.toLowerCase()),
-        );
+                                    {/* Empty State */}
+                                    {query !== '' && !hasResults && (
+                                        <motion.div
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            className="px-6 py-14 text-center text-sm sm:px-14"
+                                        >
+                                            <Command
+                                                className="mx-auto h-6 w-6 text-gray-400"
+                                                aria-hidden="true"
+                                            />
+                                            <p className="mt-4 font-semibold text-gray-900 dark:text-white">
+                                                No se encontraron resultados
+                                            </p>
+                                            <p className="mt-2 text-gray-500">
+                                                No pudimos encontrar nada para &ldquo;{query}&rdquo;.
+                                                Intenta con otra cosa.
+                                            </p>
+                                        </motion.div>
+                                    )}
 
-  const handleSelect = (item: CommandItem) => {
-    setIsOpen(false);
-    setQuery('');
-
-    if (item.href) {
-      router.visit(item.href);
-    } else if (item.action) {
-      item.action();
-    }
-  };
-
-  return (
-    <Transition.Root show={isOpen} as={Fragment} afterLeave={() => setQuery('')} appear>
-      <Dialog as="div" className="relative z-50" onClose={setIsOpen}>
-        <Transition.Child
-          as={Fragment}
-          enter="ease-out duration-300"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="ease-in duration-200"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
-          <div className="fixed inset-0 bg-gray-500/25 backdrop-blur-sm transition-opacity dark:bg-black/50" />
-        </Transition.Child>
-
-        <div className="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-20 md:p-20 lg:p-20">
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0 scale-95"
-            enterTo="opacity-100 scale-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100 scale-100"
-            leaveTo="opacity-0 scale-95"
-          >
-            <Dialog.Panel className="mx-auto max-w-2xl transform divide-y divide-gray-100 overflow-hidden rounded-lg bg-white shadow-2xl ring-1 ring-black/5 transition-all dark:divide-gray-800 dark:bg-gray-900">
-              <Combobox onChange={(item: CommandItem) => handleSelect(item)}>
-                <div className="relative">
-                  <Search
-                    className="pointer-events-none absolute left-4 top-3.5 h-5 w-5 text-gray-400"
-                    aria-hidden="true"
-                  />
-                  <Combobox.Input
-                    className="h-12 w-full border-0 bg-transparent pl-11 pr-4 text-gray-900 placeholder:text-gray-400 focus:ring-0 dark:text-gray-100 sm:text-sm"
-                    placeholder="Escribe un comando o busca..."
-                    onChange={(event) => setQuery(event.target.value)}
-                    autoComplete="off"
-                  />
-                </div>
-
-                {filteredItems.length > 0 && (
-                  <Combobox.Options static className="max-h-96 scroll-py-3 overflow-y-auto p-3">
-                    {filteredItems.map((item) => (
-                      <Combobox.Option
-                        key={item.name}
-                        value={item}
-                        className={({ active }) =>
-                          `flex cursor-default select-none rounded-lg p-3 px-3 py-2 transition-colors ${
-                            active ? 'bg-gray-100 dark:bg-gray-800' : ''
-                          }`
-                        }
-                      >
-                        {({ active }) => (
-                          <>
-                            <div
-                              className={`flex h-10 w-10 flex-none items-center justify-center rounded-lg ${active ? 'bg-white dark:bg-gray-700' : 'bg-gray-50 dark:bg-gray-800'}`}
-                            >
-                              <item.icon
-                                className={`h-5 w-5 ${active ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400'}`}
-                                aria-hidden="true"
-                              />
-                            </div>
-                            <div className="my-auto ml-4 flex-auto">
-                              <p
-                                className={`text-sm font-medium ${active ? 'text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-300'}`}
-                              >
-                                {item.name}
-                              </p>
-                              <p
-                                className={`text-xs ${active ? 'text-gray-500 dark:text-gray-400' : 'text-gray-500 dark:text-gray-500'}`}
-                              >
-                                {'href' in item ? 'Ir a...' : 'Acción'}
-                              </p>
-                            </div>
-                          </>
-                        )}
-                      </Combobox.Option>
-                    ))}
-                  </Combobox.Options>
-                )}
-
-                {query !== '' && filteredItems.length === 0 && (
-                  <div className="px-6 py-14 text-center text-sm sm:px-14">
-                    <Command className="mx-auto h-6 w-6 text-gray-400" aria-hidden="true" />
-                    <p className="mt-4 font-semibold text-gray-900 dark:text-white">
-                      No se encontraron resultados
-                    </p>
-                    <p className="mt-2 text-gray-500">
-                      No pudimos encontrar nada para &ldquo;{query}&rdquo;. Intenta con otra cosa.
-                    </p>
-                  </div>
-                )}
-
-                <div className="flex flex-wrap items-center bg-gray-50 px-4 py-2.5 text-xs text-gray-500 dark:bg-gray-800/50 dark:text-gray-400">
-                  <span className="flex items-center gap-1 rounded border border-gray-200 bg-white px-1.5 py-0.5 font-mono shadow-sm dark:border-gray-600 dark:bg-gray-700">
-                    <span className="text-xs">⌘</span> K
-                  </span>
-                  <span className="ml-2">para cerrar</span>
-                </div>
-              </Combobox>
-            </Dialog.Panel>
-          </Transition.Child>
-        </div>
-      </Dialog>
-    </Transition.Root>
-  );
+                                    {/* Footer */}
+                                    <div className="flex flex-wrap items-center bg-gray-50 px-4 py-2.5 text-xs text-gray-500 dark:bg-gray-800/50 dark:text-gray-400">
+                                        <kbd className="flex items-center gap-1 rounded border border-gray-200 bg-white px-1.5 py-0.5 font-mono shadow-sm dark:border-gray-600 dark:bg-gray-700">
+                                            <span className="text-xs">⌘</span> K
+                                        </kbd>
+                                        <span className="ml-2">para abrir/cerrar</span>
+                                        <span className="mx-2">·</span>
+                                        <kbd className="rounded border border-gray-200 bg-white px-1.5 py-0.5 font-mono shadow-sm dark:border-gray-600 dark:bg-gray-700">
+                                            ↑↓
+                                        </kbd>
+                                        <span className="ml-2">para navegar</span>
+                                        <span className="mx-2">·</span>
+                                        <kbd className="rounded border border-gray-200 bg-white px-1.5 py-0.5 font-mono shadow-sm dark:border-gray-600 dark:bg-gray-700">
+                                            ↵
+                                        </kbd>
+                                        <span className="ml-2">para seleccionar</span>
+                                    </div>
+                                </Combobox>
+                            </DialogPanel>
+                        </motion.div>
+                    </div>
+                </Dialog>
+            )}
+        </AnimatePresence>
+    );
 }
