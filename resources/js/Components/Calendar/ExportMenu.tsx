@@ -5,8 +5,15 @@ import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { FaGoogle, FaMicrosoft } from 'react-icons/fa';
 
+interface ExportEvent {
+  title: string;
+  start: string;
+  end?: string;
+  status: string;
+}
+
 interface ExportMenuProps {
-  events: any[];
+  events: ExportEvent[];
 }
 
 export const ExportMenu: React.FC<ExportMenuProps> = ({ events }) => {
@@ -31,9 +38,10 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ events }) => {
           `Calendario exportado exitosamente a ${type === 'google' ? 'Google Calendar' : 'Outlook'}`,
         );
       }
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as { response?: { data?: { message?: string } } };
       toast.error(
-        error.response?.data?.message ||
+        axiosError.response?.data?.message ||
           `Error al exportar a ${type === 'google' ? 'Google Calendar' : 'Outlook'}`,
       );
     } finally {
@@ -56,7 +64,12 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ events }) => {
 
       {isOpen && (
         <>
-          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+          <button
+            type="button"
+            aria-label="Close export menu"
+            className="fixed inset-0 z-40"
+            onClick={() => setIsOpen(false)}
+          />
           <div className="absolute right-0 z-50 mt-2 w-64 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-800">
             <div className="border-b border-gray-200 p-3 dark:border-gray-700">
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white">

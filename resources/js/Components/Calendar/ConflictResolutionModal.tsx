@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { AlertTriangle, Clock, User } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { CalendarEvent } from '@/types/calendar';
+import { AlertTriangle, Clock, User } from 'lucide-react';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export interface DataConflict {
   eventId: string;
   field: string;
-  localValue: any;
-  serverValue: any;
+  localValue: unknown;
+  serverValue: unknown;
   localTimestamp: Date;
   serverTimestamp: Date;
   localUser?: string;
@@ -34,11 +34,11 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
 
   if (!isOpen) return null;
 
-  const formatValue = (value: any): string => {
+  const formatValue = (value: unknown): string => {
     if (value instanceof Date) {
       return value.toLocaleString();
     }
-    if (typeof value === 'object') {
+    if (typeof value === 'object' && value !== null) {
       return JSON.stringify(value, null, 2);
     }
     return String(value);

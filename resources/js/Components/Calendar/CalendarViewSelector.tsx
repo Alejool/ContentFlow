@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
-import { Calendar, CalendarDays, CalendarRange } from 'lucide-react';
 import { CalendarView } from '@/types/calendar';
+import { Calendar, CalendarDays, CalendarRange } from 'lucide-react';
+import React, { useEffect } from 'react';
 
 interface CalendarViewSelectorProps {
   currentView: CalendarView;
@@ -19,6 +19,7 @@ export const CalendarViewSelector: React.FC<CalendarViewSelectorProps> = ({
     if (savedView && ['month', 'week', 'day'].includes(savedView)) {
       onViewChange(savedView);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Persist view preference when it changes

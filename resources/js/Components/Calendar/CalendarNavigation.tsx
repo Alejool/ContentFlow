@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronDown,
-  Calendar as CalendarIcon,
-  Loader2,
-} from 'lucide-react';
-import { format, setMonth, setYear } from 'date-fns';
-import { useTranslation } from 'react-i18next';
 import { formatDate } from '@/Utils/i18nHelpers';
 import { CalendarView } from '@/types/calendar';
+import { format, setMonth, setYear } from 'date-fns';
+import {
+    Calendar as CalendarIcon,
+    ChevronDown,
+    ChevronLeft,
+    ChevronRight,
+    Loader2,
+} from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface CalendarNavigationProps {
   currentDate: Date;
@@ -30,7 +30,7 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
   onNavigateToDate,
   isLoading = false,
 }) => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [showMonthPicker, setShowMonthPicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const today = new Date();

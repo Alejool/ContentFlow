@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { validateDate } from '@/Utils/dateValidation';
+import { AlertTriangle } from 'lucide-react';
+import React from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { validateDate, DateValidationResult } from '@/Utils/dateValidation';
 
 interface DateTimePickerProps {
   selectedDate: Date;
@@ -21,25 +21,14 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
   className = '',
 }) => {
   const { t } = useTranslation();
-  const [validation, setValidation] = useState<DateValidationResult>({
-    isValid: true,
-    isPastDate: false,
-  });
-
-  // Validate date whenever it changes
-  useEffect(() => {
-    const result = validateDate(selectedDate);
-    setValidation(result);
-  }, [selectedDate, showWarningForPastDates]);
+  // Validate date whenever it changes — derived state, no effect needed
+  const validation = useMemo(() => validateDate(selectedDate), [selectedDate, showWarningForPastDates]);
 
   const handleDateChange = (date: Date | null) => {
     if (!date) return;
 
-    // Validate the date
-    const result = validateDate(date);
-    setValidation(result);
-
     // Only call onChange if date is valid
+    const result = validateDate(date);
     if (result.isValid) {
       onChange(date);
     }

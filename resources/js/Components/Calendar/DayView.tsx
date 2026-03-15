@@ -1,19 +1,19 @@
-import { formatTime } from '@/Utils/formatDate';
-import { format, parseISO } from 'date-fns';
-import { Clock, Trash2 } from 'lucide-react';
-import React, { useState } from 'react';
 import { CalendarEvent } from '@/types/calendar';
+import { formatTime } from '@/Utils/formatDate';
 import {
-  DndContext,
-  DragEndEvent,
-  DragOverlay,
-  DragStartEvent,
-  useDraggable,
-  useDroppable,
-  PointerSensor,
-  useSensor,
-  useSensors,
+    DndContext,
+    DragEndEvent,
+    DragOverlay,
+    DragStartEvent,
+    PointerSensor,
+    useDraggable,
+    useDroppable,
+    useSensor,
+    useSensors,
 } from '@dnd-kit/core';
+import { format, parseISO } from 'date-fns';
+import { Clock } from 'lucide-react';
+import React, { useState } from 'react';
 
 interface DayViewProps {
   currentDate: Date;
@@ -24,7 +24,6 @@ interface DayViewProps {
   selectedEvents: Set<string>;
   onToggleSelection: (eventId: string) => void;
   PlatformIcon: React.ComponentType<{ platform?: string; className?: string }>;
-  auth: any;
 }
 
 interface DraggableDayEventProps {
@@ -54,7 +53,10 @@ const DraggableDayEvent: React.FC<DraggableDayEventProps> = ({
       ref={setNodeRef}
       {...listeners}
       {...attributes}
+      role="button"
+      tabIndex={0}
       onClick={() => onEventClick?.(event)}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onEventClick?.(event); }}
       className={`relative cursor-grab rounded-lg p-4 active:cursor-grabbing ${isSelected ? 'ring-2 ring-primary-500' : ''} ${isDragging ? 'opacity-50' : ''} border-l-4 bg-white transition-all hover:shadow-lg dark:bg-gray-800`}
       style={{ borderLeftColor: event.color }}
     >
@@ -176,7 +178,6 @@ export const DayView: React.FC<DayViewProps> = ({
   selectedEvents,
   onToggleSelection,
   PlatformIcon,
-  auth,
 }) => {
   const [activeEvent, setActiveEvent] = useState<CalendarEvent | null>(null);
 

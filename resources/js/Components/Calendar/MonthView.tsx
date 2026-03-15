@@ -1,30 +1,29 @@
-import React, { useState } from 'react';
-import {
-  eachDayOfInterval,
-  endOfMonth,
-  format,
-  isSameDay,
-  isSameMonth,
-  isToday,
-  parseISO,
-  startOfMonth,
-} from 'date-fns';
-import { Clock, Trash2 } from 'lucide-react';
+import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatformsConfig';
 import { CalendarEvent } from '@/types/calendar';
 import { formatTime } from '@/Utils/formatDate';
-import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatformsConfig';
-import { useTranslation } from 'react-i18next';
 import {
-  DndContext,
-  DragEndEvent,
-  DragOverlay,
-  DragStartEvent,
-  useDraggable,
-  useDroppable,
-  PointerSensor,
-  useSensor,
-  useSensors,
+    DndContext,
+    DragEndEvent,
+    DragOverlay,
+    DragStartEvent,
+    PointerSensor,
+    useDraggable,
+    useDroppable,
+    useSensor,
+    useSensors,
 } from '@dnd-kit/core';
+import {
+    eachDayOfInterval,
+    endOfMonth,
+    format,
+    isSameDay,
+    isSameMonth,
+    isToday,
+    parseISO,
+    startOfMonth,
+} from 'date-fns';
+import { Clock, Trash2 } from 'lucide-react';
+import React, { useState } from 'react';
 
 interface MonthViewProps {
   currentDate: Date;
@@ -94,7 +93,10 @@ const DraggableEvent: React.FC<DraggableEventProps> = ({
       ref={setNodeRef}
       {...listeners}
       {...attributes}
+      role="button"
+      tabIndex={0}
       onClick={() => onEventClick?.(event)}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onEventClick?.(event); }}
       className={`group/card relative cursor-grab overflow-hidden rounded-lg border-2 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg active:cursor-grabbing ${isSelected ? 'ring-2 ring-primary-500 ring-offset-2' : ''} ${isDragging ? 'scale-95 opacity-50' : ''} ${hasNoPlatforms ? 'border-orange-300 bg-orange-50 dark:border-orange-600 dark:bg-orange-900/10' : ''} ${platformConfig && !hasNoPlatforms ? `${platformConfig.borderColor} ${platformConfig.darkBorderColor} ${platformConfig.bgClass} ${platformConfig.darkColor}` : !hasNoPlatforms ? 'border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800' : ''} `}
     >
       {/* Status Indicator Bar with platform color */}

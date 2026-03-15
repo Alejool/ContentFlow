@@ -1,21 +1,21 @@
 import Button from '@/Components/common/Modern/Button';
 import ConfirmDialog from '@/Components/common/ui/ConfirmDialog';
 import {
-  useConnectCalendar,
-  useDisconnectCalendar,
-  useExternalCalendarStatus,
-  useRetrySync,
+    useConnectCalendar,
+    useDisconnectCalendar,
+    useExternalCalendarStatus,
+    useRetrySync,
 } from '@/Hooks/useExternalCalendar';
 import type { ExternalCalendarConnection } from '@/stores/externalCalendarStore';
 import { formatDateTimeString } from '@/Utils/dateHelpers';
 import {
-  AlertCircle,
-  Calendar,
-  CheckCircle2,
-  Loader2,
-  RefreshCw,
-  XCircle,
-  X as XIcon,
+    AlertCircle,
+    Calendar,
+    CheckCircle2,
+    Loader2,
+    RefreshCw,
+    XCircle,
+    X as XIcon,
 } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -92,8 +92,8 @@ const StatusBadge = ({ status }: { status: string }) => {
 };
 
 export default function ExternalCalendarSettings({
-  campaigns = [],
-  platforms = [],
+  campaigns: _campaigns = [],
+  platforms: _platforms = [],
 }: ExternalCalendarSettingsProps) {
   const { t } = useTranslation();
   const { data: connections, isLoading } = useExternalCalendarStatus();
@@ -108,8 +108,9 @@ export default function ExternalCalendarSettings({
   const handleConnect = async (provider: 'google' | 'outlook') => {
     try {
       await connectCalendar.mutateAsync(provider);
-    } catch (error: any) {
-      const data = error?.response?.data;
+    } catch (error) {
+      const axiosError = error as { response?: { data?: { upgrade_required?: boolean; error?: string } } };
+      const data = axiosError?.response?.data;
       if (data?.upgrade_required) {
         toast.error(
           data.error || 'Tu plan no incluye sincronización de calendario. Actualiza tu plan.',
@@ -131,7 +132,7 @@ export default function ExternalCalendarSettings({
     try {
       await disconnectCalendar.mutateAsync(providerToDisconnect);
       toast.success(t('calendar.external.disconnectSuccess'));
-    } catch (error) {
+    } catch (_error) {
       toast.error(t('calendar.external.disconnectError'));
     } finally {
       setShowDisconnectDialog(false);
@@ -143,7 +144,7 @@ export default function ExternalCalendarSettings({
     try {
       await retrySync.mutateAsync(provider);
       toast.success(t('calendar.external.syncSuccess'));
-    } catch (error) {
+    } catch (_error) {
       toast.error(t('calendar.external.syncError'));
     }
   };

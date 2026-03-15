@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { FaFilter, FaTimes } from 'react-icons/fa';
-import { CalendarFilters, Platform, PublicationStatus } from '@/types/calendar';
-import { Campaign } from '@/stores/campaignStore';
 import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatformsConfig';
+import { Campaign } from '@/stores/campaignStore';
+import { CalendarFilters, Platform, PublicationStatus } from '@/types/calendar';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { FaFilter } from 'react-icons/fa';
 
 interface FilterPanelProps {
   filters: CalendarFilters;
