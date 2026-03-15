@@ -1,5 +1,5 @@
 interface GenericResponseProps {
-  data: any;
+  data: Record<string, unknown>;
   theme: 'dark' | 'light';
 }
 
@@ -37,14 +37,14 @@ export default function GenericResponse({ data, theme }: GenericResponseProps) {
                   {key.replace(/_/g, ' ')}:
                 </h4>
                 <div className="space-y-2">
-                  {value.map((item: any, index: number) => (
+                  {value.map((item: unknown, index: number) => (
                     <div
                       key={index}
                       className={`rounded p-2 text-sm ${
                         theme === 'dark' ? 'bg-neutral-800/50' : 'bg-gray-50'
                       }`}
                     >
-                      {typeof item === 'object' ? JSON.stringify(item) : item}
+                      {typeof item === 'object' ? JSON.stringify(item) : String(item)}
                     </div>
                   ))}
                 </div>

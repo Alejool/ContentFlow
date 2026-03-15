@@ -8,7 +8,8 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
-const aiPromptSchema = (t: any) =>
+
+const aiPromptSchema = (t: (key: string) => string) =>
   z.object({
     prompt: z
       .string()
@@ -17,9 +18,9 @@ const aiPromptSchema = (t: any) =>
   });
 
 interface AiPromptSectionProps {
-  onSuggest: (data: any) => void;
+  onSuggest: (data: Record<string, unknown>) => void;
   type: 'publication' | 'campaign';
-  currentFields: Record<string, any>;
+  currentFields: Record<string, unknown>;
   disabled?: boolean;
   className?: string;
 }
@@ -32,7 +33,7 @@ const AiPromptSection: React.FC<AiPromptSectionProps> = ({
   className = '',
 }) => {
   const { t } = useTranslation();
-  const { auth, ai_enabled } = usePage<any>().props;
+  const { auth, ai_enabled } = usePage<{ auth: { user?: { ai_settings?: Record<string, { enabled: boolean; api_key: string }>; locale?: string } }; ai_enabled: boolean }>().props;
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
@@ -40,7 +41,7 @@ const AiPromptSection: React.FC<AiPromptSectionProps> = ({
   const isAiConfigured = useMemo(() => {
     if (!ai_enabled) return false;
     const settings = auth.user?.ai_settings || {};
-    return Object.values(settings).some((s: any) => s.enabled && s.api_key);
+    return Object.values(settings).some((s) => s.enabled && s.api_key);
   }, [auth.user, ai_enabled]);
 
   const validatePrompt = () => {
@@ -48,9 +49,10 @@ const AiPromptSection: React.FC<AiPromptSectionProps> = ({
       aiPromptSchema(t).parse({ prompt });
       setError('');
       return true;
-    } catch (err: any) {
-      if (err.errors && err.errors[0]) {
-        setError(err.errors[0].message);
+    } catch (err) {
+      const zodErr = err as ZodError;
+      if (zodErr.errors && zodErr.errors[0]) {
+        setError(zodErr.errors[0].message);
       }
       return false;
     }
@@ -63,18 +65,6 @@ const AiPromptSection: React.FC<AiPromptSectionProps> = ({
 
     setLoading(true);
     try {
-      // Calculate default dates for campaigns
-      const today = new Date();
-      const twoDaysLater = new Date(today);
-      twoDaysLater.setDate(today.getDate() + 2);
-
-      const formatDate = (date: Date) => {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-      };
-
       // Define field limits based on type
       const fieldLimits =
         type === 'publication'
@@ -119,9 +109,10 @@ const AiPromptSection: React.FC<AiPromptSectionProps> = ({
             'No se pudieron generar sugerencias',
         );
       }
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as { response?: { data?: { message?: string } } };
       toast.error(
-        error.response?.data?.message || t('common.error') || 'Error al procesar la solicitud',
+        axiosError.response?.data?.message || t('common.error') || 'Error al procesar la solicitud',
       );
     } finally {
       setLoading(false);

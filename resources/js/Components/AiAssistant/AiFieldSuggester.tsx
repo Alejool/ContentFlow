@@ -7,9 +7,9 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 
 interface AiFieldSuggesterProps {
-  fields: Record<string, any>;
+  fields: Record<string, unknown>;
   type: 'publication' | 'campaign';
-  onSuggest: (data: any) => void;
+  onSuggest: (data: Record<string, unknown>) => void;
   disabled?: boolean;
   className?: string;
 }
@@ -22,7 +22,7 @@ const AiFieldSuggester: React.FC<AiFieldSuggesterProps> = ({
   className = '',
 }) => {
   const { t } = useTranslation();
-  const { auth, ai_enabled } = usePage<any>().props;
+  const { auth, ai_enabled } = usePage<{ auth: { user?: { ai_settings?: Record<string, { enabled: boolean; api_key: string }>; locale?: string } }; ai_enabled: boolean }>().props;
   const [loading, setLoading] = useState(false);
 
   const isAiConfigured = useMemo(() => {
@@ -30,7 +30,7 @@ const AiFieldSuggester: React.FC<AiFieldSuggesterProps> = ({
     if (!ai_enabled) return false;
 
     const settings = auth.user?.ai_settings || {};
-    return Object.values(settings).some((s: any) => s.enabled && s.api_key);
+    return Object.values(settings).some((s) => s.enabled && s.api_key);
   }, [auth.user, ai_enabled]);
 
   const handleSuggest = async () => {
@@ -72,9 +72,10 @@ const AiFieldSuggester: React.FC<AiFieldSuggesterProps> = ({
             'No se pudieron generar sugerencias',
         );
       }
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as { response?: { data?: { message?: string } } };
       toast.error(
-        error.response?.data?.message || t('common.error') || 'Error al procesar la solicitud',
+        axiosError.response?.data?.message || t('common.error') || 'Error al procesar la solicitud',
       );
     } finally {
       setLoading(false);

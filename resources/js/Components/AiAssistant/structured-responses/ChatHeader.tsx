@@ -11,8 +11,9 @@ export default function ChatHeader({ isMinimized, onMinimize, onClose }: ChatHea
   const { t } = useTranslation();
 
   return (
-    <div
-      className="flex shrink-0 cursor-pointer items-center justify-between bg-gradient-to-r from-primary-600 to-primary-600 p-4 text-white transition-colors dark:from-primary-700 dark:to-primary-900"
+    <button
+      type="button"
+      className="flex w-full shrink-0 cursor-pointer items-center justify-between bg-gradient-to-r from-primary-600 to-primary-600 p-4 text-white transition-colors dark:from-primary-700 dark:to-primary-900"
       onClick={onMinimize}
     >
       <div className="flex items-center gap-3">
@@ -46,6 +47,6 @@ export default function ChatHeader({ isMinimized, onMinimize, onClose }: ChatHea
           <X className="h-4 w-4" />
         </button>
       </div>
-    </div>
+    </button>
   );
 }

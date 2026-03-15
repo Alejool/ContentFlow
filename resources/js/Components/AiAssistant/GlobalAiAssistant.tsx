@@ -11,14 +11,18 @@ interface Message {
   role: 'assistant' | 'user';
   content: string;
   suggestion?: {
-    data: any;
+    data: Record<string, unknown>;
   };
+}
+
+interface PageProps {
+  locale: string;
 }
 
 export default function GlobalAiAssistant() {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  const { locale } = usePage().props as any;
+  const { locale } = usePage<PageProps>().props;
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
@@ -77,7 +81,7 @@ export default function GlobalAiAssistant() {
         };
         setMessages((prev) => [...prev, aiMessage]);
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error(t('common.error'));
       setMessages((prev) => [
         ...prev,
@@ -99,24 +103,10 @@ export default function GlobalAiAssistant() {
       : 'bg-gradient-to-r from-primary-600 to-primary-600 hover:from-primary-700 hover:to-primary-700';
   };
 
-  const getCardBg = () => {
-    return theme === 'dark'
-      ? 'bg-neutral-800/50 backdrop-blur-md border border-neutral-700/70'
-      : 'bg-white/10 border border-gray-200';
-  };
-
   const getHeaderBg = () => {
     return theme === 'dark'
       ? 'bg-gradient-to-r from-primary-700 to-primary-900'
       : 'bg-gradient-to-r from-primary-600 to-primary-600';
-  };
-
-  const getTextColor = (type: 'primary' | 'secondary' = 'primary') => {
-    if (theme === 'dark') {
-      return type === 'primary' ? 'text-gray-100' : 'text-gray-400';
-    } else {
-      return type === 'primary' ? 'text-gray-800' : 'text-gray-600';
-    }
   };
 
   const getMessageBg = (role: 'assistant' | 'user') => {
@@ -170,8 +160,9 @@ export default function GlobalAiAssistant() {
         isMinimized ? 'w-68 h-18' : 'h-[500px] w-80 sm:w-96'
       } `}
     >
-      <div
-        className={`flex shrink-0 cursor-pointer items-center justify-between p-4 text-white transition-colors ${getHeaderBg()}`}
+      <button
+        type="button"
+        className={`flex w-full shrink-0 cursor-pointer items-center justify-between p-4 text-white transition-colors ${getHeaderBg()}`}
         onClick={() => setIsMinimized(!isMinimized)}
       >
         <div className="flex items-center gap-3">
@@ -211,7 +202,7 @@ export default function GlobalAiAssistant() {
             <X className="h-4 w-4" />
           </button>
         </div>
-      </div>
+      </button>
 
       {!isMinimized && (
         <>
