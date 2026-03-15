@@ -27,6 +27,24 @@ class NotificationsController extends Controller
             $query->whereJsonContains('data->priority', $request->priority);
         }
 
+        if ($request->has('notification_type') && $request->notification_type !== 'all') {
+            $typeMap = [
+                'publications' => ['Publication', 'Playlist', 'Reels', 'Video', 'Media'],
+                'approvals'    => ['Approval', 'Awaiting', 'Approved', 'Rejected', 'Reassigned', 'MissingApprovers'],
+                'campaigns'    => ['Campaign'],
+                'account'      => ['Social', 'Workspace', 'Role', 'TwoFactor', 'Verify'],
+                'system'       => ['System', 'Trial', 'Usage', 'API', 'Error'],
+            ];
+            $patterns = $typeMap[$request->notification_type] ?? [];
+            if (!empty($patterns)) {
+                $query->where(function ($q) use ($patterns) {
+                    foreach ($patterns as $pattern) {
+                        $q->orWhere('type', 'like', "%{$pattern}%");
+                    }
+                });
+            }
+        }
+
         if ($request->has('unread_only') && $request->unread_only) {
             $query->whereNull('read_at');
         }
