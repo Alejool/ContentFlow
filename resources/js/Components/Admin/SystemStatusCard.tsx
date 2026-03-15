@@ -1,6 +1,6 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
-import { CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import { AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface SystemStatus {
@@ -16,6 +16,32 @@ interface SystemStatus {
 
 interface Props {
   status: SystemStatus;
+}
+
+interface StatusItemProps {
+  label: string;
+  enabled: number;
+  total: number;
+  getColor: (enabled: number, total: number) => string;
+}
+
+function StatusItem({ label, enabled, total, getColor }: StatusItemProps) {
+  const Icon = enabled === total ? CheckCircle2 : enabled === 0 ? XCircle : AlertTriangle;
+  const colorClass = getColor(enabled, total);
+
+  return (
+    <div className="flex items-center justify-between border-b border-gray-200 py-2 last:border-b-0 dark:border-gray-700">
+      <div className="flex items-center gap-2">
+        <Icon className={`h-4 w-4 ${colorClass}`} />
+        <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{label}</span>
+      </div>
+      <Badge
+        variant={enabled === total ? 'default' : enabled === 0 ? 'destructive' : 'secondary'}
+      >
+        {enabled}/{total}
+      </Badge>
+    </div>
+  );
 }
 
 export default function SystemStatusCard({ status }: Props) {
@@ -34,33 +60,6 @@ export default function SystemStatusCard({ status }: Props) {
     if (percentage === 100) return 'text-green-600 dark:text-green-400';
     if (percentage >= 50) return 'text-yellow-600 dark:text-yellow-400';
     return 'text-red-600 dark:text-red-400';
-  };
-
-  const StatusItem = ({
-    label,
-    enabled,
-    total,
-  }: {
-    label: string;
-    enabled: number;
-    total: number;
-  }) => {
-    const Icon = enabled === total ? CheckCircle2 : enabled === 0 ? XCircle : AlertTriangle;
-    const colorClass = getStatusColor(enabled, total);
-
-    return (
-      <div className="flex items-center justify-between border-b border-gray-200 py-2 last:border-b-0 dark:border-gray-700">
-        <div className="flex items-center gap-2">
-          <Icon className={`h-4 w-4 ${colorClass}`} />
-          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{label}</span>
-        </div>
-        <Badge
-          variant={enabled === total ? 'default' : enabled === 0 ? 'destructive' : 'secondary'}
-        >
-          {enabled}/{total}
-        </Badge>
-      </div>
-    );
   };
 
   return (
@@ -107,21 +106,25 @@ export default function SystemStatusCard({ status }: Props) {
             label={t('admin.system_status.categories.plans')}
             enabled={countEnabled(status.plans)}
             total={countTotal(status.plans)}
+            getColor={getStatusColor}
           />
           <StatusItem
             label={t('admin.system_status.categories.addons')}
             enabled={countEnabled(status.addons)}
             total={countTotal(status.addons)}
+            getColor={getStatusColor}
           />
           <StatusItem
             label={t('admin.system_status.categories.features')}
             enabled={countEnabled(status.features)}
             total={countTotal(status.features)}
+            getColor={getStatusColor}
           />
           <StatusItem
             label={t('admin.system_status.categories.integrations')}
             enabled={countEnabled(status.integrations)}
             total={countTotal(status.integrations)}
+            getColor={getStatusColor}
           />
         </div>
 
