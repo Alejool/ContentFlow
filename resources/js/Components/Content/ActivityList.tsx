@@ -1,17 +1,18 @@
+import { Avatar } from '@/Components/common/Avatar';
 import { VirtualList } from '@/Components/common/ui/VirtualList';
 import { getDateFnsLocale } from '@/Utils/dateLocales';
-import { formatDistanceToNow } from 'date-fns';
+import { format } from 'date-fns';
 import {
-    Activity,
-    CheckCircle,
-    Clock,
-    Edit,
-    FileText,
-    Lock,
-    MessageSquare,
-    Send,
-    ServerCrash,
-    XCircle,
+  Activity,
+  CheckCircle,
+  Clock,
+  Edit,
+  FileText,
+  Lock,
+  MessageSquare,
+  Send,
+  ServerCrash,
+  XCircle,
 } from 'lucide-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -50,6 +51,8 @@ const ActivityTimelineItem = ({
   locale,
   getActivityIcon,
   formatActivityText,
+  AvatarComponent,
+  formatDate,
 }: {
   activity: ActivityItem;
   activityIdx: number;
@@ -58,6 +61,8 @@ const ActivityTimelineItem = ({
   locale: any;
   getActivityIcon: (type: string) => React.ReactElement;
   formatActivityText: (activity: ActivityItem) => string;
+  AvatarComponent: typeof Avatar;
+  formatDate: (date: Date, formatStr: string, options: any) => string;
 }) => (
   <div key={activity.id} className="relative pb-8">
     {activityIdx !== activitiesLength - 1 ? (
@@ -68,23 +73,18 @@ const ActivityTimelineItem = ({
     ) : null}
     <div className="relative flex space-x-3">
       <div className="relative">
-        {activity.user?.photo_url ? (
-          <img
-            src={activity.user.photo_url}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-400 ring-8 ring-white dark:ring-neutral-800"
-            alt=""
+        <div className="ring-8 ring-white dark:ring-neutral-800">
+          <AvatarComponent
+            src={activity.user?.photo_url ?? null}
+            name={activity.user?.name || 'Sistema'}
+            size="sm"
+            className="h-8 w-8"
           />
-        ) : (
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 ring-8 ring-white dark:bg-neutral-700 dark:ring-neutral-800">
-            {getActivityIcon(activity.type)}
-          </div>
-        )}
+        </div>
 
-        {activity.user?.photo_url && (
-          <span className="absolute -bottom-1 -right-1 rounded-full bg-white p-0.5 dark:bg-neutral-800">
-            {getActivityIcon(activity.type)}
-          </span>
-        )}
+        <span className="absolute -bottom-1 -right-1 rounded-full bg-white p-0.5 dark:bg-neutral-800">
+          {getActivityIcon(activity.type)}
+        </span>
       </div>
 
       <div className="min-w-0 flex-1 space-y-2 pt-1.5">
@@ -103,8 +103,7 @@ const ActivityTimelineItem = ({
           </div>
           <div className="whitespace-nowrap text-right text-sm text-gray-500 dark:text-gray-400">
             <time dateTime={activity.created_at}>
-              {formatDistanceToNow(new Date(activity.created_at), {
-                addSuffix: true,
+              {formatDate(new Date(activity.created_at), 'PPp', {
                 locale: locale,
               })}
             </time>
@@ -309,11 +308,13 @@ export default function ActivityList({ activities }: ActivityListProps) {
       locale={locale}
       getActivityIcon={getActivityIcon}
       formatActivityText={formatActivityText}
+      AvatarComponent={Avatar}
+      formatDate={format}
     />
   );
 
   return (
-    <div className="flow-root overflow-y-auto" style={{ height: '500px' }}>
+    <div className="flow-root">
       <VirtualList
         items={activities}
         estimatedItemSize={100}
