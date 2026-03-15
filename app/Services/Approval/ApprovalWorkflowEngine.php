@@ -251,20 +251,42 @@ class ApprovalWorkflowEngine
 
         return DB::transaction(function () use ($request, $approver, $comment) {
             $currentStep = $request->currentStep;
-            
-            // Create approval log entry
+
+            // Create approval log entry (step may be null for simple approvals)
             ApprovalLog::create([
                 'approval_request_id' => $request->id,
-                'approval_step_id' => $currentStep->id,
-                'user_id' => $approver->id,
-                'action' => ApprovalLog::ACTION_APPROVED,
-                'level_number' => $currentStep->level_number,
-                'comment' => $comment,
-                'metadata' => [
-                    'ip' => request()->ip(),
+                'approval_step_id'    => $currentStep?->id,
+                'user_id'             => $approver->id,
+                'action'              => ApprovalLog::ACTION_APPROVED,
+                'level_number'        => $currentStep?->level_number ?? 0,
+                'comment'             => $comment,
+                'metadata'            => [
+                    'ip'         => request()->ip(),
                     'user_agent' => request()->userAgent(),
                 ],
             ]);
+
+            // For simple approval (no workflow/step), complete immediately
+            if (!$currentStep) {
+                $request->update([
+                    'status'       => ApprovalRequest::STATUS_APPROVED,
+                    'completed_at' => now(),
+                    'completed_by' => $approver->id,
+                ]);
+
+                $request->publication->update([
+                    'status'                    => Publication::STATUS_APPROVED,
+                    'approved_at'               => now(),
+                    'approved_by'               => $approver->id,
+                    'current_approval_level'    => null,
+                    'current_approval_step_id'  => null,
+                ]);
+
+                $this->clearApprovalCache($request->publication->workspace_id);
+                event(new ApprovalRequestCompleted($request));
+
+                return $request->fresh()->load(['currentStep.role', 'workflow', 'submitter', 'publication']);
+            }
 
             // Check if there are more steps
             $nextStep = $request->workflow->levels()
@@ -342,17 +364,17 @@ class ApprovalWorkflowEngine
 
         return DB::transaction(function () use ($request, $rejector, $reason) {
             $currentStep = $request->currentStep;
-            
-            // Create rejection log entry
+
+            // Create rejection log entry (step may be null for simple approvals)
             ApprovalLog::create([
                 'approval_request_id' => $request->id,
-                'approval_step_id' => $currentStep->id,
-                'user_id' => $rejector->id,
-                'action' => ApprovalLog::ACTION_REJECTED,
-                'level_number' => $currentStep->level_number,
-                'comment' => $reason,
-                'metadata' => [
-                    'ip' => request()->ip(),
+                'approval_step_id'    => $currentStep?->id,
+                'user_id'             => $rejector->id,
+                'action'              => ApprovalLog::ACTION_REJECTED,
+                'level_number'        => $currentStep?->level_number ?? 0,
+                'comment'             => $reason,
+                'metadata'            => [
+                    'ip'         => request()->ip(),
                     'user_agent' => request()->userAgent(),
                 ],
             ]);
@@ -376,10 +398,10 @@ class ApprovalWorkflowEngine
             ]);
 
             Log::info('Approval request rejected', [
-                'request_id' => $request->id,
-                'publication_id' => $request->publication_id,
-                'rejected_at_level' => $currentStep->level_number,
-                'rejected_by' => $rejector->id,
+                'request_id'       => $request->id,
+                'publication_id'   => $request->publication_id,
+                'rejected_at_level' => $currentStep?->level_number ?? 0,
+                'rejected_by'      => $rejector->id,
             ]);
 
             // Clear cache
@@ -404,8 +426,23 @@ class ApprovalWorkflowEngine
             return false;
         }
 
+        $workspaceId = $request->publication->workspace_id;
+
+        // Owner and Admin can always approve, including simple (no-workflow) requests
+        $isOwnerOrAdmin = DB::table('role_user')
+            ->join('roles', 'roles.id', '=', 'role_user.role_id')
+            ->where('role_user.user_id', $user->id)
+            ->where('role_user.workspace_id', $workspaceId)
+            ->whereIn('roles.name', ['Owner', 'Admin'])
+            ->exists();
+
+        if ($isOwnerOrAdmin) {
+            return true;
+        }
+
         $currentStep = $request->currentStep;
-        
+
+        // Simple approval (no workflow step) — only Owner/Admin can approve
         if (!$currentStep) {
             return false;
         }
@@ -425,9 +462,9 @@ class ApprovalWorkflowEngine
             $hasRole = DB::table('role_user')
                 ->where('user_id', $user->id)
                 ->where('role_id', $currentStep->role_id)
-                ->where('workspace_id', $request->publication->workspace_id)
+                ->where('workspace_id', $workspaceId)
                 ->exists();
-            
+
             if ($hasRole) {
                 return true;
             }
@@ -460,20 +497,45 @@ class ApprovalWorkflowEngine
         })
         ->where('status', ApprovalRequest::STATUS_PENDING);
 
-        // If type is 'my_requests', show only requests submitted by the user
         if ($type === 'my_requests') {
             $query->where('submitted_by', $user->id);
         } else {
-            // Default: show requests the user can approve (not their own)
-            $query->where('submitted_by', '!=', $user->id)
-                ->whereHas('currentStep', function ($q) use ($user, $workspaceId) {
-                    // User is directly assigned
+            // Check if user is Owner or Admin — they see everything including simple approvals
+            $isOwnerOrAdmin = DB::table('role_user')
+                ->join('roles', 'roles.id', '=', 'role_user.role_id')
+                ->where('role_user.user_id', $user->id)
+                ->where('role_user.workspace_id', $workspaceId)
+                ->whereIn('roles.name', ['Owner', 'Admin'])
+                ->exists();
+
+            $query->where('submitted_by', '!=', $user->id);
+
+            if ($isOwnerOrAdmin) {
+                // Owner/Admin see all pending requests: with workflow steps AND simple (no step)
+                $query->where(function ($q) use ($user, $workspaceId) {
+                    // Simple approval (no workflow step)
+                    $q->whereNull('current_step_id')
+                        // OR requests assigned to them via workflow step
+                        ->orWhereHas('currentStep', function ($sq) use ($user, $workspaceId) {
+                            $sq->where('user_id', $user->id)
+                                ->orWhereHas('users', function ($uq) use ($user) {
+                                    $uq->where('users.id', $user->id);
+                                })
+                                ->orWhereHas('role', function ($rq) use ($user, $workspaceId) {
+                                    $rq->whereHas('users', function ($ruq) use ($user, $workspaceId) {
+                                        $ruq->where('users.id', $user->id)
+                                            ->where('role_user.workspace_id', $workspaceId);
+                                    });
+                                });
+                        });
+                });
+            } else {
+                // Regular users only see requests where they are assigned to the current step
+                $query->whereHas('currentStep', function ($q) use ($user, $workspaceId) {
                     $q->where('user_id', $user->id)
-                        // OR user is in the step's user list
                         ->orWhereHas('users', function ($userQuery) use ($user) {
                             $userQuery->where('users.id', $user->id);
                         })
-                        // OR user has the role assigned to this step
                         ->orWhereHas('role', function ($roleQuery) use ($user, $workspaceId) {
                             $roleQuery->whereHas('users', function ($userRoleQuery) use ($user, $workspaceId) {
                                 $userRoleQuery->where('users.id', $user->id)
@@ -481,6 +543,7 @@ class ApprovalWorkflowEngine
                             });
                         });
                 });
+            }
         }
 
         return $query->orderBy('submitted_at', 'desc')->get();
