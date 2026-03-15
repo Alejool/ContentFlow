@@ -1,10 +1,9 @@
 import Button from '@/Components/common/Modern/Button';
+import DatePickerModern from '@/Components/common/Modern/DatePicker';
 import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
-import { Calendar, X, Undo2, Trash2 } from 'lucide-react';
+import { Calendar, Trash2, Undo2, X } from 'lucide-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 
 interface BulkActionsBarProps {
   selectedCount: number;
@@ -168,26 +167,23 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
           </div>
 
           <div className="space-y-3">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              {t('calendar.newDateAndTime')}
-            </label>
-            <div className="flex justify-center">
-              <DatePicker
-                selected={selectedDate}
-                onChange={(date: Date | null) => {
-                  if (date) {
-                    // Ensure the date is set to start of day
-                    const newDate = new Date(date);
-                    newDate.setHours(0, 0, 0, 0);
-                    setSelectedDate(newDate);
-                  }
-                }}
-                minDate={new Date()}
-                dateFormat="MMMM d, yyyy"
-                inline
-                className="rounded-lg border border-gray-300 dark:border-gray-600"
-              />
-            </div>
+            <DatePickerModern
+              label={t('calendar.newDateAndTime')}
+              selected={selectedDate}
+              onChange={(date: Date | null) => {
+                if (date) {
+                  const newDate = new Date(date);
+                  newDate.setHours(0, 0, 0, 0);
+                  setSelectedDate(newDate);
+                }
+              }}
+              minDate={new Date()}
+              allowPastDates={false}
+              isClearable={false}
+              showTimeSelect={false}
+              variant="outlined"
+              size="lg"
+            />
             <div className="text-center">
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 {t('calendar.selected_date')}
