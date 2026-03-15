@@ -1,17 +1,24 @@
 import { Combobox, Dialog, Transition } from '@headlessui/react';
 import { router } from '@inertiajs/react';
 import {
-  Calendar,
-  Command,
-  FileText,
-  LayoutDashboard,
-  LogOut,
-  Plus,
-  Search,
-  Settings,
-  Target,
+    Calendar,
+    Command,
+    FileText,
+    LayoutDashboard,
+    LogOut,
+    Plus,
+    Search,
+    Settings,
+    Target,
 } from 'lucide-react';
 import { Fragment, useEffect, useState } from 'react';
+
+interface CommandItem {
+  name: string;
+  href?: string;
+  action?: () => void;
+  icon: React.ComponentType<{ className?: string; 'aria-hidden'?: string }>;
+}
 
 export default function CommandPalette() {
   const [isOpen, setIsOpen] = useState(false);
@@ -74,7 +81,7 @@ export default function CommandPalette() {
           item.name.toLowerCase().includes(query.toLowerCase()),
         );
 
-  const handleSelect = (item: any) => {
+  const handleSelect = (item: CommandItem) => {
     setIsOpen(false);
     setQuery('');
 
@@ -111,7 +118,7 @@ export default function CommandPalette() {
             leaveTo="opacity-0 scale-95"
           >
             <Dialog.Panel className="mx-auto max-w-2xl transform divide-y divide-gray-100 overflow-hidden rounded-lg bg-white shadow-2xl ring-1 ring-black/5 transition-all dark:divide-gray-800 dark:bg-gray-900">
-              <Combobox onChange={(item: any) => handleSelect(item)}>
+              <Combobox onChange={(item: CommandItem) => handleSelect(item)}>
                 <div className="relative">
                   <Search
                     className="pointer-events-none absolute left-4 top-3.5 h-5 w-5 text-gray-400"
@@ -156,7 +163,7 @@ export default function CommandPalette() {
                               <p
                                 className={`text-xs ${active ? 'text-gray-500 dark:text-gray-400' : 'text-gray-500 dark:text-gray-500'}`}
                               >
-                                {item.href ? 'Ir a...' : 'Acción'}
+                                {'href' in item ? 'Ir a...' : 'Acción'}
                               </p>
                             </div>
                           </>
@@ -173,7 +180,7 @@ export default function CommandPalette() {
                       No se encontraron resultados
                     </p>
                     <p className="mt-2 text-gray-500">
-                      No pudimos encontrar nada para "{query}". Intenta con otra cosa.
+                      No pudimos encontrar nada para &ldquo;{query}&rdquo;. Intenta con otra cosa.
                     </p>
                   </div>
                 )}
