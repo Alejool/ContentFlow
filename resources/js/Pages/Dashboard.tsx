@@ -2,9 +2,10 @@ import { CampaignStat } from '@/Components/Analytics/PerformanceTable';
 import { AddonsPromotionCard } from '@/Components/Dashboard/AddonsPromotionCard';
 import StatCard from '@/Components/Statistics/StatCard';
 import Skeleton from '@/Components/common/ui/Skeleton';
+import { useDashboardStats } from '@/Hooks/useDashboardStats';
 import { useTheme } from '@/Hooks/useTheme';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import {
@@ -21,34 +22,8 @@ import {
   Users,
   X,
 } from 'lucide-react';
-import { Suspense, lazy, useCallback, useEffect, useState } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-// Custom hook to fetch publication stats (avoids fetch in useEffect warning)
-const useFetchPublicationStats = (shouldFetch: boolean) => {
-  const [data, setData] = useState<Record<string, number>>({});
-  const [loading, setLoading] = useState(shouldFetch);
-
-  const fetchStats = useCallback(() => {
-    if (!shouldFetch) return;
-
-    axios
-      .get(route('api.v1.publications.stats'))
-      .then((res) => setData(res.data || {}))
-      .catch((error) => {
-        if (error.response?.status !== 401) {
-          // Handle error silently
-        }
-      })
-      .finally(() => setLoading(false));
-  }, [shouldFetch]);
-
-  useEffect(() => {
-    fetchStats();
-  }, [fetchStats]);
-
-  return { data, loading, refetch: fetchStats };
-};
 
 const PlatformPerformance = lazy(() => import('@/Components/Analytics/PlatformPerformance'));
 const SocialMediaAccounts = lazy(() => import('@/Components/Analytics/SocialMediaAccounts'));
@@ -78,16 +53,18 @@ interface DashboardProps {
 export default function Dashboard({ auth, stats, status, period = 30 }: DashboardProps) {
   const { t } = useTranslation();
   const { actualTheme: theme } = useTheme();
+  const { auth: pageAuth } = usePage<any>().props;
+  const workspaceId = pageAuth?.user?.current_workspace_id;
   const [showBanner, setShowBanner] = useState(true);
 
-  // Use custom hook for fetching stats - always call hooks unconditionally
-  const shouldFetch = !stats.publicationStats;
+  // TanStack Query — replaces the manual useFetchPublicationStats hook
   const {
     data: fetchedStats,
-    loading: loadingPubStats,
+    isLoading: loadingPubStats,
     refetch: refetchStats,
-  } = useFetchPublicationStats(shouldFetch);
-  const pubStats = stats.publicationStats || fetchedStats;
+  } = useDashboardStats(workspaceId);
+  const pubStats = stats.publicationStats ?? fetchedStats ?? {};
+
   const [sending, setSending] = useState(false);
   const [successMessage, setSuccessMessage] = useState(status === 'verification-link-sent');
 
@@ -95,8 +72,7 @@ export default function Dashboard({ auth, stats, status, period = 30 }: Dashboar
     if (!auth?.user?.id) return;
 
     const channel = window.Echo.private(`users.${auth.user.id}`);
-
-    channel.listen('.PublicationStatusUpdated', refetchStats);
+    channel.listen('.PublicationStatusUpdated', () => refetchStats());
 
     return () => {
       channel.stopListening('.PublicationStatusUpdated');

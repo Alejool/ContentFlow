@@ -1,6 +1,7 @@
 import StatCard from '@/Components/Statistics/StatCard';
 import EmptyState from '@/Components/common/EmptyState';
 import Skeleton from '@/Components/common/ui/Skeleton';
+import { useAnalyticsData } from '@/Hooks/useAnalyticsData';
 import { useTheme } from '@/Hooks/useTheme';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { getEmptyStateByKey } from '@/Utils/emptyStateMapper';
@@ -67,36 +68,39 @@ interface AnalyticsProps {
   period: number;
 }
 
-export default function Index({ stats, period }: AnalyticsProps) {
+export default function Index({ stats: initialStats, period }: AnalyticsProps) {
   const { t } = useTranslation();
   const { actualTheme: theme } = useTheme();
-  const [loading, setLoading] = useState(false);
+  const [selectedPeriod, setSelectedPeriod] = useState(Number(period));
   const isDark = theme === 'dark';
   const { auth } = usePage<any>().props;
+  const workspaceId = auth?.user?.current_workspace_id;
 
   // Gate advanced analytics based on workspace plan features
   const hasAdvancedAnalytics =
     auth?.current_workspace?.features?.advanced_analytics ||
     ['professional', 'enterprise'].includes(auth?.current_workspace?.plan?.toLowerCase() ?? '');
 
-  const overview = stats?.overview || {};
-  const campaigns = stats?.campaigns || [];
-  const socialMedia = stats?.social_media || [];
-  const engagementTrends = stats?.engagement_trends || [];
-  const detailedPlatforms = stats?.detailedPlatforms || [];
-  const detailedPublications = stats?.detailedPublications || [];
+  // TanStack Query — caches data per period so switching is instant after first load
+  const { data: queryStats, isFetching } = useAnalyticsData(selectedPeriod, workspaceId);
+
+  // Use query data when available, fall back to Inertia SSR props for initial render
+  const stats = queryStats ?? initialStats;
+
+  const overview = stats?.overview ?? {};
+  const campaigns = stats?.campaigns ?? [];
+  const socialMedia = stats?.social_media ?? [];
+  const engagementTrends = stats?.engagement_trends ?? [];
+  const detailedPlatforms = stats?.detailedPlatforms ?? [];
+  const detailedPublications = stats?.detailedPublications ?? [];
 
   const handlePeriodChange = (days: number) => {
-    setLoading(true);
+    setSelectedPeriod(days);
+    // Keep Inertia in sync for SSR/bookmarking, but don't wait for it to re-render
     router.get(
       route('analytics.index'),
       { days },
-      {
-        preserveState: true,
-        preserveScroll: true,
-        only: ['stats', 'period'],
-        onFinish: () => setLoading(false),
-      },
+      { preserveState: true, preserveScroll: true, only: ['period'] },
     );
   };
 
@@ -109,12 +113,15 @@ export default function Index({ stats, period }: AnalyticsProps) {
           <div>
             <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">
               {t('analytics.title')}
+              {isFetching && (
+                <span className="ml-3 inline-block h-4 w-4 animate-spin rounded-full border-2 border-primary-400 border-t-transparent align-middle" />
+              )}
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-400">{t('analytics.subtitle')}</p>
           </div>
 
           <PeriodSelector
-            selectedPeriod={Number(period)}
+            selectedPeriod={selectedPeriod}
             onPeriodChange={handlePeriodChange}
             theme={theme}
           />
