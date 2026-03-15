@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 
 interface ApprovalStats {
   pending_requests: number;
+  pending_for_me: number;
   approved_today: number;
   rejected_today: number;
   avg_approval_time_hours: number;
@@ -63,7 +64,7 @@ export default function ApprovalStats({ refreshTrigger }: ApprovalStatsProps) {
   const statCards = [
     {
       label: t("approvals.stats.pendingRequests"),
-      value: stats.pending_requests,
+      value: stats.pending_for_me ?? stats.pending_requests,
       icon: Clock,
       color: "text-amber-600 dark:text-amber-400",
       bgColor: "bg-amber-50 dark:bg-amber-900/20",

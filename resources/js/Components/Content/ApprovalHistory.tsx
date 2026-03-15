@@ -171,23 +171,26 @@ export default function ApprovalHistory({
           <thead className="bg-gray-50/50 dark:bg-neutral-900/50 border-b border-gray-100 dark:border-neutral-700">
             <tr className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
               {!publicationId && (
-                <th className="px-6 py-4 text-left font-bold w-[25%]">
+                <th className="px-6 py-4 text-left font-bold w-[20%]">
                   {t("approvals.historyTable.publication")}
                 </th>
               )}
-              <th className="px-6 py-4 text-left font-bold w-[15%]">
+              <th className="px-6 py-4 text-left font-bold w-[12%]">
                 {t("approvals.historyTable.submittedBy")}
               </th>
-              <th className="px-6 py-4 text-left font-bold w-[15%]">
+              <th className="px-6 py-4 text-left font-bold w-[12%]">
                 {t("approvals.historyTable.submittedAt")}
               </th>
-              <th className="px-6 py-4 text-left font-bold w-[15%]">
+              <th className="px-6 py-4 text-left font-bold w-[12%]">
                 {t("approvals.historyTable.status")}
               </th>
               <th className="px-6 py-4 text-left font-bold w-[15%]">
+                {t("approvals.historyTable.currentReviewer") || "Revisor Actual"}
+              </th>
+              <th className="px-6 py-4 text-left font-bold w-[12%]">
                 {t("approvals.historyTable.completedBy")}
               </th>
-              <th className="px-6 py-4 text-left font-bold w-[15%]">
+              <th className="px-6 py-4 text-left font-bold w-[12%]">
                 {t("approvals.historyTable.actions")}
               </th>
             </tr>
@@ -202,7 +205,7 @@ export default function ApprovalHistory({
             ) : displayedRequests.length === 0 ? (
               <tr>
                 <td
-                  colSpan={publicationId ? 5 : 6}
+                  colSpan={publicationId ? 6 : 7}
                   className="px-6 py-16 text-center"
                 >
                   <div className="flex flex-col items-center justify-center">
@@ -247,6 +250,35 @@ export default function ApprovalHistory({
                   </td>
                   <td className="px-6 py-4">
                     {getStatusBadge(request.status)}
+                  </td>
+                  <td className="px-6 py-4">
+                    {request.status === "pending" && request.currentStep ? (
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-yellow-500" />
+                          <span className="text-sm font-medium text-gray-900 dark:text-white">
+                            {request.currentStep.level_name || `Nivel ${request.currentStep.level_number}`}
+                          </span>
+                        </div>
+                        {request.currentStep.role && (
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            {request.currentStep.role.name}
+                          </span>
+                        )}
+                        {request.currentStep.user && (
+                          <span className="text-xs text-primary-600 dark:text-primary-400">
+                            {request.currentStep.user.name}
+                          </span>
+                        )}
+                        {request.workflow?.is_multi_level && (
+                          <span className="text-xs text-gray-400">
+                            ({request.currentStep.level_number}/{request.workflow.levels?.length || '?'})
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-gray-400">-</span>
+                    )}
                   </td>
                   <td className="px-6 py-4">
                     {request.completedBy ? (

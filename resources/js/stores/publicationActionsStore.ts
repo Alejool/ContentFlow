@@ -75,6 +75,7 @@ export const usePublicationActionsStore = create<PublicationActionsStore>((set, 
           approval_request: approvalRequest,
         };
 
+        // Actualizar la publicación en el store con el nuevo estado
         usePublicationStore.getState().updatePublication(itemId, updateData);
 
         // Actualizar selectedItem si está abierto
@@ -82,6 +83,13 @@ export const usePublicationActionsStore = create<PublicationActionsStore>((set, 
         if (selectedItem?.id === itemId) {
           useManageContentUIStore.getState().updateSelectedItem(updateData);
         }
+
+        // CRITICAL: Emit event to trigger list refresh
+        // The backend has already invalidated the cache, so the next API call
+        // will return fresh data without this publication (now in pending_review status)
+        window.dispatchEvent(new CustomEvent('publication-submitted-for-approval', {
+          detail: { publicationId: itemId, publication: updateData }
+        }));
       }
 
       return {

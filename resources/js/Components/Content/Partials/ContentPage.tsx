@@ -11,14 +11,16 @@ import { useCampaignStore } from "@/stores/campaignStore";
 import { usePublicationStore } from "@/stores/publicationStore";
 import { Head, usePage } from "@inertiajs/react";
 import {
-    Calendar as CalendarIcon,
-    CheckCircle,
-    FileText,
-    Folder,
-    Plus,
-    Shield,
-    Target,
-    Trash2
+  Calendar as CalendarIcon,
+  CheckCircle,
+  Clock,
+  FileText,
+  Folder,
+  History as HistoryIcon,
+  Plus,
+  Shield,
+  Target,
+  Trash2
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import toast from "react-hot-toast";
@@ -34,8 +36,8 @@ import TabNavigation from "@/Components/common/TabNavigation";
 import { useCanApprove } from "@/Hooks/approval/useCanApprove";
 import { usePendingApprovals } from "@/Hooks/approval/usePendingApprovals";
 import {
-    ContentTab,
-    usePublications,
+  ContentTab,
+  usePublications,
 } from "@/Hooks/publication/usePublications";
 import { useManageContentUIStore } from "@/stores/manageContentUIStore";
 import { useShallow } from "zustand/react/shallow";
@@ -238,6 +240,31 @@ export default function ManageContentPage() {
     }
   }, [auth?.user?.current_workspace_id]);
 
+  // CRITICAL: Refresh approvals when switching to approvals tab
+  useEffect(() => {
+    if (activeTab === "approvals") {
+      console.log('[ContentPage] Switched to approvals tab, refreshing...');
+      setRefreshTrigger((prev) => prev + 1);
+    }
+  }, [activeTab]);
+
+  // Listen for publication submitted for approval event
+  useEffect(() => {
+    const handleSubmittedForApproval = (event: CustomEvent) => {
+      console.log('[ContentPage] Publication submitted for approval:', event.detail);
+      // Refresh the publications list to remove the publication from current view
+      handleRefresh();
+      // CRITICAL: Also refresh approvals list to show the new pending request
+      setRefreshTrigger((prev) => prev + 1);
+    };
+
+    window.addEventListener('publication-submitted-for-approval', handleSubmittedForApproval as EventListener);
+
+    return () => {
+      window.removeEventListener('publication-submitted-for-approval', handleSubmittedForApproval as EventListener);
+    };
+  }, [handleRefresh]);
+
   const [approvalTab, setApprovalTab] = useState("pending");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
@@ -348,7 +375,6 @@ export default function ManageContentPage() {
         id: "approvals",
         label: t("manageContent.tabs.approvals"),
         icon: CheckCircle,
-        badge: pendingApprovals,
         enabled: canApprove,
       },
     ],
@@ -368,102 +394,6 @@ export default function ManageContentPage() {
               </p>
             </div>
 
-            <div className="flex justify-end gap-2">
-              {permissions.includes("manage-content") && (
-                <>
-                  {/* <Dropdown>
-                    <Dropdown.Trigger>
-                      <Button
-                        id="import-excel"
-                        variant="ghost"
-                        buttonStyle="outline"
-                        size="md"
-                        icon={FileSpreadsheet}
-                        className="gap-2 uppercase tracking-wider font-bold text-xs"
-                      >
-                        {t("manageContent.importExcel") || "IMPORTAR EXCEL"}
-                      </Button>
-                    </Dropdown.Trigger>
-                    <Dropdown.Content
-                      align="right"
-                      width="auto"
-                      contentClasses="py-1 bg-white/95 dark:bg-neutral-800 shadow-xl rounded-lg min-w-[220px]"
-                    >
-                      <div className="p-1">
-                        <Button
-                          onClick={() => setExcelImporter({ isOpen: true, type: 'publications' })}
-                          variant="ghost"
-                          buttonStyle="outline"
-                          size="md"
-                          icon={FileText}
-                          fullWidth
-                          className="border-none"
-                        >
-                          {t("manageContent.tabs.publications").toUpperCase()}
-                        </Button>
-                        <div className="border-t border-gray-100 dark:border-neutral-700/50" />
-                        <Button
-                          onClick={() => setExcelImporter({ isOpen: true, type: 'campaigns' })}
-                          variant="ghost"
-                          buttonStyle="outline"
-                          size="md"
-                          icon={Target}
-                          fullWidth
-                          className="border-none"
-                        >
-                          {t("manageContent.tabs.campaigns").toUpperCase()}
-                        </Button>
-                      </div>
-                    </Dropdown.Content>
-                  </Dropdown> */}
-
-                  <Dropdown>
-                    <Dropdown.Trigger>
-                      <Button
-                        id="create-publication"
-                        variant="primary"
-                        size="md"
-                        icon={Plus}
-                        className="gap-2 uppercase tracking-wider font-bold text-xs backdrop-3xl"
-                      >
-                        {t("manageContent.createNew").toUpperCase()}
-                      </Button>
-                    </Dropdown.Trigger>
-                    <Dropdown.Content
-                      align="right"
-                      width="auto"
-                      contentClasses="py-1 bg-white/95 dark:bg-neutral-800 shadow-xl rounded-lg min-w-[220px]"
-                    >
-                      <div className="p-1">
-                        <Button
-                          onClick={() => openAddModal("publication")}
-                          variant="ghost"
-                          buttonStyle="outline"
-                          size="md"
-                          icon={FileText}
-                          fullWidth
-                          className="border-none"
-                        >
-                          {t("manageContent.tabs.publications").toUpperCase()}
-                        </Button>
-                        <div className="border-t border-gray-100 dark:border-neutral-700/50" />
-                        <Button
-                          onClick={() => openAddModal("campaign")}
-                          variant="ghost"
-                          buttonStyle="outline"
-                          size="md"
-                          icon={Target}
-                          fullWidth
-                          className="border-none"
-                        >
-                          {t("manageContent.tabs.campaigns").toUpperCase()}
-                        </Button>
-                      </div>
-                    </Dropdown.Content>
-                  </Dropdown>
-                </>
-              )}
-            </div>
         </div>
       }>
       <Head title={t("manageContent.title")} />
@@ -525,36 +455,30 @@ export default function ManageContentPage() {
                 )}
                 <ApprovalStats refreshTrigger={refreshTrigger} />
 
-                <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 overflow-hidden shadow-sm">
-                  <div className="border-b border-gray-200 dark:border-neutral-700 flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 bg-gray-50/50 dark:bg-neutral-800/50">
-                    <div className="flex bg-gray-200/50 dark:bg-neutral-700/50 p-1 rounded-lg w-fit">
-                      <Button
-                        onClick={() => setApprovalTab("pending")}
-                        variant="ghost"
-                        buttonStyle="solid"
-                        className={`px-6 py-2 rounded-lg font-bold text-sm transition-all border-0 shadow-none hover:bg-transparent ${
-                          approvalTab === "pending"
-                            ? "bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 shadow-sm ring-1 ring-black/5"
-                            : "text-gray-500 hover:text-gray-700"
-                        }`}
-                      >
-                        {t("approvals.tabs.pending").toUpperCase()}
-                      </Button>
-                      <Button
-                        onClick={() => setApprovalTab("history")}
-                        variant="ghost"
-                        buttonStyle="solid"
-                        className={`px-6 py-2 rounded-lg font-bold text-sm transition-all border-0 shadow-none hover:bg-transparent ${
-                          approvalTab === "history"
-                            ? "bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 shadow-sm ring-1 ring-black/5"
-                            : "text-gray-500 hover:text-gray-700"
-                        }`}
-                      >
-                        {t("approvals.tabs.history").toUpperCase()}
-                      </Button>
-                    </div>
-                  </div>
+                {/* Approval Tabs */}
+                <div className="mb-6">
+                  <TabNavigation
+                    tabs={[
+                      {
+                        id: "pending",
+                        label: t("approvals.tabs.pending"),
+                        icon: Clock,
+                        badge: pendingApprovals > 0 ? pendingApprovals : undefined,
+                      },
+                      {
+                        id: "history",
+                        label: t("approvals.tabs.history"),
+                        icon: HistoryIcon,
+                      },
+                    ]}
+                    activeTab={approvalTab}
+                    onTabChange={setApprovalTab}
+                    variant="horizontal"
+                  />
+                </div>
 
+                {/* Approval Content */}
+                <div className="bg-white dark:bg-neutral-800 rounded-2xl border border-gray-200 dark:border-neutral-700 overflow-hidden shadow-sm">
                   <div className="p-0">
                     {approvalTab === "pending" ? (
                       <ApprovalList

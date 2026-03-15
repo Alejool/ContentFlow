@@ -5,7 +5,7 @@ import Button from "@/Components/common/Modern/Button";
 import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
 import EmptyState from "@/Components/common/ui/EmptyState";
 import { VirtualList } from "@/Components/common/ui/VirtualList";
-import { formatDateTimeString, formatTimeString } from "@/Utils/dateHelpers";
+import { formatDateTimeString } from "@/Utils/dateHelpers";
 import { getDateFnsLocale } from "@/Utils/dateLocales";
 import { useManageContentUIStore } from "@/stores/manageContentUIStore";
 import { usePublicationStore } from "@/stores/publicationStore";
@@ -14,7 +14,7 @@ import { Publication } from "@/types/Publication";
 import { usePage } from "@inertiajs/react";
 import axios from "axios";
 import { Locale, formatDistanceToNow } from "date-fns";
-import { Check, Clock, Eye, Layers, User, X } from "lucide-react";
+import { Check, Clock, Eye, FileText, Layers, User, X } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -48,88 +48,174 @@ function ApprovalRequestItem({
   const publication = request.publication;
   if (!publication) return null;
 
+  // Get media preview
+  const firstMedia = publication.media_files?.[0];
+  const mediaPreview = firstMedia?.thumbnail?.file_path || firstMedia?.file_path;
+
   return (
-    <div
-      key={request.id}
-      className="bg-white dark:bg-neutral-800 rounded-lg p-4 border border-gray-200 dark:border-neutral-700 shadow-sm hover:shadow-md transition-shadow mb-4"
-    >
-      <div className="flex flex-col sm:flex-row justify-between gap-4">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-2">
-            <span
-              className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${getStatusColor(request.status)}`}
-            >
-              {t(`approvals.status.${request.status}`) || request.status}
+    <div className="group bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden hover:border-primary-400 dark:hover:border-primary-600">
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-neutral-900 dark:to-neutral-800 px-6 py-4 border-b border-gray-200 dark:border-neutral-700">
+        <div className="flex flex-wrap items-center gap-2">
+          <span
+            className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border shadow-sm ${getStatusColor(request.status)}`}
+          >
+            {t(`approvals.status.${request.status}`) || request.status}
+          </span>
+          {request.currentStep && (
+            <span className="px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300 border border-primary-300 dark:border-primary-700 flex items-center gap-1.5 shadow-sm">
+              <Layers className="w-3.5 h-3.5" />
+              {request.currentStep.level_name}
+              {request.workflow?.levels &&
+                ` (${request.currentStep.level_number}/${request.workflow.levels.length})`}
             </span>
-            {request.currentStep && (
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 border border-primary-200 dark:border-primary-800 flex items-center gap-1">
-                <Layers className="w-3 h-3" />
-                {request.currentStep.level_name}
-                {request.workflow?.levels &&
-                  ` (${request.currentStep.level_number}/${request.workflow.levels.length})`}
-              </span>
-            )}
-            <span
-              className="text-xs text-gray-500 flex items-center gap-1.5"
-              title={formatDateTimeString(request.submitted_at, {
-                dateStyle: "long",
-                timeStyle: "short",
+          )}
+          <span
+            className="ml-auto text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-neutral-900 rounded-full border border-gray-200 dark:border-neutral-700"
+            title={formatDateTimeString(request.submitted_at, {
+              dateStyle: "long",
+              timeStyle: "short",
+            })}
+          >
+            <Clock className="w-3.5 h-3.5" />
+            <span className="font-medium">
+              {formatDistanceToNow(new Date(request.submitted_at), {
+                addSuffix: true,
+                locale,
               })}
-            >
-              <Clock className="w-3.5 h-3.5" />
-              <span>
-                {formatTimeString(request.submitted_at)} (
-                {formatDistanceToNow(new Date(request.submitted_at), {
-                  addSuffix: true,
-                  locale,
-                })}
-                )
-              </span>
             </span>
-          </div>
-          <h4 className="font-bold text-gray-900 dark:text-white truncate">
-            {publication.title}
-          </h4>
-          <div className="flex items-center gap-2 mt-2 text-sm text-gray-600 dark:text-gray-400">
-            <User className="w-4 h-4" />
-            <span>{request.submitter?.name || "User"}</span>
+          </span>
+        </div>
+      </div>
+
+      {/* Content Section */}
+      <div className="p-6">
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Media Preview */}
+          {mediaPreview && (
+            <div className="flex-shrink-0">
+              <div className="relative w-full lg:w-40 h-40 rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-neutral-900 dark:to-neutral-800 shadow-md group-hover:shadow-lg transition-shadow">
+                <img
+                  src={mediaPreview}
+                  alt={publication.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+            </div>
+          )}
+
+          {/* Content Details */}
+          <div className="flex-1 min-w-0 space-y-4">
+            {/* Title */}
+            <div>
+              <h3 className="font-bold text-xl text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                {publication.title}
+              </h3>
+              {publication.description && (
+                <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                  {publication.description}
+                </p>
+              )}
+            </div>
+
+            {/* Metadata Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Submitter */}
+              <div className="flex items-center gap-3 px-3 py-2 bg-gray-50 dark:bg-neutral-900/50 rounded-lg">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                  <User className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                    {t("approvals.historyTable.submittedBy")}
+                  </p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                    {request.submitter?.name || "User"}
+                  </p>
+                </div>
+              </div>
+
+              {/* Content Type */}
+              {publication.content_type && (
+                <div className="flex items-center gap-3 px-3 py-2 bg-gray-50 dark:bg-neutral-900/50 rounded-lg">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                    <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                      {t("common.type") || "Tipo"}
+                    </p>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white capitalize">
+                      {publication.content_type}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Workflow Progress */}
+            {request.workflow?.levels && request.currentStep && (
+              <div className="pt-3 border-t border-gray-200 dark:border-neutral-700">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                    {t("approvals.progress") || "Progreso de Aprobación"}
+                  </span>
+                  <span className="text-xs font-bold text-primary-600 dark:text-primary-400">
+                    {request.currentStep.level_number} / {request.workflow.levels.length}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 dark:bg-neutral-700 rounded-full h-2 overflow-hidden">
+                  <div
+                    className="bg-gradient-to-r from-primary-500 to-primary-600 h-full rounded-full transition-all duration-500"
+                    style={{
+                      width: `${(request.currentStep.level_number / request.workflow.levels.length) * 100}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </div>
+      </div>
 
-        <div className="flex items-center gap-3 sm:self-center">
+      {/* Actions Footer */}
+      <div className="bg-gray-50 dark:bg-neutral-900/50 px-6 py-4 border-t border-gray-200 dark:border-neutral-700">
+        <div className="flex flex-col sm:flex-row gap-3">
           <Button
             variant="ghost"
-            buttonStyle="ghost"
+            buttonStyle="outline"
             onClick={() => onViewDetail(publication)}
-            className="p-2 min-w-0"
+            className="flex-1 sm:flex-none border-gray-300 dark:border-neutral-600 hover:bg-gray-100 dark:hover:bg-neutral-800"
             icon={Eye}
-            title={t("common.view")}
             rounded="lg"
-            shadow="none"
           >
-            {""}
+            {t("common.viewDetails") || "Ver Detalles"}
           </Button>
 
-          <Button
-            variant="success"
-            buttonStyle="gradient"
-            onClick={() => onApprove(request)}
-            className="px-6 text-white"
-            icon={Check}
-            rounded="lg"
-          >
-            {t("approvals.approve")}
-          </Button>
-          <Button
-            variant="danger"
-            buttonStyle="gradient"
-            onClick={() => onReject(request)}
-            className="px-6 text-white"
-            icon={X}
-            rounded="lg"
-          >
-            {t("approvals.reject") || "Reject"}
-          </Button>
+          <div className="flex-1 flex gap-3">
+            <Button
+              variant="success"
+              buttonStyle="gradient"
+              onClick={() => onApprove(request)}
+              className="flex-1 text-white shadow-md hover:shadow-lg"
+              icon={Check}
+              rounded="lg"
+            >
+              {t("approvals.approve") || "Aprobar"}
+            </Button>
+
+            <Button
+              variant="danger"
+              buttonStyle="gradient"
+              onClick={() => onReject(request)}
+              className="flex-1 text-white shadow-md hover:shadow-lg"
+              icon={X}
+              rounded="lg"
+            >
+              {t("approvals.reject") || "Rechazar"}
+            </Button>
+          </div>
         </div>
       </div>
     </div>
@@ -267,24 +353,49 @@ export default function ApprovalList({
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className="bg-white dark:bg-neutral-800 rounded-lg p-4 border border-gray-200 dark:border-neutral-700 shadow-sm"
+            className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 shadow-sm overflow-hidden"
           >
-            <div className="flex flex-col sm:flex-row justify-between gap-4">
-              <div className="flex-1 min-w-0 space-y-3">
-                <div className="flex items-center gap-2">
-                  <div className="h-5 w-24 bg-gray-200 dark:bg-neutral-700 rounded animate-pulse" />
-                  <div className="h-4 w-32 bg-gray-200 dark:bg-neutral-700 rounded animate-pulse" />
+            {/* Header skeleton */}
+            <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-neutral-900 dark:to-neutral-800 px-6 py-4 border-b border-gray-200 dark:border-neutral-700">
+              <div className="flex items-center gap-2">
+                <div className="h-7 w-24 bg-gray-200 dark:bg-neutral-700 rounded-full animate-pulse" />
+                <div className="h-7 w-32 bg-gray-200 dark:bg-neutral-700 rounded-full animate-pulse" />
+                <div className="h-7 w-28 bg-gray-200 dark:bg-neutral-700 rounded-full animate-pulse ml-auto" />
+              </div>
+            </div>
+
+            {/* Content skeleton */}
+            <div className="p-6">
+              <div className="flex flex-col lg:flex-row gap-6">
+                {/* Media skeleton */}
+                <div className="flex-shrink-0">
+                  <div className="w-full lg:w-40 h-40 bg-gray-200 dark:bg-neutral-700 rounded-xl animate-pulse" />
                 </div>
-                <div className="h-6 w-3/4 bg-gray-200 dark:bg-neutral-700 rounded animate-pulse" />
-                <div className="flex items-center gap-2">
-                  <div className="h-4 w-4 bg-gray-200 dark:bg-neutral-700 rounded-full animate-pulse" />
-                  <div className="h-4 w-20 bg-gray-200 dark:bg-neutral-700 rounded animate-pulse" />
+
+                {/* Details skeleton */}
+                <div className="flex-1 space-y-4">
+                  <div className="space-y-2">
+                    <div className="h-7 w-3/4 bg-gray-200 dark:bg-neutral-700 rounded animate-pulse" />
+                    <div className="h-4 w-full bg-gray-200 dark:bg-neutral-700 rounded animate-pulse" />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="h-16 bg-gray-100 dark:bg-neutral-900/50 rounded-lg animate-pulse" />
+                    <div className="h-16 bg-gray-100 dark:bg-neutral-900/50 rounded-lg animate-pulse" />
+                  </div>
+                  <div className="pt-3 space-y-2">
+                    <div className="h-4 w-32 bg-gray-200 dark:bg-neutral-700 rounded animate-pulse" />
+                    <div className="h-2 w-full bg-gray-200 dark:bg-neutral-700 rounded-full animate-pulse" />
+                  </div>
                 </div>
               </div>
-              <div className="flex items-center gap-3 sm:self-center">
-                <div className="h-10 w-10 bg-gray-200 dark:bg-neutral-700 rounded-lg animate-pulse" />
-                <div className="h-10 w-24 bg-gray-200 dark:bg-neutral-700 rounded-lg animate-pulse" />
-                <div className="h-10 w-24 bg-gray-200 dark:bg-neutral-700 rounded-lg animate-pulse" />
+            </div>
+
+            {/* Actions skeleton */}
+            <div className="bg-gray-50 dark:bg-neutral-900/50 px-6 py-4 border-t border-gray-200 dark:border-neutral-700">
+              <div className="flex gap-3">
+                <div className="h-10 w-32 bg-gray-200 dark:bg-neutral-700 rounded-lg animate-pulse" />
+                <div className="h-10 flex-1 bg-gray-200 dark:bg-neutral-700 rounded-lg animate-pulse" />
+                <div className="h-10 flex-1 bg-gray-200 dark:bg-neutral-700 rounded-lg animate-pulse" />
               </div>
             </div>
           </div>

@@ -15,11 +15,18 @@ export function usePendingApprovals(
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchPending = useCallback(async () => {
+    console.log('[usePendingApprovals] Fetching pending approvals...');
     setIsLoading(true);
     try {
-      const response = await axios.get(route("api.v1.approvals.pending"));
+      const response = await axios.get(route("api.v1.approvals.pending"), {
+        params: {
+          type: 'to_approve', // Explicitly request approvals to review
+        }
+      });
+      console.log('[usePendingApprovals] Received:', response.data);
       setRequests(response.data.requests ?? []);
-    } catch {
+    } catch (error) {
+      console.error('[usePendingApprovals] Error fetching:', error);
       setRequests([]);
     } finally {
       setIsLoading(false);
@@ -27,6 +34,7 @@ export function usePendingApprovals(
   }, []);
 
   useEffect(() => {
+    console.log('[usePendingApprovals] Effect triggered, refreshTrigger:', refreshTrigger);
     fetchPending();
   }, [fetchPending, refreshTrigger]);
 
