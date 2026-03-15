@@ -158,9 +158,7 @@ class PerformanceMetricsTracker {
       }
     >;
   } {
-    const filtered = resource
-      ? this.metrics.filter((m) => m.resource === resource)
-      : this.metrics;
+    const filtered = resource ? this.metrics.filter((m) => m.resource === resource) : this.metrics;
 
     if (filtered.length === 0) {
       return {
@@ -180,14 +178,8 @@ class PerformanceMetricsTracker {
     const failedMetrics = filtered.filter((m) => !m.success);
 
     // Calculate averages
-    const totalOptimisticTime = filtered.reduce(
-      (sum, m) => sum + m.optimisticUpdateTime,
-      0,
-    );
-    const totalServerTime = filtered.reduce(
-      (sum, m) => sum + m.serverResponseTime,
-      0,
-    );
+    const totalOptimisticTime = filtered.reduce((sum, m) => sum + m.optimisticUpdateTime, 0);
+    const totalServerTime = filtered.reduce((sum, m) => sum + m.serverResponseTime, 0);
     const totalTimeSaved = filtered.reduce((sum, m) => sum + m.timeSaved, 0);
 
     const averageOptimisticTime = totalOptimisticTime / filtered.length;
@@ -210,10 +202,7 @@ class PerformanceMetricsTracker {
 
       if (opMetrics.length > 0) {
         const opSuccess = opMetrics.filter((m) => m.success).length;
-        const opServerTime = opMetrics.reduce(
-          (sum, m) => sum + m.serverResponseTime,
-          0,
-        );
+        const opServerTime = opMetrics.reduce((sum, m) => sum + m.serverResponseTime, 0);
         const opTimeSaved = opMetrics.reduce((sum, m) => sum + m.timeSaved, 0);
 
         byOperation[op] = {
@@ -302,9 +291,7 @@ class PerformanceMetricsTracker {
 
     // Calculate performance improvement (percentage)
     const performanceImprovement =
-      stats.averageServerTime > 0
-        ? (stats.averageTimeSaved / stats.averageServerTime) * 100
-        : 0;
+      stats.averageServerTime > 0 ? (stats.averageTimeSaved / stats.averageServerTime) * 100 : 0;
 
     return {
       fastestOperation: fastestOp || "N/A",
@@ -367,10 +354,7 @@ class PerformanceMetricsTracker {
         const successCount = metrics.filter((m) => m.success).length;
         successRate.push((successCount / metrics.length) * 100);
 
-        const totalResponseTime = metrics.reduce(
-          (sum, m) => sum + m.serverResponseTime,
-          0,
-        );
+        const totalResponseTime = metrics.reduce((sum, m) => sum + m.serverResponseTime, 0);
         avgResponseTime.push(Math.round(totalResponseTime / metrics.length));
 
         const totalTimeSaved = metrics.reduce((sum, m) => sum + m.timeSaved, 0);
@@ -476,9 +460,7 @@ class PerformanceMetricsTracker {
     ]);
 
     const csv = [headers, ...rows]
-      .map((row) =>
-        row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","),
-      )
+      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
       .join("\n");
 
     return csv;

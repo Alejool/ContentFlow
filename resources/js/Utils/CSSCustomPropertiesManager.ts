@@ -21,74 +21,39 @@ class CSSPropertiesManager {
   applyThemeProperties(theme: "light" | "dark"): void {
     if (!this.root) return;
 
-    const colors =
-      theme === "dark" ? enhancedTheme.darkMode : enhancedTheme.lightMode;
+    const colors = theme === "dark" ? enhancedTheme.darkMode : enhancedTheme.lightMode;
     const focusColors = enhancedTheme.focus;
 
     // Background colors
-    this.root.style.setProperty(
-      "--theme-bg-primary",
-      colors.background.primary,
-    );
-    this.root.style.setProperty(
-      "--theme-bg-secondary",
-      colors.background.secondary,
-    );
-    this.root.style.setProperty(
-      "--theme-bg-tertiary",
-      colors.background.tertiary,
-    );
-    this.root.style.setProperty(
-      "--theme-bg-elevated",
-      colors.background.elevated,
-    );
+    this.root.style.setProperty("--theme-bg-primary", colors.background.primary);
+    this.root.style.setProperty("--theme-bg-secondary", colors.background.secondary);
+    this.root.style.setProperty("--theme-bg-tertiary", colors.background.tertiary);
+    this.root.style.setProperty("--theme-bg-elevated", colors.background.elevated);
 
     // Text colors
     this.root.style.setProperty("--theme-text-primary", colors.text.primary);
-    this.root.style.setProperty(
-      "--theme-text-secondary",
-      colors.text.secondary,
-    );
+    this.root.style.setProperty("--theme-text-secondary", colors.text.secondary);
     this.root.style.setProperty("--theme-text-tertiary", colors.text.tertiary);
     this.root.style.setProperty("--theme-text-disabled", colors.text.disabled);
 
     // Border colors
     this.root.style.setProperty("--theme-border-subtle", colors.border.subtle);
-    this.root.style.setProperty(
-      "--theme-border-default",
-      colors.border.default,
-    );
+    this.root.style.setProperty("--theme-border-default", colors.border.default);
     this.root.style.setProperty("--theme-border-strong", colors.border.strong);
 
     // Interactive states
-    this.root.style.setProperty(
-      "--theme-interactive-hover",
-      colors.interactive.hover,
-    );
-    this.root.style.setProperty(
-      "--theme-interactive-active",
-      colors.interactive.active,
-    );
-    this.root.style.setProperty(
-      "--theme-interactive-focus",
-      colors.interactive.focus,
-    );
+    this.root.style.setProperty("--theme-interactive-hover", colors.interactive.hover);
+    this.root.style.setProperty("--theme-interactive-active", colors.interactive.active);
+    this.root.style.setProperty("--theme-interactive-focus", colors.interactive.focus);
 
     // Focus ring colors
     const focusRingColor =
-      theme === "dark"
-        ? focusColors.ring.color.dark
-        : focusColors.ring.color.light;
+      theme === "dark" ? focusColors.ring.color.dark : focusColors.ring.color.light;
     const focusOutlineColor =
-      theme === "dark"
-        ? focusColors.outline.color.dark
-        : focusColors.outline.color.light;
+      theme === "dark" ? focusColors.outline.color.dark : focusColors.outline.color.light;
 
     this.root.style.setProperty("--theme-focus-ring-color", focusRingColor);
-    this.root.style.setProperty(
-      "--theme-focus-outline-color",
-      focusOutlineColor,
-    );
+    this.root.style.setProperty("--theme-focus-outline-color", focusOutlineColor);
   }
 
   /**
@@ -140,11 +105,9 @@ class CSSPropertiesManager {
       this.root.style.setProperty("--primary-950", shade(0.9));
     } else {
       // Clear custom properties when using predefined themes
-      [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].forEach(
-        (weight) => {
-          this.root?.style.removeProperty(`--primary-${weight}`);
-        },
-      );
+      [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].forEach((weight) => {
+        this.root?.style.removeProperty(`--primary-${weight}`);
+      });
       this.root.setAttribute("data-theme-color", color || "orange");
     }
   }

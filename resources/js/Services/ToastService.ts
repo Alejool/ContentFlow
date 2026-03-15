@@ -94,12 +94,7 @@ class ToastServiceClass {
   /**
    * Show toast from flash message
    */
-  fromFlash(flash: {
-    success?: string;
-    error?: string;
-    warning?: string;
-    info?: string;
-  }): void {
+  fromFlash(flash: { success?: string; error?: string; warning?: string; info?: string }): void {
     if (flash.success) {
       this.success(flash.success);
     }

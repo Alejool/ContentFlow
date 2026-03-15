@@ -23,10 +23,7 @@ export function isInertiaPage(): boolean {
   }
 
   // Check if Inertia is initialized by looking for the page data
-  return (
-    !!(window as any).Inertia ||
-    document.getElementById("app")?.hasAttribute("data-page")
-  );
+  return !!(window as any).Inertia || document.getElementById("app")?.hasAttribute("data-page");
 }
 
 /**
@@ -205,14 +202,7 @@ export function syncWithInertia(
  */
 export function isSharedData(propKey: string): boolean {
   // Common shared data keys in Inertia
-  const sharedDataKeys = [
-    "auth",
-    "flash",
-    "errors",
-    "ziggy",
-    "locale",
-    "csrf_token",
-  ];
+  const sharedDataKeys = ["auth", "flash", "errors", "ziggy", "locale", "csrf_token"];
 
   return sharedDataKeys.includes(propKey);
 }
@@ -247,10 +237,7 @@ export function mergeOptimisticData(
     case "create":
       // Add optimistic item to collection
       if (Array.isArray(merged[collectionKey])) {
-        merged[collectionKey] = [
-          operation.optimisticData,
-          ...merged[collectionKey],
-        ];
+        merged[collectionKey] = [operation.optimisticData, ...merged[collectionKey]];
       }
       break;
 

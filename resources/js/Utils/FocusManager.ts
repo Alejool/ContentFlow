@@ -80,9 +80,7 @@ class FocusManagerClass {
    * @param direction - 'forward' for next, 'backward' for previous
    * @returns The next focusable element or null
    */
-  getNextFocusable(
-    direction: "forward" | "backward" = "forward",
-  ): HTMLElement | null {
+  getNextFocusable(direction: "forward" | "backward" = "forward"): HTMLElement | null {
     const focusableElements = this.getAllFocusableElements();
 
     if (focusableElements.length === 0) {
@@ -104,8 +102,7 @@ class FocusManagerClass {
     const nextIndex =
       direction === "forward"
         ? (currentIndex + 1) % focusableElements.length
-        : (currentIndex - 1 + focusableElements.length) %
-          focusableElements.length;
+        : (currentIndex - 1 + focusableElements.length) % focusableElements.length;
 
     return focusableElements[nextIndex];
   }
@@ -151,20 +148,14 @@ class FocusManagerClass {
 
       // Shift + Tab (backward)
       if (event.shiftKey) {
-        if (
-          activeElement === firstElement ||
-          !container.contains(activeElement)
-        ) {
+        if (activeElement === firstElement || !container.contains(activeElement)) {
           event.preventDefault();
           lastElement.focus();
         }
       }
       // Tab (forward)
       else {
-        if (
-          activeElement === lastElement ||
-          !container.contains(activeElement)
-        ) {
+        if (activeElement === lastElement || !container.contains(activeElement)) {
           event.preventDefault();
           firstElement.focus();
         }
@@ -201,10 +192,7 @@ class FocusManagerClass {
    * Restore focus to the previously focused element
    */
   restoreFocus(): void {
-    if (
-      this.previousFocusElement &&
-      this.isFocusable(this.previousFocusElement)
-    ) {
+    if (this.previousFocusElement && this.isFocusable(this.previousFocusElement)) {
       this.setFocus(this.previousFocusElement);
     }
   }
@@ -262,9 +250,7 @@ class FocusManagerClass {
   private getAllFocusableElements(): HTMLElement[] {
     const selector =
       'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"]), [contenteditable="true"]';
-    const elements = Array.from(
-      document.querySelectorAll<HTMLElement>(selector),
-    );
+    const elements = Array.from(document.querySelectorAll<HTMLElement>(selector));
     return elements.filter((el) => this.isFocusable(el));
   }
 
@@ -288,10 +274,7 @@ class FocusManagerClass {
     document.addEventListener("focusout", () => {
       // Small delay to allow new focus to be set
       setTimeout(() => {
-        if (
-          !document.activeElement ||
-          document.activeElement === document.body
-        ) {
+        if (!document.activeElement || document.activeElement === document.body) {
           this.previousFocusElement = this.currentFocusElement;
           this.currentFocusElement = null;
         }

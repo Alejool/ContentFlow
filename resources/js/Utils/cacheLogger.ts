@@ -11,17 +11,8 @@ export interface CacheDecisionLog {
   timestamp: number;
   url: string;
   method: string;
-  strategy:
-    | "cache-first"
-    | "network-first"
-    | "stale-while-revalidate"
-    | "network-only";
-  result:
-    | "cache-hit"
-    | "cache-miss"
-    | "network-success"
-    | "network-error"
-    | "fallback";
+  strategy: "cache-first" | "network-first" | "stale-while-revalidate" | "network-only";
+  result: "cache-hit" | "cache-miss" | "network-success" | "network-error" | "fallback";
   responseTime: number;
   cacheAge?: number;
   size?: number;
@@ -174,8 +165,7 @@ class CacheLogger {
 
     this.logs.forEach((log) => {
       // Count by strategy
-      stats.byStrategy[log.strategy] =
-        (stats.byStrategy[log.strategy] || 0) + 1;
+      stats.byStrategy[log.strategy] = (stats.byStrategy[log.strategy] || 0) + 1;
 
       // Count by result
       stats.byResult[log.result] = (stats.byResult[log.result] || 0) + 1;
@@ -194,9 +184,7 @@ class CacheLogger {
       }
     });
 
-    stats.averageResponseTime = Math.round(
-      totalResponseTime / this.logs.length,
-    );
+    stats.averageResponseTime = Math.round(totalResponseTime / this.logs.length);
     stats.cacheHitRate = (cacheHits / this.logs.length) * 100;
     stats.networkErrorRate = (networkErrors / this.logs.length) * 100;
 
@@ -243,11 +231,8 @@ class CacheLogger {
     });
 
     // Calculate cache efficiency (cache hits vs total requests)
-    const cacheHits = this.logs.filter(
-      (log) => log.result === "cache-hit",
-    ).length;
-    const cacheEfficiency =
-      this.logs.length > 0 ? (cacheHits / this.logs.length) * 100 : 0;
+    const cacheHits = this.logs.filter((log) => log.result === "cache-hit").length;
+    const cacheEfficiency = this.logs.length > 0 ? (cacheHits / this.logs.length) * 100 : 0;
 
     return {
       fastestStrategy,
@@ -345,9 +330,7 @@ class CacheLogger {
     ]);
 
     const csv = [headers, ...rows]
-      .map((row) =>
-        row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","),
-      )
+      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
       .join("\n");
 
     return csv;

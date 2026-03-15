@@ -18,10 +18,7 @@ import { themeAPIClient } from "./ThemeAPIClient";
 export type ThemePreference = "light" | "dark" | "system";
 
 export interface ThemeStorage {
-  saveThemePreference(
-    workspaceId: string,
-    theme: ThemePreference,
-  ): Promise<void>;
+  saveThemePreference(workspaceId: string, theme: ThemePreference): Promise<void>;
   loadThemePreference(workspaceId: string): Promise<ThemePreference | null>;
   deleteThemePreference(workspaceId: string): Promise<void>;
   getAllWorkspaceThemes(): Promise<Record<string, ThemePreference>>;
@@ -32,10 +29,7 @@ export interface ThemeStorage {
  * Saves to localStorage immediately and backend asynchronously
  * If backend save fails, localStorage still has the preference
  */
-async function saveThemePreference(
-  workspaceId: string,
-  theme: ThemePreference,
-): Promise<void> {
+async function saveThemePreference(workspaceId: string, theme: ThemePreference): Promise<void> {
   if (!workspaceId) {
     return;
   }
@@ -60,9 +54,7 @@ async function saveThemePreference(
  * 2. If not found, try backend (requires network)
  * 3. If both fail, return null (caller should use system default)
  */
-async function loadThemePreference(
-  workspaceId: string,
-): Promise<ThemePreference | null> {
+async function loadThemePreference(workspaceId: string): Promise<ThemePreference | null> {
   if (!workspaceId) {
     return null;
   }
@@ -113,16 +105,12 @@ async function deleteThemePreference(workspaceId: string): Promise<void> {
  * Get all workspace themes from localStorage
  * This is a local-only operation for performance
  */
-async function getAllWorkspaceThemes(): Promise<
-  Record<string, ThemePreference>
-> {
+async function getAllWorkspaceThemes(): Promise<Record<string, ThemePreference>> {
   const themes: Record<string, ThemePreference> = {};
 
   try {
     const keys = Object.keys(localStorage);
-    const workspaceThemeKeys = keys.filter((key) =>
-      key.startsWith("workspace_theme_"),
-    );
+    const workspaceThemeKeys = keys.filter((key) => key.startsWith("workspace_theme_"));
 
     workspaceThemeKeys.forEach((key) => {
       const workspaceId = key.replace("workspace_theme_", "");

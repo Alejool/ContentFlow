@@ -8,13 +8,7 @@
 export interface ErrorLog {
   id: string;
   timestamp: number;
-  type:
-    | "optimistic"
-    | "service-worker"
-    | "cache"
-    | "sync"
-    | "network"
-    | "unknown";
+  type: "optimistic" | "service-worker" | "cache" | "sync" | "network" | "unknown";
   operation?: string;
   resource?: string;
   resourceId?: string | number;
@@ -84,8 +78,7 @@ class ErrorLogger {
       data: context?.data || error?.response?.data,
       stackTrace: error?.stack,
       context: {
-        userAgent:
-          typeof navigator !== "undefined" ? navigator.userAgent : undefined,
+        userAgent: typeof navigator !== "undefined" ? navigator.userAgent : undefined,
         url: typeof window !== "undefined" ? window.location.href : undefined,
         online: typeof navigator !== "undefined" ? navigator.onLine : undefined,
         ...context,
@@ -127,18 +120,9 @@ class ErrorLogger {
    * Output error to console with formatting
    */
   private outputToConsole(log: ErrorLog): void {
-    const emoji =
-      log.severity === "error"
-        ? "❌"
-        : log.severity === "warning"
-          ? "⚠️"
-          : "ℹ️";
+    const emoji = log.severity === "error" ? "❌" : log.severity === "warning" ? "⚠️" : "ℹ️";
     const color =
-      log.severity === "error"
-        ? "#ef4444"
-        : log.severity === "warning"
-          ? "#f59e0b"
-          : "#3b82f6";
+      log.severity === "error" ? "#ef4444" : log.severity === "warning" ? "#f59e0b" : "#3b82f6";
 
     console.log(
       `%c${emoji} [${log.type.toUpperCase()}] ${log.message}`,
@@ -152,8 +136,7 @@ class ErrorLogger {
     if (log.status) console.log(`  Status: ${log.status}`);
     if (log.data) console.log(`  Data:`, log.data);
     if (log.context) console.log(`  Context:`, log.context);
-    if (log.stackTrace && this.isDevelopment)
-      console.log(`  Stack:`, log.stackTrace);
+    if (log.stackTrace && this.isDevelopment) console.log(`  Stack:`, log.stackTrace);
   }
 
   /**
@@ -211,13 +194,11 @@ class ErrorLogger {
       stats.byType[log.type] = (stats.byType[log.type] || 0) + 1;
 
       // Count by severity
-      stats.bySeverity[log.severity] =
-        (stats.bySeverity[log.severity] || 0) + 1;
+      stats.bySeverity[log.severity] = (stats.bySeverity[log.severity] || 0) + 1;
 
       // Count by resource
       if (log.resource) {
-        stats.byResource[log.resource] =
-          (stats.byResource[log.resource] || 0) + 1;
+        stats.byResource[log.resource] = (stats.byResource[log.resource] || 0) + 1;
       }
 
       // Count recent errors
@@ -278,9 +259,7 @@ class ErrorLogger {
         this.logs = JSON.parse(stored);
 
         if (this.isDevelopment) {
-          console.log(
-            `[ErrorLogger] Restored ${this.logs.length} logs from storage`,
-          );
+          console.log(`[ErrorLogger] Restored ${this.logs.length} logs from storage`);
         }
       }
     } catch (error) {
@@ -319,9 +298,7 @@ class ErrorLogger {
     ]);
 
     const csv = [headers, ...rows]
-      .map((row) =>
-        row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","),
-      )
+      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
       .join("\n");
 
     return csv;

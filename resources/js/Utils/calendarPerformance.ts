@@ -31,9 +31,7 @@ class CalendarPerformanceMonitor {
 
     // Log warning if render is slow
     if (renderTime > this.SLOW_RENDER_THRESHOLD) {
-      console.warn(
-        `Slow calendar render detected: ${renderTime}ms for ${eventCount} events`,
-      );
+      console.warn(`Slow calendar render detected: ${renderTime}ms for ${eventCount} events`);
     }
   }
 
@@ -60,14 +58,9 @@ class CalendarPerformanceMonitor {
     const slowRenders = recentMetrics.filter(
       (m) => m.renderTime > this.SLOW_RENDER_THRESHOLD,
     ).length;
-    const highEventCount = recentMetrics.filter(
-      (m) => m.eventCount > 100,
-    ).length;
+    const highEventCount = recentMetrics.filter((m) => m.eventCount > 100).length;
 
-    return (
-      slowRenders > 5 ||
-      (avgRenderTime > this.SLOW_RENDER_THRESHOLD && highEventCount > 5)
-    );
+    return slowRenders > 5 || (avgRenderTime > this.SLOW_RENDER_THRESHOLD && highEventCount > 5);
   }
 
   /**
@@ -77,9 +70,7 @@ class CalendarPerformanceMonitor {
     return {
       totalMeasurements: this.metrics.length,
       averageRenderTime: this.getAverageRenderTime(),
-      slowRenders: this.metrics.filter(
-        (m) => m.renderTime > this.SLOW_RENDER_THRESHOLD,
-      ).length,
+      slowRenders: this.metrics.filter((m) => m.renderTime > this.SLOW_RENDER_THRESHOLD).length,
       recommendVirtualization: this.shouldUseVirtualization(),
     };
   }
@@ -98,10 +89,7 @@ export const performanceMonitor = new CalendarPerformanceMonitor();
 /**
  * Hook to measure component render time
  */
-export function useRenderTimeMonitor(
-  componentName: string,
-  eventCount: number,
-) {
+export function useRenderTimeMonitor(componentName: string, eventCount: number) {
   const startTime = performance.now();
 
   return () => {

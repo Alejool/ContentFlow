@@ -190,9 +190,7 @@ class ARIAAnnouncer {
       this.liveRegions.polite.parentNode.removeChild(this.liveRegions.polite);
     }
     if (this.liveRegions.assertive && this.liveRegions.assertive.parentNode) {
-      this.liveRegions.assertive.parentNode.removeChild(
-        this.liveRegions.assertive,
-      );
+      this.liveRegions.assertive.parentNode.removeChild(this.liveRegions.assertive);
     }
 
     this.liveRegions = {

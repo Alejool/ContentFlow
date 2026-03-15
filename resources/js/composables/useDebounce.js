@@ -88,8 +88,7 @@ export function useThrottle(fn, interval = 1000) {
 
     if (timeSinceLastCall < interval) {
       const remainingTime = interval - timeSinceLastCall;
-      }s`);
-      
+
       return Promise.reject(
         new Error(`Please wait ${Math.ceil(remainingTime / 1000)} seconds before trying again`)
       );

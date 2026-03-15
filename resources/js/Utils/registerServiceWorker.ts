@@ -14,9 +14,7 @@ export interface ServiceWorkerConfig {
 /**
  * Register the service worker
  */
-export async function registerServiceWorker(
-  config: ServiceWorkerConfig = {},
-): Promise<void> {
+export async function registerServiceWorker(config: ServiceWorkerConfig = {}): Promise<void> {
   // Check if service workers are supported
   if (!("serviceWorker" in navigator)) {
     return;
@@ -41,10 +39,7 @@ export async function registerServiceWorker(
       if (!newWorker) return;
 
       newWorker.addEventListener("statechange", () => {
-        if (
-          newWorker.state === "installed" &&
-          navigator.serviceWorker.controller
-        ) {
+        if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
           // New service worker available
           config.onUpdate?.(registration);
         }

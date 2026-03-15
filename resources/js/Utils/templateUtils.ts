@@ -64,9 +64,7 @@ export function hasTemplateInSession(): boolean {
  * @returns Formatted hashtag string
  */
 export function formatHashtags(hashtags: string[]): string {
-  return hashtags
-    .map((tag) => (tag.startsWith("#") ? tag : `#${tag}`))
-    .join(" ");
+  return hashtags.map((tag) => (tag.startsWith("#") ? tag : `#${tag}`)).join(" ");
 }
 
 /**

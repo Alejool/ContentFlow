@@ -75,10 +75,7 @@ export const formatDate = (
   format: keyof typeof dateTimeFormats = "medium",
   locale?: string,
 ): string => {
-  const dateObj =
-    typeof date === "string" || typeof date === "number"
-      ? new Date(date)
-      : date;
+  const dateObj = typeof date === "string" || typeof date === "number" ? new Date(date) : date;
 
   const currentLocale = locale || i18n.language || "es";
   const timezone = getWorkspaceTimezone();
@@ -122,11 +119,7 @@ export const formatCurrency = (
 /**
  * Formatea un porcentaje según el idioma actual
  */
-export const formatPercent = (
-  value: number,
-  decimals: number = 1,
-  locale?: string,
-): string => {
+export const formatPercent = (value: number, decimals: number = 1, locale?: string): string => {
   const currentLocale = locale || i18n.language || "es";
 
   return new Intl.NumberFormat(currentLocale, {
@@ -151,14 +144,8 @@ export const formatCompactNumber = (value: number, locale?: string): string => {
 /**
  * Formatea una fecha relativa (hace 2 horas, en 3 días)
  */
-export const formatRelativeTime = (
-  date: Date | string | number,
-  locale?: string,
-): string => {
-  const dateObj =
-    typeof date === "string" || typeof date === "number"
-      ? new Date(date)
-      : date;
+export const formatRelativeTime = (date: Date | string | number, locale?: string): string => {
+  const dateObj = typeof date === "string" || typeof date === "number" ? new Date(date) : date;
 
   const currentLocale = locale || i18n.language || "es";
   const now = new Date();

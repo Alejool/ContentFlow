@@ -20,15 +20,9 @@ export function convertDate(date: string): string {
     return "";
   }
   const dateObj = new Date(date);
-  const fechaNormalizada = new Date(
-    dateObj.getFullYear(),
-    dateObj.getMonth(),
-    dateObj.getDate(),
-  );
+  const fechaNormalizada = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
   const locale =
-    (window as any).APP_LOCALE ||
-    Intl.DateTimeFormat().resolvedOptions().locale ||
-    "es-ES";
+    (window as any).APP_LOCALE || Intl.DateTimeFormat().resolvedOptions().locale || "es-ES";
   return fechaNormalizada.toLocaleDateString(locale, {
     year: "numeric",
     month: "long",

@@ -55,17 +55,14 @@ export function formatDate(
  * toUTC(new Date('2026-03-08T15:30:00'))
  * // → "2026-03-08T20:30:00.000Z" (si workspace es America/Bogota)
  */
-export function toUTC(
-  localDate: Date | string | null | undefined,
-): string | null {
+export function toUTC(localDate: Date | string | null | undefined): string | null {
   if (!localDate) return null;
 
   try {
     const timezone = useTimezoneStore.getState().effectiveTimezone();
 
     // Convertir a Date si es string
-    const date =
-      typeof localDate === "string" ? new Date(localDate) : localDate;
+    const date = typeof localDate === "string" ? new Date(localDate) : localDate;
 
     // Convertir a UTC
     const utcDate = fromZonedTime(date, timezone);
@@ -84,9 +81,7 @@ export function toUTC(
  * @param utcDateString - Fecha en UTC (ISO 8601)
  * @returns Date en timezone del workspace
  */
-export function toLocalDate(
-  utcDateString: string | null | undefined,
-): Date | null {
+export function toLocalDate(utcDateString: string | null | undefined): Date | null {
   if (!utcDateString) return null;
 
   try {

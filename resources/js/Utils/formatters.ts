@@ -2,10 +2,7 @@ export function formatSpeed(bytesPerSecond: number): string {
   if (bytesPerSecond === 0) return "0 B/s";
   const k = 1024;
   const sizes = ["B/s", "KB/s", "MB/s", "GB/s"];
-  const i = Math.min(
-    Math.floor(Math.log(bytesPerSecond) / Math.log(k)),
-    sizes.length - 1,
-  );
+  const i = Math.min(Math.floor(Math.log(bytesPerSecond) / Math.log(k)), sizes.length - 1);
   const value = bytesPerSecond / Math.pow(k, i);
 
   // Format with 1 decimal for values >= 10, 2 decimals for values < 10

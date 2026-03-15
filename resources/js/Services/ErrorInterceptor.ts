@@ -71,8 +71,7 @@ class ErrorInterceptorClass {
   }
 
   private handle400(data?: ErrorResponse) {
-    const message =
-      data?.message || "Solicitud incorrecta. Por favor, revisa tus datos.";
+    const message = data?.message || "Solicitud incorrecta. Por favor, revisa tus datos.";
     ToastService.error(message);
   }
 
@@ -94,8 +93,7 @@ class ErrorInterceptorClass {
   }
 
   private handle403(data?: ErrorResponse) {
-    const message =
-      data?.message || "No tienes permiso para realizar esta acción.";
+    const message = data?.message || "No tienes permiso para realizar esta acción.";
     ToastService.error(message);
     console.error("403 Forbidden:", data);
   }
@@ -110,23 +108,20 @@ class ErrorInterceptorClass {
       // Laravel validation errors
       ToastService.validationErrors(data.errors);
     } else {
-      const message =
-        data?.message || "La validación falló. Por favor, revisa tus datos.";
+      const message = data?.message || "La validación falló. Por favor, revisa tus datos.";
       ToastService.error(message);
     }
   }
 
   private handle429(data?: ErrorResponse) {
     const message =
-      data?.message ||
-      "Demasiadas solicitudes. Por favor, espera un momento e intenta de nuevo.";
+      data?.message || "Demasiadas solicitudes. Por favor, espera un momento e intenta de nuevo.";
     ToastService.warning(message);
   }
 
   private handle5xx(data?: ErrorResponse) {
     const message =
-      data?.message ||
-      "Ocurrió un error en el servidor. Por favor, intenta de nuevo más tarde.";
+      data?.message || "Ocurrió un error en el servidor. Por favor, intenta de nuevo más tarde.";
     ToastService.error(message);
 
     // Log error for monitoring
@@ -147,9 +142,7 @@ class ErrorInterceptorClass {
 
     if (retries < this.maxRetries) {
       this.retryCount.set(url, retries + 1);
-      ToastService.info(
-        `Connection failed. Retrying... (${retries + 1}/${this.maxRetries})`,
-      );
+      ToastService.info(`Connection failed. Retrying... (${retries + 1}/${this.maxRetries})`);
 
       // Retry after delay
       setTimeout(
@@ -160,15 +153,12 @@ class ErrorInterceptorClass {
       );
     } else {
       this.retryCount.delete(url);
-      ToastService.error(
-        "Network error. Please check your connection and try again.",
-      );
+      ToastService.error("Network error. Please check your connection and try again.");
     }
   }
 
   private handleDefault(error: AxiosError<ErrorResponse>) {
-    const message =
-      error.response?.data?.message || "Ocurrió un error inesperado.";
+    const message = error.response?.data?.message || "Ocurrió un error inesperado.";
     ToastService.error(message);
     console.error("Unexpected error:", error);
   }

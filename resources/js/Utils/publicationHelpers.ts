@@ -152,19 +152,14 @@ export function getStatusIcon(status: string) {
  */
 export function getStatusColors(status?: string): string {
   const colors = {
-    published:
-      "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+    published: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
     draft: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400",
-    scheduled:
-      "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
+    scheduled: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
     failed: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
-    pending_review:
-      "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
-    approved:
-      "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
+    pending_review: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
+    approved: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
     rejected: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
-    publishing:
-      "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
+    publishing: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
   };
 
   return colors[status as keyof typeof colors] || colors.draft;

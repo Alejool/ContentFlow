@@ -40,8 +40,7 @@ function save(workspaceId: string, theme: ThemePreference): void {
     // Handle quota exceeded error
     if (
       error instanceof DOMException &&
-      (error.name === "QuotaExceededError" ||
-        error.name === "NS_ERROR_DOM_QUOTA_REACHED")
+      (error.name === "QuotaExceededError" || error.name === "NS_ERROR_DOM_QUOTA_REACHED")
     ) {
       try {
         // Clear all workspace themes and retry
@@ -101,9 +100,7 @@ function remove(workspaceId: string): void {
 function clearAll(): void {
   try {
     const keys = Object.keys(localStorage);
-    const workspaceThemeKeys = keys.filter((key) =>
-      key.startsWith(STORAGE_KEY_PREFIX),
-    );
+    const workspaceThemeKeys = keys.filter((key) => key.startsWith(STORAGE_KEY_PREFIX));
 
     workspaceThemeKeys.forEach((key) => {
       localStorage.removeItem(key);
@@ -120,9 +117,7 @@ function clearAll(): void {
 function clearOtherWorkspaceThemes(currentWorkspaceId: string): void {
   try {
     const keys = Object.keys(localStorage);
-    const workspaceThemeKeys = keys.filter((key) =>
-      key.startsWith(STORAGE_KEY_PREFIX),
-    );
+    const workspaceThemeKeys = keys.filter((key) => key.startsWith(STORAGE_KEY_PREFIX));
     const currentKey = `${STORAGE_KEY_PREFIX}${currentWorkspaceId}`;
 
     // Remove all workspace themes except the current one

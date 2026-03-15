@@ -64,10 +64,7 @@ export const suggestContentType = async (
 
     console.log("🎬 Sending content type suggestion request:", requestData);
 
-    const response = await axios.post(
-      route("api.v1.uploads.suggest-content-type"),
-      requestData,
-    );
+    const response = await axios.post(route("api.v1.uploads.suggest-content-type"), requestData);
 
     console.log("🎬 Content type suggestion response:", response.data);
 
@@ -86,9 +83,7 @@ export const suggestContentType = async (
 /**
  * Get content type limits for display
  */
-export const getContentTypeLimits = (
-  contentType: string,
-): { min: number; max: number } => {
+export const getContentTypeLimits = (contentType: string): { min: number; max: number } => {
   switch (contentType) {
     case "story":
       return { min: 1, max: 60 }; // 1-60 seconds
@@ -122,10 +117,7 @@ export const formatDuration = (seconds: number): string => {
 /**
  * Check if content type is valid for video duration
  */
-export const isValidDurationForType = (
-  duration: number,
-  contentType: string,
-): boolean => {
+export const isValidDurationForType = (duration: number, contentType: string): boolean => {
   const limits = getContentTypeLimits(contentType);
   return duration >= limits.min && duration <= limits.max;
 };

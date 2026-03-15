@@ -22,10 +22,7 @@ export interface ThemeAPIClient {
  * Update theme preference on the backend
  * Handles network errors gracefully
  */
-async function updateTheme(
-  workspaceId: string,
-  theme: ThemePreference,
-): Promise<void> {
+async function updateTheme(workspaceId: string, theme: ThemePreference): Promise<void> {
   if (!workspaceId) {
     return;
   }

@@ -102,15 +102,7 @@ function handleUploadProgressUpdate(event: any) {
  * Handle processing progress update events
  */
 function handleProcessingProgressUpdate(event: any) {
-  const {
-    jobId,
-    publicationId,
-    progress,
-    currentStep,
-    completedSteps,
-    totalSteps,
-    eta,
-  } = event;
+  const { jobId, publicationId, progress, currentStep, completedSteps, totalSteps, eta } = event;
 
   const processingStore = useProcessingProgress.getState();
   const job = processingStore.jobs[jobId];
@@ -155,9 +147,7 @@ function handleVideoProcessingCompleted(event: any) {
   const processingStore = useProcessingProgress.getState();
 
   // Find job by publicationId
-  const job = Object.values(processingStore.jobs).find(
-    (j) => j.publicationId === publicationId,
-  );
+  const job = Object.values(processingStore.jobs).find((j) => j.publicationId === publicationId);
 
   if (job) {
     processingStore.updateJob(job.id, {
@@ -264,38 +254,36 @@ async function pollUploadProgress() {
     const { uploads } = response.data;
 
     // Update each upload with polled progress
-    Object.entries(uploads || {}).forEach(
-      ([uploadId, progressData]: [string, any]) => {
-        const upload = uploadStore.queue[uploadId];
-        if (upload) {
-          // Check for completion or failure
-          if (progressData.status === "completed") {
-            uploadStore.updateUpload(uploadId, {
-              status: "completed",
-              progress: 100,
-              s3Key: progressData.s3_key,
-            });
-          } else if (progressData.status === "failed") {
-            uploadStore.updateUpload(uploadId, {
-              status: "error",
-              progress: 0,
-              error: progressData.error || "Upload failed",
-            });
-          } else {
-            uploadStore.updateUpload(uploadId, {
-              progress: Math.min(100, Math.max(0, progressData.progress || 0)),
-              stats: {
-                eta: progressData.eta || 0,
-                speed: progressData.speed || 0,
-                startTime: upload.stats?.startTime || Date.now(),
-                bytesUploaded: progressData.bytes_uploaded || 0,
-                lastUpdateTime: Date.now(),
-              },
-            });
-          }
+    Object.entries(uploads || {}).forEach(([uploadId, progressData]: [string, any]) => {
+      const upload = uploadStore.queue[uploadId];
+      if (upload) {
+        // Check for completion or failure
+        if (progressData.status === "completed") {
+          uploadStore.updateUpload(uploadId, {
+            status: "completed",
+            progress: 100,
+            s3Key: progressData.s3_key,
+          });
+        } else if (progressData.status === "failed") {
+          uploadStore.updateUpload(uploadId, {
+            status: "error",
+            progress: 0,
+            error: progressData.error || "Upload failed",
+          });
+        } else {
+          uploadStore.updateUpload(uploadId, {
+            progress: Math.min(100, Math.max(0, progressData.progress || 0)),
+            stats: {
+              eta: progressData.eta || 0,
+              speed: progressData.speed || 0,
+              startTime: upload.stats?.startTime || Date.now(),
+              bytesUploaded: progressData.bytes_uploaded || 0,
+              lastUpdateTime: Date.now(),
+            },
+          });
         }
-      },
-    );
+      }
+    });
   } catch (error) {
     // Check for timeout or network errors
     if (axios.isAxiosError(error)) {
@@ -304,9 +292,7 @@ async function pollUploadProgress() {
       } else if (error.response?.status === 404) {
         // Upload not found on server - this is expected for S3 direct uploads
         // Don't mark as failed, just log
-        console.debug(
-          "Upload not found on server (expected for S3 direct uploads)",
-        );
+        console.debug("Upload not found on server (expected for S3 direct uploads)");
       }
     }
   }
@@ -338,39 +324,32 @@ async function pollProcessingProgress() {
     const { jobs } = response.data;
 
     // Update each job with polled progress
-    Object.entries(jobs || {}).forEach(
-      ([jobId, progressData]: [string, any]) => {
-        const job = processingStore.jobs[jobId];
-        if (job) {
-          const isCompleted =
-            progressData.progress >= 100 || progressData.status === "completed";
-          const isFailed = progressData.status === "failed";
+    Object.entries(jobs || {}).forEach(([jobId, progressData]: [string, any]) => {
+      const job = processingStore.jobs[jobId];
+      if (job) {
+        const isCompleted = progressData.progress >= 100 || progressData.status === "completed";
+        const isFailed = progressData.status === "failed";
 
-          processingStore.updateJob(jobId, {
-            progress: Math.min(100, Math.max(0, progressData.progress || 0)),
-            status: isFailed
-              ? "failed"
-              : isCompleted
-                ? "completed"
-                : "processing",
-            error: progressData.error || job.error,
-            stats: {
-              eta: progressData.eta || 0,
-              currentStep: progressData.current_step || "",
-              totalSteps: progressData.total_steps || 0,
-              completedSteps: progressData.completed_steps || 0,
-            },
-          });
+        processingStore.updateJob(jobId, {
+          progress: Math.min(100, Math.max(0, progressData.progress || 0)),
+          status: isFailed ? "failed" : isCompleted ? "completed" : "processing",
+          error: progressData.error || job.error,
+          stats: {
+            eta: progressData.eta || 0,
+            currentStep: progressData.current_step || "",
+            totalSteps: progressData.total_steps || 0,
+            completedSteps: progressData.completed_steps || 0,
+          },
+        });
 
-          // If completed or failed, remove after delay
-          if (isCompleted || isFailed) {
-            setTimeout(() => {
-              processingStore.removeJob(jobId);
-            }, 3000);
-          }
+        // If completed or failed, remove after delay
+        if (isCompleted || isFailed) {
+          setTimeout(() => {
+            processingStore.removeJob(jobId);
+          }, 3000);
         }
-      },
-    );
+      }
+    });
   } catch (error) {
     // Handle timeout or network errors
     if (axios.isAxiosError(error)) {

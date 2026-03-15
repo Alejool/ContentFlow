@@ -103,12 +103,7 @@ export async function retryWithBackoff<T>(
       }
 
       // Calculate delay and wait
-      const delay = calculateDelay(
-        attempt,
-        initialDelay,
-        maxDelay,
-        backoffMultiplier,
-      );
+      const delay = calculateDelay(attempt, initialDelay, maxDelay, backoffMultiplier);
 
       // Call retry callback if provided
       if (onRetry) {
@@ -147,9 +142,7 @@ export async function fetchWithRetry(
     } catch (error) {
       // Handle network errors (no response)
       if (error instanceof TypeError && error.message.includes("fetch")) {
-        throw createNetworkError(
-          "Network request failed. Please check your connection.",
-        );
+        throw createNetworkError("Network request failed. Please check your connection.");
       }
       throw error;
     }

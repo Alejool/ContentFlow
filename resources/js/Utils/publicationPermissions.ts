@@ -18,22 +18,14 @@ export function canUserPublishDirectly(
   // 2. Verificar si el usuario actual tiene una aprobación activa
   const hasActiveApproval = publication.approval_logs?.some(
     (log: any) =>
-      log.requested_by === currentUserId &&
-      log.action === "approved" &&
-      log.reviewed_at !== null,
+      log.requested_by === currentUserId && log.action === "approved" && log.reviewed_at !== null,
   );
 
   if (!hasActiveApproval) return false;
 
   // 3. Verificar que la publicación esté en un estado que permita publicar
   // (no debe estar en draft o rejected)
-  const canPublishStates = [
-    "approved",
-    "failed",
-    "publishing",
-    "published",
-    "scheduled",
-  ];
+  const canPublishStates = ["approved", "failed", "publishing", "published", "scheduled"];
   const isInValidState = canPublishStates.includes(publication.status || "");
 
   return hasActiveApproval && isInValidState;
@@ -53,8 +45,7 @@ export function shouldShowRequestApproval(
   if (permissions.includes("publish")) return false;
 
   // No mostrar si puede publicar directamente
-  if (canUserPublishDirectly(publication, currentUserId, permissions))
-    return false;
+  if (canUserPublishDirectly(publication, currentUserId, permissions)) return false;
 
   // Mostrar si no tiene permiso de publicar y no puede publicar directamente
   // y tiene permiso de manage-content

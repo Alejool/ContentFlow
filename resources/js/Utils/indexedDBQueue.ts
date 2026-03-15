@@ -207,9 +207,7 @@ class IndexedDBQueue {
   /**
    * Get operations by status
    */
-  async getByStatus(
-    status: QueuedOperation["status"],
-  ): Promise<QueuedOperation[]> {
+  async getByStatus(status: QueuedOperation["status"]): Promise<QueuedOperation[]> {
     await this.init();
 
     return new Promise((resolve, reject) => {

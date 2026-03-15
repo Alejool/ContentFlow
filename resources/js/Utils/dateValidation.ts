@@ -12,9 +12,7 @@ export interface DateValidationResult {
  * @param date - Date string (ISO format) or Date object
  * @returns DateValidationResult with validation status and messages
  */
-export function validateDate(
-  date: string | Date | null | undefined,
-): DateValidationResult {
+export function validateDate(date: string | Date | null | undefined): DateValidationResult {
   // Check if date is provided
   if (!date) {
     return {
@@ -101,10 +99,8 @@ export function validateDateRange(
   }
 
   // Parse dates for comparison
-  const start =
-    typeof startDate === "string" ? parseISO(startDate) : (startDate as Date);
-  const end =
-    typeof endDate === "string" ? parseISO(endDate) : (endDate as Date);
+  const start = typeof startDate === "string" ? parseISO(startDate) : (startDate as Date);
+  const end = typeof endDate === "string" ? parseISO(endDate) : (endDate as Date);
 
   // Check if end date is after start date
   if (end <= start) {
@@ -152,9 +148,7 @@ export function isValidDateFormat(dateString: string): boolean {
  * @param date - Date to sanitize
  * @returns Sanitized date string or null if invalid
  */
-export function sanitizeDateForServer(
-  date: string | Date | null | undefined,
-): string | null {
+export function sanitizeDateForServer(date: string | Date | null | undefined): string | null {
   const validation = validateDate(date);
 
   if (!validation.isValid) {

@@ -62,14 +62,8 @@ export function transitionTheme(
 
   // Apply custom duration and easing if provided
   if (duration !== 250 || easing !== "cubic-bezier(0.4, 0, 0.2, 1)") {
-    document.documentElement.style.setProperty(
-      "--theme-transition-duration",
-      `${duration}ms`,
-    );
-    document.documentElement.style.setProperty(
-      "--theme-transition-easing",
-      easing,
-    );
+    document.documentElement.style.setProperty("--theme-transition-duration", `${duration}ms`);
+    document.documentElement.style.setProperty("--theme-transition-easing", easing);
   }
 
   // Capturar posición del cursor si está disponible

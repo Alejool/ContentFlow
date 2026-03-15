@@ -10,12 +10,7 @@
  * Requirements: 9.3, 3.3
  */
 
-import type {
-  AxiosInstance,
-  AxiosRequestConfig,
-  AxiosResponse,
-  AxiosError,
-} from "axios";
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from "axios";
 import useOptimisticStore from "../stores/optimisticStore";
 import type { OptimisticOperation } from "../types/optimistic";
 
@@ -83,9 +78,7 @@ function detectOperationType(method?: string): "create" | "update" | "delete" {
  * @param axiosInstance - The axios instance to configure
  * @returns Cleanup function to remove interceptors
  */
-export function setupOptimisticInterceptor(
-  axiosInstance: AxiosInstance,
-): () => void {
+export function setupOptimisticInterceptor(axiosInstance: AxiosInstance): () => void {
   // Request interceptor
   const requestInterceptorId = axiosInstance.interceptors.request.use(
     (config) => {
@@ -102,8 +95,7 @@ export function setupOptimisticInterceptor(
         (config as any).__requestKey = requestKey;
 
         // Detect operation type if not provided
-        const operationType =
-          config.operationType || detectOperationType(config.method);
+        const operationType = config.operationType || detectOperationType(config.method);
 
         // Create optimistic operation
         const operation: OptimisticOperation = {
@@ -148,9 +140,7 @@ export function setupOptimisticInterceptor(
 
       if (operationId && requestKey) {
         // Confirm the operation with server data
-        useOptimisticStore
-          .getState()
-          .confirmOperation(operationId, response.data);
+        useOptimisticStore.getState().confirmOperation(operationId, response.data);
 
         // Clean up mapping
         requestOperationMap.delete(requestKey);

@@ -117,9 +117,7 @@ class PerformanceValidator {
   /**
    * Measure async optimistic update time
    */
-  async measureOptimisticUpdateAsync<T>(
-    operation: () => Promise<T>,
-  ): Promise<T> {
+  async measureOptimisticUpdateAsync<T>(operation: () => Promise<T>): Promise<T> {
     const start = performance.now();
     const result = await operation();
     const duration = performance.now() - start;
@@ -155,9 +153,7 @@ class PerformanceValidator {
   private getTimeToInteractive(): number {
     if (typeof window === "undefined") return 0;
 
-    const navigation = performance.getEntriesByType(
-      "navigation",
-    )[0] as PerformanceNavigationTiming;
+    const navigation = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming;
     if (!navigation) return 0;
 
     // Approximate TTI as domInteractive
@@ -198,17 +194,14 @@ class PerformanceValidator {
         value: this.metrics.optimisticUpdateTime || 0,
         target: PERFORMANCE_TARGETS.OPTIMISTIC_UPDATE_TIME,
         passed:
-          (this.metrics.optimisticUpdateTime || 0) <
-          PERFORMANCE_TARGETS.OPTIMISTIC_UPDATE_TIME,
+          (this.metrics.optimisticUpdateTime || 0) < PERFORMANCE_TARGETS.OPTIMISTIC_UPDATE_TIME,
         unit: "ms",
       },
       {
         metric: "Cache Response Time",
         value: this.metrics.cacheResponseTime || 0,
         target: PERFORMANCE_TARGETS.CACHE_RESPONSE_TIME,
-        passed:
-          (this.metrics.cacheResponseTime || 0) <
-          PERFORMANCE_TARGETS.CACHE_RESPONSE_TIME,
+        passed: (this.metrics.cacheResponseTime || 0) < PERFORMANCE_TARGETS.CACHE_RESPONSE_TIME,
         unit: "ms",
       },
       {
@@ -216,8 +209,7 @@ class PerformanceValidator {
         value: this.metrics.firstContentfulPaint || 0,
         target: PERFORMANCE_TARGETS.FIRST_CONTENTFUL_PAINT,
         passed:
-          (this.metrics.firstContentfulPaint || 0) <
-          PERFORMANCE_TARGETS.FIRST_CONTENTFUL_PAINT,
+          (this.metrics.firstContentfulPaint || 0) < PERFORMANCE_TARGETS.FIRST_CONTENTFUL_PAINT,
         unit: "ms",
       },
       {
@@ -225,26 +217,21 @@ class PerformanceValidator {
         value: this.metrics.largestContentfulPaint || 0,
         target: PERFORMANCE_TARGETS.LARGEST_CONTENTFUL_PAINT,
         passed:
-          (this.metrics.largestContentfulPaint || 0) <
-          PERFORMANCE_TARGETS.LARGEST_CONTENTFUL_PAINT,
+          (this.metrics.largestContentfulPaint || 0) < PERFORMANCE_TARGETS.LARGEST_CONTENTFUL_PAINT,
         unit: "ms",
       },
       {
         metric: "Time to Interactive",
         value: this.metrics.timeToInteractive || 0,
         target: PERFORMANCE_TARGETS.TIME_TO_INTERACTIVE,
-        passed:
-          (this.metrics.timeToInteractive || 0) <
-          PERFORMANCE_TARGETS.TIME_TO_INTERACTIVE,
+        passed: (this.metrics.timeToInteractive || 0) < PERFORMANCE_TARGETS.TIME_TO_INTERACTIVE,
         unit: "ms",
       },
       {
         metric: "Total Blocking Time",
         value: this.metrics.totalBlockingTime || 0,
         target: PERFORMANCE_TARGETS.TOTAL_BLOCKING_TIME,
-        passed:
-          (this.metrics.totalBlockingTime || 0) <
-          PERFORMANCE_TARGETS.TOTAL_BLOCKING_TIME,
+        passed: (this.metrics.totalBlockingTime || 0) < PERFORMANCE_TARGETS.TOTAL_BLOCKING_TIME,
         unit: "ms",
       },
       {
@@ -252,8 +239,7 @@ class PerformanceValidator {
         value: this.metrics.cumulativeLayoutShift || 0,
         target: PERFORMANCE_TARGETS.CUMULATIVE_LAYOUT_SHIFT,
         passed:
-          (this.metrics.cumulativeLayoutShift || 0) <
-          PERFORMANCE_TARGETS.CUMULATIVE_LAYOUT_SHIFT,
+          (this.metrics.cumulativeLayoutShift || 0) < PERFORMANCE_TARGETS.CUMULATIVE_LAYOUT_SHIFT,
         unit: "score",
       },
     ];
@@ -322,8 +308,7 @@ class PerformanceValidator {
 
     // Check if HTTPS (or localhost)
     const isSecure =
-      window.location.protocol === "https:" ||
-      window.location.hostname === "localhost";
+      window.location.protocol === "https:" || window.location.hostname === "localhost";
 
     const installable = hasServiceWorker && hasManifest && isSecure;
 

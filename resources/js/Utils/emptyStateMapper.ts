@@ -1,9 +1,6 @@
 import { TFunction } from "i18next";
 import { EmptyStateConfig } from "@/Components/common/EmptyState";
-import {
-  emptyStateConfigs,
-  getEmptyStateConfigs,
-} from "@/Constants/emptyStateConfigs";
+import { emptyStateConfigs, getEmptyStateConfigs } from "@/Constants/emptyStateConfigs";
 
 /**
  * Empty State Context Mapping
@@ -135,10 +132,7 @@ export function getEmptyStateConfig(
  * }
  * ```
  */
-export function getEmptyStateByKey(
-  configKey: string,
-  t?: TFunction,
-): EmptyStateConfig | undefined {
+export function getEmptyStateByKey(configKey: string, t?: TFunction): EmptyStateConfig | undefined {
   const configs = t ? getEmptyStateConfigs(t) : emptyStateConfigs;
   return configs[configKey];
 }

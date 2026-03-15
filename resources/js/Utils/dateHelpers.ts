@@ -46,10 +46,7 @@ export function formatDateTimeString(
   if (!date) return "";
 
   try {
-    const dateObj =
-      typeof date === "string" || typeof date === "number"
-        ? new Date(date)
-        : date;
+    const dateObj = typeof date === "string" || typeof date === "number" ? new Date(date) : date;
 
     if (isNaN(dateObj.getTime())) return "";
 
@@ -120,10 +117,7 @@ export function formatDateString(
   if (!date) return "";
 
   try {
-    const dateObj =
-      typeof date === "string" || typeof date === "number"
-        ? new Date(date)
-        : date;
+    const dateObj = typeof date === "string" || typeof date === "number" ? new Date(date) : date;
 
     if (isNaN(dateObj.getTime())) return "";
 
@@ -166,10 +160,7 @@ export function formatTimeString(
   if (!date) return "";
 
   try {
-    const dateObj =
-      typeof date === "string" || typeof date === "number"
-        ? new Date(date)
-        : date;
+    const dateObj = typeof date === "string" || typeof date === "number" ? new Date(date) : date;
 
     if (isNaN(dateObj.getTime())) return "";
 
@@ -214,10 +205,7 @@ export function formatDateTimeStyled(
   if (!date) return "";
 
   try {
-    const dateObj =
-      typeof date === "string" || typeof date === "number"
-        ? new Date(date)
-        : date;
+    const dateObj = typeof date === "string" || typeof date === "number" ? new Date(date) : date;
 
     if (isNaN(dateObj.getTime())) return "";
 
@@ -245,10 +233,7 @@ export function formatDateStyled(
   if (!date) return "";
 
   try {
-    const dateObj =
-      typeof date === "string" || typeof date === "number"
-        ? new Date(date)
-        : date;
+    const dateObj = typeof date === "string" || typeof date === "number" ? new Date(date) : date;
 
     if (isNaN(dateObj.getTime())) return "";
 

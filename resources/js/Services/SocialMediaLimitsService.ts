@@ -32,10 +32,9 @@ class SocialMediaLimitsService {
     platformIds: number[],
   ): Promise<ValidationResponse> {
     try {
-      const response = await axios.post(
-        `/api/v1/publications/${publicationId}/validate`,
-        { platforms: platformIds },
-      );
+      const response = await axios.post(`/api/v1/publications/${publicationId}/validate`, {
+        platforms: platformIds,
+      });
       return response.data.data;
     } catch (error: any) {
       // Si el error viene del backend con validación, retornarlo
@@ -99,15 +98,9 @@ class SocialMediaLimitsService {
       const lowerError = error.toLowerCase();
       if (lowerError.includes("duración") || lowerError.includes("largo")) {
         categorized.duration.push(error);
-      } else if (
-        lowerError.includes("tamaño") ||
-        lowerError.includes("grande")
-      ) {
+      } else if (lowerError.includes("tamaño") || lowerError.includes("grande")) {
         categorized.size.push(error);
-      } else if (
-        lowerError.includes("formato") ||
-        lowerError.includes("imagen")
-      ) {
+      } else if (lowerError.includes("formato") || lowerError.includes("imagen")) {
         categorized.format.push(error);
       } else {
         categorized.other.push(error);
@@ -161,9 +154,7 @@ class SocialMediaLimitsService {
   /**
    * Obtiene sugerencias de optimización basadas en los errores
    */
-  getOptimizationSuggestions(
-    validationResults: Record<number, ValidationResult>,
-  ): string[] {
+  getOptimizationSuggestions(validationResults: Record<number, ValidationResult>): string[] {
     const suggestions: string[] = [];
     const allErrors: string[] = [];
 
@@ -180,9 +171,7 @@ class SocialMediaLimitsService {
 
     // Sugerencia para archivos grandes
     if (allErrors.some((e) => e.toLowerCase().includes("demasiado grande"))) {
-      suggestions.push(
-        "💡 Comprime el video para reducir su tamaño sin perder mucha calidad",
-      );
+      suggestions.push("💡 Comprime el video para reducir su tamaño sin perder mucha calidad");
     }
 
     // Sugerencia para verificación
@@ -197,12 +186,8 @@ class SocialMediaLimitsService {
     }
 
     // Sugerencia para múltiples plataformas
-    const incompatibleCount = Object.values(validationResults).filter(
-      (r) => !r.can_publish,
-    ).length;
-    const compatibleCount = Object.values(validationResults).filter(
-      (r) => r.can_publish,
-    ).length;
+    const incompatibleCount = Object.values(validationResults).filter((r) => !r.can_publish).length;
+    const compatibleCount = Object.values(validationResults).filter((r) => r.can_publish).length;
 
     if (incompatibleCount > 0 && compatibleCount > 0) {
       suggestions.push(

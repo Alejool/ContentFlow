@@ -166,25 +166,13 @@ export function validateVideoForPlatform(
 
   // Validar según el tipo seleccionado
   if (type === "short" && requirements.short) {
-    validateAgainstRequirements(
-      metadata,
-      requirements.short,
-      result,
-      "Short",
-      t,
-    );
+    validateAgainstRequirements(metadata, requirements.short, result, "Short", t);
     result.meetsShortRequirements = result.isValid;
   } else if (type === "reel" && requirements.reel) {
     validateAgainstRequirements(metadata, requirements.reel, result, "Reel", t);
     result.meetsReelRequirements = result.isValid;
   } else if (type === "video" && requirements.video) {
-    validateAgainstRequirements(
-      metadata,
-      requirements.video,
-      result,
-      "Video",
-      t,
-    );
+    validateAgainstRequirements(metadata, requirements.video, result, "Video", t);
     result.meetsVideoRequirements = result.isValid;
   }
 
@@ -258,10 +246,7 @@ function validateAgainstRequirements(
         t("videoValidation.invalidAspectRatio", {
           type: typeName,
           expected: formatAspectRatio(min, max),
-          current: formatAspectRatio(
-            metadata.aspectRatio,
-            metadata.aspectRatio,
-          ),
+          current: formatAspectRatio(metadata.aspectRatio, metadata.aspectRatio),
         }),
       );
     }
@@ -326,10 +311,7 @@ function formatAspectRatio(min: number, max: number): string {
 /**
  * Determina automáticamente el mejor tipo de publicación para un video
  */
-export function suggestPublicationType(
-  metadata: VideoMetadata,
-  platform: string,
-): string | null {
+export function suggestPublicationType(metadata: VideoMetadata, platform: string): string | null {
   const requirements = PLATFORM_REQUIREMENTS[platform];
   if (!requirements) return null;
 

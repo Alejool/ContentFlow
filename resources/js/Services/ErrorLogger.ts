@@ -13,10 +13,7 @@ class ErrorLoggerClass {
   /**
    * Log an error to the backend
    */
-  async log(
-    error: Error | string,
-    context?: Record<string, any>,
-  ): Promise<void> {
+  async log(error: Error | string, context?: Record<string, any>): Promise<void> {
     try {
       const entry: ErrorLogEntry = {
         message: typeof error === "string" ? error : error.message,
