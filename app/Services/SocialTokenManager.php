@@ -128,16 +128,50 @@ class SocialTokenManager
 
   private function refreshFacebookToken($account, $client)
   {
-    $response = $client->get('https://graph.facebook.com/v18.0/oauth/access_token', [
-      'query' => [
-        'grant_type' => 'fb_exchange_token',
-        'client_id' => config('services.facebook.client_id'),
-        'client_secret' => config('services.facebook.client_secret'),
-        'fb_exchange_token' => $account->access_token,
-      ]
-    ]);
+    // Facebook long-lived tokens don't use a standard refresh_token flow.
+    // We can try to extend the current token using fb_exchange_token.
+    // If the current token is invalid/expired, this will fail and return null.
+    if (empty($account->access_token)) {
+      LogHelper::socialError('facebook.token_refresh_no_token', 'No access token to exchange', [
+        'account_id' => $account->id
+      ]);
+      return null;
+    }
 
-    return json_decode($response->getBody(), true);
+    try {
+      $response = $client->get('https://graph.facebook.com/v18.0/oauth/access_token', [
+        'query' => [
+          'grant_type' => 'fb_exchange_token',
+          'client_id' => config('services.facebook.client_id'),
+          'client_secret' => config('services.facebook.client_secret'),
+          'fb_exchange_token' => $account->access_token,
+        ],
+        'http_errors' => false,
+        'timeout' => 30,
+      ]);
+
+      $statusCode = $response->getStatusCode();
+      $data = json_decode($response->getBody(), true);
+
+      if ($statusCode !== 200 || !isset($data['access_token'])) {
+        LogHelper::socialError('facebook.token_exchange_failed', 'Token exchange failed', [
+          'account_id' => $account->id,
+          'status_code' => $statusCode,
+          'error' => $data['error']['message'] ?? json_encode($data),
+        ]);
+        return null;
+      }
+
+      // Facebook long-lived tokens last ~60 days
+      $data['expires_in'] = $data['expires_in'] ?? (60 * 24 * 3600);
+
+      return $data;
+    } catch (\Exception $e) {
+      LogHelper::socialError('facebook.token_refresh_exception', $e->getMessage(), [
+        'account_id' => $account->id,
+      ]);
+      return null;
+    }
   }
 
   private function refreshGoogleToken($account, $client)
@@ -231,28 +265,78 @@ class SocialTokenManager
 
   private function refreshInstagramToken($account, $client)
   {
-    // Instagram uses long-lived token refresh
-    $response = $client->get('https://graph.instagram.com/refresh_access_token', [
-      'query' => [
-        'grant_type' => 'ig_refresh_token',
-        'access_token' => $account->access_token,
-      ]
-    ]);
+    // Instagram long-lived tokens can be refreshed if they haven't expired yet
+    if (empty($account->access_token)) {
+      return null;
+    }
 
-    return json_decode($response->getBody(), true);
+    try {
+      $response = $client->get('https://graph.instagram.com/refresh_access_token', [
+        'query' => [
+          'grant_type' => 'ig_refresh_token',
+          'access_token' => $account->access_token,
+        ],
+        'http_errors' => false,
+        'timeout' => 30,
+      ]);
+
+      $statusCode = $response->getStatusCode();
+      $data = json_decode($response->getBody(), true);
+
+      if ($statusCode !== 200 || !isset($data['access_token'])) {
+        LogHelper::socialError('instagram.token_refresh_failed', 'Token refresh failed', [
+          'account_id' => $account->id,
+          'status_code' => $statusCode,
+          'error' => $data['error']['message'] ?? json_encode($data),
+        ]);
+        return null;
+      }
+
+      return $data;
+    } catch (\Exception $e) {
+      LogHelper::socialError('instagram.token_refresh_exception', $e->getMessage(), [
+        'account_id' => $account->id,
+      ]);
+      return null;
+    }
   }
 
   private function refreshTikTokToken($account, $client)
   {
-    $response = $client->post('https://open.tiktokapis.com/v2/oauth/token/', [
-      'form_params' => [
-        'client_key' => config('services.tiktok.client_key'),
-        'client_secret' => config('services.tiktok.client_secret'),
-        'refresh_token' => $account->refresh_token,
-        'grant_type' => 'refresh_token',
-      ]
-    ]);
+    if (empty($account->refresh_token)) {
+      return null;
+    }
 
-    return json_decode($response->getBody(), true);
+    try {
+      $response = $client->post('https://open.tiktokapis.com/v2/oauth/token/', [
+        'form_params' => [
+          'client_key' => config('services.tiktok.client_key'),
+          'client_secret' => config('services.tiktok.client_secret'),
+          'refresh_token' => $account->refresh_token,
+          'grant_type' => 'refresh_token',
+        ],
+        'http_errors' => false,
+        'timeout' => 30,
+      ]);
+
+      $statusCode = $response->getStatusCode();
+      $data = json_decode($response->getBody(), true);
+
+      if ($statusCode !== 200 || !isset($data['access_token'])) {
+        LogHelper::socialError('tiktok.token_refresh_failed', 'Token refresh failed', [
+          'account_id' => $account->id,
+          'status_code' => $statusCode,
+          'error' => $data['error'] ?? json_encode($data),
+        ]);
+        return null;
+      }
+
+      return $data;
+    } catch (\Exception $e) {
+      LogHelper::socialError('tiktok.token_refresh_exception', $e->getMessage(), [
+        'account_id' => $account->id,
+      ]);
+      return null;
+    }
   }
 }

@@ -32,8 +32,7 @@ class SocialAnalyticsService
       }
 
       $token = $this->tokenManager->getValidToken($account);
-      $service = $this->getPlatformService($account->platform, $token);
-
+      $service = $this->getPlatformService($account->platform, $token, $account);
       $info = $service->getAccountInfo();
       $normalized = $this->normalizeAccountMetrics($account->platform, $info);
 
@@ -111,7 +110,7 @@ class SocialAnalyticsService
       }
 
       $token = $this->tokenManager->getValidToken($account);
-      $service = $this->getPlatformService($account->platform, $token);
+      $service = $this->getPlatformService($account->platform, $token, $account);
 
       $posts = $account->postLogs()
         ->where('status', 'published')
@@ -236,9 +235,9 @@ class SocialAnalyticsService
   /**
    * Get platform service instance
    */
-  protected function getPlatformService(string $platform, string $token)
+  protected function getPlatformService(string $platform, string $token, ?SocialAccount $account = null)
   {
-    return SocialPlatformFactory::make($platform, $token);
+    return SocialPlatformFactory::make($platform, $token, $account);
   }
 
   /**
