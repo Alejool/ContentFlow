@@ -18,27 +18,24 @@ export function useExternalCalendarStatus() {
     queryFn: async () => {
       try {
         const response = await axios.get("/api/v1/external-calendar/status");
-        const connections = (response.data.connections || []).map(
-          (conn: any) => ({
-            provider: conn.provider,
-            connected: conn.connected,
-            email: conn.email,
-            lastSync: conn.lastSync || conn.last_sync,
-            status: conn.status,
-            errorMessage: conn.errorMessage || conn.error_message,
-            syncEnabled: conn.syncEnabled ?? conn.sync_enabled ?? false,
-            syncConfig: conn.syncConfig ||
-              conn.sync_config || {
-                syncCampaigns: [],
-                syncPlatforms: [],
-              },
-          }),
-        );
+        const connections = (response.data.connections || []).map((conn: any) => ({
+          provider: conn.provider,
+          connected: conn.connected,
+          email: conn.email,
+          lastSync: conn.lastSync || conn.last_sync,
+          status: conn.status,
+          errorMessage: conn.errorMessage || conn.error_message,
+          syncEnabled: conn.syncEnabled ?? conn.sync_enabled ?? false,
+          syncConfig: conn.syncConfig ||
+            conn.sync_config || {
+              syncCampaigns: [],
+              syncPlatforms: [],
+            },
+        }));
         setConnections(connections);
         return connections;
       } catch (error: any) {
-        const errorMessage =
-          error.response?.data?.message || "Failed to fetch connection status";
+        const errorMessage = error.response?.data?.message || "Failed to fetch connection status";
         setError(errorMessage);
         throw error;
       }
@@ -56,19 +53,13 @@ export function useConnectCalendar() {
 
   return useMutation({
     mutationFn: async (provider: "google" | "outlook") => {
-      const response = await axios.post(
-        `/api/v1/external-calendar/${provider}/connect`,
-      );
+      const response = await axios.post(`/api/v1/external-calendar/${provider}/connect`);
       return response.data;
     },
     onSuccess: (data) => {
       // Open OAuth window in popup (like social networks)
       if (data.auth_url) {
-        const authWindow = window.open(
-          data.auth_url,
-          "oauth",
-          "width=600,height=700",
-        );
+        const authWindow = window.open(data.auth_url, "oauth", "width=600,height=700");
 
         // Listen for messages from the popup
         const handleMessage = (event: MessageEvent) => {
@@ -101,8 +92,7 @@ export function useConnectCalendar() {
       }
     },
     onError: (error: any) => {
-      const errorMessage =
-        error.response?.data?.message || "Failed to connect calendar";
+      const errorMessage = error.response?.data?.message || "Failed to connect calendar";
       setError(errorMessage);
     },
   });
@@ -121,8 +111,7 @@ export function useDisconnectCalendar() {
       queryClient.invalidateQueries({ queryKey: ["external-calendar-status"] });
     },
     onError: (error: any) => {
-      const errorMessage =
-        error.response?.data?.message || "Failed to disconnect calendar";
+      const errorMessage = error.response?.data?.message || "Failed to disconnect calendar";
       setError(errorMessage);
     },
   });
@@ -134,29 +123,19 @@ export function useUpdateSyncSettings() {
   const { setError } = useExternalCalendarStore();
 
   return useMutation({
-    mutationFn: async ({
-      provider,
-      settings,
-    }: {
-      provider: string;
-      settings: SyncSettings;
-    }) => {
-      const response = await axios.put(
-        `/api/v1/external-calendar/${provider}/sync-settings`,
-        {
-          sync_enabled: settings.syncEnabled,
-          sync_campaigns: settings.syncCampaigns,
-          sync_platforms: settings.syncPlatforms,
-        },
-      );
+    mutationFn: async ({ provider, settings }: { provider: string; settings: SyncSettings }) => {
+      const response = await axios.put(`/api/v1/external-calendar/${provider}/sync-settings`, {
+        sync_enabled: settings.syncEnabled,
+        sync_campaigns: settings.syncCampaigns,
+        sync_platforms: settings.syncPlatforms,
+      });
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["external-calendar-status"] });
     },
     onError: (error: any) => {
-      const errorMessage =
-        error.response?.data?.message || "Failed to save sync settings";
+      const errorMessage = error.response?.data?.message || "Failed to save sync settings";
       setError(errorMessage);
     },
   });
@@ -169,17 +148,14 @@ export function useRetrySync() {
 
   return useMutation({
     mutationFn: async (provider: string) => {
-      const response = await axios.post(
-        `/api/v1/external-calendar/${provider}/full-sync`,
-      );
+      const response = await axios.post(`/api/v1/external-calendar/${provider}/full-sync`);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["external-calendar-status"] });
     },
     onError: (error: any) => {
-      const errorMessage =
-        error.response?.data?.message || "Failed to trigger sync";
+      const errorMessage = error.response?.data?.message || "Failed to trigger sync";
       setError(errorMessage);
     },
   });

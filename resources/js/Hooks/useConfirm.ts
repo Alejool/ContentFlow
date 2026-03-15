@@ -18,9 +18,7 @@ export function useConfirm() {
     cancelText: "Cancel",
     type: "danger",
   });
-  const [resolvePromise, setResolvePromise] = useState<
-    ((value: boolean) => void) | null
-  >(null);
+  const [resolvePromise, setResolvePromise] = useState<((value: boolean) => void) | null>(null);
 
   const confirm = (opts: ConfirmOptions): Promise<boolean> => {
     setOptions({

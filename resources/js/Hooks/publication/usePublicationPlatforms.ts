@@ -3,8 +3,7 @@ import { usePublicationStore } from "@/stores/publicationStore";
 import { Publication } from "@/types/Publication";
 
 export const usePublicationPlatforms = (publication: Publication | null) => {
-  const { publishedPlatforms, publishingPlatforms, failedPlatforms } =
-    usePublicationStore();
+  const { publishedPlatforms, publishingPlatforms, failedPlatforms } = usePublicationStore();
 
   const publishedAccountIds = useMemo(() => {
     const fromStore = publishedPlatforms[publication?.id ?? 0] || [];

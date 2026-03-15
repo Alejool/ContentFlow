@@ -1,11 +1,5 @@
 import { useTimezoneStore } from "@/stores/timezoneStore";
-import {
-  formatDate,
-  toUTC,
-  toLocalDate,
-  getNow,
-  DATE_FORMATS,
-} from "@/Utils/timezoneUtils";
+import { formatDate, toUTC, toLocalDate, getNow, DATE_FORMATS } from "@/Utils/timezoneUtils";
 
 /**
  * Hook personalizado para manejar timezones de manera fácil

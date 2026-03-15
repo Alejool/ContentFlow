@@ -27,11 +27,7 @@ const MODAL_CLOSED: PricingModal = {
   message: "",
 };
 
-export function usePricing({
-  isAuthenticated,
-  currentPlan,
-  workspaceId,
-}: UsePricingOptions) {
+export function usePricing({ isAuthenticated, currentPlan, workspaceId }: UsePricingOptions) {
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const [activePlans, setActivePlans] = useState<string[]>([]);
   const [activeSubscriptions, setActiveSubscriptions] = useState<any[]>([]);
@@ -82,10 +78,7 @@ export function usePricing({
     window.location.href = "/dashboard";
   };
 
-  const handleSelectPlan = async (
-    planId: string,
-    forceCheckout: boolean = false,
-  ) => {
+  const handleSelectPlan = async (planId: string, forceCheckout: boolean = false) => {
     if (!isAuthenticated) {
       router.visit("/register", { data: { plan: planId }, method: "get" });
       return;
@@ -98,9 +91,7 @@ export function usePricing({
       const PAID = ["starter", "growth", "professional", "enterprise"];
       const hasActivePaid =
         activePlans.some((id) => PAID.includes(id)) ||
-        activeSubscriptions.some(
-          (s) => PAID.includes(s.plan) && s.status === "active",
-        );
+        activeSubscriptions.some((s) => PAID.includes(s.plan) && s.status === "active");
 
       if (hasActivePaid) {
         showModal(
@@ -149,9 +140,7 @@ export function usePricing({
             "Content-Type": "application/json",
             Accept: "application/json",
             "X-CSRF-TOKEN":
-              document
-                .querySelector('meta[name="csrf-token"]')
-                ?.getAttribute("content") || "",
+              document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || "",
           },
           body: JSON.stringify({ plan: planId, workspace_id: workspaceId }),
         });
@@ -165,9 +154,7 @@ export function usePricing({
             "Error al procesar el pago",
             checkoutData.error === "Invalid plan configuration"
               ? "Este plan requiere configuración de Stripe. Contacta al administrador."
-              : checkoutData.message ||
-                  checkoutData.error ||
-                  "Error al procesar el pago.",
+              : checkoutData.message || checkoutData.error || "Error al procesar el pago.",
           );
           return;
         }
@@ -183,11 +170,7 @@ export function usePricing({
         }
       } catch {
         setIsLoading(null);
-        showModal(
-          "error",
-          "Error de conexión",
-          "No se pudo conectar con el servidor.",
-        );
+        showModal("error", "Error de conexión", "No se pudo conectar con el servidor.");
       }
       return;
     }
@@ -201,9 +184,7 @@ export function usePricing({
           "Content-Type": "application/json",
           Accept: "application/json",
           "X-CSRF-TOKEN":
-            document
-              .querySelector('meta[name="csrf-token"]')
-              ?.getAttribute("content") || "",
+            document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || "",
         },
         body: JSON.stringify({ plan: planId, workspace_id: workspaceId }),
       });
@@ -274,9 +255,7 @@ export function usePricing({
             "Content-Type": "application/json",
             Accept: "application/json",
             "X-CSRF-TOKEN":
-              document
-                .querySelector('meta[name="csrf-token"]')
-                ?.getAttribute("content") || "",
+              document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || "",
           },
           body: JSON.stringify({ plan: planId, workspace_id: workspaceId }),
         });
@@ -290,9 +269,7 @@ export function usePricing({
             "Error al procesar el pago",
             checkoutData.error === "Invalid plan configuration"
               ? "Este plan requiere configuración de Stripe. Contacta al administrador."
-              : checkoutData.message ||
-                  checkoutData.error ||
-                  "Error al procesar el pago.",
+              : checkoutData.message || checkoutData.error || "Error al procesar el pago.",
           );
           return;
         }
@@ -316,39 +293,28 @@ export function usePricing({
       );
     } catch {
       setIsLoading(null);
-      showModal(
-        "error",
-        "Error de conexión",
-        "No se pudo conectar con el servidor.",
-      );
+      showModal("error", "Error de conexión", "No se pudo conectar con el servidor.");
     }
   };
 
   const checkActiveSubscription = async (): Promise<boolean> => {
     try {
-      const url = new URL(
-        "/api/v1/subscription/check-active",
-        window.location.origin,
-      );
-      if (workspaceId)
-        url.searchParams.append("workspace_id", workspaceId.toString());
+      const url = new URL("/api/v1/subscription/check-active", window.location.origin);
+      if (workspaceId) url.searchParams.append("workspace_id", workspaceId.toString());
 
       const response = await fetch(url.toString(), {
         method: "GET",
         headers: {
           Accept: "application/json",
           "X-CSRF-TOKEN":
-            document
-              .querySelector('meta[name="csrf-token"]')
-              ?.getAttribute("content") || "",
+            document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || "",
         },
       });
 
       if (response.ok) {
         const data = await response.json();
         if (data.active_plans) setActivePlans(data.active_plans);
-        if (data.active_subscriptions)
-          setActiveSubscriptions(data.active_subscriptions);
+        if (data.active_subscriptions) setActiveSubscriptions(data.active_subscriptions);
         if (data.expired_plans) setExpiredPlans(data.expired_plans);
         return data.has_active_subscription || false;
       }

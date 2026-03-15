@@ -8,9 +8,7 @@ interface UsePendingApprovalsReturn {
   refresh: () => void;
 }
 
-export function usePendingApprovals(
-  refreshTrigger?: number,
-): UsePendingApprovalsReturn {
+export function usePendingApprovals(refreshTrigger?: number): UsePendingApprovalsReturn {
   const [requests, setRequests] = useState<ApprovalRequest[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -34,10 +32,7 @@ export function usePendingApprovals(
   }, []);
 
   useEffect(() => {
-    console.log(
-      "[usePendingApprovals] Effect triggered, refreshTrigger:",
-      refreshTrigger,
-    );
+    console.log("[usePendingApprovals] Effect triggered, refreshTrigger:", refreshTrigger);
     fetchPending();
   }, [fetchPending, refreshTrigger]);
 

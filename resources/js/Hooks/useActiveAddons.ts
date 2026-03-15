@@ -61,9 +61,7 @@ export function useActiveAddons(): UseActiveAddonsReturn {
       } else if (!err.response) {
         setError("Error de red");
       } else {
-        setError(
-          err.response?.data?.message || "Error al cargar add-ons activos",
-        );
+        setError(err.response?.data?.message || "Error al cargar add-ons activos");
       }
     } finally {
       setLoading(false);

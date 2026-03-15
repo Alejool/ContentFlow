@@ -10,18 +10,9 @@ interface TypeSpecificState {
 
 interface UsePublicationTypeStateReturn {
   getCurrentTypeState: (type: ContentType) => TypeSpecificState;
-  updateTypeState: (
-    type: ContentType,
-    updates: Partial<TypeSpecificState>,
-  ) => void;
-  clearIncompatibleData: (
-    newType: ContentType,
-    connectedAccounts: any[],
-  ) => void;
-  getCompatiblePlatforms: (
-    type: ContentType,
-    connectedAccounts: any[],
-  ) => any[];
+  updateTypeState: (type: ContentType, updates: Partial<TypeSpecificState>) => void;
+  clearIncompatibleData: (newType: ContentType, connectedAccounts: any[]) => void;
+  getCompatiblePlatforms: (type: ContentType, connectedAccounts: any[]) => any[];
   isValidForSave: (
     publication: Publication,
     typeState: TypeSpecificState,
@@ -65,45 +56,29 @@ export const usePublicationTypeState = (): UsePublicationTypeStateReturn => {
 
   const [, forceUpdate] = useState(0);
 
-  const getCurrentTypeState = useCallback(
-    (type: ContentType): TypeSpecificState => {
-      return stateByType.current[type];
-    },
-    [],
-  );
+  const getCurrentTypeState = useCallback((type: ContentType): TypeSpecificState => {
+    return stateByType.current[type];
+  }, []);
 
-  const updateTypeState = useCallback(
-    (type: ContentType, updates: Partial<TypeSpecificState>) => {
-      stateByType.current[type] = {
-        ...stateByType.current[type],
-        ...updates,
-      };
-      forceUpdate((prev) => prev + 1);
-    },
-    [],
-  );
+  const updateTypeState = useCallback((type: ContentType, updates: Partial<TypeSpecificState>) => {
+    stateByType.current[type] = {
+      ...stateByType.current[type],
+      ...updates,
+    };
+    forceUpdate((prev) => prev + 1);
+  }, []);
 
-  const getCompatiblePlatforms = useCallback(
-    (type: ContentType, connectedAccounts: any[]) => {
-      const compatiblePlatformNames = CONTENT_TYPE_CONFIG[type].platforms;
-      return connectedAccounts.filter((account) =>
-        (compatiblePlatformNames as readonly string[]).includes(
-          account.platform.toLowerCase(),
-        ),
-      );
-    },
-    [],
-  );
+  const getCompatiblePlatforms = useCallback((type: ContentType, connectedAccounts: any[]) => {
+    const compatiblePlatformNames = CONTENT_TYPE_CONFIG[type].platforms;
+    return connectedAccounts.filter((account) =>
+      (compatiblePlatformNames as readonly string[]).includes(account.platform.toLowerCase()),
+    );
+  }, []);
 
   const clearIncompatibleData = useCallback(
     (newType: ContentType, connectedAccounts: any[]) => {
-      const compatibleAccounts = getCompatiblePlatforms(
-        newType,
-        connectedAccounts,
-      );
-      const compatibleAccountIds = new Set(
-        compatibleAccounts.map((acc) => acc.id),
-      );
+      const compatibleAccounts = getCompatiblePlatforms(newType, connectedAccounts);
+      const compatibleAccountIds = new Set(compatibleAccounts.map((acc) => acc.id));
 
       const currentState = stateByType.current[newType];
 
@@ -118,13 +93,11 @@ export const usePublicationTypeState = (): UsePublicationTypeStateReturn => {
       );
 
       const filteredSettings: Record<string, any> = {};
-      Object.entries(currentState.platformSettings).forEach(
-        ([platform, settings]) => {
-          if (compatiblePlatformNames.has(platform.toLowerCase())) {
-            filteredSettings[platform] = settings;
-          }
-        },
-      );
+      Object.entries(currentState.platformSettings).forEach(([platform, settings]) => {
+        if (compatiblePlatformNames.has(platform.toLowerCase())) {
+          filteredSettings[platform] = settings;
+        }
+      });
 
       // Actualizar estado del tipo actual
       stateByType.current[newType] = {
@@ -149,26 +122,17 @@ export const usePublicationTypeState = (): UsePublicationTypeStateReturn => {
       // Validaciones por tipo
       switch (type) {
         case "poll":
-          if (
-            !publication.poll_options ||
-            publication.poll_options.length < 2
-          ) {
+          if (!publication.poll_options || publication.poll_options.length < 2) {
             errors.push("Poll must have at least 2 options");
           }
-          if (
-            !publication.poll_duration_hours ||
-            publication.poll_duration_hours < 1
-          ) {
+          if (!publication.poll_duration_hours || publication.poll_duration_hours < 1) {
             errors.push("Poll duration must be at least 1 hour");
           }
           // Polls no requieren media
           break;
 
         case "story":
-          if (
-            !publication.media_files ||
-            publication.media_files.length === 0
-          ) {
+          if (!publication.media_files || publication.media_files.length === 0) {
             errors.push("Story requires at least 1 media file");
           }
           if (publication.media_files && publication.media_files.length > 1) {
@@ -177,15 +141,10 @@ export const usePublicationTypeState = (): UsePublicationTypeStateReturn => {
           break;
 
         case "reel":
-          if (
-            !publication.media_files ||
-            publication.media_files.length === 0
-          ) {
+          if (!publication.media_files || publication.media_files.length === 0) {
             errors.push("Reel requires 1 video file");
           }
-          const videoFiles =
-            publication.media_files?.filter((m) => m.file_type === "video") ||
-            [];
+          const videoFiles = publication.media_files?.filter((m) => m.file_type === "video") || [];
           if (videoFiles.length !== 1) {
             errors.push("Reel must have exactly 1 video file");
           }

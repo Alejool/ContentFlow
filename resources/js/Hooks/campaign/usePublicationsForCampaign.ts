@@ -39,9 +39,7 @@ export const usePublicationsForCampaign = (isOpen: boolean) => {
   const getThumbnail = (pub: any) => {
     if (!pub.media_files || pub.media_files.length === 0) return null;
 
-    const firstImage = pub.media_files.find((f: any) =>
-      f.file_type.includes("image"),
-    );
+    const firstImage = pub.media_files.find((f: any) => f.file_type.includes("image"));
     if (firstImage) {
       const url = firstImage.file_path.startsWith("http")
         ? firstImage.file_path
@@ -49,9 +47,7 @@ export const usePublicationsForCampaign = (isOpen: boolean) => {
       return { url, type: "image" };
     }
 
-    const hasVideo = pub.media_files.some((f: any) =>
-      f.file_type.includes("video"),
-    );
+    const hasVideo = pub.media_files.some((f: any) => f.file_type.includes("video"));
     if (hasVideo) {
       return { url: null, type: "video" };
     }

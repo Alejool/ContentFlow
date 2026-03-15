@@ -39,9 +39,7 @@ interface UseOfflineDisableReturn {
  *   </button>
  * );
  */
-export function useOfflineDisable(
-  options: UseOfflineDisableOptions = {},
-): UseOfflineDisableReturn {
+export function useOfflineDisable(options: UseOfflineDisableOptions = {}): UseOfflineDisableReturn {
   const { isOnline } = useOffline();
   const {
     requiresConnection = false,

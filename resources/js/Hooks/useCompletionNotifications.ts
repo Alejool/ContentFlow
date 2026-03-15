@@ -71,43 +71,39 @@ export function useCompletionNotifications() {
    * Save notification preferences to localStorage
    * Requirement 8.5: Add notification preferences to user settings
    */
-  const savePreferences = useCallback(
-    (preferences: NotificationPreferences) => {
-      try {
-        localStorage.setItem(PREFERENCES_KEY, JSON.stringify(preferences));
-      } catch (error) {}
-    },
-    [],
-  );
+  const savePreferences = useCallback((preferences: NotificationPreferences) => {
+    try {
+      localStorage.setItem(PREFERENCES_KEY, JSON.stringify(preferences));
+    } catch (error) {}
+  }, []);
 
   /**
    * Request browser notification permission
    * Requirement 8.3, 8.4: Browser notification support with permission checking
    */
-  const requestBrowserNotificationPermission =
-    useCallback(async (): Promise<boolean> => {
-      if (typeof Notification === "undefined") {
-        return false;
-      }
+  const requestBrowserNotificationPermission = useCallback(async (): Promise<boolean> => {
+    if (typeof Notification === "undefined") {
+      return false;
+    }
 
-      if (Notification.permission === "granted") {
-        browserNotificationPermission.current = "granted";
-        return true;
-      }
+    if (Notification.permission === "granted") {
+      browserNotificationPermission.current = "granted";
+      return true;
+    }
 
-      if (Notification.permission === "denied") {
-        browserNotificationPermission.current = "denied";
-        return false;
-      }
+    if (Notification.permission === "denied") {
+      browserNotificationPermission.current = "denied";
+      return false;
+    }
 
-      try {
-        const permission = await Notification.requestPermission();
-        browserNotificationPermission.current = permission;
-        return permission === "granted";
-      } catch (error) {
-        return false;
-      }
-    }, []);
+    try {
+      const permission = await Notification.requestPermission();
+      browserNotificationPermission.current = permission;
+      return permission === "granted";
+    } catch (error) {
+      return false;
+    }
+  }, []);
 
   /**
    * Show browser notification
@@ -189,10 +185,7 @@ export function useCompletionNotifications() {
         : "Your file has been uploaded successfully";
 
       // Show in-app notification
-      if (
-        preferences.enableInAppNotifications &&
-        preferences.notifyOnUploadComplete
-      ) {
+      if (preferences.enableInAppNotifications && preferences.notifyOnUploadComplete) {
         showInAppNotification(title, message, upload.publicationId);
       }
 
@@ -227,10 +220,7 @@ export function useCompletionNotifications() {
       const message = `Your ${job.type.replace("_", " ")} has been completed successfully`;
 
       // Show in-app notification
-      if (
-        preferences.enableInAppNotifications &&
-        preferences.notifyOnProcessingComplete
-      ) {
+      if (preferences.enableInAppNotifications && preferences.notifyOnProcessingComplete) {
         showInAppNotification(title, message, job.publicationId);
       }
 
@@ -256,10 +246,7 @@ export function useCompletionNotifications() {
 
     // Check for completed uploads
     Object.entries(uploadQueue.queue).forEach(([id, upload]) => {
-      if (
-        upload.status === "completed" &&
-        !completedUploadsRef.current.has(id)
-      ) {
+      if (upload.status === "completed" && !completedUploadsRef.current.has(id)) {
         handleUploadCompletion(id, upload, preferences);
       }
     });

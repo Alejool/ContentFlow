@@ -34,8 +34,7 @@ export function usePublicationActions({
   const permissionsHook = usePublicationPermissions(permissions);
 
   // Obtener estado y acciones del store
-  const { loadingStates, submitForApproval, deleteUserEvent } =
-    usePublicationActionsStore();
+  const { loadingStates, submitForApproval, deleteUserEvent } = usePublicationActionsStore();
 
   // Acción: Enviar a revisión
   const handleSubmitForApproval = useCallback(
@@ -55,8 +54,7 @@ export function usePublicationActions({
 
           const message = t("approvals.sentToReview", {
             level:
-              approvalInfo.level_name ||
-              `${t("approvals.level")} ${approvalInfo.current_level}`,
+              approvalInfo.level_name || `${t("approvals.level")} ${approvalInfo.current_level}`,
             approvers: approversList,
             defaultValue: `Enviado a revisión - ${approvalInfo.level_name || `Nivel ${approvalInfo.current_level}`}. Revisores: ${approversList}`,
           });
@@ -91,8 +89,7 @@ export function usePublicationActions({
       if (!onEdit || !item.id) return;
 
       if (remoteLock) {
-        const lockedByName =
-          remoteLock.user_name || remoteLock.user?.name || t("common.unknown");
+        const lockedByName = remoteLock.user_name || remoteLock.user?.name || t("common.unknown");
         toast.error(`${t("publications.table.lockedBy")} ${lockedByName}`);
         return;
       }
@@ -121,10 +118,7 @@ export function usePublicationActions({
           const result = await deleteUserEvent(item.id);
 
           if (result.success) {
-            toast.success(
-              result.message ||
-                t("calendar.userEvents.modal.messages.successDelete"),
-            );
+            toast.success(result.message || t("calendar.userEvents.modal.messages.successDelete"));
           } else {
             toast.error(result.message || t("common.deleteError"));
           }

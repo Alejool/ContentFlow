@@ -3,8 +3,7 @@ import axios, { type AxiosError } from "axios";
 import type { ContentValidationResult } from "@/types/validation";
 
 export function useContentValidation() {
-  const [validationResult, setValidationResult] =
-    useState<ContentValidationResult | null>(null);
+  const [validationResult, setValidationResult] = useState<ContentValidationResult | null>(null);
   const [isValidating, setIsValidating] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
 
@@ -36,9 +35,7 @@ export function useContentValidation() {
       return response.data.data;
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string }>;
-      setValidationError(
-        axiosError.response?.data?.message || "Error al validar el contenido",
-      );
+      setValidationError(axiosError.response?.data?.message || "Error al validar el contenido");
       return null;
     } finally {
       setIsValidating(false);

@@ -70,10 +70,7 @@ export const useRegister = () => {
         reset("name", "email", "password", "password_confirmation");
       }
     } catch (backendError: any) {
-      if (
-        backendError.response?.status === 422 &&
-        backendError.response?.data?.errors
-      ) {
+      if (backendError.response?.status === 422 && backendError.response?.data?.errors) {
         const errorData = backendError.response.data.errors;
         setFieldErrors(errorData);
 

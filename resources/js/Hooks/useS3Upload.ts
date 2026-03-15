@@ -107,10 +107,7 @@ export const useS3Upload = () => {
     }
 
     // Network errors are retryable
-    if (
-      error.code === "NETWORK_ERROR" ||
-      error.message?.includes("Network Error")
-    ) {
+    if (error.code === "NETWORK_ERROR" || error.message?.includes("Network Error")) {
       return true;
     }
 
@@ -157,8 +154,7 @@ export const useS3Upload = () => {
     return Object.values(currentQueue)
       .filter(
         (item) =>
-          item.id !== excludeId &&
-          (item.status === "uploading" || item.status === "pending"),
+          item.id !== excludeId && (item.status === "uploading" || item.status === "pending"),
       )
       .reduce((total, item) => total + item.file.size, 0);
   };
@@ -216,10 +212,7 @@ export const useS3Upload = () => {
       const abortController = currentUpload?.abortController;
 
       // Calculate timeout based on file size (minimum 60s, +30s per 10MB)
-      const uploadTimeout = Math.max(
-        60000,
-        Math.ceil(file.size / (10 * 1024 * 1024)) * 30000,
-      );
+      const uploadTimeout = Math.max(60000, Math.ceil(file.size / (10 * 1024 * 1024)) * 30000);
 
       await axios.put(upload_url, file, {
         headers: { "Content-Type": file.type },
@@ -323,10 +316,7 @@ export const useS3Upload = () => {
         timeout: 120000, // 2 minute timeout per part
         onUploadProgress: (p) => {
           partProgress[partNumber] = p.loaded || 0;
-          const totalUploaded = Object.values(partProgress).reduce(
-            (sum, bytes) => sum + bytes,
-            0,
-          );
+          const totalUploaded = Object.values(partProgress).reduce((sum, bytes) => sum + bytes, 0);
 
           // Calculate percentage directly here to avoid confusion
           const percentage = Math.round((totalUploaded / file.size) * 100);
@@ -358,19 +348,14 @@ export const useS3Upload = () => {
     };
 
     // Upload remaining parts with concurrency control
-    const remainingParts = Array.from(
-      { length: totalParts },
-      (_, i) => i + 1,
-    ).filter(
+    const remainingParts = Array.from({ length: totalParts }, (_, i) => i + 1).filter(
       (partNumber) => !completedParts.some((p) => p.PartNumber === partNumber),
     );
 
     // Process parts in batches
     for (let i = 0; i < remainingParts.length; i += CONCURRENCY) {
       const batch = remainingParts.slice(i, i + CONCURRENCY);
-      const batchResults = await Promise.all(
-        batch.map((partNumber) => uploadPart(partNumber)),
-      );
+      const batchResults = await Promise.all(batch.map((partNumber) => uploadPart(partNumber)));
       parts.push(...batchResults);
 
       // Update stored parts for resumption
@@ -402,8 +387,7 @@ export const useS3Upload = () => {
       const existingItem = useUploadQueue.getState().queue[tempId];
       if (
         existingItem &&
-        (existingItem.status === "uploading" ||
-          existingItem.status === "completed")
+        (existingItem.status === "uploading" || existingItem.status === "completed")
       ) {
         if (existingItem.status === "completed" && existingItem.s3Key) {
           return {
@@ -471,18 +455,12 @@ export const useS3Upload = () => {
 
           // Call attach-media endpoint in background (fire and forget)
           axios
-            .post(
-              route(
-                "api.v1.publications.attach-media",
-                currentUpload.publicationId,
-              ),
-              {
-                key: result.key,
-                filename: file.name,
-                mime_type: file.type,
-                size: file.size,
-              },
-            )
+            .post(route("api.v1.publications.attach-media", currentUpload.publicationId), {
+              key: result.key,
+              filename: file.name,
+              mime_type: file.type,
+              size: file.size,
+            })
             .then(() => {
               console.log(
                 "✅ Media attached successfully to publication",
@@ -494,9 +472,7 @@ export const useS3Upload = () => {
             })
             .catch((error) => {
               console.error("❌ Failed to attach media to publication:", error);
-              toast.error(
-                `Error al vincular ${file.name}. Intenta refrescar la página.`,
-              );
+              toast.error(`Error al vincular ${file.name}. Intenta refrescar la página.`);
             });
         }
 
@@ -534,10 +510,7 @@ export const useS3Upload = () => {
         });
 
         // Show toast for non-retryable errors
-        if (
-          !canRetry ||
-          (axios.isAxiosError(error) && error.response?.status === 402)
-        ) {
+        if (!canRetry || (axios.isAxiosError(error) && error.response?.status === 402)) {
           toast.error(errorMessage);
         }
 

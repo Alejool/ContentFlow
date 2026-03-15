@@ -56,9 +56,7 @@ export const useDeleteUser = (): UseDeleteUserReturn => {
     resolver: zodResolver(deleteUserSchema(t)),
   });
 
-  const deleteUser = async (
-    data: DeleteUserFormData,
-  ): Promise<DeleteUserResult> => {
+  const deleteUser = async (data: DeleteUserFormData): Promise<DeleteUserResult> => {
     try {
       await axios.delete(route("profile.destroy"), {
         data,
@@ -70,14 +68,12 @@ export const useDeleteUser = (): UseDeleteUserReturn => {
       const axiosError = error as AxiosError<ApiResponse>;
 
       if (axiosError.response?.data?.errors) {
-        Object.entries(axiosError.response.data.errors).forEach(
-          ([key, value]) => {
-            setError(key as keyof DeleteUserFormData, {
-              type: "server",
-              message: Array.isArray(value) ? value[0] : value,
-            });
-          },
-        );
+        Object.entries(axiosError.response.data.errors).forEach(([key, value]) => {
+          setError(key as keyof DeleteUserFormData, {
+            type: "server",
+            message: Array.isArray(value) ? value[0] : value,
+          });
+        });
       }
 
       // Focus password input on error

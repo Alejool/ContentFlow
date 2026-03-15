@@ -52,8 +52,7 @@ export const useUser = (initialUser: any) => {
         country_code: user.country_code || "",
         bio: user.bio || "",
         global_platform_settings:
-          Array.isArray(user.global_platform_settings) &&
-          user.global_platform_settings.length === 0
+          Array.isArray(user.global_platform_settings) && user.global_platform_settings.length === 0
             ? {}
             : user.global_platform_settings || {},
         ai_settings:
@@ -99,8 +98,7 @@ export const useUser = (initialUser: any) => {
       normalizedWatched.bio !== normalizedUser.bio ||
       JSON.stringify(normalizedWatched.global_platform_settings) !==
         JSON.stringify(normalizedUser.global_platform_settings) ||
-      JSON.stringify(normalizedWatched.ai_settings) !==
-        JSON.stringify(normalizedUser.ai_settings);
+      JSON.stringify(normalizedWatched.ai_settings) !== JSON.stringify(normalizedUser.ai_settings);
 
     setHasChanges(changed);
   }, [watchedValues, user]);
@@ -126,8 +124,7 @@ export const useUser = (initialUser: any) => {
               phone: latestUser.phone || "",
               country_code: latestUser.country_code || "",
               bio: latestUser.bio || "",
-              global_platform_settings:
-                latestUser.global_platform_settings || {},
+              global_platform_settings: latestUser.global_platform_settings || {},
               ai_settings: latestUser.ai_settings || {},
             });
           }
@@ -163,9 +160,7 @@ export const useUser = (initialUser: any) => {
   };
 
   const onInvalid = (errors: any) => {
-    toast.error(
-      t("validation.check_errors") || "Revisa los errores en el formulario",
-    );
+    toast.error(t("validation.check_errors") || "Revisa los errores en el formulario");
 
     // Toast specific high-level errors if they exist
     if (errors.ai_settings) {

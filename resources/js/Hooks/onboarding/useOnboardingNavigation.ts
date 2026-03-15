@@ -46,11 +46,7 @@ export function useOnboardingNavigation() {
    * Navigate to a specific step in the onboarding flow
    */
   const navigateToOnboardingStep = useCallback(
-    (
-      path: string,
-      stepId?: string,
-      stepType?: "tour" | "wizard" | "template",
-    ) => {
+    (path: string, stepId?: string, stepType?: "tour" | "wizard" | "template") => {
       navigateToStep(path, stepId, stepType);
     },
     [navigateToStep],

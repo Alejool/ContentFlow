@@ -7,9 +7,7 @@ interface UsePublicationStatusOptions {
   dismissedIds: number[];
 }
 
-export function usePublicationStatus({
-  dismissedIds,
-}: UsePublicationStatusOptions) {
+export function usePublicationStatus({ dismissedIds }: UsePublicationStatusOptions) {
   const [publications, setPublications] = useState<Publication[]>([]);
   const [isFetching, setIsFetching] = useState(false);
   const props = usePage().props as any;
@@ -107,21 +105,12 @@ export function usePublicationStatus({
     };
 
     window.addEventListener("publication-started", handlePublicationStarted);
-    window.addEventListener(
-      "publication-cancelled",
-      handlePublicationCancelled,
-    );
+    window.addEventListener("publication-cancelled", handlePublicationCancelled);
 
     return () => {
       abortController.abort();
-      window.removeEventListener(
-        "publication-started",
-        handlePublicationStarted,
-      );
-      window.removeEventListener(
-        "publication-cancelled",
-        handlePublicationCancelled,
-      );
+      window.removeEventListener("publication-started", handlePublicationStarted);
+      window.removeEventListener("publication-cancelled", handlePublicationCancelled);
     };
   }, []);
 

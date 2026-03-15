@@ -1,10 +1,6 @@
 import { useState } from "react";
 import axios, { type AxiosError } from "axios";
-import type {
-  PreviewData,
-  PlatformConfiguration,
-  PublishResponse,
-} from "@/types/preview";
+import type { PreviewData, PlatformConfiguration, PublishResponse } from "@/types/preview";
 
 export function usePublishPreview() {
   const [previewData, setPreviewData] = useState<PreviewData | null>(null);
@@ -38,10 +34,7 @@ export function usePublishPreview() {
       return response.data.data;
     } catch (err) {
       const axiosError = err as AxiosError<{ message?: string }>;
-      setError(
-        axiosError.response?.data?.message ||
-          "Error al generar la previsualización",
-      );
+      setError(axiosError.response?.data?.message || "Error al generar la previsualización");
       return null;
     } finally {
       setIsLoading(false);
@@ -70,10 +63,7 @@ export function usePublishPreview() {
       return response.data.data.preview;
     } catch (err) {
       const axiosError = err as AxiosError<{ message?: string }>;
-      setError(
-        axiosError.response?.data?.message ||
-          "Error al optimizar automáticamente",
-      );
+      setError(axiosError.response?.data?.message || "Error al optimizar automáticamente");
       return null;
     } finally {
       setIsOptimizing(false);
@@ -102,9 +92,7 @@ export function usePublishPreview() {
       setPreviewData((prev) => {
         if (!prev) return prev;
 
-        const index = prev.platform_configurations.findIndex(
-          (c) => c.account_id === accountId,
-        );
+        const index = prev.platform_configurations.findIndex((c) => c.account_id === accountId);
 
         if (index !== -1) {
           const updated = { ...prev };
@@ -118,10 +106,7 @@ export function usePublishPreview() {
       return response.data.data;
     } catch (err) {
       const axiosError = err as AxiosError<{ message?: string }>;
-      setError(
-        axiosError.response?.data?.message ||
-          "Error al actualizar la configuración",
-      );
+      setError(axiosError.response?.data?.message || "Error al actualizar la configuración");
       throw err;
     }
   };

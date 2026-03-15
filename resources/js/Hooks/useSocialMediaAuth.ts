@@ -17,18 +17,15 @@ export const useSocialMediaAuth = () => {
         setLoading(true);
         setError(null);
 
-        const response = await axios.get(
-          `/api/v1/social-accounts/auth-url/${platform}`,
-          {
-            headers: {
-              "X-CSRF-TOKEN": document
-                .querySelector('meta[name="csrf-token"]')
-                ?.getAttribute("content"),
-              Accept: "application/json",
-            },
-            withCredentials: true,
+        const response = await axios.get(`/api/v1/social-accounts/auth-url/${platform}`, {
+          headers: {
+            "X-CSRF-TOKEN": document
+              .querySelector('meta[name="csrf-token"]')
+              ?.getAttribute("content"),
+            Accept: "application/json",
           },
-        );
+          withCredentials: true,
+        });
 
         if (response.data.success && response.data.url) {
           const width = 600;
@@ -53,12 +50,10 @@ export const useSocialMediaAuth = () => {
             const isSuccessEvent =
               event.data === "social-auth-success" ||
               event.data?.type === "SOCIAL_AUTH_SUCCESS" ||
-              (event.data?.type === "social_auth_callback" &&
-                event.data?.success === true);
+              (event.data?.type === "social_auth_callback" && event.data?.success === true);
 
             const isErrorEvent =
-              event.data?.type === "social_auth_callback" &&
-              event.data?.success === false;
+              event.data?.type === "social_auth_callback" && event.data?.success === false;
 
             if (isSuccessEvent) {
               window.removeEventListener("message", handleMessage);
@@ -74,8 +69,7 @@ export const useSocialMediaAuth = () => {
               authWindow.close();
 
               setLoading(false);
-              const errorMsg =
-                event.data?.message || "Error al conectar la cuenta";
+              const errorMsg = event.data?.message || "Error al conectar la cuenta";
 
               // Detectar errores específicos de rate limit
               if (
@@ -126,18 +120,15 @@ export const useSocialMediaAuth = () => {
     setLoading(true);
     setError(null);
     try {
-      await axios.delete(
-        `/api/v1/social-accounts/${id}${force ? "?force=true" : ""}`,
-        {
-          headers: {
-            "X-CSRF-TOKEN": document
-              .querySelector('meta[name="csrf-token"]')
-              ?.getAttribute("content"),
-            Accept: "application/json",
-          },
-          withCredentials: true,
+      await axios.delete(`/api/v1/social-accounts/${id}${force ? "?force=true" : ""}`, {
+        headers: {
+          "X-CSRF-TOKEN": document
+            .querySelector('meta[name="csrf-token"]')
+            ?.getAttribute("content"),
+          Accept: "application/json",
         },
-      );
+        withCredentials: true,
+      });
       removeAccount(id);
       await fetchAccounts();
 
@@ -155,8 +146,7 @@ export const useSocialMediaAuth = () => {
           reason: responseData.reason, // 'publishing', 'scheduled', or 'published'
         };
       }
-      const errorMessage =
-        err.response?.data?.message || "Failed to disconnect account";
+      const errorMessage = err.response?.data?.message || "Failed to disconnect account";
       setError(errorMessage);
       toast.error(errorMessage);
       return { success: false, error: errorMessage };

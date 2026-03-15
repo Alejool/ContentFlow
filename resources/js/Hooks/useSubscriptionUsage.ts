@@ -133,24 +133,13 @@ export function useSubscriptionUsage(): UseSubscriptionUsageReturn {
         "[useSubscriptionUsage] Connecting to channel:",
         `workspace.${currentWorkspaceId}.limits`,
       );
-      const channel = window.Echo.private(
-        `workspace.${currentWorkspaceId}.limits`,
-      );
+      const channel = window.Echo.private(`workspace.${currentWorkspaceId}.limits`);
 
       // Try listening with the dot notation (Laravel default)
-      console.log(
-        "[useSubscriptionUsage] Listening for event:",
-        ".usage.limits.updated",
-      );
+      console.log("[useSubscriptionUsage] Listening for event:", ".usage.limits.updated");
       channel.listen(".usage.limits.updated", (data: any) => {
-        console.log(
-          "[useSubscriptionUsage] ✅ WebSocket event received (dot notation):",
-          data,
-        );
-        console.log(
-          "[useSubscriptionUsage] Full data structure:",
-          JSON.stringify(data, null, 2),
-        );
+        console.log("[useSubscriptionUsage] ✅ WebSocket event received (dot notation):", data);
+        console.log("[useSubscriptionUsage] Full data structure:", JSON.stringify(data, null, 2));
 
         // Try different data structures
         let usageData = null;
@@ -158,9 +147,7 @@ export function useSubscriptionUsage(): UseSubscriptionUsageReturn {
         // Structure 1: data.limits.data (expected)
         if (data.limits?.success && data.limits.data) {
           usageData = data.limits.data;
-          console.log(
-            "[useSubscriptionUsage] Using structure 1: data.limits.data",
-          );
+          console.log("[useSubscriptionUsage] Using structure 1: data.limits.data");
         }
         // Structure 2: data.data (alternative)
         else if (data.success && data.data) {
@@ -170,9 +157,7 @@ export function useSubscriptionUsage(): UseSubscriptionUsageReturn {
         // Structure 3: data directly
         else if (data.plan && data.publications) {
           usageData = data;
-          console.log(
-            "[useSubscriptionUsage] Using structure 3: data directly",
-          );
+          console.log("[useSubscriptionUsage] Using structure 3: data directly");
         }
 
         if (usageData) {
@@ -180,10 +165,7 @@ export function useSubscriptionUsage(): UseSubscriptionUsageReturn {
           setUsage(usageData);
           setError(null);
         } else {
-          console.warn(
-            "[useSubscriptionUsage] Could not find valid usage data in:",
-            data,
-          );
+          console.warn("[useSubscriptionUsage] Could not find valid usage data in:", data);
           // Fallback: refetch from API
           console.log("[useSubscriptionUsage] Falling back to API fetch");
           fetchUsage();
@@ -191,45 +173,29 @@ export function useSubscriptionUsage(): UseSubscriptionUsageReturn {
       });
 
       channel.subscribed(() => {
-        console.log(
-          "[useSubscriptionUsage] ✅ WebSocket channel subscribed successfully",
-        );
+        console.log("[useSubscriptionUsage] ✅ WebSocket channel subscribed successfully");
         console.log(
           "[useSubscriptionUsage] Channel name:",
           `workspace.${currentWorkspaceId}.limits`,
         );
-        console.log(
-          "[useSubscriptionUsage] Listening for:",
-          "usage.limits.updated",
-        );
+        console.log("[useSubscriptionUsage] Listening for:", "usage.limits.updated");
       });
 
       channel.error((error: any) => {
-        console.error(
-          "[useSubscriptionUsage] ❌ WebSocket channel error:",
-          error,
-        );
+        console.error("[useSubscriptionUsage] ❌ WebSocket channel error:", error);
       });
 
       // Listen to ALL events on this channel for debugging
       channel.listenToAll((eventName: string, data: any) => {
-        console.log(
-          "[useSubscriptionUsage] 🔔 ANY EVENT received:",
-          eventName,
-          data,
-        );
+        console.log("[useSubscriptionUsage] 🔔 ANY EVENT received:", eventName, data);
       });
     } else {
-      console.warn(
-        "[useSubscriptionUsage] Echo not available, WebSocket updates disabled",
-      );
+      console.warn("[useSubscriptionUsage] Echo not available, WebSocket updates disabled");
     }
 
     // Listen for plan change events
     const handlePlanChanged = () => {
-      console.log(
-        "[useSubscriptionUsage] Plan changed, refetching immediately...",
-      );
+      console.log("[useSubscriptionUsage] Plan changed, refetching immediately...");
       // Refetch inmediatamente sin delay
       fetchUsage();
     };
@@ -249,10 +215,7 @@ export function useSubscriptionUsage(): UseSubscriptionUsageReturn {
         window.Echo.leave(`workspace.${currentWorkspaceId}.limits`);
       }
 
-      window.removeEventListener(
-        "subscription-plan-changed",
-        handlePlanChanged,
-      );
+      window.removeEventListener("subscription-plan-changed", handlePlanChanged);
       window.removeEventListener("addon-purchased", handleAddonPurchased);
     };
   }, [currentWorkspaceId]);

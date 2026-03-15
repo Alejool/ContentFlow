@@ -134,10 +134,7 @@ export function useKeyboardNavigation(
 /**
  * Focus trap hook for modals and dialogs
  */
-export function useFocusTrap(
-  containerRef: RefObject<HTMLElement>,
-  enabled: boolean = true,
-): void {
+export function useFocusTrap(containerRef: RefObject<HTMLElement>, enabled: boolean = true): void {
   useEffect(() => {
     if (!enabled || !containerRef.current) return;
 
@@ -191,9 +188,7 @@ export function useRovingTabIndex(
     let currentIndex = 0;
 
     const updateTabIndex = () => {
-      const items = Array.from(
-        container.querySelectorAll<HTMLElement>(itemSelector),
-      );
+      const items = Array.from(container.querySelectorAll<HTMLElement>(itemSelector));
 
       items.forEach((item, index) => {
         if (index === currentIndex) {

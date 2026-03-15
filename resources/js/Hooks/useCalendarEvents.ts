@@ -22,10 +22,7 @@ interface BulkUpdateParams {
 }
 
 // Fetch calendar events with caching
-export function useCalendarEvents({
-  currentMonth,
-  filters,
-}: FetchEventsParams) {
+export function useCalendarEvents({ currentMonth, filters }: FetchEventsParams) {
   const { auth } = usePage<any>().props;
   const workspaceId = auth?.user?.current_workspace_id;
 

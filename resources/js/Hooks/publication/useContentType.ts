@@ -158,9 +158,7 @@ export function useContentType(contentType: ContentType = "post") {
 
     // Validar cantidad de archivos
     if (!config.allowsMultipleMedia && mediaFiles.length > 1) {
-      errors.push(
-        `This content type only allows ${config.maxMediaCount} media file`,
-      );
+      errors.push(`This content type only allows ${config.maxMediaCount} media file`);
     }
 
     if (mediaFiles.length > config.maxMediaCount) {

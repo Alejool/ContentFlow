@@ -15,21 +15,13 @@ export function usePublicationPermissions(permissions: string[] = []) {
 
   // Permisos básicos usando CASL
   const canManageContent = useMemo(
-    () =>
-      ability.can("update", "Publication") ||
-      ability.can("create", "Publication"),
+    () => ability.can("update", "Publication") || ability.can("create", "Publication"),
     [ability],
   );
 
-  const canPublish = useMemo(
-    () => ability.can("publish", "Publication"),
-    [ability],
-  );
+  const canPublish = useMemo(() => ability.can("publish", "Publication"), [ability]);
 
-  const canDelete = useMemo(
-    () => ability.can("delete", "Publication"),
-    [ability],
-  );
+  const canDelete = useMemo(() => ability.can("delete", "Publication"), [ability]);
 
   const canEdit = useMemo(() => canManageContent, [canManageContent]);
 
@@ -37,15 +29,9 @@ export function usePublicationPermissions(permissions: string[] = []) {
 
   const canView = useMemo(() => ability.can("read", "Publication"), [ability]);
 
-  const canApprove = useMemo(
-    () => ability.can("approve", "ApprovalRequest"),
-    [ability],
-  );
+  const canApprove = useMemo(() => ability.can("approve", "ApprovalRequest"), [ability]);
 
-  const canReject = useMemo(
-    () => ability.can("reject", "ApprovalRequest"),
-    [ability],
-  );
+  const canReject = useMemo(() => ability.can("reject", "ApprovalRequest"), [ability]);
 
   const canSubmitForApproval = useMemo(
     () => ability.can("submit_for_approval", "Publication"),
@@ -82,15 +68,9 @@ export function usePublicationPermissions(permissions: string[] = []) {
     return userRoleSlug === lastLevelRoleSlug;
   }, [hasWorkflow, currentWorkspace]);
 
-  const isOwner = useMemo(
-    () => currentWorkspace?.user_role_slug === "owner",
-    [currentWorkspace],
-  );
+  const isOwner = useMemo(() => currentWorkspace?.user_role_slug === "owner", [currentWorkspace]);
 
-  const isAdmin = useMemo(
-    () => currentWorkspace?.user_role_slug === "admin",
-    [currentWorkspace],
-  );
+  const isAdmin = useMemo(() => currentWorkspace?.user_role_slug === "admin", [currentWorkspace]);
 
   const isAdminOrOwner = useMemo(() => isOwner || isAdmin, [isOwner, isAdmin]);
 
@@ -122,9 +102,7 @@ export function usePublicationPermissions(permissions: string[] = []) {
     // CRÍTICO: Sin workflow, SOLO Admin y Owner pueden publicar directamente
     // Otros roles (incluso con permiso "publish") deben enviar a revisión
     if (isAdminOrOwner) {
-      return ["draft", "rejected", "failed", "published", "scheduled"].includes(
-        item.status || "",
-      );
+      return ["draft", "rejected", "failed", "published", "scheduled"].includes(item.status || "");
     }
 
     return false;
@@ -153,9 +131,7 @@ export function usePublicationPermissions(permissions: string[] = []) {
     if (isLastLevelApprover) return false;
 
     // No mostrar si está en proceso de revisión o publicación
-    if (
-      ["pending_review", "publishing", "retrying"].includes(item.status || "")
-    ) {
+    if (["pending_review", "publishing", "retrying"].includes(item.status || "")) {
       return false;
     }
 
@@ -179,9 +155,7 @@ export function usePublicationPermissions(permissions: string[] = []) {
     const isSubmitter = submitterId === currentUserId;
 
     // Retry / republicar — mismas reglas pero para estados de reintento
-    const isRetryStatus = ["failed", "published", "scheduled"].includes(
-      item.status || "",
-    );
+    const isRetryStatus = ["failed", "published", "scheduled"].includes(item.status || "");
 
     // Owner: siempre puede publicar
     if (isOwner) return true;

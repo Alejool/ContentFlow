@@ -51,9 +51,7 @@ export function useCanApprove(workspaceId?: number) {
 
       return {
         canApprove: hasApprovePermission,
-        reason: hasApprovePermission
-          ? ("workflow_assignment" as const)
-          : ("" as const),
+        reason: hasApprovePermission ? ("workflow_assignment" as const) : ("" as const),
         isLoading: false,
       };
     }

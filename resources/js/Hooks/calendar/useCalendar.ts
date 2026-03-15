@@ -74,11 +74,8 @@ export const useCalendar = () => {
           if (e.type === "user_event") return false;
 
           // Check both platform and extendedProps.platform for compatibility
-          const eventPlatform = (
-            e.platform || e.extendedProps?.platform
-          )?.toLowerCase();
-          if (!eventPlatform || eventPlatform !== platformFilter.toLowerCase())
-            return false;
+          const eventPlatform = (e.platform || e.extendedProps?.platform)?.toLowerCase();
+          if (!eventPlatform || eventPlatform !== platformFilter.toLowerCase()) return false;
         }
       }
 
@@ -86,8 +83,7 @@ export const useCalendar = () => {
       if (statusFilter !== "all" && e.status !== statusFilter) return false;
 
       // Campaign filter
-      if (campaignFilter && e.extendedProps.campaign_id !== campaignFilter)
-        return false;
+      if (campaignFilter && e.extendedProps.campaign_id !== campaignFilter) return false;
 
       return true;
     });
@@ -153,9 +149,7 @@ export const useCalendar = () => {
         }
 
         if (type === "publication") {
-          const response = await axios.get(
-            `/api/v1/publications/${resourceId}`,
-          );
+          const response = await axios.get(`/api/v1/publications/${resourceId}`);
           const data = response.data.publication || response.data.data;
           if (data) (data as any).__type = "publication";
           openEditModal(data);
@@ -164,8 +158,7 @@ export const useCalendar = () => {
 
         // Fallback for other types (e.g., campaigns)
         const response = await axios.get(`/api/v1/campaigns/${resourceId}`);
-        const data =
-          response.data.campaign || response.data.data || response.data;
+        const data = response.data.campaign || response.data.data || response.data;
 
         if (response.data.campaign) {
           if (data) (data as any).__type = "campaign";

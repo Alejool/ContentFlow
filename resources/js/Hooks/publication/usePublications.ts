@@ -13,12 +13,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/react/shallow";
 
-export type ContentTab =
-  | "publications"
-  | "campaigns"
-  | "logs"
-  | "calendar"
-  | "approvals";
+export type ContentTab = "publications" | "campaigns" | "logs" | "calendar" | "approvals";
 
 export const usePublications = () => {
   const { t } = useTranslation();
@@ -128,10 +123,7 @@ export const usePublications = () => {
     async (page = 1) => {
       const fetchKey = `${activeTab}-${JSON.stringify(filters)}-${page}`;
       // Prevent duplicate fetches in the same render cycle or loop
-      if (
-        lastFetchRef.current === fetchKey &&
-        (isPubLoading || isCampLoading || isLogsLoading)
-      ) {
+      if (lastFetchRef.current === fetchKey && (isPubLoading || isCampLoading || isLogsLoading)) {
         return;
       }
       lastFetchRef.current = fetchKey;
@@ -173,12 +165,7 @@ export const usePublications = () => {
 
   useEffect(() => {
     fetchData(1); // Always reset to page 1 when filters or perPage change
-  }, [
-    activeTab,
-    filters,
-    itemsPerPage,
-    (props.auth.user as any)?.current_workspace_id,
-  ]); // Run when tab, filters, perPage or workspace change
+  }, [activeTab, filters, itemsPerPage, (props.auth.user as any)?.current_workspace_id]); // Run when tab, filters, perPage or workspace change
 
   useEffect(() => {
     fetchAccounts();
@@ -234,10 +221,7 @@ export const usePublications = () => {
   const handleFilterChange = useCallback(
     (newFilters: any) => {
       setFilters(newFilters);
-      localStorage.setItem(
-        `contentPage_filters_${activeTab}`,
-        JSON.stringify(newFilters),
-      );
+      localStorage.setItem(`contentPage_filters_${activeTab}`, JSON.stringify(newFilters));
     },
     [activeTab],
   );
@@ -251,10 +235,7 @@ export const usePublications = () => {
         delete newFilters[key];
       }
       setFilters(newFilters);
-      localStorage.setItem(
-        `contentPage_filters_${activeTab}`,
-        JSON.stringify(newFilters),
-      );
+      localStorage.setItem(`contentPage_filters_${activeTab}`, JSON.stringify(newFilters));
     },
     [filters, activeTab],
   );
@@ -275,13 +256,7 @@ export const usePublications = () => {
         setSelectedItem(updated);
       }
     }
-  }, [
-    fetchData,
-    pagination.current_page,
-    selectedItem,
-    activeTab,
-    setSelectedItem,
-  ]);
+  }, [fetchData, pagination.current_page, selectedItem, activeTab, setSelectedItem]);
 
   const handleDeleteItem = useCallback(
     async (id: number) => {
@@ -339,11 +314,7 @@ export const usePublications = () => {
         fetchData(pagination.current_page);
       } else {
         ToastService.error(
-          t(
-            isCampaign
-              ? "campaigns.messages.error"
-              : "publications.messages.error",
-          ),
+          t(isCampaign ? "campaigns.messages.error" : "publications.messages.error"),
         );
       }
     },
@@ -364,26 +335,14 @@ export const usePublications = () => {
   );
 
   const stableOpenAddModal = useCallback(() => openAddModal(), [openAddModal]);
-  const stableCloseAddModal = useCallback(
-    () => closeAddModal(),
-    [closeAddModal],
-  );
-  const stableOpenEditModal = useCallback(
-    (item: any) => openEditModal(item),
-    [openEditModal],
-  );
-  const stableCloseEditModal = useCallback(
-    () => closeEditModal(),
-    [closeEditModal],
-  );
+  const stableCloseAddModal = useCallback(() => closeAddModal(), [closeAddModal]);
+  const stableOpenEditModal = useCallback((item: any) => openEditModal(item), [openEditModal]);
+  const stableCloseEditModal = useCallback(() => closeEditModal(), [closeEditModal]);
   const stableOpenPublishModal = useCallback(
     (item: any) => openPublishModal(item),
     [openPublishModal],
   );
-  const stableClosePublishModal = useCallback(
-    () => closePublishModal(),
-    [closePublishModal],
-  );
+  const stableClosePublishModal = useCallback(() => closePublishModal(), [closePublishModal]);
   const stableOpenViewDetailsModal = useCallback(
     (item: any) => openViewDetailsModal(item),
     [openViewDetailsModal],

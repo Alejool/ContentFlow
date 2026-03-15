@@ -8,8 +8,7 @@ import { useEffect, useState } from "react";
  * Automatically fetches and caches the action based on user role and workspace settings.
  */
 export function usePublicationAction() {
-  const [actionData, setActionData] =
-    useState<PublicationActionResponse | null>(null);
+  const [actionData, setActionData] = useState<PublicationActionResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

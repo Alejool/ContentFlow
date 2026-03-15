@@ -1,11 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import type {
-  AddonPackages,
-  AddonSummary,
-  AddonBalance,
-  WorkspaceAddon,
-} from "@/types/addon";
+import type { AddonPackages, AddonSummary, AddonBalance, WorkspaceAddon } from "@/types/addon";
 
 interface UseAddonsReturn {
   packages: AddonPackages | null;
@@ -14,9 +9,7 @@ interface UseAddonsReturn {
   error: string | null;
   refreshBalance: () => Promise<void>;
   purchaseAddon: (sku: string, quantity?: number) => Promise<void>;
-  getBalanceByType: (
-    type: "ai_credits" | "storage",
-  ) => Promise<AddonBalance | null>;
+  getBalanceByType: (type: "ai_credits" | "storage") => Promise<AddonBalance | null>;
 }
 
 export const useAddons = (): UseAddonsReturn => {
@@ -67,15 +60,11 @@ export const useAddons = (): UseAddonsReturn => {
       window.location.href = url;
     } catch (err: any) {
       console.error("Error creating checkout:", err);
-      throw new Error(
-        err.response?.data?.message || "Error al iniciar el proceso de compra",
-      );
+      throw new Error(err.response?.data?.message || "Error al iniciar el proceso de compra");
     }
   };
 
-  const getBalanceByType = async (
-    type: "ai_credits" | "storage",
-  ): Promise<AddonBalance | null> => {
+  const getBalanceByType = async (type: "ai_credits" | "storage"): Promise<AddonBalance | null> => {
     try {
       const response = await axios.get(`/api/v1/addons/balance/${type}`);
       return response.data.data;
@@ -124,9 +113,7 @@ export const useAddonHistory = () => {
       await loadHistory(); // Recargar historial
       return true;
     } catch (err: any) {
-      throw new Error(
-        err.response?.data?.message || "Error al procesar el reembolso",
-      );
+      throw new Error(err.response?.data?.message || "Error al procesar el reembolso");
     }
   };
 

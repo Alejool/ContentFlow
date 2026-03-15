@@ -20,12 +20,11 @@ export const useAuth = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [successMessage, setSuccessMessage] = useState<string>("");
 
-  const { data, setData, processing, errors, setError } =
-    useForm<LoginFormData>({
-      email: "",
-      password: "",
-      remember: false,
-    });
+  const { data, setData, processing, errors, setError } = useForm<LoginFormData>({
+    email: "",
+    password: "",
+    remember: false,
+  });
 
   const submitLogin = async (payload: LoginFormData) => {
     setLoading(true);
@@ -97,8 +96,7 @@ export const useAuth = () => {
         toast.error(msg);
       } else {
         const msg =
-          t("validation.auth.failed") ||
-          "Credenciales incorrectas o error en el servidor.";
+          t("validation.auth.failed") || "Credenciales incorrectas o error en el servidor.";
         setGeneralError(msg);
         toast.error(msg);
       }

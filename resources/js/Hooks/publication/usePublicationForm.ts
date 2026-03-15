@@ -68,9 +68,7 @@ export const usePublicationForm = ({
 
   // Selectors for Publication Store
   const createPublication = usePublicationStore((s) => s.createPublication);
-  const updatePublicationStore = usePublicationStore(
-    (s) => s.updatePublicationStore,
-  );
+  const updatePublicationStore = usePublicationStore((s) => s.updatePublicationStore);
 
   // Selectors for Media Store
   const mediaFiles = useMediaStore((s) => s.mediaFiles);
@@ -100,12 +98,8 @@ export const usePublicationForm = ({
   } | null>(null);
 
   // Platform settings and previews
-  const [platformSettings, setPlatformSettings] = useState<Record<string, any>>(
-    {},
-  );
-  const [activePlatformSettings, setActivePlatformSettings] = useState<
-    string | null
-  >(null);
+  const [platformSettings, setPlatformSettings] = useState<Record<string, any>>({});
+  const [activePlatformSettings, setActivePlatformSettings] = useState<string | null>(null);
 
   // Direct S3 Upload Hooks
   const {
@@ -116,22 +110,12 @@ export const usePublicationForm = ({
     errors: uploadErrors,
   } = useS3Upload();
   const [uploadingFiles, setUploadingFiles] = useState<Set<string>>(new Set());
-  const [activePlatformPreview, setActivePlatformPreview] = useState<
-    string | null
-  >(null);
-  const [accountSchedules, setAccountSchedules] = useState<
-    Record<number, string>
-  >({});
-  const [publishingAccountIds, setPublishingAccountIds] = useState<number[]>(
-    [],
-  );
+  const [activePlatformPreview, setActivePlatformPreview] = useState<string | null>(null);
+  const [accountSchedules, setAccountSchedules] = useState<Record<number, string>>({});
+  const [publishingAccountIds, setPublishingAccountIds] = useState<number[]>([]);
   const [publishedAccountIds, setPublishedAccountIds] = useState<number[]>([]);
-  const [durationErrors, setDurationErrors] = useState<Record<number, string>>(
-    {},
-  );
-  const [contentTypeSuggested, setContentTypeSuggested] = useState<Set<string>>(
-    new Set(),
-  );
+  const [durationErrors, setDurationErrors] = useState<Record<number, string>>({});
+  const [contentTypeSuggested, setContentTypeSuggested] = useState<Set<string>>(new Set());
 
   const prevHashtagsRef = useRef<string>("");
 
@@ -179,10 +163,7 @@ export const usePublicationForm = ({
   // Update schema when content type changes
   useEffect(() => {
     const subscription = form.watch((value, { name }) => {
-      if (
-        name === "content_type" &&
-        value.content_type !== currentContentType
-      ) {
+      if (name === "content_type" && value.content_type !== currentContentType) {
         setCurrentContentType(value.content_type || "post");
 
         // Clear validation errors for fields that are no longer required
@@ -196,9 +177,8 @@ export const usePublicationForm = ({
         };
 
         const newRequiredFields =
-          FIELD_VALIDATION_RULES[
-            newContentType as keyof typeof FIELD_VALIDATION_RULES
-          ] || FIELD_VALIDATION_RULES.post;
+          FIELD_VALIDATION_RULES[newContentType as keyof typeof FIELD_VALIDATION_RULES] ||
+          FIELD_VALIDATION_RULES.post;
 
         // Clear errors for fields that are no longer required
         ["hashtags", "description", "goal"].forEach((field) => {
@@ -307,9 +287,7 @@ export const usePublicationForm = ({
           if (accounts === null || accounts === undefined) {
             return []; // Empty array in form means "all accounts"
           }
-          const converted = accounts.map((id: any) =>
-            typeof id === "string" ? parseInt(id) : id,
-          );
+          const converted = accounts.map((id: any) => (typeof id === "string" ? parseInt(id) : id));
           return converted;
         })(),
       };
@@ -397,8 +375,7 @@ export const usePublicationForm = ({
               (l) =>
                 l.status === "publishing" ||
                 // If publication is 'publishing' or 'processing', treat 'pending' logs as actively publishing
-                ((publication.status === "publishing" ||
-                  publication.status === "processing") &&
+                ((publication.status === "publishing" || publication.status === "processing") &&
                   l.status === "pending"),
             )
             .map((l) => l.social_account_id) || [],
@@ -427,8 +404,7 @@ export const usePublicationForm = ({
         // IMPORTANT: Only load ORIGINAL posts (is_recurring_instance = false)
         // Recurring instances should not be shown in the schedule configuration
         const initialAccountSchedules: Record<number, string> = {};
-        const scheds =
-          publication.scheduled_posts || (publication as any).scheduledPosts;
+        const scheds = publication.scheduled_posts || (publication as any).scheduledPosts;
         if (scheds) {
           scheds.forEach((sp: any) => {
             if (
@@ -459,9 +435,7 @@ export const usePublicationForm = ({
           publication.media_files
             ?.filter((media: any) => !media.metadata?.original_media_id) // Exclude reels
             ?.map((media: any) => {
-              const isVideo =
-                media.file_type === "video" ||
-                media.mime_type?.startsWith("video/");
+              const isVideo = media.file_type === "video" || media.mime_type?.startsWith("video/");
               const tempId = `existing-${media.id}`;
 
               let url = media.file_path || media.url;
@@ -476,9 +450,7 @@ export const usePublicationForm = ({
               }
 
               const thumbDerivative = media.derivatives?.find(
-                (d: any) =>
-                  d.derivative_type === "thumbnail" ||
-                  d.derivative_type === "thumb",
+                (d: any) => d.derivative_type === "thumbnail" || d.derivative_type === "thumb",
               );
               let thumbnailUrl = thumbDerivative?.file_path;
               if (
@@ -526,10 +498,7 @@ export const usePublicationForm = ({
               return nameMatch && sizeMatch;
             });
 
-            if (
-              !isDuplicate &&
-              !existingMedia.some((m) => m.tempId === item.id)
-            ) {
+            if (!isDuplicate && !existingMedia.some((m) => m.tempId === item.id)) {
               existingMedia.push({
                 tempId: item.id,
                 url: URL.createObjectURL(item.file),
@@ -581,15 +550,12 @@ export const usePublicationForm = ({
     }
 
     // Only run as backup for videos that might have been missed
-    const videoFiles = completedFiles.filter((f) =>
-      f.type.startsWith("video/"),
-    );
+    const videoFiles = completedFiles.filter((f) => f.type.startsWith("video/"));
     if (videoFiles.length === 0) return;
 
     const videoFilesWithDuration = videoFiles.filter((f) => {
       const hasDuration =
-        videoMetadata[f.tempId]?.duration !== undefined &&
-        videoMetadata[f.tempId]?.duration > 0;
+        videoMetadata[f.tempId]?.duration !== undefined && videoMetadata[f.tempId]?.duration > 0;
       return hasDuration;
     });
 
@@ -623,11 +589,7 @@ export const usePublicationForm = ({
       },
       {
         onSuccess: (result) => {
-          if (
-            result &&
-            result.should_change &&
-            result.suggested_type !== currentType
-          ) {
+          if (result && result.should_change && result.suggested_type !== currentType) {
             toast.success(
               `Tipo de contenido cambiado automáticamente a "${result.suggested_type}" basado en la duración del video.`,
               {
@@ -635,11 +597,9 @@ export const usePublicationForm = ({
               },
             );
 
-            form.setValue(
-              "content_type",
-              result.suggested_type as ContentType,
-              { shouldValidate: true },
-            );
+            form.setValue("content_type", result.suggested_type as ContentType, {
+              shouldValidate: true,
+            });
             setCurrentContentType(result.suggested_type);
           }
         },
@@ -662,22 +622,16 @@ export const usePublicationForm = ({
     const currentContentType = (watch("content_type") as ContentType) || "post";
 
     // Solo hacer cambios básicos inmediatos (múltiples archivos = carousel)
-    const allFiles = [
-      ...mediaFiles.map((m) => ({ type: m.type }) as File),
-      ...newFiles,
-    ];
+    const allFiles = [...mediaFiles.map((m) => ({ type: m.type }) as File), ...newFiles];
 
     // Solo cambiar a carousel si hay múltiples archivos
     if (allFiles.length > 1 && currentContentType !== "carousel") {
       setValue("content_type", "carousel");
       setCurrentContentType("carousel");
 
-      toast.success(
-        `Tipo de contenido cambiado automáticamente a Carousel (múltiples archivos)`,
-        {
-          duration: 4000,
-        },
-      );
+      toast.success(`Tipo de contenido cambiado automáticamente a Carousel (múltiples archivos)`, {
+        duration: 4000,
+      });
     }
 
     // Para videos individuales, esperar a que el backend haga la sugerencia basada en duración
@@ -686,21 +640,13 @@ export const usePublicationForm = ({
     const mediaRules = getMediaRulesForContentType(contentType);
 
     // Get current media counts
-    const currentImages = mediaFiles.filter((m) =>
-      m.type.includes("image"),
-    ).length;
-    const currentVideos = mediaFiles.filter((m) =>
-      m.type.includes("video"),
-    ).length;
+    const currentImages = mediaFiles.filter((m) => m.type.includes("image")).length;
+    const currentVideos = mediaFiles.filter((m) => m.type.includes("video")).length;
     const currentTotal = currentImages + currentVideos;
 
     // Validate content type restrictions
-    const newImages = newFiles.filter((f) =>
-      f.type.startsWith("image/"),
-    ).length;
-    const newVideos = newFiles.filter((f) =>
-      f.type.startsWith("video/"),
-    ).length;
+    const newImages = newFiles.filter((f) => f.type.startsWith("image/")).length;
+    const newVideos = newFiles.filter((f) => f.type.startsWith("video/")).length;
 
     // Con la auto-detección, estas validaciones deberían ser menos estrictas
     // Solo validar si realmente hay incompatibilidad después del cambio automático
@@ -739,11 +685,7 @@ export const usePublicationForm = ({
     }
 
     // Check count limits
-    if (
-      mediaRules.maxImages !== undefined &&
-      mediaRules.maxImages === 0 &&
-      newImages > 0
-    ) {
+    if (mediaRules.maxImages !== undefined && mediaRules.maxImages === 0 && newImages > 0) {
       toast.error(
         t("publications.validation.no_images_allowed", {
           defaultValue: "Este tipo de contenido no permite imágenes",
@@ -757,11 +699,7 @@ export const usePublicationForm = ({
       return;
     }
 
-    if (
-      mediaRules.maxVideos !== undefined &&
-      mediaRules.maxVideos === 0 &&
-      newVideos > 0
-    ) {
+    if (mediaRules.maxVideos !== undefined && mediaRules.maxVideos === 0 && newVideos > 0) {
       toast.error(
         t("publications.validation.no_videos_allowed", {
           defaultValue: "Este tipo de contenido no permite videos",
@@ -776,10 +714,7 @@ export const usePublicationForm = ({
     }
 
     // Check if adding these files would exceed limits
-    if (
-      mediaRules.maxImages &&
-      currentImages + newImages > mediaRules.maxImages
-    ) {
+    if (mediaRules.maxImages && currentImages + newImages > mediaRules.maxImages) {
       toast.error(
         t("publications.validation.max_images_exceeded", {
           defaultValue: `Máximo ${mediaRules.maxImages} imagen(es) permitida(s)`,
@@ -795,10 +730,7 @@ export const usePublicationForm = ({
       return;
     }
 
-    if (
-      mediaRules.maxVideos &&
-      currentVideos + newVideos > mediaRules.maxVideos
-    ) {
+    if (mediaRules.maxVideos && currentVideos + newVideos > mediaRules.maxVideos) {
       toast.error(
         t("publications.validation.max_videos_exceeded", {
           defaultValue: `Máximo ${mediaRules.maxVideos} video(s) permitido(s)`,
@@ -814,10 +746,7 @@ export const usePublicationForm = ({
       return;
     }
 
-    if (
-      mediaRules.maxCount &&
-      currentTotal + newFiles.length > mediaRules.maxCount
-    ) {
+    if (mediaRules.maxCount && currentTotal + newFiles.length > mediaRules.maxCount) {
       toast.error(
         t("publications.validation.max_files_exceeded", {
           defaultValue: `Máximo ${mediaRules.maxCount} archivo(s) permitido(s)`,
@@ -835,9 +764,7 @@ export const usePublicationForm = ({
 
     // Block SVG files for security reasons (can contain malicious scripts)
     const svgFiles = newFiles.filter(
-      (file) =>
-        file.type === "image/svg+xml" ||
-        file.name.toLowerCase().endsWith(".svg"),
+      (file) => file.type === "image/svg+xml" || file.name.toLowerCase().endsWith(".svg"),
     );
 
     if (svgFiles.length > 0) {
@@ -914,9 +841,9 @@ export const usePublicationForm = ({
             width,
             height,
             aspectRatio,
-            youtubeType: (duration <= 60 && aspectRatio < 1
-              ? "short"
-              : "video") as "video" | "short",
+            youtubeType: (duration <= 60 && aspectRatio < 1 ? "short" : "video") as
+              | "video"
+              | "short",
           };
 
           setVideoMetadata(item.tempId, metadata);
@@ -940,11 +867,7 @@ export const usePublicationForm = ({
               },
               {
                 onSuccess: (result) => {
-                  if (
-                    result &&
-                    result.should_change &&
-                    result.suggested_type !== currentType
-                  ) {
+                  if (result && result.should_change && result.suggested_type !== currentType) {
                     toast.success(
                       `Tipo de contenido cambiado automáticamente a "${result.suggested_type}" basado en la duración del video (${(duration / 60).toFixed(1)} minutos).`,
                       {
@@ -952,19 +875,14 @@ export const usePublicationForm = ({
                       },
                     );
 
-                    form.setValue(
-                      "content_type",
-                      result.suggested_type as ContentType,
-                      { shouldValidate: true },
-                    );
+                    form.setValue("content_type", result.suggested_type as ContentType, {
+                      shouldValidate: true,
+                    });
                     setCurrentContentType(result.suggested_type);
                   }
                 },
                 onError: (error) => {
-                  console.error(
-                    "🎬 Content type suggestion API failed:",
-                    error,
-                  );
+                  console.error("🎬 Content type suggestion API failed:", error);
                 },
               },
             );
@@ -976,9 +894,7 @@ export const usePublicationForm = ({
             try {
               // Find the media file by matching filename and size
               const mediaFile = publication.media_files?.find(
-                (mf: any) =>
-                  mf.file_name === item.file?.name &&
-                  mf.size === item.file?.size,
+                (mf: any) => mf.file_name === item.file?.name && mf.size === item.file?.size,
               );
 
               if (mediaFile) {
@@ -1047,9 +963,7 @@ export const usePublicationForm = ({
 
     if (!isDeleting && endsWithSpace && stringValue.trim().length > 0) {
       const tags = stringValue.trim().split(/\s+/);
-      const processedTags = tags.map((tag) =>
-        tag.startsWith("#") ? tag : `#${tag}`,
-      );
+      const processedTags = tags.map((tag) => (tag.startsWith("#") ? tag : `#${tag}`));
       formatted = processedTags.join(" ") + " #";
     } else if (!endsWithSpace) {
       const tags = stringValue.split(/\s+/);
@@ -1101,10 +1015,7 @@ export const usePublicationForm = ({
       videos.forEach((video) => {
         const metadata = currentMetadata[video.tempId];
         if (metadata) {
-          const validation = validateVideoDuration(
-            platformKey,
-            metadata.duration,
-          );
+          const validation = validateVideoDuration(platformKey, metadata.duration);
           if (!validation.isValid) {
             errors[accountId] = t("publications.validation.videoTooLong", {
               platform: platformConfig.name,
@@ -1170,9 +1081,7 @@ export const usePublicationForm = ({
     if (!publication?.id) return;
     try {
       await axios.post(route("api.v1.publications.cancel", publication.id));
-      toast.success(
-        t("publications.messages.cancelSuccess") || "Publicación cancelada",
-      );
+      toast.success(t("publications.messages.cancelSuccess") || "Publicación cancelada");
 
       // Proactive store update
       usePublicationStore.getState().setPublishingPlatforms(publication.id, []);
@@ -1244,10 +1153,7 @@ export const usePublicationForm = ({
           });
         }
         if (data.poll_duration_hours) {
-          formData.append(
-            "poll_duration_hours",
-            data.poll_duration_hours.toString(),
-          );
+          formData.append("poll_duration_hours", data.poll_duration_hours.toString());
         }
       }
 
@@ -1351,10 +1257,7 @@ export const usePublicationForm = ({
         socialAccounts.forEach((id, index) => {
           formData.append(`social_accounts[${index}]`, id.toString());
           if (id && accountSchedules[id]) {
-            formData.append(
-              `social_account_schedules[${id}]`,
-              accountSchedules[id],
-            );
+            formData.append(`social_account_schedules[${id}]`, accountSchedules[id]);
           }
         });
       }
@@ -1363,10 +1266,7 @@ export const usePublicationForm = ({
       if (data.is_recurring) {
         formData.append("is_recurring", "1");
         formData.append("recurrence_type", data.recurrence_type || "daily");
-        formData.append(
-          "recurrence_interval",
-          (data.recurrence_interval || 1).toString(),
-        );
+        formData.append("recurrence_interval", (data.recurrence_interval || 1).toString());
         if (data.recurrence_days && data.recurrence_days.length > 0) {
           data.recurrence_days.forEach((day, i) => {
             formData.append(`recurrence_days[]`, day.toString());
@@ -1420,18 +1320,14 @@ export const usePublicationForm = ({
 
         // CRITICAL: Tell backend to skip media validation because files are uploading
         formData.append("has_uploading_files", "1");
-        formData.append(
-          "uploading_files_count",
-          uploadingFiles.length.toString(),
-        );
+        formData.append("uploading_files_count", uploadingFiles.length.toString());
       }
 
       // 1. Filter out files that are still uploading (File objects)
       // We will link them later via background process
       const readyMediaFiles = currentMediaFiles.filter((media) => {
         // Keep key-based (uploaded) files or existing IDs
-        const isUploaded =
-          typeof media.file === "object" && "key" in media.file;
+        const isUploaded = typeof media.file === "object" && "key" in media.file;
         const isExisting = !media.isNew && media.id;
         return isUploaded || isExisting;
       });
@@ -1442,24 +1338,12 @@ export const usePublicationForm = ({
         if (media.isNew && media.file) {
           // It's S3 metadata, send it as-is
           formData.append(`media[${index}][key]`, (media.file as any).key);
-          formData.append(
-            `media[${index}][filename]`,
-            (media.file as any).filename,
-          );
-          formData.append(
-            `media[${index}][mime_type]`,
-            (media.file as any).mime_type,
-          );
-          formData.append(
-            `media[${index}][size]`,
-            (media.file as any).size.toString(),
-          );
+          formData.append(`media[${index}][filename]`, (media.file as any).filename);
+          formData.append(`media[${index}][mime_type]`, (media.file as any).mime_type);
+          formData.append(`media[${index}][size]`, (media.file as any).size.toString());
 
           if (videoMetadata[media.tempId]) {
-            formData.append(
-              `youtube_types_new[${index}]`,
-              videoMetadata[media.tempId].youtubeType,
-            );
+            formData.append(`youtube_types_new[${index}]`, videoMetadata[media.tempId].youtubeType);
             formData.append(
               `durations_new[${index}]`,
               videoMetadata[media.tempId].duration.toString(),
@@ -1484,19 +1368,14 @@ export const usePublicationForm = ({
             formData.append(`thumbnails[${media.id}]`, hasNewThumbnail);
             if (media.type === "video") {
               formData.append("youtube_thumbnail", hasNewThumbnail);
-              formData.append(
-                "youtube_thumbnail_video_id",
-                media.id.toString(),
-              );
+              formData.append("youtube_thumbnail_video_id", media.id.toString());
             }
           }
         }
       });
 
       if (removedMediaIds && removedMediaIds.length > 0) {
-        removedMediaIds.forEach((id) =>
-          formData.append("removed_media_ids[]", id.toString()),
-        );
+        removedMediaIds.forEach((id) => formData.append("removed_media_ids[]", id.toString()));
       }
 
       if (removedThumbnailIds && removedThumbnailIds.length > 0) {
@@ -1535,31 +1414,23 @@ export const usePublicationForm = ({
       // 2. LINK PENDING UPLOADS (Moving this to background, non-awaited for UI snappiness)
       // Identify files that were filtered out (File objects)
       const pendingFiles = (currentMediaFiles || []).filter(
-        (media) =>
-          media.isNew &&
-          media.file instanceof File &&
-          media.status !== "failed",
+        (media) => media.isNew && media.file instanceof File && media.status !== "failed",
       );
 
-      const handleBackgroundLinking = async (
-        pubId: number,
-        pubTitle?: string,
-      ) => {
+      const handleBackgroundLinking = async (pubId: number, pubTitle?: string) => {
         // 2.a Lock Media for others
         try {
           await axios.post(route("api.v1.publications.lock-media", pubId));
         } catch (err) {
           console.error("Failed to lock media:", err);
           toast.error(
-            t("publications.modal.media.lockFailed") ||
-              "Warning: Could not lock media for editing",
+            t("publications.modal.media.lockFailed") || "Warning: Could not lock media for editing",
           );
         }
 
         // 2.b Link in Store and handle already completed
         const uploadQueueState = useUploadQueue.getState();
-        const linkUploadToPublication =
-          uploadQueueState.linkUploadToPublication;
+        const linkUploadToPublication = uploadQueueState.linkUploadToPublication;
         const removeUpload = uploadQueueState.removeUpload;
         const queueObj = uploadQueueState.queue;
 
@@ -1569,11 +1440,7 @@ export const usePublicationForm = ({
           const queueItem = queueObj[media.tempId];
 
           // If already finished uploading before we saved, we must attach manually NOW
-          if (
-            queueItem &&
-            queueItem.status === "completed" &&
-            !queueItem.publicationId
-          ) {
+          if (queueItem && queueItem.status === "completed" && !queueItem.publicationId) {
             try {
               const { data: attachResult } = await axios.post(
                 route("api.v1.publications.attach-media", pubId),
@@ -1621,8 +1488,7 @@ export const usePublicationForm = ({
 
       if (pendingFiles.length > 0 && result) {
         const pubId = (result as any).id || (result as any).publication?.id;
-        const pubTitle =
-          (result as any).title || (result as any).publication?.title;
+        const pubTitle = (result as any).title || (result as any).publication?.title;
 
         if (pubId) {
           handleBackgroundLinking(pubId, pubTitle).catch((error) => {
@@ -1648,9 +1514,7 @@ export const usePublicationForm = ({
       });
 
       const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        t("publications.messages.error");
+        error.response?.data?.message || error.message || t("publications.messages.error");
 
       toast.error(errorMessage);
     } finally {
@@ -1671,9 +1535,8 @@ export const usePublicationForm = ({
     };
 
     const requiredFields =
-      FIELD_VALIDATION_RULES[
-        contentType as keyof typeof FIELD_VALIDATION_RULES
-      ] || FIELD_VALIDATION_RULES.post;
+      FIELD_VALIDATION_RULES[contentType as keyof typeof FIELD_VALIDATION_RULES] ||
+      FIELD_VALIDATION_RULES.post;
 
     // Content-type specific validation messages
     const getFieldError = (field: string) => {
@@ -1684,41 +1547,27 @@ export const usePublicationForm = ({
 
       switch (field) {
         case "hashtags":
-          return (
-            t("publications.modal.validation.hashtagsRequired") ||
-            "Hashtags are required"
-          );
+          return t("publications.modal.validation.hashtagsRequired") || "Hashtags are required";
         case "description":
           return (
-            t("publications.modal.validation.descriptionRequired") ||
-            "Description is required"
+            t("publications.modal.validation.descriptionRequired") || "Description is required"
           );
         case "goal":
-          return (
-            t("publications.modal.validation.goalRequired") ||
-            "Goal is required"
-          );
+          return t("publications.modal.validation.goalRequired") || "Goal is required";
         case "title":
           return contentType === "poll"
-            ? t("publications.modal.validation.questionRequired") ||
-                "Question is required"
-            : t("publications.modal.validation.titleRequired") ||
-                "Title is required";
+            ? t("publications.modal.validation.questionRequired") || "Question is required"
+            : t("publications.modal.validation.titleRequired") || "Title is required";
         case "poll_options":
           return (
-            t("publications.modal.validation.pollOptionsRequired") ||
-            "Poll options are required"
+            t("publications.modal.validation.pollOptionsRequired") || "Poll options are required"
           );
         case "poll_duration_hours":
           return (
-            t("publications.modal.validation.pollDurationRequired") ||
-            "Poll duration is required"
+            t("publications.modal.validation.pollDurationRequired") || "Poll duration is required"
           );
         default:
-          return (
-            t(`publications.modal.validation.${field}Required`) ||
-            `${field} is required`
-          );
+          return t(`publications.modal.validation.${field}Required`) || `${field} is required`;
       }
     };
 
@@ -1726,18 +1575,14 @@ export const usePublicationForm = ({
     const relevantErrors = Object.keys(errs)
       .filter((key) => {
         // Always include poll-specific errors for polls
-        if (
-          contentType === "poll" &&
-          (key === "poll_options" || key === "poll_duration_hours")
-        ) {
+        if (contentType === "poll" && (key === "poll_options" || key === "poll_duration_hours")) {
           return true;
         }
         // Skip scheduled_at errors if use_global_schedule is false OR if scheduled_at is empty
         // OR if it's a poll without scheduling requirements
         if (key === "scheduled_at") {
           const hasGlobalSchedule = watched.use_global_schedule;
-          const hasScheduledValue =
-            watched.scheduled_at && watched.scheduled_at.trim() !== "";
+          const hasScheduledValue = watched.scheduled_at && watched.scheduled_at.trim() !== "";
           const isPoll = contentType === "poll";
 
           // For polls, skip scheduled_at validation entirely if no global schedule is set
@@ -1768,9 +1613,7 @@ export const usePublicationForm = ({
     }
 
     // Show errors only if there are relevant ones
-    toast.error(
-      `${t("common.errors.checkFormErrors")}: ${relevantErrors.join(", ")}`,
-    );
+    toast.error(`${t("common.errors.checkFormErrors")}: ${relevantErrors.join(", ")}`);
 
     // Content-type specific media validation
     const mediaRequiredTypes = ["reel", "story", "carousel"];
@@ -1843,10 +1686,7 @@ export const usePublicationForm = ({
         if (m.status === "uploading" || m.status === "processing") {
           // Double-check with uploadQueue to see if it's actually cancelled or has an error
           const queueItem = useUploadQueue.getState().queue[m.tempId];
-          if (
-            queueItem &&
-            (queueItem.status === "cancelled" || queueItem.status === "error")
-          ) {
+          if (queueItem && (queueItem.status === "cancelled" || queueItem.status === "error")) {
             return false; // Ignore cancelled or errored uploads
           }
           return true;
@@ -1854,16 +1694,12 @@ export const usePublicationForm = ({
         return uploadingFiles.has(m.tempId) && !m.id;
       }) ||
       (publication?.status as string) === "processing" ||
-      (!!publication?.media_locked_by &&
-        (publication.media_locked_by as any).id !== user?.id),
+      (!!publication?.media_locked_by && (publication.media_locked_by as any).id !== user?.id),
     isS3Uploading: mediaFiles.some((m) => {
       if (m.status === "uploading") {
         // Double-check with uploadQueue to see if it's actually cancelled or has an error
         const queueItem = useUploadQueue.getState().queue[m.tempId];
-        if (
-          queueItem &&
-          (queueItem.status === "cancelled" || queueItem.status === "error")
-        ) {
+        if (queueItem && (queueItem.status === "cancelled" || queueItem.status === "error")) {
           return false; // Ignore cancelled or errored uploads
         }
         return true;

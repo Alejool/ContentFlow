@@ -1,10 +1,7 @@
 import { usePage } from "@inertiajs/react";
 import { useMemo } from "react";
 import type { OptimisticOptions } from "../types/optimistic";
-import {
-  getInertiaPageComponent,
-  isInertiaPage,
-} from "../utils/inertiaOptimisticSync";
+import { getInertiaPageComponent, isInertiaPage } from "../utils/inertiaOptimisticSync";
 import { useOptimistic } from "./useOptimistic";
 
 /**
@@ -118,13 +115,7 @@ export function useShouldUseOptimistic(resource: string): boolean {
   ];
 
   // Resources that benefit from optimistic updates
-  const optimisticResources = [
-    "publications",
-    "campaigns",
-    "reels",
-    "calendar",
-    "social-accounts",
-  ];
+  const optimisticResources = ["publications", "campaigns", "reels", "calendar", "social-accounts"];
 
   // Check if current page is in the optimistic pages list
   const isOptimisticPage = pageComponent

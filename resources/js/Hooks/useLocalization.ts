@@ -31,9 +31,7 @@ export const useLocalization = () => {
           headers: {
             "Content-Type": "application/json",
             "X-CSRF-TOKEN":
-              document
-                .querySelector('meta[name="csrf-token"]')
-                ?.getAttribute("content") || "",
+              document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || "",
           },
           body: JSON.stringify({ locale: lng }),
         });
@@ -54,8 +52,7 @@ export const useLocalization = () => {
       percent: (value: number, decimals?: number) =>
         formatPercent(value, decimals, currentLanguage),
       compact: (value: number) => formatCompactNumber(value, currentLanguage),
-      relative: (date: Date | string | number) =>
-        formatRelativeTime(date, currentLanguage),
+      relative: (date: Date | string | number) => formatRelativeTime(date, currentLanguage),
       list: (items: string[], type?: "conjunction" | "disjunction") =>
         formatList(items, type, currentLanguage),
       plural: (count: number, singular: string, plural?: string) =>

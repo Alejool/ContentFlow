@@ -37,8 +37,7 @@ export function useContentManagement() {
       });
 
       // Handle both publications and campaigns response structure
-      const dataKey =
-        endpoint === "publications" ? "publications" : "campaigns";
+      const dataKey = endpoint === "publications" ? "publications" : "campaigns";
 
       const responseData = response.data[dataKey];
       const resultItems = responseData?.data || [];
@@ -105,8 +104,7 @@ export function useContentManagement() {
         const hasFile =
           data.image instanceof File ||
           data.image instanceof FileList ||
-          (Array.isArray(data.media) &&
-            data.media.some((item: any) => item instanceof File));
+          (Array.isArray(data.media) && data.media.some((item: any) => item instanceof File));
 
         if (hasFile) {
           const formData: FormData = new FormData();
@@ -148,9 +146,7 @@ export function useContentManagement() {
       setItems((prevItems) =>
         prevItems.map((item) =>
           item.id === id
-            ? response.data.campaign ||
-              response.data.publication ||
-              response.data.item
+            ? response.data.campaign || response.data.publication || response.data.item
             : item,
         ),
       );
