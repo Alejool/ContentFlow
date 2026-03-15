@@ -1,5 +1,6 @@
 import Button from '@/Components/common/Modern/Button';
 import Input from '@/Components/common/Modern/Input';
+import Switch from '@/Components/common/Modern/Switch';
 import ConfirmDialog from '@/Components/common/ui/ConfirmDialog';
 import { WorkspaceTimezoneSettings } from '@/Components/Workspace/WorkspaceTimezoneSettings';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -62,6 +63,7 @@ export default function GeneralSettingsTab({
     handleSubmit,
     formState: { errors },
     watch,
+    setValue,
   } = useForm<SettingsFormData>({
     resolver: zodResolver(getSettingsSchema(t)),
     defaultValues: {
