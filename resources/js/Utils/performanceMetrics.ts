@@ -75,7 +75,7 @@ class PerformanceMetricsTracker {
       timeSaved: metric.serverResponseTime - metric.optimisticUpdateTime,
       success: metric.success,
       retryCount: metric.retryCount || 0,
-      error: metric.error,
+      ...(metric.error !== undefined ? { error: metric.error } : {}),
     };
 
     // Add to metrics array
@@ -127,8 +127,9 @@ class PerformanceMetricsTracker {
       if (filter.success !== undefined) {
         filtered = filtered.filter((m) => m.success === filter.success);
       }
-      if (filter.since) {
-        filtered = filtered.filter((m) => m.timestamp >= filter.since);
+      if (filter.since !== undefined) {
+        const since = filter.since;
+        filtered = filtered.filter((m) => m.timestamp >= since);
       }
     }
 
@@ -479,3 +480,4 @@ export const performanceMetrics = new PerformanceMetricsTracker();
 
 // Export class for custom instances
 export { PerformanceMetricsTracker };
+

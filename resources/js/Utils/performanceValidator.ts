@@ -80,7 +80,9 @@ class PerformanceValidator {
         const lcpObserver = new PerformanceObserver((list) => {
           const entries = list.getEntries();
           const lastEntry = entries[entries.length - 1];
-          this.metrics.largestContentfulPaint = lastEntry.startTime;
+          if (lastEntry) {
+            this.metrics.largestContentfulPaint = lastEntry.startTime;
+          }
         });
         lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
 
@@ -332,4 +334,5 @@ export const performanceValidator = new PerformanceValidator();
 
 // Export for testing
 export { PERFORMANCE_TARGETS, PerformanceValidator };
-export type { PerformanceMetrics, ValidationResult, PerformanceReport };
+export type { PerformanceMetrics, PerformanceReport, ValidationResult };
+

@@ -118,7 +118,7 @@ export function getLockedByName(remoteLock?: any): string {
  */
 export function getLockedByFirstName(remoteLock?: any): string {
   const fullName = getLockedByName(remoteLock);
-  return fullName.split(' ')[0];
+  return fullName.split(' ')[0] ?? '';
 }
 
 /**
@@ -126,7 +126,7 @@ export function getLockedByFirstName(remoteLock?: any): string {
  */
 export function isProcessing(publication: Publication): boolean {
   const firstMedia = getFirstMedia(publication);
-  return firstMedia?.status === 'processing';
+  return (firstMedia as any)?.status === 'processing';
 }
 
 /**

@@ -26,8 +26,8 @@ export function createNetworkError(
   statusText?: string,
 ): NetworkError {
   const error = new Error(message) as NetworkError;
-  error.status = status;
-  error.statusText = statusText;
+  if (status !== undefined) error.status = status;
+  if (statusText !== undefined) error.statusText = statusText;
   error.isNetworkError = true;
   error.isRetryable = isRetryableError(status);
   return error;

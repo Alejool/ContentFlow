@@ -32,6 +32,12 @@ export interface PlatformRequirements {
     aspectRatio: { min: number; max: number };
     resolution: { minWidth: number; minHeight: number };
   };
+  story?: {
+    maxDuration: number;
+    minDuration?: number;
+    aspectRatio: { min: number; max: number };
+    resolution: { minWidth: number; minHeight: number };
+  };
 }
 
 export interface ValidationResult {
