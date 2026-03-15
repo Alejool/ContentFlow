@@ -28,6 +28,10 @@ export const queryKeys = {
   approvals: {
     all: ['approvals'] as const,
     pending: (type?: string) => ['approvals', 'pending', type] as const,
+    history: (filters?: Record<string, any>, page?: number) =>
+      ['approvals', 'history', filters, page] as const,
+    publicationHistory: (publicationId: number) =>
+      ['approvals', 'publication-history', publicationId] as const,
   },
 
   analytics: {
@@ -38,5 +42,44 @@ export const queryKeys = {
   calendar: {
     all: ['calendar'] as const,
     events: (filters?: Record<string, any>) => ['calendar', 'events', filters] as const,
+  },
+
+  socialAccounts: {
+    all: ['social-accounts'] as const,
+  },
+
+  logs: {
+    all: ['logs'] as const,
+    list: (filters: Record<string, any>, page: number) => ['logs', 'list', filters, page] as const,
+  },
+
+  members: {
+    all: ['members'] as const,
+    list: (workspaceId: number) => ['members', 'list', workspaceId] as const,
+  },
+
+  workflows: {
+    all: ['workflows'] as const,
+    list: (workspaceId: number) => ['workflows', 'list', workspaceId] as const,
+  },
+
+  roles: {
+    all: ['roles'] as const,
+    list: (workspaceId: number) => ['roles', 'list', workspaceId] as const,
+  },
+
+  dashboard: {
+    stats: (workspaceId: number) => ['dashboard', 'stats', workspaceId] as const,
+  },
+
+  analyticsData: {
+    all: ['analytics-data'] as const,
+    period: (period: number, workspaceId: number) =>
+      ['analytics-data', 'period', period, workspaceId] as const,
+  },
+
+  reels: {
+    all: ['reels'] as const,
+    list: (filters: Record<string, any>) => ['reels', 'list', filters] as const,
   },
 } as const;
