@@ -35,9 +35,7 @@ export type UserProfileFormData = z.infer<ReturnType<typeof userProfileSchema>>;
 export const passwordSchema = (t: any) =>
   z
     .object({
-      current_password: z
-        .string()
-        .min(8, t("validation.min.string", { count: 8 })),
+      current_password: z.string().min(8, t("validation.min.string", { count: 8 })),
       password: z.string().min(8, t("validation.min.string", { count: 8 })),
       password_confirmation: z.string(),
     })

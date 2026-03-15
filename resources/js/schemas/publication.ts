@@ -46,15 +46,9 @@ const VALIDATION_RULES = {
 
 export const publicationSchema = (t: any, contentType: string = "post") => {
   const rules =
-    VALIDATION_RULES[contentType as keyof typeof VALIDATION_RULES] ||
-    VALIDATION_RULES.post;
+    VALIDATION_RULES[contentType as keyof typeof VALIDATION_RULES] || VALIDATION_RULES.post;
 
-  console.log(
-    "Creating schema for content type:",
-    contentType,
-    "with rules:",
-    rules,
-  );
+  console.log("Creating schema for content type:", contentType, "with rules:", rules);
 
   return z
     .object({
@@ -64,8 +58,7 @@ export const publicationSchema = (t: any, contentType: string = "post") => {
             .min(
               1,
               contentType === "poll"
-                ? t("publications.modal.validation.questionRequired") ||
-                    "Question is required"
+                ? t("publications.modal.validation.questionRequired") || "Question is required"
                 : t("publications.modal.validation.titleRequired"),
             )
             .max(70, t("publications.modal.validation.titleLength"))
@@ -78,20 +71,11 @@ export const publicationSchema = (t: any, contentType: string = "post") => {
       description: rules.requiresDescription
         ? z
             .string()
-            .min(
-              rules.descriptionMinLength,
-              t("publications.modal.validation.descMin"),
-            )
-            .max(
-              rules.descriptionMaxLength,
-              t("publications.modal.validation.descMax"),
-            )
+            .min(rules.descriptionMinLength, t("publications.modal.validation.descMin"))
+            .max(rules.descriptionMaxLength, t("publications.modal.validation.descMax"))
         : z
             .string()
-            .max(
-              rules.descriptionMaxLength,
-              t("publications.modal.validation.descMax"),
-            )
+            .max(rules.descriptionMaxLength, t("publications.modal.validation.descMax"))
             .optional()
             .or(z.literal("")),
 
@@ -123,8 +107,7 @@ export const publicationSchema = (t: any, contentType: string = "post") => {
         .refine(
           (val) => {
             // If no value provided, it's valid (optional field)
-            if (!val || val === "" || val === null || val === undefined)
-              return true;
+            if (!val || val === "" || val === null || val === undefined) return true;
 
             try {
               const scheduledDate = new Date(val);
@@ -136,8 +119,7 @@ export const publicationSchema = (t: any, contentType: string = "post") => {
               }
 
               // Check if scheduled date is more than 1 minute (60 seconds) in the future
-              const diffInSeconds =
-                (scheduledDate.getTime() - now.getTime()) / 1000;
+              const diffInSeconds = (scheduledDate.getTime() - now.getTime()) / 1000;
               return diffInSeconds > 60;
             } catch (error) {
               // If there's any error parsing the date, consider it invalid
@@ -182,9 +164,7 @@ export const publicationSchema = (t: any, contentType: string = "post") => {
       content_metadata: z.any().optional().nullable(),
       // Recurrence
       is_recurring: z.boolean().optional().default(false),
-      recurrence_type: z
-        .enum(["daily", "weekly", "monthly", "yearly"])
-        .optional(),
+      recurrence_type: z.enum(["daily", "weekly", "monthly", "yearly"]).optional(),
       recurrence_interval: z.number().min(1).optional().default(1),
       recurrence_days: z.preprocess((val) => {
         if (typeof val === "string") {
@@ -211,11 +191,7 @@ export const publicationSchema = (t: any, contentType: string = "post") => {
 
         // If "use_global_schedule" is checked, we require a valid date.
         if (data.use_global_schedule) {
-          if (
-            !data.scheduled_at ||
-            data.scheduled_at === "" ||
-            data.scheduled_at === null
-          ) {
+          if (!data.scheduled_at || data.scheduled_at === "" || data.scheduled_at === null) {
             return false;
           }
 
@@ -231,14 +207,12 @@ export const publicationSchema = (t: any, contentType: string = "post") => {
             // For polls, be more lenient with the time requirement
             if (data.content_type === "poll") {
               // Allow polls to be scheduled with less strict time requirements
-              const diffInSeconds =
-                (scheduledDate.getTime() - now.getTime()) / 1000;
+              const diffInSeconds = (scheduledDate.getTime() - now.getTime()) / 1000;
               return diffInSeconds > 0; // Just needs to be in the future
             }
 
             // For other content types, require 1 minute in the future
-            const diffInSeconds =
-              (scheduledDate.getTime() - now.getTime()) / 1000;
+            const diffInSeconds = (scheduledDate.getTime() - now.getTime()) / 1000;
             return diffInSeconds > 60;
           } catch {
             return false;
@@ -288,10 +262,7 @@ export const publicationSchema = (t: any, contentType: string = "post") => {
         // If content type is poll, poll_options are required
         if (data.content_type === "poll") {
           console.log("Poll validation - poll_options:", data.poll_options);
-          console.log(
-            "Poll validation - poll_duration_hours:",
-            data.poll_duration_hours,
-          );
+          console.log("Poll validation - poll_duration_hours:", data.poll_duration_hours);
 
           // Check if poll_options exist and are valid
           if (!data.poll_options || !Array.isArray(data.poll_options)) {
@@ -321,16 +292,12 @@ export const publicationSchema = (t: any, contentType: string = "post") => {
         // If content type is poll, duration is required
         if (data.content_type === "poll") {
           // Check if poll_duration_hours exists and is valid
-          if (
-            !data.poll_duration_hours ||
-            typeof data.poll_duration_hours !== "number"
-          ) {
+          if (!data.poll_duration_hours || typeof data.poll_duration_hours !== "number") {
             console.log("Poll duration missing or not number");
             return false;
           }
 
-          const hasValidDuration =
-            data.poll_duration_hours >= 1 && data.poll_duration_hours <= 168;
+          const hasValidDuration = data.poll_duration_hours >= 1 && data.poll_duration_hours <= 168;
 
           console.log("Poll duration valid:", hasValidDuration);
           return hasValidDuration;
@@ -347,9 +314,8 @@ export const publicationSchema = (t: any, contentType: string = "post") => {
     .refine(
       (data) => {
         const currentRules =
-          VALIDATION_RULES[
-            data.content_type as keyof typeof VALIDATION_RULES
-          ] || VALIDATION_RULES.post;
+          VALIDATION_RULES[data.content_type as keyof typeof VALIDATION_RULES] ||
+          VALIDATION_RULES.post;
 
         console.log(
           "Hashtags validation for",
@@ -357,12 +323,7 @@ export const publicationSchema = (t: any, contentType: string = "post") => {
           "- requires hashtags:",
           currentRules.requiresHashtags,
         );
-        console.log(
-          "Hashtags value:",
-          data.hashtags,
-          "Type:",
-          typeof data.hashtags,
-        );
+        console.log("Hashtags value:", data.hashtags, "Type:", typeof data.hashtags);
 
         // If hashtags are not required for this content type, skip validation
         if (!currentRules.requiresHashtags) {
@@ -391,9 +352,8 @@ export const publicationSchema = (t: any, contentType: string = "post") => {
     .refine(
       (data) => {
         const currentRules =
-          VALIDATION_RULES[
-            data.content_type as keyof typeof VALIDATION_RULES
-          ] || VALIDATION_RULES.post;
+          VALIDATION_RULES[data.content_type as keyof typeof VALIDATION_RULES] ||
+          VALIDATION_RULES.post;
 
         // If hashtags are not required for this content type, skip count validation
         if (!currentRules.requiresHashtags) {

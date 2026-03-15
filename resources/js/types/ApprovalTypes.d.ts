@@ -27,13 +27,7 @@ export interface ApprovalLog {
   approval_request_id: number;
   approval_step_id: number | null;
   user_id: number | null;
-  action:
-    | "submitted"
-    | "approved"
-    | "rejected"
-    | "reassigned"
-    | "cancelled"
-    | "auto_advanced";
+  action: "submitted" | "approved" | "rejected" | "reassigned" | "cancelled" | "auto_advanced";
   level_number: number | null;
   comment: string | null;
   metadata: Record<string, any> | null;

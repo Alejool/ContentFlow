@@ -96,13 +96,7 @@ export type Publication = {
     string,
     {
       platform: string;
-      status:
-        | "published"
-        | "failed"
-        | "pending"
-        | "publishing"
-        | "success"
-        | "orphaned";
+      status: "published" | "failed" | "pending" | "publishing" | "success" | "orphaned";
       published_at?: string;
       error?: string;
       url?: string;
@@ -171,14 +165,7 @@ export type ScheduledPost = {
 export type SocialPostLog = {
   id: number;
   social_account_id: number;
-  status:
-    | "published"
-    | "failed"
-    | "deleted"
-    | "pending"
-    | "publishing"
-    | "success"
-    | "orphaned";
+  status: "published" | "failed" | "deleted" | "pending" | "publishing" | "success" | "orphaned";
   social_account?: SocialAccount;
   platform: string;
   created_at: string;

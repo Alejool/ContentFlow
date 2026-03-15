@@ -1,8 +1,4 @@
-import {
-  AbilityBuilder,
-  createMongoAbility,
-  MongoAbility,
-} from "@casl/ability";
+import { AbilityBuilder, createMongoAbility, MongoAbility } from "@casl/ability";
 
 export type Actions =
   | "create"
@@ -15,12 +11,7 @@ export type Actions =
   | "submit_for_approval"
   | "manage";
 
-export type Subjects =
-  | "Publication"
-  | "ApprovalRequest"
-  | "Campaign"
-  | "MediaFile"
-  | "all";
+export type Subjects = "Publication" | "ApprovalRequest" | "Campaign" | "MediaFile" | "all";
 
 export type AppAbility = MongoAbility<[Actions, Subjects]>;
 
@@ -32,9 +23,7 @@ export type AppAbility = MongoAbility<[Actions, Subjects]>;
  * @returns AppAbility - The ability instance
  */
 export function defineAbilityFor(user: any, workspace: any): AppAbility {
-  const { can, cannot, build } = new AbilityBuilder<AppAbility>(
-    createMongoAbility,
-  );
+  const { can, cannot, build } = new AbilityBuilder<AppAbility>(createMongoAbility);
 
   const userRole = workspace?.user_role_slug;
   const permissions = workspace?.permissions || [];

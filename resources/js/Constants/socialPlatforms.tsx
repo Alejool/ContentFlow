@@ -33,8 +33,7 @@ export interface SocialPlatformConfig {
   active: boolean;
 }
 
-export const SOCIAL_PLATFORMS: Record<string, SocialPlatformConfig> =
-  SOCIAL_PLATFORMS_DATA as any;
+export const SOCIAL_PLATFORMS: Record<string, SocialPlatformConfig> = SOCIAL_PLATFORMS_DATA as any;
 
 export const getPlatformConfig = (platform: string): SocialPlatformConfig => {
   if (!platform) {

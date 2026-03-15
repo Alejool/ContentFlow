@@ -31,11 +31,7 @@ export function AbilityProvider({ children }: AbilityProviderProps) {
   const { auth } = usePage<any>().props;
   const ability = defineAbilityFor(auth.user, auth.current_workspace);
 
-  return (
-    <AbilityContext.Provider value={ability}>
-      {children}
-    </AbilityContext.Provider>
-  );
+  return <AbilityContext.Provider value={ability}>{children}</AbilityContext.Provider>;
 }
 
 /**

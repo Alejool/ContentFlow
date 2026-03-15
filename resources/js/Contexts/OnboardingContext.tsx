@@ -30,9 +30,7 @@ export interface OnboardingContextValue {
 /**
  * OnboardingContext provides onboarding state and actions to child components.
  */
-export const OnboardingContext = createContext<
-  OnboardingContextValue | undefined
->(undefined);
+export const OnboardingContext = createContext<OnboardingContextValue | undefined>(undefined);
 
 interface OnboardingProviderProps {
   children: ReactNode;
@@ -100,16 +98,10 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
       store.syncWithBackend();
     };
 
-    window.addEventListener(
-      "subscription-plan-changed",
-      handleSubscriptionChange,
-    );
+    window.addEventListener("subscription-plan-changed", handleSubscriptionChange);
 
     return () => {
-      window.removeEventListener(
-        "subscription-plan-changed",
-        handleSubscriptionChange,
-      );
+      window.removeEventListener("subscription-plan-changed", handleSubscriptionChange);
     };
   }, []);
 

@@ -30,12 +30,10 @@ export const hoverVariants = {
     initial: { y: 0, boxShadow: "0 1px 3px 0 rgb(0 0 0 / 0.1)" },
     hover: {
       y: -4,
-      boxShadow:
-        "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+      boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
     },
     hoverReduced: {
-      boxShadow:
-        "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+      boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
     },
     transition: transitions.normal,
   } as Variants,
@@ -188,11 +186,7 @@ export const pageVariants = {
  * @param prefersReducedMotion - Whether reduced motion is preferred
  * @returns The appropriate variant for the state
  */
-export function getVariant(
-  variants: Variants,
-  state: string,
-  prefersReducedMotion: boolean,
-): any {
+export function getVariant(variants: Variants, state: string, prefersReducedMotion: boolean): any {
   if (prefersReducedMotion && `${state}Reduced` in variants) {
     return variants[`${state}Reduced`];
   }
@@ -205,10 +199,7 @@ export function getVariant(
  * @param prefersReducedMotion - Whether reduced motion is preferred
  * @returns The appropriate transition configuration
  */
-export function getTransition(
-  transition: Transition,
-  prefersReducedMotion: boolean,
-): Transition {
+export function getTransition(transition: Transition, prefersReducedMotion: boolean): Transition {
   if (prefersReducedMotion) {
     return transitions.instant;
   }

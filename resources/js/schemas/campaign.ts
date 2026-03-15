@@ -11,9 +11,7 @@ export const campaignSchema = (t: any) => {
       .max(500, t("campaigns.modal.validation.descriptionLength")),
     goal: z.string().min(1, t("campaigns.modal.validation.goalRequired")),
     budget: z.string().min(1, t("campaigns.modal.validation.budgetRequired")),
-    start_date: z
-      .string()
-      .min(1, t("campaigns.modal.validation.startDateRequired")),
+    start_date: z.string().min(1, t("campaigns.modal.validation.startDateRequired")),
     end_date: z.string().refine((val) => val && val.trim().length > 0, {
       message: t("campaigns.modal.validation.endDateRequired"),
     }),

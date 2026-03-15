@@ -14,9 +14,7 @@ interface ThemeContextType {
   actualTheme: "light" | "dark"; // El tema real aplicado (resuelve "system")
 }
 
-export const ThemeContext = createContext<ThemeContextType | undefined>(
-  undefined,
-);
+export const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 interface ThemeProviderProps {
   children: ReactNode;
@@ -39,9 +37,7 @@ export function ThemeProvider({
 
   const getSystemTheme = (): "light" | "dark" => {
     if (typeof window === "undefined") return "light";
-    return window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   };
 
   const resolveTheme = (themePreference: Theme): "light" | "dark" => {
@@ -60,8 +56,7 @@ export function ThemeProvider({
       if (workspaceIdStr) {
         try {
           // Load workspace-specific theme preference
-          const workspaceTheme =
-            await themeStorage.loadThemePreference(workspaceIdStr);
+          const workspaceTheme = await themeStorage.loadThemePreference(workspaceIdStr);
 
           if (workspaceTheme) {
             setThemeState(workspaceTheme);
@@ -124,8 +119,7 @@ export function ThemeProvider({
 
   // Listen for system theme changes (only when theme is "system")
   useEffect(() => {
-    if (typeof window === "undefined" || theme !== "system" || !isInitialized)
-      return;
+    if (typeof window === "undefined" || theme !== "system" || !isInitialized) return;
 
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const handleChange = () => {
@@ -160,11 +154,7 @@ export function ThemeProvider({
 
     const handleKeyDown = (event: KeyboardEvent) => {
       // Check for Ctrl+Alt+T (or Cmd+Alt+T on Mac)
-      if (
-        (event.ctrlKey || event.metaKey) &&
-        event.altKey &&
-        event.key.toLowerCase() === "t"
-      ) {
+      if ((event.ctrlKey || event.metaKey) && event.altKey && event.key.toLowerCase() === "t") {
         event.preventDefault();
         toggleTheme();
 
@@ -223,52 +213,39 @@ export function ThemeProvider({
   };
 
   return (
-    <ThemeContext.Provider
-      value={{ theme, toggleTheme, setTheme, actualTheme }}
-    >
+    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme, actualTheme }}>
       {children}
 
       {/* Theme change toast notification */}
       {showThemeToast && (
         <div
-          className="fixed bottom-6 right-6 z-[9999] animate-in fade-in slide-in-from-bottom-2 duration-300"
+          className="animate-in fade-in slide-in-from-bottom-2 fixed bottom-6 right-6 z-[9999] duration-300"
           style={{
             animation: "slideInUp 0.3s ease-out",
           }}
         >
           <div
-            className={`
-            px-4 py-3 rounded-lg shadow-2xl border backdrop-blur-sm
-            flex items-center gap-3 min-w-[200px]
-            ${
+            className={`flex min-w-[200px] items-center gap-3 rounded-lg border px-4 py-3 shadow-2xl backdrop-blur-sm ${
               actualTheme === "dark"
-                ? "bg-neutral-800/95 border-neutral-700 text-white"
-                : "bg-white/95 border-gray-200 text-gray-900"
-            }
-          `}
+                ? "border-neutral-700 bg-neutral-800/95 text-white"
+                : "border-gray-200 bg-white/95 text-gray-900"
+            } `}
           >
-            <div className="flex items-center gap-2 flex-1">
+            <div className="flex flex-1 items-center gap-2">
               <span className="text-2xl">
                 {theme === "light" ? "☀️" : theme === "dark" ? "🌙" : "💻"}
               </span>
               <div className="flex flex-col">
-                <span className="text-xs font-medium opacity-70">
-                  {t("common.theme.changed")}
-                </span>
-                <span className="text-sm font-bold">
-                  {getThemeLabel(theme)}
-                </span>
+                <span className="text-xs font-medium opacity-70">{t("common.theme.changed")}</span>
+                <span className="text-sm font-bold">{getThemeLabel(theme)}</span>
               </div>
             </div>
             <kbd
-              className={`
-              px-2 py-1 rounded text-[10px] font-mono font-bold
-              ${
+              className={`rounded px-2 py-1 font-mono text-[10px] font-bold ${
                 actualTheme === "dark"
                   ? "bg-neutral-700 text-neutral-300"
                   : "bg-gray-100 text-gray-600"
-              }
-            `}
+              } `}
             >
               Ctrl+Alt+T
             </kbd>

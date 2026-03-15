@@ -14,12 +14,7 @@ export const CONTENT_TYPES = {
  * Plataformas compatibles con reels/shorts
  * IMPORTANTE: Esta debe ser la misma definición que en app/Constants/ContentTypes.php
  */
-export const REEL_COMPATIBLE_PLATFORMS = [
-  "instagram",
-  "tiktok",
-  "youtube",
-  "facebook",
-] as const;
+export const REEL_COMPATIBLE_PLATFORMS = ["instagram", "tiktok", "youtube", "facebook"] as const;
 
 // Tipos para la configuración de campos
 export interface FieldConfig {
@@ -44,15 +39,7 @@ export interface ContentTypeFieldsConfig {
  */
 export const CONTENT_TYPE_CONFIG = {
   post: {
-    platforms: [
-      "instagram",
-      "twitter",
-      "facebook",
-      "linkedin",
-      "youtube",
-      "pinterest",
-      "tiktok",
-    ],
+    platforms: ["instagram", "twitter", "facebook", "linkedin", "youtube", "pinterest", "tiktok"],
     media: {
       required: false,
       min_count: 0,
@@ -159,9 +146,7 @@ export type Platform =
   | "pinterest";
 
 // Función helper para obtener la configuración de campos de un tipo de contenido
-export const getFieldsConfig = (
-  contentType: ContentType,
-): ContentTypeFieldsConfig => {
+export const getFieldsConfig = (contentType: ContentType): ContentTypeFieldsConfig => {
   return CONTENT_TYPE_CONFIG[contentType]?.fields || {};
 };
 
@@ -195,8 +180,7 @@ export const CONTENT_TYPE_DISPLAY = {
   reel: {
     label: "Reel",
     icon: "Video",
-    color:
-      "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
+    color: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
     borderColor: "border-purple-200 dark:border-purple-800",
     description: "Video corto vertical",
   },
@@ -210,16 +194,14 @@ export const CONTENT_TYPE_DISPLAY = {
   carousel: {
     label: "Carousel",
     icon: "Images",
-    color:
-      "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400",
+    color: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400",
     borderColor: "border-indigo-200 dark:border-indigo-800",
     description: "Múltiples imágenes",
   },
   poll: {
     label: "Encuesta",
     icon: "BarChart3",
-    color:
-      "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+    color: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
     borderColor: "border-green-200 dark:border-green-800",
     description: "Encuesta interactiva",
   },
@@ -277,10 +259,7 @@ export const suggestContentTypeFromFiles = (
 };
 
 // Función helper para detectar el tipo de contenido basado en la configuración de plataforma
-export const detectContentType = (
-  platformSettings: any,
-  mediaFiles: any[],
-): ContentType => {
+export const detectContentType = (platformSettings: any, mediaFiles: any[]): ContentType => {
   if (!platformSettings || typeof platformSettings !== "object") {
     return "post";
   }
@@ -307,12 +286,8 @@ export const detectContentType = (
 
   // Detectar basado en archivos multimedia
   if (mediaFiles && Array.isArray(mediaFiles)) {
-    const videoCount = mediaFiles.filter((f) =>
-      f?.file_type?.includes("video"),
-    ).length;
-    const imageCount = mediaFiles.filter((f) =>
-      f?.file_type?.includes("image"),
-    ).length;
+    const videoCount = mediaFiles.filter((f) => f?.file_type?.includes("video")).length;
+    const imageCount = mediaFiles.filter((f) => f?.file_type?.includes("image")).length;
 
     if (videoCount === 1 && imageCount === 0) {
       // Un solo video podría ser reel

@@ -1,11 +1,5 @@
 import axios from "axios";
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 export interface NotificationData {
   id: string;
@@ -40,9 +34,7 @@ interface NotificationContextType {
   getPlatformNotifications: (platform: string) => NotificationData[];
 }
 
-const NotificationContext = createContext<NotificationContextType | undefined>(
-  undefined,
-);
+const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 export const NotificationProvider = ({
   children,
@@ -64,9 +56,7 @@ export const NotificationProvider = ({
           if (a.read_at === null && b.read_at !== null) return -1;
           if (a.read_at !== null && b.read_at === null) return 1;
 
-          return (
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-          );
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
         },
       );
 
@@ -80,9 +70,7 @@ export const NotificationProvider = ({
     try {
       await axios.post(`/api/v1/notifications/${id}/read`);
       setNotifications((prev) =>
-        prev.map((n) =>
-          n.id === id ? { ...n, read_at: new Date().toISOString() } : n,
-        ),
+        prev.map((n) => (n.id === id ? { ...n, read_at: new Date().toISOString() } : n)),
       );
       setUnreadCount((prev) => Math.max(0, prev - 1));
     } catch (error) {}
@@ -91,9 +79,7 @@ export const NotificationProvider = ({
   const markAllAsRead = async () => {
     try {
       await axios.post("/api/v1/notifications/read-all");
-      setNotifications((prev) =>
-        prev.map((n) => ({ ...n, read_at: new Date().toISOString() })),
-      );
+      setNotifications((prev) => prev.map((n) => ({ ...n, read_at: new Date().toISOString() })));
       setUnreadCount(0);
     } catch (error) {}
   };
@@ -118,9 +104,7 @@ export const NotificationProvider = ({
 
   const filterByPlatform = (platform: string | null): NotificationData[] => {
     if (!platform) return notifications;
-    return notifications.filter(
-      (n) => n.data.platform?.toLowerCase() === platform.toLowerCase(),
-    );
+    return notifications.filter((n) => n.data.platform?.toLowerCase() === platform.toLowerCase());
   };
 
   const filterByPriority = (priority: string | null): NotificationData[] => {
@@ -159,9 +143,7 @@ export const NotificationProvider = ({
   );
 
   const systemNotifications = notifications.filter(
-    (n) =>
-      (n.category === "system" || !n.category) &&
-      n.data.category !== "application",
+    (n) => (n.category === "system" || !n.category) && n.data.category !== "application",
   );
 
   return (
@@ -191,9 +173,7 @@ export const NotificationProvider = ({
 export const useNotificationContext = () => {
   const context = useContext(NotificationContext);
   if (!context) {
-    throw new Error(
-      "useNotificationContext must be used within a NotificationProvider",
-    );
+    throw new Error("useNotificationContext must be used within a NotificationProvider");
   }
   return context;
 };
