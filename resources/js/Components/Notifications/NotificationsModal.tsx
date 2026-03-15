@@ -199,7 +199,7 @@ export default function NotificationsModal({ isOpen, onClose }: NotificationsMod
                           {unreadCount > 0 && (
                             <button
                               type="button"
-                              onClick={markAllAsRead}
+                              onClick={() => markAllAsRead()}
                               className={`text-main-color hover:text-main-color/80 flex items-center gap-1 text-xs font-medium transition-colors`}
                             >
                               <CheckCheck className="h-3.5 w-3.5" />

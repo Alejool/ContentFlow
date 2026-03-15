@@ -17,16 +17,17 @@ import ScheduleSection from '@/Components/Content/modals/common/ScheduleSection'
 import AlertCard from '@/Components/common/Modern/AlertCard';
 import { useContentType } from '@/Hooks/publication/useContentType';
 import { usePublicationForm } from '@/Hooks/publication/usePublicationForm';
+import { usePublishedPlatforms } from '@/Hooks/publication/usePublicationsList';
 import { useModalFocusTrap } from '@/Hooks/useModalFocusTrap';
 import { usePublicationLock } from '@/Hooks/usePublicationLock';
+import { useSocialAccounts } from '@/Hooks/useSocialAccounts';
 import toast from '@/Utils/toast';
-import { useCalendarStore } from '@/stores/calendarStore';
+import { queryKeys } from '@/lib/queryKeys';
 import { useCampaignStore } from '@/stores/campaignStore';
-import { usePublicationStore } from '@/stores/publicationStore';
-import { useAccountsStore } from '@/stores/socialAccountsStore';
 import { useUploadQueue } from '@/stores/uploadQueueStore';
 import { Publication } from '@/types/Publication';
 import { usePage } from '@inertiajs/react';
+import { useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { Lock, Save } from 'lucide-react';
 import { memo, useEffect, useMemo, useState } from 'react';
@@ -74,7 +75,8 @@ const EditPublicationModal = ({
   onSubmit,
 }: EditPublicationModalProps) => {
   const { campaigns } = useCampaignStore();
-  const { accounts: socialAccounts } = useAccountsStore();
+  const { data: socialAccounts = [] } = useSocialAccounts();
+  const queryClient = useQueryClient();
   const [isTimelineExpanded, setIsTimelineExpanded] = useState(false);
   const [isApprovalHistoryExpanded, setIsApprovalHistoryExpanded] = useState(false);
   const [isYouTubeThumbnailExpanded, setIsYouTubeThumbnailExpanded] = useState(true);
@@ -130,22 +132,10 @@ const EditPublicationModal = ({
     publication,
     onClose,
     onSubmitSuccess: async (success) => {
-      if (success && publication?.id) {
-        try {
-          // Force refresh the publication data from backend
-          await usePublicationStore.getState().fetchPublicationById(publication.id);
-
-          // Refresh published platforms to update the publish modal
-          await fetchPublishedPlatformsFromStore(publication.id);
-
-          // Small delay to ensure backend has processed everything
-          await new Promise((resolve) => setTimeout(resolve, 100));
-
-          // Refresh calendar events
-          await useCalendarStore.getState().fetchEvents();
-        } catch (e) {
-          console.error('Error refreshing data after update:', e);
-        }
+      if (success) {
+        // Invalidate TanStack Query cache — triggers automatic refetch everywhere
+        queryClient.invalidateQueries({ queryKey: queryKeys.publications.all });
+        queryClient.invalidateQueries({ queryKey: queryKeys.calendar.all });
       }
       onSubmit(success);
     },
@@ -171,10 +161,11 @@ const EditPublicationModal = ({
         linkUploadToPublication(tempId, publication.id, publication.title);
       }
       return result;
-    } catch (err) {}
+    } catch (err) {
+      return undefined;
+    }
   };
 
-  // Delete reels when video is removed
   // Delete reels when video is removed
   const handleRemoveMediaWithReels = async (tempId: string) => {
     const mediaToRemove = mediaFiles.find((m) => m.tempId === tempId);
@@ -299,9 +290,7 @@ const EditPublicationModal = ({
     return publication?.social_post_logs?.some((log: any) => log.status === 'published');
   }, [publication]);
 
-  const { publishedPlatforms, publishingPlatforms, failedPlatforms } = usePublicationStore();
-
-  const fetchPublishedPlatformsFromStore = usePublicationStore((s) => s.fetchPublishedPlatforms);
+  const { data: platformsData } = usePublishedPlatforms(isOpen ? publication?.id : null);
 
   const { auth } = usePage<any>().props;
   const user = auth.user;
@@ -310,13 +299,6 @@ const EditPublicationModal = ({
   const planId = auth.current_workspace?.plan?.toLowerCase() || 'demo';
   const hasRecurrenceAccess = ['demo', 'professional', 'enterprise'].includes(planId);
   const hasAdvancedScheduling = auth.current_workspace?.features?.advanced_scheduling ?? false;
-
-  // Fetch published platforms when modal opens
-  useEffect(() => {
-    if (isOpen && publication?.id) {
-      fetchPublishedPlatformsFromStore(publication.id);
-    }
-  }, [isOpen, publication?.id, fetchPublishedPlatformsFromStore]);
 
   // Auto-detect if we should use global schedule or individual schedules
   // If there are different dates for different accounts, disable global schedule
@@ -338,32 +320,31 @@ const EditPublicationModal = ({
   }, [isOpen, publication, accountSchedules, useGlobalSchedule, setValue]);
 
   const publishedAccountIds = useMemo(() => {
-    const fromStore = publishedPlatforms[publication?.id ?? 0] || [];
+    const fromQuery = platformsData?.published ?? [];
     const fromLogs =
       publication?.social_post_logs
         ?.filter((log: any) => log.status === 'published')
         .map((log: any) => log.social_account_id) || [];
-    return Array.from(new Set([...fromStore, ...fromLogs]));
-  }, [publication, publishedPlatforms]);
+    return Array.from(new Set([...fromQuery, ...fromLogs]));
+  }, [publication, platformsData]);
 
   const publishingAccountIds = useMemo(() => {
-    const fromStore = publishingPlatforms[publication?.id ?? 0] || [];
+    const fromQuery = platformsData?.publishing ?? [];
     const fromLogs =
       publication?.social_post_logs
         ?.filter((log: any) => log.status === 'publishing')
         .map((log: any) => log.social_account_id) || [];
-
-    return Array.from(new Set([...fromStore, ...fromLogs]));
-  }, [publication, publishingPlatforms]);
+    return Array.from(new Set([...fromQuery, ...fromLogs]));
+  }, [publication, platformsData]);
 
   const failedAccountIds = useMemo(() => {
-    const fromStore = failedPlatforms[publication?.id ?? 0] || [];
+    const fromQuery = platformsData?.failed ?? [];
     const fromLogs =
       publication?.social_post_logs
         ?.filter((log: any) => log.status === 'failed')
         .map((log: any) => log.social_account_id) || [];
-    return Array.from(new Set([...fromStore, ...fromLogs]));
-  }, [publication, failedPlatforms]);
+    return Array.from(new Set([...fromQuery, ...fromLogs]));
+  }, [publication, platformsData]);
 
   const selectedPlatforms = useMemo(() => {
     return Array.from(
@@ -633,7 +614,7 @@ const EditPublicationModal = ({
                       />
 
                       {/* Flujo de Aprobación */}
-                      {publication?.currentApprovalStep?.workflow && (
+                      {publication?.current_approval_step?.workflow && (
                         <div className="animate-in fade-in slide-in-from-top-4 rounded-lg border border-primary-200 bg-gradient-to-br from-primary-50 to-blue-50 p-4 dark:border-primary-800 dark:from-primary-900/20 dark:to-blue-900/20">
                           <h4 className="mb-3 flex items-center gap-2 text-sm font-bold text-primary-900 dark:text-primary-300">
                             <svg
@@ -652,12 +633,12 @@ const EditPublicationModal = ({
                             {t('approvals.workflow_progress') || 'Progreso del Flujo'}
                           </h4>
                           <div className="space-y-2">
-                            {publication.currentApprovalStep.workflow.steps?.map(
+                            {publication.current_approval_step.workflow.steps?.map(
                               (step: any, index: number) => {
-                                const isCurrent = step.id === publication.currentApprovalStep?.id;
+                                const isCurrent = step.id === publication.current_approval_step?.id;
                                 const isPast =
                                   step.level_number <
-                                  (publication.currentApprovalStep?.level_number || 0);
+                                  (publication.current_approval_step?.level_number || 0);
 
                                 return (
                                   <div
@@ -762,7 +743,7 @@ const EditPublicationModal = ({
                         uploadErrors={uploadErrors}
                         lockedBy={remoteLock}
                         videoMetadata={videoMetadata}
-                        publicationId={publication?.id}
+                        publicationId={publication?.id ?? 0}
                         allMediaFiles={publication?.media_files || []}
                       />
                     ))}
@@ -849,8 +830,10 @@ const EditPublicationModal = ({
                         username: 'username',
                         avatar: auth.user.photo_url,
                       }}
-                      title={watched.title}
-                      publishedAt={publication?.published_at}
+                      title={watched.title ?? ''}
+                      {...(publication?.published_at
+                        ? { publishedAt: publication.published_at }
+                        : {})}
                       contentType={watched.content_type}
                       selectedPlatforms={selectedSocialAccounts
                         .map((id: number) => {
@@ -860,15 +843,17 @@ const EditPublicationModal = ({
                         .filter(Boolean)}
                       pollOptions={poll_options}
                       pollDuration={poll_duration_hours}
-                      publishedLinks={publication?.social_post_logs?.reduce(
-                        (acc: Record<string, string>, log: any) => {
-                          if (log.status === 'published' && log.post_url && log.platform) {
-                            acc[log.platform.toLowerCase()] = log.post_url;
-                          }
-                          return acc;
-                        },
-                        {},
-                      )}
+                      publishedLinks={
+                        publication?.social_post_logs?.reduce(
+                          (acc: Record<string, string>, log: any) => {
+                            if (log.status === 'published' && log.post_url && log.platform) {
+                              acc[log.platform.toLowerCase()] = log.post_url;
+                            }
+                            return acc;
+                          },
+                          {},
+                        ) ?? {}
+                      }
                     />
                   </div>
                 )}
@@ -923,7 +908,7 @@ const EditPublicationModal = ({
                       }
                     }}
                     onPlatformSettingsClick={(platform) => setActivePlatformSettings(platform)}
-                    globalSchedule={watched.scheduled_at ?? undefined}
+                    {...(watched.scheduled_at ? { globalSchedule: watched.scheduled_at } : {})}
                     publishedAccountIds={publishedAccountIds}
                     publishingAccountIds={publishingAccountIds}
                     failedAccountIds={failedAccountIds}
@@ -933,9 +918,11 @@ const EditPublicationModal = ({
                     videoMetadata={videoMetadata}
                     mediaFiles={mediaFiles}
                     disabled={isContentSectionDisabled || !allowConfiguration || !canManageAccounts}
-                    socialPostLogs={publication?.social_post_logs}
+                    {...(publication?.social_post_logs
+                      ? { socialPostLogs: publication.social_post_logs }
+                      : {})}
                     contentType={watched.content_type}
-                    onThumbnailChange={(_videoId, file) => {
+                    onThumbnailChange={(_videoId: number, file: File | null) => {
                       const video = mediaFiles.find((m) => m.type === 'video');
                       if (video) {
                         if (file) {
@@ -945,7 +932,7 @@ const EditPublicationModal = ({
                         }
                       }
                     }}
-                    onThumbnailDelete={(videoId) => {
+                    onThumbnailDelete={(_videoId: number) => {
                       const video = mediaFiles.find((m) => m.type === 'video');
                       if (video) clearThumbnail(video.tempId);
                     }}
@@ -967,7 +954,7 @@ const EditPublicationModal = ({
                     </div>
 
                     <ScheduleSection
-                      scheduledAt={watched.scheduled_at ?? undefined}
+                      {...(watched.scheduled_at ? { scheduledAt: watched.scheduled_at } : {})}
                       t={t}
                       onScheduleChange={(date) => {
                         let finalDate = date;
@@ -991,21 +978,31 @@ const EditPublicationModal = ({
                       error={errors.scheduled_at?.message as string}
                       disabled={isContentSectionDisabled || !allowConfiguration}
                       hasRecurrenceAccess={hasRecurrenceAccess}
-                      recurrenceDaysError={errors.recurrence_days?.message}
+                      {...(errors.recurrence_days?.message
+                        ? { recurrenceDaysError: errors.recurrence_days.message }
+                        : {})}
                       isRecurring={watched.is_recurring}
                       recurrenceType={watched.recurrence_type as any}
                       recurrenceInterval={watched.recurrence_interval}
                       recurrenceDays={watched.recurrence_days}
-                      recurrenceEndDate={watched.recurrence_end_date ?? undefined}
+                      {...(watched.recurrence_end_date
+                        ? { recurrenceEndDate: watched.recurrence_end_date }
+                        : {})}
                       recurrenceAccounts={watched.recurrence_accounts}
                       onRecurrenceChange={handleRecurrenceChange}
                       i18n={i18n}
-                      publishDate={publication?.publish_date}
+                      {...(publication?.publish_date
+                        ? { publishDate: publication.publish_date }
+                        : {})}
                       selectedAccounts={selectedSocialAccounts}
                       socialAccounts={socialAccounts}
                       accountSchedules={accountSchedules}
-                      existingScheduledPosts={publication?.scheduled_posts}
-                      socialPostLogs={publication?.social_post_logs}
+                      {...(publication?.scheduled_posts
+                        ? { existingScheduledPosts: publication.scheduled_posts }
+                        : {})}
+                      {...(publication?.social_post_logs
+                        ? { socialPostLogs: publication.social_post_logs }
+                        : {})}
                     />
                   </div>
                 ) : (
@@ -1026,8 +1023,10 @@ const EditPublicationModal = ({
                         username: 'username',
                         avatar: auth.user.photo_url,
                       }}
-                      title={watched.title}
-                      publishedAt={publication?.published_at}
+                      title={watched.title ?? ''}
+                      {...(publication?.published_at
+                        ? { publishedAt: publication.published_at }
+                        : {})}
                       contentType={watched.content_type}
                       selectedPlatforms={selectedSocialAccounts
                         .map((id: number) => {
@@ -1037,15 +1036,17 @@ const EditPublicationModal = ({
                         .filter(Boolean)}
                       pollOptions={poll_options}
                       pollDuration={poll_duration_hours}
-                      publishedLinks={publication?.social_post_logs?.reduce(
-                        (acc: Record<string, string>, log: any) => {
-                          if (log.status === 'published' && log.post_url && log.platform) {
-                            acc[log.platform.toLowerCase()] = log.post_url;
-                          }
-                          return acc;
-                        },
-                        {},
-                      )}
+                      publishedLinks={
+                        publication?.social_post_logs?.reduce(
+                          (acc: Record<string, string>, log: any) => {
+                            if (log.status === 'published' && log.post_url && log.platform) {
+                              acc[log.platform.toLowerCase()] = log.post_url;
+                            }
+                            return acc;
+                          },
+                          {},
+                        ) ?? {}
+                      }
                     />
                   </div>
                 )}
@@ -1082,11 +1083,13 @@ const EditPublicationModal = ({
                           publication?.approval_request?.workflow ||
                           publication?.current_approval_step?.workflow
                         }
-                        currentStepNumber={
-                          publication?.approval_request?.current_step?.level_number ||
-                          publication?.current_approval_step?.level_number
-                        }
-                        approvalStatus={publication?.approval_request?.status}
+                        {...(() => {
+                          const n =
+                            publication?.approval_request?.currentStep?.level_number ??
+                            publication?.current_approval_step?.level_number;
+                          return n !== undefined ? { currentStepNumber: n } : {};
+                        })()}
+                        approvalStatus={publication?.approval_request?.status ?? 'pending'}
                       />
                     )}
 
@@ -1122,10 +1125,10 @@ const EditPublicationModal = ({
           {publication && (
             <PublicationStatusTimeline
               currentStatus={publication.status as string}
-              scheduledAt={publication.scheduled_at ?? undefined}
-              approvedAt={publication.approved_at ?? undefined}
-              publishedAt={publication.published_at ?? undefined}
-              rejectedAt={publication.rejected_at ?? undefined}
+              scheduledAt={publication.scheduled_at ?? null}
+              approvedAt={publication.approved_at ?? null}
+              publishedAt={publication.published_at ?? null}
+              rejectedAt={publication.rejected_at ?? null}
               compact={true}
             />
           )}
@@ -1156,11 +1159,19 @@ const EditPublicationModal = ({
               [platform]: newSettings,
             }));
           }}
-          videoMetadata={
-            mediaFiles.find((m) => m.type === 'video')
-              ? videoMetadata[mediaFiles.find((m) => m.type === 'video')!.tempId]
-              : undefined
-          }
+          {...(() => {
+            const vid = mediaFiles.find((m) => m.type === 'video');
+            const meta = vid ? videoMetadata[vid.tempId] : undefined;
+            if (!meta) return {};
+            return {
+              videoMetadata: {
+                duration: meta.duration,
+                ...(meta.width !== undefined ? { width: meta.width } : {}),
+                ...(meta.height !== undefined ? { height: meta.height } : {}),
+                ...(meta.aspectRatio !== undefined ? { aspectRatio: meta.aspectRatio } : {}),
+              },
+            };
+          })()}
         />
       </div>
     </div>

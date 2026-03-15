@@ -2,96 +2,82 @@ import ApprovalHistorySkeleton from '@/Components/Content/ApprovalHistorySkeleto
 import FilterSection from '@/Components/Content/common/FilterSection';
 import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
 import TableContainer from '@/Components/common/ui/TableContainer';
+import {
+  useApprovalHistory,
+  usePublicationApprovalHistory,
+} from '@/Hooks/approval/useApprovalHistory';
 import { getDateFnsLocale } from '@/Utils/dateLocales';
 import { ApprovalRequest } from '@/types/ApprovalTypes';
-import axios from 'axios';
 import { format } from 'date-fns';
 import { CheckCircle, Clock, Send, XCircle } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface ApprovalHistoryProps {
   onRefresh?: () => void;
   publicationId?: number;
-  initialData?: ApprovalRequest[]; // Datos iniciales si se pasan directamente
+  initialData?: ApprovalRequest[];
 }
 
-export default function ApprovalHistory({
-  onRefresh,
-  publicationId,
-  initialData,
-}: ApprovalHistoryProps) {
+export default function ApprovalHistory({ publicationId, initialData }: ApprovalHistoryProps) {
   const { t, i18n } = useTranslation();
   const locale = getDateFnsLocale(i18n.language);
-  const [requests, setRequests] = useState<ApprovalRequest[]>(initialData || []);
-  const [isLoading, setIsLoading] = useState(!initialData);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(12);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
-  const [filters, setFilters] = useState({
-    status: 'all',
-    search: '',
-  });
+  const [filters, setFilters] = useState({ status: 'all', search: '' });
 
-  useEffect(() => {
-    if (initialData) {
-      // Modo cliente: filtrar datos localmente
-      let filtered = [...initialData];
+  // --- Data fetching ---
+  // If publicationId is provided, use per-publication hook (no pagination needed)
+  const pubQuery = usePublicationApprovalHistory(publicationId);
 
-      if (filters.status !== 'all') {
-        filtered = filtered.filter((req) => req.status === filters.status);
-      }
+  // Workspace-wide paginated history
+  const historyQuery = useApprovalHistory(
+    publicationId ? {} : { ...filters, page: currentPage, per_page: perPage },
+  );
 
-      if (filters.search) {
-        const searchLower = filters.search.toLowerCase();
-        filtered = filtered.filter(
-          (req) =>
-            req.submitter?.name.toLowerCase().includes(searchLower) ||
-            req.rejection_reason?.toLowerCase().includes(searchLower),
-        );
-      }
+  // When initialData is passed, use it directly (static mode)
+  const isStaticMode = !!initialData;
 
-      setRequests(filtered);
-      setTotalItems(filtered.length);
-      setTotalPages(Math.ceil(filtered.length / perPage));
-      setIsLoading(false);
-      return;
-    }
-
-    fetchHistory();
-  }, [currentPage, perPage, filters, publicationId, initialData]);
-
-  const fetchHistory = async () => {
-    if (initialData) return; // No hacer fetch si tenemos datos iniciales
-
-    try {
-      setIsLoading(true);
-      const endpoint = publicationId
-        ? route('api.v1.approvals.publication.history', publicationId)
-        : route('api.v1.approvals.history');
-
-      const response = await axios.get(endpoint, {
-        params: {
-          page: currentPage,
-          per_page: perPage,
-          status: filters.status !== 'all' ? filters.status : undefined,
-          search: filters.search || undefined,
-        },
-      });
-
-      if (response.data.success) {
-        const data = response.data.history || response.data.data || [];
-        setRequests(Array.isArray(data) ? data : data.data || []);
-        setTotalPages(data.last_page || 1);
-        setTotalItems(data.total || (Array.isArray(data) ? data.length : 0));
-      }
-    } catch (error) {
-      console.error('Error fetching approval history:', error);
-    } finally {
-      setIsLoading(false);
-    }
+  const resolveData = (): ApprovalRequest[] => {
+    if (isStaticMode) return applyLocalFilters(initialData!);
+    if (publicationId) return pubQuery.data ?? [];
+    return historyQuery.data?.data ?? [];
   };
+
+  const applyLocalFilters = (data: ApprovalRequest[]): ApprovalRequest[] => {
+    let list = [...data];
+    if (filters.status !== 'all') list = list.filter((r) => r.status === filters.status);
+    if (filters.search) {
+      const q = filters.search.toLowerCase();
+      list = list.filter(
+        (r) =>
+          r.submitter?.name.toLowerCase().includes(q) ||
+          r.rejection_reason?.toLowerCase().includes(q),
+      );
+    }
+    return list;
+  };
+
+  const requests = resolveData();
+  const isLoading = publicationId ? pubQuery.isLoading : historyQuery.isLoading;
+
+  // Pagination values
+  const totalItems = isStaticMode
+    ? requests.length
+    : publicationId
+      ? requests.length
+      : (historyQuery.data?.total ?? 0);
+  const totalPages = isStaticMode
+    ? Math.ceil(requests.length / perPage)
+    : publicationId
+      ? 1
+      : (historyQuery.data?.last_page ?? 1);
+
+  // For static/publication mode, slice locally
+  const displayedRequests =
+    isStaticMode || publicationId
+      ? requests.slice((currentPage - 1) * perPage, currentPage * perPage)
+      : requests;
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -121,9 +107,7 @@ export default function ApprovalHistory({
         label: t('approvals.status.cancelled'),
       },
     };
-
     const { color, icon: Icon, label } = config[status] || config.pending;
-
     return (
       <span
         className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${color}`}
@@ -146,11 +130,6 @@ export default function ApprovalHistory({
         return <Clock className="h-4 w-4 text-gray-500" />;
     }
   };
-
-  // Calcular paginación para datos locales
-  const displayedRequests = initialData
-    ? requests.slice((currentPage - 1) * perPage, currentPage * perPage)
-    : requests;
 
   return (
     <TableContainer
@@ -199,11 +178,7 @@ export default function ApprovalHistory({
           </thead>
           <tbody className="divide-y divide-gray-50 dark:divide-neutral-700/50">
             {isLoading ? (
-              <>
-                {[...Array(perPage)].map((_, i) => (
-                  <ApprovalHistorySkeleton key={i} />
-                ))}
-              </>
+              [...Array(perPage)].map((_, i) => <ApprovalHistorySkeleton key={i} />)
             ) : displayedRequests.length === 0 ? (
               <tr>
                 <td colSpan={publicationId ? 6 : 7} className="px-6 py-16 text-center">
@@ -287,9 +262,7 @@ export default function ApprovalHistory({
                         </div>
                         {request.completed_at && (
                           <div className="text-xs text-gray-500">
-                            {format(new Date(request.completed_at), 'PPp', {
-                              locale,
-                            })}
+                            {format(new Date(request.completed_at), 'PPp', { locale })}
                           </div>
                         )}
                       </div>
@@ -339,7 +312,7 @@ export default function ApprovalHistory({
         currentPage={currentPage}
         lastPage={totalPages}
         total={totalItems}
-        perPage={perPage || 12}
+        perPage={perPage}
         onPageChange={setCurrentPage}
         onPerPageChange={(val) => {
           setPerPage(val);

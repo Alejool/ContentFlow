@@ -17,13 +17,13 @@ import { useContentType } from '@/Hooks/publication/useContentType';
 import { usePublicationForm } from '@/Hooks/publication/usePublicationForm';
 import { useConfirm } from '@/Hooks/useConfirm';
 import { useS3Upload } from '@/Hooks/useS3Upload';
-import { useAccountsStore } from '@/stores/socialAccountsStore';
+import { useSocialAccounts } from '@/Hooks/useSocialAccounts';
+import { ToastService } from '@/Services/ToastService';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { FileText, Hash, Save, Target } from 'lucide-react';
 import { useMemo } from 'react';
 import { useWatch } from 'react-hook-form';
-import toast from 'react-hot-toast';
 
 interface AddPublicationModalProps {
   isOpen: boolean;
@@ -37,7 +37,7 @@ export default function AddPublicationModal({
   onSubmit,
 }: AddPublicationModalProps) {
   const { campaigns } = useCampaigns();
-  const { accounts: socialAccounts } = useAccountsStore();
+  const { data: socialAccounts = [] } = useSocialAccounts();
   const { auth } = usePage<any>().props;
   const canManageAccounts = auth.current_workspace?.permissions?.includes('manage-accounts');
   const planId = auth.current_workspace?.plan?.toLowerCase() || 'demo';
@@ -96,7 +96,9 @@ export default function AddPublicationModal({
     try {
       const result = await uploadFile(file, tempId);
       return result;
-    } catch (err) {}
+    } catch (err) {
+      return undefined;
+    }
   };
 
   const { confirm, ConfirmDialog } = useConfirm();
@@ -347,7 +349,7 @@ export default function AddPublicationModal({
             }
           }}
           t={t}
-          mediaFiles={watched.media_files}
+          mediaFiles={stabilizedMediaPreviews}
         />
 
         <main className="custom-scrollbar flex-1 overflow-y-auto">
@@ -435,10 +437,12 @@ export default function AddPublicationModal({
                       });
                     }}
                     onPlatformSettingsClick={(platform) => setActivePlatformSettings(platform)}
-                    globalSchedule={watched.scheduled_at ?? undefined}
+                    {...(watched.scheduled_at ? { globalSchedule: watched.scheduled_at } : {})}
                     error={errors.social_accounts?.message as string}
-                    socialPostLogs={publication?.social_post_logs}
-                    contentType={watched.content_type}
+                    {...(publication?.social_post_logs
+                      ? { socialPostLogs: publication.social_post_logs }
+                      : {})}
+                    contentType={content_type}
                     disabled={!canManageAccounts}
                   />
                 </div>
@@ -453,7 +457,7 @@ export default function AddPublicationModal({
                   </div>
 
                   <ScheduleSection
-                    scheduledAt={watched.scheduled_at ?? undefined}
+                    {...(watched.scheduled_at ? { scheduledAt: watched.scheduled_at } : {})}
                     t={t}
                     onScheduleChange={(date) => {
                       let finalDate = date;
@@ -476,7 +480,9 @@ export default function AddPublicationModal({
                     recurrenceType={watched.recurrence_type as any}
                     recurrenceInterval={watched.recurrence_interval}
                     recurrenceDays={watched.recurrence_days}
-                    recurrenceEndDate={watched.recurrence_end_date ?? undefined}
+                    {...(watched.recurrence_end_date
+                      ? { recurrenceEndDate: watched.recurrence_end_date }
+                      : {})}
                     recurrenceAccounts={watched.recurrence_accounts}
                     recurrenceDaysError={errors.recurrence_days?.message as string}
                     onRecurrenceChange={(data) => {
@@ -729,7 +735,7 @@ export default function AddPublicationModal({
                     const id = (publication as any)?.id;
                     if (id) {
                       await axios.post(route('api.v1.publications.cancel', id));
-                      toast.success('Publicación cancelada');
+                      ToastService.success('Publicación cancelada');
                       handleClose();
                     }
                   } catch (err) {}

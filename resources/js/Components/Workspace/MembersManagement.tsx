@@ -3,10 +3,16 @@ import Select from '@/Components/common/Modern/Select';
 import ConfirmDialog from '@/Components/common/ui/ConfirmDialog';
 import InviteMemberModal from '@/Components/Workspace/InviteMemberModal';
 import { getRoleStyle, ROLE_STYLES } from '@/Constants/RoleConstants';
+import {
+  useRemoveWorkspaceMember,
+  useUpdateMemberRole,
+  useWorkspaceMembers,
+} from '@/Hooks/useWorkspaceMembers';
+import { queryKeys } from '@/lib/queryKeys';
 import { usePage } from '@inertiajs/react';
-import axios from 'axios';
+import { useQueryClient } from '@tanstack/react-query';
 import { Trash2, UserPlus, Users } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 
@@ -18,36 +24,16 @@ interface MembersManagementProps {
 export default function MembersManagement({ roles = [], workspace }: MembersManagementProps) {
   const { t } = useTranslation();
   const { auth } = usePage().props as any;
-  // Use the passed workspace prop, fallback to global if somehow missing (though Settings ensures it)
   const current_workspace = workspace;
+  const queryClient = useQueryClient();
 
-  const [members, setMembers] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: members = [], isLoading } = useWorkspaceMembers(current_workspace?.id);
+  const updateRole = useUpdateMemberRole(current_workspace?.id);
+  const removeMember = useRemoveWorkspaceMember(current_workspace?.id);
+
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [userToRemove, setUserToRemove] = useState<number | null>(null);
-
-  const fetchMembers = async () => {
-    if (!current_workspace?.id) return;
-
-    try {
-      setIsLoading(true);
-      const response = await axios.get(route('api.v1.workspaces.members', current_workspace.id));
-      setMembers(response.data.members || []);
-    } catch (error) {
-      toast.error(t('workspace.invite_modal.messages.error'));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (current_workspace?.id) {
-      fetchMembers();
-    } else {
-      setIsLoading(false);
-    }
-  }, [current_workspace?.id]);
 
   const roleDistribution = members.reduce((acc: any, member: any) => {
     const roleId = member.pivot?.role_id;
@@ -63,21 +49,13 @@ export default function MembersManagement({ roles = [], workspace }: MembersMana
 
   const handleRoleChange = async (userId: number, newRoleId: number) => {
     if (!canManageMembers) return;
-    try {
-      await axios.put(
-        route('api.v1.workspaces.members.update-role', {
-          idOrSlug: current_workspace.id,
-          user: userId,
-        }),
-        {
-          role_id: newRoleId,
-        },
-      );
-      toast.success(t('workspace.invite_modal.messages.success'));
-      fetchMembers();
-    } catch (error) {
-      toast.error(t('workspace.invite_modal.messages.error'));
-    }
+    updateRole.mutate(
+      { userId, roleId: newRoleId },
+      {
+        onSuccess: () => toast.success(t('workspace.invite_modal.messages.success')),
+        onError: () => toast.error(t('workspace.invite_modal.messages.error')),
+      },
+    );
   };
 
   const initiateRemoveMember = (userId: number) => {
@@ -87,25 +65,11 @@ export default function MembersManagement({ roles = [], workspace }: MembersMana
 
   const handleRemoveMember = async () => {
     if (!canManageMembers || !userToRemove) return;
-
-    try {
-      const response = await axios.delete(
-        route('api.v1.workspaces.members.remove', {
-          idOrSlug: current_workspace.id,
-          user: userToRemove,
-        }),
-      );
-      toast.success(t('workspace.invite_modal.messages.success'));
-      if (response.data.members) {
-        setMembers(response.data.members);
-      } else {
-        fetchMembers();
-      }
-    } catch (error) {
-      toast.error(t('workspace.invite_modal.messages.error'));
-    } finally {
-      setUserToRemove(null);
-    }
+    removeMember.mutate(userToRemove, {
+      onSuccess: () => toast.success(t('workspace.invite_modal.messages.success')),
+      onError: () => toast.error(t('workspace.invite_modal.messages.error')),
+      onSettled: () => setUserToRemove(null),
+    });
   };
 
   const stats = [
@@ -276,7 +240,9 @@ export default function MembersManagement({ roles = [], workspace }: MembersMana
       <InviteMemberModal
         isOpen={isInviteModalOpen}
         onClose={() => setIsInviteModalOpen(false)}
-        onSuccess={fetchMembers}
+        onSuccess={() =>
+          queryClient.invalidateQueries({ queryKey: queryKeys.members.list(current_workspace.id) })
+        }
         roles={roles}
         workspace={current_workspace}
       />
