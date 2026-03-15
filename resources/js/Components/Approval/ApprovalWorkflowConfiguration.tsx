@@ -4,7 +4,7 @@ import Input from '@/Components/common/Modern/Input';
 import Select from '@/Components/common/Modern/Select';
 import axios from 'axios';
 import { AlertTriangle, ChevronRight, Plus, Save, Settings, Trash2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { route } from 'ziggy-js';
@@ -32,7 +32,7 @@ interface Role {
 }
 
 interface ApprovalWorkflowConfigurationProps {
-  workspace: any;
+  workspace: { id: number | string; [key: string]: unknown };
   roles: Role[];
   canManageWorkflow: boolean;
   hasPendingContent?: boolean;
@@ -50,7 +50,49 @@ export default function ApprovalWorkflowConfiguration({
 }: ApprovalWorkflowConfigurationProps) {
   const { t } = useTranslation();
 
-  // Check if workspace has access to approval workflows
+  const [workflow, setWorkflow] = useState<ApprovalWorkflow>({
+    workspace_id: workspace.id as number,
+    is_enabled: false,
+    is_multi_level: false,
+    levels: [],
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Filter roles that can participate in approvals
+  const approvalRoles = roles.filter(
+    (r) => r.approval_participant === true || (r.approval_participant as unknown) === 1,
+  );
+
+  // If no approval roles found, use all roles as fallback (for development/testing)
+  const availableRoles = approvalRoles.length > 0 ? approvalRoles : roles;
+
+  const fetchWorkflow = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get(
+        route('api.v1.workspaces.approval-workflow.show', {
+          idOrSlug: workspace.id,
+        }),
+      );
+      if (response.data.data) {
+        setWorkflow(response.data.data);
+      }
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { status?: number } };
+      if (axiosError.response?.status !== 404) {
+        toast.error(t('approval.errors.fetch_failed'));
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, [workspace.id, t]);
+
+  useEffect(() => {
+    fetchWorkflow();
+  }, [fetchWorkflow]);
+
+  // Check if workspace has access to approval workflows (after all hooks)
   if (!hasBasicAccess) {
     return (
       <div className="mx-auto max-w-4xl">
@@ -77,59 +119,6 @@ export default function ApprovalWorkflowConfiguration({
     );
   }
 
-  const [workflow, setWorkflow] = useState<ApprovalWorkflow>({
-    workspace_id: workspace.id,
-    is_enabled: false,
-    is_multi_level: false,
-    levels: [],
-  });
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-
-  // Filter roles that can participate in approvals
-  const approvalRoles = roles.filter(
-    (r) => r.approval_participant === true || r.approval_participant === 1,
-  );
-
-  // If no approval roles found, use all roles as fallback (for development/testing)
-  const availableRoles = approvalRoles.length > 0 ? approvalRoles : roles;
-
-  // Debug logging
-  console.log('🔍 ApprovalWorkflow Debug:', {
-    totalRoles: roles.length,
-    approvalRoles: approvalRoles.length,
-    availableRoles: availableRoles.length,
-    roles: roles.map((r) => ({
-      id: r.id,
-      name: r.name,
-      approval_participant: r.approval_participant,
-    })),
-  });
-
-  useEffect(() => {
-    fetchWorkflow();
-  }, [workspace.id]);
-
-  const fetchWorkflow = async () => {
-    try {
-      setIsLoading(true);
-      const response = await axios.get(
-        route('api.v1.workspaces.approval-workflow.show', {
-          idOrSlug: workspace.id,
-        }),
-      );
-      if (response.data.data) {
-        setWorkflow(response.data.data);
-      }
-    } catch (error: any) {
-      if (error.response?.status !== 404) {
-        toast.error(t('approval.errors.fetch_failed'));
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleToggleEnabled = async () => {
     if (!canManageWorkflow) {
       toast.error(t('approval.errors.insufficient_permissions'));
@@ -152,8 +141,9 @@ export default function ApprovalWorkflowConfiguration({
       toast.success(
         workflow.is_enabled ? t('approval.success.disabled') : t('approval.success.enabled'),
       );
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || t('approval.errors.toggle_failed'));
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { data?: { message?: string } } };
+      toast.error(axiosError.response?.data?.message || t('approval.errors.toggle_failed'));
     } finally {
       setIsSaving(false);
     }
@@ -222,7 +212,7 @@ export default function ApprovalWorkflowConfiguration({
     });
   };
 
-  const handleLevelChange = (index: number, field: keyof ApprovalLevel, value: any) => {
+  const handleLevelChange = (index: number, field: keyof ApprovalLevel, value: string | number) => {
     const newLevels = [...workflow.levels];
     newLevels[index] = { ...newLevels[index], [field]: value };
     setWorkflow({ ...workflow, levels: newLevels });
@@ -309,9 +299,10 @@ export default function ApprovalWorkflowConfiguration({
 
       toast.success(t('approval.success.configured'));
       fetchWorkflow();
-    } catch (error: any) {
-      console.error('❌ Save error:', error.response?.data); // Debug log
-      toast.error(error.response?.data?.message || t('approval.errors.save_failed'));
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { data?: { message?: string } } };
+      console.error('❌ Save error:', axiosError.response?.data);
+      toast.error(axiosError.response?.data?.message || t('approval.errors.save_failed'));
     } finally {
       setIsSaving(false);
     }
@@ -461,7 +452,7 @@ export default function ApprovalWorkflowConfiguration({
                   <Input
                     id={`level-name-${index}`}
                     value={level.level_name}
-                    onChange={(e: any) => handleLevelChange(index, 'level_name', e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleLevelChange(index, 'level_name', e.target.value)}
                     placeholder={t('approval.level_name')}
                     disabled={!canManageWorkflow || hasPendingContent}
                     containerClassName="flex-1"

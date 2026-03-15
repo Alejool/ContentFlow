@@ -35,7 +35,7 @@ interface AnalyticsData {
 }
 
 interface ApprovalAnalyticsDashboardProps {
-  workspace: any;
+  workspace: { id: number | string };
   canViewAnalytics: boolean;
 }
 
@@ -49,19 +49,11 @@ export default function ApprovalAnalyticsDashboard({
   const [isLoading, setIsLoading] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
 
-  const COLORS = {
-    primary: '#3b82f6',
-    success: '#10b981',
-    warning: '#f59e0b',
-    danger: '#ef4444',
-    purple: '#8b5cf6',
-    teal: '#14b8a6',
-  };
-
   useEffect(() => {
     if (canViewAnalytics) {
       fetchAnalytics();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [workspace.id, canViewAnalytics]);
 
   const fetchAnalytics = async () => {
@@ -73,7 +65,7 @@ export default function ApprovalAnalyticsDashboard({
         }),
       );
       setAnalytics(response.data.data);
-    } catch (error: any) {
+    } catch (_error) {
       toast.error(t('approval.analytics.errors.fetch_failed'));
     } finally {
       setIsLoading(false);
@@ -106,7 +98,7 @@ export default function ApprovalAnalyticsDashboard({
       window.URL.revokeObjectURL(url);
 
       toast.success(t('approval.analytics.success.exported'));
-    } catch (error: any) {
+    } catch (_error) {
       toast.error(t('approval.analytics.errors.export_failed'));
     } finally {
       setIsExporting(false);

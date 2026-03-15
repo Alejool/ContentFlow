@@ -2,7 +2,7 @@ import Button from '@/Components/common/Modern/Button';
 import Input from '@/Components/common/Modern/Input';
 import axios from 'axios';
 import { AlertCircle, CheckCircle, Clock, Send, ThumbsDown, ThumbsUp, XCircle } from 'lucide-react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 
@@ -16,7 +16,7 @@ interface ApprovalStatus {
 }
 
 interface ContentApprovalStatusProps {
-  content: any;
+  content: { id: number | string; [key: string]: unknown };
   approvalStatus: ApprovalStatus;
   canApprove: boolean;
   canReject: boolean;
@@ -44,7 +44,7 @@ export default function ContentApprovalStatus({
   const [rejectionReason, setRejectionReason] = useState('');
 
   const getStatusBadge = () => {
-    const statusConfig: Record<string, { color: string; icon: any; label: string }> = {
+    const statusConfig: Record<string, { color: string; icon: React.ElementType; label: string }> = {
       draft: {
         color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
         icon: AlertCircle,
@@ -161,8 +161,9 @@ export default function ContentApprovalStatus({
 
       toast.success(t('approval.success.submitted'));
       onStatusChange?.();
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || t('approval.errors.submit_failed'));
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { data?: { message?: string } } };
+      toast.error(axiosError.response?.data?.message || t('approval.errors.submit_failed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -178,8 +179,9 @@ export default function ContentApprovalStatus({
       setShowApproveModal(false);
       setComment('');
       onStatusChange?.();
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || t('approval.errors.approve_failed'));
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { data?: { message?: string } } };
+      toast.error(axiosError.response?.data?.message || t('approval.errors.approve_failed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -200,8 +202,9 @@ export default function ContentApprovalStatus({
       setShowRejectModal(false);
       setRejectionReason('');
       onStatusChange?.();
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || t('approval.errors.reject_failed'));
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { data?: { message?: string } } };
+      toast.error(axiosError.response?.data?.message || t('approval.errors.reject_failed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -300,7 +303,7 @@ export default function ContentApprovalStatus({
               id="approve-comment"
               label={t('approval.comment_optional')}
               value={comment}
-              onChange={(e: any) => setComment(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setComment(e.target.value)}
               placeholder={t('approval.add_comment')}
               multiline
               rows={3}
@@ -345,7 +348,7 @@ export default function ContentApprovalStatus({
               id="reject-reason"
               label={t('approval.rejection_reason')}
               value={rejectionReason}
-              onChange={(e: any) => setRejectionReason(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRejectionReason(e.target.value)}
               placeholder={t('approval.explain_rejection')}
               required
             />

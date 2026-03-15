@@ -218,7 +218,7 @@ export default function ApprovalWorkflowStatus({
                           {new Date((approvedLog || rejectedLog)!.created_at).toLocaleString()}
                           {(approvedLog || rejectedLog)!.comment && (
                             <span className="ml-1 italic">
-                              "{(approvedLog || rejectedLog)!.comment}"
+                              &ldquo;{(approvedLog || rejectedLog)!.comment}&rdquo;
                             </span>
                           )}
                         </p>
