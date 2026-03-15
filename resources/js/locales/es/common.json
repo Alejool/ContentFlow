@@ -98,6 +98,11 @@
     "expand": "Expandir",
     "error": "Error",
     "next": "Siguiente",
+    "tabs": {
+      "overview": "Resumen",
+      "activity": "Actividad",
+      "approvals": "Aprobaciones"
+    },
     "previous": "Anterior",
     "showing": "Mostrando",
     "of": "de",
@@ -114,6 +119,7 @@
     "save_changes": "Guardar Cambios",
     "noCreditCard": "No requiere tarjeta de crédito",
     "unknown": "Desconocido",
+    "notSet": "No establecido",
     "platformConnect": "Plataforma",
     "understood": "Entendido",
     "untitled": "Sin título",

@@ -53,6 +53,7 @@
         "publishDate": "Publish Date",
         "publishedOn": "Published On",
         "publications": "Publications",
+        "socialNetworkPublications": "Social Network Publications",
         "associatedPublications": "Associated Publications",
         "accountMissingTitle": "Account Disconnected",
         "accountMissingText": "This publication was posted on an account ({{account}}) that is no longer connected. Editing it will create a new version for your current account(s). Proceed?",
@@ -450,6 +451,7 @@
       "retrying": "Retrying"
     },
     "scheduled_for": "Scheduled for",
+    "scheduledPosts":"Scheduled post",
     "button": {
       "add": "Add Publication",
       "edit": "Edit Publication",

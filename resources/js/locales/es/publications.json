@@ -54,6 +54,7 @@
         "publishedOn": "Publicado el",
         "publications": "Publicaciones",
         "scheduledPosts": "Publicaciones Programadas",
+        "socialNetworkPublications": "Publicaciones en Redes Sociales",
         "associatedPublications": "Publicaciones Asociadas",
         "accountMissingTitle": "Cuenta Desconectada",
         "accountMissingText": "Esta publicación se publica en una cuenta ({{account}}) que ya no está conectada. Al editarla se crear una nueva versión para tu cuenta actual. ¿Continuar?",
@@ -493,6 +494,7 @@
       "retrying": "Reintentando"
     },
     "scheduled_for": "Programado para",
+    "scheduledPosts":"Publicaciones Programadas",
     "button": {
       "add": "Agregar publicación",
       "edit": "Editar publicación",

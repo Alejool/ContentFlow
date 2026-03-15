@@ -91,6 +91,11 @@
     "expand": "Expand",
     "error": "Error",
     "next": "Next",
+    "tabs": {
+      "overview": "Overview",
+      "activity": "Activity",
+      "approvals": "Approvals"
+    },
     "previous": "Previous",
     "showing": "Showing",
     "of": "of",
@@ -107,6 +112,7 @@
     "save_changes": "Save Changes",
     "noCreditCard": "No credit card required",
     "unknown": "Unknown",
+    "notSet": "Not set",
     "platformConnect": "Platform",
     "close": "Close",
     "copy": "Copy",
