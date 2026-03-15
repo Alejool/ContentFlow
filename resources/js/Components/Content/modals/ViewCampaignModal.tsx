@@ -1,4 +1,5 @@
 import CampaignMediaCarousel from '@/Components/Campaigns/CampaignMediaCarousel';
+import { Avatar } from '@/Components/common/Avatar';
 import ActivityList from '@/Components/Content/ActivityList';
 import ApprovalHistorySection from '@/Components/Content/Publication/common/edit/ApprovalHistorySection';
 import ReelsCarousel from '@/Components/Content/ReelsCarousel';
@@ -8,7 +9,7 @@ import { Publication } from '@/types/Publication';
 import { formatDateString } from '@/Utils/dateHelpers';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { usePage } from '@inertiajs/react';
-import { Calendar, Edit, FileText, Hash, Layers, Target, User, X } from 'lucide-react';
+import { Calendar, Edit, FileText, Hash, Layers, Target, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -93,12 +94,18 @@ export default function ViewCampaignModal({
   };
 
   const formatDate = (dateString?: string) => {
-    if (!dateString) return 'Not set';
-    return formatDateString(dateString, {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+    if (!dateString) return t('common.notSet', 'Not set');
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return t('common.notSet', 'Not set');
+      return formatDateString(dateString, {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    } catch (error) {
+      return t('common.notSet', 'Not set');
+    }
   };
 
   return (
@@ -204,19 +211,12 @@ export default function ViewCampaignModal({
               )}
               {(item as any).user && (
                 <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-4 dark:bg-neutral-900/50">
-                  <div className="flex-shrink-0">
-                    {(item as any).user.photo_url ? (
-                      <img
-                        src={(item as any).user.photo_url}
-                        className="h-10 w-10 rounded-full border-2 border-white shadow-sm dark:border-neutral-700"
-                        alt=""
-                      />
-                    ) : (
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
-                        <User className="h-5 w-5" />
-                      </div>
-                    )}
-                  </div>
+                  <Avatar
+                    src={(item as any).user.photo_url}
+                    name={(item as any).user.name}
+                    size="md"
+                    className="flex-shrink-0"
+                  />
                   <div>
                     <h4 className="text-sm font-bold text-gray-900 dark:text-white">
                       {(item as any).user.name}
@@ -326,52 +326,138 @@ export default function ViewCampaignModal({
                         </div>
                       )}
 
-                      {(item as any).scheduled_posts &&
-                        (item as any).scheduled_posts.length > 0 && (
-                          <div className="rounded-lg bg-gray-50 p-4 dark:bg-neutral-900/50 md:col-span-2">
-                            <div className="mb-2 flex items-center gap-2">
-                              <Calendar className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                              <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                {t('publications.scheduledPosts')}
-                              </span>
-                            </div>
-
-                            <div className="mt-2 space-y-2 text-gray-900 dark:text-white">
-                              {(item as any).scheduled_posts.map((post: any, index: number) => (
-                                <div
-                                  key={post.id || index}
-                                  className="flex items-center justify-between rounded border border-gray-200 bg-white p-2 dark:border-neutral-700 dark:bg-neutral-800"
-                                >
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-sm font-medium capitalize">
-                                      {post?.social_account?.platform || t('common.platform')}
-                                    </span>
-                                    {post.status && (
-                                      <span
-                                        className={`rounded px-1.5 py-0.5 text-xs capitalize ${
-                                          post.status === 'posted'
-                                            ? 'bg-green-100 text-green-700'
-                                            : post.status === 'failed'
-                                              ? 'bg-primary-100 text-primary-700'
-                                              : 'bg-yellow-100 text-yellow-700'
-                                        }`}
-                                      >
-                                        {post.status}
-                                      </span>
-                                    )}
-                                  </div>
-                                  <div className="text-sm opacity-80">
-                                    {formatDate(post.scheduled_at)}{' '}
-                                    {new Date(post.scheduled_at).toLocaleTimeString([], {
-                                      hour: '2-digit',
-                                      minute: '2-digit',
-                                    })}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
+                      {/* Published Posts - Show from both social_post_logs and scheduled_posts with status 'posted' */}
+                      {(((item as any).social_post_logs && (item as any).social_post_logs.length > 0) ||
+                        ((item as any).scheduled_posts && (item as any).scheduled_posts.some((p: any) => p.status === 'posted' || p.status === 'published'))) ? (
+                        <div className="rounded-lg bg-gray-50 p-4 dark:bg-neutral-900/50 md:col-span-2">
+                          <div className="mb-3 flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-green-600 dark:text-green-400" />
+                            <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                              {t('publications.table.publishedOn', 'Publicado en')}
+                            </span>
                           </div>
-                        )}
+
+                          <div className="space-y-2">
+                            {/* From social_post_logs */}
+                            {(item as any).social_post_logs &&
+                              (item as any).social_post_logs
+                                .filter((log: any) => log.published_at || log.created_at)
+                                .map((log: any, index: number) => {
+                                  const publishDate = log.published_at || log.created_at;
+                                  const platformName = log.social_account?.platform || log.platform || 'Social Network';
+                                  const accountName = log.social_account?.account_name || log.account_name;
+                                  
+                                  return (
+                                    <div
+                                      key={`log-${log.id || index}`}
+                                      className="flex items-center justify-between rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-900/30 dark:bg-green-900/10"
+                                    >
+                                      <div className="flex items-center gap-3">
+                                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
+                                          <Calendar className="h-4 w-4 text-green-600 dark:text-green-400" />
+                                        </div>
+                                        <div>
+                                          <div className="flex items-center gap-2">
+                                            <span className="text-sm font-semibold capitalize text-gray-900 dark:text-white">
+                                              {platformName}
+                                            </span>
+                                            <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/50 dark:text-green-400">
+                                              {t('publications.status.published')}
+                                            </span>
+                                          </div>
+                                          {accountName && (
+                                            <p className="text-xs text-gray-600 dark:text-gray-400">
+                                              @{accountName}
+                                            </p>
+                                          )}
+                                        </div>
+                                      </div>
+                                      <div className="text-right">
+                                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                          {formatDate(publishDate)}
+                                        </p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                                          {(() => {
+                                            try {
+                                              const date = new Date(publishDate);
+                                              if (!isNaN(date.getTime())) {
+                                                return date.toLocaleTimeString([], {
+                                                  hour: '2-digit',
+                                                  minute: '2-digit',
+                                                });
+                                              }
+                                              return '';
+                                            } catch {
+                                              return '';
+                                            }
+                                          })()}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+
+                            {/* From scheduled_posts with status 'posted' or 'published' */}
+                            {(item as any).scheduled_posts &&
+                              (item as any).scheduled_posts
+                                .filter((post: any) => post.status === 'posted' || post.status === 'published')
+                                .map((post: any, index: number) => {
+                                  const publishDate = post.published_at || post.scheduled_at;
+                                  const platformName = post.social_account?.platform || post.platform || 'Social Network';
+                                  const accountName = post.social_account?.account_name || post.account_name;
+                                  
+                                  return (
+                                    <div
+                                      key={`posted-${post.id || index}`}
+                                      className="flex items-center justify-between rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-900/30 dark:bg-green-900/10"
+                                    >
+                                      <div className="flex items-center gap-3">
+                                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
+                                          <Calendar className="h-4 w-4 text-green-600 dark:text-green-400" />
+                                        </div>
+                                        <div>
+                                          <div className="flex items-center gap-2">
+                                            <span className="text-sm font-semibold capitalize text-gray-900 dark:text-white">
+                                              {platformName}
+                                            </span>
+                                            <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/50 dark:text-green-400">
+                                              {t('publications.status.published')}
+                                            </span>
+                                          </div>
+                                          {accountName && (
+                                            <p className="text-xs text-gray-600 dark:text-gray-400">
+                                              @{accountName}
+                                            </p>
+                                          )}
+                                        </div>
+                                      </div>
+                                      <div className="text-right">
+                                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                          {formatDate(publishDate)}
+                                        </p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                                          {(() => {
+                                            try {
+                                              const date = new Date(publishDate);
+                                              if (!isNaN(date.getTime())) {
+                                                return date.toLocaleTimeString([], {
+                                                  hour: '2-digit',
+                                                  minute: '2-digit',
+                                                });
+                                              }
+                                              return '';
+                                            } catch {
+                                              return '';
+                                            }
+                                          })()}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                          </div>
+                        </div>
+                      ) : null}
 
                       {(item as any).publish_date && (
                         <div className="rounded-lg bg-gray-50 p-4 dark:bg-neutral-900/50 md:col-span-2">
