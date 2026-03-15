@@ -240,8 +240,6 @@ const DatePickerModern = <T extends FieldValues>({
   const monthOptions = months.map((m, i) => ({ value: i, label: m }));
   const yearOptions = years.map(y => ({ value: y, label: y.toString() }));
   const focusedValue = new CalendarDate(navDate.getFullYear(), navDate.getMonth() + 1, 1);
-  const isEndPlacement = popperPlacement.includes('end');
-  const isTopPlacement = popperPlacement.startsWith('top');
 
   return (
     <I18nProvider locale={currentLocale === 'es' ? 'es-ES' : 'en-US'}>
@@ -267,27 +265,23 @@ const DatePickerModern = <T extends FieldValues>({
         </div>
         {isOpen && !disabled && (
           <>
-            <div className="fixed inset-0 z-[9998]" onClick={() => setIsOpen(false)} />
+            <div className="fixed inset-0 z-[9998] bg-black/10 backdrop-blur-[2px]" onClick={() => setIsOpen(false)} />
             <div
-              className="absolute z-[9999] mt-1 overflow-visible rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-neutral-700 dark:bg-neutral-900"
-              style={{
-                [isEndPlacement ? 'right' : 'left']: 0,
-                [isTopPlacement ? 'bottom' : 'top']: '100%',
-              }}
+              className="fixed left-1/2 top-1/2 z-[9999] max-h-[90vh] w-full max-w-[95vw] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-xl dark:border-neutral-800 dark:bg-neutral-900 sm:max-w-fit"
             >
-              <div className="flex flex-col sm:flex-row">
-                <div className="relative pb-14">
+              <div className="flex flex-col sm:flex-row max-w-full overflow-auto">
+                <div className="relative min-w-0 pb-14 flex-shrink-0" style={{ width: showTimeSelect ? 'auto' : '100%', maxWidth: '420px' }}>
                   <div
-                    className="flex h-[4.5rem] items-center justify-between gap-2 border-b border-gray-200 bg-gradient-to-br from-gray-50 to-gray-100 px-3 dark:border-neutral-700 dark:from-neutral-800 dark:to-neutral-900"
+                    className="flex h-16 items-center justify-between gap-3 border-b border-gray-100 bg-white px-4 dark:border-neutral-800 dark:bg-neutral-900"
                     style={{ borderTopLeftRadius: '0.75rem', borderTopRightRadius: showTimeSelect ? 0 : '0.75rem' }}
                   >
                     <button type="button"
-                      className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-gray-300 bg-white text-gray-600 transition hover:scale-105 dark:border-neutral-600 dark:bg-neutral-800 dark:text-gray-200"
+                      className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gray-50 text-gray-700 transition-all hover:bg-gray-100 hover:scale-105 active:scale-95 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700"
                       onClick={() => setNavDate(d => { const n = new Date(d); n.setMonth(n.getMonth() - 1); return n; })}>
-                      <ChevronLeft className="h-4 w-4" />
+                      <ChevronLeft className="h-5 w-5" />
                     </button>
                     <div className="flex flex-1 items-center justify-center gap-2">
-                      <div className="w-[130px]">
+                      <div className="w-[140px]">
                         <Select id="dp-month" options={monthOptions} value={navDate.getMonth()}
                           onChange={(v: string | number | string[]) => setNavDate(d => { const n = new Date(d); n.setMonth(Number(v)); return n; })}
                           size="sm" usePortal={false} />
@@ -299,9 +293,9 @@ const DatePickerModern = <T extends FieldValues>({
                       </div>
                     </div>
                     <button type="button"
-                      className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-gray-300 bg-white text-gray-600 transition hover:scale-105 dark:border-neutral-600 dark:bg-neutral-800 dark:text-gray-200"
+                      className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gray-50 text-gray-700 transition-all hover:bg-gray-100 hover:scale-105 active:scale-95 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700"
                       onClick={() => setNavDate(d => { const n = new Date(d); n.setMonth(n.getMonth() + 1); return n; })}>
-                      <ChevronRight className="h-4 w-4" />
+                      <ChevronRight className="h-5 w-5" />
                     </button>
                   </div>
 
@@ -313,10 +307,10 @@ const DatePickerModern = <T extends FieldValues>({
                     onFocusChange={(fv: CalendarDate) => setNavDate(new Date(fv.year, fv.month - 1, fv.day))}
                     className="p-3"
                   >
-                    <CalendarGrid>
+                    <CalendarGrid className="w-full">
                       <CalendarGridHeader>
                         {(day: string) => (
-                          <CalendarHeaderCell className="w-9 pb-2 text-center text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                          <CalendarHeaderCell className="w-10 pb-2 text-center text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
                             {day}
                           </CalendarHeaderCell>
                         )}
@@ -327,12 +321,12 @@ const DatePickerModern = <T extends FieldValues>({
                             date={date}
                             className={({ isSelected, isDisabled, isToday, isFocused: isFoc }: { isSelected: boolean; isDisabled: boolean; isToday: boolean; isFocused: boolean }) =>
                               [
-                                'flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg text-sm font-medium transition-all',
-                                isSelected ? 'scale-105 bg-primary-500/70 font-bold text-white shadow'
-                                  : isToday ? 'border-2 border-primary-500 bg-primary-500/10 font-bold text-primary-500 dark:bg-primary-500/20'
-                                  : isDisabled ? 'cursor-not-allowed opacity-30'
-                                  : 'text-gray-700 hover:scale-110 hover:bg-primary-500/10 hover:text-primary-500 dark:text-gray-200 dark:hover:bg-neutral-700 dark:hover:text-white',
-                                isFoc && !isSelected ? 'ring-2 ring-primary-500/50' : '',
+                                'flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl text-sm font-medium transition-all duration-200',
+                                isSelected ? 'scale-105 bg-primary-500 font-semibold text-white shadow-lg shadow-primary-500/30'
+                                  : isToday ? 'border-2 border-primary-500 bg-primary-50 font-semibold text-primary-600 dark:bg-primary-500/10 dark:text-primary-400'
+                                  : isDisabled ? 'cursor-not-allowed text-gray-300 dark:text-gray-700'
+                                  : 'text-gray-700 hover:scale-105 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-neutral-800',
+                                isFoc && !isSelected ? 'ring-2 ring-primary-400/40 ring-offset-2 dark:ring-offset-neutral-900' : '',
                               ].join(' ')
                             }
                           >
@@ -345,12 +339,12 @@ const DatePickerModern = <T extends FieldValues>({
 
                   {/* Footer */}
                   <div
-                    className="absolute bottom-0 left-0 right-0 flex min-h-[3.5rem] items-center justify-between gap-3 border-t border-gray-200 bg-gradient-to-br from-gray-50 to-gray-100 px-4 py-2 text-sm dark:border-neutral-700 dark:from-neutral-800 dark:to-neutral-900"
+                    className="absolute bottom-0 left-0 right-0 flex min-h-14 items-center justify-between gap-3 border-t border-gray-100 bg-white px-4 py-3 text-sm dark:border-neutral-800 dark:bg-neutral-900"
                     style={{ borderBottomLeftRadius: '0.75rem', borderBottomRightRadius: showTimeSelect ? 0 : '0.75rem' }}
                   >
-                    <div className="flex flex-1 items-center gap-2 font-semibold text-gray-900 dark:text-gray-100">
-                      <Calendar className="h-4 w-4 flex-shrink-0" />
-                      <span>
+                    <div className="flex flex-1 items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <Calendar className="h-4 w-4 flex-shrink-0 text-gray-400" />
+                      <span className="truncate">
                         {displayDate
                           ? showTimeSelect
                             ? displayDate.toLocaleString(currentLocale === 'es' ? 'es-ES' : 'en-US', { dateStyle: 'medium', timeStyle: 'short' })
@@ -358,13 +352,13 @@ const DatePickerModern = <T extends FieldValues>({
                           : currentLocale === 'es' ? 'Sin fecha seleccionada' : 'No date selected'}
                       </span>
                       {showTimezone && useUTC && (
-                        <span className="ml-1 text-xs text-gray-500 dark:text-gray-400">({timezoneLabel()})</span>
+                        <span className="ml-1 text-xs text-gray-400 dark:text-gray-500">({timezoneLabel()})</span>
                       )}
                     </div>
                     {isClearable && displayDate && (
                       <button type="button"
                         onClick={e => { e.stopPropagation(); handleDateChange(null); setIsOpen(false); }}
-                        className="flex items-center gap-1.5 rounded-lg border border-gray-300 bg-gradient-to-br from-gray-100 to-gray-200 px-3 py-1.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:-translate-y-px hover:border-gray-400 hover:shadow dark:border-neutral-600 dark:from-neutral-700 dark:to-neutral-800 dark:text-gray-200">
+                        className="flex items-center gap-1.5 rounded-lg bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700 transition-all hover:bg-gray-200 active:scale-95 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700">
                         <X className="h-4 w-4" />
                         {currentLocale === 'es' ? 'Limpiar' : 'Clear'}
                       </button>
@@ -387,35 +381,38 @@ const DatePickerModern = <T extends FieldValues>({
 
         <style>{`
           .custom-time-selector {
-            background-color: #ffffff; border-left: 1px solid #e5e7eb;
-            width: 200px; display: flex; flex-direction: column; padding-bottom: 3.5rem;
+            background-color: #ffffff; border-left: 1px solid #f3f4f6;
+            width: 220px; max-width: 220px; display: flex; flex-direction: column; padding-bottom: 3.5rem;
+            flex-shrink: 0;
           }
-          .dark .custom-time-selector { background-color: #171717; border-left-color: #404040; }
+          .dark .custom-time-selector { background-color: #171717; border-left-color: #262626; }
           .time-selector-header {
             display: flex; align-items: center; gap: 0.5rem; justify-content: center;
-            padding: 0.75rem 1rem; height: 4.5rem;
-            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
-            border-bottom: 1px solid #e5e7eb; border-top-right-radius: 0.75rem;
-            font-weight: 700; font-size: 1rem; color: #111827;
+            padding: 1rem; height: 4rem;
+            background: #ffffff;
+            border-bottom: 1px solid #f3f4f6; border-top-right-radius: 0.75rem;
+            font-weight: 600; font-size: 0.875rem; color: #374151;
           }
-          .dark .time-selector-header { background: linear-gradient(135deg,#262626 0%,#171717 100%); border-bottom-color:#404040; color:#f3f4f6; }
-          .time-selector-body { display:flex; align-items:center; justify-content:center; gap:1rem; padding:2rem 1rem; flex:1; }
-          .time-input-group { display:flex; flex-direction:column; align-items:center; gap:0.5rem; }
+          .dark .time-selector-header { background: #171717; border-bottom-color:#262626; color:#d1d5db; }
+          .time-selector-body { display:flex; align-items:center; justify-content:center; gap:1.5rem; padding:2.5rem 1rem; flex:1; }
+          .time-input-group { display:flex; flex-direction:column; align-items:center; gap:0.75rem; }
           .time-spinner-btn {
-            width:100%; padding:0.5rem;
-            background:linear-gradient(135deg,#f3f4f6 0%,#e5e7eb 100%);
-            border:1px solid #d1d5db; border-radius:0.5rem; color:#374151;
+            width:100%; padding:0.625rem;
+            background:#f9fafb;
+            border:1px solid #e5e7eb; border-radius:0.75rem; color:#6b7280;
             cursor:pointer; transition:all 0.2s ease; display:flex; align-items:center; justify-content:center;
           }
-          .time-spinner-btn:hover { background:linear-gradient(135deg,${getColor(activeColor)} 0%,${getColor(activeColor,'dd')} 100%); border-color:${getColor(activeColor)}; color:white; transform:translateY(-1px); }
-          .dark .time-spinner-btn { background:linear-gradient(135deg,#404040 0%,#262626 100%); border-color:#525252; color:#e5e7eb; }
-          .time-separator { font-size:2.5rem; font-weight:700; color:#374151; align-self:center; margin-top:-1rem; }
-          .dark .time-separator { color:#e5e7eb; }
-          .time-label { font-size:0.75rem; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:0.05em; }
-          .dark .time-label { color:#9ca3af; }
+          .time-spinner-btn:hover { background:${getColor(activeColor, '10')}; border-color:${getColor(activeColor, '50')}; color:${getColor(activeColor)}; transform:translateY(-1px); }
+          .time-spinner-btn:active { transform:translateY(0); }
+          .dark .time-spinner-btn { background:#262626; border-color:#404040; color:#9ca3af; }
+          .dark .time-spinner-btn:hover { background:${getColor(activeColor, '10')}; border-color:${getColor(activeColor, '50')}; color:${getColor(activeColor)}; }
+          .time-separator { font-size:2rem; font-weight:600; color:#9ca3af; align-self:center; margin-top:-0.5rem; }
+          .dark .time-separator { color:#737373; }
+          .time-label { font-size:0.6875rem; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; }
+          .dark .time-label { color:#737373; }
           @media (max-width:640px) {
-            .custom-time-selector { width:100% !important; border-left:none !important; border-top:1px solid #e5e7eb; }
-            .dark .custom-time-selector { border-top-color:#404040; }
+            .custom-time-selector { width:100% !important; max-width:100% !important; border-left:none !important; border-top:1px solid #f3f4f6; }
+            .dark .custom-time-selector { border-top-color:#262626; }
             .time-selector-header { border-top-right-radius:0; }
           }
         `}</style>
