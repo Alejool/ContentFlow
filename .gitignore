@@ -156,3 +156,10 @@ supervisor
 # DEPLOYMENT
 # ============================================
 fly.toml
+
+# ============================================
+# EXAMPLE FILES
+# ============================================
+# Ignore example/demo files in components
+*.example.tsx
+*.examples.tsx
