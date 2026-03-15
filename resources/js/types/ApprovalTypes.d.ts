@@ -1,5 +1,7 @@
 // Tipos para el nuevo sistema de aprobaciones simplificado
 
+import type { Publication } from '@/types/Publication';
+
 export interface ApprovalRequest {
   id: number;
   publication_id: number;
@@ -11,10 +13,10 @@ export interface ApprovalRequest {
   completed_at: string | null;
   completed_by: number | null;
   rejection_reason: string | null;
-  metadata: Record<string, any> | null;
+  metadata: Record<string, unknown> | null;
 
   // Relaciones
-  publication?: any;
+  publication?: Publication;
   workflow?: ApprovalWorkflow;
   currentStep?: ApprovalLevel;
   submitter?: User;
@@ -30,7 +32,7 @@ export interface ApprovalLog {
   action: 'submitted' | 'approved' | 'rejected' | 'reassigned' | 'cancelled' | 'auto_advanced';
   level_number: number | null;
   comment: string | null;
-  metadata: Record<string, any> | null;
+  metadata: Record<string, unknown> | null;
   created_at: string;
   updated_at: string;
 

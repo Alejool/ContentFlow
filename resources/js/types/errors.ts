@@ -19,7 +19,7 @@ export enum CalendarErrorCode {
 export interface CalendarError {
   code: CalendarErrorCode;
   message: string;
-  details?: any;
+  details?: unknown;
   timestamp: Date;
   context?: string;
 }

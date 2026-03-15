@@ -29,7 +29,7 @@ export type Publication = {
   scheduled_posts?: ScheduledPost[];
   social_post_logs?: SocialPostLog[];
   approval_logs?: ApprovalLog[];
-  activities?: any[];
+  activities?: Record<string, unknown>[];
   campaigns?: {
     id: number;
     name: string;
@@ -44,7 +44,7 @@ export type Publication = {
     email: string;
     photo_url: string;
   };
-  platform_settings?: Record<string, any>;
+  platform_settings?: Record<string, unknown>;
   approved_by?: number;
   approved_at?: string;
   published_by?: number;
@@ -86,7 +86,7 @@ export type Publication = {
     workflow?: {
       id: number;
       name: string;
-      steps?: any[];
+      steps?: { id: number; name: string; step_order: number }[];
     };
   };
   approval_logs?: ApprovalLog[];
@@ -175,7 +175,7 @@ export type SocialPostLog = {
   content?: string;
   post_url?: string;
   video_url?: string;
-  engagement_data?: any;
+  engagement_data?: Record<string, unknown>;
   publication?: Publication;
   campaign?: { id: number; name: string };
 };
@@ -191,7 +191,7 @@ export type SocialAccount = {
   is_active: boolean;
   last_failed_at: string;
   failure_count: number;
-  account_metadata: any;
+  account_metadata: Record<string, unknown>;
 };
 
 export type MediaFile = {
@@ -210,7 +210,7 @@ export type MediaFile = {
     duration?: number;
     width?: number;
     height?: number;
-    [key: string]: any;
+    [key: string]: unknown;
   };
   derivatives?: Array<{
     id: number;
@@ -218,7 +218,7 @@ export type MediaFile = {
     file_type: string;
     file_path: string;
     mime_type?: string;
-    [key: string]: any;
+    [key: string]: unknown;
   }>;
   thumbnail?: {
     id: number;

@@ -5,9 +5,9 @@ export interface OptimisticOperation {
   type: 'create' | 'update' | 'delete';
   resource: string;
   resourceId?: string | number;
-  optimisticData: any;
-  originalData: any | null;
-  request: Promise<any>;
+  optimisticData: unknown;
+  originalData: unknown | null;
+  request: Promise<unknown>;
   status: 'pending' | 'success' | 'failed' | 'rolled_back';
   timestamp: number;
   completedAt?: number;
@@ -16,9 +16,9 @@ export interface OptimisticOperation {
   error?: {
     message: string;
     code?: string;
-    details?: any;
+    details?: unknown;
   };
-  onSuccess?: (data: any) => void;
+  onSuccess?: (data: unknown) => void;
   onError?: (error: Error) => void;
   onRollback?: () => void;
 }
@@ -28,7 +28,7 @@ export interface OptimisticState {
   failedOperations: OptimisticOperation[];
   isOnline: boolean;
   addOperation: (operation: OptimisticOperation) => void;
-  confirmOperation: (id: string, serverData: any) => void;
+  confirmOperation: (id: string, serverData: unknown) => void;
   rollbackOperation: (id: string, error: Error) => void;
   getPendingOperations: (resource: string) => OptimisticOperation[];
   persist: () => void;
@@ -37,7 +37,7 @@ export interface OptimisticState {
 
 export interface OptimisticOptions {
   resource: string;
-  onSuccess?: (data: any) => void;
+  onSuccess?: (data: unknown) => void;
   onError?: (error: Error) => void;
   onRollback?: () => void;
   retryOnError?: boolean;
@@ -49,7 +49,7 @@ export interface QueuedOperation {
   url: string;
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   headers: Record<string, string>;
-  body?: any;
+  body?: unknown;
   resource: string;
   resourceId?: string | number;
   description: string;
@@ -84,7 +84,7 @@ export interface SyncOperation {
   id: string;
   url: string;
   method: string;
-  body: any;
+  body: unknown;
   headers: Record<string, string>;
   timestamp: number;
   retryCount: number;
@@ -92,7 +92,7 @@ export interface SyncOperation {
 
 export interface InterceptorConfig {
   optimistic?: boolean;
-  optimisticData?: any;
+  optimisticData?: unknown;
   resource?: string;
   rollbackOnError?: boolean;
 }
@@ -100,7 +100,7 @@ export interface InterceptorConfig {
 declare module 'axios' {
   export interface AxiosRequestConfig {
     optimistic?: boolean;
-    optimisticData?: any;
+    optimisticData?: unknown;
     resource?: string;
     rollbackOnError?: boolean;
   }

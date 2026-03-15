@@ -1,12 +1,10 @@
-/// <reference types="react" />
-/// <reference types="react-dom" />
-
 import 'react';
+import 'react-dom';
 
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      [elemName: string]: any;
+      [elemName: string]: unknown;
     }
   }
 }

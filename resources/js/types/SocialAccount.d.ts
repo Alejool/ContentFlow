@@ -7,7 +7,7 @@ export interface SocialAccount {
   account_metadata?: {
     avatar?: string;
     username?: string;
-    [key: string]: any;
+    [key: string]: unknown;
   };
   user?: {
     id: number;

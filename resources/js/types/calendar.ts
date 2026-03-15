@@ -37,7 +37,7 @@ export interface CalendarEvent {
     remind_at?: string;
     is_public?: boolean;
     user_name?: string;
-    [key: string]: any;
+    [key: string]: unknown;
   };
 }
 
