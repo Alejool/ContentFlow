@@ -1,24 +1,20 @@
-import { ref, watch } from 'vue';
-
 /**
- * Debounce composable for preventing multiple rapid function calls
- * Useful for API requests, search inputs, and button clicks
- * 
+ * Debounce utility - prevents multiple rapid function calls
+ *
  * @param {Function} fn - Function to debounce
  * @param {Number} delay - Delay in milliseconds (default: 300ms)
- * @returns {Object} - Debounced function and state
+ * @returns {Object} - { debouncedFn, cancel }
  */
 export function useDebounce(fn, delay = 300) {
-  const isDebouncing = ref(false);
   let timeoutId = null;
+  let isDebouncing = false;
 
   const debouncedFn = (...args) => {
-    if (isDebouncing.value) {
-      return Promise.reject(new Error('Request is being debounced'));
+    if (isDebouncing) {
+      return Promise.reject(new Error("Request is being debounced"));
     }
 
-    isDebouncing.value = true;
-
+    isDebouncing = true;
     clearTimeout(timeoutId);
 
     return new Promise((resolve, reject) => {
@@ -29,7 +25,7 @@ export function useDebounce(fn, delay = 300) {
         } catch (error) {
           reject(error);
         } finally {
-          isDebouncing.value = false;
+          isDebouncing = false;
         }
       }, delay);
     });
@@ -37,49 +33,40 @@ export function useDebounce(fn, delay = 300) {
 
   const cancel = () => {
     clearTimeout(timeoutId);
-    isDebouncing.value = false;
+    isDebouncing = false;
   };
 
-  return {
-    debouncedFn,
-    isDebouncing,
-    cancel,
-  };
+  return { debouncedFn, cancel };
 }
 
 /**
- * Debounce for reactive values
- * Useful for search inputs that trigger API calls
- * 
- * @param {Ref} value - Reactive value to watch
+ * Debounce for input values - executes callback after user stops typing
+ *
  * @param {Function} callback - Callback to execute
  * @param {Number} delay - Delay in milliseconds
+ * @returns {Object} - { handler, cancel }
  */
-export function useDebouncedRef(value, callback, delay = 300) {
+export function useDebouncedInput(callback, delay = 300) {
   let timeoutId = null;
 
-  watch(value, (newValue) => {
+  const handler = (value) => {
     clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => {
-      callback(newValue);
-    }, delay);
-  });
-
-  return {
-    cancel: () => clearTimeout(timeoutId),
+    timeoutId = setTimeout(() => callback(value), delay);
   };
+
+  const cancel = () => clearTimeout(timeoutId);
+
+  return { handler, cancel };
 }
 
 /**
- * Throttle composable for rate limiting function calls
- * Ensures function is called at most once per interval
- * 
+ * Throttle utility - rate limits function calls
+ *
  * @param {Function} fn - Function to throttle
  * @param {Number} interval - Minimum interval between calls in ms
- * @returns {Object} - Throttled function and state
+ * @returns {Object} - { throttledFn }
  */
 export function useThrottle(fn, interval = 1000) {
-  const isThrottled = ref(false);
   let lastCallTime = 0;
 
   const throttledFn = (...args) => {
@@ -87,25 +74,15 @@ export function useThrottle(fn, interval = 1000) {
     const timeSinceLastCall = now - lastCallTime;
 
     if (timeSinceLastCall < interval) {
-      const remainingTime = interval - timeSinceLastCall;
-
+      const remaining = interval - timeSinceLastCall;
       return Promise.reject(
-        new Error(`Please wait ${Math.ceil(remainingTime / 1000)} seconds before trying again`)
+        new Error(`Please wait ${Math.ceil(remaining / 1000)} seconds before trying again`)
       );
     }
 
-    isThrottled.value = true;
     lastCallTime = now;
-
-    return Promise.resolve(fn(...args)).finally(() => {
-      setTimeout(() => {
-        isThrottled.value = false;
-      }, interval);
-    });
+    return Promise.resolve(fn(...args));
   };
 
-  return {
-    throttledFn,
-    isThrottled,
-  };
+  return { throttledFn };
 }

@@ -8,7 +8,10 @@
     "test": "vitest",
     "format": "prettier --write \"resources/js/**/*.{js,ts,tsx,jsx,json,css}\"",
     "format:check": "prettier --check \"resources/js/**/*.{js,ts,tsx,jsx,json,css}\"",
-    "format:all": "prettier --write \"resources/**/*.{js,ts,tsx,jsx,json,css,blade.php}\""
+    "format:all": "prettier --write \"resources/**/*.{js,ts,tsx,jsx,json,css,blade.php}\"",
+    "lint": "eslint resources/js --ext .ts,.tsx",
+    "lint:fix": "eslint resources/js --ext .ts,.tsx --fix",
+    "type-check": "tsc --noEmit"
   },
   "devDependencies": {
     "@headlessui/react": "^2.2.4",
@@ -43,7 +46,7 @@
     "tailwindcss": "^3.2.1",
     "typescript": "^5.8.3",
     "vite": "^6.0.11",
-    "vite-plugin-pwa": "^0.19.8",
+    "vite-plugin-pwa": "^1.2.0",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^4.0.18",
     "workbox-core": "^7.4.0",
