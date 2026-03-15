@@ -36,6 +36,16 @@ export function UnifiedAvatar({
 }: UnifiedAvatarProps) {
   const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+
+  // Si la imagen tarda más de 5s, caer a iniciales
+  const handleImageRef = (img: HTMLImageElement | null) => {
+    if (!img) return;
+    const timer = setTimeout(() => {
+      if (!imageLoaded) setImageError(true);
+    }, 5000);
+    img.addEventListener("load", () => clearTimeout(timer), { once: true });
+    img.addEventListener("error", () => clearTimeout(timer), { once: true });
+  };
   const sizeClasses = {
     xs: "w-6 h-6 text-[10px]",
     sm: "w-8 h-8 text-xs",
@@ -69,24 +79,19 @@ export function UnifiedAvatar({
     if (src && !imageError) {
       return (
         <>
-          {/* Loader mientras carga */}
+          {/* Skeleton shimmer mientras carga */}
           {!imageLoaded && (
-            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary-500 to-primary-600 animate-pulse">
-              <div className={`border-2 border-white/30 border-t-white rounded-full animate-spin ${
-                size === "xs" ? "w-3 h-3" :
-                size === "sm" ? "w-4 h-4" :
-                size === "md" ? "w-5 h-5" :
-                size === "lg" ? "w-6 h-6" :
-                size === "xl" ? "w-8 h-8" : "w-10 h-10"
-              }`}></div>
+            <div className="absolute inset-0 overflow-hidden bg-gray-200 dark:bg-neutral-700">
+              <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.4s_infinite] bg-gradient-to-r from-transparent via-white/40 dark:via-white/10 to-transparent" />
             </div>
           )}
-          
+
           {/* Imagen con lazy loading */}
           <img
             src={src}
             alt={name}
             loading={loading}
+            ref={handleImageRef}
             className={`w-full h-full object-cover transition-opacity duration-300 ${
               imageLoaded ? "opacity-100" : "opacity-0"
             }`}
