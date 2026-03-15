@@ -4,8 +4,7 @@
  * Shows a notification when a new service worker version is available
  */
 
-import React from 'react';
-import { useServiceWorker } from '../hooks/useServiceWorker';
+import { useServiceWorker } from '../Hooks/useServiceWorker';
 
 export function ServiceWorkerUpdate() {
   const { hasUpdate, updateServiceWorker } = useServiceWorker();
