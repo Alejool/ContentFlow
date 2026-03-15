@@ -17,10 +17,7 @@ import { useWorkspaceLocks } from "@/Hooks/usePublicationLock";
 import { useSidebarState } from "@/Hooks/useSidebarState";
 import { useTheme } from "@/Hooks/useTheme";
 import { initNotificationRealtime } from "@/Services/notificationRealtime";
-import {
-  cleanupProgressRealtime,
-  initProgressRealtime,
-} from "@/Services/progressRealtime";
+import { cleanupProgressRealtime, initProgressRealtime } from "@/Services/progressRealtime";
 import { cssPropertiesManager } from "@/Utils/CSSCustomPropertiesManager";
 import { useNotificationStore } from "@/stores/notificationStore";
 import { useUploadQueue } from "@/stores/uploadQueueStore";
@@ -35,9 +32,7 @@ import { ReactNode, lazy, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 // Lazy load OnboardingFlow to reduce initial bundle size
-const OnboardingFlow = lazy(
-  () => import("@/Components/Onboarding/OnboardingFlow"),
-);
+const OnboardingFlow = lazy(() => import("@/Components/Onboarding/OnboardingFlow"));
 
 interface AuthenticatedLayoutProps {
   header?: ReactNode;
@@ -51,17 +46,13 @@ interface User {
   [key: string]: any;
 }
 
-export default function AuthenticatedLayout({
-  header,
-  children,
-}: AuthenticatedLayoutProps) {
+export default function AuthenticatedLayout({ header, children }: AuthenticatedLayoutProps) {
   const { t } = useTranslation();
   const { props } = usePage();
   const auth = props.auth as any;
   const user = auth?.user as User;
 
-  const [showingNavigationDropdown, setShowingNavigationDropdown] =
-    useState<boolean>(false);
+  const [showingNavigationDropdown, setShowingNavigationDropdown] = useState<boolean>(false);
   const [isSidebarOpen, setIsSidebarOpen] = useSidebarState(true);
   const [showShortcutsModal, setShowShortcutsModal] = useState<boolean>(false);
 
@@ -84,9 +75,7 @@ export default function AuthenticatedLayout({
   // Extract onboarding props
   const onboardingState = props.onboarding as OnboardingState | undefined;
   const tourSteps = props.tourSteps as TourStep[] | undefined;
-  const availablePlatforms = props.availablePlatforms as
-    | SocialPlatform[]
-    | undefined;
+  const availablePlatforms = props.availablePlatforms as SocialPlatform[] | undefined;
   const connectedAccounts = props.connectedAccounts as
     | Array<{ platform: string; account_name: string }>
     | undefined;
@@ -95,9 +84,7 @@ export default function AuthenticatedLayout({
   // Determine if onboarding should be shown
   // Only show onboarding if user was created recently (within 7 days) and hasn't completed it
   const isRecentUser = user?.created_at
-    ? (new Date().getTime() - new Date(user.created_at).getTime()) /
-        (1000 * 60 * 60 * 24) <=
-      7
+    ? (new Date().getTime() - new Date(user.created_at).getTime()) / (1000 * 60 * 60 * 24) <= 7
     : false;
   const shouldShowOnboarding =
     user && onboardingState && !onboardingState.completedAt && isRecentUser;
@@ -106,19 +93,10 @@ export default function AuthenticatedLayout({
   useEffect(() => {
     if (user) {
       const isRecentUser = user?.created_at
-        ? (new Date().getTime() - new Date(user.created_at).getTime()) /
-            (1000 * 60 * 60 * 24) <=
-          7
+        ? (new Date().getTime() - new Date(user.created_at).getTime()) / (1000 * 60 * 60 * 24) <= 7
         : false;
     }
-  }, [
-    user,
-    onboardingState,
-    tourSteps,
-    availablePlatforms,
-    templates,
-    shouldShowOnboarding,
-  ]);
+  }, [user, onboardingState, tourSteps, availablePlatforms, templates, shouldShowOnboarding]);
 
   useEffect(() => {
     if (user?.id) {
@@ -144,8 +122,7 @@ export default function AuthenticatedLayout({
     cssPropertiesManager.applyPrimaryColor(color);
 
     // Dynamically update favicon
-    const faviconUrl =
-      auth?.current_workspace?.white_label_favicon_url || "/favicon.ico";
+    const faviconUrl = auth?.current_workspace?.white_label_favicon_url || "/favicon.ico";
 
     // Find all icon links (icon, shortcut icon, apple-touch-icon)
     const existingLinks = document.querySelectorAll("link[rel*='icon']");
@@ -191,16 +168,13 @@ export default function AuthenticatedLayout({
         {props.maintenanceMode && props.maintenanceBanner ? (
           <MaintenanceBanner message={String(props.maintenanceBanner)} />
         ) : null}
-        <div className="flex flex-col overflow-hidden w-full max-w-full">
-          <div className="relative flex-1 min-h-0 flex w-full max-w-full min-w-0 overflow-x-hidden">
+        <div className="flex w-full max-w-full flex-col overflow-hidden">
+          <div className="relative flex min-h-0 w-full min-w-0 max-w-full flex-1 overflow-x-hidden">
             <div className="absolute inset-0 bg-white dark:bg-neutral-900" />
 
-            <Sidebar
-              isSidebarOpen={isSidebarOpen}
-              setIsSidebarOpen={setIsSidebarOpen}
-            />
+            <Sidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
 
-            <div className="flex-1 flex flex-col min-h-0 min-w-0 max-w-full relative z-5">
+            <div className="z-5 relative flex min-h-0 min-w-0 max-w-full flex-1 flex-col">
               <MobileNavbar
                 user={user}
                 showingNavigationDropdown={showingNavigationDropdown}
@@ -208,34 +182,30 @@ export default function AuthenticatedLayout({
               />
 
               <main
-                className={`flex-1 min-w-0 max-w-full overflow-y-auto overflow-x-hidden transition-all duration-500  ease-in-out ${
+                className={`min-w-0 max-w-full flex-1 overflow-y-auto overflow-x-hidden transition-all duration-500 ease-in-out ${
                   isSidebarOpen ? "lg:ml-80" : "lg:ml-32"
                 }`}
                 role="main"
                 aria-label="Main content"
               >
-                <header
-                  className="border-b border-gray-200/50
-                dark:border-neutral-800 bg-white/80 dark:bg-black/80
-                backdrop-blur-xl z-40 min-w-0 sticky top-0 flex flex-col"
-                >
+                <header className="sticky top-0 z-40 flex min-w-0 flex-col border-b border-gray-200/50 bg-white/80 backdrop-blur-xl dark:border-neutral-800 dark:bg-black/80">
                   {!route().current("workspaces.*") && (
                     <div className="w-full">
                       <ActiveWorkspace />
                     </div>
                   )}
 
-                  <div className="hidden lg:flex mx-auto w-full max-w-7xl px-4 md:px-6 py-3 md:py-4 justify-between items-center gap-4 min-w-0">
-                    <div className="flex-1 min-w-0 flex items-center gap-4">
+                  <div className="mx-auto hidden w-full min-w-0 max-w-7xl items-center justify-between gap-4 px-4 py-3 md:px-6 md:py-4 lg:flex">
+                    <div className="flex min-w-0 flex-1 items-center gap-4">
                       <div className="hidden lg:block">
                         <SearchButton />
                       </div>
                     </div>
-                    <div className="flex-shrink-0 min-w-0 flex items-center gap-3">
-                      <div className="hidden md:flex items-center gap-2">
-                        <div className="h-6 w-px bg-gray-200 dark:bg-neutral-800 mx-1"></div>
+                    <div className="flex min-w-0 flex-shrink-0 items-center gap-3">
+                      <div className="hidden items-center gap-2 md:flex">
+                        <div className="mx-1 h-6 w-px bg-gray-200 dark:bg-neutral-800"></div>
                         <NotificationButton />
-                        <div className="h-6 w-px bg-gray-200 dark:bg-neutral-800 mx-1"></div>
+                        <div className="mx-1 h-6 w-px bg-gray-200 dark:bg-neutral-800"></div>
                         <ProfileDropdown
                           user={user}
                           isProfileActive={!!route().current("profile.edit")}
@@ -245,14 +215,14 @@ export default function AuthenticatedLayout({
                   </div>
 
                   {header && (
-                    <div className="mx-auto w-full max-w-7xl px-4 md:px-6 py-4 ">
+                    <div className="mx-auto w-full max-w-7xl px-4 py-4 md:px-6">
                       <div className="min-w-0">{header}</div>
                     </div>
                   )}
                 </header>
 
-                <div className="flex-1 min-h-0 min-w-0">
-                  <div className=" min-w-0">{children}</div>
+                <div className="min-h-0 min-w-0 flex-1">
+                  <div className="min-w-0">{children}</div>
                 </div>
               </main>
             </div>
@@ -289,19 +259,13 @@ export default function AuthenticatedLayout({
             </div>
           )}
           {shouldShowOnboarding && !tourSteps && (
-            <div style={{ display: "none" }}>
-              OnboardingFlow not showing: no tourSteps
-            </div>
+            <div style={{ display: "none" }}>OnboardingFlow not showing: no tourSteps</div>
           )}
           {shouldShowOnboarding && !availablePlatforms && (
-            <div style={{ display: "none" }}>
-              OnboardingFlow not showing: no availablePlatforms
-            </div>
+            <div style={{ display: "none" }}>OnboardingFlow not showing: no availablePlatforms</div>
           )}
           {shouldShowOnboarding && !templates && (
-            <div style={{ display: "none" }}>
-              OnboardingFlow not showing: no templates
-            </div>
+            <div style={{ display: "none" }}>OnboardingFlow not showing: no templates</div>
           )}
         </div>
       </OnboardingProvider>

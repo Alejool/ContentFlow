@@ -29,28 +29,22 @@ export default function GuestLayout({ children, section }: GuestLayoutProps) {
     <div>
       {section !== "login" && <ReturnToLogin />}
       <ThemeLanguageContainer />
-      <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
-        <div className="w-full lg:w-1/2 bg-primary-500 relative overflow-hidden">
+      <div className="flex min-h-screen flex-col bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 lg:flex-row">
+        <div className="relative w-full overflow-hidden bg-primary-500 lg:w-1/2">
           <div className="absolute inset-0 bg-black/10" />
-          <div className="relative h-full flex flex-col items-center justify-center p-8 text-white">
-            <div className="text-center max-w-xl">
+          <div className="relative flex h-full flex-col items-center justify-center p-8 text-white">
+            <div className="max-w-xl text-center">
               <div className="mb-8">
-                <img
-                  src={Logo}
-                  alt="ContentFlow logo"
-                  className="w-36 h-36 mx-auto"
-                />
-                <h1 className="text-4xl font-bold  mb-4">
+                <img src={Logo} alt="ContentFlow logo" className="mx-auto h-36 w-36" />
+                <h1 className="mb-4 text-4xl font-bold">
                   {section
                     ? t(`auth.${section}.welcome`, {
                         defaultValue: t(`auth.${section}.title`),
                       })
                     : t("auth.login.welcome")}
                 </h1>
-                <p className="text-lg opacity-90 mb-8">
-                  {section
-                    ? t(`auth.${section}.subtitle`)
-                    : t("auth.login.subtitle")}
+                <p className="mb-8 text-lg opacity-90">
+                  {section ? t(`auth.${section}.subtitle`) : t("auth.login.subtitle")}
                 </p>
               </div>
 
