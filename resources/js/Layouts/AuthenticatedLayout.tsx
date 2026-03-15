@@ -15,6 +15,7 @@ import { OnboardingProvider } from '@/Contexts/OnboardingContext';
 import { useCompletionNotifications } from '@/Hooks/useCompletionNotifications';
 import { useWorkspaceLocks } from '@/Hooks/usePublicationLock';
 import { useSidebarState } from '@/Hooks/useSidebarState';
+import { useStickyOnScroll } from '@/Hooks/useStickyOnScroll';
 import { useTheme } from '@/Hooks/useTheme';
 import { initNotificationRealtime } from '@/Services/notificationRealtime';
 import { cleanupProgressRealtime, initProgressRealtime } from '@/Services/progressRealtime';
@@ -58,6 +59,9 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
 
   const { theme, actualTheme } = useTheme();
   useWorkspaceLocks();
+
+  // Activar sticky después del 50% del scroll solo en móvil
+  const isHeaderSticky = useStickyOnScroll({ threshold: 50, enabled: true });
 
   // Initialize completion notifications monitoring
   // Requirements: 8.1, 8.2, 8.3, 8.4, 8.5
@@ -187,7 +191,7 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
                 role="main"
                 aria-label="Main content"
               >
-                <header className="fixed top-0 z-40 flex min-w-0 flex-col border-b border-gray-200/50 bg-white/80 backdrop-blur-xl dark:border-neutral-800 dark:bg-black/80">
+                <header className={`${isHeaderSticky ? 'sticky top-0' : 'relative'} z-40 flex min-w-0 flex-col border-b border-gray-200/50 bg-white/80 backdrop-blur-xl transition-all duration-300 dark:border-neutral-800 dark:bg-black/80 lg:sticky lg:top-0`}>
                   {!route().current('workspaces.*') && (
                     <div className="w-full">
                       <ActiveWorkspace />

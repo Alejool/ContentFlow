@@ -1,5 +1,6 @@
 import Logo from '@/../assets/logo-with-name-1024.png';
 import ResponsiveNavLink from '@/Components/common/ui/ResponsiveNavLink';
+import { useStickyOnScroll } from '@/Hooks/useStickyOnScroll';
 import { useTheme } from '@/Hooks/useTheme';
 import { usePage } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -125,9 +126,12 @@ export default function MobileNavbar({
     return true;
   });
 
+  // Activar sticky después del 50% del scroll solo en móvil
+  const isSticky = useStickyOnScroll({ threshold: 50, enabled: true });
+
   return (
     <nav
-      className={`sticky top-0 z-50 w-full shadow-lg backdrop-blur-2xl transition-all duration-300 lg:hidden ${
+      className={`${isSticky ? 'sticky top-0' : 'relative'} z-50 w-full shadow-lg backdrop-blur-2xl transition-all duration-300 lg:hidden ${
         actualTheme === 'dark'
           ? 'border-b border-neutral-800 bg-neutral-900/90'
           : 'border-b border-gray-200 bg-white/90'
