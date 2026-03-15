@@ -184,7 +184,7 @@ export default defineConfig({
                             return 'vendor-forms';
                         }
                         // Date libraries
-                        if (id.includes('date-fns') || id.includes('react-datepicker')) {
+                        if (id.includes('date-fns') || id.includes('react-datepicker') || id.includes('react-aria') || id.includes('@internationalized') || id.includes('@react-aria') || id.includes('@react-stately')) {
                             return 'vendor-dates';
                         }
                         // i18n
