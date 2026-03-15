@@ -55,6 +55,7 @@
       "submittedBy": "Submitted by",
       "submittedAt": "Submitted At",
       "status": "Status",
+      "currentReviewer": "Current Reviewer",
       "completedBy": "Completed by",
       "actions": "Actions",
       "requestedBy": "Requested by",

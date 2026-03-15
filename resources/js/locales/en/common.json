@@ -15,6 +15,7 @@
     "inactive":"Inactive",
     "available":"Available",
     "name": "Name",
+    "type": "Type",
     "progress": "Progress",
     "dismiss": "Dismiss",
     "never":"Never",

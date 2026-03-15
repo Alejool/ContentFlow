@@ -58,6 +58,7 @@
       "submittedBy": "Enviado por",
       "submittedAt": "Fecha de Envío",
       "status": "Estado",
+      "currentReviewer": "Revisor Actual",
       "completedBy": "Completado por",
       "actions": "Acciones",
       "requestedBy": "Solicitado por",

@@ -106,8 +106,9 @@ class PlanFeatureTransitionTest extends TestCase
         // Verificar que el workflow fue convertido
         $workflow->refresh();
         $this->assertFalse($workflow->is_multi_level);
-        $this->assertFalse($workflow->is_enabled);
-        $this->assertFalse($workflow->is_active);
+        $this->assertTrue($workflow->was_multi_level); // ✅ Nuevo: debe guardar que era multinivel
+        $this->assertTrue($workflow->is_enabled); // ✅ Nuevo: debe mantener el workflow activo
+        $this->assertTrue($workflow->is_active); // ✅ Nuevo: debe mantener el workflow activo
 
         // Verificar que solo queda 1 nivel
         $this->assertEquals(1, $workflow->levels()->count());
@@ -143,6 +144,92 @@ class PlanFeatureTransitionTest extends TestCase
 
         // No debe haber cambios en approval_workflows
         $this->assertEmpty($changes);
+    }
+
+    /** @test */
+    public function it_restores_multilevel_when_upgrading_to_advanced_if_it_was_multilevel_before()
+    {
+        // Crear un workflow multinivel
+        $workflow = ApprovalWorkflow::create([
+            'workspace_id' => $this->workspace->id,
+            'is_enabled' => true,
+            'is_active' => true,
+            'is_multi_level' => true,
+        ]);
+
+        // Crear 2 niveles
+        ApprovalLevel::create([
+            'approval_workflow_id' => $workflow->id,
+            'level_number' => 1,
+            'role_id' => 1,
+        ]);
+
+        ApprovalLevel::create([
+            'approval_workflow_id' => $workflow->id,
+            'level_number' => 2,
+            'role_id' => 2,
+        ]);
+
+        // Paso 1: Downgrade de Enterprise a Professional (advanced → basic)
+        $this->service->handlePlanTransition(
+            $this->workspace,
+            'enterprise',
+            'professional'
+        );
+
+        $workflow->refresh();
+        $this->assertFalse($workflow->is_multi_level);
+        $this->assertTrue($workflow->was_multi_level);
+        $this->assertTrue($workflow->is_enabled); // Debe seguir activo
+
+        // Paso 2: Upgrade de Professional a Enterprise (basic → advanced)
+        $changes = $this->service->handlePlanTransition(
+            $this->workspace,
+            'professional',
+            'enterprise'
+        );
+
+        // Verificar que el workflow fue restaurado a multinivel
+        $workflow->refresh();
+        $this->assertTrue($workflow->is_multi_level); // ✅ Debe restaurar multinivel
+        $this->assertTrue($workflow->was_multi_level); // ✅ Debe mantener el flag
+        $this->assertTrue($workflow->is_enabled); // ✅ Debe seguir activo
+
+        // Verificar que se registraron los cambios
+        $this->assertArrayHasKey('approval_workflows', $changes);
+        $this->assertEquals('upgraded_to_advanced', $changes['approval_workflows']['action']);
+        $this->assertArrayHasKey('workflows_restored', $changes['approval_workflows']);
+    }
+
+    /** @test */
+    public function it_does_not_restore_multilevel_when_upgrading_if_it_was_never_multilevel()
+    {
+        // Crear un workflow simple (nunca fue multinivel)
+        $workflow = ApprovalWorkflow::create([
+            'workspace_id' => $this->workspace->id,
+            'is_enabled' => true,
+            'is_active' => true,
+            'is_multi_level' => false,
+            'was_multi_level' => false,
+        ]);
+
+        // Simular upgrade de Professional a Enterprise
+        $changes = $this->service->handlePlanTransition(
+            $this->workspace,
+            'professional',
+            'enterprise'
+        );
+
+        // Verificar que el workflow NO fue convertido a multinivel
+        $workflow->refresh();
+        $this->assertFalse($workflow->is_multi_level); // ✅ Debe seguir siendo simple
+        $this->assertFalse($workflow->was_multi_level);
+        $this->assertTrue($workflow->is_enabled);
+
+        // No debe haber cambios en approval_workflows (o debe estar vacío workflows_restored)
+        if (isset($changes['approval_workflows'])) {
+            $this->assertEmpty($changes['approval_workflows']['workflows_restored'] ?? []);
+        }
     }
 
     /** @test */

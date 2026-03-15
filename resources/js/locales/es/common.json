@@ -16,6 +16,7 @@
     "paused": "Pausada",
     "available":"Disponible",
     "name": "Nombre",
+    "type": "Tipo",
     "confirm": "Confirmar",
     "progress": "Progreso",
     "dismiss": "Descartar",
