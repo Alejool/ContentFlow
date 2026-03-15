@@ -1,5 +1,5 @@
 import { Badge } from '@/Components/ui/badge';
-import { Button } from '@/Components/ui/button';
+import Button from '@/Components/common/Modern/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Progress } from '@/Components/ui/progress';
 import { useProcessingProgress } from '@/stores/processingProgressStore';
@@ -45,6 +45,7 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
     if (totalActive > 0 || totalFailed > 0) {
       setIsExpanded(true);
     }
+    return undefined;
   }, [totalActive, totalFailed]);
 
   // Auto-collapse after all uploads complete (with delay)
@@ -55,6 +56,7 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
       }, 3000);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [totalActive, totalFailed, totalCompleted]);
 
   if (uploads.length === 0 && processingJobs.length === 0) {
@@ -151,7 +153,7 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
             variant="ghost"
             size="sm"
             className="h-6 w-6 p-0"
-            onClick={(e) => {
+            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
               e.stopPropagation();
               setIsExpanded(!isExpanded);
             }}
@@ -194,7 +196,7 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
                 <div className="mt-2 flex justify-end gap-1">
                   {upload.isPausable && upload.status === 'uploading' && (
                     <Button
-                      variant="outline"
+                      buttonStyle="outline" variant="secondary"
                       size="sm"
                       onClick={() => {
                         /* TODO: implement pause */
@@ -203,7 +205,7 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
                       Pause
                     </Button>
                   )}
-                  <Button variant="outline" size="sm" onClick={() => handleCancel(upload.id)}>
+                  <Button buttonStyle="outline" variant="secondary" size="sm" onClick={() => handleCancel(upload.id)}>
                     Cancel
                   </Button>
                 </div>
@@ -227,12 +229,12 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
 
                 <div className="flex justify-end gap-1">
                   {upload.canRetry && (
-                    <Button variant="outline" size="sm" onClick={() => handleRetry(upload.id)}>
+                    <Button buttonStyle="outline" variant="secondary" size="sm" onClick={() => handleRetry(upload.id)}>
                       <RotateCcw className="mr-1 h-3 w-3" />
                       Retry
                     </Button>
                   )}
-                  <Button variant="outline" size="sm" onClick={() => handleRemove(upload.id)}>
+                  <Button buttonStyle="outline" variant="secondary" size="sm" onClick={() => handleRemove(upload.id)}>
                     Remove
                   </Button>
                 </div>

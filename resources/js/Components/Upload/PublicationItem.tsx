@@ -28,7 +28,7 @@ export function PublicationItem({
     const published = platforms.filter((p) => p.status === 'published').length;
     const failed = platforms.filter((p) => p.status === 'failed').length;
     const publishing = platforms.filter(
-      (p) => p.status === 'publishing' || p.status === 'pending' || p.status === 'retrying',
+      (p) => (p.status as string) === 'publishing' || (p.status as string) === 'pending' || (p.status as string) === 'retrying',
     ).length;
 
     return { total, published, failed, publishing };
@@ -154,7 +154,7 @@ export function PublicationItem({
         </div>
       </div>
 
-      <PlatformProgress publication={publication} onCancelPlatform={onCancelPlatform} />
+      <PlatformProgress publication={publication} {...(onCancelPlatform ? { onCancelPlatform } : {})} />
     </div>
   );
 }
