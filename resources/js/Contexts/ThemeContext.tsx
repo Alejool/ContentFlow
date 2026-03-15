@@ -174,9 +174,21 @@ export function ThemeProvider({
       }
     };
 
+    // Listen for theme change events from command palette
+    const handleSetTheme = (event: CustomEvent<{ theme: Theme }>) => {
+      setTheme(event.detail.theme);
+      setShowThemeToast(true);
+      setTimeout(() => setShowThemeToast(false), 2000);
+    };
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isInitialized, toggleTheme]);
+    window.addEventListener('set-theme', handleSetTheme as EventListener);
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('set-theme', handleSetTheme as EventListener);
+    };
+  }, [isInitialized, toggleTheme, setTheme]);
 
   const getThemeLabel = (themeValue: Theme): string => {
     return t(`common.theme.${themeValue}`) || themeValue;
