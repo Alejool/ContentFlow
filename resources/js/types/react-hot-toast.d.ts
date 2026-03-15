@@ -1,17 +1,3 @@
-/// <reference types="react-hot-toast" />
+// react-hot-toast type augmentation — no overrides, use package types as-is
+export { };
 
-declare module 'react-hot-toast' {
-  export * from 'react-hot-toast';
-
-  export function success(arg0: string, p0: { id: string }) {
-    throw new Error('Function not implemented.');
-  }
-
-  export function error(arg0: string, p0: { id: string }) {
-    throw new Error('Function not implemented.');
-  }
-
-  export function loading(arg0: string, arg1: { id: string }) {
-    throw new Error('Function not implemented.');
-  }
-}
