@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import AddonUsageDisplay from './AddonUsageDisplay';
 
 interface AddonSummary {
@@ -20,7 +20,7 @@ interface AddonsSummaryData {
   };
   plan_info: {
     current_plan: string;
-    limits: any;
+    limits: Record<string, number | boolean | null>;
     plan_started_at?: string;
   };
 }
