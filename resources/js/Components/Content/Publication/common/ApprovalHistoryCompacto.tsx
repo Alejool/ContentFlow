@@ -2,11 +2,21 @@ import ApprovalHistorySection from '@/Components/Content/Publication/common/edit
 import { AlertCircle, CheckCircle, ChevronDown, ChevronUp, Shield } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+interface ApprovalLog {
+  action: string;
+  created_at: string;
+  [key: string]: unknown;
+}
+
+interface ApprovalWorkflow {
+  [key: string]: unknown;
+}
+
 interface ApprovalHistoryCompactoProps {
-  logs: any[];
+  logs: ApprovalLog[];
   isExpanded: boolean;
   onToggle: () => void;
-  workflow?: any;
+  workflow?: ApprovalWorkflow;
   currentStepNumber?: number;
   approvalStatus?: 'pending' | 'approved' | 'rejected' | 'cancelled';
 }
@@ -39,7 +49,6 @@ const ApprovalHistoryCompacto = ({
   };
 
   const latestLog = getLatestApprovalStatus();
-  const stats = getApprovalStats();
   const totalLogs = logs.length;
 
   const getStatusColor = (status: string) => {

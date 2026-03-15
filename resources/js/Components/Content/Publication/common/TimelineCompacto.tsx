@@ -2,8 +2,14 @@ import PublicationTimeline from '@/Components/Content/Publication/common/edit/Pu
 import { ChevronDown, ChevronUp, History } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+interface TimelineActivity {
+  created_at: string;
+  status?: string;
+  [key: string]: unknown;
+}
+
 interface TimelineCompactoProps {
-  activities: any[];
+  activities: TimelineActivity[];
   isExpanded: boolean;
   onToggle: () => void;
 }

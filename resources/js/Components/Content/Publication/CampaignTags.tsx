@@ -1,12 +1,12 @@
-import React, { memo } from 'react';
 import { Publication } from '@/types/Publication';
+import { memo } from 'react';
 
 interface CampaignTagsProps {
   publication: Publication;
   t: (key: string) => string;
 }
 
-const CampaignTags = memo(({ publication, t }: CampaignTagsProps) => {
+const CampaignTags = memo(function CampaignTags({ publication, t }: CampaignTagsProps) {
   const campaigns = publication.campaigns || [];
 
   if (campaigns.length === 0) {

@@ -31,7 +31,7 @@ interface WorkspaceMember {
 
 interface CommentsSectionProps {
   publicationId: number;
-  currentUser: any;
+  currentUser: { id: number; current_workspace_id?: number };
 }
 
 export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionProps) => {
@@ -53,7 +53,7 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
         route('api.v1.workspaces.members', currentUser.current_workspace_id),
       );
       setMembers(response.data.members || []);
-    } catch (error) {}
+    } catch (_error) {}
   };
 
   const fetchComments = async () => {
@@ -61,7 +61,7 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
     try {
       const response = await axios.get(route('api.v1.publications.comments.index', publicationId));
       setComments(response.data);
-    } catch (error) {
+    } catch (_error) {
     } finally {
       setLoading(false);
     }
@@ -72,6 +72,7 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
       fetchComments();
       fetchMembers();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [publicationId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -100,7 +101,7 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
 
       setNewComment('');
       setReplyTo(null);
-    } catch (error) {
+    } catch (_error) {
       toast.error(t('publications.modal.comments.postError') || 'Failed to post comment');
     } finally {
       setSubmitting(false);
@@ -123,7 +124,7 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
       );
       setComments((prev) => prev.filter((c) => c.id !== commentToDelete));
       toast.success(t('publications.modal.comments.deleteSuccess') || 'Comment deleted');
-    } catch (error) {
+    } catch (_error) {
       toast.error(t('publications.modal.comments.deleteError') || 'Failed to delete comment');
     } finally {
       setCommentToDelete(null);
@@ -299,7 +300,7 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                handleSubmit(e as any);
+                void handleSubmit(e as unknown as React.FormEvent);
               }
             }}
             placeholder={t('publications.modal.comments.placeholder') || 'Write a comment...'}
@@ -310,7 +311,7 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
           />
           <Button
             type="button"
-            onClick={handleSubmit as any}
+            onClick={() => void handleSubmit({ preventDefault: () => {} } as React.FormEvent)}
             disabled={!newComment.trim() || submitting}
             variant="primary"
             buttonStyle="icon"

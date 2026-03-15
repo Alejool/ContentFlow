@@ -33,7 +33,7 @@ import toast from 'react-hot-toast';
 interface PublicationRowProps {
   item: Publication;
   t: (key: string) => string;
-  connectedAccounts: any[];
+  connectedAccounts: { id: number; platform: string; [key: string]: unknown }[];
   getStatusColor: (status?: string) => string;
   onEdit: (item: Publication) => void;
   onDelete: (id: number) => void;
@@ -58,7 +58,7 @@ interface PublicationRowProps {
 }
 
 const PublicationRow = memo(
-  ({
+  function PublicationRow({
     item,
     t,
     connectedAccounts,
@@ -72,7 +72,7 @@ const PublicationRow = memo(
     remoteLock,
     permissions,
     onPreviewMedia,
-  }: PublicationRowProps) => {
+  }: PublicationRowProps) {
     const {
       loadingStates,
       canManageContent,
@@ -83,8 +83,6 @@ const PublicationRow = memo(
       handleDuplicate,
       handleViewDetails,
       handleDelete,
-      isOwner,
-      hasWorkflow,
     } = usePublicationActions({
       onEdit,
       onDelete,
@@ -112,12 +110,18 @@ const PublicationRow = memo(
         <td className="">
           <div className="flex items-center gap-4">
             <div
+              role="button"
+              tabIndex={0}
               className="flex h-12 w-12 flex-shrink-0 cursor-zoom-in items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800"
               onClick={(e) => {
                 e.stopPropagation();
                 const hasMedia = item.media_files && item.media_files.length > 0;
                 if (hasMedia && onPreviewMedia) {
-                  const allMedia = (item.media_files || []).map((media: any) => {
+                  const allMedia = (item.media_files || []).map((media: {
+                    file_type?: string;
+                    file_path: string;
+                    thumbnail?: { file_path: string };
+                  }) => {
                     const isV = media.file_type?.includes('video');
                     let mUrl = media.thumbnail?.file_path || media.file_path;
 
@@ -141,8 +145,33 @@ const PublicationRow = memo(
                   onPreviewMedia(allMedia, 0);
                 }
               }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  const hasMedia = item.media_files && item.media_files.length > 0;
+                  if (hasMedia && onPreviewMedia) {
+                    const allMedia = (item.media_files || []).map((media: {
+                      file_type?: string;
+                      file_path: string;
+                      thumbnail?: { file_path: string };
+                    }) => {
+                      const isV = media.file_type?.includes('video');
+                      let mUrl = media.thumbnail?.file_path || media.file_path;
+                      if (!mUrl && media.file_type === 'image') mUrl = media.file_path;
+                      return {
+                        url: isV
+                          ? media.file_path.startsWith('http') ? media.file_path : `/storage/${media.file_path}`
+                          : mUrl.startsWith('http') ? mUrl : `/storage/${mUrl}`,
+                        type: (isV ? 'video' : 'image') as 'image' | 'video',
+                        title: item.title,
+                      };
+                    });
+                    onPreviewMedia(allMedia, 0);
+                  }
+                }
+              }}
             >
-              {(item as any).type === 'user_event' ? (
+              {(item as Publication & { type?: string }).type === 'user_event' ? (
                 <Calendar className="h-6 w-6 text-primary-500" />
               ) : (
                 <PublicationThumbnail publication={item} t={t} />
@@ -175,7 +204,7 @@ const PublicationRow = memo(
                   <div className="mt-1 flex flex-wrap gap-1">
                     {Object.entries(item.platform_settings)
                       .slice(0, 2)
-                      .map(([platform, settings]: [string, any]) => {
+                      .map(([platform, settings]: [string, { type?: string }]) => {
                         if (!settings || !settings.type) return null;
 
                         const typeLabel =
@@ -275,17 +304,17 @@ const PublicationRow = memo(
                   </span>
                 </div>
               )}
-              {((item as any).type === 'user_event' || item.scheduled_at) && (
+              {((item as Publication & { type?: string }).type === 'user_event' || item.scheduled_at) && (
                 <div className="mt-1 flex flex-col gap-0.5">
                   <div className="flex items-center gap-1.5">
                     <Calendar className="h-3 w-3 text-primary-500" />
                     <span className="text-[10px] font-bold uppercase tracking-tight text-primary-500">
-                      {(item as any).type === 'user_event'
+                      {(item as Publication & { type?: string }).type === 'user_event'
                         ? t('publications.table.manualEvent')
                         : t('publications.table.socialNetworkEvent')}
                     </span>
                   </div>
-                  {(item as any).type === 'user_event' && item.user && (
+                  {(item as Publication & { type?: string }).type === 'user_event' && item.user && (
                     <span className="ml-4 text-[9px] font-medium italic text-gray-500 dark:text-gray-400">
                       {t('publications.table.createdBy')}: {item.user.name}
                     </span>
@@ -377,7 +406,7 @@ const PublicationRow = memo(
               <>
                 {shouldShowPublish(item) ? (
                   <Button
-                    onClick={async (e) => {
+                    onClick={async (e: React.MouseEvent<HTMLButtonElement>) => {
                       e.stopPropagation();
                       await handlePublish(item);
                     }}
@@ -392,7 +421,7 @@ const PublicationRow = memo(
                   </Button>
                 ) : shouldShowSendToReview(item) ? (
                   <Button
-                    onClick={(e) => {
+                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                       e.stopPropagation();
                       handleSubmitForApproval(item);
                     }}
@@ -416,7 +445,7 @@ const PublicationRow = memo(
             {/* View Details button */}
             {(!canManageContent || item.status === 'published') && (
               <Button
-                onClick={(e) => {
+                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   e.stopPropagation();
                   handleViewDetails(item);
                 }}
@@ -432,10 +461,10 @@ const PublicationRow = memo(
             {/* Edit button */}
             {canManageContent && (
               <Button
-                onClick={(e) => {
+                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   e.stopPropagation();
                   if (remoteLock) {
-                    (toast.error as any)(
+                    toast.error(
                       `${t('publications.table.lockedBy') || 'Editando por'} ${lockedByName}`,
                     );
                     return;
@@ -462,7 +491,7 @@ const PublicationRow = memo(
             {/* Duplicate button */}
             {canManageContent && onDuplicate && (
               <Button
-                onClick={(e) => {
+                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   e.stopPropagation();
                   handleDuplicate(item.id);
                 }}
@@ -480,9 +509,9 @@ const PublicationRow = memo(
             {/* Delete button */}
             {canManageContent && (
               <Button
-                onClick={async (e) => {
+                onClick={async (e: React.MouseEvent<HTMLButtonElement>) => {
                   e.stopPropagation();
-                  const isUserEvent = (item as any).type === 'user_event';
+                  const isUserEvent = (item as Publication & { type?: string }).type === 'user_event';
                   await handleDelete(item, isUserEvent);
                 }}
                 disabled={isLoading?.publishing || isLoading?.editing || isLoading?.deleting}

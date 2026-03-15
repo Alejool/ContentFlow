@@ -1,17 +1,17 @@
+import { formatDateTimeStyled } from '@/Utils/dateHelpers';
 import {
-  AlertCircle,
-  Calendar,
-  CheckCheck,
-  CheckCircle,
-  Circle,
-  Clock,
-  FileText,
-  Loader2,
-  Shield,
-  XCircle,
+    AlertCircle,
+    Calendar,
+    CheckCheck,
+    CheckCircle,
+    Circle,
+    Clock,
+    FileText,
+    Loader2,
+    Shield,
+    XCircle
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { formatDateTimeStyled } from '@/Utils/dateHelpers';
 
 interface PublicationStatusTimelineProps {
   currentStatus: string;
@@ -25,7 +25,7 @@ interface PublicationStatusTimelineProps {
 interface StatusStep {
   key: string;
   label: string;
-  icon: any;
+  icon: LucideIcon;
   color: string;
   bgColor: string;
   borderColor: string;

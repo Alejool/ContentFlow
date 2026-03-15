@@ -7,12 +7,12 @@ import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
 import EmptyState from '@/Components/common/ui/EmptyState';
 import TableContainer from '@/Components/common/ui/TableContainer';
 import { Publication } from '@/types/Publication';
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 
 interface PublicationTableProps {
   items: Publication[];
   t: (key: string) => string;
-  connectedAccounts: any[];
+  connectedAccounts: { id: number; platform: string; [key: string]: unknown }[];
   onEdit: (item: Publication) => void;
   onDelete: (id: number) => void;
   onPublish: (item: Publication) => void;
@@ -21,7 +21,12 @@ interface PublicationTableProps {
   onDuplicate?: (id: number) => void;
   isLoading?: boolean;
   permissions?: string[];
-  pagination?: any;
+  pagination?: {
+    current_page: number;
+    last_page: number;
+    total: number;
+    per_page?: number;
+  };
   onPageChange?: (page: number) => void;
   onPerPageChange?: (perPage: number) => void;
   remoteLocks?: Record<number, { user_id: number; user_name: string; expires_at: string }>;
@@ -36,7 +41,7 @@ interface PublicationTableProps {
 }
 
 const PublicationTable = memo(
-  ({
+  function PublicationTable({
     items,
     t,
     connectedAccounts,
@@ -53,28 +58,18 @@ const PublicationTable = memo(
     onPerPageChange,
     remoteLocks = {},
     onPreviewMedia,
-  }: PublicationTableProps) => {
-    // remoteLocks is now passed as prop
-    const [scrollContainer, setScrollContainer] = useState<HTMLElement | undefined>(undefined);
+  }: PublicationTableProps) {
     const [smoothLoading, setSmoothLoading] = useState(isLoading);
 
     useEffect(() => {
-      if (isLoading) {
-        setSmoothLoading(true);
+      let timer: ReturnType<typeof setTimeout>;
+      if (!isLoading) {
+        timer = setTimeout(() => setSmoothLoading(false), 300);
       } else {
-        const timer = setTimeout(() => {
-          setSmoothLoading(false);
-        }, 300);
-        return () => clearTimeout(timer);
+        timer = setTimeout(() => setSmoothLoading(true), 0);
       }
+      return () => clearTimeout(timer);
     }, [isLoading]);
-
-    useEffect(() => {
-      const main = document.getElementsByTagName('main')[0];
-      if (main) {
-        setScrollContainer(main);
-      }
-    }, []);
 
     const getStatusColor = useCallback((status?: string) => {
       switch (status) {
@@ -98,32 +93,6 @@ const PublicationTable = memo(
           return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
       }
     }, []);
-
-    const context = useMemo(
-      () => ({
-        t,
-        connectedAccounts,
-        getStatusColor,
-        onEdit,
-        onDelete,
-        onPublish,
-        onEditRequest,
-        onViewDetails,
-        remoteLocks,
-        permissions: permissions || [],
-      }),
-      [
-        t,
-        connectedAccounts,
-        getStatusColor,
-        onEdit,
-        onDelete,
-        onPublish,
-        onEditRequest,
-        remoteLocks,
-        permissions,
-      ],
-    );
 
     return (
       <TableContainer

@@ -8,7 +8,7 @@ import { Copy, Edit, Eye, Image, Repeat, Rocket, Trash2, Video } from 'lucide-re
 interface PublicationRowProps {
   item: Publication;
   t: (key: string) => string;
-  connectedAccounts: any[];
+  connectedAccounts: { id: number; platform: string; [key: string]: unknown }[];
   getStatusColor: (status?: string) => string;
   onEdit: (item: Publication) => void;
   onDelete: (id: number) => void;
@@ -30,7 +30,7 @@ export default function PublicationRow({
   onViewDetails,
   onDuplicate,
 }: PublicationRowProps) {
-  const { auth } = usePage<any>().props;
+  const { auth } = usePage<{ auth: { current_workspace?: { permissions?: string[] } } }>().props;
   const canManageContent = auth.current_workspace?.permissions?.includes('manage-content');
 
   const countMediaFiles = (pub: Publication) => {
@@ -73,7 +73,7 @@ export default function PublicationRow({
               Object.keys(item.platform_settings).length > 0 && (
                 <div className="mt-1 flex flex-wrap gap-1">
                   {Object.entries(item.platform_settings).map(
-                    ([platform, settings]: [string, any]) => {
+                    ([platform, settings]: [string, { type?: string }]) => {
                       if (!settings) return null;
 
                       // For Twitter polls/threads

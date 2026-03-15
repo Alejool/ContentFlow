@@ -4,30 +4,30 @@ import SocialAccountsDisplay from '@/Components/Content/Publication/SocialAccoun
 import { usePublicationActions } from '@/Hooks/publication/usePublicationActions';
 import { Publication } from '@/types/Publication';
 import {
-  countMediaFiles,
-  formatPublicationDate,
-  getLockedByName,
-  getMediaUrl,
-  hasMedia,
-  isVideoMedia,
-  prepareMediaForPreview,
+    countMediaFiles,
+    formatPublicationDate,
+    getLockedByName,
+    getMediaUrl,
+    hasMedia,
+    isVideoMedia,
+    prepareMediaForPreview,
 } from '@/Utils/publicationHelpers';
 import {
-  Calendar,
-  CheckCircle,
-  Clock,
-  Copy,
-  Edit,
-  Eye,
-  Image as ImageIcon,
-  Loader2,
-  Lock,
-  MoreVertical,
-  Rocket,
-  Trash2,
-  Users,
-  Video,
-  XCircle,
+    Calendar,
+    CheckCircle,
+    Clock,
+    Copy,
+    Edit,
+    Eye,
+    Image as ImageIcon,
+    Loader2,
+    Lock,
+    MoreVertical,
+    Rocket,
+    Trash2,
+    Users,
+    Video,
+    XCircle,
 } from 'lucide-react';
 import React, { memo, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -35,7 +35,7 @@ import toast from 'react-hot-toast';
 interface PublicationMobileRowProps {
   items: Publication[];
   t: (key: string) => string;
-  connectedAccounts: any[];
+  connectedAccounts: { id: number; platform: string; [key: string]: unknown }[];
   getStatusColor: (status?: string) => string;
   onEdit: (item: Publication) => void;
   onDelete: (id: number) => void;
@@ -56,7 +56,7 @@ interface PublicationMobileRowProps {
 }
 
 const PublicationMobileRow = memo(
-  ({
+  function PublicationMobileRow({
     items,
     t,
     connectedAccounts,
@@ -70,7 +70,7 @@ const PublicationMobileRow = memo(
     remoteLocks = {},
     permissions,
     onPreviewMedia,
-  }: PublicationMobileRowProps) => {
+  }: PublicationMobileRowProps) {
     // Usar el hook centralizado
     const {
       loadingStates,
@@ -154,7 +154,10 @@ const PublicationMobileRow = memo(
           return (
             <div
               key={item.id}
+              role="button"
+              tabIndex={0}
               onClick={(e) => handleRowClick(item.id, e)}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleExpand(item.id); } }}
               className={`relative overflow-hidden rounded-lg border transition-all duration-300 ${
                 isExpanded
                   ? 'border-primary-200 bg-white shadow-md ring-1 ring-primary-500/10 dark:border-primary-900/40 dark:bg-neutral-800'
@@ -169,22 +172,33 @@ const PublicationMobileRow = memo(
               <div className="flex items-start gap-3 p-4">
                 {/* Thumbnail with media preview */}
                 <div
+                  role="button"
+                  tabIndex={0}
                   className="relative flex-shrink-0 cursor-pointer"
                   onClick={(e) => {
                     e.stopPropagation();
-                    // Trigger preview
                     if (hasMedia(item) && onPreviewMedia) {
                       const allMedia = prepareMediaForPreview(item);
                       onPreviewMedia(allMedia, 0);
                     } else {
-                      // If no media or preview handler, toggle row
                       if (!hasMedia(item)) toggleExpand(item.id);
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      if (hasMedia(item) && onPreviewMedia) {
+                        const allMedia = prepareMediaForPreview(item);
+                        onPreviewMedia(allMedia, 0);
+                      } else {
+                        if (!hasMedia(item)) toggleExpand(item.id);
+                      }
                     }
                   }}
                 >
                   {hasMedia(item) && mediaUrl ? (
                     <div className="h-16 w-16 overflow-hidden rounded-lg border border-gray-200 bg-gray-100 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
-                      {(item as any).type === 'user_event' ? (
+                      {(item as Publication & { type?: string }).type === 'user_event' ? (
                         <div className="flex h-16 w-16 items-center justify-center rounded-lg border border-gray-200 bg-gray-100 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
                           <Calendar className="h-8 w-8 text-primary-500" />
                         </div>
@@ -237,7 +251,7 @@ const PublicationMobileRow = memo(
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      {(item as any).type === 'user_event' && canManageContent && (
+                      {(item as Publication & { type?: string }).type === 'user_event' && canManageContent && (
                         <Button
                           onClick={async (e) => {
                             e.stopPropagation();
@@ -270,7 +284,7 @@ const PublicationMobileRow = memo(
                   </div>
 
                   {/* Creator info for events */}
-                  {(item as any).type === 'user_event' && item.user && (
+                  {(item as Publication & { type?: string }).type === 'user_event' && item.user && (
                     <div className="mb-2 flex items-center gap-1.5">
                       <Users className="h-3 w-3 text-gray-400" />
                       <span className="text-[10px] font-medium italic text-gray-500 dark:text-gray-400">
@@ -324,12 +338,12 @@ const PublicationMobileRow = memo(
                     )}
 
                     {/* Event indicators */}
-                    {((item as any).type === 'user_event' ||
+                    {((item as Publication & { type?: string }).type === 'user_event' ||
                       (item.scheduled_at && item.status !== 'published')) && (
                       <div className="flex items-center gap-1.5 rounded-full bg-primary-50 px-2.5 py-1 text-xs font-medium text-primary-600 dark:bg-primary-900/20 dark:text-primary-400">
                         <Calendar className="h-3.5 w-3.5" />
                         <span className="font-medium">
-                          {(item as any).type === 'user_event'
+                          {(item as Publication & { type?: string }).type === 'user_event'
                             ? t('publications.table.manualEvent')
                             : t('publications.table.socialNetworkEvent')}
                         </span>
@@ -528,7 +542,6 @@ const PublicationMobileRow = memo(
                           publication={item}
                           connectedAccounts={connectedAccounts}
                           compact={true}
-                          t={t}
                         />
                       </div>
                     </div>
@@ -555,7 +568,7 @@ const PublicationMobileRow = memo(
                           onClick={(e) => {
                             e.stopPropagation();
                             if (remoteLocks[item.id]) {
-                              (toast.error as any)(
+                              toast.error(
                                 `${t('publications.table.lockedBy') || 'Editando por'} ${lockedByName}`,
                               );
                               return;
@@ -597,7 +610,7 @@ const PublicationMobileRow = memo(
                         <Button
                           onClick={async (e) => {
                             e.stopPropagation();
-                            await handleDelete(item, (item as any).type === 'user_event');
+                            await handleDelete(item, (item as Publication & { type?: string }).type === 'user_event');
                           }}
                           disabled={
                             isLoading?.publishing || isLoading?.editing || isLoading?.deleting

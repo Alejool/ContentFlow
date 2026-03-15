@@ -33,11 +33,28 @@ interface SocialPostLog {
   account_name?: string;
 }
 
+interface VideoMetadata {
+  duration?: number;
+  [key: string]: unknown;
+}
+
+interface MediaFile {
+  id?: number;
+  type?: string;
+  url?: string;
+  thumbnailUrl?: string;
+  tempId?: string;
+  mime_type?: string;
+  file_type?: string;
+  file_name?: string;
+  [key: string]: unknown;
+}
+
 interface SocialAccountsSectionProps {
   socialAccounts: SocialAccount[];
   selectedAccounts: number[];
   accountSchedules: Record<number, string>;
-  t: any;
+  t: (key: string) => string;
   onAccountToggle: (accountId: number) => void;
   onScheduleChange: (accountId: number, schedule: string) => void;
   onScheduleRemove: (accountId: number) => void;
@@ -50,20 +67,18 @@ interface SocialAccountsSectionProps {
   onCancel?: () => void;
   error?: string;
   durationErrors?: Record<number, string>;
-  videoMetadata?: Record<string, any>;
-  mediaFiles?: any[];
+  videoMetadata?: Record<string, VideoMetadata>;
+  mediaFiles?: MediaFile[];
   disabled?: boolean;
   socialPostLogs?: SocialPostLog[];
   contentType?: 'post' | 'reel' | 'story' | 'poll' | 'carousel';
-  // YouTube thumbnail props
   onThumbnailChange?: (videoId: number, file: File | null) => void;
   onThumbnailDelete?: (videoId: number) => void;
   thumbnails?: Record<string, { file?: File; url?: string }>;
-  publication?: any;
+  publication?: { media_files?: { file_type?: string; mime_type?: string; file_name?: string }[] };
 }
 
-const VisualCheckbox = memo(
-  ({
+const VisualCheckbox = memo(function VisualCheckbox({
     isChecked,
     onToggle,
     disabled = false,
@@ -71,22 +86,26 @@ const VisualCheckbox = memo(
     isChecked: boolean;
     onToggle: (e?: React.MouseEvent) => void;
     disabled?: boolean;
-  }) => (
-    <div className="relative">
-      <div
-        className={`flex h-5 w-5 items-center justify-center rounded border-2 transition-all duration-200 ${
-          isChecked
-            ? 'border-primary-500 bg-primary-500'
-            : 'border-gray-300 bg-white dark:bg-neutral-800'
-        } ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} `}
-        onClick={disabled ? undefined : onToggle}
-        {...(disabled ? { disabled: true } : {})}
-      >
-        {isChecked && <Check className="h-3 w-3 stroke-[3] text-white" />}
+  }) {
+    return (
+      <div className="relative">
+        <div
+          role="checkbox"
+          aria-checked={isChecked}
+          tabIndex={disabled ? -1 : 0}
+          className={`flex h-5 w-5 items-center justify-center rounded border-2 transition-all duration-200 ${
+            isChecked
+              ? 'border-primary-500 bg-primary-500'
+              : 'border-gray-300 bg-white dark:bg-neutral-800'
+          } ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} `}
+          onClick={disabled ? undefined : onToggle}
+          onKeyDown={(e) => { if (!disabled && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); onToggle(); } }}
+        >
+          {isChecked && <Check className="h-3 w-3 stroke-[3] text-white" />}
+        </div>
       </div>
-    </div>
-  ),
-);
+    );
+  });
 
 const SchedulePopoverContent = memo(
   ({
@@ -215,7 +234,7 @@ interface SocialAccountItemProps {
   onScheduleRemove: () => void;
   onPlatformSettingsClick: () => void;
   onPopoverClose: () => void;
-  t: any;
+  t: (key: string) => string;
   globalSchedule?: string;
   isPublished?: boolean;
   isPublishing?: boolean;
@@ -224,15 +243,14 @@ interface SocialAccountItemProps {
   onCancel?: () => void;
   disabled?: boolean;
   durationError?: string;
-  videoMetadata?: Record<string, any>;
-  mediaFiles?: any[];
+  videoMetadata?: Record<string, VideoMetadata>;
+  mediaFiles?: MediaFile[];
   errorMessage?: string;
   contentType?: ContentType;
-  // YouTube thumbnail props
   onThumbnailChange?: (videoId: number, file: File | null) => void;
   onThumbnailDelete?: (videoId: number) => void;
   thumbnails?: Record<string, { file?: File; url?: string }>;
-  publication?: any;
+  publication?: { media_files?: { file_type?: string; mime_type?: string; file_name?: string }[] };
   isYouTubeThumbnailExpanded?: boolean;
   setIsYouTubeThumbnailExpanded?: (expanded: boolean) => void;
 }

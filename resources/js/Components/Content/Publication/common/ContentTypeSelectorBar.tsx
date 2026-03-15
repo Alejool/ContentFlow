@@ -107,8 +107,8 @@ export default function ContentTypeSelectorBar({
     };
   }, [selectedType, selectedPlatforms, mediaFiles]);
 
-  // Get warning message
-  const warningMessage = useMemo(() => {
+  // Warning message computed but used only for future display
+  const _warningMessage = useMemo(() => {
     if (!validation.hasWarnings) return null;
 
     const { platformValidation, mediaValidation } = validation;

@@ -1,6 +1,6 @@
 import Button from '@/Components/common/Modern/Button';
 import { REEL_COMPATIBLE_PLATFORMS } from '@/Constants/contentTypes';
-import { BarChart3, Clock, FileText, Images, Video } from 'lucide-react';
+import { BarChart3, Clock, FileText, Images, type LucideIcon, Video } from 'lucide-react';
 import { useMemo } from 'react';
 
 export type ContentType = 'post' | 'reel' | 'story' | 'poll' | 'carousel';
@@ -8,7 +8,7 @@ export type ContentType = 'post' | 'reel' | 'story' | 'poll' | 'carousel';
 interface ContentTypeOption {
   value: ContentType;
   label: string;
-  icon: any;
+  icon: LucideIcon;
   platforms: string[];
 }
 
@@ -18,7 +18,7 @@ interface ContentTypeIconSelectorProps {
   onChange: (type: ContentType) => void;
   t: (key: string) => string;
   disabled?: boolean;
-  mediaFiles?: any[];
+  mediaFiles?: { mime_type?: string; type?: string }[];
 }
 
 // Content type platform support (mirroring backend config/content_types.php)

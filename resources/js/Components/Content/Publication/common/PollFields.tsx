@@ -6,8 +6,8 @@ interface PollFieldsProps {
   options: string[];
   duration: number;
   onChange: (data: { options: string[]; duration: number }) => void;
-  register?: any; // Add register prop
-  setValue?: any; // Add setValue prop
+  register?: (name: string) => object;
+  setValue?: (name: string, value: unknown, options?: object) => void;
   t: (key: string) => string;
   errors?: {
     options?: string;
@@ -19,7 +19,7 @@ export default function PollFields({
   options = ['', ''],
   duration = 24,
   onChange,
-  register,
+  register: _register,
   setValue,
   t,
   errors = {},

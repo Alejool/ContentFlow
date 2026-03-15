@@ -7,7 +7,7 @@ interface PublicationThumbnailProps {
   t?: (key: string) => string;
 }
 
-const PublicationThumbnail = memo(({ publication }: PublicationThumbnailProps) => {
+const PublicationThumbnail = memo(function PublicationThumbnail({ publication }: PublicationThumbnailProps) {
   if (!publication) {
     return <File className="h-6 w-6 text-gray-400" />;
   }

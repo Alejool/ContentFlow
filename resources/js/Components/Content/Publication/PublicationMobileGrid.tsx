@@ -12,7 +12,7 @@ import toast from 'react-hot-toast';
 interface PublicationMobileGridProps {
   items: Publication[];
   t: (key: string) => string;
-  connectedAccounts: any[];
+  connectedAccounts: { id: number; platform: string; [key: string]: unknown }[];
   getStatusColor: (status?: string) => string;
   onEdit: (item: Publication) => void;
   onDelete: (id: number) => void;
@@ -20,12 +20,11 @@ interface PublicationMobileGridProps {
   onEditRequest?: (item: Publication) => void;
   onViewDetails?: (item: Publication) => void;
   onDuplicate?: (id: number) => void;
-  canManage: boolean;
   permissions?: string[];
 }
 
 const PublicationMobileGrid = memo(
-  ({
+  function PublicationMobileGrid({
     items,
     t,
     connectedAccounts,
@@ -36,11 +35,9 @@ const PublicationMobileGrid = memo(
     onEditRequest,
     onViewDetails,
     onDuplicate,
-    canManage,
     permissions,
   }: PublicationMobileGridProps) => {
-    const { auth } = usePage<any>().props;
-    const currentUserId = auth.user?.id;
+    const { auth } = usePage<{ auth: { user?: { id: number }; current_workspace?: { approval_workflow?: { is_enabled?: boolean }; user_role_slug?: string } } }>().props;
     const currentWorkspace = auth.current_workspace;
 
     const [isSubmittingForApproval, setIsSubmittingForApproval] = useState<Record<number, boolean>>(
@@ -102,9 +99,10 @@ const PublicationMobileGrid = memo(
 
         // Recargar la página para actualizar el estado
         window.location.reload();
-      } catch (error: any) {
+      } catch (error) {
+        const axiosError = error as { response?: { data?: { message?: string } } };
         console.error('Error submitting for approval:', error);
-        toast.error(error.response?.data?.message || 'Error al enviar a revisión');
+        toast.error(axiosError.response?.data?.message || 'Error al enviar a revisión');
       } finally {
         setIsSubmittingForApproval((prev) => ({ ...prev, [item.id]: false }));
       }

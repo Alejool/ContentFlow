@@ -3,28 +3,23 @@ import { validateVideoDuration } from '@/Utils/validationUtils';
 import { Publication } from '@/types/Publication';
 import { AlertTriangle } from 'lucide-react';
 import { memo, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
 
 interface SocialAccountsDisplayProps {
   publication?: Publication | null;
-  connectedAccounts?: any[];
+  connectedAccounts?: { id: number; platform?: string; account_name?: string; [key: string]: unknown }[];
   compact?: boolean;
   showCount?: boolean;
   publishingPlatforms?: number[];
-  t?: any;
 }
 
 const SocialAccountsDisplay = memo(
-  ({
+  function SocialAccountsDisplay({
     publication,
     connectedAccounts = [],
-    compact = true, // Defaulting to compact for better performance in lists
+    compact: _compact = true,
     showCount = false,
     publishingPlatforms = [],
-    t: propsT,
-  }: SocialAccountsDisplayProps) => {
-    const { t: hookT } = useTranslation();
-    const t = propsT || hookT;
+  }: SocialAccountsDisplayProps) {
 
     const displayItems = useMemo(() => {
       if (!publication) return [];
@@ -37,7 +32,7 @@ const SocialAccountsDisplay = memo(
 
       if (scheduledPosts.length === 0 && postLogs.length === 0) return [];
 
-      const combined = new Map<number, any>();
+      const combined = new Map<number, (typeof scheduledPosts[number]) | (typeof postLogs[number])>();
       scheduledPosts.forEach((p) => {
         if (p && p.social_account_id) combined.set(p.social_account_id, p);
       });
@@ -47,7 +42,7 @@ const SocialAccountsDisplay = memo(
       });
 
       return Array.from(combined.values());
-    }, [publication?.scheduled_posts, publication?.social_post_logs]); // Stable dependencies
+    }, [publication]);
 
     const connectedIds = useMemo(
       () => new Set(connectedAccounts.map((a) => a.id)),

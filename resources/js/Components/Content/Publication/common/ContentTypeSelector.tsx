@@ -8,7 +8,7 @@ interface ContentTypeOption {
   value: ContentType;
   label: string;
   description: string;
-  icon: any;
+  icon: LucideIcon;
   platforms: string[];
   mediaRules: {
     minCount?: number;
@@ -26,7 +26,7 @@ interface ContentTypeSelectorProps {
   selectedPlatforms: string[];
   onChange: (type: ContentType) => void;
   t: (key: string) => string;
-  mediaFiles?: any[];
+  mediaFiles?: { mime_type?: string; type?: string }[];
 }
 
 /**
