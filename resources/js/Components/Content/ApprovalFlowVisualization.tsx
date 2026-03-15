@@ -425,7 +425,7 @@ function StatusBadge({ status, t }: { status: string; t: any }) {
       label: t('approvals.status.cancelled') || 'Cancelado',
     },
   };
-  const { color, label } = config[status] || config.pending;
+  const { color, label } = config[status] ?? config['pending']!;
   return <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${color}`}>{label}</span>;
 }
 

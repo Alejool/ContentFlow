@@ -3,8 +3,8 @@ import FilterSection from '@/Components/Content/common/FilterSection';
 import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
 import TableContainer from '@/Components/common/ui/TableContainer';
 import {
-  useApprovalHistory,
-  usePublicationApprovalHistory,
+    useApprovalHistory,
+    usePublicationApprovalHistory,
 } from '@/Hooks/approval/useApprovalHistory';
 import { getDateFnsLocale } from '@/Utils/dateLocales';
 import { ApprovalRequest } from '@/types/ApprovalTypes';
@@ -107,7 +107,7 @@ export default function ApprovalHistory({ publicationId, initialData }: Approval
         label: t('approvals.status.cancelled'),
       },
     };
-    const { color, icon: Icon, label } = config[status] || config.pending;
+    const { color, icon: Icon, label } = config[status] ?? config['pending']!;
     return (
       <span
         className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${color}`}

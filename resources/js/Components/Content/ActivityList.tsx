@@ -1,18 +1,19 @@
-import { getDateFnsLocale } from '@/Utils/dateLocales';
 import { VirtualList } from '@/Components/common/ui/VirtualList';
+import { getDateFnsLocale } from '@/Utils/dateLocales';
 import { formatDistanceToNow } from 'date-fns';
 import {
-  Activity,
-  CheckCircle,
-  Clock,
-  Edit,
-  FileText,
-  Lock,
-  MessageSquare,
-  Send,
-  ServerCrash,
-  XCircle,
+    Activity,
+    CheckCircle,
+    Clock,
+    Edit,
+    FileText,
+    Lock,
+    MessageSquare,
+    Send,
+    ServerCrash,
+    XCircle,
 } from 'lucide-react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface ActivityItem {
@@ -55,7 +56,7 @@ const ActivityTimelineItem = ({
   activitiesLength: number;
   t: any;
   locale: any;
-  getActivityIcon: (type: string) => JSX.Element;
+  getActivityIcon: (type: string) => React.ReactElement;
   formatActivityText: (activity: ActivityItem) => string;
 }) => (
   <div key={activity.id} className="relative pb-8">
