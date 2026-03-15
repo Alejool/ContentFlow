@@ -1,6 +1,14 @@
 import axios from "axios";
 import { create } from "zustand";
 
+export type NotificationTypeFilter =
+  | "all"
+  | "publications"
+  | "approvals"
+  | "campaigns"
+  | "account"
+  | "system";
+
 export interface NotificationData {
   id: string;
   type: string;
@@ -12,10 +20,27 @@ export interface NotificationData {
     status?: string;
     platform?: string;
     priority?: string;
+    notification_type?: string;
     [key: string]: any;
   };
   read_at: string | null;
   created_at: string;
+}
+
+/** Derive a semantic type from the Laravel notification class name */
+export function getNotificationType(n: NotificationData): NotificationTypeFilter {
+  const cls = n.type ?? "";
+  const notifType = n.data?.notification_type ?? "";
+
+  if (notifType) return notifType as NotificationTypeFilter;
+
+  if (/Approval|Awaiting|Approved|Rejected|Reassigned|MissingApprovers/i.test(cls)) return "approvals";
+  if (/Publication|Playlist|Reels|Video|Media/i.test(cls)) return "publications";
+  if (/Campaign/i.test(cls) || n.data?.campaign_id) return "campaigns";
+  if (/Social|Workspace|Role|TwoFactor|Verify/i.test(cls)) return "account";
+  if (/System|Trial|Usage|API|Error/i.test(cls)) return "system";
+
+  return n.data?.category === "system" ? "system" : "publications";
 }
 
 interface NotificationState {
@@ -31,6 +56,8 @@ interface NotificationState {
   markAllAsRead: () => Promise<void>;
   deleteNotification: (id: string) => Promise<void>;
   filterByPriority: (priority: string | null) => NotificationData[];
+  filterByType: (type: NotificationTypeFilter, source?: NotificationData[]) => NotificationData[];
+  countByType: (type: NotificationTypeFilter, source?: NotificationData[]) => number;
 }
 
 export const useNotificationStore = create<NotificationState>((set, get) => ({
@@ -174,5 +201,17 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     const { notifications } = get();
     if (!priority) return notifications;
     return notifications.filter((n) => n.data.priority === priority);
+  },
+
+  filterByType: (type: NotificationTypeFilter, source?: NotificationData[]) => {
+    const list = source ?? get().notifications;
+    if (type === "all") return list;
+    return list.filter((n) => getNotificationType(n) === type);
+  },
+
+  countByType: (type: NotificationTypeFilter, source?: NotificationData[]) => {
+    const list = source ?? get().notifications;
+    if (type === "all") return list.length;
+    return list.filter((n) => getNotificationType(n) === type).length;
   },
 }));
