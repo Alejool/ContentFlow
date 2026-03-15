@@ -165,51 +165,46 @@ export function usePublicationPermissions(permissions: string[] = []) {
     return ["draft", "rejected", "scheduled"].includes(item.status || "draft");
   };
 
+  // Detectar si el workflow es multinivel
+  const isMultiLevelWorkflow = useMemo(() => {
+    const levels = currentWorkspace?.approval_workflow?.levels;
+    return Array.isArray(levels) && levels.length > 1;
+  }, [currentWorkspace]);
+
   // Verificar si debe mostrar botón de publicar
   const shouldShowPublish = (item: Publication) => {
-    // No mostrar publicar si está en revisión
-    if (item.status === "pending_review") {
-      return false;
+    // Nunca mostrar si está en revisión
+    if (item.status === "pending_review") return false;
+
+    const submitterId = item.approval_request?.submitted_by;
+    const isSubmitter = submitterId === currentUserId;
+
+    // Retry / republicar — mismas reglas pero para estados de reintento
+    const isRetryStatus = ["failed", "published", "scheduled"].includes(item.status || "");
+
+    // Owner: siempre puede publicar
+    if (isOwner) return true;
+
+    if (item.status === "approved") {
+      if (isMultiLevelWorkflow) {
+        // Multinivel: solo Owner (ya cubierto) y quien lo envió
+        return isSubmitter;
+      }
+      // Sin flujo o nivel único: Owner + Admin + quien lo envió
+      return isAdmin || isSubmitter;
     }
 
-    // SOLO Owner puede publicar directamente sin importar el workflow
-    if (isOwner) {
-      return true;
+    // Para retry: mismas reglas según tipo de workflow
+    if (isRetryStatus) {
+      if (isMultiLevelWorkflow) return isOwner || isSubmitter;
+      return isOwner || isAdmin || isSubmitter;
     }
-    
-    // Si hay workflow activo:
-    // - Solo quien envió a revisión puede publicar cuando está aprobado
-    // - Owner puede publicar siempre
-    if (hasWorkflow) {
-      // Debe tener permiso de publicar
-      if (!canPublish) {
-        return false;
-      }
-      
-      // Verificar que el contenido esté aprobado Y el approval_request esté completado
-      const isApprovedWithCompletedRequest = 
-        item.status === "approved" && 
-        item.approval_request?.status === "approved" && 
-        item.approval_request?.completed_by;
-      
-      if (isApprovedWithCompletedRequest) {
-        // CRÍTICO: Solo quien envió a revisión puede publicar
-        const submitterId = item.approval_request?.submitted_by;
-        const canPublishApproved = submitterId === currentUserId;
-        
-        return canPublishApproved;
-      }
-      
-      // Puede publicar si es retry (failed, published, scheduled)
-      return ["failed", "published", "scheduled"].includes(item.status || "");
+
+    // Draft/rejected sin workflow: Admin puede publicar directamente
+    if (!hasWorkflow && isAdmin) {
+      return ["draft", "rejected"].includes(item.status || "");
     }
-    
-    // CRÍTICO: Sin workflow, SOLO Admin y Owner pueden publicar directamente
-    // Otros roles (incluso con permiso "publish") NO deben ver el botón de publicar
-    if (isAdminOrOwner) {
-      return ["draft", "rejected", "failed", "published", "scheduled", "approved"].includes(item.status || "");
-    }
-    
+
     return false;
   };
 
@@ -256,6 +251,7 @@ export function usePublicationPermissions(permissions: string[] = []) {
     isAdmin,
     isAdminOrOwner,
     isLastLevelApprover,
+    isMultiLevelWorkflow,
     currentUserId,
 
     // Verificaciones específicas por item
