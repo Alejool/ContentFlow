@@ -41,6 +41,10 @@ class ContentValidationService
             );
         }
 
+        if (empty($platformIds)) {
+            return new ContentValidationResultDTO(isValid: true, warnings: []);
+        }
+
         // Obtener cuentas sociales
         $socialAccounts = SocialAccount::whereIn('id', $platformIds)
             ->where('workspace_id', $publication->workspace_id)

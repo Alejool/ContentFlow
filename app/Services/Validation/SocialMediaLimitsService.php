@@ -95,6 +95,10 @@ class SocialMediaLimitsService
      */
     public function validatePublication(Publication $publication, array $socialAccountIds): array
     {
+        if (empty($socialAccountIds)) {
+            return ['hasErrors' => false, 'results' => []];
+        }
+
         $socialAccounts = SocialAccount::whereIn('id', $socialAccountIds)
             ->where('workspace_id', $publication->workspace_id)
             ->get();
@@ -355,7 +359,9 @@ class SocialMediaLimitsService
     {
         $recommendations = [];
         
-        $socialAccounts = SocialAccount::whereIn('id', $socialAccountIds)->get();
+        $socialAccounts = empty($socialAccountIds)
+            ? collect()
+            : SocialAccount::whereIn('id', $socialAccountIds)->get();
         $mediaFiles = $publication->mediaFiles;
         
         if ($mediaFiles->isEmpty()) {

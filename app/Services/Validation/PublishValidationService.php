@@ -14,6 +14,10 @@ class PublishValidationService
      */
     public function validatePublishRequest(Publication $publication, array $platformIds): array
     {
+        if (empty($platformIds)) {
+            return ['canPublish' => false, 'errors' => ['No social accounts selected.']];
+        }
+
         $socialAccounts = SocialAccount::whereIn('id', $platformIds)
             ->where('workspace_id', $publication->workspace_id)
             ->get();

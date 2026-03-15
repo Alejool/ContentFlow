@@ -57,7 +57,9 @@ class SchedulingService
       ?? $publication->published_at
       ?? ($publication->publish_date ? Carbon::parse($publication->publish_date) : null);
 
-    $socialAccounts = SocialAccount::whereIn('id', $accountIds)->get()->keyBy('id');
+    $socialAccounts = empty($accountIds)
+      ? collect()->keyBy('id')
+      : SocialAccount::whereIn('id', $accountIds)->get()->keyBy('id');
 
     // Determine which accounts should have recurrence
     // If recurrence_accounts is null or empty, all selected accounts get recurrence
