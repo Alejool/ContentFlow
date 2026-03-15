@@ -1,21 +1,63 @@
-import Logo from "@/../assets/logo-with-name.png";
+import Logo from "@/../assets/logo-with-name-1024.png";
 import ResponsiveNavLink from "@/Components/common/ui/ResponsiveNavLink";
 import { useTheme } from "@/Hooks/useTheme";
 import { usePage } from "@inertiajs/react";
 import {
-    BarChart3,
-    X as CloseIcon,
-    FileText,
-    Home,
-    Layers,
-    LogOut,
-    Menu,
-    User,
+  BarChart3,
+  X as CloseIcon,
+  FileText,
+  Home,
+  Layers,
+  LogOut,
+  Menu,
+  User,
 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import NotificationButton from "./NotificationButton";
 import ProfileDropdown from "./ProfileDropdown";
 import SearchButton from "./SearchButton";
+
+function NavLogo({ src, fallbackSrc, isWhiteLabel }: { src: string; fallbackSrc: string; isWhiteLabel: boolean }) {
+  const [status, setStatus] = useState<"loading" | "loaded" | "error">("loading");
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    setStatus("loading");
+    const img = new Image();
+    timerRef.current = setTimeout(() => setStatus("error"), 5000);
+    img.onload = () => { clearTimeout(timerRef.current!); setStatus("loaded"); };
+    img.onerror = () => { clearTimeout(timerRef.current!); setStatus("error"); };
+    img.src = src;
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, [src]);
+
+  // Si el whiteLabelLogo falla, caer al logo por defecto
+  const finalSrc = status === "error" && isWhiteLabel ? fallbackSrc : src;
+  const isShowingFallback = status === "error" && isWhiteLabel;
+
+  return (
+    <div className="relative flex items-center justify-center">
+      {status === "loading" && (
+        <div
+          className={`rounded overflow-hidden bg-gray-200 dark:bg-neutral-700 ${
+            isWhiteLabel ? "h-12 w-24" : "h-20 w-32"
+          }`}
+        >
+          <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/40 dark:via-white/10 to-transparent" />
+        </div>
+      )}
+      <img
+        src={isShowingFallback ? fallbackSrc : src}
+        alt="Logo"
+        onLoad={() => setStatus("loaded")}
+        className={`w-auto object-contain transition-opacity duration-300 ${
+          status === "loading" ? "opacity-0 absolute" : "opacity-100"
+        } ${isShowingFallback || !isWhiteLabel ? "h-20" : "h-12"}`}
+      />
+    </div>
+  );
+}
 
 interface MobileNavbarProps {
   user: {
@@ -101,14 +143,10 @@ export default function MobileNavbar({
           </div>
 
           <div className="flex-1 flex justify-center">
-            <img
+            <NavLogo
               src={whiteLabelLogo || Logo}
-              alt="Logo"
-              className={
-                whiteLabelLogo
-                  ? "h-12 w-auto object-contain"
-                  : "h-20 w-auto object-contain"
-              }
+              fallbackSrc={Logo}
+              isWhiteLabel={!!whiteLabelLogo}
             />
           </div>
 
