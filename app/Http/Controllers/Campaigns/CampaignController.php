@@ -314,8 +314,29 @@ class CampaignController extends Controller
     $filters = $request->only(['status', 'search', 'date_start', 'date_end']);
 
     try {
+      // Get workspace and history limit info
+      $workspace = Auth::user()->currentWorkspace ?? Auth::user()->workspaces()->first();
+      $validator = app(\App\Services\Subscription\GranularLimitValidator::class);
+      $historyDays = $validator->getHistoryDaysLimit($workspace);
+      $startDate = $validator->getExportStartDate($workspace);
+      $endDate = now();
+      
       $export = new \App\Exports\CampaignsExport($filters);
-      $filename = 'campañas_' . date('Y-m-d_His') . '.' . $format;
+      
+      // Generate descriptive filename with date range and plan limit
+      $startDateStr = $startDate->format('Y-m-d');
+      $endDateStr = $endDate->format('Y-m-d');
+      $filename = "campañas_{$startDateStr}_{$endDateStr}_{$historyDays}dias.{$format}";
+
+      if ($format === 'csv' || $format === 'xlsx') {
+        $response = Excel::download($export, $filename);
+        
+        // Add custom header with export info
+        $response->headers->set('X-Export-History-Days', $historyDays);
+        $response->headers->set('X-Export-Start-Date', $startDate->format('Y-m-d'));
+        
+        return $response;
+      }
 
       if ($format === 'pdf') {
         return Excel::download($export, $filename, \Maatwebsite\Excel\Excel::DOMPDF);

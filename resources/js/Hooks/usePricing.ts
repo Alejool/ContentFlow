@@ -206,17 +206,6 @@ export function usePricing({ isAuthenticated, currentPlan, workspaceId }: UsePri
         router.reload({
           preserveScroll: false,
           preserveState: false,
-          onSuccess: () => {
-            // Show success message after reload
-            showModal(
-              'info',
-              'Plan actualizado',
-              `Tu plan ha sido cambiado exitosamente a ${changeData.plan}.`,
-              {
-                closeLabel: 'Entendido',
-              },
-            );
-          },
         });
 
         return;

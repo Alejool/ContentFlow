@@ -40,6 +40,8 @@
     "cancelRequired": "Subscription management required",
     "cancelSubscriptionFirst": "To downgrade to the free plan, you must first cancel your current paid subscription. The change will take effect at the end of your billing cycle.",
     "missingFeatures": "What you're missing",
+    "showMore": "Show more",
+    "showLess": "Show less",
 
     "activeSubscription": {
       "title": "You already have an active subscription",
@@ -113,10 +115,15 @@
       "dedicatedSupport": "Dedicated support",
       "calendarSync": "Calendar sync",
       "bulkOperations": "Bulk operations",
+      "bulkOperations3": "Bulk operations (up to 3)",
+      "bulkOperations10": "Bulk operations (up to 10)",
+      "bulkOperations20": "Bulk operations (up to 20)",
+      "bulkOperations50": "Bulk operations (up to 50)",
       "customBranding": "Custom branding",
       "whiteLabel": "White-label",
       "apiAccess": "API access",
       "customIntegrations": "Custom integrations",
+      "customIntegrationsContact": "Custom integrations (contact us)",
       "slaGuarantee": "SLA guarantee",
       "discordChannels1": "1 Discord channel",
       "discordChannels2": "2 Discord channels",
@@ -125,13 +132,20 @@
       "basicScheduling": "Basic scheduling (date & time)",
       "schedulingRecurrence": "Automatic post recurrence",
       "queuePublishing": "Publishing queue",
+      "queuePriorityLow": "Low queue priority",
+      "queuePriorityStandard": "Standard queue priority",
+      "queuePriorityMedium": "Medium queue priority",
+      "queuePriorityHigh": "High queue priority",
+      "queuePriorityMaximum": "Maximum queue priority",
       "optimalTimes": "AI-powered optimal times",
       "approvalWorkflowsBasic": "Approval workflows (single-level)",
       "approvalWorkflowsAdvanced": "Multi-level approval workflows",
       "historyDays30": "30-day history",
       "historyDays60": "60-day history",
       "historyDays90": "90-day history",
-      "historyDays365": "1-year history"
+      "historyDays365": "1-year history",
+      "exportHistoryLimit": "Your plan allows exporting up to {{days}} days of history",
+      "exportHistoryLimitYear": "Your plan allows exporting up to {{days}} days of history (1 year)"
     },
 
     "billing": {

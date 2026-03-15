@@ -34,7 +34,10 @@ class PublishToSocialMedia implements ShouldQueue
    */
   public function middleware(): array
   {
-    return [new RateLimitPublishing];
+    return [
+      new RateLimitPublishing,
+      new \App\Jobs\Middleware\PlanBasedPriority,
+    ];
   }
 
   public function __construct(

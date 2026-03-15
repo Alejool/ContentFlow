@@ -11,9 +11,12 @@ use Illuminate\Support\Facades\Redis;
  */
 class QueuePriorityService
 {
-    // Queue names with priority levels
+    // Queue names with base priority levels
     private const QUEUES = [
-        'critical' => 100,      // User-facing operations (publishing, notifications)
+        'publishing' => 100,    // Publishing operations (affected by plan priority)
+        'publishing:notify' => 95, // Publishing notifications
+        'notifications' => 90,  // User notifications
+        'emails' => 85,         // Email delivery
         'high' => 75,           // Time-sensitive (scheduled posts, webhooks)
         'media-processing' => 50, // Image/video optimization
         'default' => 25,        // Standard operations
@@ -21,14 +24,30 @@ class QueuePriorityService
         'bulk' => 5,            // Bulk operations, exports
     ];
 
+    // Plan-based priority multipliers
+    private const PLAN_PRIORITIES = [
+        'enterprise' => 2.0,    // 100% MÁS de prioridad (el doble)
+        'professional' => 0.85, // 15% menos prioridad
+        'growth' => 0.70,       // 30% menos prioridad
+        'starter' => 0.50,      // 50% menos prioridad
+        'free' => 0.30,         // 70% menos prioridad
+        'demo' => 0.30,         // 70% menos prioridad
+    ];
+
     // Job type to queue mapping
     private const JOB_QUEUE_MAP = [
-        'PublishPublicationJob' => 'critical',
-        'SendNotificationJob' => 'critical',
+        'PublishToSocialMedia' => 'publishing',
+        'BulkPublishPublications' => 'bulk',
+        'SendNotificationJob' => 'notifications',
+        'SendSystemNotificationJob' => 'notifications',
+        'BulkPublishStartedNotification' => 'notifications',
+        'BulkPublishCompletedNotification' => 'notifications',
         'ProcessScheduledPostJob' => 'high',
         'WebhookDeliveryJob' => 'high',
         'OptimizeImageJob' => 'media-processing',
         'ProcessVideoJob' => 'media-processing',
+        'ProcessBackgroundUpload' => 'media-processing',
+        'GenerateReelsFromVideo' => 'media-processing',
         'GenerateAnalyticsJob' => 'low',
         'CleanupOldFilesJob' => 'low',
         'BulkExportJob' => 'bulk',
@@ -49,6 +68,136 @@ class QueuePriorityService
     public function getPriority(string $queue): int
     {
         return self::QUEUES[$queue] ?? 25;
+    }
+
+    /**
+     * Calculate effective priority based on queue and plan
+     * 
+     * @param string $queue Queue name
+     * @param string|null $planSlug Plan slug (enterprise, professional, etc.)
+     * @return int Effective priority score
+     */
+    public function getEffectivePriority(string $queue, ?string $planSlug = null): int
+    {
+        $basePriority = $this->getPriority($queue);
+        
+        // Si no hay plan, usar prioridad base
+        if (!$planSlug) {
+            return $basePriority;
+        }
+        
+        // Aplicar multiplicador de plan solo a colas específicas
+        $affectedQueues = ['publishing', 'bulk'];
+        
+        if (!in_array($queue, $affectedQueues)) {
+            return $basePriority;
+        }
+        
+        $planMultiplier = self::PLAN_PRIORITIES[$planSlug] ?? self::PLAN_PRIORITIES['free'];
+        
+        // Calcular prioridad efectiva
+        $effectivePriority = (int) round($basePriority * $planMultiplier);
+        
+        Log::debug('Calculated effective priority', [
+            'queue' => $queue,
+            'plan' => $planSlug,
+            'base_priority' => $basePriority,
+            'multiplier' => $planMultiplier,
+            'effective_priority' => $effectivePriority
+        ]);
+        
+        return $effectivePriority;
+    }
+
+    /**
+     * Get plan priority multiplier
+     */
+    public function getPlanMultiplier(string $planSlug): float
+    {
+        return self::PLAN_PRIORITIES[$planSlug] ?? self::PLAN_PRIORITIES['free'];
+    }
+
+    /**
+     * Get queue position estimate for a plan
+     * 
+     * @param string $queue Queue name
+     * @param string $planSlug Plan slug
+     * @return array Queue statistics with position estimate
+     */
+    public function getQueuePositionForPlan(string $queue, string $planSlug): array
+    {
+        $pendingJobs = $this->getPendingJobsCount($queue);
+        $effectivePriority = $this->getEffectivePriority($queue, $planSlug);
+        
+        // Estimar posición en cola basada en prioridad
+        // Jobs con mayor prioridad se procesan primero
+        $estimatedPosition = $this->estimateQueuePosition($queue, $effectivePriority);
+        
+        return [
+            'queue' => $queue,
+            'plan' => $planSlug,
+            'pending_jobs' => $pendingJobs,
+            'effective_priority' => $effectivePriority,
+            'estimated_position' => $estimatedPosition,
+            'estimated_wait_minutes' => $this->estimateWaitTime($estimatedPosition),
+        ];
+    }
+
+    /**
+     * Estimate queue position based on priority
+     */
+    private function estimateQueuePosition(string $queue, int $priority): int
+    {
+        try {
+            // Obtener todos los jobs en la cola con sus prioridades
+            $key = "queues:{$queue}";
+            $jobCount = Redis::llen($key);
+            
+            if ($jobCount === 0) {
+                return 1;
+            }
+            
+            // Estimar que jobs con mayor prioridad están adelante
+            // Asumiendo distribución uniforme de planes
+            $avgPriority = 50; // Prioridad promedio estimada
+            
+            if ($priority >= $avgPriority) {
+                // Alta prioridad: posición en el primer tercio
+                return max(1, (int) round($jobCount * 0.33));
+            } elseif ($priority >= 40) {
+                // Media prioridad: posición en el segundo tercio
+                return max(1, (int) round($jobCount * 0.66));
+            } else {
+                // Baja prioridad: posición al final
+                return max(1, $jobCount);
+            }
+            
+        } catch (\Exception $e) {
+            Log::warning('Failed to estimate queue position', [
+                'queue' => $queue,
+                'error' => $e->getMessage()
+            ]);
+            return 1;
+        }
+    }
+
+    /**
+     * Estimate wait time based on position
+     */
+    private function estimateWaitTime(int $position): int
+    {
+        if ($position <= 1) {
+            return 0;
+        }
+        
+        // Estimación: cada job toma aproximadamente 5 minutos en promedio
+        // Con workers concurrentes, dividimos el tiempo
+        $avgJobTimeMinutes = 5;
+        $concurrentWorkers = config('queue.workers.publishing', 3);
+        
+        $estimatedMinutes = ceil(($position * $avgJobTimeMinutes) / $concurrentWorkers);
+        
+        return (int) $estimatedMinutes;
     }
 
     /**

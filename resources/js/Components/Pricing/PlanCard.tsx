@@ -1,16 +1,17 @@
 import Button from '@/Components/common/Modern/Button';
 import { Badge } from '@/Components/ui/badge';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
 } from '@/Components/ui/card';
 import { PLAN_FEATURES, type PlanId } from '@/Constants/plans';
 import { cn } from '@/lib/utils';
-import { ArrowRight, Award, Check, Lock, Shield, Sparkles, Star, Zap } from 'lucide-react';
+import { ArrowRight, Award, Check, ChevronDown, ChevronUp, Lock, Shield, Sparkles, Star, Zap } from 'lucide-react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface Plan {
@@ -71,6 +72,7 @@ export default function PlanCard({
   systemFeatures = {},
 }: PlanCardProps) {
   const { t } = useTranslation();
+  const [showAllMissing, setShowAllMissing] = useState(false);
 
   const getPlanIcon = (planId: string) => {
     const iconClass = variant === 'compact' ? 'w-8 h-8' : 'w-8 h-8';
@@ -449,7 +451,7 @@ export default function PlanCard({
                 {t('pricing.missingFeatures', 'Te estás perdiendo')}
               </p>
               <ul className="space-y-2">
-                {missingFeatures.slice(0, 3).map((feature, index) => (
+                {(showAllMissing ? missingFeatures : missingFeatures.slice(0, 3)).map((feature, index) => (
                   <li key={index} className="flex items-start gap-2">
                     <Lock className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-gray-300 dark:text-neutral-600" />
                     <span className="text-xs italic leading-tight text-gray-400 dark:text-neutral-500">
@@ -457,12 +459,25 @@ export default function PlanCard({
                     </span>
                   </li>
                 ))}
-                {missingFeatures.length > 3 && (
-                  <li className="pl-5 text-xs italic text-gray-400 dark:text-neutral-500">
-                    +{missingFeatures.length - 3} más...
-                  </li>
-                )}
               </ul>
+              {missingFeatures.length > 3 && (
+                <button
+                  onClick={() => setShowAllMissing(!showAllMissing)}
+                  className="mt-2 flex w-full items-center justify-center gap-1 rounded-md py-1.5 text-xs font-medium text-primary-600 transition-colors hover:bg-primary-50 dark:text-primary-400 dark:hover:bg-primary-900/20"
+                >
+                  {showAllMissing ? (
+                    <>
+                      <ChevronUp className="h-3.5 w-3.5" />
+                      {t('pricing.showLess', 'Ver menos')}
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="h-3.5 w-3.5" />
+                      {t('pricing.showMore', `Ver ${missingFeatures.length - 3} más`)}
+                    </>
+                  )}
+                </button>
+              )}
             </div>
           )}
         </CardContent>
@@ -668,7 +683,7 @@ export default function PlanCard({
                 {t('pricing.missingFeatures', 'Lo que te estás perdiendo')}
               </p>
               <ul className="space-y-3">
-                {missingFeatures.map((feature, index) => (
+                {(showAllMissing ? missingFeatures : missingFeatures.slice(0, 4)).map((feature, index) => (
                   <li key={index} className="group/item flex items-start gap-3">
                     <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border border-gray-100 bg-gray-50 dark:border-neutral-700/50 dark:bg-neutral-800/50">
                       <Lock className="h-2.5 w-2.5 text-gray-400 dark:text-neutral-500" />
@@ -679,6 +694,24 @@ export default function PlanCard({
                   </li>
                 ))}
               </ul>
+              {missingFeatures.length > 4 && (
+                <button
+                  onClick={() => setShowAllMissing(!showAllMissing)}
+                  className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white py-2.5 text-sm font-medium text-primary-600 transition-all hover:border-primary-300 hover:bg-primary-50 dark:border-neutral-700 dark:bg-neutral-800/50 dark:text-primary-400 dark:hover:border-primary-700 dark:hover:bg-primary-900/20"
+                >
+                  {showAllMissing ? (
+                    <>
+                      <ChevronUp className="h-4 w-4" />
+                      {t('pricing.showLess', 'Ver menos')}
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="h-4 w-4" />
+                      {t('pricing.showMore', `Ver ${missingFeatures.length - 4} más características`)}
+                    </>
+                  )}
+                </button>
+              )}
             </div>
           )}
         </CardContent>

@@ -9,14 +9,27 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Illuminate\Support\Facades\Auth;
+use App\Services\Subscription\GranularLimitValidator;
 
 class CampaignsExport implements FromQuery, WithHeadings, WithMapping, WithStyles
 {
     protected $filters;
+    protected $historyStartDate;
 
     public function __construct($filters = [])
     {
         $this->filters = $filters;
+        
+        // Get history limit based on plan
+        $user = Auth::user();
+        $workspace = $user->currentWorkspace ?? $user->workspaces()->first();
+        
+        if ($workspace) {
+            $validator = app(GranularLimitValidator::class);
+            $this->historyStartDate = $validator->getExportStartDate($workspace);
+        } else {
+            $this->historyStartDate = now()->subDays(30); // Default to 30 days
+        }
     }
 
     public function query()
@@ -24,7 +37,8 @@ class CampaignsExport implements FromQuery, WithHeadings, WithMapping, WithStyle
         $workspaceId = Auth::user()->current_workspace_id;
         
         $query = Campaign::where('workspace_id', $workspaceId)
-            ->with(['user', 'publications']);
+            ->with(['user', 'publications'])
+            ->where('created_at', '>=', $this->historyStartDate); // Apply history limit
 
         if (!empty($this->filters['status']) && $this->filters['status'] !== 'all') {
             $query->where('status', $this->filters['status']);
@@ -35,7 +49,12 @@ class CampaignsExport implements FromQuery, WithHeadings, WithMapping, WithStyle
         }
 
         if (!empty($this->filters['date_start']) && !empty($this->filters['date_end'])) {
-            $query->byDateRange($this->filters['date_start'], $this->filters['date_end']);
+            // Respect plan limits even if user specifies custom date range
+            $dateStart = max(
+                \Carbon\Carbon::parse($this->filters['date_start']),
+                $this->historyStartDate
+            );
+            $query->byDateRange($dateStart->format('Y-m-d'), $this->filters['date_end']);
         }
 
         return $query->orderBy('created_at', 'desc');

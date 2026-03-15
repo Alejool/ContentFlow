@@ -91,4 +91,26 @@ trait TracksExports
         
         return $validator->getMaxExportRows($workspace);
     }
+
+    /**
+     * Get history days limit for exports based on plan.
+     */
+    protected function getHistoryDaysLimit(): int
+    {
+        $workspace = $this->getWorkspaceForExport();
+        $validator = app(GranularLimitValidator::class);
+        
+        return $validator->getHistoryDaysLimit($workspace);
+    }
+
+    /**
+     * Get the start date for export based on plan's history limit.
+     */
+    protected function getExportStartDate(): \Carbon\Carbon
+    {
+        $workspace = $this->getWorkspaceForExport();
+        $validator = app(GranularLimitValidator::class);
+        
+        return $validator->getExportStartDate($workspace);
+    }
 }

@@ -62,6 +62,7 @@ export default function CommandPalette() {
                                             onChange={(event) => setQuery(event.target.value)}
                                             value={query}
                                             autoComplete="off"
+                                            autoFocus
                                         />
                                     </div>
 

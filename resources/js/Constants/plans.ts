@@ -34,9 +34,76 @@
  * - popular: true/false - Mostrar badge de "Más Popular"
  * - requiresStripe: true/false - Si requiere pago con Stripe
  * - features: array - Lista de características (keys de traducción)
+ * - queuePriority: Información de prioridad en colas
  *
  * ============================================================================
  */
+
+/**
+ * Información de prioridad de colas por plan
+ */
+export const QUEUE_PRIORITY_INFO = {
+  enterprise: {
+    priority: 200,
+    label: 'Prioridad Máxima',
+    description: 'Procesamiento instantáneo garantizado',
+    maxPublicationsPerBatch: 500,
+    maxConcurrentBatches: 10,
+    estimatedWaitTime: '< 2 min',
+    color: 'purple',
+    icon: '⚡',
+  },
+  professional: {
+    priority: 85,
+    label: 'Prioridad Alta',
+    description: 'Procesamiento preferente',
+    maxPublicationsPerBatch: 50,
+    maxConcurrentBatches: 3,
+    estimatedWaitTime: '< 5 min',
+    color: 'blue',
+    icon: '🚀',
+  },
+  growth: {
+    priority: 70,
+    label: 'Prioridad Media',
+    description: 'Procesamiento estándar',
+    maxPublicationsPerBatch: 20,
+    maxConcurrentBatches: 2,
+    estimatedWaitTime: '< 10 min',
+    color: 'green',
+    icon: '📈',
+  },
+  starter: {
+    priority: 50,
+    label: 'Prioridad Estándar',
+    description: 'Procesamiento cuando hay capacidad',
+    maxPublicationsPerBatch: 10,
+    maxConcurrentBatches: 1,
+    estimatedWaitTime: '< 20 min',
+    color: 'gray',
+    icon: '📊',
+  },
+  free: {
+    priority: 30,
+    label: 'Prioridad Baja',
+    description: 'Procesamiento de baja prioridad',
+    maxPublicationsPerBatch: 3,
+    maxConcurrentBatches: 1,
+    estimatedWaitTime: '< 40 min',
+    color: 'gray',
+    icon: '⏱️',
+  },
+  demo: {
+    priority: 30,
+    label: 'Prioridad Baja',
+    description: 'Procesamiento de baja prioridad',
+    maxPublicationsPerBatch: 20,
+    maxConcurrentBatches: 2,
+    estimatedWaitTime: '< 40 min',
+    color: 'gray',
+    icon: '⏱️',
+  },
+} as const;
 
 export const PLAN_CONFIG = {
   // ========================================
@@ -59,8 +126,9 @@ export const PLAN_CONFIG = {
       'advancedScheduling',
       'schedulingRecurrence',
       'queuePublishing',
+      'queuePriorityLow',
+      'bulkOperations20',
       'calendarSync',
-      'bulkOperations',
       'discordChannels5',
       'approvalWorkflowsBasic',
       'historyDays90',
@@ -83,6 +151,8 @@ export const PLAN_CONFIG = {
       'storage1',
       'aiRequests10',
       'basicAnalytics',
+      'queuePriorityLow',
+      'bulkOperations3',
       'emailSupport',
     ],
   },
@@ -103,6 +173,8 @@ export const PLAN_CONFIG = {
       'aiRequests100',
       'basicAnalytics',
       'basicScheduling',
+      'queuePriorityStandard',
+      'bulkOperations10',
       'calendarSync',
       'discordChannels1',
       'historyDays30',
@@ -128,6 +200,8 @@ export const PLAN_CONFIG = {
       'advancedAnalytics',
       'advancedScheduling',
       'schedulingRecurrence',
+      'queuePriorityMedium',
+      'bulkOperations20',
       'optimalTimes',
       'calendarSync',
       'discordChannels2',
@@ -155,9 +229,10 @@ export const PLAN_CONFIG = {
       'advancedScheduling',
       'schedulingRecurrence',
       'queuePublishing',
+      'queuePriorityHigh',
+      'bulkOperations50',
       'optimalTimes',
       'calendarSync',
-      'bulkOperations',
       'discordChannels5',
       'approvalWorkflowsBasic',
       'historyDays90',
@@ -184,16 +259,16 @@ export const PLAN_CONFIG = {
       'advancedScheduling',
       'schedulingRecurrence',
       'queuePublishing',
+      'queuePriorityMaximum',
+      'bulkOperations500',
       'optimalTimes',
       'calendarSync',
-      'bulkOperations',
       'discordChannelsUnlimited',
       'approvalWorkflowsAdvanced',
       'historyDays365',
       'whiteLabel',
       'apiAccess',
-      'customIntegrations',
-      'slaGuarantee',
+      'customIntegrationsContact',
       'dedicatedSupport',
     ],
   },

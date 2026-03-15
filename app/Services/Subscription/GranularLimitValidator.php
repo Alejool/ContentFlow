@@ -273,6 +273,44 @@ class GranularLimitValidator
     }
 
     /**
+     * Get history days limit for exports based on plan.
+     * Returns the number of days of historical data that can be exported.
+     */
+    public function getHistoryDaysLimit(Workspace $workspace): int
+    {
+        $plan = $workspace->subscription?->plan ?? 'demo';
+        $planConfig = config("plans.{$plan}");
+        
+        $historyDays = $planConfig['features']['history_days'] ?? 30;
+        
+        // Debug logging
+        \Log::info('Export History Limit Check', [
+            'workspace_id' => $workspace->id,
+            'workspace_name' => $workspace->name,
+            'subscription_exists' => !is_null($workspace->subscription),
+            'plan_from_subscription' => $workspace->subscription?->plan ?? 'NULL',
+            'plan_used' => $plan,
+            'config_found' => !is_null($planConfig),
+            'config_path' => "plans.{$plan}",
+            'history_days_from_config' => $planConfig['features']['history_days'] ?? 'NOT SET',
+            'final_history_days' => $historyDays,
+            'all_plans_in_config' => array_keys(config('plans', [])),
+        ]);
+        
+        return $historyDays;
+    }
+
+    /**
+     * Get the start date for export based on plan's history limit.
+     * Returns Carbon instance representing the earliest date that can be exported.
+     */
+    public function getExportStartDate(Workspace $workspace): Carbon
+    {
+        $historyDays = $this->getHistoryDaysLimit($workspace);
+        return now()->subDays($historyDays)->startOfDay();
+    }
+
+    /**
      * Check if user can create more workspaces.
      */
     public function canCreateWorkspace(User $user): bool

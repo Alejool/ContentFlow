@@ -160,14 +160,22 @@ class PublishPublicationAction
     cache()->forget("publication_{$publication->id}_platforms");
 
     // Obtener información de la cola antes de despachar
-    $queueSize = \Illuminate\Support\Facades\Redis::llen('queues:publishing');
-    $estimatedWaitMinutes = $this->estimateWaitTime($queueSize);
+    $queuePriorityService = app(\App\Services\Queue\QueuePriorityService::class);
+    $planSlug = $publication->workspace->subscription_plan ?? 'free';
+    
+    $queueInfo = $queuePriorityService->getQueuePositionForPlan('publishing', $planSlug);
+    $queueSize = $queueInfo['pending_jobs'];
+    $estimatedWaitMinutes = $queueInfo['estimated_wait_minutes'];
+    $effectivePriority = $queueInfo['effective_priority'];
 
     LogHelper::job('Dispatching PublishToSocialMedia job', [
       'publication_id' => $publication->id,
       'platform_count' => $socialAccounts->count(),
       'platforms' => $socialAccounts->pluck('platform')->toArray(),
+      'plan' => $planSlug,
       'queue_size' => $queueSize,
+      'effective_priority' => $effectivePriority,
+      'estimated_position' => $queueInfo['estimated_position'],
       'estimated_wait_minutes' => $estimatedWaitMinutes
     ]);
 
@@ -179,12 +187,13 @@ class PublishPublicationAction
       $socialAccounts->pluck('id')->toArray()
     )->onQueue('publishing');
 
-    // Si el archivo es pequeño, darle mayor prioridad
-    if ($priority === 'high') {
-      Log::info('Small file detected, using high priority', [
-        'publication_id' => $publication->id
-      ]);
-    }
+    // Log de prioridad
+    Log::info('Job dispatched with priority', [
+      'publication_id' => $publication->id,
+      'plan' => $planSlug,
+      'file_priority' => $priority,
+      'effective_priority' => $effectivePriority
+    ]);
 
     // Notificar al usuario sobre la posición en cola si hay espera
     if ($queueSize > 0) {
@@ -193,8 +202,9 @@ class PublishPublicationAction
         if ($user) {
           $user->notify(new \App\Notifications\PublicationQueuedNotification(
             $publication,
-            $queueSize + 1,
-            $estimatedWaitMinutes
+            $queueInfo['estimated_position'],
+            $estimatedWaitMinutes,
+            $planSlug
           ));
         }
       } catch (\Exception $e) {
@@ -204,25 +214,6 @@ class PublishPublicationAction
         ]);
       }
     }
-  }
-
-  /**
-   * Estimar tiempo de espera basado en el tamaño de la cola
-   */
-  private function estimateWaitTime(int $queueSize): int
-  {
-    if ($queueSize === 0) {
-      return 0;
-    }
-
-    // Estimación: cada job toma aproximadamente 8 minutos en promedio
-    // Con 5 workers simultáneos, dividimos el tiempo
-    $avgJobTimeMinutes = 8;
-    $concurrentWorkers = 5;
-
-    $estimatedMinutes = ceil(($queueSize * $avgJobTimeMinutes) / $concurrentWorkers);
-
-    return (int) $estimatedMinutes;
   }
 
   /**

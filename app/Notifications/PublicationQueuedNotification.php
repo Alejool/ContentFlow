@@ -15,7 +15,8 @@ class PublicationQueuedNotification extends Notification
     public function __construct(
         private Publication $publication,
         private int $queuePosition,
-        private int $estimatedWaitMinutes
+        private int $estimatedWaitMinutes,
+        private ?string $planSlug = null
     ) {}
 
     public function via($notifiable): array
@@ -31,6 +32,7 @@ class PublicationQueuedNotification extends Notification
             'publication_title' => $this->publication->title,
             'queue_position' => $this->queuePosition,
             'estimated_wait_minutes' => $this->estimatedWaitMinutes,
+            'plan' => $this->planSlug,
             'message' => $this->getMessage(),
         ];
     }
@@ -43,20 +45,43 @@ class PublicationQueuedNotification extends Notification
             'publication_title' => $this->publication->title,
             'queue_position' => $this->queuePosition,
             'estimated_wait_minutes' => $this->estimatedWaitMinutes,
+            'plan' => $this->planSlug,
             'message' => $this->getMessage(),
         ]);
     }
 
     private function getMessage(): string
     {
+        $planInfo = $this->getPlanInfo();
+        
         if ($this->queuePosition <= 3) {
-            return "Tu publicación '{$this->publication->title}' está en cola. Comenzará pronto.";
+            return "Tu publicación '{$this->publication->title}' está en cola{$planInfo}. Comenzará pronto.";
         }
         
         if ($this->estimatedWaitMinutes < 5) {
-            return "Tu publicación '{$this->publication->title}' está en cola (posición {$this->queuePosition}). Tiempo estimado: menos de 5 minutos.";
+            return "Tu publicación '{$this->publication->title}' está en cola (posición {$this->queuePosition}{$planInfo}). Tiempo estimado: menos de 5 minutos.";
         }
         
-        return "Tu publicación '{$this->publication->title}' está en cola (posición {$this->queuePosition}). Tiempo estimado: ~{$this->estimatedWaitMinutes} minutos.";
+        return "Tu publicación '{$this->publication->title}' está en cola (posición {$this->queuePosition}{$planInfo}). Tiempo estimado: ~{$this->estimatedWaitMinutes} minutos.";
+    }
+
+    private function getPlanInfo(): string
+    {
+        if (!$this->planSlug) {
+            return '';
+        }
+
+        $planNames = [
+            'enterprise' => 'Prioridad Máxima',
+            'professional' => 'Prioridad Alta',
+            'growth' => 'Prioridad Media',
+            'starter' => 'Prioridad Estándar',
+            'free' => '',
+            'demo' => '',
+        ];
+
+        $planName = $planNames[$this->planSlug] ?? '';
+        
+        return $planName ? " - {$planName}" : '';
     }
 }

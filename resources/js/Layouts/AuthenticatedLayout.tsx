@@ -7,6 +7,7 @@ import ProfileDropdown from '@/Components/Layout/ProfileDropdown';
 import SearchButton from '@/Components/Layout/SearchButton';
 import Sidebar from '@/Components/Layout/Sidebar';
 import MaintenanceBanner from '@/Components/MaintenanceBanner';
+import QueueNotificationFloat from '@/Components/Queue/QueueNotificationFloat';
 import { ResumeUploadsPrompt } from '@/Components/Upload/ResumeUploadsPrompt';
 import { TimezoneInitializer } from '@/Components/common/TimezoneInitializer';
 import KeyboardShortcutsModal from '@/Components/common/ui/KeyboardShortcutsModal';
@@ -234,6 +235,7 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
           </div>
           <GlobalUploadIndicator />
           <ResumeUploadsPrompt />
+          <QueueNotificationFloat />
           <KeyboardShortcutsModal
             isOpen={showShortcutsModal}
             onClose={() => setShowShortcutsModal(false)}

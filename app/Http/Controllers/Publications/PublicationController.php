@@ -2087,8 +2087,31 @@ class PublicationController extends Controller
     $filters = $request->only(['status', 'search', 'date_start', 'date_end', 'platform']);
 
     try {
+      // Get workspace and history limit info
+      $workspace = Auth::user()->currentWorkspace ?? Auth::user()->workspaces()->first();
+      $validator = app(\App\Services\Subscription\GranularLimitValidator::class);
+      $historyDays = $validator->getHistoryDaysLimit($workspace);
+      $startDate = $validator->getExportStartDate($workspace);
+      $endDate = now();
+      
       $export = new \App\Exports\PublicationsExport($filters);
-      $filename = 'publicaciones_' . date('Y-m-d_His') . '.' . $format;
+      
+      // Generate descriptive filename with date range and plan limit
+      $startDateStr = $startDate->format('Y-m-d');
+      $endDateStr = $endDate->format('Y-m-d');
+      $filename = "publicaciones_{$startDateStr}_{$endDateStr}_{$historyDays}dias.{$format}";
+
+      // Add metadata header for CSV/XLSX
+      if ($format === 'csv' || $format === 'xlsx') {
+        // The export class will handle the date filtering
+        $response = Excel::download($export, $filename);
+        
+        // Add custom header with export info
+        $response->headers->set('X-Export-History-Days', $historyDays);
+        $response->headers->set('X-Export-Start-Date', $startDate->format('Y-m-d'));
+        
+        return $response;
+      }
 
       if ($format === 'pdf') {
         return Excel::download($export, $filename, \Maatwebsite\Excel\Excel::DOMPDF);

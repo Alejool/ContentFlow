@@ -40,6 +40,8 @@
     "cancelRequired": "Gestión de suscripción requerida",
     "cancelSubscriptionFirst": "Para volver al plan gratuito, primero debes cancelar tu suscripción de pago actual. El cambio se aplicará al finalizar tu periodo de facturación.",
     "missingFeatures": "Lo que te estás perdiendo",
+    "showMore": "Ver más",
+    "showLess": "Ver menos",
 
     "activeSubscription": {
       "title": "Ya tienes una suscripción activa",
@@ -113,10 +115,15 @@
       "dedicatedSupport": "Soporte dedicado",
       "calendarSync": "Sincronización de calendario",
       "bulkOperations": "Operaciones en lote",
+      "bulkOperations3": "Operaciones en lote (hasta 3)",
+      "bulkOperations10": "Operaciones en lote (hasta 10)",
+      "bulkOperations20": "Operaciones en lote (hasta 20)",
+      "bulkOperations50": "Operaciones en lote (hasta 50)",
       "customBranding": "Branding personalizado",
       "whiteLabel": "White-label",
       "apiAccess": "Acceso API",
       "customIntegrations": "Integraciones personalizadas",
+      "customIntegrationsContact": "Integraciones personalizadas (contactar)",
       "slaGuarantee": "Garantía SLA",
       "discordChannels1": "1 canal de Discord",
       "discordChannels2": "2 canales de Discord",
@@ -125,13 +132,20 @@
       "basicScheduling": "Programación básica (fecha y hora)",
       "schedulingRecurrence": "Recurrencia automática de publicaciones",
       "queuePublishing": "Cola de publicación",
+      "queuePriorityLow": "Prioridad baja en cola",
+      "queuePriorityStandard": "Prioridad estándar en cola",
+      "queuePriorityMedium": "Prioridad media en cola",
+      "queuePriorityHigh": "Prioridad alta en cola",
+      "queuePriorityMaximum": "Prioridad máxima en cola",
       "optimalTimes": "Horarios óptimos con IA",
       "approvalWorkflowsBasic": "Flujos de aprobación (nivel único)",
       "approvalWorkflowsAdvanced": "Flujos de aprobación multi-nivel",
       "historyDays30": "Historial de 30 días",
       "historyDays60": "Historial de 60 días",
       "historyDays90": "Historial de 90 días",
-      "historyDays365": "Historial de 1 año"
+      "historyDays365": "Historial de 1 año",
+      "exportHistoryLimit": "Tu plan permite exportar hasta {{days}} días de historial",
+      "exportHistoryLimitYear": "Tu plan permite exportar hasta {{days}} días de historial (1 año)"
     },
 
     "billing": {
