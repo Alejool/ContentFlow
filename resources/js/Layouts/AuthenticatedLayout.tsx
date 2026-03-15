@@ -161,7 +161,6 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
   return (
     <AbilityProvider>
       <OnboardingProvider>
-        {/* ✅ Inicializar timezone desde Inertia props */}
         <TimezoneInitializer />
 
         {/* Banner de mantenimiento para super admins */}
@@ -188,7 +187,7 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
                 role="main"
                 aria-label="Main content"
               >
-                <header className="sticky top-0 z-40 flex min-w-0 flex-col border-b border-gray-200/50 bg-white/80 backdrop-blur-xl dark:border-neutral-800 dark:bg-black/80">
+                <header className="fixed top-0 z-40 flex min-w-0 flex-col border-b border-gray-200/50 bg-white/80 backdrop-blur-xl dark:border-neutral-800 dark:bg-black/80">
                   {!route().current('workspaces.*') && (
                     <div className="w-full">
                       <ActiveWorkspace />
