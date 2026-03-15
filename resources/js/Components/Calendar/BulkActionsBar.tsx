@@ -248,14 +248,14 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
 
           <div className="flex justify-end gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">
             <Button
-              variant="secondary"
+              variant="ghost"
               onClick={() => setShowDeleteModal(false)}
               disabled={isDeleting}
             >
               {t('common.cancel')}
             </Button>
             <Button
-              variant="danger"
+              variant="primary"
               onClick={handleBulkDelete}
               disabled={isDeleting}
               loading={isDeleting}

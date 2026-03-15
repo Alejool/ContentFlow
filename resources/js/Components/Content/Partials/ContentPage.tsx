@@ -671,7 +671,7 @@ export default function ManageContentPage() {
           onPrimarySubmit={confirmDelete}
           submitText={t('common.delete').toUpperCase() || 'ELIMINAR'}
           cancelText={t('common.cancel').toUpperCase() || 'CANCELAR'}
-          submitVariant="danger"
+          submitVariant="primary"
           submitIcon={<Trash2 className="h-4 w-4" />}
           cancelStyle="outline"
         />
