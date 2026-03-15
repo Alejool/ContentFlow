@@ -2,7 +2,7 @@ import axios from 'axios';
 import { create } from 'zustand';
 
 interface LogState {
-  logs: any[];
+  logs: Record<string, unknown>[];
   pagination: {
     current_page: number;
     last_page: number;
@@ -12,7 +12,7 @@ interface LogState {
   isLoading: boolean;
   error: string | null;
 
-  fetchLogs: (filters?: any, page?: number) => Promise<void>;
+  fetchLogs: (filters?: Record<string, unknown>, page?: number) => Promise<void>;
   reset: () => void;
 }
 
@@ -38,7 +38,7 @@ export const useLogStore = create<LogState>((set) => ({
           acc[key] = value;
         }
         return acc;
-      }, {} as any);
+      }, {} as Record<string, unknown>);
       const response = await axios.get('/api/v1/logs', {
         params: { ...cleanFilters, page },
         paramsSerializer: {
@@ -67,7 +67,7 @@ export const useLogStore = create<LogState>((set) => ({
           },
         });
       }
-    } catch (error: any) {
+    } catch (error) {
       set({
         error: error.message ?? 'Failed to fetch logs',
       });

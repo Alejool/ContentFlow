@@ -26,7 +26,7 @@ interface ProcessingProgressState {
   cancelJob: (id: string) => void;
 }
 
-export const useProcessingProgress = create<ProcessingProgressState>((set, get) => ({
+export const useProcessingProgress = create<ProcessingProgressState>((set, _get) => ({
   jobs: {},
 
   addJob: (job) =>
@@ -73,6 +73,14 @@ export const useProcessingProgress = create<ProcessingProgressState>((set, get) 
     }),
 }));
 
+interface ProcessingEvent {
+  jobId: string;
+  publicationId: number;
+  progress: number;
+  stats?: ProcessingJob['stats'];
+  error?: string;
+}
+
 // WebSocket listener initialization
 export function initProcessingProgressRealtime(userId: number) {
   if (!window.Echo) {
@@ -82,7 +90,7 @@ export function initProcessingProgressRealtime(userId: number) {
   const channel = window.Echo.private(`users.${userId}`);
 
   // Listen for processing progress updates
-  channel.listen('.ProcessingProgressUpdated', (e: any) => {
+  channel.listen('.ProcessingProgressUpdated', (e: ProcessingEvent) => {
     const { jobId, publicationId, progress, stats } = e;
 
     const store = useProcessingProgress.getState();
@@ -109,8 +117,8 @@ export function initProcessingProgressRealtime(userId: number) {
   });
 
   // Listen for processing completion
-  channel.listen('.VideoProcessingCompleted', (e: any) => {
-    const { jobId, publicationId } = e;
+  channel.listen('.VideoProcessingCompleted', (e: ProcessingEvent) => {
+    const { jobId } = e;
 
     const store = useProcessingProgress.getState();
     const job = store.jobs[jobId];
@@ -130,7 +138,7 @@ export function initProcessingProgressRealtime(userId: number) {
   });
 
   // Listen for processing failures
-  channel.listen('.VideoProcessingFailed', (e: any) => {
+  channel.listen('.VideoProcessingFailed', (e: ProcessingEvent) => {
     const { jobId, error } = e;
 
     const store = useProcessingProgress.getState();
@@ -146,7 +154,7 @@ export function initProcessingProgressRealtime(userId: number) {
   });
 
   // Listen for processing cancellations
-  channel.listen('.VideoProcessingCancelled', (e: any) => {
+  channel.listen('.VideoProcessingCancelled', (e: ProcessingEvent) => {
     const { jobId } = e;
 
     const store = useProcessingProgress.getState();

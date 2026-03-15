@@ -13,8 +13,8 @@ interface PublicationState {
   scheduledPlatforms: Record<number, number[]>;
   removedPlatforms: Record<number, number[]>;
   duplicatePlatforms: Record<number, number[]>; // Plataformas con intentos duplicados
-  recurringPosts: Record<number, Record<number, any[]>>; // publicationId -> accountId -> posts[]
-  publishedRecurringPosts: Record<number, Record<number, any[]>>; // publicationId -> accountId -> posts[]
+  recurringPosts: Record<number, Record<number, unknown[]>>; // publicationId -> accountId -> posts[]
+  publishedRecurringPosts: Record<number, Record<number, unknown[]>>; // publicationId -> accountId -> posts[]
   retryInfo: Record<
     number,
     Record<
@@ -39,7 +39,7 @@ interface PublicationState {
     per_page: number;
   };
 
-  fetchPublications: (filters?: any, page?: number, useApprovalFilter?: boolean) => Promise<void>;
+  fetchPublications: (filters?: Record<string, unknown>, page?: number, useApprovalFilter?: boolean) => Promise<void>;
   fetchPublicationById: (id: number) => Promise<Publication | null>;
   fetchPublishedPlatforms: (publicationId: number) => Promise<{
     published: number[];
@@ -59,11 +59,11 @@ interface PublicationState {
   deletePublication: (id: number) => Promise<boolean>;
   duplicatePublication: (id: number) => Promise<boolean>;
 
-  publishPublication: (id: number, formData: FormData) => Promise<{ success: boolean; data?: any }>;
+  publishPublication: (id: number, formData: FormData) => Promise<{ success: boolean; data?: unknown }>;
   unpublishPublication: (
     id: number,
     platformIds: number[],
-  ) => Promise<{ success: boolean; data?: any }>;
+  ) => Promise<{ success: boolean; data?: unknown }>;
   setCurrentPublication: (publication: Publication | null) => void;
 
   getPublicationById: (id: number) => Publication | undefined;
@@ -95,8 +95,8 @@ interface PublicationState {
   clearError: () => void;
   reset: () => void;
 
-  acquireLock: (id: number, force?: boolean) => Promise<{ success: boolean; data?: any }>;
-  releaseLock: (id: number) => Promise<{ success: boolean; data?: any }>;
+  acquireLock: (id: number, force?: boolean) => Promise<{ success: boolean; data?: unknown }>;
+  releaseLock: (id: number) => Promise<{ success: boolean; data?: unknown }>;
 }
 
 export const usePublicationStore = create<PublicationState>((set, get) => ({
@@ -126,11 +126,6 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
   fetchPublications: async (filters = {}, page = 1, useApprovalFilter = false) => {
     set({ isLoading: true, error: null });
 
-    // CRITICAL: Clear previous page data to prevent memory bloat
-    // Only keep data for the current page being viewed
-    // TEMPORARILY DISABLED FOR DEBUGGING
-    // get().clearPageData();
-
     try {
       // Limpiar filtros vacíos
       const cleanFilters = Object.entries(filters).reduce((acc, [key, value]) => {
@@ -143,7 +138,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
           acc[key] = value;
         }
         return acc;
-      }, {} as any);
+      }, {} as Record<string, unknown>);
 
       // Use different endpoint based on approval filter
       const endpoint = useApprovalFilter
@@ -209,9 +204,10 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
         },
         isLoading: false,
       });
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
       set({
-        error: error.message ?? 'Failed to fetch publications',
+        error: axiosError.message ?? 'Failed to fetch publications',
         isLoading: false,
       });
     }
@@ -236,9 +232,10 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       }));
 
       return publication;
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
       set({
-        error: error.message ?? 'Failed to fetch publication',
+        error: axiosError.message ?? 'Failed to fetch publication',
       });
       return null;
     }
@@ -330,7 +327,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       // 1. Process social_post_logs if they are part of the update
       // This ensures that platform status caches (published, publishing, etc.)
       // are always in sync with the latest data from Echo or API.
-      const logs = updated.social_post_logs || (updated as any).socialPostLogs;
+      const logs = updated.social_post_logs || (updated as Publication & { socialPostLogs?: Publication['social_post_logs'] }).socialPostLogs;
 
       const newPlatformStatusUpdates: Partial<PublicationState> = {};
 
@@ -339,9 +336,8 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
         const failed: number[] = [];
         const publishing: number[] = [];
         const removed: number[] = [];
-        const scheduled: number[] = [];
         const duplicates: number[] = []; // Plataformas con intentos duplicados
-        const retryInfoUpdates: Record<number, any> = {};
+        const retryInfoUpdates: Record<number, { retry_count: number; is_retrying: boolean; retry_status: string; is_duplicate: boolean; original_attempt_at?: string }> = {};
 
         // Determine which social accounts have pending scheduled posts
         // to avoid marking them as "available" prematurely
@@ -353,7 +349,8 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
         );
 
         // Agrupar logs por social_account_id para detectar duplicados
-        const logsByAccount = logs.reduce((acc: any, log: any) => {
+        type SocialPostLog = NonNullable<Publication['social_post_logs']>[number];
+        const logsByAccount = logs.reduce((acc: Record<string, SocialPostLog[]>, log: SocialPostLog) => {
           if (!acc[log.social_account_id]) {
             acc[log.social_account_id] = [];
           }
@@ -361,12 +358,12 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
           return acc;
         }, {});
 
-        Object.entries(logsByAccount).forEach(([accountId, accountLogs]: [string, any]) => {
+        Object.entries(logsByAccount).forEach(([accountId, accountLogs]: [string, SocialPostLog[]]) => {
           const socialAccountId = parseInt(accountId);
           if (scheduledIds.has(socialAccountId)) return;
 
           // Ordenar logs por fecha de creación (más reciente primero)
-          const sortedLogs = (accountLogs as any[]).sort(
+          const sortedLogs = (accountLogs as SocialPostLog[]).sort(
             (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
           );
 
@@ -466,9 +463,10 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       // Refresh calendar store to reflect changes
       useCalendarStore.getState().fetchEvents();
       return publication;
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
       set({
-        error: error.response?.data?.message ?? 'Failed to create publication',
+        error: axiosError.response?.data?.message ?? 'Failed to create publication',
         isLoading: false,
       });
       throw error;
@@ -493,9 +491,10 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       // Refresh calendar store to reflect updated publication
       useCalendarStore.getState().fetchEvents();
       return publication;
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
       set({
-        error: error.response?.data?.message ?? 'Failed to update publication',
+        error: axiosError.response?.data?.message ?? 'Failed to update publication',
         isLoading: false,
       });
       throw error;
@@ -510,9 +509,10 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       set({ isLoading: false });
       useCalendarStore.getState().fetchEvents();
       return true;
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
       set({
-        error: error.response?.data?.message ?? 'Failed to delete publication',
+        error: axiosError.response?.data?.message ?? 'Failed to delete publication',
         isLoading: false,
       });
       return false;
@@ -530,9 +530,10 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       set({ isLoading: false });
       useCalendarStore.getState().fetchEvents();
       return true;
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
       set({
-        error: error.response?.data?.message ?? 'Failed to duplicate publication',
+        error: axiosError.response?.data?.message ?? 'Failed to duplicate publication',
         isLoading: false,
       });
       return false;
@@ -545,10 +546,11 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       return { success: response.data.success, data: response.data };
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
       return {
         success: false,
-        data: error.response?.data?.message ?? 'Failed to publish',
+        data: axiosError.response?.data?.message ?? 'Failed to publish',
       };
     }
   },
@@ -559,10 +561,11 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
         platform_ids: platformIds,
       });
       return { success: true, data: response.data };
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
       return {
         success: false,
-        data: error.response?.data?.message ?? 'Failed to unpublish',
+        data: axiosError.response?.data?.message ?? 'Failed to unpublish',
       };
     }
   },
@@ -625,7 +628,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
     })),
 
   clearPageData: () =>
-    set((state) => ({
+    set((_state) => ({
       // Clear publications array to free memory
       publications: [],
       // Clear all platform caches as they're page-specific
@@ -665,12 +668,11 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
         force,
       });
       return { success: response.data.success, data: response.data };
-    } catch (error: any) {
-      // Don't set global store error for locks as it's often background/ephemeral
-      // Just return the error state so the hook can handle it (e.g. 423 Locked)
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
       return {
         success: false,
-        data: error.response?.data ?? { message: 'Failed to acquire lock' },
+        data: axiosError.response?.data ?? { message: 'Failed to acquire lock' },
       };
     }
   },
@@ -679,10 +681,11 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
     try {
       const response = await axios.post(route('api.v1.publications.unlock', id));
       return { success: true, data: response.data };
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
       return {
         success: false,
-        data: error.response?.data ?? { message: 'Failed to release lock' },
+        data: axiosError.response?.data ?? { message: 'Failed to release lock' },
       };
     }
   },

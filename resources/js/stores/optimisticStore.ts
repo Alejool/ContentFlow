@@ -52,7 +52,7 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
    * Confirm an operation as successful and update with server data
    * Requirements: 2.2, 9.4
    */
-  confirmOperation: (id: string, serverData: any) => {
+  confirmOperation: (id: string, serverData: unknown) => {
     set((state) => {
       const newOps = new Map(state.operations);
       const op = newOps.get(id);
@@ -77,8 +77,8 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
         if (op.onSuccess) {
           try {
             op.onSuccess(serverData);
-          } catch (error) {
-            console.warn('[OptimisticStore] onSuccess callback error:', error);
+          } catch (_error) {
+            console.warn('[OptimisticStore] onSuccess callback error:', _error);
           }
         }
       }
@@ -110,8 +110,8 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
           completedAt: Date.now(),
           error: {
             message: error.message,
-            code: (error as any).code,
-            details: (error as any).response?.data,
+            code: (error as NodeJS.ErrnoException).code,
+            details: (error as { response?: { data?: unknown } }).response?.data,
           },
         };
 
@@ -241,7 +241,7 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
       if (import.meta.env.DEV) {
         console.log(`[OptimisticStore] Persisted ${state.operations.size} operations`);
       }
-    } catch (error) {
+    } catch {
       // Ignore storage errors
     }
   },
@@ -259,7 +259,7 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
 
         // Convert array back to Map
         const operationsMap = new Map<string, OptimisticOperation>(
-          data.operations.map(([id, op]: [string, any]) => [
+          data.operations.map(([id, op]: [string, unknown]) => [
             id,
             {
               ...op,
@@ -279,7 +279,7 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
           console.log(`[OptimisticStore] Restored ${operationsMap.size} operations (age: ${age}s)`);
         }
       }
-    } catch (error) {
+    } catch {
       // Ignore storage errors
     }
   },

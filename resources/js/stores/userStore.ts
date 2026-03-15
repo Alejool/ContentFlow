@@ -16,7 +16,7 @@ export interface User {
   provider?: string | null;
   locale?: string | null;
   country_code?: string | null;
-  global_platform_settings?: Record<string, any> | null;
+  global_platform_settings?: Record<string, unknown> | null;
 }
 
 interface UserState {
@@ -24,11 +24,11 @@ interface UserState {
   isLoading: boolean;
   error: string | null;
   setUser: (user: User | null) => void;
-  updateProfile: (data: any) => Promise<{ success: boolean; message?: string }>;
-  updatePassword: (data: any) => Promise<{ success: boolean; message?: string }>;
+  updateProfile: (data: Record<string, unknown>) => Promise<{ success: boolean; message?: string }>;
+  updatePassword: (data: Record<string, unknown>) => Promise<{ success: boolean; message?: string }>;
 }
 
-export const useUserStore = create<UserState>((set, get) => ({
+export const useUserStore = create<UserState>((set, _get) => ({
   user: null,
   isLoading: false,
   error: null,
@@ -44,8 +44,9 @@ export const useUserStore = create<UserState>((set, get) => ({
         return { success: true, message: response.data.message };
       }
       return { success: false, message: response.data.message };
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Failed to update profile';
+    } catch (error) {
+      const axiosError = error as import('axios').AxiosError<{ message?: string }>;
+      const errorMessage = axiosError.response?.data?.message || 'Failed to update profile';
       set({ error: errorMessage });
       throw error;
     } finally {
@@ -61,8 +62,9 @@ export const useUserStore = create<UserState>((set, get) => ({
         return { success: true, message: response.data.message };
       }
       return { success: false, message: response.data.message };
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Failed to update password';
+    } catch (error) {
+      const axiosError = error as import('axios').AxiosError<{ message?: string }>;
+      const errorMessage = axiosError.response?.data?.message || 'Failed to update password';
       set({ error: errorMessage });
       throw error;
     } finally {

@@ -1,19 +1,19 @@
+import { DataConflict } from '@/Components/Calendar/ConflictResolutionModal';
+import { CalendarEvent, CalendarFilters, CalendarView } from '@/types/calendar';
 import axios from 'axios';
 import {
-  endOfMonth,
-  endOfWeek,
-  startOfMonth,
-  startOfWeek,
-  addMonths,
-  subMonths,
-  addWeeks,
-  subWeeks,
-  addDays,
-  subDays,
+    addDays,
+    addMonths,
+    addWeeks,
+    endOfMonth,
+    endOfWeek,
+    startOfMonth,
+    startOfWeek,
+    subDays,
+    subMonths,
+    subWeeks,
 } from 'date-fns';
 import { create } from 'zustand';
-import { CalendarEvent, CalendarView, CalendarFilters } from '@/types/calendar';
-import { DataConflict } from '@/Components/Calendar/ConflictResolutionModal';
 
 interface CalendarState {
   events: CalendarEvent[];
@@ -27,7 +27,7 @@ interface CalendarState {
   selectedEvents: Set<string>;
   filters: CalendarFilters;
   canUndo: boolean;
-  lastBulkOperation: any | null;
+  lastBulkOperation: Record<string, unknown> | null;
   lastBulkOperationTime: Date | null;
   conflict: DataConflict | null;
 
@@ -175,7 +175,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       const end = endOfWeek(endOfMonth(currentMonth)).toISOString();
 
       // Build query params with filters
-      const params: any = { start, end };
+      const params: Record<string, string> = { start, end };
 
       if (filters.platforms.length > 0) {
         params.platforms = filters.platforms.join(',');
@@ -195,7 +195,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
         events: response.data.data || [],
         isLoading: false,
       });
-    } catch (error: any) {
+    } catch (error) {
       set({
         error: error.message ?? 'Failed to fetch calendar events',
         isLoading: false,
@@ -252,7 +252,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       set({ events });
 
       return true;
-    } catch (error: any) {
+    } catch (error) {
       // Check for conflict error (409)
       if (error.response?.status === 409 && error.response?.data?.conflict) {
         const conflictData = error.response.data.conflict;
@@ -320,7 +320,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       }
 
       return false;
-    } catch (error: any) {
+    } catch (error) {
       set({
         error: error.response?.data?.message ?? 'Failed to bulk update events',
       });
@@ -352,7 +352,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       }
 
       return false;
-    } catch (error: any) {
+    } catch (error) {
       set({
         error: error.response?.data?.message ?? 'Failed to bulk delete events',
       });
@@ -378,7 +378,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       }
 
       return false;
-    } catch (error: any) {
+    } catch (error) {
       set({
         error: error.response?.data?.message ?? 'Failed to undo operation',
       });
@@ -423,7 +423,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       set({ events });
 
       return true;
-    } catch (error: any) {
+    } catch (error) {
       console.error('Delete event error:', error);
       set({
         error: error.response?.data?.message || error.message || 'Failed to delete event',
@@ -447,7 +447,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       if (response.data.url) {
         window.open(response.data.url, '_blank');
       }
-    } catch (error: any) {
+    } catch (error) {
       set({
         error: error.message ?? 'Failed to export to Google Calendar',
       });
@@ -469,7 +469,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       if (response.data.url) {
         window.open(response.data.url, '_blank');
       }
-    } catch (error: any) {
+    } catch (error) {
       set({
         error: error.message ?? 'Failed to export to Outlook',
       });
@@ -558,7 +558,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
 
       set({ events, conflict: null });
       return true;
-    } catch (error: any) {
+    } catch (error) {
       set({
         error: error.message ?? 'Failed to resolve conflict',
       });

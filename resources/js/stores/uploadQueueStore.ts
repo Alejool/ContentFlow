@@ -282,7 +282,9 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
 
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(persistedState));
-    } catch (error) {}
+    } catch {
+      // Ignore storage quota errors
+    }
   },
 
   restoreState: () => {
@@ -333,7 +335,7 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
       });
 
       set({ persistedState: restoredUploads });
-    } catch (error) {
+    } catch {
       localStorage.removeItem(STORAGE_KEY);
     }
   },
@@ -352,7 +354,9 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
         const { [id]: _, ...rest } = state.persistedState;
         return { persistedState: rest };
       });
-    } catch (error) {}
+    } catch {
+      // Ignore storage errors
+    }
   },
 
   initializeStore: () => {
@@ -385,6 +389,8 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
     try {
       localStorage.removeItem(STORAGE_KEY);
       set({ persistedState: {}, showResumePrompt: false });
-    } catch (error) {}
+    } catch {
+      // Ignore storage errors
+    }
   },
 }));

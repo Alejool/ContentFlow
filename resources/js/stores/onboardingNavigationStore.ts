@@ -1,5 +1,5 @@
-import { create } from 'zustand';
 import { router } from '@inertiajs/react';
+import { create } from 'zustand';
 
 /**
  * Store for managing onboarding navigation state and history
@@ -100,7 +100,7 @@ export const useOnboardingNavigationStore = create<OnboardingNavigationState>((s
         state.setCurrentPath(path);
         state.setNavigating(false);
       },
-      onError: (errors) => {
+      onError: (_errors) => {
         state.setNavigating(false);
       },
     });

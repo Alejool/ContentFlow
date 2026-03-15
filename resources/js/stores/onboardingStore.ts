@@ -1,15 +1,15 @@
-import { router } from '@inertiajs/react';
-import { create } from 'zustand';
-import axios from 'axios';
 import type { OnboardingState } from '@/types/onboarding';
-import { offlineQueue, type QueuedAction } from '@/Utils/offlineQueue';
 import {
-  retryWithBackoff,
-  createNetworkError,
-  getErrorMessage,
-  isOnline,
-  type RetryOptions,
+    createNetworkError,
+    getErrorMessage,
+    isOnline,
+    retryWithBackoff,
+    type RetryOptions,
 } from '@/Utils/networkErrorHandler';
+import { offlineQueue, type QueuedAction } from '@/Utils/offlineQueue';
+import { router } from '@inertiajs/react';
+import axios from 'axios';
+import { create } from 'zustand';
 
 // LocalStorage cache key
 const CACHE_KEY = 'onboarding_state_cache';
@@ -94,7 +94,7 @@ interface OnboardingStoreState extends OnboardingState {
   lastSyncTimestamp: number | null;
 
   // Business info actions
-  completeBusinessInfo: (data: any) => Promise<void>;
+  completeBusinessInfo: (data: Record<string, unknown>) => Promise<void>;
 
   // Plan selection actions
   selectPlan: (planId: string) => Promise<void>;
@@ -131,7 +131,7 @@ interface OnboardingStoreState extends OnboardingState {
 
   // Internal helper for optimistic updates
   _rollback: (previousState: Partial<OnboardingState>) => void;
-  _executeAction: (type: string, payload: any) => Promise<void>;
+  _executeAction: (type: string, payload: Record<string, unknown>) => Promise<void>;
   _updateCache: () => void;
 }
 
@@ -189,7 +189,7 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
     lastSyncTimestamp: null,
 
     // Business info actions
-    completeBusinessInfo: async (data: any) => {
+    completeBusinessInfo: async (data: Record<string, unknown>) => {
       const previousState = {
         businessInfoCompleted: get().businessInfoCompleted,
       };
@@ -209,7 +209,7 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
 
       try {
         await get()._executeAction('completeBusinessInfo', data);
-      } catch (error: any) {
+      } catch (error) {
         get()._rollback(previousState);
         const errorMessage = getErrorMessage(error);
         set({ error: errorMessage });
@@ -238,7 +238,7 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
 
       try {
         await get()._executeAction('selectPlan', { planId });
-      } catch (error: any) {
+      } catch (error) {
         get()._rollback(previousState);
         const errorMessage = getErrorMessage(error);
         set({ error: errorMessage });
@@ -267,7 +267,7 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
             },
           },
         );
-      } catch (error: any) {
+      } catch (error) {
         set({
           error: error.message || 'Failed to start tour',
           isLoading: false,
@@ -378,7 +378,7 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
       try {
         // Sync with backend asynchronously
         await get()._executeAction('skipTour', {});
-      } catch (error: any) {
+      } catch (error) {
         // Rollback on failure with user notification
         get()._rollback(previousState);
         const errorMessage = getErrorMessage(error);
@@ -421,7 +421,7 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
       try {
         // Sync with backend asynchronously
         await get()._executeAction('completeTourStep', { stepId });
-      } catch (error: any) {
+      } catch (error) {
         // Rollback on failure with user notification
         get()._rollback(previousState);
         const errorMessage = getErrorMessage(error);
@@ -463,7 +463,7 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
       try {
         // Sync with backend asynchronously
         await get()._executeAction('dismissTooltip', { tooltipId });
-      } catch (error: any) {
+      } catch (error) {
         // Rollback on failure with user notification
         get()._rollback(previousState);
         const errorMessage = getErrorMessage(error);
@@ -517,7 +517,7 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
       try {
         // Sync with backend asynchronously
         await get()._executeAction('completeWizardStep', { stepId, data });
-      } catch (error: any) {
+      } catch (error) {
         console.error('Failed to complete wizard step', error);
         // Rollback on failure with user notification
         get()._rollback(previousState);
@@ -554,7 +554,7 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
       try {
         // Sync with backend asynchronously
         await get()._executeAction('skipWizard', {});
-      } catch (error: any) {
+      } catch (error) {
         // Rollback on failure with user notification
         get()._rollback(previousState);
         const errorMessage = getErrorMessage(error);
@@ -592,7 +592,7 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
       try {
         // Sync with backend asynchronously
         await get()._executeAction('selectTemplate', { templateId });
-      } catch (error: any) {
+      } catch (error) {
         // Rollback on failure with user notification
         get()._rollback(previousState);
         const errorMessage = getErrorMessage(error);
@@ -640,7 +640,7 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
             },
           },
         );
-      } catch (error: any) {
+      } catch (error) {
         set({
           error: error.message || 'Failed to restart onboarding',
           isLoading: false,
@@ -752,7 +752,7 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
       saveCachedState(cacheableState);
     },
 
-    _executeAction: async (type: string, payload: any) => {
+    _executeAction: async (type: string, payload: Record<string, unknown>) => {
       const retryOptions: RetryOptions = {
         maxRetries: 3,
         initialDelay: 1000,
@@ -767,7 +767,7 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
         }
 
         let endpoint = '';
-        let data: any = {};
+        let data: Record<string, unknown> = {};
 
         switch (type) {
           case 'completeBusinessInfo':

@@ -21,7 +21,7 @@ export interface NotificationData {
     platform?: string;
     priority?: string;
     notification_type?: string;
-    [key: string]: any;
+    [key: string]: unknown;
   };
   read_at: string | null;
   created_at: string;
@@ -101,7 +101,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
         systemNotifications,
         isLoading: false,
       });
-    } catch (error) {
+    } catch {
       set({ isLoading: false });
     }
   },
@@ -128,7 +128,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
           ),
         };
       });
-    } catch (error) {}
+    } catch {}
   },
 
   markAllAsRead: async () => {
@@ -151,7 +151,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
           ),
         };
       });
-    } catch (error) {}
+    } catch {}
   },
 
   deleteNotification: async (id: string) => {
@@ -177,7 +177,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
           ),
         };
       });
-    } catch (error) {}
+    } catch {}
   },
 
   filterByPriority: (priority: string | null) => {

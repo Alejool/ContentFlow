@@ -1,6 +1,6 @@
+import { useCalendarStore } from '@/stores/calendarStore';
 import axios from 'axios';
 import { create } from 'zustand';
-import { useCalendarStore } from '@/stores/calendarStore';
 
 export interface Campaign {
   id: number;
@@ -26,7 +26,7 @@ interface CampaignState {
     total: number;
     per_page: number;
   };
-  fetchCampaigns: (filters?: any, page?: number) => Promise<void>;
+  fetchCampaigns: (filters?: Record<string, unknown>, page?: number) => Promise<void>;
   getCampaignById: (id: number) => Campaign | undefined;
   addCampaign: (campaign: Campaign) => void;
   updateCampaign: (id: number, campaign: Partial<Campaign>) => void;
@@ -94,7 +94,7 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
         isLoading: false,
         pagination: paginationData,
       });
-    } catch (error: any) {
+    } catch (error) {
       set({
         error: error.message || 'Failed to fetch campaigns',
         isLoading: false,
@@ -134,7 +134,7 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
       set({ isLoading: false });
       useCalendarStore.getState().fetchEvents();
       return true;
-    } catch (error: any) {
+    } catch (error) {
       set({
         error: error.response?.data?.message ?? 'Failed to delete campaign',
         isLoading: false,
@@ -154,7 +154,7 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
       set({ isLoading: false });
       useCalendarStore.getState().fetchEvents();
       return true;
-    } catch (error: any) {
+    } catch (error) {
       set({
         error: error.response?.data?.message ?? 'Failed to duplicate campaign',
         isLoading: false,

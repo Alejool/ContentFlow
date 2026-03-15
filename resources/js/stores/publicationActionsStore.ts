@@ -106,10 +106,11 @@ export const usePublicationActionsStore = create<PublicationActionsStore>((set, 
             }
           : undefined,
       };
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
       return {
         success: false,
-        message: error.response?.data?.message || 'Error al enviar a revisión',
+        message: axiosError.response?.data?.message || 'Error al enviar a revisión',
       };
     } finally {
       setItemLoading(itemId, 'submitting', false);
@@ -124,11 +125,12 @@ export const usePublicationActionsStore = create<PublicationActionsStore>((set, 
       // La eliminación se maneja a través del callback onDelete
       // que viene del componente padre
       return { success: true };
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
       console.error('Error deleting publication:', error);
       return {
         success: false,
-        message: error.response?.data?.message || 'Error al eliminar',
+        message: axiosError.response?.data?.message || 'Error al eliminar',
       };
     } finally {
       setItemLoading(itemId, 'deleting', false);
@@ -143,11 +145,12 @@ export const usePublicationActionsStore = create<PublicationActionsStore>((set, 
       await axios.delete(`/api/v1/calendar/user-events/${itemId}`);
       router.reload({ only: ['publications'] });
       return { success: true, message: 'Evento eliminado' };
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
       console.error('Error deleting user event:', error);
       return {
         success: false,
-        message: error.response?.data?.message || 'Error al eliminar evento',
+        message: axiosError.response?.data?.message || 'Error al eliminar evento',
       };
     } finally {
       setItemLoading(itemId, 'deleting', false);
@@ -162,11 +165,12 @@ export const usePublicationActionsStore = create<PublicationActionsStore>((set, 
       // La duplicación se maneja a través del callback onDuplicate
       // que viene del componente padre
       return { success: true };
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
       console.error('Error duplicating publication:', error);
       return {
         success: false,
-        message: error.response?.data?.message || 'Error al duplicar',
+        message: axiosError.response?.data?.message || 'Error al duplicar',
       };
     } finally {
       setItemLoading(itemId, 'duplicating', false);

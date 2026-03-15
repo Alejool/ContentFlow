@@ -87,9 +87,10 @@ export const useAccountsStore = create<AccountsStore>((set) => ({
         lastUpdated: new Date(),
       });
       return processedAccounts;
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as import('axios').AxiosError<{ message?: string }>;
       const errorMessage =
-        error.response?.data?.message || error.message || 'Failed to fetch accounts';
+        axiosError.response?.data?.message || axiosError.message || 'Failed to fetch accounts';
       set({
         error: errorMessage,
         isLoading: false,
