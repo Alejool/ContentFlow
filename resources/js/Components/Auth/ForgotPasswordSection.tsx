@@ -27,16 +27,12 @@ export default function ForgotPasswordSection() {
         />
       </div>
 
-      <div className="mt-8 p-4 rounded-lg bg-white/10 backdrop-blur-sm">
-        <div className="flex items-center justify-center gap-2 mb-2">
-          <Shield className="w-4 h-4 " />
-          <p className="text-sm font-medium">
-            {t(`auth.forgot-password.tags.secureProcess`)}
-          </p>
+      <div className="mt-8 rounded-lg bg-white/10 p-4 backdrop-blur-sm">
+        <div className="mb-2 flex items-center justify-center gap-2">
+          <Shield className="h-4 w-4" />
+          <p className="text-sm font-medium">{t(`auth.forgot-password.tags.secureProcess`)}</p>
         </div>
-        <p className="text-sm opacity-80">
-          {t(`auth.forgot-password.tags.privacyPolicy`)}
-        </p>
+        <p className="text-sm opacity-80">{t(`auth.forgot-password.tags.privacyPolicy`)}</p>
       </div>
     </>
   );

@@ -7,10 +7,7 @@ interface CheckoutButtonProps {
   children?: React.ReactNode;
 }
 
-export default function CheckoutButton({
-  className = "",
-  children,
-}: CheckoutButtonProps) {
+export default function CheckoutButton({ className = "", children }: CheckoutButtonProps) {
   const [loading, setLoading] = useState(false);
 
   const handleCheckout = async () => {
@@ -25,9 +22,7 @@ export default function CheckoutButton({
       }
     } catch (error) {
       console.error("Error al crear sesión de checkout:", error);
-      alert(
-        "Hubo un error al procesar tu solicitud. Por favor intenta de nuevo.",
-      );
+      alert("Hubo un error al procesar tu solicitud. Por favor intenta de nuevo.");
       setLoading(false);
     }
   };
@@ -36,16 +31,16 @@ export default function CheckoutButton({
     <button
       onClick={handleCheckout}
       disabled={loading}
-      className={`inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
     >
       {loading ? (
         <>
-          <Loader2 className="w-5 h-5 animate-spin" />
+          <Loader2 className="h-5 w-5 animate-spin" />
           Procesando...
         </>
       ) : (
         <>
-          <CreditCard className="w-5 h-5" />
+          <CreditCard className="h-5 w-5" />
           {children || "Comprar Plan Premium"}
         </>
       )}

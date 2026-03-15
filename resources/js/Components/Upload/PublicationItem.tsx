@@ -7,11 +7,7 @@ interface PublicationItemProps {
   publication: Publication;
   onCancel: (e: React.MouseEvent, id: number) => void;
   onDismiss: (e: React.MouseEvent, id: number) => void;
-  onCancelPlatform?: (
-    publicationId: number,
-    platformId: number,
-    platformName: string,
-  ) => void;
+  onCancelPlatform?: (publicationId: number, platformId: number, platformName: string) => void;
 }
 
 export function PublicationItem({
@@ -32,10 +28,7 @@ export function PublicationItem({
     const published = platforms.filter((p) => p.status === "published").length;
     const failed = platforms.filter((p) => p.status === "failed").length;
     const publishing = platforms.filter(
-      (p) =>
-        p.status === "publishing" ||
-        p.status === "pending" ||
-        p.status === "retrying",
+      (p) => p.status === "publishing" || p.status === "pending" || p.status === "retrying",
     ).length;
 
     return { total, published, failed, publishing };
@@ -46,19 +39,19 @@ export function PublicationItem({
 
     switch (publication.status) {
       case "failed":
-        return <AlertTriangle className="w-3.5 h-3.5 text-red-500" />;
+        return <AlertTriangle className="h-3.5 w-3.5 text-red-500" />;
       case "publishing":
       case "processing":
       case "retrying":
-        return <Loader2 className="w-3.5 h-3.5 text-primary animate-spin" />;
+        return <Loader2 className="text-primary h-3.5 w-3.5 animate-spin" />;
       case "published":
         // Show warning icon if some platforms failed
         if (stats && stats.failed > 0) {
-          return <AlertTriangle className="w-3.5 h-3.5 text-orange-500" />;
+          return <AlertTriangle className="h-3.5 w-3.5 text-orange-500" />;
         }
-        return <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />;
+        return <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />;
       default:
-        return <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />;
+        return <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />;
     }
   };
 
@@ -84,8 +77,7 @@ export function PublicationItem({
               defaultValue: `Reintentando ${stats.published}/${stats.total}`,
             })
           : t("common.retrying") || "Reintentando",
-        className:
-          "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
+        className: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
       },
       published: {
         text: stats
@@ -107,8 +99,7 @@ export function PublicationItem({
       },
       failed: {
         text: t("common.failed") || "Falló",
-        className:
-          "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
+        className: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
       },
     };
 
@@ -117,7 +108,7 @@ export function PublicationItem({
 
     return (
       <span
-        className={`text-[9px] px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider ${badge.className}`}
+        className={`rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider ${badge.className}`}
       >
         {badge.text}
       </span>
@@ -128,15 +119,14 @@ export function PublicationItem({
     publication.status === "publishing" ||
     publication.status === "processing" ||
     publication.status === "retrying";
-  const canDismiss =
-    publication.status === "failed" || publication.status === "published";
+  const canDismiss = publication.status === "failed" || publication.status === "published";
 
   return (
-    <div className="p-3 border-b border-gray-100 dark:border-neutral-700 last:border-0 group">
-      <div className="flex items-center gap-2 mb-2">
+    <div className="group border-b border-gray-100 p-3 last:border-0 dark:border-neutral-700">
+      <div className="mb-2 flex items-center gap-2">
         {getStatusIcon()}
         <span
-          className="text-xs font-medium truncate text-neutral-900 dark:text-neutral-100 flex-1"
+          className="flex-1 truncate text-xs font-medium text-neutral-900 dark:text-neutral-100"
           title={publication.title}
         >
           {publication.title}
@@ -145,29 +135,26 @@ export function PublicationItem({
           {canDismiss && (
             <button
               onClick={(e) => onDismiss(e, publication.id)}
-              className="text-gray-400 hover:text-green-500 opacity-0 group-hover:opacity-100 transition-opacity"
+              className="text-gray-400 opacity-0 transition-opacity hover:text-green-500 group-hover:opacity-100"
               title={t("common.dismiss") || "Descartar"}
             >
-              <X className="w-3.5 h-3.5" />
+              <X className="h-3.5 w-3.5" />
             </button>
           )}
           {canCancel && (
             <button
               onClick={(e) => onCancel(e, publication.id)}
-              className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+              className="text-gray-400 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
               title={t("publications.publish.button.cancel") || "Cancelar"}
             >
-              <X className="w-3.5 h-3.5" />
+              <X className="h-3.5 w-3.5" />
             </button>
           )}
           {getStatusBadge()}
         </div>
       </div>
 
-      <PlatformProgress
-        publication={publication}
-        onCancelPlatform={onCancelPlatform}
-      />
+      <PlatformProgress publication={publication} onCancelPlatform={onCancelPlatform} />
     </div>
   );
 }

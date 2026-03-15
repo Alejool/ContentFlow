@@ -27,11 +27,7 @@ interface AddCampaignModalProps {
   onSubmit: (data: any) => void;
 }
 
-export default function AddCampaignModal({
-  isOpen,
-  onClose,
-  onSubmit,
-}: AddCampaignModalProps) {
+export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampaignModalProps) {
   const { t } = useTranslation();
   const { addCampaign } = useCampaignStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,8 +36,7 @@ export default function AddCampaignModal({
   // Requirements: 5.5
   const modalRef = useModalFocusTrap(isOpen);
 
-  const { register, handleSubmit, setValue, watch, reset, errors } =
-    useAddCampaignForm(t);
+  const { register, handleSubmit, setValue, watch, reset, errors } = useAddCampaignForm(t);
 
   const {
     availablePublications,
@@ -106,17 +101,13 @@ export default function AddCampaignModal({
       if (response.data && response.data.campaign) {
         addCampaign(response.data.campaign);
         handleClose();
-        toast.success(
-          t("campaigns.messages.success") || "Campaign created successfully",
-        );
+        toast.success(t("campaigns.messages.success") || "Campaign created successfully");
         if (onSubmit) {
           onSubmit(true);
         }
       }
     } catch (error: any) {
-      toast.error(
-        error.response?.data?.message || t("campaigns.messages.error"),
-      );
+      toast.error(error.response?.data?.message || t("campaigns.messages.error"));
     } finally {
       setIsSubmitting(false);
     }
@@ -143,15 +134,15 @@ export default function AddCampaignModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 text-gray-900 dark:text-white">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 text-gray-900 dark:text-white sm:p-6">
       <div
-        className="absolute inset-0 bg-gray-900/60 dark:bg-black/70 backdrop-blur-sm"
+        className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm dark:bg-black/70"
         onClick={handleClose}
       />
 
       <div
         ref={modalRef as React.RefObject<HTMLDivElement>}
-        className="relative w-full max-w-2xl bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300 border border-gray-200/50 dark:border-neutral-800/50"
+        className="animate-in fade-in zoom-in relative flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-lg border border-gray-200/50 bg-gradient-to-br from-white to-gray-50 shadow-2xl duration-300 dark:border-neutral-800/50 dark:from-neutral-900 dark:to-neutral-950"
       >
         <ModalHeader
           t={t}
@@ -163,19 +154,15 @@ export default function AddCampaignModal({
           size="xl"
         />
 
-        <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+        <div className="custom-scrollbar flex-1 overflow-y-auto p-6">
           <AiPromptSection
             type="campaign"
             currentFields={watchedFields}
             onSuggest={handleAiSuggestion}
             disabled={isSubmitting}
           />
-          <form
-            id="campaign-form"
-            onSubmit={handleSubmit(onFormSubmit)}
-            className="space-y-6"
-          >
-            <div className="flex justify-between items-end mb-4 px-1">
+          <form id="campaign-form" onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
+            <div className="mb-4 flex items-end justify-between px-1">
               <AiFieldSuggester
                 fields={watchedFields}
                 type="campaign"
@@ -191,10 +178,7 @@ export default function AddCampaignModal({
                 register={register}
                 name="name"
                 required
-                placeholder={
-                  t("campaigns.modal.add.placeholders.name") ||
-                  "e.g. Summer Sale 2024"
-                }
+                placeholder={t("campaigns.modal.add.placeholders.name") || "e.g. Summer Sale 2024"}
                 sizeType="lg"
                 variant="filled"
                 error={errors.name?.message as string}
@@ -215,14 +199,13 @@ export default function AddCampaignModal({
                 maxLength={200}
                 showCharCount
                 hint={
-                  t("campaigns.modal.add.placeholders.description_hint") ||
-                  "Maximum 200 characters"
+                  t("campaigns.modal.add.placeholders.description_hint") || "Maximum 200 characters"
                 }
                 size="lg"
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div className="form-group">
                 <Input
                   id="goal"
@@ -265,11 +248,11 @@ export default function AddCampaignModal({
             />
 
             <div className="form-group">
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+              <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
                 {t("campaigns.modal.add.publications") || "Publications"}
               </label>
 
-              <div className="border border-gray-200 dark:border-neutral-700 rounded-lg p-2 bg-gray-50 dark:bg-black/20">
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-2 dark:border-neutral-700 dark:bg-black/20">
                 <PublicationSelector
                   publications={availablePublications}
                   selectedIds={watchedFields.publication_ids || []}
@@ -281,7 +264,7 @@ export default function AddCampaignModal({
                 />
               </div>
 
-              <p className="text-xs mt-1.5 text-gray-500 dark:text-gray-400">
+              <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
                 {t("campaigns.modal.add.associatedPublicationsRequired") ||
                   "Associated Publications is required"}
               </p>

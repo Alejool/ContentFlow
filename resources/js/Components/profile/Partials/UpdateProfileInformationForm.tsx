@@ -6,13 +6,7 @@ import ConnectedAccounts from "@/Components/profile/Partials/ConnectedAccounts";
 import AvatarSettings from "@/Pages/Profile/AvatarSettings";
 import { useUser } from "@/Hooks/useUser";
 import { Link } from "@inertiajs/react";
-import {
-  CheckCircle,
-  Mail,
-  MailWarning,
-  Send,
-  User as UserIcon,
-} from "lucide-react";
+import { CheckCircle, Mail, MailWarning, Send, User as UserIcon } from "lucide-react";
 import { Controller } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import type { CountryCode } from "libphonenumber-js";
@@ -59,28 +53,21 @@ export default function UpdateProfileInformation({
 }: UpdateProfileInformationProps) {
   const { t } = useTranslation();
 
-  const {
-    register,
-    handleSubmit,
-    errors,
-    isSubmitting,
-    hasChanges,
-    user,
-    control,
-  } = useUser(initialUser);
+  const { register, handleSubmit, errors, isSubmitting, hasChanges, user, control } =
+    useUser(initialUser);
 
   return (
     <div className={className}>
       <form onSubmit={handleSubmit} className="">
         {/* Layout de dos columnas en md+ */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-12">
           {/* Columna izquierda: Avatar */}
           <div className="md:col-span-4">
             <AvatarSettings user={user} />
           </div>
 
           {/* Columna derecha: Información */}
-          <div className="md:col-span-8 space-y-8">
+          <div className="space-y-8 md:col-span-8">
             {/* Sección: Información Personal */}
             <div>
               <div className="flex items-center gap-3 pb-4">
@@ -121,7 +108,7 @@ export default function UpdateProfileInformation({
             </div>
 
             {/* Sección: Contacto */}
-            <div className="border-t border-gray-100 dark:border-neutral-800 pt-8">
+            <div className="border-t border-gray-100 pt-8 dark:border-neutral-800">
               <div className="flex items-center gap-3 pb-4">
                 <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                   {t("profile.information.sections.contact")}
@@ -163,35 +150,34 @@ export default function UpdateProfileInformation({
         </div>
 
         {mustVerifyEmail && user?.email_verified_at === null && (
-          <div className="rounded-lg p-6 shadow-inner bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/30">
+          <div className="rounded-lg border border-amber-200 bg-amber-50 p-6 shadow-inner dark:border-amber-800/30 dark:bg-amber-900/10">
             <div className="flex items-center gap-3 font-bold text-amber-800 dark:text-amber-300">
-              <div className="p-2 rounded-lg bg-amber-500/20">
-                <MailWarning className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+              <div className="rounded-lg bg-amber-500/20 p-2">
+                <MailWarning className="h-5 w-5 text-amber-600 dark:text-amber-400" />
               </div>
               <span className="text-lg">
-                {t("profile.statistics.emailStatus")}:{" "}
-                {t("profile.statistics.unverified")}
+                {t("profile.statistics.emailStatus")}: {t("profile.statistics.unverified")}
               </span>
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-              <p className="text-sm flex-1 leading-relaxed text-amber-700 dark:text-amber-200/70 font-medium">
+            <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
+              <p className="flex-1 text-sm font-medium leading-relaxed text-amber-700 dark:text-amber-200/70">
                 {t("profile.information.emailUnverified")}
               </p>
               <Link
                 href={route("verification.send")}
                 method="post"
                 as="button"
-                className="px-6 py-3 text-sm font-bold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-primary-500/20 bg-primary-600 hover:bg-primary-500 text-white border-0"
+                className="flex items-center justify-center gap-2 rounded-lg border-0 bg-primary-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-primary-500/20 transition-all duration-300 hover:bg-primary-500"
               >
-                <Send className="w-4 h-4" />
+                <Send className="h-4 w-4" />
                 {t("profile.information.sendVerification")}
               </Link>
             </div>
 
             {status === "verification-link-sent" && (
-              <div className="mt-4 text-sm font-bold flex items-center gap-2 p-4 rounded-lg bg-green-50 dark:bg-green-900/10 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800/30">
-                <CheckCircle className="w-5 h-5" />
+              <div className="mt-4 flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-4 text-sm font-bold text-green-700 dark:border-green-800/30 dark:bg-green-900/10 dark:text-green-400">
+                <CheckCircle className="h-5 w-5" />
                 {t("profile.information.verificationSent")}
               </div>
             )}

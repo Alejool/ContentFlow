@@ -6,10 +6,7 @@ interface FloatingButtonProps {
   onClick: () => void;
 }
 
-export default function FloatingButton({
-  theme,
-  onClick,
-}: FloatingButtonProps) {
+export default function FloatingButton({ theme, onClick }: FloatingButtonProps) {
   const { t } = useTranslation();
 
   const getButtonBg = () => {
@@ -21,13 +18,13 @@ export default function FloatingButton({
   return (
     <button
       onClick={onClick}
-      className={`fixed bottom-6 right-6 w-14 h-14 ${getButtonBg()} text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center z-50 group`}
+      className={`fixed bottom-6 right-6 h-14 w-14 ${getButtonBg()} group z-50 flex items-center justify-center rounded-full text-white shadow-lg transition-all duration-300 hover:shadow-xl`}
     >
-      <Sparkles className="w-6 h-6 group-hover:scale-110 transition-transform" />
+      <Sparkles className="h-6 w-6 transition-transform group-hover:scale-110" />
       <span
-        className={`absolute right-full mr-3 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap ${
+        className={`absolute right-full mr-3 whitespace-nowrap rounded px-2 py-1 text-xs opacity-0 transition-opacity group-hover:opacity-100 ${
           theme === "dark"
-            ? "bg-neutral-800 text-white border border-neutral-700"
+            ? "border border-neutral-700 bg-neutral-800 text-white"
             : "bg-gray-900 text-white"
         }`}
       >
@@ -36,7 +33,7 @@ export default function FloatingButton({
 
       {/* Efecto de pulso */}
       <div
-        className={`absolute inset-0 rounded-full animate-ping ${
+        className={`absolute inset-0 animate-ping rounded-full ${
           theme === "dark" ? "bg-primary-600/30" : "bg-primary-600/30"
         }`}
       ></div>

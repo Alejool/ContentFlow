@@ -34,19 +34,13 @@ export function GatewaySelector({
       .then((res) => res.json())
       .then((data) => {
         // Filtrar solo gateways disponibles (habilitados en el sistema)
-        const availableGateways = (data.gateways || []).filter(
-          (g: Gateway) => g.available,
-        );
+        const availableGateways = (data.gateways || []).filter((g: Gateway) => g.available);
         setGateways(availableGateways);
 
         // Si solo hay un gateway, seleccionarlo automáticamente
         if (availableGateways.length === 1 && !selectedGateway) {
           onGatewayChange(availableGateways[0].name);
-        } else if (
-          data.default_gateway &&
-          !selectedGateway &&
-          availableGateways.length > 0
-        ) {
+        } else if (data.default_gateway && !selectedGateway && availableGateways.length > 0) {
           onGatewayChange(data.default_gateway);
         }
 
@@ -80,7 +74,7 @@ export function GatewaySelector({
   if (loading) {
     return (
       <div className={`animate-pulse ${className}`}>
-        <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>
+        <div className="h-10 rounded bg-gray-200 dark:bg-gray-700"></div>
       </div>
     );
   }
@@ -98,7 +92,7 @@ export function GatewaySelector({
   // Contenido del selector
   const selectorContent = (
     <>
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+      <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
         {t("payment.paymentMethod") || "Método de pago"}
       </label>
       <div
@@ -117,35 +111,31 @@ export function GatewaySelector({
             key={gateway.name}
             onClick={() => handleGatewaySelect(gateway.name)}
             disabled={!gateway.available}
-            className={`
-                            relative flex flex-col items-center justify-center p-4 rounded-lg border-2 transition-all min-h-[100px]
-                            ${
-                              selectedGateway === gateway.name
-                                ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20"
-                                : "border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-600"
-                            }
-                            ${!gateway.available ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
-                        `}
+            className={`relative flex min-h-[100px] flex-col items-center justify-center rounded-lg border-2 p-4 transition-all ${
+              selectedGateway === gateway.name
+                ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20"
+                : "border-gray-200 hover:border-primary-300 dark:border-gray-700 dark:hover:border-primary-600"
+            } ${!gateway.available ? "cursor-not-allowed opacity-50" : "cursor-pointer"} `}
           >
             {gateway.logo ? (
               <img
                 src={gateway.logo}
                 alt={gateway.display_name}
-                className="h-10 w-auto object-contain mb-2"
+                className="mb-2 h-10 w-auto object-contain"
               />
             ) : (
-              <CreditCard className="w-8 h-8 mb-2 text-gray-600 dark:text-gray-400" />
+              <CreditCard className="mb-2 h-8 w-8 text-gray-600 dark:text-gray-400" />
             )}
 
-            <span className="text-sm font-medium text-gray-900 dark:text-white text-center">
+            <span className="text-center text-sm font-medium text-gray-900 dark:text-white">
               {gateway.display_name}
             </span>
 
             {selectedGateway === gateway.name && (
-              <div className="absolute top-2 right-2">
-                <div className="w-5 h-5 bg-primary-500 rounded-full flex items-center justify-center">
+              <div className="absolute right-2 top-2">
+                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary-500">
                   <svg
-                    className="w-3 h-3 text-white"
+                    className="h-3 w-3 text-white"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -172,25 +162,24 @@ export function GatewaySelector({
       <>
         {/* Backdrop */}
         <div
-          className="fixed inset-0 bg-black/50 z-50 transition-opacity"
+          className="fixed inset-0 z-50 bg-black/50 transition-opacity"
           onClick={handleModalClose}
         />
 
         {/* Modal */}
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6 relative">
+          <div className="relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800">
             {/* Close button */}
             <button
               onClick={handleModalClose}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
             >
-              <X className="w-5 h-5" />
+              <X className="h-5 w-5" />
             </button>
 
             {/* Modal content */}
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              {t("payment.selectPaymentMethod") ||
-                "Selecciona un método de pago"}
+            <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+              {t("payment.selectPaymentMethod") || "Selecciona un método de pago"}
             </h3>
 
             {selectorContent}

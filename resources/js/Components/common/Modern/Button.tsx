@@ -1,21 +1,9 @@
 import { useTheme } from "@/Hooks/useTheme";
-import {
-  ButtonHTMLAttributes,
-  ComponentType,
-  ReactNode,
-  forwardRef,
-  isValidElement,
-} from "react";
+import { ButtonHTMLAttributes, ComponentType, ReactNode, forwardRef, isValidElement } from "react";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
-  variant?:
-    | "primary"
-    | "danger"
-    | "secondary"
-    | "success"
-    | "ghost"
-    | "warning";
+  variant?: "primary" | "danger" | "secondary" | "success" | "ghost" | "warning";
   buttonStyle?: "solid" | "outline" | "gradient" | "ghost" | "icon";
   size?: "xs" | "sm" | "md" | "lg" | "xl";
   loading?: boolean;
@@ -23,15 +11,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   fullWidth?: boolean;
   iconPosition?: "left" | "right";
   rounded?: "none" | "sm" | "md" | "lg" | "xl" | "2xl" | "full";
-  shadow?:
-    | "none"
-    | "sm"
-    | "md"
-    | "lg"
-    | "xl"
-    | "primary"
-    | "danger"
-    | "success";
+  shadow?: "none" | "sm" | "md" | "lg" | "xl" | "primary" | "danger" | "success";
   animation?: "none" | "pulse" | "bounce" | "scale";
   theme?: "light" | "dark";
   icon?: any;
@@ -191,11 +171,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             border border-gray-300 dark:border-gray-700
             hover:${colors.hoverBg}
             hover:${colors.hoverText}
-            ${
-              currentTheme === "dark"
-                ? "dark:hover:bg-gray-800 dark:hover:text-gray-300"
-                : ""
-            }
+            ${currentTheme === "dark" ? "dark:hover:bg-gray-800 dark:hover:text-gray-300" : ""}
           `;
         case "solid":
         default:
@@ -246,9 +222,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       ${buttonStyle !== "icon" ? sizeClasses[size] : ""}
       ${getStyleClasses()}
       ${
-        variant === "primary" &&
-        buttonStyle !== "outline" &&
-        buttonStyle !== "icon"
+        variant === "primary" && buttonStyle !== "outline" && buttonStyle !== "icon"
           ? "hover:shadow-primary-500/25 shadow-xl hover:shadow-2xl"
           : "hover:bg-gray-700/10"
       }
@@ -317,7 +291,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <>
         {isActuallyLoading ? (
           <>
-            <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
             <span>{displayLoadingText}</span>
           </>
         ) : (

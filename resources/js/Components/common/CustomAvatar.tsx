@@ -55,16 +55,14 @@ export default function Avatar({
       ? "bg-gradient-to-br from-primary-900/30 to-purple-900/30"
       : "bg-gradient-to-br from-primary-100 to-purple-100";
 
-  const avatarTextClass =
-    theme === "dark" ? "text-primary-200" : "text-primary-800";
+  const avatarTextClass = theme === "dark" ? "text-primary-200" : "text-primary-800";
 
-  const borderClass =
-    theme === "dark" ? "ring-2 ring-purple-900/50" : "ring-2 ring-green-200";
+  const borderClass = theme === "dark" ? "ring-2 ring-purple-900/50" : "ring-2 ring-green-200";
 
   return (
     <div className={`relative ${className}`}>
       <div
-        className={`${sizeClasses[size]} ${borderClass} ${avatarBgClass} rounded-full overflow-hidden flex items-center justify-center font-bold shadow-lg`}
+        className={`${sizeClasses[size]} ${borderClass} ${avatarBgClass} flex items-center justify-center overflow-hidden rounded-full font-bold shadow-lg`}
       >
         {src && !imageError ? (
           <>
@@ -74,18 +72,18 @@ export default function Avatar({
                 className={`absolute inset-0 flex items-center justify-center ${avatarBgClass} animate-pulse`}
               >
                 <div
-                  className={`border-2 ${theme === "dark" ? "border-primary-400/30 border-t-primary-400" : "border-primary-600/30 border-t-primary-600"} rounded-full animate-spin ${
+                  className={`border-2 ${theme === "dark" ? "border-primary-400/30 border-t-primary-400" : "border-primary-600/30 border-t-primary-600"} animate-spin rounded-full ${
                     size === "xs"
-                      ? "w-3 h-3"
+                      ? "h-3 w-3"
                       : size === "sm"
-                        ? "w-4 h-4"
+                        ? "h-4 w-4"
                         : size === "md"
-                          ? "w-5 h-5"
+                          ? "h-5 w-5"
                           : size === "lg"
-                            ? "w-6 h-6"
+                            ? "h-6 w-6"
                             : size === "xl"
-                              ? "w-8 h-8"
-                              : "w-10 h-10"
+                              ? "h-8 w-8"
+                              : "h-10 w-10"
                   }`}
                 ></div>
               </div>
@@ -95,7 +93,7 @@ export default function Avatar({
               src={src}
               alt={name}
               loading={loading}
-              className={`w-full h-full object-cover transition-opacity duration-300 ${
+              className={`h-full w-full object-cover transition-opacity duration-300 ${
                 imageLoaded ? "opacity-100" : "opacity-0"
               }`}
               onLoad={() => setImageLoaded(true)}
@@ -106,9 +104,7 @@ export default function Avatar({
             />
           </>
         ) : (
-          <div
-            className={`w-full h-full flex items-center justify-center ${avatarTextClass}`}
-          >
+          <div className={`flex h-full w-full items-center justify-center ${avatarTextClass}`}>
             {getInitials(name)}
           </div>
         )}
@@ -116,8 +112,8 @@ export default function Avatar({
 
       {showStatus && (
         <div
-          className={`absolute bottom-0 right-0 w-3 h-3 ${
-            size === "2xl" || size === "xl" ? "w-4 h-4" : ""
+          className={`absolute bottom-0 right-0 h-3 w-3 ${
+            size === "2xl" || size === "xl" ? "h-4 w-4" : ""
           } rounded-full border-2 ${
             theme === "dark" ? "border-neutral-800" : "border-white"
           } ${statusColors[status]}`}

@@ -33,13 +33,12 @@ export default function PlatformSettingsModal({
   allSettings = {},
   onAllSettingsChange,
 }: PlatformSettingsModalProps) {
-  const isAllPlatforms =
-    platform.toLowerCase() === "all" || allPlatforms.length > 0;
+  const isAllPlatforms = platform.toLowerCase() === "all" || allPlatforms.length > 0;
 
   return (
     <Modal show={isOpen} onClose={onClose} maxWidth="lg">
       <div className="relative overflow-hidden bg-white text-neutral-900 dark:bg-neutral-900 dark:text-white">
-        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-primary-500/5 rounded-full blur-lg pointer-events-none" />
+        <div className="pointer-events-none absolute right-0 top-0 -mr-10 -mt-10 h-40 w-40 rounded-full bg-primary-500/5 blur-lg" />
 
         <div className="px-6">
           <PlatformModalHeader
@@ -48,8 +47,8 @@ export default function PlatformSettingsModal({
             onClose={onClose}
           />
 
-          <div className="max-h-[60vh] overflow-y-auto pr-4 platform-modal-scrollbar">
-            <div className="space-y-8 py-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <div className="platform-modal-scrollbar max-h-[60vh] overflow-y-auto pr-4">
+            <div className="animate-in fade-in slide-in-from-bottom-2 space-y-8 py-2 duration-300">
               <PlatformModalContent
                 platform={platform}
                 settings={settings}

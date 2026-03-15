@@ -1,10 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/Components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Badge } from "@/Components/ui/badge";
 import { CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -51,30 +45,17 @@ export default function SystemStatusCard({ status }: Props) {
     enabled: number;
     total: number;
   }) => {
-    const Icon =
-      enabled === total
-        ? CheckCircle2
-        : enabled === 0
-          ? XCircle
-          : AlertTriangle;
+    const Icon = enabled === total ? CheckCircle2 : enabled === 0 ? XCircle : AlertTriangle;
     const colorClass = getStatusColor(enabled, total);
 
     return (
-      <div className="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
+      <div className="flex items-center justify-between border-b border-gray-200 py-2 last:border-b-0 dark:border-gray-700">
         <div className="flex items-center gap-2">
           <Icon className={`h-4 w-4 ${colorClass}`} />
-          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-            {label}
-          </span>
+          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{label}</span>
         </div>
         <Badge
-          variant={
-            enabled === total
-              ? "default"
-              : enabled === 0
-                ? "destructive"
-                : "secondary"
-          }
+          variant={enabled === total ? "default" : enabled === 0 ? "destructive" : "secondary"}
         >
           {enabled}/{total}
         </Badge>
@@ -83,7 +64,7 @@ export default function SystemStatusCard({ status }: Props) {
   };
 
   return (
-    <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+    <Card className="border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
       <CardHeader>
         <CardTitle className="text-gray-900 dark:text-gray-100">
           {t("admin.system_status.title")}
@@ -94,7 +75,7 @@ export default function SystemStatusCard({ status }: Props) {
       </CardHeader>
       <CardContent className="space-y-4">
         {status.general.maintenance_mode && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 flex items-center gap-2">
+          <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-900/20">
             <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
             <div>
               <p className="text-sm font-semibold text-red-900 dark:text-red-100">
@@ -108,7 +89,7 @@ export default function SystemStatusCard({ status }: Props) {
         )}
 
         {!status.general.new_registrations && (
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 flex items-center gap-2">
+          <div className="flex items-center gap-2 rounded-lg border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-800 dark:bg-yellow-900/20">
             <AlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
             <div>
               <p className="text-sm font-semibold text-yellow-900 dark:text-yellow-100">
@@ -144,7 +125,7 @@ export default function SystemStatusCard({ status }: Props) {
           />
         </div>
 
-        <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="border-t border-gray-200 pt-4 dark:border-gray-700">
           <div className="grid grid-cols-2 gap-4 text-center">
             <div>
               <p className="text-2xl font-bold text-green-600 dark:text-green-400">

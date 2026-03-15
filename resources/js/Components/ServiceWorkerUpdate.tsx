@@ -36,12 +36,10 @@ export function ServiceWorkerUpdate() {
           </svg>
         </div>
         <div className="ml-3 flex-1">
-          <h3 className="text-sm font-medium text-gray-900">
-            Nueva versión disponible
-          </h3>
+          <h3 className="text-sm font-medium text-gray-900">Nueva versión disponible</h3>
           <p className="mt-1 text-sm text-gray-500">
-            Una nueva versión de la aplicación está lista. Actualiza para
-            obtener las últimas mejoras.
+            Una nueva versión de la aplicación está lista. Actualiza para obtener las últimas
+            mejoras.
           </p>
           <div className="mt-3 flex space-x-3">
             <button

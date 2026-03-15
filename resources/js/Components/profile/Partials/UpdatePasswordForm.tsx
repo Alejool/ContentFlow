@@ -15,9 +15,7 @@ interface IconProps {
 
 const LockIcon = ({ className }: IconProps) => <Lock className={className} />;
 
-const CheckIcon = ({ className = "w-5 h-5" }: IconProps) => (
-  <Check className={className} />
-);
+const CheckIcon = ({ className = "w-5 h-5" }: IconProps) => <Check className={className} />;
 
 interface SuccessAlertProps {
   show: boolean;
@@ -34,15 +32,15 @@ const SuccessAlert = ({ show, t }: SuccessAlertProps) => (
     leaveFrom="translate-y-0 opacity-100"
     leaveTo="translate-y-2 opacity-0"
   >
-    <div className="flex items-center gap-4 p-5 rounded-lg mb-8 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/50 shadow-sm">
-      <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center bg-green-100 dark:bg-green-800/40">
-        <CheckIcon className="w-6 h-6 text-green-600 dark:text-green-400" />
+    <div className="mb-8 flex items-center gap-4 rounded-lg border border-green-200 bg-green-50 p-5 shadow-sm dark:border-green-800/50 dark:bg-green-900/20">
+      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-green-100 dark:bg-green-800/40">
+        <CheckIcon className="h-6 w-6 text-green-600 dark:text-green-400" />
       </div>
       <div>
-        <p className="text-sm font-bold text-green-800 dark:text-green-300 uppercase tracking-wide">
+        <p className="text-sm font-bold uppercase tracking-wide text-green-800 dark:text-green-300">
           {t("profile.password.successTitle")}
         </p>
-        <p className="text-sm text-green-600 dark:text-green-400/80 font-medium">
+        <p className="text-sm font-medium text-green-600 dark:text-green-400/80">
           {t("profile.password.successMessage")}
         </p>
       </div>
@@ -53,18 +51,17 @@ const SuccessAlert = ({ show, t }: SuccessAlertProps) => (
 const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
   const { t } = useTranslation();
 
-  const { register, handleSubmit, errors, isSubmitting, isSuccess } =
-    useUpdatePassword();
+  const { register, handleSubmit, errors, isSubmitting, isSuccess } = useUpdatePassword();
 
   return (
     <div className={className}>
       <header className="mb-8">
-        <div className="flex items-center gap-4 mb-2">
-          <div className="p-2.5 rounded-lg bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
-            <LockIcon className="w-5 h-5" />
+        <div className="mb-2 flex items-center gap-4">
+          <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-2.5 text-red-600 dark:text-red-400">
+            <LockIcon className="h-5 w-5" />
           </div>
           <div>
-            <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+            <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
               {t("profile.password.title")}
             </h2>
             <p className="text-sm text-gray-500 dark:text-neutral-400">
@@ -76,16 +73,16 @@ const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
 
       <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
         {errors && Object.keys(errors).length > 0 && (
-          <div className="p-5 mb-8 rounded-lg bg-primary-50 dark:bg-primary-900/20 border border-primary-100 dark:border-primary-800/30 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary-100 dark:bg-primary-800/40">
-                <AlertTriangle className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+          <div className="animate-in fade-in slide-in-from-top-2 mb-8 rounded-lg border border-primary-100 bg-primary-50 p-5 shadow-sm duration-300 dark:border-primary-800/30 dark:bg-primary-900/20">
+            <div className="mb-3 flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-800/40">
+                <AlertTriangle className="h-5 w-5 text-primary-600 dark:text-primary-400" />
               </div>
-              <h3 className="font-bold text-sm text-primary-800 dark:text-primary-300 uppercase tracking-wide">
+              <h3 className="text-sm font-bold uppercase tracking-wide text-primary-800 dark:text-primary-300">
                 {t("profile.password.errorTitle")}
               </h3>
             </div>
-            <ul className="space-y-1.5 text-sm ml-11 list-disc text-primary-700 dark:text-primary-400 font-medium leading-relaxed">
+            <ul className="ml-11 list-disc space-y-1.5 text-sm font-medium leading-relaxed text-primary-700 dark:text-primary-400">
               {Object.entries(errors).map(([field, error]: [string, any]) => (
                 <li key={field}>{error.message}</li>
               ))}
@@ -136,16 +133,14 @@ const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
               variant="primary"
               icon={Key}
               loading={isSubmitting}
-              className="w-full sm:w-auto min-w-[200px] font-bold uppercase tracking-wider rounded-lg shadow-lg shadow-primary-500/20 active:scale-95 transition-transform"
+              className="w-full min-w-[200px] rounded-lg font-bold uppercase tracking-wider shadow-lg shadow-primary-500/20 transition-transform active:scale-95 sm:w-auto"
             >
-              {isSubmitting
-                ? t("common.updating")
-                : t("profile.password.updateButton")}
+              {isSubmitting ? t("common.updating") : t("profile.password.updateButton")}
             </ModernButton>
 
             {isSubmitting && (
-              <div className="mt-4 text-sm font-bold flex items-center gap-3 text-gray-500 dark:text-gray-400">
-                <div className="w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+              <div className="mt-4 flex items-center gap-3 text-sm font-bold text-gray-500 dark:text-gray-400">
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary-500 border-t-transparent"></div>
                 {t("common.processing")}
               </div>
             )}

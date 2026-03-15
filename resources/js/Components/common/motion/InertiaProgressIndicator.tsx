@@ -33,9 +33,7 @@ export interface InertiaProgressIndicatorProps {
  * // With custom color
  * <InertiaProgressIndicator color="#ff0000" />
  */
-export const InertiaProgressIndicator: React.FC<
-  InertiaProgressIndicatorProps
-> = ({
+export const InertiaProgressIndicator: React.FC<InertiaProgressIndicatorProps> = ({
   color,
   height = 3,
   showSpinner = false,
@@ -51,9 +49,7 @@ export const InertiaProgressIndicator: React.FC<
   // Use CSS variable for primary color if no color is provided
   const progressColor =
     color ||
-    getComputedStyle(document.documentElement)
-      .getPropertyValue("--primary-600")
-      .trim() ||
+    getComputedStyle(document.documentElement).getPropertyValue("--primary-600").trim() ||
     "#ad421e";
 
   useEffect(() => {
@@ -139,9 +135,7 @@ export const InertiaProgressIndicator: React.FC<
     animate: {
       scaleX: progress / 100,
       opacity: 1,
-      transition: shouldReduceMotion
-        ? { duration: 0 }
-        : { duration: 0.3, ease: [0.4, 0, 0.2, 1] },
+      transition: shouldReduceMotion ? { duration: 0 } : { duration: 0.3, ease: [0.4, 0, 0.2, 1] },
     },
     exit: {
       opacity: 0,
@@ -210,9 +204,7 @@ export const InertiaProgressIndicator: React.FC<
                   border: `3px solid ${progressColor}`,
                   borderTopColor: "transparent",
                   borderRadius: "50%",
-                  animation: shouldReduceMotion
-                    ? "none"
-                    : "spin 0.8s linear infinite",
+                  animation: shouldReduceMotion ? "none" : "spin 0.8s linear infinite",
                 }}
               />
             </m.div>

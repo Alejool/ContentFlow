@@ -20,20 +20,13 @@ interface CreateWorkspaceModalProps {
 
 const workspaceSchema = (t: any) =>
   z.object({
-    name: z
-      .string()
-      .min(1, t("workspace.invite_modal.validation.nameRequired"))
-      .max(255),
+    name: z.string().min(1, t("workspace.invite_modal.validation.nameRequired")).max(255),
     description: z.string().max(1000).optional().or(z.literal("")),
   });
 
 type WorkspaceFormData = z.infer<ReturnType<typeof workspaceSchema>>;
 
-const CreateWorkspaceModal = ({
-  isOpen,
-  onClose,
-  t,
-}: CreateWorkspaceModalProps) => {
+const CreateWorkspaceModal = ({ isOpen, onClose, t }: CreateWorkspaceModalProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -81,26 +74,24 @@ const CreateWorkspaceModal = ({
         className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-200"
         onClick={onClose}
       />
-      <div className="relative w-full max-w-lg bg-gradient-to-b from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-lg shadow-2xl p-8 animate-in zoom-in-95 duration-300">
-        <div className="flex items-center justify-between mb-8">
+      <div className="animate-in zoom-in-95 relative w-full max-w-lg rounded-lg border border-gray-200 bg-gradient-to-b from-white to-gray-50 p-8 shadow-2xl duration-300 dark:border-neutral-800 dark:from-neutral-900 dark:to-neutral-950">
+        <div className="mb-8 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="h-12 w-12 rounded-lg flex items-center justify-center ">
-              <Building2 className="h-6 w-6 text-dark dark:text-white" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg">
+              <Building2 className="text-dark h-6 w-6 dark:text-white" />
             </div>
             <div>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
                 {t("workspace.create_new_workspace")}
               </h3>
-              <p className="text-sm text-gray-500 dark:text-neutral-500 mt-1">
+              <p className="mt-1 text-sm text-gray-500 dark:text-neutral-500">
                 {t("workspace.modal.subtitle")}
               </p>
             </div>
           </div>
           <Button
             onClick={onClose}
-            className="p-3 transition-colors rounded-full  
-            hover:bg-gray-700
-            dark:hover:bg-gray-700"
+            className="rounded-full p-3 transition-colors hover:bg-gray-700 dark:hover:bg-gray-700"
             variant="ghost"
             buttonStyle="icon"
             icon={X}
@@ -137,7 +128,7 @@ const CreateWorkspaceModal = ({
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4 mt-8">
+          <div className="mt-8 grid grid-cols-2 gap-4">
             <Button
               type="button"
               onClick={onClose}
@@ -147,19 +138,13 @@ const CreateWorkspaceModal = ({
             >
               {t("common.cancel")}
             </Button>
-            <Button
-              type="submit"
-              loading={isSubmitting}
-              fullWidth
-              buttonStyle="gradient"
-              icon={X}
-            >
+            <Button type="submit" loading={isSubmitting} fullWidth buttonStyle="gradient" icon={X}>
               {isSubmitting ? t("common.creating") : t("workspace.create")}
             </Button>
           </div>
 
           <div>
-            <p className="text-xs text-gray-500 dark:text-neutral-500 text-center">
+            <p className="text-center text-xs text-gray-500 dark:text-neutral-500">
               {t("workspace.modal.footer_note")}
             </p>
           </div>

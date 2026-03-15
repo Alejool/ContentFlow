@@ -45,12 +45,12 @@ export default function PlatformSelector({
 
   return (
     <div className="mb-6">
-      <h3 className="text-base font-semibold text-gray-700 dark:text-gray-300 mb-3">
+      <h3 className="mb-3 text-base font-semibold text-gray-700 dark:text-gray-300">
         Selecciona las plataformas
       </h3>
 
       {/* Compatible Platforms */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+      <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-3">
         {compatibleAccounts.map((account) => (
           <PlatformCard
             key={account.id}
@@ -64,19 +64,15 @@ export default function PlatformSelector({
 
       {/* Incompatible Platforms Warning */}
       {incompatibleAccounts.length > 0 && (
-        <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
+        <div className="mt-4 rounded-md border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-800 dark:bg-yellow-900/20">
           <div className="flex items-start gap-2">
-            <span className="text-yellow-600 dark:text-yellow-400 text-lg">
-              ⚠
-            </span>
+            <span className="text-lg text-yellow-600 dark:text-yellow-400">⚠</span>
             <div>
               <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
                 Plataformas no compatibles con {publication.content_type}:
               </p>
-              <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
-                {incompatibleAccounts
-                  .map((account) => account.platform)
-                  .join(", ")}
+              <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
+                {incompatibleAccounts.map((account) => account.platform).join(", ")}
               </p>
             </div>
           </div>

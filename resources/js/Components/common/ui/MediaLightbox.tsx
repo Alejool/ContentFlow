@@ -24,11 +24,7 @@ export default function MediaLightbox({
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  const mediaArray: MediaItem[] = Array.isArray(media)
-    ? media
-    : media
-      ? [media]
-      : [];
+  const mediaArray: MediaItem[] = Array.isArray(media) ? media : media ? [media] : [];
 
   useEffect(() => {
     if (isOpen) {
@@ -56,9 +52,7 @@ export default function MediaLightbox({
   const handlePrev = () => {
     if (mediaArray.length <= 1 || isAnimating) return;
     setIsAnimating(true);
-    setCurrentIndex(
-      (prev) => (prev - 1 + mediaArray.length) % mediaArray.length,
-    );
+    setCurrentIndex((prev) => (prev - 1 + mediaArray.length) % mediaArray.length);
     setTimeout(() => setIsAnimating(false), 300);
   };
 
@@ -67,43 +61,43 @@ export default function MediaLightbox({
   const currentMedia = mediaArray[currentIndex];
 
   return createPortal(
-    <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md animate-in fade-in duration-300">
+    <div className="animate-in fade-in fixed inset-0 z-[10000] flex items-center justify-center bg-black/95 p-4 backdrop-blur-md duration-300">
       <button
         onClick={onClose}
-        className="absolute top-6 right-6 p-2.5 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition-all z-50 hover:scale-110 active:scale-95"
+        className="absolute right-6 top-6 z-50 rounded-full bg-white/10 p-2.5 text-white/70 transition-all hover:scale-110 hover:bg-white/20 hover:text-white active:scale-95"
       >
-        <X className="w-6 h-6" />
+        <X className="h-6 w-6" />
       </button>
 
       {mediaArray.length > 1 && (
         <>
           <button
             onClick={handlePrev}
-            className="absolute left-6 p-3 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition-all z-50 hover:scale-110 active:scale-95 group"
+            className="group absolute left-6 z-50 rounded-full bg-white/10 p-3 text-white/70 transition-all hover:scale-110 hover:bg-white/20 hover:text-white active:scale-95"
           >
-            <ChevronLeft className="w-8 h-8 group-hover:-translate-x-0.5 transition-transform" />
+            <ChevronLeft className="h-8 w-8 transition-transform group-hover:-translate-x-0.5" />
           </button>
           <button
             onClick={handleNext}
-            className="absolute right-6 p-3 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition-all z-50 hover:scale-110 active:scale-95 group"
+            className="group absolute right-6 z-50 rounded-full bg-white/10 p-3 text-white/70 transition-all hover:scale-110 hover:bg-white/20 hover:text-white active:scale-95"
           >
-            <ChevronRight className="w-8 h-8 group-hover:translate-x-0.5 transition-transform" />
+            <ChevronRight className="h-8 w-8 transition-transform group-hover:translate-x-0.5" />
           </button>
         </>
       )}
 
       <div
-        className="relative max-w-7xl max-h-[90vh] w-full h-full flex flex-col items-center justify-center overflow-hidden"
+        className="relative flex h-full max-h-[90vh] w-full max-w-7xl flex-col items-center justify-center overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         <div
           key={currentIndex}
-          className={`absolute inset-0 flex items-center justify-center p-4 transition-all duration-300 ease-out ${isAnimating ? "opacity-50 scale-95" : "opacity-100 scale-100"}`}
+          className={`absolute inset-0 flex items-center justify-center p-4 transition-all duration-300 ease-out ${isAnimating ? "scale-95 opacity-50" : "scale-100 opacity-100"}`}
         >
           {currentMedia.type === "video" ? (
             <video
               src={currentMedia.url}
-              className="max-h-full max-w-full rounded-lg shadow-[0_0_50px_rgba(0,0,0,0.5)] bg-black"
+              className="max-h-full max-w-full rounded-lg bg-black shadow-[0_0_50px_rgba(0,0,0,0.5)]"
               controls
               autoPlay
             />
@@ -111,13 +105,13 @@ export default function MediaLightbox({
             <img
               src={currentMedia.url}
               alt={currentMedia.title || "Media preview"}
-              className="max-h-full max-w-full object-contain rounded-lg shadow-[0_0_50px_rgba(0,0,0,0.5)]"
+              className="max-h-full max-w-full rounded-lg object-contain shadow-[0_0_50px_rgba(0,0,0,0.5)]"
             />
           )}
         </div>
 
         {mediaArray.length > 1 && (
-          <div className="absolute bottom-10 flex gap-2.5 z-50 p-2 rounded-full bg-black/20 backdrop-blur-sm">
+          <div className="absolute bottom-10 z-50 flex gap-2.5 rounded-full bg-black/20 p-2 backdrop-blur-sm">
             {mediaArray.map((media, idx) => (
               <button
                 key={`${media.url}-${idx}`}
@@ -129,10 +123,8 @@ export default function MediaLightbox({
                   }
                 }}
                 aria-label={`Go to media ${idx + 1} of ${mediaArray.length}`}
-                className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                  idx === currentIndex
-                    ? "bg-primary-500 w-8"
-                    : "bg-white/40 hover:bg-white/60"
+                className={`h-2.5 w-2.5 rounded-full transition-all duration-300 ${
+                  idx === currentIndex ? "w-8 bg-primary-500" : "bg-white/40 hover:bg-white/60"
                 }`}
               />
             ))}
@@ -141,7 +133,7 @@ export default function MediaLightbox({
       </div>
 
       {currentMedia.title && (
-        <div className="absolute top-6 left-1/2 -translate-x-1/2 text-white text-lg font-medium opacity-70">
+        <div className="absolute left-1/2 top-6 -translate-x-1/2 text-lg font-medium text-white opacity-70">
           {currentMedia.title}
         </div>
       )}

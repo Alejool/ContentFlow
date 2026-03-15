@@ -39,7 +39,7 @@ export default function InstagramSettings({
     <div className="space-y-6">
       <div className="space-y-4">
         <SectionHeader title={t("platformSettings.instagram.type")} />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <PlatformCard
             value="feed"
             label={t("platformSettings.instagram.feed")}
@@ -56,8 +56,7 @@ export default function InstagramSettings({
             iconColor="text-pink-500"
             iconBgColor="bg-pink-100 dark:bg-pink-900/20"
             selected={
-              settings?.type === "reel" ||
-              (!settings?.type && defaultSettings.type === "reel")
+              settings?.type === "reel" || (!settings?.type && defaultSettings.type === "reel")
             }
             onSelect={(val) => handleChange("type", val)}
           />

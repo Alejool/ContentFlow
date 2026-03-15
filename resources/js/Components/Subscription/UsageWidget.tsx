@@ -1,10 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/Components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Progress } from "@/Components/ui/progress";
 import Button from "@/Components/common/Modern/Button";
 import { Badge } from "@/Components/ui/badge";
@@ -63,9 +57,7 @@ export default function UsageWidget({ plan, usage, className }: Props) {
         <div className="flex items-center justify-between">
           <div>
             <CardTitle>{t("subscription.usage.planUsage")}</CardTitle>
-            <CardDescription>
-              {t("subscription.usage.monitorConsumption")}
-            </CardDescription>
+            <CardDescription>{t("subscription.usage.monitorConsumption")}</CardDescription>
           </div>
           <Badge className={getPlanColor(plan)}>
             {plan.charAt(0).toUpperCase() + plan.slice(1)}
@@ -80,9 +72,7 @@ export default function UsageWidget({ plan, usage, className }: Props) {
           return (
             <div key={metric.type} className="space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span className="font-medium">
-                  {getMetricName(metric.type)}
-                </span>
+                <span className="font-medium">{getMetricName(metric.type)}</span>
                 <span className="text-gray-600">
                   {metric.current} / {formatLimit(metric.limit, metric.type)}
                 </span>
@@ -107,7 +97,7 @@ export default function UsageWidget({ plan, usage, className }: Props) {
           );
         })}
 
-        <div className="pt-4 space-y-2">
+        <div className="space-y-2 pt-4">
           <Link href="/subscription/usage">
             <Button variant="ghost" className="w-full" size="sm">
               {t("subscription.usage.viewFullDetails")}

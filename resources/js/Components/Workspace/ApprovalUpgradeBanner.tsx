@@ -23,17 +23,17 @@ export default function ApprovalUpgradeBanner({
 
   return (
     <div
-      className={`bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm animate-in fade-in slide-in-from-top-2 duration-500 ${className}`}
+      className={`animate-in fade-in slide-in-from-top-2 flex flex-col items-start justify-between gap-4 rounded-xl border border-primary-200 bg-primary-50 p-4 shadow-sm duration-500 dark:border-primary-800 dark:bg-primary-900/20 sm:flex-row sm:items-center ${className}`}
     >
       <div className="flex items-start gap-4">
-        <div className="p-2 bg-primary-100 dark:bg-primary-900/40 rounded-full shrink-0">
-          <Shield className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+        <div className="shrink-0 rounded-full bg-primary-100 p-2 dark:bg-primary-900/40">
+          <Shield className="h-5 w-5 text-primary-600 dark:text-primary-400" />
         </div>
         <div>
           <p className="text-sm font-bold text-primary-900 dark:text-primary-300">
             {t("common.approvals.basic_enabled.title")}
           </p>
-          <p className="text-xs text-primary-700 dark:text-primary-400 mt-1 leading-relaxed max-w-xl">
+          <p className="mt-1 max-w-xl text-xs leading-relaxed text-primary-700 dark:text-primary-400">
             {t("common.approvals.basic_enabled.description")}
           </p>
         </div>

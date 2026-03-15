@@ -157,13 +157,9 @@ export default function ContentList(props: ContentListProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
-        {title && (
-          <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-            {title}
-          </h3>
-        )}
-        <div className="flex items-center gap-2 ml-auto">
+      <div className="mb-2 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+        {title && <h3 className="text-lg font-bold text-gray-900 dark:text-white">{title}</h3>}
+        <div className="ml-auto flex items-center gap-2">
           {onRefresh && (
             <Button
               variant="ghost"
@@ -178,26 +174,23 @@ export default function ContentList(props: ContentListProps) {
             </Button>
           )}
 
-          <div className="flex items-center gap-1.5 ml-auto">
+          <div className="ml-auto flex items-center gap-1.5">
             <Button
               variant="ghost"
               buttonStyle="outline"
               size="sm"
-              onClick={() =>
-                props.onToggleFilters &&
-                props.onToggleFilters(!props.showFilters)
-              }
+              onClick={() => props.onToggleFilters && props.onToggleFilters(!props.showFilters)}
               icon={Filter}
               className={
                 props.showFilters
-                  ? "bg-primary-50 border-primary-200 text-primary-600 ring-1 ring-primary-500/20"
+                  ? "border-primary-200 bg-primary-50 text-primary-600 ring-1 ring-primary-500/20"
                   : ""
               }
             >
               {t("common.filters.title") || "Filtros"}
             </Button>
 
-            <div className="bg-gray-100/80 dark:bg-neutral-900/80 p-1 rounded-lg flex items-center gap-1 border border-white/20 dark:border-white/5 ring-1 ring-black/5 dark:ring-white/5 backdrop-blur-sm shadow-inner">
+            <div className="flex items-center gap-1 rounded-lg border border-white/20 bg-gray-100/80 p-1 shadow-inner ring-1 ring-black/5 backdrop-blur-sm dark:border-white/5 dark:bg-neutral-900/80 dark:ring-white/5">
               <Button
                 variant="ghost"
                 buttonStyle="ghost"
@@ -207,14 +200,14 @@ export default function ContentList(props: ContentListProps) {
                   setSmoothLoading(true);
                   startTransition(() => setViewMode("grid"));
                 }}
-                className={`p-2 rounded-lg transition-all duration-300 ease-out border-0 ${
+                className={`rounded-lg border-0 p-2 transition-all duration-300 ease-out ${
                   viewMode === "grid"
-                    ? "bg-white dark:bg-neutral-800 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.1)] ring-1 ring-black/5 dark:ring-white/10 text-primary-600 dark:text-primary-400 scale-[1.05]"
-                    : "text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 hover:bg-white/50 dark:hover:bg-neutral-700/30"
+                    ? "scale-[1.05] bg-white text-primary-600 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.1)] ring-1 ring-black/5 dark:bg-neutral-800 dark:text-primary-400 dark:ring-white/10"
+                    : "text-gray-400 hover:bg-white/50 hover:text-gray-600 dark:text-gray-500 dark:hover:bg-neutral-700/30 dark:hover:text-gray-300"
                 }`}
                 title={t("common.gridView")}
               >
-                <LayoutGrid className="w-4 h-4" />
+                <LayoutGrid className="h-4 w-4" />
               </Button>
               <Button
                 variant="ghost"
@@ -225,14 +218,14 @@ export default function ContentList(props: ContentListProps) {
                   setSmoothLoading(true);
                   startTransition(() => setViewMode("list"));
                 }}
-                className={`p-2 rounded-lg transition-all duration-300 ease-out border-0 ${
+                className={`rounded-lg border-0 p-2 transition-all duration-300 ease-out ${
                   viewMode === "list"
-                    ? "bg-white dark:bg-neutral-800 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.1)] ring-1 ring-black/5 dark:ring-white/10 text-primary-600 dark:text-primary-400 scale-[1.05]"
-                    : "text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 hover:bg-white/50 dark:hover:bg-neutral-700/30"
+                    ? "scale-[1.05] bg-white text-primary-600 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.1)] ring-1 ring-black/5 dark:bg-neutral-800 dark:text-primary-400 dark:ring-white/10"
+                    : "text-gray-400 hover:bg-white/50 hover:text-gray-600 dark:text-gray-500 dark:hover:bg-neutral-700/30 dark:hover:text-gray-300"
                 }`}
                 title={t("common.listView")}
               >
-                <ListIcon className="w-4 h-4" />
+                <ListIcon className="h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -274,21 +267,16 @@ export default function ContentList(props: ContentListProps) {
       ) : viewMode === "grid" ? (
         <div className="flex flex-col">
           <div className="flex-1 overflow-hidden">
-            <div className="grid grid-cols-1 grid-rows-1 h-full">
+            <div className="grid h-full grid-cols-1 grid-rows-1">
               <div
-                className={`col-start-1 row-start-1 transition-all duration-500 overflow-y-auto ${smoothLoading ? "invisible opacity-0" : "visible opacity-100"}`}
+                className={`col-start-1 row-start-1 overflow-y-auto transition-all duration-500 ${smoothLoading ? "invisible opacity-0" : "visible opacity-100"}`}
               >
-                <VirtualGrid
-                  items={items}
-                  columns={4}
-                  overscan={2}
-                  renderItem={renderGridItem}
-                />
+                <VirtualGrid items={items} columns={4} overscan={2} renderItem={renderGridItem} />
               </div>
 
               {smoothLoading && (
-                <div className="col-start-1 row-start-1 bg-gray-50 dark:bg-neutral-900 animate-out fade-out duration-500 fill-mode-forwards z-20 overflow-y-auto">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div className="animate-out fade-out fill-mode-forwards z-20 col-start-1 row-start-1 overflow-y-auto bg-gray-50 duration-500 dark:bg-neutral-900">
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {[...Array(12)].map((_, i) => (
                       <ContentCardSkeleton key={i} />
                     ))}
@@ -299,7 +287,7 @@ export default function ContentList(props: ContentListProps) {
           </div>
 
           {props.pagination && (
-            <div className="mt-4 pt-4  dark:border-neutral-700 bg-white dark:bg-neutral-900">
+            <div className="mt-4 bg-white pt-4 dark:border-neutral-700 dark:bg-neutral-900">
               <AdvancedPagination
                 currentPage={props.pagination.current_page}
                 lastPage={props.pagination.last_page}
@@ -313,7 +301,7 @@ export default function ContentList(props: ContentListProps) {
           )}
         </div>
       ) : (
-        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm overflow-hidden border border-gray-100 dark:border-gray-800 w-full overflow-x-auto">
+        <div className="w-full overflow-hidden overflow-x-auto rounded-lg border border-gray-100 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
           {mode === "campaigns" ? (
             <CampaignTable
               {...props}
@@ -336,12 +324,8 @@ export default function ContentList(props: ContentListProps) {
               remoteLocks={remoteLocks}
               onPreviewMedia={(item: any) => {
                 const allM = (item.media_files || []).map((m: any) => ({
-                  url: m.file_path.startsWith("http")
-                    ? m.file_path
-                    : `/storage/${m.file_path}`,
-                  type: (m.file_type?.includes("video") ? "video" : "image") as
-                    | "image"
-                    | "video",
+                  url: m.file_path.startsWith("http") ? m.file_path : `/storage/${m.file_path}`,
+                  type: (m.file_type?.includes("video") ? "video" : "image") as "image" | "video",
                   title: item.title,
                 }));
                 handlePreviewMedia(allM, 0);

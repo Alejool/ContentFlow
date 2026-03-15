@@ -15,9 +15,9 @@ export default function PlatformFeatureTag({
   const { t } = useTranslation();
 
   return (
-    <div className="flex items-center gap-3 p-3 rounded-lg bg-white/10 backdrop-blur-sm">
-      <div className="w-10 h-10 rounded-full  flex items-center justify-center">
-        <Icon className="w-5 h-5" />
+    <div className="flex items-center gap-3 rounded-lg bg-white/10 p-3 backdrop-blur-sm">
+      <div className="flex h-10 w-10 items-center justify-center rounded-full">
+        <Icon className="h-5 w-5" />
       </div>
       <div>
         <p className="font-semibold">{t(titleKey)}</p>

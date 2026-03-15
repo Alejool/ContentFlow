@@ -75,21 +75,18 @@ const CampaignTable = memo(
       <TableContainer
         className="w-full"
         title={t("campaigns.title") || "Campañas"}
-        subtitle={
-          t("campaigns.subtitle") ||
-          "Gestiona tus agrupaciones de publicaciones"
-        }
+        subtitle={t("campaigns.subtitle") || "Gestiona tus agrupaciones de publicaciones"}
       >
-        <div className="hidden lg:block overflow-x-auto scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700">
+        <div className="scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700 hidden overflow-x-auto lg:block">
           <div className="grid grid-cols-1 grid-rows-1">
             {/* Data Table */}
             <div
               className={`col-start-1 row-start-1 transition-all duration-500 ${smoothLoading ? "invisible opacity-0" : "visible opacity-100"}`}
             >
-              <table className="w-full text-left border-collapse z-0 whitespace-nowrap">
+              <table className="z-0 w-full border-collapse whitespace-nowrap text-left">
                 {items.length > 0 && (
-                  <thead className="bg-gray-50/50 border-gray-100 dark:bg-neutral-900/50 dark:border-neutral-700">
-                    <tr className="text-[10px] uppercase tracking-wider border-b text-gray-500 dark:text-gray-400">
+                  <thead className="border-gray-100 bg-gray-50/50 dark:border-neutral-700 dark:bg-neutral-900/50">
+                    <tr className="border-b text-[10px] uppercase tracking-wider text-gray-500 dark:text-gray-400">
                       <TableHeader mode="campaigns" t={t} />
                     </tr>
                   </thead>
@@ -104,7 +101,7 @@ const CampaignTable = memo(
                             t("campaigns.table.emptyState.description") ||
                             "No se encontraron campañas."
                           }
-                          className="border-none shadow-none bg-transparent"
+                          className="border-none bg-transparent shadow-none"
                         />
                       </td>
                     </tr>
@@ -123,10 +120,7 @@ const CampaignTable = memo(
                           onDuplicate={onDuplicate}
                         />
                         {expandedCampaigns.includes(item.id) && (
-                          <CampaignPublications
-                            campaign={item}
-                            getStatusColor={getStatusColor}
-                          />
+                          <CampaignPublications campaign={item} getStatusColor={getStatusColor} />
                         )}
                       </Fragment>
                     ))
@@ -137,10 +131,10 @@ const CampaignTable = memo(
 
             {/* Skeleton Layer */}
             {smoothLoading && (
-              <div className="col-start-1 row-start-1 bg-white/50 dark:bg-neutral-900/50 animate-out fade-out duration-500 fill-mode-forwards z-20">
-                <table className="w-full text-left border-collapse whitespace-nowrap">
-                  <thead className="bg-gray-50 border-gray-100 dark:bg-neutral-900 dark:border-neutral-700">
-                    <tr className="text-[10px] uppercase tracking-wider border-b">
+              <div className="animate-out fade-out fill-mode-forwards z-20 col-start-1 row-start-1 bg-white/50 duration-500 dark:bg-neutral-900/50">
+                <table className="w-full border-collapse whitespace-nowrap text-left">
+                  <thead className="border-gray-100 bg-gray-50 dark:border-neutral-700 dark:bg-neutral-900">
+                    <tr className="border-b text-[10px] uppercase tracking-wider">
                       <TableHeader mode="campaigns" t={t} />
                     </tr>
                   </thead>
@@ -155,13 +149,12 @@ const CampaignTable = memo(
           </div>
         </div>
 
-        <div className="lg:hidden relative">
+        <div className="relative lg:hidden">
           {!smoothLoading && items.length === 0 ? (
             <EmptyState
               title={t("campaigns.table.emptyState.title")}
               description={
-                t("campaigns.table.emptyState.description") ||
-                "No se encontraron campañas."
+                t("campaigns.table.emptyState.description") || "No se encontraron campañas."
               }
               imageSize="sm"
             />
@@ -187,7 +180,7 @@ const CampaignTable = memo(
 
               {/* Skeleton Layer */}
               {smoothLoading && (
-                <div className="col-start-1 row-start-1 bg-white dark:bg-neutral-900 animate-out fade-out duration-500 fill-mode-forwards space-y-3 z-20">
+                <div className="animate-out fade-out fill-mode-forwards z-20 col-start-1 row-start-1 space-y-3 bg-white duration-500 dark:bg-neutral-900">
                   {[...Array(3)].map((_, i) => (
                     <CampaignMobileRowSkeleton key={i} />
                   ))}

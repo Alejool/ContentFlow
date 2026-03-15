@@ -32,8 +32,7 @@ export default function PlatformModalContent({
   onAllSettingsChange,
 }: PlatformModalContentProps) {
   const { t } = useTranslation();
-  const isAllPlatforms =
-    platform.toLowerCase() === "all" || allPlatforms.length > 0;
+  const isAllPlatforms = platform.toLowerCase() === "all" || allPlatforms.length > 0;
 
   const renderPlatformSettings = (
     platformName: string,
@@ -50,33 +49,13 @@ export default function PlatformModalContent({
           />
         );
       case "facebook":
-        return (
-          <FacebookSettings
-            settings={platformSettings}
-            onSettingsChange={onChange}
-          />
-        );
+        return <FacebookSettings settings={platformSettings} onSettingsChange={onChange} />;
       case "instagram":
-        return (
-          <InstagramSettings
-            settings={platformSettings}
-            onSettingsChange={onChange}
-          />
-        );
+        return <InstagramSettings settings={platformSettings} onSettingsChange={onChange} />;
       case "tiktok":
-        return (
-          <TikTokSettings
-            settings={platformSettings}
-            onSettingsChange={onChange}
-          />
-        );
+        return <TikTokSettings settings={platformSettings} onSettingsChange={onChange} />;
       case "twitter":
-        return (
-          <TwitterSettings
-            settings={platformSettings}
-            onSettingsChange={onChange}
-          />
-        );
+        return <TwitterSettings settings={platformSettings} onSettingsChange={onChange} />;
       default:
         return null;
     }
@@ -84,20 +63,13 @@ export default function PlatformModalContent({
 
   const getPlatformIcon = (platformName: string) => {
     const platformKey = platformName.toLowerCase();
-    const platformConfig =
-      SOCIAL_PLATFORMS[platformKey as keyof typeof SOCIAL_PLATFORMS];
+    const platformConfig = SOCIAL_PLATFORMS[platformKey as keyof typeof SOCIAL_PLATFORMS];
 
     if (platformConfig && platformConfig.logo) {
-      return (
-        <img
-          src={platformConfig.logo}
-          alt={platformConfig.name}
-          className="w-8 h-8"
-        />
-      );
+      return <img src={platformConfig.logo} alt={platformConfig.name} className="h-8 w-8" />;
     }
 
-    return <Settings2 className="w-6 h-6 text-primary-500" />;
+    return <Settings2 className="h-6 w-6 text-primary-500" />;
   };
 
   if (isAllPlatforms && allPlatforms.length > 0) {
@@ -106,13 +78,12 @@ export default function PlatformModalContent({
         {allPlatforms.map((platformName) => (
           <div
             key={platformName}
-            className="p-6 rounded-lg border bg-gray-50 border-gray-200 dark:bg-neutral-800/50 dark:border-neutral-700"
+            className="rounded-lg border border-gray-200 bg-gray-50 p-6 dark:border-neutral-700 dark:bg-neutral-800/50"
           >
-            <div className="flex items-center gap-3 mb-6">
+            <div className="mb-6 flex items-center gap-3">
               {getPlatformIcon(platformName)}
               <h3 className="text-lg font-bold uppercase">
-                {t(`platformSettings.${platformName.toLowerCase()}.title`) ||
-                  platformName}
+                {t(`platformSettings.${platformName.toLowerCase()}.title`) || platformName}
               </h3>
             </div>
             {renderPlatformSettings(

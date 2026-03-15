@@ -22,14 +22,7 @@ import {
   Target,
   Trash2,
 } from "lucide-react";
-import {
-  Fragment,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  useTransition,
-} from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import toast from "react-hot-toast";
 
 import ApprovalHistory from "@/Components/Content/ApprovalHistory";
@@ -42,10 +35,7 @@ import TabNavigation from "@/Components/common/TabNavigation";
 
 import { useCanApprove } from "@/Hooks/approval/useCanApprove";
 import { usePendingApprovals } from "@/Hooks/approval/usePendingApprovals";
-import {
-  ContentTab,
-  usePublications,
-} from "@/Hooks/publication/usePublications";
+import { ContentTab, usePublications } from "@/Hooks/publication/usePublications";
 import { useManageContentUIStore } from "@/stores/manageContentUIStore";
 import { useShallow } from "zustand/react/shallow";
 
@@ -58,9 +48,7 @@ export default function ManageContentPage() {
     "demo";
 
   // Check if user can approve content (admin permission OR workflow assignment)
-  const { canApprove, reason: approvalReason } = useCanApprove(
-    auth.current_workspace?.id,
-  );
+  const { canApprove, reason: approvalReason } = useCanApprove(auth.current_workspace?.id);
 
   const {
     t,
@@ -86,12 +74,8 @@ export default function ManageContentPage() {
     filters,
   } = usePublications();
 
-  const fetchPublicationById = usePublicationStore(
-    (s) => s.fetchPublicationById,
-  );
-  const deletePublicationAction = usePublicationStore(
-    (s) => s.deletePublication,
-  );
+  const fetchPublicationById = usePublicationStore((s) => s.fetchPublicationById);
+  const deletePublicationAction = usePublicationStore((s) => s.deletePublication);
   const deleteCampaignAction = useCampaignStore((s) => s.deleteCampaign);
 
   const {
@@ -165,12 +149,7 @@ export default function ManageContentPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const tab = params.get("tab") as ContentTab;
-    if (
-      tab &&
-      ["publications", "campaigns", "calendar", "logs", "approvals"].includes(
-        tab,
-      )
-    ) {
+    if (tab && ["publications", "campaigns", "calendar", "logs", "approvals"].includes(tab)) {
       setActiveTab(tab);
     }
 
@@ -221,9 +200,7 @@ export default function ManageContentPage() {
 
     // CRITICAL: Listen on workspace channel for approval level advancement
     // This is a SPECIFIC event for when a publication moves to the next approval level
-    const workspaceChannel = window.Echo.private(
-      `workspace.${auth.user.current_workspace_id}`,
-    );
+    const workspaceChannel = window.Echo.private(`workspace.${auth.user.current_workspace_id}`);
 
     const handleApprovalLevelAdvanced = (event: any) => {
       console.log("[ContentPage] Approval level advanced:", event);
@@ -237,17 +214,11 @@ export default function ManageContentPage() {
       handleRefresh();
     };
 
-    workspaceChannel.listen(
-      ".approval.level.advanced",
-      handleApprovalLevelAdvanced,
-    );
+    workspaceChannel.listen(".approval.level.advanced", handleApprovalLevelAdvanced);
 
     return () => {
       channel.stopListening(".PublicationStatusUpdated", handleStatusUpdate);
-      workspaceChannel.stopListening(
-        ".approval.level.advanced",
-        handleApprovalLevelAdvanced,
-      );
+      workspaceChannel.stopListening(".approval.level.advanced", handleApprovalLevelAdvanced);
     };
   }, [auth.user?.id, auth.user?.current_workspace_id, handleRefresh]);
 
@@ -270,10 +241,7 @@ export default function ManageContentPage() {
   // Listen for publication submitted for approval event
   useEffect(() => {
     const handleSubmittedForApproval = (event: CustomEvent) => {
-      console.log(
-        "[ContentPage] Publication submitted for approval:",
-        event.detail,
-      );
+      console.log("[ContentPage] Publication submitted for approval:", event.detail);
       // Refresh the publications list to reflect the new status
       handleRefresh();
       // CRITICAL: Also refresh approvals list to show the new pending request
@@ -329,9 +297,7 @@ export default function ManageContentPage() {
 
       setDeleteConfirmation({ isOpen: false, id: null });
       if (success) {
-        toast.success(
-          t("common.deleteSuccess") || "Campaign deleted successfully",
-        );
+        toast.success(t("common.deleteSuccess") || "Campaign deleted successfully");
         handleRefreshWrapped();
       } else {
         toast.error(t("common.deleteError") || "Failed to delete campaign");
@@ -343,9 +309,7 @@ export default function ManageContentPage() {
     const success = await deletePublicationAction(deleteConfirmation.id);
     setDeleteConfirmation({ isOpen: false, id: null });
     if (success) {
-      toast.success(
-        t("common.deleteSuccess") || "Elemento eliminado correctamente",
-      );
+      toast.success(t("common.deleteSuccess") || "Elemento eliminado correctamente");
     } else {
       toast.error(t("common.deleteError") || "Error al eliminar el elemento");
     }
@@ -412,12 +376,12 @@ export default function ManageContentPage() {
   return (
     <AuthenticatedLayout
       header={
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4  min-w-0">
+        <div className="flex min-w-0 flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div className="min-w-0 flex-1">
-            <h1 className="text-xl lg:text-2xl font-extrabold text-gray-900 dark:text-white truncate tracking-tight">
+            <h1 className="truncate text-xl font-extrabold tracking-tight text-gray-900 dark:text-white lg:text-2xl">
               {t("manageContent.title")}
             </h1>
-            <p className="text-gray-500 dark:text-gray-400 mt-0.5 text-xs sm:text-base lg:text-lg truncate">
+            <p className="mt-0.5 truncate text-xs text-gray-500 dark:text-gray-400 sm:text-base lg:text-lg">
               {t("manageContent.subtitle")}
             </p>
           </div>
@@ -432,46 +396,46 @@ export default function ManageContentPage() {
                       variant="primary"
                       size="md"
                       icon={Plus}
-                      className="gap-2 uppercase tracking-wider font-bold text-xs"
+                      className="gap-2 text-xs font-bold uppercase tracking-wider"
                     >
                       {t("manageContent.createNew").toUpperCase()}
                     </Button>
                   </MenuButton>
                   <MenuItems
                     transition
-                    className="absolute right-0 z-50 mt-2 w-56 origin-top-right rounded-lg bg-white dark:bg-neutral-900 shadow-2xl ring-1 ring-black/8 dark:ring-white/10 focus:outline-none overflow-hidden transition data-[closed]:scale-95 data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+                    className="ring-black/8 absolute right-0 z-50 mt-2 w-56 origin-top-right overflow-hidden rounded-lg bg-white shadow-2xl ring-1 transition focus:outline-none data-[closed]:scale-95 data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in dark:bg-neutral-900 dark:ring-white/10"
                   >
-                    <div className="px-4 pt-3 pb-2">
+                    <div className="px-4 pb-2 pt-3">
                       <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-neutral-500">
                         {t("manageContent.createNew")}
                       </p>
                     </div>
 
-                    <div className="px-2 pb-2 space-y-0.5">
+                    <div className="space-y-0.5 px-2 pb-2">
                       <MenuItem>
                         {({ focus }) => (
                           <button
                             onClick={() => openAddModal("publication")}
-                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 text-left ${
+                            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-all duration-150 ${
                               focus
-                                ? "bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300"
-                                : "text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-neutral-800"
+                                ? "bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300"
+                                : "text-gray-700 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-neutral-800"
                             }`}
                           >
                             <span
-                              className={`flex items-center justify-center w-8 h-8 rounded-lg shrink-0 transition-colors ${
+                              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${
                                 focus
                                   ? "bg-primary-100 dark:bg-primary-900/50"
                                   : "bg-gray-100 dark:bg-neutral-800"
                               }`}
                             >
-                              <FileText className="w-4 h-4" />
+                              <FileText className="h-4 w-4" />
                             </span>
-                            <div className="flex flex-col min-w-0">
+                            <div className="flex min-w-0 flex-col">
                               <span className="truncate">
                                 {t("manageContent.tabs.publications")}
                               </span>
-                              <span className="text-[11px] font-normal text-gray-400 dark:text-neutral-500 truncate">
+                              <span className="truncate text-[11px] font-normal text-gray-400 dark:text-neutral-500">
                                 {t("manageContent.createPublication")}
                               </span>
                             </div>
@@ -483,26 +447,24 @@ export default function ManageContentPage() {
                         {({ focus }) => (
                           <button
                             onClick={() => openAddModal("campaign")}
-                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 text-left ${
+                            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-all duration-150 ${
                               focus
-                                ? "bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300"
-                                : "text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-neutral-800"
+                                ? "bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300"
+                                : "text-gray-700 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-neutral-800"
                             }`}
                           >
                             <span
-                              className={`flex items-center justify-center w-8 h-8 rounded-lg shrink-0 transition-colors ${
+                              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${
                                 focus
                                   ? "bg-primary-100 dark:bg-primary-900/50"
                                   : "bg-gray-100 dark:bg-neutral-800"
                               }`}
                             >
-                              <Target className="w-4 h-4" />
+                              <Target className="h-4 w-4" />
                             </span>
-                            <div className="flex flex-col min-w-0">
-                              <span className="truncate">
-                                {t("manageContent.tabs.campaigns")}
-                              </span>
-                              <span className="text-[11px] font-normal text-gray-400 dark:text-neutral-500 truncate">
+                            <div className="flex min-w-0 flex-col">
+                              <span className="truncate">{t("manageContent.tabs.campaigns")}</span>
+                              <span className="truncate text-[11px] font-normal text-gray-400 dark:text-neutral-500">
                                 {t("manageContent.createCampaign")}
                               </span>
                             </div>
@@ -520,8 +482,8 @@ export default function ManageContentPage() {
     >
       <Head title={t("manageContent.title")} />
 
-      <div className="w-full max-w-full overflow-x-hidden min-w-0 bg-gray-50/30 dark:bg-neutral-900/10 min-h-screen">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-5 sm:py-8 min-w-0">
+      <div className="min-h-screen w-full min-w-0 max-w-full overflow-x-hidden bg-gray-50/30 dark:bg-neutral-900/10">
+        <div className="mx-auto min-w-0 max-w-7xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
           <div className="mb-8">
             <SocialMediaAccounts />
           </div>
@@ -545,19 +507,18 @@ export default function ManageContentPage() {
             )}
 
             {activeTab === "approvals" && (
-              <div className="animate-in fade-in zoom-in duration-300 space-y-6">
+              <div className="animate-in fade-in zoom-in space-y-6 duration-300">
                 {planId !== "enterprise" && (
-                  <div className="bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+                  <div className="flex flex-col items-start justify-between gap-4 rounded-xl border border-primary-200 bg-primary-50 p-4 shadow-sm dark:border-primary-800 dark:bg-primary-900/20 sm:flex-row sm:items-center">
                     <div className="flex items-start gap-3">
-                      <div className="p-2 bg-primary-100 dark:bg-primary-900/40 rounded-full shrink-0">
-                        <Shield className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+                      <div className="shrink-0 rounded-full bg-primary-100 p-2 dark:bg-primary-900/40">
+                        <Shield className="h-5 w-5 text-primary-600 dark:text-primary-400" />
                       </div>
                       <div>
                         <p className="text-sm font-bold text-primary-900 dark:text-primary-300">
-                          {t("approvals.locked.title") ||
-                            "Flujos de aprobación multi-nivel"}
+                          {t("approvals.locked.title") || "Flujos de aprobación multi-nivel"}
                         </p>
-                        <p className="text-xs text-primary-700 dark:text-primary-400 mt-1 leading-relaxed max-w-2xl">
+                        <p className="mt-1 max-w-2xl text-xs leading-relaxed text-primary-700 dark:text-primary-400">
                           {t("approvals.locked.description") ||
                             "Tu plan actual permite aprobaciones de un nivel. Mejora tu plan para crear flujos de aprobación avanzados y multi-nivel con responsables jerárquicos."}
                         </p>
@@ -584,8 +545,7 @@ export default function ManageContentPage() {
                         id: "pending",
                         label: t("approvals.tabs.pending"),
                         icon: Clock,
-                        badge:
-                          pendingApprovals > 0 ? pendingApprovals : undefined,
+                        badge: pendingApprovals > 0 ? pendingApprovals : undefined,
                       },
                       {
                         id: "history",
@@ -600,7 +560,7 @@ export default function ManageContentPage() {
                 </div>
 
                 {/* Approval Content */}
-                <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 overflow-hidden shadow-sm">
+                <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
                   <div className="p-0">
                     {approvalTab === "pending" ? (
                       <ApprovalList
@@ -645,30 +605,16 @@ export default function ManageContentPage() {
                       : t("manageContent.tabs.campaigns")
                   }
                   onRefresh={handleRefreshWrapped}
-                  items={
-                    activeTab === "publications" ? publications : campaigns
-                  }
-                  isLoading={
-                    activeTab === "publications" ? isPubLoading : isCampLoading
-                  }
-                  mode={
-                    activeTab === "publications" ? "publications" : "campaigns"
-                  }
-                  pagination={
-                    activeTab === "publications"
-                      ? pubPagination
-                      : campPagination
-                  }
+                  items={activeTab === "publications" ? publications : campaigns}
+                  isLoading={activeTab === "publications" ? isPubLoading : isCampLoading}
+                  mode={activeTab === "publications" ? "publications" : "campaigns"}
+                  pagination={activeTab === "publications" ? pubPagination : campPagination}
                   onPageChange={handlePageChange}
-                  onEdit={(item) =>
-                    useManageContentUIStore.getState().openEditModal(item)
-                  }
+                  onEdit={(item) => useManageContentUIStore.getState().openEditModal(item)}
                   onDelete={handleDeleteItemClick}
                   onDuplicate={handleDuplicateItem}
                   onViewDetails={openViewDetailsModal}
-                  onPublish={(item) =>
-                    useManageContentUIStore.getState().openPublishModal(item)
-                  }
+                  onPublish={(item) => useManageContentUIStore.getState().openPublishModal(item)}
                   onEditRequest={handleEditRequest}
                   connectedAccounts={connectedAccounts}
                   expandedCampaigns={expandedCampaigns}
@@ -726,7 +672,7 @@ export default function ManageContentPage() {
           submitText={t("common.delete").toUpperCase() || "ELIMINAR"}
           cancelText={t("common.cancel").toUpperCase() || "CANCELAR"}
           submitVariant="danger"
-          submitIcon={<Trash2 className="w-4 h-4" />}
+          submitIcon={<Trash2 className="h-4 w-4" />}
           cancelStyle="outline"
         />
       </Modal>

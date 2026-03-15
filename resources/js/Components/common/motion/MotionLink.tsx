@@ -1,11 +1,7 @@
 import React, { AnchorHTMLAttributes, forwardRef } from "react";
 import { LazyMotion, domAnimation, m, HTMLMotionProps } from "framer-motion";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
-import {
-  hoverVariants,
-  getVariant,
-  getTransition,
-} from "@/config/animationVariants";
+import { hoverVariants, getVariant, getTransition } from "@/config/animationVariants";
 
 /**
  * Hover effect variants for links
@@ -82,9 +78,7 @@ export const MotionLink = forwardRef<HTMLAnchorElement, MotionLinkProps>(
 
     // Add underline effect via className if needed
     const linkClassName =
-      hoverEffect === "underline"
-        ? `${className || ""} hover:underline`.trim()
-        : className;
+      hoverEffect === "underline" ? `${className || ""} hover:underline`.trim() : className;
 
     return (
       <LazyMotion features={domAnimation}>
@@ -92,11 +86,7 @@ export const MotionLink = forwardRef<HTMLAnchorElement, MotionLinkProps>(
           ref={ref}
           className={linkClassName}
           initial="initial"
-          whileHover={getVariant(
-            selectedHoverVariant,
-            hoverState,
-            shouldReduceMotion,
-          )}
+          whileHover={getVariant(selectedHoverVariant, hoverState, shouldReduceMotion)}
           transition={getTransition(
             selectedHoverVariant.transition || { duration: 0.15 },
             shouldReduceMotion,

@@ -17,15 +17,10 @@ export interface TooltipManagerProps {
  *
  * Requirements: 2.5, 2.6, 2.7
  */
-export const TooltipManager: React.FC<TooltipManagerProps> = ({
-  tooltips,
-  enabled = true,
-}) => {
+export const TooltipManager: React.FC<TooltipManagerProps> = ({ tooltips, enabled = true }) => {
   const { dismissedTooltips, dismissTooltip } = useOnboardingStore();
   const [activeTooltipId, setActiveTooltipId] = useState<string | null>(null);
-  const [tooltipElements, setTooltipElements] = useState<
-    Map<string, HTMLElement>
-  >(new Map());
+  const [tooltipElements, setTooltipElements] = useState<Map<string, HTMLElement>>(new Map());
 
   // Find and cache target elements for tooltips
   useEffect(() => {
@@ -39,9 +34,7 @@ export const TooltipManager: React.FC<TooltipManagerProps> = ({
         return;
       }
 
-      const element = document.querySelector(
-        tooltip.targetSelector,
-      ) as HTMLElement;
+      const element = document.querySelector(tooltip.targetSelector) as HTMLElement;
       if (element) {
         elements.set(tooltip.id, element);
       }
@@ -58,9 +51,7 @@ export const TooltipManager: React.FC<TooltipManagerProps> = ({
           return;
         }
 
-        const element = document.querySelector(
-          tooltip.targetSelector,
-        ) as HTMLElement;
+        const element = document.querySelector(tooltip.targetSelector) as HTMLElement;
         if (element) {
           updatedElements.set(tooltip.id, element);
         }
@@ -80,20 +71,15 @@ export const TooltipManager: React.FC<TooltipManagerProps> = ({
   }, [tooltips, dismissedTooltips, enabled]);
 
   // Handle tooltip open/close with mutual exclusion (Requirement 2.6)
-  const handleTooltipOpenChange = useCallback(
-    (tooltipId: string, isOpen: boolean) => {
-      if (isOpen) {
-        // Enforce mutual exclusion: close any other open tooltip
-        setActiveTooltipId(tooltipId);
-      } else {
-        // Only clear if this tooltip was the active one
-        setActiveTooltipId((current) =>
-          current === tooltipId ? null : current,
-        );
-      }
-    },
-    [],
-  );
+  const handleTooltipOpenChange = useCallback((tooltipId: string, isOpen: boolean) => {
+    if (isOpen) {
+      // Enforce mutual exclusion: close any other open tooltip
+      setActiveTooltipId(tooltipId);
+    } else {
+      // Only clear if this tooltip was the active one
+      setActiveTooltipId((current) => (current === tooltipId ? null : current));
+    }
+  }, []);
 
   // Handle tooltip dismissal (Requirement 2.4, 2.7)
   const handleDismiss = useCallback(

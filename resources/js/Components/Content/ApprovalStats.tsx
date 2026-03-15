@@ -40,17 +40,17 @@ export default function ApprovalStats({ refreshTrigger }: ApprovalStatsProps) {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="bg-white dark:bg-neutral-800 rounded-lg p-4 border border-gray-100 dark:border-neutral-700/50 shadow-sm animate-pulse h-[88px]"
+            className="h-[88px] animate-pulse rounded-lg border border-gray-100 bg-white p-4 shadow-sm dark:border-neutral-700/50 dark:bg-neutral-800"
           >
-            <div className="flex items-center gap-4 h-full">
-              <div className="w-12 h-12 bg-gray-100 dark:bg-neutral-700 rounded-full shrink-0"></div>
+            <div className="flex h-full items-center gap-4">
+              <div className="h-12 w-12 shrink-0 rounded-full bg-gray-100 dark:bg-neutral-700"></div>
               <div className="flex-1 space-y-2">
-                <div className="h-6 bg-gray-100 dark:bg-neutral-700 rounded w-8"></div>
-                <div className="h-3 bg-gray-100 dark:bg-neutral-700 rounded w-24"></div>
+                <div className="h-6 w-8 rounded bg-gray-100 dark:bg-neutral-700"></div>
+                <div className="h-3 w-24 rounded bg-gray-100 dark:bg-neutral-700"></div>
               </div>
             </div>
           </div>
@@ -88,10 +88,7 @@ export default function ApprovalStats({ refreshTrigger }: ApprovalStatsProps) {
     },
     {
       label: t("approvals.stats.avgApprovalTime"),
-      value:
-        stats.avg_approval_time_hours != null
-          ? `${stats.avg_approval_time_hours}h`
-          : "—",
+      value: stats.avg_approval_time_hours != null ? `${stats.avg_approval_time_hours}h` : "—",
       icon: Timer,
       color: "text-blue-600 dark:text-blue-400",
       bgColor: "bg-blue-50 dark:bg-blue-900/20",
@@ -100,18 +97,18 @@ export default function ApprovalStats({ refreshTrigger }: ApprovalStatsProps) {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {statCards.map((stat, index) => (
         <div
           key={index}
-          className={`bg-white dark:bg-neutral-800 rounded-lg p-4 border ${stat.borderColor} shadow-sm hover:shadow-md transition-all duration-200`}
+          className={`rounded-lg border bg-white p-4 dark:bg-neutral-800 ${stat.borderColor} shadow-sm transition-all duration-200 hover:shadow-md`}
         >
           <div className="flex items-center gap-4">
-            <div className={`p-3 rounded-full shrink-0 ${stat.bgColor}`}>
-              <stat.icon className={`w-6 h-6 ${stat.color}`} strokeWidth={2} />
+            <div className={`shrink-0 rounded-full p-3 ${stat.bgColor}`}>
+              <stat.icon className={`h-6 w-6 ${stat.color}`} strokeWidth={2} />
             </div>
             <div>
-              <div className="text-2xl font-bold text-gray-900 dark:text-white leading-none mb-1">
+              <div className="mb-1 text-2xl font-bold leading-none text-gray-900 dark:text-white">
                 {stat.value}
               </div>
               <div className="text-xs font-medium text-gray-500 dark:text-gray-400">

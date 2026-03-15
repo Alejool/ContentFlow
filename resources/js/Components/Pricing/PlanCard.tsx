@@ -10,16 +10,7 @@ import {
 } from "@/Components/ui/card";
 import { PLAN_FEATURES, type PlanId } from "@/Constants/plans";
 import { cn } from "@/lib/utils";
-import {
-  ArrowRight,
-  Award,
-  Check,
-  Lock,
-  Shield,
-  Sparkles,
-  Star,
-  Zap,
-} from "lucide-react";
+import { ArrowRight, Award, Check, Lock, Shield, Sparkles, Star, Zap } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface Plan {
@@ -134,9 +125,7 @@ export default function PlanCard({
           // Excluir límites numéricos
           if (
             !/^(publications|socialAccounts|storage|aiRequests)\d/.test(f) &&
-            !/^(publications|socialAccounts|storage|aiRequests)Unlimited/.test(
-              f,
-            ) &&
+            !/^(publications|socialAccounts|storage|aiRequests)Unlimited/.test(f) &&
             !/^(storage)1TB/.test(f) &&
             f !== "fullAccessDays"
           ) {
@@ -147,9 +136,7 @@ export default function PlanCard({
     });
 
     // Filtrar lo que ya tiene el plan actual
-    let missing = Array.from(superiorFeatures).filter(
-      (f) => !currentFeatures.has(f),
-    );
+    let missing = Array.from(superiorFeatures).filter((f) => !currentFeatures.has(f));
 
     // Aplicar lógica de jerarquías: si el plan tiene una versión superior de algo, no mostrar la inferior como "missing"
     Object.values(featureHierarchies).forEach((tierList) => {
@@ -180,10 +167,7 @@ export default function PlanCard({
       demo: t("pricing.taglines.demo", "Explora todo sin compromisos"),
       free: t("pricing.taglines.free", "Empieza gratis, sin tarjeta"),
       starter: t("pricing.taglines.starter", "Para creadores individuales"),
-      professional: t(
-        "pricing.taglines.professional",
-        "Escala tu contenido con tu equipo",
-      ),
+      professional: t("pricing.taglines.professional", "Escala tu contenido con tu equipo"),
       enterprise: t("pricing.taglines.enterprise", "Control total de tu marca"),
     };
     return taglines[planId] || "";
@@ -211,8 +195,7 @@ export default function PlanCard({
   // Bloquear cambio a Free o Demo si hay suscripción activa de pago
   const isPlanActive = activePlans.includes(plan.id) || isCurrentPlan;
   const isPlanExpired = (expiredPlans || []).includes(plan.id);
-  const isDowngradeBlocked =
-    hasActiveSubscription && (isFreePlan || isDemoPlan) && !isCurrentPlan;
+  const isDowngradeBlocked = hasActiveSubscription && (isFreePlan || isDemoPlan) && !isCurrentPlan;
 
   // Determinar si el usuario puede cambiar gratis a este plan
   const canSwitchFree = isPlanActive && !isCurrentPlan;
@@ -301,8 +284,7 @@ export default function PlanCard({
       return {
         label: t("pricing.status.available", "Disponible"),
         variant: "outline" as const,
-        className:
-          "border-primary-200 dark:border-primary-800 text-primary-600",
+        className: "border-primary-200 dark:border-primary-800 text-primary-600",
       };
     }
     return null;
@@ -314,17 +296,17 @@ export default function PlanCard({
     return (
       <Card
         className={cn(
-          "relative flex flex-col h-full transition-all duration-300 hover:shadow-lg",
+          "relative flex h-full flex-col transition-all duration-300 hover:shadow-lg",
           isPopular
-            ? "border-2 border-primary-600 shadow-xl bg-white dark:bg-neutral-900"
-            : "border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-primary-400 dark:hover:border-primary-800",
+            ? "border-2 border-primary-600 bg-white shadow-xl dark:bg-neutral-900"
+            : "border border-neutral-200 bg-white hover:border-primary-400 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-primary-800",
           isCurrentPlan && "ring-2 ring-primary-200 dark:ring-primary-900/50",
         )}
       >
         {/* Badge superior */}
         {isPopular && (
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20">
-            <div className="bg-primary-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md flex items-center gap-1">
+          <div className="absolute -top-3 left-1/2 z-20 -translate-x-1/2">
+            <div className="flex items-center gap-1 rounded-full bg-primary-600 px-3 py-1 text-xs font-bold text-white shadow-md">
               <Star className="h-3 w-3 fill-current" />
               {t("pricing.mostPopular")}
             </div>
@@ -332,8 +314,8 @@ export default function PlanCard({
         )}
 
         {plan.id === "demo" && !isPopular && (
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20">
-            <Badge className="bg-purple-500 text-white border-0 shadow-md text-xs">
+          <div className="absolute -top-3 left-1/2 z-20 -translate-x-1/2">
+            <Badge className="border-0 bg-purple-500 text-xs text-white shadow-md">
               {t("pricing.demoTemporal", "Demo Temporal")}
             </Badge>
           </div>
@@ -341,7 +323,7 @@ export default function PlanCard({
 
         {isCurrentPlan && showCurrentBadge && (
           <div className="absolute -top-3 right-4 z-20">
-            <Badge className="bg-green-500 text-white border-0 shadow-md text-xs">
+            <Badge className="border-0 bg-green-500 text-xs text-white shadow-md">
               {t("pricing.currentPlan", "Plan Actual")}
             </Badge>
           </div>
@@ -351,7 +333,7 @@ export default function PlanCard({
           <div className="absolute -top-3 right-4 z-20">
             <Badge
               variant={status.variant}
-              className={cn("shadow-md border text-xs", status.className)}
+              className={cn("border text-xs shadow-md", status.className)}
             >
               {status.label}
             </Badge>
@@ -360,15 +342,15 @@ export default function PlanCard({
 
         <CardHeader className="pb-4">
           {/* Icono y nombre */}
-          <div className="flex items-center gap-3 mb-3">
+          <div className="mb-3 flex items-center gap-3">
             <div
               className={cn(
-                "p-2.5 rounded-lg transition-all",
+                "rounded-lg p-2.5 transition-all",
                 isPopular
-                  ? "bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400"
+                  ? "bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400"
                   : plan.id === "demo"
-                    ? "bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400"
-                    : "bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400",
+                    ? "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
+                    : "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400",
               )}
             >
               {getPlanIcon(plan.id)}
@@ -378,7 +360,7 @@ export default function PlanCard({
                 {plan.name}
               </CardTitle>
               {/* Tagline compacto */}
-              <p className="text-xs text-primary-600 dark:text-primary-400 font-medium mt-0.5">
+              <p className="mt-0.5 text-xs font-medium text-primary-600 dark:text-primary-400">
                 {getPlanTagline(plan.id)}
               </p>
             </div>
@@ -396,7 +378,7 @@ export default function PlanCard({
             >
               ${displayPrice}
             </span>
-            <span className="text-gray-500 dark:text-gray-400 text-sm">
+            <span className="text-sm text-gray-500 dark:text-gray-400">
               /
               {plan.price === 0
                 ? t("planSelection.intervals.forever")
@@ -409,7 +391,7 @@ export default function PlanCard({
           {/* Ahorro anual compacto */}
           {plan.price > 0 && billingCycle === "monthly" && (
             <div className="mt-2">
-              <span className="text-xs text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded-full font-semibold">
+              <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400">
                 ${annualMonthlyPrice}/mes anual (ahorra ${annualSavings}/año)
               </span>
             </div>
@@ -417,14 +399,14 @@ export default function PlanCard({
 
           {/* User count */}
           {userCount && (
-            <p className="text-xs text-gray-400 dark:text-neutral-500 mt-2">
+            <p className="mt-2 text-xs text-gray-400 dark:text-neutral-500">
               👥 {userCount} equipos
             </p>
           )}
 
           {/* Trial days */}
           {plan.trial_days && (
-            <p className="text-xs text-purple-600 dark:text-purple-400 mt-2 flex items-center gap-1">
+            <p className="mt-2 flex items-center gap-1 text-xs text-purple-600 dark:text-purple-400">
               <Sparkles className="h-3.5 w-3.5" />
               {plan.trial_days} {t("pricing.plans.demo.trialDays")}
             </p>
@@ -438,7 +420,7 @@ export default function PlanCard({
               <li key={index} className="flex items-start gap-2.5">
                 <div
                   className={cn(
-                    "flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center mt-0.5",
+                    "mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full",
                     isPopular
                       ? "bg-primary-100 dark:bg-primary-900/30"
                       : "bg-green-100 dark:bg-green-900/30",
@@ -453,7 +435,7 @@ export default function PlanCard({
                     )}
                   />
                 </div>
-                <span className="text-sm text-gray-700 dark:text-gray-300 leading-tight">
+                <span className="text-sm leading-tight text-gray-700 dark:text-gray-300">
                   {feature}
                 </span>
               </li>
@@ -462,21 +444,21 @@ export default function PlanCard({
 
           {/* Missing features compacto */}
           {missingFeatures.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-gray-100 dark:border-neutral-800/50">
-              <p className="text-xs font-semibold text-gray-400 dark:text-neutral-500 uppercase tracking-wider mb-2.5">
+            <div className="mt-4 border-t border-gray-100 pt-4 dark:border-neutral-800/50">
+              <p className="mb-2.5 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-neutral-500">
                 {t("pricing.missingFeatures", "Te estás perdiendo")}
               </p>
               <ul className="space-y-2">
                 {missingFeatures.slice(0, 3).map((feature, index) => (
                   <li key={index} className="flex items-start gap-2">
-                    <Lock className="h-3.5 w-3.5 text-gray-300 dark:text-neutral-600 flex-shrink-0 mt-0.5" />
-                    <span className="text-xs text-gray-400 dark:text-neutral-500 italic leading-tight">
+                    <Lock className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-gray-300 dark:text-neutral-600" />
+                    <span className="text-xs italic leading-tight text-gray-400 dark:text-neutral-500">
                       {feature}
                     </span>
                   </li>
                 ))}
                 {missingFeatures.length > 3 && (
-                  <li className="text-xs text-gray-400 dark:text-neutral-500 italic pl-5">
+                  <li className="pl-5 text-xs italic text-gray-400 dark:text-neutral-500">
                     +{missingFeatures.length - 3} más...
                   </li>
                 )}
@@ -487,30 +469,22 @@ export default function PlanCard({
 
         <CardFooter className="flex flex-col gap-2 pt-4">
           {isDowngradeBlocked && (
-            <p className="text-xs text-center text-amber-600 dark:text-amber-400 mb-1">
-              {t(
-                "pricing.cancelSubscriptionFirst",
-                "Cancela tu suscripción actual primero",
-              )}
+            <p className="mb-1 text-center text-xs text-amber-600 dark:text-amber-400">
+              {t("pricing.cancelSubscriptionFirst", "Cancela tu suscripción actual primero")}
             </p>
           )}
           {!plan.enabled && plan.requires_stripe && (
-            <p className="text-xs text-center text-gray-500 dark:text-gray-400 mb-1">
+            <p className="mb-1 text-center text-xs text-gray-500 dark:text-gray-400">
               {t("pricing.paymentSetup", "Configuración en proceso")}
             </p>
           )}
 
           <Button
             onClick={() => onSelectPlan(plan.id)}
-            disabled={
-              buttonConfig.disabled ||
-              isLoading ||
-              (!plan.enabled && plan.requires_stripe)
-            }
+            disabled={buttonConfig.disabled || isLoading || (!plan.enabled && plan.requires_stripe)}
             variant={isPopular ? "primary" : "ghost"}
             buttonStyle={
-              buttonConfig.variant === "current" ||
-              buttonConfig.variant === "blocked"
+              buttonConfig.variant === "current" || buttonConfig.variant === "blocked"
                 ? "outline"
                 : isPopular
                   ? "solid"
@@ -530,10 +504,8 @@ export default function PlanCard({
             iconPosition="right"
             className={cn(
               "group transition-all",
-              buttonConfig.variant === "current" &&
-                "opacity-60 cursor-not-allowed",
-              buttonConfig.variant === "blocked" &&
-                "opacity-60 cursor-not-allowed",
+              buttonConfig.variant === "current" && "cursor-not-allowed opacity-60",
+              buttonConfig.variant === "blocked" && "cursor-not-allowed opacity-60",
             )}
           >
             {getButtonText()}
@@ -547,17 +519,17 @@ export default function PlanCard({
     <div className="relative">
       <Card
         className={cn(
-          "relative flex flex-col h-full transition-all duration-300",
+          "relative flex h-full flex-col transition-all duration-300",
           isPopular
-            ? "border-2 border-primary-600 shadow-xl bg-white dark:bg-neutral-900"
-            : "border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-primary-400 dark:hover:border-primary-800",
+            ? "border-2 border-primary-600 bg-white shadow-xl dark:bg-neutral-900"
+            : "border border-neutral-200 bg-white hover:border-primary-400 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-primary-800",
           isCurrentPlan && "border-green-500",
         )}
       >
         {/* Badge superior */}
         {isPopular && (
-          <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-20">
-            <div className="bg-primary-600 text-white px-4 py-1 rounded-full text-xs font-bold shadow-md flex items-center gap-1.5">
+          <div className="absolute -top-4 left-1/2 z-20 -translate-x-1/2 transform">
+            <div className="flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-1 text-xs font-bold text-white shadow-md">
               <Star className="h-3.5 w-3.5 fill-current" />
               {t("pricing.mostPopular")}
             </div>
@@ -565,8 +537,8 @@ export default function PlanCard({
         )}
 
         {plan.id === "demo" && !isPopular && (
-          <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-            <Badge className="bg-purple-500 text-white border-0 shadow-md">
+          <div className="absolute -top-4 left-1/2 -translate-x-1/2 transform">
+            <Badge className="border-0 bg-purple-500 text-white shadow-md">
               {t("pricing.demoTemporal", "Demo Temporal")}
             </Badge>
           </div>
@@ -574,7 +546,7 @@ export default function PlanCard({
 
         {isCurrentPlan && showCurrentBadge && (
           <div className="absolute -top-4 right-4 z-20">
-            <Badge className="bg-green-500 text-white border-0 shadow-md">
+            <Badge className="border-0 bg-green-500 text-white shadow-md">
               {t("pricing.currentPlan", "Plan Actual")}
             </Badge>
           </div>
@@ -582,20 +554,17 @@ export default function PlanCard({
 
         {!isCurrentPlan && status && (
           <div className="absolute -top-4 right-4 z-20">
-            <Badge
-              variant={status.variant}
-              className={cn("shadow-md border", status.className)}
-            >
+            <Badge variant={status.variant} className={cn("border shadow-md", status.className)}>
               {status.label}
             </Badge>
           </div>
         )}
 
         <CardHeader className="relative">
-          <div className="flex items-center justify-center my-4 ">
+          <div className="my-4 flex items-center justify-center">
             <div
               className={cn(
-                "p-3.5 rounded-lg mr-2 transition-all duration-300",
+                "mr-2 rounded-lg p-3.5 transition-all duration-300",
                 isPopular
                   ? "text-primary-500"
                   : plan.id === "demo"
@@ -607,35 +576,33 @@ export default function PlanCard({
             </div>
 
             <div>
-              <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+              <CardTitle className="mb-1 text-2xl font-bold text-gray-900 dark:text-white">
                 {plan.name}
               </CardTitle>
 
               {/* Tagline */}
-              <p className="text-sm font-medium text-primary-600 dark:text-primary-400 mb-1">
+              <p className="mb-1 text-sm font-medium text-primary-600 dark:text-primary-400">
                 {getPlanTagline(plan.id)}
               </p>
 
-              <CardDescription className="text-gray-600 dark:text-gray-400 min-h-[2rem] text-xs">
+              <CardDescription className="min-h-[2rem] text-xs text-gray-600 dark:text-gray-400">
                 {plan.description}
               </CardDescription>
             </div>
           </div>
 
-          <div className="mt-6 pt-6 border-t border-gray-200 dark:border-neutral-800">
+          <div className="mt-6 border-t border-gray-200 pt-6 dark:border-neutral-800">
             <div className="flex items-baseline gap-2">
               <span
                 className={cn(
                   "text-4xl font-extrabold",
-                  isPopular
-                    ? "text-primary-600"
-                    : "text-neutral-900 dark:text-white",
+                  isPopular ? "text-primary-600" : "text-neutral-900 dark:text-white",
                 )}
               >
                 ${displayPrice}
               </span>
               {plan.price > 0 && (
-                <span className="text-gray-600 dark:text-gray-400 text-lg">
+                <span className="text-lg text-gray-600 dark:text-gray-400">
                   /{billingCycle === "monthly" ? "mes" : "año"}
                 </span>
               )}
@@ -643,8 +610,8 @@ export default function PlanCard({
 
             {/* Annual savings callout */}
             {plan.price > 0 && (
-              <div className="mt-2 flex items-center gap-2 flex-wrap">
-                <span className="text-xs text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded-full font-semibold">
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400">
                   {t("pricing.annualPricing", {
                     price: annualMonthlyPrice,
                     savings: annualSavings,
@@ -655,13 +622,13 @@ export default function PlanCard({
 
             {/* User count badge */}
             {userCount && (
-              <p className="text-xs text-gray-400 dark:text-neutral-500 mt-2">
+              <p className="mt-2 text-xs text-gray-400 dark:text-neutral-500">
                 👥 Elegido por {userCount} equipos
               </p>
             )}
 
             {plan.trial_days && (
-              <p className="text-sm text-purple-600 dark:text-purple-400 mt-3 flex items-center gap-1">
+              <p className="mt-3 flex items-center gap-1 text-sm text-purple-600 dark:text-purple-400">
                 <Sparkles className="h-4 w-4" />
                 {plan.trial_days} {t("pricing.plans.demo.trialDays")}
               </p>
@@ -669,13 +636,13 @@ export default function PlanCard({
           </div>
         </CardHeader>
 
-        <CardContent className="flex-1 relative">
+        <CardContent className="relative flex-1">
           <ul className="space-y-3">
             {features.map((feature, index) => (
               <li key={index} className="flex items-start gap-3">
                 <div
                   className={cn(
-                    "flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5",
+                    "mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full",
                     isPopular
                       ? "bg-primary-100 dark:bg-primary-900/30"
                       : "bg-green-100 dark:bg-green-900/30",
@@ -690,25 +657,23 @@ export default function PlanCard({
                     )}
                   />
                 </div>
-                <span className="text-sm text-gray-700 dark:text-gray-300">
-                  {feature}
-                </span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">{feature}</span>
               </li>
             ))}
           </ul>
 
           {missingFeatures.length > 0 && (
-            <div className="mt-8 pt-6 border-t border-gray-100 dark:border-neutral-800/50">
-              <p className="text-xs font-bold text-gray-400 dark:text-neutral-500 uppercase tracking-wider mb-4">
+            <div className="mt-8 border-t border-gray-100 pt-6 dark:border-neutral-800/50">
+              <p className="mb-4 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-neutral-500">
                 {t("pricing.missingFeatures", "Lo que te estás perdiendo")}
               </p>
               <ul className="space-y-3">
                 {missingFeatures.map((feature, index) => (
-                  <li key={index} className="flex items-start gap-3 group/item">
-                    <div className="flex-shrink-0 w-5 h-5 rounded-full bg-gray-50 dark:bg-neutral-800/50 flex items-center justify-center mt-0.5 border border-gray-100 dark:border-neutral-700/50">
+                  <li key={index} className="group/item flex items-start gap-3">
+                    <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border border-gray-100 bg-gray-50 dark:border-neutral-700/50 dark:bg-neutral-800/50">
                       <Lock className="h-2.5 w-2.5 text-gray-400 dark:text-neutral-500" />
                     </div>
-                    <span className="text-sm text-gray-400 dark:text-neutral-500 italic">
+                    <span className="text-sm italic text-gray-400 dark:text-neutral-500">
                       {feature}
                     </span>
                   </li>
@@ -721,7 +686,7 @@ export default function PlanCard({
         <CardFooter className="flex flex-col gap-2 pt-6">
           <div>
             {isDowngradeBlocked && (
-              <p className="text-xs text-center text-amber-600 dark:text-amber-400 mt-2">
+              <p className="mt-2 text-center text-xs text-amber-600 dark:text-amber-400">
                 {t(
                   "pricing.cancelSubscriptionFirst",
                   "Para cambiar a un plan gratuito, cancela tu suscripción de pago actual y espera a que termine el período de facturación.",
@@ -729,22 +694,17 @@ export default function PlanCard({
               </p>
             )}
             {!plan.enabled && plan.requires_stripe && (
-              <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-2">
+              <p className="mt-2 text-center text-xs text-gray-500 dark:text-gray-400">
                 {t("pricing.paymentSetup", "Configuración de pagos en proceso")}
               </p>
             )}
           </div>
           <Button
             onClick={() => onSelectPlan(plan.id)}
-            disabled={
-              buttonConfig.disabled ||
-              isLoading ||
-              (!plan.enabled && plan.requires_stripe)
-            }
+            disabled={buttonConfig.disabled || isLoading || (!plan.enabled && plan.requires_stripe)}
             variant={isPopular ? "primary" : "ghost"}
             buttonStyle={
-              buttonConfig.variant === "current" ||
-              buttonConfig.variant === "blocked"
+              buttonConfig.variant === "current" || buttonConfig.variant === "blocked"
                 ? "gradient"
                 : isPopular
                   ? "solid"
@@ -764,10 +724,8 @@ export default function PlanCard({
             iconPosition="right"
             className={cn(
               "group transition-all",
-              buttonConfig.variant === "current" &&
-                "opacity-60 cursor-not-allowed",
-              buttonConfig.variant === "blocked" &&
-                "opacity-60 cursor-not-allowed",
+              buttonConfig.variant === "current" && "cursor-not-allowed opacity-60",
+              buttonConfig.variant === "blocked" && "cursor-not-allowed opacity-60",
             )}
           >
             {getButtonText()}

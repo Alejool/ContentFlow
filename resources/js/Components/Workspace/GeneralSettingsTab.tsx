@@ -30,11 +30,7 @@ const getSettingsSchema = (t: any) =>
   z.object({
     name: z
       .string()
-      .min(
-        1,
-        t("workspace.invite_modal.validation.nameRequired") ||
-          "Workspace name is required",
-      )
+      .min(1, t("workspace.invite_modal.validation.nameRequired") || "Workspace name is required")
       .max(255),
     description: z.string().max(1000).optional().or(z.literal("")),
     public: z.boolean().optional(),
@@ -79,8 +75,7 @@ export default function GeneralSettingsTab({
   const onSubmit = (data: SettingsFormData) => {
     if (!isOwner) {
       toast.error(
-        t("workspace.permissions_required") ||
-          "Only the workspace owner can update these settings",
+        t("workspace.permissions_required") || "Only the workspace owner can update these settings",
       );
       return;
     }
@@ -100,17 +95,12 @@ export default function GeneralSettingsTab({
     setIsDeleting(true);
     router.delete(route("workspaces.destroy", workspace.id), {
       onSuccess: () => {
-        toast.success(
-          t("workspace.messages.delete_success") ||
-            "Workspace deleted successfully",
-        );
+        toast.success(t("workspace.messages.delete_success") || "Workspace deleted successfully");
         setIsDeleting(false);
         setShowDeleteConfirm(false);
       },
       onError: () => {
-        toast.error(
-          t("workspace.messages.delete_error") || "Failed to delete workspace",
-        );
+        toast.error(t("workspace.messages.delete_error") || "Failed to delete workspace");
         setIsDeleting(false);
         setShowDeleteConfirm(false);
       },
@@ -121,9 +111,9 @@ export default function GeneralSettingsTab({
 
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-br from-white/90 to-white/95 dark:from-black/90 dark:to-black/95 border border-white/70 dark:border-black/70 rounded-lg shadow-sm p-6">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="h-12 w-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
+      <div className="rounded-lg border border-white/70 bg-gradient-to-br from-white/90 to-white/95 p-6 shadow-sm dark:border-black/70 dark:from-black/90 dark:to-black/95">
+        <div className="mb-8 flex items-center gap-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-primary-500 to-primary-600">
             <SettingsIcon className="h-6 w-6 text-white" />
           </div>
           <div>
@@ -137,7 +127,7 @@ export default function GeneralSettingsTab({
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             <div className="space-y-6">
               <Input
                 id="name"
@@ -157,21 +147,19 @@ export default function GeneralSettingsTab({
                 <textarea
                   {...register("description")}
                   disabled={!isOwner}
-                  className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm transition-colors px-4 py-3 min-h-[120px] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="mt-1 block min-h-[120px] w-full rounded-lg border border-gray-300 px-4 py-3 shadow-sm transition-colors focus:border-primary-500 focus:ring-primary-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white sm:text-sm"
                   rows={4}
                   placeholder={t("workspace.description_placeholder")}
                 />
                 {errors.description && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.description.message}
-                  </p>
+                  <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
                 )}
               </div>
             </div>
 
             <div className="space-y-6">
-              <div className="bg-gradient-to-br from-gray-50 to-white dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-lg p-5">
-                <h4 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+              <div className="rounded-lg border border-gray-200 bg-gradient-to-br from-gray-50 to-white p-5 dark:border-neutral-800 dark:from-neutral-900 dark:to-neutral-950">
+                <h4 className="mb-4 flex items-center gap-2 font-semibold text-gray-900 dark:text-white">
                   <Shield className="h-5 w-5 text-primary-500" />
                   {t("workspace.visibility")}
                 </h4>
@@ -180,17 +168,13 @@ export default function GeneralSettingsTab({
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div
-                        className={`h-10 w-10 rounded-lg flex items-center justify-center ${
+                        className={`flex h-10 w-10 items-center justify-center rounded-lg ${
                           isPublic
-                            ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400"
-                            : "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+                            ? "bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400"
+                            : "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400"
                         }`}
                       >
-                        {isPublic ? (
-                          <Globe className="h-5 w-5" />
-                        ) : (
-                          <Lock className="h-5 w-5" />
-                        )}
+                        {isPublic ? <Globe className="h-5 w-5" /> : <Lock className="h-5 w-5" />}
                       </div>
                       <div>
                         <p className="font-medium text-gray-900 dark:text-white">
@@ -205,21 +189,21 @@ export default function GeneralSettingsTab({
                         </p>
                       </div>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
+                    <label className="relative inline-flex cursor-pointer items-center">
                       <input
                         type="checkbox"
                         {...register("public")}
                         disabled={!isOwner}
-                        className="sr-only peer"
+                        className="peer sr-only"
                       />
-                      <div className="w-11 h-6 bg-gray-200 dark:bg-neutral-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"></div>
+                      <div className="peer h-6 w-11 rounded-full bg-gray-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] disabled:cursor-not-allowed disabled:opacity-50 peer-checked:bg-primary-500 peer-checked:after:translate-x-full peer-focus:outline-none dark:bg-neutral-700"></div>
                     </label>
                   </div>
 
                   {isPublic && (
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-neutral-800">
+                    <div className="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-neutral-800">
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-lg bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 flex items-center justify-center">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400">
                           <UserCheck className="h-5 w-5" />
                         </div>
                         <div>
@@ -231,29 +215,29 @@ export default function GeneralSettingsTab({
                           </p>
                         </div>
                       </div>
-                      <label className="relative inline-flex items-center cursor-pointer">
+                      <label className="relative inline-flex cursor-pointer items-center">
                         <input
                           type="checkbox"
                           {...register("allow_public_invites")}
                           disabled={!isOwner}
-                          className="sr-only peer"
+                          className="peer sr-only"
                         />
-                        <div className="w-11 h-6 bg-gray-200 dark:bg-neutral-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"></div>
+                        <div className="peer h-6 w-11 rounded-full bg-gray-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] disabled:cursor-not-allowed disabled:opacity-50 peer-checked:bg-primary-500 peer-checked:after:translate-x-full peer-focus:outline-none dark:bg-neutral-700"></div>
                       </label>
                     </div>
                   )}
                 </div>
               </div>
 
-              <div className="bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/10 dark:to-neutral-950 border border-blue-100 dark:border-blue-800/30 rounded-lg p-5">
-                <div className="flex items-center gap-3 mb-3">
+              <div className="rounded-lg border border-blue-100 bg-gradient-to-br from-blue-50 to-white p-5 dark:border-blue-800/30 dark:from-blue-900/10 dark:to-neutral-950">
+                <div className="mb-3 flex items-center gap-3">
                   <Info className="h-5 w-5 text-blue-500" />
                   <h4 className="font-semibold text-gray-900 dark:text-white">
                     {t("workspace.workspace_id")}
                   </h4>
                 </div>
                 <div className="flex items-center gap-2">
-                  <code className="flex-1 bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-lg px-3 py-2 text-sm font-mono text-gray-900 dark:text-gray-300 truncate">
+                  <code className="flex-1 truncate rounded-lg border border-gray-200 bg-white px-3 py-2 font-mono text-sm text-gray-900 dark:border-neutral-800 dark:bg-neutral-900 dark:text-gray-300">
                     {workspace.id}
                   </code>
                   <button
@@ -262,26 +246,21 @@ export default function GeneralSettingsTab({
                       navigator.clipboard.writeText(workspace.id);
                       toast.success(t("workspace.id_copied"));
                     }}
-                    className="p-2 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-lg transition-colors"
+                    className="rounded-lg p-2 transition-colors hover:bg-gray-100 dark:hover:bg-neutral-800"
                     title={t("common.copy")}
                   >
                     <Copy className="h-4 w-4 text-gray-500 dark:text-neutral-400" />
                   </button>
                 </div>
-                <p className="text-xs text-gray-500 dark:text-neutral-500 mt-2">
+                <p className="mt-2 text-xs text-gray-500 dark:text-neutral-500">
                   {t("workspace.id_description")}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="flex justify-end pt-6 border-t border-gray-100 dark:border-neutral-800">
-            <Button
-              type="submit"
-              loading={isSaving}
-              disabled={!isOwner}
-              className="px-8"
-            >
+          <div className="flex justify-end border-t border-gray-100 pt-6 dark:border-neutral-800">
+            <Button type="submit" loading={isSaving} disabled={!isOwner} className="px-8">
               {isSaving ? t("common.saving") : t("common.save_changes")}
             </Button>
           </div>
@@ -292,9 +271,9 @@ export default function GeneralSettingsTab({
       <WorkspaceTimezoneSettings canManage={isOwner} />
 
       {isOwner && (
-        <div className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-lg shadow-sm p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="h-10 w-10 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center">
+        <div className="rounded-lg border border-red-100 bg-red-50 p-6 shadow-sm dark:border-red-900/30 dark:bg-red-900/10">
+          <div className="mb-6 flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100 dark:bg-red-900/30">
               <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
             </div>
             <div>
@@ -308,21 +287,17 @@ export default function GeneralSettingsTab({
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-white dark:bg-neutral-900 rounded-lg border border-red-100 dark:border-red-900/30">
+          <div className="flex items-center justify-between rounded-lg border border-red-100 bg-white p-4 dark:border-red-900/30 dark:bg-neutral-900">
             <div>
               <h4 className="font-medium text-gray-900 dark:text-white">
                 {t("workspace.delete_workspace") || "Delete this workspace"}
               </h4>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 {t("workspace.delete_workspace_warning") ||
                   "Once you delete a workspace, there is no going back. Please be certain."}
               </p>
             </div>
-            <Button
-              variant="primary"
-              onClick={() => setShowDeleteConfirm(true)}
-              icon={Trash2}
-            >
+            <Button variant="primary" onClick={() => setShowDeleteConfirm(true)} icon={Trash2}>
               {t("workspace.delete_button") || "Delete Workspace"}
             </Button>
           </div>

@@ -5,18 +5,7 @@ import SocialAccountsDisplay from "@/Components/Content/Publication/SocialAccoun
 import { Publication } from "@/types/Publication";
 import { usePage } from "@inertiajs/react";
 import axios from "axios";
-import {
-  Clock,
-  Copy,
-  Edit,
-  Eye,
-  Folder,
-  Image,
-  Rocket,
-  Send,
-  Trash2,
-  Video,
-} from "lucide-react";
+import { Clock, Copy, Edit, Eye, Folder, Image, Rocket, Send, Trash2, Video } from "lucide-react";
 import { memo, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -54,47 +43,50 @@ const PublicationMobileGrid = memo(
     const currentUserId = auth.user?.id;
     const currentWorkspace = auth.current_workspace;
 
-    const [isSubmittingForApproval, setIsSubmittingForApproval] = useState<
-      Record<number, boolean>
-    >({});
+    const [isSubmittingForApproval, setIsSubmittingForApproval] = useState<Record<number, boolean>>(
+      {},
+    );
 
     // Verificar permisos usando la misma lógica que ContentCard
     const canManageContent = permissions?.includes("publish");
 
     // Verificar si hay workflow habilitado
-    const hasWorkflow =
-      currentWorkspace?.approval_workflow?.is_enabled === true;
+    const hasWorkflow = currentWorkspace?.approval_workflow?.is_enabled === true;
 
     // Verificar si el usuario es Owner (puede saltarse el workflow)
     const isOwner = currentWorkspace?.user_role_slug === "owner";
 
     // Función para enviar a revisión
-    const handleSubmitForApproval = async (
-      item: Publication,
-      e: React.MouseEvent,
-    ) => {
+    const handleSubmitForApproval = async (item: Publication, e: React.MouseEvent) => {
       e.stopPropagation();
 
       try {
         setIsSubmittingForApproval((prev) => ({ ...prev, [item.id]: true }));
 
-        const response = await axios.post(
-          `/api/v1/content/${item.id}/submit-for-approval`,
-        );
+        const response = await axios.post(`/api/v1/content/${item.id}/submit-for-approval`);
 
         // Update stores with fresh data
-        const publication =
-          response.data?.data?.content || response.data?.data?.publication;
+        const publication = response.data?.data?.content || response.data?.data?.publication;
         if (publication) {
-          const publicationStoreModule =
-            await import("@/stores/publicationStore");
-          const manageContentUIStoreModule =
-            await import("@/stores/manageContentUIStore");
+          const publicationStoreModule = await import("@/stores/publicationStore");
+          const manageContentUIStoreModule = await import("@/stores/manageContentUIStore");
 
           // CRITICAL: Update immediately with new status
-          publicationStoreModule.usePublicationStore
-            .getState()
-            .updatePublication(item.id, {
+          publicationStoreModule.usePublicationStore.getState().updatePublication(item.id, {
+            status: publication.status,
+            current_approval_step_id: publication.current_approval_step_id,
+            currentApprovalStep: publication.currentApprovalStep,
+            approval_logs: publication.approval_logs,
+            approvalLogs: publication.approval_logs,
+            submitted_for_approval_at: publication.submitted_for_approval_at,
+            ...publication,
+          });
+
+          // Also update selectedItem if this publication is currently open in a modal
+          const selectedItem =
+            manageContentUIStoreModule.useManageContentUIStore.getState().selectedItem;
+          if (selectedItem?.id === item.id) {
+            manageContentUIStoreModule.useManageContentUIStore.getState().updateSelectedItem({
               status: publication.status,
               current_approval_step_id: publication.current_approval_step_id,
               currentApprovalStep: publication.currentApprovalStep,
@@ -103,24 +95,6 @@ const PublicationMobileGrid = memo(
               submitted_for_approval_at: publication.submitted_for_approval_at,
               ...publication,
             });
-
-          // Also update selectedItem if this publication is currently open in a modal
-          const selectedItem =
-            manageContentUIStoreModule.useManageContentUIStore.getState()
-              .selectedItem;
-          if (selectedItem?.id === item.id) {
-            manageContentUIStoreModule.useManageContentUIStore
-              .getState()
-              .updateSelectedItem({
-                status: publication.status,
-                current_approval_step_id: publication.current_approval_step_id,
-                currentApprovalStep: publication.currentApprovalStep,
-                approval_logs: publication.approval_logs,
-                approvalLogs: publication.approval_logs,
-                submitted_for_approval_at:
-                  publication.submitted_for_approval_at,
-                ...publication,
-              });
           }
         }
 
@@ -130,20 +104,14 @@ const PublicationMobileGrid = memo(
         window.location.reload();
       } catch (error: any) {
         console.error("Error submitting for approval:", error);
-        toast.error(
-          error.response?.data?.message || "Error al enviar a revisión",
-        );
+        toast.error(error.response?.data?.message || "Error al enviar a revisión");
       } finally {
         setIsSubmittingForApproval((prev) => ({ ...prev, [item.id]: false }));
       }
     };
 
     const countMediaFiles = (pub: Publication) => {
-      if (
-        !pub.media_files ||
-        !Array.isArray(pub.media_files) ||
-        pub.media_files.length === 0
-      ) {
+      if (!pub.media_files || !Array.isArray(pub.media_files) || pub.media_files.length === 0) {
         return { images: 0, videos: 0, total: 0 };
       }
       let images = 0;
@@ -157,7 +125,7 @@ const PublicationMobileGrid = memo(
     };
 
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 px-1 pb-10">
+      <div className="grid grid-cols-1 gap-5 px-1 pb-10 md:grid-cols-2">
         {items.map((item) => {
           const mediaCount = countMediaFiles(item);
           const isSubmitting = isSubmittingForApproval[item.id] || false;
@@ -165,16 +133,16 @@ const PublicationMobileGrid = memo(
           return (
             <div
               key={item.id}
-              className="group relative flex flex-col min-h-[16rem] rounded-lg bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+              className="group relative flex min-h-[16rem] flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-neutral-800 dark:bg-neutral-900"
             >
               {/* Primary Visual/Info Area */}
-              <div className="p-5 flex-1">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-16 h-16 rounded-lg flex-shrink-0 border border-gray-100 bg-gray-50/50 dark:border-neutral-800 dark:bg-neutral-800/50 overflow-hidden flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform duration-300">
+              <div className="flex-1 p-5">
+                <div className="mb-4 flex items-start gap-4">
+                  <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-100 bg-gray-50/50 shadow-inner transition-transform duration-300 group-hover:scale-105 dark:border-neutral-800 dark:bg-neutral-800/50">
                     <PublicationThumbnail publication={item} t={t} />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2 mb-1">
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-1 flex items-center justify-between gap-2">
                       {/* Content Type Badge */}
                       <SimpleContentTypeBadge
                         contentType={item.content_type}
@@ -183,43 +151,39 @@ const PublicationMobileGrid = memo(
                       />
 
                       <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-tight ${getStatusColor(item.status)}`}
+                        className={`inline-flex items-center rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase tracking-tight ${getStatusColor(item.status)}`}
                       >
                         {item.status || "Draft"}
                       </span>
                       {mediaCount.total > 0 && (
                         <div className="flex items-center gap-1.5 opacity-60">
-                          {mediaCount.images > 0 && (
-                            <Image className="w-3 h-3" />
-                          )}
-                          {mediaCount.videos > 0 && (
-                            <Video className="w-3 h-3" />
-                          )}
+                          {mediaCount.images > 0 && <Image className="h-3 w-3" />}
+                          {mediaCount.videos > 0 && <Video className="h-3 w-3" />}
                         </div>
                       )}
                     </div>
                     <h3
-                      className="font-bold text-gray-900 dark:text-white text-lg truncate leading-snug"
+                      className="truncate text-lg font-bold leading-snug text-gray-900 dark:text-white"
                       title={item.title || t("publications.table.untitled")}
                     >
                       {item.title || t("publications.table.untitled")}
                     </h3>
-                    <p className="text-[11px] text-gray-500 dark:text-gray-400 line-clamp-2 mt-1 font-medium leading-relaxed">
+                    <p className="mt-1 line-clamp-2 text-[11px] font-medium leading-relaxed text-gray-500 dark:text-gray-400">
                       {item.description || "Sin descripción"}
                     </p>
                   </div>
                 </div>
 
                 {/* Platform Metadata */}
-                <div className="flex flex-wrap gap-2 py-3 border-y border-gray-50 dark:border-neutral-800/50 mb-4">
+                <div className="mb-4 flex flex-wrap gap-2 border-y border-gray-50 py-3 dark:border-neutral-800/50">
                   <SocialAccountsDisplay
                     publication={item}
                     connectedAccounts={connectedAccounts}
                     compact={true}
                   />
                   {item.campaigns && item.campaigns.length > 0 && (
-                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-indigo-50/50 dark:bg-indigo-900/10 border border-indigo-100/50 dark:border-indigo-900/30">
-                      <Folder className="w-3 h-3 text-indigo-500" />
+                    <div className="flex items-center gap-1.5 rounded-lg border border-indigo-100/50 bg-indigo-50/50 px-2 py-1 dark:border-indigo-900/30 dark:bg-indigo-900/10">
+                      <Folder className="h-3 w-3 text-indigo-500" />
                       <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400">
                         {item.campaigns.length}
                       </span>
@@ -229,7 +193,7 @@ const PublicationMobileGrid = memo(
               </div>
 
               {/* Action Bar */}
-              <div className="px-5 py-4 bg-gray-50/50 dark:bg-neutral-800/20 backdrop-blur-sm flex gap-3 mt-auto border-t border-gray-50 dark:border-neutral-800">
+              <div className="mt-auto flex gap-3 border-t border-gray-50 bg-gray-50/50 px-5 py-4 backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-800/20">
                 {!canManageContent ? (
                   <Button
                     onClick={(e) => {
@@ -248,9 +212,7 @@ const PublicationMobileGrid = memo(
                   <>
                     {/* Si es Owner, puede publicar directamente sin workflow */}
                     {isOwner &&
-                    ["draft", "rejected", "approved"].includes(
-                      item.status || "draft",
-                    ) ? (
+                    ["draft", "rejected", "approved"].includes(item.status || "draft") ? (
                       <Button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -272,17 +234,14 @@ const PublicationMobileGrid = memo(
                         onClick={(e) => handleSubmitForApproval(item, e)}
                         disabled={isSubmitting}
                         loading={isSubmitting}
-                        loadingText={
-                          t("publications.button.submitting") || "Enviando..."
-                        }
+                        loadingText={t("publications.button.submitting") || "Enviando..."}
                         variant="primary"
                         buttonStyle="gradient"
                         size="sm"
                         className="flex-[2]"
                         icon={Send}
                       >
-                        {t("publications.button.submitForReview") ||
-                          "Enviar a Revisión"}
+                        {t("publications.button.submitForReview") || "Enviar a Revisión"}
                       </Button>
                     ) : hasWorkflow && item.status === "pending_review" ? (
                       /* Si está en revisión, mostrar botón disabled */
@@ -294,8 +253,7 @@ const PublicationMobileGrid = memo(
                         className="flex-[2]"
                         icon={Clock}
                       >
-                        {t("publications.status.pending_review") ||
-                          "En Revisión"}
+                        {t("publications.status.pending_review") || "En Revisión"}
                       </Button>
                     ) : hasWorkflow && item.status === "approved" ? (
                       /* Si está aprobado, mostrar botón de publicar */

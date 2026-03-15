@@ -35,20 +35,8 @@ interface SortableTabProps {
   isDraggable: boolean;
 }
 
-const SortableTab = ({
-  tab,
-  isActive,
-  onTabChange,
-  isDraggable,
-}: SortableTabProps) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
+const SortableTab = ({ tab, isActive, onTabChange, isDraggable }: SortableTabProps) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: tab.id,
     disabled: !isDraggable || tab.locked,
   });
@@ -62,40 +50,35 @@ const SortableTab = ({
 
   const Icon = tab.icon;
   const hasBadge = tab.badge !== undefined && tab.badge !== null;
-  const badgeValue =
-    typeof tab.badge === "number" && tab.badge > 99 ? "99+" : tab.badge;
+  const badgeValue = typeof tab.badge === "number" && tab.badge > 99 ? "99+" : tab.badge;
 
   return (
-    <div ref={setNodeRef} style={style} className="flex items-center group/tab">
+    <div ref={setNodeRef} style={style} className="group/tab flex items-center">
       <button
         onClick={() => onTabChange(tab.id)}
         {...(isDraggable && !tab.locked ? attributes : {})}
         {...(isDraggable && !tab.locked ? listeners : {})}
-        className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap select-none ${
+        className={`flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-lg px-5 py-2.5 text-sm font-bold transition-all duration-200 ${
           isActive
             ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
-            : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
+            : "text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-neutral-700/50 dark:hover:text-gray-200"
         }`}
       >
         {isDraggable && !tab.locked && (
           <GripHorizontal
-            className={`w-3 h-3 opacity-0 group-hover/tab:opacity-60 transition-opacity cursor-grab active:cursor-grabbing ${
+            className={`h-3 w-3 cursor-grab opacity-0 transition-opacity active:cursor-grabbing group-hover/tab:opacity-60 ${
               isActive ? "text-white" : "text-gray-400"
             }`}
           />
         )}
-        {Icon && (
-          <Icon
-            className={`w-4 h-4 ${isActive ? "text-white" : "opacity-70"}`}
-          />
-        )}
+        {Icon && <Icon className={`h-4 w-4 ${isActive ? "text-white" : "opacity-70"}`} />}
         <span>{tab.label}</span>
         {hasBadge && (
           <span
-            className={`px-2 py-0.5 text-xs font-bold rounded-full ${
+            className={`rounded-full px-2 py-0.5 text-xs font-bold ${
               isActive
                 ? "bg-white/20 text-white"
-                : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
             }`}
           >
             {badgeValue}
@@ -198,18 +181,10 @@ export default function DraggableTabs({
 
     if (oldIndex !== -1 && newIndex !== -1) {
       // Reordenar todos los tabs (no solo los visibles)
-      const allTabsOldIndex = orderedTabs.findIndex(
-        (tab) => tab.id === active.id,
-      );
-      const allTabsNewIndex = orderedTabs.findIndex(
-        (tab) => tab.id === over.id,
-      );
+      const allTabsOldIndex = orderedTabs.findIndex((tab) => tab.id === active.id);
+      const allTabsNewIndex = orderedTabs.findIndex((tab) => tab.id === over.id);
 
-      const newOrderedTabs = arrayMove(
-        orderedTabs,
-        allTabsOldIndex,
-        allTabsNewIndex,
-      );
+      const newOrderedTabs = arrayMove(orderedTabs, allTabsOldIndex, allTabsNewIndex);
 
       // Actualizar estado interno
       setOrderedTabs(newOrderedTabs);
@@ -226,7 +201,7 @@ export default function DraggableTabs({
     // Modo estático (sin drag & drop)
     return (
       <div className={`mb-8 overflow-x-auto ${className}`}>
-        <div className="inline-flex items-center p-1.5 rounded-lg bg-white dark:bg-neutral-800 backdrop-blur-sm border border-gray-200/60 dark:border-neutral-700/60 gap-1 shadow-sm min-w-max">
+        <div className="inline-flex min-w-max items-center gap-1 rounded-lg border border-gray-200/60 bg-white p-1.5 shadow-sm backdrop-blur-sm dark:border-neutral-700/60 dark:bg-neutral-800">
           {visibleTabs.map((tab) => (
             <SortableTab
               key={tab.id}
@@ -244,12 +219,8 @@ export default function DraggableTabs({
   // Modo con drag & drop
   return (
     <div className={`mb-8 overflow-x-auto ${className}`}>
-      <div className="inline-flex items-center p-1.5 rounded-lg bg-white dark:bg-neutral-800 backdrop-blur-sm border border-gray-200/60 dark:border-neutral-700/60 gap-1 shadow-sm min-w-max">
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
+      <div className="inline-flex min-w-max items-center gap-1 rounded-lg border border-gray-200/60 bg-white p-1.5 shadow-sm backdrop-blur-sm dark:border-neutral-700/60 dark:bg-neutral-800">
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext
             items={visibleTabs.map((tab) => tab.id)}
             strategy={horizontalListSortingStrategy}

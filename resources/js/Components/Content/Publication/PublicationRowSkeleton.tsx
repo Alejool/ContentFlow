@@ -7,7 +7,7 @@ const PublicationRowSkeleton = () => {
       <td className="px-2 py-4 text-center"></td>
       <td className="px-6 py-4">
         <div className="flex items-center gap-4">
-          <Skeleton className="w-12 h-12 rounded-lg flex-shrink-0" />
+          <Skeleton className="h-12 w-12 flex-shrink-0 rounded-lg" />
           <div className="min-w-0 flex-1 space-y-2">
             <Skeleton className="h-4 w-3/4" />
             <Skeleton className="h-3 w-1/2" />
@@ -30,7 +30,7 @@ const PublicationRowSkeleton = () => {
         <Skeleton className="h-6 w-24 rounded" />
       </td>
       <td className="px-6 py-4">
-        <div className="flex gap-2 justify-end">
+        <div className="flex justify-end gap-2">
           <Skeleton className="h-6 w-12 rounded" />
         </div>
       </td>

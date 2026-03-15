@@ -136,36 +136,32 @@ export default function FilterSection({
     }
   };
 
-  const showExportButtons = ["publications", "campaigns", "logs"].includes(
-    mode,
-  );
+  const showExportButtons = ["publications", "campaigns", "logs"].includes(mode);
 
   return (
-    <div className="bg-white dark:bg-neutral-800/50 p-4 rounded-lg border border-gray-100 dark:border-neutral-700 shadow-sm mt-4">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
-          <Filter className="w-4 h-4" />
+    <div className="mt-4 rounded-lg border border-gray-100 bg-white p-4 shadow-sm dark:border-neutral-700 dark:bg-neutral-800/50">
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+          <Filter className="h-4 w-4" />
           {t("common.filters.title")}
         </h3>
         <div className="flex items-center gap-2">
-          {showExportButtons && (
-            <ExportButtons endpoint={getExportEndpoint()} filters={filters} />
-          )}
+          {showExportButtons && <ExportButtons endpoint={getExportEndpoint()} filters={filters} />}
           {onResetFilters && (
             <button
               onClick={() => {
                 onResetFilters();
                 setSearch("");
               }}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded-lg transition-colors"
+              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-primary-600 dark:text-gray-400 dark:hover:bg-neutral-700 dark:hover:text-primary-400"
             >
-              <RotateCcw className="w-3.5 h-3.5" />
+              <RotateCcw className="h-3.5 w-3.5" />
               {t("logs.filters.clear")}
             </button>
           )}
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         <div className="md:col-span-2 lg:col-span-3 xl:col-span-2">
           <Input
             id="search"
@@ -253,13 +249,9 @@ export default function FilterSection({
                     : []
               }
               variant="outlined"
-              onChange={(val) =>
-                handleFilterChange("content_type", val as string | string[])
-              }
+              onChange={(val) => handleFilterChange("content_type", val as string | string[])}
               size="md"
-              placeholder={
-                t("publications.filters.content_type") || "Tipo de contenido"
-              }
+              placeholder={t("publications.filters.content_type") || "Tipo de contenido"}
               activeColor={activeColor}
               multiple
               clearable
@@ -280,9 +272,7 @@ export default function FilterSection({
                     : []
               }
               variant="outlined"
-              onChange={(val) =>
-                handleFilterChange("platform", val as string | string[])
-              }
+              onChange={(val) => handleFilterChange("platform", val as string | string[])}
               size="md"
               placeholder={t("common.platform.title") || "Plataforma"}
               activeColor={activeColor}
@@ -317,12 +307,7 @@ export default function FilterSection({
                 allowPastDates={true}
                 selected={dateStart ? parseISO(dateStart) : null}
                 dateFormat="dd/MM/yyyy HH:mm"
-                onChange={(d) =>
-                  handleFilterChange(
-                    "date_start",
-                    d ? format(d, "yyyy-MM-dd") : "",
-                  )
-                }
+                onChange={(d) => handleFilterChange("date_start", d ? format(d, "yyyy-MM-dd") : "")}
                 placeholder={t("common.filters.startDate")}
                 withPortal
                 variant="outlined"
@@ -335,12 +320,7 @@ export default function FilterSection({
                 selected={dateEnd ? parseISO(dateEnd) : null}
                 allowPastDates={true}
                 dateFormat="dd/MM/yyyy HH:mm"
-                onChange={(d) =>
-                  handleFilterChange(
-                    "date_end",
-                    d ? format(d, "yyyy-MM-dd") : "",
-                  )
-                }
+                onChange={(d) => handleFilterChange("date_end", d ? format(d, "yyyy-MM-dd") : "")}
                 placeholder={t("common.filters.endDate")}
                 withPortal
                 activeColor={activeColor}

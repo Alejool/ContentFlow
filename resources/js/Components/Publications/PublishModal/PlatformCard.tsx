@@ -41,15 +41,11 @@ export default function PlatformCard({
 
   return (
     <label
-      className={`
-        flex items-center gap-3 p-3 border-2 rounded-lg cursor-pointer transition-all
-        ${isCompatible ? "opacity-100" : "opacity-50 cursor-not-allowed"}
-        ${
-          isSelected && isCompatible
-            ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-            : "border-gray-200 dark:border-neutral-700 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/10"
-        }
-      `}
+      className={`flex cursor-pointer items-center gap-3 rounded-lg border-2 p-3 transition-all ${isCompatible ? "opacity-100" : "cursor-not-allowed opacity-50"} ${
+        isSelected && isCompatible
+          ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+          : "border-gray-200 hover:border-blue-500 hover:bg-blue-50 dark:border-neutral-700 dark:hover:bg-blue-900/10"
+      } `}
     >
       <input
         type="checkbox"
@@ -59,12 +55,9 @@ export default function PlatformCard({
         className="rounded"
       />
 
-      <div className="flex items-center gap-2 flex-1">
+      <div className="flex flex-1 items-center gap-2">
         <div
-          className={`
-          w-8 h-8 rounded-full bg-gradient-to-r ${getPlatformColor(account.platform)}
-          flex items-center justify-center text-white text-sm
-        `}
+          className={`h-8 w-8 rounded-full bg-gradient-to-r ${getPlatformColor(account.platform)} flex items-center justify-center text-sm text-white`}
         >
           {getPlatformIcon(account.platform)}
         </div>
@@ -77,13 +70,10 @@ export default function PlatformCard({
                 : "text-gray-700 dark:text-gray-300"
             }`}
           >
-            {account.platform.charAt(0).toUpperCase() +
-              account.platform.slice(1)}
+            {account.platform.charAt(0).toUpperCase() + account.platform.slice(1)}
           </div>
           {account.name && (
-            <div className="text-xs text-gray-500 dark:text-gray-400">
-              {account.name}
-            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">{account.name}</div>
           )}
         </div>
       </div>

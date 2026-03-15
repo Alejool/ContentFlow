@@ -9,12 +9,7 @@ interface UsageWarningBannerProps {
   typeName?: string;
 }
 
-export function UsageWarningBanner({
-  usage,
-  limit,
-  type,
-  typeName,
-}: UsageWarningBannerProps) {
+export function UsageWarningBanner({ usage, limit, type, typeName }: UsageWarningBannerProps) {
   const [dismissed, setDismissed] = useState(false);
 
   const percentage = (usage / limit) * 100;
@@ -32,8 +27,7 @@ export function UsageWarningBanner({
   const remaining = limit - usage;
 
   // Colores según severidad
-  const severity =
-    percentage >= 95 ? "critical" : percentage >= 90 ? "high" : "warning";
+  const severity = percentage >= 95 ? "critical" : percentage >= 90 ? "high" : "warning";
 
   const styles = {
     critical: {
@@ -65,14 +59,10 @@ export function UsageWarningBanner({
   const style = styles[severity];
 
   return (
-    <div
-      className={`${style.bg} border-l-4 ${style.border} p-4 mb-4 rounded-r-lg shadow-sm`}
-    >
+    <div className={`${style.bg} border-l-4 ${style.border} mb-4 rounded-r-lg p-4 shadow-sm`}>
       <div className="flex items-center justify-between">
-        <div className="flex items-center flex-1">
-          <AlertTriangle
-            className={`h-5 w-5 ${style.icon} mr-3 flex-shrink-0`}
-          />
+        <div className="flex flex-1 items-center">
+          <AlertTriangle className={`h-5 w-5 ${style.icon} mr-3 flex-shrink-0`} />
           <div className="flex-1">
             <p className={`text-sm font-medium ${style.text}`}>
               {severity === "critical" && "🚨 "}
@@ -82,24 +72,22 @@ export function UsageWarningBanner({
             </p>
             <p className={`text-sm ${style.textLight} mt-1`}>
               Has usado <span className="font-semibold">{usage}</span> de{" "}
-              <span className="font-semibold">{limit}</span> (
-              {percentage.toFixed(0)}%)
+              <span className="font-semibold">{limit}</span> ({percentage.toFixed(0)}%)
               {remaining > 0 && (
                 <span className="ml-2">
-                  • Solo te quedan{" "}
-                  <span className="font-semibold">{remaining}</span>
+                  • Solo te quedan <span className="font-semibold">{remaining}</span>
                 </span>
               )}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 ml-4">
+        <div className="ml-4 flex items-center gap-2">
           <Link
             href="/subscription/addons"
-            className={`inline-flex items-center px-4 py-2 ${style.button} text-white text-sm font-medium rounded-lg transition-colors whitespace-nowrap`}
+            className={`inline-flex items-center px-4 py-2 ${style.button} whitespace-nowrap rounded-lg text-sm font-medium text-white transition-colors`}
           >
-            <Sparkles className="w-4 h-4 mr-2" />
+            <Sparkles className="mr-2 h-4 w-4" />
             Comprar Más
           </Link>
 
@@ -108,7 +96,7 @@ export function UsageWarningBanner({
             className={`p-1 ${style.textLight} hover:${style.text} transition-colors`}
             aria-label="Cerrar"
           >
-            <X className="w-4 h-4" />
+            <X className="h-4 w-4" />
           </button>
         </div>
       </div>

@@ -54,7 +54,7 @@ export default function YoutubeSettings({
       videoMetadata={videoMetadata}
       onTypeChange={(type) => handleChange("type", type)}
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div className="space-y-6">
           <div className="space-y-4">
             <SectionHeader title={t("platformSettings.youtube.contentType")} />
@@ -87,7 +87,7 @@ export default function YoutubeSettings({
 
           <div className="space-y-4">
             <SectionHeader title={t("platformSettings.youtube.privacy")} />
-            <div className="grid grid-cols-1  gap-2">
+            <div className="grid grid-cols-1 gap-2">
               {[
                 {
                   value: "public",
@@ -124,7 +124,7 @@ export default function YoutubeSettings({
         <div className="space-y-6">
           <div className="space-y-4">
             <SectionHeader title="Configuración adicional" />
-            <div className="p-4 border border-gray-200 dark:border-neutral-700 rounded-lg">
+            <div className="rounded-lg border border-gray-200 p-4 dark:border-neutral-700">
               <Switch
                 id="yt_kids"
                 label={t("platformSettings.youtube.madeForKids")}

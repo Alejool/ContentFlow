@@ -40,10 +40,7 @@ const BarChart: React.FC<BarChartProps> = ({
         layout={layout}
         margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
       >
-        <CartesianGrid
-          strokeDasharray="3 3"
-          stroke={isDark ? "#374151" : "#f0f0f0"}
-        />
+        <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#374151" : "#f0f0f0"} />
         <XAxis
           dataKey={xAxisKey}
           stroke={isDark ? "#9ca3af" : "#888"}

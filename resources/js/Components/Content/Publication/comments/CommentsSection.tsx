@@ -34,10 +34,7 @@ interface CommentsSectionProps {
   currentUser: any;
 }
 
-export const CommentsSection = ({
-  publicationId,
-  currentUser,
-}: CommentsSectionProps) => {
+export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionProps) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [replyTo, setReplyTo] = useState<Comment | null>(null);
@@ -62,9 +59,7 @@ export const CommentsSection = ({
   const fetchComments = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
-        route("api.v1.publications.comments.index", publicationId),
-      );
+      const response = await axios.get(route("api.v1.publications.comments.index", publicationId));
       setComments(response.data);
     } catch (error) {
     } finally {
@@ -96,9 +91,7 @@ export const CommentsSection = ({
       if (replyTo) {
         setComments((prev) =>
           prev.map((c) =>
-            c.id === replyTo.id
-              ? { ...c, replies: [...(c.replies || []), response.data] }
-              : c,
+            c.id === replyTo.id ? { ...c, replies: [...(c.replies || []), response.data] } : c,
           ),
         );
       } else {
@@ -108,9 +101,7 @@ export const CommentsSection = ({
       setNewComment("");
       setReplyTo(null);
     } catch (error) {
-      toast.error(
-        t("publications.modal.comments.postError") || "Failed to post comment",
-      );
+      toast.error(t("publications.modal.comments.postError") || "Failed to post comment");
     } finally {
       setSubmitting(false);
     }
@@ -131,14 +122,9 @@ export const CommentsSection = ({
         }),
       );
       setComments((prev) => prev.filter((c) => c.id !== commentToDelete));
-      toast.success(
-        t("publications.modal.comments.deleteSuccess") || "Comment deleted",
-      );
+      toast.success(t("publications.modal.comments.deleteSuccess") || "Comment deleted");
     } catch (error) {
-      toast.error(
-        t("publications.modal.comments.deleteError") ||
-          "Failed to delete comment",
-      );
+      toast.error(t("publications.modal.comments.deleteError") || "Failed to delete comment");
     } finally {
       setCommentToDelete(null);
     }
@@ -148,28 +134,24 @@ export const CommentsSection = ({
 
   return (
     <div className="space-y-4">
-      <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+      <div className="custom-scrollbar max-h-[300px] space-y-4 overflow-y-auto pr-2">
         {loading && comments.length === 0 ? (
-          <div className="text-center text-sm text-gray-500 py-4">
+          <div className="py-4 text-center text-sm text-gray-500">
             {t("publications.modal.comments.loading") || "Loading comments..."}
           </div>
         ) : comments.length === 0 ? (
-          <div className="text-center text-sm text-gray-500 py-4">
+          <div className="py-4 text-center text-sm text-gray-500">
             {t("publications.modal.comments.noComments") ||
               "No comments yet. Start the conversation!"}
           </div>
         ) : (
           comments.map((comment) => (
             <div key={comment.id} className="space-y-3">
-              <div className="flex gap-3 group">
-                <Avatar
-                  src={comment.user.photo_url}
-                  name={comment.user.name}
-                  size="sm"
-                />
+              <div className="group flex gap-3">
+                <Avatar src={comment.user.photo_url} name={comment.user.name} size="sm" />
                 <div className="flex-1">
-                  <div className="bg-gray-50 dark:bg-neutral-800 rounded-lg p-3">
-                    <div className="flex items-center justify-between mb-1">
+                  <div className="rounded-lg bg-gray-50 p-3 dark:bg-neutral-800">
+                    <div className="mb-1 flex items-center justify-between">
                       <span className="text-xs font-semibold text-gray-900 dark:text-gray-100">
                         {comment.user.name}
                       </span>
@@ -177,18 +159,18 @@ export const CommentsSection = ({
                         {format(new Date(comment.created_at), "MMM d, h:mm a")}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                    <p className="whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300">
                       {comment.content}
                     </p>
                   </div>
-                  <div className="flex items-center gap-3 mt-1">
+                  <div className="mt-1 flex items-center gap-3">
                     <button
                       type="button"
                       onClick={() => {
                         setReplyTo(comment);
                         setNewComment(`@${comment.user.name} `);
                       }}
-                      className="text-[11px] font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+                      className="text-[11px] font-semibold text-blue-600 transition-colors hover:text-blue-700"
                     >
                       {t("common.reply") || "Reply"}
                     </button>
@@ -196,9 +178,9 @@ export const CommentsSection = ({
                       <button
                         type="button"
                         onClick={() => handleDelete(comment.id)}
-                        className="text-xs text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1"
+                        className="flex items-center gap-1 text-xs text-red-500 opacity-0 transition-opacity hover:text-red-700 group-hover:opacity-100"
                       >
-                        <Trash className="w-3 h-3" />{" "}
+                        <Trash className="h-3 w-3" />{" "}
                         {t("publications.modal.comments.delete") || "Delete"}
                       </button>
                     )}
@@ -208,29 +190,22 @@ export const CommentsSection = ({
 
               {/* Replies */}
               {comment.replies && comment.replies.length > 0 && (
-                <div className="ml-5 mt-2 pl-6 border-l border-gray-200 dark:border-neutral-700 space-y-4 relative">
+                <div className="relative ml-5 mt-2 space-y-4 border-l border-gray-200 pl-6 dark:border-neutral-700">
                   {comment.replies.map((reply) => (
                     <div key={reply.id} className="relative">
-                      <div className="flex gap-2 group">
-                        <Avatar
-                          src={reply.user.photo_url}
-                          name={reply.user.name}
-                          size="sm"
-                        />
+                      <div className="group flex gap-2">
+                        <Avatar src={reply.user.photo_url} name={reply.user.name} size="sm" />
                         <div className="flex-1">
-                          <div className="bg-gray-100 dark:bg-neutral-900 rounded-lg px-4 py-2">
-                            <div className="flex items-center justify-between mb-0.5">
+                          <div className="rounded-lg bg-gray-100 px-4 py-2 dark:bg-neutral-900">
+                            <div className="mb-0.5 flex items-center justify-between">
                               <span className="text-[12px] font-bold text-gray-900 dark:text-gray-100">
                                 {reply.user.name}
                               </span>
                               <span className="text-[10px] text-gray-500">
-                                {format(
-                                  new Date(reply.created_at),
-                                  "MMM d, h:mm a",
-                                )}
+                                {format(new Date(reply.created_at), "MMM d, h:mm a")}
                               </span>
                             </div>
-                            <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                            <p className="whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300">
                               {reply.content}
                             </p>
                           </div>
@@ -238,11 +213,10 @@ export const CommentsSection = ({
                             <button
                               type="button"
                               onClick={() => handleDelete(reply.id)}
-                              className="text-[10px] text-red-500 hover:text-red-700 mt-1 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1"
+                              className="mt-1 flex items-center gap-1 text-[10px] text-red-500 opacity-0 transition-opacity hover:text-red-700 group-hover:opacity-100"
                             >
-                              <Trash className="w-2.5 h-2.5" />{" "}
-                              {t("publications.modal.comments.delete") ||
-                                "Delete"}
+                              <Trash className="h-2.5 w-2.5" />{" "}
+                              {t("publications.modal.comments.delete") || "Delete"}
                             </button>
                           )}
                         </div>
@@ -258,7 +232,7 @@ export const CommentsSection = ({
 
       <div className="relative">
         {replyTo && (
-          <div className="flex items-center justify-between px-3 py-1 bg-primary-50 dark:bg-primary-900/10 rounded-t-lg border-x border-t border-gray-200 dark:border-neutral-800 text-[10px] text-primary-700 dark:text-primary-400">
+          <div className="flex items-center justify-between rounded-t-lg border-x border-t border-gray-200 bg-primary-50 px-3 py-1 text-[10px] text-primary-700 dark:border-neutral-800 dark:bg-primary-900/10 dark:text-primary-400">
             <span>
               {t("publications.modal.comments.replyingTo") || "Respondiendo a"}{" "}
               <span className="font-semibold">{replyTo.user.name}</span>
@@ -267,9 +241,7 @@ export const CommentsSection = ({
               onClick={() => {
                 setReplyTo(null);
                 if (newComment.startsWith(`@${replyTo.user.name}`)) {
-                  setNewComment(
-                    newComment.replace(`@${replyTo.user.name} `, ""),
-                  );
+                  setNewComment(newComment.replace(`@${replyTo.user.name} `, ""));
                 }
               }}
               className="hover:text-primary-900"
@@ -280,7 +252,7 @@ export const CommentsSection = ({
         )}
 
         {showMentions && (
-          <div className="absolute bottom-full left-0 w-full mb-1 bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto custom-scrollbar">
+          <div className="custom-scrollbar absolute bottom-full left-0 z-50 mb-1 max-h-48 w-full overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg dark:border-neutral-800 dark:bg-neutral-900">
             {members
               .filter(
                 (m) =>
@@ -296,7 +268,7 @@ export const CommentsSection = ({
                     setNewComment(parts.join("@") + `@${member.name} `);
                     setShowMentions(false);
                   }}
-                  className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-50 dark:hover:bg-neutral-800 text-left transition-colors"
+                  className="flex w-full items-center gap-2 px-3 py-2 text-left transition-colors hover:bg-gray-50 dark:hover:bg-neutral-800"
                 >
                   <Avatar src={member.photo_url} name={member.name} size="xs" />
                   <span className="text-xs font-medium text-gray-900 dark:text-gray-100">
@@ -330,10 +302,7 @@ export const CommentsSection = ({
                 handleSubmit(e as any);
               }
             }}
-            placeholder={
-              t("publications.modal.comments.placeholder") ||
-              "Write a comment..."
-            }
+            placeholder={t("publications.modal.comments.placeholder") || "Write a comment..."}
             className={`pr-12 ${replyTo ? "rounded-t-none" : ""}`}
             disabled={submitting}
             variant="outlined"
@@ -358,10 +327,7 @@ export const CommentsSection = ({
         isOpen={!!commentToDelete}
         onClose={() => setCommentToDelete(null)}
         onConfirm={confirmDelete}
-        title={
-          t("publications.modal.comments.deleteConfirmTitle") ||
-          "¿Eliminar comentario?"
-        }
+        title={t("publications.modal.comments.deleteConfirmTitle") || "¿Eliminar comentario?"}
         message={
           t("publications.modal.comments.deleteConfirmMessage") ||
           "¿Estás seguro de que quieres eliminar este comentario?"

@@ -35,29 +35,29 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({
 
   return (
     <div
-      className="px-6 py-4 bg-gradient-to-r from-gray-50 via-white to-gray-50/80 dark:from-neutral-900 dark:via-neutral-900/95 dark:to-neutral-800/90 flex items-center justify-between sticky top-0 z-20 backdrop-blur-md"
+      className="sticky top-0 z-20 flex items-center justify-between bg-gradient-to-r from-gray-50 via-white to-gray-50/80 px-6 py-4 backdrop-blur-md dark:from-neutral-900 dark:via-neutral-900/95 dark:to-neutral-800/90"
       style={style}
     >
       <div>
         <h2
-          className={`${currentSize.title} font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2`}
+          className={`${currentSize.title} flex items-center gap-2 font-bold text-gray-900 dark:text-gray-100`}
         >
           <Icon className={`${currentSize.icon} ${iconColor}`} />
           {t(title) || title}
         </h2>
         {subtitle && (
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+          <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
             {t(subtitle) || subtitle}
           </p>
         )}
       </div>
-      <div className="flex items-center gap-4 ">
+      <div className="flex items-center gap-4">
         {rightElement}
         <button
           onClick={onClose}
-          className="p-1.5 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded-lg transition-colors text-gray-400 dark:text-gray-500"
+          className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 dark:text-gray-500 dark:hover:bg-neutral-700"
         >
-          <X className="w-5 h-5" />
+          <X className="h-5 w-5" />
         </button>
       </div>
     </div>

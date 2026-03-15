@@ -23,8 +23,7 @@ const CONTENT_TYPE_DISPLAY = {
   reel: {
     label: "Reel",
     icon: "Video",
-    color:
-      "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
+    color: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
     borderColor: "border-purple-200 dark:border-purple-800",
     description: "Video corto vertical",
   },
@@ -38,16 +37,14 @@ const CONTENT_TYPE_DISPLAY = {
   carousel: {
     label: "Carousel",
     icon: "Images",
-    color:
-      "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400",
+    color: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400",
     borderColor: "border-indigo-200 dark:border-indigo-800",
     description: "Múltiples imágenes",
   },
   poll: {
     label: "Encuesta",
     icon: "BarChart3",
-    color:
-      "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+    color: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
     borderColor: "border-green-200 dark:border-green-800",
     description: "Encuesta interactiva",
   },
@@ -63,10 +60,7 @@ const iconMap = {
 };
 
 // Función local para detectar tipo de contenido
-const detectContentType = (
-  platformSettings: any,
-  mediaFiles: any[],
-): string => {
+const detectContentType = (platformSettings: any, mediaFiles: any[]): string => {
   if (!platformSettings || typeof platformSettings !== "object") {
     return "post";
   }
@@ -84,12 +78,8 @@ const detectContentType = (
 
   // Detectar basado en archivos multimedia
   if (mediaFiles && Array.isArray(mediaFiles)) {
-    const videoCount = mediaFiles.filter((f) =>
-      f?.file_type?.includes("video"),
-    ).length;
-    const imageCount = mediaFiles.filter((f) =>
-      f?.file_type?.includes("image"),
-    ).length;
+    const videoCount = mediaFiles.filter((f) => f?.file_type?.includes("video")).length;
+    const imageCount = mediaFiles.filter((f) => f?.file_type?.includes("image")).length;
 
     if (videoCount === 1 && imageCount === 0) {
       // Un solo video podría ser reel
@@ -118,8 +108,7 @@ const ContentTypeBadge = memo(
     className = "",
   }: ContentTypeBadgeProps) => {
     // Detectar tipo de contenido si no se proporciona
-    const detectedType =
-      contentType || detectContentType(platformSettings, mediaFiles);
+    const detectedType = contentType || detectContentType(platformSettings, mediaFiles);
     const display =
       CONTENT_TYPE_DISPLAY[detectedType as keyof typeof CONTENT_TYPE_DISPLAY] ||
       CONTENT_TYPE_DISPLAY.post;
@@ -140,21 +129,14 @@ const ContentTypeBadge = memo(
 
     return (
       <div
-        className={`
-      inline-flex items-center rounded-full font-bold uppercase tracking-wider
-      border ${display.borderColor} ${display.color} ${sizeClasses[size]}
-      ${className}
-    `}
+        className={`inline-flex items-center rounded-full border font-bold uppercase tracking-wider ${display.borderColor} ${display.color} ${sizeClasses[size]} ${className} `}
       >
         {showIcon && IconComponent && (
-          <IconComponent
-            className={iconSizes[size]}
-            aria-label={display.label}
-          />
+          <IconComponent className={iconSizes[size]} aria-label={display.label} />
         )}
         <span>{display.label}</span>
         {showDescription && size === "lg" && (
-          <span className="font-normal normal-case text-[10px] opacity-75 ml-1">
+          <span className="ml-1 text-[10px] font-normal normal-case opacity-75">
             {display.description}
           </span>
         )}

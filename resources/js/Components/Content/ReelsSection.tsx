@@ -1,15 +1,7 @@
 import React, { useState } from "react";
 import Button from "@/Components/common/Modern/Button";
 import Label from "@/Components/common/Modern/Label";
-import {
-  Sparkles,
-  Loader2,
-  Trash2,
-  Film,
-  Download,
-  ExternalLink,
-  Play,
-} from "lucide-react";
+import { Sparkles, Loader2, Trash2, Film, Download, ExternalLink, Play } from "lucide-react";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
@@ -115,21 +107,15 @@ export default function ReelsSection({
     }
 
     // Check if there are reels currently processing
-    const hasProcessingReels = generatedReels.some(
-      (reel) => reel.status === "processing",
-    );
+    const hasProcessingReels = generatedReels.some((reel) => reel.status === "processing");
     if (hasProcessingReels) {
-      toast.error(
-        "Ya hay un reel generándose. Por favor espera a que termine.",
-      );
+      toast.error("Ya hay un reel generándose. Por favor espera a que termine.");
       return;
     }
 
     // If reels already exist, ask for confirmation to regenerate
     if (generatedReels.length > 0) {
-      const confirmed = confirm(
-        "Ya existen reels generados. ¿Deseas generar uno nuevo?",
-      );
+      const confirmed = confirm("Ya existen reels generados. ¿Deseas generar uno nuevo?");
       if (!confirmed) return;
     }
 
@@ -146,16 +132,13 @@ export default function ReelsSection({
 
       toast.success("Generando reel optimizado...");
     } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message || "Error al generar el reel";
+      const errorMessage = error.response?.data?.message || "Error al generar el reel";
 
       // Handle specific error cases
       if (error.response?.status === 409) {
         toast.error(errorMessage);
       } else if (errorMessage.includes("AI service not configured")) {
-        toast.error(
-          "Servicio de IA no configurado. Contacta al administrador.",
-        );
+        toast.error("Servicio de IA no configurado. Contacta al administrador.");
       } else {
         toast.error(errorMessage);
       }
@@ -171,9 +154,7 @@ export default function ReelsSection({
 
     try {
       // Delete all reels
-      await Promise.all(
-        generatedReels.map((reel) => axios.delete(`/api/v1/media/${reel.id}`)),
-      );
+      await Promise.all(generatedReels.map((reel) => axios.delete(`/api/v1/media/${reel.id}`)));
 
       toast.success(t("reels.messages.deleted"));
       onReelsDeleted?.();
@@ -187,9 +168,7 @@ export default function ReelsSection({
   if (!videoFile) return null;
 
   // Check if there are reels currently processing
-  const hasProcessingReels = generatedReels.some(
-    (reel) => reel.status === "processing",
-  );
+  const hasProcessingReels = generatedReels.some((reel) => reel.status === "processing");
   const isButtonDisabled = generating || hasProcessingReels;
 
   return (
@@ -199,13 +178,13 @@ export default function ReelsSection({
       </Label>
 
       {generatedReels.length > 0 ? (
-        <div className="border-2 border-purple-200 dark:border-purple-800 rounded-lg overflow-hidden bg-white dark:bg-neutral-800">
+        <div className="overflow-hidden rounded-lg border-2 border-purple-200 bg-white dark:border-purple-800 dark:bg-neutral-800">
           {/* Header with actions */}
-          <div className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 px-4 py-3 border-b border-purple-200 dark:border-purple-700">
+          <div className="border-b border-purple-200 bg-gradient-to-r from-purple-50 to-purple-100 px-4 py-3 dark:border-purple-700 dark:from-purple-900/30 dark:to-purple-800/30">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 text-white" />
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-500">
+                  <Sparkles className="h-4 w-4 text-white" />
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -221,16 +200,16 @@ export default function ReelsSection({
               <button
                 onClick={handleDeleteReels}
                 disabled={deleting}
-                className="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/30 rounded-lg flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-lg bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-100 hover:text-red-700 disabled:opacity-50 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30 dark:hover:text-red-300"
               >
                 {deleting ? (
                   <>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
                     {t("common.deleting")}
                   </>
                 ) : (
                   <>
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Trash2 className="h-3.5 w-3.5" />
                     {t("reels.section.deleteAll")}
                   </>
                 )}
@@ -239,44 +218,40 @@ export default function ReelsSection({
           </div>
 
           {/* Reels List */}
-          <div className="p-4 space-y-3">
+          <div className="space-y-3 p-4">
             {generatedReels.map((reel) => (
               <div
                 key={reel.id}
-                className="group relative flex items-center gap-3 p-3 bg-gray-50 dark:bg-neutral-900/50 rounded-lg border border-gray-200 dark:border-neutral-700 hover:border-primary-300 dark:hover:border-primary-600 transition-all"
+                className="group relative flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 transition-all hover:border-primary-300 dark:border-neutral-700 dark:bg-neutral-900/50 dark:hover:border-primary-600"
               >
                 {/* Video Thumbnail */}
-                <div className="relative flex-shrink-0 w-24 h-16 rounded-md overflow-hidden bg-black">
-                  <video
-                    src={reel.file_path}
-                    className="w-full h-full object-cover"
-                    muted
-                  />
-                  <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Play className="w-6 h-6 text-white" fill="white" />
+                <div className="relative h-16 w-24 flex-shrink-0 overflow-hidden rounded-md bg-black">
+                  <video src={reel.file_path} className="h-full w-full object-cover" muted />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity group-hover:opacity-100">
+                    <Play className="h-6 w-6 text-white" fill="white" />
                   </div>
                   {/* Platform Badge on thumbnail */}
                   <div
-                    className={`absolute top-1 left-1 px-1.5 py-0.5 rounded text-[10px] font-bold text-white bg-gradient-to-r ${getPlatformColor(reel.metadata?.platform)}`}
+                    className={`absolute left-1 top-1 rounded bg-gradient-to-r px-1.5 py-0.5 text-[10px] font-bold text-white ${getPlatformColor(reel.metadata?.platform)}`}
                   >
                     {getPlatformIcon(reel.metadata?.platform)}
                   </div>
                 </div>
 
                 {/* Reel Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-sm font-semibold text-gray-900 dark:text-white capitalize">
+                <div className="min-w-0 flex-1">
+                  <div className="mb-1 flex items-center gap-2">
+                    <span className="text-sm font-semibold capitalize text-gray-900 dark:text-white">
                       {reel.metadata?.platform || "Reel"}
                     </span>
-                    <span className="px-2 py-0.5 text-[10px] font-bold text-primary-700 dark:text-primary-400 bg-primary-100 dark:bg-primary-900/30 rounded-full uppercase">
+                    <span className="rounded-full bg-primary-100 px-2 py-0.5 text-[10px] font-bold uppercase text-primary-700 dark:bg-primary-900/30 dark:text-primary-400">
                       Reel
                     </span>
                   </div>
                   <div className="flex items-center gap-3 text-xs text-gray-600 dark:text-gray-400">
                     {reel.metadata?.duration && (
                       <span className="flex items-center gap-1">
-                        <Film className="w-3 h-3" />
+                        <Film className="h-3 w-3" />
                         {Math.floor(reel.metadata.duration)}s
                       </span>
                     )}
@@ -290,28 +265,28 @@ export default function ReelsSection({
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => handleOpenInNewTab(reel)}
-                    className="p-2 text-gray-600 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
+                    className="rounded-lg p-2 text-gray-600 transition-colors hover:bg-primary-50 hover:text-primary-600 dark:text-gray-400 dark:hover:bg-primary-900/20 dark:hover:text-primary-400"
                     title={t("common.openInNewTab")}
                   >
-                    <ExternalLink className="w-4 h-4" />
+                    <ExternalLink className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => handleDownload(reel)}
-                    className="p-2 text-gray-600 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
+                    className="rounded-lg p-2 text-gray-600 transition-colors hover:bg-primary-50 hover:text-primary-600 dark:text-gray-400 dark:hover:bg-primary-900/20 dark:hover:text-primary-400"
                     title={t("common.download")}
                   >
-                    <Download className="w-4 h-4" />
+                    <Download className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => handleDeleteReel(reel.id)}
                     disabled={deletingId === reel.id}
-                    className="p-2 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
+                    className="rounded-lg p-2 text-red-600 transition-colors hover:bg-red-50 hover:text-red-700 disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-300"
                     title={t("reels.actions.delete")}
                   >
                     {deletingId === reel.id ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="h-4 w-4" />
                     )}
                   </button>
                 </div>
@@ -320,16 +295,16 @@ export default function ReelsSection({
           </div>
         </div>
       ) : (
-        <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-6 text-center bg-gray-50 dark:bg-neutral-800/50">
+        <div className="rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-6 text-center dark:border-gray-700 dark:bg-neutral-800/50">
           <div className="flex flex-col items-center gap-3">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-900/30 dark:to-primary-800/30 flex items-center justify-center">
-              <Sparkles className="w-8 h-8 text-primary-600 dark:text-primary-400" />
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-900/30 dark:to-primary-800/30">
+              <Sparkles className="h-8 w-8 text-primary-600 dark:text-primary-400" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
+              <p className="mb-1 text-sm font-semibold text-gray-900 dark:text-white">
                 {t("reels.section.empty")}
               </p>
-              <p className="text-xs text-gray-600 dark:text-gray-400 max-w-sm">
+              <p className="max-w-sm text-xs text-gray-600 dark:text-gray-400">
                 {t("reels.section.emptyDescription")}
               </p>
             </div>
@@ -343,12 +318,10 @@ export default function ReelsSection({
               icon={generating || hasProcessingReels ? Loader2 : Sparkles}
               loading={generating || hasProcessingReels}
             >
-              {generating || hasProcessingReels
-                ? "Generando reel..."
-                : "Generar Reel con IA"}
+              {generating || hasProcessingReels ? "Generando reel..." : "Generar Reel con IA"}
             </Button>
             {(generating || hasProcessingReels) && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+              <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
                 ⏳ Esto puede tomar 2-4 minutos. No cierres esta página.
               </p>
             )}

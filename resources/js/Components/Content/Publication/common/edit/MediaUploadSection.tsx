@@ -4,16 +4,7 @@ import {
   type ContentType,
 } from "@/Components/Content/Publication/common/ContentTypeSelector";
 import ImageCropper from "@/Components/Content/Publication/common/edit/ImageCropper";
-import {
-  AlertTriangle,
-  Crop,
-  FileImage,
-  Info,
-  Loader2,
-  Upload,
-  Video,
-  X,
-} from "lucide-react";
+import { AlertTriangle, Crop, FileImage, Info, Loader2, Upload, Video, X } from "lucide-react";
 import React, { memo, useMemo, useRef, useState } from "react";
 
 interface MediaUploadSectionProps {
@@ -89,19 +80,12 @@ const MediaUploadSection = memo(
     } | null>(null);
 
     // Obtener reglas de medios según el tipo de contenido
-    const mediaRules = useMemo(
-      () => getMediaRulesForContentType(contentType),
-      [contentType],
-    );
+    const mediaRules = useMemo(() => getMediaRulesForContentType(contentType), [contentType]);
 
     // Calcular contadores de medios actuales
     const mediaCounts = useMemo(() => {
-      const images = mediaPreviews.filter((m) =>
-        m.type.includes("image"),
-      ).length;
-      const videos = mediaPreviews.filter((m) =>
-        m.type.includes("video"),
-      ).length;
+      const images = mediaPreviews.filter((m) => m.type.includes("image")).length;
+      const videos = mediaPreviews.filter((m) => m.type.includes("video")).length;
       return { images, videos, total: images + videos };
     }, [mediaPreviews]);
 
@@ -114,33 +98,19 @@ const MediaUploadSection = memo(
         types.push("video/mp4", "video/mov", "video/avi");
       } else if (mediaRules.imageOnly) {
         // Solo imágenes
-        types.push(
-          "image/jpeg",
-          "image/jpg",
-          "image/png",
-          "image/gif",
-          "image/webp",
-        );
+        types.push("image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp");
       } else {
         // Verificar si aún se pueden agregar imágenes
         if (
           mediaRules.maxImages === undefined ||
-          (mediaRules.maxImages > 0 &&
-            mediaCounts.images < mediaRules.maxImages)
+          (mediaRules.maxImages > 0 && mediaCounts.images < mediaRules.maxImages)
         ) {
-          types.push(
-            "image/jpeg",
-            "image/jpg",
-            "image/png",
-            "image/gif",
-            "image/webp",
-          );
+          types.push("image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp");
         }
         // Verificar si aún se pueden agregar videos
         if (
           mediaRules.maxVideos === undefined ||
-          (mediaRules.maxVideos > 0 &&
-            mediaCounts.videos < mediaRules.maxVideos)
+          (mediaRules.maxVideos > 0 && mediaCounts.videos < mediaRules.maxVideos)
         ) {
           types.push("video/mp4", "video/mov", "video/avi");
         }
@@ -152,8 +122,7 @@ const MediaUploadSection = memo(
     // Verificar si se puede agregar más contenido
     const canAddMore = useMemo(() => {
       // Para polls que no permiten media
-      if (mediaRules.maxImages === 0 && mediaRules.maxVideos === 0)
-        return false;
+      if (mediaRules.maxImages === 0 && mediaRules.maxVideos === 0) return false;
 
       // Para reels (solo video)
       if (mediaRules.videoOnly && mediaCounts.videos >= 1) return false;
@@ -167,8 +136,7 @@ const MediaUploadSection = memo(
         return false;
 
       // Para carousel, usar maxCount si está definido
-      if (mediaRules.maxCount && mediaCounts.total >= mediaRules.maxCount)
-        return false;
+      if (mediaRules.maxCount && mediaCounts.total >= mediaRules.maxCount) return false;
 
       // Para otros tipos, verificar límites individuales
       if (
@@ -185,8 +153,7 @@ const MediaUploadSection = memo(
         return false;
 
       // Verificar límites totales
-      const maxTotal =
-        (mediaRules.maxImages || 0) + (mediaRules.maxVideos || 0);
+      const maxTotal = (mediaRules.maxImages || 0) + (mediaRules.maxVideos || 0);
       if (maxTotal > 0 && mediaCounts.total >= maxTotal) return false;
 
       return true;
@@ -218,24 +185,16 @@ const MediaUploadSection = memo(
 
     return (
       <>
-        <div
-          className={`space-y-4 ${disabled ? "pointer-events-none select-none" : ""}`}
-        >
+        <div className={`space-y-4 ${disabled ? "pointer-events-none select-none" : ""}`}>
           <div className="flex items-center justify-between">
-            <Label
-              htmlFor="media-upload"
-              icon={FileImage}
-              required
-              variant="bold"
-              size="lg"
-            >
+            <Label htmlFor="media-upload" icon={FileImage} required variant="bold" size="lg">
               Media
             </Label>
 
             {/* Indicador de límites */}
             {mediaPreviews.length > 0 && (
               <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                <Info className="w-3 h-3" />
+                <Info className="h-3 w-3" />
                 <span>
                   {mediaRules.videoOnly
                     ? `${mediaCounts.videos}/1 video`
@@ -250,9 +209,9 @@ const MediaUploadSection = memo(
           </div>
 
           <div
-            className={`relative group transition-all duration-300 block ${
+            className={`group relative block transition-all duration-300 ${
               isDragOver && !disabled
-                ? "scale-[1.02] ring-2 ring-primary-500 dark:ring-primary-900 ring-offset-2"
+                ? "scale-[1.02] ring-2 ring-primary-500 ring-offset-2 dark:ring-primary-900"
                 : ""
             } ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
             onDrop={disabled ? undefined : onDrop}
@@ -260,10 +219,10 @@ const MediaUploadSection = memo(
             onDragLeave={disabled ? undefined : onDragLeave}
           >
             <div
-              className={`min-h-[200px] rounded-lg border-2 border-dashed flex flex-col items-center justify-center p-6 text-center transition-colors overflow-hidden ${getUploadAreaStyles()}`}
+              className={`flex min-h-[200px] flex-col items-center justify-center overflow-hidden rounded-lg border-2 border-dashed p-6 text-center transition-colors ${getUploadAreaStyles()}`}
             >
               {mediaPreviews.length > 0 ? (
-                <div className="grid grid-cols-2 gap-4 w-full">
+                <div className="grid w-full grid-cols-2 gap-4">
                   {mediaPreviews.map((preview, index) => (
                     <div key={preview.tempId} className="space-y-2">
                       <MediaPreviewItem
@@ -271,15 +230,9 @@ const MediaUploadSection = memo(
                         index={index}
                         thumbnail={thumbnails[preview.tempId]}
                         onRemove={() => onRemoveMedia(preview.tempId)}
-                        onSetThumbnail={(file) =>
-                          onSetThumbnail(preview.tempId, file)
-                        }
-                        onCrop={(tempId, url) =>
-                          setCroppingImage({ tempId, url })
-                        }
-                        onClearThumbnail={() =>
-                          onClearThumbnail(preview.tempId)
-                        }
+                        onSetThumbnail={(file) => onSetThumbnail(preview.tempId, file)}
+                        onCrop={(tempId, url) => setCroppingImage({ tempId, url })}
+                        onClearThumbnail={() => onClearThumbnail(preview.tempId)}
                         disabled={disabled || isAnyMediaProcessing}
                         progress={uploadProgress?.[preview.tempId]}
                         stats={uploadStats?.[preview.tempId]}
@@ -289,17 +242,11 @@ const MediaUploadSection = memo(
                       />
                     </div>
                   ))}
-                  {!disabled && !isAnyMediaProcessing && canAddMore && (
-                    <AddMoreButton />
-                  )}
+                  {!disabled && !isAnyMediaProcessing && canAddMore && <AddMoreButton />}
                 </div>
               ) : (
                 <label
-                  htmlFor={
-                    disabled || isAnyMediaProcessing
-                      ? undefined
-                      : "media-file-input"
-                  }
+                  htmlFor={disabled || isAnyMediaProcessing ? undefined : "media-file-input"}
                   className="cursor-pointer"
                 >
                   <EmptyUploadState
@@ -313,24 +260,22 @@ const MediaUploadSection = memo(
 
               {/* Global Processing Indicator for the whole area */}
               {isAnyMediaProcessing && (
-                <div className="absolute inset-x-0 bottom-0 py-1.5 px-4 bg-primary-500/10 backdrop-blur-md border-t border-primary-500/20 animate-in slide-in-from-bottom-2">
+                <div className="animate-in slide-in-from-bottom-2 absolute inset-x-0 bottom-0 border-t border-primary-500/20 bg-primary-500/10 px-4 py-1.5 backdrop-blur-md">
                   <div className="flex items-center gap-3">
-                    <div className="flex-1 h-1.5 bg-gray-200 dark:bg-neutral-800 rounded-full overflow-hidden">
+                    <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-gray-200 dark:bg-neutral-800">
                       <div
                         className="h-full bg-primary-500 transition-all duration-500 ease-out"
                         style={{
                           width: `${
                             Object.values(uploadProgress || {}).length > 0
-                              ? Object.values(uploadProgress || {}).reduce(
-                                  (a, b) => a + b,
-                                  0,
-                                ) / Object.values(uploadProgress || {}).length
+                              ? Object.values(uploadProgress || {}).reduce((a, b) => a + b, 0) /
+                                Object.values(uploadProgress || {}).length
                               : 100
                           }%`,
                         }}
                       />
                     </div>
-                    <span className="text-[10px] font-bold text-primary-600 dark:text-primary-400 uppercase whitespace-nowrap">
+                    <span className="whitespace-nowrap text-[10px] font-bold uppercase text-primary-600 dark:text-primary-400">
                       {Object.values(uploadProgress || {}).length > 0
                         ? "Subiendo..."
                         : "Procesando S3..."}
@@ -347,9 +292,7 @@ const MediaUploadSection = memo(
                 className="hidden"
                 multiple={
                   !mediaRules.videoOnly &&
-                  (mediaRules.maxCount
-                    ? mediaRules.maxCount > 1
-                    : (mediaRules.maxImages || 1) > 1)
+                  (mediaRules.maxCount ? mediaRules.maxCount > 1 : (mediaRules.maxImages || 1) > 1)
                 }
                 accept={acceptedFileTypes}
                 onChange={(e) => onFileChange(e.target.files)}
@@ -358,8 +301,8 @@ const MediaUploadSection = memo(
           </div>
 
           {imageError && (
-            <div className="mt-2 flex items-center gap-2 text-sm text-primary-500 animate-in slide-in-from-left-1">
-              <AlertTriangle className="w-4 h-4" />
+            <div className="animate-in slide-in-from-left-1 mt-2 flex items-center gap-2 text-sm text-primary-500">
+              <AlertTriangle className="h-4 w-4" />
               {imageError}
             </div>
           )}
@@ -367,7 +310,7 @@ const MediaUploadSection = memo(
           {/* Mensaje informativo sobre límites alcanzados */}
           {!canAddMore && mediaPreviews.length > 0 && (
             <div className="mt-2 flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400">
-              <Info className="w-4 h-4" />
+              <Info className="h-4 w-4" />
               <span>
                 {mediaRules.videoOnly
                   ? "Los Reels/Shorts solo permiten 1 video"
@@ -433,29 +376,25 @@ const MediaPreviewItem = memo(
 
     const isProcessing =
       preview.status === "processing" ||
-      (progress !== undefined &&
-        progress >= 100 &&
-        preview.status !== "completed") ||
+      (progress !== undefined && progress >= 100 && preview.status !== "completed") ||
       isExternalProcessing;
     const isUploading =
-      !error &&
-      (preview.status === "uploading" ||
-        (progress !== undefined && progress < 100));
+      !error && (preview.status === "uploading" || (progress !== undefined && progress < 100));
 
     return (
       <div
-        className={`relative group/item aspect-video rounded-lg overflow-hidden bg-gray-900 ${
+        className={`group/item relative aspect-video overflow-hidden rounded-lg bg-gray-900 ${
           disabled ? "opacity-90" : ""
         } ${error ? "border-red-500 ring-2 ring-red-500/20" : ""} ${isProcessing || isUploading ? "animate-pulse" : ""}`}
         onClick={(e) => e.stopPropagation()}
       >
         {isProcessing || isUploading ? (
-          <div className="w-full h-full flex flex-col items-center justify-center bg-gray-800 text-white p-4">
-            <div className="p-3 rounded-full bg-white/10 mb-2">
+          <div className="flex h-full w-full flex-col items-center justify-center bg-gray-800 p-4 text-white">
+            <div className="mb-2 rounded-full bg-white/10 p-3">
               {preview.type.includes("video") ? (
-                <Video className="w-8 h-8 text-white/50" />
+                <Video className="h-8 w-8 text-white/50" />
               ) : (
-                <FileImage className="w-8 h-8 text-white/50" />
+                <FileImage className="h-8 w-8 text-white/50" />
               )}
             </div>
             <span className="text-xs font-bold uppercase tracking-wider opacity-70">
@@ -473,39 +412,33 @@ const MediaPreviewItem = memo(
             duration={metadata?.duration}
           />
         ) : (
-          <img
-            src={preview.url}
-            className="w-full h-full object-cover"
-            alt="Media preview"
-          />
+          <img src={preview.url} className="h-full w-full object-cover" alt="Media preview" />
         )}
 
         {/* Upload Overlay (Matching Outside Style) */}
         {!error && isUploading && (
-          <div className="absolute inset-x-0 bottom-0 bg-black/60 p-3 backdrop-blur-md border-t border-white/10 z-20">
-            <div className="w-full bg-gray-700/50 h-1.5 rounded-full overflow-hidden mb-1.5">
+          <div className="absolute inset-x-0 bottom-0 z-20 border-t border-white/10 bg-black/60 p-3 backdrop-blur-md">
+            <div className="mb-1.5 h-1.5 w-full overflow-hidden rounded-full bg-gray-700/50">
               <div
-                className="bg-primary-500 h-full transition-all duration-500 linear"
+                className="linear h-full bg-primary-500 transition-all duration-500"
                 style={{ width: `${progress || 0}%` }}
               />
             </div>
-            <div className="text-[10px] text-white/90 font-bold flex justify-between w-full uppercase tracking-tighter">
+            <div className="flex w-full justify-between text-[10px] font-bold uppercase tracking-tighter text-white/90">
               <span>{Math.round(progress || 0)}%</span>
-              {stats?.eta &&
-                typeof stats.eta === "number" &&
-                !isNaN(stats.eta) && <span>~{formatETA(stats.eta)}</span>}
+              {stats?.eta && typeof stats.eta === "number" && !isNaN(stats.eta) && (
+                <span>~{formatETA(stats.eta)}</span>
+              )}
             </div>
           </div>
         )}
 
         {/* Error Overlay */}
         {error && (
-          <div className="absolute inset-0 bg-red-900/80 flex flex-col items-center justify-center p-4 backdrop-blur-sm z-20 text-center animate-in fade-in zoom-in duration-300">
-            <AlertTriangle className="w-8 h-8 text-white mb-2" />
-            <span className="text-white text-sm font-bold">Upload Failed</span>
-            <span className="text-white/80 text-xs mt-1 px-2 line-clamp-2">
-              {error}
-            </span>
+          <div className="animate-in fade-in zoom-in absolute inset-0 z-20 flex flex-col items-center justify-center bg-red-900/80 p-4 text-center backdrop-blur-sm duration-300">
+            <AlertTriangle className="mb-2 h-8 w-8 text-white" />
+            <span className="text-sm font-bold text-white">Upload Failed</span>
+            <span className="mt-1 line-clamp-2 px-2 text-xs text-white/80">{error}</span>
           </div>
         )}
 
@@ -516,9 +449,9 @@ const MediaPreviewItem = memo(
               e.stopPropagation();
               onRemove();
             }}
-            className="absolute top-2 right-2 p-1.5 bg-red-500/80 text-white rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover/item:opacity-100 backdrop-blur-sm z-30"
+            className="absolute right-2 top-2 z-30 rounded-full bg-red-500/80 p-1.5 text-white opacity-0 backdrop-blur-sm transition-colors hover:bg-red-600 group-hover/item:opacity-100"
           >
-            <X className="w-3 h-3" />
+            <X className="h-3 w-3" />
           </button>
         )}
 
@@ -529,10 +462,10 @@ const MediaPreviewItem = memo(
               e.stopPropagation();
               onCrop(preview.tempId, preview.url);
             }}
-            className="absolute top-2 right-10 p-1.5 bg-black/60 text-white rounded-full hover:bg-black/80 transition-colors opacity-0 group-hover/item:opacity-100 backdrop-blur-sm z-30"
+            className="absolute right-10 top-2 z-30 rounded-full bg-black/60 p-1.5 text-white opacity-0 backdrop-blur-sm transition-colors hover:bg-black/80 group-hover/item:opacity-100"
             title="Crop Image"
           >
-            <Crop className="w-3 h-3" />
+            <Crop className="h-3 w-3" />
           </button>
         )}
       </div>
@@ -559,12 +492,9 @@ const VideoPreview = memo(
     duration?: number;
   }) => (
     <>
-      <video
-        src={preview.url}
-        className="w-full h-full object-cover opacity-80"
-      />
+      <video src={preview.url} className="h-full w-full object-cover opacity-80" />
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-        <span className="text-white/80 text-xs font-medium bg-black/50 px-2 py-1 rounded">
+        <span className="rounded bg-black/50 px-2 py-1 text-xs font-medium text-white/80">
           {duration
             ? `${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, "0")}`
             : "Video"}
@@ -582,9 +512,9 @@ const VideoPreview = memo(
           />
           <label
             htmlFor={disabled ? undefined : `edit-thumb-${preview.tempId}`}
-            className={`text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm transition-colors flex items-center gap-1 border border-white/20 ${disabled ? "cursor-default opacity-50" : "cursor-pointer bg-white/10 hover:bg-white/20"}`}
+            className={`flex items-center gap-1 rounded-full border border-white/20 px-3 py-1.5 text-xs text-white backdrop-blur-sm transition-colors ${disabled ? "cursor-default opacity-50" : "cursor-pointer bg-white/10 hover:bg-white/20"}`}
           >
-            <FileImage className="w-3 h-3" />
+            <FileImage className="h-3 w-3" />
             {thumbnail || preview.thumbnailUrl ? "Change Thumb" : "Set Thumb"}
           </label>
           {(thumbnail || preview.thumbnailUrl) && !disabled && (
@@ -594,21 +524,19 @@ const VideoPreview = memo(
                 e.stopPropagation();
                 onClearThumbnail();
               }}
-              className="bg-red-500/80 hover:bg-red-600 text-white p-1.5 rounded-full backdrop-blur-sm transition-colors border border-red-400/50 shadow-lg"
+              className="rounded-full border border-red-400/50 bg-red-500/80 p-1.5 text-white shadow-lg backdrop-blur-sm transition-colors hover:bg-red-600"
               title="Remove Thumbnail"
             >
-              <X className="w-3 h-3" />
+              <X className="h-3 w-3" />
             </button>
           )}
         </div>
       </div>
       {(thumbnail || preview.thumbnailUrl) && (
-        <div className="absolute top-2 left-2 w-8 h-8 rounded border border-white/30 overflow-hidden shadow-lg z-10">
+        <div className="absolute left-2 top-2 z-10 h-8 w-8 overflow-hidden rounded border border-white/30 shadow-lg">
           <img
-            src={
-              thumbnail ? URL.createObjectURL(thumbnail) : preview.thumbnailUrl
-            }
-            className="w-full h-full object-cover"
+            src={thumbnail ? URL.createObjectURL(thumbnail) : preview.thumbnailUrl}
+            className="h-full w-full object-cover"
             alt="Video thumbnail"
           />
         </div>
@@ -620,10 +548,10 @@ const VideoPreview = memo(
 const AddMoreButton = memo(() => (
   <label
     htmlFor="media-file-input"
-    className="flex items-center justify-center aspect-video border-2 border-dashed border-gray-300 rounded-lg hover:bg-neutral-200/90 hover:dark:bg-neutral-800/90 transition-colors cursor-pointer"
+    className="flex aspect-video cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 transition-colors hover:bg-neutral-200/90 hover:dark:bg-neutral-800/90"
   >
     <div className="text-center">
-      <Upload className="w-6 h-6 mx-auto text-gray-400" />
+      <Upload className="mx-auto h-6 w-6 text-gray-400" />
       <span className="text-xs text-gray-500">Add more</span>
     </div>
   </label>
@@ -664,46 +592,40 @@ const EmptyUploadState = memo(
 
       const parts: string[] = [];
       if (mediaRules.maxImages && mediaRules.maxImages > 0) {
-        parts.push(
-          `${mediaRules.maxImages} imagen${mediaRules.maxImages > 1 ? "es" : ""}`,
-        );
+        parts.push(`${mediaRules.maxImages} imagen${mediaRules.maxImages > 1 ? "es" : ""}`);
       }
       if (mediaRules.maxVideos && mediaRules.maxVideos > 0) {
-        parts.push(
-          `${mediaRules.maxVideos} video${mediaRules.maxVideos > 1 ? "s" : ""}`,
-        );
+        parts.push(`${mediaRules.maxVideos} video${mediaRules.maxVideos > 1 ? "s" : ""}`);
       }
 
       if (parts.length === 0) return "Arrastra archivos aquí";
 
       const result = parts.join(" o ");
-      return mediaRules.allowMixed
-        ? `Hasta ${result} (puedes mezclar)`
-        : `Hasta ${result}`;
+      return mediaRules.allowMixed ? `Hasta ${result} (puedes mezclar)` : `Hasta ${result}`;
     };
 
     return (
       <div className="space-y-4">
         <div
-          className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto transition-all duration-300 ${isProcessing || (lockedBy && !lockedBy.isSelf) ? "bg-gray-200 dark:bg-gray-800" : "bg-primary-100 dark:bg-primary-900/30 group-hover:scale-110"}`}
+          className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full transition-all duration-300 ${isProcessing || (lockedBy && !lockedBy.isSelf) ? "bg-gray-200 dark:bg-gray-800" : "bg-primary-100 group-hover:scale-110 dark:bg-primary-900/30"}`}
         >
           {isProcessing ? (
-            <Loader2 className="w-8 h-8 text-white animate-spin" />
+            <Loader2 className="h-8 w-8 animate-spin text-white" />
           ) : lockedBy && !lockedBy.isSelf ? (
-            <AlertTriangle className="w-8 h-8 text-yellow-500" />
+            <AlertTriangle className="h-8 w-8 text-yellow-500" />
           ) : (
-            <Upload className="w-8 h-8 text-primary-500" />
+            <Upload className="h-8 w-8 text-primary-500" />
           )}
         </div>
         <div>
-          <p className="font-medium text-lg">
+          <p className="text-lg font-medium">
             {isProcessing
               ? "Procesando archivos..."
               : lockedBy && !lockedBy.isSelf
                 ? `Subida bloqueada por ${lockedBy.name}`
                 : t("publications.modal.edit.dragDrop.title")}
           </p>
-          <p className="text-sm mt-1 opacity-70">
+          <p className="mt-1 text-sm opacity-70">
             {isProcessing
               ? "Por favor, espera a que termine la subida actual."
               : lockedBy && !lockedBy.isSelf

@@ -1,12 +1,5 @@
 import Label from "@/Components/common/Modern/Label";
-import {
-  AlertCircle,
-  Check,
-  CheckCircle,
-  ChevronDown,
-  Search,
-  X,
-} from "lucide-react";
+import { AlertCircle, Check, CheckCircle, ChevronDown, Search, X } from "lucide-react";
 import { ReactNode, isValidElement, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { FieldValues, Path, UseFormRegister } from "react-hook-form";
@@ -54,8 +47,7 @@ function DropdownPortal({
           dropdown.style.bottom = "auto";
         }
       } else {
-        const bottomPosition =
-          viewportHeight - (selectRect.bottom + 4 + dropdownHeight);
+        const bottomPosition = viewportHeight - (selectRect.bottom + 4 + dropdownHeight);
         if (bottomPosition > 0) {
           dropdown.style.top = `${selectRect.bottom + 4}px`;
           dropdown.style.bottom = "auto";
@@ -79,23 +71,21 @@ function DropdownPortal({
     transition: "opacity 150ms ease-out, transform 150ms ease-out",
     opacity: isOpen ? 1 : 0,
     transform: isOpen ? "scale(1)" : "scale(0.95)",
-    transformOrigin:
-      dropdownDirection === "up" ? "bottom center" : "top center",
+    transformOrigin: dropdownDirection === "up" ? "bottom center" : "top center",
     borderRadius: "0.5rem",
     borderWidth: "1px",
-    boxShadow:
-      "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+    boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
   };
 
   const content = (
     <div
       ref={dropdownRef}
       style={portalStyles}
-      className={`bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 ${
+      className={`border border-gray-200 bg-white dark:border-neutral-700 dark:bg-neutral-800 ${
         !usePortal
           ? dropdownDirection === "up"
             ? "bottom-full left-0 mb-1"
-            : "top-full left-0 mt-1"
+            : "left-0 top-full mt-1"
           : ""
       }`}
     >
@@ -211,9 +201,7 @@ export default function Select<T extends FieldValues>({
   const currentSize = sizeConfig[size];
 
   const filteredOptions = searchable
-    ? options.filter((option) =>
-        option.label.toLowerCase().includes(searchTerm.toLowerCase()),
-      )
+    ? options.filter((option) => option.label.toLowerCase().includes(searchTerm.toLowerCase()))
     : options;
 
   useEffect(() => {
@@ -243,9 +231,7 @@ export default function Select<T extends FieldValues>({
       const spaceAbove = rect.top;
 
       if (dropdownPosition === "auto") {
-        setDropdownDirection(
-          spaceBelow >= 240 || spaceBelow >= spaceAbove ? "down" : "up",
-        );
+        setDropdownDirection(spaceBelow >= 240 || spaceBelow >= spaceAbove ? "down" : "up");
       } else {
         setDropdownDirection(dropdownPosition);
       }
@@ -345,11 +331,7 @@ export default function Select<T extends FieldValues>({
     const base = `
       ${currentSize.option} transition-colors duration-150
       flex items-center gap-3 w-full text-left px-4
-      ${
-        isDisabled
-          ? "opacity-50 cursor-not-allowed"
-          : "cursor-pointer hover:bg-opacity-50"
-      }
+      ${isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-opacity-50"}
     `;
 
     if (isSelected) {
@@ -417,12 +399,7 @@ export default function Select<T extends FieldValues>({
     if (e.key === "Escape") {
       setIsOpen(false);
     }
-    if (
-      e.key === "Enter" &&
-      isOpen &&
-      filteredOptions.length > 0 &&
-      !searchable
-    ) {
+    if (e.key === "Enter" && isOpen && filteredOptions.length > 0 && !searchable) {
       handleSelect(filteredOptions[0].value);
     }
   };
@@ -445,19 +422,11 @@ export default function Select<T extends FieldValues>({
 
   const activeColorRGB = activeColor ? getRGBValues(activeColor) : "";
   const isSolidActive =
-    activeColor &&
-    !multiple &&
-    value !== undefined &&
-    value !== "" &&
-    value !== null;
+    activeColor && !multiple && value !== undefined && value !== "" && value !== null;
 
   return (
     <>
-      <div
-        className={`${containerClassName}`}
-        ref={selectRef}
-        onKeyDown={handleKeyDown}
-      >
+      <div className={`${containerClassName}`} ref={selectRef} onKeyDown={handleKeyDown}>
         {(label || hint) && (
           <div>
             {label && (
@@ -475,9 +444,7 @@ export default function Select<T extends FieldValues>({
               </Label>
             )}
             {hint && !label && (
-              <span className="text-xs text-gray-500 dark:text-gray-400 ml-auto">
-                {hint}
-              </span>
+              <span className="ml-auto text-xs text-gray-500 dark:text-gray-400">{hint}</span>
             )}
           </div>
         )}
@@ -486,18 +453,12 @@ export default function Select<T extends FieldValues>({
           <div className="relative">
             {Icon && (
               <div
-                className={`absolute left-3 top-1/2 -translate-y-1/2 z-10 ${
-                  isSolidActive
-                    ? "text-white"
-                    : "text-gray-500 dark:text-gray-400"
+                className={`absolute left-3 top-1/2 z-10 -translate-y-1/2 ${
+                  isSolidActive ? "text-white" : "text-gray-500 dark:text-gray-400"
                 }`}
               >
                 <div className={currentSize.icon}>
-                  {isValidElement(Icon) ? (
-                    Icon
-                  ) : (
-                    <Icon className="w-full h-full" />
-                  )}
+                  {isValidElement(Icon) ? Icon : <Icon className="h-full w-full" />}
                 </div>
               </div>
             )}
@@ -529,16 +490,9 @@ export default function Select<T extends FieldValues>({
               type="button"
               onClick={handleTriggerClick}
               disabled={disabled || loading}
-              className={`
-                ${getTriggerStyles()} ${className}
-                ${
-                  isSolidActive
-                    ? "text-white"
-                    : isOpen && activeColor
-                      ? "ring-2 ring-offset-2"
-                      : ""
-                }
-              `}
+              className={` ${getTriggerStyles()} ${className} ${
+                isSolidActive ? "text-white" : isOpen && activeColor ? "ring-2 ring-offset-2" : ""
+              } `}
               aria-expanded={isOpen}
               aria-haspopup="listbox"
               aria-labelledby={`${id}-label`}
@@ -549,9 +503,7 @@ export default function Select<T extends FieldValues>({
                     ? {
                         "--active-bg-rgb": activeColorRGB,
                         "--tw-ring-color": `rgb(${activeColorRGB})`,
-                        backgroundColor: isSolidActive
-                          ? `rgb(${activeColorRGB} / 0.7)`
-                          : undefined,
+                        backgroundColor: isSolidActive ? `rgb(${activeColorRGB} / 0.7)` : undefined,
                         borderColor: isSolidActive
                           ? "transparent"
                           : isOpen
@@ -565,7 +517,7 @@ export default function Select<T extends FieldValues>({
               <span className="truncate" id={`${id}-label`}>
                 {loading ? (
                   <span className="flex items-center gap-2">
-                    <span className="animate-spin rounded-full border-2 border-current border-t-transparent w-4 h-4"></span>
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></span>
                     Loading...
                   </span>
                 ) : (
@@ -573,7 +525,7 @@ export default function Select<T extends FieldValues>({
                 )}
               </span>
 
-              <div className="flex items-center gap-1 ml-2 flex-shrink-0">
+              <div className="ml-2 flex flex-shrink-0 items-center gap-1">
                 {clearable &&
                   ((multiple && Array.isArray(value) && value.length > 0) ||
                     (!multiple && value && value !== "")) &&
@@ -592,25 +544,19 @@ export default function Select<T extends FieldValues>({
                         isSolidActive
                           ? "hover:bg-white/10"
                           : "hover:bg-black/10 dark:hover:bg-white/10"
-                      } rounded transition-colors cursor-pointer`}
+                      } cursor-pointer rounded transition-colors`}
                       aria-label="Clear selection"
                     >
-                      <X className="w-4 h-4" />
+                      <X className="h-4 w-4" />
                     </div>
                   )}
 
                 <ChevronDown
-                  className={`
-                    ${
-                      currentSize.icon
-                    } transition-transform duration-200 flex-shrink-0
-                    ${isOpen ? "rotate-180" : ""}
-                    ${
-                      isSolidActive
-                        ? "text-white"
-                        : "text-gray-500 dark:text-gray-400"
-                    }
-                  `}
+                  className={` ${
+                    currentSize.icon
+                  } flex-shrink-0 transition-transform duration-200 ${isOpen ? "rotate-180" : ""} ${
+                    isSolidActive ? "text-white" : "text-gray-500 dark:text-gray-400"
+                  } `}
                   aria-hidden="true"
                 />
               </div>
@@ -641,9 +587,9 @@ export default function Select<T extends FieldValues>({
               }
             >
               {searchable && (
-                <div className="sticky top-0 bg-white dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-700 z-10">
+                <div className="sticky top-0 z-10 border-b border-gray-200 bg-white dark:border-neutral-700 dark:bg-neutral-900">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                     <input
                       ref={inputRef}
                       type="text"
@@ -675,14 +621,9 @@ export default function Select<T extends FieldValues>({
                       <button
                         key={option.value}
                         type="button"
-                        onClick={() =>
-                          !option.disabled && handleSelect(option.value)
-                        }
+                        onClick={() => !option.disabled && handleSelect(option.value)}
                         disabled={option.disabled}
-                        className={`
-                          ${getOptionStyles(isSelected, !!option.disabled)}
-                          ${option.disabled ? "cursor-not-allowed" : ""}
-                        `}
+                        className={` ${getOptionStyles(isSelected, !!option.disabled)} ${option.disabled ? "cursor-not-allowed" : ""} `}
                         style={
                           isSelected && activeColor
                             ? {
@@ -694,18 +635,12 @@ export default function Select<T extends FieldValues>({
                         aria-selected={isSelected}
                         aria-disabled={option.disabled}
                       >
-                        {option.icon && (
-                          <span className="flex-shrink-0">{option.icon}</span>
-                        )}
-                        <span className="flex-1 text-left whitespace-nowrap">
-                          {option.label}
-                        </span>
+                        {option.icon && <span className="flex-shrink-0">{option.icon}</span>}
+                        <span className="flex-1 whitespace-nowrap text-left">{option.label}</span>
                         {isSelected && (
                           <Check
-                            className={`w-4 h-4 flex-shrink-0 ${
-                              activeColor
-                                ? "text-white"
-                                : "text-primary-500 dark:text-primary-400"
+                            className={`h-4 w-4 flex-shrink-0 ${
+                              activeColor ? "text-white" : "text-primary-500 dark:text-primary-400"
                             }`}
                           />
                         )}
@@ -719,23 +654,15 @@ export default function Select<T extends FieldValues>({
         </div>
 
         {error && (
-          <div
-            id={`${id}-error`}
-            className={getMessageStyles("error")}
-            role="alert"
-          >
-            <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+          <div id={`${id}-error`} className={getMessageStyles("error")} role="alert">
+            <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
             <span className="text-sm">{error}</span>
           </div>
         )}
 
         {success && !error && (
-          <div
-            id={`${id}-success`}
-            className={getMessageStyles("success")}
-            role="status"
-          >
-            <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+          <div id={`${id}-success`} className={getMessageStyles("success")} role="status">
+            <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
             <span className="text-sm">{success}</span>
           </div>
         )}

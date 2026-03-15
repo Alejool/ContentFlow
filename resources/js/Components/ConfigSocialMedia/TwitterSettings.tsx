@@ -49,7 +49,7 @@ export default function TwitterSettings({
     <div className="space-y-6">
       <div className="space-y-4">
         <SectionHeader title={t("platformSettings.twitter.type")} />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <PlatformCard
             value="tweet"
             label={t("platformSettings.twitter.tweet")}
@@ -57,8 +57,7 @@ export default function TwitterSettings({
             iconColor="text-sky-500"
             iconBgColor="bg-sky-100 dark:bg-sky-900/20"
             selected={
-              settings?.type === "tweet" ||
-              (!settings?.type && defaultSettings.type === "tweet")
+              settings?.type === "tweet" || (!settings?.type && defaultSettings.type === "tweet")
             }
             onSelect={(val) => handleChange("type", val)}
           />
@@ -86,11 +85,7 @@ export default function TwitterSettings({
       {settings?.type === "poll" && (
         <PollOptions
           pollOptions={settings?.poll_options || []}
-          pollDuration={
-            settings?.poll_duration_hours
-              ? settings.poll_duration_hours * 60
-              : 1440
-          }
+          pollDuration={settings?.poll_duration_hours ? settings.poll_duration_hours * 60 : 1440}
           onOptionsChange={handlePollOptionsChange}
           onDurationChange={handlePollDurationChange}
         />

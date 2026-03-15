@@ -15,28 +15,23 @@ export default function NotificationButton() {
     <>
       <button
         onClick={() => setShowNotifications(true)}
-        className={`group relative p-2.5 rounded-lg transition-all duration-300
-                    ${
-                      actualTheme === "dark"
-                        ? "text-gray-400 hover:text-primary-400 hover:bg-neutral-800"
-                        : "text-gray-600 hover:text-primary-600 hover:bg-beige-300"
-                    }
-                `}
+        className={`group relative rounded-lg p-2.5 transition-all duration-300 ${
+          actualTheme === "dark"
+            ? "text-gray-400 hover:bg-neutral-800 hover:text-primary-400"
+            : "text-gray-600 hover:bg-beige-300 hover:text-primary-600"
+        } `}
         aria-label={t("nav.notifications", "Notifications")}
       >
         <div className="relative">
           <Bell className="h-6 w-6" />
           {unreadCount > 0 && (
-            <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-sm ring-2 ring-white dark:ring-neutral-900">
+            <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-sm ring-2 ring-white dark:ring-neutral-900">
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           )}
         </div>
       </button>
-      <NotificationsModal
-        isOpen={showNotifications}
-        onClose={() => setShowNotifications(false)}
-      />
+      <NotificationsModal isOpen={showNotifications} onClose={() => setShowNotifications(false)} />
     </>
   );
 }

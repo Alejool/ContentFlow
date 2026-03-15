@@ -3,15 +3,7 @@ import { DynamicModal } from "@/Components/common/Modern/DynamicModal";
 import { Badge } from "@/Components/ui/badge";
 import { usePricing } from "@/Hooks/usePricing";
 import { cn } from "@/lib/utils";
-import {
-  AlertTriangle,
-  CheckCircle,
-  Info,
-  RefreshCw,
-  Sparkles,
-  XCircle,
-  Zap,
-} from "lucide-react";
+import { AlertTriangle, CheckCircle, Info, RefreshCw, Sparkles, XCircle, Zap } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
@@ -83,11 +75,9 @@ const MODAL_META = {
 } as const;
 
 const getPlanName = (id: string, plans: Plan[]) =>
-  plans.find((p) => p.id === id)?.name ??
-  id.charAt(0).toUpperCase() + id.slice(1);
+  plans.find((p) => p.id === id)?.name ?? id.charAt(0).toUpperCase() + id.slice(1);
 
-const getPlanPrice = (id: string, plans: Plan[]) =>
-  plans.find((p) => p.id === id)?.price ?? 0;
+const getPlanPrice = (id: string, plans: Plan[]) => plans.find((p) => p.id === id)?.price ?? 0;
 
 export default function PricingPlansSection({
   plans,
@@ -122,8 +112,7 @@ export default function PricingPlansSection({
   );
 
   // Definir effectiveActivePlans PRIMERO antes de usarlo
-  const effectiveActivePlans =
-    activePlans.length > 0 ? activePlans : propActivePlans || [];
+  const effectiveActivePlans = activePlans.length > 0 ? activePlans : propActivePlans || [];
 
   React.useEffect(() => {
     if (isAuthenticated && propHasActiveSubscription === undefined) {
@@ -153,9 +142,7 @@ export default function PricingPlansSection({
     const currentIsPaid = currentPlan && paidPlans.includes(currentPlan);
 
     // Verificar si tiene planes de pago en activePlans
-    const hasActivePaidPlan = effectiveActivePlans.some((id) =>
-      paidPlans.includes(id),
-    );
+    const hasActivePaidPlan = effectiveActivePlans.some((id) => paidPlans.includes(id));
 
     // Verificar si tiene suscripciones activas de pago
     const hasActivePaidSubscription = activeSubscriptions.some(
@@ -166,26 +153,18 @@ export default function PricingPlansSection({
   }, [currentPlan, effectiveActivePlans, activeSubscriptions]);
 
   // DEBUG: Ver qué datos llegan
-  React.useEffect(() => {}, [
-    currentPlan,
-    effectiveActivePlans,
-    expiredPlans,
-    activeSubscriptions,
-  ]);
+  React.useEffect(() => {}, [currentPlan, effectiveActivePlans, expiredPlans, activeSubscriptions]);
 
   // Plans purchased + still active (not current) → can switch for free
   const switchablePlans = effectiveActivePlans.filter(
-    (id) =>
-      id !== currentPlan &&
-      ["starter", "growth", "professional", "enterprise"].includes(id),
+    (id) => id !== currentPlan && ["starter", "growth", "professional", "enterprise"].includes(id),
   );
   // Plans purchased but now expired → need Stripe renewal
   const renewablePlans = expiredPlans.filter((id) =>
     ["starter", "growth", "professional", "enterprise"].includes(id),
   );
 
-  const meta =
-    MODAL_META[modal.type as keyof typeof MODAL_META] ?? MODAL_META.info;
+  const meta = MODAL_META[modal.type as keyof typeof MODAL_META] ?? MODAL_META.info;
   const ModalIcon = meta.icon;
 
   return (
@@ -193,117 +172,104 @@ export default function PricingPlansSection({
       {/* ── Header ─────────────────────────────────────────────────────────── */}
       {showHeader && (
         <div className="text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 rounded-full text-sm font-medium mb-6">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary-50 px-4 py-2 text-sm font-medium text-primary-600 dark:bg-primary-900/20 dark:text-primary-400">
             <Sparkles className="h-4 w-4" />
             {t("pricing.flexiblePlans", "Planes flexibles para cada necesidad")}
           </div>
 
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6 font-heading">
+          <h1 className="mb-6 font-heading text-5xl font-bold text-gray-900 dark:text-white md:text-6xl">
             {t("pricing.title")}
           </h1>
 
-          <p className="text-xl text-gray-600 dark:text-gray-400 mb-10 max-w-2xl mx-auto">
+          <p className="mx-auto mb-10 max-w-2xl text-xl text-gray-600 dark:text-gray-400">
             {t("pricing.subtitle")}
           </p>
 
           {/* ── Active subscription banner ─────────────────────────────────── */}
-          {isOwner &&
-            (hasActiveSubscription || activeSubscriptions.length > 0) && (
-              <div className="mb-8 max-w-3xl mx-auto">
-                <div className="p-6 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-lg shadow-sm">
-                  <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0">
-                      <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shadow-inner">
-                        <Info className="h-5 w-5 text-white" />
-                      </div>
+          {isOwner && (hasActiveSubscription || activeSubscriptions.length > 0) && (
+            <div className="mx-auto mb-8 max-w-3xl">
+              <div className="rounded-lg border-2 border-blue-200 bg-blue-50 p-6 shadow-sm dark:border-blue-800 dark:bg-blue-900/20">
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600 shadow-inner">
+                      <Info className="h-5 w-5 text-white" />
                     </div>
-                    <div className="flex-1 text-left">
-                      <h3 className="text-lg font-bold text-blue-900 dark:text-blue-100 mb-2">
-                        {t(
-                          "pricing.activeSubscription.title",
-                          "Ya tienes una suscripción activa",
-                        )}
-                      </h3>
-                      <div className="space-y-2 mb-3">
-                        {activeSubscriptions.length > 0 ? (
-                          activeSubscriptions.map((sub, index) => (
-                            <div
-                              key={index}
-                              className="bg-white dark:bg-blue-950/50 p-3 rounded-lg border border-blue-200 dark:border-blue-800 flex justify-between items-center"
-                            >
-                              <div>
-                                <p className="font-semibold text-blue-900 dark:text-blue-100">
-                                  {t("pricing.currentPlanLabel")}: {sub.name}
-                                </p>
-                                <p className="text-xs text-blue-700 dark:text-blue-300">
-                                  {sub.cancel_at_period_end
-                                    ? t("pricing.endsOn", {
-                                        date: new Date(
-                                          sub.ends_at,
-                                        ).toLocaleDateString(),
-                                      })
-                                    : t("pricing.autoRenewal")}
-                                </p>
-                              </div>
-                              <Badge
-                                className={cn(
-                                  sub.status === "active"
-                                    ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                                    : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-                                )}
-                              >
-                                {sub.status === "active"
-                                  ? t("pricing.statusActive")
-                                  : sub.status}
-                              </Badge>
+                  </div>
+                  <div className="flex-1 text-left">
+                    <h3 className="mb-2 text-lg font-bold text-blue-900 dark:text-blue-100">
+                      {t("pricing.activeSubscription.title", "Ya tienes una suscripción activa")}
+                    </h3>
+                    <div className="mb-3 space-y-2">
+                      {activeSubscriptions.length > 0 ? (
+                        activeSubscriptions.map((sub, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center justify-between rounded-lg border border-blue-200 bg-white p-3 dark:border-blue-800 dark:bg-blue-950/50"
+                          >
+                            <div>
+                              <p className="font-semibold text-blue-900 dark:text-blue-100">
+                                {t("pricing.currentPlanLabel")}: {sub.name}
+                              </p>
+                              <p className="text-xs text-blue-700 dark:text-blue-300">
+                                {sub.cancel_at_period_end
+                                  ? t("pricing.endsOn", {
+                                      date: new Date(sub.ends_at).toLocaleDateString(),
+                                    })
+                                  : t("pricing.autoRenewal")}
+                              </p>
                             </div>
-                          ))
-                        ) : (
-                          <p className="text-sm text-blue-800 dark:text-blue-200">
-                            <span className="font-bold">
-                              {t("pricing.currentPlanLabel")}:{" "}
-                            </span>
-                            <span className="font-bold text-blue-600 dark:text-blue-400 capitalize">
-                              {currentPlan}
-                            </span>
-                          </p>
-                        )}
-                      </div>
-                      <div className="bg-blue-100 dark:bg-blue-900/40 p-4 rounded-lg mb-4 border border-blue-200 dark:border-blue-800">
-                        <p className="text-sm text-blue-900 dark:text-blue-100 leading-relaxed">
-                          {t(
-                            "pricing.activeSubscription.prorationExplanation",
-                            "Puedes cambiar a cualquier plan disponible. El cambio se aplicará inmediatamente y la facturación se ajustará automáticamente de forma prorrateada según el tiempo restante de tu suscripción.",
-                          )}
+                            <Badge
+                              className={cn(
+                                sub.status === "active"
+                                  ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                                  : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+                              )}
+                            >
+                              {sub.status === "active" ? t("pricing.statusActive") : sub.status}
+                            </Badge>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-sm text-blue-800 dark:text-blue-200">
+                          <span className="font-bold">{t("pricing.currentPlanLabel")}: </span>
+                          <span className="font-bold capitalize text-blue-600 dark:text-blue-400">
+                            {currentPlan}
+                          </span>
                         </p>
-                      </div>
-                      <div className="flex flex-wrap gap-3">
-                        <a
-                          href={route("subscription.billing")}
-                          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg text-sm font-semibold transition-colors shadow-sm"
-                        >
-                          {t(
-                            "pricing.activeSubscription.manageBilling",
-                            "Gestionar Facturación",
-                          )}
-                        </a>
-                      </div>
+                      )}
+                    </div>
+                    <div className="mb-4 rounded-lg border border-blue-200 bg-blue-100 p-4 dark:border-blue-800 dark:bg-blue-900/40">
+                      <p className="text-sm leading-relaxed text-blue-900 dark:text-blue-100">
+                        {t(
+                          "pricing.activeSubscription.prorationExplanation",
+                          "Puedes cambiar a cualquier plan disponible. El cambio se aplicará inmediatamente y la facturación se ajustará automáticamente de forma prorrateada según el tiempo restante de tu suscripción.",
+                        )}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-3">
+                      <a
+                        href={route("subscription.billing")}
+                        className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700"
+                      >
+                        {t("pricing.activeSubscription.manageBilling", "Gestionar Facturación")}
+                      </a>
                     </div>
                   </div>
                 </div>
               </div>
-            )}
+            </div>
+          )}
 
           {/* ── Billing toggle ──────────────────────────────────────────────── */}
           {showBillingToggle && (
-            <div className="inline-flex items-center gap-2 bg-white dark:bg-neutral-800 p-1.5 rounded-lg shadow-lg border border-gray-200 dark:border-neutral-700">
+            <div className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white p-1.5 shadow-lg dark:border-neutral-700 dark:bg-neutral-800">
               <button
                 onClick={() => setBillingCycle("monthly")}
                 className={cn(
-                  "px-6 py-2.5 rounded-lg font-medium transition-all duration-200",
+                  "rounded-lg px-6 py-2.5 font-medium transition-all duration-200",
                   billingCycle === "monthly"
                     ? "bg-primary-600 text-white shadow-sm"
-                    : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white",
+                    : "text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white",
                 )}
               >
                 {t("pricing.monthly")}
@@ -313,65 +279,55 @@ export default function PricingPlansSection({
 
           {/* ── My Plans Panel ──────────────────────────────────────────────── */}
           {isAuthenticated && isOwner && currentPlan && (
-            <div className="mt-6 max-w-2xl mx-auto text-left">
-              <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-md overflow-hidden">
+            <div className="mx-auto mt-6 max-w-2xl text-left">
+              <div className="overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-md dark:border-neutral-800 dark:bg-neutral-900">
                 {/* Header row */}
-                <div className="flex items-center gap-3 px-5 py-4 bg-primary-600">
-                  <Zap className="w-5 h-5 text-white flex-shrink-0" />
+                <div className="flex items-center gap-3 bg-primary-600 px-5 py-4">
+                  <Zap className="h-5 w-5 flex-shrink-0 text-white" />
                   <div className="flex-1">
-                    <p className="text-xs font-semibold text-primary-200 uppercase tracking-wider">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-primary-200">
                       {t("pricing.activePlanNow")}
                     </p>
-                    <p className="text-lg font-bold text-white capitalize leading-tight">
+                    <p className="text-lg font-bold capitalize leading-tight text-white">
                       {getPlanName(currentPlan, plans)}
                       <span className="ml-2 text-sm font-normal text-primary-200">
-                        ${getPlanPrice(currentPlan, plans)}/
-                        {t("pricing.billing.month")}
+                        ${getPlanPrice(currentPlan, plans)}/{t("pricing.billing.month")}
                       </span>
                     </p>
                   </div>
-                  <CheckCircle className="w-6 h-6 text-primary-200" />
+                  <CheckCircle className="h-6 w-6 text-primary-200" />
                 </div>
 
                 {/* Switchable plans (purchased + time available, use for free) */}
                 {switchablePlans.length > 0 && (
-                  <div className="px-5 py-4 border-t border-neutral-100 dark:border-neutral-800">
-                    <p className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-3">
-                      {t(
-                        "pricing.purchasedPlansAvailable",
-                        "Planes comprados — cambiar sin pago",
-                      )}
+                  <div className="border-t border-neutral-100 px-5 py-4 dark:border-neutral-800">
+                    <p className="mb-3 text-xs font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                      {t("pricing.purchasedPlansAvailable", "Planes comprados — cambiar sin pago")}
                     </p>
                     <div className="flex flex-col gap-2">
                       {switchablePlans.map((id) => (
                         <div
                           key={id}
-                          className="flex items-center justify-between p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800"
+                          className="flex items-center justify-between rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-900/20"
                         >
                           <div className="flex items-center gap-2">
-                            <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0" />
+                            <CheckCircle className="h-4 w-4 flex-shrink-0 text-green-600 dark:text-green-400" />
                             <div>
-                              <p className="text-sm font-semibold text-green-800 dark:text-green-300 capitalize">
+                              <p className="text-sm font-semibold capitalize text-green-800 dark:text-green-300">
                                 {getPlanName(id, plans)}
                               </p>
                               <p className="text-xs text-green-600 dark:text-green-500">
-                                {t(
-                                  "pricing.timeAvailable",
-                                  "Tiempo disponible",
-                                )}{" "}
-                                · ${getPlanPrice(id, plans)}/
-                                {t("pricing.billing.month")}
+                                {t("pricing.timeAvailable", "Tiempo disponible")} · $
+                                {getPlanPrice(id, plans)}/{t("pricing.billing.month")}
                               </p>
                             </div>
                           </div>
                           <button
                             onClick={() => handlePlanSelect(id)}
                             disabled={!!isLoading}
-                            className="px-4 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-lg transition-colors disabled:opacity-50 flex-shrink-0"
+                            className="flex-shrink-0 rounded-lg bg-green-600 px-4 py-1.5 text-xs font-bold text-white transition-colors hover:bg-green-700 disabled:opacity-50"
                           >
-                            {isLoading === id
-                              ? t("pricing.changing")
-                              : t("pricing.use")}
+                            {isLoading === id ? t("pricing.changing") : t("pricing.use")}
                           </button>
                         </div>
                       ))}
@@ -381,25 +337,24 @@ export default function PricingPlansSection({
 
                 {/* Renewable plans (expired, need Stripe) */}
                 {renewablePlans.length > 0 && (
-                  <div className="px-5 py-4 border-t border-neutral-100 dark:border-neutral-800">
-                    <p className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-3">
+                  <div className="border-t border-neutral-100 px-5 py-4 dark:border-neutral-800">
+                    <p className="mb-3 text-xs font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                       {t("pricing.expiredPlans")}
                     </p>
                     <div className="flex flex-col gap-2">
                       {renewablePlans.map((id) => (
                         <div
                           key={id}
-                          className="flex items-center justify-between p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800"
+                          className="flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-900/20"
                         >
                           <div className="flex items-center gap-2">
-                            <RefreshCw className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+                            <RefreshCw className="h-4 w-4 flex-shrink-0 text-amber-600 dark:text-amber-400" />
                             <div>
-                              <p className="text-sm font-semibold text-amber-800 dark:text-amber-300 capitalize">
+                              <p className="text-sm font-semibold capitalize text-amber-800 dark:text-amber-300">
                                 {getPlanName(id, plans)}
                               </p>
                               <p className="text-xs text-amber-600 dark:text-amber-500">
-                                {t("pricing.expired")} · $
-                                {getPlanPrice(id, plans)}/
+                                {t("pricing.expired")} · ${getPlanPrice(id, plans)}/
                                 {t("pricing.billing.month")}
                               </p>
                             </div>
@@ -407,7 +362,7 @@ export default function PricingPlansSection({
                           <button
                             onClick={() => handlePlanSelect(id)}
                             disabled={!!isLoading}
-                            className="px-4 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-lg transition-colors disabled:opacity-50 flex-shrink-0"
+                            className="flex-shrink-0 rounded-lg bg-amber-500 px-4 py-1.5 text-xs font-bold text-white transition-colors hover:bg-amber-600 disabled:opacity-50"
                           >
                             {isLoading === id ? "..." : t("pricing.renew")}
                           </button>
@@ -440,25 +395,17 @@ export default function PricingPlansSection({
       />
 
       {/* ── Error / Warning Modal (no success modal — redirect is used instead) */}
-      <DynamicModal
-        isOpen={modal.open}
-        onClose={closeModal}
-        title={modal.title}
-        size="md"
-      >
-        <div className="flex flex-col items-center text-center gap-4">
+      <DynamicModal isOpen={modal.open} onClose={closeModal} title={modal.title} size="md">
+        <div className="flex flex-col items-center gap-4 text-center">
           <div
-            className={cn(
-              "w-14 h-14 rounded-full flex items-center justify-center",
-              meta.bgClass,
-            )}
+            className={cn("flex h-14 w-14 items-center justify-center rounded-full", meta.bgClass)}
           >
-            <ModalIcon className={cn("w-7 h-7", meta.iconClass)} />
+            <ModalIcon className={cn("h-7 w-7", meta.iconClass)} />
           </div>
-          <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+          <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">
             {modal.message}
           </p>
-          <div className="flex gap-3 justify-center mt-2 w-full">
+          <div className="mt-2 flex w-full justify-center gap-3">
             {modal.actionLabel && modal.onAction && (
               <button
                 onClick={() => {
@@ -466,7 +413,7 @@ export default function PricingPlansSection({
                   modal.onAction?.();
                 }}
                 className={cn(
-                  "flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors shadow-sm",
+                  "flex-1 rounded-lg px-4 py-2.5 text-sm font-semibold shadow-sm transition-colors",
                   meta.actionClass,
                 )}
               >
@@ -476,9 +423,9 @@ export default function PricingPlansSection({
             <button
               onClick={closeModal}
               className={cn(
-                "px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors border",
-                "bg-white dark:bg-neutral-800 text-gray-700 dark:text-gray-200",
-                "border-gray-200 dark:border-neutral-700 hover:bg-gray-50 dark:hover:bg-neutral-700",
+                "rounded-lg border px-4 py-2.5 text-sm font-semibold transition-colors",
+                "bg-white text-gray-700 dark:bg-neutral-800 dark:text-gray-200",
+                "border-gray-200 hover:bg-gray-50 dark:border-neutral-700 dark:hover:bg-neutral-700",
                 !modal.actionLabel && "flex-1",
               )}
             >

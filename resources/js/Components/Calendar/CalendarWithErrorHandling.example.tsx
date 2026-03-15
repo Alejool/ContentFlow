@@ -7,27 +7,19 @@
 
 import React, { useState, useEffect } from "react";
 import { CalendarErrorBoundary } from "./CalendarErrorBoundary";
-import {
-  ConflictResolutionModal,
-  DataConflict,
-} from "./ConflictResolutionModal";
+import { ConflictResolutionModal, DataConflict } from "./ConflictResolutionModal";
 import { SyncErrorList } from "./SyncErrorDisplay";
 import { useCalendarStore } from "@/stores/calendarStore";
 import { validateDate } from "@/Utils/dateValidation";
 import { SyncError } from "@/types/errors";
 
 export const CalendarWithErrorHandling: React.FC = () => {
-  const { events, conflict, setConflict, resolveConflict, updateEvent } =
-    useCalendarStore();
+  const { events, conflict, setConflict, resolveConflict, updateEvent } = useCalendarStore();
 
   const [syncErrors, setSyncErrors] = useState<SyncError[]>([]);
 
   // Handle event update with validation
-  const handleEventUpdate = async (
-    eventId: string,
-    newDate: string,
-    type: string,
-  ) => {
+  const handleEventUpdate = async (eventId: string, newDate: string, type: string) => {
     // Validate date before sending
     const validation = validateDate(newDate);
 

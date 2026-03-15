@@ -15,20 +15,18 @@ export default function ScheduleSettings({
 }: ScheduleSettingsProps) {
   return (
     <div className="mb-6">
-      <h3 className="text-base font-semibold text-gray-700 dark:text-gray-300 mb-3">
+      <h3 className="mb-3 text-base font-semibold text-gray-700 dark:text-gray-300">
         Configuración
       </h3>
 
-      <label className="flex items-center gap-2 cursor-pointer mb-3">
+      <label className="mb-3 flex cursor-pointer items-center gap-2">
         <input
           type="checkbox"
           checked={schedulePost}
           onChange={(e) => onScheduleChange(e.target.checked)}
           className="rounded"
         />
-        <span className="text-sm text-gray-700 dark:text-gray-300">
-          Programar publicación
-        </span>
+        <span className="text-sm text-gray-700 dark:text-gray-300">Programar publicación</span>
       </label>
 
       {schedulePost && (

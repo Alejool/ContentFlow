@@ -8,15 +8,12 @@ interface WorkspaceTimezoneSettingsProps {
   canManage?: boolean;
 }
 
-export const WorkspaceTimezoneSettings: React.FC<
-  WorkspaceTimezoneSettingsProps
-> = ({ canManage = false }) => {
+export const WorkspaceTimezoneSettings: React.FC<WorkspaceTimezoneSettingsProps> = ({
+  canManage = false,
+}) => {
   const { t } = useTranslation();
-  const { workspaceTimezone, effectiveTimezone, updateWorkspaceTimezone } =
-    useTimezoneStore();
-  const [selectedTimezone, setSelectedTimezone] = useState(
-    workspaceTimezone || "UTC",
-  );
+  const { workspaceTimezone, effectiveTimezone, updateWorkspaceTimezone } = useTimezoneStore();
+  const [selectedTimezone, setSelectedTimezone] = useState(workspaceTimezone || "UTC");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -62,8 +59,7 @@ export const WorkspaceTimezoneSettings: React.FC<
       }, 3000);
     } catch (err: any) {
       console.error("Error updating timezone:", err);
-      const errorMessage =
-        err.response?.data?.message || err.message || "Error updating timezone";
+      const errorMessage = err.response?.data?.message || err.message || "Error updating timezone";
       setError(errorMessage);
       setIsLoading(false);
     }
@@ -72,9 +68,9 @@ export const WorkspaceTimezoneSettings: React.FC<
   const hasChanges = selectedTimezone !== workspaceTimezone;
 
   return (
-    <div className="workspace-timezone-settings bg-gradient-to-br from-white/90 to-white/95 dark:from-black/90 dark:to-black/95 border border-white/70 dark:border-black/70 rounded-lg shadow-sm p-6">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="h-12 w-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+    <div className="workspace-timezone-settings rounded-lg border border-white/70 bg-gradient-to-br from-white/90 to-white/95 p-6 shadow-sm dark:border-black/70 dark:from-black/90 dark:to-black/95">
+      <div className="mb-6 flex items-center gap-3">
+        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-600">
           <Globe className="h-6 w-6 text-white" />
         </div>
         <div>
@@ -89,20 +85,20 @@ export const WorkspaceTimezoneSettings: React.FC<
 
       <div className="space-y-4">
         {/* Current Timezone Info */}
-        <div className="bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/10 dark:to-neutral-950 border border-blue-100 dark:border-blue-800/30 rounded-lg p-5 mb-6">
+        <div className="mb-6 rounded-lg border border-blue-100 bg-gradient-to-br from-blue-50 to-white p-5 dark:border-blue-800/30 dark:from-blue-900/10 dark:to-neutral-950">
           <div className="flex items-start gap-3">
-            <div className="h-10 w-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
               <i className="bi bi-info-circle text-lg"></i>
             </div>
             <div className="flex-1">
               <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">
                 {t("workspace.timezone.current")}
               </p>
-              <p className="text-sm text-blue-700 dark:text-blue-300 mt-1 font-mono">
+              <p className="mt-1 font-mono text-sm text-blue-700 dark:text-blue-300">
                 {effectiveTimezone()}
               </p>
               {!workspaceTimezone && (
-                <p className="text-xs text-blue-600 dark:text-blue-400 mt-2">
+                <p className="mt-2 text-xs text-blue-600 dark:text-blue-400">
                   {t("workspace.timezone.using_default")}
                 </p>
               )}
@@ -127,7 +123,7 @@ export const WorkspaceTimezoneSettings: React.FC<
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-4">
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
             <div className="flex items-center gap-2">
               <i className="bi bi-exclamation-triangle text-red-600 dark:text-red-400"></i>
               <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
@@ -137,7 +133,7 @@ export const WorkspaceTimezoneSettings: React.FC<
 
         {/* Success Message */}
         {success && (
-          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-4">
+          <div className="mb-4 rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
             <div className="flex items-center gap-2">
               <i className="bi bi-check-circle text-green-600 dark:text-green-400"></i>
               <p className="text-sm text-green-700 dark:text-green-300">
@@ -149,7 +145,7 @@ export const WorkspaceTimezoneSettings: React.FC<
 
         {/* Save Button */}
         {canManage && (
-          <div className="flex items-center justify-between pt-6 border-t border-gray-100 dark:border-neutral-800">
+          <div className="flex items-center justify-between border-t border-gray-100 pt-6 dark:border-neutral-800">
             <p className="text-sm text-gray-500 dark:text-gray-400">
               {hasChanges
                 ? t("workspace.timezone.unsaved_changes")
@@ -158,14 +154,11 @@ export const WorkspaceTimezoneSettings: React.FC<
             <button
               onClick={handleSave}
               disabled={!hasChanges || isLoading}
-              className="px-6 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700
-                       disabled:bg-gray-300 disabled:cursor-not-allowed
-                       focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
-                       transition-all font-medium shadow-sm hover:shadow-md"
+              className="rounded-lg bg-primary-600 px-6 py-2.5 font-medium text-white shadow-sm transition-all hover:bg-primary-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-300"
             >
               {isLoading ? (
                 <>
-                  <i className="bi bi-arrow-repeat animate-spin mr-2"></i>
+                  <i className="bi bi-arrow-repeat mr-2 animate-spin"></i>
                   {t("common.saving")}
                 </>
               ) : (
@@ -179,9 +172,9 @@ export const WorkspaceTimezoneSettings: React.FC<
         )}
 
         {!canManage && (
-          <div className="bg-gradient-to-br from-yellow-50 to-white dark:from-yellow-900/10 dark:to-neutral-950 border border-yellow-100 dark:border-yellow-800/30 rounded-lg p-4">
+          <div className="rounded-lg border border-yellow-100 bg-gradient-to-br from-yellow-50 to-white p-4 dark:border-yellow-800/30 dark:from-yellow-900/10 dark:to-neutral-950">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 flex items-center justify-center flex-shrink-0">
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400">
                 <i className="bi bi-lock text-lg"></i>
               </div>
               <p className="text-sm text-yellow-700 dark:text-yellow-300">

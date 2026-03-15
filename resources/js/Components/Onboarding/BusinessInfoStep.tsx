@@ -51,9 +51,7 @@ export default function BusinessInfoStep({
     businessSize: initialData?.businessSize || "",
   });
 
-  const [errors, setErrors] = useState<
-    Partial<Record<keyof BusinessInfoData, string>>
-  >({});
+  const [errors, setErrors] = useState<Partial<Record<keyof BusinessInfoData, string>>>({});
 
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof BusinessInfoData, string>> = {};
@@ -82,17 +80,15 @@ export default function BusinessInfoStep({
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <div className="text-center space-y-3">
-        <div className="w-16 h-16 bg-primary-100 dark:bg-primary-900/20 rounded-full flex items-center justify-center mx-auto">
-          <Building2 className="w-8 h-8 text-primary-600" />
+    <div className="mx-auto max-w-2xl space-y-6">
+      <div className="space-y-3 text-center">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900/20">
+          <Building2 className="h-8 w-8 text-primary-600" />
         </div>
         <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
           {t("businessInfo.title")}
         </h3>
-        <p className="text-gray-600 dark:text-gray-400">
-          {t("businessInfo.description")}
-        </p>
+        <p className="text-gray-600 dark:text-gray-400">{t("businessInfo.description")}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -101,9 +97,7 @@ export default function BusinessInfoStep({
           id="businessName"
           label={t("businessInfo.fields.name")}
           value={formData.businessName}
-          onChange={(e) =>
-            setFormData({ ...formData, businessName: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
           error={errors.businessName}
           placeholder={t("businessInfo.placeholders.name")}
           icon={Building2}
@@ -115,9 +109,7 @@ export default function BusinessInfoStep({
           id="businessIndustry"
           label={t("businessInfo.fields.industry")}
           value={formData.businessIndustry}
-          onChange={(value) =>
-            setFormData({ ...formData, businessIndustry: value as string })
-          }
+          onChange={(value) => setFormData({ ...formData, businessIndustry: value as string })}
           error={errors.businessIndustry}
           placeholder={t("businessInfo.placeholders.industry")}
           icon={Briefcase}
@@ -130,22 +122,22 @@ export default function BusinessInfoStep({
 
         {/* Business Size */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+          <label className="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
             {t("businessInfo.fields.size")}
           </label>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             {BUSINESS_SIZES.map((size) => (
               <button
                 key={size}
                 type="button"
                 onClick={() => setFormData({ ...formData, businessSize: size })}
-                className={`p-4 border-2 rounded-lg text-center transition-all ${
+                className={`rounded-lg border-2 p-4 text-center transition-all ${
                   formData.businessSize === size
                     ? "border-primary-600 bg-primary-50 dark:bg-primary-900/20"
-                    : "border-gray-300 dark:border-neutral-700 hover:border-primary-300"
+                    : "border-gray-300 hover:border-primary-300 dark:border-neutral-700"
                 }`}
               >
-                <Users className="w-6 h-6 mx-auto mb-2 text-gray-600 dark:text-gray-400" />
+                <Users className="mx-auto mb-2 h-6 w-6 text-gray-600 dark:text-gray-400" />
                 <p className="text-sm font-medium text-gray-900 dark:text-white">
                   {t(`businessInfo.sizes.${size}`)}
                 </p>
@@ -162,9 +154,7 @@ export default function BusinessInfoStep({
           id="businessGoals"
           label={`${t("businessInfo.fields.goals")} (${t("businessInfo.optional")})`}
           value={formData.businessGoals || ""}
-          onChange={(e) =>
-            setFormData({ ...formData, businessGoals: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, businessGoals: e.target.value })}
           rows={4}
           placeholder={t("businessInfo.placeholders.goals")}
           icon={Target}

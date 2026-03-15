@@ -1,11 +1,7 @@
 import React, { ReactNode } from "react";
 import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
-import {
-  pageVariants,
-  getVariant,
-  getTransition,
-} from "@/config/animationVariants";
+import { pageVariants, getVariant, getTransition } from "@/config/animationVariants";
 
 /**
  * AnimatedPage wrapper component for page transitions

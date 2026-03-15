@@ -21,8 +21,7 @@ export default function PublishActions({
   onPublishAnyway,
   onRequestReview,
 }: PublishActionsProps) {
-  const { canPublishDirectly, mustSendToReview, buttonText, isLoading } =
-    usePublicationAction();
+  const { canPublishDirectly, mustSendToReview, buttonText, isLoading } = usePublicationAction();
 
   // Determine the primary action based on user role
   const primaryAction = mustSendToReview ? onRequestReview : onPublish;
@@ -35,10 +34,10 @@ export default function PublishActions({
       : buttonText;
 
   return (
-    <div className="flex justify-end gap-3 p-4 border-t border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800">
+    <div className="flex justify-end gap-3 border-t border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-800">
       <button
         onClick={onCancel}
-        className="px-5 py-2.5 rounded-md font-medium text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-neutral-700 border border-gray-300 dark:border-neutral-600 hover:bg-gray-50 dark:hover:bg-neutral-600 transition-colors"
+        className="rounded-md border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-300 dark:hover:bg-neutral-600"
       >
         Cancelar
       </button>
@@ -47,7 +46,7 @@ export default function PublishActions({
         <button
           onClick={onPublishAnyway}
           disabled={isPublishing}
-          className="px-5 py-2.5 rounded-md font-medium text-sm text-yellow-900 dark:text-yellow-100 bg-yellow-400 hover:bg-yellow-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="rounded-md bg-yellow-400 px-5 py-2.5 text-sm font-medium text-yellow-900 transition-colors hover:bg-yellow-500 disabled:cursor-not-allowed disabled:opacity-50 dark:text-yellow-100"
         >
           Publicar de todas formas
         </button>
@@ -56,10 +55,8 @@ export default function PublishActions({
       <button
         onClick={primaryAction}
         disabled={!canPublish || isPublishing || isLoading}
-        className={`px-5 py-2.5 rounded-md font-medium text-sm text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-          mustSendToReview
-            ? "bg-purple-600 hover:bg-purple-700"
-            : "bg-blue-600 hover:bg-blue-700"
+        className={`rounded-md px-5 py-2.5 text-sm font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+          mustSendToReview ? "bg-purple-600 hover:bg-purple-700" : "bg-blue-600 hover:bg-blue-700"
         }`}
         title={
           mustSendToReview

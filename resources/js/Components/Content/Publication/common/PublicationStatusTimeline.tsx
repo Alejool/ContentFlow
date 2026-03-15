@@ -247,29 +247,26 @@ const PublicationStatusTimeline = ({
           const isLast = index === activeSteps.length - 1;
 
           return (
-            <div
-              key={step.key}
-              className="flex items-center gap-2 flex-shrink-0"
-            >
+            <div key={step.key} className="flex flex-shrink-0 items-center gap-2">
               <div
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all ${
+                className={`flex items-center gap-2 rounded-full border px-3 py-1.5 transition-all ${
                   state === "current"
                     ? `${step.bgColor} ${step.borderColor} ${step.color} font-semibold shadow-sm`
                     : state === "completed"
-                      ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-700 dark:text-green-300"
-                      : "bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500"
+                      ? "border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-900/20 dark:text-green-300"
+                      : "border-gray-200 bg-gray-50 text-gray-400 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-500"
                 }`}
               >
                 {state === "completed" ? (
-                  <CheckCircle className="w-3.5 h-3.5" />
+                  <CheckCircle className="h-3.5 w-3.5" />
                 ) : state === "current" ? (
                   <Icon
-                    className={`w-3.5 h-3.5 ${step.key === "publishing" ? "animate-spin" : ""}`}
+                    className={`h-3.5 w-3.5 ${step.key === "publishing" ? "animate-spin" : ""}`}
                   />
                 ) : (
-                  <Circle className="w-3.5 h-3.5" />
+                  <Circle className="h-3.5 w-3.5" />
                 )}
-                <span className="text-xs whitespace-nowrap">{step.label}</span>
+                <span className="whitespace-nowrap text-xs">{step.label}</span>
               </div>
 
               {!isLast && (
@@ -301,19 +298,19 @@ const PublicationStatusTimeline = ({
             <div className="flex items-start gap-3">
               {/* Icon Circle */}
               <div
-                className={`flex-shrink-0 w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all ${
+                className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 transition-all ${
                   state === "current"
                     ? `${step.bgColor} ${step.borderColor} ${step.color} shadow-md`
                     : state === "completed"
-                      ? "bg-green-100 dark:bg-green-900/30 border-green-500 text-green-600 dark:text-green-400"
-                      : "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-400"
+                      ? "border-green-500 bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+                      : "border-gray-300 bg-gray-100 text-gray-400 dark:border-gray-600 dark:bg-gray-800"
                 }`}
               >
                 {state === "completed" ? (
-                  <CheckCircle className="w-5 h-5" />
+                  <CheckCircle className="h-5 w-5" />
                 ) : (
                   <Icon
-                    className={`w-5 h-5 ${step.key === "publishing" && state === "current" ? "animate-spin" : ""}`}
+                    className={`h-5 w-5 ${step.key === "publishing" && state === "current" ? "animate-spin" : ""}`}
                   />
                 )}
               </div>
@@ -322,7 +319,7 @@ const PublicationStatusTimeline = ({
               <div className="flex-1 pt-1">
                 <div className="flex items-center justify-between">
                   <h4
-                    className={`font-semibold text-sm ${
+                    className={`text-sm font-semibold ${
                       state === "current"
                         ? "text-gray-900 dark:text-white"
                         : state === "completed"
@@ -336,13 +333,13 @@ const PublicationStatusTimeline = ({
                   {/* Status badge */}
                   {state === "current" && (
                     <span
-                      className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${step.bgColor} ${step.color}`}
+                      className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${step.bgColor} ${step.color}`}
                     >
                       {t("publications.status.current") || "Actual"}
                     </span>
                   )}
                   {state === "completed" && (
-                    <span className="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
+                    <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-bold uppercase text-green-700 dark:bg-green-900/30 dark:text-green-300">
                       {t("publications.status.completed") || "Completado"}
                     </span>
                   )}
@@ -350,38 +347,32 @@ const PublicationStatusTimeline = ({
 
                 {/* Timestamp if available */}
                 {state === "completed" && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
                     {step.key === "approved" && approvedAt && (
-                      <span>
-                        {formatDateTimeStyled(approvedAt, "short", "short")}
-                      </span>
+                      <span>{formatDateTimeStyled(approvedAt, "short", "short")}</span>
                     )}
                     {step.key === "published" && publishedAt && (
-                      <span>
-                        {formatDateTimeStyled(publishedAt, "short", "short")}
-                      </span>
+                      <span>{formatDateTimeStyled(publishedAt, "short", "short")}</span>
                     )}
                   </p>
                 )}
 
-                {state === "current" &&
-                  step.key === "scheduled" &&
-                  scheduledAt && (
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      <span>
-                        {t("publications.scheduled_for") || "Programado para"}:{" "}
-                        {formatDateTimeStyled(scheduledAt, "short", "short")}
-                      </span>
-                    </p>
-                  )}
+                {state === "current" && step.key === "scheduled" && scheduledAt && (
+                  <p className="mt-1 flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400">
+                    <Clock className="h-3 w-3" />
+                    <span>
+                      {t("publications.scheduled_for") || "Programado para"}:{" "}
+                      {formatDateTimeStyled(scheduledAt, "short", "short")}
+                    </span>
+                  </p>
+                )}
               </div>
             </div>
 
             {/* Connecting line */}
             {!isLast && (
               <div
-                className={`absolute left-5 top-10 w-0.5 h-8 -ml-px ${
+                className={`absolute left-5 top-10 -ml-px h-8 w-0.5 ${
                   state === "completed"
                     ? "bg-green-300 dark:bg-green-700"
                     : "bg-gray-200 dark:bg-gray-700"

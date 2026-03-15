@@ -1,9 +1,5 @@
 import { formatDuration } from "@/Utils/contentTypeUtils";
-import {
-  CheckIcon,
-  InformationCircleIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+import { CheckIcon, InformationCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
@@ -29,27 +25,25 @@ export const ContentTypeSuggestion: React.FC<ContentTypeSuggestionProps> = ({
   const { t } = useTranslation();
 
   return (
-    <div
-      className={`bg-blue-50 border border-blue-200 rounded-lg p-4 ${className}`}
-    >
+    <div className={`rounded-lg border border-blue-200 bg-blue-50 p-4 ${className}`}>
       <div className="flex items-start gap-3">
-        <InformationCircleIcon className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
+        <InformationCircleIcon className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-500" />
 
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-2">
+        <div className="min-w-0 flex-1">
+          <div className="mb-2 flex items-center gap-2">
             <h4 className="text-sm font-medium text-blue-900">
               {t("publications.modal.contentType.suggestion.title", {
                 defaultValue: "Content Type Suggestion",
               })}
             </h4>
             {duration && (
-              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+              <span className="rounded bg-blue-100 px-2 py-1 text-xs text-blue-700">
                 {formatDuration(duration)}
               </span>
             )}
           </div>
 
-          <p className="text-sm text-blue-800 mb-3">
+          <p className="mb-3 text-sm text-blue-800">
             {reason ||
               t("publications.modal.contentType.suggestion.reason", {
                 defaultValue:
@@ -62,7 +56,7 @@ export const ContentTypeSuggestion: React.FC<ContentTypeSuggestionProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={onApply}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
               <CheckIcon className="h-4 w-4" />
               {t("publications.modal.contentType.suggestion.apply", {
@@ -73,7 +67,7 @@ export const ContentTypeSuggestion: React.FC<ContentTypeSuggestionProps> = ({
 
             <button
               onClick={onDismiss}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-md bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
             >
               <XMarkIcon className="h-4 w-4" />
               {t("publications.modal.contentType.suggestion.keep", {

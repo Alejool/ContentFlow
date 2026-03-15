@@ -25,8 +25,7 @@ function validateContentTypePlatforms(
 
   const rules = CONTENT_TYPE_CONFIG[contentType];
   const unsupportedPlatforms = platforms.filter(
-    (platform) =>
-      !(rules.platforms as readonly string[]).includes(platform.toLowerCase()),
+    (platform) => !(rules.platforms as readonly string[]).includes(platform.toLowerCase()),
   );
 
   return {
@@ -98,10 +97,7 @@ export default function ContentTypeSelectorBar({
 }: ContentTypeSelectorBarProps) {
   // Validate current selection
   const validation = useMemo(() => {
-    const platformValidation = validateContentTypePlatforms(
-      selectedType,
-      selectedPlatforms,
-    );
+    const platformValidation = validateContentTypePlatforms(selectedType, selectedPlatforms);
     const mediaValidation = validateMediaFiles(selectedType, mediaFiles);
 
     return {
@@ -165,7 +161,7 @@ export default function ContentTypeSelectorBar({
   }, [validation, selectedType, t]);
 
   return (
-    <div className="px-6 pt-4 pb-2 border-b border-gray-200 dark:border-neutral-700 bg-gradient-to-r from-gray-50 via-white to-gray-50/80 dark:from-neutral-900 dark:via-neutral-900/95 dark:to-neutral-800/90">
+    <div className="border-b border-gray-200 bg-gradient-to-r from-gray-50 via-white to-gray-50/80 px-6 pb-2 pt-4 dark:border-neutral-700 dark:from-neutral-900 dark:via-neutral-900/95 dark:to-neutral-800/90">
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-center gap-4">
           <div className="flex items-center gap-3">
@@ -183,7 +179,7 @@ export default function ContentTypeSelectorBar({
         {/* Lock message when media is uploaded */}
         {mediaFiles && mediaFiles.length > 0 && (
           <div className="flex items-center justify-center gap-2 text-xs text-amber-600 dark:text-amber-400">
-            <AlertCircle className="w-3.5 h-3.5" />
+            <AlertCircle className="h-3.5 w-3.5" />
             <span>
               {t("publications.modal.contentType.locked") ||
                 "Content type is locked after uploading media"}

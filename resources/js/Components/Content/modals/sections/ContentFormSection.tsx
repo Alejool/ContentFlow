@@ -32,9 +32,7 @@ export const ContentFormSection = ({
 }: ContentFormSectionProps) => {
   return (
     <div className="space-y-4">
-      <SectionHeader
-        title={t("publications.modal.edit.contentSection") || "Contenido"}
-      />
+      <SectionHeader title={t("publications.modal.edit.contentSection") || "Contenido"} />
 
       <ContentSection
         register={register}

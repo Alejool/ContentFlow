@@ -47,9 +47,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
     <Popover className="relative inline-block">
       {({ open, close }) => (
         <>
-          <PopoverButton className="inline-block focus:outline-none">
-            {children}
-          </PopoverButton>
+          <PopoverButton className="inline-block focus:outline-none">{children}</PopoverButton>
 
           <AnimatePresence>
             {open && (
@@ -77,7 +75,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
                           close();
                           onDismiss?.(id);
                         }}
-                        className="flex-shrink-0 rounded p-1 flex items-center justify-center text-gray-400 transition-colors hover:bg-gray-800 hover:text-white dark:hover:bg-gray-700"
+                        className="flex flex-shrink-0 items-center justify-center rounded p-1 text-gray-400 transition-colors hover:bg-gray-800 hover:text-white dark:hover:bg-gray-700"
                         aria-label="Dismiss tooltip"
                       >
                         <X size={14} />

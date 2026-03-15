@@ -30,16 +30,8 @@ export default function RejectionReasonModal({
   const rejectionSchema = z.object({
     reason: z
       .string()
-      .min(
-        10,
-        t("approvals.validation.reasonMin") ||
-          "La razón debe tener al menos 10 caracteres",
-      )
-      .max(
-        500,
-        t("approvals.validation.reasonMax") ||
-          "La razón no puede exceder 500 caracteres",
-      ),
+      .min(10, t("approvals.validation.reasonMin") || "La razón debe tener al menos 10 caracteres")
+      .max(500, t("approvals.validation.reasonMax") || "La razón no puede exceder 500 caracteres"),
   });
 
   const {
@@ -76,36 +68,33 @@ export default function RejectionReasonModal({
 
   return (
     <Dialog open={isOpen} onClose={handleClose} className="relative z-50">
-      <div
-        className="fixed inset-0 bg-black/30 backdrop-blur-sm"
-        aria-hidden="true"
-      />
+      <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" aria-hidden="true" />
 
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <DialogPanel className="w-full max-w-md rounded-lg shadow-2xl bg-white dark:bg-neutral-800 dark:border dark:border-neutral-700/50 overflow-hidden">
-          <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-neutral-700/50">
-            <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              <AlertCircle className="w-6 h-6 text-red-500" />
+        <DialogPanel className="w-full max-w-md overflow-hidden rounded-lg bg-white shadow-2xl dark:border dark:border-neutral-700/50 dark:bg-neutral-800">
+          <div className="flex items-center justify-between border-b border-gray-100 p-6 dark:border-neutral-700/50">
+            <DialogTitle className="flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-white">
+              <AlertCircle className="h-6 w-6 text-red-500" />
               {t("approvals.rejectPublication") || "Rechazar Publicación"}
             </DialogTitle>
             <button
               onClick={handleClose}
-              className="p-2 rounded-lg transition-all hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+              className="rounded-lg p-2 text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-600 dark:text-gray-500 dark:hover:bg-neutral-700 dark:hover:text-gray-300"
             >
-              <X className="w-5 h-5" />
+              <X className="h-5 w-5" />
             </button>
           </div>
 
           <form onSubmit={handleSubmit(onFormSubmit)}>
             <div className="p-6">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+              <p className="mb-6 text-sm leading-relaxed text-gray-600 dark:text-gray-400">
                 {t("approvals.rejectionReasonDescription") ||
                   "Proporciona una razón detallada para el rechazo de"}{" "}
                 <span className="font-bold text-gray-900 dark:text-white">
                   "{publicationTitle}"
                 </span>
                 {". "}
-                <span className="text-red-500 dark:text-red-400 font-medium">
+                <span className="font-medium text-red-500 dark:text-red-400">
                   {t("common.required") || "Requerido"}
                 </span>
               </p>
@@ -130,7 +119,7 @@ export default function RejectionReasonModal({
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 p-6 border-t border-gray-100 dark:border-neutral-700/50 bg-gray-50/30 dark:bg-neutral-900/10">
+            <div className="flex justify-end gap-3 border-t border-gray-100 bg-gray-50/30 p-6 dark:border-neutral-700/50 dark:bg-neutral-900/10">
               <Button
                 variant="secondary"
                 buttonStyle="ghost"

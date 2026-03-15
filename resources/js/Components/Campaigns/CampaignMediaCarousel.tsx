@@ -1,14 +1,6 @@
 import { useTheme } from "@/Hooks/useTheme";
 import { Dialog, DialogPanel } from "@headlessui/react";
-import {
-  ChevronLeft,
-  ChevronRight,
-  File,
-  Film,
-  Image as ImageIcon,
-  Play,
-  X,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, File, Film, Image as ImageIcon, Play, X } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 
 interface MediaFile {
@@ -22,9 +14,7 @@ interface CampaignMediaCarouselProps {
   mediaFiles: MediaFile[];
 }
 
-export default function CampaignMediaCarousel({
-  mediaFiles,
-}: CampaignMediaCarouselProps) {
+export default function CampaignMediaCarousel({ mediaFiles }: CampaignMediaCarouselProps) {
   const { theme } = useTheme();
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -66,9 +56,7 @@ export default function CampaignMediaCarousel({
     (file) =>
       !file.file_type.startsWith("image/") &&
       !file.file_type.startsWith("video/") &&
-      !file.file_path?.match(
-        /\.(jpg|jpeg|png|gif|webp|svg|mp4|avi|mov|wmv|flv|webm)$/i,
-      ),
+      !file.file_path?.match(/\.(jpg|jpeg|png|gif|webp|svg|mp4|avi|mov|wmv|flv|webm)$/i),
   );
 
   if (mediaFiles.length === 1) {
@@ -83,7 +71,7 @@ export default function CampaignMediaCarousel({
     return (
       <div className="mb-6">
         <div
-          className="relative rounded-lg overflow-hidden cursor-pointer group"
+          className="group relative cursor-pointer overflow-hidden rounded-lg"
           onClick={() => openLightbox(0)}
         >
           {isImage ? (
@@ -91,35 +79,35 @@ export default function CampaignMediaCarousel({
               <img
                 src={media.file_path}
                 alt={media.file_name || "Media"}
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                 onError={(e) => {
                   e.currentTarget.src =
                     "https://images.unsplash.com/photo-1579546929662-711aa81148cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80";
                 }}
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
             </div>
           ) : isVideo ? (
-            <div className="relative aspect-video bg-gray-800 dark:bg-gray-900 rounded-lg overflow-hidden">
+            <div className="relative aspect-video overflow-hidden rounded-lg bg-gray-800 dark:bg-gray-900">
               <video
                 src={media.file_path}
-                className="w-full h-full object-cover"
+                className="h-full w-full object-cover"
                 controls
                 onClick={(e) => e.stopPropagation()}
               />
-              <div className="absolute top-3 right-3 bg-black/70 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
-                <Film className="w-3 h-3" />
+              <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-black/70 px-3 py-1 text-xs font-medium text-white">
+                <Film className="h-3 w-3" />
                 VIDEO
               </div>
             </div>
           ) : (
-            <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 rounded-lg flex flex-col items-center justify-center p-8">
-              <File className="w-16 h-16 text-gray-400 dark:text-gray-600 mb-4" />
-              <span className="text-gray-600 dark:text-gray-400 font-medium">
+            <div className="flex aspect-video flex-col items-center justify-center rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 p-8 dark:from-gray-800 dark:to-gray-900">
+              <File className="mb-4 h-16 w-16 text-gray-400 dark:text-gray-600" />
+              <span className="font-medium text-gray-600 dark:text-gray-400">
                 {media.file_name || "Archivo adjunto"}
               </span>
-              <span className="text-gray-500 dark:text-gray-500 text-sm mt-1">
+              <span className="mt-1 text-sm text-gray-500 dark:text-gray-500">
                 {media.file_type || "Tipo desconocido"}
               </span>
             </div>
@@ -175,18 +163,18 @@ export default function CampaignMediaCarousel({
 
   return (
     <div className="mb-6">
-      <div className="flex items-center gap-3 mb-4">
+      <div className="mb-4 flex items-center gap-3">
         {images.length > 0 && (
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 rounded-full">
-            <ImageIcon className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+          <div className="flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1.5 dark:bg-blue-900/30">
+            <ImageIcon className="h-4 w-4 text-blue-600 dark:text-blue-400" />
             <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
               {images.length} {images.length === 1 ? "imagen" : "imágenes"}
             </span>
           </div>
         )}
         {videos.length > 0 && (
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-purple-50 dark:bg-purple-900/30 rounded-full">
-            <Film className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+          <div className="flex items-center gap-2 rounded-full bg-purple-50 px-3 py-1.5 dark:bg-purple-900/30">
+            <Film className="h-4 w-4 text-purple-600 dark:text-purple-400" />
             <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
               {videos.length} {videos.length === 1 ? "video" : "videos"}
             </span>
@@ -249,7 +237,7 @@ function ImageGridItem({
 
   return (
     <div
-      className={`relative rounded-lg overflow-hidden cursor-pointer group ${
+      className={`group relative cursor-pointer overflow-hidden rounded-lg ${
         isLarge ? "row-span-2" : ""
       }`}
       onClick={onClick}
@@ -258,17 +246,17 @@ function ImageGridItem({
         <img
           src={media.file_path}
           alt={media.file_name || `Imagen ${index + 1}`}
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           onError={(e) => {
             e.currentTarget.src =
               "https://images.unsplash.com/photo-1579546929662-711aa81148cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80";
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       </div>
       {total > 4 && index === 3 && (
-        <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-          <span className="text-white text-lg font-semibold">+{total - 4}</span>
+        <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+          <span className="text-lg font-semibold text-white">+{total - 4}</span>
         </div>
       )}
     </div>
@@ -289,10 +277,7 @@ function ModernCarousel({
   onItemClick: (index: number) => void;
 }) {
   const totalSlides = Math.ceil(mediaFiles.length / slidesToShow);
-  const visibleSlides = mediaFiles.slice(
-    currentIndex,
-    currentIndex + slidesToShow,
-  );
+  const visibleSlides = mediaFiles.slice(currentIndex, currentIndex + slidesToShow);
 
   const nextSlide = () => {
     setCurrentIndex((prev) => {
@@ -313,8 +298,8 @@ function ModernCarousel({
   };
 
   return (
-    <div className="relative group">
-      <div className="flex gap-4 overflow-hidden relative">
+    <div className="group relative">
+      <div className="relative flex gap-4 overflow-hidden">
         {visibleSlides.map((media, idx) => {
           const actualIndex = currentIndex + idx;
           const isImage =
@@ -329,54 +314,48 @@ function ModernCarousel({
               key={media.id}
               className={`flex-shrink-0 transition-all duration-300 ${
                 slidesToShow > 1 ? "w-1/2" : "w-full"
-              } ${
-                slidesToShow === 2
-                  ? "lg:w-1/2"
-                  : slidesToShow === 3
-                    ? "lg:w-1/3"
-                    : ""
-              }`}
+              } ${slidesToShow === 2 ? "lg:w-1/2" : slidesToShow === 3 ? "lg:w-1/3" : ""}`}
               onClick={() => onItemClick(actualIndex)}
             >
-              <div className="relative rounded-lg overflow-hidden cursor-pointer group/card">
+              <div className="group/card relative cursor-pointer overflow-hidden rounded-lg">
                 {isImage ? (
                   <div className="relative aspect-video">
                     <img
                       src={media.file_path}
                       alt={media.file_name || `Media ${actualIndex + 1}`}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover/card:scale-105"
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover/card:scale-105"
                       onError={(e) => {
                         e.currentTarget.src =
                           "https://images.unsplash.com/photo-1579546929662-711aa81148cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80";
                       }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 transition-opacity duration-300 group-hover/card:opacity-100" />
                   </div>
                 ) : isVideo ? (
-                  <div className="relative aspect-video bg-gray-800 dark:bg-gray-900 rounded-lg overflow-hidden">
+                  <div className="relative aspect-video overflow-hidden rounded-lg bg-gray-800 dark:bg-gray-900">
                     <video
                       src={media.file_path}
-                      className="w-full h-full object-cover"
+                      className="h-full w-full object-cover"
                       onClick={(e) => e.stopPropagation()}
                     />
-                    <div className="absolute inset-0 bg-black/20 group-hover/card:bg-black/10 transition-colors duration-300" />
-                    <div className="absolute top-3 right-3 bg-black/70 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
-                      <Film className="w-3 h-3" />
+                    <div className="absolute inset-0 bg-black/20 transition-colors duration-300 group-hover/card:bg-black/10" />
+                    <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-black/70 px-3 py-1 text-xs font-medium text-white">
+                      <Film className="h-3 w-3" />
                       VIDEO
                     </div>
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center group-hover/card:bg-white/30 transition-colors duration-300">
-                        <Play className="w-7 h-7 text-white" fill="white" />
+                      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm transition-colors duration-300 group-hover/card:bg-white/30">
+                        <Play className="h-7 w-7 text-white" fill="white" />
                       </div>
                     </div>
                   </div>
                 ) : (
-                  <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 rounded-lg flex flex-col items-center justify-center p-6">
-                    <File className="w-12 h-12 text-gray-400 dark:text-gray-600 mb-3" />
-                    <span className="text-gray-600 dark:text-gray-400 font-medium text-sm text-center truncate max-w-full">
+                  <div className="flex aspect-video flex-col items-center justify-center rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 p-6 dark:from-gray-800 dark:to-gray-900">
+                    <File className="mb-3 h-12 w-12 text-gray-400 dark:text-gray-600" />
+                    <span className="max-w-full truncate text-center text-sm font-medium text-gray-600 dark:text-gray-400">
                       {media.file_name || "Archivo"}
                     </span>
-                    <span className="text-gray-500 dark:text-gray-500 text-xs mt-1">
+                    <span className="mt-1 text-xs text-gray-500 dark:text-gray-500">
                       {media.file_type || "Tipo desconocido"}
                     </span>
                   </div>
@@ -391,17 +370,17 @@ function ModernCarousel({
         <>
           <button
             aria-label="Previous slide"
-            className="absolute left-0 top-1/2 transform -translate-y-1/2 p-3 rounded-full bg-white/90 dark:bg-gray-800 shadow-lg z-10 hover:bg-white dark:hover:bg-gray-700 transition-all opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 duration-300"
+            className="absolute left-0 top-1/2 z-10 -translate-x-4 -translate-y-1/2 transform rounded-full bg-white/90 p-3 opacity-0 shadow-lg transition-all duration-300 hover:bg-white group-hover:translate-x-0 group-hover:opacity-100 dark:bg-gray-800 dark:hover:bg-gray-700"
             onClick={prevSlide}
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="h-5 w-5" />
           </button>
           <button
             aria-label="Next slide"
-            className="absolute right-0 top-1/2 transform -translate-y-1/2 p-3 rounded-full bg-white/90 dark:bg-gray-800 shadow-lg z-10 hover:bg-white dark:hover:bg-gray-700 transition-all opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 duration-300"
+            className="absolute right-0 top-1/2 z-10 -translate-y-1/2 translate-x-4 transform rounded-full bg-white/90 p-3 opacity-0 shadow-lg transition-all duration-300 hover:bg-white group-hover:translate-x-0 group-hover:opacity-100 dark:bg-gray-800 dark:hover:bg-gray-700"
             onClick={nextSlide}
           >
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="h-5 w-5" />
           </button>
         </>
       )}
@@ -439,15 +418,11 @@ function Lightbox({
     currentMedia?.file_path?.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i);
 
   const nextSlide = () => {
-    setSelectedIndex((prev: number) =>
-      prev === mediaFiles.length - 1 ? 0 : prev + 1,
-    );
+    setSelectedIndex((prev: number) => (prev === mediaFiles.length - 1 ? 0 : prev + 1));
   };
 
   const prevSlide = () => {
-    setSelectedIndex((prev: number) =>
-      prev === 0 ? mediaFiles.length - 1 : prev - 1,
-    );
+    setSelectedIndex((prev: number) => (prev === 0 ? mediaFiles.length - 1 : prev - 1));
   };
 
   useEffect(() => {
@@ -480,26 +455,26 @@ function Lightbox({
 
       <div className="fixed inset-0 flex items-center justify-center p-4">
         <DialogPanel
-          className="relative w-full max-w-6xl max-h-[90vh] bg-transparent"
+          className="relative max-h-[90vh] w-full max-w-6xl bg-transparent"
           onClick={(e) => e.stopPropagation()}
         >
           <button
             onClick={onClose}
-            className="absolute -top-12 right-0 p-2 text-white hover:text-gray-300 transition-colors z-20"
+            className="absolute -top-12 right-0 z-20 p-2 text-white transition-colors hover:text-gray-300"
           >
-            <X className="w-8 h-8" />
+            <X className="h-8 w-8" />
           </button>
 
           <div className="relative h-full">
             <button
               aria-label="Previous image"
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 p-4 rounded-full bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-colors z-10"
+              className="absolute left-4 top-1/2 z-10 -translate-y-1/2 transform rounded-full bg-white/10 p-4 text-white backdrop-blur-sm transition-colors hover:bg-white/20"
               onClick={prevSlide}
             >
-              <ChevronLeft className="w-8 h-8" />
+              <ChevronLeft className="h-8 w-8" />
             </button>
 
-            <div className="flex flex-col items-center justify-center h-full">
+            <div className="flex h-full flex-col items-center justify-center">
               {isImage ? (
                 <img
                   src={currentMedia.file_path}
@@ -511,7 +486,7 @@ function Lightbox({
                   }}
                 />
               ) : (
-                <div className="max-h-[70vh] w-full flex items-center justify-center">
+                <div className="flex max-h-[70vh] w-full items-center justify-center">
                   <video
                     src={currentMedia.file_path}
                     controls
@@ -521,8 +496,8 @@ function Lightbox({
                 </div>
               )}
 
-              <div className="mt-6 text-white text-center max-w-2xl">
-                <h3 className="text-lg font-semibold mb-2">
+              <div className="mt-6 max-w-2xl text-center text-white">
+                <h3 className="mb-2 text-lg font-semibold">
                   {currentMedia.file_name || `Media ${selectedIndex + 1}`}
                 </h3>
                 <div className="flex items-center justify-center gap-4 text-sm text-gray-300">
@@ -537,22 +512,22 @@ function Lightbox({
 
             <button
               aria-label="Next image"
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 p-4 rounded-full bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-colors z-10"
+              className="absolute right-4 top-1/2 z-10 -translate-y-1/2 transform rounded-full bg-white/10 p-4 text-white backdrop-blur-sm transition-colors hover:bg-white/20"
               onClick={nextSlide}
             >
-              <ChevronRight className="w-8 h-8" />
+              <ChevronRight className="h-8 w-8" />
             </button>
           </div>
 
           {/* Miniaturas en la parte inferior */}
           {mediaFiles.length > 1 && (
-            <div className="flex justify-center gap-2 mt-8 overflow-x-auto py-2">
+            <div className="mt-8 flex justify-center gap-2 overflow-x-auto py-2">
               {mediaFiles.map((media, idx) => (
                 <button
                   key={media.id}
-                  className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                  className={`h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-200 ${
                     idx === selectedIndex
-                      ? "border-blue-500 dark:border-blue-400 scale-105"
+                      ? "scale-105 border-blue-500 dark:border-blue-400"
                       : "border-transparent hover:border-gray-400"
                   }`}
                   onClick={() => setSelectedIndex(idx)}
@@ -560,7 +535,7 @@ function Lightbox({
                   <img
                     src={media.file_path}
                     alt={`Thumbnail ${idx + 1}`}
-                    className="w-full h-full object-cover"
+                    className="h-full w-full object-cover"
                     onError={(e) => {
                       e.currentTarget.src =
                         "https://images.unsplash.com/photo-1579546929662-711aa81148cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80";

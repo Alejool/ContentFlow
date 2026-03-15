@@ -30,9 +30,9 @@ export default function LiveFields({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700">
-        <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
+      <div className="flex items-center gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700">
+        <div className="h-5 w-1 rounded-full bg-primary-500"></div>
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
           {t("publications.modal.live.title") || "Live Stream Settings"}
         </h3>
       </div>
@@ -74,12 +74,10 @@ export default function LiveFields({
             {t("publications.modal.live.minutes") || "minutes"}
           </span>
         </div>
-        {errors.duration && (
-          <p className="text-xs text-red-500">{errors.duration}</p>
-        )}
+        {errors.duration && <p className="text-xs text-red-500">{errors.duration}</p>}
       </div>
 
-      <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-3">
+      <div className="rounded-lg border border-purple-200 bg-purple-50 p-3 dark:border-purple-800 dark:bg-purple-900/20">
         <p className="text-xs text-purple-700 dark:text-purple-300">
           <strong>{t("common.note") || "Note"}:</strong>{" "}
           {t("publications.modal.live.note") ||

@@ -23,9 +23,7 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
   onThumbnailDelete,
 }: YouTubeThumbnailUploaderProps) {
   const { t } = useTranslation();
-  const [preview, setPreview] = useState<string | null>(
-    existingThumbnail?.url || null,
-  );
+  const [preview, setPreview] = useState<string | null>(existingThumbnail?.url || null);
   const [showFullSize, setShowFullSize] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -37,39 +35,36 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
     setPreview(existingThumbnail?.url || null);
   }, [existingThumbnail?.url]);
 
-  const validateThumbnail = useCallback(
-    (file: File): Promise<string | null> => {
-      return new Promise((resolve) => {
-        if (!file.type.startsWith("image/")) {
-          resolve("Only image files are allowed");
-          return;
+  const validateThumbnail = useCallback((file: File): Promise<string | null> => {
+    return new Promise((resolve) => {
+      if (!file.type.startsWith("image/")) {
+        resolve("Only image files are allowed");
+        return;
+      }
+
+      if (file.size > 2 * 1024 * 1024) {
+        resolve("Image must be smaller than 2MB");
+        return;
+      }
+
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+
+      img.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+        if (img.width < 1280 || img.height < 720) {
+          resolve("Image must be at least 1280x720 pixels");
+        } else {
+          resolve(null);
         }
-
-        if (file.size > 2 * 1024 * 1024) {
-          resolve("Image must be smaller than 2MB");
-          return;
-        }
-
-        const img = new Image();
-        const objectUrl = URL.createObjectURL(file);
-
-        img.onload = () => {
-          URL.revokeObjectURL(objectUrl);
-          if (img.width < 1280 || img.height < 720) {
-            resolve("Image must be at least 1280x720 pixels");
-          } else {
-            resolve(null);
-          }
-        };
-        img.onerror = () => {
-          URL.revokeObjectURL(objectUrl);
-          resolve("Failed to load image");
-        };
-        img.src = objectUrl;
-      });
-    },
-    [],
-  );
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        resolve("Failed to load image");
+      };
+      img.src = objectUrl;
+    });
+  }, []);
 
   const handleFileSelect = useCallback(
     async (file: File) => {
@@ -152,31 +147,29 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
     <div className="space-y-3">
       {/* Video Preview */}
       {videoPreviewUrl && (
-        <div className="p-3 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800">
+        <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-neutral-800">
           <div className="flex items-center gap-3">
             <div
-              className="relative flex-shrink-0 group cursor-pointer"
+              className="group relative flex-shrink-0 cursor-pointer"
               onClick={handleShowVideoModal}
             >
               {/* Thumbnail estático sin cargar el video */}
-              <div className="w-32 h-20 bg-gradient-to-br from-gray-800 to-gray-900 rounded border border-gray-300 dark:border-gray-600 overflow-hidden relative flex items-center justify-center">
-                <Play className="w-12 h-12 text-white/60" />
+              <div className="relative flex h-20 w-32 items-center justify-center overflow-hidden rounded border border-gray-300 bg-gradient-to-br from-gray-800 to-gray-900 dark:border-gray-600">
+                <Play className="h-12 w-12 text-white/60" />
               </div>
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded flex items-center justify-center">
-                <Play className="w-8 h-8 text-white" fill="white" />
+              <div className="absolute inset-0 flex items-center justify-center rounded bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                <Play className="h-8 w-8 text-white" fill="white" />
               </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Video:
-              </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+            <div className="min-w-0 flex-1">
+              <p className="mb-1 text-xs font-medium text-gray-700 dark:text-gray-300">Video:</p>
+              <p className="truncate text-sm text-gray-600 dark:text-gray-400">
                 {videoFileName || `Video #${videoId}`}
               </p>
               <button
                 type="button"
                 onClick={handleShowVideoModal}
-                className="text-xs text-primary-500 hover:text-primary-600 mt-1"
+                className="mt-1 text-xs text-primary-500 hover:text-primary-600"
               >
                 Click to preview
               </button>
@@ -188,39 +181,37 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
       <div className="flex items-center justify-between">
         <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
           YouTube Thumbnail
-          <span className="text-xs text-gray-500 ml-2">
-            (Recommended: 1280x720)
-          </span>
+          <span className="ml-2 text-xs text-gray-500">(Recommended: 1280x720)</span>
         </label>
       </div>
 
       {preview ? (
         <div className="space-y-2">
           {/* Small Preview */}
-          <div className="relative group">
+          <div className="group relative">
             <img
               src={preview}
               alt="YouTube Thumbnail"
-              className="w-full h-32 object-cover rounded-lg border-2 border-gray-200 dark:border-neutral-700"
+              className="h-32 w-full rounded-lg border-2 border-gray-200 object-cover dark:border-neutral-700"
             />
 
             {/* Overlay with actions */}
-            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+            <div className="absolute inset-0 flex items-center justify-center gap-2 rounded-lg bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
               <button
                 type="button"
                 onClick={handleShowFullSize}
-                className="p-2 bg-white/90 hover:bg-white rounded-full transition-colors"
+                className="rounded-full bg-white/90 p-2 transition-colors hover:bg-white"
                 title="View full size"
               >
-                <ZoomIn className="w-4 h-4 text-gray-900" />
+                <ZoomIn className="h-4 w-4 text-gray-900" />
               </button>
               <button
                 type="button"
                 onClick={handleDelete}
-                className="p-2 bg-red-500/90 hover:bg-red-500 rounded-full transition-colors"
+                className="rounded-full bg-red-500/90 p-2 transition-colors hover:bg-red-500"
                 title="Delete thumbnail"
               >
-                <Trash2 className="w-4 h-4 text-white" />
+                <Trash2 className="h-4 w-4 text-white" />
               </button>
             </div>
           </div>
@@ -229,7 +220,7 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
           <button
             type="button"
             onClick={handleInputClick}
-            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 hover:bg-opacity-80 transition-colors text-gray-700 dark:text-gray-300"
+            className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-opacity-80 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-300"
           >
             {t("publications.modal.publish.button.change")}
           </button>
@@ -240,18 +231,16 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onClick={handleInputClick}
-          className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all ${
+          className={`cursor-pointer rounded-lg border-2 border-dashed p-6 text-center transition-all ${
             isDragging
               ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20"
-              : "border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 hover:border-primary-400"
+              : "border-gray-200 bg-gray-50 hover:border-primary-400 dark:border-neutral-700 dark:bg-neutral-800"
           }`}
         >
           <Upload
-            className={`w-8 h-8 mx-auto mb-2 ${
-              isDragging ? "text-primary-500" : "text-gray-400"
-            }`}
+            className={`mx-auto mb-2 h-8 w-8 ${isDragging ? "text-primary-500" : "text-gray-400"}`}
           />
-          <p className="text-sm text-gray-700 dark:text-gray-300 mb-1">
+          <p className="mb-1 text-sm text-gray-700 dark:text-gray-300">
             {t("publications.modal.publish.dragDrop.title")}
           </p>
           <p className="text-xs text-gray-500">
@@ -261,8 +250,8 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
       )}
 
       {error && (
-        <p className="text-sm text-red-500 flex items-center gap-1">
-          <X className="w-4 h-4" />
+        <p className="flex items-center gap-1 text-sm text-red-500">
+          <X className="h-4 w-4" />
           {error}
         </p>
       )}
@@ -281,20 +270,20 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
       {/* Full Size Thumbnail Modal */}
       {showFullSize && preview && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
           onClick={handleCloseFullSize}
         >
-          <div className="relative max-w-4xl max-h-[90vh]">
+          <div className="relative max-h-[90vh] max-w-4xl">
             <button
               onClick={handleCloseFullSize}
               className="absolute -top-10 right-0 p-2 text-white hover:text-gray-300"
             >
-              <X className="w-6 h-6" />
+              <X className="h-6 w-6" />
             </button>
             <img
               src={preview}
               alt="YouTube Thumbnail Full Size"
-              className="max-w-full max-h-[90vh] object-contain rounded-lg"
+              className="max-h-[90vh] max-w-full rounded-lg object-contain"
               onClick={(e) => e.stopPropagation()}
             />
           </div>
@@ -304,20 +293,20 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
       {/* Video Preview Modal */}
       {showVideoModal && videoPreviewUrl && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
           onClick={handleCloseVideoModal}
         >
-          <div className="relative max-w-4xl w-full">
+          <div className="relative w-full max-w-4xl">
             <button
               onClick={handleCloseVideoModal}
               className="absolute -top-10 right-0 p-2 text-white hover:text-gray-300"
             >
-              <X className="w-6 h-6" />
+              <X className="h-6 w-6" />
             </button>
             <video
               ref={videoRef}
               src={videoPreviewUrl}
-              className="w-full max-h-[80vh] rounded-lg"
+              className="max-h-[80vh] w-full rounded-lg"
               controls
               autoPlay
               onClick={(e) => e.stopPropagation()}

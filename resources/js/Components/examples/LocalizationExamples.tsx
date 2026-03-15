@@ -6,17 +6,7 @@ import { useState } from "react";
  * Componente de ejemplo que muestra todas las capacidades de localización
  */
 export const LocalizationExamples = () => {
-  const {
-    t,
-    date,
-    number,
-    currency,
-    percent,
-    compact,
-    relative,
-    list,
-    plural,
-  } = useLocalization();
+  const { t, date, number, currency, percent, compact, relative, list, plural } = useLocalization();
   const [translatedText, setTranslatedText] = useState("");
   const [isTranslating, setIsTranslating] = useState(false);
 
@@ -40,11 +30,9 @@ export const LocalizationExamples = () => {
   };
 
   return (
-    <div className="p-6 space-y-8">
+    <div className="space-y-8 p-6">
       <div>
-        <h2 className="text-2xl font-bold mb-4">
-          {t("common.localizationExamples")}
-        </h2>
+        <h2 className="mb-4 text-2xl font-bold">{t("common.localizationExamples")}</h2>
       </div>
 
       {/* Fechas */}
@@ -77,10 +65,7 @@ export const LocalizationExamples = () => {
           <p>Número: {number(1234567.89)}</p>
           <p>Compacto: {compact(1234567)}</p>
           <p>Porcentaje: {percent(75.5)}</p>
-          <p>
-            Decimal personalizado:{" "}
-            {number(1234.5678, { minimumFractionDigits: 4 })}
-          </p>
+          <p>Decimal personalizado: {number(1234.5678, { minimumFractionDigits: 4 })}</p>
         </div>
       </section>
 
@@ -99,13 +84,8 @@ export const LocalizationExamples = () => {
       <section className="space-y-2">
         <h3 className="text-lg font-semibold">Formatos de Listas</h3>
         <div className="space-y-1 text-sm">
-          <p>
-            Conjunción:{" "}
-            {list(["Facebook", "Instagram", "Twitter"], "conjunction")}
-          </p>
-          <p>
-            Disyunción: {list(["Lunes", "Martes", "Miércoles"], "disjunction")}
-          </p>
+          <p>Conjunción: {list(["Facebook", "Instagram", "Twitter"], "conjunction")}</p>
+          <p>Disyunción: {list(["Lunes", "Martes", "Miércoles"], "disjunction")}</p>
         </div>
       </section>
 
@@ -125,14 +105,12 @@ export const LocalizationExamples = () => {
         <button
           onClick={handleTranslate}
           disabled={isTranslating}
-          className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
+          className="rounded-lg bg-primary-600 px-4 py-2 text-white hover:bg-primary-700 disabled:opacity-50"
         >
           {isTranslating ? "Traduciendo..." : "Traducir Texto de IA"}
         </button>
         {translatedText && (
-          <p className="text-sm mt-2 p-3 bg-gray-100 dark:bg-gray-800 rounded">
-            {translatedText}
-          </p>
+          <p className="mt-2 rounded bg-gray-100 p-3 text-sm dark:bg-gray-800">{translatedText}</p>
         )}
       </section>
     </div>

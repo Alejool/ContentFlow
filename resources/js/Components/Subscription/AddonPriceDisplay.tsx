@@ -37,17 +37,13 @@ export function AddonPriceDisplay({
   return (
     <div className="flex flex-col">
       {/* Precio principal en moneda local */}
-      <div
-        className={`${sizeClasses[size]} font-bold text-gray-900 dark:text-white`}
-      >
+      <div className={`${sizeClasses[size]} font-bold text-gray-900 dark:text-white`}>
         {formattedPrice}
       </div>
 
       {/* Equivalente en USD (si no es USD) */}
       {showUsdEquivalent && currency !== "USD" && (
-        <div
-          className={`${subTextClasses[size]} text-gray-500 dark:text-gray-400 mt-1`}
-        >
+        <div className={`${subTextClasses[size]} mt-1 text-gray-500 dark:text-gray-400`}>
           ≈ USD ${priceUsd.toFixed(2)}
         </div>
       )}
@@ -55,7 +51,7 @@ export function AddonPriceDisplay({
       {/* Badge de moneda */}
       {currency !== "USD" && (
         <div className="mt-2">
-          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-300">
+          <span className="inline-flex items-center rounded-full bg-primary-100 px-2 py-1 text-xs font-medium text-primary-800 dark:bg-primary-900/30 dark:text-primary-300">
             {currency}
           </span>
         </div>

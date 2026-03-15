@@ -69,7 +69,7 @@ export default function PlanGrid({
   };
 
   return (
-    <div className="relative grid grid-cols-1 md:grid-cols-2  gap-6 lg:gap-8">
+    <div className="relative grid grid-cols-1 gap-6 md:grid-cols-2 lg:gap-8">
       {plans
         .filter((plan) => plan.enabled !== false)
         .map((plan) => {

@@ -28,10 +28,10 @@ export const LanguageSwitcher = () => {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+        className="flex items-center gap-2 rounded-lg px-3 py-2 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
         aria-label="Change language"
       >
-        <Globe className="w-5 h-5" />
+        <Globe className="h-5 w-5" />
         <span className="text-sm font-medium">
           {currentLang?.flag} {currentLang?.name}
         </span>
@@ -39,27 +39,22 @@ export const LanguageSwitcher = () => {
 
       {isOpen && (
         <>
-          <div
-            className="fixed inset-0 z-10"
-            onClick={() => setIsOpen(false)}
-          />
-          <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-20">
+          <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
+          <div className="absolute right-0 z-20 mt-2 w-48 rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800">
             {languages.map((lang) => (
               <button
                 key={lang.code}
                 onClick={() => handleLanguageChange(lang.code)}
-                className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors first:rounded-t-lg last:rounded-b-lg ${
+                className={`flex w-full items-center gap-3 px-4 py-3 text-left transition-colors first:rounded-t-lg last:rounded-b-lg hover:bg-gray-50 dark:hover:bg-gray-700 ${
                   currentLanguage === lang.code
-                    ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400"
+                    ? "bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400"
                     : ""
                 }`}
               >
                 <span className="text-2xl">{lang.flag}</span>
                 <span className="text-sm font-medium">{lang.name}</span>
                 {currentLanguage === lang.code && (
-                  <span className="ml-auto text-primary-600 dark:text-primary-400">
-                    ✓
-                  </span>
+                  <span className="ml-auto text-primary-600 dark:text-primary-400">✓</span>
                 )}
               </button>
             ))}

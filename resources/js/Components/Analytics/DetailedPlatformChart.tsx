@@ -41,10 +41,7 @@ interface Props {
   theme?: "light" | "dark";
 }
 
-export default function DetailedPlatformChart({
-  platforms,
-  theme = "light",
-}: Props) {
+export default function DetailedPlatformChart({ platforms, theme = "light" }: Props) {
   const isDark = theme === "dark";
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -228,11 +225,11 @@ export default function DetailedPlatformChart({
   };
 
   return (
-    <div className="relative group">
+    <div className="group relative">
       {platforms.length === 0 && (
-        <div className="mb-4 p-4 bg-orange-50 border border-orange-200 text-orange-800 rounded-lg text-sm dark:bg-orange-900/20 dark:border-orange-800/50 dark:text-orange-300">
-          <strong>Modo de demostración:</strong> No hay datos reales de
-          plataformas. Se están mostrando métricas de prueba.
+        <div className="mb-4 rounded-lg border border-orange-200 bg-orange-50 p-4 text-sm text-orange-800 dark:border-orange-800/50 dark:bg-orange-900/20 dark:text-orange-300">
+          <strong>Modo de demostración:</strong> No hay datos reales de plataformas. Se están
+          mostrando métricas de prueba.
         </div>
       )}
 
@@ -241,80 +238,66 @@ export default function DetailedPlatformChart({
         <>
           <button
             onClick={() => scroll("left")}
-            className={`absolute left-0 top-1/2 -translate-y-1/2 -ml-4 z-10 p-2 rounded-full shadow-lg transition-all opacity-0 group-hover:opacity-100 disabled:opacity-0 ${
+            className={`absolute left-0 top-1/2 z-10 -ml-4 -translate-y-1/2 rounded-full p-2 opacity-0 shadow-lg transition-all disabled:opacity-0 group-hover:opacity-100 ${
               isDark
                 ? "bg-neutral-800 text-white hover:bg-neutral-700"
                 : "bg-white text-gray-800 hover:bg-gray-50"
             }`}
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeft className="h-6 w-6" />
           </button>
           <button
             onClick={() => scroll("right")}
-            className={`absolute right-0 top-1/2 -translate-y-1/2 -mr-4 z-10 p-2 rounded-full shadow-lg transition-all opacity-0 group-hover:opacity-100 disabled:opacity-0 ${
+            className={`absolute right-0 top-1/2 z-10 -mr-4 -translate-y-1/2 rounded-full p-2 opacity-0 shadow-lg transition-all disabled:opacity-0 group-hover:opacity-100 ${
               isDark
                 ? "bg-neutral-800 text-white hover:bg-neutral-700"
                 : "bg-white text-gray-800 hover:bg-gray-50"
             }`}
           >
-            <ChevronRight className="w-6 h-6" />
+            <ChevronRight className="h-6 w-6" />
           </button>
         </>
       )}
 
       <div
         ref={scrollContainerRef}
-        className={`flex overflow-x-auto gap-6 pb-6 snap-x snap-mandatory hide-scrollbars ${isDark ? "text-gray-100" : "text-gray-900"}`}
+        className={`hide-scrollbars flex snap-x snap-mandatory gap-6 overflow-x-auto pb-6 ${isDark ? "text-gray-100" : "text-gray-900"}`}
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         {" "}
         {displayPlatforms.map((platform) => (
           <div
             key={platform.id}
-            className={`shrink-0 w-full lg:w-[800px] snap-center rounded-lg p-6 ${
+            className={`w-full shrink-0 snap-center rounded-lg p-6 lg:w-[800px] ${
               isDark
-                ? "bg-neutral-800/50 border border-neutral-700/50"
-                : "bg-white border border-gray-100 shadow-sm"
+                ? "border border-neutral-700/50 bg-neutral-800/50"
+                : "border border-gray-100 bg-white shadow-sm"
             }`}
           >
-            <div className="flex items-center justify-between mb-6">
+            <div className="mb-6 flex items-center justify-between">
               <div>
-                <h3
-                  className={`text-xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}
-                >
+                <h3 className={`text-xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
                   {platform.platform.toUpperCase()} - {platform.account_name}
                 </h3>
-                <p
-                  className={`text-sm ${isDark ? "text-gray-400" : "text-gray-600"}`}
-                >
+                <p className={`text-sm ${isDark ? "text-gray-400" : "text-gray-600"}`}>
                   {platform.current_followers.toLocaleString()} seguidores
                 </p>
               </div>
               <div className="flex gap-4 text-sm">
                 <div className="text-center">
-                  <p className={isDark ? "text-gray-400" : "text-gray-600"}>
-                    Engagement
-                  </p>
-                  <p
-                    className={`font-bold ${isDark ? "text-white" : "text-gray-900"}`}
-                  >
+                  <p className={isDark ? "text-gray-400" : "text-gray-600"}>Engagement</p>
+                  <p className={`font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
                     {platform.total_engagement.toLocaleString()}
                   </p>
                 </div>
                 <div className="text-center">
-                  <p className={isDark ? "text-gray-400" : "text-gray-600"}>
-                    Tasa
-                  </p>
-                  <p
-                    className={`font-bold ${isDark ? "text-white" : "text-gray-900"}`}
-                  >
+                  <p className={isDark ? "text-gray-400" : "text-gray-600"}>Tasa</p>
+                  <p className={`font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
                     {platform.avg_engagement_rate}%
                   </p>
                 </div>
                 <div className="text-center">
-                  <p className={isDark ? "text-gray-400" : "text-gray-600"}>
-                    Crecimiento
-                  </p>
+                  <p className={isDark ? "text-gray-400" : "text-gray-600"}>Crecimiento</p>
                   <p
                     className={`font-bold ${platform.follower_growth >= 0 ? "text-green-500" : "text-red-500"}`}
                   >
@@ -325,28 +308,22 @@ export default function DetailedPlatformChart({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
               <div>
                 <h4
-                  className={`text-sm font-semibold mb-3 ${isDark ? "text-gray-300" : "text-gray-700"}`}
+                  className={`mb-3 text-sm font-semibold ${isDark ? "text-gray-300" : "text-gray-700"}`}
                 >
                   Seguidores y Alcance
                 </h4>
                 <ResponsiveContainer width="100%" height={250}>
                   <LineChart data={ensureMetrics(platform)}>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke={isDark ? "#374151" : "#e5e7eb"}
-                    />
+                    <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#374151" : "#e5e7eb"} />
                     <XAxis
                       dataKey="date"
                       stroke={isDark ? "#9ca3af" : "#6b7280"}
                       tick={{ fontSize: 12 }}
                     />
-                    <YAxis
-                      stroke={isDark ? "#9ca3af" : "#6b7280"}
-                      tick={{ fontSize: 12 }}
-                    />
+                    <YAxis stroke={isDark ? "#9ca3af" : "#6b7280"} tick={{ fontSize: 12 }} />
                     <Tooltip
                       contentStyle={{
                         backgroundColor: isDark ? "#1f2937" : "#ffffff",
@@ -376,25 +353,19 @@ export default function DetailedPlatformChart({
 
               <div>
                 <h4
-                  className={`text-sm font-semibold mb-3 ${isDark ? "text-gray-300" : "text-gray-700"}`}
+                  className={`mb-3 text-sm font-semibold ${isDark ? "text-gray-300" : "text-gray-700"}`}
                 >
                   Engagement Diario
                 </h4>
                 <ResponsiveContainer width="100%" height={250}>
                   <BarChart data={ensureMetrics(platform)}>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke={isDark ? "#374151" : "#e5e7eb"}
-                    />
+                    <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#374151" : "#e5e7eb"} />
                     <XAxis
                       dataKey="date"
                       stroke={isDark ? "#9ca3af" : "#6b7280"}
                       tick={{ fontSize: 12 }}
                     />
-                    <YAxis
-                      stroke={isDark ? "#9ca3af" : "#6b7280"}
-                      tick={{ fontSize: 12 }}
-                    />
+                    <YAxis stroke={isDark ? "#9ca3af" : "#6b7280"} tick={{ fontSize: 12 }} />
                     <Tooltip
                       contentStyle={{
                         backgroundColor: isDark ? "#1f2937" : "#ffffff",
@@ -404,21 +375,9 @@ export default function DetailedPlatformChart({
                       labelStyle={{ color: isDark ? "#f3f4f6" : "#111827" }}
                     />
                     <Legend />
-                    <Bar
-                      dataKey="engagement"
-                      fill="#8b5cf6"
-                      name="Engagement"
-                    />
-                    <Bar
-                      dataKey="followers_gained"
-                      fill="#10b981"
-                      name="Ganados"
-                    />
-                    <Bar
-                      dataKey="followers_lost"
-                      fill="#ef4444"
-                      name="Perdidos"
-                    />
+                    <Bar dataKey="engagement" fill="#8b5cf6" name="Engagement" />
+                    <Bar dataKey="followers_gained" fill="#10b981" name="Ganados" />
+                    <Bar dataKey="followers_lost" fill="#ef4444" name="Perdidos" />
                   </BarChart>
                 </ResponsiveContainer>
               </div>

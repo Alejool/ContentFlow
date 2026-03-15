@@ -15,9 +15,7 @@ export function usePublishModal(
 
   const handlePlatformChange = useCallback((accountId: number) => {
     setSelectedPlatforms((prev) =>
-      prev.includes(accountId)
-        ? prev.filter((id) => id !== accountId)
-        : [...prev, accountId],
+      prev.includes(accountId) ? prev.filter((id) => id !== accountId) : [...prev, accountId],
     );
   }, []);
 
@@ -37,13 +35,10 @@ export function usePublishModal(
     setIsPublishing(true);
 
     try {
-      const response = await axios.post(
-        `/api/v1/publications/${publication.id}/publish`,
-        {
-          platforms: selectedPlatforms,
-          scheduled_at: schedulePost ? scheduledAt : null,
-        },
-      );
+      const response = await axios.post(`/api/v1/publications/${publication.id}/publish`, {
+        platforms: selectedPlatforms,
+        scheduled_at: schedulePost ? scheduledAt : null,
+      });
 
       toast.success("Contenido publicado exitosamente");
       onPublished(response.data);
@@ -67,23 +62,19 @@ export function usePublishModal(
     setIsPublishing(true);
 
     try {
-      const response = await axios.post(
-        `/api/v1/publications/${publication.id}/request-review`,
-        {
-          platform_settings: {
-            platforms: selectedPlatforms,
-            scheduled_at: schedulePost ? scheduledAt : null,
-          },
+      const response = await axios.post(`/api/v1/publications/${publication.id}/request-review`, {
+        platform_settings: {
+          platforms: selectedPlatforms,
+          scheduled_at: schedulePost ? scheduledAt : null,
         },
-      );
+      });
 
       toast.success("Contenido enviado a revisión exitosamente");
       onPublished(response.data);
       resetState();
       onClose();
     } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message || "Error al enviar a revisión";
+      const errorMessage = error.response?.data?.message || "Error al enviar a revisión";
       toast.error(errorMessage);
       console.error("Error requesting review:", error);
     } finally {

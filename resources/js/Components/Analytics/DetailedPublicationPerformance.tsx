@@ -77,43 +77,26 @@ interface StatCardProps {
   isDark: boolean;
 }
 
-const StatCard = ({
-  icon: Icon,
-  label,
-  value,
-  color,
-  isDark,
-}: StatCardProps) => (
-  <div
-    className={`p-3 rounded-lg ${isDark ? "bg-neutral-700/50" : "bg-gray-50"}`}
-  >
-    <div className="flex items-center gap-2 mb-1">
-      <Icon className={`w-4 h-4 ${color}`} />
-      <span className={`text-xs ${isDark ? "text-gray-400" : "text-gray-600"}`}>
-        {label}
-      </span>
+const StatCard = ({ icon: Icon, label, value, color, isDark }: StatCardProps) => (
+  <div className={`rounded-lg p-3 ${isDark ? "bg-neutral-700/50" : "bg-gray-50"}`}>
+    <div className="mb-1 flex items-center gap-2">
+      <Icon className={`h-4 w-4 ${color}`} />
+      <span className={`text-xs ${isDark ? "text-gray-400" : "text-gray-600"}`}>{label}</span>
     </div>
-    <p
-      className={`text-lg font-bold ${isDark ? "text-white" : "text-gray-900"}`}
-    >
+    <p className={`text-lg font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
       {typeof value === "number" ? value.toLocaleString() : value}
     </p>
   </div>
 );
 
-export default function DetailedPublicationPerformance({
-  publications,
-  theme = "light",
-}: Props) {
+export default function DetailedPublicationPerformance({ publications, theme = "light" }: Props) {
   const isDark = theme === "dark";
   const [searchTerm, setSearchTerm] = useState("");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const filteredPublications = useMemo(() => {
     if (!searchTerm) return publications;
-    return publications.filter((pub) =>
-      pub.title.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
+    return publications.filter((pub) => pub.title.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [publications, searchTerm]);
 
   const mockPublications: Publication[] = [
@@ -235,9 +218,7 @@ export default function DetailedPublicationPerformance({
   ];
 
   const displayPublications =
-    filteredPublications.length > 0 || searchTerm
-      ? filteredPublications
-      : mockPublications;
+    filteredPublications.length > 0 || searchTerm ? filteredPublications : mockPublications;
 
   const scroll = (direction: "left" | "right") => {
     if (scrollContainerRef.current) {
@@ -293,19 +274,17 @@ export default function DetailedPublicationPerformance({
 
   return (
     <div className={`space-y-6 ${isDark ? "text-gray-100" : "text-gray-900"}`}>
-      <div className="flex items-center gap-3 w-full max-w-md mb-6">
+      <div className="mb-6 flex w-full max-w-md items-center gap-3">
         <div className="relative w-full">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search
-              className={`w-5 h-5 ${isDark ? "text-gray-500" : "text-gray-400"}`}
-            />
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+            <Search className={`h-5 w-5 ${isDark ? "text-gray-500" : "text-gray-400"}`} />
           </div>
           <input
             type="text"
-            className={`block w-full pl-10 pr-3 py-2 border rounded-lg leading-5 transition-colors duration-150 focus:outline-none sm:text-sm ${
+            className={`block w-full rounded-lg border py-2 pl-10 pr-3 leading-5 transition-colors duration-150 focus:outline-none sm:text-sm ${
               isDark
-                ? "bg-neutral-800/50 border-neutral-700 text-gray-200 focus:border-primary-500 focus:ring-primary-500 placeholder-gray-500"
-                : "bg-white border-gray-300 text-gray-900 focus:border-primary-500 focus:ring-primary-500 placeholder-gray-400"
+                ? "border-neutral-700 bg-neutral-800/50 text-gray-200 placeholder-gray-500 focus:border-primary-500 focus:ring-primary-500"
+                : "border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:border-primary-500 focus:ring-primary-500"
             }`}
             placeholder="Buscar publicación..."
             value={searchTerm}
@@ -315,68 +294,66 @@ export default function DetailedPublicationPerformance({
       </div>
 
       {publications.length === 0 && !searchTerm && (
-        <div className="mb-4 p-4 bg-orange-50 border border-orange-200 text-orange-800 rounded-lg text-sm dark:bg-orange-900/20 dark:border-orange-800/50 dark:text-orange-300">
-          <strong>Modo de demostración:</strong> No tienes publicaciones con
-          análisis aún. Se están mostrando métricas de prueba.
+        <div className="mb-4 rounded-lg border border-orange-200 bg-orange-50 p-4 text-sm text-orange-800 dark:border-orange-800/50 dark:bg-orange-900/20 dark:text-orange-300">
+          <strong>Modo de demostración:</strong> No tienes publicaciones con análisis aún. Se están
+          mostrando métricas de prueba.
         </div>
       )}
 
-      <div className="relative group">
+      <div className="group relative">
         {/* Navigation Buttons */}
         {displayPublications.length > 1 && (
           <>
             <button
               onClick={() => scroll("left")}
-              className={`absolute left-0 top-1/2 -translate-y-1/2 -ml-4 z-10 p-2 rounded-full shadow-lg transition-all opacity-0 group-hover:opacity-100 disabled:opacity-0 ${
+              className={`absolute left-0 top-1/2 z-10 -ml-4 -translate-y-1/2 rounded-full p-2 opacity-0 shadow-lg transition-all disabled:opacity-0 group-hover:opacity-100 ${
                 isDark
                   ? "bg-neutral-800 text-white hover:bg-neutral-700"
                   : "bg-white text-gray-800 hover:bg-gray-50"
               }`}
             >
-              <ChevronLeft className="w-6 h-6" />
+              <ChevronLeft className="h-6 w-6" />
             </button>
             <button
               onClick={() => scroll("right")}
-              className={`absolute right-0 top-1/2 -translate-y-1/2 -mr-4 z-10 p-2 rounded-full shadow-lg transition-all opacity-0 group-hover:opacity-100 disabled:opacity-0 ${
+              className={`absolute right-0 top-1/2 z-10 -mr-4 -translate-y-1/2 rounded-full p-2 opacity-0 shadow-lg transition-all disabled:opacity-0 group-hover:opacity-100 ${
                 isDark
                   ? "bg-neutral-800 text-white hover:bg-neutral-700"
                   : "bg-white text-gray-800 hover:bg-gray-50"
               }`}
             >
-              <ChevronRight className="w-6 h-6" />
+              <ChevronRight className="h-6 w-6" />
             </button>
           </>
         )}
 
         <div
           ref={scrollContainerRef}
-          className="flex overflow-x-auto gap-6 pb-6 snap-x snap-mandatory hide-scrollbars"
+          className="hide-scrollbars flex snap-x snap-mandatory gap-6 overflow-x-auto pb-6"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {displayPublications.map((pub) => (
             <div
               key={pub.id}
-              className={`shrink-0 w-full lg:w-[800px] snap-center rounded-lg p-6 ${
+              className={`w-full shrink-0 snap-center rounded-lg p-6 lg:w-[800px] ${
                 isDark
-                  ? "bg-neutral-800/50 border border-neutral-700/50"
-                  : "bg-white border border-gray-100 shadow-sm"
+                  ? "border border-neutral-700/50 bg-neutral-800/50"
+                  : "border border-gray-100 bg-white shadow-sm"
               }`}
             >
               <div className="mb-6">
                 <h3
-                  className={`text-xl font-bold mb-1 truncate ${isDark ? "text-white" : "text-gray-900"}`}
+                  className={`mb-1 truncate text-xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}
                   title={pub.title}
                 >
                   {pub.title}
                 </h3>
-                <p
-                  className={`text-sm ${isDark ? "text-gray-400" : "text-gray-600"}`}
-                >
+                <p className={`text-sm ${isDark ? "text-gray-400" : "text-gray-600"}`}>
                   Publicado: {pub.published_at}
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+              <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-5">
                 <StatCard
                   icon={Eye}
                   label="Vistas"
@@ -414,10 +391,10 @@ export default function DetailedPublicationPerformance({
                 />
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <div>
                   <h4
-                    className={`text-sm font-semibold mb-3 ${isDark ? "text-gray-300" : "text-gray-700"}`}
+                    className={`mb-3 text-sm font-semibold ${isDark ? "text-gray-300" : "text-gray-700"}`}
                   >
                     Rendimiento por Plataforma
                   </h4>
@@ -432,10 +409,7 @@ export default function DetailedPublicationPerformance({
                         stroke={isDark ? "#9ca3af" : "#6b7280"}
                         tick={{ fontSize: 12 }}
                       />
-                      <YAxis
-                        stroke={isDark ? "#9ca3af" : "#6b7280"}
-                        tick={{ fontSize: 12 }}
-                      />
+                      <YAxis stroke={isDark ? "#9ca3af" : "#6b7280"} tick={{ fontSize: 12 }} />
                       <Tooltip
                         contentStyle={{
                           backgroundColor: isDark ? "#1f2937" : "#ffffff",
@@ -446,11 +420,7 @@ export default function DetailedPublicationPerformance({
                       />
                       <Legend />
                       <Bar dataKey="views" fill="#3b82f6" name="Vistas" />
-                      <Bar
-                        dataKey="engagement"
-                        fill="#8b5cf6"
-                        name="Engagement"
-                      />
+                      <Bar dataKey="engagement" fill="#8b5cf6" name="Engagement" />
                       <Bar dataKey="reach" fill="#10b981" name="Alcance" />
                     </BarChart>
                   </ResponsiveContainer>
@@ -459,16 +429,15 @@ export default function DetailedPublicationPerformance({
                     {ensurePlatformBreakdown(pub).map((platform) => (
                       <div
                         key={platform.platform}
-                        className={`flex items-center justify-between p-2 rounded ${
+                        className={`flex items-center justify-between rounded p-2 ${
                           isDark ? "bg-neutral-700/30" : "bg-gray-50"
                         }`}
                       >
                         <div className="flex items-center gap-2">
                           <div
-                            className="w-3 h-3 rounded-full"
+                            className="h-3 w-3 rounded-full"
                             style={{
-                              backgroundColor:
-                                PLATFORM_COLORS[platform.platform] || "#6366f1",
+                              backgroundColor: PLATFORM_COLORS[platform.platform] || "#6366f1",
                             }}
                           />
                           <span className="text-sm font-medium capitalize">
@@ -478,9 +447,7 @@ export default function DetailedPublicationPerformance({
                         <div className="flex gap-4 text-xs">
                           <span>{platform.views} vistas</span>
                           <span>{platform.engagement} eng.</span>
-                          <span className="font-semibold">
-                            {platform.avg_engagement_rate}%
-                          </span>
+                          <span className="font-semibold">{platform.avg_engagement_rate}%</span>
                         </div>
                       </div>
                     ))}
@@ -489,7 +456,7 @@ export default function DetailedPublicationPerformance({
 
                 <div>
                   <h4
-                    className={`text-sm font-semibold mb-3 ${isDark ? "text-gray-300" : "text-gray-700"}`}
+                    className={`mb-3 text-sm font-semibold ${isDark ? "text-gray-300" : "text-gray-700"}`}
                   >
                     Rendimiento Diario
                   </h4>
@@ -504,10 +471,7 @@ export default function DetailedPublicationPerformance({
                         stroke={isDark ? "#9ca3af" : "#6b7280"}
                         tick={{ fontSize: 12 }}
                       />
-                      <YAxis
-                        stroke={isDark ? "#9ca3af" : "#6b7280"}
-                        tick={{ fontSize: 12 }}
-                      />
+                      <YAxis stroke={isDark ? "#9ca3af" : "#6b7280"} tick={{ fontSize: 12 }} />
                       <Tooltip
                         contentStyle={{
                           backgroundColor: isDark ? "#1f2937" : "#ffffff",
@@ -546,7 +510,7 @@ export default function DetailedPublicationPerformance({
           ))}
           {displayPublications.length === 0 && (
             <div
-              className={`w-full text-center py-12 ${isDark ? "text-gray-400" : "text-gray-500"}`}
+              className={`w-full py-12 text-center ${isDark ? "text-gray-400" : "text-gray-500"}`}
             >
               {t("publications.table.emptyState.searchEmpty")}
             </div>

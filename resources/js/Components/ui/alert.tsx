@@ -14,8 +14,7 @@ const Alert = React.forwardRef<
       "relative w-full rounded-lg border p-4",
       {
         "bg-background text-foreground": variant === "default",
-        "border-destructive/50 text-destructive dark:border-destructive":
-          variant === "destructive",
+        "border-destructive/50 text-destructive dark:border-destructive": variant === "destructive",
       },
       className,
     )}
@@ -28,11 +27,7 @@ const AlertDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("text-sm [&_p]:leading-relaxed", className)}
-    {...props}
-  />
+  <div ref={ref} className={cn("text-sm [&_p]:leading-relaxed", className)} {...props} />
 ));
 AlertDescription.displayName = "AlertDescription";
 

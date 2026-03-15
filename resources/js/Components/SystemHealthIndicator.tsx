@@ -48,23 +48,21 @@ export default function SystemHealthIndicator() {
   return (
     <div className="fixed bottom-4 right-4 z-50">
       <div
-        className={`flex items-center gap-2 px-3 py-2 rounded-lg shadow-lg backdrop-blur-sm transition-all ${
-          isOnline && allServicesUp
-            ? "bg-green-500/90 text-white"
-            : "bg-red-500/90 text-white"
+        className={`flex items-center gap-2 rounded-lg px-3 py-2 shadow-lg backdrop-blur-sm transition-all ${
+          isOnline && allServicesUp ? "bg-green-500/90 text-white" : "bg-red-500/90 text-white"
         }`}
       >
         {isOnline && allServicesUp ? (
           <>
-            <Activity className="w-4 h-4 animate-pulse" />
+            <Activity className="h-4 w-4 animate-pulse" />
             <span className="text-sm font-medium">Sistema Actualizado</span>
-            <CheckCircle2 className="w-4 h-4" />
+            <CheckCircle2 className="h-4 w-4" />
           </>
         ) : (
           <>
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <Loader2 className="h-4 w-4 animate-spin" />
             <span className="text-sm font-medium">Reconectando...</span>
-            <XCircle className="w-4 h-4" />
+            <XCircle className="h-4 w-4" />
           </>
         )}
       </div>

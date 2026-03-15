@@ -40,45 +40,38 @@ export const SyncErrorDisplay: React.FC<SyncErrorDisplayProps> = ({
           `${getProviderName(error.provider)} is currently unavailable. Please try again later.`,
         );
       default:
-        return (
-          error.message ||
-          t("calendar.sync.error.unknown", "An unknown sync error occurred")
-        );
+        return error.message || t("calendar.sync.error.unknown", "An unknown sync error occurred");
     }
   };
 
   return (
     <div
-      className={`flex items-start gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg ${className}`}
+      className={`flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20 ${className}`}
       role="alert"
       aria-live="polite"
     >
-      <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+      <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600 dark:text-red-400" />
 
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1">
             <p className="text-sm font-medium text-red-800 dark:text-red-200">
               {t("calendar.sync.error.title", "Synchronization Error")}
             </p>
-            <p className="text-sm text-red-700 dark:text-red-300 mt-1">
-              {getErrorMessage(error)}
-            </p>
+            <p className="mt-1 text-sm text-red-700 dark:text-red-300">{getErrorMessage(error)}</p>
 
             {error.details && (
-              <p className="text-xs text-red-600 dark:text-red-400 mt-2">
-                {error.details}
-              </p>
+              <p className="mt-2 text-xs text-red-600 dark:text-red-400">{error.details}</p>
             )}
           </div>
 
           {onDismiss && (
             <button
               onClick={onDismiss}
-              className="flex-shrink-0 p-1 hover:bg-red-100 dark:hover:bg-red-900/40 rounded transition-colors"
+              className="flex-shrink-0 rounded p-1 transition-colors hover:bg-red-100 dark:hover:bg-red-900/40"
               aria-label={t("calendar.sync.error.dismiss", "Dismiss error")}
             >
-              <X className="w-4 h-4 text-red-600 dark:text-red-400" />
+              <X className="h-4 w-4 text-red-600 dark:text-red-400" />
             </button>
           )}
         </div>
@@ -86,19 +79,16 @@ export const SyncErrorDisplay: React.FC<SyncErrorDisplayProps> = ({
         {error.retryable && onRetry && (
           <button
             onClick={onRetry}
-            className="inline-flex items-center gap-2 mt-3 px-3 py-1.5 text-sm font-medium text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900/40 hover:bg-red-200 dark:hover:bg-red-900/60 rounded transition-colors"
+            className="mt-3 inline-flex items-center gap-2 rounded bg-red-100 px-3 py-1.5 text-sm font-medium text-red-700 transition-colors hover:bg-red-200 dark:bg-red-900/40 dark:text-red-300 dark:hover:bg-red-900/60"
             aria-label={t("calendar.sync.error.retry", "Retry synchronization")}
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw className="h-4 w-4" />
             {t("calendar.sync.error.retry_button", "Retry")}
           </button>
         )}
 
-        <p className="text-xs text-red-600 dark:text-red-400 mt-2">
-          {t(
-            "calendar.sync.error.local_saved",
-            "Your changes have been saved locally.",
-          )}
+        <p className="mt-2 text-xs text-red-600 dark:text-red-400">
+          {t("calendar.sync.error.local_saved", "Your changes have been saved locally.")}
         </p>
       </div>
     </div>
@@ -129,16 +119,13 @@ export const SyncErrorList: React.FC<SyncErrorListProps> = ({
   return (
     <div className={`space-y-3 ${className}`}>
       {errors.length > 1 && onDismissAll && (
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between">
           <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            {t(
-              "calendar.sync.error.multiple",
-              `${errors.length} synchronization errors`,
-            )}
+            {t("calendar.sync.error.multiple", `${errors.length} synchronization errors`)}
           </p>
           <button
             onClick={onDismissAll}
-            className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 underline"
+            className="text-sm text-gray-600 underline hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
           >
             {t("calendar.sync.error.dismiss_all", "Dismiss all")}
           </button>

@@ -37,7 +37,7 @@ interface ExternalCalendarSettingsProps {
 }
 
 const GoogleIcon = () => (
-  <svg className="w-6 h-6" viewBox="0 0 24 24">
+  <svg className="h-6 w-6" viewBox="0 0 24 24">
     <path
       fill="#4285F4"
       d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -64,8 +64,7 @@ const StatusBadge = ({ status }: { status: string }) => {
     connected: {
       icon: CheckCircle2,
       text: t("calendar.external.connected"),
-      className:
-        "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+      className: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
     },
     error: {
       icon: XCircle,
@@ -75,21 +74,18 @@ const StatusBadge = ({ status }: { status: string }) => {
     disconnected: {
       icon: AlertCircle,
       text: t("calendar.external.disconnected"),
-      className:
-        "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300",
+      className: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300",
     },
   };
 
-  const config =
-    statusConfig[status as keyof typeof statusConfig] ||
-    statusConfig.disconnected;
+  const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.disconnected;
   const Icon = config.icon;
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${config.className}`}
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${config.className}`}
     >
-      <Icon className="w-3.5 h-3.5" />
+      <Icon className="h-3.5 w-3.5" />
       {config.text}
     </span>
   );
@@ -105,9 +101,9 @@ export default function ExternalCalendarSettings({
   const disconnectCalendar = useDisconnectCalendar();
   const retrySync = useRetrySync();
   const [showDisconnectDialog, setShowDisconnectDialog] = useState(false);
-  const [providerToDisconnect, setProviderToDisconnect] = useState<
-    "google" | "outlook" | null
-  >(null);
+  const [providerToDisconnect, setProviderToDisconnect] = useState<"google" | "outlook" | null>(
+    null,
+  );
 
   const handleConnect = async (provider: "google" | "outlook") => {
     try {
@@ -116,8 +112,7 @@ export default function ExternalCalendarSettings({
       const data = error?.response?.data;
       if (data?.upgrade_required) {
         toast.error(
-          data.error ||
-            "Tu plan no incluye sincronización de calendario. Actualiza tu plan.",
+          data.error || "Tu plan no incluye sincronización de calendario. Actualiza tu plan.",
         );
       } else {
         toast.error(t("calendar.external.connectError"));
@@ -156,7 +151,7 @@ export default function ExternalCalendarSettings({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-12">
-        <Loader2 className="w-8 h-8 text-primary-600 animate-spin" />
+        <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
       </div>
     );
   }
@@ -173,9 +168,7 @@ export default function ExternalCalendarSettings({
         <div className="space-y-3">
           <CalendarConnectionCard
             connection={
-              connections?.find(
-                (c: ExternalCalendarConnection) => c.provider === "google",
-              ) || {
+              connections?.find((c: ExternalCalendarConnection) => c.provider === "google") || {
                 provider: "google" as const,
                 connected: false,
                 status: "disconnected" as const,
@@ -231,25 +224,22 @@ const CalendarConnectionCard = ({
   const { t } = useTranslation();
 
   return (
-    <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 hover:border-primary-500 dark:hover:border-primary-500 transition-all">
+    <div className="rounded-lg border border-gray-200 bg-white p-4 transition-all hover:border-primary-500 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-primary-500">
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-white dark:bg-gray-700 rounded-lg flex items-center justify-center shadow-sm">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white shadow-sm dark:bg-gray-700">
             {icon}
           </div>
           <div>
-            <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 capitalize">
+            <h4 className="text-sm font-semibold capitalize text-gray-900 dark:text-gray-100">
               {connection.provider} Calendar
             </h4>
             {connection.connected && connection.email && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                {connection.email}
-              </p>
+              <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{connection.email}</p>
             )}
             {connection.lastSync && (
-              <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                {t("calendar.external.lastSync")}:{" "}
-                {formatDateTimeString(connection.lastSync)}
+              <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-500">
+                {t("calendar.external.lastSync")}: {formatDateTimeString(connection.lastSync)}
               </p>
             )}
           </div>
@@ -258,11 +248,9 @@ const CalendarConnectionCard = ({
       </div>
 
       {connection.errorMessage && (
-        <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md flex items-start gap-2">
-          <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-red-700 dark:text-red-300">
-            {connection.errorMessage}
-          </p>
+        <div className="mt-3 flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-900/20">
+          <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-600 dark:text-red-400" />
+          <p className="text-sm text-red-700 dark:text-red-300">{connection.errorMessage}</p>
         </div>
       )}
 

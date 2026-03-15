@@ -6,10 +6,7 @@ interface SearchButtonProps {
   variant?: "default" | "compact";
 }
 
-export default function SearchButton({
-  className = "",
-  variant = "default",
-}: SearchButtonProps) {
+export default function SearchButton({ className = "", variant = "default" }: SearchButtonProps) {
   const { t } = useTranslation();
 
   const handleClick = () => {
@@ -20,10 +17,10 @@ export default function SearchButton({
     return (
       <button
         onClick={handleClick}
-        className={`p-2 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors ${className}`}
+        className={`rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-neutral-800 dark:hover:text-gray-200 ${className}`}
         aria-label={t("common.search")}
       >
-        <Search className="w-5 h-5" />
+        <Search className="h-5 w-5" />
       </button>
     );
   }
@@ -31,17 +28,11 @@ export default function SearchButton({
   return (
     <button
       onClick={handleClick}
-      className={`group relative flex items-center gap-2 px-3 py-1.5 w-full md:w-64 
-                bg-gray-100 dark:bg-neutral-800/50 
-                border border-gray-200 dark:border-neutral-700/50 
-                rounded-lg text-sm text-gray-500 dark:text-gray-400 
-                hover:border-gray-300 dark:hover:border-neutral-600 
-                hover:bg-gray-50 dark:hover:bg-neutral-800 
-                transition-all duration-200 ${className}`}
+      className={`group relative flex w-full items-center gap-2 rounded-lg border border-gray-200 bg-gray-100 px-3 py-1.5 text-sm text-gray-500 transition-all duration-200 hover:border-gray-300 hover:bg-gray-50 dark:border-neutral-700/50 dark:bg-neutral-800/50 dark:text-gray-400 dark:hover:border-neutral-600 dark:hover:bg-neutral-800 md:w-64 ${className}`}
     >
-      <Search className="w-4 h-4" />
+      <Search className="h-4 w-4" />
       <span className="flex-1 text-left">{t("common.search")}...</span>
-      <kbd className="hidden md:inline-flex h-5 items-center gap-1 rounded border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-900 px-1.5 font-mono text-[10px] font-medium text-gray-500 dark:text-gray-400 opacity-100 group-hover:opacity-100 transition-opacity">
+      <kbd className="hidden h-5 items-center gap-1 rounded border border-gray-200 bg-gray-50 px-1.5 font-mono text-[10px] font-medium text-gray-500 opacity-100 transition-opacity group-hover:opacity-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-gray-400 md:inline-flex">
         <span className="text-xs">⌘</span>K
       </kbd>
     </button>

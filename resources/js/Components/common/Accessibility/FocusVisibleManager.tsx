@@ -31,8 +31,7 @@ const inputTypesAllowlist = new Set([
  * Check if element should always show focus
  */
 function focusTriggersKeyboardModality(element: Element): boolean {
-  const { tagName, type, readOnly, isContentEditable } =
-    element as HTMLInputElement;
+  const { tagName, type, readOnly, isContentEditable } = element as HTMLInputElement;
 
   if (tagName === "INPUT" && inputTypesAllowlist.has(type) && !readOnly) {
     return true;

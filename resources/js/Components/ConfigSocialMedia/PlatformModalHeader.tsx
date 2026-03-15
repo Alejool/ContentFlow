@@ -18,24 +18,17 @@ export default function PlatformModalHeader({
 
   const getPlatformIcon = () => {
     const platformKey = platform.toLowerCase();
-    const platformConfig =
-      SOCIAL_PLATFORMS[platformKey as keyof typeof SOCIAL_PLATFORMS];
+    const platformConfig = SOCIAL_PLATFORMS[platformKey as keyof typeof SOCIAL_PLATFORMS];
 
     if (platformConfig && platformConfig.logo) {
-      return (
-        <img
-          src={platformConfig.logo}
-          alt={platformConfig.name}
-          className="w-8 h-8"
-        />
-      );
+      return <img src={platformConfig.logo} alt={platformConfig.name} className="h-8 w-8" />;
     }
 
     if (platformKey === "all") {
-      return <Settings2 className="w-6 h-6 text-primary-500" />;
+      return <Settings2 className="h-6 w-6 text-primary-500" />;
     }
 
-    return <Settings2 className="w-6 h-6 text-primary-500" />;
+    return <Settings2 className="h-6 w-6 text-primary-500" />;
   };
 
   return (
@@ -43,17 +36,15 @@ export default function PlatformModalHeader({
       <div className="flex items-center gap-5">
         <div className="p-2">{getPlatformIcon()}</div>
         <div>
-          <h2 className="text-xl font-black tracking-tight uppercase">
+          <h2 className="text-xl font-black uppercase tracking-tight">
             {isAllPlatforms
               ? t("platformSettings.all.title") || "All Platforms"
               : platform && platform.trim()
-                ? t(`platformSettings.${platform.toLowerCase()}.title`) ||
-                  `${platform} Defaults`
+                ? t(`platformSettings.${platform.toLowerCase()}.title`) || `${platform} Defaults`
                 : "Platform Defaults"}
           </h2>
           <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400">
-            {t("common.adjustOptions") ||
-              "Personaliza las opciones predeterminadas"}
+            {t("common.adjustOptions") || "Personaliza las opciones predeterminadas"}
           </p>
         </div>
       </div>

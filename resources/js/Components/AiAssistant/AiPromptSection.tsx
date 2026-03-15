@@ -12,16 +12,8 @@ const aiPromptSchema = (t: any) =>
   z.object({
     prompt: z
       .string()
-      .min(
-        10,
-        t("common.ai.prompt_min") ||
-          "El prompt debe tener al menos 10 caracteres",
-      )
-      .max(
-        500,
-        t("common.ai.prompt_max") ||
-          "El prompt no puede exceder 500 caracteres",
-      ),
+      .min(10, t("common.ai.prompt_min") || "El prompt debe tener al menos 10 caracteres")
+      .max(500, t("common.ai.prompt_max") || "El prompt no puede exceder 500 caracteres"),
   });
 
 interface AiPromptSectionProps {
@@ -111,11 +103,9 @@ const AiPromptSection: React.FC<AiPromptSectionProps> = ({
         // Only show success message if there's actual data
         const message = response.data.message;
         if (!message || message === "OK" || message.trim() === "") {
-          toast.success(
-            t("common.ai.suggestions_generated") ||
-              "Sugerencias generadas con éxito",
-            { id: "ai-suggestions" },
-          );
+          toast.success(t("common.ai.suggestions_generated") || "Sugerencias generadas con éxito", {
+            id: "ai-suggestions",
+          });
         } else {
           toast.success(message, { id: "ai-suggestions" });
         }
@@ -131,9 +121,7 @@ const AiPromptSection: React.FC<AiPromptSectionProps> = ({
       }
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message ||
-          t("common.error") ||
-          "Error al procesar la solicitud",
+        error.response?.data?.message || t("common.error") || "Error al procesar la solicitud",
       );
     } finally {
       setLoading(false);
@@ -144,11 +132,11 @@ const AiPromptSection: React.FC<AiPromptSectionProps> = ({
 
   return (
     <div
-      className={`p-4 bg-primary-50/30 dark:bg-primary-900/10 border border-primary-100 dark:border-primary-800/50 rounded-lg space-y-4 mb-6 ${className}`}
+      className={`mb-6 space-y-4 rounded-lg border border-primary-100 bg-primary-50/30 p-4 dark:border-primary-800/50 dark:bg-primary-900/10 ${className}`}
     >
       <div className="flex items-center gap-2">
-        <div className="p-1.5 bg-primary-100 dark:bg-primary-800/50 rounded-lg text-primary-600 dark:text-primary-400">
-          <Wand2 className="w-4 h-4" />
+        <div className="rounded-lg bg-primary-100 p-1.5 text-primary-600 dark:bg-primary-800/50 dark:text-primary-400">
+          <Wand2 className="h-4 w-4" />
         </div>
         <span className="text-sm font-bold text-primary-700 dark:text-primary-300">
           {t("common.ai.idea_prompt")}

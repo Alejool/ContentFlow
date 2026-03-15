@@ -44,7 +44,7 @@ export default function TikTokSettings({
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
       <div className="space-y-6">
         <div className="space-y-4">
           <SectionHeader title={t("platformSettings.tiktok.privacy")} />
@@ -89,7 +89,7 @@ export default function TikTokSettings({
       <div className="space-y-6">
         <div className="space-y-4">
           <SectionHeader title={t("platformSettings.tiktok.interactions")} />
-          <div className="space-y-3 p-4 border border-gray-200 dark:border-neutral-700 rounded-lg">
+          <div className="space-y-3 rounded-lg border border-gray-200 p-4 dark:border-neutral-700">
             <Switch
               id="tt_comment"
               label={t("platformSettings.tiktok.comments")}

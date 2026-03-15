@@ -64,13 +64,13 @@ const IntegrationCard = ({
 
   return (
     <div
-      className={`bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border ${
+      className={`border bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 ${
         isConnected
           ? "border-emerald-200 dark:border-emerald-800/50"
           : "border-gray-200 dark:border-neutral-800"
       } rounded-lg p-6 transition-all duration-300 hover:shadow-lg`}
     >
-      <div className="flex items-start justify-between mb-4">
+      <div className="mb-4 flex items-start justify-between">
         <div className="flex items-center gap-4">
           <div
             className={`h-12 w-12 rounded-lg bg-gradient-to-br ${color} flex items-center justify-center`}
@@ -79,13 +79,11 @@ const IntegrationCard = ({
           </div>
           <div>
             <h4 className="font-bold text-gray-900 dark:text-white">{title}</h4>
-            <p className="text-sm text-gray-500 dark:text-neutral-500">
-              {description}
-            </p>
+            <p className="text-sm text-gray-500 dark:text-neutral-500">{description}</p>
           </div>
         </div>
         {isConnected && (
-          <div className="flex items-center gap-2 px-3 py-1 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 text-xs font-bold rounded-full">
+          <div className="flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400">
             <CheckCircle className="h-3 w-3" />
             {t("common.connected")}
           </div>
@@ -116,9 +114,7 @@ const IntegrationCard = ({
             className="gap-2"
             icon={ExternalLink}
           >
-            {isConnected
-              ? t("workspace.integrations.test_connection")
-              : t("common.connect")}
+            {isConnected ? t("workspace.integrations.test_connection") : t("common.connect")}
           </Button>
         </div>
       </div>
@@ -132,9 +128,7 @@ export default function IntegrationsSettingsTab({
   canManageWorkspace,
 }: IntegrationsSettingsTabProps) {
   const { t } = useTranslation();
-  const [activeSubTab, setActiveSubTab] = useState<"config" | "activity">(
-    "config",
-  );
+  const [activeSubTab, setActiveSubTab] = useState<"config" | "activity">("config");
   const [isSaving, setIsSaving] = useState(false);
   const [testing, setTesting] = useState<string | null>(null);
   const [activityData, setActivityData] = useState<any>({
@@ -181,31 +175,21 @@ export default function IntegrationsSettingsTab({
     }
   };
   const fetchActivity = useCallback(
-    async (
-      page = 1,
-      perPage = 5,
-      channelOverride?: string,
-      statusOverride?: string,
-    ) => {
+    async (page = 1, perPage = 5, channelOverride?: string, statusOverride?: string) => {
       try {
         setLoadingActivity(true);
         // Use current state if no override provided
-        const channel =
-          channelOverride !== undefined ? channelOverride : channelFilter;
-        const status =
-          statusOverride !== undefined ? statusOverride : statusFilter;
+        const channel = channelOverride !== undefined ? channelOverride : channelFilter;
+        const status = statusOverride !== undefined ? statusOverride : statusFilter;
 
-        const response = await axios.get(
-          route("api.v1.workspaces.activity", workspace.id),
-          {
-            params: {
-              page,
-              per_page: perPage,
-              channel: channel || undefined,
-              status: status || undefined,
-            },
+        const response = await axios.get(route("api.v1.workspaces.activity", workspace.id), {
+          params: {
+            page,
+            per_page: perPage,
+            channel: channel || undefined,
+            status: status || undefined,
           },
-        );
+        });
 
         const payload = response.data;
         // ApiResponse merges the paginator if toArray() was called in backend
@@ -248,13 +232,9 @@ export default function IntegrationsSettingsTab({
       return;
     }
 
-    const currentUrl = getValues(
-      type === "slack" ? "slack_webhook_url" : "discord_webhook_url",
-    );
+    const currentUrl = getValues(type === "slack" ? "slack_webhook_url" : "discord_webhook_url");
     if (!currentUrl) {
-      toast.error(
-        t("workspace.integrations.messages.enter_url", { type: type }),
-      );
+      toast.error(t("workspace.integrations.messages.enter_url", { type: type }));
       return;
     }
 
@@ -287,12 +267,7 @@ export default function IntegrationsSettingsTab({
 
   useEffect(() => {
     if (activeSubTab === "activity") {
-      fetchActivity(
-        1,
-        activityData?.per_page || 5,
-        channelFilter,
-        statusFilter,
-      );
+      fetchActivity(1, activityData?.per_page || 5, channelFilter, statusFilter);
     }
   }, [activeSubTab, channelFilter, statusFilter, fetchActivity]);
 
@@ -308,15 +283,12 @@ export default function IntegrationsSettingsTab({
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <StatCard
           icon={Bell}
           label={t("workspace.active_integrations")}
           value={
-            [
-              workspace?.slack_webhook_url,
-              workspace?.discord_webhook_url,
-            ].filter(Boolean).length
+            [workspace?.slack_webhook_url, workspace?.discord_webhook_url].filter(Boolean).length
           }
           color="purple"
         />
@@ -328,23 +300,23 @@ export default function IntegrationsSettingsTab({
         />
       </div>
 
-      <div className="flex items-center gap-1 p-1 bg-gray-100 dark:bg-neutral-800/50 rounded-lg w-fit">
+      <div className="flex w-fit items-center gap-1 rounded-lg bg-gray-100 p-1 dark:bg-neutral-800/50">
         <button
           onClick={() => setActiveSubTab("config")}
-          className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
+          className={`rounded-lg px-6 py-2.5 text-sm font-semibold transition-all duration-200 ${
             activeSubTab === "config"
-              ? "bg-white dark:bg-neutral-900 text-primary-500 shadow-sm"
-              : "text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-200 hover:bg-white/50 dark:hover:bg-neutral-800/50"
+              ? "bg-white text-primary-500 shadow-sm dark:bg-neutral-900"
+              : "text-gray-500 hover:bg-white/50 hover:text-gray-700 dark:text-neutral-400 dark:hover:bg-neutral-800/50 dark:hover:text-neutral-200"
           }`}
         >
           {t("workspace.integrations.title")}
         </button>
         <button
           onClick={() => setActiveSubTab("activity")}
-          className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
+          className={`rounded-lg px-6 py-2.5 text-sm font-semibold transition-all duration-200 ${
             activeSubTab === "activity"
-              ? "bg-white dark:bg-neutral-900 text-primary-500 shadow-sm"
-              : "text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-200 hover:bg-white/50 dark:hover:bg-neutral-800/50"
+              ? "bg-white text-primary-500 shadow-sm dark:bg-neutral-900"
+              : "text-gray-500 hover:bg-white/50 hover:text-gray-700 dark:text-neutral-400 dark:hover:bg-neutral-800/50 dark:hover:text-neutral-200"
           }`}
         >
           {t("workspace.activity_log")}
@@ -352,7 +324,7 @@ export default function IntegrationsSettingsTab({
       </div>
 
       {activeSubTab === "config" ? (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <div className="animate-in fade-in slide-in-from-bottom-2 space-y-8 duration-300">
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
@@ -371,9 +343,7 @@ export default function IntegrationsSettingsTab({
                   className="gap-2"
                   icon={ChevronRight}
                 >
-                  {showAdvanced
-                    ? t("common.hide_advanced")
-                    : t("common.show_advanced")}
+                  {showAdvanced ? t("common.hide_advanced") : t("common.show_advanced")}
                 </Button>
               )}
             </div>
@@ -415,9 +385,9 @@ export default function IntegrationsSettingsTab({
           </div>
 
           {showAdvanced && canManageWorkspace && (
-            <div className="bg-gradient-to-br from-neutral-50 to-white dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-lg p-6">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-primary-400 to-primary-500 flex items-center justify-center">
+            <div className="rounded-lg border border-gray-200 bg-gradient-to-br from-neutral-50 to-white p-6 dark:border-neutral-800 dark:from-neutral-900 dark:to-neutral-950">
+              <div className="mb-6 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary-400 to-primary-500">
                   <ShieldCheck className="h-5 w-5 text-white" />
                 </div>
                 <div>
@@ -432,7 +402,7 @@ export default function IntegrationsSettingsTab({
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     {t("workspace.integrations.webhook_secret")}
                   </label>
                   <div className="flex items-center gap-2">
@@ -440,10 +410,8 @@ export default function IntegrationsSettingsTab({
                       type="text"
                       {...register("webhook_secret")}
                       disabled={!canManageWorkspace}
-                      className="flex-1 rounded-lg border border-gray-300 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white px-4 py-2 font-mono text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                      placeholder={t(
-                        "workspace.integrations.secret_placeholder",
-                      )}
+                      className="flex-1 rounded-lg border border-gray-300 px-4 py-2 font-mono text-sm disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
+                      placeholder={t("workspace.integrations.secret_placeholder")}
                     />
                     <Button
                       type="button"
@@ -457,7 +425,7 @@ export default function IntegrationsSettingsTab({
                       {t("common.generate")}
                     </Button>
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-neutral-500 mt-2">
+                  <p className="mt-2 text-xs text-gray-500 dark:text-neutral-500">
                     {t("workspace.integrations.secret_description")}
                   </p>
                 </div>
@@ -476,11 +444,11 @@ export default function IntegrationsSettingsTab({
           )}
         </div>
       ) : (
-        <div className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-lg overflow-hidden shadow-sm animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <div className="p-6 border-b border-gray-100 dark:border-neutral-800 flex flex-col gap-4">
-            <div className="flex  items-center justify-between gap-3">
+        <div className="animate-in fade-in slide-in-from-bottom-2 overflow-hidden rounded-lg border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-sm duration-300 dark:border-neutral-800 dark:from-neutral-900 dark:to-neutral-950">
+          <div className="flex flex-col gap-4 border-b border-gray-100 p-6 dark:border-neutral-800">
+            <div className="flex items-center justify-between gap-3">
               <div className="flex">
-                <div className="h-10 mr-2 w-10 rounded-lg bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
+                <div className="mr-2 flex h-10 w-10 items-center justify-center rounded-lg bg-primary-50 dark:bg-primary-900/20">
                   <Activity className="h-5 w-5 text-primary-500" />
                 </div>
                 <div>
@@ -499,10 +467,7 @@ export default function IntegrationsSettingsTab({
                   buttonStyle="outline"
                   size="lg"
                   onClick={() =>
-                    fetchActivity(
-                      activityData?.current_page || 1,
-                      activityData?.per_page || 5,
-                    )
+                    fetchActivity(activityData?.current_page || 1, activityData?.per_page || 5)
                   }
                   loading={loadingActivity}
                   icon={RefreshCw}
@@ -537,7 +502,7 @@ export default function IntegrationsSettingsTab({
                   ].map((header) => (
                     <th
                       key={header}
-                      className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider"
+                      className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-neutral-400"
                     >
                       {header}
                     </th>
@@ -551,10 +516,10 @@ export default function IntegrationsSettingsTab({
                   activityData.data.map((log: any) => (
                     <tr
                       key={log.id}
-                      className="hover:bg-gray-50 dark:hover:bg-neutral-900/50 transition-colors"
+                      className="transition-colors hover:bg-gray-50 dark:hover:bg-neutral-900/50"
                     >
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900 dark:text-white font-medium">
+                      <td className="whitespace-nowrap px-6 py-4">
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">
                           {formatDateString(log.created_at, {
                             month: "short",
                             day: "numeric",
@@ -564,10 +529,10 @@ export default function IntegrationsSettingsTab({
                           {formatTimeString(log.created_at)}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="whitespace-nowrap px-6 py-4">
                         <div className="flex items-center gap-2">
                           <div
-                            className={`h-8 w-8 rounded-lg flex items-center justify-center ${
+                            className={`flex h-8 w-8 items-center justify-center rounded-lg ${
                               log.channel === "slack"
                                 ? "bg-purple-100 dark:bg-purple-900/30"
                                 : log.channel === "discord"
@@ -583,13 +548,13 @@ export default function IntegrationsSettingsTab({
                               <Bell className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                             )}
                           </div>
-                          <span className="text-sm font-medium text-gray-900 dark:text-white capitalize">
+                          <span className="text-sm font-medium capitalize text-gray-900 dark:text-white">
                             {log.channel}
                           </span>
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-sm text-gray-900 dark:text-white font-medium">
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">
                           {log.event_type}
                         </div>
                         {log.payload?.url && (
@@ -597,16 +562,16 @@ export default function IntegrationsSettingsTab({
                             href={log.payload.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-xs text-primary-500 hover:text-primary-600 flex items-center gap-1 mt-1 truncate max-w-[200px]"
+                            className="mt-1 flex max-w-[200px] items-center gap-1 truncate text-xs text-primary-500 hover:text-primary-600"
                           >
                             <ExternalLink className="h-3 w-3" />
                             {log.payload.url}
                           </a>
                         )}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-center">
+                      <td className="whitespace-nowrap px-6 py-4 text-center">
                         <span
-                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
+                          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${
                             log.success
                               ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
                               : "bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400"
@@ -622,7 +587,7 @@ export default function IntegrationsSettingsTab({
                       </td>
                       <td className="px-6 py-4">
                         <div
-                          className="text-sm font-mono text-gray-500 dark:text-neutral-500 max-w-[250px] truncate"
+                          className="max-w-[250px] truncate font-mono text-sm text-gray-500 dark:text-neutral-500"
                           title={log.response}
                         >
                           {log.status_code ? `[${log.status_code}] ` : ""}
@@ -635,13 +600,9 @@ export default function IntegrationsSettingsTab({
                   <tr>
                     <td colSpan={5} className="px-6 py-12 text-center">
                       <div className="flex flex-col items-center justify-center text-gray-500 dark:text-neutral-500">
-                        <Bell className="h-12 w-12 mb-4 opacity-20" />
-                        <p className="font-medium">
-                          {t("workspace.no_activity")}
-                        </p>
-                        <p className="text-sm mt-1">
-                          {t("workspace.activity_will_appear")}
-                        </p>
+                        <Bell className="mb-4 h-12 w-12 opacity-20" />
+                        <p className="font-medium">{t("workspace.no_activity")}</p>
+                        <p className="mt-1 text-sm">{t("workspace.activity_will_appear")}</p>
                       </div>
                     </td>
                   </tr>
@@ -655,9 +616,7 @@ export default function IntegrationsSettingsTab({
             lastPage={activityData?.last_page || 1}
             total={activityData?.total || 0}
             perPage={activityData?.per_page || 5}
-            onPageChange={(page) =>
-              fetchActivity(page, activityData?.per_page || 5)
-            }
+            onPageChange={(page) => fetchActivity(page, activityData?.per_page || 5)}
             onPerPageChange={(perPage) => fetchActivity(1, perPage)}
             t={t}
             isLoading={loadingActivity}

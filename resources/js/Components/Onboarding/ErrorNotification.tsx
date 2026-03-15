@@ -40,13 +40,13 @@ export function ErrorNotification() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 max-w-md animate-slide-up">
-      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg shadow-lg p-4">
+    <div className="animate-slide-up fixed bottom-4 right-4 z-50 max-w-md">
+      <div className="rounded-lg border border-red-200 bg-red-50 p-4 shadow-lg dark:border-red-800 dark:bg-red-900/20">
         <div className="flex items-start gap-3">
           {/* Error Icon */}
           <div className="flex-shrink-0">
             <svg
-              className="w-5 h-5 text-red-600 dark:text-red-400"
+              className="h-5 w-5 text-red-600 dark:text-red-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -61,26 +61,24 @@ export function ErrorNotification() {
           </div>
 
           {/* Error Message */}
-          <div className="flex-1 min-w-0">
-            <h4 className="text-sm font-semibold text-red-900 dark:text-red-100 mb-1">
+          <div className="min-w-0 flex-1">
+            <h4 className="mb-1 text-sm font-semibold text-red-900 dark:text-red-100">
               Something went wrong
             </h4>
-            <p className="text-sm text-red-700 dark:text-red-300">
-              {state.error}
-            </p>
+            <p className="text-sm text-red-700 dark:text-red-300">{state.error}</p>
 
             {/* Action Buttons */}
-            <div className="flex items-center gap-2 mt-3">
+            <div className="mt-3 flex items-center gap-2">
               <button
                 onClick={handleRetry}
-                className="text-xs font-medium text-red-700 dark:text-red-300 hover:text-red-900 dark:hover:text-red-100 underline"
+                className="text-xs font-medium text-red-700 underline hover:text-red-900 dark:text-red-300 dark:hover:text-red-100"
               >
                 Try Again
               </button>
               <span className="text-red-300 dark:text-red-700">•</span>
               <button
                 onClick={handleDismiss}
-                className="text-xs font-medium text-red-700 dark:text-red-300 hover:text-red-900 dark:hover:text-red-100 underline"
+                className="text-xs font-medium text-red-700 underline hover:text-red-900 dark:text-red-300 dark:hover:text-red-100"
               >
                 Dismiss
               </button>
@@ -92,12 +90,7 @@ export function ErrorNotification() {
             onClick={handleDismiss}
             className="flex-shrink-0 text-red-400 hover:text-red-600 dark:text-red-500 dark:hover:text-red-300"
           >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"

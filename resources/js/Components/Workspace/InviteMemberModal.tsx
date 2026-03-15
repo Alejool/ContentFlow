@@ -67,7 +67,7 @@ export default function InviteMemberModal({
     .map((role) => ({
       value: role.id,
       label: role.name,
-      icon: <Shield className="w-4 h-4" />,
+      icon: <Shield className="h-4 w-4" />,
     }));
 
   const onSubmit = async (data: InviteFormData) => {
@@ -77,13 +77,8 @@ export default function InviteMemberModal({
     }
     setIsSubmitting(true);
     try {
-      const response = await axios.post(
-        route("api.v1.workspaces.invite", workspace.id),
-        data,
-      );
-      toast.success(
-        response.data.message || t("workspace.invite_modal.messages.success"),
-      );
+      const response = await axios.post(route("api.v1.workspaces.invite", workspace.id), data);
+      toast.success(response.data.message || t("workspace.invite_modal.messages.success"));
       reset();
       onSuccess();
       onClose();
@@ -94,9 +89,7 @@ export default function InviteMemberModal({
         const errorMessage = error.response.data.errors[firstErrorField][0];
         toast.error(errorMessage);
       } else {
-        const message =
-          error.response?.data?.message ||
-          t("workspace.invite_modal.messages.error");
+        const message = error.response?.data?.message || t("workspace.invite_modal.messages.error");
         toast.error(message);
       }
     } finally {
@@ -106,16 +99,16 @@ export default function InviteMemberModal({
 
   return (
     <Modal show={isOpen} onClose={onClose} maxWidth="md">
-      <div className="p-4 md:p-6 overflow-x-hidden">
-        <div className="flex flex-col md:flex-row md:items-center gap-3 mb-6">
-          <div className="bg-primary-100 dark:bg-primary-900/30 p-2 rounded-lg w-fit shrink-0">
-            <UserPlus className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+      <div className="overflow-x-hidden p-4 md:p-6">
+        <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center">
+          <div className="w-fit shrink-0 rounded-lg bg-primary-100 p-2 dark:bg-primary-900/30">
+            <UserPlus className="h-6 w-6 text-primary-600 dark:text-primary-400" />
           </div>
           <div className="min-w-0">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white truncate">
+            <h2 className="truncate text-xl font-bold text-gray-900 dark:text-white">
               {t("workspace.invite_modal.title")}
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+            <p className="truncate text-sm text-gray-500 dark:text-gray-400">
               {t("workspace.invite_modal.subtitle", { name: workspace?.name })}
             </p>
           </div>
@@ -133,7 +126,7 @@ export default function InviteMemberModal({
             required
           />
 
-          <div className="space-y-1 relative">
+          <div className="relative space-y-1">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               {t("workspace.invite_modal.role_label")}
             </label>
@@ -141,26 +134,22 @@ export default function InviteMemberModal({
               id="role_id"
               options={roleOptions}
               value={watch("role_id")}
-              onChange={(val) =>
-                setValue("role_id", Number(val), { shouldValidate: true })
-              }
+              onChange={(val) => setValue("role_id", Number(val), { shouldValidate: true })}
               placeholder={t("workspace.invite_modal.role_placeholder")}
             />
             {errors.role_id && (
-              <p className="text-xs text-red-500 mt-1">
-                {errors.role_id.message}
-              </p>
+              <p className="mt-1 text-xs text-red-500">{errors.role_id.message}</p>
             )}
           </div>
 
-          <div className="flex flex-col md:flex-row justify-end gap-3 pt-4">
+          <div className="flex flex-col justify-end gap-3 pt-4 md:flex-row">
             <Button
               variant="ghost"
               buttonStyle="outline"
               onClick={onClose}
               type="button"
               disabled={isSubmitting}
-              className="w-full md:w-auto order-2 md:order-1"
+              className="order-2 w-full md:order-1 md:w-auto"
             >
               {t("workspace.invite_modal.cancel")}
             </Button>
@@ -168,7 +157,7 @@ export default function InviteMemberModal({
               type="submit"
               loading={isSubmitting}
               icon={UserPlus}
-              className="w-full md:w-auto order-1 md:order-2"
+              className="order-1 w-full md:order-2 md:w-auto"
             >
               {t("workspace.invite_modal.submit")}
             </Button>

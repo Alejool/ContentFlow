@@ -52,9 +52,7 @@ export default function RoleManagement({
 }: RoleManagementProps) {
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
-  const [expandedPermissions, setExpandedPermissions] = useState<number | null>(
-    null,
-  );
+  const [expandedPermissions, setExpandedPermissions] = useState<number | null>(null);
   const [editingRole, setEditingRole] = useState<Role | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedPermissions, setSelectedPermissions] = useState<number[]>([]);
@@ -67,19 +65,15 @@ export default function RoleManagement({
 
     try {
       setIsLoading(true);
-      await axios.post(
-        route("api.v1.workspaces.roles.assign", { idOrSlug: workspace.id }),
-        {
-          user_id: userId,
-          role_id: roleId,
-        },
-      );
+      await axios.post(route("api.v1.workspaces.roles.assign", { idOrSlug: workspace.id }), {
+        user_id: userId,
+        role_id: roleId,
+      });
 
       toast.success(t("roles.success.assigned"));
       router.reload({ only: ["users"] });
     } catch (error: any) {
-      const message =
-        error.response?.data?.message || t("roles.errors.assignment_failed");
+      const message = error.response?.data?.message || t("roles.errors.assignment_failed");
       toast.error(message);
     } finally {
       setIsLoading(false);
@@ -111,8 +105,7 @@ export default function RoleManagement({
       setEditingRole(null);
       setSelectedPermissions([]);
     } catch (error: any) {
-      const message =
-        error.response?.data?.message || t("roles.errors.update_failed");
+      const message = error.response?.data?.message || t("roles.errors.update_failed");
       toast.error(message);
     } finally {
       setIsLoading(false);
@@ -125,13 +118,10 @@ export default function RoleManagement({
 
   const getRoleBadgeColor = (roleName: string) => {
     const colors: Record<string, string> = {
-      owner:
-        "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
+      owner: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
       admin: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-      editor:
-        "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-      viewer:
-        "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400",
+      editor: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+      viewer: "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400",
     };
     return colors[roleName.toLowerCase()] || colors.viewer;
   };
@@ -139,10 +129,10 @@ export default function RoleManagement({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-xl p-6">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="p-2 bg-primary-100 dark:bg-primary-900/20 rounded-lg">
-            <Shield className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+      <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="mb-2 flex items-center gap-3">
+          <div className="rounded-lg bg-primary-100 p-2 dark:bg-primary-900/20">
+            <Shield className="h-6 w-6 text-primary-600 dark:text-primary-400" />
           </div>
           <div>
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">
@@ -156,67 +146,60 @@ export default function RoleManagement({
       </div>
 
       {/* Roles Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         {roles.map((role) => (
           <div
             key={role.id}
-            className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-xl p-5 hover:border-primary-300 dark:hover:border-primary-700 transition-all"
+            className="rounded-xl border border-gray-200 bg-white p-5 transition-all hover:border-primary-300 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-primary-700"
           >
-            <div className="flex items-center justify-between mb-3">
-              <h4 className="font-bold text-gray-900 dark:text-white">
-                {role.display_name}
-              </h4>
+            <div className="mb-3 flex items-center justify-between">
+              <h4 className="font-bold text-gray-900 dark:text-white">{role.display_name}</h4>
               <div className="flex items-center gap-2">
                 <span
-                  className={`px-2 py-1 rounded-full text-xs font-bold ${getRoleBadgeColor(role.name)}`}
+                  className={`rounded-full px-2 py-1 text-xs font-bold ${getRoleBadgeColor(role.name)}`}
                 >
                   {users.filter((u) => u.pivot?.role_id === role.id).length}
                 </span>
-                {canManageRoles &&
-                  !role.name.toLowerCase().includes("owner") && (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      buttonStyle="icon"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEditRole(role);
-                      }}
-                      icon={Edit2}
-                      title={t("common.edit")}
-                    >
-                      {""}
-                    </Button>
-                  )}
+                {canManageRoles && !role.name.toLowerCase().includes("owner") && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    buttonStyle="icon"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEditRole(role);
+                    }}
+                    icon={Edit2}
+                    title={t("common.edit")}
+                  >
+                    {""}
+                  </Button>
+                )}
               </div>
             </div>
 
             {role.description && (
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
-                {role.description}
-              </p>
+              <p className="mb-3 text-sm text-gray-500 dark:text-gray-400">{role.description}</p>
             )}
 
             <div
               onClick={() =>
-                setExpandedPermissions(
-                  expandedPermissions === role.id ? null : role.id,
-                )
+                setExpandedPermissions(expandedPermissions === role.id ? null : role.id)
               }
-              className="w-full text-left cursor-pointer"
+              className="w-full cursor-pointer text-left"
             >
               {expandedPermissions === role.id && (
-                <div className="mt-3 pt-3 border-t border-gray-200 dark:border-neutral-700">
-                  <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                <div className="mt-3 border-t border-gray-200 pt-3 dark:border-neutral-700">
+                  <p className="mb-2 text-xs font-semibold text-gray-700 dark:text-gray-300">
                     {t("roles.permissions")}:
                   </p>
                   <div className="space-y-1">
                     {role.permissions.map((permission) => (
                       <div
                         key={permission.id}
-                        className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1"
+                        className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400"
                       >
-                        <UserCheck className="w-3 h-3" />
+                        <UserCheck className="h-3 w-3" />
                         {permission.display_name}
                       </div>
                     ))}
@@ -229,11 +212,9 @@ export default function RoleManagement({
       </div>
 
       {/* Users List */}
-      <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-xl overflow-hidden">
-        <div className="p-6 border-b border-gray-200 dark:border-neutral-800">
-          <h4 className="font-bold text-gray-900 dark:text-white">
-            {t("roles.users_list")}
-          </h4>
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="border-b border-gray-200 p-6 dark:border-neutral-800">
+          <h4 className="font-bold text-gray-900 dark:text-white">{t("roles.users_list")}</h4>
           <p className="text-sm text-gray-500 dark:text-gray-400">
             {t("roles.users_list_subtitle")}
           </p>
@@ -241,19 +222,19 @@ export default function RoleManagement({
 
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50 dark:bg-neutral-800/50 border-b border-gray-200 dark:border-neutral-700">
+            <thead className="border-b border-gray-200 bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800/50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                   {t("roles.table.user")}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                   {t("roles.table.current_role")}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                   {t("roles.table.permissions")}
                 </th>
                 {canManageRoles && (
-                  <th className="px-6 py-3 text-right text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                     {t("roles.table.actions")}
                   </th>
                 )}
@@ -265,7 +246,7 @@ export default function RoleManagement({
                 return (
                   <tr
                     key={user.id}
-                    className="hover:bg-gray-50 dark:hover:bg-neutral-800/30 transition-colors"
+                    className="transition-colors hover:bg-gray-50 dark:hover:bg-neutral-800/30"
                   >
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
@@ -273,27 +254,23 @@ export default function RoleManagement({
                           <img
                             src={user.photo_url}
                             alt={user.name}
-                            className="w-10 h-10 rounded-full object-cover"
+                            className="h-10 w-10 rounded-full object-cover"
                           />
                         ) : (
-                          <div className="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
-                            <User className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900/30">
+                            <User className="h-5 w-5 text-primary-600 dark:text-primary-400" />
                           </div>
                         )}
                         <div>
-                          <p className="font-medium text-gray-900 dark:text-white">
-                            {user.name}
-                          </p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            {user.email}
-                          </p>
+                          <p className="font-medium text-gray-900 dark:text-white">{user.name}</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">{user.email}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       {userRole && (
                         <span
-                          className={`px-3 py-1 rounded-full text-xs font-bold ${getRoleBadgeColor(userRole.name)}`}
+                          className={`rounded-full px-3 py-1 text-xs font-bold ${getRoleBadgeColor(userRole.name)}`}
                         >
                           {userRole.display_name}
                         </span>
@@ -304,14 +281,14 @@ export default function RoleManagement({
                         {userRole?.permissions.slice(0, 3).map((permission) => (
                           <span
                             key={permission.id}
-                            className="px-2 py-0.5 bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-400 text-xs rounded"
+                            className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-neutral-800 dark:text-gray-400"
                             title={permission.description}
                           >
                             {permission.display_name}
                           </span>
                         ))}
                         {userRole && userRole.permissions.length > 3 && (
-                          <span className="px-2 py-0.5 bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-400 text-xs rounded">
+                          <span className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-neutral-800 dark:text-gray-400">
                             +{userRole.permissions.length - 3}
                           </span>
                         )}
@@ -326,9 +303,7 @@ export default function RoleManagement({
                             label: r.display_name,
                           }))}
                           value={user.pivot?.role_id?.toString() || ""}
-                          onChange={(value) =>
-                            handleRoleAssignment(user.id, parseInt(value))
-                          }
+                          onChange={(value) => handleRoleAssignment(user.id, parseInt(value))}
                           size="sm"
                           containerClassName="inline-block w-40"
                           disabled={isLoading}
@@ -344,14 +319,14 @@ export default function RoleManagement({
       </div>
 
       {!canManageRoles && (
-        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-4">
+        <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
           <div className="flex items-start gap-3">
-            <UserX className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5" />
+            <UserX className="mt-0.5 h-5 w-5 text-yellow-600 dark:text-yellow-400" />
             <div>
               <p className="text-sm font-medium text-yellow-800 dark:text-yellow-400">
                 {t("roles.insufficient_permissions_title")}
               </p>
-              <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
+              <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
                 {t("roles.insufficient_permissions_message")}
               </p>
             </div>
@@ -367,11 +342,7 @@ export default function RoleManagement({
           setEditingRole(null);
           setSelectedPermissions([]);
         }}
-        title={
-          editingRole
-            ? `${t("roles.edit_role")} - ${editingRole.display_name}`
-            : ""
-        }
+        title={editingRole ? `${t("roles.edit_role")} - ${editingRole.display_name}` : ""}
         size="2xl"
       >
         <div className="space-y-6">
@@ -383,26 +354,21 @@ export default function RoleManagement({
             {t("roles.select_permissions")}
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[50vh] overflow-y-auto">
+          <div className="grid max-h-[50vh] grid-cols-1 gap-3 overflow-y-auto md:grid-cols-2">
             {permissions.map((permission) => (
               <label
                 key={permission.id}
-                className="flex items-start gap-3 p-3 border border-gray-200 dark:border-neutral-700 rounded-lg hover:bg-gray-50 dark:hover:bg-neutral-800/50 cursor-pointer transition-colors"
+                className="flex cursor-pointer items-start gap-3 rounded-lg border border-gray-200 p-3 transition-colors hover:bg-gray-50 dark:border-neutral-700 dark:hover:bg-neutral-800/50"
               >
                 <input
                   type="checkbox"
                   checked={selectedPermissions.includes(permission.id)}
                   onChange={(e) => {
                     if (e.target.checked) {
-                      setSelectedPermissions([
-                        ...selectedPermissions,
-                        permission.id,
-                      ]);
+                      setSelectedPermissions([...selectedPermissions, permission.id]);
                     } else {
                       setSelectedPermissions(
-                        selectedPermissions.filter(
-                          (id) => id !== permission.id,
-                        ),
+                        selectedPermissions.filter((id) => id !== permission.id),
                       );
                     }
                   }}
@@ -413,7 +379,7 @@ export default function RoleManagement({
                     {permission.display_name}
                   </p>
                   {permission.description && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
                       {permission.description}
                     </p>
                   )}
@@ -422,7 +388,7 @@ export default function RoleManagement({
             ))}
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-neutral-800">
+          <div className="flex justify-end gap-3 border-t border-gray-200 pt-4 dark:border-neutral-800">
             <Button
               variant="ghost"
               buttonStyle="outline"
@@ -440,10 +406,7 @@ export default function RoleManagement({
               variant="primary"
               buttonStyle="solid"
               size="md"
-              onClick={() =>
-                editingRole &&
-                handleSaveRole(editingRole.id, selectedPermissions)
-              }
+              onClick={() => editingRole && handleSaveRole(editingRole.id, selectedPermissions)}
               disabled={isLoading || selectedPermissions.length === 0}
               icon={Shield}
             >

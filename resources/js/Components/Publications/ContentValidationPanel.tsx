@@ -37,9 +37,7 @@ export default function ContentValidationPanel({
 
   const platformResults = validationResult.platform_results || {};
 
-  const compatiblePlatforms = Object.entries(platformResults).filter(
-    ([_, r]) => r.is_compatible,
-  );
+  const compatiblePlatforms = Object.entries(platformResults).filter(([_, r]) => r.is_compatible);
 
   const incompatiblePlatforms = Object.entries(platformResults).filter(
     ([_, r]) => !r.is_compatible,
@@ -53,8 +51,7 @@ export default function ContentValidationPanel({
   const hasIncompatiblePlatforms = incompatiblePlatforms.length > 0;
   const hasWarnings = platformsWithWarnings.length > 0;
   const hasRecommendations =
-    validationResult.recommendations &&
-    validationResult.recommendations.length > 0;
+    validationResult.recommendations && validationResult.recommendations.length > 0;
 
   const formatPlatform = (platform: string): string => {
     const names: Record<string, string> = {
@@ -77,8 +74,7 @@ export default function ContentValidationPanel({
   const formatFileSize = (bytes: number): string => {
     if (bytes < 1024) return bytes + " B";
     if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + " KB";
-    if (bytes < 1024 * 1024 * 1024)
-      return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+    if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(2) + " MB";
     return (bytes / (1024 * 1024 * 1024)).toFixed(2) + " GB";
   };
 
@@ -87,18 +83,14 @@ export default function ContentValidationPanel({
     if (platforms.length === 0) return "";
     if (platforms.length === 1) return platforms[0];
     if (platforms.length === 2) return platforms.join(" y ");
-    return (
-      platforms.slice(0, -1).join(", ") +
-      " y " +
-      platforms[platforms.length - 1]
-    );
+    return platforms.slice(0, -1).join(", ") + " y " + platforms[platforms.length - 1];
   };
 
   return (
-    <div className="flex flex-col gap-3 p-4 bg-gray-50 dark:bg-neutral-800 rounded-lg">
+    <div className="flex flex-col gap-3 rounded-lg bg-gray-50 p-4 dark:bg-neutral-800">
       {/* Resumen General */}
       {hasCompatiblePlatforms && (
-        <div className="flex items-center gap-3 p-3 rounded-md bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+        <div className="flex items-center gap-3 rounded-md border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-900/20">
           <div className="text-xl text-green-600 dark:text-green-400">✓</div>
           <div className="flex flex-col gap-0.5">
             <span className="font-semibold text-green-800 dark:text-green-300">
@@ -117,22 +109,17 @@ export default function ContentValidationPanel({
           {incompatiblePlatforms.map(([platform, result]) => (
             <div
               key={platform}
-              className="p-3 rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800"
+              className="rounded-md border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-900/20"
             >
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-base text-red-600 dark:text-red-400">
-                  ✗
-                </span>
-                <span className="font-semibold text-sm text-red-900 dark:text-red-300">
+              <div className="mb-2 flex items-center gap-2">
+                <span className="text-base text-red-600 dark:text-red-400">✗</span>
+                <span className="text-sm font-semibold text-red-900 dark:text-red-300">
                   {formatPlatform(platform)}
                 </span>
               </div>
-              <ul className="list-disc pl-6 space-y-1">
+              <ul className="list-disc space-y-1 pl-6">
                 {result.errors?.map((error, index) => (
-                  <li
-                    key={index}
-                    className="text-sm text-gray-700 dark:text-gray-300"
-                  >
+                  <li key={index} className="text-sm text-gray-700 dark:text-gray-300">
                     {error}
                   </li>
                 ))}
@@ -148,22 +135,17 @@ export default function ContentValidationPanel({
           {platformsWithWarnings.map(([platform, result]) => (
             <div
               key={platform}
-              className="p-3 rounded-md bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800"
+              className="rounded-md border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-800 dark:bg-yellow-900/20"
             >
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-base text-yellow-600 dark:text-yellow-400">
-                  ⚠
-                </span>
-                <span className="font-semibold text-sm text-yellow-900 dark:text-yellow-300">
+              <div className="mb-2 flex items-center gap-2">
+                <span className="text-base text-yellow-600 dark:text-yellow-400">⚠</span>
+                <span className="text-sm font-semibold text-yellow-900 dark:text-yellow-300">
                   {formatPlatform(platform)}
                 </span>
               </div>
-              <ul className="list-disc pl-6 space-y-1">
+              <ul className="list-disc space-y-1 pl-6">
                 {result.warnings?.map((warning, index) => (
-                  <li
-                    key={index}
-                    className="text-sm text-gray-700 dark:text-gray-300"
-                  >
+                  <li key={index} className="text-sm text-gray-700 dark:text-gray-300">
                     {warning}
                   </li>
                 ))}
@@ -175,19 +157,16 @@ export default function ContentValidationPanel({
 
       {/* Recomendaciones */}
       {hasRecommendations && (
-        <div className="p-3 rounded-md bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-          <div className="flex items-center gap-2 mb-2">
+        <div className="rounded-md border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-900/20">
+          <div className="mb-2 flex items-center gap-2">
             <span className="text-base">💡</span>
-            <span className="font-semibold text-sm text-blue-900 dark:text-blue-300">
+            <span className="text-sm font-semibold text-blue-900 dark:text-blue-300">
               Recomendaciones
             </span>
           </div>
-          <ul className="list-disc pl-6 space-y-1">
+          <ul className="list-disc space-y-1 pl-6">
             {validationResult.recommendations?.map((recommendation, index) => (
-              <li
-                key={index}
-                className="text-sm text-blue-900 dark:text-blue-200"
-              >
+              <li key={index} className="text-sm text-blue-900 dark:text-blue-200">
                 {recommendation}
               </li>
             ))}
@@ -197,17 +176,17 @@ export default function ContentValidationPanel({
 
       {/* Información de Media */}
       {showMediaInfo && validationResult.media_info && (
-        <div className="border-t border-gray-200 dark:border-neutral-700 pt-3">
+        <div className="border-t border-gray-200 pt-3 dark:border-neutral-700">
           <button
             onClick={() => setMediaInfoExpanded(!mediaInfoExpanded)}
-            className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+            className="flex items-center gap-1.5 text-xs text-gray-600 transition-colors hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
           >
             <span>{mediaInfoExpanded ? "▼" : "▶"}</span>
             <span>Detalles técnicos</span>
           </button>
           {mediaInfoExpanded && (
-            <div className="mt-3 p-3 bg-white dark:bg-neutral-900 rounded-md border border-gray-200 dark:border-neutral-700">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <div className="mt-3 rounded-md border border-gray-200 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900">
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
                 {validationResult.media_info.extension && (
                   <div className="flex flex-col gap-1">
                     <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
@@ -234,8 +213,7 @@ export default function ContentValidationPanel({
                       Resolución:
                     </span>
                     <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                      {validationResult.media_info.width}x
-                      {validationResult.media_info.height}
+                      {validationResult.media_info.width}x{validationResult.media_info.height}
                     </span>
                   </div>
                 )}

@@ -2,15 +2,9 @@ import { Link } from "@inertiajs/react";
 import { ChevronRight } from "lucide-react";
 import { ReactNode } from "react";
 
-const CustomIcon = ({
-  children,
-  className = "",
-}: {
-  children: ReactNode;
-  className?: string;
-}) => (
+const CustomIcon = ({ children, className = "" }: { children: ReactNode; className?: string }) => (
   <div
-    className={`flex items-center justify-center rounded-full bg-gradient-to-br from-primary-50 to-primary-50 dark:from-primary-900/20 dark:to-primary-900/20 p-3 ${className}`}
+    className={`flex items-center justify-center rounded-full bg-gradient-to-br from-primary-50 to-primary-50 p-3 dark:from-primary-900/20 dark:to-primary-900/20 ${className}`}
   >
     {children}
   </div>
@@ -36,18 +30,18 @@ export default function FeatureCard({
   return (
     <Link
       href={href}
-      className={`group relative overflow-hidden rounded-lg backdrop-blur-sm p-5 shadow-lg ring-1 ring-gray-200/50 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:ring-primary-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:bg-gray-900/80 dark:ring-gray-700/50 dark:hover:ring-primary-700 ${className}`}
+      className={`group relative overflow-hidden rounded-lg p-5 shadow-lg ring-1 ring-gray-200/50 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:ring-primary-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:bg-gray-900/80 dark:ring-gray-700/50 dark:hover:ring-primary-700 ${className}`}
     >
       <div className="flex items-start gap-3">
-        <CustomIcon className="w-11 h-11 shrink-0 group-hover:scale-110 transition-transform duration-300">
+        <CustomIcon className="h-11 w-11 shrink-0 transition-transform duration-300 group-hover:scale-110">
           {icon}
         </CustomIcon>
 
-        <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+        <div className="min-w-0 flex-1">
+          <h3 className="text-lg font-semibold text-gray-900 transition-colors group-hover:text-primary-600 dark:text-white dark:group-hover:text-primary-400">
             {title}
           </h3>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+          <p className="mt-2 text-sm leading-relaxed text-gray-600 dark:text-gray-300">
             {description}
           </p>
 
@@ -56,7 +50,7 @@ export default function FeatureCard({
               {tags.map((tag, index) => (
                 <span
                   key={index}
-                  className="inline-flex items-center rounded-full bg-primary-50 px-2.5 py-1 text-xs font-medium text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 border border-primary-100 dark:border-primary-800/30"
+                  className="inline-flex items-center rounded-full border border-primary-100 bg-primary-50 px-2.5 py-1 text-xs font-medium text-primary-700 dark:border-primary-800/30 dark:bg-primary-900/30 dark:text-primary-300"
                 >
                   {tag}
                 </span>
@@ -65,7 +59,7 @@ export default function FeatureCard({
           )}
         </div>
 
-        <ChevronRight className="w-5 h-5 text-primary-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 shrink-0 mt-1" />
+        <ChevronRight className="mt-1 h-5 w-5 shrink-0 text-primary-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       </div>
     </Link>
   );

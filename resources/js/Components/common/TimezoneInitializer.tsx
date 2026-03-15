@@ -13,10 +13,7 @@ export const TimezoneInitializer: React.FC = () => {
   useEffect(() => {
     if (!isLoaded && auth?.current_workspace && auth?.user) {
       // Inicializar desde props de Inertia (más rápido que hacer requests)
-      initializeFromInertia(
-        auth.current_workspace?.timezone,
-        auth.user?.timezone,
-      );
+      initializeFromInertia(auth.current_workspace?.timezone, auth.user?.timezone);
     }
   }, [auth, isLoaded, initializeFromInertia]);
 

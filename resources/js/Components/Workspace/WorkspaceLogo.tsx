@@ -8,15 +8,8 @@ interface WorkspaceLogoProps {
   timeoutMs?: number;
 }
 
-export function WorkspaceLogo({
-  src,
-  alt,
-  fallback,
-  timeoutMs = 5000,
-}: WorkspaceLogoProps) {
-  const [status, setStatus] = useState<"loading" | "loaded" | "error">(
-    "loading",
-  );
+export function WorkspaceLogo({ src, alt, fallback, timeoutMs = 5000 }: WorkspaceLogoProps) {
+  const [status, setStatus] = useState<"loading" | "loaded" | "error">("loading");
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const initial = (fallback ?? alt).charAt(0).toUpperCase();
@@ -59,8 +52,8 @@ export function WorkspaceLogo({
   return (
     <>
       {status === "loading" && (
-        <div className="absolute inset-0 bg-gray-200 dark:bg-neutral-700 overflow-hidden">
-          <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/40 dark:via-white/10 to-transparent" />
+        <div className="absolute inset-0 overflow-hidden bg-gray-200 dark:bg-neutral-700">
+          <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/40 to-transparent dark:via-white/10" />
         </div>
       )}
       <img

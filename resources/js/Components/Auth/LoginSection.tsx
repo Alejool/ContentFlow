@@ -3,7 +3,7 @@ import PlatformFeatureTag from "@/Components/Auth/PlatformFeatureTag";
 
 export default function Loglogin() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+    <div className="grid grid-cols-1 gap-4 text-left md:grid-cols-2">
       <PlatformFeatureTag
         titleKey="auth.login.tags.secureAccess.title"
         subtitleKey="auth.login.tags.endToEndEncryption.subtitle"

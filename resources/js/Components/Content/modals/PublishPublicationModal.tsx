@@ -12,15 +12,7 @@ import { formatDateTime } from "@/Utils/formatDate";
 import { validateVideoDuration } from "@/Utils/validationUtils";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { usePage } from "@inertiajs/react";
-import {
-  AlertCircle,
-  CheckCircle,
-  Clock,
-  Loader2,
-  Share2,
-  X,
-  XCircle,
-} from "lucide-react";
+import { AlertCircle, CheckCircle, Clock, Loader2, Share2, X, XCircle } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -39,10 +31,7 @@ const RecurringPostsSection = ({
   t: any;
 }) => {
   const recurringScheduled = getRecurringPosts(publication.id, accountId);
-  const recurringPublished = getPublishedRecurringPosts(
-    publication.id,
-    accountId,
-  );
+  const recurringPublished = getPublishedRecurringPosts(publication.id, accountId);
 
   // Eliminar duplicados basados en el ID
   const uniqueScheduled = Array.from(
@@ -57,28 +46,27 @@ const RecurringPostsSection = ({
   if (!hasRecurring) return null;
 
   return (
-    <div className="mt-3 p-3 bg-gray-50 dark:bg-neutral-800/50 rounded-lg border border-gray-200 dark:border-neutral-700">
-      <div className="flex items-center gap-2 mb-2">
-        <Clock className="w-3.5 h-3.5 text-primary-600 dark:text-primary-400" />
+    <div className="mt-3 rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-neutral-800/50">
+      <div className="mb-2 flex items-center gap-2">
+        <Clock className="h-3.5 w-3.5 text-primary-600 dark:text-primary-400" />
         <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
-          {t("publications.modal.publish.recurringPosts") ||
-            "Publicaciones Recurrentes"}
+          {t("publications.modal.publish.recurringPosts") || "Publicaciones Recurrentes"}
         </span>
       </div>
 
-      <div className="space-y-1.5 max-h-[200px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-neutral-600 scrollbar-track-transparent">
+      <div className="scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-neutral-600 scrollbar-track-transparent max-h-[200px] space-y-1.5 overflow-y-auto pr-1">
         {uniqueScheduled.map((post: any) => (
           <div
             key={post.id}
-            className="flex items-center justify-between text-xs p-2 bg-white dark:bg-neutral-900 rounded border border-blue-200 dark:border-blue-800"
+            className="flex items-center justify-between rounded border border-blue-200 bg-white p-2 text-xs dark:border-blue-800 dark:bg-neutral-900"
           >
             <div className="flex items-center gap-2">
-              <Clock className="w-3 h-3 text-blue-600 dark:text-blue-400" />
+              <Clock className="h-3 w-3 text-blue-600 dark:text-blue-400" />
               <span className="text-gray-700 dark:text-gray-300">
                 {formatDateTimeStyled(post.scheduled_at, "short", "short")}
               </span>
             </div>
-            <span className="text-blue-600 dark:text-blue-400 font-medium">
+            <span className="font-medium text-blue-600 dark:text-blue-400">
               {t("publications.status.scheduled") || "Programado"}
             </span>
           </div>
@@ -87,10 +75,10 @@ const RecurringPostsSection = ({
         {uniquePublished.map((post: any) => (
           <div
             key={post.id}
-            className="flex items-center justify-between text-xs p-2 bg-white dark:bg-neutral-900 rounded border border-green-200 dark:border-green-800"
+            className="flex items-center justify-between rounded border border-green-200 bg-white p-2 text-xs dark:border-green-800 dark:bg-neutral-900"
           >
             <div className="flex items-center gap-2">
-              <CheckCircle className="w-3 h-3 text-green-600 dark:text-green-400" />
+              <CheckCircle className="h-3 w-3 text-green-600 dark:text-green-400" />
               <span className="text-gray-700 dark:text-gray-300">
                 {formatDateTimeStyled(post.published_at, "short", "short")}
               </span>
@@ -100,13 +88,13 @@ const RecurringPostsSection = ({
                 href={post.post_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-green-600 dark:text-green-400 hover:underline font-medium flex items-center gap-1"
+                className="flex items-center gap-1 font-medium text-green-600 hover:underline dark:text-green-400"
               >
                 {t("publications.modal.publish.viewPost") || "Ver"}
-                <Share2 className="w-3 h-3" />
+                <Share2 className="h-3 w-3" />
               </a>
             ) : (
-              <span className="text-green-600 dark:text-green-400 font-medium">
+              <span className="font-medium text-green-600 dark:text-green-400">
                 {t("publications.status.published") || "Publicado"}
               </span>
             )}
@@ -133,12 +121,8 @@ export default function PublishPublicationModal({
   const { confirm, ConfirmDialog } = useConfirm();
   const { t, i18n } = useTranslation();
 
-  const [activePlatformSettings, setActivePlatformSettings] = useState<
-    string | null
-  >(null);
-  const [platformSettings, setPlatformSettings] = useState<Record<string, any>>(
-    {},
-  );
+  const [activePlatformSettings, setActivePlatformSettings] = useState<string | null>(null);
+  const [platformSettings, setPlatformSettings] = useState<Record<string, any>>({});
   const [rejectionModalOpen, setRejectionModalOpen] = useState(false);
 
   const {
@@ -186,9 +170,7 @@ export default function PublishPublicationModal({
   const currentUserId = auth.user?.id;
   const hasActiveApproval = publication?.approval_logs?.some(
     (log: any) =>
-      log.requested_by === currentUserId &&
-      log.action === "approved" &&
-      log.reviewed_at !== null,
+      log.requested_by === currentUserId && log.action === "approved" && log.reviewed_at !== null,
   );
 
   // Una publicación puede publicarse directamente si:
@@ -196,16 +178,11 @@ export default function PublishPublicationModal({
   // 2. El usuario actual tiene una aprobación activa en approval_logs, O
   // 3. El estado actual es "approved", "failed", "publishing", "published", "scheduled" Y tiene aprobación
   const wasEverApproved = !!publication?.approved_at;
-  const isInApprovedState = [
-    "approved",
-    "failed",
-    "publishing",
-    "published",
-    "scheduled",
-  ].includes(publication?.status || "");
+  const isInApprovedState = ["approved", "failed", "publishing", "published", "scheduled"].includes(
+    publication?.status || "",
+  );
   const canPublishDirectly =
-    hasPublishPermission ||
-    (hasActiveApproval && (wasEverApproved || isInApprovedState));
+    hasPublishPermission || (hasActiveApproval && (wasEverApproved || isInApprovedState));
   const isPendingReview = publication?.status === "pending_review";
 
   const handleRequestApproval = async () => {
@@ -312,9 +289,7 @@ export default function PublishPublicationModal({
 
     // Find which content types support this platform using shared config
     for (const [contentType, config] of Object.entries(CONTENT_TYPE_CONFIG)) {
-      if (
-        (config.platforms as readonly string[]).includes(platform.toLowerCase())
-      ) {
+      if ((config.platforms as readonly string[]).includes(platform.toLowerCase())) {
         supportedTypes.push(contentType);
       }
     }
@@ -337,10 +312,7 @@ export default function PublishPublicationModal({
     (account) => !compatibleAccounts.includes(account),
   );
 
-  const handleUnpublishWithConfirm = async (
-    accountId: number,
-    platform: string,
-  ) => {
+  const handleUnpublishWithConfirm = async (accountId: number, platform: string) => {
     if (!publication) return;
 
     // Siempre pedir confirmación al despublicar
@@ -353,10 +325,8 @@ export default function PublishPublicationModal({
         "¿Estás seguro de que deseas despublicar este contenido de " +
           platform +
           "? Esta acción no se puede deshacer.",
-      confirmText:
-        t("publications.modal.publish.unpublish.confirm") || "Sí, despublicar",
-      cancelText:
-        t("publications.modal.publish.unpublish.cancel") || "Cancelar",
+      confirmText: t("publications.modal.publish.unpublish.confirm") || "Sí, despublicar",
+      cancelText: t("publications.modal.publish.unpublish.cancel") || "Cancelar",
       type: "warning",
     });
 
@@ -364,11 +334,7 @@ export default function PublishPublicationModal({
 
     setUnpublishing(accountId);
     try {
-      const success = await handleUnpublish(
-        publication.id,
-        accountId,
-        platform,
-      );
+      const success = await handleUnpublish(publication.id, accountId, platform);
       if (success) {
         if (onSuccess) onSuccess();
       }
@@ -424,50 +390,40 @@ export default function PublishPublicationModal({
 
   return (
     <>
-      <Dialog
-        open={isOpen}
-        onClose={() => onClose(publication.id)}
-        className="relative z-50"
-      >
-        <div
-          className="fixed inset-0 bg-black/30 backdrop-blur-sm"
-          aria-hidden="true"
-        />
+      <Dialog open={isOpen} onClose={() => onClose(publication.id)} className="relative z-50">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" aria-hidden="true" />
 
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <DialogPanel className="w-full max-w-xl rounded-lg shadow-2xl flex flex-col max-h-[90vh] bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200/50 dark:border-neutral-800/50">
-            <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-200/50 dark:border-neutral-800/50 sticky top-0 z-20 bg-gradient-to-r from-gray-50 via-white to-gray-50/80 dark:from-neutral-900 dark:via-neutral-900/95 dark:to-neutral-800/90 backdrop-blur-md shadow-sm dark:shadow-neutral-950/20">
+          <DialogPanel className="flex max-h-[90vh] w-full max-w-xl flex-col rounded-lg border border-gray-200/50 bg-gradient-to-br from-white to-gray-50 shadow-2xl dark:border-neutral-800/50 dark:from-neutral-900 dark:to-neutral-950">
+            <div className="sticky top-0 z-20 flex items-center justify-between border-b border-gray-200/50 bg-gradient-to-r from-gray-50 via-white to-gray-50/80 p-6 pb-4 shadow-sm backdrop-blur-md dark:border-neutral-800/50 dark:from-neutral-900 dark:via-neutral-900/95 dark:to-neutral-800/90 dark:shadow-neutral-950/20">
               <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
                 <div className="flex items-center gap-2">
-                  <div className="p-1.5 rounded-lg">
-                    <Share2 className="w-5 h-5 text-primary-500" />
+                  <div className="rounded-lg p-1.5">
+                    <Share2 className="h-5 w-5 text-primary-500" />
                   </div>
                   {t("publications.modal.publish.title")}
                 </div>
               </DialogTitle>
               <button
                 onClick={() => onClose(publication.id)}
-                className="p-1.5 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-500 dark:text-gray-400"
+                className="rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-neutral-700"
               >
-                <X className="w-5 h-5" />
+                <X className="h-5 w-5" />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto custom-scrollbar p-6 pt-4">
+            <div className="custom-scrollbar flex-1 overflow-y-auto p-6 pt-4">
               {isPendingReview && (
-                <div className="mb-6 p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
-                  <div className="flex items-start gap-3 mb-4">
-                    <Clock className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
+                <div className="mb-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
+                  <div className="mb-4 flex items-start gap-3">
+                    <Clock className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-600 dark:text-yellow-400" />
                     <div className="flex-1">
                       <h4 className="text-sm font-bold text-yellow-800 dark:text-yellow-200">
-                        {t(
-                          "publications.modal.publish.pendingReviewBanner.title",
-                        ) || "Publicación en Revisión"}
+                        {t("publications.modal.publish.pendingReviewBanner.title") ||
+                          "Publicación en Revisión"}
                       </h4>
-                      <p className="text-xs text-yellow-700 dark:text-yellow-300 mt-1">
-                        {t(
-                          "publications.modal.publish.pendingReviewBanner.message",
-                        ) ||
+                      <p className="mt-1 text-xs text-yellow-700 dark:text-yellow-300">
+                        {t("publications.modal.publish.pendingReviewBanner.message") ||
                           "Esta publicación está esperando aprobación antes de poder ser publicada."}
                       </p>
 
@@ -483,12 +439,11 @@ export default function PublishPublicationModal({
                                   <img
                                     src={latestLog.requester.photo_url}
                                     alt={latestLog.requester.name}
-                                    className="w-5 h-5 rounded-full"
+                                    className="h-5 w-5 rounded-full"
                                   />
                                 ) : (
-                                  <div className="w-5 h-5 rounded-full bg-yellow-200 dark:bg-yellow-800 flex items-center justify-center text-[10px] font-bold">
-                                    {latestLog.requester?.name?.charAt(0) ||
-                                      "?"}
+                                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-yellow-200 text-[10px] font-bold dark:bg-yellow-800">
+                                    {latestLog.requester?.name?.charAt(0) || "?"}
                                   </div>
                                 )}
                                 <span className="font-medium">
@@ -507,7 +462,7 @@ export default function PublishPublicationModal({
 
                   {/* Botones de aprobar/rechazar (solo si tiene permisos) */}
                   {hasPublishPermission && (
-                    <div className="flex gap-2 mt-4 pt-4 border-t border-yellow-200 dark:border-yellow-800">
+                    <div className="mt-4 flex gap-2 border-t border-yellow-200 pt-4 dark:border-yellow-800">
                       <Button
                         onClick={handleApproveRequest}
                         variant="success"
@@ -534,36 +489,33 @@ export default function PublishPublicationModal({
               )}
 
               {publication.status === "rejected" && !hasPublishPermission && (
-                <div className="mb-6 p-4 rounded-lg bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 flex items-start gap-3">
-                  <XCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 mt-0.5" />
+                <div className="mb-6 flex items-start gap-3 rounded-lg border border-rose-200 bg-rose-50 p-4 dark:border-rose-800 dark:bg-rose-900/20">
+                  <XCircle className="mt-0.5 h-5 w-5 text-rose-600 dark:text-rose-400" />
                   <div className="flex-1">
                     <h4 className="text-sm font-bold text-rose-800 dark:text-rose-200">
                       {t("publications.modal.publish.rejectedBanner.title")}
                     </h4>
-                    <div className="mt-1 text-xs text-rose-700 dark:text-rose-300 space-y-2">
+                    <div className="mt-1 space-y-2 text-xs text-rose-700 dark:text-rose-300">
                       <p>
-                        {t(
-                          "publications.modal.publish.rejectedBanner.message",
-                          {
-                            name: publication.rejector?.name || "Admin",
-                          },
-                        )}
+                        {t("publications.modal.publish.rejectedBanner.message", {
+                          name: publication.rejector?.name || "Admin",
+                        })}
                       </p>
 
                       {publication.rejected_at && (
                         <div className="flex items-center gap-1.5 opacity-80">
-                          <Clock className="w-3.5 h-3.5" />
+                          <Clock className="h-3.5 w-3.5" />
                           <span>{formatDateTime(publication.rejected_at)}</span>
                         </div>
                       )}
 
                       {publication.rejection_reason && (
-                        <div className="p-3 bg-white/50 dark:bg-black/20 rounded border border-rose-200/50 dark:border-rose-900/30 italic">
+                        <div className="rounded border border-rose-200/50 bg-white/50 p-3 italic dark:border-rose-900/30 dark:bg-black/20">
                           "{publication.rejection_reason}"
                         </div>
                       )}
 
-                      <p className="font-medium pt-1">
+                      <p className="pt-1 font-medium">
                         {t("publications.modal.publish.rejectedBanner.footer")}
                       </p>
                     </div>
@@ -571,8 +523,8 @@ export default function PublishPublicationModal({
                 </div>
               )}
 
-              <div className="mb-6 p-4 rounded-lg bg-gray-50 dark:bg-neutral-900/50">
-                <h3 className="font-semibold mb-1 text-gray-900 dark:text-white">
+              <div className="mb-6 rounded-lg bg-gray-50 p-4 dark:bg-neutral-900/50">
+                <h3 className="mb-1 font-semibold text-gray-900 dark:text-white">
                   {publication.title}
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -588,9 +540,7 @@ export default function PublishPublicationModal({
                   // 'published' = publicada exitosamente
                   // 'success' = publicada exitosamente (legacy)
                   // 'orphaned' = publicada pero la cuenta fue desconectada
-                  const publishedAccounts = Object.entries(
-                    publication.platform_status_summary,
-                  )
+                  const publishedAccounts = Object.entries(publication.platform_status_summary)
                     .filter(
                       ([_, status]: [string, any]) =>
                         status.status === "published" ||
@@ -602,28 +552,22 @@ export default function PublishPublicationModal({
                   if (publishedAccounts.length === 0) return null;
 
                   return (
-                    <div className="mb-6 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+                    <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
                       <div className="flex items-start gap-3">
-                        <CheckCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                        <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
                         <div className="flex-1">
                           <h4 className="text-sm font-bold text-blue-800 dark:text-blue-200">
-                            {t(
-                              "publications.modal.publish.alreadyPublishedBanner.title",
-                            ) || "Publicación Activa"}
+                            {t("publications.modal.publish.alreadyPublishedBanner.title") ||
+                              "Publicación Activa"}
                           </h4>
-                          <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
-                            {t(
-                              "publications.modal.publish.alreadyPublishedBanner.message",
-                            ) ||
+                          <p className="mt-1 text-xs text-blue-700 dark:text-blue-300">
+                            {t("publications.modal.publish.alreadyPublishedBanner.message") ||
                               "Esta publicación ya está publicada en las siguientes cuentas:"}
                           </p>
 
                           <div className="mt-2 flex flex-wrap gap-2">
                             {publishedAccounts.map((accountId) => {
-                              const statusInfo =
-                                publication.platform_status_summary?.[
-                                  accountId
-                                ];
+                              const statusInfo = publication.platform_status_summary?.[accountId];
                               if (!statusInfo) return null;
 
                               // Verificar si la cuenta está conectada actualmente
@@ -639,21 +583,15 @@ export default function PublishPublicationModal({
                                 return (
                                   <span
                                     key={accountId}
-                                    className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-blue-100 dark:bg-blue-900/40 text-xs font-medium text-blue-800 dark:text-blue-300"
+                                    className="inline-flex items-center gap-1.5 rounded-md bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/40 dark:text-blue-300"
                                   >
                                     <img
-                                      src={getPlatformIcon(
-                                        connectedAcc.platform,
-                                      )}
+                                      src={getPlatformIcon(connectedAcc.platform)}
                                       alt={connectedAcc.platform}
-                                      className="w-3.5 h-3.5"
+                                      className="h-3.5 w-3.5"
                                     />
-                                    <span className="capitalize">
-                                      {connectedAcc.platform}
-                                    </span>
-                                    <span className="opacity-75">
-                                      @{connectedAcc.account_name}
-                                    </span>
+                                    <span className="capitalize">{connectedAcc.platform}</span>
+                                    <span className="opacity-75">@{connectedAcc.account_name}</span>
                                   </span>
                                 );
                               } else {
@@ -661,22 +599,17 @@ export default function PublishPublicationModal({
                                 return (
                                   <span
                                     key={accountId}
-                                    className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-amber-100 dark:bg-amber-900/40 text-xs font-medium text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-700"
+                                    className="inline-flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-100 px-2 py-1 text-xs font-medium text-amber-800 dark:border-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
                                   >
                                     <img
                                       src={getPlatformIcon(statusInfo.platform)}
                                       alt={statusInfo.platform}
-                                      className="w-3.5 h-3.5"
+                                      className="h-3.5 w-3.5"
                                     />
-                                    <span className="capitalize">
-                                      {statusInfo.platform}
-                                    </span>
-                                    <span className="opacity-75">
-                                      @{statusInfo.account_name}
-                                    </span>
-                                    <span className="ml-1 px-1 py-0.5 rounded bg-amber-200 dark:bg-amber-800 text-amber-900 dark:text-amber-100 text-[9px] font-bold">
-                                      {t("common.disconnected") ||
-                                        "Desconectada"}
+                                    <span className="capitalize">{statusInfo.platform}</span>
+                                    <span className="opacity-75">@{statusInfo.account_name}</span>
+                                    <span className="ml-1 rounded bg-amber-200 px-1 py-0.5 text-[9px] font-bold text-amber-900 dark:bg-amber-800 dark:text-amber-100">
+                                      {t("common.disconnected") || "Desconectada"}
                                     </span>
                                   </span>
                                 );
@@ -684,10 +617,8 @@ export default function PublishPublicationModal({
                             })}
                           </div>
 
-                          <p className="text-xs text-blue-600 dark:text-blue-400 mt-2 font-medium">
-                            {t(
-                              "publications.modal.publish.alreadyPublishedBanner.hint",
-                            ) ||
+                          <p className="mt-2 text-xs font-medium text-blue-600 dark:text-blue-400">
+                            {t("publications.modal.publish.alreadyPublishedBanner.hint") ||
                               "Puedes publicar en cuentas adicionales seleccionándolas a continuación."}
                           </p>
                         </div>
@@ -698,16 +629,15 @@ export default function PublishPublicationModal({
 
               {/* Banner de cuentas incompatibles */}
               {incompatibleAccounts.length > 0 && (
-                <div className="mb-6 p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20">
                   <div className="flex items-start gap-3">
-                    <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                    <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600 dark:text-amber-400" />
                     <div className="flex-1">
                       <h4 className="text-sm font-bold text-amber-800 dark:text-amber-200">
-                        {t(
-                          "publications.modal.publish.incompatibleAccountsBanner.title",
-                        ) || "Cuentas No Compatibles"}
+                        {t("publications.modal.publish.incompatibleAccountsBanner.title") ||
+                          "Cuentas No Compatibles"}
                       </h4>
-                      <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
+                      <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">
                         {`Las siguientes cuentas no son compatibles con el tipo de contenido "${getContentTypeLabel(publication.content_type || "post")}":`}
                       </p>
 
@@ -715,27 +645,21 @@ export default function PublishPublicationModal({
                         {incompatibleAccounts.map((account) => (
                           <span
                             key={account.id}
-                            className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-amber-100 dark:bg-amber-900/40 text-xs font-medium text-amber-800 dark:text-amber-300"
+                            className="inline-flex items-center gap-1.5 rounded-md bg-amber-100 px-2 py-1 text-xs font-medium text-amber-800 dark:bg-amber-900/40 dark:text-amber-300"
                           >
                             <img
                               src={getPlatformIcon(account.platform)}
                               alt={account.platform}
-                              className="w-3.5 h-3.5"
+                              className="h-3.5 w-3.5"
                             />
-                            <span className="capitalize">
-                              {account.platform}
-                            </span>
-                            <span className="opacity-75">
-                              @{account.account_name}
-                            </span>
+                            <span className="capitalize">{account.platform}</span>
+                            <span className="opacity-75">@{account.account_name}</span>
                           </span>
                         ))}
                       </div>
 
-                      <p className="text-xs text-amber-600 dark:text-amber-400 mt-2 font-medium">
-                        {t(
-                          "publications.modal.publish.incompatibleAccountsBanner.hint",
-                        ) ||
+                      <p className="mt-2 text-xs font-medium text-amber-600 dark:text-amber-400">
+                        {t("publications.modal.publish.incompatibleAccountsBanner.hint") ||
                           "Estas cuentas no aparecerán en las opciones de publicación."}
                       </p>
                     </div>
@@ -744,18 +668,18 @@ export default function PublishPublicationModal({
               )}
 
               <div className="mb-6">
-                <div className="flex items-center justify-between mb-4">
+                <div className="mb-4 flex items-center justify-between">
                   <div className="flex gap-2">
                     <button
                       onClick={selectAll}
-                      className="text-sm text-primary-500 hover:text-primary-600 font-medium"
+                      className="text-sm font-medium text-primary-500 hover:text-primary-600"
                     >
                       {t("publications.modal.publish.selectAll")}
                     </button>
                     <span className="text-gray-400 dark:text-gray-600">|</span>
                     <button
                       onClick={deselectAll}
-                      className="text-sm text-primary-500 hover:text-primary-600 font-medium"
+                      className="text-sm font-medium text-primary-500 hover:text-primary-600"
                     >
                       {t("publications.modal.publish.deselectAll")}
                     </button>
@@ -763,7 +687,7 @@ export default function PublishPublicationModal({
                 </div>
 
                 {compatibleAccounts.length === 0 ? (
-                  <div className="text-center py-8 rounded-lg bg-gray-50 dark:bg-neutral-900/50">
+                  <div className="rounded-lg bg-gray-50 py-8 text-center dark:bg-neutral-900/50">
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       {connectedAccounts.length === 0 ? (
                         <>
@@ -773,9 +697,7 @@ export default function PublishPublicationModal({
                         </>
                       ) : (
                         <>
-                          {t(
-                            "publications.modal.publish.noCompatibleAccounts",
-                          ) ||
+                          {t("publications.modal.publish.noCompatibleAccounts") ||
                             "No hay cuentas compatibles con este tipo de contenido"}
                           <br />
                           {t("publications.modal.publish.changeContentType") ||
@@ -785,40 +707,28 @@ export default function PublishPublicationModal({
                     </p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                     {compatibleAccounts.map((account) => {
                       const iconSrc = getPlatformIcon(account.platform);
                       const isSelected = selectedPlatforms.includes(account.id);
-                      const isPublished = publishedPlatforms.includes(
-                        account.id,
-                      );
+                      const isPublished = publishedPlatforms.includes(account.id);
                       const isFailed = failedPlatforms.includes(account.id);
-                      const isRemovedPlatform = removedPlatforms.includes(
-                        account.id,
-                      );
-                      const isDuplicate = duplicatePlatforms.includes(
-                        account.id,
-                      ); // Estado de duplicado
+                      const isRemovedPlatform = removedPlatforms.includes(account.id);
+                      const isDuplicate = duplicatePlatforms.includes(account.id); // Estado de duplicado
                       // Mostrar "publishing" si la publicación está en estado "publishing" o "retrying" Y está en la lista
                       const isPublishing =
                         publishingPlatforms.includes(account.id) &&
                         (publication?.status === "publishing" ||
                           publication?.status === "retrying");
-                      const isScheduled = scheduledPlatforms.includes(
-                        account.id,
-                      );
+                      const isScheduled = scheduledPlatforms.includes(account.id);
                       const isUnpublishing = unpublishing === account.id;
 
                       // Get retry information for this platform
                       const platformRetryInfo = retryInfo[account.id];
-                      const isRetrying =
-                        platformRetryInfo?.is_retrying || false;
-                      const retryStatus =
-                        platformRetryInfo?.retry_status || null;
-                      const isDuplicateAttempt =
-                        platformRetryInfo?.is_duplicate || false;
-                      const originalAttemptAt =
-                        platformRetryInfo?.original_attempt_at;
+                      const isRetrying = platformRetryInfo?.is_retrying || false;
+                      const retryStatus = platformRetryInfo?.retry_status || null;
+                      const isDuplicateAttempt = platformRetryInfo?.is_duplicate || false;
+                      const originalAttemptAt = platformRetryInfo?.original_attempt_at;
 
                       return (
                         <div key={account.id} className="relative w-full">
@@ -836,7 +746,7 @@ export default function PublishPublicationModal({
                                 togglePlatform(account.id);
                               }
                             }}
-                            className={`w-full h-[110px] flex flex-col gap-3 p-4 rounded-lg transition-all relative ${
+                            className={`relative flex h-[110px] w-full flex-col gap-3 rounded-lg p-4 transition-all ${
                               !isPublished &&
                               !isScheduled &&
                               !isPublishing &&
@@ -859,32 +769,29 @@ export default function PublishPublicationModal({
                                         : isRemovedPlatform
                                           ? "border border-gray-500 bg-gray-50 dark:bg-gray-900/20"
                                           : isSelected
-                                            ? "border border-primary-600 bg-primary-50 dark:bg-primary-900/30 ring-2 ring-primary-400/50 dark:ring-primary-500/50"
-                                            : "border bg-white dark:bg-neutral-900/30 border-gray-300 dark:border-neutral-700 hover:border-primary-400 dark:hover:border-primary-600 hover:shadow-md"
+                                            ? "border border-primary-600 bg-primary-50 ring-2 ring-primary-400/50 dark:bg-primary-900/30 dark:ring-primary-500/50"
+                                            : "border border-gray-300 bg-white hover:border-primary-400 hover:shadow-md dark:border-neutral-700 dark:bg-neutral-900/30 dark:hover:border-primary-600"
                             }`}
                           >
                             {/* Publishing Overlay */}
                             {(isPublishing || isRetrying) && !isFailed && (
-                              <div className="absolute inset-0 z-30 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-sm flex flex-col items-center justify-center rounded-lg animate-in fade-in duration-300">
+                              <div className="animate-in fade-in absolute inset-0 z-30 flex flex-col items-center justify-center rounded-lg bg-white/95 backdrop-blur-sm duration-300 dark:bg-neutral-900/95">
                                 <div className="flex flex-col items-center gap-2">
                                   <div className="relative flex-shrink-0">
-                                    <div className="w-10 h-10 border border-yellow-200 dark:border-yellow-900 rounded-full" />
-                                    <div className="absolute inset-0 w-10 h-10 border border-yellow-500 border-t-transparent rounded-full animate-spin" />
+                                    <div className="h-10 w-10 rounded-full border border-yellow-200 dark:border-yellow-900" />
+                                    <div className="absolute inset-0 h-10 w-10 animate-spin rounded-full border border-yellow-500 border-t-transparent" />
                                   </div>
 
                                   <div className="flex flex-col items-center gap-0.5">
-                                    <span className="text-sm font-bold text-yellow-800 dark:text-yellow-300  tracking-wide capitalize">
+                                    <span className="text-sm font-bold capitalize tracking-wide text-yellow-800 dark:text-yellow-300">
                                       {account.platform}
                                     </span>
                                     <span className="text-xs font-medium text-yellow-600 dark:text-yellow-400">
                                       {isRetrying && retryStatus
                                         ? `${t("publications.status.retrying") || "Reintentando"} ${retryStatus}`
                                         : publication?.status === "retrying"
-                                          ? t("publications.status.retrying") ||
-                                            "Reintentando"
-                                          : t(
-                                              "publications.modal.publish.publishing",
-                                            )}
+                                          ? t("publications.status.retrying") || "Reintentando"
+                                          : t("publications.modal.publish.publishing")}
                                     </span>
                                   </div>
                                 </div>
@@ -897,35 +804,27 @@ export default function PublishPublicationModal({
 
                                     const confirmed = await confirm({
                                       title:
-                                        t(
-                                          "publications.modal.cancel_platform.title",
-                                          { platform: account.platform },
-                                        ) || `¿Cancelar ${account.platform}?`,
+                                        t("publications.modal.cancel_platform.title", {
+                                          platform: account.platform,
+                                        }) || `¿Cancelar ${account.platform}?`,
                                       message:
-                                        t(
-                                          "publications.modal.cancel_platform.message",
-                                          { platform: account.platform },
-                                        ) ||
+                                        t("publications.modal.cancel_platform.message", {
+                                          platform: account.platform,
+                                        }) ||
                                         `¿Estás seguro de que deseas cancelar la publicación en ${account.platform}? Se detendrán todos los reintentos para esta plataforma.`,
                                       confirmText:
-                                        t(
-                                          "publications.modal.cancel_platform.confirm",
-                                        ) || "Sí, cancelar",
+                                        t("publications.modal.cancel_platform.confirm") ||
+                                        "Sí, cancelar",
                                       cancelText:
-                                        t(
-                                          "publications.modal.cancel_platform.cancel",
-                                        ) || "No",
+                                        t("publications.modal.cancel_platform.cancel") || "No",
                                       type: "warning",
                                     });
 
                                     if (confirmed) {
-                                      await handleCancelPlatform(
-                                        publication.id,
-                                        account.id,
-                                      );
+                                      await handleCancelPlatform(publication.id, account.id);
                                     }
                                   }}
-                                  className="mt-3 px-3 py-1.5 text-xs font-medium text-yellow-700 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-200 bg-white dark:bg-neutral-800 hover:bg-yellow-50 dark:hover:bg-neutral-700 border border-yellow-300 dark:border-yellow-700 rounded-md transition-colors"
+                                  className="mt-3 rounded-md border border-yellow-300 bg-white px-3 py-1.5 text-xs font-medium text-yellow-700 transition-colors hover:bg-yellow-50 hover:text-yellow-900 dark:border-yellow-700 dark:bg-neutral-800 dark:text-yellow-400 dark:hover:bg-neutral-700 dark:hover:text-yellow-200"
                                 >
                                   {t("common.cancel") || "Cancelar"}
                                 </button>
@@ -934,16 +833,15 @@ export default function PublishPublicationModal({
 
                             {/* Failed Overlay */}
                             {isFailed && !isPublished && !isScheduled && (
-                              <div className="absolute inset-0 z-30 bg-red-50/95 dark:bg-red-900/30 backdrop-blur-sm flex flex-col items-center justify-center rounded-lg animate-in fade-in duration-300">
+                              <div className="animate-in fade-in absolute inset-0 z-30 flex flex-col items-center justify-center rounded-lg bg-red-50/95 backdrop-blur-sm duration-300 dark:bg-red-900/30">
                                 <div className="flex flex-col items-center gap-2">
-                                  <XCircle className="w-10 h-10 text-red-600 dark:text-red-400" />
+                                  <XCircle className="h-10 w-10 text-red-600 dark:text-red-400" />
                                   <div className="flex flex-col items-center gap-0.5">
-                                    <span className="text-sm font-bold text-red-800 dark:text-red-300  tracking-wide capitalize">
+                                    <span className="text-sm font-bold capitalize tracking-wide text-red-800 dark:text-red-300">
                                       {account.platform}
                                     </span>
                                     <span className="text-xs font-medium text-red-600 dark:text-red-400">
-                                      {t("publications.modal.publish.failed") ||
-                                        "Falló"}
+                                      {t("publications.modal.publish.failed") || "Falló"}
                                     </span>
                                   </div>
                                 </div>
@@ -952,13 +850,12 @@ export default function PublishPublicationModal({
 
                             {/* Unpublishing Overlay */}
                             {isUnpublishing && (
-                              <div className="absolute inset-0 z-30 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-sm flex flex-col items-center justify-center rounded-lg animate-in fade-in duration-300">
+                              <div className="animate-in fade-in absolute inset-0 z-30 flex flex-col items-center justify-center rounded-lg bg-white/95 backdrop-blur-sm duration-300 dark:bg-neutral-900/95">
                                 <div className="flex flex-col items-center gap-2">
-                                  <Loader2 className="w-10 h-10 animate-spin text-amber-600 dark:text-amber-400" />
-                                  <span className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wide">
-                                    {t(
-                                      "publications.modal.publish.unpublishing",
-                                    ) || "Despublicando..."}
+                                  <Loader2 className="h-10 w-10 animate-spin text-amber-600 dark:text-amber-400" />
+                                  <span className="text-xs font-bold uppercase tracking-wide text-amber-600 dark:text-amber-400">
+                                    {t("publications.modal.publish.unpublishing") ||
+                                      "Despublicando..."}
                                   </span>
                                 </div>
                               </div>
@@ -968,12 +865,12 @@ export default function PublishPublicationModal({
                             {(isDuplicate || isDuplicateAttempt) &&
                               !isPublished &&
                               !isScheduled && (
-                                <div className="absolute inset-0 z-30 bg-orange-50/95 dark:bg-orange-900/30 backdrop-blur-sm flex flex-col items-center justify-center rounded-lg animate-in fade-in duration-300">
+                                <div className="animate-in fade-in absolute inset-0 z-30 flex flex-col items-center justify-center rounded-lg bg-orange-50/95 backdrop-blur-sm duration-300 dark:bg-orange-900/30">
                                   <div className="flex flex-col items-center gap-2">
                                     <div className="relative flex-shrink-0">
-                                      <div className="w-10 h-10 bg-orange-100 dark:bg-orange-900/50 rounded-full flex items-center justify-center">
+                                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/50">
                                         <svg
-                                          className="w-6 h-6 text-orange-600 dark:text-orange-400"
+                                          className="h-6 w-6 text-orange-600 dark:text-orange-400"
                                           fill="none"
                                           stroke="currentColor"
                                           viewBox="0 0 24 24"
@@ -988,22 +885,18 @@ export default function PublishPublicationModal({
                                       </div>
                                     </div>
                                     <div className="flex flex-col items-center gap-0.5">
-                                      <span className="text-sm font-bold text-orange-800 dark:text-orange-300 tracking-wide capitalize">
+                                      <span className="text-sm font-bold capitalize tracking-wide text-orange-800 dark:text-orange-300">
                                         {account.platform}
                                       </span>
-                                      <span className="text-xs font-medium text-orange-600 dark:text-orange-400 text-center">
-                                        {t(
-                                          "publications.modal.publish.duplicate",
-                                        ) || "Intento duplicado"}
+                                      <span className="text-center text-xs font-medium text-orange-600 dark:text-orange-400">
+                                        {t("publications.modal.publish.duplicate") ||
+                                          "Intento duplicado"}
                                       </span>
                                       {originalAttemptAt && (
-                                        <span className="text-xs text-orange-500 dark:text-orange-500 text-center mt-1">
-                                          {t(
-                                            "publications.modal.publish.original_attempt",
-                                          ) || "Intento original:"}{" "}
-                                          {new Date(
-                                            originalAttemptAt,
-                                          ).toLocaleString()}
+                                        <span className="mt-1 text-center text-xs text-orange-500 dark:text-orange-500">
+                                          {t("publications.modal.publish.original_attempt") ||
+                                            "Intento original:"}{" "}
+                                          {new Date(originalAttemptAt).toLocaleString()}
                                         </span>
                                       )}
                                     </div>
@@ -1016,26 +909,23 @@ export default function PublishPublicationModal({
                               !isUnpublishing &&
                               (() => {
                                 // Buscar el log de esta cuenta para obtener el post_url
-                                const postLog =
-                                  publication.social_post_logs?.find(
-                                    (log: any) =>
-                                      log.social_account_id === account.id &&
-                                      log.status === "published",
-                                  );
+                                const postLog = publication.social_post_logs?.find(
+                                  (log: any) =>
+                                    log.social_account_id === account.id &&
+                                    log.status === "published",
+                                );
                                 const postUrl = postLog?.post_url;
 
                                 return (
-                                  <div className="absolute inset-0 z-20 bg-green-50/80 dark:bg-green-900/30 backdrop-blur-[2px] flex flex-col items-center justify-center rounded-lg">
+                                  <div className="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-lg bg-green-50/80 backdrop-blur-[2px] dark:bg-green-900/30">
                                     <div className="flex flex-col items-center gap-2">
-                                      <CheckCircle className="w-10 h-10 text-green-600 dark:text-green-400" />
+                                      <CheckCircle className="h-10 w-10 text-green-600 dark:text-green-400" />
                                       <div className="flex flex-col items-center gap-0.5">
-                                        <span className="text-sm font-bold text-green-800 dark:text-green-300  tracking-wide capitalize">
+                                        <span className="text-sm font-bold capitalize tracking-wide text-green-800 dark:text-green-300">
                                           {account.platform}
                                         </span>
                                         <span className="text-xs font-medium text-green-600 dark:text-green-400">
-                                          {t(
-                                            "publications.modal.publish.published",
-                                          )}
+                                          {t("publications.modal.publish.published")}
                                         </span>
                                       </div>
 
@@ -1046,10 +936,10 @@ export default function PublishPublicationModal({
                                           target="_blank"
                                           rel="noopener noreferrer"
                                           onClick={(e) => e.stopPropagation()}
-                                          className="mt-2 px-3 py-1.5 text-xs font-medium text-white bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 rounded-md transition-colors pointer-events-auto flex items-center gap-1.5 shadow-sm"
+                                          className="pointer-events-auto mt-2 flex items-center gap-1.5 rounded-md bg-green-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600"
                                         >
                                           <svg
-                                            className="w-3.5 h-3.5"
+                                            className="h-3.5 w-3.5"
                                             fill="none"
                                             stroke="currentColor"
                                             viewBox="0 0 24 24"
@@ -1061,9 +951,8 @@ export default function PublishPublicationModal({
                                               d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
                                             />
                                           </svg>
-                                          {t(
-                                            "publications.modal.publish.viewPost",
-                                          ) || "Ver publicación"}
+                                          {t("publications.modal.publish.viewPost") ||
+                                            "Ver publicación"}
                                         </a>
                                       )}
                                     </div>
@@ -1076,12 +965,10 @@ export default function PublishPublicationModal({
                               !isUnpublishing &&
                               !isPublished &&
                               (() => {
-                                const mediaFiles =
-                                  publication.media_files || [];
+                                const mediaFiles = publication.media_files || [];
                                 const video = mediaFiles.find(
                                   (m: any) =>
-                                    m.file_type === "video" ||
-                                    m.mime_type?.startsWith("video/"),
+                                    m.file_type === "video" || m.mime_type?.startsWith("video/"),
                                 );
                                 if (!video) return null;
 
@@ -1091,15 +978,12 @@ export default function PublishPublicationModal({
                                   duration,
                                 );
 
-                                if (
-                                  validation.maxDuration === Infinity ||
-                                  validation.isValid
-                                )
+                                if (validation.maxDuration === Infinity || validation.isValid)
                                   return null;
 
                                 return (
-                                  <div className="absolute top-2 left-2 z-10 flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold border shadow-sm bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800/30 animate-pulse">
-                                    <XCircle className="w-3 h-3" />
+                                  <div className="absolute left-2 top-2 z-10 flex animate-pulse items-center gap-1 rounded-md border border-red-200 bg-red-50 px-2 py-1 text-[10px] font-bold text-red-600 shadow-sm dark:border-red-800/30 dark:bg-red-900/30 dark:text-red-400">
+                                    <XCircle className="h-3 w-3" />
                                     <span className="leading-none">
                                       MAX {validation.formattedMax}
                                     </span>
@@ -1108,19 +992,19 @@ export default function PublishPublicationModal({
                               })()}
 
                             {/* Platform Logo and Info */}
-                            <div className="flex items-center gap-3 z-10">
-                              <div className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0  p-1">
+                            <div className="z-10 flex items-center gap-3">
+                              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg p-1">
                                 <img
                                   src={iconSrc}
                                   alt={account.platform}
-                                  className="w-full h-full object-contain"
+                                  className="h-full w-full object-contain"
                                 />
                               </div>
-                              <div className="flex-1 text-left min-w-0">
-                                <div className="font-bold capitalize text-base text-gray-900 dark:text-white truncate">
+                              <div className="min-w-0 flex-1 text-left">
+                                <div className="truncate text-base font-bold capitalize text-gray-900 dark:text-white">
                                   {account.platform}
                                 </div>
-                                <div className="text-xs text-gray-600 dark:text-gray-400 truncate">
+                                <div className="truncate text-xs text-gray-600 dark:text-gray-400">
                                   @{account.account_name}
                                 </div>
                               </div>
@@ -1131,10 +1015,9 @@ export default function PublishPublicationModal({
                               !isPublishing &&
                               !isUnpublishing &&
                               !isPublished && (
-                                <div className="text-[10px] text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide truncate z-10">
-                                  {t(
-                                    "manageContent.socialMedia.status.connectedBy",
-                                  ) || "Conectado por"}
+                                <div className="z-10 truncate text-[10px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                                  {t("manageContent.socialMedia.status.connectedBy") ||
+                                    "Conectado por"}
                                   : {account.user.name}
                                 </div>
                               )}
@@ -1144,20 +1027,17 @@ export default function PublishPublicationModal({
                           {isScheduled && !isPublishing && !isUnpublishing && (
                             <div className="absolute -top-3 right-2 z-40">
                               <div className="flex flex-col items-end gap-1">
-                                <span className="flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-blue-700 px-3 py-1.5 rounded-full shadow-lg border border-white dark:border-neutral-800">
-                                  <Clock className="w-3.5 h-3.5" />
-                                  {t(
-                                    "publications.status.scheduled",
-                                  )?.toUpperCase() || "PROGRAMADO"}
+                                <span className="flex items-center gap-1.5 rounded-full border border-white bg-gradient-to-r from-blue-600 to-blue-700 px-3 py-1.5 text-xs font-bold text-white shadow-lg dark:border-neutral-800">
+                                  <Clock className="h-3.5 w-3.5" />
+                                  {t("publications.status.scheduled")?.toUpperCase() ||
+                                    "PROGRAMADO"}
                                 </span>
                                 {(() => {
-                                  const schedPost =
-                                    publication.scheduled_posts?.find(
-                                      (sp) =>
-                                        sp.social_account_id === account.id,
-                                    );
+                                  const schedPost = publication.scheduled_posts?.find(
+                                    (sp) => sp.social_account_id === account.id,
+                                  );
                                   return schedPost?.scheduled_at ? (
-                                    <span className="text-[10px] text-gray-600 dark:text-gray-400 bg-white dark:bg-neutral-800 px-2 py-0.5 rounded-full shadow-sm">
+                                    <span className="rounded-full bg-white px-2 py-0.5 text-[10px] text-gray-600 shadow-sm dark:bg-neutral-800 dark:text-gray-400">
                                       {formatDateTimeStyled(
                                         schedPost.scheduled_at,
                                         "short",
@@ -1176,11 +1056,10 @@ export default function PublishPublicationModal({
                             !isUnpublishing &&
                             !isPublished && (
                               <div className="absolute -top-3 right-2 z-40">
-                                <span className="flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-r from-gray-600 to-gray-700 px-3 py-1.5 rounded-full shadow-lg border border-white dark:border-neutral-800">
-                                  <XCircle className="w-3.5 h-3.5" />
-                                  {t(
-                                    "publications.modal.publish.removed",
-                                  )?.toUpperCase() || "REMOVIDO"}
+                                <span className="flex items-center gap-1.5 rounded-full border border-white bg-gradient-to-r from-gray-600 to-gray-700 px-3 py-1.5 text-xs font-bold text-white shadow-lg dark:border-neutral-800">
+                                  <XCircle className="h-3.5 w-3.5" />
+                                  {t("publications.modal.publish.removed")?.toUpperCase() ||
+                                    "REMOVIDO"}
                                 </span>
                               </div>
                             )}
@@ -1192,11 +1071,10 @@ export default function PublishPublicationModal({
                             !isPublishing &&
                             !isUnpublishing &&
                             !isRetrying && (
-                              <div className="absolute top-2 left-2 z-10">
-                                <span className="flex items-center gap-1 text-[10px] font-bold text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/40 px-2 py-1 rounded-md shadow-sm border border-red-300 dark:border-red-800">
-                                  <XCircle className="w-3 h-3" />
-                                  {t("publications.modal.publish.failed") ||
-                                    "Falló"}
+                              <div className="absolute left-2 top-2 z-10">
+                                <span className="flex items-center gap-1 rounded-md border border-red-300 bg-red-100 px-2 py-1 text-[10px] font-bold text-red-700 shadow-sm dark:border-red-800 dark:bg-red-900/40 dark:text-red-400">
+                                  <XCircle className="h-3 w-3" />
+                                  {t("publications.modal.publish.failed") || "Falló"}
                                 </span>
                               </div>
                             )}
@@ -1206,32 +1084,25 @@ export default function PublishPublicationModal({
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleUnpublishWithConfirm(
-                                  account.id,
-                                  account.platform,
-                                );
+                                handleUnpublishWithConfirm(account.id, account.platform);
                               }}
                               disabled={isUnpublishing}
-                              className="absolute top-3 right-3 z-30 p-2 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors disabled:opacity-50 shadow-lg"
+                              className="absolute right-3 top-3 z-30 rounded-full bg-red-500 p-2 text-white shadow-lg transition-colors hover:bg-red-600 disabled:opacity-50"
                               title="Despublicar"
                             >
-                              <X className="w-4 h-4" />
+                              <X className="h-4 w-4" />
                             </button>
                           )}
 
-                          {publication &&
-                            getRecurringPosts &&
-                            getPublishedRecurringPosts && (
-                              <RecurringPostsSection
-                                publication={publication}
-                                accountId={account.id}
-                                getRecurringPosts={getRecurringPosts}
-                                getPublishedRecurringPosts={
-                                  getPublishedRecurringPosts
-                                }
-                                t={t}
-                              />
-                            )}
+                          {publication && getRecurringPosts && getPublishedRecurringPosts && (
+                            <RecurringPostsSection
+                              publication={publication}
+                              accountId={account.id}
+                              getRecurringPosts={getRecurringPosts}
+                              getPublishedRecurringPosts={getPublishedRecurringPosts}
+                              t={t}
+                            />
+                          )}
                         </div>
                       );
                     })}
@@ -1241,10 +1112,10 @@ export default function PublishPublicationModal({
 
               {isYoutubeSelected() && videoFiles.length > 0 && (
                 <div className="mb-6">
-                  <div className="flex items-center gap-2 mb-4">
+                  <div className="mb-4 flex items-center gap-2">
                     <img
                       src={getPlatformConfig("youtube").logo}
-                      className="w-5 h-5"
+                      className="h-5 w-5"
                       alt="YouTube"
                     />
                     <h4 className="font-semibold text-gray-900 dark:text-white">
@@ -1258,8 +1129,8 @@ export default function PublishPublicationModal({
                   </div>
 
                   {isLoadingThumbnails ? (
-                    <div className="text-center py-4">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500 mx-auto"></div>
+                    <div className="py-4 text-center">
+                      <div className="mx-auto h-8 w-8 animate-spin rounded-full border-b-2 border-primary-500"></div>
                     </div>
                   ) : (
                     <div className="space-y-4">
@@ -1280,15 +1151,14 @@ export default function PublishPublicationModal({
               )}
             </div>
 
-            <div className="flex gap-3 p-4 border-t border-gray-200/50 dark:border-neutral-800/50 sticky bottom-0 z-20 bg-gradient-to-r from-gray-50 via-white to-gray-50/80 dark:from-neutral-900 dark:via-neutral-900/95 dark:to-neutral-800/90 backdrop-blur-md shadow-sm dark:shadow-neutral-950/20">
+            <div className="sticky bottom-0 z-20 flex gap-3 border-t border-gray-200/50 bg-gradient-to-r from-gray-50 via-white to-gray-50/80 p-4 shadow-sm backdrop-blur-md dark:border-neutral-800/50 dark:from-neutral-900 dark:via-neutral-900/95 dark:to-neutral-800/90 dark:shadow-neutral-950/20">
               <button
                 type="button"
                 onClick={async () => {
                   // Si hay plataformas publicando o reintentando, preguntar si quiere cancelar
                   const hasPublishingPlatforms =
                     publishingPlatforms.length > 0 &&
-                    (publication.status === "publishing" ||
-                      publication.status === "retrying");
+                    (publication.status === "publishing" || publication.status === "retrying");
 
                   if (hasPublishingPlatforms) {
                     const confirmed = await confirm({
@@ -1301,10 +1171,8 @@ export default function PublishPublicationModal({
                         }) ||
                         `¿Estás seguro de que deseas cancelar la publicación en TODAS las plataformas (${publishingPlatforms.length})? Se detendrán todos los reintentos. Las plataformas que ya se publicaron no se verán afectadas.`,
                       confirmText:
-                        t("publications.modal.cancelAllConfirm.confirm") ||
-                        "Sí, cancelar todas",
-                      cancelText:
-                        t("publications.modal.cancelAllConfirm.cancel") || "No",
+                        t("publications.modal.cancelAllConfirm.confirm") || "Sí, cancelar todas",
+                      cancelText: t("publications.modal.cancelAllConfirm.cancel") || "No",
                       type: "danger",
                     });
 
@@ -1318,11 +1186,10 @@ export default function PublishPublicationModal({
                   }
                 }}
                 disabled={unpublishing !== null}
-                className="flex-1 px-4 py-3 rounded-lg font-medium transition-colors bg-gray-100 dark:bg-neutral-700 hover:bg-gray-200 dark:hover:bg-neutral-600 text-gray-700 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 rounded-lg bg-gray-100 px-4 py-3 font-medium text-gray-700 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-neutral-700 dark:text-white dark:hover:bg-neutral-600"
               >
                 {publishingPlatforms.length > 0 &&
-                (publication.status === "publishing" ||
-                  publication.status === "retrying")
+                (publication.status === "publishing" || publication.status === "retrying")
                   ? t("publications.modal.publish.button.cancelAll", {
                       count: publishingPlatforms.length,
                     }) || `Cancelar Todas (${publishingPlatforms.length})`
@@ -1333,19 +1200,18 @@ export default function PublishPublicationModal({
                   type="button"
                   onClick={handlePublishWithNotifications}
                   disabled={selectedPlatforms.length === 0 || publishing}
-                  className="flex-[2] px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="flex flex-[2] items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-primary-500 to-primary-600 px-4 py-3 font-medium text-white transition-all hover:from-primary-600 hover:to-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {publishing ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      <div className="h-4 w-4 animate-spin rounded-full border-b-2 border-white"></div>
                       {t("publications.modal.publish.publishing")}
                     </>
                   ) : (
                     <>
-                      <Share2 className="w-4 h-4" />
+                      <Share2 className="h-4 w-4" />
                       {t("publications.modal.publish.button.publish")}{" "}
-                      {selectedPlatforms.length > 0 &&
-                        `(${selectedPlatforms.length})`}
+                      {selectedPlatforms.length > 0 && `(${selectedPlatforms.length})`}
                     </>
                   )}
                 </button>
@@ -1354,16 +1220,16 @@ export default function PublishPublicationModal({
                   type="button"
                   onClick={handleRequestApproval}
                   disabled={publishing || isPendingReview}
-                  className="flex-[2] px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="flex flex-[2] items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-primary-500 to-primary-600 px-4 py-3 font-medium text-white transition-all hover:from-primary-600 hover:to-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {isPendingReview ? (
                     <>
-                      <Clock className="w-4 h-4" />
+                      <Clock className="h-4 w-4" />
                       {t("publications.modal.publish.button.pendingReview")}
                     </>
                   ) : (
                     <>
-                      <CheckCircle className="w-4 h-4" />
+                      <CheckCircle className="h-4 w-4" />
                       {t("publications.modal.publish.button.requestApproval")}
                     </>
                   )}

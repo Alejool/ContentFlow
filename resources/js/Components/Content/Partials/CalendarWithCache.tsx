@@ -20,8 +20,7 @@ interface CalendarWithCacheProps {
  * - Shows loading indicators during data fetch and operations
  */
 export function CalendarWithCache({ onEventClick }: CalendarWithCacheProps) {
-  const { currentMonth, filters, setEvents, setLoading, setError } =
-    useCalendarStore();
+  const { currentMonth, filters, setEvents, setLoading, setError } = useCalendarStore();
 
   // Use React Query hook for cached data fetching
   const {
@@ -44,11 +43,7 @@ export function CalendarWithCache({ onEventClick }: CalendarWithCacheProps) {
     setLoading(isLoading);
 
     if (isError && error) {
-      setError(
-        error instanceof Error
-          ? error.message
-          : "Failed to fetch calendar events",
-      );
+      setError(error instanceof Error ? error.message : "Failed to fetch calendar events");
     } else {
       setError(null);
     }
@@ -62,10 +57,7 @@ export function CalendarWithCache({ onEventClick }: CalendarWithCacheProps) {
   return (
     <div className="relative">
       {/* Show overlay when refetching (e.g., after filter change) */}
-      <LoadingOverlay
-        show={isFetching && !!events}
-        message="Updating calendar..."
-      />
+      <LoadingOverlay show={isFetching && !!events} message="Updating calendar..." />
       <ModernCalendar onEventClick={onEventClick} />
     </div>
   );

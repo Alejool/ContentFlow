@@ -2,15 +2,7 @@ import Button from "@/Components/common/Modern/Button";
 import { Publication } from "@/types/Publication";
 import { getDateFnsLocale } from "@/Utils/dateLocales";
 import { format } from "date-fns";
-import {
-  Check,
-  CheckCircle,
-  Clock,
-  Info,
-  User,
-  X,
-  XCircle,
-} from "lucide-react";
+import { Check, CheckCircle, Clock, Info, User, X, XCircle } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import RejectionReasonModal from "./modals/RejectionReasonModal";
@@ -115,16 +107,16 @@ export default function ApprovalLevelCard({
   return (
     <>
       <div
-        className={`border-2 rounded-lg p-5 transition-all duration-200 ${borderColor} ${bgColor}`}
+        className={`rounded-lg border-2 p-5 transition-all duration-200 ${borderColor} ${bgColor}`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div
-              className={`w-12 h-12 rounded-full flex items-center justify-center bg-${statusColor}-100 dark:bg-${statusColor}-900/30`}
+              className={`flex h-12 w-12 items-center justify-center rounded-full bg-${statusColor}-100 dark:bg-${statusColor}-900/30`}
             >
               <StatusIcon
-                className={`w-6 h-6 text-${statusColor}-600 dark:text-${statusColor}-400`}
+                className={`h-6 w-6 text-${statusColor}-600 dark:text-${statusColor}-400`}
               />
             </div>
 
@@ -135,15 +127,15 @@ export default function ApprovalLevelCard({
                   name: level.level_name,
                 })}
               </h4>
-              <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1.5">
-                <User className="w-3.5 h-3.5" />
+              <p className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400">
+                <User className="h-3.5 w-3.5" />
                 {level.role.display_name}
               </p>
             </div>
           </div>
 
           <span
-            className={`px-3 py-1.5 rounded-full text-xs font-bold bg-${statusColor}-100 text-${statusColor}-700 dark:bg-${statusColor}-900/30 dark:text-${statusColor}-400 border border-${statusColor}-200 dark:border-${statusColor}-800`}
+            className={`rounded-full px-3 py-1.5 text-xs font-bold bg-${statusColor}-100 text-${statusColor}-700 dark:bg-${statusColor}-900/30 dark:text-${statusColor}-400 border border-${statusColor}-200 dark:border-${statusColor}-800`}
           >
             {statusText}
           </span>
@@ -151,14 +143,14 @@ export default function ApprovalLevelCard({
 
         {/* Approved Action Info */}
         {level.approved_action && (
-          <div className="mt-3 p-4 bg-white dark:bg-neutral-800 rounded-lg border border-green-200 dark:border-green-800">
+          <div className="mt-3 rounded-lg border border-green-200 bg-white p-4 dark:border-green-800 dark:bg-neutral-800">
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
-                <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
+                <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-medium text-gray-900 dark:text-white text-sm">
+              <div className="min-w-0 flex-1">
+                <div className="mb-1 flex items-center gap-2">
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">
                     {t("approvals.level.approvedBy") || "Aprobado por"}:
                   </span>
                   <span className="text-sm text-gray-700 dark:text-gray-300">
@@ -171,7 +163,7 @@ export default function ApprovalLevelCard({
                   })}
                 </p>
                 {level.approved_action.comment && (
-                  <p className="text-sm text-gray-700 dark:text-gray-300 mt-2 italic">
+                  <p className="mt-2 text-sm italic text-gray-700 dark:text-gray-300">
                     "{level.approved_action.comment}"
                   </p>
                 )}
@@ -182,14 +174,14 @@ export default function ApprovalLevelCard({
 
         {/* Rejected Action Info */}
         {level.rejected_action && (
-          <div className="mt-3 p-4 bg-white dark:bg-neutral-800 rounded-lg border border-red-200 dark:border-red-800">
+          <div className="mt-3 rounded-lg border border-red-200 bg-white p-4 dark:border-red-800 dark:bg-neutral-800">
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center shrink-0">
-                <XCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
+                <XCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-medium text-gray-900 dark:text-white text-sm">
+              <div className="min-w-0 flex-1">
+                <div className="mb-1 flex items-center gap-2">
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">
                     {t("approvals.level.rejectedBy") || "Rechazado por"}:
                   </span>
                   <span className="text-sm text-gray-700 dark:text-gray-300">
@@ -203,7 +195,7 @@ export default function ApprovalLevelCard({
                 </p>
                 {level.rejected_action.comment && (
                   <div className="mt-2">
-                    <p className="text-xs font-medium text-red-700 dark:text-red-400 mb-1">
+                    <p className="mb-1 text-xs font-medium text-red-700 dark:text-red-400">
                       Motivo:
                     </p>
                     <p className="text-sm text-red-700 dark:text-red-300">
@@ -246,13 +238,12 @@ export default function ApprovalLevelCard({
 
         {/* Info Message - For current level when user cannot approve */}
         {level.is_current_level && !level.can_user_approve && (
-          <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+          <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-900/20">
             <div className="flex items-start gap-2">
-              <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+              <Info className="mt-0.5 h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
               <p className="text-sm text-blue-700 dark:text-blue-300">
-                {t("approvals.level.requiresRole") ||
-                  "Este nivel requiere aprobación del rol"}
-                : <strong>{level.role.display_name}</strong>
+                {t("approvals.level.requiresRole") || "Este nivel requiere aprobación del rol"}:{" "}
+                <strong>{level.role.display_name}</strong>
               </p>
             </div>
           </div>
@@ -260,9 +251,9 @@ export default function ApprovalLevelCard({
 
         {/* Waiting Message - For future levels */}
         {level.is_future_level && (
-          <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+          <div className="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800/50">
             <div className="flex items-start gap-2">
-              <Clock className="w-4 h-4 text-gray-500 dark:text-gray-400 shrink-0 mt-0.5" />
+              <Clock className="mt-0.5 h-4 w-4 shrink-0 text-gray-500 dark:text-gray-400" />
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 {t("approvals.level.waitingFor") || "Esperando aprobación de"}:{" "}
                 <strong>{level.role.display_name}</strong>

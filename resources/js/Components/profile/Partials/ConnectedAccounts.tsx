@@ -69,8 +69,7 @@ export default function ConnectedAccounts({ className = "" }) {
     setAccounts((prevAccounts) =>
       prevAccounts.map((account) => {
         const connectedAccount = connectedAccounts.find(
-          (ca: any) =>
-            ca.platform.toLowerCase() === account.platform.toLowerCase(),
+          (ca: any) => ca.platform.toLowerCase() === account.platform.toLowerCase(),
         );
 
         return {
@@ -91,79 +90,66 @@ export default function ConnectedAccounts({ className = "" }) {
     <div className={className}>
       {loading ? (
         <div className="flex justify-center py-4">
-          <div className="w-10 h-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary-500 border-t-transparent"></div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {accounts.map((account) => (
             <button
               key={account.id}
               onClick={() => handleAccountClick(account)}
-              className={`
-                group relative flex flex-col items-center p-5 rounded-lg border-2 transition-all duration-200
-                ${
-                  account.isConnected
-                    ? `${account.bgClass} ${account.darkColor} border-transparent hover:shadow-lg hover:scale-105`
-                    : "bg-white dark:bg-neutral-800 border-gray-200 dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600 hover:shadow-md"
-                }
-                cursor-pointer
-              `}
+              className={`group relative flex flex-col items-center rounded-lg border-2 p-5 transition-all duration-200 ${
+                account.isConnected
+                  ? `${account.bgClass} ${account.darkColor} border-transparent hover:scale-105 hover:shadow-lg`
+                  : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-md dark:border-neutral-700 dark:bg-neutral-800 dark:hover:border-neutral-600"
+              } cursor-pointer`}
             >
               {/* Logo */}
               <div
-                className={`
-                  w-16 h-16 flex items-center justify-center mb-3 transition-transform group-hover:scale-105
-                `}
+                className={`mb-3 flex h-16 w-16 items-center justify-center transition-transform group-hover:scale-105`}
               >
-                <img
-                  src={account.logo}
-                  alt={account.name}
-                  className="w-8 h-8"
-                />
+                <img src={account.logo} alt={account.name} className="h-8 w-8" />
               </div>
 
               {/* Nombre */}
-              <h4 className="font-bold text-gray-900 dark:text-white text-base mb-2">
+              <h4 className="mb-2 text-base font-bold text-gray-900 dark:text-white">
                 {account.name}
               </h4>
 
               {/* Estado */}
               <div
-                className={`
-                  inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold
-                  ${
-                    account.isConnected
-                      ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
-                      : "bg-gray-100 dark:bg-neutral-700 text-gray-600 dark:text-gray-400"
-                  }
-                `}
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold ${
+                  account.isConnected
+                    ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                    : "bg-gray-100 text-gray-600 dark:bg-neutral-700 dark:text-gray-400"
+                } `}
               >
                 {account.isConnected ? (
                   <>
-                    <CheckCircle className="w-3.5 h-3.5" />
+                    <CheckCircle className="h-3.5 w-3.5" />
                     {t("profile.connectedAccounts.active", "Activa")}
                   </>
                 ) : (
                   <>
-                    <XCircle className="w-3.5 h-3.5" />
+                    <XCircle className="h-3.5 w-3.5" />
                     {t("profile.connectedAccounts.inactive", "No conectada")}
                   </>
                 )}
               </div>
 
               {/* Icono de configuración */}
-              <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="p-1.5 rounded-lg bg-white dark:bg-neutral-700 shadow-md">
-                  <Settings className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+              <div className="absolute right-3 top-3 opacity-0 transition-opacity group-hover:opacity-100">
+                <div className="rounded-lg bg-white p-1.5 shadow-md dark:bg-neutral-700">
+                  <Settings className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                 </div>
               </div>
 
               {/* Indicador de estado (punto) */}
               {account.isConnected && (
-                <div className="absolute top-3 left-3">
+                <div className="absolute left-3 top-3">
                   <div className="relative">
-                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                    <div className="absolute inset-0 w-3 h-3 rounded-full bg-green-500 animate-ping opacity-75"></div>
+                    <div className="h-3 w-3 rounded-full bg-green-500"></div>
+                    <div className="absolute inset-0 h-3 w-3 animate-ping rounded-full bg-green-500 opacity-75"></div>
                   </div>
                 </div>
               )}
@@ -173,16 +159,13 @@ export default function ConnectedAccounts({ className = "" }) {
       )}
 
       {/* Link para gestionar */}
-      <div className="mt-6 pt-6 border-t border-gray-200 dark:border-neutral-700">
+      <div className="mt-6 border-t border-gray-200 pt-6 dark:border-neutral-700">
         <button
           onClick={() => router.visit(route("settings.social"))}
-          className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
+          className="flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-primary-600 transition-colors hover:bg-primary-50 hover:text-primary-700 dark:text-primary-400 dark:hover:bg-primary-900/20 dark:hover:text-primary-300"
         >
-          <Settings className="w-4 h-4" />
-          {t(
-            "profile.connectedAccounts.manageLink",
-            "Gestionar cuentas conectadas",
-          )}
+          <Settings className="h-4 w-4" />
+          {t("profile.connectedAccounts.manageLink", "Gestionar cuentas conectadas")}
         </button>
       </div>
     </div>

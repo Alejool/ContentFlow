@@ -30,45 +30,39 @@ export const OfflineDemo: React.FC = () => {
   });
 
   return (
-    <div className="p-8 space-y-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold mb-6">Offline Components Demo</h1>
+    <div className="space-y-8 p-8">
+      <div className="mx-auto max-w-4xl">
+        <h1 className="mb-6 text-2xl font-bold">Offline Components Demo</h1>
 
         {/* Example 1: Disabled button */}
-        <section className="mb-8 p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
-          <h2 className="text-lg font-semibold mb-4">
-            Example 1: Disabled Button
-          </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            This button is automatically disabled when offline using the
-            useOfflineDisable hook.
+        <section className="mb-8 rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+          <h2 className="mb-4 text-lg font-semibold">Example 1: Disabled Button</h2>
+          <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+            This button is automatically disabled when offline using the useOfflineDisable hook.
           </p>
           <button
             {...submitProps}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Submit Form
           </button>
         </section>
 
         {/* Example 2: Disabled wrapper */}
-        <section className="mb-8 p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
-          <h2 className="text-lg font-semibold mb-4">
-            Example 2: Disabled Content Wrapper
-          </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            This video player is wrapped and disabled when offline with an
-            overlay.
+        <section className="mb-8 rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+          <h2 className="mb-4 text-lg font-semibold">Example 2: Disabled Content Wrapper</h2>
+          <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+            This video player is wrapped and disabled when offline with an overlay.
           </p>
           <OfflineDisabledWrapper
             requiresConnection={true}
             offlineMessage="Video streaming requires internet connection"
             showOfflineOverlay={true}
           >
-            <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center">
+            <div className="flex aspect-video items-center justify-center rounded-lg bg-gray-900">
               <button
                 {...streamProps}
-                className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                className="rounded-lg bg-red-600 px-6 py-3 text-white hover:bg-red-700"
               >
                 ▶ Play Video
               </button>
@@ -77,27 +71,25 @@ export const OfflineDemo: React.FC = () => {
         </section>
 
         {/* Example 3: Pending operations modal */}
-        <section className="mb-8 p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
-          <h2 className="text-lg font-semibold mb-4">
-            Example 3: Pending Operations
-          </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+        <section className="mb-8 rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+          <h2 className="mb-4 text-lg font-semibold">Example 3: Pending Operations</h2>
+          <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
             Click the button to view pending operations in a modal.
           </p>
           <button
             onClick={() => setShowModal(true)}
-            className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+            className="rounded bg-gray-600 px-4 py-2 text-white hover:bg-gray-700"
           >
             View Pending Operations
           </button>
         </section>
 
         {/* Instructions */}
-        <section className="p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-          <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-2">
+        <section className="rounded-lg border border-blue-200 bg-blue-50 p-6 dark:border-blue-800 dark:bg-blue-900/20">
+          <h3 className="mb-2 text-sm font-semibold text-blue-900 dark:text-blue-300">
             Testing Instructions
           </h3>
-          <ol className="text-sm text-blue-800 dark:text-blue-300 space-y-1 list-decimal list-inside">
+          <ol className="list-inside list-decimal space-y-1 text-sm text-blue-800 dark:text-blue-300">
             <li>Open DevTools (F12)</li>
             <li>Go to Network tab</li>
             <li>Toggle "Offline" checkbox</li>
@@ -114,13 +106,13 @@ export const OfflineDemo: React.FC = () => {
       {/* Pending operations modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden flex flex-col">
+          <div className="mx-4 flex max-h-[80vh] w-full max-w-2xl flex-col overflow-hidden rounded-lg bg-white shadow-xl dark:bg-gray-800">
             {/* Modal header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between border-b border-gray-200 p-4 dark:border-gray-700">
               <h2 className="text-lg font-semibold">Pending Operations</h2>
               <button
                 onClick={() => setShowModal(false)}
-                className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="rounded p-1 hover:bg-gray-100 dark:hover:bg-gray-700"
                 aria-label="Close modal"
               >
                 <X className="h-5 w-5" />
@@ -128,7 +120,7 @@ export const OfflineDemo: React.FC = () => {
             </div>
 
             {/* Modal content */}
-            <div className="p-4 overflow-y-auto flex-1">
+            <div className="flex-1 overflow-y-auto p-4">
               <PendingOperationsList />
             </div>
           </div>

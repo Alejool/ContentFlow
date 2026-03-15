@@ -26,7 +26,7 @@ const LogRowSkeleton = () => {
         <Skeleton className="h-4 w-full" />
       </td>
       <td className="px-4 py-3 text-center">
-        <Skeleton className="h-8 w-8 rounded-lg mx-auto" />
+        <Skeleton className="mx-auto h-8 w-8 rounded-lg" />
       </td>
     </tr>
   );

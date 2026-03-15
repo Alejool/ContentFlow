@@ -71,7 +71,7 @@ const ContentSection = memo(
 
     return (
       <div className={`space-y-6 ${disabled ? "opacity-75" : ""}`}>
-        <div className="flex justify-between items-end px-1">
+        <div className="flex items-end justify-between px-1">
           <AiFieldSuggester
             fields={watched}
             type="publication"
@@ -83,15 +83,12 @@ const ContentSection = memo(
         {shouldShowTitle && (
           <Input
             id="title"
-            label={t(
-              fieldsConfig.title?.label || "publications.modal.edit.titleField",
-            )}
+            label={t(fieldsConfig.title?.label || "publications.modal.edit.titleField")}
             type="text"
             register={register}
             name="title"
             placeholder={t(
-              fieldsConfig.title?.placeholder ||
-                "publications.modal.edit.placeholders.title",
+              fieldsConfig.title?.placeholder || "publications.modal.edit.placeholders.title",
             )}
             error={errors.title?.message as string}
             icon={contentType === "poll" ? HelpCircle : FileText}
@@ -106,10 +103,7 @@ const ContentSection = memo(
         {shouldShowDescription && (
           <Textarea
             id="description"
-            label={t(
-              fieldsConfig.description?.label ||
-                "publications.modal.edit.description",
-            )}
+            label={t(fieldsConfig.description?.label || "publications.modal.edit.description")}
             register={register}
             name="description"
             placeholder={t("publications.modal.edit.placeholders.description")}
@@ -129,9 +123,7 @@ const ContentSection = memo(
         {shouldShowGoal && (
           <Input
             id="goal"
-            label={t(
-              fieldsConfig.goal?.label || "publications.modal.edit.goal",
-            )}
+            label={t(fieldsConfig.goal?.label || "publications.modal.edit.goal")}
             type="text"
             register={register}
             name="goal"
@@ -150,10 +142,7 @@ const ContentSection = memo(
         {shouldShowHashtags && (
           <Input
             id="hashtags"
-            label={t(
-              fieldsConfig.hashtags?.label ||
-                "publications.modal.edit.hashtags",
-            )}
+            label={t(fieldsConfig.hashtags?.label || "publications.modal.edit.hashtags")}
             type="text"
             value={watched.hashtags || ""}
             name="hashtags"
@@ -199,14 +188,10 @@ const ContentSection = memo(
           <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
             {t("publications.modal.edit.campaigns") || "Add to Campaign"}
           </label>
-          <div className="border border-gray-200 dark:border-neutral-700 rounded-lg p-3 bg-gray-50 dark:bg-black/20">
+          <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-black/20">
             <CampaignSelector
               campaigns={campaigns || []}
-              selectedId={
-                watched.campaign_id
-                  ? parseInt(watched.campaign_id.toString())
-                  : null
-              }
+              selectedId={watched.campaign_id ? parseInt(watched.campaign_id.toString()) : null}
               loading={false}
               t={t}
               onSelectCampaign={(id: number | null) => {
@@ -218,9 +203,7 @@ const ContentSection = memo(
             />
           </div>
           {errors.campaign_id?.message && (
-            <p className="text-xs text-red-500 mt-1">
-              {errors.campaign_id.message as string}
-            </p>
+            <p className="mt-1 text-xs text-red-500">{errors.campaign_id.message as string}</p>
           )}
         </div>
       </div>

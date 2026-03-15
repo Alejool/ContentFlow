@@ -19,12 +19,8 @@ export default function ThemedToaster() {
           borderRadius: "12px",
           fontSize: "14px",
           fontWeight: 500,
-          border: isDark
-            ? "1px solid rgba(255,255,255,0.1)"
-            : "1px solid rgba(0,0,0,0.05)",
-          background: isDark
-            ? "rgba(10, 10, 10, 0.95)"
-            : "rgba(255, 255, 255, 0.95)",
+          border: isDark ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(0,0,0,0.05)",
+          background: isDark ? "rgba(10, 10, 10, 0.95)" : "rgba(255, 255, 255, 0.95)",
           color: isDark ? "#ffffff" : "#000000",
           backdropFilter: "blur(12px)",
           boxShadow: isDark

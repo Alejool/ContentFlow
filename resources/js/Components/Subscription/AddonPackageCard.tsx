@@ -46,13 +46,9 @@ export const AddonPackageCard: React.FC<AddonPackageCardProps> = ({
 
   return (
     <Card
-      className={`relative hover:shadow-lg transition-all ${pkg.popular ? "border-blue-500 border-2" : ""}`}
+      className={`relative transition-all hover:shadow-lg ${pkg.popular ? "border-2 border-blue-500" : ""}`}
     >
-      {pkg.popular && (
-        <Badge className="absolute -top-3 right-4 bg-blue-600">
-          Más Popular
-        </Badge>
-      )}
+      {pkg.popular && <Badge className="absolute -top-3 right-4 bg-blue-600">Más Popular</Badge>}
 
       <CardHeader>
         <div className="flex items-center justify-between">
@@ -72,18 +68,16 @@ export const AddonPackageCard: React.FC<AddonPackageCardProps> = ({
 
       <CardContent className="space-y-4">
         {/* Amount */}
-        <div className="text-center py-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <div className="text-3xl font-bold text-blue-600">
-            {totalAmount.toLocaleString()}
-          </div>
-          <div className="text-sm text-muted-foreground">{unit}</div>
+        <div className="rounded-lg bg-gray-50 py-4 text-center dark:bg-gray-800">
+          <div className="text-3xl font-bold text-blue-600">{totalAmount.toLocaleString()}</div>
+          <div className="text-muted-foreground text-sm">{unit}</div>
         </div>
 
         {/* Price */}
         <div className="text-center">
           <div className="text-2xl font-bold">${totalPrice.toFixed(2)}</div>
           {quantity > 1 && (
-            <div className="text-xs text-muted-foreground">
+            <div className="text-muted-foreground text-xs">
               ${pkg.price.toFixed(2)} × {quantity}
             </div>
           )}
@@ -102,9 +96,7 @@ export const AddonPackageCard: React.FC<AddonPackageCardProps> = ({
             >
               <Minus className="h-4 w-4" />
             </Button>
-            <span className="text-lg font-semibold w-12 text-center">
-              {quantity}
-            </span>
+            <span className="w-12 text-center text-lg font-semibold">{quantity}</span>
             <Button
               variant="outline"
               size="icon"

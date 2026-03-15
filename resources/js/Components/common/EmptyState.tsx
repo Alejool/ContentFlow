@@ -45,7 +45,7 @@ interface EmptyStateProps {
 const EmptyState: React.FC<EmptyStateProps> = ({ config, className = "" }) => {
   return (
     <div
-      className={`flex flex-col items-center justify-center py-12 px-4 text-center ${className}`}
+      className={`flex flex-col items-center justify-center px-4 py-12 text-center ${className}`}
       role="status"
       aria-live="polite"
     >
@@ -54,38 +54,35 @@ const EmptyState: React.FC<EmptyStateProps> = ({ config, className = "" }) => {
         <img
           src={config.illustration}
           alt={config.title}
-          className="w-48 h-48 mb-6 object-contain"
+          className="mb-6 h-48 w-48 object-contain"
           loading="lazy"
         />
       ) : (
-        <div
-          className="w-24 h-24 mb-6 text-gray-400 dark:text-neutral-500"
-          aria-hidden="true"
-        >
+        <div className="mb-6 h-24 w-24 text-gray-400 dark:text-neutral-500" aria-hidden="true">
           {config.icon}
         </div>
       )}
 
       {/* Title */}
-      <h3 className="text-xl font-semibold text-gray-900 dark:text-neutral-100 mb-2">
+      <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-neutral-100">
         {config.title}
       </h3>
 
       {/* Description */}
-      <p className="text-gray-600 dark:text-neutral-400 text-center max-w-md mb-6 leading-relaxed">
+      <p className="mb-6 max-w-md text-center leading-relaxed text-gray-600 dark:text-neutral-400">
         {config.description}
       </p>
 
       {/* Actions */}
-      <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+      <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
         {config.primaryAction && (
           <button
             onClick={config.primaryAction.onClick}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition-colors duration-200"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 py-2 font-medium text-white transition-colors duration-200 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
             aria-label={config.primaryAction.label}
           >
             {config.primaryAction.icon && (
-              <span className="w-4 h-4" aria-hidden="true">
+              <span className="h-4 w-4" aria-hidden="true">
                 {config.primaryAction.icon}
               </span>
             )}
@@ -97,11 +94,11 @@ const EmptyState: React.FC<EmptyStateProps> = ({ config, className = "" }) => {
           <button
             key={index}
             onClick={action.onClick}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-medium rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition-colors duration-200"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 transition-colors duration-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 dark:focus:ring-offset-gray-900"
             aria-label={action.label}
           >
             {action.icon && (
-              <span className="w-4 h-4" aria-hidden="true">
+              <span className="h-4 w-4" aria-hidden="true">
                 {action.icon}
               </span>
             )}

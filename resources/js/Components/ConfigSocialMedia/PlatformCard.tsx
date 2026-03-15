@@ -27,29 +27,23 @@ export default function PlatformCard({
   return (
     <label
       htmlFor={inputId}
-      className="flex flex-col items-center p-5 border-2 border-gray-200 dark:border-neutral-700 rounded-lg hover:border-primary-500 cursor-pointer transition-all"
+      className="flex cursor-pointer flex-col items-center rounded-lg border-2 border-gray-200 p-5 transition-all hover:border-primary-500 dark:border-neutral-700"
     >
-      <div
-        className={`w-10 h-10 ${iconBgColor} rounded-lg flex items-center justify-center mb-3`}
-      >
-        <Icon className={`w-5 h-5 ${iconColor}`} />
+      <div className={`h-10 w-10 ${iconBgColor} mb-3 flex items-center justify-center rounded-lg`}>
+        <Icon className={`h-5 w-5 ${iconColor}`} />
       </div>
-      <span className="font-medium text-gray-900 dark:text-white text-center">
-        {label}
-      </span>
+      <span className="text-center font-medium text-gray-900 dark:text-white">{label}</span>
       {description && (
-        <span className="text-sm text-gray-500 dark:text-gray-400 text-center mt-1">
+        <span className="mt-1 text-center text-sm text-gray-500 dark:text-gray-400">
           {description}
         </span>
       )}
       <div
-        className={`mt-3 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-          selected
-            ? "border-primary-500 bg-primary-500"
-            : "border-gray-300 dark:border-gray-600"
+        className={`mt-3 flex h-5 w-5 items-center justify-center rounded-full border-2 ${
+          selected ? "border-primary-500 bg-primary-500" : "border-gray-300 dark:border-gray-600"
         }`}
       >
-        {selected && <Check className="w-3 h-3 text-white" />}
+        {selected && <Check className="h-3 w-3 text-white" />}
       </div>
       <RadioInput
         id={inputId}

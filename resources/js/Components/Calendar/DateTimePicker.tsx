@@ -58,24 +58,21 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
           dateFormat="MMMM d, yyyy h:mm aa"
           inline
           minDate={minDate}
-          className="border border-gray-300 dark:border-gray-600 rounded-lg"
+          className="rounded-lg border border-gray-300 dark:border-gray-600"
         />
       </div>
 
       {/* Validation Messages */}
       {!validation.isValid && validation.error && (
-        <div className="flex items-start gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-          <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+        <div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-900/20">
+          <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600 dark:text-red-400" />
           <div className="flex-1">
             <p className="text-sm font-medium text-red-800 dark:text-red-200">
               {validation.isPastDate
-                ? t(
-                    "calendar.validation.past_date_error",
-                    "Cannot Schedule in the Past",
-                  )
+                ? t("calendar.validation.past_date_error", "Cannot Schedule in the Past")
                 : t("calendar.validation.invalid_date", "Invalid Date")}
             </p>
-            <p className="text-xs text-red-600 dark:text-red-300 mt-1">
+            <p className="mt-1 text-xs text-red-600 dark:text-red-300">
               {validation.isPastDate
                 ? t(
                     "calendar.validation.past_date_message",
@@ -93,7 +90,7 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
           <p className="text-xs text-gray-500 dark:text-gray-400">
             {t("calendar.selected_date", "Selected date:")}
           </p>
-          <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
+          <p className="mt-1 text-sm font-medium text-gray-900 dark:text-white">
             {selectedDate.toLocaleString("es-ES", {
               weekday: "long",
               year: "numeric",

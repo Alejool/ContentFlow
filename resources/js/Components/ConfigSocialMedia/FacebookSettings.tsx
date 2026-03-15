@@ -39,7 +39,7 @@ export default function FacebookSettings({
     <div className="space-y-6">
       <div className="space-y-4">
         <SectionHeader title={t("platformSettings.facebook.type")} />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <PlatformCard
             value="feed"
             label={t("platformSettings.facebook.feed")}
@@ -58,8 +58,7 @@ export default function FacebookSettings({
             iconColor="text-blue-500"
             iconBgColor="bg-blue-100 dark:bg-blue-900/20"
             selected={
-              settings?.type === "reel" ||
-              (!settings?.type && defaultSettings.type === "reel")
+              settings?.type === "reel" || (!settings?.type && defaultSettings.type === "reel")
             }
             onSelect={(val) => handleChange("type", val)}
           />

@@ -3,14 +3,7 @@ import Modal from "@/Components/common/ui/Modal";
 import ModalFooter from "@/Components/Content/modals/common/ModalFooter";
 import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
 import axios from "axios";
-import {
-  AlertCircle,
-  CheckCircle,
-  Download,
-  FileSpreadsheet,
-  Upload,
-  X,
-} from "lucide-react";
+import { AlertCircle, CheckCircle, Download, FileSpreadsheet, Upload, X } from "lucide-react";
 import React, { useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 
@@ -36,13 +29,7 @@ interface ImportResult {
   }>;
 }
 
-export default function ExcelImporter({
-  type,
-  isOpen,
-  onClose,
-  onSuccess,
-  t,
-}: ExcelImporterProps) {
+export default function ExcelImporter({ type, isOpen, onClose, onSuccess, t }: ExcelImporterProps) {
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [result, setResult] = useState<ImportResult | null>(null);
@@ -65,14 +52,10 @@ export default function ExcelImporter({
       link.remove();
       window.URL.revokeObjectURL(url);
 
-      toast.success(
-        t("excel.templateDownloaded") || "Plantilla descargada correctamente",
-      );
+      toast.success(t("excel.templateDownloaded") || "Plantilla descargada correctamente");
     } catch (error) {
       console.error("Error downloading template:", error);
-      toast.error(
-        t("excel.downloadError") || "Error al descargar la plantilla",
-      );
+      toast.error(t("excel.downloadError") || "Error al descargar la plantilla");
     }
   };
 
@@ -91,18 +74,12 @@ export default function ExcelImporter({
     ];
 
     if (!validTypes.includes(selectedFile.type)) {
-      toast.error(
-        t("excel.invalidFileType") ||
-          "Tipo de archivo inválido. Use .xlsx, .xls o .csv",
-      );
+      toast.error(t("excel.invalidFileType") || "Tipo de archivo inválido. Use .xlsx, .xls o .csv");
       return;
     }
 
     if (selectedFile.size > 10 * 1024 * 1024) {
-      toast.error(
-        t("excel.fileTooLarge") ||
-          "El archivo es demasiado grande. Máximo 10MB",
-      );
+      toast.error(t("excel.fileTooLarge") || "El archivo es demasiado grande. Máximo 10MB");
       return;
     }
 
@@ -132,9 +109,7 @@ export default function ExcelImporter({
 
   const handleImport = async () => {
     if (!file) {
-      toast.error(
-        t("excel.noFileSelected") || "Por favor selecciona un archivo",
-      );
+      toast.error(t("excel.noFileSelected") || "Por favor selecciona un archivo");
       return;
     }
 
@@ -206,17 +181,16 @@ export default function ExcelImporter({
         size="lg"
       />
 
-      <div className="p-6 space-y-6">
+      <div className="space-y-6 p-6">
         {/* Download Template Section */}
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
           <div className="flex items-start gap-3">
-            <Download className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+            <Download className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
             <div className="flex-1">
-              <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-1">
-                {t("excel.downloadTemplateTitle") ||
-                  "Paso 1: Descarga la plantilla"}
+              <h3 className="mb-1 text-sm font-semibold text-blue-900 dark:text-blue-300">
+                {t("excel.downloadTemplateTitle") || "Paso 1: Descarga la plantilla"}
               </h3>
-              <p className="text-xs text-blue-700 dark:text-blue-400 mb-3">
+              <p className="mb-3 text-xs text-blue-700 dark:text-blue-400">
                 {t("excel.downloadTemplateDesc") ||
                   "Descarga la plantilla oficial con el formato correcto y ejemplos."}
               </p>
@@ -235,7 +209,7 @@ export default function ExcelImporter({
 
         {/* Upload Section */}
         <div>
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
+          <h3 className="mb-3 text-sm font-semibold text-gray-900 dark:text-white">
             {t("excel.uploadFileTitle") || "Paso 2: Sube tu archivo"}
           </h3>
 
@@ -244,9 +218,9 @@ export default function ExcelImporter({
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             onClick={() => !file && fileInputRef.current?.click()}
-            className={`relative group transition-all duration-300 cursor-pointer ${
+            className={`group relative cursor-pointer transition-all duration-300 ${
               isDragging
-                ? "scale-[1.02] ring-2 ring-primary-500 dark:ring-primary-400 ring-offset-2"
+                ? "scale-[1.02] ring-2 ring-primary-500 ring-offset-2 dark:ring-primary-400"
                 : ""
             }`}
           >
@@ -259,50 +233,48 @@ export default function ExcelImporter({
             />
 
             <div
-              className={`min-h-[200px] rounded-lg border-2 border-dashed flex flex-col items-center justify-center p-8 text-center transition-all duration-300 ${
+              className={`flex min-h-[200px] flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center transition-all duration-300 ${
                 isDragging
-                  ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20 dark:border-primary-400"
-                  : "border-gray-300 dark:border-gray-600 hover:border-primary-400 dark:hover:border-primary-500 bg-gray-50 dark:bg-neutral-900/90"
+                  ? "border-primary-500 bg-primary-50 dark:border-primary-400 dark:bg-primary-900/20"
+                  : "border-gray-300 bg-gray-50 hover:border-primary-400 dark:border-gray-600 dark:bg-neutral-900/90 dark:hover:border-primary-500"
               }`}
             >
               {!file ? (
                 <div className="space-y-4">
                   <div className="relative">
-                    <div className="absolute inset-0 bg-primary-500/10 dark:bg-primary-400/10 rounded-full blur-xl"></div>
-                    <div className="relative bg-white dark:bg-neutral-800 rounded-full p-4 shadow-lg">
-                      <Upload className="w-10 h-10 text-primary-500 dark:text-primary-400" />
+                    <div className="absolute inset-0 rounded-full bg-primary-500/10 blur-xl dark:bg-primary-400/10"></div>
+                    <div className="relative rounded-full bg-white p-4 shadow-lg dark:bg-neutral-800">
+                      <Upload className="h-10 w-10 text-primary-500 dark:text-primary-400" />
                     </div>
                   </div>
                   <div>
-                    <p className="text-base font-medium text-gray-900 dark:text-white mb-1">
+                    <p className="mb-1 text-base font-medium text-gray-900 dark:text-white">
                       {t("excel.dragDropText") || "Arrastra tu archivo aquí"}
                     </p>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {t("excel.orClickToSelect") ||
-                        "o haz clic para seleccionar"}
+                      {t("excel.orClickToSelect") || "o haz clic para seleccionar"}
                     </p>
                   </div>
                   <div className="pt-2">
-                    <p className="text-xs text-gray-500 dark:text-gray-500 bg-gray-100 dark:bg-neutral-800 px-3 py-1.5 rounded-full inline-block">
-                      {t("excel.supportedFormats") ||
-                        "Formatos: .xlsx, .xls, .csv (Máx. 10MB)"}
+                    <p className="inline-block rounded-full bg-gray-100 px-3 py-1.5 text-xs text-gray-500 dark:bg-neutral-800 dark:text-gray-500">
+                      {t("excel.supportedFormats") || "Formatos: .xlsx, .xls, .csv (Máx. 10MB)"}
                     </p>
                   </div>
                 </div>
               ) : (
-                <div className="space-y-4 w-full">
+                <div className="w-full space-y-4">
                   <div className="relative">
-                    <div className="absolute inset-0 bg-green-500/10 dark:bg-green-400/10 rounded-full blur-xl"></div>
-                    <div className="relative bg-white dark:bg-neutral-800 rounded-full p-4 shadow-lg mx-auto w-fit">
-                      <FileSpreadsheet className="w-10 h-10 text-green-500 dark:text-green-400" />
+                    <div className="absolute inset-0 rounded-full bg-green-500/10 blur-xl dark:bg-green-400/10"></div>
+                    <div className="relative mx-auto w-fit rounded-full bg-white p-4 shadow-lg dark:bg-neutral-800">
+                      <FileSpreadsheet className="h-10 w-10 text-green-500 dark:text-green-400" />
                     </div>
                   </div>
-                  <div className="bg-white dark:bg-neutral-800 rounded-lg p-4 border border-gray-200 dark:border-neutral-700">
+                  <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <FileSpreadsheet className="w-5 h-5 text-green-500 dark:text-green-400 flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                      <div className="flex min-w-0 flex-1 items-center gap-3">
+                        <FileSpreadsheet className="h-5 w-5 flex-shrink-0 text-green-500 dark:text-green-400" />
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
                             {file.name}
                           </p>
                           <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -315,9 +287,9 @@ export default function ExcelImporter({
                           e.stopPropagation();
                           setFile(null);
                         }}
-                        className="ml-3 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 dark:text-red-400 transition-colors flex-shrink-0"
+                        className="ml-3 flex-shrink-0 rounded-lg p-1.5 text-red-500 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
                       >
-                        <X className="w-4 h-4" />
+                        <X className="h-4 w-4" />
                       </button>
                     </div>
                   </div>
@@ -332,20 +304,20 @@ export default function ExcelImporter({
           <div
             className={`rounded-lg p-4 ${
               result.success && result.data?.failed_count === 0
-                ? "bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800"
+                ? "border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20"
                 : result.data?.failed_count && result.data.failed_count > 0
-                  ? "bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800"
-                  : "bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800"
+                  ? "border border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-900/20"
+                  : "border border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20"
             }`}
           >
             <div className="flex items-start gap-3">
               {result.success && result.data?.failed_count === 0 ? (
-                <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+                <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
               ) : (
-                <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
+                <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-600 dark:text-yellow-400" />
               )}
-              <div className="flex-1 min-w-0">
-                <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
+              <div className="min-w-0 flex-1">
+                <h4 className="mb-2 text-sm font-semibold text-gray-900 dark:text-white">
                   {result.message}
                 </h4>
 
@@ -379,19 +351,16 @@ export default function ExcelImporter({
                 )}
 
                 {result.errors && result.errors.length > 0 && (
-                  <div className="mt-4 space-y-2 max-h-48 overflow-y-auto">
+                  <div className="mt-4 max-h-48 space-y-2 overflow-y-auto">
                     <h5 className="text-xs font-semibold text-gray-900 dark:text-white">
                       {t("excel.errors") || "Errores encontrados"}:
                     </h5>
                     {result.errors.map((error, idx) => (
-                      <div
-                        key={idx}
-                        className="bg-white dark:bg-gray-800 rounded p-2 text-xs"
-                      >
-                        <p className="font-semibold text-red-600 dark:text-red-400 mb-1">
+                      <div key={idx} className="rounded bg-white p-2 text-xs dark:bg-gray-800">
+                        <p className="mb-1 font-semibold text-red-600 dark:text-red-400">
                           {t("excel.row") || "Fila"} {error.row}:
                         </p>
-                        <ul className="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400">
+                        <ul className="list-inside list-disc space-y-0.5 text-gray-600 dark:text-gray-400">
                           {error.errors.map((err, i) => (
                             <li key={i}>{err}</li>
                           ))}
@@ -412,7 +381,7 @@ export default function ExcelImporter({
         submitText={t("excel.import") || "IMPORTAR"}
         cancelText={t("common.cancel") || "CANCELAR"}
         submitVariant="primary"
-        submitIcon={<Upload className="w-4 h-4" />}
+        submitIcon={<Upload className="h-4 w-4" />}
         isLoading={isUploading}
         submitDisabled={!file || isUploading}
       />

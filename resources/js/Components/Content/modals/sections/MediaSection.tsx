@@ -54,11 +54,7 @@ export const MediaSection = ({
 }: MediaSectionProps) => {
   return (
     <div className="space-y-4">
-      <SectionHeader
-        title={
-          t("publications.modal.edit.mediaSection") || "Archivos Multimedia"
-        }
-      />
+      <SectionHeader title={t("publications.modal.edit.mediaSection") || "Archivos Multimedia"} />
 
       {!isDataReady ? (
         <MediaUploadSkeleton />

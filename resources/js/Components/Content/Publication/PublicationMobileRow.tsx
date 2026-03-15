@@ -43,10 +43,7 @@ interface PublicationMobileRowProps {
   onEditRequest?: (item: Publication) => void;
   onViewDetails?: (item: Publication) => void;
   onDuplicate?: (id: number) => void;
-  remoteLocks?: Record<
-    number,
-    { user_id: number; user_name: string; expires_at: string }
-  >;
+  remoteLocks?: Record<number, { user_id: number; user_name: string; expires_at: string }>;
   permissions?: string[];
   onPreviewMedia?: (
     media: {
@@ -112,21 +109,21 @@ const PublicationMobileRow = memo(
     const getStatusIcon = (status: string) => {
       switch (status) {
         case "published":
-          return <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />;
+          return <CheckCircle className="h-3.5 w-3.5 text-emerald-500" />;
         case "publishing":
-          return <Loader2 className="w-3.5 h-3.5 text-blue-500 animate-spin" />;
+          return <Loader2 className="h-3.5 w-3.5 animate-spin text-blue-500" />;
         case "scheduled":
-          return <Calendar className="w-3.5 h-3.5 text-blue-500" />;
+          return <Calendar className="h-3.5 w-3.5 text-blue-500" />;
         case "failed":
-          return <XCircle className="w-3.5 h-3.5 text-rose-500" />;
+          return <XCircle className="h-3.5 w-3.5 text-rose-500" />;
         case "pending_review":
-          return <Clock className="w-3.5 h-3.5 text-amber-500" />;
+          return <Clock className="h-3.5 w-3.5 text-amber-500" />;
         case "approved":
-          return <CheckCircle className="w-3.5 h-3.5 text-purple-500" />;
+          return <CheckCircle className="h-3.5 w-3.5 text-purple-500" />;
         case "rejected":
-          return <XCircle className="w-3.5 h-3.5 text-rose-500" />;
+          return <XCircle className="h-3.5 w-3.5 text-rose-500" />;
         default:
-          return <Clock className="w-3.5 h-3.5 text-gray-500" />;
+          return <Clock className="h-3.5 w-3.5 text-gray-500" />;
       }
     };
 
@@ -158,21 +155,18 @@ const PublicationMobileRow = memo(
             <div
               key={item.id}
               onClick={(e) => handleRowClick(item.id, e)}
-              className={`
-                relative overflow-hidden rounded-lg border transition-all duration-300
-                ${
-                  isExpanded
-                    ? "bg-white dark:bg-neutral-800 border-primary-200 dark:border-primary-900/40 shadow-md ring-1 ring-primary-500/10"
-                    : "bg-white/80 dark:bg-neutral-900/80 border-gray-100 dark:border-neutral-800 hover:border-gray-200 dark:hover:border-neutral-700 shadow-sm"
-                }
-              `}
+              className={`relative overflow-hidden rounded-lg border transition-all duration-300 ${
+                isExpanded
+                  ? "border-primary-200 bg-white shadow-md ring-1 ring-primary-500/10 dark:border-primary-900/40 dark:bg-neutral-800"
+                  : "border-gray-100 bg-white/80 shadow-sm hover:border-gray-200 dark:border-neutral-800 dark:bg-neutral-900/80 dark:hover:border-neutral-700"
+              } `}
               style={{
                 contentVisibility: "auto",
                 containIntrinsicSize: "0 88px",
               }}
             >
               {/* Header Content */}
-              <div className="p-4 flex items-start gap-3">
+              <div className="flex items-start gap-3 p-4">
                 {/* Thumbnail with media preview */}
                 <div
                   className="relative flex-shrink-0 cursor-pointer"
@@ -189,80 +183,76 @@ const PublicationMobileRow = memo(
                   }}
                 >
                   {hasMedia(item) && mediaUrl ? (
-                    <div className="w-16 h-16 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-100 dark:bg-neutral-800 overflow-hidden shadow-sm">
+                    <div className="h-16 w-16 overflow-hidden rounded-lg border border-gray-200 bg-gray-100 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
                       {(item as any).type === "user_event" ? (
-                        <div className="w-16 h-16 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shadow-sm">
-                          <Calendar className="w-8 h-8 text-primary-500" />
+                        <div className="flex h-16 w-16 items-center justify-center rounded-lg border border-gray-200 bg-gray-100 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
+                          <Calendar className="h-8 w-8 text-primary-500" />
                         </div>
                       ) : !hasImageError ? (
                         <img
                           src={mediaUrl}
                           alt={item.title || "Preview"}
-                          className="w-full h-full object-cover"
+                          className="h-full w-full object-cover"
                           loading="lazy"
                           onError={() => handleImageError(item.id)}
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-neutral-800 text-gray-400">
+                        <div className="flex h-full w-full items-center justify-center bg-gray-100 text-gray-400 dark:bg-neutral-800">
                           {isVideo ? (
-                            <Video className="w-6 h-6" />
+                            <Video className="h-6 w-6" />
                           ) : (
-                            <ImageIcon className="w-6 h-6" />
+                            <ImageIcon className="h-6 w-6" />
                           )}
                         </div>
                       )}
                       {isVideo && (
                         <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                          <Video className="w-5 h-5 text-white" />
+                          <Video className="h-5 w-5 text-white" />
                         </div>
                       )}
                       {mediaCount.total > 1 && (
-                        <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-gray-800 text-white text-[10px] flex items-center justify-center border border-white">
+                        <div className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full border border-white bg-gray-800 text-[10px] text-white">
                           +{mediaCount.total - 1}
                         </div>
                       )}
                     </div>
                   ) : (
-                    <div className="w-16 h-16 rounded-lg border border-dashed border-gray-300 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-900/30 flex items-center justify-center shadow-sm">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 shadow-sm dark:border-neutral-700 dark:bg-neutral-900/30">
                       <div className="text-center">
-                        <ImageIcon className="w-6 h-6 text-gray-300 dark:text-neutral-700 mx-auto" />
+                        <ImageIcon className="mx-auto h-6 w-6 text-gray-300 dark:text-neutral-700" />
                       </div>
                     </div>
                   )}
                 </div>
 
                 {/* Main content */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-sm text-gray-900 dark:text-white truncate leading-tight">
+                <div className="min-w-0 flex-1">
+                  <div className="mb-2 flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="truncate text-sm font-semibold leading-tight text-gray-900 dark:text-white">
                         {item.title || t("publications.table.untitled")}
                       </h3>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 break-words line-clamp-2">
-                        {item.description ||
-                          t("publications.table.noDescription")}
+                      <p className="mt-1 line-clamp-2 break-words text-xs text-gray-500 dark:text-gray-400">
+                        {item.description || t("publications.table.noDescription")}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      {(item as any).type === "user_event" &&
-                        canManageContent && (
-                          <Button
-                            onClick={async (e) => {
-                              e.stopPropagation();
-                              await handleDelete(item, true);
-                            }}
-                            disabled={isLoading?.deleting}
-                            loading={isLoading?.deleting}
-                            variant="danger"
-                            buttonStyle="icon"
-                            size="sm"
-                            icon={Trash2}
-                          >
-                            <span className="sr-only">
-                              {t("common.delete")}
-                            </span>
-                          </Button>
-                        )}
+                      {(item as any).type === "user_event" && canManageContent && (
+                        <Button
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            await handleDelete(item, true);
+                          }}
+                          disabled={isLoading?.deleting}
+                          loading={isLoading?.deleting}
+                          variant="danger"
+                          buttonStyle="icon"
+                          size="sm"
+                          icon={Trash2}
+                        >
+                          <span className="sr-only">{t("common.delete")}</span>
+                        </Button>
+                      )}
                       <Button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -281,9 +271,9 @@ const PublicationMobileRow = memo(
 
                   {/* Creator info for events */}
                   {(item as any).type === "user_event" && item.user && (
-                    <div className="flex items-center gap-1.5 mb-2">
-                      <Users className="w-3 h-3 text-gray-400" />
-                      <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400 italic">
+                    <div className="mb-2 flex items-center gap-1.5">
+                      <Users className="h-3 w-3 text-gray-400" />
+                      <span className="text-[10px] font-medium italic text-gray-500 dark:text-gray-400">
                         {t("publications.table.createdBy")}: {item.user.name}
                       </span>
                     </div>
@@ -301,12 +291,10 @@ const PublicationMobileRow = memo(
 
                     {/* Status badge */}
                     <span
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}
+                      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${getStatusColor(item.status)}`}
                     >
                       {getStatusIcon(item.status || "draft")}
-                      <span className="font-medium">
-                        {getStatusText(item.status || "draft")}
-                      </span>
+                      <span className="font-medium">{getStatusText(item.status || "draft")}</span>
                     </span>
 
                     {/* Media indicators */}
@@ -314,13 +302,13 @@ const PublicationMobileRow = memo(
                       <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                         {mediaCount.images > 0 && (
                           <div className="flex items-center gap-1">
-                            <ImageIcon className="w-3 h-3 text-blue-500" />
+                            <ImageIcon className="h-3 w-3 text-blue-500" />
                             <span>{mediaCount.images}</span>
                           </div>
                         )}
                         {mediaCount.videos > 0 && (
                           <div className="flex items-center gap-1">
-                            <Video className="w-3 h-3 text-purple-500" />
+                            <Video className="h-3 w-3 text-purple-500" />
                             <span>{mediaCount.videos}</span>
                           </div>
                         )}
@@ -330,7 +318,7 @@ const PublicationMobileRow = memo(
                     {/* Scheduled time */}
                     {item.scheduled_at && (
                       <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-                        <Calendar className="w-3 h-3" />
+                        <Calendar className="h-3 w-3" />
                         <span>{formatDate(item.scheduled_at)}</span>
                       </div>
                     )}
@@ -338,8 +326,8 @@ const PublicationMobileRow = memo(
                     {/* Event indicators */}
                     {((item as any).type === "user_event" ||
                       (item.scheduled_at && item.status !== "published")) && (
-                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400">
-                        <Calendar className="w-3.5 h-3.5" />
+                      <div className="flex items-center gap-1.5 rounded-full bg-primary-50 px-2.5 py-1 text-xs font-medium text-primary-600 dark:bg-primary-900/20 dark:text-primary-400">
+                        <Calendar className="h-3.5 w-3.5" />
                         <span className="font-medium">
                           {(item as any).type === "user_event"
                             ? t("publications.table.manualEvent")
@@ -351,12 +339,12 @@ const PublicationMobileRow = memo(
 
                   {/* Lock indicator */}
                   {remoteLocks[item.id] && item.status !== "pending_review" && (
-                    <div className="flex items-center gap-2 mt-2 p-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/30 w-full animate-in fade-in slide-in-from-top-1">
-                      <div className="relative flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400">
-                        <Lock className="w-3 h-3" />
-                        <span className="absolute -top-1 -right-1 flex h-2 w-2">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                    <div className="animate-in fade-in slide-in-from-top-1 mt-2 flex w-full items-center gap-2 rounded-lg border border-amber-100 bg-amber-50 p-2 dark:border-amber-800/30 dark:bg-amber-900/20">
+                      <div className="relative flex h-5 w-5 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-800 dark:text-amber-400">
+                        <Lock className="h-3 w-3" />
+                        <span className="absolute -right-1 -top-1 flex h-2 w-2">
+                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75"></span>
+                          <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500"></span>
                         </span>
                       </div>
                       <span className="text-xs font-semibold text-amber-700 dark:text-amber-400">
@@ -366,19 +354,17 @@ const PublicationMobileRow = memo(
                   )}
                   {/* Pending review indicator */}
                   {item.status === "pending_review" && (
-                    <div className="flex items-center gap-2 mt-2 p-2 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-100 dark:border-yellow-800/30 w-full animate-in fade-in slide-in-from-top-1">
-                      <div className="relative flex items-center justify-center w-5 h-5 rounded-full bg-yellow-100 dark:bg-yellow-800 text-yellow-600 dark:text-yellow-400">
-                        <Clock className="w-3 h-3" />
+                    <div className="animate-in fade-in slide-in-from-top-1 mt-2 flex w-full items-center gap-2 rounded-lg border border-yellow-100 bg-yellow-50 p-2 dark:border-yellow-800/30 dark:bg-yellow-900/20">
+                      <div className="relative flex h-5 w-5 items-center justify-center rounded-full bg-yellow-100 text-yellow-600 dark:bg-yellow-800 dark:text-yellow-400">
+                        <Clock className="h-3 w-3" />
                       </div>
-                      <div className="flex flex-col flex-1">
+                      <div className="flex flex-1 flex-col">
                         <span className="text-xs font-semibold text-yellow-700 dark:text-yellow-400">
-                          {t("publications.table.pendingAdminReview") ||
-                            "Pendiente de revisión"}
+                          {t("publications.table.pendingAdminReview") || "Pendiente de revisión"}
                         </span>
                         {item.currentApprovalStep?.role?.name && (
                           <span className="text-[10px] text-yellow-600 dark:text-yellow-500">
-                            {t("approvals.approver_role")}:{" "}
-                            {item.currentApprovalStep.role.name}
+                            {t("approvals.approver_role")}: {item.currentApprovalStep.role.name}
                           </span>
                         )}
                       </div>
@@ -388,7 +374,7 @@ const PublicationMobileRow = memo(
               </div>
 
               {/* Quick actions bar */}
-              <div className="px-4 pb-4 flex items-center gap-2">
+              <div className="flex items-center gap-2 px-4 pb-4">
                 {/* View Details button - Always visible */}
                 <Button
                   onClick={(e) => {
@@ -457,14 +443,14 @@ const PublicationMobileRow = memo(
 
               {/* Expanded Content */}
               {isExpanded && (
-                <div className="px-4 pb-4 animate-in fade-in slide-in-from-top-1 duration-200">
-                  <div className="pt-4 border-t border-gray-100 dark:border-neutral-700/50 space-y-4">
+                <div className="animate-in fade-in slide-in-from-top-1 px-4 pb-4 duration-200">
+                  <div className="space-y-4 border-t border-gray-100 pt-4 dark:border-neutral-700/50">
                     {/* Additional info */}
                     <div className="space-y-3">
                       {/* User info */}
                       {item.user && (
                         <div className="flex items-center gap-3">
-                          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center flex-shrink-0">
+                          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-500">
                             {item.user.photo_url ? (
                               <img
                                 src={item.user.photo_url}
@@ -473,7 +459,7 @@ const PublicationMobileRow = memo(
                                 loading="lazy"
                               />
                             ) : (
-                              <span className="text-xs font-bold text-white uppercase">
+                              <span className="text-xs font-bold uppercase text-white">
                                 {item.user.name.charAt(0)}
                               </span>
                             )}
@@ -495,21 +481,18 @@ const PublicationMobileRow = memo(
                         !Array.isArray(item.platform_settings) &&
                         Object.keys(item.platform_settings).length > 0 && (
                           <div>
-                            <h4 className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2">
+                            <h4 className="mb-2 text-xs font-semibold text-gray-600 dark:text-gray-400">
                               {t("publications.table.platforms")}:
                             </h4>
                             <div className="flex flex-wrap gap-1.5">
-                              {Object.keys(item.platform_settings).map(
-                                (platform) => (
-                                  <span
-                                    key={platform}
-                                    className="px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 text-xs text-gray-700 dark:text-gray-300 font-medium"
-                                  >
-                                    {platform.charAt(0).toUpperCase() +
-                                      platform.slice(1)}
-                                  </span>
-                                ),
-                              )}
+                              {Object.keys(item.platform_settings).map((platform) => (
+                                <span
+                                  key={platform}
+                                  className="rounded-lg bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                                >
+                                  {platform.charAt(0).toUpperCase() + platform.slice(1)}
+                                </span>
+                              ))}
                             </div>
                           </div>
                         )}
@@ -517,8 +500,8 @@ const PublicationMobileRow = memo(
                       {/* Campaigns */}
                       {item.campaigns && item.campaigns.length > 0 && (
                         <div className="flex items-center gap-2">
-                          <div className="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-900/20">
-                            <Users className="w-4 h-4 text-indigo-500" />
+                          <div className="rounded-lg bg-indigo-50 p-1.5 dark:bg-indigo-900/20">
+                            <Users className="h-4 w-4 text-indigo-500" />
                           </div>
                           <div>
                             <p className="text-sm font-medium text-gray-900 dark:text-white">
@@ -538,7 +521,7 @@ const PublicationMobileRow = memo(
 
                       {/* Accounts */}
                       <div>
-                        <h4 className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2">
+                        <h4 className="mb-2 text-xs font-semibold text-gray-600 dark:text-gray-400">
                           {t("publications.table.linkedAccounts")}:
                         </h4>
                         <SocialAccountsDisplay
@@ -601,14 +584,10 @@ const PublicationMobileRow = memo(
                           }
                           className="flex-1"
                         >
-                          {remoteLocks[item.id] ||
-                          (item.status as string) === "processing"
+                          {remoteLocks[item.id] || (item.status as string) === "processing"
                             ? (item.status as string) === "processing"
                               ? t("common.processing")
-                              : t("publications.table.lockedBy").replace(
-                                  ":",
-                                  "",
-                                )
+                              : t("publications.table.lockedBy").replace(":", "")
                             : t("common.edit")}
                         </Button>
                       )}
@@ -618,15 +597,10 @@ const PublicationMobileRow = memo(
                         <Button
                           onClick={async (e) => {
                             e.stopPropagation();
-                            await handleDelete(
-                              item,
-                              (item as any).type === "user_event",
-                            );
+                            await handleDelete(item, (item as any).type === "user_event");
                           }}
                           disabled={
-                            isLoading?.publishing ||
-                            isLoading?.editing ||
-                            isLoading?.deleting
+                            isLoading?.publishing || isLoading?.editing || isLoading?.deleting
                           }
                           loading={isLoading?.deleting}
                           variant="danger"

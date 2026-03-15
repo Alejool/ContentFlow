@@ -39,16 +39,10 @@ export const CommentsHistorySection = ({
       {publicationId && (
         <div className="space-y-4">
           <SectionHeader
-            title={
-              t("publications.modal.edit.commentsSection") ||
-              "Comentarios Internos"
-            }
+            title={t("publications.modal.edit.commentsSection") || "Comentarios Internos"}
             className="pt-6"
           />
-          <CommentsSection
-            publicationId={publicationId}
-            currentUser={currentUser}
-          />
+          <CommentsSection publicationId={publicationId} currentUser={currentUser} />
         </div>
       )}
 

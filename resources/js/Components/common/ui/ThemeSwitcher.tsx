@@ -42,46 +42,31 @@ export default function ThemeSwitcher() {
   return (
     <button
       onClick={handleToggle}
-      className="relative p-2 rounded-lg text-gray-600 dark:text-gray-300
-       transition-all duration-300 group
-       border border-gray-300/50 dark:border-gray-600/50
-       bg-gray-100/70 dark:bg-gray-800/70
-       hover:bg-gray-200 dark:hover:bg-gray-700
-       hover:border-primary-400/50 dark:hover:border-primary-600/50
-       shadow-sm hover:shadow-md
-       disabled:opacity-50 disabled:cursor-not-allowed"
+      className="group relative rounded-lg border border-gray-300/50 bg-gray-100/70 p-2 text-gray-600 shadow-sm transition-all duration-300 hover:border-primary-400/50 hover:bg-gray-200 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600/50 dark:bg-gray-800/70 dark:text-gray-300 dark:hover:border-primary-600/50 dark:hover:bg-gray-700"
       aria-label={`Toggle theme (current: ${label})`}
       title={`Switch to ${nextTheme} mode`}
       disabled={isAnimating}
     >
-      <div className="relative w-10 h-10 flex items-center justify-center">
+      <div className="relative flex h-10 w-10 items-center justify-center">
         <Icon
-          className={`w-6 h-6 transition-all duration-500 ease-out ${
+          className={`h-6 w-6 transition-all duration-500 ease-out ${
             isAnimating
-              ? "scale-0 rotate-180 opacity-0"
-              : "scale-100 group-hover:scale-110 group-hover:rotate-12 opacity-100"
+              ? "rotate-180 scale-0 opacity-0"
+              : "scale-100 opacity-100 group-hover:rotate-12 group-hover:scale-110"
           }`}
         />
 
         <div
-          className={`absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center rounded-full 
-            bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900
-            border border-gray-300 dark:border-gray-600 
-            shadow-sm transition-all duration-500 ease-out ${
-              isAnimating
-                ? "scale-0 -rotate-90 opacity-0"
-                : "scale-100 opacity-100 group-hover:scale-110 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-            }`}
+          className={`absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full border border-gray-300 bg-gradient-to-br from-gray-50 to-gray-100 shadow-sm transition-all duration-500 ease-out dark:border-gray-600 dark:from-gray-800 dark:to-gray-900 ${
+            isAnimating
+              ? "-rotate-90 scale-0 opacity-0"
+              : "scale-100 opacity-100 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:scale-110"
+          }`}
         >
-          <NextIcon className="w-3 h-3 text-gray-700 dark:text-gray-300" />
+          <NextIcon className="h-3 w-3 text-gray-700 dark:text-gray-300" />
         </div>
 
-        <div
-          className="absolute -top-0.5 -left-0.5 w-2 h-2 rounded-full 
-          bg-primary-500 dark:bg-primary-400 
-          opacity-0 group-hover:opacity-100 transition-all duration-300
-          group-hover:animate-pulse"
-        />
+        <div className="absolute -left-0.5 -top-0.5 h-2 w-2 rounded-full bg-primary-500 opacity-0 transition-all duration-300 group-hover:animate-pulse group-hover:opacity-100 dark:bg-primary-400" />
       </div>
     </button>
   );

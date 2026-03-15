@@ -42,9 +42,7 @@ export default function PlatformVideoSettings({
         duration: videoMetadata.duration,
         width: videoMetadata.width,
         height: videoMetadata.height,
-        aspectRatio:
-          videoMetadata.aspectRatio ||
-          videoMetadata.width / videoMetadata.height,
+        aspectRatio: videoMetadata.aspectRatio || videoMetadata.width / videoMetadata.height,
         size: 0,
         format: "",
       },
@@ -62,11 +60,11 @@ export default function PlatformVideoSettings({
     <div className="space-y-4">
       {/* Información de requisitos */}
       {requirements && (
-        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
           <div className="flex items-start gap-3">
-            <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+            <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
             <div className="flex-1">
-              <p className="text-sm font-medium text-blue-800 dark:text-blue-300 mb-2">
+              <p className="mb-2 text-sm font-medium text-blue-800 dark:text-blue-300">
                 {t("videoValidation.requirements")}
               </p>
               <div className="space-y-2 text-xs text-blue-700 dark:text-blue-400">
@@ -75,12 +73,9 @@ export default function PlatformVideoSettings({
                     <p className="font-medium">YouTube Shorts:</p>
                     <ul className="ml-4 mt-1 space-y-1">
                       <li>
-                        • {t("videoValidation.maxDuration")}:{" "}
-                        {requirements.short.maxDuration}s
+                        • {t("videoValidation.maxDuration")}: {requirements.short.maxDuration}s
                       </li>
-                      <li>
-                        • {t("videoValidation.aspectRatio")}: 9:16 (vertical)
-                      </li>
+                      <li>• {t("videoValidation.aspectRatio")}: 9:16 (vertical)</li>
                       <li>• {t("videoValidation.minResolution")}: 720x1280</li>
                     </ul>
                   </div>
@@ -90,12 +85,9 @@ export default function PlatformVideoSettings({
                     <p className="font-medium">{requirements.name} Reels:</p>
                     <ul className="ml-4 mt-1 space-y-1">
                       <li>
-                        • {t("videoValidation.maxDuration")}:{" "}
-                        {requirements.reel.maxDuration}s
+                        • {t("videoValidation.maxDuration")}: {requirements.reel.maxDuration}s
                       </li>
-                      <li>
-                        • {t("videoValidation.aspectRatio")}: 9:16 (vertical)
-                      </li>
+                      <li>• {t("videoValidation.aspectRatio")}: 9:16 (vertical)</li>
                       <li>
                         • {t("videoValidation.minResolution")}:{" "}
                         {requirements.reel.resolution.minWidth}x
@@ -134,8 +126,8 @@ export default function PlatformVideoSettings({
 
       {/* Metadatos del video */}
       {videoMetadata && videoMetadata.width && videoMetadata.height && (
-        <div className="p-3 bg-gray-50 dark:bg-neutral-800 rounded-lg">
-          <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <div className="rounded-lg bg-gray-50 p-3 dark:bg-neutral-800">
+          <p className="mb-2 text-xs font-medium text-gray-700 dark:text-gray-300">
             {t("videoValidation.videoInfo")}
           </p>
           <div className="grid grid-cols-2 gap-2 text-xs">
@@ -163,8 +155,7 @@ export default function PlatformVideoSettings({
                 {videoMetadata.aspectRatio?.toFixed(2)} (
                 {videoMetadata.aspectRatio && videoMetadata.aspectRatio < 1
                   ? "9:16"
-                  : videoMetadata.aspectRatio &&
-                      Math.abs(videoMetadata.aspectRatio - 1) < 0.1
+                  : videoMetadata.aspectRatio && Math.abs(videoMetadata.aspectRatio - 1) < 0.1
                     ? "1:1"
                     : "16:9"}
                 )

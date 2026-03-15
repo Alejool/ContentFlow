@@ -6,21 +6,12 @@ interface PlatformModalFooterProps {
   onSave?: () => void;
 }
 
-export default function PlatformModalFooter({
-  onClose,
-  onSave,
-}: PlatformModalFooterProps) {
+export default function PlatformModalFooter({ onClose, onSave }: PlatformModalFooterProps) {
   const { t } = useTranslation();
 
   return (
-    <div className="flex justify-end gap-3 py-4 border-t border-neutral-100 dark:border-neutral-800">
-      <Button
-        onClick={onClose}
-        variant="secondary"
-        buttonStyle="outline"
-        size="lg"
-        type="button"
-      >
+    <div className="flex justify-end gap-3 border-t border-neutral-100 py-4 dark:border-neutral-800">
+      <Button onClick={onClose} variant="secondary" buttonStyle="outline" size="lg" type="button">
         {t("common.cancel") || "Cancelar"}
       </Button>
       <Button

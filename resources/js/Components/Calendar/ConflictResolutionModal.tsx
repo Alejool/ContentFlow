@@ -22,13 +22,15 @@ interface ConflictResolutionModalProps {
   isOpen: boolean;
 }
 
-export const ConflictResolutionModal: React.FC<
-  ConflictResolutionModalProps
-> = ({ conflict, event, onResolve, onCancel, isOpen }) => {
+export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = ({
+  conflict,
+  event,
+  onResolve,
+  onCancel,
+  isOpen,
+}) => {
   const { t } = useTranslation();
-  const [selectedResolution, setSelectedResolution] = useState<
-    "local" | "server" | null
-  >(null);
+  const [selectedResolution, setSelectedResolution] = useState<"local" | "server" | null>(null);
 
   if (!isOpen) return null;
 
@@ -67,21 +69,21 @@ export const ConflictResolutionModal: React.FC<
       role="dialog"
       aria-modal="true"
     >
-      <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+      <div className="flex min-h-screen items-center justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
         {/* Background overlay */}
         <div
-          className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
+          className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
           aria-hidden="true"
           onClick={onCancel}
         ></div>
 
         {/* Modal panel */}
-        <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+        <div className="inline-block transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all dark:bg-gray-800 sm:my-8 sm:w-full sm:max-w-2xl sm:align-middle">
           {/* Header */}
-          <div className="bg-amber-50 dark:bg-amber-900/20 px-6 py-4 border-b border-amber-200 dark:border-amber-800">
+          <div className="border-b border-amber-200 bg-amber-50 px-6 py-4 dark:border-amber-800 dark:bg-amber-900/20">
             <div className="flex items-center gap-3">
               <div className="flex-shrink-0">
-                <AlertTriangle className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+                <AlertTriangle className="h-6 w-6 text-amber-600 dark:text-amber-400" />
               </div>
               <div className="flex-1">
                 <h3
@@ -90,7 +92,7 @@ export const ConflictResolutionModal: React.FC<
                 >
                   {t("calendar.conflict.title", "Data Conflict Detected")}
                 </h3>
-                <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">
                   {t(
                     "calendar.conflict.description",
                     "This event has been modified by another user. Please choose which version to keep.",
@@ -103,11 +105,11 @@ export const ConflictResolutionModal: React.FC<
           {/* Content */}
           <div className="px-6 py-4">
             {event && (
-              <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <div className="mb-4 rounded-lg bg-gray-50 p-3 dark:bg-gray-700">
                 <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
                   {t("calendar.conflict.event", "Event")}: {event.title}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                   {t("calendar.conflict.field_label", "Conflicting field")}:{" "}
                   {getFieldLabel(conflict.field)}
                 </p>
@@ -117,10 +119,10 @@ export const ConflictResolutionModal: React.FC<
             <div className="space-y-4">
               {/* Local Version */}
               <div
-                className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
+                className={`cursor-pointer rounded-lg border-2 p-4 transition-all ${
                   selectedResolution === "local"
                     ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                    : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                    : "border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600"
                 }`}
                 onClick={() => setSelectedResolution("local")}
                 role="button"
@@ -131,17 +133,14 @@ export const ConflictResolutionModal: React.FC<
                   }
                 }}
               >
-                <div className="flex items-start justify-between mb-2">
+                <div className="mb-2 flex items-start justify-between">
                   <div className="flex items-center gap-2">
                     <input
                       type="radio"
                       checked={selectedResolution === "local"}
                       onChange={() => setSelectedResolution("local")}
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500"
-                      aria-label={t(
-                        "calendar.conflict.select_local",
-                        "Select your version",
-                      )}
+                      aria-label={t("calendar.conflict.select_local", "Select your version")}
                     />
                     <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                       {t("calendar.conflict.your_version", "Your Version")}
@@ -154,17 +153,17 @@ export const ConflictResolutionModal: React.FC<
 
                 <div className="ml-6 space-y-2">
                   <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
-                    <Clock className="w-3 h-3" />
+                    <Clock className="h-3 w-3" />
                     <span>{conflict.localTimestamp.toLocaleString()}</span>
                   </div>
                   {conflict.localUser && (
                     <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
-                      <User className="w-3 h-3" />
+                      <User className="h-3 w-3" />
                       <span>{conflict.localUser}</span>
                     </div>
                   )}
-                  <div className="mt-2 p-2 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
-                    <pre className="text-xs text-gray-900 dark:text-gray-100 whitespace-pre-wrap break-all">
+                  <div className="mt-2 rounded border border-gray-200 bg-white p-2 dark:border-gray-700 dark:bg-gray-800">
+                    <pre className="whitespace-pre-wrap break-all text-xs text-gray-900 dark:text-gray-100">
                       {formatValue(conflict.localValue)}
                     </pre>
                   </div>
@@ -173,10 +172,10 @@ export const ConflictResolutionModal: React.FC<
 
               {/* Server Version */}
               <div
-                className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
+                className={`cursor-pointer rounded-lg border-2 p-4 transition-all ${
                   selectedResolution === "server"
                     ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                    : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                    : "border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600"
                 }`}
                 onClick={() => setSelectedResolution("server")}
                 role="button"
@@ -187,17 +186,14 @@ export const ConflictResolutionModal: React.FC<
                   }
                 }}
               >
-                <div className="flex items-start justify-between mb-2">
+                <div className="mb-2 flex items-start justify-between">
                   <div className="flex items-center gap-2">
                     <input
                       type="radio"
                       checked={selectedResolution === "server"}
                       onChange={() => setSelectedResolution("server")}
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500"
-                      aria-label={t(
-                        "calendar.conflict.select_server",
-                        "Select server version",
-                      )}
+                      aria-label={t("calendar.conflict.select_server", "Select server version")}
                     />
                     <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                       {t("calendar.conflict.server_version", "Server Version")}
@@ -210,17 +206,17 @@ export const ConflictResolutionModal: React.FC<
 
                 <div className="ml-6 space-y-2">
                   <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
-                    <Clock className="w-3 h-3" />
+                    <Clock className="h-3 w-3" />
                     <span>{conflict.serverTimestamp.toLocaleString()}</span>
                   </div>
                   {conflict.serverUser && (
                     <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
-                      <User className="w-3 h-3" />
+                      <User className="h-3 w-3" />
                       <span>{conflict.serverUser}</span>
                     </div>
                   )}
-                  <div className="mt-2 p-2 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
-                    <pre className="text-xs text-gray-900 dark:text-gray-100 whitespace-pre-wrap break-all">
+                  <div className="mt-2 rounded border border-gray-200 bg-white p-2 dark:border-gray-700 dark:bg-gray-800">
+                    <pre className="whitespace-pre-wrap break-all text-xs text-gray-900 dark:text-gray-100">
                       {formatValue(conflict.serverValue)}
                     </pre>
                   </div>
@@ -228,7 +224,7 @@ export const ConflictResolutionModal: React.FC<
               </div>
             </div>
 
-            <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+            <div className="mt-4 rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20">
               <p className="text-xs text-blue-700 dark:text-blue-300">
                 {t(
                   "calendar.conflict.info",
@@ -239,11 +235,11 @@ export const ConflictResolutionModal: React.FC<
           </div>
 
           {/* Footer */}
-          <div className="bg-gray-50 dark:bg-gray-700 px-6 py-4 flex items-center justify-end gap-3">
+          <div className="flex items-center justify-end gap-3 bg-gray-50 px-6 py-4 dark:bg-gray-700">
             <button
               type="button"
               onClick={onCancel}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-500 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500"
             >
               {t("calendar.conflict.cancel", "Cancel")}
             </button>
@@ -251,7 +247,7 @@ export const ConflictResolutionModal: React.FC<
               type="button"
               onClick={handleResolve}
               disabled={!selectedResolution}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {t("calendar.conflict.resolve", "Apply Selected Version")}
             </button>

@@ -18,20 +18,8 @@ interface ModalFooterProps {
   onSecondarySubmit?: () => void;
   onPrimarySubmit?: () => void;
 
-  submitVariant?:
-    | "primary"
-    | "danger"
-    | "secondary"
-    | "success"
-    | "ghost"
-    | "warning";
-  cancelVariant?:
-    | "primary"
-    | "danger"
-    | "secondary"
-    | "success"
-    | "ghost"
-    | "warning";
+  submitVariant?: "primary" | "danger" | "secondary" | "success" | "ghost" | "warning";
+  cancelVariant?: "primary" | "danger" | "secondary" | "success" | "ghost" | "warning";
   submitStyle?: "solid" | "outline" | "gradient" | "ghost";
   cancelStyle?: "solid" | "outline" | "gradient" | "ghost";
   hideSubmit?: boolean;
@@ -46,8 +34,8 @@ export default function ModalFooter({
   submitText = "Save",
   cancelText = "Cancel",
   formId,
-  submitIcon = <Save className="w-4 h-4" />,
-  cancelIcon = <X className="w-4 h-4" />,
+  submitIcon = <Save className="h-4 w-4" />,
+  cancelIcon = <X className="h-4 w-4" />,
   showSecondarySubmit = false,
   secondarySubmitText = "Secondary",
   secondarySubmitVariant = "secondary",
@@ -67,13 +55,13 @@ export default function ModalFooter({
 }: ModalFooterProps) {
   return (
     <div
-      className="bg-gradient-to-r from-gray-50 to-white dark:from-neutral-900 dark:to-neutral-800 border-t border-gray-100 dark:border-neutral-700 p-4 sticky bottom-0 z-20 backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95 flex items-center justify-between gap-4"
+      className="sticky bottom-0 z-20 flex items-center justify-between gap-4 border-t border-gray-100 bg-opacity-95 bg-gradient-to-r from-gray-50 to-white p-4 backdrop-blur-sm dark:border-neutral-700 dark:bg-opacity-95 dark:from-neutral-900 dark:to-neutral-800"
       style={style}
     >
-      <div className="flex flex-col flex-1 gap-4 overflow-x-auto">
-        <div className="flex-1 overflow-x-auto min-w-0">{children}</div>
+      <div className="flex flex-1 flex-col gap-4 overflow-x-auto">
+        <div className="min-w-0 flex-1 overflow-x-auto">{children}</div>
 
-        <div className="flex justify-end gap-3 shrink-0">
+        <div className="flex shrink-0 justify-end gap-3">
           {onClose && (
             <Button
               type="button"
@@ -124,10 +112,7 @@ export default function ModalFooter({
                   "Button type:",
                   onPrimarySubmit ? "button" : formId ? "submit" : "button",
                 );
-                console.log(
-                  "Button form:",
-                  onPrimarySubmit ? undefined : formId,
-                );
+                console.log("Button form:", onPrimarySubmit ? undefined : formId);
                 if (onPrimarySubmit) {
                   onPrimarySubmit();
                 }

@@ -89,12 +89,7 @@ export const AnimatedToast: React.FC<ToastProps> = ({
         animate="animate"
         exit="exit"
         transition={{ duration: 0.25, ease: "easeInOut" }}
-        className={`
-          flex items-start gap-3 p-4 rounded-lg shadow-lg
-          border-l-4 ${styles.border}
-          ${styles.bg}
-          min-w-[320px] max-w-md
-        `}
+        className={`flex items-start gap-3 rounded-lg border-l-4 p-4 shadow-lg ${styles.border} ${styles.bg} min-w-[320px] max-w-md`}
         role="alert"
         aria-live={type === "error" ? "assertive" : "polite"}
       >
@@ -106,20 +101,10 @@ export const AnimatedToast: React.FC<ToastProps> = ({
 
         <button
           onClick={() => onClose(id)}
-          className={`
-            p-1 rounded hover:bg-black/10 dark:hover:bg-white/10
-            transition-colors duration-fast
-            focus-ring
-            ${styles.text}
-          `}
+          className={`rounded p-1 transition-colors duration-fast focus-ring hover:bg-black/10 dark:hover:bg-white/10 ${styles.text} `}
           aria-label="Cerrar notificación"
         >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"

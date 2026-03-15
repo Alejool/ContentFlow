@@ -18,9 +18,9 @@ export default function CampaignPublications({
 
   return (
     <tr>
-      <td colSpan={5} className="px-0 bg-gray-50/50 dark:bg-neutral-900/30">
-        <div className="px-4 lg:px-12 py-4">
-          <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3 pl-2 border-l-2 border-primary-500">
+      <td colSpan={5} className="bg-gray-50/50 px-0 dark:bg-neutral-900/30">
+        <div className="px-4 py-4 lg:px-12">
+          <div className="mb-3 border-l-2 border-primary-500 pl-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
             {t("campaigns.modal.view.associatedPublications")}
           </div>
           {publications.length > 0 ? (
@@ -30,14 +30,14 @@ export default function CampaignPublications({
                 return (
                   <div
                     key={pub.id}
-                    className="flex items-center gap-3 p-3 rounded-lg border bg-white border-gray-200 dark:bg-neutral-800 dark:border-neutral-700"
+                    className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-800"
                   >
                     <div className="flex items-center gap-3 p-2">
-                      <div className="w-8 h-8 lg:w-10 lg:h-10 rounded flex-shrink-0 border border-gray-200 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800 overflow-hidden flex items-center justify-center">
+                      <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center overflow-hidden rounded border border-gray-200 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800 lg:h-10 lg:w-10">
                         <PublicationThumbnail publication={pub} />
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium truncate text-gray-800 dark:text-gray-200">
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate text-sm font-medium text-gray-800 dark:text-gray-200">
                           {pub.title}
                         </div>
                         <div className="text-xs text-gray-500">
@@ -46,7 +46,7 @@ export default function CampaignPublications({
                       </div>
                     </div>
                     <div
-                      className={`text-xs px-2 py-1 rounded-full flex-shrink-0 ${getStatusColor(
+                      className={`flex-shrink-0 rounded-full px-2 py-1 text-xs ${getStatusColor(
                         pub.status,
                       )}`}
                     >
@@ -57,9 +57,7 @@ export default function CampaignPublications({
               })}
             </div>
           ) : (
-            <div className="text-sm text-gray-500 italic">
-              {t("campaigns.noPublications")}
-            </div>
+            <div className="text-sm italic text-gray-500">{t("campaigns.noPublications")}</div>
           )}
         </div>
       </td>

@@ -1,15 +1,7 @@
 import DynamicIcon from "@/Components/Notifications/DynamicIcon";
 import { formatDistanceToNow } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  AlertCircle,
-  AlertTriangle,
-  CheckCircle,
-  ImageOff,
-  Info,
-  X,
-  XCircle,
-} from "lucide-react";
+import { AlertCircle, AlertTriangle, CheckCircle, ImageOff, Info, X, XCircle } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -18,10 +10,7 @@ interface NotificationItemProps {
   onMarkAsRead: (id: string) => void;
 }
 
-export default function NotificationItem({
-  notification,
-  onMarkAsRead,
-}: NotificationItemProps) {
+export default function NotificationItem({ notification, onMarkAsRead }: NotificationItemProps) {
   const { t } = useTranslation();
 
   // Guard against undefined notification
@@ -61,8 +50,8 @@ export default function NotificationItem({
       return (
         <DynamicIcon
           name={data.icon}
-          className={`w-4 h-4 ${getStatusColor()}`}
-          fallback={<Info className="w-4 h-4 text-blue-500" />}
+          className={`h-4 w-4 ${getStatusColor()}`}
+          fallback={<Info className="h-4 w-4 text-blue-500" />}
         />
       );
     }
@@ -70,39 +59,36 @@ export default function NotificationItem({
     switch (data.status) {
       case "success":
       case "published":
-        return <CheckCircle className="w-4 h-4 text-green-500" />;
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
       case "deleted":
-        return <X className="w-4 h-4 text-gray-500" />;
+        return <X className="h-4 w-4 text-gray-500" />;
       case "rejected":
       case "failed":
       case "error":
-        return <XCircle className="w-4 h-4 text-red-500" />;
+        return <XCircle className="h-4 w-4 text-red-500" />;
       case "restricted":
       case "copyright_claim":
-        return <AlertCircle className="w-4 h-4 text-amber-500" />;
+        return <AlertCircle className="h-4 w-4 text-amber-500" />;
       default:
-        if (data.type === "success")
-          return <CheckCircle className="w-4 h-4 text-green-500" />;
-        if (data.type === "error")
-          return <XCircle className="w-4 h-4 text-red-500" />;
-        if (data.type === "warning")
-          return <AlertTriangle className="w-4 h-4 text-amber-500" />;
-        return <Info className="w-4 h-4 text-blue-500" />;
+        if (data.type === "success") return <CheckCircle className="h-4 w-4 text-green-500" />;
+        if (data.type === "error") return <XCircle className="h-4 w-4 text-red-500" />;
+        if (data.type === "warning") return <AlertTriangle className="h-4 w-4 text-amber-500" />;
+        return <Info className="h-4 w-4 text-blue-500" />;
     }
   };
 
   return (
     <motion.div
       layout
-      className={`p-3 sm:p-4 border-b border-gray-200 dark:border-neutral-800 transition-colors duration-200 cursor-pointer relative group hover:bg-gray-50 dark:hover:bg-neutral-800/50 ${
+      className={`group relative cursor-pointer border-b border-gray-200 p-3 transition-colors duration-200 hover:bg-gray-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50 sm:p-4 ${
         !isRead ? "bg-primary-50/50 dark:bg-primary-900/10" : ""
       }`}
       onClick={() => onMarkAsRead(notification.id)}
     >
-      <div className="flex gap-2 sm:gap-3 items-start">
+      <div className="flex items-start gap-2 sm:gap-3">
         <div className="mt-0.5 flex-shrink-0">{getIcon()}</div>
 
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0 flex-1">
           <div
             onClick={(e) => {
               e.stopPropagation();
@@ -110,7 +96,7 @@ export default function NotificationItem({
             }}
           >
             {data.title && (
-              <p className="text-sm font-semibold mb-1 text-gray-900 dark:text-gray-100">
+              <p className="mb-1 text-sm font-semibold text-gray-900 dark:text-gray-100">
                 {data.title}
               </p>
             )}
@@ -122,7 +108,7 @@ export default function NotificationItem({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.15 }}
-                  className={`text-sm mb-1 break-words text-gray-700 dark:text-gray-200 ${
+                  className={`mb-1 break-words text-sm text-gray-700 dark:text-gray-200 ${
                     isExpanded ? "" : "line-clamp-2"
                   }`}
                 >
@@ -132,21 +118,19 @@ export default function NotificationItem({
             )}
 
             {data.message && data.message.length > 100 && (
-              <span className="text-xs hover:underline cursor-pointer text-primary-600 dark:text-primary-400">
+              <span className="cursor-pointer text-xs text-primary-600 hover:underline dark:text-primary-400">
                 {isExpanded ? t("common.show_less") : t("common.read_more")}
               </span>
             )}
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap mt-1">
+          <div className="mt-1 flex flex-wrap items-center gap-2">
             {data.description && (
-              <p className="text-xs mb-1.5 text-gray-500 dark:text-gray-400">
-                {data.description}
-              </p>
+              <p className="mb-1.5 text-xs text-gray-500 dark:text-gray-400">{data.description}</p>
             )}
 
             {data.account_name && (
-              <p className="text-xs mb-1 font-medium text-primary-600 dark:text-primary-400">
+              <p className="mb-1 text-xs font-medium text-primary-600 dark:text-primary-400">
                 {data.account_name}
               </p>
             )}
@@ -156,31 +140,21 @@ export default function NotificationItem({
                 <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
                   {data.publication_title}
                 </span>
-                <span className="text-xs text-gray-400 dark:text-gray-600">
-                  •
-                </span>
+                <span className="text-xs text-gray-400 dark:text-gray-600">•</span>
               </>
             )}
 
             {data.campaign_name && (
               <>
-                <span className="text-xs italic text-gray-500">
-                  {data.campaign_name}
-                </span>
-                <span className="text-xs text-gray-400 dark:text-gray-600">
-                  •
-                </span>
+                <span className="text-xs italic text-gray-500">{data.campaign_name}</span>
+                <span className="text-xs text-gray-400 dark:text-gray-600">•</span>
               </>
             )}
 
             {data.platform && (
               <>
-                <span className={`text-xs capitalize ${getStatusColor()}`}>
-                  {data.platform}
-                </span>
-                <span className="text-xs text-gray-400 dark:text-gray-600">
-                  •
-                </span>
+                <span className={`text-xs capitalize ${getStatusColor()}`}>{data.platform}</span>
+                <span className="text-xs text-gray-400 dark:text-gray-600">•</span>
               </>
             )}
 
@@ -192,22 +166,19 @@ export default function NotificationItem({
           </div>
 
           {data.orphaned_posts_list && data.orphaned_posts_list.length > 0 && (
-            <div className="mt-2 p-2 rounded text-xs bg-gray-100 dark:bg-neutral-800">
-              <p className="font-semibold mb-1 text-gray-700 dark:text-gray-300">
+            <div className="mt-2 rounded bg-gray-100 p-2 text-xs dark:bg-neutral-800">
+              <p className="mb-1 font-semibold text-gray-700 dark:text-gray-300">
                 {t("common.affected_publications")}
               </p>
-              <ul className="list-disc list-inside text-gray-600 dark:text-gray-400">
-                {data.orphaned_posts_list
-                  .slice(0, 3)
-                  .map((title: string, index: number) => (
-                    <li key={index} className="truncate">
-                      {title}
-                    </li>
-                  ))}
+              <ul className="list-inside list-disc text-gray-600 dark:text-gray-400">
+                {data.orphaned_posts_list.slice(0, 3).map((title: string, index: number) => (
+                  <li key={index} className="truncate">
+                    {title}
+                  </li>
+                ))}
                 {data.orphaned_posts_list.length > 3 && (
                   <li className="list-none pt-1 opacity-75">
-                    + {data.orphaned_posts_list.length - 3}{" "}
-                    {t("common.more_items")}
+                    + {data.orphaned_posts_list.length - 3} {t("common.more_items")}
                   </li>
                 )}
               </ul>
@@ -216,11 +187,11 @@ export default function NotificationItem({
         </div>
 
         {data.thumbnail_url && !imageError && (
-          <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-md overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-neutral-800">
+          <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-md bg-gray-100 dark:bg-neutral-800 sm:h-16 sm:w-16">
             <img
               src={data.thumbnail_url}
               alt={data.publication_title || "Thumbnail"}
-              className="w-full h-full object-cover"
+              className="h-full w-full object-cover"
               onError={() => setImageError(true)}
               loading="lazy"
             />
@@ -228,13 +199,13 @@ export default function NotificationItem({
         )}
 
         {data.thumbnail_url && imageError && (
-          <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-md flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-neutral-800">
-            <ImageOff className="w-6 h-6 text-gray-400 dark:text-neutral-600" />
+          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-md bg-gray-100 dark:bg-neutral-800 sm:h-16 sm:w-16">
+            <ImageOff className="h-6 w-6 text-gray-400 dark:text-neutral-600" />
           </div>
         )}
 
         {!isRead && (
-          <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-primary-500 flex-shrink-0" />
+          <div className="absolute right-3 top-3 h-2 w-2 flex-shrink-0 rounded-full bg-primary-500" />
         )}
       </div>
     </motion.div>

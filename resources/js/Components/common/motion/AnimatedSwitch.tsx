@@ -8,10 +8,7 @@ import React, { forwardRef, InputHTMLAttributes } from "react";
 import { LazyMotion, domAnimation, m } from "framer-motion";
 import { prefersReducedMotion } from "@/Utils/themeTransition";
 
-interface AnimatedSwitchProps extends Omit<
-  InputHTMLAttributes<HTMLInputElement>,
-  "type"
-> {
+interface AnimatedSwitchProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
   label?: string;
   description?: string;
   onCheckedChange?: (checked: boolean) => void;
@@ -56,31 +53,20 @@ export const AnimatedSwitch = forwardRef<HTMLInputElement, AnimatedSwitchProps>(
             checked={checked}
             onChange={handleChange}
             disabled={disabled}
-            className="sr-only peer"
+            className="peer sr-only"
             role="switch"
             aria-checked={checked}
-            aria-describedby={
-              description ? `${switchId}-description` : undefined
-            }
+            aria-describedby={description ? `${switchId}-description` : undefined}
             {...props}
           />
 
           <label
             htmlFor={switchId}
-            className={`
-              relative inline-flex h-6 w-11 items-center rounded-full
-              transition-colors duration-fast
-              cursor-pointer
-              peer-focus-visible:ring-2 peer-focus-visible:ring-primary-500 peer-focus-visible:ring-offset-2
-              peer-disabled:opacity-50 peer-disabled:cursor-not-allowed
-              ${checked ? "bg-primary-600" : "bg-theme-border-strong"}
-            `}
+            className={`relative inline-flex h-6 w-11 cursor-pointer items-center rounded-full transition-colors duration-fast peer-focus-visible:ring-2 peer-focus-visible:ring-primary-500 peer-focus-visible:ring-offset-2 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 ${checked ? "bg-primary-600" : "bg-theme-border-strong"} `}
           >
             <LazyMotion features={domAnimation}>
               <m.span
-                className={`
-                  inline-block h-4 w-4 rounded-full bg-white shadow-sm
-                `}
+                className={`inline-block h-4 w-4 rounded-full bg-white shadow-sm`}
                 initial={false}
                 animate={{
                   x: checked ? 24 : 4,
@@ -96,16 +82,13 @@ export const AnimatedSwitch = forwardRef<HTMLInputElement, AnimatedSwitchProps>(
             {label && (
               <label
                 htmlFor={switchId}
-                className="text-sm font-medium text-theme-text-primary cursor-pointer"
+                className="cursor-pointer text-sm font-medium text-theme-text-primary"
               >
                 {label}
               </label>
             )}
             {description && (
-              <p
-                id={`${switchId}-description`}
-                className="text-sm text-theme-text-tertiary"
-              >
+              <p id={`${switchId}-description`} className="text-sm text-theme-text-tertiary">
                 {description}
               </p>
             )}

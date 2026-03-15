@@ -5,29 +5,16 @@ import { CONTENT_TYPE_CONFIG, ContentType } from "@/Constants/contentTypes";
 import { formatDateTimeStyled } from "@/Utils/dateHelpers";
 import { validateVideoDuration } from "@/Utils/validationUtils";
 import { parseISO } from "date-fns";
-import {
-  AlertTriangle,
-  Check,
-  ChevronDown,
-  Clock,
-  Info,
-  Target,
-  X,
-} from "lucide-react";
+import { AlertTriangle, Check, ChevronDown, Clock, Info, Target, X } from "lucide-react";
 import React, { memo, useMemo, useState } from "react";
 
 /**
  * Check if a platform is compatible with the selected content type
  */
-function isPlatformCompatible(
-  platform: string,
-  contentType?: ContentType,
-): boolean {
+function isPlatformCompatible(platform: string, contentType?: ContentType): boolean {
   if (!contentType) return true;
   const rules = CONTENT_TYPE_CONFIG[contentType];
-  return (rules.platforms as readonly string[]).includes(
-    platform.toLowerCase(),
-  );
+  return (rules.platforms as readonly string[]).includes(platform.toLowerCase());
 }
 
 interface SocialAccount {
@@ -87,20 +74,15 @@ const VisualCheckbox = memo(
   }) => (
     <div className="relative">
       <div
-        className={`
-        w-5 h-5 rounded border-2 flex items-center justify-center
-        transition-all duration-200
-        ${
+        className={`flex h-5 w-5 items-center justify-center rounded border-2 transition-all duration-200 ${
           isChecked
-            ? "bg-primary-500 border-primary-500"
+            ? "border-primary-500 bg-primary-500"
             : "border-gray-300 bg-white dark:bg-neutral-800"
-        }
-        ${disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"}
-      `}
+        } ${disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"} `}
         onClick={disabled ? undefined : onToggle}
         {...(disabled ? { disabled: true } : {})}
       >
-        {isChecked && <Check className="w-3 h-3 text-white stroke-[3]" />}
+        {isChecked && <Check className="h-3 w-3 stroke-[3] text-white" />}
       </div>
     </div>
   ),
@@ -122,7 +104,7 @@ const SchedulePopoverContent = memo(
   }) => {
     return (
       <>
-        <div className="flex justify-between items-center mb-3">
+        <div className="mb-3 flex items-center justify-between">
           <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
             Schedule for {account.platform}
           </h4>
@@ -165,7 +147,7 @@ const SchedulePopoverContent = memo(
           isClearable
         />
 
-        <div className="flex justify-end gap-2 mt-4">
+        <div className="mt-4 flex justify-end gap-2">
           <Button variant="primary" size="sm" onClick={onClose}>
             Done
           </Button>
@@ -194,22 +176,20 @@ const ScheduleButton = memo(
     onPopoverClose: () => void;
   }) => {
     return (
-      <div className="ml-2 relative" onClick={(e) => e.stopPropagation()}>
+      <div className="relative ml-2" onClick={(e) => e.stopPropagation()}>
         <button
           type="button"
           onClick={onScheduleClick}
-          className={`p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 ${
-            customSchedule
-              ? "text-primary-500"
-              : "text-gray-500 dark:text-gray-400"
+          className={`rounded-full p-1.5 hover:bg-black/5 dark:hover:bg-white/10 ${
+            customSchedule ? "text-primary-500" : "text-gray-500 dark:text-gray-400"
           }`}
           title="Set individual time"
         >
-          <Clock className="w-4 h-4" />
+          <Clock className="h-4 w-4" />
         </button>
 
         {activePopover === account.id && (
-          <div className="absolute right-0 top-full mt-2 z-50 p-4 rounded-lg shadow-xl border w-64 bg-white dark:bg-neutral-800 border-gray-200 dark:border-neutral-600 animate-in fade-in zoom-in-95">
+          <div className="animate-in fade-in zoom-in-95 absolute right-0 top-full z-50 mt-2 w-64 rounded-lg border border-gray-200 bg-white p-4 shadow-xl dark:border-neutral-600 dark:bg-neutral-800">
             <SchedulePopoverContent
               account={account}
               customSchedule={customSchedule}
@@ -289,18 +269,10 @@ const SocialAccountItem = memo(
     setIsYouTubeThumbnailExpanded,
     contentType,
   }: SocialAccountItemProps) => {
-    const isPlatformIncompatible = !isPlatformCompatible(
-      account.platform,
-      contentType,
-    );
+    const isPlatformIncompatible = !isPlatformCompatible(account.platform, contentType);
     const isInternalDisabled =
-      isPublished ||
-      isPublishing ||
-      isUnpublishing ||
-      disabled ||
-      isPlatformIncompatible;
-    const isCheckedActually =
-      isChecked || isPublished || isPublishing || isUnpublishing;
+      isPublished || isPublishing || isUnpublishing || disabled || isPlatformIncompatible;
+    const isCheckedActually = isChecked || isPublished || isPublishing || isUnpublishing;
 
     const complianceInfo = React.useMemo(() => {
       const videos = mediaFiles.filter((m) => m.type === "video");
@@ -327,20 +299,20 @@ const SocialAccountItem = memo(
     return (
       <>
         <div
-          className={`relative flex items-start p-3 rounded-lg border transition-all min-h-[80px] ${
-            isInternalDisabled ? "opacity-80 cursor-default" : ""
+          className={`relative flex min-h-[80px] items-start rounded-lg border p-3 transition-all ${
+            isInternalDisabled ? "cursor-default opacity-80" : ""
           } ${
             isFailed || durationError
-              ? "border-red-500 bg-red-50 dark:bg-red-900/20 shadow-sm"
+              ? "border-red-500 bg-red-50 shadow-sm dark:bg-red-900/20"
               : isUnpublishing
-                ? "border-amber-500 bg-amber-50 dark:bg-amber-900/20 shadow-sm"
+                ? "border-amber-500 bg-amber-50 shadow-sm dark:bg-amber-900/20"
                 : isCheckedActually
-                  ? `border-primary-500 bg-primary-50 dark:bg-primary-900/20 shadow-sm`
-                  : "border-gray-200 dark:border-neutral-600 hover:bg-gray-50 dark:hover:bg-neutral-700/5"
+                  ? `border-primary-500 bg-primary-50 shadow-sm dark:bg-primary-900/20`
+                  : "border-gray-200 hover:bg-gray-50 dark:border-neutral-600 dark:hover:bg-neutral-700/5"
           }`}
           data-platform={account.platform}
         >
-          <div className="flex items-center gap-3 flex-1">
+          <div className="flex flex-1 items-center gap-3">
             <VisualCheckbox
               isChecked={!!isCheckedActually}
               onToggle={(e) => {
@@ -350,16 +322,16 @@ const SocialAccountItem = memo(
               disabled={isInternalDisabled}
             />
 
-            <div className="flex flex-col flex-1">
+            <div className="flex flex-1 flex-col">
               <div className="flex items-center gap-2">
-                <span className="font-medium text-sm">{account.platform}</span>
+                <span className="text-sm font-medium">{account.platform}</span>
                 {isPlatformIncompatible && (
                   <div className="group relative">
-                    <Info className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" />
-                    <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block z-50 pointer-events-none">
-                      <div className="bg-gray-900 dark:bg-neutral-800 text-white text-xs rounded-lg py-1.5 px-3 whitespace-nowrap shadow-lg border border-gray-700">
+                    <Info className="h-3.5 w-3.5 text-amber-500 dark:text-amber-400" />
+                    <div className="pointer-events-none absolute bottom-full left-0 z-50 mb-2 hidden group-hover:block">
+                      <div className="whitespace-nowrap rounded-lg border border-gray-700 bg-gray-900 px-3 py-1.5 text-xs text-white shadow-lg dark:bg-neutral-800">
                         {`This platform doesn't support ${contentType} content`}
-                        <div className="absolute top-full left-4 -mt-px">
+                        <div className="absolute left-4 top-full -mt-px">
                           <div className="border-4 border-transparent border-t-gray-900 dark:border-t-neutral-800"></div>
                         </div>
                       </div>
@@ -367,20 +339,18 @@ const SocialAccountItem = memo(
                   </div>
                 )}
                 {account.isDisconnected && (
-                  <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold uppercase bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+                  <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold uppercase text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
                     {t("common.disconnected") || "Desconectada"}
                   </span>
                 )}
                 {isCheckedActually && (
                   <span
-                    className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase ${
+                    className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold uppercase ${
                       isPublished
                         ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
                         : isPublishing
                           ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300"
-                          : (customSchedule || globalSchedule) &&
-                              !isPublished &&
-                              !isPublishing
+                          : (customSchedule || globalSchedule) && !isPublished && !isPublishing
                             ? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
                             : "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
                     }`}
@@ -392,15 +362,10 @@ const SocialAccountItem = memo(
                         : isFailed
                           ? t("publications.modal.publish.failed") || "Fallido"
                           : isUnpublishing
-                            ? t("publications.modal.publish.unpublishing") ||
-                              "Despublicando..."
-                            : (customSchedule || globalSchedule) &&
-                                !isPublished &&
-                                !isPublishing
-                              ? t("publications.status.scheduled") ||
-                                "Programado"
-                              : t("publications.status.instant") ||
-                                "Instantáneo"}
+                            ? t("publications.modal.publish.unpublishing") || "Despublicando..."
+                            : (customSchedule || globalSchedule) && !isPublished && !isPublishing
+                              ? t("publications.status.scheduled") || "Programado"
+                              : t("publications.status.instant") || "Instantáneo"}
                   </span>
                 )}
               </div>
@@ -409,69 +374,57 @@ const SocialAccountItem = memo(
                   @{account.account_name || account.name}
                 </span>
               )}
-              {isChecked &&
-                (customSchedule || globalSchedule) &&
-                !isPublished &&
-                !isPublishing && (
-                  <div className="flex items-center gap-2 mt-1">
-                    <span
-                      className={`text-xs flex items-center gap-1 ${
-                        customSchedule
-                          ? "text-primary-600 dark:text-primary-400"
-                          : "text-gray-500 dark:text-gray-400"
-                      }`}
-                    >
-                      <Clock className="w-3 h-3" />
-                      {formatDateTimeStyled(
-                        customSchedule || globalSchedule || "",
-                        "short",
-                        "short",
-                      )}
-                      {!customSchedule && globalSchedule && (
-                        <span className="text-[10px] opacity-70">(Global)</span>
-                      )}
-                    </span>
-                    {customSchedule && (
-                      <Button
-                        variant="ghost"
-                        size="xs"
-                        buttonStyle="icon"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onScheduleRemove();
-                        }}
-                        icon={X}
-                        className="!p-1 text-primary-500 hover:text-primary-600"
-                        title={t("common.remove") || "Eliminar programación"}
-                      >
-                        {""}
-                      </Button>
+              {isChecked && (customSchedule || globalSchedule) && !isPublished && !isPublishing && (
+                <div className="mt-1 flex items-center gap-2">
+                  <span
+                    className={`flex items-center gap-1 text-xs ${
+                      customSchedule
+                        ? "text-primary-600 dark:text-primary-400"
+                        : "text-gray-500 dark:text-gray-400"
+                    }`}
+                  >
+                    <Clock className="h-3 w-3" />
+                    {formatDateTimeStyled(customSchedule || globalSchedule || "", "short", "short")}
+                    {!customSchedule && globalSchedule && (
+                      <span className="text-[10px] opacity-70">(Global)</span>
                     )}
-                  </div>
-                )}
-              {!customSchedule &&
-                !globalSchedule &&
-                !isPublished &&
-                !isPublishing &&
-                isChecked && (
-                  <div className="flex items-center gap-1 text-[10px] text-primary-500 font-medium animate-in fade-in slide-in-from-top-1">
-                    <Clock className="w-3 h-3" />
-                    {t("publications.modal.schedule.instantWarning") ||
-                      "Para publicar inmediatamente, configura la fecha desde el modal de programación."}
-                  </div>
-                )}
+                  </span>
+                  {customSchedule && (
+                    <Button
+                      variant="ghost"
+                      size="xs"
+                      buttonStyle="icon"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onScheduleRemove();
+                      }}
+                      icon={X}
+                      className="!p-1 text-primary-500 hover:text-primary-600"
+                      title={t("common.remove") || "Eliminar programación"}
+                    >
+                      {""}
+                    </Button>
+                  )}
+                </div>
+              )}
+              {!customSchedule && !globalSchedule && !isPublished && !isPublishing && isChecked && (
+                <div className="animate-in fade-in slide-in-from-top-1 flex items-center gap-1 text-[10px] font-medium text-primary-500">
+                  <Clock className="h-3 w-3" />
+                  {t("publications.modal.schedule.instantWarning") ||
+                    "Para publicar inmediatamente, configura la fecha desde el modal de programación."}
+                </div>
+              )}
               {isPublished && (
                 <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-green-600 dark:text-green-400">
-                  <Check className="w-3 h-3" />
+                  <Check className="h-3 w-3" />
                   {t("publications.modal.publish.published")}
                 </div>
               )}
               {isPublishing && (
                 <div className="mt-1 flex items-center justify-between gap-1 text-[10px] font-medium text-yellow-600 dark:text-yellow-400">
                   <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin" />
-                    {t("publications.modal.publish.publishing")} en{" "}
-                    {account.platform}
+                    <div className="h-3 w-3 animate-spin rounded-full border-2 border-yellow-600 border-t-transparent" />
+                    {t("publications.modal.publish.publishing")} en {account.platform}
                   </div>
                   {onCancel && (
                     <Button
@@ -490,36 +443,35 @@ const SocialAccountItem = memo(
               )}
               {isUnpublishing && (
                 <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-amber-600 dark:text-amber-400">
-                  <div className="w-3 h-3 border-2 border-amber-600 border-t-transparent rounded-full animate-spin" />
-                  {t("publications.modal.publish.unpublishing") ||
-                    "Despublicando..."}
+                  <div className="h-3 w-3 animate-spin rounded-full border-2 border-amber-600 border-t-transparent" />
+                  {t("publications.modal.publish.unpublishing") || "Despublicando..."}
                 </div>
               )}
               {isFailed && (
                 <div className="mt-1 flex flex-col gap-1">
                   <div className="flex items-center gap-1 text-[10px] font-medium text-red-600 dark:text-red-400">
-                    <div className="w-3 h-3 rounded-full bg-red-500 flex items-center justify-center">
-                      <X className="w-2 h-2 text-white" />
+                    <div className="flex h-3 w-3 items-center justify-center rounded-full bg-red-500">
+                      <X className="h-2 w-2 text-white" />
                     </div>
                     {t("publications.modal.publish.failed") || "Fallido"}
                   </div>
                   {errorMessage && (
-                    <div className="text-[10px] text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded border border-red-200 dark:border-red-800">
+                    <div className="rounded border border-red-200 bg-red-50 px-2 py-1 text-[10px] text-red-600 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
                       {errorMessage}
                     </div>
                   )}
                 </div>
               )}
               {durationError && (
-                <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-red-600 dark:text-red-400 animate-in slide-in-from-top-1">
-                  <AlertTriangle className="w-3 h-3" />
+                <div className="animate-in slide-in-from-top-1 mt-1 flex items-center gap-1 text-[10px] font-medium text-red-600 dark:text-red-400">
+                  <AlertTriangle className="h-3 w-3" />
                   {durationError}
                 </div>
               )}
             </div>
           </div>
 
-          <div className="flex items-start gap-2 ml-auto pl-2">
+          <div className="ml-auto flex items-start gap-2 pl-2">
             {isCheckedActually && !isInternalDisabled && (
               <ScheduleButton
                 account={account}
@@ -551,28 +503,22 @@ const SocialAccountItem = memo(
                   setIsYouTubeThumbnailExpanded &&
                   setIsYouTubeThumbnailExpanded(!isYouTubeThumbnailExpanded)
                 }
-                className="flex items-center justify-between w-full px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors bg-gray-50 dark:bg-neutral-800/50 rounded-lg border border-gray-200 dark:border-neutral-700"
+                className="flex w-full items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:text-primary-600 dark:border-neutral-700 dark:bg-neutral-800/50 dark:text-gray-300 dark:hover:text-primary-400"
               >
                 <span>YouTube Thumbnail</span>
                 <ChevronDown
-                  className={`w-4 h-4 transition-transform duration-200 ${isYouTubeThumbnailExpanded ? "rotate-180" : ""}`}
+                  className={`h-4 w-4 transition-transform duration-200 ${isYouTubeThumbnailExpanded ? "rotate-180" : ""}`}
                 />
               </button>
 
               {isYouTubeThumbnailExpanded && (
-                <div className="p-4 rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="animate-in fade-in slide-in-from-top-2 rounded-lg border border-gray-200 bg-white p-4 duration-200 dark:border-neutral-700 dark:bg-neutral-900">
                   <YouTubeThumbnailUploader
-                    videoId={
-                      mediaFiles.find((m) => m.type === "video")?.id || 0
-                    }
-                    videoPreviewUrl={
-                      mediaFiles.find((m) => m.type === "video")?.url
-                    }
+                    videoId={mediaFiles.find((m) => m.type === "video")?.id || 0}
+                    videoPreviewUrl={mediaFiles.find((m) => m.type === "video")?.url}
                     videoFileName={
                       publication?.media_files?.find(
-                        (m) =>
-                          m.file_type === "video" ||
-                          m.mime_type?.startsWith("video/"),
+                        (m) => m.file_type === "video" || m.mime_type?.startsWith("video/"),
                       )?.file_name
                     }
                     existingThumbnail={(() => {
@@ -626,8 +572,7 @@ const SocialAccountsSection = memo(
     publication,
   }: SocialAccountsSectionProps) => {
     const [activePopover, setActivePopover] = useState<number | null>(null);
-    const [isYouTubeThumbnailExpanded, setIsYouTubeThumbnailExpanded] =
-      useState(true);
+    const [isYouTubeThumbnailExpanded, setIsYouTubeThumbnailExpanded] = useState(true);
 
     // Merge connected accounts with disconnected accounts from social_post_logs
     const allAccounts = useMemo(() => {
@@ -663,19 +608,16 @@ const SocialAccountsSection = memo(
       <div className="space-y-4">
         {/* Banner informativo si ya está publicada en algunas cuentas */}
         {publishedAccountIds && publishedAccountIds.length > 0 && (
-          <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+          <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-900/20">
             <div className="flex items-start gap-2">
-              <Check className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+              <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-blue-600 dark:text-blue-400" />
               <div className="flex-1">
                 <h4 className="text-xs font-bold text-blue-800 dark:text-blue-200">
-                  {t(
-                    "publications.modal.publish.alreadyPublishedBanner.title",
-                  ) || "Publicación Activa"}
+                  {t("publications.modal.publish.alreadyPublishedBanner.title") ||
+                    "Publicación Activa"}
                 </h4>
-                <p className="text-[11px] text-blue-700 dark:text-blue-300 mt-0.5">
-                  {t(
-                    "publications.modal.publish.alreadyPublishedBanner.message",
-                  ) ||
+                <p className="mt-0.5 text-[11px] text-blue-700 dark:text-blue-300">
+                  {t("publications.modal.publish.alreadyPublishedBanner.message") ||
                     "Esta publicación ya está publicada en las siguientes cuentas:"}
                 </p>
                 <div className="mt-1.5 flex flex-wrap gap-1.5">
@@ -684,24 +626,20 @@ const SocialAccountsSection = memo(
                     .map((acc) => (
                       <span
                         key={acc.id}
-                        className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 text-[10px] font-medium text-blue-800 dark:text-blue-300"
+                        className="inline-flex items-center gap-1 rounded bg-blue-100 px-1.5 py-0.5 text-[10px] font-medium text-blue-800 dark:bg-blue-900/40 dark:text-blue-300"
                       >
                         <span className="capitalize">{acc.platform}</span>
-                        <span className="opacity-75">
-                          @{acc.account_name || acc.name}
-                        </span>
+                        <span className="opacity-75">@{acc.account_name || acc.name}</span>
                         {acc.isDisconnected && (
-                          <span className="ml-1 px-1 py-0.5 rounded bg-amber-200 dark:bg-amber-800 text-amber-800 dark:text-amber-200 text-[9px] font-bold">
+                          <span className="ml-1 rounded bg-amber-200 px-1 py-0.5 text-[9px] font-bold text-amber-800 dark:bg-amber-800 dark:text-amber-200">
                             {t("common.disconnected") || "Desconectada"}
                           </span>
                         )}
                       </span>
                     ))}
                 </div>
-                <p className="text-[11px] text-blue-600 dark:text-blue-400 mt-1.5 font-medium">
-                  {t(
-                    "publications.modal.publish.alreadyPublishedBanner.hint",
-                  ) ||
+                <p className="mt-1.5 text-[11px] font-medium text-blue-600 dark:text-blue-400">
+                  {t("publications.modal.publish.alreadyPublishedBanner.hint") ||
                     "Puedes publicar en cuentas adicionales seleccionándolas a continuación."}
                 </p>
               </div>
@@ -710,10 +648,9 @@ const SocialAccountsSection = memo(
         )}
 
         <div className="flex items-center justify-between">
-          <label className="font-semibold flex items-center gap-2">
-            <Target className="w-4 h-4" />
-            {t("manageContent.configureNetworks") ||
-              "Configura tus redes sociales"}
+          <label className="flex items-center gap-2 font-semibold">
+            <Target className="h-4 w-4" />
+            {t("manageContent.configureNetworks") || "Configura tus redes sociales"}
           </label>
         </div>
 
@@ -728,8 +665,7 @@ const SocialAccountsSection = memo(
 
             // Get error message from social post logs
             const errorMessage = socialPostLogs?.find(
-              (log) =>
-                log.social_account_id === account.id && log.status === "failed",
+              (log) => log.social_account_id === account.id && log.status === "failed",
             )?.error_message;
 
             return (
@@ -742,15 +678,11 @@ const SocialAccountsSection = memo(
                 onToggle={() => onAccountToggle(account.id)}
                 t={t}
                 onScheduleClick={() =>
-                  setActivePopover(
-                    activePopover === account.id ? null : account.id,
-                  )
+                  setActivePopover(activePopover === account.id ? null : account.id)
                 }
                 onScheduleChange={(date) => onScheduleChange(account.id, date)}
                 onScheduleRemove={() => onScheduleRemove(account.id)}
-                onPlatformSettingsClick={() =>
-                  onPlatformSettingsClick(account.platform)
-                }
+                onPlatformSettingsClick={() => onPlatformSettingsClick(account.platform)}
                 onPopoverClose={() => setActivePopover(null)}
                 globalSchedule={globalSchedule}
                 isPublished={isPublished}

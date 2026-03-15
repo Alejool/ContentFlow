@@ -4,14 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Progress } from "@/Components/ui/progress";
 import { useProcessingProgress } from "@/stores/processingProgressStore";
 import { useUploadQueue } from "@/stores/uploadQueueStore";
-import {
-  AlertCircle,
-  CheckCircle,
-  Clock,
-  RotateCcw,
-  Upload,
-  X,
-} from "lucide-react";
+import { AlertCircle, CheckCircle, Clock, RotateCcw, Upload, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -34,9 +27,7 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
   const uploads = Object.values(queue);
   const processingJobs = Object.values(jobs);
 
-  const activeUploads = uploads.filter(
-    (u) => u.status === "uploading" || u.status === "pending",
-  );
+  const activeUploads = uploads.filter((u) => u.status === "uploading" || u.status === "pending");
   const failedUploads = uploads.filter((u) => u.status === "error");
   const completedUploads = uploads.filter((u) => u.status === "completed");
 
@@ -139,11 +130,8 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
   };
 
   return (
-    <Card className={`fixed bottom-4 right-4 w-96 z-50 shadow-lg ${className}`}>
-      <CardHeader
-        className="pb-2 cursor-pointer"
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
+    <Card className={`fixed bottom-4 right-4 z-50 w-96 shadow-lg ${className}`}>
+      <CardHeader className="cursor-pointer pb-2" onClick={() => setIsExpanded(!isExpanded)}>
         <CardTitle className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-2">
             <Upload className="h-4 w-4" />
@@ -168,31 +156,25 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
               setIsExpanded(!isExpanded);
             }}
           >
-            {isExpanded ? (
-              <X className="h-3 w-3" />
-            ) : (
-              <Clock className="h-3 w-3" />
-            )}
+            {isExpanded ? <X className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
           </Button>
         </CardTitle>
       </CardHeader>
 
       {isExpanded && (
-        <CardContent className="pt-0 max-h-96 overflow-y-auto">
+        <CardContent className="max-h-96 overflow-y-auto pt-0">
           <div className="space-y-3">
             {/* Active Uploads */}
             {activeUploads.map((upload) => (
-              <div key={upload.id} className="border rounded-lg p-3">
-                <div className="flex items-center justify-between mb-2">
+              <div key={upload.id} className="rounded-lg border p-3">
+                <div className="mb-2 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     {getStatusIcon(upload.status)}
-                    <span className="text-sm font-medium truncate max-w-48">
+                    <span className="max-w-48 truncate text-sm font-medium">
                       {upload.file.name}
                     </span>
                   </div>
-                  <Badge className={getStatusColor(upload.status)}>
-                    {upload.status}
-                  </Badge>
+                  <Badge className={getStatusColor(upload.status)}>{upload.status}</Badge>
                 </div>
 
                 <Progress value={upload.progress} className="mb-2" />
@@ -209,7 +191,7 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
                   </div>
                 </div>
 
-                <div className="flex justify-end gap-1 mt-2">
+                <div className="mt-2 flex justify-end gap-1">
                   {upload.isPausable && upload.status === "uploading" && (
                     <Button
                       variant="outline"
@@ -221,11 +203,7 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
                       Pause
                     </Button>
                   )}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleCancel(upload.id)}
-                  >
+                  <Button variant="outline" size="sm" onClick={() => handleCancel(upload.id)}>
                     Cancel
                   </Button>
                 </div>
@@ -234,42 +212,27 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
 
             {/* Failed Uploads */}
             {failedUploads.map((upload) => (
-              <div
-                key={upload.id}
-                className="border border-red-200 rounded-lg p-3"
-              >
-                <div className="flex items-center justify-between mb-2">
+              <div key={upload.id} className="rounded-lg border border-red-200 p-3">
+                <div className="mb-2 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     {getStatusIcon(upload.status)}
-                    <span className="text-sm font-medium truncate max-w-48">
+                    <span className="max-w-48 truncate text-sm font-medium">
                       {upload.file.name}
                     </span>
                   </div>
-                  <Badge className={getStatusColor(upload.status)}>
-                    Failed
-                  </Badge>
+                  <Badge className={getStatusColor(upload.status)}>Failed</Badge>
                 </div>
 
-                {upload.error && (
-                  <p className="text-xs text-red-600 mb-2">{upload.error}</p>
-                )}
+                {upload.error && <p className="mb-2 text-xs text-red-600">{upload.error}</p>}
 
                 <div className="flex justify-end gap-1">
                   {upload.canRetry && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleRetry(upload.id)}
-                    >
-                      <RotateCcw className="h-3 w-3 mr-1" />
+                    <Button variant="outline" size="sm" onClick={() => handleRetry(upload.id)}>
+                      <RotateCcw className="mr-1 h-3 w-3" />
                       Retry
                     </Button>
                   )}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleRemove(upload.id)}
-                  >
+                  <Button variant="outline" size="sm" onClick={() => handleRemove(upload.id)}>
                     Remove
                   </Button>
                 </div>
@@ -278,17 +241,13 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
 
             {/* Active Processing Jobs */}
             {activeProcessing.map((job) => (
-              <div key={job.id} className="border rounded-lg p-3">
-                <div className="flex items-center justify-between mb-2">
+              <div key={job.id} className="rounded-lg border p-3">
+                <div className="mb-2 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     {getStatusIcon(job.status)}
-                    <span className="text-sm font-medium">
-                      Processing Media
-                    </span>
+                    <span className="text-sm font-medium">Processing Media</span>
                   </div>
-                  <Badge className={getStatusColor(job.status)}>
-                    {job.status}
-                  </Badge>
+                  <Badge className={getStatusColor(job.status)}>{job.status}</Badge>
                 </div>
 
                 <Progress value={job.progress} className="mb-2" />
@@ -301,30 +260,23 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
                 </div>
 
                 {job.stats?.currentStep && (
-                  <p className="text-xs text-gray-600 mt-1">
-                    {job.stats.currentStep}
-                  </p>
+                  <p className="mt-1 text-xs text-gray-600">{job.stats.currentStep}</p>
                 )}
               </div>
             ))}
 
             {/* Completed Uploads (show briefly) */}
             {completedUploads.slice(-3).map((upload) => (
-              <div
-                key={upload.id}
-                className="border border-green-200 rounded-lg p-3"
-              >
+              <div key={upload.id} className="rounded-lg border border-green-200 p-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     {getStatusIcon(upload.status)}
-                    <span className="text-sm font-medium truncate max-w-48">
+                    <span className="max-w-48 truncate text-sm font-medium">
                       {upload.file.name}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge className={getStatusColor(upload.status)}>
-                      Completed
-                    </Badge>
+                    <Badge className={getStatusColor(upload.status)}>Completed</Badge>
                     <Button
                       variant="ghost"
                       size="sm"

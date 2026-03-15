@@ -33,11 +33,7 @@ interface DynamicIconProps {
   fallback?: React.ReactNode;
 }
 
-export default function DynamicIcon({
-  name,
-  className,
-  fallback,
-}: DynamicIconProps) {
+export default function DynamicIcon({ name, className, fallback }: DynamicIconProps) {
   const IconComponent = ICON_MAP[name];
 
   if (!IconComponent) {

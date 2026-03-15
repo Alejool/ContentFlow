@@ -15,22 +15,13 @@ export default function ApprovalWorkflowStatus({
 
   if (!approvalRequest) return null;
 
-  const {
-    status,
-    currentStep,
-    workflow,
-    logs = [],
-    rejection_reason,
-  } = approvalRequest;
+  const { status, currentStep, workflow, logs = [], rejection_reason } = approvalRequest;
   const levels = workflow?.levels ?? [];
 
   // Último rechazo
   const lastRejection = [...logs]
     .filter((l) => l.action === "rejected")
-    .sort(
-      (a, b) =>
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-    )[0];
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
 
   const isRejected = status === "rejected";
   const isApproved = status === "approved";
@@ -63,8 +54,7 @@ export default function ApprovalWorkflowStatus({
     },
   };
 
-  const cfg =
-    statusConfig[status as keyof typeof statusConfig] ?? statusConfig.pending;
+  const cfg = statusConfig[status as keyof typeof statusConfig] ?? statusConfig.pending;
   const StatusIcon = cfg.icon;
 
   // Progreso
@@ -74,13 +64,11 @@ export default function ApprovalWorkflowStatus({
   return (
     <div className={`space-y-4 ${className}`}>
       {/* Estado actual */}
-      <div className={`border rounded-xl p-4 ${cfg.bg}`}>
+      <div className={`rounded-xl border p-4 ${cfg.bg}`}>
         <div className="flex items-start gap-3">
-          <StatusIcon className={`w-6 h-6 flex-shrink-0 mt-0.5 ${cfg.color}`} />
+          <StatusIcon className={`mt-0.5 h-6 w-6 flex-shrink-0 ${cfg.color}`} />
           <div className="flex-1">
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-1">
-              {cfg.label}
-            </h4>
+            <h4 className="mb-1 font-semibold text-gray-900 dark:text-white">{cfg.label}</h4>
             {isPending && currentStep && (
               <p className="text-sm text-gray-700 dark:text-gray-300">
                 {t("approvals.awaitingLevel") || "Esperando aprobación en"}:{" "}
@@ -90,8 +78,7 @@ export default function ApprovalWorkflowStatus({
             )}
             {isApproved && (
               <p className="text-sm text-gray-700 dark:text-gray-300">
-                {t("approvals.approvedReadyToPublish") ||
-                  "Aprobado. Listo para publicar."}
+                {t("approvals.approvedReadyToPublish") || "Aprobado. Listo para publicar."}
               </p>
             )}
           </div>
@@ -100,28 +87,24 @@ export default function ApprovalWorkflowStatus({
 
       {/* Detalle del rechazo */}
       {isRejected && (lastRejection || rejection_reason) && (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
           <div className="flex items-start gap-3">
-            <XCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+            <XCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600 dark:text-red-400" />
             <div className="flex-1">
               {lastRejection?.user && (
-                <h5 className="font-semibold text-red-900 dark:text-red-100 mb-1">
-                  {t("approvals.rejectedBy") || "Rechazado por"}:{" "}
-                  {lastRejection.user.name}
+                <h5 className="mb-1 font-semibold text-red-900 dark:text-red-100">
+                  {t("approvals.rejectedBy") || "Rechazado por"}: {lastRejection.user.name}
                 </h5>
               )}
               {lastRejection?.level_number && (
-                <p className="text-xs text-red-700 dark:text-red-300 mb-2">
-                  {t("approvals.rejectedAtLevel") || "En nivel"}{" "}
-                  {lastRejection.level_number}
+                <p className="mb-2 text-xs text-red-700 dark:text-red-300">
+                  {t("approvals.rejectedAtLevel") || "En nivel"} {lastRejection.level_number}
                 </p>
               )}
               {(lastRejection?.comment || rejection_reason) && (
-                <div className="bg-white/50 dark:bg-black/20 rounded-lg p-3">
+                <div className="rounded-lg bg-white/50 p-3 dark:bg-black/20">
                   <p className="text-sm text-red-800 dark:text-red-200">
-                    <span className="font-medium">
-                      {t("approvals.reason") || "Razón"}:
-                    </span>{" "}
+                    <span className="font-medium">{t("approvals.reason") || "Razón"}:</span>{" "}
                     {lastRejection?.comment || rejection_reason}
                   </p>
                 </div>
@@ -133,23 +116,23 @@ export default function ApprovalWorkflowStatus({
 
       {/* Progreso del flujo */}
       {levels.length > 0 && (
-        <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-xl p-4">
-          <h5 className="font-semibold text-gray-900 dark:text-white mb-4">
+        <div className="rounded-xl border border-gray-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900">
+          <h5 className="mb-4 font-semibold text-gray-900 dark:text-white">
             {t("approvals.workflowProgress") || "Progreso del flujo"}
           </h5>
 
           {/* Barra */}
           {totalLevels > 0 && (
             <div className="mb-5">
-              <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mb-1.5">
+              <div className="mb-1.5 flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
                 <span>{t("approvals.progress") || "Progreso"}</span>
                 <span>
                   {completedLevels} / {totalLevels}
                 </span>
               </div>
-              <div className="w-full bg-gray-200 dark:bg-neutral-700 rounded-full h-2">
+              <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-neutral-700">
                 <div
-                  className="bg-primary-600 h-2 rounded-full transition-all duration-300"
+                  className="h-2 rounded-full bg-primary-600 transition-all duration-300"
                   style={{
                     width: `${totalLevels > 0 ? (completedLevels / totalLevels) * 100 : 0}%`,
                   }}
@@ -162,17 +145,12 @@ export default function ApprovalWorkflowStatus({
           <div className="space-y-3">
             {levels.map((level, index) => {
               const approvedLog = logs.find(
-                (l) =>
-                  l.action === "approved" &&
-                  l.level_number === level.level_number,
+                (l) => l.action === "approved" && l.level_number === level.level_number,
               );
               const rejectedLog = logs.find(
-                (l) =>
-                  l.action === "rejected" &&
-                  l.level_number === level.level_number,
+                (l) => l.action === "rejected" && l.level_number === level.level_number,
               );
-              const isCurrent =
-                isPending && currentStep?.level_number === level.level_number;
+              const isCurrent = isPending && currentStep?.level_number === level.level_number;
               const isDone = !!approvedLog;
               const isRejectedHere = !!rejectedLog;
 
@@ -180,7 +158,7 @@ export default function ApprovalWorkflowStatus({
                 <div key={level.id} className="relative">
                   {index < levels.length - 1 && (
                     <div
-                      className={`absolute left-5 top-10 bottom-0 w-0.5 ${
+                      className={`absolute bottom-0 left-5 top-10 w-0.5 ${
                         isDone
                           ? "bg-green-500"
                           : isRejectedHere
@@ -191,58 +169,55 @@ export default function ApprovalWorkflowStatus({
                   )}
                   <div className="flex items-start gap-3">
                     <div
-                      className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 font-semibold text-sm ${
+                      className={`relative z-10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
                         isDone
                           ? "bg-green-500 text-white"
                           : isRejectedHere
                             ? "bg-red-500 text-white"
                             : isCurrent
-                              ? "bg-primary-500 text-white animate-pulse"
-                              : "bg-gray-200 dark:bg-neutral-700 text-gray-500 dark:text-gray-400"
+                              ? "animate-pulse bg-primary-500 text-white"
+                              : "bg-gray-200 text-gray-500 dark:bg-neutral-700 dark:text-gray-400"
                       }`}
                     >
                       {isDone ? (
-                        <CheckCircle className="w-5 h-5" />
+                        <CheckCircle className="h-5 w-5" />
                       ) : isRejectedHere ? (
-                        <XCircle className="w-5 h-5" />
+                        <XCircle className="h-5 w-5" />
                       ) : isCurrent ? (
-                        <Clock className="w-5 h-5" />
+                        <Clock className="h-5 w-5" />
                       ) : (
                         level.level_number
                       )}
                     </div>
 
-                    <div className="flex-1 pt-1 pb-4">
-                      <div className="flex items-center gap-2 flex-wrap">
+                    <div className="flex-1 pb-4 pt-1">
+                      <div className="flex flex-wrap items-center gap-2">
                         <span className="font-semibold text-gray-900 dark:text-white">
                           {level.level_name}
                         </span>
                         {isCurrent && (
-                          <span className="px-2 py-0.5 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 text-xs font-medium rounded-full">
+                          <span className="rounded-full bg-primary-100 px-2 py-0.5 text-xs font-medium text-primary-700 dark:bg-primary-900/30 dark:text-primary-400">
                             {t("approvals.inProgress") || "En revisión"}
                           </span>
                         )}
                         {isRejectedHere && (
-                          <span className="px-2 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs font-medium rounded-full">
+                          <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700 dark:bg-red-900/30 dark:text-red-400">
                             {t("approvals.rejectedHere") || "Rechazado aquí"}
                           </span>
                         )}
                       </div>
                       {level.role && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                          {t("approvals.approverRole") || "Rol"}:{" "}
-                          {level.role.name}
+                        <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                          {t("approvals.approverRole") || "Rol"}: {level.role.name}
                         </p>
                       )}
                       {/* Quién aprobó/rechazó */}
                       {(approvedLog || rejectedLog) && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                        <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
                           {(approvedLog || rejectedLog)!.user?.name} ·{" "}
-                          {new Date(
-                            (approvedLog || rejectedLog)!.created_at,
-                          ).toLocaleString()}
+                          {new Date((approvedLog || rejectedLog)!.created_at).toLocaleString()}
                           {(approvedLog || rejectedLog)!.comment && (
-                            <span className="italic ml-1">
+                            <span className="ml-1 italic">
                               "{(approvedLog || rejectedLog)!.comment}"
                             </span>
                           )}

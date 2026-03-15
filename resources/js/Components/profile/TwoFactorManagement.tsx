@@ -1,13 +1,7 @@
 import { useState } from "react";
 import { router } from "@inertiajs/react";
 import { useTranslation } from "react-i18next";
-import {
-  Shield,
-  ShieldCheck,
-  ShieldOff,
-  RefreshCw,
-  AlertTriangle,
-} from "lucide-react";
+import { Shield, ShieldCheck, ShieldOff, RefreshCw, AlertTriangle } from "lucide-react";
 import Button from "@/Components/common/Modern/Button";
 import Input from "@/Components/common/Modern/Input";
 import Modal from "@/Components/common/Modern/Modal";
@@ -17,19 +11,14 @@ interface TwoFactorManagementProps {
   enabledAt?: string;
 }
 
-export default function TwoFactorManagement({
-  isEnabled,
-  enabledAt,
-}: TwoFactorManagementProps) {
+export default function TwoFactorManagement({ isEnabled, enabledAt }: TwoFactorManagementProps) {
   const { t } = useTranslation();
   const [showDisableModal, setShowDisableModal] = useState(false);
   const [showRegenerateModal, setShowRegenerateModal] = useState(false);
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errors, setErrors] = useState<{ password?: string; code?: string }>(
-    {},
-  );
+  const [errors, setErrors] = useState<{ password?: string; code?: string }>({});
 
   const handleDisable2FA = () => {
     setIsSubmitting(true);
@@ -80,16 +69,16 @@ export default function TwoFactorManagement({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-      <div className="flex items-start justify-between mb-4">
+    <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
+      <div className="mb-4 flex items-start justify-between">
         <div className="flex items-center gap-3">
           {isEnabled ? (
-            <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-              <ShieldCheck className="w-6 h-6 text-green-600 dark:text-green-400" />
+            <div className="rounded-lg bg-green-100 p-2 dark:bg-green-900/30">
+              <ShieldCheck className="h-6 w-6 text-green-600 dark:text-green-400" />
             </div>
           ) : (
-            <div className="p-2 bg-gray-100 dark:bg-gray-900/30 rounded-lg">
-              <Shield className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+            <div className="rounded-lg bg-gray-100 p-2 dark:bg-gray-900/30">
+              <Shield className="h-6 w-6 text-gray-600 dark:text-gray-400" />
             </div>
           )}
           <div>
@@ -105,11 +94,11 @@ export default function TwoFactorManagement({
         </div>
         <div className="flex items-center gap-2">
           {isEnabled ? (
-            <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-medium rounded-full">
+            <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
               Enabled
             </span>
           ) : (
-            <span className="px-3 py-1 bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-400 text-xs font-medium rounded-full">
+            <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 dark:bg-gray-900/30 dark:text-gray-400">
               Disabled
             </span>
           )}
@@ -117,21 +106,17 @@ export default function TwoFactorManagement({
       </div>
 
       {isEnabled && enabledAt && (
-        <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+        <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-900/20">
           <p className="text-sm text-blue-700 dark:text-blue-400">
             Enabled on {new Date(enabledAt).toLocaleDateString()}
           </p>
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row">
         {isEnabled ? (
           <>
-            <Button
-              variant="outline"
-              icon={RefreshCw}
-              onClick={() => setShowRegenerateModal(true)}
-            >
+            <Button variant="outline" icon={RefreshCw} onClick={() => setShowRegenerateModal(true)}>
               Regenerate Backup Codes
             </Button>
             <Button
@@ -161,16 +146,14 @@ export default function TwoFactorManagement({
         title="Disable Two-Factor Authentication"
       >
         <div className="space-y-4">
-          <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+          <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
             <div className="flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-yellow-700 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+              <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-700 dark:text-yellow-400" />
               <div>
-                <p className="text-sm font-medium text-yellow-700 dark:text-yellow-400">
-                  Warning
-                </p>
-                <p className="text-xs text-yellow-600 dark:text-yellow-500 mt-1">
-                  Disabling 2FA will make your account less secure. You'll need
-                  to re-enable it to access admin features.
+                <p className="text-sm font-medium text-yellow-700 dark:text-yellow-400">Warning</p>
+                <p className="mt-1 text-xs text-yellow-600 dark:text-yellow-500">
+                  Disabling 2FA will make your account less secure. You'll need to re-enable it to
+                  access admin features.
                 </p>
               </div>
             </div>
@@ -186,7 +169,7 @@ export default function TwoFactorManagement({
             placeholder="Enter your password to confirm"
           />
 
-          <div className="flex gap-3 justify-end">
+          <div className="flex justify-end gap-3">
             <Button
               variant="outline"
               onClick={() => {
@@ -221,10 +204,10 @@ export default function TwoFactorManagement({
         title="Regenerate Backup Codes"
       >
         <div className="space-y-4">
-          <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
             <p className="text-sm text-blue-700 dark:text-blue-400">
-              This will invalidate your current backup codes and generate new
-              ones. Make sure to save the new codes in a safe place.
+              This will invalidate your current backup codes and generate new ones. Make sure to
+              save the new codes in a safe place.
             </p>
           </div>
 
@@ -239,7 +222,7 @@ export default function TwoFactorManagement({
             maxLength={6}
           />
 
-          <div className="flex gap-3 justify-end">
+          <div className="flex justify-end gap-3">
             <Button
               variant="outline"
               onClick={() => {

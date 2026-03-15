@@ -33,16 +33,17 @@ export default function EditCampaignModal({
   const { updateItem: updateCampaign } = useContentManagement();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { auth } = usePage<any>().props;
-  const canManage =
-    auth.current_workspace?.permissions?.includes("manage-content");
+  const canManage = auth.current_workspace?.permissions?.includes("manage-content");
   const isDisabled = !canManage;
 
   // Integrate focus trap for modal accessibility
   // Requirements: 5.5
   const modalRef = useModalFocusTrap(isOpen);
 
-  const { register, handleSubmit, setValue, watch, reset, errors } =
-    useEditCampaignForm(t, campaign);
+  const { register, handleSubmit, setValue, watch, reset, errors } = useEditCampaignForm(
+    t,
+    campaign,
+  );
 
   const {
     availablePublications,
@@ -83,23 +84,16 @@ export default function EditCampaignModal({
 
       const success = await updateCampaign(campaign.id, payload, "campaigns");
       if (success) {
-        toast.success(
-          t("campaigns.messages.updateSuccess") ||
-            "Campaign updated successfully",
-        );
+        toast.success(t("campaigns.messages.updateSuccess") || "Campaign updated successfully");
         if (onSubmit) {
           onSubmit(true);
         }
         handleClose();
       } else {
-        toast.error(
-          t("campaigns.messages.updateError") || "Failed to update campaign",
-        );
+        toast.error(t("campaigns.messages.updateError") || "Failed to update campaign");
       }
     } catch (error) {
-      toast.error(
-        t("campaigns.messages.updateError") || "Failed to update campaign",
-      );
+      toast.error(t("campaigns.messages.updateError") || "Failed to update campaign");
     } finally {
       setIsSubmitting(false);
     }
@@ -126,40 +120,28 @@ export default function EditCampaignModal({
   if (!isOpen || !campaign) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 text-gray-900 dark:text-white">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 text-gray-900 dark:text-white sm:p-6">
       <div
-        className="absolute inset-0 bg-gray-900/60 dark:bg-black/70 backdrop-blur-sm"
+        className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm dark:bg-black/70"
         onClick={handleClose}
       />
 
       <div
         ref={modalRef as React.RefObject<HTMLDivElement>}
-        className="relative w-full max-w-2xl bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300 border border-gray-200/50 dark:border-neutral-800/50"
+        className="animate-in fade-in zoom-in relative flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-lg border border-gray-200/50 bg-gradient-to-br from-white to-gray-50 shadow-2xl duration-300 dark:border-neutral-800/50 dark:from-neutral-900 dark:to-neutral-950"
       >
         <ModalHeader
           t={t}
           onClose={handleClose}
-          title={
-            canManage
-              ? "campaigns.modal.edit.title"
-              : "campaigns.modal.view.title"
-          }
-          subtitle={
-            canManage
-              ? "campaigns.modal.edit.subtitle"
-              : "campaigns.modal.view.subtitle"
-          }
+          title={canManage ? "campaigns.modal.edit.title" : "campaigns.modal.view.title"}
+          subtitle={canManage ? "campaigns.modal.edit.subtitle" : "campaigns.modal.view.subtitle"}
           icon={Target}
           iconColor="text-primary-500"
           size="xl"
         />
 
-        <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
-          <form
-            id="edit-campaign-form"
-            onSubmit={handleSubmit(onFormSubmit)}
-            className="space-y-6"
-          >
+        <div className="custom-scrollbar flex-1 overflow-y-auto p-6">
+          <form id="edit-campaign-form" onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
             <CampaignFormFields
               register={register}
               setValue={setValue}
@@ -182,20 +164,20 @@ export default function EditCampaignModal({
             />
 
             {errors.end_date && (
-              <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
-                <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4" />
+              <div className="rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-900/20">
+                <p className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
+                  <AlertTriangle className="h-4 w-4" />
                   {errors.end_date.message as string}
                 </p>
               </div>
             )}
 
             <div className="form-group">
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+              <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
                 {t("campaigns.modal.edit.associatedPublications")}
               </label>
 
-              <div className="border border-gray-200 dark:border-neutral-700 rounded-lg p-2 bg-gray-50 dark:bg-black/20">
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-2 dark:border-neutral-700 dark:bg-black/20">
                 <PublicationSelector
                   publications={availablePublications}
                   selectedIds={watchedFields.publication_ids || []}

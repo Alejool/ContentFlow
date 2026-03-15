@@ -48,7 +48,7 @@ export const OfflineDisabledWrapper: React.FC<OfflineDisabledWrapperProps> = ({
     <div className={`relative ${className}`}>
       {/* Disabled content */}
       <div
-        className="pointer-events-none opacity-50 select-none"
+        className="pointer-events-none select-none opacity-50"
         aria-disabled="true"
         title={disabledReason || undefined}
       >
@@ -57,10 +57,10 @@ export const OfflineDisabledWrapper: React.FC<OfflineDisabledWrapperProps> = ({
 
       {/* Offline overlay */}
       {showOfflineOverlay && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-900/10 dark:bg-gray-900/30 backdrop-blur-[1px] rounded-lg">
-          <div className="flex flex-col items-center gap-2 px-4 py-3 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+        <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-gray-900/10 backdrop-blur-[1px] dark:bg-gray-900/30">
+          <div className="flex flex-col items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-lg dark:border-gray-700 dark:bg-gray-800">
             <WifiOff className="h-5 w-5 text-gray-500 dark:text-gray-400" />
-            <p className="text-xs font-medium text-gray-700 dark:text-gray-300 text-center max-w-xs">
+            <p className="max-w-xs text-center text-xs font-medium text-gray-700 dark:text-gray-300">
               {disabledReason}
             </p>
           </div>

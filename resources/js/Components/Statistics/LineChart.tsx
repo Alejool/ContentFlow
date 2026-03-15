@@ -33,23 +33,14 @@ const LineChart: React.FC<LineChartProps> = ({
 
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <RechartsLineChart
-        data={data}
-        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-      >
-        <CartesianGrid
-          strokeDasharray="3 3"
-          stroke={isDark ? "#374151" : "#f0f0f0"}
-        />
+      <RechartsLineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#374151" : "#f0f0f0"} />
         <XAxis
           dataKey={xAxisKey}
           stroke={isDark ? "#9ca3af" : "#888"}
           style={{ fontSize: "12px" }}
         />
-        <YAxis
-          stroke={isDark ? "#9ca3af" : "#888"}
-          style={{ fontSize: "12px" }}
-        />
+        <YAxis stroke={isDark ? "#9ca3af" : "#888"} style={{ fontSize: "12px" }} />
         <Tooltip
           contentStyle={{
             backgroundColor: isDark ? "#1f2937" : "white",

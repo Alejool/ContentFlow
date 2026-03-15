@@ -9,14 +9,14 @@ interface ContentResponseProps {
 export default function ContentResponse({ data, theme }: ContentResponseProps) {
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between mb-3">
+      <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Hash className="w-5 h-5 text-purple-500" />
-          <h3 className="font-semibold text-lg">{data.title}</h3>
+          <Hash className="h-5 w-5 text-purple-500" />
+          <h3 className="text-lg font-semibold">{data.title}</h3>
         </div>
         {data.platform && (
           <span
-            className={`px-2 py-1 text-xs rounded-full ${
+            className={`rounded-full px-2 py-1 text-xs ${
               theme === "dark"
                 ? "bg-purple-900/30 text-purple-300"
                 : "bg-purple-100 text-purple-700"
@@ -29,24 +29,20 @@ export default function ContentResponse({ data, theme }: ContentResponseProps) {
 
       {data.content && (
         <div
-          className={`p-4 rounded-lg ${
+          className={`rounded-lg p-4 ${
             theme === "dark"
               ? "bg-gradient-to-r from-purple-900/10 to-pink-900/10"
               : "bg-gradient-to-r from-purple-50 to-pink-50"
           }`}
         >
-          <p className="text-sm whitespace-pre-line">{data.content}</p>
+          <p className="whitespace-pre-line text-sm">{data.content}</p>
           {data.character_count && (
             <div
-              className={`mt-3 pt-3 border-t ${
+              className={`mt-3 border-t pt-3 ${
                 theme === "dark" ? "border-purple-800/30" : "border-purple-100"
               }`}
             >
-              <p
-                className={`text-xs ${
-                  theme === "dark" ? "text-gray-400" : "text-gray-500"
-                }`}
-              >
+              <p className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
                 Caracteres: {data.character_count}
               </p>
             </div>
@@ -63,12 +59,8 @@ export default function ContentResponse({ data, theme }: ContentResponseProps) {
                 theme === "dark" ? "border-purple-400" : "border-purple-500"
               }`}
             >
-              <h4 className="font-medium text-sm">{section.heading}</h4>
-              <p
-                className={`text-sm mt-1 ${
-                  theme === "dark" ? "text-gray-300" : "text-gray-600"
-                }`}
-              >
+              <h4 className="text-sm font-medium">{section.heading}</h4>
+              <p className={`mt-1 text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
                 {section.content}
               </p>
             </div>
@@ -81,7 +73,7 @@ export default function ContentResponse({ data, theme }: ContentResponseProps) {
           {data.keywords.map((keyword, index) => (
             <span
               key={index}
-              className={`px-2 py-1 text-xs rounded-full ${
+              className={`rounded-full px-2 py-1 text-xs ${
                 theme === "dark"
                   ? "bg-purple-900/30 text-purple-300"
                   : "bg-purple-100 text-purple-700"

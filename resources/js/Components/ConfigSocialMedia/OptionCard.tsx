@@ -27,33 +27,25 @@ export default function OptionCard({
   return (
     <label
       htmlFor={inputId}
-      className="flex items-center justify-between p-4 border border-gray-200 dark:border-neutral-700 rounded-lg hover:border-primary-500 cursor-pointer transition-colors"
+      className="flex cursor-pointer items-center justify-between rounded-lg border border-gray-200 p-4 transition-colors hover:border-primary-500 dark:border-neutral-700"
     >
       <div className="flex items-center gap-3">
-        <div
-          className={`w-8 h-8 ${iconBgColor} rounded-lg flex items-center justify-center`}
-        >
-          <Icon className={`w-4 h-4 ${iconColor}`} />
+        <div className={`h-8 w-8 ${iconBgColor} flex items-center justify-center rounded-lg`}>
+          <Icon className={`h-4 w-4 ${iconColor}`} />
         </div>
         <div>
-          <span className="font-medium text-gray-900 dark:text-white block">
-            {label}
-          </span>
+          <span className="block font-medium text-gray-900 dark:text-white">{label}</span>
           {description && (
-            <span className="text-xs text-gray-500 dark:text-gray-400">
-              {description}
-            </span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">{description}</span>
           )}
         </div>
       </div>
       <div
-        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-          selected
-            ? "border-primary-500 bg-primary-500"
-            : "border-gray-300 dark:border-gray-600"
+        className={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${
+          selected ? "border-primary-500 bg-primary-500" : "border-gray-300 dark:border-gray-600"
         }`}
       >
-        {selected && <Check className="w-3 h-3 text-white" />}
+        {selected && <Check className="h-3 w-3 text-white" />}
       </div>
       <RadioInput
         id={inputId}

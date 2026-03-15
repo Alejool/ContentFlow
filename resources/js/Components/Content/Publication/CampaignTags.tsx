@@ -18,15 +18,11 @@ const CampaignTags = memo(({ publication, t }: CampaignTagsProps) => {
   }
 
   const handleCampaignClick = (campaignId: number) => {
-    const campaignTab = document.querySelector(
-      '[data-tab="campaigns"]',
-    ) as HTMLButtonElement;
+    const campaignTab = document.querySelector('[data-tab="campaigns"]') as HTMLButtonElement;
     if (campaignTab) {
       campaignTab.click();
       setTimeout(() => {
-        const campaignRow = document.querySelector(
-          `[data-campaign-id="${campaignId}"]`,
-        );
+        const campaignRow = document.querySelector(`[data-campaign-id="${campaignId}"]`);
         if (campaignRow) {
           campaignRow.scrollIntoView({
             behavior: "smooth",
@@ -49,7 +45,7 @@ const CampaignTags = memo(({ publication, t }: CampaignTagsProps) => {
         <button
           key={campaign.id}
           onClick={() => handleCampaignClick(campaign.id)}
-          className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium transition-all bg-primary-100 text-primary-800 hover:bg-primary-200 dark:bg-primary-900/30 dark:text-primary-400 dark:hover:bg-primary-900/50"
+          className="inline-flex items-center rounded-lg bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 transition-all hover:bg-primary-200 dark:bg-primary-900/30 dark:text-primary-400 dark:hover:bg-primary-900/50"
           title={`Click to view ${campaign.name || campaign.title}`}
         >
           {campaign.name || campaign.title}

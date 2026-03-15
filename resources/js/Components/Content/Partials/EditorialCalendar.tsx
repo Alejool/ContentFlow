@@ -26,48 +26,39 @@ import { useTranslation } from "react-i18next";
 export default function EditorialCalendar() {
   const { t } = useTranslation();
   const { actualTheme } = useTheme();
-  const {
-    events,
-    currentMonth,
-    isLoading,
-    nextMonth,
-    prevMonth,
-    goToToday,
-    handleEventClick,
-  } = useCalendar();
+  const { events, currentMonth, isLoading, nextMonth, prevMonth, goToToday, handleEventClick } =
+    useCalendar();
 
   const renderHeader = () => (
-    <div className="flex flex-col sm:flex-row items-center justify-between mb-6 sm:mb-8 gap-4">
+    <div className="mb-6 flex flex-col items-center justify-between gap-4 sm:mb-8 sm:flex-row">
       <div className="flex items-center gap-3">
-        <div className={`p-2 rounded-lg bg-primary-100 dark:bg-primary-900/20`}>
+        <div className={`rounded-lg bg-primary-100 p-2 dark:bg-primary-900/20`}>
           <CalendarIcon
-            className={`w-5 h-5 sm:w-6 sm:h-6 text-primary-600 dark:text-primary-400`}
+            className={`h-5 w-5 text-primary-600 dark:text-primary-400 sm:h-6 sm:w-6`}
           />
         </div>
-        <h2
-          className={`text-xl sm:text-2xl font-bold text-gray-900 dark:text-white`}
-        >
+        <h2 className={`text-xl font-bold text-gray-900 dark:text-white sm:text-2xl`}>
           {format(currentMonth, "MMMM yyyy")}
         </h2>
       </div>
-      <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+      <div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-end">
         <button
           onClick={prevMonth}
-          className={`p-2 rounded-lg transition-colors ${actualTheme === "dark" ? "hover:bg-neutral-800 text-gray-400" : "hover:bg-gray-100 text-gray-600"}`}
+          className={`rounded-lg p-2 transition-colors ${actualTheme === "dark" ? "text-gray-400 hover:bg-neutral-800" : "text-gray-600 hover:bg-gray-100"}`}
         >
-          <ChevronLeft className="w-5 h-5" />
+          <ChevronLeft className="h-5 w-5" />
         </button>
         <button
           onClick={goToToday}
-          className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${actualTheme === "dark" ? "bg-neutral-800 text-white hover:bg-neutral-700" : "bg-white text-gray-700 border border-gray-200 hover:bg-gray-50"}`}
+          className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${actualTheme === "dark" ? "bg-neutral-800 text-white hover:bg-neutral-700" : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50"}`}
         >
           {t("common.today")}
         </button>
         <button
           onClick={nextMonth}
-          className={`p-2 rounded-lg transition-colors ${actualTheme === "dark" ? "hover:bg-neutral-800 text-gray-400" : "hover:bg-gray-100 text-gray-600"}`}
+          className={`rounded-lg p-2 transition-colors ${actualTheme === "dark" ? "text-gray-400 hover:bg-neutral-800" : "text-gray-600 hover:bg-gray-100"}`}
         >
-          <ChevronRight className="w-5 h-5" />
+          <ChevronRight className="h-5 w-5" />
         </button>
       </div>
     </div>
@@ -76,11 +67,11 @@ export default function EditorialCalendar() {
   const renderDays = () => {
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     return (
-      <div className="grid grid-cols-7 mb-2">
+      <div className="mb-2 grid grid-cols-7">
         {days.map((day) => (
           <div
             key={day}
-            className="text-center text-[10px] sm:text-xs font-bold uppercase tracking-wider text-gray-400 py-2"
+            className="py-2 text-center text-[10px] font-bold uppercase tracking-wider text-gray-400 sm:text-xs"
           >
             {day}
           </div>
@@ -99,7 +90,7 @@ export default function EditorialCalendar() {
 
     return (
       <div
-        className={`grid grid-cols-7 border-t border-l ${actualTheme === "dark" ? "border-neutral-800" : "border-gray-100"} rounded-lg overflow-hidden`}
+        className={`grid grid-cols-7 border-l border-t ${actualTheme === "dark" ? "border-neutral-800" : "border-gray-100"} overflow-hidden rounded-lg`}
       >
         {days.map((day) => {
           const dayEvents = events.filter((event) => {
@@ -112,15 +103,15 @@ export default function EditorialCalendar() {
           return (
             <div
               key={day.toISOString()}
-              className={`min-h-[80px] sm:min-h-[140px] p-1 sm:p-2 border-r border-b transition-colors relative ${
+              className={`relative min-h-[80px] border-b border-r p-1 transition-colors sm:min-h-[140px] sm:p-2 ${
                 actualTheme === "dark"
                   ? `${isCurrentMonth ? "bg-neutral-900/30" : "bg-neutral-950/50"} border-neutral-800`
                   : `${isCurrentMonth ? "bg-white" : "bg-gray-50/50"} border-gray-100`
               }`}
             >
-              <div className="flex justify-end mb-1">
+              <div className="mb-1 flex justify-end">
                 <span
-                  className={`text-[10px] sm:text-sm font-medium w-5 h-5 sm:w-8 sm:h-8 flex items-center justify-center rounded-full ${
+                  className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-medium sm:h-8 sm:w-8 sm:text-sm ${
                     isTodayDate
                       ? "bg-primary-600 text-white shadow-lg"
                       : isCurrentMonth
@@ -134,7 +125,7 @@ export default function EditorialCalendar() {
                 </span>
               </div>
 
-              <div className="space-y-1 max-h-[60px] sm:max-h-[100px] overflow-y-auto overflow-x-hidden scrollbar-none hover:scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-neutral-800 scroll-smooth pr-0.5 transition-all duration-300">
+              <div className="scrollbar-none hover:scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-neutral-800 max-h-[60px] space-y-1 overflow-y-auto overflow-x-hidden scroll-smooth pr-0.5 transition-all duration-300 sm:max-h-[100px]">
                 {dayEvents.map((event) => (
                   <div
                     key={event.id}
@@ -142,7 +133,7 @@ export default function EditorialCalendar() {
                       e.stopPropagation();
                       handleEventClick(event);
                     }}
-                    className={`group px-1 py-0.5 sm:px-2 sm:py-1 rounded text-[7px] sm:text-[10px] font-medium border-l-2 shadow-sm truncate flex flex-col gap-0.5 cursor-pointer hover:scale-[1.02] active:scale-95 transition-all ${
+                    className={`group flex cursor-pointer flex-col gap-0.5 truncate rounded border-l-2 px-1 py-0.5 text-[7px] font-medium shadow-sm transition-all hover:scale-[1.02] active:scale-95 sm:px-2 sm:py-1 sm:text-[10px] ${
                       actualTheme === "dark"
                         ? "bg-neutral-800/80 hover:bg-neutral-700/80"
                         : "bg-gray-50 hover:bg-gray-100"
@@ -151,9 +142,9 @@ export default function EditorialCalendar() {
                   >
                     <div className="flex items-center gap-1">
                       {event.type === "publication" ? (
-                        <Layers className="w-2 h-2 sm:w-3 sm:h-3" />
+                        <Layers className="h-2 w-2 sm:h-3 sm:w-3" />
                       ) : (
-                        <Share2 className="w-2 h-2 sm:w-3 sm:h-3" />
+                        <Share2 className="h-2 w-2 sm:h-3 sm:w-3" />
                       )}
                       <span
                         className={`truncate ${actualTheme === "dark" ? "text-gray-200" : "text-gray-700"}`}
@@ -162,8 +153,8 @@ export default function EditorialCalendar() {
                       </span>
                     </div>
                     {event.start && (
-                      <div className="hidden sm:flex items-center gap-1 text-[9px] text-gray-500">
-                        <Clock className="w-2.5 h-2.5" />
+                      <div className="hidden items-center gap-1 text-[9px] text-gray-500 sm:flex">
+                        <Clock className="h-2.5 w-2.5" />
                         {formatTime(event.start)}
                       </div>
                     )}
@@ -179,13 +170,13 @@ export default function EditorialCalendar() {
 
   return (
     <div
-      className={`p-3 sm:p-6 rounded-lg ${actualTheme === "dark" ? "bg-neutral-900/50 border border-neutral-800" : "bg-white shadow-sm border border-gray-100"}`}
+      className={`rounded-lg p-3 sm:p-6 ${actualTheme === "dark" ? "border border-neutral-800 bg-neutral-900/50" : "border border-gray-100 bg-white shadow-sm"}`}
     >
       {renderHeader()}
       <div className="relative">
         {isLoading && (
-          <div className="absolute inset-0 bg-white/50 dark:bg-neutral-900/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white/50 backdrop-blur-sm dark:bg-neutral-900/50">
+            <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-primary-600"></div>
           </div>
         )}
         <div className="w-full">

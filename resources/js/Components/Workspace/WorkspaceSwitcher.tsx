@@ -1,11 +1,7 @@
 import { useForm, usePage } from "@inertiajs/react";
 import WorkspaceDropdown from "./WorkspaceDropdown";
 
-export default function WorkspaceSwitcher({
-  isSidebarOpen,
-}: {
-  isSidebarOpen: boolean;
-}) {
+export default function WorkspaceSwitcher({ isSidebarOpen }: { isSidebarOpen: boolean }) {
   const { auth } = usePage().props as any;
   const workspaces = auth?.workspaces || [];
   const current_workspace = auth?.current_workspace || null;

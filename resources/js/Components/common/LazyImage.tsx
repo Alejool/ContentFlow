@@ -84,9 +84,7 @@ export function LazyImage({
       <div
         className={`flex items-center justify-center bg-neutral-100 dark:bg-neutral-800 ${className}`}
       >
-        <span className="text-neutral-400 dark:text-neutral-600 text-xs">
-          Sin imagen
-        </span>
+        <span className="text-xs text-neutral-400 dark:text-neutral-600">Sin imagen</span>
       </div>
     );
   }
@@ -96,9 +94,9 @@ export function LazyImage({
       {/* Loader mientras carga */}
       {showLoader && isLoading && !hasError && (
         <div
-          className={`absolute inset-0 flex items-center justify-center bg-neutral-100 dark:bg-neutral-800 animate-pulse ${loaderClassName}`}
+          className={`absolute inset-0 flex animate-pulse items-center justify-center bg-neutral-100 dark:bg-neutral-800 ${loaderClassName}`}
         >
-          <div className="w-8 h-8 border-3 border-primary-200 border-t-primary-600 rounded-full animate-spin"></div>
+          <div className="border-3 h-8 w-8 animate-spin rounded-full border-primary-200 border-t-primary-600"></div>
         </div>
       )}
 
@@ -110,19 +108,14 @@ export function LazyImage({
         loading={loading}
         onLoad={handleLoad}
         onError={handleError}
-        className={`
-          w-full h-full object-cover
-          transition-opacity duration-300 ease-in-out
-          ${isLoading ? "opacity-0" : "opacity-100"}
-          ${hasError ? "hidden" : ""}
-        `}
+        className={`h-full w-full object-cover transition-opacity duration-300 ease-in-out ${isLoading ? "opacity-0" : "opacity-100"} ${hasError ? "hidden" : ""} `}
       />
 
       {/* Fallback visual si todo falla */}
       {hasError && (
         <div className="absolute inset-0 flex items-center justify-center bg-neutral-100 dark:bg-neutral-800">
           <svg
-            className="w-1/3 h-1/3 text-neutral-300 dark:text-neutral-600"
+            className="h-1/3 w-1/3 text-neutral-300 dark:text-neutral-600"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

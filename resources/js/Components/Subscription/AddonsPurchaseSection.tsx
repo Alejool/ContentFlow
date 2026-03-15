@@ -3,10 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import Button from "@/Components/common/Modern/Button";
 import Input from "@/Components/common/Modern/Input";
-import {
-  CarouselPagination,
-  CarouselDots,
-} from "@/Components/common/CarouselPagination";
+import { CarouselPagination, CarouselDots } from "@/Components/common/CarouselPagination";
 import { GatewaySelector } from "@/Components/Payment/GatewaySelector";
 import { ActiveAddonsCards } from "./ActiveAddonsCards";
 import { TabNavigation, Tab } from "@/Components/common/TabNavigation";
@@ -96,9 +93,7 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
   const currentPackages = addons[activeTab]?.packages
     ? Object.values(addons[activeTab].packages).filter((pkg) => pkg.enabled)
     : [];
-  const totalPackageSlides = Math.ceil(
-    currentPackages.length / packagesPerSlide,
-  );
+  const totalPackageSlides = Math.ceil(currentPackages.length / packagesPerSlide);
   const showPackageCarousel = currentPackages.length > packagesPerSlide;
 
   const nextPackageSlide = () => {
@@ -106,9 +101,7 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
   };
 
   const prevPackageSlide = () => {
-    setCurrentPackageSlide(
-      (prev) => (prev - 1 + totalPackageSlides) % totalPackageSlides,
-    );
+    setCurrentPackageSlide((prev) => (prev - 1 + totalPackageSlides) % totalPackageSlides);
   };
 
   const getCurrentPackages = () => {
@@ -165,9 +158,7 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
         headers: {
           "Content-Type": "application/json",
           "X-CSRF-TOKEN":
-            document
-              .querySelector('meta[name="csrf-token"]')
-              ?.getAttribute("content") || "",
+            document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || "",
         },
         body: JSON.stringify({
           sku,
@@ -184,12 +175,8 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
       } else if (data.client_secret) {
         // Para Stripe Payment Intent, usar el client_secret con Stripe Elements
         // Por ahora, mostrar un mensaje
-        console.error(
-          "Payment Intent flow not implemented yet. Use Checkout Session instead.",
-        );
-        alert(
-          "Por favor configura los Price IDs de Stripe para usar el checkout completo.",
-        );
+        console.error("Payment Intent flow not implemented yet. Use Checkout Session instead.");
+        alert("Por favor configura los Price IDs de Stripe para usar el checkout completo.");
       } else {
         console.error("Invalid response from payment API");
         alert("Error al crear la sesión de pago. Por favor intenta de nuevo.");
@@ -207,15 +194,15 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
 
     return (
       <div
-        className={`relative bg-white dark:bg-gray-800 rounded-xl p-6 border-2 transition-all ${
+        className={`relative rounded-xl border-2 bg-white p-6 transition-all dark:bg-gray-800 ${
           pkg.popular
-            ? "border-primary-500 shadow-lg scale-105"
-            : "border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-600"
+            ? "scale-105 border-primary-500 shadow-lg"
+            : "border-gray-200 hover:border-primary-300 dark:border-gray-700 dark:hover:border-primary-600"
         }`}
       >
         {pkg.popular && (
           <div className="absolute -top-2 left-3">
-            <span className="bg-primary-500/90 backdrop-2xl text-white text-xs font-bold px-3 py-2 rounded-full">
+            <span className="backdrop-2xl rounded-full bg-primary-500/90 px-3 py-2 text-xs font-bold text-white">
               {t("subscription.addons.mostPopular", "Más Popular")}
             </span>
           </div>
@@ -223,55 +210,40 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
 
         {pkg.savings_percentage > 0 && (
           <div className="absolute -top-2 right-3">
-            <span className="bg-green-500/90 backdrop-2xl text-white text-xs font-bold px-3 py-2 rounded-full">
-              {t("subscription.addons.save", "Ahorra")} {pkg.savings_percentage}
-              %
+            <span className="backdrop-2xl rounded-full bg-green-500/90 px-3 py-2 text-xs font-bold text-white">
+              {t("subscription.addons.save", "Ahorra")} {pkg.savings_percentage}%
             </span>
           </div>
         )}
 
-        <div className="flex justify-center mb-4">
-          {activeTab === "ai_credits" && (
-            <Sparkles className="w-12 h-12 text-primary-500" />
-          )}
-          {activeTab === "storage" && (
-            <HardDrive className="w-12 h-12 text-primary-500" />
-          )}
-          {activeTab === "publications" && (
-            <FileText className="w-12 h-12 text-primary-500" />
-          )}
-          {activeTab === "team_members" && (
-            <Users className="w-12 h-12 text-primary-500" />
-          )}
+        <div className="mb-4 flex justify-center">
+          {activeTab === "ai_credits" && <Sparkles className="h-12 w-12 text-primary-500" />}
+          {activeTab === "storage" && <HardDrive className="h-12 w-12 text-primary-500" />}
+          {activeTab === "publications" && <FileText className="h-12 w-12 text-primary-500" />}
+          {activeTab === "team_members" && <Users className="h-12 w-12 text-primary-500" />}
         </div>
 
-        <h3 className="text-xl font-bold text-center text-gray-900 dark:text-white mb-2">
+        <h3 className="mb-2 text-center text-xl font-bold text-gray-900 dark:text-white">
           {t(`subscription.addons.packages.${pkg.sku}.name`, pkg.name)}
         </h3>
 
-        <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-4">
-          {t(
-            `subscription.addons.packages.${pkg.sku}.description`,
-            pkg.description,
-          )}
+        <p className="mb-4 text-center text-sm text-gray-600 dark:text-gray-400">
+          {t(`subscription.addons.packages.${pkg.sku}.description`, pkg.description)}
         </p>
 
-        <div className="text-center mb-4">
+        <div className="mb-4 text-center">
           <div className="text-4xl font-bold text-primary-600 dark:text-primary-400">
             {pkg.amount.toLocaleString()}
           </div>
           <div className="text-sm text-gray-600 dark:text-gray-400">
-            {activeTab === "ai_credits" &&
-              t("subscription.addons.credits", "créditos")}
+            {activeTab === "ai_credits" && t("subscription.addons.credits", "créditos")}
             {activeTab === "storage" && "GB"}
-            {activeTab === "publications" &&
-              t("subscription.addons.posts", "publicaciones")}
-            {activeTab === "team_members" &&
-              t("subscription.addons.members", "miembros")}
+            {activeTab === "publications" && t("subscription.addons.posts", "publicaciones")}
+            {activeTab === "team_members" && t("subscription.addons.members", "miembros")}
           </div>
         </div>
 
-        <div className="flex justify-center mb-6">
+        <div className="mb-6 flex justify-center">
           <AddonPriceDisplay
             priceUsd={pkg.price_usd || pkg.price}
             priceLocal={pkg.price_local || pkg.price}
@@ -289,7 +261,7 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
               variant="ghost"
               buttonStyle="icon"
               size="lg"
-              className="w-10 h-10 !p-0"
+              className="h-10 w-10 !p-0"
               animation="scale"
             >
               -
@@ -314,7 +286,7 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
               buttonStyle="icon"
               variant="ghost"
               size="lg"
-              className="w-10 h-10 !p-0"
+              className="h-10 w-10 !p-0"
               animation="scale"
             >
               +
@@ -323,18 +295,15 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
         </div>
 
         {quantity > 1 && (
-          <div className="text-center mb-4 p-3 bg-primary-50 dark:bg-primary-900/20 rounded-lg border border-primary-200 dark:border-primary-800">
-            <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+          <div className="mb-4 rounded-lg border border-primary-200 bg-primary-50 p-3 text-center dark:border-primary-800 dark:bg-primary-900/20">
+            <div className="mb-2 text-sm text-gray-600 dark:text-gray-400">
               {t("subscription.addons.total", "Total")} ({quantity}x):
             </div>
             <AddonPriceDisplay
               priceUsd={totalPriceUsd}
               priceLocal={totalPriceLocal}
               currency={pkg.currency || "USD"}
-              formattedPrice={formatPrice(
-                totalPriceLocal,
-                pkg.currency || "USD",
-              )}
+              formattedPrice={formatPrice(totalPriceLocal, pkg.currency || "USD")}
               showUsdEquivalent={true}
               size="md"
             />
@@ -393,7 +362,7 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
   return (
     <div className="space-y-6">
       {/* Sección de compra de paquetes */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
         <TabNavigation
           tabs={tabs}
           activeTab={activeTab}
@@ -405,7 +374,7 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
         />
 
         {showPackageCarousel && (
-          <div className="px-8 pt-4 flex justify-center">
+          <div className="flex justify-center px-8 pt-4">
             <CarouselPagination
               currentSlide={currentPackageSlide}
               totalSlides={totalPackageSlides}
@@ -418,9 +387,9 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
         <div className="p-8">
           {/* Banner informativo de moneda */}
           {hasCurrencyConversion && (
-            <div className="mb-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+            <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
               <div className="flex items-start gap-3">
-                <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
                 <div className="flex-1">
                   <p className="text-sm text-blue-800 dark:text-blue-200">
                     {t(
@@ -442,7 +411,7 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
 
           {showPackageCarousel ? (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
                 {getCurrentPackages().map((pkg) => (
                   <div key={pkg.sku}>{renderPackageCard(pkg)}</div>
                 ))}
@@ -456,13 +425,11 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
               />
             </>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-4">
               {currentPackages.length > 0 ? (
-                currentPackages.map((pkg) => (
-                  <div key={pkg.sku}>{renderPackageCard(pkg)}</div>
-                ))
+                currentPackages.map((pkg) => <div key={pkg.sku}>{renderPackageCard(pkg)}</div>)
               ) : (
-                <div className="col-span-full text-center py-12">
+                <div className="col-span-full py-12 text-center">
                   <p className="text-gray-500 dark:text-gray-400">
                     {t(
                       "subscription.addons.noPackages",

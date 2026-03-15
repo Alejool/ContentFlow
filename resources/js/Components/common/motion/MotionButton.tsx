@@ -96,11 +96,7 @@ export const MotionButton = forwardRef<HTMLButtonElement, MotionButtonProps>(
           ref={ref}
           className={className}
           initial="initial"
-          whileHover={getVariant(
-            selectedHoverVariant,
-            hoverState,
-            shouldReduceMotion,
-          )}
+          whileHover={getVariant(selectedHoverVariant, hoverState, shouldReduceMotion)}
           whileTap={
             actionFeedback === "press"
               ? getVariant(selectedActionVariant, tapState, shouldReduceMotion)

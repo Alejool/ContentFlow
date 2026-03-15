@@ -3,14 +3,7 @@ import Button from "@/Components/common/Modern/Button";
 import Input from "@/Components/common/Modern/Input";
 import Select from "@/Components/common/Modern/Select";
 import axios from "axios";
-import {
-  AlertTriangle,
-  ChevronRight,
-  Plus,
-  Save,
-  Settings,
-  Trash2,
-} from "lucide-react";
+import { AlertTriangle, ChevronRight, Plus, Save, Settings, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -60,15 +53,15 @@ export default function ApprovalWorkflowConfiguration({
   // Check if workspace has access to approval workflows
   if (!hasBasicAccess) {
     return (
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-xl p-8 text-center">
-          <div className="mx-auto w-16 h-16 bg-blue-100 dark:bg-blue-900/40 rounded-full flex items-center justify-center mb-4">
-            <Settings className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+      <div className="mx-auto max-w-4xl">
+        <div className="rounded-xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-purple-50 p-8 text-center dark:border-blue-800 dark:from-blue-900/20 dark:to-purple-900/20">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/40">
+            <Settings className="h-8 w-8 text-blue-600 dark:text-blue-400" />
           </div>
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          <h3 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
             {t("approvals.upgrade.title") || "Aprobaciones no disponibles"}
           </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-2xl mx-auto">
+          <p className="mx-auto mb-6 max-w-2xl text-gray-600 dark:text-gray-400">
             {t("approvals.upgrade.description") ||
               "Las aprobaciones son una funcionalidad premium disponible en los planes Professional y Enterprise. Actualiza tu plan para obtener acceso a flujos de aprobación y control de contenido."}
           </p>
@@ -157,14 +150,10 @@ export default function ApprovalWorkflowConfiguration({
 
       setWorkflow({ ...workflow, is_enabled: !workflow.is_enabled });
       toast.success(
-        workflow.is_enabled
-          ? t("approval.success.disabled")
-          : t("approval.success.enabled"),
+        workflow.is_enabled ? t("approval.success.disabled") : t("approval.success.enabled"),
       );
     } catch (error: any) {
-      toast.error(
-        error.response?.data?.message || t("approval.errors.toggle_failed"),
-      );
+      toast.error(error.response?.data?.message || t("approval.errors.toggle_failed"));
     } finally {
       setIsSaving(false);
     }
@@ -233,11 +222,7 @@ export default function ApprovalWorkflowConfiguration({
     });
   };
 
-  const handleLevelChange = (
-    index: number,
-    field: keyof ApprovalLevel,
-    value: any,
-  ) => {
+  const handleLevelChange = (index: number, field: keyof ApprovalLevel, value: any) => {
     const newLevels = [...workflow.levels];
     newLevels[index] = { ...newLevels[index], [field]: value };
     setWorkflow({ ...workflow, levels: newLevels });
@@ -285,9 +270,7 @@ export default function ApprovalWorkflowConfiguration({
       }
 
       // Check for invalid role selections (role_id = 0 or null)
-      const invalidRoles = workflow.levels.filter(
-        (l) => !l.role_id || l.role_id === 0,
-      );
+      const invalidRoles = workflow.levels.filter((l) => !l.role_id || l.role_id === 0);
       if (invalidRoles.length > 0) {
         toast.error(t("approval.errors.invalid_role_selection"));
         return;
@@ -328,9 +311,7 @@ export default function ApprovalWorkflowConfiguration({
       fetchWorkflow();
     } catch (error: any) {
       console.error("❌ Save error:", error.response?.data); // Debug log
-      toast.error(
-        error.response?.data?.message || t("approval.errors.save_failed"),
-      );
+      toast.error(error.response?.data?.message || t("approval.errors.save_failed"));
     } finally {
       setIsSaving(false);
     }
@@ -339,7 +320,7 @@ export default function ApprovalWorkflowConfiguration({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-12">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600"></div>
+        <div className="h-10 w-10 animate-spin rounded-full border-b-2 border-primary-600"></div>
       </div>
     );
   }
@@ -347,11 +328,11 @@ export default function ApprovalWorkflowConfiguration({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-xl p-6">
+      <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary-100 dark:bg-primary-900/20 rounded-lg">
-              <Settings className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+            <div className="rounded-lg bg-primary-100 p-2 dark:bg-primary-900/20">
+              <Settings className="h-6 w-6 text-primary-600 dark:text-primary-400" />
             </div>
             <div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">
@@ -387,10 +368,10 @@ export default function ApprovalWorkflowConfiguration({
       )}
 
       {/* Enable/Disable Workflow */}
-      <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-xl p-6">
+      <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="font-bold text-gray-900 dark:text-white mb-1">
+            <h4 className="mb-1 font-bold text-gray-900 dark:text-white">
               {t("approval.enable_workflow")}
             </h4>
             <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -401,10 +382,8 @@ export default function ApprovalWorkflowConfiguration({
             onClick={handleToggleEnabled}
             disabled={!canManageWorkflow || isSaving}
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              workflow.is_enabled
-                ? "bg-primary-600"
-                : "bg-gray-200 dark:bg-neutral-700"
-            } ${!canManageWorkflow || isSaving ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+              workflow.is_enabled ? "bg-primary-600" : "bg-gray-200 dark:bg-neutral-700"
+            } ${!canManageWorkflow || isSaving ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
           >
             <span
               className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
@@ -417,10 +396,10 @@ export default function ApprovalWorkflowConfiguration({
 
       {/* Multi-Level Toggle */}
       {workflow.is_enabled && (
-        <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-xl p-6">
+        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
           <div className="flex items-center justify-between">
             <div>
-              <h4 className="font-bold text-gray-900 dark:text-white mb-1">
+              <h4 className="mb-1 font-bold text-gray-900 dark:text-white">
                 {t("approval.multi_level_workflow")}
               </h4>
               <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -431,10 +410,8 @@ export default function ApprovalWorkflowConfiguration({
               onClick={handleToggleMultiLevel}
               disabled={!canManageWorkflow || hasPendingContent}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                workflow.is_multi_level
-                  ? "bg-primary-600"
-                  : "bg-gray-200 dark:bg-neutral-700"
-              } ${!canManageWorkflow || hasPendingContent ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+                workflow.is_multi_level ? "bg-primary-600" : "bg-gray-200 dark:bg-neutral-700"
+              } ${!canManageWorkflow || hasPendingContent ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
             >
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
@@ -448,8 +425,8 @@ export default function ApprovalWorkflowConfiguration({
 
       {/* Multi-Level Configuration */}
       {workflow.is_enabled && workflow.is_multi_level && (
-        <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-xl p-6">
-          <div className="flex items-center justify-between mb-4">
+        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+          <div className="mb-4 flex items-center justify-between">
             <h4 className="font-bold text-gray-900 dark:text-white">
               {t("approval.approval_levels")}
             </h4>
@@ -474,19 +451,17 @@ export default function ApprovalWorkflowConfiguration({
             {workflow.levels.map((level, index) => (
               <div
                 key={index}
-                className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-neutral-800/20 border border-gray-200 dark:border-neutral-800 rounded-lg"
+                className="flex items-center gap-4 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-800 dark:bg-neutral-800/20"
               >
-                <div className="flex items-center gap-3 flex-1">
-                  <div className="h-8 w-8 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 flex items-center justify-center font-bold text-sm">
+                <div className="flex flex-1 items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 text-sm font-bold text-primary-700 dark:bg-primary-900/30 dark:text-primary-400">
                     {level.level_number}
                   </div>
 
                   <Input
                     id={`level-name-${index}`}
                     value={level.level_name}
-                    onChange={(e: any) =>
-                      handleLevelChange(index, "level_name", e.target.value)
-                    }
+                    onChange={(e: any) => handleLevelChange(index, "level_name", e.target.value)}
                     placeholder={t("approval.level_name")}
                     disabled={!canManageWorkflow || hasPendingContent}
                     containerClassName="flex-1"
@@ -500,25 +475,20 @@ export default function ApprovalWorkflowConfiguration({
                         const selectedRoleIds = workflow.levels
                           .filter((_, i) => i !== index) // Exclude current level
                           .map((l) => l.role_id);
-                        return (
-                          r.id === level.role_id ||
-                          !selectedRoleIds.includes(r.id)
-                        );
+                        return r.id === level.role_id || !selectedRoleIds.includes(r.id);
                       })
                       .map((r) => ({
                         value: r.id.toString(),
                         label: r.display_name,
                       }))}
                     value={level.role_id.toString()}
-                    onChange={(value) =>
-                      handleLevelChange(index, "role_id", parseInt(value))
-                    }
+                    onChange={(value) => handleLevelChange(index, "role_id", parseInt(value))}
                     disabled={!canManageWorkflow || hasPendingContent}
                     containerClassName={`w-48 ${duplicateRoles.has(level.role_id) ? "border-red-500" : ""}`}
                   />
 
                   {duplicateRoles.has(level.role_id) && (
-                    <div className="text-red-500 text-xs mt-1">
+                    <div className="mt-1 text-xs text-red-500">
                       {t("approval.errors.duplicate_role_selected")}
                     </div>
                   )}
@@ -527,7 +497,7 @@ export default function ApprovalWorkflowConfiguration({
                 {workflow.levels.length > 1 && (
                   <>
                     {index < workflow.levels.length - 1 && (
-                      <ChevronRight className="w-5 h-5 text-gray-400" />
+                      <ChevronRight className="h-5 w-5 text-gray-400" />
                     )}
                     <Button
                       variant="ghost"
@@ -536,7 +506,7 @@ export default function ApprovalWorkflowConfiguration({
                       className="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10"
                       size="sm"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </>
                 )}
@@ -545,9 +515,9 @@ export default function ApprovalWorkflowConfiguration({
           </div>
 
           {workflow.levels.length === 0 && (
-            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+            <div className="py-8 text-center text-gray-500 dark:text-gray-400">
               <p>{t("approval.no_levels_configured")}</p>
-              <p className="text-sm mt-1">{t("approval.click_add_level")}</p>
+              <p className="mt-1 text-sm">{t("approval.click_add_level")}</p>
             </div>
           )}
         </div>
@@ -559,10 +529,7 @@ export default function ApprovalWorkflowConfiguration({
       )}
 
       {!canManageWorkflow && (
-        <AlertCard
-          type="warning"
-          message={t("approval.insufficient_permissions")}
-        />
+        <AlertCard type="warning" message={t("approval.insufficient_permissions")} />
       )}
     </div>
   );

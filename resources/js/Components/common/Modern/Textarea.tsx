@@ -116,13 +116,7 @@ export default function Textarea<T extends FieldValues>({
   return (
     <div className={` ${containerClassName}`}>
       {label && (
-        <Label
-          htmlFor={id}
-          size={size}
-          required={required}
-          error={error}
-          success={success}
-        >
+        <Label htmlFor={id} size={size} required={required} error={error} success={success}>
           {label}
         </Label>
       )}
@@ -133,9 +127,7 @@ export default function Textarea<T extends FieldValues>({
             {isValidElement(Icon) ? (
               Icon
             ) : (
-              <Icon
-                className={`${currentSize.icon} text-gray-500 dark:text-gray-400`}
-              />
+              <Icon className={`${currentSize.icon} text-gray-500 dark:text-gray-400`} />
             )}
           </div>
         )}
@@ -179,24 +171,20 @@ export default function Textarea<T extends FieldValues>({
 
         {error && (
           <div className={getMessageStyles("error")} role="alert">
-            <TriangleAlert
-              className={`${currentSize.icon} mt-0.5 flex-shrink-0`}
-            />
+            <TriangleAlert className={`${currentSize.icon} mt-0.5 flex-shrink-0`} />
             <span>{error}</span>
           </div>
         )}
 
         {success && !error && (
           <div className={getMessageStyles("success")} role="status">
-            <CheckCircle
-              className={`${currentSize.icon} mt-0.5 flex-shrink-0`}
-            />
+            <CheckCircle className={`${currentSize.icon} mt-0.5 flex-shrink-0`} />
             <span>{success}</span>
           </div>
         )}
 
         {showCharCount && maxLength && (
-          <div className="text-xs mt-1 text-gray-500">
+          <div className="mt-1 text-xs text-gray-500">
             {charCount}/{maxLength} characters
           </div>
         )}

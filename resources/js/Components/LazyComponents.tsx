@@ -34,9 +34,7 @@ export const LazyReelsCarousel = createLazyComponent(
   () => import("@/Components/Content/ReelsCarousel"),
 );
 
-export const LazyVideoEditor = createLazyComponent(
-  () => import("@/Components/Upload/UploadItem"),
-);
+export const LazyVideoEditor = createLazyComponent(() => import("@/Components/Upload/UploadItem"));
 
 // Modales pesados
 export const LazyCreateWorkspaceModal = createLazyComponent(
@@ -54,12 +52,8 @@ export const LazyPlatformSettingsModal = createLazyComponent(
 // Páginas pesadas
 export const LazyAnalyticsPage = lazy(() => import("@/Pages/Analytics/Index"));
 export const LazyCalendarPage = lazy(() => import("@/Pages/Calendar/Index"));
-export const LazyReelsGallery = lazy(
-  () => import("@/Pages/Reels/AiReelsGallery"),
-);
-export const LazyWorkspaceSettings = lazy(
-  () => import("@/Pages/Workspace/Settings"),
-);
+export const LazyReelsGallery = lazy(() => import("@/Pages/Reels/AiReelsGallery"));
+export const LazyWorkspaceSettings = lazy(() => import("@/Pages/Workspace/Settings"));
 
 // AI Components - lazy load for better performance
 export const LazyAiFieldSuggester = createLazyComponent(
@@ -89,6 +83,4 @@ export const LazyResumeUploadsPrompt = createLazyComponent(
 );
 
 // Charts and heavy visualizations
-export const LazyRechartsComponents = createLazyComponent(
-  () => import("recharts"),
-);
+export const LazyRechartsComponents = createLazyComponent(() => import("recharts"));

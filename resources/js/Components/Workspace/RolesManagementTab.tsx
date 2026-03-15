@@ -78,8 +78,7 @@ export default function RolesManagementTab({
     // Prevenir edición de roles protegidos
     if (!canEditRole(role)) {
       toast.error(
-        t("roles.errors.cannot_edit_protected") ||
-          "No se puede editar este rol protegido",
+        t("roles.errors.cannot_edit_protected") || "No se puede editar este rol protegido",
       );
       return;
     }
@@ -93,16 +92,14 @@ export default function RolesManagementTab({
     // Prevenir eliminación de roles que no se pueden eliminar
     if (!canDeleteRole(role)) {
       toast.error(
-        t("roles.errors.cannot_delete_protected") ||
-          "No se puede eliminar este rol protegido",
+        t("roles.errors.cannot_delete_protected") || "No se puede eliminar este rol protegido",
       );
       return;
     }
 
     // Verificar si hay usuarios con este rol
     const memberCount =
-      workspace.users?.filter((u: any) => u.pivot?.role_id === role.id)
-        .length || 0;
+      workspace.users?.filter((u: any) => u.pivot?.role_id === role.id).length || 0;
     if (memberCount > 0) {
       toast.error(
         t("roles.errors.role_has_users") ||
@@ -166,9 +163,7 @@ export default function RolesManagementTab({
       console.error("Error updating role:", error);
       console.error("Error response:", error.response);
       const message =
-        error.response?.data?.message ||
-        t("roles.errors.update_failed") ||
-        "Failed to update role";
+        error.response?.data?.message || t("roles.errors.update_failed") || "Failed to update role";
       toast.error(message);
     } finally {
       setIsLoading(false);
@@ -177,8 +172,8 @@ export default function RolesManagementTab({
 
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-lg p-6">
-        <div className="flex items-center gap-3 mb-6">
+      <div className="rounded-lg border border-gray-200 bg-gradient-to-br from-white to-gray-50 p-6 dark:border-neutral-800 dark:from-neutral-900 dark:to-neutral-950">
+        <div className="mb-6 flex items-center gap-3">
           <div>
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">
               {t("workspace.roles_management.title")}
@@ -189,26 +184,25 @@ export default function RolesManagementTab({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
           {roles.map((role) => {
             const isCurrentRole = userRole === role.slug;
             const memberCount =
-              workspace.users?.filter((u: any) => u.pivot?.role_id === role.id)
-                .length || 0;
+              workspace.users?.filter((u: any) => u.pivot?.role_id === role.id).length || 0;
 
             return (
               <div
                 key={role.id}
-                className={`border rounded-lg p-5 transition-all duration-300 hover:shadow-lg ${
+                className={`rounded-lg border p-5 transition-all duration-300 hover:shadow-lg ${
                   isCurrentRole
-                    ? "border-primary-300 dark:border-primary-700 bg-gradient-to-br from-primary-50 to-white dark:from-primary-900/10 dark:to-neutral-950"
-                    : "border-gray-200 dark:border-neutral-800 bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950"
+                    ? "border-primary-300 bg-gradient-to-br from-primary-50 to-white dark:border-primary-700 dark:from-primary-900/10 dark:to-neutral-950"
+                    : "border-gray-200 bg-gradient-to-br from-white to-gray-50 dark:border-neutral-800 dark:from-neutral-900 dark:to-neutral-950"
                 }`}
               >
-                <div className="flex items-start justify-between mb-4">
+                <div className="mb-4 flex items-start justify-between">
                   <div className="flex items-center gap-3">
                     <div
-                      className={`h-10 w-10 rounded-lg flex items-center justify-center ${
+                      className={`flex h-10 w-10 items-center justify-center rounded-lg ${
                         role.slug === "owner"
                           ? "bg-gradient-to-br from-primary-500 to-primary-600"
                           : role.slug === "admin"
@@ -233,10 +227,10 @@ export default function RolesManagementTab({
                       )}
                     </div>
                     <div>
-                      <h4 className="font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                      <h4 className="flex items-center gap-2 font-bold text-gray-900 dark:text-white">
                         {role.name}
                         {isCurrentRole && (
-                          <span className="px-2 py-0.5 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 text-xs font-bold rounded-full">
+                          <span className="rounded-full bg-primary-100 px-2 py-0.5 text-xs font-bold text-primary-700 dark:bg-primary-900/30 dark:text-primary-400">
                             {t("workspace.your_role")}
                           </span>
                         )}
@@ -247,11 +241,11 @@ export default function RolesManagementTab({
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-1 bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-neutral-400 text-xs font-mono rounded">
+                    <span className="rounded bg-gray-100 px-2 py-1 font-mono text-xs text-gray-600 dark:bg-neutral-800 dark:text-neutral-400">
                       {role.slug}
                     </span>
                     {isProtectedRole(role) && (
-                      <span className="px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs font-bold rounded flex items-center gap-1">
+                      <span className="flex items-center gap-1 rounded bg-amber-100 px-2 py-1 text-xs font-bold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
                         <Shield className="h-3 w-3" />
                         {t("roles.protected") || "Protegido"}
                       </span>
@@ -278,7 +272,7 @@ export default function RolesManagementTab({
                             onClick={() => handleDeleteRole(role)}
                             icon={Trash2}
                             title={t("common.delete")}
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
+                            className="text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-300"
                           >
                             {""}
                           </Button>
@@ -288,13 +282,13 @@ export default function RolesManagementTab({
                   </div>
                 </div>
 
-                <p className="text-sm text-gray-600 dark:text-neutral-400 mb-4">
+                <p className="mb-4 text-sm text-gray-600 dark:text-neutral-400">
                   {role.description || t("workspace.no_description")}
 
                   {/* Información adicional para roles específicos */}
                   {role.slug === "editor" && (
-                    <span className="flex items-start gap-2 mt-2 text-xs text-primary-600 dark:text-primary-400 font-medium">
-                      <Info className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                    <span className="mt-2 flex items-start gap-2 text-xs font-medium text-primary-600 dark:text-primary-400">
+                      <Info className="mt-0.5 h-4 w-4 flex-shrink-0" />
                       <span>
                         {t("roles.editor_publish_info") ||
                           "Al publicar, el contenido se enviará a revisión si no eres Admin. En workspaces con flujo multinivel, debe pasar por todas las etapas de aprobación configuradas."}
@@ -302,8 +296,8 @@ export default function RolesManagementTab({
                     </span>
                   )}
                   {role.slug === "admin" && (
-                    <span className="flex items-start gap-2 mt-2 text-xs text-blue-600 dark:text-blue-400 font-medium">
-                      <ShieldCheck className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                    <span className="mt-2 flex items-start gap-2 text-xs font-medium text-blue-600 dark:text-blue-400">
+                      <ShieldCheck className="mt-0.5 h-4 w-4 flex-shrink-0" />
                       <span>
                         {t("roles.admin_publish_info") ||
                           "Puede publicar directamente sin revisión y aprobar contenido de otros usuarios."}
@@ -311,8 +305,8 @@ export default function RolesManagementTab({
                     </span>
                   )}
                   {role.slug === "owner" && (
-                    <span className="flex items-start gap-2 mt-2 text-xs text-purple-600 dark:text-purple-400 font-medium">
-                      <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                    <span className="mt-2 flex items-start gap-2 text-xs font-medium text-purple-600 dark:text-purple-400">
+                      <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
                       <span>
                         {t("roles.owner_info") ||
                           "Control total del workspace. Este rol no puede ser editado ni eliminado."}
@@ -329,14 +323,14 @@ export default function RolesManagementTab({
                     {role.permissions?.slice(0, 4).map((permission: any) => (
                       <div
                         key={permission.id}
-                        className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-white dark:bg-neutral-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-neutral-700 shadow-sm"
+                        className="inline-flex items-center rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-300"
                         title={permission.description}
                       >
                         {permission.name}
                       </div>
                     ))}
                     {role.permissions && role.permissions.length > 4 && (
-                      <div className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-gray-100 dark:bg-neutral-800 text-gray-500 dark:text-neutral-400">
+                      <div className="inline-flex items-center rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-500 dark:bg-neutral-800 dark:text-neutral-400">
                         +{role.permissions.length - 4} {t("workspace.more")}
                       </div>
                     )}
@@ -348,14 +342,14 @@ export default function RolesManagementTab({
         </div>
 
         {!canManageWorkspace && (
-          <div className="mt-6 p-4 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg">
+          <div className="mt-6 rounded-lg border border-primary-200 bg-primary-50 p-4 dark:border-primary-800 dark:bg-primary-900/20">
             <div className="flex items-start gap-3">
-              <ShieldAlert className="h-5 w-5 text-primary-500 mt-0.5" />
+              <ShieldAlert className="mt-0.5 h-5 w-5 text-primary-500" />
               <div>
                 <p className="text-sm font-medium text-primary-800 dark:text-primary-400">
                   {t("workspace.permissions_required")}
                 </p>
-                <p className="text-sm text-primary-700 dark:text-primary-300 mt-1">
+                <p className="mt-1 text-sm text-primary-700 dark:text-primary-300">
                   {t("workspace.owner_admin_required")}
                 </p>
               </div>
@@ -372,9 +366,7 @@ export default function RolesManagementTab({
           setEditingRole(null);
           setSelectedPermissions([]);
         }}
-        title={
-          editingRole ? `${t("roles.edit_role")} - ${editingRole.name}` : ""
-        }
+        title={editingRole ? `${t("roles.edit_role")} - ${editingRole.name}` : ""}
         size="2xl"
       >
         <div className="space-y-6">
@@ -386,26 +378,21 @@ export default function RolesManagementTab({
             {t("roles.select_permissions")}
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[50vh] overflow-y-auto">
+          <div className="grid max-h-[50vh] grid-cols-1 gap-3 overflow-y-auto md:grid-cols-2">
             {permissions.map((permission: any) => (
               <label
                 key={permission.id}
-                className="flex items-start gap-3 p-3 border border-gray-200 dark:border-neutral-700 rounded-lg hover:bg-gray-50 dark:hover:bg-neutral-800/50 cursor-pointer transition-colors"
+                className="flex cursor-pointer items-start gap-3 rounded-lg border border-gray-200 p-3 transition-colors hover:bg-gray-50 dark:border-neutral-700 dark:hover:bg-neutral-800/50"
               >
                 <input
                   type="checkbox"
                   checked={selectedPermissions.includes(permission.id)}
                   onChange={(e) => {
                     if (e.target.checked) {
-                      setSelectedPermissions([
-                        ...selectedPermissions,
-                        permission.id,
-                      ]);
+                      setSelectedPermissions([...selectedPermissions, permission.id]);
                     } else {
                       setSelectedPermissions(
-                        selectedPermissions.filter(
-                          (id) => id !== permission.id,
-                        ),
+                        selectedPermissions.filter((id) => id !== permission.id),
                       );
                     }
                   }}
@@ -416,7 +403,7 @@ export default function RolesManagementTab({
                     {permission.display_name || permission.name}
                   </p>
                   {permission.description && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
                       {permission.description}
                     </p>
                   )}
@@ -425,7 +412,7 @@ export default function RolesManagementTab({
             ))}
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-neutral-800">
+          <div className="flex justify-end gap-3 border-t border-gray-200 pt-4 dark:border-neutral-800">
             <Button
               variant="ghost"
               buttonStyle="outline"
@@ -464,23 +451,22 @@ export default function RolesManagementTab({
         size="md"
       >
         <div className="space-y-6">
-          <div className="flex items-start gap-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-            <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+          <div className="flex items-start gap-4 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
+            <AlertCircle className="mt-0.5 h-6 w-6 flex-shrink-0 text-red-600 dark:text-red-400" />
             <div>
-              <h4 className="text-sm font-bold text-red-900 dark:text-red-200 mb-1">
+              <h4 className="mb-1 text-sm font-bold text-red-900 dark:text-red-200">
                 {t("roles.delete_confirmation_title") || "¿Estás seguro?"}
               </h4>
               <p className="text-sm text-red-800 dark:text-red-300">
                 {t("roles.delete_confirmation_message") ||
                   "Esta acción no se puede deshacer. El rol"}{" "}
                 <span className="font-bold">{deletingRole?.name}</span>{" "}
-                {t("roles.will_be_deleted") || "será eliminado permanentemente"}
-                .
+                {t("roles.will_be_deleted") || "será eliminado permanentemente"}.
               </p>
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-neutral-800">
+          <div className="flex justify-end gap-3 border-t border-gray-200 pt-4 dark:border-neutral-800">
             <Button
               variant="ghost"
               buttonStyle="outline"
@@ -500,7 +486,7 @@ export default function RolesManagementTab({
               onClick={confirmDeleteRole}
               disabled={isLoading}
               icon={Trash2}
-              className="bg-red-600 hover:bg-red-700 text-white"
+              className="bg-red-600 text-white hover:bg-red-700"
             >
               {isLoading ? t("common.deleting") : t("common.delete")}
             </Button>

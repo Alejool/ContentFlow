@@ -27,15 +27,7 @@ const contentTypes: ContentTypeOption[] = [
     value: "post",
     label: "Post",
     icon: FileText,
-    platforms: [
-      "instagram",
-      "twitter",
-      "facebook",
-      "linkedin",
-      "youtube",
-      "pinterest",
-      "tiktok",
-    ],
+    platforms: ["instagram", "twitter", "facebook", "linkedin", "youtube", "pinterest", "tiktok"],
   },
   {
     value: "reel",
@@ -47,43 +39,19 @@ const contentTypes: ContentTypeOption[] = [
     value: "story",
     label: "Story",
     icon: Clock,
-    platforms: [
-      "instagram",
-      "facebook",
-      "twitter",
-      "linkedin",
-      "youtube",
-      "pinterest",
-      "tiktok",
-    ],
+    platforms: ["instagram", "facebook", "twitter", "linkedin", "youtube", "pinterest", "tiktok"],
   },
   {
     value: "poll",
     label: "Poll",
     icon: BarChart3,
-    platforms: [
-      "twitter",
-      "facebook",
-      "instagram",
-      "linkedin",
-      "youtube",
-      "pinterest",
-      "tiktok",
-    ],
+    platforms: ["twitter", "facebook", "instagram", "linkedin", "youtube", "pinterest", "tiktok"],
   },
   {
     value: "carousel",
     label: "Carousel",
     icon: Images,
-    platforms: [
-      "instagram",
-      "facebook",
-      "linkedin",
-      "twitter",
-      "youtube",
-      "pinterest",
-      "tiktok",
-    ],
+    platforms: ["instagram", "facebook", "linkedin", "twitter", "youtube", "pinterest", "tiktok"],
   },
 ];
 
@@ -102,14 +70,12 @@ export default function ContentTypeIconSelector({
     }
 
     return contentTypes.filter((type) => {
-      return selectedPlatforms.every((platform) =>
-        type.platforms.includes(platform.toLowerCase()),
-      );
+      return selectedPlatforms.every((platform) => type.platforms.includes(platform.toLowerCase()));
     });
   }, [selectedPlatforms]);
 
   return (
-    <div className="flex items-centergap-1 bg-gray-50 dark:bg-neutral-800/50 rounded-lg p-1 border border-gray-200 dark:border-neutral-700">
+    <div className="items-centergap-1 flex rounded-lg border border-gray-200 bg-gray-50 p-1 dark:border-neutral-700 dark:bg-neutral-800/50">
       {availableTypes.map((type) => {
         const Icon = type.icon;
         const isSelected = selectedType === type.value;
@@ -118,9 +84,7 @@ export default function ContentTypeIconSelector({
           !disabled &&
           !isTypeLocked &&
           (selectedPlatforms.length === 0 ||
-            selectedPlatforms.every((p) =>
-              type.platforms.includes(p.toLowerCase()),
-            ));
+            selectedPlatforms.every((p) => type.platforms.includes(p.toLowerCase())));
 
         // Determine tooltip message
         let tooltipMessage = type.label;
@@ -136,7 +100,7 @@ export default function ContentTypeIconSelector({
         }
 
         return (
-          <div key={type.value} className="relative group">
+          <div key={type.value} className="group relative">
             <Button
               type="button"
               onClick={() => isAvailable && onChange(type.value)}
@@ -144,21 +108,17 @@ export default function ContentTypeIconSelector({
               buttonStyle="icon"
               size="xl"
               icon={Icon}
-              className={`
-                !p-2 !rounded-lg transition-all duration-200
-                ${isSelected ? "shadow-sm !bg-primary-500 !text-white" : ""}
-                ${!isAvailable ? "opacity-40 cursor-not-allowed" : ""}
-              `}
+              className={`!rounded-lg !p-2 transition-all duration-200 ${isSelected ? "!bg-primary-500 !text-white shadow-sm" : ""} ${!isAvailable ? "cursor-not-allowed opacity-40" : ""} `}
               title={tooltipMessage}
             >
               <></>
             </Button>
 
             {/* Tooltip */}
-            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-50 pointer-events-none">
-              <div className="bg-gray-900 dark:bg-neutral-800 text-white text-xs rounded-lg py-1.5 px-3 whitespace-nowrap shadow-lg border border-gray-700">
+            <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 hidden -translate-x-1/2 group-hover:block">
+              <div className="whitespace-nowrap rounded-lg border border-gray-700 bg-gray-900 px-3 py-1.5 text-xs text-white shadow-lg dark:bg-neutral-800">
                 {tooltipMessage}
-                <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px">
+                <div className="absolute left-1/2 top-full -mt-px -translate-x-1/2">
                   <div className="border-4 border-transparent border-t-gray-900 dark:border-t-neutral-800"></div>
                 </div>
               </div>

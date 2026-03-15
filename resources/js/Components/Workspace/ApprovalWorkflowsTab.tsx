@@ -60,11 +60,7 @@ export default function ApprovalWorkflowsTab({
   const { t } = useTranslation();
 
   // Get plan ID with multiple fallbacks
-  const planId = (
-    workspace.subscription?.plan ||
-    workspace.plan ||
-    "demo"
-  ).toLowerCase();
+  const planId = (workspace.subscription?.plan || workspace.plan || "demo").toLowerCase();
 
   // Obtener características del plan desde el backend
   const planFeatures = workspace.features || {};
@@ -78,9 +74,7 @@ export default function ApprovalWorkflowsTab({
     hasBasicApprovalAccess = approvalWorkflowFeature !== false;
   } else {
     // Fallback: usar lógica basada en planId
-    hasBasicApprovalAccess = ["demo", "professional", "enterprise"].includes(
-      planId,
-    );
+    hasBasicApprovalAccess = ["demo", "professional", "enterprise"].includes(planId);
   }
 
   // Determinar si tiene acceso avanzado (multinivel)
@@ -109,44 +103,43 @@ export default function ApprovalWorkflowsTab({
   // Si no tiene acceso, mostrar mensaje de upgrade
   if (!hasBasicApprovalAccess) {
     return (
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-xl p-8 text-center">
-          <div className="mx-auto w-16 h-16 bg-blue-100 dark:bg-blue-900/40 rounded-full flex items-center justify-center mb-4">
-            <Shield className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+      <div className="mx-auto max-w-4xl">
+        <div className="rounded-xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-purple-50 p-8 text-center dark:border-blue-800 dark:from-blue-900/20 dark:to-purple-900/20">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/40">
+            <Shield className="h-8 w-8 text-blue-600 dark:text-blue-400" />
           </div>
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          <h3 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
             {t("common.approvals.upgrade.title")}
           </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-2xl mx-auto">
+          <p className="mx-auto mb-6 max-w-2xl text-gray-600 dark:text-gray-400">
             {t("common.approvals.upgrade.description")}
           </p>
 
-          <div className="bg-white dark:bg-neutral-900 rounded-lg p-6 mb-6 max-w-md mx-auto">
-            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-              {t("common.approvals.upgrade.benefits_title") ||
-                "With approvals you get:"}
+          <div className="mx-auto mb-6 max-w-md rounded-lg bg-white p-6 dark:bg-neutral-900">
+            <p className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">
+              {t("common.approvals.upgrade.benefits_title") || "With approvals you get:"}
             </p>
-            <ul className="text-left space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <ul className="space-y-2 text-left text-sm text-gray-600 dark:text-gray-400">
               <li className="flex items-center">
-                <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
+                <CheckCircle className="mr-2 h-4 w-4 flex-shrink-0 text-green-500" />
                 {t("common.approvals.upgrade.benefits.custom_workflows")}
               </li>
               <li className="flex items-center">
-                <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
+                <CheckCircle className="mr-2 h-4 w-4 flex-shrink-0 text-green-500" />
                 {t("common.approvals.upgrade.benefits.content_control")}
               </li>
               <li className="flex items-center">
-                <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
+                <CheckCircle className="mr-2 h-4 w-4 flex-shrink-0 text-green-500" />
                 {t("common.approvals.upgrade.benefits.role_assignment")}
               </li>
               <li className="flex items-center">
-                <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
+                <CheckCircle className="mr-2 h-4 w-4 flex-shrink-0 text-green-500" />
                 {t("common.approvals.upgrade.benefits.approval_history")}
               </li>
             </ul>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <div className="flex flex-col justify-center gap-3 sm:flex-row">
             <Button
               variant="primary"
               buttonStyle="solid"
@@ -187,40 +180,33 @@ export default function ApprovalWorkflowsTab({
   // Filter roles that have "approve" permission
   const rolesWithApprovePermission = roles.filter((role: any) => {
     return role.permissions?.some(
-      (permission: any) =>
-        permission.name === "approve" || permission.slug === "approve",
+      (permission: any) => permission.name === "approve" || permission.slug === "approve",
     );
   });
 
   // Filter users that have "approve" permission (either through their role or direct permission)
-  const usersWithApprovePermission = (workspace.users || []).filter(
-    (user: any) => {
-      // Check if user's role has approve permission
-      const userRole = roles.find(
-        (role: any) => role.id === user.pivot?.role_id,
-      );
-      if (
-        userRole?.permissions?.some(
-          (permission: any) =>
-            permission.name === "approve" || permission.slug === "approve",
-        )
-      ) {
-        return true;
-      }
+  const usersWithApprovePermission = (workspace.users || []).filter((user: any) => {
+    // Check if user's role has approve permission
+    const userRole = roles.find((role: any) => role.id === user.pivot?.role_id);
+    if (
+      userRole?.permissions?.some(
+        (permission: any) => permission.name === "approve" || permission.slug === "approve",
+      )
+    ) {
+      return true;
+    }
 
-      // Check if user has direct approve permission
-      if (
-        user.permissions?.some(
-          (permission: any) =>
-            permission.name === "approve" || permission.slug === "approve",
-        )
-      ) {
-        return true;
-      }
+    // Check if user has direct approve permission
+    if (
+      user.permissions?.some(
+        (permission: any) => permission.name === "approve" || permission.slug === "approve",
+      )
+    ) {
+      return true;
+    }
 
-      return false;
-    },
-  );
+    return false;
+  });
 
   console.log("🔍 Filtrado de permisos:", {
     totalRoles: roles.length,
@@ -228,9 +214,7 @@ export default function ApprovalWorkflowsTab({
     totalUsuarios: workspace.users?.length || 0,
     usuariosConApprove: usersWithApprovePermission.length,
     rolesConApprove_lista: rolesWithApprovePermission.map((r: any) => r.name),
-    usuariosConApprove_lista: usersWithApprovePermission.map(
-      (u: any) => u.name,
-    ),
+    usuariosConApprove_lista: usersWithApprovePermission.map((u: any) => u.name),
   });
 
   const fetchWorkflows = async () => {
@@ -243,8 +227,7 @@ export default function ApprovalWorkflowsTab({
       // Backend returns collections in 'data' key due to ApiResponse trait wrapping lists
       setWorkflows(response.data.data || []);
     } catch (error: any) {
-      const message =
-        error.response?.data?.message || error.message || t("common.unknown");
+      const message = error.response?.data?.message || error.message || t("common.unknown");
       toast.error(`${t("common.approvals.errors.fetch")}: ${message}`);
     } finally {
       setIsLoading(false);
@@ -301,9 +284,7 @@ export default function ApprovalWorkflowsTab({
     }
 
     // Validation: Each step must have either role_id or user_id
-    const invalidSteps = editingWorkflow.steps.filter(
-      (s) => !s.role_id && !s.user_id,
-    );
+    const invalidSteps = editingWorkflow.steps.filter((s) => !s.role_id && !s.user_id);
     if (invalidSteps.length > 0) {
       toast.error("Cada nivel debe tener asignado un rol o usuario");
       return;
@@ -348,13 +329,9 @@ export default function ApprovalWorkflowsTab({
       setIsEditing(false);
       fetchWorkflows();
     } catch (error: any) {
-      console.error(
-        "❌ Error guardando workflow:",
-        error.response?.data || error,
-      );
+      console.error("❌ Error guardando workflow:", error.response?.data || error);
       toast.error(
-        `${t("common.approvals.errors.save")}: ` +
-          (error.response?.data?.message || error.message),
+        `${t("common.approvals.errors.save")}: ` + (error.response?.data?.message || error.message),
       );
     }
   };
@@ -421,24 +398,22 @@ export default function ApprovalWorkflowsTab({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-12">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600"></div>
+        <div className="h-10 w-10 animate-spin rounded-full border-b-2 border-primary-600"></div>
       </div>
     );
   }
 
   if (isEditing && editingWorkflow) {
     return (
-      <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-xl overflow-hidden shadow-sm">
-        <div className="p-6 border-b border-gray-200 dark:border-neutral-800 flex flex-col md:flex-row md:items-center md:justify-between bg-gray-50 dark:bg-neutral-800/50">
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="flex flex-col border-b border-gray-200 bg-gray-50 p-6 dark:border-neutral-800 dark:bg-neutral-800/50 md:flex-row md:items-center md:justify-between">
           <div className="mb-6 md:mb-0">
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">
               {editingWorkflow.id === 0
                 ? t("common.approvals.createFlow")
                 : t("common.approvals.editFlow")}
             </h3>
-            <p className="text-sm text-gray-500">
-              {t("common.approvals.configureSequence")}
-            </p>
+            <p className="text-sm text-gray-500">{t("common.approvals.configureSequence")}</p>
           </div>
           <div className="flex gap-2">
             <Button
@@ -462,14 +437,12 @@ export default function ApprovalWorkflowsTab({
           </div>
         </div>
 
-        <div className="p-6 space-y-6">
+        <div className="space-y-6 p-6">
           <Input
             id="workflow-name"
             label={t("common.approvals.workflowName")}
             value={editingWorkflow.name}
-            onChange={(e: any) =>
-              setEditingWorkflow({ ...editingWorkflow, name: e.target.value })
-            }
+            onChange={(e: any) => setEditingWorkflow({ ...editingWorkflow, name: e.target.value })}
             placeholder={t("common.approvals.workflowName")}
           />
 
@@ -505,12 +478,10 @@ export default function ApprovalWorkflowsTab({
                     size="md"
                     variant="ghost"
                     buttonStyle="outline"
-                    className="text-gray-400 cursor-not-allowed opacity-50"
+                    className="cursor-not-allowed text-gray-400 opacity-50"
                     icon={Plus}
                     disabled
-                    title={
-                      t("approvals.locked.title") || "Requiere plan Enterprise"
-                    }
+                    title={t("approvals.locked.title") || "Requiere plan Enterprise"}
                   >
                     {t("common.approvals.addLevel")}
                   </Button>
@@ -518,34 +489,32 @@ export default function ApprovalWorkflowsTab({
               </div>
             </div>
 
-            {rolesWithApprovePermission.length === 0 &&
-              usersWithApprovePermission.length === 0 && (
-                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-4">
-                  <div className="flex items-start gap-3">
-                    <Shield className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="text-sm font-semibold text-yellow-900 dark:text-yellow-300">
-                        No hay roles o usuarios con permiso de aprobación
-                      </p>
-                      <p className="text-xs text-yellow-700 dark:text-yellow-400 mt-1">
-                        Para crear un flujo de aprobación, primero debes asignar
-                        el permiso "Aprobar" a al menos un rol o usuario. Puedes
-                        crear un nuevo rol con este permiso usando el botón
-                        "Crear Nuevo Rol" arriba.
-                      </p>
-                    </div>
+            {rolesWithApprovePermission.length === 0 && usersWithApprovePermission.length === 0 && (
+              <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
+                <div className="flex items-start gap-3">
+                  <Shield className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-600 dark:text-yellow-400" />
+                  <div>
+                    <p className="text-sm font-semibold text-yellow-900 dark:text-yellow-300">
+                      No hay roles o usuarios con permiso de aprobación
+                    </p>
+                    <p className="mt-1 text-xs text-yellow-700 dark:text-yellow-400">
+                      Para crear un flujo de aprobación, primero debes asignar el permiso "Aprobar"
+                      a al menos un rol o usuario. Puedes crear un nuevo rol con este permiso usando
+                      el botón "Crear Nuevo Rol" arriba.
+                    </p>
                   </div>
                 </div>
-              )}
+              </div>
+            )}
 
             <div className="space-y-3">
               {editingWorkflow.steps.map((step, index) => (
                 <div
                   key={index}
-                  className="flex flex-col xl:flex-row items-start xl:items-center gap-4 p-4 bg-gray-50 dark:bg-neutral-800/20 border border-gray-200 dark:border-neutral-800 rounded-lg group animate-in fade-in slide-in-from-top-2 duration-300"
+                  className="animate-in fade-in slide-in-from-top-2 group flex flex-col items-start gap-4 rounded-lg border border-gray-200 bg-gray-50 p-4 duration-300 dark:border-neutral-800 dark:bg-neutral-800/20 xl:flex-row xl:items-center"
                 >
-                  <div className="flex items-center gap-3 flex-1 w-full">
-                    <div className="h-8 w-8 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 flex items-center justify-center font-bold text-sm shrink-0">
+                  <div className="flex w-full flex-1 items-center gap-3">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-100 text-sm font-bold text-primary-700 dark:bg-primary-900/30 dark:text-primary-400">
                       {index + 1}
                     </div>
                     <Input
@@ -553,7 +522,7 @@ export default function ApprovalWorkflowsTab({
                       value={step.name}
                       variant="outlined"
                       sizeType="md"
-                      className="bg-transparent border-none focus:ring-0 px-0"
+                      className="border-none bg-transparent px-0 focus:ring-0"
                       containerClassName="flex-1"
                       onChange={(e: any) => {
                         const newSteps = [...editingWorkflow.steps];
@@ -566,8 +535,8 @@ export default function ApprovalWorkflowsTab({
                     />
                   </div>
 
-                  <div className="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto">
-                    <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <div className="flex w-full flex-col items-center gap-3 sm:flex-row xl:w-auto">
+                    <div className="flex w-full items-center gap-2 sm:w-auto">
                       <Select
                         id={`step-role-${index}`}
                         options={[
@@ -578,13 +547,8 @@ export default function ApprovalWorkflowsTab({
                               const selectedRoleIds = editingWorkflow.steps
                                 .filter((_, i) => i !== index) // Exclude current step
                                 .map((s) => s.role_id)
-                                .filter(
-                                  (id) => id !== null && id !== undefined,
-                                );
-                              return (
-                                step.role_id === r.id ||
-                                !selectedRoleIds.includes(r.id)
-                              );
+                                .filter((id) => id !== null && id !== undefined);
+                              return step.role_id === r.id || !selectedRoleIds.includes(r.id);
                             })
                             .map((r) => ({
                               value: String(r.id),
@@ -612,7 +576,7 @@ export default function ApprovalWorkflowsTab({
                           });
                         }}
                       />
-                      <span className="text-gray-400 text-xs text-center px-1">
+                      <span className="px-1 text-center text-xs text-gray-400">
                         {t("common.approvals.or")}
                       </span>
                       <Select
@@ -625,13 +589,8 @@ export default function ApprovalWorkflowsTab({
                               const selectedUserIds = editingWorkflow.steps
                                 .filter((_, i) => i !== index) // Exclude current step
                                 .map((s) => s.user_id)
-                                .filter(
-                                  (id) => id !== null && id !== undefined,
-                                );
-                              return (
-                                step.user_id === u.id ||
-                                !selectedUserIds.includes(u.id)
-                              );
+                                .filter((id) => id !== null && id !== undefined);
+                              return step.user_id === u.id || !selectedUserIds.includes(u.id);
                             })
                             .map((u: any) => ({
                               value: String(u.id),
@@ -665,7 +624,7 @@ export default function ApprovalWorkflowsTab({
                       size="md"
                       buttonStyle="icon"
                       onClick={() => removeStep(index)}
-                      className="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 shrink-0"
+                      className="shrink-0 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10"
                       title={t("common.approvals.deleteLevel")}
                       icon={Trash2}
                     ></Button>
@@ -688,14 +647,12 @@ export default function ApprovalWorkflowsTab({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h3 className="text-xl font-bold text-gray-900 dark:text-white">
             {t("common.approvals.title")}
           </h3>
-          <p className="text-sm text-gray-500">
-            {t("common.approvals.subtitle")}
-          </p>
+          <p className="text-sm text-gray-500">{t("common.approvals.subtitle")}</p>
         </div>
         {canManageWorkspace && (
           <div className="flex gap-2">
@@ -709,12 +666,7 @@ export default function ApprovalWorkflowsTab({
               {t("common.approvals.invite")}
             </Button>
             {workflows.length === 0 || hasAdvancedApprovalAccess ? (
-              <Button
-                variant="primary"
-                buttonStyle="solid"
-                onClick={handleCreate}
-                icon={Plus}
-              >
+              <Button variant="primary" buttonStyle="solid" onClick={handleCreate} icon={Plus}>
                 {t("common.approvals.createWorkflow")}
               </Button>
             ) : null}
@@ -723,14 +675,14 @@ export default function ApprovalWorkflowsTab({
       </div>
 
       {workflows.length === 0 ? (
-        <div className="bg-white dark:bg-neutral-900 border border-dashed border-gray-300 dark:border-neutral-700 rounded-xl p-12 text-center">
-          <div className="bg-primary-50 dark:bg-primary-900/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle className="w-8 h-8 text-primary-600" />
+        <div className="rounded-xl border border-dashed border-gray-300 bg-white p-12 text-center dark:border-neutral-700 dark:bg-neutral-900">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary-50 dark:bg-primary-900/10">
+            <CheckCircle className="h-8 w-8 text-primary-600" />
           </div>
-          <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+          <h4 className="mb-2 text-lg font-bold text-gray-900 dark:text-white">
             {t("common.approvals.noWorkflowsTitle")}
           </h4>
-          <p className="text-gray-500 max-w-sm mx-auto mb-6">
+          <p className="mx-auto mb-6 max-w-sm text-gray-500">
             {t("common.approvals.noWorkflowsDesc")}
           </p>
           <Button
@@ -748,20 +700,17 @@ export default function ApprovalWorkflowsTab({
           {workflows.map((workflow) => (
             <div
               key={workflow.id}
-              className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-xl p-5 hover:border-primary-300 dark:hover:border-primary-700 transition-all group"
+              className="group rounded-xl border border-gray-200 bg-white p-5 transition-all hover:border-primary-300 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-primary-700"
             >
-              <div className="flex items-center justify-between mb-4">
+              <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-primary-100 dark:bg-primary-900/20 text-primary-600 rounded-lg">
-                    <Shield className="w-5 h-5" />
+                  <div className="rounded-lg bg-primary-100 p-2 text-primary-600 dark:bg-primary-900/20">
+                    <Shield className="h-5 w-5" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-gray-900 dark:text-white">
-                      {workflow.name}
-                    </h4>
+                    <h4 className="font-bold text-gray-900 dark:text-white">{workflow.name}</h4>
                     <p className="text-xs text-gray-500">
-                      {workflow.steps.length}{" "}
-                      {t("common.approvals.levelsConfigured")}
+                      {workflow.steps.length} {t("common.approvals.levelsConfigured")}
                     </p>
                   </div>
                 </div>
@@ -772,7 +721,7 @@ export default function ApprovalWorkflowsTab({
                     buttonStyle="outline"
                     onClick={() => handleEdit(workflow)}
                   >
-                    <Edit2 className="w-4 h-4" />
+                    <Edit2 className="h-4 w-4" />
                   </Button>
                   <Button
                     size="sm"
@@ -781,7 +730,7 @@ export default function ApprovalWorkflowsTab({
                     className="text-red-500"
                     onClick={() => handleDelete(workflow.id)}
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
@@ -789,16 +738,12 @@ export default function ApprovalWorkflowsTab({
               <div className="flex flex-wrap items-center gap-2">
                 {workflow.steps.map((step, idx) => (
                   <div key={idx} className="flex items-center gap-2">
-                    <div className="px-3 py-1.5 bg-gray-100 dark:bg-neutral-800 rounded-full text-xs font-medium text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-neutral-700 flex items-center gap-1.5">
-                      {step.user_id ? (
-                        <User className="w-3 h-3" />
-                      ) : (
-                        <Users className="w-3 h-3" />
-                      )}
+                    <div className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-300">
+                      {step.user_id ? <User className="h-3 w-3" /> : <Users className="h-3 w-3" />}
                       {step.name}
                     </div>
                     {idx < workflow.steps.length - 1 && (
-                      <ChevronRight className="w-4 h-4 text-gray-400" />
+                      <ChevronRight className="h-4 w-4 text-gray-400" />
                     )}
                   </div>
                 ))}

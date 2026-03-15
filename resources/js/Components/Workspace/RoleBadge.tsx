@@ -28,7 +28,7 @@ const RoleBadge = ({ role, showIcon = false, size = "md" }: RoleBadgeProps) => {
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 ${sizeClasses[size]} font-semibold uppercase tracking-wider rounded-full shadow-sm ${roleColors[roleSlug]}`}
+      className={`inline-flex items-center gap-1.5 ${sizeClasses[size]} rounded-full font-semibold uppercase tracking-wider shadow-sm ${roleColors[roleSlug]}`}
     >
       {showIcon && roleSlug === "owner" && <Shield className="h-3 w-3" />}
       {role?.name || "Member"}

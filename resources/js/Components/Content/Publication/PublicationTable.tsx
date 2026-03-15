@@ -24,10 +24,7 @@ interface PublicationTableProps {
   pagination?: any;
   onPageChange?: (page: number) => void;
   onPerPageChange?: (perPage: number) => void;
-  remoteLocks?: Record<
-    number,
-    { user_id: number; user_name: string; expires_at: string }
-  >;
+  remoteLocks?: Record<number, { user_id: number; user_name: string; expires_at: string }>;
   onPreviewMedia?: (
     media: {
       url: string;
@@ -58,9 +55,7 @@ const PublicationTable = memo(
     onPreviewMedia,
   }: PublicationTableProps) => {
     // remoteLocks is now passed as prop
-    const [scrollContainer, setScrollContainer] = useState<
-      HTMLElement | undefined
-    >(undefined);
+    const [scrollContainer, setScrollContainer] = useState<HTMLElement | undefined>(undefined);
     const [smoothLoading, setSmoothLoading] = useState(isLoading);
 
     useEffect(() => {
@@ -133,10 +128,7 @@ const PublicationTable = memo(
     return (
       <TableContainer
         title={t("publications.title") || "Publicaciones"}
-        subtitle={
-          t("publications.subtitle") ||
-          "Gestiona tu contenido en redes sociales"
-        }
+        subtitle={t("publications.subtitle") || "Gestiona tu contenido en redes sociales"}
       >
         <div className="transition-opacity duration-300">
           <div className="hidden lg:block">
@@ -151,13 +143,13 @@ const PublicationTable = memo(
                       t("publications.table.emptyState.description") ||
                       "No se encontraron publicaciones."
                     }
-                    className="border-none shadow-none bg-transparent"
+                    className="border-none bg-transparent shadow-none"
                   />
                 ) : (
                   <div className="w-full overflow-x-auto">
-                    <table className="w-full text-left border-collapse z-0">
-                      <thead className="bg-gray-50/50 border-gray-100 dark:bg-neutral-900/50 dark:border-neutral-800 sticky top-0 z-10">
-                        <tr className="text-xs uppercase tracking-wider border-b bg-gray-50/80 dark:bg-neutral-900/80 text-gray-500 dark:text-gray-400">
+                    <table className="z-0 w-full border-collapse text-left">
+                      <thead className="sticky top-0 z-10 border-gray-100 bg-gray-50/50 dark:border-neutral-800 dark:bg-neutral-900/50">
+                        <tr className="border-b bg-gray-50/80 text-xs uppercase tracking-wider text-gray-500 dark:bg-neutral-900/80 dark:text-gray-400">
                           <TableHeader mode="publications" t={t} />
                         </tr>
                       </thead>
@@ -166,7 +158,7 @@ const PublicationTable = memo(
                           <tr
                             key={item.id}
                             onClick={() => onViewDetails?.(item)}
-                            className="border-b border-gray-50 dark:border-neutral-800 hover:bg-gray-50/30 dark:hover:bg-neutral-800/30 cursor-pointer transition-colors"
+                            className="cursor-pointer border-b border-gray-50 transition-colors hover:bg-gray-50/30 dark:border-neutral-800 dark:hover:bg-neutral-800/30"
                           >
                             <PublicationDesktopRow
                               item={item}
@@ -192,10 +184,10 @@ const PublicationTable = memo(
               </div>
 
               {smoothLoading && (
-                <div className="col-start-1 row-start-1 bg-white/50 dark:bg-neutral-900/50 animate-out fade-out duration-500 fill-mode-forwards z-20">
-                  <table className="w-full text-left border-collapse">
+                <div className="animate-out fade-out fill-mode-forwards z-20 col-start-1 row-start-1 bg-white/50 duration-500 dark:bg-neutral-900/50">
+                  <table className="w-full border-collapse text-left">
                     <thead>
-                      <tr className="text-xs uppercase tracking-wider border-b text-gray-500 dark:text-gray-400">
+                      <tr className="border-b text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
                         <TableHeader mode="publications" t={t} />
                       </tr>
                     </thead>
@@ -243,7 +235,7 @@ const PublicationTable = memo(
                 </div>
 
                 {smoothLoading && (
-                  <div className="col-start-1 row-start-1 bg-white dark:bg-neutral-900 animate-out fade-out duration-500 fill-mode-forwards z-20">
+                  <div className="animate-out fade-out fill-mode-forwards z-20 col-start-1 row-start-1 bg-white duration-500 dark:bg-neutral-900">
                     <PublicationMobileRowSkeleton />
                   </div>
                 )}

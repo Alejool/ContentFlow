@@ -28,9 +28,7 @@ function NavLogo({
   fallbackSrc: string;
   isWhiteLabel: boolean;
 }) {
-  const [status, setStatus] = useState<"loading" | "loaded" | "error">(
-    "loading",
-  );
+  const [status, setStatus] = useState<"loading" | "loaded" | "error">("loading");
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -59,11 +57,11 @@ function NavLogo({
     <div className="relative flex items-center justify-center">
       {status === "loading" && (
         <div
-          className={`rounded overflow-hidden bg-gray-200 dark:bg-neutral-700 ${
+          className={`overflow-hidden rounded bg-gray-200 dark:bg-neutral-700 ${
             isWhiteLabel ? "h-12 w-24" : "h-20 w-32"
           }`}
         >
-          <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/40 dark:via-white/10 to-transparent" />
+          <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/40 to-transparent dark:via-white/10" />
         </div>
       )}
       <img
@@ -71,7 +69,7 @@ function NavLogo({
         alt="Logo"
         onLoad={() => setStatus("loaded")}
         className={`w-auto object-contain transition-opacity duration-300 ${
-          status === "loading" ? "opacity-0 absolute" : "opacity-100"
+          status === "loading" ? "absolute opacity-0" : "opacity-100"
         } ${isShowingFallback || !isWhiteLabel ? "h-20" : "h-12"}`}
       />
     </div>
@@ -129,29 +127,23 @@ export default function MobileNavbar({
 
   return (
     <nav
-      className={`w-full lg:hidden sticky top-0 z-50 transition-all duration-300 shadow-lg backdrop-blur-2xl
-        ${
-          actualTheme === "dark"
-            ? "bg-neutral-900/90 border-b border-neutral-800"
-            : "bg-white/90 border-b border-gray-200"
-        }`}
+      className={`sticky top-0 z-50 w-full shadow-lg backdrop-blur-2xl transition-all duration-300 lg:hidden ${
+        actualTheme === "dark"
+          ? "border-b border-neutral-800 bg-neutral-900/90"
+          : "border-b border-gray-200 bg-white/90"
+      }`}
     >
-      <div className="w-full mx-auto max-w-7xl">
-        <div className="flex h-16 justify-between items-center px-4">
+      <div className="mx-auto w-full max-w-7xl">
+        <div className="flex h-16 items-center justify-between px-4">
           <div className="flex items-center">
             <button
-              onClick={() =>
-                setShowingNavigationDropdown(!showingNavigationDropdown)
-              }
-              className={`inline-flex items-center justify-center p-2 rounded-lg transition-colors duration-200
-                ${
-                  actualTheme === "dark"
-                    ? "text-gray-400 hover:text-white hover:bg-neutral-800"
-                    : "text-gray-700 hover:text-primary-600 hover:bg-gray-100"
-                }`}
-              aria-label={
-                showingNavigationDropdown ? "Close menu" : "Open menu"
-              }
+              onClick={() => setShowingNavigationDropdown(!showingNavigationDropdown)}
+              className={`inline-flex items-center justify-center rounded-lg p-2 transition-colors duration-200 ${
+                actualTheme === "dark"
+                  ? "text-gray-400 hover:bg-neutral-800 hover:text-white"
+                  : "text-gray-700 hover:bg-gray-100 hover:text-primary-600"
+              }`}
+              aria-label={showingNavigationDropdown ? "Close menu" : "Open menu"}
             >
               {showingNavigationDropdown ? (
                 <CloseIcon className="h-6 w-6" />
@@ -161,7 +153,7 @@ export default function MobileNavbar({
             </button>
           </div>
 
-          <div className="flex-1 flex justify-center">
+          <div className="flex flex-1 justify-center">
             <NavLogo
               src={whiteLabelLogo || Logo}
               fallbackSrc={Logo}
@@ -191,7 +183,7 @@ export default function MobileNavbar({
                 : "border-gray-100 bg-white"
             }`}
           >
-            <div className="px-4 py-6 space-y-1">
+            <div className="space-y-1 px-4 py-6">
               {filteredMobileNavigationItems.map((item) => {
                 const isActive = !!route().current(item.href);
                 return (
@@ -199,41 +191,37 @@ export default function MobileNavbar({
                     key={item.href}
                     href={route(item.href)}
                     active={isActive}
-                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-300
-                      ${
-                        isActive
-                          ? `bg-primary-600 text-white shadow-sm`
-                          : `${
-                              actualTheme === "dark"
-                                ? "text-gray-300 hover:bg-neutral-800 hover:text-primary-400"
-                                : "text-gray-700 hover:bg-gray-50 hover:text-primary-600"
-                            }`
-                      }`}
+                    className={`flex items-center space-x-3 rounded-lg px-4 py-3 transition-all duration-300 ${
+                      isActive
+                        ? `bg-primary-600 text-white shadow-sm`
+                        : `${
+                            actualTheme === "dark"
+                              ? "text-gray-300 hover:bg-neutral-800 hover:text-primary-400"
+                              : "text-gray-700 hover:bg-gray-50 hover:text-primary-600"
+                          }`
+                    }`}
                   >
                     <item.lucideIcon
                       className={`h-5 w-5 ${isActive ? "text-white" : "text-gray-400"}`}
                     />
                     <span className="font-bold">{t(item.nameKey)}</span>
-                    {isActive && (
-                      <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white"></div>
-                    )}
+                    {isActive && <div className="ml-auto h-1.5 w-1.5 rounded-full bg-white"></div>}
                   </ResponsiveNavLink>
                 );
               })}
 
               <div
-                className={`pt-4 mt-4 border-t ${actualTheme === "dark" ? "border-neutral-800" : "border-gray-100"}`}
+                className={`mt-4 border-t pt-4 ${actualTheme === "dark" ? "border-neutral-800" : "border-gray-100"}`}
               >
                 <ResponsiveNavLink
                   href={route("logout")}
                   method="post"
                   as="button"
-                  className={`w-full flex items-center justify-center space-x-3 px-4 py-3 rounded-lg border transition-all duration-300 font-bold
-                      ${
-                        actualTheme === "dark"
-                          ? "bg-neutral-800 border-neutral-700 text-red-400 hover:bg-red-900/20"
-                          : "bg-gray-50 border-gray-200 text-red-600 hover:bg-red-50"
-                      }`}
+                  className={`flex w-full items-center justify-center space-x-3 rounded-lg border px-4 py-3 font-bold transition-all duration-300 ${
+                    actualTheme === "dark"
+                      ? "border-neutral-700 bg-neutral-800 text-red-400 hover:bg-red-900/20"
+                      : "border-gray-200 bg-gray-50 text-red-600 hover:bg-red-50"
+                  }`}
                 >
                   <LogOut className="h-5 w-5" />
                   <span>{t("nav.logout")}</span>

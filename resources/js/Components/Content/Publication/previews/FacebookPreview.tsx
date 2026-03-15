@@ -26,16 +26,16 @@ export const FacebookPreview = memo(
     pollDuration = 24,
   }: FacebookPreviewProps) => {
     return (
-      <div className="w-full max-w-[500px] bg-white dark:bg-[#242526] rounded-lg shadow-sm border border-gray-200 dark:border-[#3e4042] overflow-hidden text-gray-900 dark:text-[#e4e6eb]">
+      <div className="w-full max-w-[500px] overflow-hidden rounded-lg border border-gray-200 bg-white text-gray-900 shadow-sm dark:border-[#3e4042] dark:bg-[#242526] dark:text-[#e4e6eb]">
         {/* Header */}
-        <div className="p-3 flex items-center justify-between">
-          <div className="flex gap-2 items-center">
+        <div className="flex items-center justify-between p-3">
+          <div className="flex items-center gap-2">
             <Avatar src={user?.avatar} name={user?.name || "User"} size="md" />
             <div>
-              <div className="font-semibold text-[15px] hover:underline cursor-pointer leading-tight">
+              <div className="cursor-pointer text-[15px] font-semibold leading-tight hover:underline">
                 {user?.name || "ContentFlow User"}
               </div>
-              <div className="text-[13px] text-gray-500 dark:text-[#b0b3b8] leading-tight flex items-center gap-1">
+              <div className="flex items-center gap-1 text-[13px] leading-tight text-gray-500 dark:text-[#b0b3b8]">
                 {publishedAt
                   ? new Date(publishedAt).toLocaleDateString("en-US", {
                       month: "short",
@@ -44,55 +44,50 @@ export const FacebookPreview = memo(
                     })
                   : "Just now"}{" "}
                 ·{" "}
-                <span className="inline-block w-3 h-3 bg-gray-400 dark:bg-[#b0b3b8] rounded-full" />
+                <span className="inline-block h-3 w-3 rounded-full bg-gray-400 dark:bg-[#b0b3b8]" />
               </div>
             </div>
           </div>
           <button
             type="button"
-            className="p-2 hover:bg-gray-100 dark:hover:bg-[#3a3b3c] rounded-full transition-colors"
+            className="rounded-full p-2 transition-colors hover:bg-gray-100 dark:hover:bg-[#3a3b3c]"
           >
-            <MoreHorizontal className="w-5 h-5 text-gray-500 dark:text-[#b0b3b8]" />
+            <MoreHorizontal className="h-5 w-5 text-gray-500 dark:text-[#b0b3b8]" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="px-3 pb-3 text-[15px] whitespace-pre-wrap break-words">
+        <div className="whitespace-pre-wrap break-words px-3 pb-3 text-[15px]">
           {content || "Your Facebook post content will appear here..."}
         </div>
 
         {/* Media */}
         {mediaUrls.length > 0 && contentType !== "poll" && (
-          <div className="relative border-y border-gray-100 dark:border-[#3e4042] bg-black">
+          <div className="relative border-y border-gray-100 bg-black dark:border-[#3e4042]">
             {contentType === "carousel" && mediaUrls.length > 1 ? (
               // Carousel layout for multiple images
               <div className="relative">
-                <div className="grid gap-0.5 grid-cols-2">
+                <div className="grid grid-cols-2 gap-0.5">
                   {mediaUrls.slice(0, 4).map((url, index) => (
                     <div
                       key={index}
                       className={`relative aspect-square overflow-hidden bg-gray-200 dark:bg-[#3a3b3c] ${
-                        mediaUrls.length === 3 && index === 0
-                          ? "row-span-2 aspect-auto"
-                          : ""
+                        mediaUrls.length === 3 && index === 0 ? "row-span-2 aspect-auto" : ""
                       }`}
                     >
                       {url.includes("video") || url.includes(".mp4") ? (
-                        <video
-                          src={url}
-                          className="w-full h-full object-cover"
-                        />
+                        <video src={url} className="h-full w-full object-cover" />
                       ) : (
                         <img
                           src={url}
                           alt="Facebook carousel media"
-                          className="w-full h-full object-cover"
+                          className="h-full w-full object-cover"
                         />
                       )}
                       {/* Carousel indicator */}
                       {index === 0 && mediaUrls.length > 4 && (
-                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                          <span className="text-white text-lg font-bold">
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                          <span className="text-lg font-bold text-white">
                             +{mediaUrls.length - 4}
                           </span>
                         </div>
@@ -102,17 +97,15 @@ export const FacebookPreview = memo(
                 </div>
                 {/* Carousel dots indicator */}
                 {mediaUrls.length > 1 && (
-                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1">
-                    {mediaUrls
-                      .slice(0, Math.min(5, mediaUrls.length))
-                      .map((_, index) => (
-                        <div
-                          key={index}
-                          className={`w-2 h-2 rounded-full ${
-                            index === 0 ? "bg-white" : "bg-white/50"
-                          }`}
-                        />
-                      ))}
+                  <div className="absolute bottom-2 left-1/2 flex -translate-x-1/2 transform gap-1">
+                    {mediaUrls.slice(0, Math.min(5, mediaUrls.length)).map((_, index) => (
+                      <div
+                        key={index}
+                        className={`h-2 w-2 rounded-full ${
+                          index === 0 ? "bg-white" : "bg-white/50"
+                        }`}
+                      />
+                    ))}
                   </div>
                 )}
               </div>
@@ -125,18 +118,16 @@ export const FacebookPreview = memo(
                   <div
                     key={index}
                     className={`relative aspect-square overflow-hidden bg-gray-200 dark:bg-[#3a3b3c] ${
-                      mediaUrls.length === 3 && index === 0
-                        ? "row-span-2 aspect-auto"
-                        : ""
+                      mediaUrls.length === 3 && index === 0 ? "row-span-2 aspect-auto" : ""
                     }`}
                   >
                     {url.includes("video") || url.includes(".mp4") ? (
-                      <video src={url} className="w-full h-full object-cover" />
+                      <video src={url} className="h-full w-full object-cover" />
                     ) : (
                       <img
                         src={url}
                         alt="Facebook post media"
-                        className="w-full h-full object-cover"
+                        className="h-full w-full object-cover"
                       />
                     )}
                   </div>
@@ -148,8 +139,8 @@ export const FacebookPreview = memo(
 
         {/* Poll */}
         {contentType === "poll" && pollOptions.length >= 2 && (
-          <div className="mx-3 mb-3 border border-gray-200 dark:border-[#3e4042] rounded-lg overflow-hidden bg-gray-50 dark:bg-[#3a3b3c]">
-            <div className="p-3 border-b border-gray-200 dark:border-[#3e4042] bg-white dark:bg-[#242526]">
+          <div className="mx-3 mb-3 overflow-hidden rounded-lg border border-gray-200 bg-gray-50 dark:border-[#3e4042] dark:bg-[#3a3b3c]">
+            <div className="border-b border-gray-200 bg-white p-3 dark:border-[#3e4042] dark:bg-[#242526]">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-semibold text-gray-900 dark:text-[#e4e6eb]">
                   📊 Encuesta
@@ -167,30 +158,26 @@ export const FacebookPreview = memo(
               .map((option, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-3 hover:bg-gray-100 dark:hover:bg-[#4e4f50] border-b border-gray-200 dark:border-[#3e4042] last:border-b-0 cursor-pointer transition-colors"
+                  className="flex cursor-pointer items-center justify-between border-b border-gray-200 p-3 transition-colors last:border-b-0 hover:bg-gray-100 dark:border-[#3e4042] dark:hover:bg-[#4e4f50]"
                 >
-                  <div className="flex items-center gap-3 flex-1">
-                    <div className="w-4 h-4 border-2 border-blue-500 rounded-full flex items-center justify-center">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="flex flex-1 items-center gap-3">
+                    <div className="flex h-4 w-4 items-center justify-center rounded-full border-2 border-blue-500">
+                      <div className="h-2 w-2 rounded-full bg-blue-500 opacity-0 transition-opacity group-hover:opacity-100" />
                     </div>
-                    <span className="text-sm text-gray-900 dark:text-[#e4e6eb]">
-                      {option}
-                    </span>
+                    <span className="text-sm text-gray-900 dark:text-[#e4e6eb]">{option}</span>
                   </div>
-                  <span className="text-sm text-gray-500 dark:text-[#b0b3b8]">
-                    0%
-                  </span>
+                  <span className="text-sm text-gray-500 dark:text-[#b0b3b8]">0%</span>
                 </div>
               ))}
           </div>
         )}
 
         {/* Footer Stats */}
-        <div className="px-3 py-2 flex items-center justify-between border-b border-gray-200 dark:border-[#3e4042] mx-3 text-[13px] text-gray-500 dark:text-[#b0b3b8]">
+        <div className="mx-3 flex items-center justify-between border-b border-gray-200 px-3 py-2 text-[13px] text-gray-500 dark:border-[#3e4042] dark:text-[#b0b3b8]">
           <div className="flex items-center gap-1">
             <div className="flex -space-x-1">
-              <div className="w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center ring-1 ring-white dark:ring-[#242526]">
-                <ThumbsUp className="w-2.5 h-2.5 text-white fill-white" />
+              <div className="flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 ring-1 ring-white dark:ring-[#242526]">
+                <ThumbsUp className="h-2.5 w-2.5 fill-white text-white" />
               </div>
             </div>
             <span>0</span>
@@ -202,24 +189,24 @@ export const FacebookPreview = memo(
         </div>
 
         {/* Actions */}
-        <div className="px-1 py-1 flex items-center gap-1">
+        <div className="flex items-center gap-1 px-1 py-1">
           <button
             type="button"
-            className="flex-1 flex items-center justify-center gap-2 py-1.5 hover:bg-gray-100 dark:hover:bg-[#3a3b3c] rounded-md transition-colors text-gray-600 dark:text-[#b0b3b8] font-semibold text-sm"
+            className="flex flex-1 items-center justify-center gap-2 rounded-md py-1.5 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-100 dark:text-[#b0b3b8] dark:hover:bg-[#3a3b3c]"
           >
-            <ThumbsUp className="w-5 h-5" /> Like
+            <ThumbsUp className="h-5 w-5" /> Like
           </button>
           <button
             type="button"
-            className="flex-1 flex items-center justify-center gap-2 py-1.5 hover:bg-gray-100 dark:hover:bg-[#3a3b3c] rounded-md transition-colors text-gray-600 dark:text-[#b0b3b8] font-semibold text-sm"
+            className="flex flex-1 items-center justify-center gap-2 rounded-md py-1.5 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-100 dark:text-[#b0b3b8] dark:hover:bg-[#3a3b3c]"
           >
-            <MessageSquare className="w-5 h-5" /> Comment
+            <MessageSquare className="h-5 w-5" /> Comment
           </button>
           <button
             type="button"
-            className="flex-1 flex items-center justify-center gap-2 py-1.5 hover:bg-gray-100 dark:hover:bg-[#3a3b3c] rounded-md transition-colors text-gray-600 dark:text-[#b0b3b8] font-semibold text-sm"
+            className="flex flex-1 items-center justify-center gap-2 rounded-md py-1.5 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-100 dark:text-[#b0b3b8] dark:hover:bg-[#3a3b3c]"
           >
-            <Share2 className="w-5 h-5" /> Share
+            <Share2 className="h-5 w-5" /> Share
           </button>
         </div>
       </div>

@@ -65,19 +65,17 @@ export function UsageCard({
   const isUnlimited = limit === "∞" || limit === -1;
 
   return (
-    <div className="bg-gradient-to-br from-primary-50/10 to-primary-50 dark:from-primary-200/10 dark:to-primary-600/20 rounded-lg p-4   shadow-sm hover:shadow-md transition-all h-full">
-      <div className="flex items-center justify-between mb-3 relative">
+    <div className="h-full rounded-lg bg-gradient-to-br from-primary-50/10 to-primary-50 p-4 shadow-sm transition-all hover:shadow-md dark:from-primary-200/10 dark:to-primary-600/20">
+      <div className="relative mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="p-2">
-            <Icon className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+            <Icon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
           </div>
-          <span className="text-sm font-semibold text-gray-900 dark:text-white">
-            {label}
-          </span>
+          <span className="text-sm font-semibold text-gray-900 dark:text-white">{label}</span>
         </div>
         {(isCritical || isHigh || isWarning) && (
           <span
-            className={`absolute text-xs text-white px-2 py-1 -right-5 -top-5 rounded-full font-semibold ${getBadgeColor(percentage)}`}
+            className={`absolute -right-5 -top-5 rounded-full px-2 py-1 text-xs font-semibold text-white ${getBadgeColor(percentage)}`}
           >
             {getBadgeText(percentage)}
           </span>
@@ -88,23 +86,22 @@ export function UsageCard({
         <div className="text-3xl font-bold text-gray-900 dark:text-white">
           {isUnlimited ? used : `${Math.round(percentage)}%`}
         </div>
-        <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+        <div className="mt-1 text-xs text-gray-600 dark:text-gray-400">
           {isUnlimited
             ? t("subscription.usage.unlimited", "Ilimitado")
             : `${used} / ${total_available || limit}`}
         </div>
         {addon_info && addon_info.total > 0 && (
-          <div className="text-xs text-primary-600 dark:text-primary-400 mt-1">
+          <div className="mt-1 text-xs text-primary-600 dark:text-primary-400">
             <span className="font-medium">Plan:</span> {limit} +
-            <span className="font-medium"> Addons:</span> {addon_info.remaining}
-            /{addon_info.total}
+            <span className="font-medium"> Addons:</span> {addon_info.remaining}/{addon_info.total}
           </div>
         )}
       </div>
 
       {!isUnlimited && (
         <div className="mb-3">
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+          <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
             <div
               className={`h-2 rounded-full transition-all ${getProgressBarColor(percentage)}`}
               style={{ width: `${Math.min(percentage, 100)}%` }}
@@ -113,7 +110,7 @@ export function UsageCard({
         </div>
       )}
 
-      <div className="text-xs text-gray-600 dark:text-gray-400 mb-3">
+      <div className="mb-3 text-xs text-gray-600 dark:text-gray-400">
         {isUnlimited ? (
           t("subscription.addons.noLimits", "Sin límites")
         ) : (
@@ -129,9 +126,9 @@ export function UsageCard({
       {shouldShowBuyButton && (
         <Link
           href={`/subscription/addons?tab=${addonType}`}
-          className="block w-full text-center bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 text-white text-sm font-semibold py-2 px-3 rounded-lg transition-colors"
+          className="block w-full rounded-lg bg-primary-600 px-3 py-2 text-center text-sm font-semibold text-white transition-colors hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600"
         >
-          <Sparkles className="w-3 h-3 inline mr-1" />
+          <Sparkles className="mr-1 inline h-3 w-3" />
           {t("subscription.addons.buyMore", "Comprar Más")}
         </Link>
       )}
@@ -139,9 +136,9 @@ export function UsageCard({
       {shouldShowUpgradeButton && (
         <Link
           href={upgradeUrl || "/pricing"}
-          className="block w-full text-center bg-gray-600 hover:bg-gray-700 dark:bg-gray-500 dark:hover:bg-gray-600 text-white text-sm font-semibold py-2 px-3 rounded-lg transition-colors"
+          className="block w-full rounded-lg bg-gray-600 px-3 py-2 text-center text-sm font-semibold text-white transition-colors hover:bg-gray-700 dark:bg-gray-500 dark:hover:bg-gray-600"
         >
-          <Zap className="w-3 h-3 inline mr-1" />
+          <Zap className="mr-1 inline h-3 w-3" />
           {t("subscription.addons.upgradePlan", "Actualizar Plan")}
         </Link>
       )}

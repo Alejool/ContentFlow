@@ -6,10 +6,7 @@ import UserEventModal from "@/Components/Content/Partials/UserEventModal";
 import ModalFooter from "@/Components/Content/modals/common/ModalFooter";
 import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
 import Modal from "@/Components/common/ui/Modal";
-import {
-  getActivePlatformKeys,
-  getPlatformConfig,
-} from "@/Constants/socialPlatforms";
+import { getActivePlatformKeys, getPlatformConfig } from "@/Constants/socialPlatforms";
 import { useCalendar } from "@/Hooks/calendar/useCalendar";
 import { validateDate } from "@/Utils/dateValidation";
 import { formatTime } from "@/Utils/formatDate";
@@ -94,13 +91,7 @@ interface CalendarEvent {
   };
 }
 
-const PlatformIcon = ({
-  platform,
-  className,
-}: {
-  platform?: string;
-  className?: string;
-}) => {
+const PlatformIcon = ({ platform, className }: { platform?: string; className?: string }) => {
   const config = getPlatformConfig(platform || "");
   const Icon = config.icon;
   return <Icon className={`${config.textColor} ${className}`} />;
@@ -128,14 +119,13 @@ const DraggableEvent = ({
     (event.user?.id && Number(event.user.id) === Number(currentUser?.id)) ||
     (!event.user?.id && event.extendedProps?.user_name === currentUser?.name);
 
-  const { attributes, listeners, setNodeRef, transform, isDragging } =
-    useDraggable({
-      id: event.id,
-      disabled: !isDraggable,
-      data: {
-        event,
-      },
-    });
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: event.id,
+    disabled: !isDraggable,
+    data: {
+      event,
+    },
+  });
 
   const style = transform
     ? {
@@ -151,11 +141,11 @@ const DraggableEvent = ({
       {...listeners}
       {...attributes}
       onClick={onClick}
-      className={`flex items-center gap-1.5 px-1.5 py-1 rounded-md text-[10px] font-medium border ${
+      className={`flex items-center gap-1.5 rounded-md border px-1.5 py-1 text-[10px] font-medium ${
         isSelected
-          ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20 ring-2 ring-primary-500"
-          : "border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800"
-      } truncate transition-transform hover:scale-[1.02] shadow-sm ${isDragging ? "opacity-50 cursor-grabbing" : "cursor-pointer"}`}
+          ? "border-primary-500 bg-primary-50 ring-2 ring-primary-500 dark:bg-primary-900/20"
+          : "border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-800"
+      } truncate shadow-sm transition-transform hover:scale-[1.02] ${isDragging ? "cursor-grabbing opacity-50" : "cursor-pointer"}`}
     >
       {onToggleSelect && (
         <button
@@ -163,25 +153,23 @@ const DraggableEvent = ({
             e.stopPropagation();
             onToggleSelect(e);
           }}
-          className="flex-shrink-0 hover:scale-110 transition-transform"
+          className="flex-shrink-0 transition-transform hover:scale-110"
         >
           {isSelected ? (
-            <CheckSquare className="w-3 h-3 text-primary-600" />
+            <CheckSquare className="h-3 w-3 text-primary-600" />
           ) : (
-            <Square className="w-3 h-3 text-gray-400" />
+            <Square className="h-3 w-3 text-gray-400" />
           )}
         </button>
       )}
       <div
-        className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+        className="h-1.5 w-1.5 flex-shrink-0 rounded-full"
         style={{ backgroundColor: event.color }}
       />
-      {remoteLocks[
-        event.extendedProps.publication_id || Number(event.resourceId)
-      ] && <Lock className="w-2.5 h-2.5 text-amber-500 flex-shrink-0" />}
-      <span className="truncate text-gray-700 dark:text-gray-200">
-        {event.title}
-      </span>
+      {remoteLocks[event.extendedProps.publication_id || Number(event.resourceId)] && (
+        <Lock className="h-2.5 w-2.5 flex-shrink-0 text-amber-500" />
+      )}
+      <span className="truncate text-gray-700 dark:text-gray-200">{event.title}</span>
     </div>
   );
 };
@@ -214,38 +202,30 @@ const DroppableDay = ({
     <div
       ref={setNodeRef}
       onClick={onSelect}
-      className={`
-        relative h-24 sm:h-32 lg:h-40 p-2 transition-all cursor-pointer group overflow-hidden
-        ${isSelected ? "bg-primary-50/50 dark:bg-primary-900/20 ring-2 ring-primary-500 ring-inset z-10" : "bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800/50"}
-        ${!isSameMonth(day, currentMonth) ? "opacity-40" : ""}
-        ${isOver ? "ring-2 ring-primary-500 ring-inset bg-primary-50/50 dark:bg-primary-900/20" : ""}
-      `}
+      className={`group relative h-24 cursor-pointer overflow-hidden p-2 transition-all sm:h-32 lg:h-40 ${isSelected ? "z-10 bg-primary-50/50 ring-2 ring-inset ring-primary-500 dark:bg-primary-900/20" : "bg-white hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-800/50"} ${!isSameMonth(day, currentMonth) ? "opacity-40" : ""} ${isOver ? "bg-primary-50/50 ring-2 ring-inset ring-primary-500 dark:bg-primary-900/20" : ""} `}
     >
-      <div className="flex justify-between items-start mb-1">
+      <div className="mb-1 flex items-start justify-between">
         <span
-          className={`
-            flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 text-xs sm:text-sm font-bold rounded-lg transition-all
-            ${
-              isTodayDay
-                ? "bg-primary-500 text-white shadow-lg shadow-primary-500/30"
-                : isSelected
-                  ? "text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30"
-                  : "text-gray-700 dark:text-gray-300 group-hover:bg-gray-100 dark:group-hover:bg-gray-800"
-            }
-          `}
+          className={`flex h-6 w-6 items-center justify-center rounded-lg text-xs font-bold transition-all sm:h-8 sm:w-8 sm:text-sm ${
+            isTodayDay
+              ? "bg-primary-500 text-white shadow-lg shadow-primary-500/30"
+              : isSelected
+                ? "bg-primary-50 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400"
+                : "text-gray-700 group-hover:bg-gray-100 dark:text-gray-300 dark:group-hover:bg-gray-800"
+          } `}
         >
           {format(day, "d")}
         </span>
 
         <button
           onClick={onAddClick}
-          className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-all text-gray-400 hover:text-primary-500"
+          className="rounded-md p-1 text-gray-400 opacity-0 transition-all hover:bg-gray-100 hover:text-primary-500 group-hover:opacity-100 dark:hover:bg-gray-800"
         >
-          <CalendarIcon className="w-3.5 h-3.5" />
+          <CalendarIcon className="h-3.5 w-3.5" />
         </button>
       </div>
 
-      <div className="hidden sm:flex flex-col gap-1 overflow-y-auto scrollbar-none max-h-[calc(100%-2rem)]">
+      <div className="scrollbar-none hidden max-h-[calc(100%-2rem)] flex-col gap-1 overflow-y-auto sm:flex">
         {children}
       </div>
     </div>
@@ -271,15 +251,11 @@ const DroppableTimeSlot = ({
   return (
     <div
       ref={setNodeRef}
-      className={`
-        p-1 border-r border-gray-100 dark:border-gray-800
-        hover:bg-gray-50 dark:hover:bg-gray-900/30 transition-colors
-        ${isOver ? "bg-primary-100/50 dark:bg-primary-900/20 ring-1 ring-primary-500" : ""}
-      `}
+      className={`border-r border-gray-100 p-1 transition-colors hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-900/30 ${isOver ? "bg-primary-100/50 ring-1 ring-primary-500 dark:bg-primary-900/20" : ""} `}
     >
       {children}
       {isOver && !children && (
-        <div className="text-xs text-primary-600 dark:text-primary-400 text-center py-2">
+        <div className="py-2 text-center text-xs text-primary-600 dark:text-primary-400">
           Soltar aquí
         </div>
       )}
@@ -315,9 +291,9 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
 
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [showEventModal, setShowEventModal] = useState(false);
-  const [selectedEventForModal, setSelectedEventForModal] = useState<
-    CalendarEvent | undefined
-  >(undefined);
+  const [selectedEventForModal, setSelectedEventForModal] = useState<CalendarEvent | undefined>(
+    undefined,
+  );
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
     isOpen: boolean;
     event: CalendarEvent | null;
@@ -360,9 +336,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
 
   const handleBulkMove = async (newDate: Date) => {
     const eventIds = Array.from(selectedEvents);
-    const selectedEventsList = filteredEvents.filter((e) =>
-      eventIds.includes(e.id),
-    );
+    const selectedEventsList = filteredEvents.filter((e) => eventIds.includes(e.id));
 
     try {
       // Move each event, preserving the original time
@@ -513,19 +487,11 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
     if (isSameDay(originalDate, newDateTime)) return;
 
     try {
-      await handleEventDrop(
-        eventData.id,
-        newDateTime.toISOString(),
-        eventData.type,
-      );
-      toast.success(
-        t("calendar.bulkActions.moveSuccess") || "Evento movido exitosamente",
-      );
+      await handleEventDrop(eventData.id, newDateTime.toISOString(), eventData.type);
+      toast.success(t("calendar.bulkActions.moveSuccess") || "Evento movido exitosamente");
     } catch (error: any) {
       toast.error(
-        error.message ||
-          t("calendar.bulkActions.moveError") ||
-          "Error al mover el evento",
+        error.message || t("calendar.bulkActions.moveError") || "Error al mover el evento",
       );
     }
   };
@@ -542,14 +508,12 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
     const success = await deleteEvent(event.id);
     if (success) {
       toast.success(
-        t("calendar.userEvents.modal.messages.successDelete") ||
-          "Evento eliminado correctamente",
+        t("calendar.userEvents.modal.messages.successDelete") || "Evento eliminado correctamente",
       );
       setDeleteConfirmation({ isOpen: false, event: null });
     } else {
       toast.error(
-        t("calendar.userEvents.modal.messages.errorDelete") ||
-          "Error al eliminar el evento",
+        t("calendar.userEvents.modal.messages.errorDelete") || "Error al eliminar el evento",
       );
     }
   };
@@ -571,8 +535,8 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
     return filteredEvents.filter((event) => {
       const eventDate = parseISO(event.start);
       return (
-        format(eventDate, "yyyy-MM-dd") ===
-          format(selectedDate, "yyyy-MM-dd") && eventDate.getHours() === hour
+        format(eventDate, "yyyy-MM-dd") === format(selectedDate, "yyyy-MM-dd") &&
+        eventDate.getHours() === hour
       );
     });
   };
@@ -600,14 +564,14 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
       <div className="overflow-x-auto">
         <div className="min-w-[800px]">
           {/* Header with days */}
-          <div className="grid grid-cols-8 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10">
-            <div className="p-3 text-center text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 border-r border-gray-200 dark:border-gray-800">
+          <div className="sticky top-0 z-10 grid grid-cols-8 border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+            <div className="border-r border-gray-200 p-3 text-center text-xs font-bold uppercase tracking-wider text-gray-400 dark:border-gray-800 dark:text-gray-500">
               Hora
             </div>
             {days.map((day) => (
               <div
                 key={day.toString()}
-                className={`p-3 text-center border-r border-gray-200 dark:border-gray-800 ${
+                className={`border-r border-gray-200 p-3 text-center dark:border-gray-800 ${
                   isToday(day) ? "bg-primary-50 dark:bg-primary-900/20" : ""
                 }`}
               >
@@ -615,7 +579,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                   {format(day, "EEE")}
                 </div>
                 <div
-                  className={`text-lg font-bold mt-1 ${
+                  className={`mt-1 text-lg font-bold ${
                     isToday(day)
                       ? "text-primary-600 dark:text-primary-400"
                       : "text-gray-900 dark:text-white"
@@ -632,9 +596,9 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
             {hours.map((hour) => (
               <div
                 key={hour}
-                className="grid grid-cols-8 border-b border-gray-200 dark:border-gray-800 min-h-[80px]"
+                className="grid min-h-[80px] grid-cols-8 border-b border-gray-200 dark:border-gray-800"
               >
-                <div className="p-2 text-right border-r border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-900">
+                <div className="border-r border-gray-200 bg-gray-100 p-2 text-right dark:border-gray-800 dark:bg-gray-900">
                   <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
                     {format(setHours(new Date(), hour), "HH:mm")}
                   </span>
@@ -644,12 +608,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                   const dropId = `${format(day, "yyyy-MM-dd")}-${hour}`;
 
                   return (
-                    <DroppableTimeSlot
-                      key={dropId}
-                      id={dropId}
-                      day={day}
-                      hour={hour}
-                    >
+                    <DroppableTimeSlot key={dropId} id={dropId} day={day} hour={hour}>
                       {dayEvents.map((event) => (
                         <DraggableEvent
                           key={event.id}
@@ -668,11 +627,8 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                               setSelectedEventForModal(event);
                               setShowEventModal(true);
                             } else {
-                              const pubId =
-                                event.extendedProps.publication_id ||
-                                event.resourceId;
-                              if (pubId)
-                                onEventClick?.(pubId, event.type, event);
+                              const pubId = event.extendedProps.publication_id || event.resourceId;
+                              if (pubId) onEventClick?.(pubId, event.type, event);
                             }
                           }}
                         />
@@ -700,20 +656,20 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
           return (
             <div
               key={hour}
-              className="flex border-b border-gray-100 dark:border-gray-800 min-h-[100px] hover:bg-gray-50 dark:hover:bg-gray-900/30 transition-colors"
+              className="flex min-h-[100px] border-b border-gray-100 transition-colors hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-900/30"
             >
-              <div className="w-24 p-4 text-right border-r border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
+              <div className="w-24 border-r border-gray-100 bg-gray-50 p-4 text-right dark:border-gray-800 dark:bg-gray-900/50">
                 <div className="text-sm font-semibold text-gray-900 dark:text-white">
                   {format(setHours(new Date(), hour), "HH:mm")}
                 </div>
               </div>
 
               <DroppableTimeSlot id={dropId} day={selectedDate} hour={hour}>
-                <div className="flex-1 p-3 space-y-2">
+                <div className="flex-1 space-y-2 p-3">
                   {hourEvents.map((event) => (
                     <div
                       key={event.id}
-                      className="relative p-4 rounded-lg bg-white dark:bg-gray-800 border-l-4 hover:shadow-lg transition-all"
+                      className="relative rounded-lg border-l-4 bg-white p-4 transition-all hover:shadow-lg dark:bg-gray-800"
                       style={{ borderLeftColor: event.color }}
                     >
                       <div className="flex items-start gap-3">
@@ -727,37 +683,26 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                           className="mt-1"
                         />
 
-                        <div className="flex-1 min-w-0">
+                        <div className="min-w-0 flex-1">
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex items-center gap-2">
                               {event.type === "user_event" ? (
-                                <CalendarIcon
-                                  className="w-5 h-5"
-                                  style={{ color: event.color }}
-                                />
+                                <CalendarIcon className="h-5 w-5" style={{ color: event.color }} />
                               ) : event.platform ? (
-                                <PlatformIcon
-                                  platform={event.platform}
-                                  className="w-5 h-5"
-                                />
+                                <PlatformIcon platform={event.platform} className="h-5 w-5" />
                               ) : (
-                                <Clock
-                                  className="w-5 h-5"
-                                  style={{ color: event.color }}
-                                />
+                                <Clock className="h-5 w-5" style={{ color: event.color }} />
                               )}
                               <h3
-                                className="text-base font-semibold text-gray-900 dark:text-white cursor-pointer hover:text-primary-600"
+                                className="cursor-pointer text-base font-semibold text-gray-900 hover:text-primary-600 dark:text-white"
                                 onClick={() => {
                                   if (event.type === "user_event") {
                                     setSelectedEventForModal(event);
                                     setShowEventModal(true);
                                   } else {
                                     const pubId =
-                                      event.extendedProps.publication_id ||
-                                      event.resourceId;
-                                    if (pubId)
-                                      onEventClick?.(pubId, event.type, event);
+                                      event.extendedProps.publication_id || event.resourceId;
+                                    if (pubId) onEventClick?.(pubId, event.type, event);
                                   }
                                 }}
                               >
@@ -766,12 +711,12 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-4 mt-2 text-sm text-gray-500 dark:text-gray-400">
+                          <div className="mt-2 flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                             <div className="flex items-center gap-1">
-                              <Clock className="w-4 h-4" />
+                              <Clock className="h-4 w-4" />
                               <span>{formatTime(event.start)}</span>
                             </div>
-                            <span className="px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-xs capitalize">
+                            <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs capitalize dark:bg-gray-700">
                               {event.status}
                             </span>
                           </div>
@@ -787,7 +732,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                   ))}
 
                   {hourEvents.length === 0 && (
-                    <div className="text-center py-4 text-gray-400 dark:text-gray-600 text-sm">
+                    <div className="py-4 text-center text-sm text-gray-400 dark:text-gray-600">
                       Sin eventos programados
                     </div>
                   )}
@@ -811,7 +756,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
 
     return (
       <>
-        <div className="grid grid-cols-7 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+        <div className="grid grid-cols-7 border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
           {[
             { key: "sun", label: t("calendar.weekdays.sun") },
             { key: "mon", label: t("calendar.weekdays.mon") },
@@ -823,7 +768,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
           ].map((day) => (
             <div
               key={day.key}
-              className="py-3 text-center text-[10px] sm:text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500"
+              className="py-3 text-center text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 sm:text-xs"
             >
               <span className="hidden sm:inline">{day.label}</span>
               <span className="inline sm:hidden">{day.label.charAt(0)}</span>
@@ -831,18 +776,16 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
           ))}
         </div>
 
-        <div className="grid grid-cols-7 bg-gray-200 dark:bg-gray-800 gap-[1px]">
+        <div className="grid grid-cols-7 gap-[1px] bg-gray-200 dark:bg-gray-800">
           {startingEmptySlots.map((_, i) => (
             <div
               key={`empty-${i}`}
-              className="bg-gray-50/50 dark:bg-gray-900/40 h-24 sm:h-32 lg:h-40"
+              className="h-24 bg-gray-50/50 dark:bg-gray-900/40 sm:h-32 lg:h-40"
             />
           ))}
 
           {days.map((day) => {
-            const dayEvents = filteredEvents.filter((e) =>
-              isSameDay(parseISO(e.start), day),
-            );
+            const dayEvents = filteredEvents.filter((e) => isSameDay(parseISO(e.start), day));
             const isTodayDay = isToday(day);
             const isSelected = isSameDay(day, selectedDate);
 
@@ -857,9 +800,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                 onAddClick={(e) => {
                   e.stopPropagation();
                   if (isBefore(startOfDay(day), startOfDay(new Date()))) {
-                    toast.error(
-                      t("calendar.userEvents.modal.validation.pastDate"),
-                    );
+                    toast.error(t("calendar.userEvents.modal.validation.pastDate"));
                     return;
                   }
                   setSelectedDate(day);
@@ -885,24 +826,22 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                         setSelectedEventForModal(event);
                         setShowEventModal(true);
                       } else {
-                        const pubId =
-                          event.extendedProps.publication_id ||
-                          event.resourceId;
+                        const pubId = event.extendedProps.publication_id || event.resourceId;
                         if (pubId) onEventClick?.(pubId, event.type, event);
                       }
                     }}
                   />
                 ))}
                 {dayEvents.length > 3 && (
-                  <div className="text-[10px] text-gray-400 font-bold px-1.5">
+                  <div className="px-1.5 text-[10px] font-bold text-gray-400">
                     + {dayEvents.length - 3}
                   </div>
                 )}
-                <div className="flex sm:hidden flex-wrap gap-0.5 mt-1">
+                <div className="mt-1 flex flex-wrap gap-0.5 sm:hidden">
                   {dayEvents.slice(0, 4).map((event) => (
                     <div
                       key={event.id}
-                      className="w-1.5 h-1.5 rounded-full"
+                      className="h-1.5 w-1.5 rounded-full"
                       style={{ backgroundColor: event.color }}
                     />
                   ))}
@@ -917,37 +856,35 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
 
   return (
     <CalendarErrorBoundary>
-      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+      <div className="overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
         <div className="p-6">
-          <div className="flex flex-col sm:flex-row justify-between items-center mb-6 sm:mb-8 gap-4 sm:gap-6">
+          <div className="mb-6 flex flex-col items-center justify-between gap-4 sm:mb-8 sm:flex-row sm:gap-6">
             <div className="flex items-center gap-4">
-              <div className="relative month-picker-container">
+              <div className="month-picker-container relative">
                 <button
                   onClick={() => setShowMonthPicker(!showMonthPicker)}
-                  className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white capitalize flex items-center gap-3 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                  className="flex items-center gap-3 text-lg font-bold capitalize text-gray-900 transition-colors hover:text-primary-600 dark:text-white dark:hover:text-primary-400 sm:text-2xl"
                 >
                   {formatDate(currentMonth, "monthYear")}
                   <ChevronDown
-                    className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${showMonthPicker ? "rotate-180" : ""}`}
+                    className={`h-4 w-4 transition-transform sm:h-5 sm:w-5 ${showMonthPicker ? "rotate-180" : ""}`}
                   />
                   {isLoading && (
-                    <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-primary-500" />
+                    <Loader2 className="h-4 w-4 animate-spin text-primary-500 sm:h-5 sm:w-5" />
                   )}
                 </button>
 
                 {showMonthPicker && (
-                  <div className="absolute top-full left-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 p-4 min-w-[280px]">
-                    <div className="grid grid-cols-3 gap-2 mb-4">
+                  <div className="absolute left-0 top-full z-50 mt-2 min-w-[280px] rounded-lg border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-700 dark:bg-gray-800">
+                    <div className="mb-4 grid grid-cols-3 gap-2">
                       {Array.from({ length: 12 }, (_, i) => (
                         <button
                           key={i}
-                          onClick={() =>
-                            goToMonth(i, currentMonth.getFullYear())
-                          }
-                          className={`p-2 text-sm rounded-lg transition-colors ${
+                          onClick={() => goToMonth(i, currentMonth.getFullYear())}
+                          className={`rounded-lg p-2 text-sm transition-colors ${
                             currentMonth.getMonth() === i
                               ? "bg-primary-500 text-white"
-                              : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+                              : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                           }`}
                         >
                           {formatDate(new Date(2024, i, 1), "monthShort")}
@@ -957,28 +894,22 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                     <div className="flex items-center justify-between gap-2">
                       <button
                         onClick={() =>
-                          goToMonth(
-                            currentMonth.getMonth(),
-                            currentMonth.getFullYear() - 1,
-                          )
+                          goToMonth(currentMonth.getMonth(), currentMonth.getFullYear() - 1)
                         }
-                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                        className="rounded-lg p-2 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
-                        <ChevronLeft className="w-4 h-4" />
+                        <ChevronLeft className="h-4 w-4" />
                       </button>
                       <span className="font-semibold text-gray-900 dark:text-white">
                         {currentMonth.getFullYear()}
                       </span>
                       <button
                         onClick={() =>
-                          goToMonth(
-                            currentMonth.getMonth(),
-                            currentMonth.getFullYear() + 1,
-                          )
+                          goToMonth(currentMonth.getMonth(), currentMonth.getFullYear() + 1)
                         }
-                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                        className="rounded-lg p-2 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
-                        <ChevronRight className="w-4 h-4" />
+                        <ChevronRight className="h-4 w-4" />
                       </button>
                     </div>
                   </div>
@@ -986,34 +917,32 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto justify-center sm:justify-end">
+            <div className="flex w-full flex-wrap items-center justify-center gap-2 sm:w-auto sm:justify-end sm:gap-3">
               {/* View Selector */}
               <CalendarViewSelector currentView={view} onViewChange={setView} />
 
               {/* External Calendars Button - Gated by plan features */}
               {auth.current_workspace?.features?.calendar_sync && (
                 <button
-                  onClick={() =>
-                    setShowExternalCalendars(!showExternalCalendars)
-                  }
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-sm font-medium border ${
+                  onClick={() => setShowExternalCalendars(!showExternalCalendars)}
+                  className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-all ${
                     showExternalCalendars
-                      ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 border-primary-200 dark:border-primary-800"
-                      : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700"
+                      ? "border-primary-200 bg-primary-50 text-primary-600 dark:border-primary-800 dark:bg-primary-900/20 dark:text-primary-400"
+                      : "border-gray-200 bg-gray-100 text-gray-600 hover:bg-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                   }`}
                   title="Calendarios Externos"
                 >
-                  <CalendarIcon className="w-4 h-4" />
+                  <CalendarIcon className="h-4 w-4" />
                   <span className="hidden sm:inline">Externos</span>
                 </button>
               )}
 
-              <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1 overflow-x-auto scrollbar-subtle max-w-full sm:max-w-none">
+              <div className="scrollbar-subtle flex max-w-full items-center overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-800 sm:max-w-none">
                 {platforms.map((p) => (
                   <button
                     key={p}
                     onClick={() => setPlatformFilter(p)}
-                    className={`p-1.5 sm:p-2 rounded-full transition-all ${platformFilter === p ? "bg-white dark:bg-gray-700 shadow text-primary-600" : "text-gray-400 hover:text-gray-600"}`}
+                    className={`rounded-full p-1.5 transition-all sm:p-2 ${platformFilter === p ? "bg-white text-primary-600 shadow dark:bg-gray-700" : "text-gray-400 hover:text-gray-600"}`}
                     title={
                       p === "all"
                         ? t("calendar.filters.all")
@@ -1023,38 +952,35 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                     }
                   >
                     {p === "all" ? (
-                      <Filter className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                      <Filter className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     ) : p === "user_event" ? (
-                      <CalendarIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary-500" />
+                      <CalendarIcon className="h-3.5 w-3.5 text-primary-500 sm:h-4 sm:w-4" />
                     ) : (
-                      <PlatformIcon
-                        platform={p}
-                        className="w-3.5 h-3.5 sm:w-4 sm:h-4"
-                      />
+                      <PlatformIcon platform={p} className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     )}
                   </button>
                 ))}
               </div>
 
-              <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg border border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-1 rounded-lg border border-gray-200 bg-gray-100 p-1 dark:border-gray-700 dark:bg-gray-800">
                 <button
                   onClick={navigatePrevious}
-                  className="p-1.5 sm:p-2 hover:bg-white dark:hover:bg-gray-700 rounded-lg transition-all text-gray-600 dark:text-gray-300"
+                  className="rounded-lg p-1.5 text-gray-600 transition-all hover:bg-white dark:text-gray-300 dark:hover:bg-gray-700 sm:p-2"
                 >
-                  <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
                 </button>
                 <button
                   onClick={goToToday}
-                  className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold hover:bg-white dark:hover:bg-gray-700 rounded-lg transition-all text-gray-700 dark:text-gray-200"
+                  className="rounded-lg px-3 py-1.5 text-xs font-semibold text-gray-700 transition-all hover:bg-white dark:text-gray-200 dark:hover:bg-gray-700 sm:px-4 sm:py-2 sm:text-sm"
                 >
                   {t("calendar.actions.today")}
                 </button>
 
                 <button
                   onClick={navigateNext}
-                  className="p-1.5 sm:p-2 hover:bg-white dark:hover:bg-gray-700 rounded-lg transition-all text-gray-600 dark:text-gray-300"
+                  className="rounded-lg p-1.5 text-gray-600 transition-all hover:bg-white dark:text-gray-300 dark:hover:bg-gray-700 sm:p-2"
                 >
-                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
                 </button>
               </div>
             </div>
@@ -1062,28 +988,28 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
 
           {/* External Calendars Panel */}
           {showExternalCalendars && (
-            <div className="mb-6 p-6 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                  <CalendarIcon className="w-5 h-5 text-primary-500" />
+            <div className="mb-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white">
+                  <CalendarIcon className="h-5 w-5 text-primary-500" />
                   {t("calendar.external.title")}
                 </h3>
                 <button
                   onClick={() => setShowExternalCalendars(false)}
-                  className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors"
+                  className="rounded p-1 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="h-5 w-5 text-gray-500" />
                 </button>
               </div>
               <ExternalCalendarSettings />
             </div>
           )}
 
-          <div className="flex flex-col xl:flex-row gap-8">
-            <div className="flex-1 min-w-0">
+          <div className="flex flex-col gap-8 xl:flex-row">
+            <div className="min-w-0 flex-1">
               <div
                 id="calendar"
-                className="w-full border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden shadow-sm bg-gray-50 dark:bg-gray-900/50"
+                className="w-full overflow-hidden rounded-lg border border-gray-200 bg-gray-50 shadow-sm dark:border-gray-800 dark:bg-gray-900/50"
               >
                 <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
                   {renderCalendarView()}
@@ -1091,29 +1017,27 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
               </div>
             </div>
 
-            <div className="w-full xl:w-96 space-y-6">
-              <div className="bg-gray-50 dark:bg-neutral-800/30 p-6 rounded-lg border border-gray-100 dark:border-neutral-800/50 h-full flex flex-col">
+            <div className="w-full space-y-6 xl:w-96">
+              <div className="flex h-full flex-col rounded-lg border border-gray-100 bg-gray-50 p-6 dark:border-neutral-800/50 dark:bg-neutral-800/30">
                 <div className="mb-6">
-                  <h4 className="font-black text-gray-900 dark:text-white flex items-center gap-2 text-xl">
-                    <CalendarIcon className="w-6 h-6 text-primary-500" />
+                  <h4 className="flex items-center gap-2 text-xl font-black text-gray-900 dark:text-white">
+                    <CalendarIcon className="h-6 w-6 text-primary-500" />
                     {formatDate(selectedDate, "dayMonth")}
                   </h4>
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-primary-500 bg-primary-50 dark:bg-primary-900/30 px-2 py-0.5 rounded-full">
+                  <div className="mt-2 flex items-center gap-2">
+                    <span className="rounded-full bg-primary-50 px-2 py-0.5 text-[10px] font-black uppercase tracking-widest text-primary-500 dark:bg-primary-900/30">
                       {
-                        filteredEvents.filter((e) =>
-                          isSameDay(parseISO(e.start), selectedDate),
-                        ).length
+                        filteredEvents.filter((e) => isSameDay(parseISO(e.start), selectedDate))
+                          .length
                       }{" "}
                       {t("calendar.events.count")}
                     </span>
                   </div>
                 </div>
 
-                <div className="space-y-4 flex-1 overflow-y-auto pr-1 scrollbar-thin max-h-[calc(100vh-400px)]">
-                  {filteredEvents.filter((e) =>
-                    isSameDay(parseISO(e.start), selectedDate),
-                  ).length > 0 ? (
+                <div className="scrollbar-thin max-h-[calc(100vh-400px)] flex-1 space-y-4 overflow-y-auto pr-1">
+                  {filteredEvents.filter((e) => isSameDay(parseISO(e.start), selectedDate)).length >
+                  0 ? (
                     filteredEvents
                       .filter((e) => isSameDay(parseISO(e.start), selectedDate))
                       .sort((a, b) => a.start.localeCompare(b.start))
@@ -1125,63 +1049,47 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                               setSelectedEventForModal(event);
                               setShowEventModal(true);
                             } else {
-                              const pubId =
-                                event.extendedProps.publication_id ||
-                                event.resourceId;
-                              if (pubId)
-                                onEventClick?.(pubId, event.type, event);
+                              const pubId = event.extendedProps.publication_id || event.resourceId;
+                              if (pubId) onEventClick?.(pubId, event.type, event);
                             }
                           }}
-                          className="group flex items-center gap-4 p-4 rounded-lg shadow-sm hover:shadow-md active:scale-[0.98] transition-all cursor-pointer border-2"
+                          className="group flex cursor-pointer items-center gap-4 rounded-lg border-2 p-4 shadow-sm transition-all hover:shadow-md active:scale-[0.98]"
                           style={{
                             backgroundColor: `${event.color}15`,
                             borderColor: `${event.color}40`,
                           }}
                         >
-                          <div className="w-12 h-12 rounded-lg flex-shrink-0 flex items-center justify-center bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-700 group-hover:scale-110 transition-transform shadow-sm">
+                          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg border border-gray-100 bg-white shadow-sm transition-transform group-hover:scale-110 dark:border-neutral-700 dark:bg-neutral-900">
                             {event.type === "user_event" ? (
-                              <CalendarIcon
-                                className="w-6 h-6"
-                                style={{ color: event.color }}
-                              />
+                              <CalendarIcon className="h-6 w-6" style={{ color: event.color }} />
                             ) : event.platform ? (
-                              <PlatformIcon
-                                platform={event.platform}
-                                className="w-6 h-6"
-                              />
+                              <PlatformIcon platform={event.platform} className="h-6 w-6" />
                             ) : (
-                              <Clock
-                                className="w-6 h-6"
-                                style={{ color: event.color }}
-                              />
+                              <Clock className="h-6 w-6" style={{ color: event.color }} />
                             )}
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <h5 className="font-bold text-gray-900 dark:text-white truncate text-sm flex items-center gap-1.5">
+                          <div className="min-w-0 flex-1">
+                            <h5 className="flex items-center gap-1.5 truncate text-sm font-bold text-gray-900 dark:text-white">
                               {remoteLocks[
-                                event.extendedProps.publication_id ||
-                                  Number(event.resourceId)
-                              ] && <Lock className="w-3 h-3 text-amber-500" />}
+                                event.extendedProps.publication_id || Number(event.resourceId)
+                              ] && <Lock className="h-3 w-3 text-amber-500" />}
                               {event.title}
                             </h5>
                             {event.user?.name && (
-                              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">
+                              <p className="text-[10px] font-medium text-gray-500 dark:text-gray-400">
                                 {t("common.creator")}:{" "}
-                                {Number(event.user.id) ===
-                                Number(currentUser?.id)
+                                {Number(event.user.id) === Number(currentUser?.id)
                                   ? t("common.me") || "Yo"
                                   : event.user.name}
                               </p>
                             )}
-                            {!event.user?.name &&
-                              event.extendedProps?.user_name && (
-                                <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">
-                                  {t("common.creator")}:{" "}
-                                  {event.extendedProps.user_name}
-                                </p>
-                              )}
-                            <div className="flex items-center gap-2 mt-1">
-                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/50 dark:bg-neutral-900/50 text-gray-500 dark:text-gray-400 font-bold uppercase backdrop-blur-sm">
+                            {!event.user?.name && event.extendedProps?.user_name && (
+                              <p className="text-[10px] font-medium text-gray-500 dark:text-gray-400">
+                                {t("common.creator")}: {event.extendedProps.user_name}
+                              </p>
+                            )}
+                            <div className="mt-1 flex items-center gap-2">
+                              <span className="rounded-full bg-white/50 px-2 py-0.5 text-[10px] font-bold uppercase text-gray-500 backdrop-blur-sm dark:bg-neutral-900/50 dark:text-gray-400">
                                 {formatTime(event.start)}
                               </span>
                               <span
@@ -1194,27 +1102,26 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                           </div>
                           <div className="flex flex-col items-center gap-2">
                             <div
-                              className="w-1.5 h-10 rounded-full opacity-50 group-hover:opacity-100 transition-opacity"
+                              className="h-10 w-1.5 rounded-full opacity-50 transition-opacity group-hover:opacity-100"
                               style={{ backgroundColor: event.color }}
                             />
                             {event.type === "user_event" &&
-                              Number(event.user?.id) ===
-                                Number(currentUser?.id) && (
+                              Number(event.user?.id) === Number(currentUser?.id) && (
                                 <button
                                   onClick={(e) => handleDeleteEvent(e, event)}
-                                  className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-400 hover:text-red-600 dark:hover:text-red-400"
+                                  className="rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
                                   title={t("common.delete") || "Eliminar"}
                                 >
-                                  <Trash2 className="w-4 h-4" />
+                                  <Trash2 className="h-4 w-4" />
                                 </button>
                               )}
                           </div>
                         </div>
                       ))
                   ) : (
-                    <div className="py-12 text-center rounded-lg border-2 border-dashed border-gray-200 dark:border-neutral-800 bg-white/50 dark:bg-neutral-900/10">
-                      <div className="w-12 h-12 rounded-full bg-gray-50 dark:bg-neutral-800 flex items-center justify-center mx-auto mb-4">
-                        <CalendarIcon className="w-6 h-6 text-gray-300" />
+                    <div className="rounded-lg border-2 border-dashed border-gray-200 bg-white/50 py-12 text-center dark:border-neutral-800 dark:bg-neutral-900/10">
+                      <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 dark:bg-neutral-800">
+                        <CalendarIcon className="h-6 w-6 text-gray-300" />
                       </div>
                       <p className="text-sm font-medium text-gray-400">
                         {t("calendar.events.empty")}
@@ -1245,9 +1152,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
         >
           <ModalHeader
             t={t}
-            onClose={() =>
-              setDeleteConfirmation({ isOpen: false, event: null })
-            }
+            onClose={() => setDeleteConfirmation({ isOpen: false, event: null })}
             title="common.deleteConfirmTitle"
             icon={Trash2}
             iconColor="text-red-500"
@@ -1263,14 +1168,12 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
           </div>
 
           <ModalFooter
-            onClose={() =>
-              setDeleteConfirmation({ isOpen: false, event: null })
-            }
+            onClose={() => setDeleteConfirmation({ isOpen: false, event: null })}
             onPrimarySubmit={confirmDelete}
             submitText={t("common.delete") || "Eliminar"}
             cancelText={t("common.cancel") || "Cancelar"}
             submitVariant="danger"
-            submitIcon={<Trash2 className="w-4 h-4" />}
+            submitIcon={<Trash2 className="h-4 w-4" />}
             cancelStyle="outline"
           />
         </Modal>

@@ -68,9 +68,9 @@ export default function PollFields({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700">
-        <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
+      <div className="flex items-center gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700">
+        <div className="h-5 w-1 rounded-full bg-primary-500"></div>
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
           {t("publications.modal.poll.title") || "Poll Options"}
         </h3>
       </div>
@@ -109,9 +109,7 @@ export default function PollFields({
           </div>
         ))}
 
-        {errors.options && (
-          <p className="text-xs text-red-500">{errors.options}</p>
-        )}
+        {errors.options && <p className="text-xs text-red-500">{errors.options}</p>}
 
         {options.length < 4 && (
           <Button
@@ -149,22 +147,19 @@ export default function PollFields({
             {t("publications.modal.poll.hours") || "hours"}
           </span>
           <div className="group relative">
-            <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
-            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-10">
-              <div className="bg-gray-900 text-white text-xs rounded-lg py-2 px-3 whitespace-nowrap">
-                {t("publications.modal.poll.durationHint") ||
-                  "Twitter: 5min-7days"}
+            <HelpCircle className="h-4 w-4 cursor-help text-gray-400" />
+            <div className="absolute bottom-full left-1/2 z-10 mb-2 hidden -translate-x-1/2 group-hover:block">
+              <div className="whitespace-nowrap rounded-lg bg-gray-900 px-3 py-2 text-xs text-white">
+                {t("publications.modal.poll.durationHint") || "Twitter: 5min-7days"}
               </div>
             </div>
           </div>
         </div>
 
-        {errors.duration && (
-          <p className="text-xs text-red-500">{errors.duration}</p>
-        )}
+        {errors.duration && <p className="text-xs text-red-500">{errors.duration}</p>}
       </div>
 
-      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+      <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-900/20">
         <p className="text-xs text-blue-700 dark:text-blue-300">
           <strong>{t("common.note") || "Note"}:</strong>{" "}
           {t("publications.modal.poll.note") ||

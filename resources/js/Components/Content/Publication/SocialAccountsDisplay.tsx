@@ -55,43 +55,28 @@ const SocialAccountsDisplay = memo(
     );
 
     if (displayItems.length === 0) {
-      return <span className="text-gray-400 text-[10px] italic">No props</span>;
+      return <span className="text-[10px] italic text-gray-400">No props</span>;
     }
 
     if (showCount) {
-      return (
-        <span className="text-xs font-bold text-gray-500">
-          {displayItems.length} IDs
-        </span>
-      );
+      return <span className="text-xs font-bold text-gray-500">{displayItems.length} IDs</span>;
     }
 
     return (
-      <div className="flex flex-wrap gap-1.5 items-center">
+      <div className="flex flex-wrap items-center gap-1.5">
         {displayItems.slice(0, 4).map((item) => {
           const account = item.social_account;
-          const platform = (
-            account?.platform ||
-            item.platform ||
-            "social"
-          ).toLowerCase();
+          const platform = (account?.platform || item.platform || "social").toLowerCase();
           const config = getPlatformConfig(platform);
           const isConnected = item.social_account_id
             ? connectedIds.has(item.social_account_id)
             : false;
-          const isPublishing = publishingPlatforms.includes(
-            item.social_account_id,
-          );
+          const isPublishing = publishingPlatforms.includes(item.social_account_id);
 
           return (
             <div
               key={`${item.id}-${platform}`}
-              className={`
-              relative w-6 h-6 rounded flex items-center justify-center text-[10px] font-black uppercase transition-all
-              ${config.bgClass} ${config.textColor} ${config.borderColor}
-              ${config.darkColor} ${config.darkTextColor} ${config.darkBorderColor}
-              ${isConnected ? "opacity-100 ring-1 ring-emerald-500/20" : "opacity-40 grayscale scale-95"}
-            `}
+              className={`relative flex h-6 w-6 items-center justify-center rounded text-[10px] font-black uppercase transition-all ${config.bgClass} ${config.textColor} ${config.borderColor} ${config.darkColor} ${config.darkTextColor} ${config.darkBorderColor} ${isConnected ? "opacity-100 ring-1 ring-emerald-500/20" : "scale-95 opacity-40 grayscale"} `}
               title={
                 isPublishing
                   ? `Publicando en ${account?.account_name || platform}...`
@@ -100,9 +85,9 @@ const SocialAccountsDisplay = memo(
             >
               {platform.slice(0, 1)}
               {isPublishing && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded animate-pulse">
+                <div className="absolute inset-0 flex animate-pulse items-center justify-center rounded bg-black/20">
                   <svg
-                    className="w-4 h-4 text-white animate-spin"
+                    className="h-4 w-4 animate-spin text-white"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -124,16 +109,14 @@ const SocialAccountsDisplay = memo(
                 </div>
               )}
               {(() => {
-                const video = publication?.media_files?.find(
-                  (m) => m.file_type === "video",
-                );
+                const video = publication?.media_files?.find((m) => m.file_type === "video");
                 if (!video) return null;
                 const duration = video.metadata?.duration || 0;
                 const validation = validateVideoDuration(platform, duration);
                 if (!validation.isValid) {
                   return (
-                    <div className="absolute -top-1 -right-1 bg-red-600 rounded-full border border-white dark:border-neutral-800 animate-pulse">
-                      <AlertTriangle className="w-2 h-2 text-white" />
+                    <div className="absolute -right-1 -top-1 animate-pulse rounded-full border border-white bg-red-600 dark:border-neutral-800">
+                      <AlertTriangle className="h-2 w-2 text-white" />
                     </div>
                   );
                 }
@@ -143,9 +126,7 @@ const SocialAccountsDisplay = memo(
           );
         })}
         {displayItems.length > 4 && (
-          <span className="text-[10px] font-bold text-gray-400">
-            +{displayItems.length - 4}
-          </span>
+          <span className="text-[10px] font-bold text-gray-400">+{displayItems.length - 4}</span>
         )}
       </div>
     );

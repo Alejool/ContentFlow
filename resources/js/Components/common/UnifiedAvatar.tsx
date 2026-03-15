@@ -1,13 +1,4 @@
-import {
-  Briefcase,
-  Crown,
-  Heart,
-  Smile,
-  Sparkles,
-  Star,
-  User,
-  Zap,
-} from "lucide-react";
+import { Briefcase, Crown, Heart, Smile, Sparkles, Star, User, Zap } from "lucide-react";
 import { useState } from "react";
 
 interface UnifiedAvatarProps {
@@ -91,7 +82,7 @@ export function UnifiedAvatar({
           {/* Skeleton shimmer mientras carga */}
           {!imageLoaded && (
             <div className="absolute inset-0 overflow-hidden bg-gray-200 dark:bg-neutral-700">
-              <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.4s_infinite] bg-gradient-to-r from-transparent via-white/40 dark:via-white/10 to-transparent" />
+              <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.4s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent dark:via-white/10" />
             </div>
           )}
 
@@ -101,7 +92,7 @@ export function UnifiedAvatar({
             alt={name}
             loading={loading}
             ref={handleImageRef}
-            className={`w-full h-full object-cover transition-opacity duration-300 ${
+            className={`h-full w-full object-cover transition-opacity duration-300 ${
               imageLoaded ? "opacity-100" : "opacity-0"
             }`}
             onLoad={() => setImageLoaded(true)}
@@ -115,14 +106,10 @@ export function UnifiedAvatar({
     }
 
     // Si hay icono por defecto seleccionado, mostrarlo
-    if (
-      defaultIcon &&
-      DEFAULT_ICONS[defaultIcon as keyof typeof DEFAULT_ICONS]
-    ) {
-      const IconComponent =
-        DEFAULT_ICONS[defaultIcon as keyof typeof DEFAULT_ICONS];
+    if (defaultIcon && DEFAULT_ICONS[defaultIcon as keyof typeof DEFAULT_ICONS]) {
+      const IconComponent = DEFAULT_ICONS[defaultIcon as keyof typeof DEFAULT_ICONS];
       return (
-        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-500 to-primary-600 text-white">
+        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary-500 to-primary-600 text-white">
           <IconComponent size={iconSizes[size]} />
         </div>
       );
@@ -130,7 +117,7 @@ export function UnifiedAvatar({
 
     // Si no hay nada o falló la imagen, mostrar iniciales
     return (
-      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-500 to-primary-600 text-white font-bold">
+      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary-500 to-primary-600 font-bold text-white">
         {getInitials(name)}
       </div>
     );
@@ -139,7 +126,7 @@ export function UnifiedAvatar({
   return (
     <div className={`relative inline-block ${className}`}>
       <div
-        className={`${sizeClasses[size]} relative rounded-full overflow-hidden flex items-center justify-center`}
+        className={`${sizeClasses[size]} relative flex items-center justify-center overflow-hidden rounded-full`}
       >
         {renderContent()}
       </div>
@@ -147,11 +134,11 @@ export function UnifiedAvatar({
         <div
           className={`absolute bottom-0 right-0 ${
             size === "xs" || size === "sm"
-              ? "w-2 h-2"
+              ? "h-2 w-2"
               : size === "md" || size === "lg"
-                ? "w-3 h-3"
-                : "w-4 h-4"
-          } ${statusColor} border-2 border-white dark:border-neutral-900 rounded-full shadow-sm`}
+                ? "h-3 w-3"
+                : "h-4 w-4"
+          } ${statusColor} rounded-full border-2 border-white shadow-sm dark:border-neutral-900`}
         ></div>
       )}
     </div>

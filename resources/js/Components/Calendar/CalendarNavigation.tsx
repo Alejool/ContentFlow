@@ -89,32 +89,30 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
   return (
     <div className="flex items-center gap-4">
       {/* Date Display with Dropdown */}
-      <div className="relative month-picker-container">
+      <div className="month-picker-container relative">
         <button
           onClick={() => setShowMonthPicker(!showMonthPicker)}
-          className="text-3xl font-bold text-gray-900 dark:text-white capitalize flex items-center gap-3 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+          className="flex items-center gap-3 text-3xl font-bold capitalize text-gray-900 transition-colors hover:text-primary-600 dark:text-white dark:hover:text-primary-400"
         >
           {getDateDisplay()}
           <ChevronDown
-            className={`w-5 h-5 transition-transform ${showMonthPicker ? "rotate-180" : ""}`}
+            className={`h-5 w-5 transition-transform ${showMonthPicker ? "rotate-180" : ""}`}
           />
-          {isLoading && (
-            <Loader2 className="w-5 h-5 animate-spin text-primary-500" />
-          )}
+          {isLoading && <Loader2 className="h-5 w-5 animate-spin text-primary-500" />}
         </button>
 
         {/* Month/Year Picker Dropdown */}
         {showMonthPicker && (
-          <div className="absolute top-full left-0 mt-2 bg-white dark:bg-black border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 p-4 min-w-[280px]">
-            <div className="grid grid-cols-3 gap-2 mb-4">
+          <div className="absolute left-0 top-full z-50 mt-2 min-w-[280px] rounded-lg border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-700 dark:bg-black">
+            <div className="mb-4 grid grid-cols-3 gap-2">
               {Array.from({ length: 12 }, (_, i) => (
                 <button
                   key={i}
                   onClick={() => goToMonth(i, currentDate.getFullYear())}
-                  className={`p-2 text-sm rounded-lg transition-colors ${
+                  className={`rounded-lg p-2 text-sm transition-colors ${
                     currentDate.getMonth() === i
                       ? "bg-primary-500 text-white"
-                      : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+                      : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                   }`}
                 >
                   {formatDate(new Date(2024, i, 1), "monthShort")}
@@ -123,29 +121,19 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
             </div>
             <div className="flex items-center justify-between gap-2">
               <button
-                onClick={() =>
-                  goToMonth(
-                    currentDate.getMonth(),
-                    currentDate.getFullYear() - 1,
-                  )
-                }
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                onClick={() => goToMonth(currentDate.getMonth(), currentDate.getFullYear() - 1)}
+                className="rounded-lg p-2 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
               >
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft className="h-4 w-4" />
               </button>
               <span className="font-semibold text-gray-900 dark:text-white">
                 {currentDate.getFullYear()}
               </span>
               <button
-                onClick={() =>
-                  goToMonth(
-                    currentDate.getMonth(),
-                    currentDate.getFullYear() + 1,
-                  )
-                }
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                onClick={() => goToMonth(currentDate.getMonth(), currentDate.getFullYear() + 1)}
+                className="rounded-lg p-2 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
               >
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="h-4 w-4" />
               </button>
             </div>
           </div>
@@ -153,28 +141,28 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
       </div>
 
       {/* Navigation Controls */}
-      <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg border border-gray-200 dark:border-gray-700">
+      <div className="flex items-center gap-1 rounded-lg border border-gray-200 bg-gray-100 p-1 dark:border-gray-700 dark:bg-gray-800">
         {/* Previous Button */}
         <button
           onClick={onNavigatePrevious}
-          className="p-2 hover:bg-white dark:hover:bg-gray-700 rounded-lg transition-all shadow-sm hover:shadow text-gray-600 dark:text-gray-300"
+          className="rounded-lg p-2 text-gray-600 shadow-sm transition-all hover:bg-white hover:shadow dark:text-gray-300 dark:hover:bg-gray-700"
           title={t("calendar.navigation.previous") || "Anterior"}
         >
-          <ChevronLeft className="w-5 h-5" />
+          <ChevronLeft className="h-5 w-5" />
         </button>
 
         {/* Today Button with visual indicator */}
         <button
           onClick={onNavigateToToday}
-          className={`px-4 py-2 text-sm font-semibold hover:bg-white dark:hover:bg-gray-700 rounded-lg transition-all shadow-sm hover:shadow relative ${
+          className={`relative rounded-lg px-4 py-2 text-sm font-semibold shadow-sm transition-all hover:bg-white hover:shadow dark:hover:bg-gray-700 ${
             isCurrentDay(currentDate)
-              ? "bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300"
+              ? "bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300"
               : "text-gray-700 dark:text-gray-200"
           }`}
           title={t("calendar.navigation.today") || "Hoy"}
         >
           {isCurrentDay(currentDate) && (
-            <span className="absolute top-1 right-1 w-2 h-2 bg-primary-500 rounded-full"></span>
+            <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-primary-500"></span>
           )}
           {t("calendar.navigation.today") || "Hoy"}
         </button>
@@ -182,33 +170,33 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
         {/* Next Button */}
         <button
           onClick={onNavigateNext}
-          className="p-2 hover:bg-white dark:hover:bg-gray-700 rounded-lg transition-all shadow-sm hover:shadow text-gray-600 dark:text-gray-300"
+          className="rounded-lg p-2 text-gray-600 shadow-sm transition-all hover:bg-white hover:shadow dark:text-gray-300 dark:hover:bg-gray-700"
           title={t("calendar.navigation.next") || "Siguiente"}
         >
-          <ChevronRight className="w-5 h-5" />
+          <ChevronRight className="h-5 w-5" />
         </button>
 
         {/* Date Picker Button */}
-        <div className="relative date-picker-container ml-1">
+        <div className="date-picker-container relative ml-1">
           <button
             onClick={() => setShowDatePicker(!showDatePicker)}
-            className="p-2 hover:bg-white dark:hover:bg-gray-700 rounded-lg transition-all shadow-sm hover:shadow text-gray-600 dark:text-gray-300"
+            className="rounded-lg p-2 text-gray-600 shadow-sm transition-all hover:bg-white hover:shadow dark:text-gray-300 dark:hover:bg-gray-700"
             title={t("calendar.navigation.selectDate") || "Seleccionar fecha"}
           >
-            <CalendarIcon className="w-5 h-5" />
+            <CalendarIcon className="h-5 w-5" />
           </button>
 
           {/* Date Picker Dropdown */}
           {showDatePicker && (
-            <div className="absolute top-full right-0 mt-2 bg-white dark:bg-black border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 p-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <div className="absolute right-0 top-full z-50 mt-2 rounded-lg border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-700 dark:bg-black">
+              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 {t("calendar.navigation.selectDate") || "Seleccionar fecha"}
               </label>
               <input
                 type="date"
                 value={format(currentDate, "yyyy-MM-dd")}
                 onChange={handleDatePickerChange}
-                className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:text-white"
+                className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
               />
             </div>
           )}

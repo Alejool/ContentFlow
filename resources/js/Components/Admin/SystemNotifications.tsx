@@ -4,14 +4,7 @@ import Input from "@/Components/common/Modern/Input";
 import Select from "@/Components/common/Modern/Select";
 import Textarea from "@/Components/common/Modern/Textarea";
 import { useForm } from "@inertiajs/react";
-import {
-  AlertTriangle,
-  Bell,
-  CheckCircle,
-  Info,
-  Send,
-  XCircle,
-} from "lucide-react";
+import { AlertTriangle, Bell, CheckCircle, Info, Send, XCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export default function SystemNotifications() {
@@ -37,22 +30,22 @@ export default function SystemNotifications() {
     {
       value: "info",
       label: t("notifications.admin.form.types.info"),
-      icon: <Info className="w-4 h-4" />,
+      icon: <Info className="h-4 w-4" />,
     },
     {
       value: "success",
       label: t("notifications.admin.form.types.success"),
-      icon: <CheckCircle className="w-4 h-4" />,
+      icon: <CheckCircle className="h-4 w-4" />,
     },
     {
       value: "warning",
       label: t("notifications.admin.form.types.warning"),
-      icon: <AlertTriangle className="w-4 h-4" />,
+      icon: <AlertTriangle className="h-4 w-4" />,
     },
     {
       value: "error",
       label: t("notifications.admin.form.types.error"),
-      icon: <XCircle className="w-4 h-4" />,
+      icon: <XCircle className="h-4 w-4" />,
     },
   ];
 
@@ -65,7 +58,7 @@ export default function SystemNotifications() {
       className="mb-6"
     >
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div className="space-y-4">
             <Input
               id="title"
@@ -124,12 +117,7 @@ export default function SystemNotifications() {
         />
 
         <div className="flex justify-end pt-4">
-          <Button
-            type="submit"
-            variant="primary"
-            loading={processing}
-            icon={Send}
-          >
+          <Button type="submit" variant="primary" loading={processing} icon={Send}>
             {t("notifications.admin.form.submit")}
           </Button>
         </div>

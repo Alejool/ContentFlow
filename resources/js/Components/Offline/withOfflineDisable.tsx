@@ -25,9 +25,7 @@ interface WithOfflineDisableProps {
  * </OfflineAwareButton>
  */
 export function withOfflineDisable<P extends object>(
-  Component: ComponentType<
-    P & { disabled?: boolean; title?: string; className?: string }
-  >,
+  Component: ComponentType<P & { disabled?: boolean; title?: string; className?: string }>,
 ) {
   return function OfflineDisabledComponent(props: P & WithOfflineDisableProps) {
     const { isOnline } = useOffline();

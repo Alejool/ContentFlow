@@ -33,20 +33,19 @@ export default function ValidationDemo() {
     { id: 4, platform: "instagram", name: "Instagram Account" },
   ];
 
-  const [currentPublication, setCurrentPublication] =
-    useState(mockPollPublication);
+  const [currentPublication, setCurrentPublication] = useState(mockPollPublication);
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Publish Modal Validation Demo</h1>
+    <div className="mx-auto max-w-4xl p-6">
+      <h1 className="mb-6 text-2xl font-bold">Publish Modal Validation Demo</h1>
 
-      <div className="space-y-4 mb-6">
+      <div className="mb-6 space-y-4">
         <div>
-          <h2 className="text-lg font-semibold mb-2">Test Publications:</h2>
+          <h2 className="mb-2 text-lg font-semibold">Test Publications:</h2>
           <div className="flex gap-4">
             <button
               onClick={() => setCurrentPublication(mockPollPublication)}
-              className={`px-4 py-2 rounded ${
+              className={`rounded px-4 py-2 ${
                 currentPublication.content_type === "poll"
                   ? "bg-blue-500 text-white"
                   : "bg-gray-200 text-gray-700"
@@ -56,7 +55,7 @@ export default function ValidationDemo() {
             </button>
             <button
               onClick={() => setCurrentPublication(mockVideoPublication)}
-              className={`px-4 py-2 rounded ${
+              className={`rounded px-4 py-2 ${
                 currentPublication.content_type === "reel"
                   ? "bg-blue-500 text-white"
                   : "bg-gray-200 text-gray-700"
@@ -67,8 +66,8 @@ export default function ValidationDemo() {
           </div>
         </div>
 
-        <div className="bg-gray-100 p-4 rounded">
-          <h3 className="font-medium mb-2">Current Publication:</h3>
+        <div className="rounded bg-gray-100 p-4">
+          <h3 className="mb-2 font-medium">Current Publication:</h3>
           <p>
             <strong>Type:</strong> {currentPublication.content_type}
           </p>
@@ -77,15 +76,14 @@ export default function ValidationDemo() {
           </p>
           {currentPublication.content_type === "poll" && (
             <p>
-              <strong>Poll Options:</strong>{" "}
-              {(currentPublication as any).poll_options?.join(", ")}
+              <strong>Poll Options:</strong> {(currentPublication as any).poll_options?.join(", ")}
             </p>
           )}
         </div>
 
-        <div className="bg-gray-100 p-4 rounded">
-          <h3 className="font-medium mb-2">Available Platforms:</h3>
-          <ul className="list-disc list-inside">
+        <div className="rounded bg-gray-100 p-4">
+          <h3 className="mb-2 font-medium">Available Platforms:</h3>
+          <ul className="list-inside list-disc">
             {mockSocialAccounts.map((account) => (
               <li key={account.id}>
                 <strong>{account.platform}:</strong> {account.name}
@@ -94,17 +92,17 @@ export default function ValidationDemo() {
           </ul>
         </div>
 
-        <div className="bg-yellow-100 p-4 rounded">
-          <h3 className="font-medium mb-2">Expected Validation Results:</h3>
+        <div className="rounded bg-yellow-100 p-4">
+          <h3 className="mb-2 font-medium">Expected Validation Results:</h3>
           {currentPublication.content_type === "poll" ? (
-            <ul className="list-disc list-inside text-sm">
+            <ul className="list-inside list-disc text-sm">
               <li>✅ Twitter: Should allow polls</li>
               <li>❌ Facebook: No soporta encuestas nativas</li>
               <li>❌ YouTube: Should reject polls (not supported)</li>
               <li>❌ Instagram: Should reject polls (not supported)</li>
             </ul>
           ) : (
-            <ul className="list-disc list-inside text-sm">
+            <ul className="list-inside list-disc text-sm">
               <li>✅ Instagram: Should allow reels</li>
               <li>✅ YouTube: Should allow reels</li>
               <li>❌ Twitter: Should reject reels (not supported)</li>
@@ -116,7 +114,7 @@ export default function ValidationDemo() {
 
       <button
         onClick={() => setShowModal(true)}
-        className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
+        className="rounded-lg bg-blue-600 px-6 py-3 text-white hover:bg-blue-700"
       >
         Open Publish Modal
       </button>

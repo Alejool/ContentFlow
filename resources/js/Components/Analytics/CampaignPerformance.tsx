@@ -50,10 +50,7 @@ export default function CampaignPerformance({
   }, [filteredCampaigns]);
 
   const campaignData = topCampaigns.map((campaign) => ({
-    name:
-      campaign.title.length > 15
-        ? campaign.title.substring(0, 15) + "..."
-        : campaign.title,
+    name: campaign.title.length > 15 ? campaign.title.substring(0, 15) + "..." : campaign.title,
     engagement: campaign.total_engagement,
     views: campaign.total_views,
     clicks: campaign.total_clicks,
@@ -98,27 +95,21 @@ export default function CampaignPerformance({
 
   return (
     <div
-      className={`rounded-lg p-6 mb-8 transition-colors duration-300
-            ${
-              theme === "dark"
-                ? "bg-neutral-800/50 backdrop-blur-sm border border-neutral-700/50"
-                : "bg-white shadow-xl border border-gray-100"
-            }`}
+      className={`mb-8 rounded-lg p-6 transition-colors duration-300 ${
+        theme === "dark"
+          ? "border border-neutral-700/50 bg-neutral-800/50 backdrop-blur-sm"
+          : "border border-gray-100 bg-white shadow-xl"
+      }`}
     >
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+      <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <div>
           <h2
-            className={`text-xl font-bold flex items-center gap-2
-                    text-gray-900 dark:text-gray-100`}
+            className={`flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-gray-100`}
           >
-            <TrendingUp className="w-5 h-5 text-primary-500" />
+            <TrendingUp className="h-5 w-5 text-primary-500" />
             {title || t("analytics.charts.topCampaignPerformance")}
           </h2>
-          {subtitle && (
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              {subtitle}
-            </p>
-          )}
+          {subtitle && <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{subtitle}</p>}
         </div>
 
         <div className="flex items-center gap-3">
@@ -134,25 +125,18 @@ export default function CampaignPerformance({
           </div>
           <button
             onClick={() => setIsDetailModalOpen(true)}
-            className={`text-sm font-bold px-4 py-2 rounded-lg transition-all active:scale-95 shrink-0
-                ${
-                  theme === "dark"
-                    ? "bg-primary-900/30 text-primary-400 hover:bg-primary-900/50"
-                    : "bg-primary-50 text-primary-600 hover:bg-primary-100"
-                }`}
+            className={`shrink-0 rounded-lg px-4 py-2 text-sm font-bold transition-all active:scale-95 ${
+              theme === "dark"
+                ? "bg-primary-900/30 text-primary-400 hover:bg-primary-900/50"
+                : "bg-primary-50 text-primary-600 hover:bg-primary-100"
+            }`}
           >
             {t("common.viewAll") || "Ver todo"}
           </button>
         </div>
       </div>
 
-      <BarChart
-        data={campaignData}
-        bars={barColors}
-        xAxisKey="name"
-        height={350}
-        theme={theme}
-      />
+      <BarChart data={campaignData} bars={barColors} xAxisKey="name" height={350} theme={theme} />
 
       <PerformanceDetailModal
         isOpen={isDetailModalOpen}

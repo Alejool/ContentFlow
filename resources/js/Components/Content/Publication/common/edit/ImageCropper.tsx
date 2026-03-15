@@ -32,12 +32,9 @@ export default function ImageCropper({
     setZoom(zoom);
   };
 
-  const onCropCompleteHandler = useCallback(
-    (_croppedArea: Area, croppedAreaPixels: Area) => {
-      setCroppedAreaPixels(croppedAreaPixels);
-    },
-    [],
-  );
+  const onCropCompleteHandler = useCallback((_croppedArea: Area, croppedAreaPixels: Area) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  }, []);
 
   const createImage = (url: string): Promise<HTMLImageElement> =>
     new Promise((resolve, reject) => {
@@ -48,10 +45,7 @@ export default function ImageCropper({
       image.src = url;
     });
 
-  const getCroppedImg = async (
-    imageSrc: string,
-    pixelCrop: Area,
-  ): Promise<Blob> => {
+  const getCroppedImg = async (imageSrc: string, pixelCrop: Area): Promise<Blob> => {
     const image = await createImage(imageSrc);
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
@@ -122,21 +116,21 @@ export default function ImageCropper({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-lg bg-white dark:bg-neutral-900 p-6 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-lg bg-white p-6 text-left align-middle shadow-xl transition-all dark:bg-neutral-900">
                 <Dialog.Title
                   as="h3"
-                  className="text-lg font-medium leading-6 text-gray-900 dark:text-white flex justify-between items-center mb-4"
+                  className="mb-4 flex items-center justify-between text-lg font-medium leading-6 text-gray-900 dark:text-white"
                 >
                   {t("media.crop.title") || "Crop Image"}
                   <button
                     onClick={onClose}
-                    className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                    className="text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                   >
-                    <X className="w-5 h-5" />
+                    <X className="h-5 w-5" />
                   </button>
                 </Dialog.Title>
 
-                <div className="relative w-full h-[400px] bg-gray-900 rounded-lg overflow-hidden mb-6">
+                <div className="relative mb-6 h-[400px] w-full overflow-hidden rounded-lg bg-gray-900">
                   <Cropper
                     image={image}
                     crop={crop}
@@ -148,8 +142,8 @@ export default function ImageCropper({
                   />
                 </div>
 
-                <div className="flex items-center gap-4 mb-6">
-                  <ZoomOut className="w-5 h-5 text-gray-500" />
+                <div className="mb-6 flex items-center gap-4">
+                  <ZoomOut className="h-5 w-5 text-gray-500" />
                   <input
                     type="range"
                     value={zoom}
@@ -158,23 +152,23 @@ export default function ImageCropper({
                     step={0.1}
                     aria-labelledby="Zoom"
                     onChange={(e) => setZoom(Number(e.target.value))}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 accent-primary-600"
+                    className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 accent-primary-600 dark:bg-gray-700"
                   />
-                  <ZoomIn className="w-5 h-5 text-gray-500" />
+                  <ZoomIn className="h-5 w-5 text-gray-500" />
                 </div>
 
                 <div className="flex justify-end gap-3">
                   <button
                     onClick={onClose}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700 transition-colors"
+                    className="rounded-md bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700"
                   >
                     {t("common.cancel") || "Cancel"}
                   </button>
                   <button
                     onClick={handleSave}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 transition-colors"
+                    className="flex items-center gap-2 rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
                   >
-                    <Check className="w-4 h-4" />
+                    <Check className="h-4 w-4" />
                     {t("common.apply") || "Apply"}
                   </button>
                 </div>

@@ -46,10 +46,8 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
   const isPublicationItem = selectedItem && !isCampaignItem;
 
   // Logic for targeting correct modal based on selection or active tab
-  const targetIsCampaign =
-    isCampaignItem || (activeTab === "campaigns" && !selectedItem);
-  const targetIsPublication =
-    isPublicationItem || (activeTab === "publications" && !selectedItem);
+  const targetIsCampaign = isCampaignItem || (activeTab === "campaigns" && !selectedItem);
+  const targetIsPublication = isPublicationItem || (activeTab === "publications" && !selectedItem);
 
   // CRITICAL: Get FRESH data from stores to ensure reactivity when background processes update them
   const publications = usePublicationStore((s) => s.publications);
@@ -65,8 +63,7 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
 
   // Determine which Add Modal to show
   // Prefer addType from store, fallback to activeTab logic
-  const showAddCampaign =
-    addType === "campaign" || (addType === null && activeTab === "campaigns");
+  const showAddCampaign = addType === "campaign" || (addType === null && activeTab === "campaigns");
   const showAddPublication = !showAddCampaign;
 
   return (

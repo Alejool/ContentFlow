@@ -4,14 +4,7 @@ import { useSubscriptionUsage } from "@/Hooks/useSubscriptionUsage";
 import { PageProps as InertiaPageProps } from "@inertiajs/core";
 import { usePage } from "@inertiajs/react";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  FileText,
-  HardDrive,
-  Share2,
-  Sparkles,
-  Users,
-  Zap,
-} from "lucide-react";
+import { FileText, HardDrive, Share2, Sparkles, Users, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { UsageCard } from "./UsageCard";
@@ -37,10 +30,7 @@ interface PageProps extends InertiaPageProps {
   };
 }
 
-export function PlanUsageCards({
-  showCarousel = false,
-  showTitle = true,
-}: PlanUsageCardsProps) {
+export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanUsageCardsProps) {
   const { t } = useTranslation();
   const { usage, loading } = useSubscriptionUsage();
   const { visibleUsageMetrics, systemAddons } = usePage<PageProps>().props;
@@ -91,8 +81,7 @@ export function PlanUsageCards({
           percentage: usage.ai_requests.percentage || 0,
           used: usage.ai_requests.used,
           limit: usage.ai_requests.limit || "∞",
-          total_available:
-            usage.ai_requests.total_available || usage.ai_requests.limit || "∞",
+          total_available: usage.ai_requests.total_available || usage.ai_requests.limit || "∞",
           remaining: usage.ai_requests.remaining || "∞",
           addon_info: usage.ai_requests.addon_info,
           show: visibleUsageMetrics?.ai_requests !== false,
@@ -122,18 +111,12 @@ export function PlanUsageCards({
           icon: Share2,
           percentage: usage.social_accounts.percentage,
           used: usage.social_accounts.used,
-          limit:
-            usage.social_accounts.limit === -1
-              ? "∞"
-              : usage.social_accounts.limit,
+          limit: usage.social_accounts.limit === -1 ? "∞" : usage.social_accounts.limit,
           total_available:
             usage.social_accounts.total_available === -1
               ? "∞"
               : usage.social_accounts.total_available,
-          remaining:
-            usage.social_accounts.remaining === -1
-              ? "∞"
-              : usage.social_accounts.remaining,
+          remaining: usage.social_accounts.remaining === -1 ? "∞" : usage.social_accounts.remaining,
           show: visibleUsageMetrics?.social_accounts !== false,
           canBuy: false,
           upgradeUrl: "/pricing",
@@ -149,13 +132,11 @@ export function PlanUsageCards({
               ? "∞"
               : usage.team_members.limit,
           total_available:
-            usage.team_members?.total_available === -1 ||
-            !usage.team_members?.total_available
+            usage.team_members?.total_available === -1 || !usage.team_members?.total_available
               ? "∞"
               : usage.team_members.total_available,
           remaining:
-            usage.team_members?.remaining === -1 ||
-            usage.team_members?.remaining === null
+            usage.team_members?.remaining === -1 || usage.team_members?.remaining === null
               ? "∞"
               : usage.team_members.remaining,
           show: visibleUsageMetrics?.team_members !== false,
@@ -197,15 +178,12 @@ export function PlanUsageCards({
       {showTitle && (
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              <Zap className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+            <h2 className="flex items-center gap-2 text-2xl font-bold text-gray-900 dark:text-white">
+              <Zap className="h-6 w-6 text-primary-600 dark:text-primary-400" />
               {t("subscription.addons.planUsage", "Uso del Plan")}
             </h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              {t(
-                "subscription.addons.monitorMonthlyUsage",
-                "Monitorea tu consumo mensual",
-              )}
+            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+              {t("subscription.addons.monitorMonthlyUsage", "Monitorea tu consumo mensual")}
             </p>
           </div>
 

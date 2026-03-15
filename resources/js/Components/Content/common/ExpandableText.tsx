@@ -16,7 +16,7 @@ export default function ExpandableText({
   const { t } = useTranslation();
 
   if (!text || text.trim() === "") {
-    return <span className={`text-gray-400 italic ${className}`}>-</span>;
+    return <span className={`italic text-gray-400 ${className}`}>-</span>;
   }
 
   const needsTruncation = text.length > maxLength;
@@ -27,11 +27,9 @@ export default function ExpandableText({
   return (
     <button
       onClick={() => needsTruncation && setIsExpanded(!isExpanded)}
-      className={`text-left focus:outline-none focus:ring-2 rounded ${
-        needsTruncation
-          ? "cursor-pointer hover:opacity-80 transition-opacity"
-          : "cursor-default"
-      } ${className} text-gray-700 dark:text-white break-words`}
+      className={`rounded text-left focus:outline-none focus:ring-2 ${
+        needsTruncation ? "cursor-pointer transition-opacity hover:opacity-80" : "cursor-default"
+      } ${className} break-words text-gray-700 dark:text-white`}
       aria-label={
         needsTruncation
           ? isExpanded

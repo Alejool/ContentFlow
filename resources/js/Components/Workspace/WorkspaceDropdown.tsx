@@ -26,23 +26,15 @@ export default function WorkspaceDropdown({
   const { t } = useTranslation();
 
   return (
-    <Menu as="div" className="relative px-4 py-2 z-5">
+    <Menu as="div" className="z-5 relative px-4 py-2">
       {({ open }) => (
         <>
           {/* Trigger button */}
           <MenuButton
-            className={`
-              w-full flex items-center justify-center gap-3 p-3 rounded-lg
-              transition-all duration-300 group focus:outline-none
-              ${open ? "bg-primary-600 shadow-lg scale-[1.02]" : "hover:bg-gray-100 dark:hover:bg-neutral-800/50"}
-            `}
+            className={`group flex w-full items-center justify-center gap-3 rounded-lg p-3 transition-all duration-300 focus:outline-none ${open ? "scale-[1.02] bg-primary-600 shadow-lg" : "hover:bg-gray-100 dark:hover:bg-neutral-800/50"} `}
           >
             <div
-              className={`
-                h-10 w-10 rounded-lg flex items-center justify-center font-bold text-lg
-                transition-all duration-300 overflow-hidden relative
-                ${open ? "bg-white text-primary-600" : "bg-primary-600 text-white shadow-md group-hover:scale-110"}
-              `}
+              className={`relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg text-lg font-bold transition-all duration-300 ${open ? "bg-white text-primary-600" : "bg-primary-600 text-white shadow-md group-hover:scale-110"} `}
             >
               {current_workspace?.white_label_logo_url ? (
                 <WorkspaceLogo
@@ -57,9 +49,9 @@ export default function WorkspaceDropdown({
 
             {isSidebarOpen && (
               <>
-                <div className="flex-1 text-left min-w-0">
+                <div className="min-w-0 flex-1 text-left">
                   <p
-                    className={`text-sm font-semibold truncate ${open ? "text-white" : "text-gray-700 dark:text-neutral-200"}`}
+                    className={`truncate text-sm font-semibold ${open ? "text-white" : "text-gray-700 dark:text-neutral-200"}`}
                   >
                     {current_workspace.name}
                   </p>
@@ -70,13 +62,12 @@ export default function WorkspaceDropdown({
                       {roleLabel || t("workspace.member")}
                     </p>
                     <span
-                      className={`w-1 h-1 rounded-full ${open ? "bg-primary-200" : "bg-gray-300 dark:bg-neutral-600"}`}
+                      className={`h-1 w-1 rounded-full ${open ? "bg-primary-200" : "bg-gray-300 dark:bg-neutral-600"}`}
                     />
                     <p
-                      className={`text-[10px] truncate ${open ? "text-primary-100" : "text-gray-500 dark:text-neutral-400"}`}
+                      className={`truncate text-[10px] ${open ? "text-primary-100" : "text-gray-500 dark:text-neutral-400"}`}
                     >
-                      {workspaces.length}{" "}
-                      {t("workspace.workspaces", { count: workspaces.length })}
+                      {workspaces.length} {t("workspace.workspaces", { count: workspaces.length })}
                     </p>
                   </div>
                 </div>
@@ -87,9 +78,9 @@ export default function WorkspaceDropdown({
             )}
 
             {!isSidebarOpen && (
-              <div className="absolute left-full ml-3 px-3 py-2 bg-gray-900 dark:bg-neutral-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap z-50 shadow-xl border border-white/10 translate-x-1 group-hover:translate-x-0">
+              <div className="pointer-events-none absolute left-full z-50 ml-3 translate-x-1 whitespace-nowrap rounded-lg border border-white/10 bg-gray-900 px-3 py-2 text-xs text-white opacity-0 shadow-xl transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100 dark:bg-neutral-800">
                 {current_workspace.name}
-                <div className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1 w-2 h-2 bg-gray-900 dark:bg-neutral-800 rotate-45" />
+                <div className="absolute left-0 top-1/2 h-2 w-2 -translate-x-1 -translate-y-1/2 rotate-45 transform bg-gray-900 dark:bg-neutral-800" />
               </div>
             )}
           </MenuButton>
@@ -118,18 +109,18 @@ export default function WorkspaceDropdown({
                 initial="hidden"
                 animate="visible"
                 exit="exit"
-                className={`absolute z-50 bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-lg shadow-2xl overflow-hidden focus:outline-none ${
+                className={`absolute z-50 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-2xl focus:outline-none dark:border-neutral-800 dark:bg-neutral-900 ${
                   isSidebarOpen
                     ? "left-4 right-4 mt-2 origin-top"
                     : "left-full top-0 ml-3 w-72 origin-top-left"
                 }`}
               >
                 {/* Workspace list */}
-                <div className="p-2 border-b border-gray-100 dark:border-neutral-800">
-                  <p className="px-3 py-1 text-[10px] font-bold text-gray-500 dark:text-neutral-500 uppercase tracking-wider">
+                <div className="border-b border-gray-100 p-2 dark:border-neutral-800">
+                  <p className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-500">
                     {t("workspace.select_workspace")}
                   </p>
-                  <div className="space-y-1 mt-1">
+                  <div className="mt-1 space-y-1">
                     {workspaces.map((ws: any) => {
                       const memberCount = ws.users_count || 0;
                       const userRole = ws.user_role || ws.role?.name;
@@ -138,47 +129,40 @@ export default function WorkspaceDropdown({
                         <button
                           key={ws.id}
                           onClick={() => onSwitch(ws.slug)}
-                          className={`w-full flex items-center gap-3 p-2 rounded-lg text-sm transition-colors duration-200 ${
+                          className={`flex w-full items-center gap-3 rounded-lg p-2 text-sm transition-colors duration-200 ${
                             ws.id === current_workspace.id
-                              ? "bg-primary-50 dark:bg-primary-600/10 text-primary-600 dark:text-primary-400"
-                              : "text-gray-600 dark:text-neutral-300 hover:bg-gray-100 dark:hover:bg-neutral-800"
+                              ? "bg-primary-50 text-primary-600 dark:bg-primary-600/10 dark:text-primary-400"
+                              : "text-gray-600 hover:bg-gray-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
                           }`}
                         >
                           <div
-                            className={`relative h-8 w-8 rounded flex items-center justify-center font-bold overflow-hidden ${
+                            className={`relative flex h-8 w-8 items-center justify-center overflow-hidden rounded font-bold ${
                               ws.id === current_workspace.id
                                 ? "bg-primary-600 text-white"
-                                : "bg-gray-200 dark:bg-neutral-800 text-gray-600 dark:text-neutral-400"
+                                : "bg-gray-200 text-gray-600 dark:bg-neutral-800 dark:text-neutral-400"
                             }`}
                           >
                             {ws.white_label_logo_url ? (
-                              <WorkspaceLogo
-                                src={ws.white_label_logo_url}
-                                alt={ws.name}
-                              />
+                              <WorkspaceLogo src={ws.white_label_logo_url} alt={ws.name} />
                             ) : (
                               ws.name.charAt(0).toUpperCase()
                             )}
                           </div>
-                          <div className="flex-1 text-left min-w-0">
-                            <span className="block truncate font-medium">
-                              {ws.name}
-                            </span>
+                          <div className="min-w-0 flex-1 text-left">
+                            <span className="block truncate font-medium">{ws.name}</span>
                             <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-neutral-400">
                               <span className="flex items-center gap-1">
                                 <Users className="h-3 w-3" />
                                 {memberCount}
                               </span>
                               {userRole && (
-                                <span className="px-1.5 py-0.5 rounded bg-primary-100 dark:bg-primary-600/20 text-primary-600 dark:text-primary-400 capitalize">
+                                <span className="rounded bg-primary-100 px-1.5 py-0.5 capitalize text-primary-600 dark:bg-primary-600/20 dark:text-primary-400">
                                   {userRole}
                                 </span>
                               )}
                             </div>
                           </div>
-                          {ws.id === current_workspace.id && (
-                            <Check className="h-4 w-4" />
-                          )}
+                          {ws.id === current_workspace.id && <Check className="h-4 w-4" />}
                         </button>
                       );
                     })}
@@ -186,10 +170,10 @@ export default function WorkspaceDropdown({
                 </div>
 
                 {/* Footer actions */}
-                <div className="p-2 bg-gray-50 dark:bg-neutral-900/50">
+                <div className="bg-gray-50 p-2 dark:bg-neutral-900/50">
                   <Link
                     href={route("workspaces.index")}
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-neutral-300 hover:bg-white dark:hover:bg-neutral-800 hover:text-primary-600 dark:hover:text-white transition-all duration-200 shadow-sm border border-transparent hover:border-gray-200 dark:hover:border-neutral-700"
+                    className="flex items-center gap-3 rounded-lg border border-transparent px-3 py-2 text-sm text-gray-700 shadow-sm transition-all duration-200 hover:border-gray-200 hover:bg-white hover:text-primary-600 dark:text-neutral-300 dark:hover:border-neutral-700 dark:hover:bg-neutral-800 dark:hover:text-white"
                   >
                     <Plus className="h-4 w-4" />
                     {t("workspace.manage_workspaces")}
@@ -197,7 +181,7 @@ export default function WorkspaceDropdown({
                   {hasCurrentWorkspace && (
                     <Link
                       href={route("workspaces.settings", current_workspace.id)}
-                      className="mt-1 flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-500 dark:text-neutral-500 hover:text-gray-900 dark:hover:text-white transition-colors"
+                      className="mt-1 flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-500 transition-colors hover:text-gray-900 dark:text-neutral-500 dark:hover:text-white"
                     >
                       <Settings className="h-4 w-4" />
                       {t("workspace.settings")}

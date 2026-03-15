@@ -24,12 +24,7 @@ interface WorkspaceCardProps {
   auth: any;
 }
 
-const WorkspaceCard = ({
-  workspace,
-  roles,
-  currentWorkspaceId,
-  auth,
-}: WorkspaceCardProps) => {
+const WorkspaceCard = ({ workspace, roles, currentWorkspaceId, auth }: WorkspaceCardProps) => {
   const { t } = useTranslation();
   const [hoveredWorkspace, setHoveredWorkspace] = useState<number | null>(null);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
@@ -53,7 +48,7 @@ const WorkspaceCard = ({
 
   return (
     <div
-      className={`group relative bg-gradient-to-br from-white/90 to-white/95 dark:from-black/90 dark:to-black/95 border dark:border-black/70 rounded-lg p-6 transition-all duration-700 ease-in-out hover:border-primary-300 dark:hover:border-primary-500/30 hover:shadow-2xl hover:shadow-primary-600/10 hover:-translate-y-1 ${
+      className={`group relative rounded-lg border bg-gradient-to-br from-white/90 to-white/95 p-6 transition-all duration-700 ease-in-out hover:-translate-y-1 hover:border-primary-300 hover:shadow-2xl hover:shadow-primary-600/10 dark:border-black/70 dark:from-black/90 dark:to-black/95 dark:hover:border-primary-500/30 ${
         openMenuId === workspace.id ? "z-50 shadow-2xl" : "z-0"
       }`}
       style={{
@@ -65,19 +60,19 @@ const WorkspaceCard = ({
       onMouseLeave={() => setHoveredWorkspace(null)}
     >
       {isActive && (
-        <div className="absolute -top-2 -right-2 px-3 py-1 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-xs font-bold rounded-full shadow-lg flex items-center gap-1.5">
-          <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+        <div className="absolute -right-2 -top-2 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 px-3 py-1 text-xs font-bold text-white shadow-lg">
+          <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
           {t("workspace.active")}
         </div>
       )}
 
-      <div className="flex items-start justify-between mb-6">
+      <div className="mb-6 flex items-start justify-between">
         <div className="relative">
-          <div className="h-14 w-14 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center text-white font-bold text-2xl group-hover:scale-110 transition-transform duration-300 shadow-lg">
+          <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 text-2xl font-bold text-white shadow-lg transition-transform duration-300 group-hover:scale-110">
             {workspace.name.charAt(0).toUpperCase()}
           </div>
           {userRole?.slug === "owner" && (
-            <div className="absolute -top-1 -left-1 h-6 w-6 bg-primary-500 rounded-full flex items-center justify-center border-2 border-white dark:border-neutral-900">
+            <div className="absolute -left-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-primary-500 dark:border-neutral-900">
               <Users className="h-3 w-3 text-white" />
             </div>
           )}
@@ -98,10 +93,10 @@ const WorkspaceCard = ({
       </div>
 
       <div className="mb-6">
-        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+        <h3 className="mb-2 truncate text-xl font-bold text-gray-900 transition-colors group-hover:text-primary-600 dark:text-white dark:group-hover:text-primary-400">
           {workspace.name}
         </h3>
-        <p className="text-sm text-gray-500 dark:text-neutral-500 mb-4 line-clamp-2 min-h-[2.5rem]">
+        <p className="mb-4 line-clamp-2 min-h-[2.5rem] text-sm text-gray-500 dark:text-neutral-500">
           {workspace.description || (
             <span className="italic text-gray-400 dark:text-neutral-600">
               {t("workspace.no_description_italic")}
@@ -119,7 +114,7 @@ const WorkspaceCard = ({
             </span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="h-3.5 w-3.5 rounded-full bg-blue-500/20 flex items-center justify-center">
+            <div className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-blue-500/20">
               <div className="h-1.5 w-1.5 rounded-full bg-blue-500"></div>
             </div>
             <span className="font-medium">
@@ -131,15 +126,15 @@ const WorkspaceCard = ({
         </div>
       </div>
 
-      <div className="flex items-center gap-3 pt-6 border-t border-gray-100 dark:border-neutral-800">
+      <div className="flex items-center gap-3 border-t border-gray-100 pt-6 dark:border-neutral-800">
         <div className="flex-1">
           <AvatarStack users={workspace.users || []} roles={roles} />
         </div>
 
         <div className="flex items-center gap-2">
           {isActive ? (
-            <div className="px-4 py-2 bg-gradient-to-r from-emerald-50 to-emerald-100 dark:from-emerald-900/30 dark:to-emerald-900/10 text-emerald-700 dark:text-emerald-400 text-sm font-semibold rounded-lg border border-emerald-200 dark:border-emerald-800/50 flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-gradient-to-r from-emerald-50 to-emerald-100 px-4 py-2 text-sm font-semibold text-emerald-700 dark:border-emerald-800/50 dark:from-emerald-900/30 dark:to-emerald-900/10 dark:text-emerald-400">
+              <div className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
               {t("workspace.status.current")}
             </div>
           ) : (
@@ -159,14 +154,12 @@ const WorkspaceCard = ({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                setOpenMenuId(
-                  openMenuId === workspace.id ? null : workspace.id,
-                );
+                setOpenMenuId(openMenuId === workspace.id ? null : workspace.id);
               }}
-              className={`p-2.5 rounded-lg transition-all duration-200 ${
+              className={`rounded-lg p-2.5 transition-all duration-200 ${
                 ["owner", "admin"].includes(userRole?.slug)
-                  ? "text-gray-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gradient-to-r hover:from-primary-50 hover:to-primary-100 dark:hover:from-primary-900/20 dark:hover:to-primary-900/10 hover:shadow-sm"
-                  : "text-gray-400 dark:text-neutral-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-800"
+                  ? "text-gray-600 hover:bg-gradient-to-r hover:from-primary-50 hover:to-primary-100 hover:text-primary-600 hover:shadow-sm dark:text-neutral-400 dark:hover:from-primary-900/20 dark:hover:to-primary-900/10 dark:hover:text-primary-400"
+                  : "text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:text-neutral-500 dark:hover:bg-neutral-800 dark:hover:text-gray-300"
               }`}
               title={
                 ["owner", "admin"].includes(userRole?.slug)
@@ -187,21 +180,19 @@ const WorkspaceCard = ({
                   className="fixed inset-0 z-40 bg-transparent"
                   onClick={() => setOpenMenuId(null)}
                 />
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-lg shadow-2xl z-50 py-2">
+                <div className="absolute right-0 top-full z-50 mt-2 w-48 rounded-lg border border-gray-200 bg-white py-2 shadow-2xl dark:border-neutral-800 dark:bg-neutral-900">
                   <Link
                     href={route("workspaces.show", workspace.id)}
-                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-neutral-800 text-gray-700 dark:text-neutral-300 transition-colors"
+                    className="flex items-center gap-3 px-4 py-2.5 text-gray-700 transition-colors hover:bg-gray-50 dark:text-neutral-300 dark:hover:bg-neutral-800"
                   >
                     <ExternalLink className="h-4 w-4" />
-                    <span className="text-sm font-medium">
-                      {t("workspace.status.open")}
-                    </span>
+                    <span className="text-sm font-medium">{t("workspace.status.open")}</span>
                   </Link>
                   {["owner", "admin"].includes(userRole?.slug) && (
                     <>
                       <Link
                         href={route("workspaces.settings", workspace.id)}
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-neutral-800 text-gray-700 dark:text-neutral-300 transition-colors"
+                        className="flex items-center gap-3 px-4 py-2.5 text-gray-700 transition-colors hover:bg-gray-50 dark:text-neutral-300 dark:hover:bg-neutral-800"
                       >
                         <SettingsIcon className="h-4 w-4" />
                         <span className="text-sm font-medium">
@@ -210,12 +201,10 @@ const WorkspaceCard = ({
                       </Link>
                       <Link
                         href={`${route("workspaces.settings", workspace.id)}?tab=members`}
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-neutral-800 text-gray-700 dark:text-neutral-300 transition-colors"
+                        className="flex items-center gap-3 px-4 py-2.5 text-gray-700 transition-colors hover:bg-gray-50 dark:text-neutral-300 dark:hover:bg-neutral-800"
                       >
                         <UserPlus className="h-4 w-4" />
-                        <span className="text-sm font-medium">
-                          {t("workspace.status.invite")}
-                        </span>
+                        <span className="text-sm font-medium">{t("workspace.status.invite")}</span>
                       </Link>
                     </>
                   )}

@@ -76,13 +76,9 @@ const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
   return (
     <>
       {showAiPrompt && (
-        <AiPromptSection
-          type="campaign"
-          currentFields={watched}
-          onSuggest={handleAiSuggestion}
-        />
+        <AiPromptSection type="campaign" currentFields={watched} onSuggest={handleAiSuggestion} />
       )}
-      <div className="flex justify-between items-end mb-4 px-1">
+      <div className="mb-4 flex items-end justify-between px-1">
         <AiFieldSuggester
           fields={watched}
           type="campaign"
@@ -123,15 +119,11 @@ const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div className="form-group">
           <Input
             id="goal"
-            label={
-              mode === "edit"
-                ? t("campaigns.modal.edit.goal")
-                : t("campaigns.modal.add.goal")
-            }
+            label={mode === "edit" ? t("campaigns.modal.edit.goal") : t("campaigns.modal.add.goal")}
             register={register}
             name="goal"
             placeholder={goalPlaceholder}
@@ -148,9 +140,7 @@ const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
           <Input
             id="budget"
             label={
-              mode === "edit"
-                ? t("campaigns.modal.edit.budget")
-                : t("campaigns.modal.add.budget")
+              mode === "edit" ? t("campaigns.modal.edit.budget") : t("campaigns.modal.add.budget")
             }
             type="number"
             register={register}

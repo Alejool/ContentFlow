@@ -3,13 +3,7 @@ import { useS3Upload } from "@/Hooks/useS3Upload";
 import { useUploadQueue } from "@/stores/uploadQueueStore";
 import { useProcessingProgress } from "@/stores/processingProgressStore";
 import axios from "axios";
-import {
-  AlertTriangle,
-  CheckCircle2,
-  ChevronDown,
-  ChevronUp,
-  Loader2,
-} from "lucide-react";
+import { AlertTriangle, CheckCircle2, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { UploadItem } from "./Upload/UploadItem";
@@ -34,9 +28,7 @@ export default function GlobalUploadIndicator() {
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [dismissedIds, setDismissedIds] = useState<number[]>([]);
-  const [uploadProgressUpdates, setUploadProgressUpdates] = useState<
-    Record<string, number>
-  >({});
+  const [uploadProgressUpdates, setUploadProgressUpdates] = useState<Record<string, number>>({});
   const [processingProgressUpdates, setProcessingProgressUpdates] = useState<
     Record<string, number>
   >({});
@@ -49,10 +41,7 @@ export default function GlobalUploadIndicator() {
   const jobs = Object.values(processingJobs);
 
   const activeUploads = uploads.filter(
-    (u) =>
-      u.status === "uploading" ||
-      u.status === "pending" ||
-      u.status === "paused",
+    (u) => u.status === "uploading" || u.status === "pending" || u.status === "paused",
   );
   const errorUploads = uploads.filter((u) => u.status === "error");
 
@@ -60,21 +49,14 @@ export default function GlobalUploadIndicator() {
     (p) => p.status === "processing" || p.status === "publishing",
   );
   const failedPublications = publications.filter((p) => p.status === "failed");
-  const completedPublications = publications.filter(
-    (p) => p.status === "published",
-  );
+  const completedPublications = publications.filter((p) => p.status === "published");
 
-  const activeJobs = jobs.filter(
-    (j) => j.status === "processing" || j.status === "queued",
-  );
+  const activeJobs = jobs.filter((j) => j.status === "processing" || j.status === "queued");
   const failedJobs = jobs.filter((j) => j.status === "failed");
 
-  const totalActive =
-    activeUploads.length + activePublications.length + activeJobs.length;
+  const totalActive = activeUploads.length + activePublications.length + activeJobs.length;
   const hasErrors =
-    errorUploads.length > 0 ||
-    failedPublications.length > 0 ||
-    failedJobs.length > 0;
+    errorUploads.length > 0 || failedPublications.length > 0 || failedJobs.length > 0;
   const hasCompleted =
     completedPublications.length > 0 ||
     uploads.some((u) => u.status === "completed") ||
@@ -111,16 +93,10 @@ export default function GlobalUploadIndicator() {
     e.stopPropagation();
 
     const isConfirmed = await confirm({
-      title:
-        t("publications.modal.cancel_confirmation.title") ||
-        "Cancelar Publicación",
-      message:
-        t("publications.modal.cancel_confirmation.message") ||
-        "¿Cancelar esta publicación?",
-      confirmText:
-        t("publications.modal.cancel_confirmation.confirm") || "Sí, cancelar",
-      cancelText:
-        t("publications.modal.cancel_confirmation.cancel") || "No, continuar",
+      title: t("publications.modal.cancel_confirmation.title") || "Cancelar Publicación",
+      message: t("publications.modal.cancel_confirmation.message") || "¿Cancelar esta publicación?",
+      confirmText: t("publications.modal.cancel_confirmation.confirm") || "Sí, cancelar",
+      cancelText: t("publications.modal.cancel_confirmation.cancel") || "No, continuar",
       type: "danger",
     });
 
@@ -148,8 +124,7 @@ export default function GlobalUploadIndicator() {
         "¿Estás seguro de que deseas cancelar la publicación en " +
           platformName +
           "? Se detendrán todos los reintentos para esta plataforma.",
-      confirmText:
-        t("publications.modal.cancel_platform.confirm") || "Sí, cancelar",
+      confirmText: t("publications.modal.cancel_platform.confirm") || "Sí, cancelar",
       cancelText: t("publications.modal.cancel_platform.cancel") || "No",
       type: "warning",
     });
@@ -186,15 +161,12 @@ export default function GlobalUploadIndicator() {
 
   const handleCancelUpload = async (id: string) => {
     const isConfirmed = await confirm({
-      title:
-        t("publications.modal.cancel_confirmation.title") || "Cancel Upload",
+      title: t("publications.modal.cancel_confirmation.title") || "Cancel Upload",
       message:
         t("publications.modal.upload.cancel_message") ||
         "Are you sure you want to cancel this upload?",
-      confirmText:
-        t("publications.modal.cancel_confirmation.confirm") || "Yes, cancel",
-      cancelText:
-        t("publications.modal.cancel_confirmation.cancel") || "No, continue",
+      confirmText: t("publications.modal.cancel_confirmation.confirm") || "Yes, cancel",
+      cancelText: t("publications.modal.cancel_confirmation.cancel") || "No, continue",
       type: "danger",
     });
 
@@ -206,16 +178,12 @@ export default function GlobalUploadIndicator() {
 
   const handleCancelJob = async (id: string) => {
     const isConfirmed = await confirm({
-      title:
-        t("publications.modal.cancel_confirmation.title") ||
-        "Cancel Processing",
+      title: t("publications.modal.cancel_confirmation.title") || "Cancel Processing",
       message:
         t("publications.modal.processing.cancel_message") ||
         "Are you sure you want to cancel this processing job?",
-      confirmText:
-        t("publications.modal.cancel_confirmation.confirm") || "Yes, cancel",
-      cancelText:
-        t("publications.modal.cancel_confirmation.cancel") || "No, continue",
+      confirmText: t("publications.modal.cancel_confirmation.confirm") || "Yes, cancel",
+      cancelText: t("publications.modal.cancel_confirmation.cancel") || "No, continue",
       type: "danger",
     });
 
@@ -228,17 +196,16 @@ export default function GlobalUploadIndicator() {
     retryUpload(id);
   };
 
-  if (uploads.length === 0 && publications.length === 0 && jobs.length === 0)
-    return null;
+  if (uploads.length === 0 && publications.length === 0 && jobs.length === 0) return null;
 
   const getHeaderIcon = () => {
     if (totalActive > 0) {
-      return <Loader2 className="w-4 h-4 text-primary animate-spin" />;
+      return <Loader2 className="text-primary h-4 w-4 animate-spin" />;
     }
     if (hasErrors) {
-      return <AlertTriangle className="w-4 h-4 text-red-500" />;
+      return <AlertTriangle className="h-4 w-4 text-red-500" />;
     }
-    return <CheckCircle2 className="w-4 h-4 text-green-500" />;
+    return <CheckCircle2 className="h-4 w-4 text-green-500" />;
   };
 
   const getHeaderText = () => {
@@ -277,11 +244,11 @@ export default function GlobalUploadIndicator() {
 
   return (
     <>
-      <div className="fixed bottom-4 right-4 z-[100] w-80 bg-white dark:bg-neutral-800 rounded-lg shadow-2xl border border-gray-200 dark:border-neutral-700 overflow-hidden">
+      <div className="fixed bottom-4 right-4 z-[100] w-80 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-2xl dark:border-neutral-700 dark:bg-neutral-800">
         {/* Header */}
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="w-full flex items-center justify-between p-3 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-neutral-700/50 dark:to-neutral-700/30 hover:from-gray-100 hover:to-gray-50 dark:hover:from-neutral-700/70 dark:hover:to-neutral-700/50 transition-colors"
+          className="flex w-full items-center justify-between bg-gradient-to-r from-gray-50 to-gray-100 p-3 transition-colors hover:from-gray-100 hover:to-gray-50 dark:from-neutral-700/50 dark:to-neutral-700/30 dark:hover:from-neutral-700/70 dark:hover:to-neutral-700/50"
           aria-label={
             isExpanded
               ? t("common.collapse", {
@@ -293,31 +260,31 @@ export default function GlobalUploadIndicator() {
         >
           <div className="flex items-center gap-2.5">
             {getHeaderIcon()}
-            <span className="font-semibold text-sm text-gray-800 dark:text-neutral-100">
+            <span className="text-sm font-semibold text-gray-800 dark:text-neutral-100">
               {getHeaderText()}
             </span>
           </div>
           <div className="flex items-center gap-2">
             {totalActive > 0 && (
-              <span className="text-xs font-bold text-primary dark:text-primary-light bg-primary/10 dark:bg-primary/20 px-2 py-0.5 rounded-full">
+              <span className="text-primary dark:text-primary-light bg-primary/10 dark:bg-primary/20 rounded-full px-2 py-0.5 text-xs font-bold">
                 {totalActive}
               </span>
             )}
             {isExpanded ? (
-              <ChevronDown className="w-4 h-4 text-gray-500 dark:text-neutral-400" />
+              <ChevronDown className="h-4 w-4 text-gray-500 dark:text-neutral-400" />
             ) : (
-              <ChevronUp className="w-4 h-4 text-gray-500 dark:text-neutral-400" />
+              <ChevronUp className="h-4 w-4 text-gray-500 dark:text-neutral-400" />
             )}
           </div>
         </button>
 
         {/* Content */}
         {isExpanded && (
-          <div className="max-h-96 overflow-y-auto custom-scrollbar">
+          <div className="custom-scrollbar max-h-96 overflow-y-auto">
             {/* File Uploads Section */}
             {uploads.length > 0 && (
               <div>
-                <div className="bg-gray-50/70 dark:bg-neutral-700/30 px-3 py-2 flex items-center justify-between border-b border-gray-100 dark:border-neutral-700">
+                <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50/70 px-3 py-2 dark:border-neutral-700 dark:bg-neutral-700/30">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">
                     {t("common.files") || "Archivos"}
                   </span>
@@ -328,11 +295,11 @@ export default function GlobalUploadIndicator() {
                 {uploads.map((upload) => (
                   <div
                     key={upload.id}
-                    className="p-3 border-b border-gray-100 dark:border-neutral-700 last:border-0"
+                    className="border-b border-gray-100 p-3 last:border-0 dark:border-neutral-700"
                   >
-                    <div className="flex justify-between items-start mb-2">
+                    <div className="mb-2 flex items-start justify-between">
                       <span
-                        className="text-xs font-medium truncate max-w-[200px] text-neutral-900 dark:text-neutral-100"
+                        className="max-w-[200px] truncate text-xs font-medium text-neutral-900 dark:text-neutral-100"
                         title={upload.file.name}
                       >
                         {upload.file.name}
@@ -349,13 +316,10 @@ export default function GlobalUploadIndicator() {
                           : undefined
                       }
                       onResume={
-                        upload.status === "paused"
-                          ? () => handleResumeUpload(upload.id)
-                          : undefined
+                        upload.status === "paused" ? () => handleResumeUpload(upload.id) : undefined
                       }
                       onCancel={
-                        upload.status === "uploading" ||
-                        upload.status === "paused"
+                        upload.status === "uploading" || upload.status === "paused"
                           ? () => handleCancelUpload(upload.id)
                           : undefined
                       }
@@ -379,12 +343,10 @@ export default function GlobalUploadIndicator() {
             {jobs.length > 0 && (
               <div
                 className={
-                  uploads.length > 0
-                    ? "border-t-2 border-gray-200 dark:border-neutral-600"
-                    : ""
+                  uploads.length > 0 ? "border-t-2 border-gray-200 dark:border-neutral-600" : ""
                 }
               >
-                <div className="bg-gray-50/70 dark:bg-neutral-700/30 px-3 py-2 flex items-center justify-between border-b border-gray-100 dark:border-neutral-700">
+                <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50/70 px-3 py-2 dark:border-neutral-700 dark:bg-neutral-700/30">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">
                     {t("common.processing") || "Processing"}
                   </span>
@@ -395,19 +357,17 @@ export default function GlobalUploadIndicator() {
                 {jobs.map((job) => (
                   <div
                     key={job.id}
-                    className="p-3 border-b border-gray-100 dark:border-neutral-700 last:border-0"
+                    className="border-b border-gray-100 p-3 last:border-0 dark:border-neutral-700"
                   >
-                    <div className="flex justify-between items-start mb-2">
+                    <div className="mb-2 flex items-start justify-between">
                       <div className="flex-1">
-                        <span className="text-xs font-medium text-neutral-900 dark:text-neutral-100 block">
+                        <span className="block text-xs font-medium text-neutral-900 dark:text-neutral-100">
                           {job.type === "video_processing" &&
-                            (t("common.video_processing") ||
-                              "Video Processing")}
+                            (t("common.video_processing") || "Video Processing")}
                           {job.type === "reel_generation" &&
                             (t("common.reel_generation") || "Reel Generation")}
                           {job.type === "thumbnail_generation" &&
-                            (t("common.thumbnail_generation") ||
-                              "Thumbnail Generation")}
+                            (t("common.thumbnail_generation") || "Thumbnail Generation")}
                         </span>
                         {job.stats?.currentStep && (
                           <span className="text-[10px] text-gray-500 dark:text-neutral-400">
@@ -450,7 +410,7 @@ export default function GlobalUploadIndicator() {
                     : ""
                 }
               >
-                <div className="bg-gray-50/70 dark:bg-neutral-700/30 px-3 py-2 flex items-center justify-between border-b border-gray-100 dark:border-neutral-700">
+                <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50/70 px-3 py-2 dark:border-neutral-700 dark:bg-neutral-700/30">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">
                     {t("common.publications") || "Publicaciones"}
                   </span>

@@ -32,27 +32,21 @@ export default function MessageBubble({ message, theme }: MessageBubbleProps) {
             <div className="text-sm leading-relaxed">{message.content}</div>
           )}
 
-          <StructuredResponseRenderer
-            aiResponse={message.aiResponse}
-            theme={theme}
-          />
+          <StructuredResponseRenderer aiResponse={message.aiResponse} theme={theme} />
 
           {message.aiResponse._metadata && (
-            <div className="mt-4 pt-3 border-t border-gray-200 dark:border-neutral-600/50">
+            <div className="mt-4 border-t border-gray-200 pt-3 dark:border-neutral-600/50">
               <div
                 className={`flex items-center justify-between text-xs ${
                   theme === "dark" ? "text-gray-400" : "text-gray-500"
                 }`}
               >
                 <span className="flex items-center gap-1">
-                  <Bot className="w-3 h-3" />
-                  {message.aiResponse._metadata.provider} •{" "}
-                  {message.aiResponse._metadata.model}
+                  <Bot className="h-3 w-3" />
+                  {message.aiResponse._metadata.provider} • {message.aiResponse._metadata.model}
                 </span>
                 <span>
-                  {new Date(
-                    message.aiResponse._metadata.timestamp,
-                  ).toLocaleTimeString([], {
+                  {new Date(message.aiResponse._metadata.timestamp).toLocaleTimeString([], {
                     hour: "2-digit",
                     minute: "2-digit",
                   })}

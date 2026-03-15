@@ -34,11 +34,7 @@ class CalendarErrorBoundaryClass extends Component<Props, State> {
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log error to console in development
     if (import.meta.env.DEV) {
-      console.error(
-        "Calendar Error Boundary caught an error:",
-        error,
-        errorInfo,
-      );
+      console.error("Calendar Error Boundary caught an error:", error, errorInfo);
     }
 
     // Log to error tracking service
@@ -58,9 +54,7 @@ class CalendarErrorBoundaryClass extends Component<Props, State> {
         headers: {
           "Content-Type": "application/json",
           "X-CSRF-TOKEN":
-            document
-              .querySelector('meta[name="csrf-token"]')
-              ?.getAttribute("content") || "",
+            document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || "",
         },
         body: JSON.stringify({
           error: {
@@ -91,9 +85,7 @@ class CalendarErrorBoundaryClass extends Component<Props, State> {
         return this.props.fallback;
       }
 
-      return (
-        <ErrorFallback error={this.state.error} onRetry={this.handleRetry} />
-      );
+      return <ErrorFallback error={this.state.error} onRetry={this.handleRetry} />;
     }
 
     return this.props.children;
@@ -109,19 +101,19 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, onRetry }) => {
   const { t } = useTranslation();
 
   return (
-    <div className="flex items-center justify-center min-h-[400px] p-8">
-      <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center">
-        <div className="flex justify-center mb-4">
-          <div className="rounded-full bg-red-100 dark:bg-red-900/20 p-3">
-            <AlertTriangle className="w-8 h-8 text-red-600 dark:text-red-400" />
+    <div className="flex min-h-[400px] items-center justify-center p-8">
+      <div className="w-full max-w-md rounded-lg bg-white p-6 text-center shadow-lg dark:bg-gray-800">
+        <div className="mb-4 flex justify-center">
+          <div className="rounded-full bg-red-100 p-3 dark:bg-red-900/20">
+            <AlertTriangle className="h-8 w-8 text-red-600 dark:text-red-400" />
           </div>
         </div>
 
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+        <h2 className="mb-2 text-xl font-semibold text-gray-900 dark:text-gray-100">
           {t("calendar.error.title", "Something went wrong")}
         </h2>
 
-        <p className="text-gray-600 dark:text-gray-400 mb-4">
+        <p className="mb-4 text-gray-600 dark:text-gray-400">
           {t(
             "calendar.error.description",
             "An error occurred while rendering the calendar. Please try again.",
@@ -129,8 +121,8 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, onRetry }) => {
         </p>
 
         {error && import.meta.env.DEV && (
-          <div className="mb-4 p-3 bg-gray-100 dark:bg-gray-700 rounded text-left">
-            <p className="text-xs font-mono text-gray-700 dark:text-gray-300 break-all">
+          <div className="mb-4 rounded bg-gray-100 p-3 text-left dark:bg-gray-700">
+            <p className="break-all font-mono text-xs text-gray-700 dark:text-gray-300">
               {error.message}
             </p>
           </div>
@@ -138,18 +130,15 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, onRetry }) => {
 
         <button
           onClick={onRetry}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           aria-label={t("calendar.error.retry", "Retry loading calendar")}
         >
-          <RefreshCw className="w-4 h-4" />
+          <RefreshCw className="h-4 w-4" />
           {t("calendar.error.retry_button", "Try Again")}
         </button>
 
         <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
-          {t(
-            "calendar.error.persist",
-            "If the problem persists, please contact support.",
-          )}
+          {t("calendar.error.persist", "If the problem persists, please contact support.")}
         </p>
       </div>
     </div>

@@ -102,9 +102,7 @@ const CustomTimeSelector = ({
   currentLocale: string;
   activeColor?: string;
 }) => {
-  const [hours, setHours] = useState(
-    date ? date.getHours().toString().padStart(2, "0") : "12",
-  );
+  const [hours, setHours] = useState(date ? date.getHours().toString().padStart(2, "0") : "12");
   const [minutes, setMinutes] = useState(
     date ? date.getMinutes().toString().padStart(2, "0") : "00",
   );
@@ -189,19 +187,15 @@ const CustomTimeSelector = ({
   return (
     <div className="custom-time-selector">
       <div className="time-selector-header">
-        <Clock className="w-4 h-4" />
+        <Clock className="h-4 w-4" />
         <span className="text-base font-medium">
           {currentLocale === "es" ? "Seleccionar Hora" : "Select Time"}
         </span>
       </div>
       <div className="time-selector-body">
         <div className="time-input-group">
-          <button
-            type="button"
-            className="time-spinner-btn"
-            onClick={incrementHours}
-          >
-            <ChevronUp className="w-4 h-4" />
+          <button type="button" className="time-spinner-btn" onClick={incrementHours}>
+            <ChevronUp className="h-4 w-4" />
           </button>
           <Input
             id="time-hours"
@@ -210,30 +204,20 @@ const CustomTimeSelector = ({
             onChange={handleHoursChange}
             onFocus={() => setIsFocused((prev) => ({ ...prev, h: true }))}
             onBlur={() => handleBlur("h")}
-            className="!text-center !text-2xl font-bold !p-2 w-16"
+            className="w-16 !p-2 !text-center !text-2xl font-bold"
             sizeType="lg"
             maxLength={2}
             activeColor={activeColor}
           />
-          <button
-            type="button"
-            className="time-spinner-btn"
-            onClick={decrementHours}
-          >
-            <ChevronDown className="w-4 h-4" />
+          <button type="button" className="time-spinner-btn" onClick={decrementHours}>
+            <ChevronDown className="h-4 w-4" />
           </button>
-          <span className="time-label">
-            {currentLocale === "es" ? "Horas" : "Hours"}
-          </span>
+          <span className="time-label">{currentLocale === "es" ? "Horas" : "Hours"}</span>
         </div>
         <div className="time-separator">:</div>
         <div className="time-input-group">
-          <button
-            type="button"
-            className="time-spinner-btn"
-            onClick={incrementMinutes}
-          >
-            <ChevronUp className="w-4 h-4" />
+          <button type="button" className="time-spinner-btn" onClick={incrementMinutes}>
+            <ChevronUp className="h-4 w-4" />
           </button>
           <Input
             id="time-minutes"
@@ -242,21 +226,15 @@ const CustomTimeSelector = ({
             onChange={handleMinutesChange}
             onFocus={() => setIsFocused((prev) => ({ ...prev, m: true }))}
             onBlur={() => handleBlur("m")}
-            className="!text-center !text-2xl font-bold !p-2 w-16"
+            className="w-16 !p-2 !text-center !text-2xl font-bold"
             sizeType="lg"
             maxLength={2}
             activeColor={activeColor}
           />
-          <button
-            type="button"
-            className="time-spinner-btn"
-            onClick={decrementMinutes}
-          >
-            <ChevronDown className="w-4 h-4" />
+          <button type="button" className="time-spinner-btn" onClick={decrementMinutes}>
+            <ChevronDown className="h-4 w-4" />
           </button>
-          <span className="time-label">
-            {currentLocale === "es" ? "Minutos" : "Minutes"}
-          </span>
+          <span className="time-label">{currentLocale === "es" ? "Minutos" : "Minutes"}</span>
         </div>
       </div>
     </div>
@@ -329,10 +307,7 @@ const DatePickerModern = <T extends FieldValues>({
   };
 
   const CustomInput = forwardRef<HTMLInputElement, any>(
-    (
-      { value, onClick, onChange, placeholder: inputPlaceholder, ...props },
-      ref,
-    ) => (
+    ({ value, onClick, onChange, placeholder: inputPlaceholder, ...props }, ref) => (
       <Input
         {...props}
         id={id || name || "datepicker-input"}
@@ -368,8 +343,8 @@ const DatePickerModern = <T extends FieldValues>({
   return (
     <div className={`relative ${containerClassName}`}>
       {showTimezone && useUTC && (
-        <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 mb-1">
-          <Clock className="w-3 h-3" />
+        <div className="mb-1 flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+          <Clock className="h-3 w-3" />
           {timezoneLabel()}
         </div>
       )}
@@ -1047,18 +1022,13 @@ const DatePickerModern = <T extends FieldValues>({
             "Diciembre",
           ];
 
-          const monthOptions = (currentLocale === "es" ? monthsEs : months).map(
-            (m, i) => ({
-              value: i,
-              label: m,
-            }),
-          );
+          const monthOptions = (currentLocale === "es" ? monthsEs : months).map((m, i) => ({
+            value: i,
+            label: m,
+          }));
 
           const currentYear = new Date().getFullYear();
-          const years = Array.from(
-            { length: 101 },
-            (_, i) => currentYear - 50 + i,
-          );
+          const years = Array.from({ length: 101 }, (_, i) => currentYear - 50 + i);
           const yearOptions = years.map((y) => ({
             value: y,
             label: y.toString(),
@@ -1072,10 +1042,10 @@ const DatePickerModern = <T extends FieldValues>({
                 onClick={decreaseMonth}
                 disabled={prevMonthButtonDisabled}
               >
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft className="h-4 w-4" />
               </button>
 
-              <div className="flex gap-2 items-center justify-center flex-1">
+              <div className="flex flex-1 items-center justify-center gap-2">
                 <div className="w-[130px]">
                   <Select
                     id="month-select"
@@ -1104,7 +1074,7 @@ const DatePickerModern = <T extends FieldValues>({
                 onClick={increaseMonth}
                 disabled={nextMonthButtonDisabled}
               >
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="h-4 w-4" />
               </button>
             </div>
           );
@@ -1145,7 +1115,7 @@ const DatePickerModern = <T extends FieldValues>({
                   )}
                   <div className="react-datepicker__footer">
                     <div className="react-datepicker__footer-selected">
-                      <Calendar className="w-4 h-4 flex-shrink-0" />
+                      <Calendar className="h-4 w-4 flex-shrink-0" />
                       <span>
                         {displayDate
                           ? showTimeSelect
@@ -1161,7 +1131,7 @@ const DatePickerModern = <T extends FieldValues>({
                             : "No date selected"}
                       </span>
                       {showTimezone && useUTC && (
-                        <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
+                        <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
                           ({timezoneLabel()})
                         </span>
                       )}
@@ -1177,7 +1147,7 @@ const DatePickerModern = <T extends FieldValues>({
                         className="react-datepicker__footer-clear"
                         title={currentLocale === "es" ? "Limpiar" : "Clear"}
                       >
-                        <X className="w-4 h-4" />
+                        <X className="h-4 w-4" />
                         {currentLocale === "es" ? "Limpiar" : "Clear"}
                       </button>
                     )}

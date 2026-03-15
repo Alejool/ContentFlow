@@ -294,10 +294,7 @@ const StatCard: React.FC<StatCardProps> = ({
               : "from-amber-500 via-orange-500 to-orange-600", // Amber shift
         },
         blue: {
-          2:
-            themeMode === "dark"
-              ? "from-blue-700 to-blue-900"
-              : "from-blue-600 to-blue-700",
+          2: themeMode === "dark" ? "from-blue-700 to-blue-900" : "from-blue-600 to-blue-700",
           3:
             themeMode === "dark"
               ? "from-blue-600 via-indigo-700 to-indigo-800"
@@ -342,10 +339,9 @@ const StatCard: React.FC<StatCardProps> = ({
 
   const getTrendIcon = () => {
     if (change === undefined || change === null) return null;
-    if (change > 0) return <TrendingUp className="w-4 h-4 text-green-500" />;
-    if (change < 0)
-      return <TrendingDown className="w-4 h-4 text-primary-500" />;
-    return <Minus className="w-4 h-4 text-gray-400" />;
+    if (change > 0) return <TrendingUp className="h-4 w-4 text-green-500" />;
+    if (change < 0) return <TrendingDown className="h-4 w-4 text-primary-500" />;
+    return <Minus className="h-4 w-4 text-gray-400" />;
   };
 
   const getTrendColor = () => {
@@ -360,8 +356,7 @@ const StatCard: React.FC<StatCardProps> = ({
     if (change === undefined || change === null)
       return theme === "dark" ? "bg-neutral-800/50" : "bg-gray-100";
     if (change > 0) return theme === "dark" ? "bg-green-900/20" : "bg-green-50";
-    if (change < 0)
-      return theme === "dark" ? "bg-primary-900/20" : "bg-primary-50";
+    if (change < 0) return theme === "dark" ? "bg-primary-900/20" : "bg-primary-50";
     return theme === "dark" ? "bg-neutral-800/50" : "bg-gray-100";
   };
 
@@ -377,33 +372,23 @@ const StatCard: React.FC<StatCardProps> = ({
   };
   return (
     <div className={getCardStyles()}>
-      <div
-        className={`bg-gradient-to-r ${colors.gradient} ${compact ? "p-3" : "p-4"}`}
-      >
-        <div className="flex items-center justify-between text-white relative z-10">
+      <div className={`bg-gradient-to-r ${colors.gradient} ${compact ? "p-3" : "p-4"}`}>
+        <div className="relative z-10 flex items-center justify-between text-white">
           {isLoading ? (
             <Skeleton className="h-4 w-24 bg-white/20 dark:bg-white/10" />
           ) : (
-            <h3
-              className={`${
-                compact ? "text-xs" : "text-sm"
-              } font-medium opacity-90`}
-            >
-              {title}
-            </h3>
+            <h3 className={`${compact ? "text-xs" : "text-sm"} font-medium opacity-90`}>{title}</h3>
           )}
           {(typeof Icon === "function" || Icon) && (
             <div
               className={`${
-                compact ? "w-6 h-6" : "w-8 h-8"
-              } rounded-lg flex items-center justify-center backdrop-blur-sm ${colors.iconBg || "bg-white/10"}`}
+                compact ? "h-6 w-6" : "h-8 w-8"
+              } flex items-center justify-center rounded-lg backdrop-blur-sm ${colors.iconBg || "bg-white/10"}`}
             >
               {isLoading ? (
-                <Skeleton className="w-4 h-4 rounded bg-white/20 dark:bg-white/10" />
+                <Skeleton className="h-4 w-4 rounded bg-white/20 dark:bg-white/10" />
               ) : typeof Icon === "function" ? (
-                <Icon
-                  className={`${compact ? "w-3 h-3" : "w-4 h-4"} text-white`}
-                />
+                <Icon className={`${compact ? "h-3 w-3" : "h-4 w-4"} text-white`} />
               ) : (
                 <div className="opacity-90">{Icon}</div>
               )}
@@ -415,9 +400,7 @@ const StatCard: React.FC<StatCardProps> = ({
       <div className={compact ? "p-4" : "p-6"}>
         <div className="flex flex-col">
           {isLoading ? (
-            <Skeleton
-              className={`mb-2 ${compact ? "h-8 w-20" : "h-10 w-24"}`}
-            />
+            <Skeleton className={`mb-2 ${compact ? "h-8 w-20" : "h-10 w-24"}`} />
           ) : (
             <p
               className={`font-bold ${compact ? "text-2xl" : "text-3xl"} ${
@@ -434,17 +417,13 @@ const StatCard: React.FC<StatCardProps> = ({
             change !== undefined &&
             change !== null && (
               <div
-                className={`flex items-center space-x-2 px-3 py-2 rounded-lg ${getTrendBg()} transition-colors duration-300`}
+                className={`flex items-center space-x-2 rounded-lg px-3 py-2 ${getTrendBg()} transition-colors duration-300`}
               >
                 {getTrendIcon()}
                 <span className={`text-sm font-medium ${getTrendColor()}`}>
                   {Math.abs(change)}%
                 </span>
-                <span
-                  className={`text-xs ${
-                    theme === "dark" ? "text-gray-400" : "text-gray-500"
-                  }`}
-                >
+                <span className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
                   vs last period
                 </span>
               </div>
@@ -456,7 +435,7 @@ const StatCard: React.FC<StatCardProps> = ({
           {isLoading ? (
             <Skeleton className="h-1.5 flex-1 rounded-full" />
           ) : (
-            <div className="flex-1 h-1.5 rounded-full overflow-hidden">
+            <div className="h-1.5 flex-1 overflow-hidden rounded-full">
               <div
                 className={`h-full bg-gradient-to-r ${colors.gradient} transition-all duration-700`}
                 style={{
@@ -469,14 +448,14 @@ const StatCard: React.FC<StatCardProps> = ({
             <Skeleton className="ml-2 h-6 w-12 rounded" />
           ) : (
             <div
-              className={`ml-2 text-xs px-2 py-1 rounded ${colors.bg} ${colors.text} font-medium`}
+              className={`ml-2 rounded px-2 py-1 text-xs ${colors.bg} ${colors.text} font-medium`}
             ></div>
           )}
         </div>
       </div>
 
       {/* Efecto de brillo en hover */}
-      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-transparent opacity-0 transition-opacity duration-300 hover:opacity-100">
         <div
           className={`absolute -inset-1 bg-gradient-to-r ${
             colors.glow ||

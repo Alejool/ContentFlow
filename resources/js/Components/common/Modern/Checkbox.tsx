@@ -149,9 +149,7 @@ export default function Checkbox<T extends FieldValues>({
             ${baseStyles}
             bg-transparent
             ${
-              checked
-                ? "border-primary-500 bg-primary-50"
-                : "border-gray-300 hover:border-gray-400"
+              checked ? "border-primary-500 bg-primary-50" : "border-gray-300 hover:border-gray-400"
             }
             focus:ring-primary-500/20
           `;
@@ -174,17 +172,9 @@ export default function Checkbox<T extends FieldValues>({
     const base = `font-medium cursor-pointer select-none ${currentSize.label}`;
 
     if (theme === "dark") {
-      return `${base} ${
-        error
-          ? "text-primary-400"
-          : success
-            ? "text-green-400"
-            : "text-gray-300"
-      }`;
+      return `${base} ${error ? "text-primary-400" : success ? "text-green-400" : "text-gray-300"}`;
     }
-    return `${base} ${
-      error ? "text-primary-600" : success ? "text-green-600" : "text-gray-700"
-    }`;
+    return `${base} ${error ? "text-primary-600" : success ? "text-green-600" : "text-gray-700"}`;
   };
 
   const getDescriptionStyles = () => {
@@ -222,52 +212,34 @@ export default function Checkbox<T extends FieldValues>({
               }
             }}
             value={value}
-            className={`
-              absolute opacity-0 w-full h-full cursor-pointer
-              ${disabled ? "cursor-not-allowed" : ""}
-            `}
+            className={`absolute h-full w-full cursor-pointer opacity-0 ${disabled ? "cursor-not-allowed" : ""} `}
             aria-invalid={!!error}
-            aria-describedby={
-              error ? `${id}-error` : success ? `${id}-success` : undefined
-            }
+            aria-describedby={error ? `${id}-error` : success ? `${id}-success` : undefined}
             {...props}
           />
           <div className={getCheckboxStyles()}>
-            {checked && (
-              <Check className={`${currentSize.icon} text-white stroke-[3]`} />
-            )}
+            {checked && <Check className={`${currentSize.icon} stroke-[3] text-white`} />}
           </div>
         </div>
 
         <div className="flex-1">
           <label htmlFor={id} className={getLabelStyles()}>
             {label}
-            {required && <span className="text-primary-500 ml-1">*</span>}
+            {required && <span className="ml-1 text-primary-500">*</span>}
           </label>
 
           {description && (
-            <p
-              className={`${getDescriptionStyles()} ${currentSize.description}`}
-            >
-              {description}
-            </p>
+            <p className={`${getDescriptionStyles()} ${currentSize.description}`}>{description}</p>
           )}
 
           {hint && (
-            <p
-              className={`${getDescriptionStyles()} ${
-                currentSize.description
-              } mt-1`}
-            >
-              {hint}
-            </p>
+            <p className={`${getDescriptionStyles()} ${currentSize.description} mt-1`}>{hint}</p>
           )}
         </div>
 
         {Icon && (
           <div
-            className={`
-            ${
+            className={` ${
               theme === "dark"
                 ? error
                   ? "text-primary-400"
@@ -279,8 +251,7 @@ export default function Checkbox<T extends FieldValues>({
                   : success
                     ? "text-green-500"
                     : "text-gray-400"
-            }
-          `}
+            } `}
           >
             <Icon className={currentSize.icon} />
           </div>
@@ -288,22 +259,14 @@ export default function Checkbox<T extends FieldValues>({
       </div>
 
       {error && (
-        <div
-          id={`${id}-error`}
-          className={getMessageStyles("error")}
-          role="alert"
-        >
+        <div id={`${id}-error`} className={getMessageStyles("error")} role="alert">
           <AlertCircle className={`${currentSize.icon} mt-0.5 flex-shrink-0`} />
           <span>{error}</span>
         </div>
       )}
 
       {success && !error && (
-        <div
-          id={`${id}-success`}
-          className={getMessageStyles("success")}
-          role="status"
-        >
+        <div id={`${id}-success`} className={getMessageStyles("success")} role="status">
           <CheckCircle className={`${currentSize.icon} mt-0.5 flex-shrink-0`} />
           <span>{success}</span>
         </div>

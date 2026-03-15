@@ -1,11 +1,5 @@
 import { CheckCircle, Eye, EyeOff, TriangleAlert } from "lucide-react";
-import {
-  InputHTMLAttributes,
-  ReactNode,
-  forwardRef,
-  isValidElement,
-  useState,
-} from "react";
+import { InputHTMLAttributes, ReactNode, forwardRef, isValidElement, useState } from "react";
 import { FieldValues, Path, UseFormRegister } from "react-hook-form";
 
 import Label from "@/Components/common/Modern/Label";
@@ -136,14 +130,9 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
         : "flex items-start align-center gap-2 py-2 rounded-lg text-sm text-green-600";
     };
 
-    const {
-      value: propValue,
-      onChange: propOnChange,
-      ...restProps
-    } = props as any;
+    const { value: propValue, onChange: propOnChange, ...restProps } = props as any;
 
-    const hasValue =
-      propValue !== undefined && propValue !== "" && propValue !== null;
+    const hasValue = propValue !== undefined && propValue !== "" && propValue !== null;
     const isSolidActive = activeColor && hasValue;
 
     const getRGBValues = (color: string) => {
@@ -171,9 +160,7 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
             {label && (
               <Label
                 htmlFor={id}
-                size={
-                  sizeType === "md" ? "md" : sizeType === "lg" ? "lg" : "sm"
-                }
+                size={sizeType === "md" ? "md" : sizeType === "lg" ? "lg" : "sm"}
                 required={required}
                 error={error}
                 success={success}
@@ -185,9 +172,7 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
               </Label>
             )}
             {hint && !label && (
-              <span className="text-xs text-gray-500 dark:text-gray-400 ml-auto">
-                {hint}
-              </span>
+              <span className="ml-auto text-xs text-gray-500 dark:text-gray-400">{hint}</span>
             )}
           </div>
         )}
@@ -195,28 +180,21 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
         <div className={getContainerStyles()}>
           {(Icon || prefix) && (
             <div
-              className={`
-            absolute left-3 top-1/2 -translate-y-1/2 flex items-center
-            ${
-              isSolidActive
-                ? "text-white"
-                : error
-                  ? "text-primary-500 dark:text-primary-400"
-                  : success
-                    ? "text-green-500 dark:text-green-400"
-                    : "text-gray-400 dark:text-gray-400"
-            }
-          `}
+              className={`absolute left-3 top-1/2 flex -translate-y-1/2 items-center ${
+                isSolidActive
+                  ? "text-white"
+                  : error
+                    ? "text-primary-500 dark:text-primary-400"
+                    : success
+                      ? "text-green-500 dark:text-green-400"
+                      : "text-gray-400 dark:text-gray-400"
+              } `}
             >
               {Icon && (
                 <div
                   className={`${currentSize.icon} ${prefix ? "mr-2" : ""} flex items-center justify-center`}
                 >
-                  {isValidElement(Icon) ? (
-                    Icon
-                  ) : (
-                    <Icon className="w-full h-full" />
-                  )}
+                  {isValidElement(Icon) ? Icon : <Icon className="h-full w-full" />}
                 </div>
               )}
               {prefix}
@@ -229,19 +207,15 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
             type={inputType}
             disabled={disabled}
             placeholder={placeholder}
-            className={`
-              ${getInputStyles()} ${className}
-              ${isSolidActive ? "!placeholder-white/70" : ""}
-              ${
-                activeColor
-                  ? isSolidActive
-                    ? "text-white"
-                    : isFocused
-                      ? "ring-2 ring-offset-2"
-                      : ""
-                  : ""
-              }
-            `}
+            className={` ${getInputStyles()} ${className} ${isSolidActive ? "!placeholder-white/70" : ""} ${
+              activeColor
+                ? isSolidActive
+                  ? "text-white"
+                  : isFocused
+                    ? "ring-2 ring-offset-2"
+                    : ""
+                : ""
+            } `}
             {...(!register ? { name: fieldName } : {})}
             {...registerProps}
             onFocus={(e) => {
@@ -260,9 +234,7 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
                   ? {
                       "--active-bg-rgb": activeColorRGB,
                       "--tw-ring-color": `rgb(${activeColorRGB})`,
-                      backgroundColor: isSolidActive
-                        ? `rgb(${activeColorRGB} / 0.7)`
-                        : undefined,
+                      backgroundColor: isSolidActive ? `rgb(${activeColorRGB} / 0.7)` : undefined,
                       borderColor: isFocused
                         ? `rgb(${activeColorRGB})`
                         : activeColor
@@ -274,26 +246,22 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
               } as React.CSSProperties
             }
             aria-invalid={!!error}
-            aria-describedby={
-              error ? `${id}-error` : success ? `${id}-success` : undefined
-            }
+            aria-describedby={error ? `${id}-error` : success ? `${id}-success` : undefined}
             {...(propValue !== undefined ? { value: propValue } : {})}
             {...(propOnChange !== undefined ? { onChange: propOnChange } : {})}
             {...restProps}
           />
 
           {(suffix || showPasswordToggle || error || success) && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+            <div className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-2">
               {suffix}
 
               {showPasswordToggle && !disabled && (
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="transition-colors rounded-lg p-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
-                  aria-label={
-                    showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
-                  }
+                  className="rounded-lg p-1 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-neutral-700/50 dark:hover:text-gray-300"
+                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                   aria-pressed={showPassword}
                 >
                   {showPassword ? (
@@ -309,14 +277,14 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
 
         {error && (
           <div className={getMessageStyles("error")} role="alert">
-            <TriangleAlert className={`${currentSize.icon}  flex-shrink-0`} />
+            <TriangleAlert className={`${currentSize.icon} flex-shrink-0`} />
             <span>{error}</span>
           </div>
         )}
 
         {success && !error && (
           <div className={getMessageStyles("success")} role="status">
-            <CheckCircle className={`${currentSize.icon}  flex-shrink-0`} />
+            <CheckCircle className={`${currentSize.icon} flex-shrink-0`} />
             <span>{success}</span>
           </div>
         )}

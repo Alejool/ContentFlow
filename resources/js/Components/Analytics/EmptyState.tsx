@@ -7,11 +7,5 @@ interface EmptyStateProps {
 }
 
 export default function EmptyState({ title, description }: EmptyStateProps) {
-  return (
-    <EmptyStateUnified
-      title={title}
-      description={description}
-      className="!py-20"
-    />
-  );
+  return <EmptyStateUnified title={title} description={description} className="!py-20" />;
 }

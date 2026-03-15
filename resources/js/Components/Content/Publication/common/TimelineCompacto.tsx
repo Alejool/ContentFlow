@@ -8,26 +8,19 @@ interface TimelineCompactoProps {
   onToggle: () => void;
 }
 
-const TimelineCompacto = ({
-  activities,
-  isExpanded,
-  onToggle,
-}: TimelineCompactoProps) => {
+const TimelineCompacto = ({ activities, isExpanded, onToggle }: TimelineCompactoProps) => {
   const { t } = useTranslation();
   const getLastSignificantActivity = () => {
     if (!activities || activities.length === 0) return null;
 
     const sortedActivities = [...activities].sort(
-      (a, b) =>
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
     );
 
     const relevantActivities = sortedActivities.filter(
       (activity) =>
         activity.status &&
-        ["published", "scheduled", "draft", "rejected", "approved"].includes(
-          activity.status,
-        ),
+        ["published", "scheduled", "draft", "rejected", "approved"].includes(activity.status),
     );
 
     return relevantActivities[0] || sortedActivities[0];
@@ -38,21 +31,14 @@ const TimelineCompacto = ({
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      published:
-        "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-      scheduled:
-        "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+      published: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+      scheduled: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
       draft: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300",
       rejected: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-      approved:
-        "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
-      pending:
-        "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+      approved: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
+      pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
     };
-    return (
-      colors[status] ||
-      "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
-    );
+    return colors[status] || "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
   };
 
   const getStatusText = (status: string) => {
@@ -70,15 +56,15 @@ const TimelineCompacto = ({
   if (totalActivities === 0) return null;
 
   return (
-    <div className="bg-gray-50 dark:bg-neutral-700/30 rounded-lg border border-gray-200 dark:border-neutral-600 overflow-hidden">
+    <div className="overflow-hidden rounded-lg border border-gray-200 bg-gray-50 dark:border-neutral-600 dark:bg-neutral-700/30">
       <button
         type="button"
         onClick={onToggle}
-        className="w-full p-4 flex items-center justify-between hover:bg-gray-100 dark:hover:bg-neutral-600/30 transition-colors"
+        className="flex w-full items-center justify-between p-4 transition-colors hover:bg-gray-100 dark:hover:bg-neutral-600/30"
       >
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-white dark:bg-neutral-600 rounded-lg border border-gray-200 dark:border-neutral-500">
-            <History className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+          <div className="rounded-lg border border-gray-200 bg-white p-2 dark:border-neutral-500 dark:bg-neutral-600">
+            <History className="h-4 w-4 text-gray-600 dark:text-gray-300" />
           </div>
           <div className="text-left">
             <div className="flex items-center gap-2">
@@ -87,7 +73,7 @@ const TimelineCompacto = ({
               </span>
               {lastActivity && (
                 <span
-                  className={`text-xs px-2 py-1 rounded-full ${getStatusColor(lastActivity.status)}`}
+                  className={`rounded-full px-2 py-1 text-xs ${getStatusColor(lastActivity.status)}`}
                 >
                   {getStatusText(lastActivity.status)}
                 </span>
@@ -103,15 +89,15 @@ const TimelineCompacto = ({
             {isExpanded ? t("common.collapse") : t("common.expand")}
           </span>
           {isExpanded ? (
-            <ChevronUp className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+            <ChevronUp className="h-5 w-5 text-gray-500 dark:text-gray-400" />
           ) : (
-            <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+            <ChevronDown className="h-5 w-5 text-gray-500 dark:text-gray-400" />
           )}
         </div>
       </button>
 
       {isExpanded && (
-        <div className="border-t border-gray-200 dark:border-neutral-600 p-4 max-h-96 overflow-y-auto custom-scrollbar">
+        <div className="custom-scrollbar max-h-96 overflow-y-auto border-t border-gray-200 p-4 dark:border-neutral-600">
           <PublicationTimeline activities={activities} />
         </div>
       )}

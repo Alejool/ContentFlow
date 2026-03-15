@@ -39,12 +39,9 @@ export default function AddPublicationModal({
   const { campaigns } = useCampaigns();
   const { accounts: socialAccounts } = useAccountsStore();
   const { auth } = usePage<any>().props;
-  const canManageAccounts =
-    auth.current_workspace?.permissions?.includes("manage-accounts");
+  const canManageAccounts = auth.current_workspace?.permissions?.includes("manage-accounts");
   const planId = auth.current_workspace?.plan?.toLowerCase() || "demo";
-  const hasRecurrenceAccess = ["demo", "professional", "enterprise"].includes(
-    planId,
-  );
+  const hasRecurrenceAccess = ["demo", "professional", "enterprise"].includes(planId);
 
   const {
     t,
@@ -104,12 +101,7 @@ export default function AddPublicationModal({
 
   const { confirm, ConfirmDialog } = useConfirm();
 
-  const {
-    uploadFile,
-    uploading,
-    progress: uploadProgress,
-    errors: uploadErrors,
-  } = useS3Upload(); // Use hook
+  const { uploadFile, uploading, progress: uploadProgress, errors: uploadErrors } = useS3Upload(); // Use hook
 
   // Custom submit handler to intercept fields and upload first
   const handleFormSubmit = async (e: React.FormEvent) => {
@@ -206,10 +198,7 @@ export default function AddPublicationModal({
     e.preventDefault();
 
     const filesToUpload = mediaFiles.filter(
-      (m) =>
-        m.file instanceof File &&
-        m.status !== "failed" &&
-        !uploadErrors?.[m.tempId],
+      (m) => m.file instanceof File && m.status !== "failed" && !uploadErrors?.[m.tempId],
     );
 
     if (filesToUpload.length > 0) {
@@ -246,8 +235,7 @@ export default function AddPublicationModal({
   const { register } = form; // Keep existing destructuring
 
   // Use individual watchers to prevent unnecessary re-renders
-  const selectedSocialAccounts =
-    useWatch({ control, name: "social_accounts" }) || [];
+  const selectedSocialAccounts = useWatch({ control, name: "social_accounts" }) || [];
   const scheduledAt = useWatch({ control, name: "scheduled_at" });
   const useGlobalSchedule = useWatch({ control, name: "use_global_schedule" });
   const title = useWatch({ control, name: "title" });
@@ -270,11 +258,9 @@ export default function AddPublicationModal({
     control,
     name: "recurrence_accounts",
   });
-  const content_type =
-    (useWatch({ control, name: "content_type" }) as ContentType) || "post";
+  const content_type = (useWatch({ control, name: "content_type" }) as ContentType) || "post";
   const poll_options = useWatch({ control, name: "poll_options" }) || ["", ""];
-  const poll_duration_hours =
-    useWatch({ control, name: "poll_duration_hours" }) || 24;
+  const poll_duration_hours = useWatch({ control, name: "poll_duration_hours" }) || 24;
 
   // Use content type hook for field visibility
   const { fieldVisibility } = useContentType(content_type);
@@ -336,11 +322,11 @@ export default function AddPublicationModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center text-gray-900 dark:text-white">
       <div
-        className="absolute inset-0 bg-gray-900/60 dark:bg-black/70 backdrop-blur-sm transition-opacity"
+        className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity dark:bg-black/70"
         onClick={handleClose}
       />
 
-      <div className="relative w-full max-w-5xl bg-white backdrop-blur-2xl dark:bg-neutral-900/90 rounded-lg shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300">
+      <div className="animate-in fade-in zoom-in relative flex max-h-[90vh] w-full max-w-5xl flex-col rounded-lg bg-white shadow-2xl backdrop-blur-2xl duration-300 dark:bg-neutral-900/90">
         <ModalHeader
           t={t}
           onClose={handleClose}
@@ -364,13 +350,9 @@ export default function AddPublicationModal({
           mediaFiles={watched.media_files}
         />
 
-        <main className="flex-1 overflow-y-auto custom-scrollbar">
-          <form
-            id="add-publication-form"
-            onSubmit={handleUploadAndSubmit}
-            className="p-6"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <main className="custom-scrollbar flex-1 overflow-y-auto">
+          <form id="add-publication-form" onSubmit={handleUploadAndSubmit} className="p-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               {/* ========================================
                   COLUMNA IZQUIERDA: MEDIA Y REDES SOCIALES
                   ======================================== */}
@@ -378,11 +360,10 @@ export default function AddPublicationModal({
                 {/* ==================== SECCIÓN: ARCHIVOS MULTIMEDIA ==================== */}
                 {fieldVisibility.showMediaSection && (
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700">
-                      <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
-                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
-                        {t("publications.modal.add.mediaSection") ||
-                          "Archivos Multimedia"}
+                    <div className="flex items-center gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700">
+                      <div className="h-5 w-1 rounded-full bg-primary-500"></div>
+                      <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                        {t("publications.modal.add.mediaSection") || "Archivos Multimedia"}
                       </h3>
                     </div>
 
@@ -394,9 +375,7 @@ export default function AddPublicationModal({
                       t={t}
                       onFileChange={handleFileChange}
                       onRemoveMedia={handleRemoveMedia}
-                      onSetThumbnail={(tempId, file) =>
-                        setThumbnail(tempId, file)
-                      }
+                      onSetThumbnail={(tempId, file) => setThumbnail(tempId, file)}
                       onClearThumbnail={(tempId) => clearThumbnail(tempId)}
                       onDragOver={(e) => {
                         e.preventDefault();
@@ -424,11 +403,10 @@ export default function AddPublicationModal({
 
                 {/* ==================== SECCIÓN: REDES SOCIALES ==================== */}
                 <div className="space-y-4">
-                  <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700">
-                    <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
-                      {t("publications.modal.add.socialAccountsSection") ||
-                        "Redes Sociales"}
+                  <div className="flex items-center gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700">
+                    <div className="h-5 w-1 rounded-full bg-primary-500"></div>
+                    <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                      {t("publications.modal.add.socialAccountsSection") || "Redes Sociales"}
                     </h3>
                   </div>
 
@@ -443,10 +421,7 @@ export default function AddPublicationModal({
                     onScheduleChange={(id, date) => {
                       setAccountSchedules((prev) => ({ ...prev, [id]: date }));
 
-                      if (
-                        watched.use_global_schedule &&
-                        date !== watched.scheduled_at
-                      ) {
+                      if (watched.use_global_schedule && date !== watched.scheduled_at) {
                         setValue("use_global_schedule", false, {
                           shouldDirty: true,
                         });
@@ -459,9 +434,7 @@ export default function AddPublicationModal({
                         return n;
                       });
                     }}
-                    onPlatformSettingsClick={(platform) =>
-                      setActivePlatformSettings(platform)
-                    }
+                    onPlatformSettingsClick={(platform) => setActivePlatformSettings(platform)}
                     globalSchedule={watched.scheduled_at ?? undefined}
                     error={errors.social_accounts?.message as string}
                     socialPostLogs={publication?.social_post_logs}
@@ -472,11 +445,10 @@ export default function AddPublicationModal({
 
                 {/* ==================== SECCIÓN: PROGRAMACIÓN Y RECURRENCIA ==================== */}
                 <div className="space-y-4">
-                  <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700">
-                    <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
-                      {t("publications.modal.add.scheduleSection") ||
-                        "Programación"}
+                  <div className="flex items-center gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700">
+                    <div className="h-5 w-1 rounded-full bg-primary-500"></div>
+                    <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                      {t("publications.modal.add.scheduleSection") || "Programación"}
                     </h3>
                   </div>
 
@@ -494,9 +466,7 @@ export default function AddPublicationModal({
                       setValue("scheduled_at", finalDate);
                     }}
                     useGlobalSchedule={watched.use_global_schedule}
-                    onGlobalScheduleToggle={(val) =>
-                      setValue("use_global_schedule", val)
-                    }
+                    onGlobalScheduleToggle={(val) => setValue("use_global_schedule", val)}
                     onClearAccountSchedules={() => {
                       setAccountSchedules({});
                     }}
@@ -508,9 +478,7 @@ export default function AddPublicationModal({
                     recurrenceDays={watched.recurrence_days}
                     recurrenceEndDate={watched.recurrence_end_date ?? undefined}
                     recurrenceAccounts={watched.recurrence_accounts}
-                    recurrenceDaysError={
-                      errors.recurrence_days?.message as string
-                    }
+                    recurrenceDaysError={errors.recurrence_days?.message as string}
                     onRecurrenceChange={(data) => {
                       Object.entries(data).forEach(([key, val]) => {
                         setValue(key as any, val, {
@@ -554,12 +522,11 @@ export default function AddPublicationModal({
 
                 {/* ==================== SECCIÓN: CONTENIDO ==================== */}
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between pb-2 border-b border-gray-200 dark:border-neutral-700">
+                  <div className="flex items-center justify-between border-b border-gray-200 pb-2 dark:border-neutral-700">
                     <div className="flex items-center gap-2">
-                      <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
-                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
-                        {t("publications.modal.add.contentSection") ||
-                          "Contenido"}
+                      <div className="h-5 w-1 rounded-full bg-primary-500"></div>
+                      <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                        {t("publications.modal.add.contentSection") || "Contenido"}
                       </h3>
                     </div>
                     <AiFieldSuggester
@@ -578,8 +545,7 @@ export default function AddPublicationModal({
                           setValue("description", data.description, {
                             shouldValidate: true,
                           });
-                        if (data.goal)
-                          setValue("goal", data.goal, { shouldValidate: true });
+                        if (data.goal) setValue("goal", data.goal, { shouldValidate: true });
                         if (data.hashtags) {
                           setValue("hashtags", data.hashtags, {
                             shouldValidate: true,
@@ -597,9 +563,7 @@ export default function AddPublicationModal({
                       type="text"
                       register={register}
                       name="title"
-                      placeholder={t(
-                        "publications.modal.add.placeholders.title",
-                      )}
+                      placeholder={t("publications.modal.add.placeholders.title")}
                       error={errors.title?.message as string}
                       icon={FileText}
                       variant="filled"
@@ -614,9 +578,7 @@ export default function AddPublicationModal({
                     label={t("publications.modal.add.description")}
                     register={register}
                     name="description"
-                    placeholder={t(
-                      "publications.modal.add.placeholders.description",
-                    )}
+                    placeholder={t("publications.modal.add.placeholders.description")}
                     error={errors.description?.message as string}
                     icon={FileText}
                     variant="filled"
@@ -643,9 +605,7 @@ export default function AddPublicationModal({
                       type="text"
                       register={register}
                       name="goal"
-                      placeholder={t(
-                        "publications.modal.add.placeholders.goal",
-                      )}
+                      placeholder={t("publications.modal.add.placeholders.goal")}
                       error={errors.goal?.message as string}
                       icon={Target}
                       variant="filled"
@@ -662,24 +622,19 @@ export default function AddPublicationModal({
                       type="text"
                       register={register}
                       name="hashtags"
-                      placeholder={t(
-                        "publications.modal.add.placeholders.hashtags",
-                      )}
+                      placeholder={t("publications.modal.add.placeholders.hashtags")}
                       error={errors.hashtags?.message as string}
                       onChange={(e) => handleHashtagChange(e.target.value)}
                       icon={Hash}
                       variant="filled"
-                      required={
-                        content_type === "post" || content_type === "reel"
-                      }
+                      required={content_type === "post" || content_type === "reel"}
                       sizeType="lg"
                       hint={`${
                         watched.hashtags
                           ? typeof watched.hashtags === "string"
                             ? watched.hashtags
                                 .split(" ")
-                                .filter((tag: string) => tag.startsWith("#"))
-                                .length
+                                .filter((tag: string) => tag.startsWith("#")).length
                             : Array.isArray(watched.hashtags)
                               ? (watched.hashtags as any).length
                               : 0
@@ -691,25 +646,22 @@ export default function AddPublicationModal({
 
                 {/* ==================== SECCIÓN: CAMPAÑA ==================== */}
                 <div className="space-y-4">
-                  <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700">
-                    <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
+                  <div className="flex items-center gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700">
+                    <div className="h-5 w-1 rounded-full bg-primary-500"></div>
+                    <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
                       {t("publications.modal.add.campaignSection") || "Campaña"}
                     </h3>
                   </div>
 
                   <div className="space-y-2">
                     <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                      {t("publications.modal.edit.campaigns") ||
-                        "Add to Campaign"}
+                      {t("publications.modal.edit.campaigns") || "Add to Campaign"}
                     </label>
-                    <div className="border border-gray-200 dark:border-neutral-700 rounded-lg p-3 bg-gray-50 dark:bg-black/20">
+                    <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-black/20">
                       <CampaignSelector
                         campaigns={campaigns || []}
                         selectedId={
-                          watched.campaign_id
-                            ? parseInt(watched.campaign_id.toString())
-                            : null
+                          watched.campaign_id ? parseInt(watched.campaign_id.toString()) : null
                         }
                         loading={false}
                         t={t}
@@ -721,7 +673,7 @@ export default function AddPublicationModal({
                       />
                     </div>
                     {errors.campaign_id?.message && (
-                      <p className="text-xs text-red-500 mt-1">
+                      <p className="mt-1 text-xs text-red-500">
                         {errors.campaign_id.message as string}
                       </p>
                     )}
@@ -737,25 +689,18 @@ export default function AddPublicationModal({
             isSubmitting={isSubmitting || uploading} // Block on upload too
             formId="add-publication-form"
             submitText={
-              uploading
-                ? `Uploading...`
-                : t("publications.button.add") || "Save Publication"
+              uploading ? `Uploading...` : t("publications.button.add") || "Save Publication"
             }
-            submitIcon={<Save className="w-4 h-4" />}
+            submitIcon={<Save className="h-4 w-4" />}
             cancelText={t("common.cancel") || "Close"}
           />
           {/* Progress bar could go here */}
           {uploading && (
             <div className="px-6 pb-2">
-              <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                <div
-                  className="bg-blue-600 h-2.5 rounded-full"
-                  style={{ width: "50%" }}
-                ></div>
+              <div className="h-2.5 w-full rounded-full bg-gray-200 dark:bg-gray-700">
+                <div className="h-2.5 rounded-full bg-blue-600" style={{ width: "50%" }}></div>
               </div>
-              <p className="text-xs text-center mt-1 text-gray-500">
-                Uploading to S3...
-              </p>
+              <p className="mt-1 text-center text-xs text-gray-500">Uploading to S3...</p>
             </div>
           )}
 
@@ -769,17 +714,13 @@ export default function AddPublicationModal({
               onCancel={async () => {
                 const isConfirmed = await confirm({
                   title:
-                    t("publications.modal.cancel_confirmation.title") ||
-                    "Cancelar Publicación",
+                    t("publications.modal.cancel_confirmation.title") || "Cancelar Publicación",
                   message:
                     t("publications.modal.cancel_confirmation.message") ||
                     "¿Estás seguro de que deseas cancelar esta publicación? El envío a redes se detendrá.",
                   confirmText:
-                    t("publications.modal.cancel_confirmation.confirm") ||
-                    "Sí, cancelar",
-                  cancelText:
-                    t("publications.modal.cancel_confirmation.cancel") ||
-                    "No, continuar",
+                    t("publications.modal.cancel_confirmation.confirm") || "Sí, cancelar",
+                  cancelText: t("publications.modal.cancel_confirmation.cancel") || "No, continuar",
                   type: "danger",
                 });
 
@@ -804,9 +745,7 @@ export default function AddPublicationModal({
           isOpen={!!activePlatformSettings}
           onClose={() => setActivePlatformSettings(null)}
           platform={activePlatformSettings || ""}
-          settings={
-            platformSettings[activePlatformSettings?.toLowerCase() || ""] || {}
-          }
+          settings={platformSettings[activePlatformSettings?.toLowerCase() || ""] || {}}
           onSettingsChange={(newSettings) => {
             if (activePlatformSettings) {
               setPlatformSettings((prev) => ({

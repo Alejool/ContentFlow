@@ -133,12 +133,8 @@ export const ResponsiveImage: React.FC<ResponsiveImageProps> = ({
 
   return (
     <picture>
-      {avifSrcSet && (
-        <source type="image/avif" srcSet={avifSrcSet} sizes={sizes} />
-      )}
-      {webpSrcSet && (
-        <source type="image/webp" srcSet={webpSrcSet} sizes={sizes} />
-      )}
+      {avifSrcSet && <source type="image/avif" srcSet={avifSrcSet} sizes={sizes} />}
+      {webpSrcSet && <source type="image/webp" srcSet={webpSrcSet} sizes={sizes} />}
       <LazyImage
         src={imageData.fallback_url}
         srcSet={jpegSrcSet}

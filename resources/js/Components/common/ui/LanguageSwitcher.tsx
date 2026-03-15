@@ -18,11 +18,9 @@ export default function LanguageSwitcher() {
   const getBaseLang = (lang: string) => lang.split("-")[0];
   const currentLangCode = getBaseLang(i18n.resolvedLanguage || i18n.language);
 
-  const currentLanguage =
-    languages.find((lang) => lang.code === currentLangCode) || languages[0];
+  const currentLanguage = languages.find((lang) => lang.code === currentLangCode) || languages[0];
 
-  const nextLanguage =
-    languages.find((lang) => lang.code !== currentLangCode) || languages[1];
+  const nextLanguage = languages.find((lang) => lang.code !== currentLangCode) || languages[1];
 
   const toggleLanguage = async () => {
     if (isAnimating) return;
@@ -45,35 +43,29 @@ export default function LanguageSwitcher() {
   return (
     <button
       onClick={toggleLanguage}
-      className="relative p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-neutral-800 transition-all duration-300
-        group overflow-hidden border border-gray-200 dark:border-neutral-700 hover:border-indigo-300 min-w-[44px]"
+      className="group relative min-w-[44px] overflow-hidden rounded-lg border border-gray-200 p-2 transition-all duration-300 hover:border-indigo-300 hover:bg-gray-50 dark:border-neutral-700 dark:hover:bg-neutral-800"
       aria-label={`Switch to ${nextLanguage.code.toUpperCase()}`}
     >
-      <div className="relative w-8 h-8 flex items-center justify-center">
-        <div className="w-6 h-4 transition-all duration-300 group-hover:scale-110 shadow-sm overflow-hidden rounded-sm">
+      <div className="relative flex h-8 w-8 items-center justify-center">
+        <div className="h-4 w-6 overflow-hidden rounded-sm shadow-sm transition-all duration-300 group-hover:scale-110">
           <img
             src={currentLanguage.flag}
             alt={currentLanguage.name}
-            className="w-full h-full object-cover"
+            className="h-full w-full object-cover"
           />
         </div>
 
         <div
-          className={`absolute -bottom-1 -right-1 w-5 h-3.5 transition-all duration-300
-          bg-white dark:bg-neutral-900 rounded-sm border border-gray-200 dark:border-neutral-700 p-0.5 overflow-hidden shadow-sm
-          ${isAnimating ? "scale-0 opacity-0" : "scale-100 opacity-100"}`}
+          className={`absolute -bottom-1 -right-1 h-3.5 w-5 overflow-hidden rounded-sm border border-gray-200 bg-white p-0.5 shadow-sm transition-all duration-300 dark:border-neutral-700 dark:bg-neutral-900 ${isAnimating ? "scale-0 opacity-0" : "scale-100 opacity-100"}`}
         >
           <img
             src={nextLanguage.flag}
             alt={nextLanguage.name}
-            className="w-full h-full object-cover"
+            className="h-full w-full object-cover"
           />
         </div>
 
-        <span
-          className="absolute -top-1 -left-1 text-[10px] text-indigo-500
-          opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        >
+        <span className="absolute -left-1 -top-1 text-[10px] text-indigo-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
           →
         </span>
       </div>

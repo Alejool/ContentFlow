@@ -198,13 +198,7 @@ export function DisabledTabsExample() {
     },
   ];
 
-  return (
-    <DraggableTabs
-      tabs={tabs}
-      activeTab={activeTab}
-      onTabChange={setActiveTab}
-    />
-  );
+  return <DraggableTabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />;
 }
 
 // ============================================
@@ -212,9 +206,7 @@ export function DisabledTabsExample() {
 // ============================================
 export function PlanFilteredTabsExample() {
   const [activeTab, setActiveTab] = useState("basic");
-  const [currentPlan, setCurrentPlan] = useState<
-    "demo" | "professional" | "enterprise"
-  >("demo");
+  const [currentPlan, setCurrentPlan] = useState<"demo" | "professional" | "enterprise">("demo");
 
   const tabs: DraggableTab[] = [
     {
@@ -248,9 +240,7 @@ export function PlanFilteredTabsExample() {
       {/* Selector de plan para demo */}
       <div className="mb-4 flex gap-2">
         <button onClick={() => setCurrentPlan("demo")}>Demo</button>
-        <button onClick={() => setCurrentPlan("professional")}>
-          Professional
-        </button>
+        <button onClick={() => setCurrentPlan("professional")}>Professional</button>
         <button onClick={() => setCurrentPlan("enterprise")}>Enterprise</button>
       </div>
 
@@ -261,9 +251,7 @@ export function PlanFilteredTabsExample() {
         currentPlan={currentPlan}
       />
 
-      <div className="mt-4 text-sm text-gray-600">
-        Plan actual: {currentPlan}
-      </div>
+      <div className="mt-4 text-sm text-gray-600">Plan actual: {currentPlan}</div>
     </div>
   );
 }
@@ -302,11 +290,7 @@ export function DynamicBadgesExample() {
 
   return (
     <div>
-      <DraggableTabs
-        tabs={tabs}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-      />
+      <DraggableTabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
 
       {/* Simular actualización de badges */}
       <button
@@ -343,9 +327,7 @@ export function PersistentOrderExample() {
 
   // Reordenar tabs según el orden guardado
   const orderedTabs = initialOrder
-    ? initialOrder
-        .map((id: string) => tabs.find((t) => t.id === id))
-        .filter(Boolean)
+    ? initialOrder.map((id: string) => tabs.find((t) => t.id === id)).filter(Boolean)
     : tabs;
 
   const handleTabOrderChange = (newOrder: string[]) => {

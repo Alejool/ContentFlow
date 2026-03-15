@@ -7,9 +7,7 @@ interface AdminNavigationProps {
   currentRoute?: string;
 }
 
-export default function AdminNavigation({
-  currentRoute,
-}: AdminNavigationProps) {
+export default function AdminNavigation({ currentRoute }: AdminNavigationProps) {
   const { t } = useTranslation();
 
   const navItems = [
@@ -33,8 +31,7 @@ export default function AdminNavigation({
     },
   ];
 
-  const activeTab =
-    navItems.find((item) => item.href === currentRoute)?.id || "dashboard";
+  const activeTab = navItems.find((item) => item.href === currentRoute)?.id || "dashboard";
 
   const handleTabChange = (tabId: string) => {
     const item = navItems.find((nav) => nav.id === tabId);
@@ -44,7 +41,7 @@ export default function AdminNavigation({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 shadow-sm">
+    <div className="bg-white shadow-sm dark:bg-gray-800">
       <div className="">
         <SettingsTabs
           tabs={navItems.map((item) => ({

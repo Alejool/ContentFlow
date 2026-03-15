@@ -1,35 +1,22 @@
 import { AIResponse } from "@/Hooks/useAIChat";
-import {
-  Clock,
-  Edit,
-  List,
-  PlayCircle,
-  PlusCircle,
-  TrendingUp,
-  Zap,
-} from "lucide-react";
+import { Clock, Edit, List, PlayCircle, PlusCircle, TrendingUp, Zap } from "lucide-react";
 
 interface QuickTipResponseProps {
   data: AIResponse;
   theme: "dark" | "light";
 }
 
-export default function QuickTipResponse({
-  data,
-  theme,
-}: QuickTipResponseProps) {
+export default function QuickTipResponse({ data, theme }: QuickTipResponseProps) {
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2 mb-3">
-        <Zap className="w-5 h-5 text-primary-500" />
-        <h3 className="font-semibold text-lg">
-          {data.title || "Consejo rápido"}
-        </h3>
+      <div className="mb-3 flex items-center gap-2">
+        <Zap className="h-5 w-5 text-primary-500" />
+        <h3 className="text-lg font-semibold">{data.title || "Consejo rápido"}</h3>
       </div>
 
       {data.tip && (
         <div
-          className={`p-4 rounded-lg ${
+          className={`rounded-lg p-4 ${
             theme === "dark"
               ? "bg-gradient-to-r from-primary-900/20 to-yellow-900/20"
               : "bg-gradient-to-r from-primary-50 to-yellow-50"
@@ -40,23 +27,15 @@ export default function QuickTipResponse({
       )}
 
       {data.response?.message && (
-        <div
-          className={`p-4 rounded-lg ${
-            theme === "dark" ? "bg-blue-900/20" : "bg-blue-50"
-          }`}
-        >
+        <div className={`rounded-lg p-4 ${theme === "dark" ? "bg-blue-900/20" : "bg-blue-50"}`}>
           <p className="text-sm leading-relaxed">{data.response.message}</p>
         </div>
       )}
 
       {/* Resto del componente... */}
-      {data.response?.campaign_options &&
-        data.response.campaign_options.length > 0 && (
-          <CampaignOptions
-            campaigns={data.response.campaign_options}
-            theme={theme}
-          />
-        )}
+      {data.response?.campaign_options && data.response.campaign_options.length > 0 && (
+        <CampaignOptions campaigns={data.response.campaign_options} theme={theme} />
+      )}
 
       {data.response?.actions && data.response.actions.length > 0 && (
         <ActionOptions actions={data.response.actions} theme={theme} />
@@ -69,13 +48,13 @@ export default function QuickTipResponse({
       <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
         {data.estimated_time && (
           <div className="flex items-center gap-1">
-            <Clock className="w-3 h-3" />
+            <Clock className="h-3 w-3" />
             <span>{data.estimated_time}</span>
           </div>
         )}
         {data.priority && (
           <div className="flex items-center gap-1">
-            <TrendingUp className="w-3 h-3" />
+            <TrendingUp className="h-3 w-3" />
             <span>Prioridad: {data.priority}</span>
           </div>
         )}
@@ -97,26 +76,26 @@ interface CampaignOptionsProps {
 function CampaignOptions({ campaigns, theme }: CampaignOptionsProps) {
   return (
     <div className="space-y-3">
-      <h4 className="font-medium text-sm text-gray-700 dark:text-gray-300 flex items-center gap-2">
-        <List className="w-4 h-4" />
+      <h4 className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+        <List className="h-4 w-4" />
         Campañas disponibles:
       </h4>
       <div className="space-y-2">
         {campaigns.map((campaign, index) => (
           <div
             key={index}
-            className={`p-3 rounded-lg border ${
+            className={`rounded-lg border p-3 ${
               theme === "dark"
-                ? "bg-neutral-800/50 border-neutral-700"
-                : "bg-gray-50 border-gray-200"
+                ? "border-neutral-700 bg-neutral-800/50"
+                : "border-gray-200 bg-gray-50"
             }`}
           >
-            <div className="flex justify-between items-start">
+            <div className="flex items-start justify-between">
               <div>
-                <p className="font-medium text-sm">{campaign.name}</p>
-                <div className="flex items-center gap-2 mt-1">
+                <p className="text-sm font-medium">{campaign.name}</p>
+                <div className="mt-1 flex items-center gap-2">
                   <span
-                    className={`px-2 py-0.5 text-xs rounded-full ${
+                    className={`rounded-full px-2 py-0.5 text-xs ${
                       campaign.status === "active"
                         ? theme === "dark"
                           ? "bg-green-900/30 text-green-400"
@@ -132,11 +111,7 @@ function CampaignOptions({ campaigns, theme }: CampaignOptionsProps) {
               </div>
             </div>
             {campaign.description && (
-              <p
-                className={`text-xs mt-2 ${
-                  theme === "dark" ? "text-gray-400" : "text-gray-600"
-                }`}
-              >
+              <p className={`mt-2 text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
                 {campaign.description}
               </p>
             )}
@@ -159,11 +134,11 @@ function ActionOptions({ actions, theme }: ActionOptionsProps) {
   const getActionIcon = (type: string) => {
     switch (type) {
       case "edit_campaign":
-        return <Edit className="w-4 h-4" />;
+        return <Edit className="h-4 w-4" />;
       case "activate_campaign":
-        return <PlayCircle className="w-4 h-4" />;
+        return <PlayCircle className="h-4 w-4" />;
       case "create_new_campaign":
-        return <PlusCircle className="w-4 h-4" />;
+        return <PlusCircle className="h-4 w-4" />;
       default:
         return null;
     }
@@ -197,14 +172,14 @@ function ActionOptions({ actions, theme }: ActionOptionsProps) {
 
   return (
     <div className="space-y-3">
-      <h4 className="font-medium text-sm text-gray-700 dark:text-gray-300">
+      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
         Acciones disponibles:
       </h4>
       <div className="grid grid-cols-1 gap-2">
         {actions.map((action, index) => (
           <div
             key={index}
-            className={`p-3 rounded-lg flex items-start gap-3 ${
+            className={`flex items-start gap-3 rounded-lg p-3 ${
               theme === "dark"
                 ? "bg-gradient-to-r from-blue-900/10 to-purple-900/10"
                 : "bg-gradient-to-r from-blue-50 to-purple-50"
@@ -214,14 +189,8 @@ function ActionOptions({ actions, theme }: ActionOptionsProps) {
               {getActionIcon(action.type)}
             </div>
             <div>
-              <p className="font-medium text-sm">
-                {getActionLabel(action.type)}
-              </p>
-              <p
-                className={`text-xs mt-1 ${
-                  theme === "dark" ? "text-gray-400" : "text-gray-600"
-                }`}
-              >
+              <p className="text-sm font-medium">{getActionLabel(action.type)}</p>
+              <p className={`mt-1 text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
                 {action.description}
               </p>
             </div>
@@ -240,19 +209,17 @@ interface StepsListProps {
 function StepsList({ steps, theme }: StepsListProps) {
   return (
     <div className="space-y-3">
-      <h4 className="font-medium text-sm text-gray-700 dark:text-gray-300">
-        Pasos a seguir:
-      </h4>
+      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Pasos a seguir:</h4>
       <div className="space-y-2">
         {steps.map((step, index) => (
           <div
             key={index}
-            className={`flex gap-3 p-3 rounded-lg ${
+            className={`flex gap-3 rounded-lg p-3 ${
               theme === "dark" ? "bg-neutral-800/50" : "bg-gray-50"
             }`}
           >
             <div
-              className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${
+              className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full ${
                 theme === "dark" ? "bg-primary-900/30" : "bg-primary-100"
               }`}
             >

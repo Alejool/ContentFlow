@@ -66,9 +66,7 @@ export default function CreateRoleModal({
   const fetchPermissions = async () => {
     try {
       setIsLoadingPermissions(true);
-      const response = await axios.get(
-        route("api.v1.workspaces.permissions", workspace.id),
-      );
+      const response = await axios.get(route("api.v1.workspaces.permissions", workspace.id));
       setAllPermissions(response.data.data || []);
     } catch (error) {
       toast.error(t("workspace.roles_management.role_created_error"));
@@ -79,26 +77,20 @@ export default function CreateRoleModal({
 
   const handleTogglePermission = (id: number) => {
     const current = selectedPermissions || [];
-    const updated = current.includes(id)
-      ? current.filter((p) => p !== id)
-      : [...current, id];
+    const updated = current.includes(id) ? current.filter((p) => p !== id) : [...current, id];
     setValue("permissions", updated);
   };
 
   const onSubmit = async (data: CreateRoleFormData) => {
     try {
-      const response = await axios.post(
-        route("api.v1.workspaces.roles.store", workspace.id),
-        data,
-      );
+      const response = await axios.post(route("api.v1.workspaces.roles.store", workspace.id), data);
       toast.success(t("workspace.roles_management.role_created_success"));
       onSuccess(response.data.role);
       onClose();
       reset();
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message ||
-          t("workspace.roles_management.role_created_error"),
+        error.response?.data?.message || t("workspace.roles_management.role_created_error"),
       );
     }
   };
@@ -106,9 +98,9 @@ export default function CreateRoleModal({
   return (
     <Modal show={isOpen} onClose={onClose} maxWidth="lg">
       <div className="p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="bg-primary-100 dark:bg-primary-900/30 p-2 rounded-lg">
-            <Shield className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+        <div className="mb-6 flex items-center gap-3">
+          <div className="rounded-lg bg-primary-100 p-2 dark:bg-primary-900/30">
+            <Shield className="h-6 w-6 text-primary-600 dark:text-primary-400" />
           </div>
           <div>
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
@@ -121,15 +113,13 @@ export default function CreateRoleModal({
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-4">
               <div>
                 <Input
                   id="role_name"
                   label={t("workspace.roles_management.role_name")}
-                  placeholder={t(
-                    "workspace.roles_management.role_name_placeholder",
-                  )}
+                  placeholder={t("workspace.roles_management.role_name_placeholder")}
                   {...register("name")}
                   error={errors.name?.message}
                 />
@@ -137,9 +127,7 @@ export default function CreateRoleModal({
               <Textarea
                 id="role_description"
                 label={t("workspace.roles_management.role_description")}
-                placeholder={t(
-                  "workspace.roles_management.role_description_placeholder",
-                )}
+                placeholder={t("workspace.roles_management.role_description_placeholder")}
                 rows={3}
                 {...register("description")}
                 error={errors.description?.message}
@@ -147,31 +135,31 @@ export default function CreateRoleModal({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 {t("workspace.roles_management.key_permissions_label")}
               </label>
-              <div className="bg-gray-50 dark:bg-neutral-800/50 border border-gray-200 dark:border-neutral-800 rounded-lg p-3 h-[200px] overflow-y-auto space-y-2">
+              <div className="h-[200px] space-y-2 overflow-y-auto rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-neutral-800 dark:bg-neutral-800/50">
                 {isLoadingPermissions ? (
                   <div className="flex justify-center p-4">
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-600"></div>
+                    <div className="h-5 w-5 animate-spin rounded-full border-b-2 border-primary-600"></div>
                   </div>
                 ) : (
                   allPermissions.map((permission) => (
                     <div
                       key={permission.id}
-                      className={`flex items-center gap-2 p-2 rounded-md cursor-pointer transition-colors ${
+                      className={`flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors ${
                         selectedPermissions?.includes(permission.id)
-                          ? "bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300"
+                          ? "bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300"
                           : "hover:bg-white dark:hover:bg-neutral-800"
                       }`}
                       onClick={() => handleTogglePermission(permission.id)}
                     >
                       <CheckSquare
-                        className={`w-4 h-4 ${selectedPermissions?.includes(permission.id) ? "opacity-100" : "opacity-30"}`}
+                        className={`h-4 w-4 ${selectedPermissions?.includes(permission.id) ? "opacity-100" : "opacity-30"}`}
                       />
                       <div className="text-xs">
                         <div className="font-bold">{permission.name}</div>
-                        <div className="opacity-70 truncate max-w-[200px]">
+                        <div className="max-w-[200px] truncate opacity-70">
                           {permission.description}
                         </div>
                       </div>
@@ -182,7 +170,7 @@ export default function CreateRoleModal({
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-neutral-800">
+          <div className="flex justify-end gap-3 border-t border-gray-100 pt-4 dark:border-neutral-800">
             <Button variant="ghost" onClick={onClose} type="button">
               {t("common.cancel")}
             </Button>

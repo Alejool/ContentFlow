@@ -39,21 +39,15 @@ const parseUserAgent = (userAgent?: string): string => {
   if (userAgent.includes("Firefox")) browser = "Firefox";
   else if (userAgent.includes("Edg")) browser = "Edge";
   else if (userAgent.includes("Chrome")) browser = "Chrome";
-  else if (userAgent.includes("Safari") && !userAgent.includes("Chrome"))
-    browser = "Safari";
-  else if (userAgent.includes("Opera") || userAgent.includes("OPR"))
-    browser = "Opera";
+  else if (userAgent.includes("Safari") && !userAgent.includes("Chrome")) browser = "Safari";
+  else if (userAgent.includes("Opera") || userAgent.includes("OPR")) browser = "Opera";
 
   let os = "";
   if (userAgent.includes("Windows")) os = "Windows";
   else if (userAgent.includes("Mac")) os = "macOS";
   else if (userAgent.includes("Linux")) os = "Linux";
   else if (userAgent.includes("Android")) os = "Android";
-  else if (
-    userAgent.includes("iOS") ||
-    userAgent.includes("iPhone") ||
-    userAgent.includes("iPad")
-  )
+  else if (userAgent.includes("iOS") || userAgent.includes("iPhone") || userAgent.includes("iPad"))
     os = "iOS";
 
   return os ? `${browser} on ${os}` : browser;
@@ -82,15 +76,15 @@ const EditPublicationModal = ({
   const { campaigns } = useCampaignStore();
   const { accounts: socialAccounts } = useAccountsStore();
   const [isTimelineExpanded, setIsTimelineExpanded] = useState(false);
-  const [isApprovalHistoryExpanded, setIsApprovalHistoryExpanded] =
-    useState(false);
-  const [isYouTubeThumbnailExpanded, setIsYouTubeThumbnailExpanded] =
-    useState(true);
+  const [isApprovalHistoryExpanded, setIsApprovalHistoryExpanded] = useState(false);
+  const [isYouTubeThumbnailExpanded, setIsYouTubeThumbnailExpanded] = useState(true);
 
   const modalRef = useModalFocusTrap(isOpen);
 
-  const { isLockedByMe, isLockedByOther, lockInfo, activeUsers } =
-    usePublicationLock(publication?.id ?? null, isOpen);
+  const { isLockedByMe, isLockedByOther, lockInfo, activeUsers } = usePublicationLock(
+    publication?.id ?? null,
+    isOpen,
+  );
 
   const {
     t,
@@ -139,9 +133,7 @@ const EditPublicationModal = ({
       if (success && publication?.id) {
         try {
           // Force refresh the publication data from backend
-          await usePublicationStore
-            .getState()
-            .fetchPublicationById(publication.id);
+          await usePublicationStore.getState().fetchPublicationById(publication.id);
 
           // Refresh published platforms to update the publish modal
           await fetchPublishedPlatformsFromStore(publication.id);
@@ -199,11 +191,7 @@ const EditPublicationModal = ({
 
       if (reelsToDelete.length > 0) {
         try {
-          await Promise.all(
-            reelsToDelete.map((reel) =>
-              axios.delete(`/api/v1/media/${reel.id}`),
-            ),
-          );
+          await Promise.all(reelsToDelete.map((reel) => axios.delete(`/api/v1/media/${reel.id}`)));
           toast.success(t("reels.messages.deletedWithVideo"));
         } catch (error) {
           console.error("Failed to delete associated reels", error);
@@ -217,8 +205,7 @@ const EditPublicationModal = ({
 
   const { register } = form;
 
-  const selectedSocialAccounts =
-    useWatch({ control, name: "social_accounts" }) || [];
+  const selectedSocialAccounts = useWatch({ control, name: "social_accounts" }) || [];
   const scheduledAt = useWatch({ control, name: "scheduled_at" });
   const useGlobalSchedule = useWatch({ control, name: "use_global_schedule" });
   const title = useWatch({ control, name: "title" });
@@ -241,11 +228,9 @@ const EditPublicationModal = ({
     control,
     name: "recurrence_accounts",
   });
-  const content_type =
-    (useWatch({ control, name: "content_type" }) as ContentType) || "post";
+  const content_type = (useWatch({ control, name: "content_type" }) as ContentType) || "post";
   const poll_options = useWatch({ control, name: "poll_options" }) || ["", ""];
-  const poll_duration_hours =
-    useWatch({ control, name: "poll_duration_hours" }) || 24;
+  const poll_duration_hours = useWatch({ control, name: "poll_duration_hours" }) || 24;
 
   // Use content type hook for field visibility
   const { fieldVisibility } = useContentType(content_type);
@@ -311,30 +296,20 @@ const EditPublicationModal = ({
   }, [mediaFiles]);
 
   const hasPublishedPlatform = useMemo(() => {
-    return publication?.social_post_logs?.some(
-      (log: any) => log.status === "published",
-    );
+    return publication?.social_post_logs?.some((log: any) => log.status === "published");
   }, [publication]);
 
-  const { publishedPlatforms, publishingPlatforms, failedPlatforms } =
-    usePublicationStore();
+  const { publishedPlatforms, publishingPlatforms, failedPlatforms } = usePublicationStore();
 
-  const fetchPublishedPlatformsFromStore = usePublicationStore(
-    (s) => s.fetchPublishedPlatforms,
-  );
+  const fetchPublishedPlatformsFromStore = usePublicationStore((s) => s.fetchPublishedPlatforms);
 
   const { auth } = usePage<any>().props;
   const user = auth.user;
-  const canManage =
-    auth.current_workspace?.permissions?.includes("manage-content");
-  const canManageAccounts =
-    auth.current_workspace?.permissions?.includes("manage-accounts");
+  const canManage = auth.current_workspace?.permissions?.includes("manage-content");
+  const canManageAccounts = auth.current_workspace?.permissions?.includes("manage-accounts");
   const planId = auth.current_workspace?.plan?.toLowerCase() || "demo";
-  const hasRecurrenceAccess = ["demo", "professional", "enterprise"].includes(
-    planId,
-  );
-  const hasAdvancedScheduling =
-    auth.current_workspace?.features?.advanced_scheduling ?? false;
+  const hasRecurrenceAccess = ["demo", "professional", "enterprise"].includes(planId);
+  const hasAdvancedScheduling = auth.current_workspace?.features?.advanced_scheduling ?? false;
 
   // Fetch published platforms when modal opens
   useEffect(() => {
@@ -351,9 +326,7 @@ const EditPublicationModal = ({
     // Check if all account schedules are the same
     const scheduleValues = Object.values(accountSchedules);
     if (scheduleValues.length > 1) {
-      const allSame = scheduleValues.every(
-        (date) => date === scheduleValues[0],
-      );
+      const allSame = scheduleValues.every((date) => date === scheduleValues[0]);
 
       // If dates are different and global schedule is enabled, disable it
       if (!allSame && useGlobalSchedule) {
@@ -427,14 +400,10 @@ const EditPublicationModal = ({
   // - Media section lock: if another user has lock OR media is processing OR pending review
   const isPendingReview = publication?.status === "pending_review";
   const isMediaSectionDisabled =
-    isLockedByOtherEditor ||
-    isAnyMediaProcessing ||
-    !canManage ||
-    isPendingReview;
+    isLockedByOtherEditor || isAnyMediaProcessing || !canManage || isPendingReview;
 
   // - Content/Settings section lock: ONLY if another user has lock OR pending review
-  const isContentSectionDisabled =
-    isLockedByOtherEditor || !canManage || isPendingReview;
+  const isContentSectionDisabled = isLockedByOtherEditor || !canManage || isPendingReview;
 
   const canPublish = auth.current_workspace?.permissions?.includes("publish");
 
@@ -473,41 +442,33 @@ const EditPublicationModal = ({
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center sm:p-6 text-gray-900 dark:text-white transition-opacity duration-200 ${isOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}
+      className={`fixed inset-0 z-50 flex items-center justify-center text-gray-900 transition-opacity duration-200 dark:text-white sm:p-6 ${isOpen ? "visible opacity-100" : "pointer-events-none invisible opacity-0"}`}
     >
       <div
-        className="absolute inset-0 bg-gray-900/60 dark:bg-black/70 backdrop-blur-sm"
+        className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm dark:bg-black/70"
         onClick={handleClose}
       />
 
       <div
         ref={modalRef as React.RefObject<HTMLDivElement>}
-        className="relative w-full max-w-5xl bg-white backdrop-blur-2xl dark:bg-neutral-900/90 rounded-lg shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300"
+        className="animate-in fade-in zoom-in relative flex max-h-[90vh] w-full max-w-5xl flex-col rounded-lg bg-white shadow-2xl backdrop-blur-2xl duration-300 dark:bg-neutral-900/90"
       >
         <ModalHeader
           t={t}
           onClose={handleClose}
-          title={
-            canManage
-              ? "publications.modal.edit.title"
-              : "publications.modal.show.title"
-          }
+          title={canManage ? "publications.modal.edit.title" : "publications.modal.show.title"}
           subtitle={
-            canManage
-              ? "publications.modal.edit.subtitle"
-              : "publications.modal.show.subtitle"
+            canManage ? "publications.modal.edit.subtitle" : "publications.modal.show.subtitle"
           }
           rightElement={
-            <div className="flex -space-x-2 overflow-hidden mr-2 p-2">
+            <div className="mr-2 flex -space-x-2 overflow-hidden p-2">
               {activeUsers.map((user: any) => {
                 const isTheLocker = lockInfo?.user_id === user.id;
                 return (
                   <div
                     key={user.id}
-                    className={`inline-block h-7 w-7 rounded-full ring-2 ${isTheLocker ? "ring-amber-500 z-10" : "ring-white dark:ring-neutral-800"} bg-gray-200 dark:bg-neutral-700 flex-shrink-0 relative`}
-                    title={
-                      user.name + (isTheLocker ? " (Editando)" : " (Viendo)")
-                    }
+                    className={`inline-block h-7 w-7 rounded-full ring-2 ${isTheLocker ? "z-10 ring-amber-500" : "ring-white dark:ring-neutral-800"} relative flex-shrink-0 bg-gray-200 dark:bg-neutral-700`}
+                    title={user.name + (isTheLocker ? " (Editando)" : " (Viendo)")}
                   >
                     {user.avatar ? (
                       <img
@@ -530,13 +491,13 @@ const EditPublicationModal = ({
                         }}
                       />
                     ) : (
-                      <div className="h-full w-full flex items-center justify-center text-xs font-bold text-gray-500 uppercase">
+                      <div className="flex h-full w-full items-center justify-center text-xs font-bold uppercase text-gray-500">
                         {user.name.charAt(0)}
                       </div>
                     )}
                     {isTheLocker && (
-                      <div className="absolute -bottom-0.5 -right-0.5 bg-amber-500 rounded-full p-0.5 shadow-sm">
-                        <Lock className="w-2 h-2 text-white" />
+                      <div className="absolute -bottom-0.5 -right-0.5 rounded-full bg-amber-500 p-0.5 shadow-sm">
+                        <Lock className="h-2 w-2 text-white" />
                       </div>
                     )}
                   </div>
@@ -562,7 +523,7 @@ const EditPublicationModal = ({
           mediaFiles={mediaFiles}
         />
 
-        <div className="flex-1 overflow-y-auto custom-scrollbar">
+        <div className="custom-scrollbar flex-1 overflow-y-auto">
           <form
             id="edit-publication-form"
             onSubmit={(e) => {
@@ -582,9 +543,7 @@ const EditPublicationModal = ({
               {/* ========================================
                   COLUMNA IZQUIERDA: MEDIA Y CONTENIDO
                   ======================================== */}
-              <div
-                className={` ${fieldVisibility.showMediaSection ? "lg:col-span-7" : ""}`}
-              >
+              <div className={` ${fieldVisibility.showMediaSection ? "lg:col-span-7" : ""}`}>
                 <div className="space-y-6">
                   {!isLockedByMe &&
                     isLockedByOther &&
@@ -595,10 +554,8 @@ const EditPublicationModal = ({
                         type="amber"
                         title={
                           lockInfo?.locked_by === "session"
-                            ? t("publications.modal.edit.lockedBySession") ||
-                              "Sesión Duplicada"
-                            : t("publications.modal.edit.lockedByOther") ||
-                              "En cola de espera"
+                            ? t("publications.modal.edit.lockedBySession") || "Sesión Duplicada"
+                            : t("publications.modal.edit.lockedByOther") || "En cola de espera"
                         }
                         message={
                           lockInfo?.locked_by === "session" ? (
@@ -632,8 +589,7 @@ const EditPublicationModal = ({
                                 }}
                               />
                               <p className="mt-1 font-medium text-amber-600 dark:text-amber-400">
-                                Tomarás el control automáticamente cuando se
-                                libere.
+                                Tomarás el control automáticamente cuando se libere.
                               </p>
                             </div>
                           )
@@ -670,9 +626,7 @@ const EditPublicationModal = ({
                           "Publicación en Revisión"
                         }
                         message={
-                          t(
-                            "publications.modal.edit.pendingReviewWarningHint",
-                          ) ||
+                          t("publications.modal.edit.pendingReviewWarningHint") ||
                           "Esta publicación está esperando aprobación. Debes aprobarla o rechazarla antes de poder editarla. Si la rechazas, el creador podrá hacer cambios y volver a solicitar aprobación."
                         }
                         className="animate-in fade-in slide-in-from-top-4"
@@ -680,10 +634,10 @@ const EditPublicationModal = ({
 
                       {/* Flujo de Aprobación */}
                       {publication?.currentApprovalStep?.workflow && (
-                        <div className="bg-gradient-to-br from-primary-50 to-blue-50 dark:from-primary-900/20 dark:to-blue-900/20 rounded-lg p-4 border border-primary-200 dark:border-primary-800 animate-in fade-in slide-in-from-top-4">
-                          <h4 className="text-sm font-bold text-primary-900 dark:text-primary-300 mb-3 flex items-center gap-2">
+                        <div className="animate-in fade-in slide-in-from-top-4 rounded-lg border border-primary-200 bg-gradient-to-br from-primary-50 to-blue-50 p-4 dark:border-primary-800 dark:from-primary-900/20 dark:to-blue-900/20">
+                          <h4 className="mb-3 flex items-center gap-2 text-sm font-bold text-primary-900 dark:text-primary-300">
                             <svg
-                              className="w-4 h-4"
+                              className="h-4 w-4"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -695,38 +649,34 @@ const EditPublicationModal = ({
                                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
                               />
                             </svg>
-                            {t("approvals.workflow_progress") ||
-                              "Progreso del Flujo"}
+                            {t("approvals.workflow_progress") || "Progreso del Flujo"}
                           </h4>
                           <div className="space-y-2">
                             {publication.currentApprovalStep.workflow.steps?.map(
                               (step: any, index: number) => {
-                                const isCurrent =
-                                  step.id ===
-                                  publication.currentApprovalStep?.id;
+                                const isCurrent = step.id === publication.currentApprovalStep?.id;
                                 const isPast =
                                   step.level_number <
-                                  (publication.currentApprovalStep
-                                    ?.level_number || 0);
+                                  (publication.currentApprovalStep?.level_number || 0);
 
                                 return (
                                   <div
                                     key={step.id}
-                                    className={`flex items-center gap-3 p-2 rounded-lg transition-all ${
+                                    className={`flex items-center gap-3 rounded-lg p-2 transition-all ${
                                       isCurrent
-                                        ? "bg-primary-100 dark:bg-primary-900/40 border border-primary-300 dark:border-primary-700"
+                                        ? "border border-primary-300 bg-primary-100 dark:border-primary-700 dark:bg-primary-900/40"
                                         : isPast
-                                          ? "bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800"
-                                          : "bg-white/50 dark:bg-neutral-800/50 border border-gray-200 dark:border-neutral-700"
+                                          ? "border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20"
+                                          : "border border-gray-200 bg-white/50 dark:border-neutral-700 dark:bg-neutral-800/50"
                                     }`}
                                   >
                                     <div
-                                      className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
+                                      className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
                                         isCurrent
                                           ? "bg-primary-500 text-white"
                                           : isPast
                                             ? "bg-green-500 text-white"
-                                            : "bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-300"
+                                            : "bg-gray-300 text-gray-600 dark:bg-gray-600 dark:text-gray-300"
                                       }`}
                                     >
                                       {isPast ? "✓" : index + 1}
@@ -740,15 +690,13 @@ const EditPublicationModal = ({
                                       </div>
                                     </div>
                                     {isCurrent && (
-                                      <span className="text-[10px] font-bold text-primary-600 dark:text-primary-400 px-2 py-0.5 bg-primary-200 dark:bg-primary-800 rounded-full">
-                                        {t("approvals.in_progress") ||
-                                          "En Proceso"}
+                                      <span className="rounded-full bg-primary-200 px-2 py-0.5 text-[10px] font-bold text-primary-600 dark:bg-primary-800 dark:text-primary-400">
+                                        {t("approvals.in_progress") || "En Proceso"}
                                       </span>
                                     )}
                                     {isPast && (
                                       <span className="text-[10px] font-bold text-green-600 dark:text-green-400">
-                                        ✓{" "}
-                                        {t("common.completed") || "Completado"}
+                                        ✓ {t("common.completed") || "Completado"}
                                       </span>
                                     )}
                                   </div>
@@ -762,23 +710,19 @@ const EditPublicationModal = ({
                   )}
 
                   {/* Alerta: Publicación aprobada */}
-                  {publication?.status === "approved" &&
-                    !hasPublishedPlatform && (
-                      <AlertCard
-                        type="info"
-                        title={
-                          t("publications.modal.edit.approvedEditWarning") ||
-                          "Publicación Aprobada"
-                        }
-                        message={
-                          t(
-                            "publications.modal.edit.approvedEditWarningHint",
-                          ) ||
-                          "Esta publicación ya fue aprobada. Si realizas cambios, volverá a estado 'Pendiente' y requerirá una nueva aprobación."
-                        }
-                        className="animate-in fade-in slide-in-from-top-4"
-                      />
-                    )}
+                  {publication?.status === "approved" && !hasPublishedPlatform && (
+                    <AlertCard
+                      type="info"
+                      title={
+                        t("publications.modal.edit.approvedEditWarning") || "Publicación Aprobada"
+                      }
+                      message={
+                        t("publications.modal.edit.approvedEditWarningHint") ||
+                        "Esta publicación ya fue aprobada. Si realizas cambios, volverá a estado 'Pendiente' y requerirá una nueva aprobación."
+                      }
+                      className="animate-in fade-in slide-in-from-top-4"
+                    />
+                  )}
 
                   {fieldVisibility.showMediaSection &&
                     (!isDataReady ? (
@@ -792,9 +736,7 @@ const EditPublicationModal = ({
                         t={t}
                         onFileChange={handleFileChange}
                         onRemoveMedia={handleRemoveMediaWithReels}
-                        onSetThumbnail={(tempId, file) =>
-                          setThumbnail(tempId, file)
-                        }
+                        onSetThumbnail={(tempId, file) => setThumbnail(tempId, file)}
                         onClearThumbnail={(tempId) => clearThumbnail(tempId)}
                         onUpdateFile={updateFile}
                         onDragOver={(e) => {
@@ -813,9 +755,7 @@ const EditPublicationModal = ({
                           setIsDragOver(false);
                           handleFileChange(e.dataTransfer.files);
                         }}
-                        disabled={
-                          hasPublishedPlatform || isMediaSectionDisabled
-                        }
+                        disabled={hasPublishedPlatform || isMediaSectionDisabled}
                         isAnyMediaProcessing={isAnyMediaProcessing}
                         uploadProgress={uploadProgress}
                         uploadStats={uploadStats}
@@ -830,11 +770,10 @@ const EditPublicationModal = ({
 
                 {/* ==================== SECCIÓN: CONTENIDO DE LA PUBLICACIÓN ==================== */}
                 <div className="space-y-4">
-                  <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700">
-                    <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
-                      {t("publications.modal.edit.contentSection") ||
-                        "Contenido"}
+                  <div className="flex items-center gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700">
+                    <div className="h-5 w-1 rounded-full bg-primary-500"></div>
+                    <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                      {t("publications.modal.edit.contentSection") || "Contenido"}
                     </h3>
                   </div>
 
@@ -842,8 +781,7 @@ const EditPublicationModal = ({
                     <AlertCard
                       type="info"
                       title={
-                        t("publications.modal.edit.contentLocked") ||
-                        "Publication partially live"
+                        t("publications.modal.edit.contentLocked") || "Publication partially live"
                       }
                       message={
                         t("publications.modal.edit.contentLockedHint") ||
@@ -896,11 +834,10 @@ const EditPublicationModal = ({
                 {/* ==================== SECCIÓN: VISTA PREVIA (Solo si tiene advanced_scheduling) ==================== */}
                 {hasRecurrenceAccess && (
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700 pt-6">
-                      <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
-                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
-                        {t("publications.modal.edit.previewSection") ||
-                          "Vista Previa"}
+                    <div className="flex items-center gap-2 border-b border-gray-200 pb-2 pt-6 dark:border-neutral-700">
+                      <div className="h-5 w-1 rounded-full bg-primary-500"></div>
+                      <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                        {t("publications.modal.edit.previewSection") || "Vista Previa"}
                       </h3>
                     </div>
 
@@ -917,9 +854,7 @@ const EditPublicationModal = ({
                       contentType={watched.content_type}
                       selectedPlatforms={selectedSocialAccounts
                         .map((id: number) => {
-                          const account = socialAccounts.find(
-                            (a) => a.id === id,
-                          );
+                          const account = socialAccounts.find((a) => a.id === id);
                           return account?.platform.toLowerCase() || "";
                         })
                         .filter(Boolean)}
@@ -927,11 +862,7 @@ const EditPublicationModal = ({
                       pollDuration={poll_duration_hours}
                       publishedLinks={publication?.social_post_logs?.reduce(
                         (acc: Record<string, string>, log: any) => {
-                          if (
-                            log.status === "published" &&
-                            log.post_url &&
-                            log.platform
-                          ) {
+                          if (log.status === "published" && log.post_url && log.platform) {
                             acc[log.platform.toLowerCase()] = log.post_url;
                           }
                           return acc;
@@ -951,13 +882,12 @@ const EditPublicationModal = ({
               >
                 {/* ==================== SECCIÓN: CUENTAS DE REDES SOCIALES ==================== */}
                 <div
-                  className={`space-y-4 transition-opacity duration-200 ${!allowConfiguration || isContentSectionDisabled ? "opacity-50 pointer-events-none grayscale-[0.5]" : ""}`}
+                  className={`space-y-4 transition-opacity duration-200 ${!allowConfiguration || isContentSectionDisabled ? "pointer-events-none opacity-50 grayscale-[0.5]" : ""}`}
                 >
-                  <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700">
-                    <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
-                      {t("publications.modal.edit.socialAccountsSection") ||
-                        "Redes Sociales"}
+                  <div className="flex items-center gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700">
+                    <div className="h-5 w-1 rounded-full bg-primary-500"></div>
+                    <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                      {t("publications.modal.edit.socialAccountsSection") || "Redes Sociales"}
                     </h3>
                   </div>
 
@@ -983,22 +913,16 @@ const EditPublicationModal = ({
                         return n;
                       });
 
-                      const remainingSchedules = Object.keys(
-                        accountSchedules,
-                      ).filter((key) => parseInt(key) !== id);
-                      if (
-                        remainingSchedules.length === 0 &&
-                        scheduledAt &&
-                        !useGlobalSchedule
-                      ) {
+                      const remainingSchedules = Object.keys(accountSchedules).filter(
+                        (key) => parseInt(key) !== id,
+                      );
+                      if (remainingSchedules.length === 0 && scheduledAt && !useGlobalSchedule) {
                         setValue("use_global_schedule", true, {
                           shouldDirty: true,
                         });
                       }
                     }}
-                    onPlatformSettingsClick={(platform) =>
-                      setActivePlatformSettings(platform)
-                    }
+                    onPlatformSettingsClick={(platform) => setActivePlatformSettings(platform)}
                     globalSchedule={watched.scheduled_at ?? undefined}
                     publishedAccountIds={publishedAccountIds}
                     publishingAccountIds={publishingAccountIds}
@@ -1008,11 +932,7 @@ const EditPublicationModal = ({
                     durationErrors={durationErrors}
                     videoMetadata={videoMetadata}
                     mediaFiles={mediaFiles}
-                    disabled={
-                      isContentSectionDisabled ||
-                      !allowConfiguration ||
-                      !canManageAccounts
-                    }
+                    disabled={isContentSectionDisabled || !allowConfiguration || !canManageAccounts}
                     socialPostLogs={publication?.social_post_logs}
                     contentType={watched.content_type}
                     onThumbnailChange={(_videoId, file) => {
@@ -1037,13 +957,12 @@ const EditPublicationModal = ({
                 {/* ==================== SECCIÓN: PROGRAMACIÓN Y RECURRENCIA (Solo si tiene advanced_scheduling) ==================== */}
                 {hasRecurrenceAccess ? (
                   <div
-                    className={`space-y-4 transition-opacity duration-200 ${!allowConfiguration || isContentSectionDisabled ? "opacity-50 pointer-events-none grayscale-[0.5]" : ""}`}
+                    className={`space-y-4 transition-opacity duration-200 ${!allowConfiguration || isContentSectionDisabled ? "pointer-events-none opacity-50 grayscale-[0.5]" : ""}`}
                   >
-                    <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700">
-                      <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
-                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
-                        {t("publications.modal.edit.scheduleSection") ||
-                          "Programación"}
+                    <div className="flex items-center gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700">
+                      <div className="h-5 w-1 rounded-full bg-primary-500"></div>
+                      <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                        {t("publications.modal.edit.scheduleSection") || "Programación"}
                       </h3>
                     </div>
 
@@ -1065,9 +984,7 @@ const EditPublicationModal = ({
                         });
                       }}
                       useGlobalSchedule={watched.use_global_schedule}
-                      onGlobalScheduleToggle={(val) =>
-                        setValue("use_global_schedule", val)
-                      }
+                      onGlobalScheduleToggle={(val) => setValue("use_global_schedule", val)}
                       onClearAccountSchedules={() => {
                         setAccountSchedules({});
                       }}
@@ -1079,9 +996,7 @@ const EditPublicationModal = ({
                       recurrenceType={watched.recurrence_type as any}
                       recurrenceInterval={watched.recurrence_interval}
                       recurrenceDays={watched.recurrence_days}
-                      recurrenceEndDate={
-                        watched.recurrence_end_date ?? undefined
-                      }
+                      recurrenceEndDate={watched.recurrence_end_date ?? undefined}
                       recurrenceAccounts={watched.recurrence_accounts}
                       onRecurrenceChange={handleRecurrenceChange}
                       i18n={i18n}
@@ -1096,11 +1011,10 @@ const EditPublicationModal = ({
                 ) : (
                   /* ==================== SECCIÓN: VISTA PREVIA (Reemplaza programación si NO tiene advanced_scheduling) ==================== */
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700">
-                      <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
-                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
-                        {t("publications.modal.edit.previewSection") ||
-                          "Vista Previa"}
+                    <div className="flex items-center gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700">
+                      <div className="h-5 w-1 rounded-full bg-primary-500"></div>
+                      <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                        {t("publications.modal.edit.previewSection") || "Vista Previa"}
                       </h3>
                     </div>
 
@@ -1117,9 +1031,7 @@ const EditPublicationModal = ({
                       contentType={watched.content_type}
                       selectedPlatforms={selectedSocialAccounts
                         .map((id: number) => {
-                          const account = socialAccounts.find(
-                            (a) => a.id === id,
-                          );
+                          const account = socialAccounts.find((a) => a.id === id);
                           return account?.platform.toLowerCase() || "";
                         })
                         .filter(Boolean)}
@@ -1127,11 +1039,7 @@ const EditPublicationModal = ({
                       pollDuration={poll_duration_hours}
                       publishedLinks={publication?.social_post_logs?.reduce(
                         (acc: Record<string, string>, log: any) => {
-                          if (
-                            log.status === "published" &&
-                            log.post_url &&
-                            log.platform
-                          ) {
+                          if (log.status === "published" && log.post_url && log.platform) {
                             acc[log.platform.toLowerCase()] = log.post_url;
                           }
                           return acc;
@@ -1145,64 +1053,50 @@ const EditPublicationModal = ({
                 {/* ==================== SECCIÓN: COMENTARIOS INTERNOS ==================== */}
                 {publication?.id && (
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700 pt-6">
-                      <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
-                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
-                        {t("publications.modal.edit.commentsSection") ||
-                          "Comentarios Internos"}
+                    <div className="flex items-center gap-2 border-b border-gray-200 pb-2 pt-6 dark:border-neutral-700">
+                      <div className="h-5 w-1 rounded-full bg-primary-500"></div>
+                      <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                        {t("publications.modal.edit.commentsSection") || "Comentarios Internos"}
                       </h3>
                     </div>
-                    <CommentsSection
-                      publicationId={publication.id}
-                      currentUser={auth.user}
-                    />
+                    <CommentsSection publicationId={publication.id} currentUser={auth.user} />
                   </div>
                 )}
 
                 {/* ==================== SECCIÓN: HISTORIAL Y ACTIVIDAD ==================== */}
                 <div className="space-y-4">
-                  <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-neutral-700 pt-6">
-                    <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
-                      {t("publications.modal.edit.historySection") ||
-                        "Historial"}
+                  <div className="flex items-center gap-2 border-b border-gray-200 pb-2 pt-6 dark:border-neutral-700">
+                    <div className="h-5 w-1 rounded-full bg-primary-500"></div>
+                    <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                      {t("publications.modal.edit.historySection") || "Historial"}
                     </h3>
                   </div>
 
                   <div className="space-y-4">
-                    {publication?.approval_logs &&
-                      publication.approval_logs.length > 0 && (
-                        <ApprovalHistoryCompacto
-                          logs={publication.approval_logs}
-                          isExpanded={isApprovalHistoryExpanded}
-                          onToggle={() =>
-                            setIsApprovalHistoryExpanded(
-                              !isApprovalHistoryExpanded,
-                            )
-                          }
-                          workflow={
-                            publication?.approval_request?.workflow ||
-                            publication?.current_approval_step?.workflow
-                          }
-                          currentStepNumber={
-                            publication?.approval_request?.current_step
-                              ?.level_number ||
-                            publication?.current_approval_step?.level_number
-                          }
-                          approvalStatus={publication?.approval_request?.status}
-                        />
-                      )}
+                    {publication?.approval_logs && publication.approval_logs.length > 0 && (
+                      <ApprovalHistoryCompacto
+                        logs={publication.approval_logs}
+                        isExpanded={isApprovalHistoryExpanded}
+                        onToggle={() => setIsApprovalHistoryExpanded(!isApprovalHistoryExpanded)}
+                        workflow={
+                          publication?.approval_request?.workflow ||
+                          publication?.current_approval_step?.workflow
+                        }
+                        currentStepNumber={
+                          publication?.approval_request?.current_step?.level_number ||
+                          publication?.current_approval_step?.level_number
+                        }
+                        approvalStatus={publication?.approval_request?.status}
+                      />
+                    )}
 
-                    {publication?.activities &&
-                      publication.activities.length > 0 && (
-                        <TimelineCompacto
-                          activities={publication.activities}
-                          isExpanded={isTimelineExpanded}
-                          onToggle={() =>
-                            setIsTimelineExpanded(!isTimelineExpanded)
-                          }
-                        />
-                      )}
+                    {publication?.activities && publication.activities.length > 0 && (
+                      <TimelineCompacto
+                        activities={publication.activities}
+                        isExpanded={isTimelineExpanded}
+                        onToggle={() => setIsTimelineExpanded(!isTimelineExpanded)}
+                      />
+                    )}
                   </div>
                 </div>
               </div>
@@ -1221,7 +1115,7 @@ const EditPublicationModal = ({
                 })
               : t("publications.button.edit") || "Edit Publication"
           }
-          submitIcon={<Save className="w-4 h-4" />}
+          submitIcon={<Save className="h-4 w-4" />}
           cancelText={t("common.cancel") || "Close"}
           hideSubmit={!canManage}
         >
@@ -1244,30 +1138,18 @@ const EditPublicationModal = ({
           settings={
             activePlatformSettings?.toLowerCase() === "all"
               ? {}
-              : platformSettings[activePlatformSettings?.toLowerCase() || ""] ||
-                {}
+              : platformSettings[activePlatformSettings?.toLowerCase() || ""] || {}
           }
           onSettingsChange={(newSettings) => {
-            if (
-              activePlatformSettings &&
-              activePlatformSettings.toLowerCase() !== "all"
-            ) {
+            if (activePlatformSettings && activePlatformSettings.toLowerCase() !== "all") {
               setPlatformSettings((prev) => ({
                 ...prev,
                 [activePlatformSettings.toLowerCase()]: newSettings,
               }));
             }
           }}
-          allPlatforms={
-            activePlatformSettings?.toLowerCase() === "all"
-              ? selectedPlatforms
-              : []
-          }
-          allSettings={
-            activePlatformSettings?.toLowerCase() === "all"
-              ? allPlatformSettings
-              : {}
-          }
+          allPlatforms={activePlatformSettings?.toLowerCase() === "all" ? selectedPlatforms : []}
+          allSettings={activePlatformSettings?.toLowerCase() === "all" ? allPlatformSettings : {}}
           onAllSettingsChange={(platform, newSettings) => {
             setPlatformSettings((prev) => ({
               ...prev,
@@ -1276,9 +1158,7 @@ const EditPublicationModal = ({
           }}
           videoMetadata={
             mediaFiles.find((m) => m.type === "video")
-              ? videoMetadata[
-                  mediaFiles.find((m) => m.type === "video")!.tempId
-                ]
+              ? videoMetadata[mediaFiles.find((m) => m.type === "video")!.tempId]
               : undefined
           }
         />

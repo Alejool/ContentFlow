@@ -24,7 +24,7 @@ const CampaignDateFields: React.FC<CampaignDateFieldsProps> = ({
 }) => {
   const activeColor = "primary-500";
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
       <div className="form-group">
         <DatePickerModern
           register={undefined}
@@ -62,9 +62,7 @@ const CampaignDateFields: React.FC<CampaignDateFieldsProps> = ({
             })
           }
           placeholder={t("campaigns.modal.add.placeholders.endDate")}
-          minDate={
-            watch("start_date") ? new Date(watch("start_date")!) : undefined
-          }
+          minDate={watch("start_date") ? new Date(watch("start_date")!) : undefined}
           size="lg"
           variant="filled"
           withPortal

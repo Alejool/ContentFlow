@@ -81,29 +81,27 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
         {/* Event Header */}
         <div className="flex items-start gap-4">
           <div
-            className="w-1 h-20 rounded-full flex-shrink-0"
+            className="h-20 w-1 flex-shrink-0 rounded-full"
             style={{ backgroundColor: event.color }}
           />
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-2">
+          <div className="min-w-0 flex-1">
+            <div className="mb-2 flex items-center gap-2">
               <PlatformIcon
                 platform={
                   ["user_event", "event"].includes(String(event.type))
                     ? "user_event"
                     : event.platform
                 }
-                className="w-6 h-6"
+                className="h-6 w-6"
               />
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                {event.title}
-              </h3>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">{event.title}</h3>
             </div>
             <div className="flex items-center gap-2">
-              <span className="px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 capitalize">
+              <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium capitalize text-gray-700 dark:bg-gray-700 dark:text-gray-300">
                 {t(`status.${event.status}`, event.status)}
               </span>
               {event.type && (
-                <span className="px-3 py-1 rounded-full bg-primary-100 dark:bg-primary-900/30 text-sm font-medium text-primary-700 dark:text-primary-300 capitalize">
+                <span className="rounded-full bg-primary-100 px-3 py-1 text-sm font-medium capitalize text-primary-700 dark:bg-primary-900/30 dark:text-primary-300">
                   {event.type.replace("_", " ")}
                 </span>
               )}
@@ -115,9 +113,9 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
         <div className="space-y-4">
           {/* Date and Time */}
           <div className="flex items-start gap-3">
-            <Calendar className="w-5 h-5 text-gray-400 mt-0.5" />
+            <Calendar className="mt-0.5 h-5 w-5 text-gray-400" />
             <div className="flex-1">
-              <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+              <div className="mb-1 text-sm font-medium text-gray-500 dark:text-gray-400">
                 {t("calendar.eventDetails.dateTime") || "Fecha y Hora"}
               </div>
               {isEditingDate ? (
@@ -127,11 +125,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                     onChange={(date) => setNewDate(date)}
                   />
                   <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      onClick={handleSaveDate}
-                      disabled={isSaving || !newDate}
-                    >
+                    <Button size="sm" onClick={handleSaveDate} disabled={isSaving || !newDate}>
                       {isSaving
                         ? t("common.saving") || "Guardando..."
                         : t("common.save") || "Guardar"}
@@ -156,16 +150,16 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                   {canEdit && onUpdateDate && (
                     <button
                       onClick={() => setIsEditingDate(true)}
-                      className="p-1 rounded-md text-gray-400 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all"
+                      className="rounded-md p-1 text-gray-400 transition-all hover:bg-primary-50 hover:text-primary-600 dark:hover:bg-primary-900/20"
                       title={t("common.edit") || "Editar"}
                     >
-                      <Edit2 className="w-4 h-4" />
+                      <Edit2 className="h-4 w-4" />
                     </button>
                   )}
                 </div>
               )}
-              <div className="flex items-center gap-1 mt-1 text-gray-600 dark:text-gray-400">
-                <Clock className="w-4 h-4" />
+              <div className="mt-1 flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                <Clock className="h-4 w-4" />
                 <span className="text-sm">{formatTime(event.start)}</span>
               </div>
             </div>
@@ -174,12 +168,12 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
           {/* Platform */}
           {event.platform && (
             <div className="flex items-start gap-3">
-              <Tag className="w-5 h-5 text-gray-400 mt-0.5" />
+              <Tag className="mt-0.5 h-5 w-5 text-gray-400" />
               <div className="flex-1">
-                <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                <div className="mb-1 text-sm font-medium text-gray-500 dark:text-gray-400">
                   {t("calendar.eventDetails.platform") || "Plataforma"}
                 </div>
-                <div className="text-base text-gray-900 dark:text-white capitalize">
+                <div className="text-base capitalize text-gray-900 dark:text-white">
                   {event.platform}
                 </div>
               </div>
@@ -189,14 +183,12 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
           {/* Campaign */}
           {event.campaign && (
             <div className="flex items-start gap-3">
-              <Tag className="w-5 h-5 text-gray-400 mt-0.5" />
+              <Tag className="mt-0.5 h-5 w-5 text-gray-400" />
               <div className="flex-1">
-                <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                <div className="mb-1 text-sm font-medium text-gray-500 dark:text-gray-400">
                   {t("calendar.eventDetails.campaign") || "Campaña"}
                 </div>
-                <div className="text-base text-gray-900 dark:text-white">
-                  {event.campaign}
-                </div>
+                <div className="text-base text-gray-900 dark:text-white">{event.campaign}</div>
               </div>
             </div>
           )}
@@ -204,9 +196,9 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
           {/* Description */}
           {event.extendedProps?.description && (
             <div className="flex items-start gap-3">
-              <LinkIcon className="w-5 h-5 text-gray-400 mt-0.5" />
+              <LinkIcon className="mt-0.5 h-5 w-5 text-gray-400" />
               <div className="flex-1">
-                <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                <div className="mb-1 text-sm font-medium text-gray-500 dark:text-gray-400">
                   {t("calendar.eventDetails.description") || "Descripción"}
                 </div>
                 <div className="text-base text-gray-900 dark:text-white">
@@ -219,18 +211,16 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
           {/* Link to publication (Internal) */}
           {event.extendedProps?.slug && (
             <div className="flex items-start gap-3">
-              <LinkIcon className="w-5 h-5 text-gray-400 mt-0.5" />
+              <LinkIcon className="mt-0.5 h-5 w-5 text-gray-400" />
               <div className="flex-1">
-                <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                  {t("calendar.eventDetails.viewPublication") ||
-                    "Ver en ContentFlow"}
+                <div className="mb-1 text-sm font-medium text-gray-500 dark:text-gray-400">
+                  {t("calendar.eventDetails.viewPublication") || "Ver en ContentFlow"}
                 </div>
                 <a
                   href={`${event.extendedProps.slug}?id=${event.publicationId || event.extendedProps.publication_id}`}
-                  className="text-base text-primary-600 dark:text-primary-400 hover:underline"
+                  className="text-base text-primary-600 hover:underline dark:text-primary-400"
                 >
-                  {t("calendar.eventDetails.openInEditor") ||
-                    "Abrir en el editor"}
+                  {t("calendar.eventDetails.openInEditor") || "Abrir en el editor"}
                 </a>
               </div>
             </div>
@@ -238,22 +228,20 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
 
           {/* External platform link */}
           {event.extendedProps?.post_url && (
-            <div className="flex items-start gap-3 p-3 bg-primary-50 dark:bg-primary-900/10 rounded-lg border border-primary-100 dark:border-primary-800/30">
-              <ExternalLink className="w-5 h-5 text-primary-600 dark:text-primary-400 mt-0.5" />
+            <div className="flex items-start gap-3 rounded-lg border border-primary-100 bg-primary-50 p-3 dark:border-primary-800/30 dark:bg-primary-900/10">
+              <ExternalLink className="mt-0.5 h-5 w-5 text-primary-600 dark:text-primary-400" />
               <div className="flex-1">
-                <div className="text-sm font-medium text-primary-700 dark:text-primary-300 mb-1">
-                  {t("calendar.eventDetails.publishedLink") ||
-                    "Publicado en la red social"}
+                <div className="mb-1 text-sm font-medium text-primary-700 dark:text-primary-300">
+                  {t("calendar.eventDetails.publishedLink") || "Publicado en la red social"}
                 </div>
                 <a
                   href={event.extendedProps.post_url}
-                  className="inline-flex items-center gap-1.5 text-sm text-primary-600 dark:text-primary-400 hover:underline font-semibold"
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary-600 hover:underline dark:text-primary-400"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {t("calendar.eventDetails.viewOnPlatform") ||
-                    "Ver publicación real"}
-                  <ExternalLink className="w-3 h-3" />
+                  {t("calendar.eventDetails.viewOnPlatform") || "Ver publicación real"}
+                  <ExternalLink className="h-3 w-3" />
                 </a>
               </div>
             </div>
@@ -261,13 +249,13 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
 
           {/* Error Message */}
           {event.status === "failed" && event.extendedProps?.error_message && (
-            <div className="flex items-start gap-3 p-3 bg-red-50 dark:bg-red-900/10 rounded-lg border border-red-100 dark:border-red-900/30">
-              <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5" />
+            <div className="flex items-start gap-3 rounded-lg border border-red-100 bg-red-50 p-3 dark:border-red-900/30 dark:bg-red-900/10">
+              <AlertCircle className="mt-0.5 h-5 w-5 text-red-600 dark:text-red-400" />
               <div className="flex-1">
-                <div className="text-sm font-medium text-red-700 dark:text-red-300 mb-1">
+                <div className="mb-1 text-sm font-medium text-red-700 dark:text-red-300">
                   {t("calendar.eventDetails.errorTitle") || "Error en el envío"}
                 </div>
-                <div className="text-sm text-red-600 dark:text-red-400 font-medium italic">
+                <div className="text-sm font-medium italic text-red-600 dark:text-red-400">
                   {event.extendedProps.error_message}
                 </div>
               </div>
@@ -276,14 +264,14 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
         </div>
 
         {/* Actions */}
-        <div className="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between border-t border-gray-200 pt-4 dark:border-gray-700">
           <div>
             {canDelete && onDelete && (
               <Button
                 variant="danger"
                 size="sm"
                 onClick={handleDelete}
-                icon={<Trash2 className="w-4 h-4" />}
+                icon={<Trash2 className="h-4 w-4" />}
               >
                 {t("common.delete") || "Eliminar"}
               </Button>

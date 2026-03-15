@@ -43,9 +43,7 @@ export function AddonsPromotionCard({
           // Encontrar el más barato por precio local
           if (allPackages.length > 0) {
             const cheapest = allPackages.reduce((min, pkg) =>
-              (pkg.price_local || pkg.price) < (min.price_local || min.price)
-                ? pkg
-                : min,
+              (pkg.price_local || pkg.price) < (min.price_local || min.price) ? pkg : min,
             );
             setCheapestAddon(cheapest);
           }
@@ -73,15 +71,12 @@ export function AddonsPromotionCard({
 
       {/* Banner promocional si hay uso alto y está habilitado */}
       {showPromoBanner && hasHighUsage && (
-        <div className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-xl p-6 border border-primary-200 dark:border-primary-700/50 shadow-sm hover:shadow-md text-dark dark:text-white ">
-          <div className="flex items-start justify-between mb-4">
+        <div className="text-dark rounded-xl border border-primary-200 bg-gradient-to-br from-primary-50 to-primary-100 p-6 shadow-sm hover:shadow-md dark:border-primary-700/50 dark:from-primary-900/20 dark:to-primary-800/20 dark:text-white">
+          <div className="mb-4 flex items-start justify-between">
             <div>
-              <h3 className="text-xl font-bold mb-2 flex items-center">
-                <Sparkles className="w-6 h-6 mr-2" />
-                {t(
-                  "subscription.addons.powerUpWorkspace",
-                  "Potencia tu Workspace",
-                )}
+              <h3 className="mb-2 flex items-center text-xl font-bold">
+                <Sparkles className="mr-2 h-6 w-6" />
+                {t("subscription.addons.powerUpWorkspace", "Potencia tu Workspace")}
               </h3>
               <p className="text-sm">
                 {t(
@@ -90,26 +85,20 @@ export function AddonsPromotionCard({
                 )}
               </p>
             </div>
-            <Sparkles className="w-8 h-8 opacity-80" />
+            <Sparkles className="h-8 w-8 opacity-80" />
           </div>
 
           {/* Beneficios */}
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 mb-4 border border-white/20">
-            <div className="text-xs space-y-1.5">
+          <div className="mb-4 rounded-lg border border-white/20 bg-white/10 p-3 backdrop-blur-sm">
+            <div className="space-y-1.5 text-xs">
               {[
                 cheapestAddon
                   ? t("subscription.addons.packagesFrom", "Paquetes desde") +
                     " " +
                     (cheapestAddon.formatted_price || `$${cheapestAddon.price}`)
-                  : t(
-                      "subscription.addons.packagesFrom",
-                      "Paquetes desde $9.99",
-                    ),
+                  : t("subscription.addons.packagesFrom", "Paquetes desde $9.99"),
                 t("subscription.addons.upToDiscount", "Hasta 40% de descuento"),
-                t(
-                  "subscription.addons.instantAvailable",
-                  "Disponible al instante",
-                ),
+                t("subscription.addons.instantAvailable", "Disponible al instante"),
               ].map((benefit, index) => (
                 <div key={index} className="flex items-center">
                   <span className="mr-2">✓</span>
@@ -122,18 +111,15 @@ export function AddonsPromotionCard({
           {/* CTA */}
           <Link
             href="/subscription/addons"
-            className="block w-full bg-primary-500 text-white text-center py-3 rounded-lg font-semibold hover:bg-primary-600 transition-all transform shadow-lg"
+            className="block w-full transform rounded-lg bg-primary-500 py-3 text-center font-semibold text-white shadow-lg transition-all hover:bg-primary-600"
           >
-            <Sparkles className="w-4 h-4 inline mr-2" />
+            <Sparkles className="mr-2 inline h-4 w-4" />
             {t("subscription.addons.viewPackages", "Ver Paquetes Disponibles")}
           </Link>
 
           {/* Footer */}
-          <p className="text-xs text-center mt-3">
-            {t(
-              "subscription.addons.noCommitment",
-              "Sin compromisos • Cancela cuando quieras",
-            )}
+          <p className="mt-3 text-center text-xs">
+            {t("subscription.addons.noCommitment", "Sin compromisos • Cancela cuando quieras")}
           </p>
         </div>
       )}

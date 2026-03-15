@@ -17,9 +17,7 @@ interface DropDownContextType {
   toggleOpen: () => void;
 }
 
-const DropDownContext = createContext<DropDownContextType | undefined>(
-  undefined,
-);
+const DropDownContext = createContext<DropDownContextType | undefined>(undefined);
 
 interface DropdownProps {
   children: ReactNode;
@@ -68,11 +66,7 @@ const Trigger = ({ children }: TriggerProps) => {
         {children}
       </div>
       {open && (
-        <div
-          className="fixed inset-0 z-20"
-          onClick={() => setOpen(false)}
-          aria-hidden="true"
-        ></div>
+        <div className="fixed inset-0 z-20" onClick={() => setOpen(false)} aria-hidden="true"></div>
       )}
     </>
   );
@@ -124,12 +118,11 @@ const Content = ({
       leaveTo="opacity-0 scale-95"
     >
       <div
-        className={`absolute z-50 mt-2 rounded-lg shadow-2xl border border-gray-100 dark:border-neutral-700 ${alignmentClasses} ${widthClasses} ${className}`}
+        className={`absolute z-50 mt-2 rounded-lg border border-gray-100 shadow-2xl dark:border-neutral-700 ${alignmentClasses} ${widthClasses} ${className}`}
         onClick={() => setOpen(false)}
       >
         <div
-          className={`rounded-lg ring-1 ring-black ring-opacity-5 overflow-hidden
-                        ${contentClasses}`}
+          className={`overflow-hidden rounded-lg ring-1 ring-black ring-opacity-5 ${contentClasses}`}
         >
           {children}
         </div>
@@ -143,11 +136,7 @@ interface DropdownLinkProps extends ComponentProps<typeof InertiaLink> {
   children: ReactNode;
 }
 
-const DropdownLink = ({
-  className = "",
-  children,
-  ...props
-}: DropdownLinkProps) => {
+const DropdownLink = ({ className = "", children, ...props }: DropdownLinkProps) => {
   return (
     <InertiaLink
       {...props}

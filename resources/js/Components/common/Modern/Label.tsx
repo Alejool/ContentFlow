@@ -20,13 +20,7 @@ interface LabelProps {
   align?: "left" | "center" | "right";
   tooltip?: string;
   badge?: string | number;
-  badgeColor?:
-    | "primary"
-    | "secondary"
-    | "success"
-    | "warning"
-    | "error"
-    | "info";
+  badgeColor?: "primary" | "secondary" | "success" | "warning" | "error" | "info";
   withIndicator?: boolean;
   indicatorColor?: "primary" | "success" | "warning" | "error" | "info";
   onClick?: () => void;
@@ -96,14 +90,8 @@ export default function Label({
   const currentSize = sizeConfig[size];
 
   const getContainerStyles = () => {
-    const baseStyles = ` ${
-      onClick ? "cursor-pointer hover:opacity-90 active:scale-95" : ""
-    } ${
-      align === "center"
-        ? "justify-center"
-        : align === "right"
-          ? "justify-end"
-          : ""
+    const baseStyles = ` ${onClick ? "cursor-pointer hover:opacity-90 active:scale-95" : ""} ${
+      align === "center" ? "justify-center" : align === "right" ? "justify-end" : ""
     }`;
 
     if (disabled) {
@@ -118,14 +106,10 @@ export default function Label({
 
     switch (variant) {
       case "bold":
-        return `${base} font-bold ${
-          theme === "dark" ? "text-white" : "text-gray-900"
-        }`;
+        return `${base} font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`;
 
       case "subtle":
-        return `${base} ${
-          theme === "dark" ? "text-gray-400" : "text-gray-500"
-        }`;
+        return `${base} ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`;
 
       case "highlighted":
         return `${base} font-semibold ${
@@ -135,9 +119,7 @@ export default function Label({
         }`;
 
       default:
-        return `${base} ${
-          theme === "dark" ? "text-gray-300" : "text-gray-700"
-        }`;
+        return `${base} ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`;
     }
   };
 
@@ -256,14 +238,10 @@ export default function Label({
 
   const renderIcon = () => {
     if (error) {
-      return (
-        <AlertCircle className={`${currentSize.icon} ${getIconStyles()}`} />
-      );
+      return <AlertCircle className={`${currentSize.icon} ${getIconStyles()}`} />;
     }
     if (success) {
-      return (
-        <CheckCircle className={`${currentSize.icon} ${getIconStyles()}`} />
-      );
+      return <CheckCircle className={`${currentSize.icon} ${getIconStyles()}`} />;
     }
     if (info) {
       return <Info className={`${currentSize.icon} ${getIconStyles()}`} />;
@@ -275,7 +253,7 @@ export default function Label({
   };
 
   return (
-    <div className={`space-y-2 mb-1 ${containerClassName}`}>
+    <div className={`mb-1 space-y-2 ${containerClassName}`}>
       <div className={getContainerStyles()}>
         <label
           id={id}
@@ -295,13 +273,7 @@ export default function Label({
             {children}
 
             {required && (
-              <span
-                className={
-                  theme === "dark" ? "text-primary-400" : "text-primary-500"
-                }
-              >
-                *
-              </span>
+              <span className={theme === "dark" ? "text-primary-400" : "text-primary-500"}>*</span>
             )}
           </span>
 

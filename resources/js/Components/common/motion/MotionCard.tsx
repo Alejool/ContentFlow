@@ -1,11 +1,7 @@
 import React, { HTMLAttributes, forwardRef } from "react";
 import { LazyMotion, domAnimation, m, HTMLMotionProps } from "framer-motion";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
-import {
-  hoverVariants,
-  getVariant,
-  getTransition,
-} from "@/config/animationVariants";
+import { hoverVariants, getVariant, getTransition } from "@/config/animationVariants";
 
 /**
  * Hover effect variants for cards
@@ -80,11 +76,7 @@ export const MotionCard = forwardRef<HTMLDivElement, MotionCardProps>(
           ref={ref}
           className={className}
           initial="initial"
-          whileHover={getVariant(
-            selectedHoverVariant,
-            hoverState,
-            shouldReduceMotion,
-          )}
+          whileHover={getVariant(selectedHoverVariant, hoverState, shouldReduceMotion)}
           transition={getTransition(
             selectedHoverVariant.transition || { duration: 0.25 },
             shouldReduceMotion,

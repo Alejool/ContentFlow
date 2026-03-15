@@ -16,8 +16,7 @@ export default function ResponsiveNavLink({
   return (
     <Link
       {...props}
-      className={`flex w-full items-start  py-2 pe-4 ps-3
-                text-base transition duration-150 ease-in-out focus:outline-none ${className}`}
+      className={`flex w-full items-start py-2 pe-4 ps-3 text-base transition duration-150 ease-in-out focus:outline-none ${className}`}
     >
       {children}
     </Link>

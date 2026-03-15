@@ -19,7 +19,7 @@ export const SkipLink: React.FC<SkipLinkProps> = ({
   return (
     <a
       href={href}
-      className="skip-link focus-ring"
+      className="focus-ring skip-link"
       onClick={(e) => {
         e.preventDefault();
         const target = document.querySelector(href);

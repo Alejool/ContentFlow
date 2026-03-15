@@ -11,20 +11,15 @@ interface AddonBalanceWidgetProps {
   loading?: boolean;
 }
 
-export const AddonBalanceWidget: React.FC<AddonBalanceWidgetProps> = ({
-  summary,
-  loading,
-}) => {
+export const AddonBalanceWidget: React.FC<AddonBalanceWidgetProps> = ({ summary, loading }) => {
   if (loading || !summary) {
     return null;
   }
 
   // Solo mostrar si tiene add-ons activos o si está cerca del límite
   const hasAddons = summary.active_addons_count > 0;
-  const aiLowBalance =
-    summary.ai_credits.percentage_used >= 70 && summary.ai_credits.total > 0;
-  const storageLowBalance =
-    summary.storage.percentage_used >= 70 && summary.storage.total > 0;
+  const aiLowBalance = summary.ai_credits.percentage_used >= 70 && summary.ai_credits.total > 0;
+  const storageLowBalance = summary.storage.percentage_used >= 70 && summary.storage.total > 0;
 
   if (!hasAddons && !aiLowBalance && !storageLowBalance) {
     return null;
@@ -33,12 +28,10 @@ export const AddonBalanceWidget: React.FC<AddonBalanceWidgetProps> = ({
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-        <CardTitle className="text-base font-semibold">
-          Add-ons Activos
-        </CardTitle>
+        <CardTitle className="text-base font-semibold">Add-ons Activos</CardTitle>
         <Button asChild variant="ghost" size="sm">
           <Link href="/subscription/addons">
-            <Plus className="h-4 w-4 mr-1" />
+            <Plus className="mr-1 h-4 w-4" />
             Comprar
           </Link>
         </Button>
@@ -98,7 +91,7 @@ export const AddonBalanceWidget: React.FC<AddonBalanceWidgetProps> = ({
 
         {/* Low Balance Warning */}
         {(aiLowBalance || storageLowBalance) && (
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-3">
+          <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-800 dark:bg-yellow-900/20">
             <p className="text-xs text-yellow-800 dark:text-yellow-200">
               ⚠️ Saldo bajo. Considera comprar más créditos.
             </p>
@@ -107,7 +100,7 @@ export const AddonBalanceWidget: React.FC<AddonBalanceWidgetProps> = ({
 
         {/* Total Spent */}
         {summary.total_spent > 0 && (
-          <div className="pt-3 border-t text-xs text-muted-foreground">
+          <div className="text-muted-foreground border-t pt-3 text-xs">
             Total invertido: ${summary.total_spent.toFixed(2)}
           </div>
         )}

@@ -28,10 +28,7 @@ interface Plan {
   requires_stripe?: boolean;
 }
 
-export default function PlanSelectionStep({
-  onComplete,
-  onSkip,
-}: PlanSelectionStepProps) {
+export default function PlanSelectionStep({ onComplete, onSkip }: PlanSelectionStepProps) {
   const { t } = useTranslation();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -55,9 +52,7 @@ export default function PlanSelectionStep({
 
         // Check if user has an active subscription
         try {
-          const response = await axios.get(
-            "/api/v1/subscription/current-usage",
-          );
+          const response = await axios.get("/api/v1/subscription/current-usage");
           const currentPlan = response.data?.data?.plan;
 
           // If user has an active paid plan, update onboarding and complete this step
@@ -120,10 +115,10 @@ export default function PlanSelectionStep({
 
   if (isLoading || checkingSubscription) {
     return (
-      <div className="max-w-7xl mx-auto space-y-6">
-        <div className="text-center space-y-3">
-          <div className="w-16 h-16 bg-primary-100 dark:bg-primary-900/20 rounded-full flex items-center justify-center mx-auto">
-            <Crown className="w-8 h-8 text-primary-600 animate-pulse" />
+      <div className="mx-auto max-w-7xl space-y-6">
+        <div className="space-y-3 text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900/20">
+            <Crown className="h-8 w-8 animate-pulse text-primary-600" />
           </div>
           <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
             {t("planSelection.title")}
@@ -139,17 +134,15 @@ export default function PlanSelectionStep({
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      <div className="text-center space-y-3 mb-8">
-        <div className="w-16 h-16 bg-primary-100 dark:bg-primary-900/20 rounded-full flex items-center justify-center mx-auto">
-          <Crown className="w-8 h-8 text-primary-600" />
+    <div className="mx-auto max-w-7xl space-y-6">
+      <div className="mb-8 space-y-3 text-center">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900/20">
+          <Crown className="h-8 w-8 text-primary-600" />
         </div>
         <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
           {t("planSelection.title")}
         </h3>
-        <p className="text-gray-600 dark:text-gray-400">
-          {t("planSelection.description")}
-        </p>
+        <p className="text-gray-600 dark:text-gray-400">{t("planSelection.description")}</p>
       </div>
 
       {/* Usar el mismo componente que PricingPage */}
@@ -163,13 +156,8 @@ export default function PlanSelectionStep({
         onPlanSelected={handlePlanSelected}
       />
 
-      <div className="text-center pt-4 flex justify-end">
-        <Button
-          onClick={onSkip}
-          variant="ghost"
-          buttonStyle="outline"
-          size="md"
-        >
+      <div className="flex justify-end pt-4 text-center">
+        <Button onClick={onSkip} variant="ghost" buttonStyle="outline" size="md">
           {t("planSelection.decideLater")}
         </Button>
       </div>

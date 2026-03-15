@@ -62,11 +62,9 @@ const AiFieldSuggester: React.FC<AiFieldSuggesterProps> = ({
 
       if (response.data.success && response.data.data) {
         onSuggest(response.data.data);
-        toast.success(
-          t("common.ai.suggestions_generated") ||
-            "Sugerencias generadas con éxito",
-          { id: "ai-suggestions" },
-        );
+        toast.success(t("common.ai.suggestions_generated") || "Sugerencias generadas con éxito", {
+          id: "ai-suggestions",
+        });
       } else {
         toast.error(
           response.data.message ||
@@ -76,9 +74,7 @@ const AiFieldSuggester: React.FC<AiFieldSuggesterProps> = ({
       }
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message ||
-          t("common.error") ||
-          "Error al procesar la solicitud",
+        error.response?.data?.message || t("common.error") || "Error al procesar la solicitud",
       );
     } finally {
       setLoading(false);

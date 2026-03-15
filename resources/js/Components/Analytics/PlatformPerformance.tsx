@@ -15,10 +15,7 @@ interface PlatformPerformanceProps {
   theme?: "light" | "dark";
 }
 
-export default function PlatformPerformance({
-  data,
-  theme = "light",
-}: PlatformPerformanceProps) {
+export default function PlatformPerformance({ data, theme = "light" }: PlatformPerformanceProps) {
   const { t } = useTranslation();
 
   const chartData = data.map((item) => ({
@@ -54,39 +51,24 @@ export default function PlatformPerformance({
   };
 
   return (
-    <div
-      className={`rounded-lg p-6 transition-all duration-300 ${getCardBg()}`}
-    >
-      <div className="flex items-center justify-between mb-6">
-        <h2
-          className={`text-xl font-bold flex items-center gap-2 ${getTextColor(
-            "title",
-          )}`}
-        >
+    <div className={`rounded-lg p-6 transition-all duration-300 ${getCardBg()}`}>
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className={`flex items-center gap-2 text-xl font-bold ${getTextColor("title")}`}>
           <div
-            className={`p-2 rounded-lg ${
+            className={`rounded-lg p-2 ${
               theme === "dark" ? "bg-primary-900/20" : "bg-primary-100"
             }`}
           >
             <LayoutPanelLeft
-              className={`w-5 h-5 ${
-                theme === "dark" ? "text-primary-400" : "text-primary-600"
-              }`}
+              className={`h-5 w-5 ${theme === "dark" ? "text-primary-400" : "text-primary-600"}`}
             />
           </div>
-          {t("dashboard.platformPerformance") ||
-            "Rendimiento Global por Plataforma"}
+          {t("dashboard.platformPerformance") || "Rendimiento Global por Plataforma"}
         </h2>
       </div>
 
       <div className="mt-4">
-        <BarChart
-          data={chartData}
-          bars={bars}
-          xAxisKey="name"
-          height={300}
-          theme={theme}
-        />
+        <BarChart data={chartData} bars={bars} xAxisKey="name" height={300} theme={theme} />
       </div>
     </div>
   );

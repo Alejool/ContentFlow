@@ -12,13 +12,6 @@ interface VisuallyHiddenProps {
   focusable?: boolean;
 }
 
-export const VisuallyHidden: React.FC<VisuallyHiddenProps> = ({
-  children,
-  focusable = false,
-}) => {
-  return (
-    <span className={focusable ? "sr-only-focusable" : "sr-only"}>
-      {children}
-    </span>
-  );
+export const VisuallyHidden: React.FC<VisuallyHiddenProps> = ({ children, focusable = false }) => {
+  return <span className={focusable ? "sr-only-focusable" : "sr-only"}>{children}</span>;
 };

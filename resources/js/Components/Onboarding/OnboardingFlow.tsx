@@ -3,11 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useOnboarding } from "@/Contexts/OnboardingContext";
 import { OnboardingErrorBoundary } from "./OnboardingErrorBoundary";
 import { Building2, Gem, Target, Link2, Check } from "lucide-react";
-import type {
-  TourStep,
-  SocialPlatform,
-  PublicationTemplate,
-} from "@/types/onboarding";
+import type { TourStep, SocialPlatform, PublicationTemplate } from "@/types/onboarding";
 
 // Lazy load onboarding components to reduce initial bundle size
 const BusinessInfoStep = lazy(() => import("./BusinessInfoStep"));
@@ -50,14 +46,8 @@ export default function OnboardingFlow({
   connectedAccounts = [],
   templates,
 }: OnboardingFlowProps) {
-  const {
-    state,
-    completeBusinessInfo,
-    selectPlan,
-    completeTourStep,
-    skipTour,
-    nextTourStep,
-  } = useOnboarding();
+  const { state, completeBusinessInfo, selectPlan, completeTourStep, skipTour, nextTourStep } =
+    useOnboarding();
 
   // Determine initial stage based on current state to avoid flash
   const determineCurrentStage = useCallback((): OnboardingStage => {
@@ -92,9 +82,7 @@ export default function OnboardingFlow({
     state.wizardSkipped,
   ]);
 
-  const [currentStage, setCurrentStage] = useState<OnboardingStage>(() =>
-    determineCurrentStage(),
-  );
+  const [currentStage, setCurrentStage] = useState<OnboardingStage>(() => determineCurrentStage());
 
   // Debug logging
   useEffect(() => {}, []);
@@ -210,8 +198,8 @@ export default function OnboardingFlow({
       {currentStage === "businessInfo" && (
         <OnboardingErrorBoundary>
           <Suspense fallback={<OnboardingLoadingFallback />}>
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-              <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8">
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+              <div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-lg bg-white p-8 shadow-2xl dark:bg-neutral-800">
                 <BusinessInfoStep
                   onComplete={handleBusinessInfoComplete}
                   onSkip={handleBusinessInfoSkip}
@@ -226,12 +214,9 @@ export default function OnboardingFlow({
       {currentStage === "planSelection" && (
         <OnboardingErrorBoundary>
           <Suspense fallback={<OnboardingLoadingFallback />}>
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-              <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-2xl w-full max-w-7xl max-h-[90vh] overflow-y-auto p-8">
-                <PlanSelectionStep
-                  onComplete={handlePlanSelect}
-                  onSkip={handlePlanSkip}
-                />
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+              <div className="max-h-[90vh] w-full max-w-7xl overflow-y-auto rounded-lg bg-white p-8 shadow-2xl dark:bg-neutral-800">
+                <PlanSelectionStep onComplete={handlePlanSelect} onSkip={handlePlanSkip} />
               </div>
             </div>
           </Suspense>
@@ -244,9 +229,7 @@ export default function OnboardingFlow({
           <Suspense fallback={<OnboardingLoadingFallback />}>
             <TourOverlay
               currentStep={
-                tourSteps[
-                  Math.min(state.tourCurrentStep, tourSteps.length - 1)
-                ] || tourSteps[0]
+                tourSteps[Math.min(state.tourCurrentStep, tourSteps.length - 1)] || tourSteps[0]
               }
               totalSteps={tourSteps.length}
               onNext={nextTourStep}
@@ -314,7 +297,7 @@ function OnboardingProgressIndicator({
   const currentStageIndex = stages.findIndex((s) => s.id === currentStage);
 
   return (
-    <div className="fixed top-6 right-6 z-[99] bg-white dark:bg-neutral-800 rounded-lg shadow-2xl border border-gray-200 dark:border-neutral-700 p-6 w-80">
+    <div className="fixed right-6 top-6 z-[99] w-80 rounded-lg border border-gray-200 bg-white p-6 shadow-2xl dark:border-neutral-700 dark:bg-neutral-800">
       {/* Header */}
     </div>
   );
@@ -326,11 +309,9 @@ function OnboardingProgressIndicator({
 function OnboardingLoadingFallback() {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-xl p-8 flex flex-col items-center gap-4">
-        <div className="w-12 h-12 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
-        <p className="text-gray-700 dark:text-gray-300 text-sm font-medium">
-          Loading...
-        </p>
+      <div className="flex flex-col items-center gap-4 rounded-lg bg-white p-8 shadow-xl dark:bg-neutral-800">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary-200 border-t-primary-600" />
+        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Loading...</p>
       </div>
     </div>
   );

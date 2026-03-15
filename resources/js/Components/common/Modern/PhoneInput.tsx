@@ -58,11 +58,7 @@ const FlagEmoji = ({ countryCode }: { countryCode: string }) => {
     .toUpperCase()
     .split("")
     .map((char) => 127397 + char.charCodeAt(0));
-  return (
-    <span className="text-xl leading-none">
-      {String.fromCodePoint(...codePoints)}
-    </span>
-  );
+  return <span className="text-xl leading-none">{String.fromCodePoint(...codePoints)}</span>;
 };
 
 export default function PhoneInput({
@@ -102,12 +98,9 @@ export default function PhoneInput({
   className = "",
 }: PhoneInputProps) {
   const { t } = useTranslation();
-  const [selectedCountry, setSelectedCountry] =
-    useState<CountryCode>(defaultCountry);
+  const [selectedCountry, setSelectedCountry] = useState<CountryCode>(defaultCountry);
   const [nationalNumber, setNationalNumber] = useState("");
-  const [validationError, setValidationError] = useState<string | undefined>(
-    error,
-  );
+  const [validationError, setValidationError] = useState<string | undefined>(error);
   const [isValid, setIsValid] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const onChangeRef = useRef(onChange);
@@ -241,13 +234,11 @@ export default function PhoneInput({
   return (
     <div className={className}>
       {label && (
-        <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          {required && <span className="ml-1 text-red-500">*</span>}
           {!required && (
-            <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
-              (Opcional)
-            </span>
+            <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">(Opcional)</span>
           )}
         </label>
       )}
@@ -271,7 +262,7 @@ export default function PhoneInput({
         {/* Input de número */}
         <div className="col-span-7">
           <div className="relative">
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 z-10 text-gray-500 dark:text-gray-400 font-medium text-base">
+            <div className="absolute left-3 top-1/2 z-10 -translate-y-1/2 text-base font-medium text-gray-500 dark:text-gray-400">
               +{callingCode}
             </div>
             <input
@@ -279,17 +270,8 @@ export default function PhoneInput({
               value={nationalNumber}
               onChange={handleNumberChange}
               disabled={disabled}
-              placeholder={
-                placeholder || t("profile.information.phonePlaceholder")
-              }
-              className={`
-                w-full rounded-lg transition-all duration-200
-                border focus:outline-none focus:ring-2 focus:ring-offset-2
-                py-3 pr-4 text-base
-                bg-gray-50 dark:bg-neutral-800/50 text-gray-900 dark:text-white
-                ${validationError ? "border-red-500 focus:ring-red-500/20" : "border-gray-200 dark:border-neutral-700 hover:border-primary-400 dark:hover:border-primary-600 focus:ring-primary-500/20 focus:border-primary-500"}
-                ${disabled ? "opacity-60 cursor-not-allowed" : ""}
-              `}
+              placeholder={placeholder || t("profile.information.phonePlaceholder")}
+              className={`w-full rounded-lg border bg-gray-50 py-3 pr-4 text-base text-gray-900 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:bg-neutral-800/50 dark:text-white ${validationError ? "border-red-500 focus:ring-red-500/20" : "border-gray-200 hover:border-primary-400 focus:border-primary-500 focus:ring-primary-500/20 dark:border-neutral-700 dark:hover:border-primary-600"} ${disabled ? "cursor-not-allowed opacity-60" : ""} `}
               style={{ paddingLeft: `${2.5 + callingCode.length * 0.6}rem` }}
             />
           </div>
@@ -298,21 +280,19 @@ export default function PhoneInput({
 
       {/* Mensajes de validación */}
       {validationError && (
-        <div className="mt-2 text-red-600 dark:text-red-400 text-sm flex items-center gap-2 animate-shake">
-          <TriangleAlert className="w-4 h-4 flex-shrink-0" />
+        <div className="animate-shake mt-2 flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
+          <TriangleAlert className="h-4 w-4 flex-shrink-0" />
           <span>{validationError}</span>
         </div>
       )}
 
       {isValid && !validationError && nationalNumber && (
-        <div className="mt-2 text-green-600 dark:text-green-400 text-xs flex items-center gap-2">
-          <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" />
+        <div className="mt-2 flex items-center gap-2 text-xs text-green-600 dark:text-green-400">
+          <CheckCircle className="h-3.5 w-3.5 flex-shrink-0" />
           <span>
             {(() => {
               try {
-                const phoneNumber = parsePhoneNumber(
-                  `+${callingCode}${nationalNumber}`,
-                );
+                const phoneNumber = parsePhoneNumber(`+${callingCode}${nationalNumber}`);
                 if (phoneNumber) {
                   return `${phoneNumber.formatInternational()} - ${phoneNumber.country}`;
                 }

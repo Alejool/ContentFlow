@@ -5,11 +5,7 @@ interface InputErrorProps extends HTMLAttributes<HTMLParagraphElement> {
   className?: string;
 }
 
-export default function InputError({
-  message,
-  className = "",
-  ...props
-}: InputErrorProps) {
+export default function InputError({ message, className = "", ...props }: InputErrorProps) {
   return message ? (
     <p {...props} className={"text-sm text-primary-600 " + className}>
       {message}

@@ -8,16 +8,7 @@ import { Publication } from "@/types/Publication";
 import { formatDateString } from "@/Utils/dateHelpers";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { usePage } from "@inertiajs/react";
-import {
-  Calendar,
-  Edit,
-  FileText,
-  Hash,
-  Layers,
-  Target,
-  User,
-  X,
-} from "lucide-react";
+import { Calendar, Edit, FileText, Hash, Layers, Target, User, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -38,8 +29,7 @@ export default function ViewCampaignModal({
   const { auth } = usePage<any>().props;
   const [activeTab, setActiveTab] = useState("overview");
   const [hashtagsExpanded, setHashtagsExpanded] = useState(false);
-  const canEdit =
-    auth.current_workspace?.permissions?.includes("manage-content");
+  const canEdit = auth.current_workspace?.permissions?.includes("manage-content");
 
   // Get fresh data from publicationStore if this is a publication
   const publicationsFromStore = usePublicationStore((s) => s.publications);
@@ -49,9 +39,7 @@ export default function ViewCampaignModal({
   useEffect(() => {
     if (initialItem && (initialItem as any).title && initialItem.id) {
       // This is a publication - check for updates in store
-      const freshPub = publicationsFromStore.find(
-        (p) => p.id === initialItem.id,
-      );
+      const freshPub = publicationsFromStore.find((p) => p.id === initialItem.id);
       if (freshPub) {
         setItem(freshPub);
       } else {
@@ -76,9 +64,7 @@ export default function ViewCampaignModal({
     auth.current_workspace?.subscription?.plan?.toLowerCase() ||
     auth.current_workspace?.plan?.toLowerCase() ||
     "demo";
-  const canAccessApprovals = ["demo", "professional", "enterprise"].includes(
-    planId,
-  );
+  const canAccessApprovals = ["demo", "professional", "enterprise"].includes(planId);
 
   const title = (item as any).title || (item as any).name || "Untitled";
   const desc = item.description || "No description provided.";
@@ -117,19 +103,16 @@ export default function ViewCampaignModal({
 
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
-      <div
-        className="fixed inset-0 bg-black/30 backdrop-blur-sm"
-        aria-hidden="true"
-      />
+      <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" aria-hidden="true" />
 
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <DialogPanel className="w-full max-w-3xl max-h-[90vh] rounded-lg shadow-2xl flex flex-col bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200/50 dark:border-neutral-800/50">
-          <div className="flex-shrink-0 flex items-center justify-between p-6 border-b border-gray-100 dark:border-neutral-700">
-            <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+        <DialogPanel className="flex max-h-[90vh] w-full max-w-3xl flex-col rounded-lg border border-gray-200/50 bg-gradient-to-br from-white to-gray-50 shadow-2xl dark:border-neutral-800/50 dark:from-neutral-900 dark:to-neutral-950">
+          <div className="flex flex-shrink-0 items-center justify-between border-b border-gray-100 p-6 dark:border-neutral-700">
+            <DialogTitle className="flex items-center gap-2 text-2xl font-bold text-gray-900 dark:text-white">
               {isActuallyPublication ? (
-                <FileText className="w-6 h-6 text-primary-500" />
+                <FileText className="h-6 w-6 text-primary-500" />
               ) : (
-                <Layers className="w-6 h-6 text-primary-500" />
+                <Layers className="h-6 w-6 text-primary-500" />
               )}
               {isActuallyPublication
                 ? t("publications.modal.show.title")
@@ -137,26 +120,26 @@ export default function ViewCampaignModal({
             </DialogTitle>
             <button
               onClick={onClose}
-              className="p-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-500 dark:text-gray-400"
+              className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-neutral-700"
             >
-              <X className="w-5 h-5" />
+              <X className="h-5 w-5" />
             </button>
           </div>
 
           <div className="flex-1 overflow-y-auto p-6">
             <div className="space-y-6">
               {regularMedia.length > 0 && (
-                <div className="relative w-full h-64 rounded-lg overflow-hidden bg-gray-100 dark:bg-neutral-900">
+                <div className="relative h-64 w-full overflow-hidden rounded-lg bg-gray-100 dark:bg-neutral-900">
                   <CampaignMediaCarousel mediaFiles={regularMedia} />
                 </div>
               )}
 
               {/* Reels Section */}
               {reels.length > 0 && (
-                <div className="border-2 border-purple-200 dark:border-purple-800 rounded-lg p-4 bg-purple-50/50 dark:bg-purple-900/10">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                      <FileText className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                <div className="rounded-lg border-2 border-purple-200 bg-purple-50/50 p-4 dark:border-purple-800 dark:bg-purple-900/10">
+                  <div className="mb-4 flex items-center gap-2">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900/30">
+                      <FileText className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                     </div>
                     <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                       {t("reels.section.title")} ({reels.length})
@@ -167,13 +150,11 @@ export default function ViewCampaignModal({
               )}
 
               <div>
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-2">
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {title}
-                  </h3>
+                <div className="mb-2 flex flex-col justify-between gap-2 sm:flex-row sm:items-start">
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{title}</h3>
                   {(item as any).status && (
                     <span
-                      className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium capitalize whitespace-nowrap self-start ${getStatusColor(
+                      className={`inline-flex items-center self-start whitespace-nowrap rounded-full px-3 py-1 text-sm font-medium capitalize ${getStatusColor(
                         (item as any).status,
                       )}`}
                     >
@@ -181,15 +162,13 @@ export default function ViewCampaignModal({
                     </span>
                   )}
                 </div>
-                <p className="text-base leading-relaxed text-gray-600 dark:text-gray-300">
-                  {desc}
-                </p>
+                <p className="text-base leading-relaxed text-gray-600 dark:text-gray-300">{desc}</p>
               </div>
 
               {publications.length > 0 && (
-                <div className="p-4 rounded-lg border bg-gray-50 border-gray-200 dark:bg-neutral-900/30 dark:border-neutral-700">
-                  <h3 className="text-sm font-semibold mb-3 flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                    <Layers className="w-4 h-4" />
+                <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-900/30">
+                  <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    <Layers className="h-4 w-4" />
                     {t("campaigns.modal.view.associatedPublications")} (
                     <span className="font-bold">{publications.length}</span>)
                   </h3>
@@ -199,26 +178,24 @@ export default function ViewCampaignModal({
                       return (
                         <div
                           key={pub.id}
-                          className="flex items-center gap-3 p-2 rounded bg-white dark:bg-neutral-800 shadow-sm"
+                          className="flex items-center gap-3 rounded bg-white p-2 shadow-sm dark:bg-neutral-800"
                         >
                           {pub.media_files?.[0] ? (
                             <img
                               src={pub.media_files[0].file_path}
-                              className="w-8 h-8 rounded object-cover"
+                              className="h-8 w-8 rounded object-cover"
                               alt={pub.title || "Publication media"}
                             />
                           ) : (
-                            <div className="w-8 h-8 rounded bg-gray-200 flex items-center justify-center">
-                              <FileText className="w-4 h-4 text-gray-400" />
+                            <div className="flex h-8 w-8 items-center justify-center rounded bg-gray-200">
+                              <FileText className="h-4 w-4 text-gray-400" />
                             </div>
                           )}
                           <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
                             {pub.title || pub.name || "Untitled"}
                           </span>
 
-                          {pub.status === "published" && (
-                            <div className="ml-auto flex gap-1"></div>
-                          )}
+                          {pub.status === "published" && <div className="ml-auto flex gap-1"></div>}
                         </div>
                       );
                     })}
@@ -226,17 +203,17 @@ export default function ViewCampaignModal({
                 </div>
               )}
               {(item as any).user && (
-                <div className="flex items-center gap-3 p-4 rounded-lg bg-gray-50 dark:bg-neutral-900/50">
+                <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-4 dark:bg-neutral-900/50">
                   <div className="flex-shrink-0">
                     {(item as any).user.photo_url ? (
                       <img
                         src={(item as any).user.photo_url}
-                        className="w-10 h-10 rounded-full border-2 border-white dark:border-neutral-700 shadow-sm"
+                        className="h-10 w-10 rounded-full border-2 border-white shadow-sm dark:border-neutral-700"
                         alt=""
                       />
                     ) : (
-                      <div className="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400">
-                        <User className="w-5 h-5" />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
+                        <User className="h-5 w-5" />
                       </div>
                     )}
                   </div>
@@ -253,24 +230,19 @@ export default function ViewCampaignModal({
 
               {/* Tabs Navigation for Publications */}
               {isActuallyPublication && (
-                <div className="mt-8 border-b border-gray-200 dark:border-neutral-700 mb-6">
+                <div className="mb-6 mt-8 border-b border-gray-200 dark:border-neutral-700">
                   <nav className="-mb-px flex space-x-8" aria-label="Tabs">
                     {["overview", "activity", "approvals"]
-                      .filter(
-                        (tab) => tab !== "approvals" || canAccessApprovals,
-                      )
+                      .filter((tab) => tab !== "approvals" || canAccessApprovals)
                       .map((tab) => (
                         <button
                           key={tab}
                           onClick={() => setActiveTab(tab)}
-                          className={`
-                          whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm capitalize
-                          ${
+                          className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium capitalize ${
                             activeTab === tab
                               ? "border-primary-500 text-primary-600 dark:text-primary-400"
-                              : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
-                          }
-                        `}
+                              : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                          } `}
                         >
                           {t(`common.tabs.${tab}`, tab)}
                         </button>
@@ -283,11 +255,11 @@ export default function ViewCampaignModal({
                 {/* Overview Content (Grid + Footer) */}
                 {(!isActuallyPublication || activeTab === "overview") && (
                   <>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                       {(item as any).goal && (
-                        <div className="p-4 rounded-lg bg-gray-50 dark:bg-neutral-900/50">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Target className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+                        <div className="rounded-lg bg-gray-50 p-4 dark:bg-neutral-900/50">
+                          <div className="mb-2 flex items-center gap-2">
+                            <Target className="h-4 w-4 text-primary-600 dark:text-primary-400" />
                             <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
                               {t("campaigns.modal.view.goal")}
                             </span>
@@ -299,9 +271,9 @@ export default function ViewCampaignModal({
                       )}
 
                       {(item as any).hashtags && (
-                        <div className="p-4 rounded-lg bg-gray-50 dark:bg-neutral-900/50">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Hash className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                        <div className="rounded-lg bg-gray-50 p-4 dark:bg-neutral-900/50">
+                          <div className="mb-2 flex items-center gap-2">
+                            <Hash className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                             <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
                               {t("campaigns.modal.view.hashtags")}
                             </span>
@@ -309,24 +281,16 @@ export default function ViewCampaignModal({
                           <div
                             className={`text-sm text-gray-900 dark:text-white ${
                               !hashtagsExpanded ? "line-clamp-2" : ""
-                            } break-words cursor-pointer hover:text-primary-600 dark:hover:text-primary-400 transition-colors`}
-                            onClick={() =>
-                              setHashtagsExpanded(!hashtagsExpanded)
-                            }
-                            title={
-                              hashtagsExpanded
-                                ? "Click para contraer"
-                                : "Click para expandir"
-                            }
+                            } cursor-pointer break-words transition-colors hover:text-primary-600 dark:hover:text-primary-400`}
+                            onClick={() => setHashtagsExpanded(!hashtagsExpanded)}
+                            title={hashtagsExpanded ? "Click para contraer" : "Click para expandir"}
                           >
                             {(item as any).hashtags}
                           </div>
                           {(item as any).hashtags.length > 100 && (
                             <button
-                              onClick={() =>
-                                setHashtagsExpanded(!hashtagsExpanded)
-                              }
-                              className="text-xs text-primary-600 dark:text-primary-400 hover:underline mt-2"
+                              onClick={() => setHashtagsExpanded(!hashtagsExpanded)}
+                              className="mt-2 text-xs text-primary-600 hover:underline dark:text-primary-400"
                             >
                               {hashtagsExpanded ? "Ver menos" : "Ver más"}
                             </button>
@@ -335,9 +299,9 @@ export default function ViewCampaignModal({
                       )}
 
                       {(item as any).start_date && (
-                        <div className="p-4 rounded-lg bg-gray-50 dark:bg-neutral-900/50">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Calendar className="w-4 h-4 text-green-600 dark:text-green-400" />
+                        <div className="rounded-lg bg-gray-50 p-4 dark:bg-neutral-900/50">
+                          <div className="mb-2 flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-green-600 dark:text-green-400" />
                             <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
                               {t("campaigns.modal.view.startDate")}
                             </span>
@@ -349,9 +313,9 @@ export default function ViewCampaignModal({
                       )}
 
                       {(item as any).end_date && (
-                        <div className="p-4 rounded-lg bg-gray-50 dark:bg-neutral-900/50">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Calendar className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+                        <div className="rounded-lg bg-gray-50 p-4 dark:bg-neutral-900/50">
+                          <div className="mb-2 flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-primary-600 dark:text-primary-400" />
                             <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
                               {t("campaigns.modal.view.endDate")}
                             </span>
@@ -364,60 +328,55 @@ export default function ViewCampaignModal({
 
                       {(item as any).scheduled_posts &&
                         (item as any).scheduled_posts.length > 0 && (
-                          <div className="p-4 rounded-lg md:col-span-2 bg-gray-50 dark:bg-neutral-900/50">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Calendar className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                          <div className="rounded-lg bg-gray-50 p-4 dark:bg-neutral-900/50 md:col-span-2">
+                            <div className="mb-2 flex items-center gap-2">
+                              <Calendar className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                               <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
                                 {t("publications.scheduledPosts")}
                               </span>
                             </div>
 
-                            <div className="space-y-2 mt-2 text-gray-900 dark:text-white">
-                              {(item as any).scheduled_posts.map(
-                                (post: any, index: number) => (
-                                  <div
-                                    key={post.id || index}
-                                    className="flex items-center justify-between p-2 rounded border bg-white dark:bg-neutral-800 border-gray-200 dark:border-neutral-700"
-                                  >
-                                    <div className="flex items-center gap-2">
-                                      <span className="capitalize font-medium text-sm">
-                                        {post?.social_account?.platform ||
-                                          t("common.platform")}
+                            <div className="mt-2 space-y-2 text-gray-900 dark:text-white">
+                              {(item as any).scheduled_posts.map((post: any, index: number) => (
+                                <div
+                                  key={post.id || index}
+                                  className="flex items-center justify-between rounded border border-gray-200 bg-white p-2 dark:border-neutral-700 dark:bg-neutral-800"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm font-medium capitalize">
+                                      {post?.social_account?.platform || t("common.platform")}
+                                    </span>
+                                    {post.status && (
+                                      <span
+                                        className={`rounded px-1.5 py-0.5 text-xs capitalize ${
+                                          post.status === "posted"
+                                            ? "bg-green-100 text-green-700"
+                                            : post.status === "failed"
+                                              ? "bg-primary-100 text-primary-700"
+                                              : "bg-yellow-100 text-yellow-700"
+                                        }`}
+                                      >
+                                        {post.status}
                                       </span>
-                                      {post.status && (
-                                        <span
-                                          className={`text-xs px-1.5 py-0.5 rounded capitalize ${
-                                            post.status === "posted"
-                                              ? "bg-green-100 text-green-700"
-                                              : post.status === "failed"
-                                                ? "bg-primary-100 text-primary-700"
-                                                : "bg-yellow-100 text-yellow-700"
-                                          }`}
-                                        >
-                                          {post.status}
-                                        </span>
-                                      )}
-                                    </div>
-                                    <div className="text-sm opacity-80">
-                                      {formatDate(post.scheduled_at)}{" "}
-                                      {new Date(
-                                        post.scheduled_at,
-                                      ).toLocaleTimeString([], {
-                                        hour: "2-digit",
-                                        minute: "2-digit",
-                                      })}
-                                    </div>
+                                    )}
                                   </div>
-                                ),
-                              )}
+                                  <div className="text-sm opacity-80">
+                                    {formatDate(post.scheduled_at)}{" "}
+                                    {new Date(post.scheduled_at).toLocaleTimeString([], {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    })}
+                                  </div>
+                                </div>
+                              ))}
                             </div>
                           </div>
                         )}
 
                       {(item as any).publish_date && (
-                        <div className="p-4 rounded-lg md:col-span-2 bg-gray-50 dark:bg-neutral-900/50">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Calendar className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                        <div className="rounded-lg bg-gray-50 p-4 dark:bg-neutral-900/50 md:col-span-2">
+                          <div className="mb-2 flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                             <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
                               {t("campaigns.modal.view.publishedOn")}
                             </span>
@@ -429,8 +388,8 @@ export default function ViewCampaignModal({
                       )}
                     </div>
 
-                    <div className="mt-6 p-4 rounded-lg border bg-gray-50 border-gray-200 dark:bg-neutral-900/30 dark:border-neutral-700">
-                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
+                    <div className="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-900/30">
+                      <div className="flex flex-col items-start justify-between gap-2 text-xs sm:flex-row sm:items-center">
                         <span className="text-gray-500 dark:text-gray-400">
                           {t("campaigns.modal.view.created")}:{" "}
                           {formatDate((item as any).created_at)}
@@ -453,14 +412,14 @@ export default function ViewCampaignModal({
 
                 {/* Approvals Tab */}
                 {activeTab === "approvals" && isActuallyPublication && (
-                  <div className="max-h-[500px] overflow-y-auto pr-2 space-y-6">
+                  <div className="max-h-[500px] space-y-6 overflow-y-auto pr-2">
                     {/* Current Workflow Progress */}
                     {(item as any).status === "pending_review" &&
                       (item as any).currentApprovalStep?.workflow && (
-                        <div className="bg-gradient-to-br from-primary-50 to-blue-50 dark:from-primary-900/20 dark:to-blue-900/20 rounded-lg p-4 border border-primary-200 dark:border-primary-800">
-                          <h4 className="text-sm font-bold text-primary-900 dark:text-primary-300 mb-3 flex items-center gap-2">
+                        <div className="rounded-lg border border-primary-200 bg-gradient-to-br from-primary-50 to-blue-50 p-4 dark:border-primary-800 dark:from-primary-900/20 dark:to-blue-900/20">
+                          <h4 className="mb-3 flex items-center gap-2 text-sm font-bold text-primary-900 dark:text-primary-300">
                             <svg
-                              className="w-4 h-4"
+                              className="h-4 w-4"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -472,40 +431,34 @@ export default function ViewCampaignModal({
                                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
                               />
                             </svg>
-                            {t("approvals.workflow_progress") ||
-                              "Progreso del Flujo Actual"}
+                            {t("approvals.workflow_progress") || "Progreso del Flujo Actual"}
                           </h4>
                           <div className="space-y-2">
-                            {(
-                              item as any
-                            ).currentApprovalStep.workflow.steps?.map(
+                            {(item as any).currentApprovalStep.workflow.steps?.map(
                               (step: any, index: number) => {
-                                const isCurrent =
-                                  step.id ===
-                                  (item as any).currentApprovalStep?.id;
+                                const isCurrent = step.id === (item as any).currentApprovalStep?.id;
                                 const isPast =
                                   step.level_number <
-                                  ((item as any).currentApprovalStep
-                                    ?.level_number || 0);
+                                  ((item as any).currentApprovalStep?.level_number || 0);
 
                                 return (
                                   <div
                                     key={step.id}
-                                    className={`flex items-center gap-3 p-3 rounded-lg transition-all ${
+                                    className={`flex items-center gap-3 rounded-lg p-3 transition-all ${
                                       isCurrent
-                                        ? "bg-primary-100 dark:bg-primary-900/40 border-2 border-primary-400 dark:border-primary-600 shadow-sm"
+                                        ? "border-2 border-primary-400 bg-primary-100 shadow-sm dark:border-primary-600 dark:bg-primary-900/40"
                                         : isPast
-                                          ? "bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800"
-                                          : "bg-white/50 dark:bg-neutral-800/50 border border-gray-200 dark:border-neutral-700"
+                                          ? "border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20"
+                                          : "border border-gray-200 bg-white/50 dark:border-neutral-700 dark:bg-neutral-800/50"
                                     }`}
                                   >
                                     <div
-                                      className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold ${
+                                      className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
                                         isCurrent
                                           ? "bg-primary-500 text-white ring-2 ring-primary-300 dark:ring-primary-700"
                                           : isPast
                                             ? "bg-green-500 text-white"
-                                            : "bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-300"
+                                            : "bg-gray-300 text-gray-600 dark:bg-gray-600 dark:text-gray-300"
                                       }`}
                                     >
                                       {isPast ? "✓" : index + 1}
@@ -519,15 +472,13 @@ export default function ViewCampaignModal({
                                       </div>
                                     </div>
                                     {isCurrent && (
-                                      <span className="text-xs font-bold text-primary-600 dark:text-primary-400 px-2 py-1 bg-primary-200 dark:bg-primary-800 rounded-full">
-                                        {t("approvals.in_progress") ||
-                                          "En Proceso"}
+                                      <span className="rounded-full bg-primary-200 px-2 py-1 text-xs font-bold text-primary-600 dark:bg-primary-800 dark:text-primary-400">
+                                        {t("approvals.in_progress") || "En Proceso"}
                                       </span>
                                     )}
                                     {isPast && (
                                       <span className="text-xs font-bold text-green-600 dark:text-green-400">
-                                        ✓{" "}
-                                        {t("common.completed") || "Completado"}
+                                        ✓ {t("common.completed") || "Completado"}
                                       </span>
                                     )}
                                   </div>
@@ -541,11 +492,11 @@ export default function ViewCampaignModal({
                     {/* Workflow Completed */}
                     {(item as any).status === "approved" &&
                       (item as any).currentApprovalStep?.workflow && (
-                        <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800">
-                          <div className="flex items-center gap-3 mb-3">
-                            <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center">
+                        <div className="rounded-lg border border-green-200 bg-gradient-to-br from-green-50 to-emerald-50 p-4 dark:border-green-800 dark:from-green-900/20 dark:to-emerald-900/20">
+                          <div className="mb-3 flex items-center gap-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-500">
                               <svg
-                                className="w-6 h-6 text-white"
+                                className="h-6 w-6 text-white"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -570,15 +521,13 @@ export default function ViewCampaignModal({
                             </div>
                           </div>
                           <div className="space-y-2">
-                            {(
-                              item as any
-                            ).currentApprovalStep.workflow.steps?.map(
+                            {(item as any).currentApprovalStep.workflow.steps?.map(
                               (step: any, index: number) => (
                                 <div
                                   key={step.id}
-                                  className="flex items-center gap-3 p-2 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800"
+                                  className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-2 dark:border-green-800 dark:bg-green-900/20"
                                 >
-                                  <div className="flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold bg-green-500 text-white">
+                                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-green-500 text-xs font-bold text-white">
                                     ✓
                                   </div>
                                   <div className="flex-1">
@@ -600,36 +549,29 @@ export default function ViewCampaignModal({
                       )}
 
                     {/* Approval History */}
-                    {(item as any).approval_logs &&
-                      (item as any).approval_logs.length > 0 && (
-                        <div>
-                          <ApprovalHistorySection
-                            logs={(item as any).approval_logs || []}
-                            workflow={
-                              (item as any).approval_request?.workflow ||
-                              (item as any).currentApprovalStep?.workflow
-                            }
-                            currentStepNumber={
-                              (item as any).approval_request?.current_step
-                                ?.level_number ||
-                              (item as any).currentApprovalStep?.level_number
-                            }
-                            approvalStatus={
-                              (item as any).approval_request?.status
-                            }
-                          />
-                        </div>
-                      )}
+                    {(item as any).approval_logs && (item as any).approval_logs.length > 0 && (
+                      <div>
+                        <ApprovalHistorySection
+                          logs={(item as any).approval_logs || []}
+                          workflow={
+                            (item as any).approval_request?.workflow ||
+                            (item as any).currentApprovalStep?.workflow
+                          }
+                          currentStepNumber={
+                            (item as any).approval_request?.current_step?.level_number ||
+                            (item as any).currentApprovalStep?.level_number
+                          }
+                          approvalStatus={(item as any).approval_request?.status}
+                        />
+                      </div>
+                    )}
 
                     {/* No approvals */}
                     {!(item as any).approval_logs?.length &&
                       (item as any).status !== "pending_review" &&
                       (item as any).status !== "approved" && (
-                        <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-                          <p>
-                            {t("approvals.noHistory") ||
-                              "No hay historial de aprobaciones"}
-                          </p>
+                        <div className="py-12 text-center text-gray-500 dark:text-gray-400">
+                          <p>{t("approvals.noHistory") || "No hay historial de aprobaciones"}</p>
                         </div>
                       )}
                   </div>
@@ -638,22 +580,22 @@ export default function ViewCampaignModal({
             </div>
           </div>
 
-          <div className="flex-shrink-0 flex justify-end gap-3 p-6 border-t border-gray-100 dark:border-neutral-700">
+          <div className="flex flex-shrink-0 justify-end gap-3 border-t border-gray-100 p-6 dark:border-neutral-700">
             {onEdit && canEdit && (
               <button
                 onClick={() => {
                   onClose();
                   onEdit(item);
                 }}
-                className="px-6 py-2.5 rounded-lg font-bold transition-all bg-primary-600 hover:bg-primary-700 text-white flex items-center gap-2 shadow-lg shadow-primary-500/20 active:scale-95"
+                className="flex items-center gap-2 rounded-lg bg-primary-600 px-6 py-2.5 font-bold text-white shadow-lg shadow-primary-500/20 transition-all hover:bg-primary-700 active:scale-95"
               >
-                <Edit className="w-4 h-4" />
+                <Edit className="h-4 w-4" />
                 {t("common.editInPanel")}
               </button>
             )}
             <button
               onClick={onClose}
-              className="px-6 py-2.5 rounded-lg font-medium transition-colors bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-white"
+              className="rounded-lg bg-gray-100 px-6 py-2.5 font-medium text-gray-700 transition-colors hover:bg-gray-200 dark:bg-neutral-700 dark:text-white dark:hover:bg-neutral-600"
             >
               {t("common.close")}
             </button>

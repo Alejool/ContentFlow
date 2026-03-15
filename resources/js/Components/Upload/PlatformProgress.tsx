@@ -4,27 +4,20 @@ import { useTranslation } from "react-i18next";
 
 interface PlatformProgressProps {
   publication: Publication;
-  onCancelPlatform?: (
-    publicationId: number,
-    platformId: number,
-    platformName: string,
-  ) => void;
+  onCancelPlatform?: (publicationId: number, platformId: number, platformName: string) => void;
 }
 
-export function PlatformProgress({
-  publication,
-  onCancelPlatform,
-}: PlatformProgressProps) {
+export function PlatformProgress({ publication, onCancelPlatform }: PlatformProgressProps) {
   const { t } = useTranslation();
   const platformSummary = (publication as any).platform_status_summary;
 
   if (!platformSummary) {
     return (
-      <div className="space-y-2 mt-2">
-        <div className="flex-1 bg-gray-100 dark:bg-neutral-700 h-1.5 rounded-full overflow-hidden">
-          <div className="h-full bg-primary/50 animate-pulse w-full" />
+      <div className="mt-2 space-y-2">
+        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-gray-100 dark:bg-neutral-700">
+          <div className="bg-primary/50 h-full w-full animate-pulse" />
         </div>
-        <span className="block text-center text-[10px] text-gray-500 dark:text-neutral-400 italic">
+        <span className="block text-center text-[10px] italic text-gray-500 dark:text-neutral-400">
           {publication.status === "publishing"
             ? t("publications.gallery.sendingToSocial", {
                 defaultValue: "Iniciando envío...",
@@ -58,7 +51,7 @@ export function PlatformProgress({
   });
 
   return (
-    <div className="space-y-2 mt-2">
+    <div className="mt-2 space-y-2">
       {platforms.map((platform: any) => {
         const isDone = platform.status === "published";
         const isFailed = platform.status === "failed";
@@ -72,18 +65,18 @@ export function PlatformProgress({
         return (
           <div
             key={`${platform.platform}-${platform.id || platform.platform_id}`}
-            className="p-2 rounded-lg bg-gray-50/80 dark:bg-neutral-700/40 border border-gray-100 dark:border-neutral-600/50 group"
+            className="group rounded-lg border border-gray-100 bg-gray-50/80 p-2 dark:border-neutral-600/50 dark:bg-neutral-700/40"
           >
-            <div className="flex items-center justify-between mb-1.5">
+            <div className="mb-1.5 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 {isPublishing ? (
-                  <Loader2 className="w-3 h-3 animate-spin text-primary" />
+                  <Loader2 className="text-primary h-3 w-3 animate-spin" />
                 ) : isDone ? (
-                  <CheckCircle2 className="w-3 h-3 text-green-500" />
+                  <CheckCircle2 className="h-3 w-3 text-green-500" />
                 ) : (
-                  <AlertTriangle className="w-3 h-3 text-red-500" />
+                  <AlertTriangle className="h-3 w-3 text-red-500" />
                 )}
-                <span className="capitalize font-semibold text-[11px] text-neutral-800 dark:text-neutral-200">
+                <span className="text-[11px] font-semibold capitalize text-neutral-800 dark:text-neutral-200">
                   {platform.platform}
                 </span>
               </div>
@@ -98,14 +91,14 @@ export function PlatformProgress({
                         platform.platform,
                       );
                     }}
-                    className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="text-gray-400 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
                     title={t("common.cancel") || "Cancelar"}
                   >
-                    <X className="w-3 h-3" />
+                    <X className="h-3 w-3" />
                   </button>
                 )}
                 <span
-                  className={`text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                  className={`rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider ${
                     isDone
                       ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400"
                       : isFailed
@@ -122,24 +115,20 @@ export function PlatformProgress({
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <div className="flex-1 bg-gray-200 dark:bg-neutral-600 h-1.5 rounded-full overflow-hidden">
+              <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-gray-200 dark:bg-neutral-600">
                 <div
                   className={`h-full transition-all duration-500 ${
-                    isFailed
-                      ? "bg-red-500"
-                      : isDone
-                        ? "bg-green-500"
-                        : "bg-primary"
+                    isFailed ? "bg-red-500" : isDone ? "bg-green-500" : "bg-primary"
                   } ${isPublishing ? "animate-pulse" : ""}`}
                   style={{ width: `${progress}%` }}
                 />
               </div>
-              <span className="text-[10px] font-semibold text-neutral-600 dark:text-neutral-300 w-10 text-right">
+              <span className="w-10 text-right text-[10px] font-semibold text-neutral-600 dark:text-neutral-300">
                 {isDone || isFailed ? "100%" : "..."}
               </span>
             </div>
             {isFailed && platform.error && (
-              <div className="mt-1.5 text-[10px] text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded">
+              <div className="mt-1.5 rounded bg-red-50 px-2 py-1 text-[10px] text-red-600 dark:bg-red-900/20 dark:text-red-400">
                 {platform.error}
               </div>
             )}
@@ -148,17 +137,12 @@ export function PlatformProgress({
                 href={platform.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-1.5 text-[10px] text-primary-500 hover:underline flex items-center gap-1"
+                className="mt-1.5 flex items-center gap-1 text-[10px] text-primary-500 hover:underline"
               >
                 {t("publications.viewPost", {
                   defaultValue: "Ver publicación",
                 })}
-                <svg
-                  className="w-3 h-3"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
+                <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"

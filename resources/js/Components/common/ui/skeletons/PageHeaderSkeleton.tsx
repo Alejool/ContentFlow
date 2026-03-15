@@ -3,7 +3,7 @@ import Skeleton from "@/Components/common/ui/Skeleton";
 
 const PageHeaderSkeleton = () => {
   return (
-    <div className="space-y-4 mb-6">
+    <div className="mb-6 space-y-4">
       <div className="flex items-center justify-between">
         <div className="space-y-2">
           <Skeleton className="h-8 w-48" />

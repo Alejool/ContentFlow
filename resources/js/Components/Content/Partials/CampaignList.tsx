@@ -45,36 +45,17 @@ const CampaignList = memo(
     };
 
     const handleFilterChange = (key: string, value: string | string[]) => {
-      if (key === "status")
-        setStatusFilter(Array.isArray(value) ? value[0] : value);
-      if (key === "platform")
-        setPlatformFilter(Array.isArray(value) ? value[0] : value);
-      if (key === "date_start")
-        setDateStart(Array.isArray(value) ? value[0] : value);
-      if (key === "date_end")
-        setDateEnd(Array.isArray(value) ? value[0] : value);
+      if (key === "status") setStatusFilter(Array.isArray(value) ? value[0] : value);
+      if (key === "platform") setPlatformFilter(Array.isArray(value) ? value[0] : value);
+      if (key === "date_start") setDateStart(Array.isArray(value) ? value[0] : value);
+      if (key === "date_end") setDateEnd(Array.isArray(value) ? value[0] : value);
 
       if (onFilterChange) {
         onFilterChange({
-          status:
-            key === "status"
-              ? Array.isArray(value)
-                ? value[0]
-                : value
-              : statusFilter,
+          status: key === "status" ? (Array.isArray(value) ? value[0] : value) : statusFilter,
           platform: key === "platform" ? value : platformFilter,
-          date_start:
-            key === "date_start"
-              ? Array.isArray(value)
-                ? value[0]
-                : value
-              : dateStart,
-          date_end:
-            key === "date_end"
-              ? Array.isArray(value)
-                ? value[0]
-                : value
-              : dateEnd,
+          date_start: key === "date_start" ? (Array.isArray(value) ? value[0] : value) : dateStart,
+          date_end: key === "date_end" ? (Array.isArray(value) ? value[0] : value) : dateEnd,
         });
       }
     };
@@ -102,7 +83,7 @@ const CampaignList = memo(
     };
 
     return (
-      <div className="overflow-hidden shadow-lg border transition-all duration-300 backdrop-blur-lg bg-white/95 border-gray-100/95 text-gray-900 dark:bg-black/95 dark:border-black/95 dark:text-white">
+      <div className="overflow-hidden border border-gray-100/95 bg-white/95 text-gray-900 shadow-lg backdrop-blur-lg transition-all duration-300 dark:border-black/95 dark:bg-black/95 dark:text-white">
         <HeaderSection
           mode={mode}
           t={t}

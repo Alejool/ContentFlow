@@ -7,13 +7,7 @@ interface UploadItemProps {
     id: string;
     file: { name: string };
     progress: number;
-    status:
-      | "uploading"
-      | "pending"
-      | "paused"
-      | "completed"
-      | "error"
-      | "cancelled";
+    status: "uploading" | "pending" | "paused" | "completed" | "error" | "cancelled";
     error?: string;
     stats?: { speed?: number; eta?: number };
   };
@@ -60,10 +54,10 @@ export function UploadItem({ upload, onRemove }: UploadItemProps) {
   };
 
   return (
-    <div className="p-3 border-b border-gray-100 dark:border-neutral-700 last:border-0 group">
-      <div className="flex justify-between items-start mb-2">
+    <div className="group border-b border-gray-100 p-3 last:border-0 dark:border-neutral-700">
+      <div className="mb-2 flex items-start justify-between">
         <span
-          className="text-xs font-medium truncate max-w-[200px] text-neutral-900 dark:text-neutral-100"
+          className="max-w-[200px] truncate text-xs font-medium text-neutral-900 dark:text-neutral-100"
           title={upload.file.name}
         >
           {upload.file.name}
@@ -73,20 +67,20 @@ export function UploadItem({ upload, onRemove }: UploadItemProps) {
             e.stopPropagation();
             onRemove(upload.id);
           }}
-          className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+          className="text-gray-400 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
         >
-          <X className="w-3.5 h-3.5" />
+          <X className="h-3.5 w-3.5" />
         </button>
       </div>
 
-      <div className="flex items-center gap-2 mb-1.5">
-        <div className="flex-1 bg-gray-100 dark:bg-neutral-700 h-1.5 rounded-full overflow-hidden">
+      <div className="mb-1.5 flex items-center gap-2">
+        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-gray-100 dark:bg-neutral-700">
           <div
             className={`h-full transition-all duration-300 ${getProgressColor()}`}
             style={{ width: `${progress}%` }}
           />
         </div>
-        <span className="text-[10px] font-semibold text-neutral-600 dark:text-neutral-300 w-10 text-right">
+        <span className="w-10 text-right text-[10px] font-semibold text-neutral-600 dark:text-neutral-300">
           {progress}%
         </span>
       </div>

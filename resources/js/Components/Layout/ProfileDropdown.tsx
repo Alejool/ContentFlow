@@ -5,13 +5,7 @@ import { useSubscriptionUsage } from "@/Hooks/useSubscriptionUsage";
 import { useTheme } from "@/Hooks/useTheme";
 import { cssPropertiesManager } from "@/Utils/CSSCustomPropertiesManager";
 import { transitionTheme } from "@/Utils/themeTransition";
-import {
-  Menu,
-  MenuButton,
-  MenuItems,
-  Radio,
-  RadioGroup,
-} from "@headlessui/react";
+import { Menu, MenuButton, MenuItems, Radio, RadioGroup } from "@headlessui/react";
 import { Link as InertiaLink, Link, usePage } from "@inertiajs/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -44,17 +38,12 @@ interface ProfileDropdownProps {
   isProfileActive?: boolean;
 }
 
-export default function ProfileDropdown({
-  user,
-  isProfileActive = false,
-}: ProfileDropdownProps) {
+export default function ProfileDropdown({ user, isProfileActive = false }: ProfileDropdownProps) {
   const { t, i18n } = useTranslation();
   const { theme, setTheme } = useTheme();
   const { auth } = (usePage().props as any) || {};
   const { usage, loading: usageLoading } = useSubscriptionUsage();
-  const [currentTheme, setCurrentTheme] = useState(
-    user?.theme_color || "orange",
-  );
+  const [currentTheme, setCurrentTheme] = useState(user?.theme_color || "orange");
 
   const currentWorkspace = auth?.current_workspace;
   const isOwner =
@@ -99,16 +88,13 @@ export default function ProfileDropdown({
       axios.patch((route as any)("api.v1.profile.theme.update"), {
         theme_color: color,
       }),
-    onError: () =>
-      toast.error(t("common.error") || "Error al actualizar el tema"),
+    onError: () => toast.error(t("common.error") || "Error al actualizar el tema"),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["profile"] }),
   });
 
   const updateLocaleMutation = useMutation({
-    mutationFn: (locale: string) =>
-      axios.patch((route as any)("settings.locale"), { locale }),
-    onError: () =>
-      toast.error(t("common.error") || "Error al actualizar el idioma"),
+    mutationFn: (locale: string) => axios.patch((route as any)("settings.locale"), { locale }),
+    onError: () => toast.error(t("common.error") || "Error al actualizar el idioma"),
   });
 
   const handleColorChange = (color: string) => {
@@ -148,12 +134,7 @@ export default function ProfileDropdown({
     <Menu as="div" className="relative">
       {({ open }) => (
         <>
-          <MenuButton
-            className="group inline-flex items-center gap-3 py-1.5 pl-2 pr-3 rounded-full transition-all duration-300
-                       bg-white hover:bg-gray-50 border border-gray-200 hover:border-gray-300 text-gray-700
-                       dark:bg-neutral-800/80 dark:hover:bg-neutral-800 dark:border-neutral-700 dark:hover:border-neutral-600 dark:text-gray-200
-                       focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
-          >
+          <MenuButton className="group inline-flex items-center gap-3 rounded-full border border-gray-200 bg-white py-1.5 pl-2 pr-3 text-gray-700 transition-all duration-300 hover:border-gray-300 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:border-neutral-700 dark:bg-neutral-800/80 dark:text-gray-200 dark:hover:border-neutral-600 dark:hover:bg-neutral-800">
             <div className="relative">
               <Avatar
                 src={user?.photo_url}
@@ -163,11 +144,11 @@ export default function ProfileDropdown({
                 showStatus
               />
             </div>
-            <span className="hidden sm:block font-medium text-sm truncate max-w-[150px] group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            <span className="hidden max-w-[150px] truncate text-sm font-medium transition-colors group-hover:text-primary-600 dark:group-hover:text-primary-400 sm:block">
               {user?.name || "User"}
             </span>
             <ChevronDown
-              className={`h-4 w-4 transition-transform duration-300 text-gray-400 ${open ? "rotate-180" : ""}`}
+              className={`h-4 w-4 text-gray-400 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
             />
           </MenuButton>
 
@@ -195,17 +176,11 @@ export default function ProfileDropdown({
                 animate="visible"
                 exit="exit"
                 style={{ originX: 1, originY: 0 }}
-                className="absolute right-0 z-50 mt-2 w-72 rounded-lg bg-white/95 backdrop-blur-xl shadow-2xl
-                           border border-white/20 dark:bg-neutral-900 dark:border-neutral-800/90
-                           focus:outline-none overflow-hidden"
+                className="absolute right-0 z-50 mt-2 w-72 overflow-hidden rounded-lg border border-white/20 bg-white/95 shadow-2xl backdrop-blur-xl focus:outline-none dark:border-neutral-800/90 dark:bg-neutral-900"
               >
                 {/* Header: Avatar + info + color picker */}
-                <div className="px-4 pt-4 pb-2">
-                  <div
-                    className="p-4 rounded-lg relative overflow-hidden group
-                               bg-gradient-to-br from-gray-50 to-white border border-gray-100
-                               dark:from-neutral-800 dark:to-neutral-900 dark:border-neutral-700/50"
-                  >
+                <div className="px-4 pb-2 pt-4">
+                  <div className="group relative overflow-hidden rounded-lg border border-gray-100 bg-gradient-to-br from-gray-50 to-white p-4 dark:border-neutral-700/50 dark:from-neutral-800 dark:to-neutral-900">
                     <div className="relative flex items-center gap-4">
                       <Avatar
                         src={user?.photo_url}
@@ -214,15 +189,15 @@ export default function ProfileDropdown({
                         size="xl"
                         showStatus
                       />
-                      <div className="flex flex-col min-w-0">
-                        <p className="text-base font-bold text-gray-900 dark:text-white truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                      <div className="flex min-w-0 flex-col">
+                        <p className="truncate text-base font-bold text-gray-900 transition-colors group-hover:text-primary-600 dark:text-white dark:group-hover:text-primary-400">
                           {user?.name || "User"}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-neutral-400 truncate">
+                        <p className="truncate text-xs text-gray-500 dark:text-neutral-400">
                           {user?.email}
                         </p>
                         <div className="mt-1.5">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400">
+                          <span className="inline-flex items-center rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
                             Active
                           </span>
                         </div>
@@ -235,7 +210,7 @@ export default function ProfileDropdown({
                       onChange={(val: string) => {
                         handleColorChange(val);
                       }}
-                      className="flex items-center gap-2 mt-3 px-1"
+                      className="mt-3 flex items-center gap-2 px-1"
                       aria-label={t("profile.appearance.color") || "Color"}
                     >
                       {colors.map((color) => (
@@ -244,28 +219,21 @@ export default function ProfileDropdown({
                           value={color.value}
                           onClick={(e) => e.stopPropagation()}
                           className={({ checked }: { checked: boolean }) =>
-                            `relative w-6 h-6 rounded-full flex items-center justify-center transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
+                            `relative flex h-6 w-6 cursor-pointer items-center justify-center rounded-full transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
                               checked
-                                ? "ring-2 ring-offset-2 ring-primary-500 dark:ring-offset-neutral-900 scale-110"
-                                : "hover:scale-110 opacity-70 hover:opacity-100"
+                                ? "scale-110 ring-2 ring-primary-500 ring-offset-2 dark:ring-offset-neutral-900"
+                                : "opacity-70 hover:scale-110 hover:opacity-100"
                             } ${color.bg}`
                           }
-                          style={
-                            (color as any).isCustom
-                              ? { backgroundColor: color.value }
-                              : {}
-                          }
+                          style={(color as any).isCustom ? { backgroundColor: color.value } : {}}
                           title={
                             (color as any).isCustom
-                              ? t("workspace.white_label.title") ||
-                                "Marca Blanca"
+                              ? t("workspace.white_label.title") || "Marca Blanca"
                               : t(`colors.${color.name}`) || color.name
                           }
                         >
                           {({ checked }: { checked: boolean }) =>
-                            checked ? (
-                              <Check className="w-3 h-3 text-white" />
-                            ) : null
+                            checked ? <Check className="h-3 w-3 text-white" /> : null
                           }
                         </Radio>
                       ))}
@@ -276,10 +244,10 @@ export default function ProfileDropdown({
                 {/* Plan Usage */}
                 {usage && !usageLoading && (
                   <div className="px-4 pb-3">
-                    <div className="p-3 rounded-lg bg-gradient-to-br from-primary-50 to-primary-100/50 dark:from-primary-900/20 dark:to-primary-800/10 border border-primary-200 dark:border-primary-800/30">
-                      <div className="flex items-center justify-between mb-3">
+                    <div className="rounded-lg border border-primary-200 bg-gradient-to-br from-primary-50 to-primary-100/50 p-3 dark:border-primary-800/30 dark:from-primary-900/20 dark:to-primary-800/10">
+                      <div className="mb-3 flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <Zap className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+                          <Zap className="h-4 w-4 text-primary-600 dark:text-primary-400" />
                           <span className="text-sm font-bold text-primary-900 dark:text-primary-100">
                             {getPlanDisplayName(usage.plan)}
                           </span>
@@ -287,10 +255,9 @@ export default function ProfileDropdown({
                         {isOwner && (
                           <Link
                             href={route("pricing")}
-                            className="text-xs font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
+                            className="text-xs font-medium text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
                           >
-                            {t("subscription.usage.upgradePlan") ||
-                              "Actualizar"}
+                            {t("subscription.usage.upgradePlan") || "Actualizar"}
                           </Link>
                         )}
                       </div>
@@ -300,20 +267,17 @@ export default function ProfileDropdown({
                         <div className="space-y-1">
                           <div className="flex items-center justify-between text-xs">
                             <div className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300">
-                              <FileText className="w-3 h-3" />
-                              <span>
-                                {t("subscription.usage.publications") ||
-                                  "Publicaciones"}
-                              </span>
+                              <FileText className="h-3 w-3" />
+                              <span>{t("subscription.usage.publications") || "Publicaciones"}</span>
                             </div>
-                            <span className="font-semibold text-xs text-gray-900 dark:text-white">
+                            <span className="text-xs font-semibold text-gray-900 dark:text-white">
                               {usage.publications.limit === -1
                                 ? `${usage.publications.used} / ∞`
                                 : `${usage.publications.used} / ${usage.publications.total_available || usage.publications.limit}`}
                             </span>
                           </div>
                           {usage.publications.limit !== -1 && (
-                            <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                            <div className="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
                               <div
                                 className={`h-full rounded-full transition-all ${
                                   usage.publications.percentage >= 90
@@ -330,7 +294,7 @@ export default function ProfileDropdown({
                           )}
                           {usage.publications.addon_info &&
                             usage.publications.addon_info.total > 0 && (
-                              <div className="text-xs text-primary-600 dark:text-primary-400 mt-1">
+                              <div className="mt-1 text-xs text-primary-600 dark:text-primary-400">
                                 <span className="font-medium">Plan:</span>{" "}
                                 {usage.publications.limit} +{" "}
                                 <span className="font-medium">Addons:</span>{" "}
@@ -344,11 +308,8 @@ export default function ProfileDropdown({
                         <div className="space-y-1">
                           <div className="flex items-center justify-between text-xs">
                             <div className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300">
-                              <HardDrive className="w-3 h-3" />
-                              <span>
-                                {t("subscription.usage.storage") ||
-                                  "Almacenamiento"}
-                              </span>
+                              <HardDrive className="h-3 w-3" />
+                              <span>{t("subscription.usage.storage") || "Almacenamiento"}</span>
                             </div>
                             <span className="font-semibold text-gray-900 dark:text-white">
                               {usage.storage.limit_gb === -1
@@ -357,7 +318,7 @@ export default function ProfileDropdown({
                             </span>
                           </div>
                           {usage.storage.limit_gb !== -1 && (
-                            <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                            <div className="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
                               <div
                                 className={`h-full rounded-full transition-all ${
                                   usage.storage.percentage >= 90
@@ -372,33 +333,30 @@ export default function ProfileDropdown({
                               />
                             </div>
                           )}
-                          {usage.storage.addon_info &&
-                            usage.storage.addon_info.total > 0 && (
-                              <div className="text-xs text-primary-600 dark:text-primary-400 mt-1">
-                                <span className="font-medium">Plan:</span>{" "}
-                                {usage.storage.limit_gb} GB +{" "}
-                                <span className="font-medium">Addons:</span>{" "}
-                                {usage.storage.addon_info.remaining}/
-                                {usage.storage.addon_info.total} GB
-                              </div>
-                            )}
+                          {usage.storage.addon_info && usage.storage.addon_info.total > 0 && (
+                            <div className="mt-1 text-xs text-primary-600 dark:text-primary-400">
+                              <span className="font-medium">Plan:</span> {usage.storage.limit_gb} GB
+                              + <span className="font-medium">Addons:</span>{" "}
+                              {usage.storage.addon_info.remaining}/{usage.storage.addon_info.total}{" "}
+                              GB
+                            </div>
+                          )}
                         </div>
                       </div>
 
                       {usage.limits_reached && (
-                        <div className="mt-2 pt-2 border-t border-primary-200 dark:border-primary-800/30">
+                        <div className="mt-2 border-t border-primary-200 pt-2 dark:border-primary-800/30">
                           <Link
                             href={route("subscription.addons")}
-                            className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white transition-all group"
+                            className="group flex items-center justify-between gap-2 rounded-lg bg-gradient-to-r from-primary-500 to-primary-600 px-3 py-2 text-white transition-all hover:from-primary-600 hover:to-primary-700"
                           >
                             <div className="flex items-center gap-2">
-                              <Zap className="w-4 h-4" />
+                              <Zap className="h-4 w-4" />
                               <span className="text-xs font-semibold">
-                                {t("subscription.addons.buyCredits") ||
-                                  "Comprar Créditos"}
+                                {t("subscription.addons.buyCredits") || "Comprar Créditos"}
                               </span>
                             </div>
-                            <ChevronDown className="w-3 h-3 -rotate-90 group-hover:translate-x-0.5 transition-transform" />
+                            <ChevronDown className="h-3 w-3 -rotate-90 transition-transform group-hover:translate-x-0.5" />
                           </Link>
                         </div>
                       )}
@@ -408,33 +366,26 @@ export default function ProfileDropdown({
 
                 {/* Appearance */}
                 <div className="px-4 pb-3">
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="mb-2 flex items-center gap-2">
                     {theme === "dark" ? (
-                      <Moon className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
+                      <Moon className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
                     ) : theme === "system" ? (
-                      <Palette className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
+                      <Palette className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
                     ) : (
-                      <Sun className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
+                      <Sun className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
                     )}
-                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                       {t("profile.appearance.title") || "Apariencia"}
                     </span>
                   </div>
                   <RadioGroup
                     value={theme}
-                    onChange={(val: "light" | "dark" | "system") =>
-                      handleModeChange(val)
-                    }
+                    onChange={(val: "light" | "dark" | "system") => handleModeChange(val)}
                     className="grid grid-cols-3 gap-2"
                     aria-label={t("profile.appearance.title") || "Apariencia"}
                   >
                     {(["light", "dark", "system"] as const).map((mode) => {
-                      const Icon =
-                        mode === "light"
-                          ? Sun
-                          : mode === "dark"
-                            ? Moon
-                            : Palette;
+                      const Icon = mode === "light" ? Sun : mode === "dark" ? Moon : Palette;
                       const label =
                         mode === "light"
                           ? t("profile.appearance.light") || "Claro"
@@ -447,14 +398,14 @@ export default function ProfileDropdown({
                           value={mode}
                           onClick={(e) => e.stopPropagation()}
                           className={({ checked }: { checked: boolean }) =>
-                            `flex flex-col items-center justify-center gap-1.5 px-2 py-2.5 rounded-lg text-xs font-medium transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
+                            `flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-xs font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
                               checked
-                                ? "bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-400 ring-2 ring-primary-500"
-                                : "bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-neutral-700"
+                                ? "bg-primary-100 text-primary-700 ring-2 ring-primary-500 dark:bg-primary-900/40 dark:text-primary-400"
+                                : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-neutral-800 dark:text-gray-400 dark:hover:bg-neutral-700"
                             }`
                           }
                         >
-                          <Icon className="w-4 h-4" />
+                          <Icon className="h-4 w-4" />
                           <span>{label}</span>
                         </Radio>
                       );
@@ -464,9 +415,9 @@ export default function ProfileDropdown({
 
                 {/* Language */}
                 <div className="px-4 pb-3">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Globe className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
-                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <div className="mb-2 flex items-center gap-2">
+                    <Globe className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
+                    <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                       {t("profile.language.title") || "Idioma"}
                     </span>
                   </div>
@@ -482,17 +433,17 @@ export default function ProfileDropdown({
                         value={lang.code}
                         onClick={(e) => e.stopPropagation()}
                         className={({ checked }: { checked: boolean }) =>
-                          `flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
+                          `flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
                             checked
-                              ? "bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-400 ring-2 ring-primary-500"
-                              : "bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-neutral-700"
+                              ? "bg-primary-100 text-primary-700 ring-2 ring-primary-500 dark:bg-primary-900/40 dark:text-primary-400"
+                              : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-neutral-800 dark:text-gray-400 dark:hover:bg-neutral-700"
                           }`
                         }
                       >
                         <img
                           src={lang.flag}
                           alt={lang.name}
-                          className="w-5 h-3.5 object-cover rounded-sm"
+                          className="h-3.5 w-5 rounded-sm object-cover"
                         />
                         <span>{lang.name}</span>
                       </Radio>
@@ -501,39 +452,39 @@ export default function ProfileDropdown({
                 </div>
 
                 {/* Links */}
-                <div className="px-2 pb-2 space-y-1">
+                <div className="space-y-1 px-2 pb-2">
                   <InertiaLink
                     href={route("profile.edit")}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 w-full ${
+                    className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
                       isProfileActive
-                        ? "bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400"
-                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-800 hover:text-gray-900 dark:hover:text-white"
+                        ? "bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400"
+                        : "text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-neutral-800 dark:hover:text-white"
                     }`}
                   >
                     <div
-                      className={`p-1.5 rounded-md ${
+                      className={`rounded-md p-1.5 ${
                         isProfileActive
-                          ? "bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400"
-                          : "bg-gray-100 dark:bg-neutral-800 text-gray-500 dark:text-gray-400"
+                          ? "bg-primary-100 text-primary-600 dark:bg-primary-900/40 dark:text-primary-400"
+                          : "bg-gray-100 text-gray-500 dark:bg-neutral-800 dark:text-gray-400"
                       }`}
                     >
                       <User className="h-4 w-4" />
                     </div>
                     {t("nav.profile")}
                     {isProfileActive && (
-                      <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-500" />
+                      <div className="ml-auto h-1.5 w-1.5 rounded-full bg-primary-500" />
                     )}
                   </InertiaLink>
 
-                  <div className="h-px bg-gray-100 dark:bg-neutral-800 mx-2" />
+                  <div className="mx-2 h-px bg-gray-100 dark:bg-neutral-800" />
 
                   <InertiaLink
                     href={route("logout")}
                     method="post"
                     as="button"
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/10 hover:text-red-600 dark:hover:text-red-400 transition-all duration-200 w-full group"
+                    className="group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-red-50 hover:text-red-600 dark:text-gray-300 dark:hover:bg-red-900/10 dark:hover:text-red-400"
                   >
-                    <div className="p-1.5 rounded-md bg-gray-100 dark:bg-neutral-800 text-gray-500 dark:text-gray-400 group-hover:bg-red-100 dark:group-hover:bg-red-900/30 group-hover:text-red-500 dark:group-hover:text-red-400 transition-colors">
+                    <div className="rounded-md bg-gray-100 p-1.5 text-gray-500 transition-colors group-hover:bg-red-100 group-hover:text-red-500 dark:bg-neutral-800 dark:text-gray-400 dark:group-hover:bg-red-900/30 dark:group-hover:text-red-400">
                       <LogOut className="h-4 w-4" />
                     </div>
                     {t("nav.logout")}

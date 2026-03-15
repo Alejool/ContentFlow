@@ -9,9 +9,9 @@ interface DataResponseProps {
 export default function DataResponse({ data, theme }: DataResponseProps) {
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2 mb-3">
-        <BarChart3 className="w-5 h-5 text-green-500" />
-        <h3 className="font-semibold text-lg">{data.title}</h3>
+      <div className="mb-3 flex items-center gap-2">
+        <BarChart3 className="h-5 w-5 text-green-500" />
+        <h3 className="text-lg font-semibold">{data.title}</h3>
       </div>
 
       {data.items && data.items.length > 0 && (
@@ -19,27 +19,21 @@ export default function DataResponse({ data, theme }: DataResponseProps) {
           {data.items.map((item, index) => (
             <div
               key={index}
-              className={`flex justify-between items-center p-3 rounded-lg ${
+              className={`flex items-center justify-between rounded-lg p-3 ${
                 theme === "dark" ? "bg-neutral-800/50" : "bg-gray-50"
               }`}
             >
               <div>
-                <p className="font-medium text-sm">{item.name}</p>
+                <p className="text-sm font-medium">{item.name}</p>
                 {item.description && (
-                  <p
-                    className={`text-xs ${
-                      theme === "dark" ? "text-gray-400" : "text-gray-500"
-                    }`}
-                  >
+                  <p className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
                     {item.description}
                   </p>
                 )}
               </div>
               <div className="text-right">
                 <p
-                  className={`font-bold ${
-                    theme === "dark" ? "text-green-400" : "text-green-600"
-                  }`}
+                  className={`font-bold ${theme === "dark" ? "text-green-400" : "text-green-600"}`}
                 >
                   {item.value}
                 </p>
@@ -54,10 +48,8 @@ export default function DataResponse({ data, theme }: DataResponseProps) {
           {data.categories.map((category, index) => (
             <span
               key={index}
-              className={`px-2 py-1 text-xs rounded-full ${
-                theme === "dark"
-                  ? "bg-neutral-700 text-gray-300"
-                  : "bg-gray-100 text-gray-600"
+              className={`rounded-full px-2 py-1 text-xs ${
+                theme === "dark" ? "bg-neutral-700 text-gray-300" : "bg-gray-100 text-gray-600"
               }`}
             >
               {category}

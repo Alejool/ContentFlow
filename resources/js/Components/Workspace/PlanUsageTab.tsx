@@ -12,18 +12,12 @@ export default function PlanUsageTab({ workspace }: PlanUsageTabProps) {
   const { t } = useTranslation();
 
   const planId =
-    workspace.subscription?.plan?.toLowerCase() ||
-    workspace.plan?.toLowerCase() ||
-    "demo";
+    workspace.subscription?.plan?.toLowerCase() || workspace.plan?.toLowerCase() || "demo";
 
   return (
     <div className="space-y-6">
       {/* Usage Cards */}
-      <PlanUsageCards
-        key={`usage-${planId}-${Date.now()}`}
-        showCarousel={true}
-        showTitle={true}
-      />
+      <PlanUsageCards key={`usage-${planId}-${Date.now()}`} showCarousel={true} showTitle={true} />
     </div>
   );
 }

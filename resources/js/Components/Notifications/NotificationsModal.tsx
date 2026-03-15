@@ -59,10 +59,7 @@ const itemVariants = {
   },
 };
 
-export default function NotificationsModal({
-  isOpen,
-  onClose,
-}: NotificationsModalProps) {
+export default function NotificationsModal({ isOpen, onClose }: NotificationsModalProps) {
   const { t } = useTranslation();
   const { actualTheme } = useTheme();
   const {
@@ -75,11 +72,8 @@ export default function NotificationsModal({
     countByType,
   } = useNotifications();
 
-  const [activeCategory, setActiveCategory] = useState<
-    "application" | "system"
-  >("application");
-  const [selectedType, setSelectedType] =
-    useState<NotificationTypeFilter>("all");
+  const [activeCategory, setActiveCategory] = useState<"application" | "system">("application");
+  const [selectedType, setSelectedType] = useState<NotificationTypeFilter>("all");
   const [selectedPriority, setSelectedPriority] = useState<string>("all");
 
   const isDark = actualTheme === "dark";
@@ -90,18 +84,14 @@ export default function NotificationsModal({
     textMuted: isDark ? "text-gray-400" : "text-gray-500",
     border: isDark ? "border-neutral-700" : "border-gray-200",
     overlay: isDark ? "bg-black/70" : "bg-gray-500/60",
-    closeBtn: isDark
-      ? "hover:bg-neutral-800 text-gray-400"
-      : "hover:bg-gray-100 text-gray-400",
+    closeBtn: isDark ? "hover:bg-neutral-800 text-gray-400" : "hover:bg-gray-100 text-gray-400",
     tabActive: isDark
       ? "border-primary-500 text-primary-400"
       : "border-primary-500 text-primary-600",
     tabInactive: isDark
       ? "border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500"
       : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300",
-    dropdownBg: isDark
-      ? "bg-neutral-800 border-neutral-700"
-      : "bg-white border-gray-200",
+    dropdownBg: isDark ? "bg-neutral-800 border-neutral-700" : "bg-white border-gray-200",
     dropdownItem: isDark
       ? "text-gray-300 hover:bg-neutral-700 hover:text-white"
       : "text-gray-700 hover:bg-gray-50 hover:text-gray-900",
@@ -129,16 +119,12 @@ export default function NotificationsModal({
   ];
 
   const currentSource =
-    activeCategory === "application"
-      ? applicationNotifications
-      : systemNotifications;
+    activeCategory === "application" ? applicationNotifications : systemNotifications;
 
   const filteredList = useMemo(() => {
     let list = filterByType(selectedType, currentSource);
     if (selectedPriority !== "all") {
-      list = list.filter(
-        (n) => (n.data.priority ?? "normal") === selectedPriority,
-      );
+      list = list.filter((n) => (n.data.priority ?? "normal") === selectedPriority);
     }
     return list;
   }, [currentSource, selectedType, selectedPriority]);
@@ -182,7 +168,7 @@ export default function NotificationsModal({
 
         <div className={`fixed inset-0 z-10 overflow-hidden ${c.text}`}>
           <div className="absolute inset-0 overflow-hidden">
-            <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-0 sm:pl-10 w-full sm:w-auto">
+            <div className="pointer-events-none fixed inset-y-0 right-0 flex w-full max-w-full pl-0 sm:w-auto sm:pl-10">
               <TransitionChild
                 as={Fragment}
                 enter="transform transition ease-in-out duration-300"
@@ -193,22 +179,18 @@ export default function NotificationsModal({
                 leaveTo="translate-x-full"
               >
                 <DialogPanel
-                  className={`pointer-events-auto w-full sm:w-[28rem] ${c.bg} flex flex-col h-screen max-h-screen overflow-hidden shadow-2xl`}
+                  className={`pointer-events-auto w-full sm:w-[28rem] ${c.bg} flex h-screen max-h-screen flex-col overflow-hidden shadow-2xl`}
                 >
-                  <div className="flex flex-col h-full mt-0 sm:mt-6">
+                  <div className="mt-0 flex h-full flex-col sm:mt-6">
                     {/* ── Header ── */}
-                    <div
-                      className={`px-4 py-5 sm:px-6 border-b ${c.border} shrink-0`}
-                    >
+                    <div className={`border-b px-4 py-5 sm:px-6 ${c.border} shrink-0`}>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2.5">
-                          <DialogTitle
-                            className={`text-base font-semibold ${c.text}`}
-                          >
+                          <DialogTitle className={`text-base font-semibold ${c.text}`}>
                             {t("notifications.title")}
                           </DialogTitle>
                           {unreadCount > 0 && (
-                            <span className="inline-flex items-center rounded-full bg-main-color/10 px-2 py-0.5 text-xs font-medium text-main-color ring-1 ring-inset ring-main-color/20">
+                            <span className="bg-main-color/10 text-main-color ring-main-color/20 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset">
                               {unreadCount} {t("notifications.new")}
                             </span>
                           )}
@@ -218,7 +200,7 @@ export default function NotificationsModal({
                             <button
                               type="button"
                               onClick={markAllAsRead}
-                              className={`flex items-center gap-1 text-xs font-medium text-main-color hover:text-main-color/80 transition-colors`}
+                              className={`text-main-color hover:text-main-color/80 flex items-center gap-1 text-xs font-medium transition-colors`}
                             >
                               <CheckCheck className="h-3.5 w-3.5" />
                               {t("notifications.mark_all_read")}
@@ -237,18 +219,14 @@ export default function NotificationsModal({
                     </div>
 
                     {/* ── Category tabs (underline style) ── */}
-                    <div
-                      className={`px-4 sm:px-6 border-b ${c.border} shrink-0`}
-                    >
+                    <div className={`border-b px-4 sm:px-6 ${c.border} shrink-0`}>
                       <nav className="-mb-px flex gap-6">
                         {categories.map((cat) => (
                           <button
                             key={cat.key}
                             onClick={() => setActiveCategory(cat.key as any)}
-                            className={`flex items-center gap-1.5 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                              activeCategory === cat.key
-                                ? c.tabActive
-                                : c.tabInactive
+                            className={`flex items-center gap-1.5 whitespace-nowrap border-b-2 py-3 text-sm font-medium transition-colors ${
+                              activeCategory === cat.key ? c.tabActive : c.tabInactive
                             }`}
                           >
                             {cat.label}
@@ -283,16 +261,14 @@ export default function NotificationsModal({
                           style={{ overflow: "visible" }}
                         >
                           <div
-                            className={`px-4 sm:px-6 py-2.5 border-b ${c.border} flex items-center gap-2 flex-wrap relative z-30`}
+                            className={`border-b px-4 py-2.5 sm:px-6 ${c.border} relative z-30 flex flex-wrap items-center gap-2`}
                           >
-                            <Filter
-                              className={`h-3.5 w-3.5 shrink-0 ${c.textMuted}`}
-                            />
+                            <Filter className={`h-3.5 w-3.5 shrink-0 ${c.textMuted}`} />
 
                             {/* Type dropdown */}
                             <Menu as="div" className="relative">
                               <MenuButton
-                                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors border ${
+                                className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors ${
                                   selectedType !== "all"
                                     ? c.chipActive
                                     : isDark
@@ -314,14 +290,14 @@ export default function NotificationsModal({
                                 leaveTo="transform opacity-0 scale-95 -translate-y-1"
                               >
                                 <MenuItems
-                                  className={`absolute left-0 z-50 mt-1 w-44 rounded-xl border shadow-lg py-1 focus:outline-none ${c.dropdownBg}`}
+                                  className={`absolute left-0 z-50 mt-1 w-44 rounded-xl border py-1 shadow-lg focus:outline-none ${c.dropdownBg}`}
                                 >
                                   {TYPE_OPTIONS.map(({ key, icon: Icon }) => (
                                     <MenuItem key={key}>
                                       {({ focus }) => (
                                         <button
                                           onClick={() => setSelectedType(key)}
-                                          className={`w-full flex items-center gap-2 px-3 py-2 text-xs transition-colors ${
+                                          className={`flex w-full items-center gap-2 px-3 py-2 text-xs transition-colors ${
                                             selectedType === key
                                               ? c.dropdownActive
                                               : focus
@@ -332,16 +308,9 @@ export default function NotificationsModal({
                                           }`}
                                         >
                                           <Icon className="h-3.5 w-3.5 shrink-0" />
-                                          <span>
-                                            {t(`notifications.types.${key}`)}
-                                          </span>
-                                          <span
-                                            className={`ml-auto text-xs ${c.textMuted}`}
-                                          >
-                                            {countByType(
-                                              key,
-                                              applicationNotifications,
-                                            )}
+                                          <span>{t(`notifications.types.${key}`)}</span>
+                                          <span className={`ml-auto text-xs ${c.textMuted}`}>
+                                            {countByType(key, applicationNotifications)}
                                           </span>
                                         </button>
                                       )}
@@ -354,7 +323,7 @@ export default function NotificationsModal({
                             {/* Priority dropdown */}
                             <Menu as="div" className="relative">
                               <MenuButton
-                                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors border ${
+                                className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors ${
                                   selectedPriority !== "all"
                                     ? c.chipActive
                                     : isDark
@@ -376,14 +345,14 @@ export default function NotificationsModal({
                                 leaveTo="transform opacity-0 scale-95 -translate-y-1"
                               >
                                 <MenuItems
-                                  className={`absolute left-0 z-50 mt-1 w-36 rounded-xl border shadow-lg py-1 focus:outline-none ${c.dropdownBg}`}
+                                  className={`absolute left-0 z-50 mt-1 w-36 rounded-xl border py-1 shadow-lg focus:outline-none ${c.dropdownBg}`}
                                 >
                                   {PRIORITY_OPTIONS.map((p) => (
                                     <MenuItem key={p}>
                                       {({ focus }) => (
                                         <button
                                           onClick={() => setSelectedPriority(p)}
-                                          className={`w-full flex items-center gap-2 px-3 py-2 text-xs transition-colors ${
+                                          className={`flex w-full items-center gap-2 px-3 py-2 text-xs transition-colors ${
                                             selectedPriority === p
                                               ? c.dropdownActive
                                               : focus
@@ -394,16 +363,16 @@ export default function NotificationsModal({
                                           }`}
                                         >
                                           {p === "critical" && (
-                                            <span className="h-1.5 w-1.5 rounded-full bg-red-500 shrink-0" />
+                                            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />
                                           )}
                                           {p === "high" && (
-                                            <span className="h-1.5 w-1.5 rounded-full bg-orange-400 shrink-0" />
+                                            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" />
                                           )}
                                           {p === "normal" && (
-                                            <span className="h-1.5 w-1.5 rounded-full bg-blue-400 shrink-0" />
+                                            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" />
                                           )}
                                           {p === "low" && (
-                                            <span className="h-1.5 w-1.5 rounded-full bg-gray-400 shrink-0" />
+                                            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-gray-400" />
                                           )}
                                           {t(`notifications.priorities.${p}`)}
                                         </button>
@@ -424,7 +393,7 @@ export default function NotificationsModal({
                                   setSelectedType("all");
                                   setSelectedPriority("all");
                                 }}
-                                className={`text-xs ${c.textMuted} hover:text-red-400 transition-colors`}
+                                className={`text-xs ${c.textMuted} transition-colors hover:text-red-400`}
                               >
                                 <X className="h-3.5 w-3.5" />
                               </motion.button>
@@ -435,7 +404,7 @@ export default function NotificationsModal({
                     </AnimatePresence>
 
                     {/* ── List ── */}
-                    <div className="flex-1 min-h-0">
+                    <div className="min-h-0 flex-1">
                       <AnimatePresence mode="wait">
                         <motion.div
                           key={activeCategory}
@@ -464,10 +433,8 @@ export default function NotificationsModal({
                               />
                             </motion.div>
                           ) : (
-                            <div className="flex flex-col items-center justify-center h-full text-center p-6">
-                              <div
-                                className={`rounded-full p-4 mb-3 ${c.emptyBg}`}
-                              >
+                            <div className="flex h-full flex-col items-center justify-center p-6 text-center">
+                              <div className={`mb-3 rounded-full p-4 ${c.emptyBg}`}>
                                 <Bell className={`h-7 w-7 ${c.emptyText}`} />
                               </div>
                               <p className={`text-sm ${c.textMuted}`}>

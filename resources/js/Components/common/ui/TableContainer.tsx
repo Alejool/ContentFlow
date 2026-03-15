@@ -17,21 +17,17 @@ export default function TableContainer({
 }: TableContainerProps) {
   return (
     <div
-      className={`rounded-lg shadow-lg border transition-all duration-300 backdrop-blur-lg bg-white/70 border-gray-100/70 text-gray-900 dark:bg-neutral-800/70 dark:border-neutral-700/70 dark:text-white ${className}`}
+      className={`rounded-lg border border-gray-100/70 bg-white/70 text-gray-900 shadow-lg backdrop-blur-lg transition-all duration-300 dark:border-neutral-700/70 dark:bg-neutral-800/70 dark:text-white ${className}`}
     >
       {(title || subtitle || actions) && (
-        <div className="p-4 sm:p-6 border-b border-gray-100 dark:border-neutral-700/50 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <div className="flex flex-col gap-4 border-b border-gray-100 p-4 dark:border-neutral-700/50 sm:flex-row sm:items-center sm:justify-between sm:p-6">
           <div>
-            {title && <h2 className="text-lg sm:text-xl font-bold">{title}</h2>}
+            {title && <h2 className="text-lg font-bold sm:text-xl">{title}</h2>}
             {subtitle && (
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                {subtitle}
-              </p>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{subtitle}</p>
             )}
           </div>
-          {actions && (
-            <div className="flex gap-2 self-end sm:self-auto">{actions}</div>
-          )}
+          {actions && <div className="flex gap-2 self-end sm:self-auto">{actions}</div>}
         </div>
       )}
       <div className="overflow-hidden">{children}</div>

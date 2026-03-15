@@ -60,12 +60,7 @@ const DraggableWeekEvent: React.FC<DraggableWeekEventProps> = ({
       {...listeners}
       {...attributes}
       onClick={() => onEventClick?.(event)}
-      className={`
-        relative p-2 mb-1 rounded-lg cursor-grab active:cursor-grabbing
-        ${isSelected ? "ring-2 ring-primary-500" : ""}
-        ${isDragging ? "opacity-50" : ""}
-        hover:shadow-md transition-all
-      `}
+      className={`relative mb-1 cursor-grab rounded-lg p-2 active:cursor-grabbing ${isSelected ? "ring-2 ring-primary-500" : ""} ${isDragging ? "opacity-50" : ""} transition-all hover:shadow-md`}
       style={{
         backgroundColor: event.color + "20",
         borderLeft: `3px solid ${event.color}`,
@@ -82,21 +77,16 @@ const DraggableWeekEvent: React.FC<DraggableWeekEventProps> = ({
           onClick={(e) => e.stopPropagation()}
           className="mt-0.5"
         />
-        <div className="flex-1 min-w-0">
-          <div className="text-xs font-semibold text-gray-900 dark:text-white truncate">
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-xs font-semibold text-gray-900 dark:text-white">
             {event.title}
           </div>
-          <div className="flex items-center gap-1 mt-1">
-            <Clock className="w-3 h-3 text-gray-400" />
-            <span className="text-[10px] text-gray-500">
-              {formatTime(event.start)}
-            </span>
+          <div className="mt-1 flex items-center gap-1">
+            <Clock className="h-3 w-3 text-gray-400" />
+            <span className="text-[10px] text-gray-500">{formatTime(event.start)}</span>
           </div>
         </div>
-        <PlatformIcon
-          platform={event.extendedProps.platform}
-          className="w-4 h-4"
-        />
+        <PlatformIcon platform={event.extendedProps.platform} className="h-4 w-4" />
       </div>
     </div>
   );
@@ -130,11 +120,7 @@ const DroppableTimeSlot: React.FC<DroppableTimeSlotProps> = ({
   return (
     <div
       ref={setNodeRef}
-      className={`
-        p-1 border-r border-gray-100 dark:border-gray-800 
-        hover:bg-gray-50 dark:hover:bg-gray-900/30 transition-colors
-        ${isOver ? "bg-primary-100/50 dark:bg-primary-900/20 ring-1 ring-primary-500" : ""}
-      `}
+      className={`border-r border-gray-100 p-1 transition-colors hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-900/30 ${isOver ? "bg-primary-100/50 ring-1 ring-primary-500 dark:bg-primary-900/20" : ""} `}
     >
       {events.map((event) => (
         <DraggableWeekEvent
@@ -147,7 +133,7 @@ const DroppableTimeSlot: React.FC<DroppableTimeSlotProps> = ({
         />
       ))}
       {isOver && events.length === 0 && (
-        <div className="text-xs text-primary-600 dark:text-primary-400 text-center py-2">
+        <div className="py-2 text-center text-xs text-primary-600 dark:text-primary-400">
           Soltar aquí
         </div>
       )}
@@ -214,31 +200,25 @@ export const WeekView: React.FC<WeekViewProps> = ({
   };
 
   return (
-    <DndContext
-      sensors={sensors}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-    >
-      <div className="flex flex-col h-full overflow-hidden">
+    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      <div className="flex h-full flex-col overflow-hidden">
         {/* Header with days */}
-        <div className="grid grid-cols-8 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-black sticky top-0 z-10">
-          <div className="p-4 text-xs font-bold text-gray-400 border-r border-gray-200 dark:border-gray-700">
+        <div className="sticky top-0 z-10 grid grid-cols-8 border-b border-gray-200 bg-white dark:border-gray-700 dark:bg-black">
+          <div className="border-r border-gray-200 p-4 text-xs font-bold text-gray-400 dark:border-gray-700">
             Hora
           </div>
           {days.map((day) => (
             <div
               key={day.toISOString()}
-              className={`p-4 text-center border-r border-gray-200 dark:border-gray-700 ${
-                isToday(day)
-                  ? "bg-primary-50 dark:bg-primary-900/20"
-                  : "bg-white dark:bg-black"
+              className={`border-r border-gray-200 p-4 text-center dark:border-gray-700 ${
+                isToday(day) ? "bg-primary-50 dark:bg-primary-900/20" : "bg-white dark:bg-black"
               }`}
             >
               <div className="text-xs font-medium text-gray-500 dark:text-gray-400">
                 {format(day, "EEE")}
               </div>
               <div
-                className={`text-2xl font-bold mt-1 ${
+                className={`mt-1 text-2xl font-bold ${
                   isToday(day)
                     ? "text-primary-600 dark:text-primary-400"
                     : "text-gray-900 dark:text-white"
@@ -255,9 +235,9 @@ export const WeekView: React.FC<WeekViewProps> = ({
           {hours.map((hour) => (
             <div
               key={hour}
-              className="grid grid-cols-8 border-b border-gray-100 dark:border-gray-800 min-h-[80px]"
+              className="grid min-h-[80px] grid-cols-8 border-b border-gray-100 dark:border-gray-800"
             >
-              <div className="p-2 text-xs text-gray-400 border-r border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
+              <div className="border-r border-gray-100 bg-gray-50 p-2 text-xs text-gray-400 dark:border-gray-800 dark:bg-gray-900/50">
                 {format(new Date().setHours(hour, 0, 0, 0), "HH:mm")}
               </div>
               {days.map((day) => {
@@ -283,12 +263,9 @@ export const WeekView: React.FC<WeekViewProps> = ({
       {/* Drag Overlay */}
       <DragOverlay>
         {activeEvent ? (
-          <div className="rounded-lg border border-primary-500 bg-white dark:bg-gray-800 shadow-2xl p-2 opacity-90 cursor-grabbing">
+          <div className="cursor-grabbing rounded-lg border border-primary-500 bg-white p-2 opacity-90 shadow-2xl dark:bg-gray-800">
             <div className="flex items-center gap-2">
-              <PlatformIcon
-                platform={activeEvent.extendedProps.platform}
-                className="w-4 h-4"
-              />
+              <PlatformIcon platform={activeEvent.extendedProps.platform} className="h-4 w-4" />
               <div className="text-xs font-semibold text-gray-700 dark:text-gray-200">
                 {activeEvent.title}
               </div>

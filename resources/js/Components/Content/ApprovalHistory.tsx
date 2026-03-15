@@ -23,9 +23,7 @@ export default function ApprovalHistory({
 }: ApprovalHistoryProps) {
   const { t, i18n } = useTranslation();
   const locale = getDateFnsLocale(i18n.language);
-  const [requests, setRequests] = useState<ApprovalRequest[]>(
-    initialData || [],
-  );
+  const [requests, setRequests] = useState<ApprovalRequest[]>(initialData || []);
   const [isLoading, setIsLoading] = useState(!initialData);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(12);
@@ -101,41 +99,36 @@ export default function ApprovalHistory({
   };
 
   const getStatusBadge = (status: string) => {
-    const config: Record<string, { color: string; icon: any; label: string }> =
-      {
-        pending: {
-          color:
-            "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
-          icon: Clock,
-          label: t("approvals.status.pending"),
-        },
-        approved: {
-          color:
-            "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-          icon: CheckCircle,
-          label: t("approvals.status.approved"),
-        },
-        rejected: {
-          color:
-            "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400",
-          icon: XCircle,
-          label: t("approvals.status.rejected"),
-        },
-        cancelled: {
-          color:
-            "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400",
-          icon: XCircle,
-          label: t("approvals.status.cancelled"),
-        },
-      };
+    const config: Record<string, { color: string; icon: any; label: string }> = {
+      pending: {
+        color: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
+        icon: Clock,
+        label: t("approvals.status.pending"),
+      },
+      approved: {
+        color: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+        icon: CheckCircle,
+        label: t("approvals.status.approved"),
+      },
+      rejected: {
+        color: "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400",
+        icon: XCircle,
+        label: t("approvals.status.rejected"),
+      },
+      cancelled: {
+        color: "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400",
+        icon: XCircle,
+        label: t("approvals.status.cancelled"),
+      },
+    };
 
     const { color, icon: Icon, label } = config[status] || config.pending;
 
     return (
       <span
-        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${color}`}
+        className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${color}`}
       >
-        <Icon className="w-3.5 h-3.5" />
+        <Icon className="h-3.5 w-3.5" />
         {label}
       </span>
     );
@@ -144,13 +137,13 @@ export default function ApprovalHistory({
   const getActionIcon = (action: string) => {
     switch (action) {
       case "submitted":
-        return <Send className="w-4 h-4 text-blue-500" />;
+        return <Send className="h-4 w-4 text-blue-500" />;
       case "approved":
-        return <CheckCircle className="w-4 h-4 text-green-500" />;
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
       case "rejected":
-        return <XCircle className="w-4 h-4 text-red-500" />;
+        return <XCircle className="h-4 w-4 text-red-500" />;
       default:
-        return <Clock className="w-4 h-4 text-gray-500" />;
+        return <Clock className="h-4 w-4 text-gray-500" />;
     }
   };
 
@@ -163,8 +156,7 @@ export default function ApprovalHistory({
     <TableContainer
       title={t("approvals.historyTitle") || "Historial de Aprobaciones"}
       subtitle={
-        t("approvals.historySubtitle") ||
-        "Registros completos de solicitudes de aprobación"
+        t("approvals.historySubtitle") || "Registros completos de solicitudes de aprobación"
       }
     >
       <FilterSection
@@ -178,30 +170,29 @@ export default function ApprovalHistory({
 
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-gray-50/50 dark:bg-neutral-900/50 border-b border-gray-100 dark:border-neutral-700">
+          <thead className="border-b border-gray-100 bg-gray-50/50 dark:border-neutral-700 dark:bg-neutral-900/50">
             <tr className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
               {!publicationId && (
-                <th className="px-6 py-4 text-left font-bold w-[20%]">
+                <th className="w-[20%] px-6 py-4 text-left font-bold">
                   {t("approvals.historyTable.publication")}
                 </th>
               )}
-              <th className="px-6 py-4 text-left font-bold w-[12%]">
+              <th className="w-[12%] px-6 py-4 text-left font-bold">
                 {t("approvals.historyTable.submittedBy")}
               </th>
-              <th className="px-6 py-4 text-left font-bold w-[12%]">
+              <th className="w-[12%] px-6 py-4 text-left font-bold">
                 {t("approvals.historyTable.submittedAt")}
               </th>
-              <th className="px-6 py-4 text-left font-bold w-[12%]">
+              <th className="w-[12%] px-6 py-4 text-left font-bold">
                 {t("approvals.historyTable.status")}
               </th>
-              <th className="px-6 py-4 text-left font-bold w-[15%]">
-                {t("approvals.historyTable.currentReviewer") ||
-                  "Revisor Actual"}
+              <th className="w-[15%] px-6 py-4 text-left font-bold">
+                {t("approvals.historyTable.currentReviewer") || "Revisor Actual"}
               </th>
-              <th className="px-6 py-4 text-left font-bold w-[12%]">
+              <th className="w-[12%] px-6 py-4 text-left font-bold">
                 {t("approvals.historyTable.completedBy")}
               </th>
-              <th className="px-6 py-4 text-left font-bold w-[12%]">
+              <th className="w-[12%] px-6 py-4 text-left font-bold">
                 {t("approvals.historyTable.actions")}
               </th>
             </tr>
@@ -215,17 +206,14 @@ export default function ApprovalHistory({
               </>
             ) : displayedRequests.length === 0 ? (
               <tr>
-                <td
-                  colSpan={publicationId ? 6 : 7}
-                  className="px-6 py-16 text-center"
-                >
+                <td colSpan={publicationId ? 6 : 7} className="px-6 py-16 text-center">
                   <div className="flex flex-col items-center justify-center">
                     <img
                       src="/assets/empty-state.svg"
                       alt="No History"
-                      className="w-40 h-auto object-contain mb-4 opacity-80"
+                      className="mb-4 h-auto w-40 object-contain opacity-80"
                     />
-                    <p className="text-gray-500 dark:text-gray-400 font-medium">
+                    <p className="font-medium text-gray-500 dark:text-gray-400">
                       {t("approvals.noHistory")}
                     </p>
                   </div>
@@ -235,12 +223,11 @@ export default function ApprovalHistory({
               displayedRequests.map((request) => (
                 <tr
                   key={request.id}
-                  className="hover:bg-gray-50/50 dark:hover:bg-neutral-700/30 transition-colors"
+                  className="transition-colors hover:bg-gray-50/50 dark:hover:bg-neutral-700/30"
                 >
                   {!publicationId && (
                     <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                      {request.publication?.title ||
-                        t("common.unknown", "Unknown")}
+                      {request.publication?.title || t("common.unknown", "Unknown")}
                     </td>
                   )}
                   <td className="px-6 py-4">
@@ -249,7 +236,7 @@ export default function ApprovalHistory({
                         <img
                           src={request.submitter.photo_url}
                           alt={request.submitter.name}
-                          className="w-8 h-8 rounded-full"
+                          className="h-8 w-8 rounded-full"
                         />
                       )}
                       <span className="text-gray-900 dark:text-white">
@@ -257,17 +244,15 @@ export default function ApprovalHistory({
                       </span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-gray-500 text-sm">
+                  <td className="px-6 py-4 text-sm text-gray-500">
                     {format(new Date(request.submitted_at), "PPp", { locale })}
                   </td>
-                  <td className="px-6 py-4">
-                    {getStatusBadge(request.status)}
-                  </td>
+                  <td className="px-6 py-4">{getStatusBadge(request.status)}</td>
                   <td className="px-6 py-4">
                     {request.status === "pending" && request.currentStep ? (
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2">
-                          <Clock className="w-4 h-4 text-yellow-500" />
+                          <Clock className="h-4 w-4 text-yellow-500" />
                           <span className="text-sm font-medium text-gray-900 dark:text-white">
                             {request.currentStep.level_name ||
                               `Nivel ${request.currentStep.level_number}`}
@@ -331,17 +316,16 @@ export default function ApprovalHistory({
                           )}
                         </div>
                       ) : (
-                        <span className="text-gray-400 text-sm">-</span>
+                        <span className="text-sm text-gray-400">-</span>
                       )}
-                      {request.status === "rejected" &&
-                        request.rejection_reason && (
-                          <div
-                            className="text-xs text-rose-600 dark:text-rose-400 max-w-[200px] truncate"
-                            title={request.rejection_reason}
-                          >
-                            {request.rejection_reason}
-                          </div>
-                        )}
+                      {request.status === "rejected" && request.rejection_reason && (
+                        <div
+                          className="max-w-[200px] truncate text-xs text-rose-600 dark:text-rose-400"
+                          title={request.rejection_reason}
+                        >
+                          {request.rejection_reason}
+                        </div>
+                      )}
                     </div>
                   </td>
                 </tr>

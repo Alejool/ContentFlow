@@ -59,22 +59,22 @@ export default function PublishModal({
 
   return (
     <Modal show={show} onClose={handleClose} maxWidth="2xl">
-      <div className="bg-white dark:bg-neutral-900 rounded-lg overflow-hidden">
+      <div className="overflow-hidden rounded-lg bg-white dark:bg-neutral-900">
         {/* Header */}
-        <div className="flex justify-between items-center p-5 border-b border-gray-200 dark:border-neutral-700">
+        <div className="flex items-center justify-between border-b border-gray-200 p-5 dark:border-neutral-700">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
             Publicar Contenido
           </h2>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-3xl leading-none w-8 h-8 flex items-center justify-center"
+            className="flex h-8 w-8 items-center justify-center text-3xl leading-none text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
           >
             ×
           </button>
         </div>
 
         {/* Body */}
-        <div className="p-6 max-h-[70vh] overflow-y-auto">
+        <div className="max-h-[70vh] overflow-y-auto p-6">
           <PlatformSelector
             socialAccounts={socialAccounts}
             selectedPlatforms={selectedPlatforms}
