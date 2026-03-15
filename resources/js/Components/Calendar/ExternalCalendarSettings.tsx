@@ -132,7 +132,7 @@ export default function ExternalCalendarSettings({
     try {
       await disconnectCalendar.mutateAsync(providerToDisconnect);
       toast.success(t('calendar.external.disconnectSuccess'));
-    } catch (_error) {
+    } catch {
       toast.error(t('calendar.external.disconnectError'));
     } finally {
       setShowDisconnectDialog(false);
@@ -144,7 +144,7 @@ export default function ExternalCalendarSettings({
     try {
       await retrySync.mutateAsync(provider);
       toast.success(t('calendar.external.syncSuccess'));
-    } catch (_error) {
+    } catch {
       toast.error(t('calendar.external.syncError'));
     }
   };

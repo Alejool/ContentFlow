@@ -9,8 +9,8 @@ import { useTranslation } from 'react-i18next';
 
 interface PlatformModalContentProps {
   platform: string;
-  settings: any;
-  onSettingsChange: (newSettings: any) => void;
+  settings: Record<string, unknown>;
+  onSettingsChange: (newSettings: Record<string, unknown>) => void;
   videoMetadata?: {
     duration: number;
     width?: number;
@@ -18,8 +18,8 @@ interface PlatformModalContentProps {
     aspectRatio?: number;
   };
   allPlatforms?: string[];
-  allSettings?: Record<string, any>;
-  onAllSettingsChange?: (platform: string, newSettings: any) => void;
+  allSettings?: Record<string, Record<string, unknown>>;
+  onAllSettingsChange?: (platform: string, newSettings: Record<string, unknown>) => void;
 }
 
 export default function PlatformModalContent({
@@ -36,8 +36,8 @@ export default function PlatformModalContent({
 
   const renderPlatformSettings = (
     platformName: string,
-    platformSettings: any,
-    onChange: (newSettings: any) => void,
+    platformSettings: Record<string, unknown>,
+    onChange: (newSettings: Record<string, unknown>) => void,
   ) => {
     switch (platformName.toLowerCase()) {
       case 'youtube':

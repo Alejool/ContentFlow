@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Building2, Target, Users, Briefcase } from 'lucide-react';
-import { z } from 'zod';
+import Button from '@/Components/common/Modern/Button';
 import Input from '@/Components/common/Modern/Input';
 import Select from '@/Components/common/Modern/Select';
 import Textarea from '@/Components/common/Modern/Textarea';
-import Button from '@/Components/common/Modern/Button';
+import { Briefcase, Building2, Target, Users } from 'lucide-react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
 
 interface BusinessInfoStepProps {
   onComplete: (data: BusinessInfoData) => void;
@@ -40,7 +40,7 @@ const BUSINESS_SIZES = ['solo', 'small', 'medium', 'large'];
 
 export default function BusinessInfoStep({
   onComplete,
-  onSkip,
+  onSkip: _onSkip,
   initialData,
 }: BusinessInfoStepProps) {
   const { t } = useTranslation();

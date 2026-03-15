@@ -1,5 +1,5 @@
-import React, { ComponentType } from 'react';
 import { useOffline } from '@/Hooks/useOffline';
+import { ComponentType } from 'react';
 
 /**
  * Props for components wrapped with withOfflineDisable
@@ -44,16 +44,19 @@ export function withOfflineDisable<P extends object>(
     // Determine if should be disabled
     const shouldDisable = !isOnline;
 
+    type PropsWithExtras = P & { className?: string; disabled?: boolean; title?: string };
+    const typedRest = restProps as PropsWithExtras;
+
     // Merge className with disabled styles
     const className = shouldDisable
-      ? `${(restProps as any).className || ''} ${disabledClassName}`.trim()
-      : (restProps as any).className;
+      ? `${typedRest.className || ''} ${disabledClassName}`.trim()
+      : typedRest.className;
 
     return (
       <Component
         {...(restProps as P)}
-        disabled={shouldDisable || (restProps as any).disabled}
-        title={shouldDisable ? offlineTooltip : (restProps as any).title}
+        disabled={shouldDisable || typedRest.disabled}
+        title={shouldDisable ? offlineTooltip : typedRest.title}
         className={className}
       />
     );

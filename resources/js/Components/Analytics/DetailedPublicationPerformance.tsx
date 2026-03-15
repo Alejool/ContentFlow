@@ -1,7 +1,8 @@
 import { SeededRandom } from '@/Utils/stableMock';
-import { LucideIcon } from 'lucide-react';
+import { 
   ChevronRight,
   Eye,
+  ChevronLeft,
   Heart,
   MousePointer2,
   Search,

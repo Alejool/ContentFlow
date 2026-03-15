@@ -174,7 +174,7 @@ export const DayView: React.FC<DayViewProps> = ({
   events,
   onEventDrop,
   onEventClick,
-  onDeleteEvent,
+  onDeleteEvent: _onDeleteEvent,
   selectedEvents,
   onToggleSelection,
   PlatformIcon,
@@ -249,7 +249,7 @@ export const DayView: React.FC<DayViewProps> = ({
                 selectedEvents={selectedEvents}
                 onToggleSelection={onToggleSelection}
                 onEventClick={onEventClick}
-                onDeleteEvent={onDeleteEvent}
+                onDeleteEvent={_onDeleteEvent}
                 PlatformIcon={PlatformIcon}
               />
             );

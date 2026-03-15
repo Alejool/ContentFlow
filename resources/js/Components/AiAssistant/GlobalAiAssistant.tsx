@@ -81,7 +81,7 @@ export default function GlobalAiAssistant() {
         };
         setMessages((prev) => [...prev, aiMessage]);
       }
-    } catch (_error) {
+    } catch {
       toast.error(t('common.error'));
       setMessages((prev) => [
         ...prev,

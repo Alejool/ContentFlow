@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
 import { useOnboarding } from '@/Contexts/OnboardingContext';
+import { useEffect, useState } from 'react';
 
 /**
  * ErrorNotification displays user-friendly error messages with retry option
@@ -7,27 +7,25 @@ import { useOnboarding } from '@/Contexts/OnboardingContext';
  */
 export function ErrorNotification() {
   const { state } = useOnboarding();
-  const [visible, setVisible] = useState(false);
   const [dismissed, setDismissed] = useState(false);
+  const [autoHidden, setAutoHidden] = useState(false);
+
+  const visible = !!state.error && !dismissed && !autoHidden;
 
   useEffect(() => {
-    if (state.error && !dismissed) {
-      setVisible(true);
+    if (!state.error || dismissed) return;
 
-      // Auto-hide after 10 seconds
-      const timer = setTimeout(() => {
-        setVisible(false);
-      }, 10000);
+    setAutoHidden(false);
+    // Auto-hide after 10 seconds
+    const timer = setTimeout(() => {
+      setAutoHidden(true);
+    }, 10000);
 
-      return () => clearTimeout(timer);
-    } else {
-      setVisible(false);
-    }
+    return () => clearTimeout(timer);
   }, [state.error, dismissed]);
 
   const handleDismiss = () => {
     setDismissed(true);
-    setVisible(false);
   };
 
   const handleRetry = () => {

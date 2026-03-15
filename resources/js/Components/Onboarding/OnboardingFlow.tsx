@@ -1,9 +1,9 @@
-import { useEffect, useState, lazy, Suspense, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useOnboarding } from '@/Contexts/OnboardingContext';
+import type { PublicationTemplate, SocialPlatform, TourStep } from '@/types/onboarding';
+import { Building2, Gem, Link2, Target } from 'lucide-react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { OnboardingErrorBoundary } from './OnboardingErrorBoundary';
-import { Building2, Gem, Target, Link2, Check } from 'lucide-react';
-import type { TourStep, SocialPlatform, PublicationTemplate } from '@/types/onboarding';
 
 // Lazy load onboarding components to reduce initial bundle size
 const BusinessInfoStep = lazy(() => import('./BusinessInfoStep'));
@@ -109,7 +109,7 @@ export default function OnboardingFlow({
   /**
    * Handles business info completion
    */
-  const handleBusinessInfoComplete = async (data: any) => {
+  const handleBusinessInfoComplete = async (data: BusinessInfoData) => {
     await completeBusinessInfo(data);
   };
 

@@ -65,7 +65,7 @@ export default function ApprovalAnalyticsDashboard({
         }),
       );
       setAnalytics(response.data.data);
-    } catch (_error) {
+    } catch {
       toast.error(t('approval.analytics.errors.fetch_failed'));
     } finally {
       setIsLoading(false);
@@ -98,7 +98,7 @@ export default function ApprovalAnalyticsDashboard({
       window.URL.revokeObjectURL(url);
 
       toast.success(t('approval.analytics.success.exported'));
-    } catch (_error) {
+    } catch {
       toast.error(t('approval.analytics.errors.export_failed'));
     } finally {
       setIsExporting(false);

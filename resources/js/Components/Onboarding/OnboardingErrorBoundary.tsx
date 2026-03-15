@@ -1,4 +1,4 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { Component, ErrorInfo, ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
@@ -44,6 +44,7 @@ export class OnboardingErrorBoundary extends Component<Props, State> {
   private logErrorToService(error: Error, errorInfo: ErrorInfo): void {
     // Log to console in development
     if (import.meta.env.DEV) {
+      console.error('[OnboardingErrorBoundary]', error, errorInfo);
     }
 
     // In production, send to error tracking service
@@ -70,7 +71,7 @@ export class OnboardingErrorBoundary extends Component<Props, State> {
       }).catch(() => {
         // Silently fail if logging endpoint is not available
       });
-    } catch (loggingError) {
+    } catch {
       // Don't let logging errors break the error boundary
     }
   }
@@ -114,7 +115,7 @@ export class OnboardingErrorBoundary extends Component<Props, State> {
             </h2>
 
             <p className="mb-6 text-center text-gray-600 dark:text-gray-400">
-              We encountered an error while loading the onboarding experience. Don't worry, your
+              We encountered an error while loading the onboarding experience. Don&apos;t worry, your
               progress has been saved.
             </p>
 

@@ -1,12 +1,12 @@
+import VideoValidationAlert from '@/Components/Content/VideoValidationAlert';
+import {
+    PLATFORM_REQUIREMENTS,
+    validateVideoForPlatform,
+    ValidationResult,
+} from '@/Utils/videoValidation';
+import { Info } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertCircle, CheckCircle, Info } from 'lucide-react';
-import {
-  validateVideoForPlatform,
-  PLATFORM_REQUIREMENTS,
-  ValidationResult,
-} from '@/Utils/videoValidation';
-import VideoValidationAlert from '@/Components/Content/VideoValidationAlert';
 
 interface PlatformVideoSettingsProps {
   platform: string;

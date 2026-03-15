@@ -5,8 +5,8 @@ import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface FacebookSettingsProps {
-  settings: any;
-  onSettingsChange: (settings: any) => void;
+  settings: Record<string, unknown>;
+  onSettingsChange: (settings: Record<string, unknown>) => void;
 }
 
 const EMPTY_SETTINGS = {};
@@ -29,9 +29,10 @@ export default function FacebookSettings({
       isInitialized.current = true;
       onSettingsChange(defaultSettings);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleChange = (key: string, value: any) => {
+  const handleChange = (key: string, value: unknown) => {
     onSettingsChange({ ...settings, [key]: value });
   };
 
