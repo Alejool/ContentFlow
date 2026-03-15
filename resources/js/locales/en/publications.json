@@ -6,7 +6,7 @@
       "sections": {
         "details": "Content Details"
       },
-      "contentType":{
+      "contentType": {
         "label": "Content Type",
         "value": "Video",
         "filteredByPlatforms": "Filtered by selected platforms",
@@ -116,7 +116,7 @@
         "selectSocialAccounts": "Select Accounts",
         "associatedPublicationsRequired": "Associated Publications is required",
         "lockedBySession": "Locked by Session",
-        "noCampaigns":"no campaign",
+        "noCampaigns": "no campaign",
         "dragDrop": {
           "title": "Drag and drop to sort",
           "subtitle": "Upload your multimedia files here"

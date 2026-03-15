@@ -10,11 +10,11 @@
     "deleting": "Eliminando...",
     "select": "Seleccionar",
     "more": "Más",
-    "active":"Activa",
-    "inactive":"Inactiva",
-    "completed": "Completada",    
+    "active": "Activa",
+    "inactive": "Inactiva",
+    "completed": "Completada",
     "paused": "Pausada",
-    "available":"Disponible",
+    "available": "Disponible",
     "name": "Nombre",
     "type": "Tipo",
     "confirm": "Confirmar",
@@ -52,8 +52,8 @@
     "aiChat": "Chat IA",
     "logout": "Cerrar Sesión",
     "localizationExamples": "Ejemplos de Localización",
-    "read_more":"Leer más",
-    "show_less":"Leer menos",
+    "read_more": "Leer más",
+    "show_less": "Leer menos",
     "affected_publications": "Publicaciones afectadas:",
     "more_items": "más...",
     "today": "Hoy",
@@ -184,7 +184,7 @@
       "title_asc": "Título (A-Z)",
       "title_desc": "Título (Z-A)"
     },
-    "platform":{
+    "platform": {
       "title": "Ninguna plataforma"
     },
     "errors": {

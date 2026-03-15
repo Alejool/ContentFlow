@@ -10,15 +10,15 @@
     "deleting": "Deleting...",
     "select": "Select",
     "more": "More",
-    "active":"Active",
+    "active": "Active",
     "completed": "Completed",
-    "inactive":"Inactive",
-    "available":"Available",
+    "inactive": "Inactive",
+    "available": "Available",
     "name": "Name",
     "type": "Type",
     "progress": "Progress",
     "dismiss": "Dismiss",
-    "never":"Never",
+    "never": "Never",
     "viewAll": "View all",
     "new": "New",
     "saving": "Saving...",
@@ -45,8 +45,8 @@
     "aiChat": "AI Chat",
     "logout": "Logout",
     "localizationExamples": "Localization Examples",
-    "read_more":"Read more",
-    "show_less":"Show less",
+    "read_more": "Read more",
+    "show_less": "Show less",
     "affected_publications": "Affected publications:",
     "more_items": "more...",
     "today": "Today",
@@ -172,7 +172,7 @@
       "title_asc": "Title (A-Z)",
       "title_desc": "Title (Z-A)"
     },
-    "platform":{
+    "platform": {
       "title": "All platforms"
     },
     "errors": {

@@ -18,9 +18,9 @@
     "phoneInvalid": "Número de teléfono inválido.",
     "phoneValid": "Número válido.",
     "auth": {
-        "failed": "Las credenciales no coinciden con nuestros registros.",
-        "password": "La contraseña proporcionada es incorrecta.",
-        "throttle": "Demasiados intentos de acceso. Por favor reintente en {{seconds}} segundos."
+      "failed": "Las credenciales no coinciden con nuestros registros.",
+      "password": "La contraseña proporcionada es incorrecta.",
+      "throttle": "Demasiados intentos de acceso. Por favor reintente en {{seconds}} segundos."
     }
   }
 }
