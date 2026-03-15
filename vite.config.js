@@ -211,32 +211,19 @@ export default defineConfig({
                         return 'service-worker';
                     }
 
-                    // Stores in separate chunk
-                    if (id.includes('/stores/')) {
-                        return 'stores';
+                    // Merge stores + utils into a single chunk to avoid circular
+                    // dependencies (stores import utils and vice-versa).
+                    // Stores that are both statically and dynamically imported
+                    // (publicationStore, manageContentUIStore) must also live here
+                    // so Vite doesn't try to move them into a dynamic chunk.
+                    if (id.includes('/stores/') || id.includes('/Utils/')) {
+                        return 'app-core';
                     }
 
-                    // Utils in separate chunk
-                    if (id.includes('/Utils/')) {
-                        return 'utils';
-                    }
-
-                    // Pages - split by route
-                    if (id.includes('/Pages/Analytics/')) {
-                        return 'page-analytics';
-                    }
-                    if (id.includes('/Pages/Calendar/')) {
-                        return 'page-calendar';
-                    }
-                    if (id.includes('/Pages/Reels/')) {
-                        return 'page-reels';
-                    }
-                    if (id.includes('/Pages/Workspace/')) {
-                        return 'page-workspace';
-                    }
-                    if (id.includes('/Pages/Profile/')) {
-                        return 'page-profile';
-                    }
+                    // Let Rollup handle page-level splitting automatically.
+                    // Assigning pages to named chunks caused cycles because pages
+                    // import from app-core (formerly utils) which would then
+                    // re-enter the page chunk.
                 },
                 // Optimize chunk file names
                 chunkFileNames: (chunkInfo) => {
