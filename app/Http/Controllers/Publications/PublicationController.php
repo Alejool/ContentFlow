@@ -118,16 +118,15 @@ class PublicationController extends Controller
         ]);
 
       // Status filtering with smart defaults
-      // By default, exclude pending_review publications from the main list
-      // They should only appear in the Approvals section
       if ($request->has('status') && $request->status !== 'all') {
         $statuses = explode(',', $request->status);
         $query->whereIn('status', $statuses);
-      } else {
-        // No status filter provided: exclude pending_review by default
-        // This ensures publications sent to review disappear from the main list
+      } elseif (!$request->has('status')) {
+        // No status filter at all: exclude pending_review by default
+        // (they appear in the Approvals tab instead)
         $query->where('status', '!=', 'pending_review');
       }
+      // status=all: no filter applied, show everything including pending_review
 
       if ($request->has('search') && !empty($request->search)) {
         $query->where('title', 'LIKE', '%' . $request->search . '%');

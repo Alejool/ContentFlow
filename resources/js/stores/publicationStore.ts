@@ -147,7 +147,10 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       // Limpiar filtros vacíos
       const cleanFilters = Object.entries(filters).reduce(
         (acc, [key, value]) => {
-          if (Array.isArray(value) && value.length > 0) {
+          // Keep status even if "all" — backend needs it to know user wants everything
+          if (key === "status") {
+            if (value) acc[key] = value;
+          } else if (Array.isArray(value) && value.length > 0) {
             acc[key] = value;
           } else if (value && !Array.isArray(value) && value !== "all") {
             acc[key] = value;
