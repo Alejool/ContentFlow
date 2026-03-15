@@ -146,20 +146,11 @@ export default function AiConfigSection({
                     <ExternalLink className="h-3 w-3" />
                   </a>
 
-                  <button
-                    type="button"
-                    onClick={() => handleToggleProvider(provider.id, !isEnabled)}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isEnabled ? 'bg-primary-600' : 'bg-gray-300 dark:bg-neutral-700'} `}
-                  >
-                    <input
-                      type="checkbox"
-                      className="sr-only"
-                      {...register(`ai_settings.${provider.id}.enabled`)}
-                    />
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isEnabled ? 'translate-x-6' : 'translate-x-1'} `}
-                    />
-                  </button>
+                  <Switch
+                    isSelected={isEnabled}
+                    onChange={(value) => handleToggleProvider(provider.id, value)}
+                    size="sm"
+                  />
                 </div>
               </div>
 

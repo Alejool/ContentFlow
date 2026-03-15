@@ -1,4 +1,5 @@
 import Button from '@/Components/common/Modern/Button';
+import ColorArea from '@/Components/common/Modern/ColorArea';
 import { useS3Upload } from '@/Hooks/useS3Upload';
 import { router, useForm } from '@inertiajs/react';
 import axios from 'axios';
@@ -387,45 +388,20 @@ export default function WhiteLabelSettingsTab({
               <div className="h-px bg-neutral-100 dark:bg-neutral-800" />
 
               {/* Color Selection */}
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-base font-bold text-gray-900 dark:text-white">
-                    {t('workspace.white_label.primary_color') || 'Color de Marca'}
-                  </label>
-                  <p className="mt-1 text-sm text-gray-500 dark:text-neutral-500">
-                    {t('workspace.white_label.color_help') ||
-                      'Este color se aplicará a botones, enlaces e indicadores.'}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <div className="relative">
-                    <input
-                      type="color"
-                      value={data.primary_color}
-                      onChange={(e) => setData('primary_color', e.target.value)}
-                      disabled={!canManageWorkspace}
-                      className="h-14 w-14 cursor-pointer overflow-hidden rounded-lg border-0 p-0 shadow-lg"
-                    />
-                  </div>
-                  <div className="relative max-w-xs flex-1">
-                    <input
-                      type="text"
-                      value={data.primary_color}
-                      onChange={(e) => setData('primary_color', e.target.value)}
-                      disabled={!canManageWorkspace}
-                      className="block h-14 w-full rounded-lg border-transparent bg-neutral-100 pl-10 pr-4 font-mono text-lg font-bold text-black focus:ring-2 focus:ring-primary-500 dark:bg-neutral-800 dark:text-white"
-                      placeholder="#000000"
-                    />
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 font-mono text-lg text-neutral-400">
-                      #
-                    </div>
-                  </div>
-                </div>
-                {errors.primary_color && (
-                  <p className="text-sm font-medium text-red-500">{errors.primary_color}</p>
-                )}
-              </div>
+              <ColorArea
+                id="primary-color"
+                label={t('workspace.white_label.primary_color') || 'Color de Marca'}
+                hint={
+                  t('workspace.white_label.color_help') ||
+                  'Este color se aplicará a botones, enlaces e indicadores.'
+                }
+                value={data.primary_color}
+                onChange={(color) => setData('primary_color', color)}
+                disabled={!canManageWorkspace}
+                error={errors.primary_color}
+                showHexInput={true}
+                showSliders={true}
+              />
 
               <div className="flex justify-end">
                 <Button

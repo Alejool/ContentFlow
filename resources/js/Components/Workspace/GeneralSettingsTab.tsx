@@ -5,15 +5,15 @@ import { WorkspaceTimezoneSettings } from '@/Components/Workspace/WorkspaceTimez
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router, usePage } from '@inertiajs/react';
 import {
-  AlertTriangle,
-  Copy,
-  Globe,
-  Info,
-  Lock,
-  SettingsIcon,
-  Shield,
-  Trash2,
-  UserCheck,
+    AlertTriangle,
+    Copy,
+    Globe,
+    Info,
+    Lock,
+    SettingsIcon,
+    Shield,
+    Trash2,
+    UserCheck,
 } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -189,15 +189,12 @@ export default function GeneralSettingsTab({
                         </p>
                       </div>
                     </div>
-                    <label className="relative inline-flex cursor-pointer items-center">
-                      <input
-                        type="checkbox"
-                        {...register('public')}
-                        disabled={!isOwner}
-                        className="peer sr-only"
-                      />
-                      <div className="peer h-6 w-11 rounded-full bg-gray-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] disabled:cursor-not-allowed disabled:opacity-50 peer-checked:bg-primary-500 peer-checked:after:translate-x-full peer-focus:outline-none dark:bg-neutral-700"></div>
-                    </label>
+                    <Switch
+                      isSelected={isPublic}
+                      onChange={(value) => setValue('public', value)}
+                      isDisabled={!isOwner}
+                      size="md"
+                    />
                   </div>
 
                   {isPublic && (
@@ -215,15 +212,12 @@ export default function GeneralSettingsTab({
                           </p>
                         </div>
                       </div>
-                      <label className="relative inline-flex cursor-pointer items-center">
-                        <input
-                          type="checkbox"
-                          {...register('allow_public_invites')}
-                          disabled={!isOwner}
-                          className="peer sr-only"
-                        />
-                        <div className="peer h-6 w-11 rounded-full bg-gray-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] disabled:cursor-not-allowed disabled:opacity-50 peer-checked:bg-primary-500 peer-checked:after:translate-x-full peer-focus:outline-none dark:bg-neutral-700"></div>
-                      </label>
+                      <Switch
+                        isSelected={watch('allow_public_invites') || false}
+                        onChange={(value) => setValue('allow_public_invites', value)}
+                        isDisabled={!isOwner}
+                        size="md"
+                      />
                     </div>
                   )}
                 </div>
