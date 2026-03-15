@@ -117,7 +117,8 @@ export class CacheManager {
             });
             
             if (this.isDevelopment) {
-              }
+              console.log(`[CacheManager] Cached static: ${url}`);
+            }
           }
         } catch (error) {
           // Log comprehensive error
@@ -167,7 +168,8 @@ export class CacheManager {
       });
       
       if (this.isDevelopment) {
-        }
+        console.log(`[CacheManager] Cached dynamic: ${request.url}`);
+      }
       
       // Check cache size and evict if necessary
       await this.checkAndEvict(CACHE_NAMES.DYNAMIC, CACHE_SIZE_LIMITS.DYNAMIC);
@@ -419,10 +421,11 @@ export class CacheManager {
         for (const request of keys) {
           this.metadataStore.delete(request.url);
         }
-        
-        }
-    } catch (error) {
+        if (this.isDevelopment) console.log(`[CacheManager] Invalidated cache: ${cacheName}`);
       }
+    } catch (error) {
+      // Ignore errors
+    }
   }
 
   /**
@@ -584,12 +587,9 @@ export class CacheManager {
         
         if (this.isDevelopment) {
           const duration = Date.now() - startTime;
-          `);
+          console.log(`[CacheManager] cache-first HIT: ${request.url} (${duration}ms)`);
         }
         return cachedResponse;
-      }
-      
-      // Fallback to network
       const networkResponse = await fetch(request);
       const responseTime = Date.now() - startTime;
       
@@ -622,7 +622,7 @@ export class CacheManager {
       
       if (this.isDevelopment) {
         const duration = Date.now() - startTime;
-        `);
+        console.log(`[CacheManager] cache-first MISS (network): ${request.url} (${duration}ms)`);
       }
       
       return networkResponse;
@@ -674,7 +674,7 @@ export class CacheManager {
         
         if (this.isDevelopment) {
           const duration = Date.now() - startTime;
-          `);
+          console.log(`[CacheManager] network-first SUCCESS: ${request.url} (${duration}ms)`);
         }
       }
       
@@ -700,12 +700,9 @@ export class CacheManager {
         
         if (this.isDevelopment) {
           const duration = Date.now() - startTime;
-          `);
+          console.log(`[CacheManager] network-first FALLBACK (cache): ${request.url} (${duration}ms)`);
         }
         return cachedResponse;
-      }
-      
-      // Log cache decision with error
       cacheLogger.logDecision({
         url: request.url,
         method: request.method,
@@ -777,7 +774,7 @@ export class CacheManager {
         
         if (this.isDevelopment) {
           const duration = Date.now() - startTime;
-          `);
+          console.log(`[CacheManager] stale-while-revalidate HIT: ${request.url} (${duration}ms)`);
         }
         return cachedResponse;
       }
@@ -801,7 +798,7 @@ export class CacheManager {
         
         if (this.isDevelopment) {
           const duration = Date.now() - startTime;
-          `);
+          console.log(`[CacheManager] stale-while-revalidate MISS (network): ${request.url} (${duration}ms)`);
         }
         return networkResponse;
       }
