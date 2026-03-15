@@ -11,6 +11,7 @@ import {
     Home,
     Layers,
 } from "lucide-react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 interface SidebarProps {
@@ -49,6 +50,8 @@ export default function Sidebar({
   const { t } = useTranslation();
   const { actualTheme } = useTheme();
   const { auth } = usePage().props as any;
+  const [logoLoaded, setLogoLoaded] = useState(false);
+  const [logoError, setLogoError] = useState(false);
 
   // Get user permissions from current workspace
   const userPermissions = auth?.current_workspace?.permissions || [];
@@ -145,18 +148,31 @@ export default function Sidebar({
               }`}
             >
               <div
-                className={`w-12 h-14 ${!auth?.current_workspace?.white_label_logo_url ? "bg-gradient-to-r" : ""} rounded-lg flex items-center justify-center flex-shrink-0`}
+                className={`relative w-12 h-14 ${!auth?.current_workspace?.white_label_logo_url ? "bg-gradient-to-r" : ""} rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden`}
               >
-                <img
-                  id="sidebar-logo"
-                  src={Logo}
-                  alt={`${auth?.current_workspace?.name || "ContentFlow"} logo`}
-                  className={
-                    auth?.current_workspace?.white_label_logo_url
-                      ? "w-full h-full object-contain p-1"
-                      : "w-16 h-16 object-contain"
-                  }
-                />
+                {!logoLoaded && !logoError && (
+                  <div className="absolute inset-0 rounded-lg overflow-hidden bg-gray-200 dark:bg-neutral-700">
+                    <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/40 dark:via-white/10 to-transparent" />
+                  </div>
+                )}
+                {logoError ? (
+                  <span className="text-lg font-bold text-primary-600 dark:text-primary-400">
+                    {(auth?.current_workspace?.name || "C").charAt(0).toUpperCase()}
+                  </span>
+                ) : (
+                  <img
+                    id="sidebar-logo"
+                    src={Logo}
+                    alt={`${auth?.current_workspace?.name || "ContentFlow"} logo`}
+                    onLoad={() => setLogoLoaded(true)}
+                    onError={() => setLogoError(true)}
+                    className={`transition-opacity duration-300 ${logoLoaded ? "opacity-100" : "opacity-0"} ${
+                      auth?.current_workspace?.white_label_logo_url
+                        ? "w-full h-full object-contain p-1"
+                        : "w-16 h-16 object-contain"
+                    }`}
+                  />
+                )}
               </div>
               {isSidebarOpen && (
                 <div className="ml-4 opacity-100 transition-opacity duration-300">
