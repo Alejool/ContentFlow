@@ -250,7 +250,7 @@ export default function ManageContentPage() {
   useEffect(() => {
     const handleSubmittedForApproval = (event: CustomEvent) => {
       console.log('[ContentPage] Publication submitted for approval:', event.detail);
-      // Refresh the publications list to remove the publication from current view
+      // Refresh the publications list to reflect the new status
       handleRefresh();
       // CRITICAL: Also refresh approvals list to show the new pending request
       setRefreshTrigger((prev) => prev + 1);

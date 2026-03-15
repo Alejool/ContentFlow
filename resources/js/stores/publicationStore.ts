@@ -186,9 +186,38 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       });
 
       const data = response.data.publications;
+      const incomingItems: Publication[] = data.data ?? data ?? [];
+
+      // Preserve optimistic local state: if the store already has a more
+      // "advanced" status for an item (e.g. pending_review) and the backend
+      // still returns the old status (e.g. draft) due to cache or timing,
+      // keep the local state to avoid re-enabling buttons incorrectly.
+      const statusPriority: Record<string, number> = {
+        draft: 0,
+        rejected: 1,
+        failed: 1,
+        scheduled: 2,
+        approved: 3,
+        pending_review: 4,
+        publishing: 5,
+        published: 6,
+      };
+
+      const currentPublications = get().publications;
+      const mergedItems = incomingItems.map((incoming) => {
+        const existing = currentPublications.find((p) => p.id === incoming.id);
+        if (!existing) return incoming;
+        const existingPriority = statusPriority[existing.status ?? ''] ?? 0;
+        const incomingPriority = statusPriority[incoming.status ?? ''] ?? 0;
+        // Keep local state if it's more advanced than what the backend returned
+        if (existingPriority > incomingPriority) {
+          return { ...incoming, status: existing.status };
+        }
+        return incoming;
+      });
 
       set({
-        publications: data.data ?? data ?? [], // Handle both paginated and non-paginated responses
+        publications: mergedItems,
         pagination: {
           current_page: data.current_page ?? 1,
           last_page: data.last_page ?? 1,

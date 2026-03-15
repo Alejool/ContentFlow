@@ -57,8 +57,9 @@ export const usePublicationActionsStore = create<PublicationActionsStore>((set, 
         publication_id: itemId,
       });
 
-      const approvalRequest = response.data?.data?.request;
-      const publication = response.data?.data?.publication;
+      // Backend can return either { data: { request, publication } } or { request, publication }
+      const approvalRequest = response.data?.data?.request ?? response.data?.request;
+      const publication = response.data?.data?.publication ?? response.data?.publication;
 
       // Actualizar el store de publicaciones con el nuevo estado
       if (publication) {
