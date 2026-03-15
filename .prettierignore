@@ -11,6 +11,7 @@ public/hot
 # Laravel
 storage
 bootstrap/cache
+resources/views/**/*.blade.php
 
 # Docker
 docker
