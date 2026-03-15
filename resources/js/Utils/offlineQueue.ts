@@ -6,7 +6,7 @@
 export interface QueuedAction {
   id: string;
   type: string;
-  payload: any;
+  payload: unknown;
   timestamp: number;
   retries: number;
 }
@@ -31,7 +31,7 @@ class OfflineQueueManager {
       if (stored) {
         this.queue = JSON.parse(stored);
       }
-    } catch (error) {
+    } catch {
       this.queue = [];
     }
   }
@@ -42,7 +42,7 @@ class OfflineQueueManager {
   private saveQueue(): void {
     try {
       localStorage.setItem(QUEUE_STORAGE_KEY, JSON.stringify(this.queue));
-    } catch (error) {
+    } catch {
       // Failed to save offline queue
     }
   }
@@ -50,7 +50,7 @@ class OfflineQueueManager {
   /**
    * Add an action to the queue
    */
-  enqueue(type: string, payload: any): string {
+  enqueue(type: string, payload: unknown): string {
     const action: QueuedAction = {
       id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       type,
@@ -117,7 +117,7 @@ class OfflineQueueManager {
         await syncFn(action);
         this.dequeue(action.id);
         successCount++;
-      } catch (error) {
+      } catch {
         // Increment retry count
         action.retries++;
 

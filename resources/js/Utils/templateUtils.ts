@@ -13,7 +13,7 @@ import type { PublicationTemplate } from '@/types/onboarding';
 export function storeTemplateInSession(template: PublicationTemplate): void {
   try {
     sessionStorage.setItem('selectedTemplate', JSON.stringify(template));
-  } catch (error) {
+  } catch {
     // Failed to store template in session
   }
 }
@@ -28,7 +28,7 @@ export function getTemplateFromSession(): PublicationTemplate | null {
     const stored = sessionStorage.getItem('selectedTemplate');
     if (!stored) return null;
     return JSON.parse(stored) as PublicationTemplate;
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -39,7 +39,7 @@ export function getTemplateFromSession(): PublicationTemplate | null {
 export function clearTemplateFromSession(): void {
   try {
     sessionStorage.removeItem('selectedTemplate');
-  } catch (error) {
+  } catch {
     // Failed to clear template from session
   }
 }
@@ -52,7 +52,7 @@ export function clearTemplateFromSession(): void {
 export function hasTemplateInSession(): boolean {
   try {
     return sessionStorage.getItem('selectedTemplate') !== null;
-  } catch (error) {
+  } catch {
     return false;
   }
 }
@@ -75,7 +75,7 @@ export function formatHashtags(hashtags: string[]): string {
  */
 export function applyTemplateToForm(
   template: PublicationTemplate,
-  setValue: (name: string, value: any, options?: any) => void,
+  setValue: (name: string, value: string, options?: { shouldValidate?: boolean; shouldDirty?: boolean }) => void,
 ): void {
   // Populate title
   setValue('title', template.name, {

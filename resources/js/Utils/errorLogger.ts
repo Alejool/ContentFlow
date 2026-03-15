@@ -15,9 +15,9 @@ export interface ErrorLog {
   message: string;
   code?: string;
   status?: number;
-  data?: any;
+  data?: unknown;
   stackTrace?: string;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
   severity: 'error' | 'warning' | 'info';
 }
 
@@ -55,16 +55,17 @@ class ErrorLogger {
    * Requirements: 3.5, 10.3
    */
   logError(
-    error: Error | any,
+    error: Error | unknown,
     context?: {
       type?: ErrorLog['type'];
       operation?: string;
       resource?: string;
       resourceId?: string | number;
-      data?: any;
+      data?: unknown;
       severity?: ErrorLog['severity'];
     },
   ): ErrorLog {
+    const err = error as Error & { code?: string; response?: { status?: number; data?: unknown }; status?: number };
     const errorLog: ErrorLog = {
       id: `error-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       timestamp: Date.now(),
@@ -72,11 +73,11 @@ class ErrorLogger {
       operation: context?.operation,
       resource: context?.resource,
       resourceId: context?.resourceId,
-      message: error?.message || String(error),
-      code: error?.code,
-      status: error?.response?.status || error?.status,
-      data: context?.data || error?.response?.data,
-      stackTrace: error?.stack,
+      message: err?.message || String(error),
+      code: err?.code,
+      status: err?.response?.status || err?.status,
+      data: context?.data || err?.response?.data,
+      stackTrace: err?.stack,
       context: {
         userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
         url: typeof window !== 'undefined' ? window.location.href : undefined,
@@ -108,7 +109,7 @@ class ErrorLogger {
     if (this.config.onError) {
       try {
         this.config.onError(errorLog);
-      } catch (handlerError) {
+      } catch {
         // Ignore handler errors
       }
     }
@@ -219,7 +220,7 @@ class ErrorLogger {
     if (this.config.persistToStorage) {
       try {
         localStorage.removeItem(this.STORAGE_KEY);
-      } catch (error) {
+      } catch {
         // Ignore storage errors
       }
     }
@@ -244,7 +245,7 @@ class ErrorLogger {
     try {
       const serialized = JSON.stringify(this.logs);
       localStorage.setItem(this.STORAGE_KEY, serialized);
-    } catch (error) {
+    } catch {
       // Ignore storage errors
     }
   }
@@ -262,7 +263,7 @@ class ErrorLogger {
           console.log(`[ErrorLogger] Restored ${this.logs.length} logs from storage`);
         }
       }
-    } catch (error) {
+    } catch {
       // Ignore storage errors
     }
   }
@@ -310,3 +311,4 @@ export const errorLogger = new ErrorLogger();
 
 // Export class for custom instances
 export { ErrorLogger };
+

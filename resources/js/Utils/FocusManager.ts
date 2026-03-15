@@ -213,7 +213,7 @@ class FocusManagerClass {
     }
 
     // Check if element is disabled
-    if ((element as any).disabled === true) {
+    if ((element as HTMLInputElement).disabled === true) {
       return false;
     }
 

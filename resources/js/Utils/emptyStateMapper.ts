@@ -1,6 +1,6 @@
-import { TFunction } from 'i18next';
 import { EmptyStateConfig } from '@/Components/common/EmptyState';
 import { emptyStateConfigs, getEmptyStateConfigs } from '@/Constants/emptyStateConfigs';
+import { TFunction } from 'i18next';
 
 /**
  * Empty State Context Mapping
@@ -79,7 +79,7 @@ export const emptyStateContexts: EmptyStateContext[] = [
  */
 export function getEmptyStateConfig(
   routeName: string,
-  props: any,
+  props: Record<string, unknown>,
   t?: TFunction,
 ): EmptyStateConfig | null {
   // Find the context mapping for this route
@@ -154,7 +154,7 @@ export function getEmptyStateByKey(configKey: string, t?: TFunction): EmptyState
  * }
  * ```
  */
-export function isDataEmpty(data: any): boolean {
+export function isDataEmpty(data: unknown): boolean {
   // Null or undefined
   if (data == null) {
     return true;

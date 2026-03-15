@@ -222,13 +222,13 @@ export function waitForOnline(): Promise<void> {
  * Queue for offline actions
  */
 class OfflineQueue {
-  private queue: Array<() => Promise<any>> = [];
+  private queue: Array<() => Promise<unknown>> = [];
   private processing = false;
 
   /**
    * Adds an action to the queue
    */
-  enqueue(action: () => Promise<any>): void {
+  enqueue(action: () => Promise<unknown>): void {
     this.queue.push(action);
     this.processQueue();
   }

@@ -102,7 +102,7 @@ class PerformanceMetricsTracker {
   /**
    * Log metric to console
    */
-  private logMetric(metric: PerformanceMetric): void {
+  private logMetric(_metric: PerformanceMetric): void {
     // Logging disabled
   }
 
@@ -379,7 +379,7 @@ class PerformanceMetricsTracker {
     if (this.config.persistToStorage) {
       try {
         localStorage.removeItem(this.STORAGE_KEY);
-      } catch (error) {
+      } catch {
         // Failed to clear metrics from storage
       }
     }
@@ -404,7 +404,7 @@ class PerformanceMetricsTracker {
     try {
       const serialized = JSON.stringify(this.metrics);
       localStorage.setItem(this.STORAGE_KEY, serialized);
-    } catch (error) {
+    } catch {
       // Failed to persist metrics
     }
   }
@@ -418,7 +418,7 @@ class PerformanceMetricsTracker {
       if (stored) {
         this.metrics = JSON.parse(stored);
       }
-    } catch (error) {
+    } catch {
       // Failed to restore metrics
     }
   }
@@ -470,7 +470,7 @@ class PerformanceMetricsTracker {
   /**
    * Print summary to console
    */
-  printSummary(resource?: string): void {
+  printSummary(_resource?: string): void {
     // Logging disabled
   }
 }

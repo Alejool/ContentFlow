@@ -71,7 +71,7 @@ export function getMediaUrl(publication: Publication): string | null {
 export function prepareMediaForPreview(publication: Publication) {
   if (!hasMedia(publication)) return [];
 
-  return (publication.media_files || []).map((media: any) => {
+  return (publication.media_files || []).map((media: { file_type?: string; thumbnail?: { file_path?: string }; file_path: string }) => {
     const isVideo = media.file_type?.includes('video');
     let mediaUrl = media.thumbnail?.file_path || media.file_path;
 
@@ -108,7 +108,7 @@ export function formatPublicationDate(dateString?: string): string {
 /**
  * Obtiene el nombre del usuario que tiene bloqueada la publicación
  */
-export function getLockedByName(remoteLock?: any): string {
+export function getLockedByName(remoteLock?: { user_name?: string; user?: { name?: string } }): string {
   if (!remoteLock) return '';
   return remoteLock.user_name || remoteLock.user?.name || 'Usuario';
 }
@@ -116,7 +116,7 @@ export function getLockedByName(remoteLock?: any): string {
 /**
  * Obtiene el primer nombre del usuario que tiene bloqueada la publicación
  */
-export function getLockedByFirstName(remoteLock?: any): string {
+export function getLockedByFirstName(remoteLock?: { user_name?: string; user?: { name?: string } }): string {
   const fullName = getLockedByName(remoteLock);
   return fullName.split(' ')[0] ?? '';
 }
@@ -126,7 +126,7 @@ export function getLockedByFirstName(remoteLock?: any): string {
  */
 export function isProcessing(publication: Publication): boolean {
   const firstMedia = getFirstMedia(publication);
-  return (firstMedia as any)?.status === 'processing';
+  return (firstMedia as unknown as { status?: string })?.status === 'processing';
 }
 
 /**
@@ -169,7 +169,7 @@ export function getStatusColors(status?: string): string {
  * Verifica si una publicación es un evento de usuario
  */
 export function isUserEvent(publication: Publication): boolean {
-  return (publication as any).type === 'user_event';
+  return (publication as Publication & { type?: string }).type === 'user_event';
 }
 
 /**

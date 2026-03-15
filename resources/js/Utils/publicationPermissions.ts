@@ -17,7 +17,7 @@ export function canUserPublishDirectly(
 
   // 2. Verificar si el usuario actual tiene una aprobación activa
   const hasActiveApproval = publication.approval_logs?.some(
-    (log: any) =>
+    (log: { requested_by: number; action: string; reviewed_at: string | null }) =>
       log.requested_by === currentUserId && log.action === 'approved' && log.reviewed_at !== null,
   );
 

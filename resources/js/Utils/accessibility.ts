@@ -51,7 +51,7 @@ export const makeClickable = (onClick: () => void) => {
  *   // items will always be the same reference when empty
  * }
  */
-export const EMPTY_ARRAY: readonly any[] = [];
+export const EMPTY_ARRAY: readonly unknown[] = [];
 
 /**
  * Empty object constant to use as default prop value

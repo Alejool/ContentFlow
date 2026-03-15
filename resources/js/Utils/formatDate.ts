@@ -1,5 +1,5 @@
-import { parseISO } from 'date-fns';
 import { useTimezoneStore } from '@/stores/timezoneStore';
+import { parseISO } from 'date-fns';
 
 // Small helper to format UTC ISO timestamps into the workspace timezone
 const getWorkspaceTimezone = () => {
@@ -7,7 +7,7 @@ const getWorkspaceTimezone = () => {
 };
 
 const getUserLocale = () =>
-  (window as any).APP_LOCALE ||
+  (window as unknown as Record<string, unknown>).APP_LOCALE as string ||
   document.documentElement.lang ||
   Intl.DateTimeFormat().resolvedOptions().locale;
 
@@ -23,7 +23,7 @@ export function formatTime(iso?: string | null) {
       hour12: false,
       timeZone: tz,
     });
-  } catch (e) {
+  } catch {
     return '';
   }
 }
@@ -40,7 +40,7 @@ export function formatDate(iso?: string | null) {
       day: 'numeric',
       timeZone: tz,
     });
-  } catch (e) {
+  } catch {
     return '';
   }
 }
@@ -60,7 +60,7 @@ export function formatDateTime(iso?: string | null) {
       hour12: false,
       timeZone: tz,
     });
-  } catch (e) {
+  } catch {
     return '';
   }
 }

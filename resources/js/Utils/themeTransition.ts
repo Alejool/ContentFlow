@@ -55,7 +55,7 @@ export function transitionTheme(
   }
 
   // Si no hay soporte para View Transition API, ejecutar directamente
-  if (!(document as any).startViewTransition) {
+  if (!(document as Document & { startViewTransition?: (cb: () => void) => { finished: Promise<void> } }).startViewTransition) {
     callback();
     return Promise.resolve();
   }
@@ -84,7 +84,7 @@ export function transitionTheme(
   }
 
   // Iniciar la transición
-  const transition = (document as any).startViewTransition(() => {
+  const transition = (document as Document & { startViewTransition?: (cb: () => void) => { finished: Promise<void> } }).startViewTransition!(() => {
     flushSync(() => {
       callback();
     });

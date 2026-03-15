@@ -8,7 +8,7 @@
  * Requirements: 2.4
  */
 
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 
 export type ThemePreference = 'light' | 'dark' | 'system';
 
@@ -81,7 +81,7 @@ async function syncThemes(): Promise<void> {
 /**
  * Handle API errors with appropriate logging
  */
-function handleAPIError(operation: string, error: unknown): void {
+function handleAPIError(_operation: string, _error: unknown): void {
   // Error handling disabled
 }
 

@@ -102,7 +102,7 @@ class CacheLogger {
   /**
    * Output cache decision to console with formatting
    */
-  private outputToConsole(log: CacheDecisionLog): void {
+  private outputToConsole(_log: CacheDecisionLog): void {
     // Logging disabled
   }
 
@@ -251,7 +251,7 @@ class CacheLogger {
     if (this.config.persistToStorage) {
       try {
         localStorage.removeItem(this.STORAGE_KEY);
-      } catch (error) {
+      } catch {
         // Failed to clear logs from storage
       }
     }
@@ -276,7 +276,7 @@ class CacheLogger {
     try {
       const serialized = JSON.stringify(this.logs);
       localStorage.setItem(this.STORAGE_KEY, serialized);
-    } catch (error) {
+    } catch {
       // Failed to persist logs
     }
   }
@@ -290,7 +290,7 @@ class CacheLogger {
       if (stored) {
         this.logs = JSON.parse(stored);
       }
-    } catch (error) {
+    } catch {
       // Failed to restore logs
     }
   }
@@ -349,3 +349,4 @@ export const cacheLogger = new CacheLogger();
 
 // Export class for custom instances
 export { CacheLogger };
+

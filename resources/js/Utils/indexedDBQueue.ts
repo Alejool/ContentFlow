@@ -44,8 +44,6 @@ class IndexedDBQueue {
 
       request.onsuccess = () => {
         this.db = request.result;
-        if (import.meta.env.DEV) {
-        }
         resolve();
       };
 
@@ -63,9 +61,6 @@ class IndexedDBQueue {
           objectStore.createIndex('timestamp', 'timestamp', { unique: false });
           objectStore.createIndex('resource', 'resource', { unique: false });
           objectStore.createIndex('priority', 'priority', { unique: false });
-
-          if (import.meta.env.DEV) {
-          }
         }
       };
     });
@@ -103,8 +98,6 @@ class IndexedDBQueue {
         request.onsuccess = () => {
           completed++;
           if (completed + errors === batch.length) {
-            if (import.meta.env.DEV) {
-            }
             resolve();
           }
         };
@@ -165,8 +158,6 @@ class IndexedDBQueue {
         request.onsuccess = () => {
           completed++;
           if (completed === operations.length) {
-            if (import.meta.env.DEV) {
-            }
             resolve();
           }
         };
@@ -248,8 +239,6 @@ class IndexedDBQueue {
       const request = store.put(operation);
 
       request.onsuccess = () => {
-        if (import.meta.env.DEV) {
-        }
         resolve();
       };
 
@@ -276,8 +265,6 @@ class IndexedDBQueue {
       const request = store.delete(id);
 
       request.onsuccess = () => {
-        if (import.meta.env.DEV) {
-        }
         resolve();
       };
 
@@ -304,8 +291,6 @@ class IndexedDBQueue {
       const request = store.clear();
 
       request.onsuccess = () => {
-        if (import.meta.env.DEV) {
-        }
         resolve();
       };
 
@@ -349,9 +334,6 @@ class IndexedDBQueue {
       this.db.close();
       this.db = null;
       this.initPromise = null;
-
-      if (import.meta.env.DEV) {
-      }
     }
   }
 }

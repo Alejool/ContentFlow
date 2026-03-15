@@ -10,7 +10,6 @@
 export type ThemePreference = 'light' | 'dark' | 'system';
 
 const STORAGE_KEY_PREFIX = 'workspace_theme_';
-const FALLBACK_KEY = 'theme'; // Fallback for non-workspace usage
 
 export interface LocalStorageThemeManager {
   save(workspaceId: string, theme: ThemePreference): void;
@@ -46,7 +45,7 @@ function save(workspaceId: string, theme: ThemePreference): void {
         // Clear all workspace themes and retry
         clearAll();
         localStorage.setItem(key, theme);
-      } catch (retryError) {
+      } catch {
         // Failed to save theme after cleanup
       }
     }
@@ -72,7 +71,7 @@ function load(workspaceId: string): ThemePreference | null {
     }
 
     return null;
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -89,7 +88,7 @@ function remove(workspaceId: string): void {
 
   try {
     localStorage.removeItem(key);
-  } catch (error) {
+  } catch {
     // Failed to remove theme preference
   }
 }
@@ -105,7 +104,7 @@ function clearAll(): void {
     workspaceThemeKeys.forEach((key) => {
       localStorage.removeItem(key);
     });
-  } catch (error) {
+  } catch {
     // Failed to clear all theme preferences
   }
 }
@@ -126,7 +125,7 @@ function clearOtherWorkspaceThemes(currentWorkspaceId: string): void {
         localStorage.removeItem(key);
       }
     });
-  } catch (error) {
+  } catch {
     // Failed to clear other workspace themes
   }
 }

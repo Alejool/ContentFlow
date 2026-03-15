@@ -31,7 +31,7 @@ export const validateVideoDuration = (
   platformKey: string,
   durationInSeconds: number,
 ): DurationValidationResult => {
-  const platform = (SOCIAL_PLATFORMS as any)[platformKey.toLowerCase()];
+  const platform = (SOCIAL_PLATFORMS as Record<string, { maxVideoDuration?: number }>)[platformKey.toLowerCase()];
 
   if (!platform || !platform.maxVideoDuration) {
     return {
@@ -56,9 +56,9 @@ export const validateVideoDuration = (
  */
 export const checkPublicationDurationErrors = (
   socialAccountIds: number[],
-  accounts: any[],
-  mediaFiles: any[],
-  videoMetadata: Record<string, any>,
+  accounts: { id: number; platform?: string }[],
+  mediaFiles: { type: string; tempId: string }[],
+  videoMetadata: Record<string, { duration: number }>,
 ): Record<number, string> => {
   const errors: Record<number, string> = {};
   const videos = mediaFiles.filter((m) => m.type === 'video');

@@ -90,14 +90,14 @@ class PerformanceValidator {
         let clsValue = 0;
         const clsObserver = new PerformanceObserver((list) => {
           for (const entry of list.getEntries()) {
-            if (!(entry as any).hadRecentInput) {
-              clsValue += (entry as any).value;
+            if (!(entry as unknown as { hadRecentInput: boolean }).hadRecentInput) {
+              clsValue += (entry as unknown as { value: number }).value;
               this.metrics.cumulativeLayoutShift = clsValue;
             }
           }
         });
         clsObserver.observe({ entryTypes: ['layout-shift'] });
-      } catch (error) {
+      } catch {
         // Failed to initialize observers
       }
     }
@@ -144,7 +144,7 @@ class PerformanceValidator {
       this.metrics.cacheResponseTime = duration;
 
       return response || null;
-    } catch (error) {
+    } catch {
       return null;
     }
   }
@@ -270,7 +270,7 @@ class PerformanceValidator {
   /**
    * Log performance report to console
    */
-  private logReport(report: PerformanceReport): void {
+  private logReport(_report: PerformanceReport): void {
     // Logging disabled
   }
 
@@ -320,7 +320,7 @@ class PerformanceValidator {
   /**
    * Run Lighthouse audit programmatically (requires lighthouse npm package)
    */
-  async runLighthouseAudit(): Promise<any> {
+  async runLighthouseAudit(): Promise<unknown> {
     if (typeof window === 'undefined') {
       return null;
     }

@@ -146,7 +146,7 @@ export function validateVideoForPlatform(
   metadata: VideoMetadata,
   platform: string,
   type: string,
-  t: (key: string, params?: any) => string,
+  t: (key: string, params?: Record<string, unknown>) => string,
 ): ValidationResult {
   const requirements = PLATFORM_REQUIREMENTS[platform];
 
@@ -210,15 +210,22 @@ export function validateVideoForPlatform(
   return result;
 }
 
+interface PlatformTypeRequirements {
+  maxDuration?: number;
+  minDuration?: number;
+  aspectRatio?: { min: number; max: number };
+  resolution?: { minWidth: number; minHeight: number };
+}
+
 /**
  * Valida metadatos contra requisitos específicos
  */
 function validateAgainstRequirements(
   metadata: VideoMetadata,
-  reqs: any,
+  reqs: PlatformTypeRequirements,
   result: ValidationResult,
   typeName: string,
-  t: (key: string, params?: any) => string,
+  t: (key: string, params?: Record<string, unknown>) => string,
 ): void {
   // Validar duración
   if (reqs.maxDuration && metadata.duration > reqs.maxDuration) {
@@ -276,7 +283,7 @@ function validateAgainstRequirements(
 /**
  * Verifica si los metadatos cumplen con los requisitos (sin agregar errores)
  */
-function checkRequirements(metadata: VideoMetadata, reqs: any): boolean {
+function checkRequirements(metadata: VideoMetadata, reqs: PlatformTypeRequirements): boolean {
   // Duración
   if (reqs.maxDuration && metadata.duration > reqs.maxDuration) return false;
   if (reqs.minDuration && metadata.duration < reqs.minDuration) return false;

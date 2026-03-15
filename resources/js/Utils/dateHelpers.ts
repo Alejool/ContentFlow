@@ -21,7 +21,7 @@ const getWorkspaceTimezone = (): string => {
  */
 const getUserLocale = (): string => {
   return (
-    (window as any).APP_LOCALE ||
+    (window as { APP_LOCALE?: string }).APP_LOCALE ||
     document.documentElement.lang ||
     Intl.DateTimeFormat().resolvedOptions().locale ||
     'es-ES'

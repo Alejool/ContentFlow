@@ -1,4 +1,4 @@
-import { isValid, isPast, isFuture, parseISO, isDate } from 'date-fns';
+import { isDate, isPast, isValid, parseISO } from 'date-fns';
 
 export interface DateValidationResult {
   isValid: boolean;
@@ -28,7 +28,7 @@ export function validateDate(date: string | Date | null | undefined): DateValida
   if (typeof date === 'string') {
     try {
       dateObj = parseISO(date);
-    } catch (error) {
+    } catch {
       return {
         isValid: false,
         isPastDate: false,

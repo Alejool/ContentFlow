@@ -40,7 +40,7 @@ async function saveThemePreference(workspaceId: string, theme: ThemePreference):
   // Save to backend asynchronously (may fail due to network)
   try {
     await themeAPIClient.updateTheme(workspaceId, theme);
-  } catch (error) {
+  } catch {
     // Backend save failed, but localStorage has the preference
     // This is acceptable - the preference will sync on next successful connection
   }
@@ -76,7 +76,7 @@ async function loadThemePreference(workspaceId: string): Promise<ThemePreference
     }
 
     return backendTheme;
-  } catch (error) {
+  } catch {
     // Both localStorage and backend failed
     return null;
   }
@@ -96,7 +96,7 @@ async function deleteThemePreference(workspaceId: string): Promise<void> {
   // Remove from backend (best effort)
   try {
     await themeAPIClient.updateTheme(workspaceId, 'system'); // Reset to system default
-  } catch (error) {
+  } catch {
     // Failed to delete theme from backend
   }
 }
@@ -120,7 +120,7 @@ async function getAllWorkspaceThemes(): Promise<Record<string, ThemePreference>>
         themes[workspaceId] = theme;
       }
     });
-  } catch (error) {
+  } catch {
     // Failed to get all workspace themes
   }
 

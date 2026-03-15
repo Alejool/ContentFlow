@@ -7,7 +7,7 @@ import { TFunction } from 'i18next';
 export const getErrorMessage = (
   error: string | string[] | undefined,
   t: TFunction,
-  fieldName?: string,
+  _fieldName?: string,
 ): string => {
   if (!error) return '';
 
