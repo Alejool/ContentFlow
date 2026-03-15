@@ -8,6 +8,7 @@ import Modal from "@/Components/common/ui/Modal";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { useCampaignStore } from "@/stores/campaignStore";
 import { usePublicationStore } from "@/stores/publicationStore";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { Head, usePage } from "@inertiajs/react";
 import {
   Calendar as CalendarIcon,
@@ -16,11 +17,12 @@ import {
   FileText,
   Folder,
   History as HistoryIcon,
+  Plus,
   Shield,
   Target,
   Trash2
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import toast from "react-hot-toast";
 
 import ApprovalHistory from "@/Components/Content/ApprovalHistory";
@@ -392,6 +394,88 @@ export default function ManageContentPage() {
               </p>
             </div>
 
+              <div className="flex justify-end gap-2">
+              {permissions.includes("manage-content") && (
+                <>
+                  <Menu as="div" className="relative">
+                    <MenuButton as={Fragment}>
+                      <Button
+                        id="create-publication"
+                        variant="primary"
+                        size="md"
+                        icon={Plus}
+                        className="gap-2 uppercase tracking-wider font-bold text-xs"
+                      >
+                        {t("manageContent.createNew").toUpperCase()}
+                      </Button>
+                    </MenuButton>
+                    <MenuItems
+                      transition
+                      className="absolute right-0 z-50 mt-2 w-56 origin-top-right rounded-lg bg-white dark:bg-neutral-900 shadow-2xl ring-1 ring-black/8 dark:ring-white/10 focus:outline-none overflow-hidden transition data-[closed]:scale-95 data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+                    >
+                      <div className="px-4 pt-3 pb-2">
+                        <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-neutral-500">
+                          {t("manageContent.createNew")}
+                        </p>
+                      </div>
+
+                      <div className="px-2 pb-2 space-y-0.5">
+                        <MenuItem>
+                          {({ focus }) => (
+                            <button
+                              onClick={() => openAddModal("publication")}
+                              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 text-left ${
+                                focus
+                                  ? "bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300"
+                                  : "text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-neutral-800"
+                              }`}
+                            >
+                              <span className={`flex items-center justify-center w-8 h-8 rounded-lg shrink-0 transition-colors ${
+                                focus ? "bg-primary-100 dark:bg-primary-900/50" : "bg-gray-100 dark:bg-neutral-800"
+                              }`}>
+                                <FileText className="w-4 h-4" />
+                              </span>
+                              <div className="flex flex-col min-w-0">
+                                <span className="truncate">{t("manageContent.tabs.publications")}</span>
+                                <span className="text-[11px] font-normal text-gray-400 dark:text-neutral-500 truncate">
+                                  {t("manageContent.createPublication")}
+                                </span>
+                              </div>
+                            </button>
+                          )}
+                        </MenuItem>
+
+                        <MenuItem>
+                          {({ focus }) => (
+                            <button
+                              onClick={() => openAddModal("campaign")}
+                              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 text-left ${
+                                focus
+                                  ? "bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300"
+                                  : "text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-neutral-800"
+                              }`}
+                            >
+                              <span className={`flex items-center justify-center w-8 h-8 rounded-lg shrink-0 transition-colors ${
+                                focus ? "bg-primary-100 dark:bg-primary-900/50" : "bg-gray-100 dark:bg-neutral-800"
+                              }`}>
+                                <Target className="w-4 h-4" />
+                              </span>
+                              <div className="flex flex-col min-w-0">
+                                <span className="truncate">{t("manageContent.tabs.campaigns")}</span>
+                                <span className="text-[11px] font-normal text-gray-400 dark:text-neutral-500 truncate">
+                                  {t("manageContent.createCampaign")}
+                                </span>
+                              </div>
+                            </button>
+                          )}
+                        </MenuItem>
+                      </div>
+                    </MenuItems>
+                  </Menu>
+                </>
+              )}
+            </div>
+
         </div>
       }>
       <Head title={t("manageContent.title")} />
@@ -476,7 +560,7 @@ export default function ManageContentPage() {
                 </div>
 
                 {/* Approval Content */}
-                <div className="bg-white dark:bg-neutral-800 rounded-2xl border border-gray-200 dark:border-neutral-700 overflow-hidden shadow-sm">
+                <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 overflow-hidden shadow-sm">
                   <div className="p-0">
                     {approvalTab === "pending" ? (
                       <ApprovalList
