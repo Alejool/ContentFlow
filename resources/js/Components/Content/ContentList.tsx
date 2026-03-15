@@ -1,4 +1,6 @@
 import CampaignTable from "@/Components/Content/Campaign/CampaignTable";
+import ContentCard from "@/Components/Content/ContentCard";
+import ContentCardSkeleton from "@/Components/Content/ContentCardSkeleton";
 import PublicationTable from "@/Components/Content/Publication/PublicationTable";
 import FilterSection from "@/Components/Content/common/FilterSection";
 import Button from "@/Components/common/Modern/Button";
@@ -9,8 +11,6 @@ import { useLockStore } from "@/stores/lockStore";
 import { Filter, LayoutGrid, List as ListIcon, RotateCcw } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
 import { useTranslation } from "react-i18next";
-import ContentCard from "@/Components/Content/ContentCard";
-import ContentCardSkeleton from "@/Components/Content/ContentCardSkeleton";
 
 import MediaLightbox from "@/Components/common/ui/MediaLightbox";
 
@@ -245,6 +245,7 @@ export default function ContentList(props: ContentListProps) {
             setSearch={props.onSearchChange || (() => {})}
             statusFilter={props.filters?.status || "all"}
             platformFilter={props.filters?.platform || []}
+            contentTypeFilter={props.filters?.content_type || []}
             sortFilter={props.filters?.sort || "newest"}
             dateStart={props.filters?.date_start || ""}
             dateEnd={props.filters?.date_end || ""}

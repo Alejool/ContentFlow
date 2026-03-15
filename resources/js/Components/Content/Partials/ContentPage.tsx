@@ -4,7 +4,6 @@ import ModalManager from "@/Components/Content/ModalManager";
 import ModalFooter from "@/Components/Content/modals/common/ModalFooter";
 import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
 import SocialMediaAccounts from "@/Components/Content/socialAccount/SocialMediaAccounts";
-import Dropdown from "@/Components/common/ui/Dropdown";
 import Modal from "@/Components/common/ui/Modal";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { useCampaignStore } from "@/stores/campaignStore";
@@ -17,7 +16,6 @@ import {
   FileText,
   Folder,
   History as HistoryIcon,
-  Plus,
   Shield,
   Target,
   Trash2
@@ -120,7 +118,7 @@ export default function ManageContentPage() {
   useEffect(() => {
     localStorage.setItem(`contentPage_search_${activeTab}`, search);
     const timer = setTimeout(() => {
-      handleFilterChange({ ...filters, search: search || undefined });
+      handleSingleFilterChange("search", search || undefined);
     }, 300);
 
     return () => clearTimeout(timer);
