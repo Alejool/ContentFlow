@@ -4,6 +4,8 @@
     "title": "Content Management",
     "subtitle": "Organize and manage your multimedia content elegantly and efficiently",
     "createNew": "Create New",
+    "createPublication": "Post, reel, story...",
+    "createCampaign": "Group publications",
     "publications": "Publications",
     "campaigns": "Campaigns",
     "logs": "Logs",

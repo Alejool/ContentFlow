@@ -15,6 +15,23 @@
     "normal_priority": "Normal priority",
     "low_priority": "Low priority",
     "all": "All",
+    "types": {
+      "all": "All",
+      "publications": "Publications",
+      "approvals": "Approvals",
+      "campaigns": "Campaigns",
+      "account": "Account",
+      "system": "System"
+    },
+    "priorities": {
+      "all": "All",
+      "critical": "Critical",
+      "high": "High",
+      "normal": "Normal",
+      "low": "Low"
+    },
+    "priority_label": "Priority",
+    "no_notifications_filtered": "No notifications for the selected filters",
     "video_uploaded": "Video uploaded successfully to {{platform}}",
     "video_deleted": "Video deleted from {{platform}}",
     "status_update": "Status update",
