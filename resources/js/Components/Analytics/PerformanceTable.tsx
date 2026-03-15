@@ -106,8 +106,8 @@ export default function PerformanceTable({
 
   const sortedCampaigns = useMemo(() => {
     return [...filteredCampaigns].sort((a, b) => {
-      let valA = a[sortField];
-      let valB = b[sortField];
+      const valA = a[sortField];
+      const valB = b[sortField];
 
       if (typeof valA === 'string' && typeof valB === 'string') {
         return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);

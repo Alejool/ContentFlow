@@ -1,6 +1,5 @@
 import { SeededRandom } from '@/Utils/stableMock';
-import {
-  ChevronLeft,
+import { LucideIcon } from 'lucide-react';
   ChevronRight,
   Eye,
   Heart,
@@ -70,7 +69,7 @@ const PLATFORM_COLORS: Record<string, string> = {
 };
 
 interface StatCardProps {
-  icon: any;
+  icon: LucideIcon;
   label: string;
   value: number | string;
   color: string;

@@ -9,7 +9,6 @@ interface PeriodSelectorProps {
 export default function PeriodSelector({
   selectedPeriod,
   onPeriodChange,
-  theme = 'light',
 }: PeriodSelectorProps) {
   const { t } = useTranslation();
   const periods = [7, 30, 90];
