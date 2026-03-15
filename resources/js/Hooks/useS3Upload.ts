@@ -128,7 +128,7 @@ const uploadMultipart = async (file: File, id: string, startTime: number) => {
   const existing = useUploadQueue.getState().queue[id];
   let uploadId = existing?.uploadId;
   let key = existing?.s3Key;
-  let completedParts = existing?.uploadedParts ?? [];
+  const completedParts = existing?.uploadedParts ?? [];
 
   if (!uploadId || !key) {
     const { data } = await axios.post(

@@ -6,11 +6,11 @@
 
 import { useEffect, useState } from 'react';
 import {
-  registerServiceWorker,
-  skipWaiting,
-  getServiceWorkerStatus,
-  isStandalone,
-} from '../utils/registerServiceWorker';
+    getServiceWorkerStatus,
+    isStandalone,
+    registerServiceWorker,
+    skipWaiting,
+} from '../Utils/registerServiceWorker';
 
 interface UseServiceWorkerReturn {
   isSupported: boolean;
@@ -29,35 +29,22 @@ export function useServiceWorker(): UseServiceWorkerReturn {
   const [standalone, setStandalone] = useState(false);
 
   useEffect(() => {
-    // Check initial status
     checkStatus();
 
-    // Register service worker
     registerServiceWorker({
-      onSuccess: () => {
-        checkStatus();
-      },
-      onUpdate: () => {
-        setHasUpdate(true);
-      },
+      onSuccess: () => { checkStatus(); },
+      onUpdate: () => { setHasUpdate(true); },
       onOnline: () => {},
       onOffline: () => {},
     });
 
-    // Check if running as standalone PWA
     setStandalone(isStandalone());
 
-    // Listen for display mode changes
     const mediaQuery = window.matchMedia('(display-mode: standalone)');
-    const handleChange = (e: MediaQueryListEvent) => {
-      setStandalone(e.matches);
-    };
-
+    const handleChange = (e: MediaQueryListEvent) => { setStandalone(e.matches); };
     mediaQuery.addEventListener('change', handleChange);
 
-    return () => {
-      mediaQuery.removeEventListener('change', handleChange);
-    };
+    return () => { mediaQuery.removeEventListener('change', handleChange); };
   }, []);
 
   async function checkStatus() {
@@ -71,16 +58,8 @@ export function useServiceWorker(): UseServiceWorkerReturn {
   function updateServiceWorker() {
     skipWaiting();
     setHasUpdate(false);
-    // Reload page to activate new service worker
     window.location.reload();
   }
 
-  return {
-    isSupported,
-    isRegistered,
-    isActive,
-    hasUpdate,
-    isStandalone: standalone,
-    updateServiceWorker,
-  };
+  return { isSupported, isRegistered, isActive, hasUpdate, isStandalone: standalone, updateServiceWorker };
 }

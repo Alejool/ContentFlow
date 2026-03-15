@@ -1161,7 +1161,7 @@ export const usePublicationForm = ({
         formData.append('campaign_id', '');
       }
 
-      let socialAccounts = [...(data.social_accounts || [])];
+      const socialAccounts = [...(data.social_accounts || [])];
 
       // If recurring, we MUST include already published accounts so the backend
       // knows to schedule future instances for them as well.
@@ -1275,10 +1275,10 @@ export const usePublicationForm = ({
 
       // CRITICAL: Read mediaFiles FRESH from store (not from stale selector)
       // This ensures we get the updated metadata after S3 upload
-      let currentMediaFiles = useMediaStore.getState().mediaFiles;
+      const currentMediaFiles = useMediaStore.getState().mediaFiles;
 
       // Check if there are files still uploading
-      let uploadingFiles = currentMediaFiles.filter((media) => {
+      const uploadingFiles = currentMediaFiles.filter((media) => {
         return (
           media.status === 'uploading' ||
           media.status === 'processing' ||

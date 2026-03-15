@@ -10,7 +10,7 @@ export const usePublicationsForCampaignEdit = (isOpen: boolean, campaignId?: num
 
     setLoading(true);
     try {
-      let url = `/api/v1/publications?simplified=true&exclude_assigned=true&include_campaign_id=${campaignId}`;
+      const url = `/api/v1/publications?simplified=true&exclude_assigned=true&include_campaign_id=${campaignId}`;
 
       const response = await axios.get(url);
 
