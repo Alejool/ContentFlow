@@ -254,7 +254,7 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-primary-500 rounded-full;
+    @apply rounded-full bg-primary-500;
     border: 2px solid transparent;
     background-clip: content-box;
   }
@@ -275,7 +275,7 @@
 
   /* Enhanced Focus Indicators - WCAG AAA Compliant */
   /* Requirements: 6.1, 6.2, 6.3, 6.4 */
-  
+
   /* Remove default browser focus outline */
   *:focus {
     outline: none;
@@ -285,10 +285,11 @@
   .focus-visible,
   [data-focus-visible="true"],
   *:focus-visible {
-    outline: 2px solid #FF6D1F;
+    outline: 2px solid #ff6d1f;
     outline-offset: 2px;
-    transition: outline-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
-                outline-offset 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    transition:
+      outline-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+      outline-offset 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   /* Dark mode focus indicators */
@@ -308,12 +309,13 @@
   [role="button"].focus-visible,
   [role="button"][data-focus-visible="true"],
   [role="button"]:focus-visible {
-    outline: 2px solid #FF6D1F;
+    outline: 2px solid #ff6d1f;
     outline-offset: 2px;
     box-shadow: 0 0 0 4px rgba(255, 109, 31, 0.2);
-    transition: outline-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
-                outline-offset 0.15s cubic-bezier(0.4, 0, 0.2, 1),
-                box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    transition:
+      outline-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+      outline-offset 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .dark button.focus-visible,
@@ -339,13 +341,14 @@
   select.focus-visible,
   select[data-focus-visible="true"],
   select:focus-visible {
-    outline: 2px solid #FF6D1F;
+    outline: 2px solid #ff6d1f;
     outline-offset: 0px;
-    border-color: #FF6D1F;
+    border-color: #ff6d1f;
     box-shadow: 0 0 0 3px rgba(255, 109, 31, 0.15);
-    transition: outline-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
-                border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
-                box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    transition:
+      outline-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+      border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .dark input.focus-visible,
@@ -375,12 +378,13 @@
   [role="slider"].focus-visible,
   [role="slider"][data-focus-visible="true"],
   [role="slider"]:focus-visible {
-    outline: 2px solid #FF6D1F;
+    outline: 2px solid #ff6d1f;
     outline-offset: 2px;
     box-shadow: 0 0 0 4px rgba(255, 109, 31, 0.2);
-    transition: outline-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
-                outline-offset 0.15s cubic-bezier(0.4, 0, 0.2, 1),
-                box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    transition:
+      outline-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+      outline-offset 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .dark [role="checkbox"].focus-visible,
@@ -409,11 +413,12 @@
   [role="tab"].focus-visible,
   [role="tab"][data-focus-visible="true"],
   [role="tab"]:focus-visible {
-    outline: 2px solid #FF6D1F;
+    outline: 2px solid #ff6d1f;
     outline-offset: -2px;
     background-color: rgba(255, 109, 31, 0.08);
-    transition: outline-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
-                background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    transition:
+      outline-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+      background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .dark [role="menuitem"].focus-visible,
@@ -459,34 +464,34 @@
   /* Ensure minimum contrast ratio of 3:1 for focus indicators */
   /* Light mode: #FF6D1F on white background = 3.4:1 contrast ✓ */
   /* Dark mode: #fb923c on #0a0a0a background = 8.2:1 contrast ✓ */
-  
+
   /* Ensure focus indicators are at least 2px thick */
   /* All focus outlines use 2px solid ✓ */
 }
 
 @layer components {
   .heading-1 {
-    @apply text-4xl md:text-5xl lg:text-6xl font-heading font-bold tracking-tight;
+    @apply font-heading text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl;
   }
 
   .heading-2 {
-    @apply text-3xl md:text-4xl font-heading font-semibold tracking-tight;
+    @apply font-heading text-3xl font-semibold tracking-tight md:text-4xl;
   }
 
   .heading-3 {
-    @apply text-2xl md:text-3xl font-heading font-semibold;
+    @apply font-heading text-2xl font-semibold md:text-3xl;
   }
 
   .body-lg {
-    @apply text-lg font-sans leading-relaxed;
+    @apply font-sans text-lg leading-relaxed;
   }
 
   .body-md {
-    @apply text-base font-sans leading-relaxed;
+    @apply font-sans text-base leading-relaxed;
   }
 
   .body-sm {
-    @apply text-sm font-sans leading-normal;
+    @apply font-sans text-sm leading-normal;
   }
 
   .btn {
@@ -587,10 +592,11 @@
   html {
     transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   body {
-    transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), 
-                color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transition:
+      background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+      color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
@@ -627,7 +633,8 @@ a,
 input,
 textarea,
 select {
-  transition-property: background-color, border-color, color, fill, stroke, box-shadow, opacity, transform;
+  transition-property:
+    background-color, border-color, color, fill, stroke, box-shadow, opacity, transform;
   transition-duration: 0.15s;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -661,7 +668,8 @@ select {
 }
 
 @keyframes bounce-subtle {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0) translateX(-50%);
   }
   50% {

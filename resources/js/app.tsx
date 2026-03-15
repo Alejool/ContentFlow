@@ -37,10 +37,7 @@ createInertiaApp<PageProps>({
   resolve: (name) => {
     const cleanName = name.startsWith("/") ? name.slice(1) : name;
     // Lazy loading agresivo por rutas
-    return resolvePageComponent(
-      `./Pages/${cleanName}.tsx`,
-      import.meta.glob("./Pages/**/*.tsx"),
-    );
+    return resolvePageComponent(`./Pages/${cleanName}.tsx`, import.meta.glob("./Pages/**/*.tsx"));
   },
 
   setup({ el, App, props }) {
@@ -65,8 +62,8 @@ createInertiaApp<PageProps>({
           >
             <Suspense
               fallback={
-                <div className="flex items-center justify-center min-h-screen">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+                <div className="flex min-h-screen items-center justify-center">
+                  <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-primary-600"></div>
                 </div>
               }
             >
