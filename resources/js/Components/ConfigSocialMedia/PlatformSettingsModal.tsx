@@ -53,15 +53,15 @@ export default function PlatformSettingsModal({
                 platform={platform}
                 settings={settings}
                 onSettingsChange={onSettingsChange}
-                videoMetadata={videoMetadata}
+                {...(videoMetadata ? { videoMetadata } : {})}
                 allPlatforms={allPlatforms}
                 allSettings={allSettings}
-                onAllSettingsChange={onAllSettingsChange}
+                {...(onAllSettingsChange ? { onAllSettingsChange } : {})}
               />
             </div>
           </div>
 
-          <PlatformModalFooter onClose={onClose} onSave={onSave} />
+          <PlatformModalFooter onClose={onClose} {...(onSave ? { onSave } : {})} />
         </div>
       </div>
     </Modal>

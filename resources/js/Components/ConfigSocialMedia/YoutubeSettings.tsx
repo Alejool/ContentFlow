@@ -1,10 +1,10 @@
 import OptionCard from '@/Components/ConfigSocialMedia/OptionCard';
-import SectionHeader from '@/Components/ConfigSocialMedia/SectionHeader';
 import PlatformVideoSettings from '@/Components/ConfigSocialMedia/PlatformVideoSettings';
+import SectionHeader from '@/Components/ConfigSocialMedia/SectionHeader';
 import Switch from '@/Components/common/Modern/Switch';
 import { Globe, Link2, Lock, Video } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface YoutubeSettingsProps {
   settings: any;
@@ -51,7 +51,7 @@ export default function YoutubeSettings({
     <PlatformVideoSettings
       platform="youtube"
       currentType={settings?.type || 'video'}
-      videoMetadata={videoMetadata}
+      {...(videoMetadata ? { videoMetadata } : {})}
       onTypeChange={(type) => handleChange('type', type)}
     >
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">

@@ -45,7 +45,7 @@ export default function PlatformModalContent({
           <YoutubeSettings
             settings={platformSettings}
             onSettingsChange={onChange}
-            videoMetadata={videoMetadata}
+            {...(videoMetadata ? { videoMetadata } : {})}
           />
         );
       case 'facebook':
