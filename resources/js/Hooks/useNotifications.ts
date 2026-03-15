@@ -1,4 +1,10 @@
-import { NotificationData } from '@/stores/notificationStore';
+import { queryKeys } from '@/lib/queryKeys';
+import {
+  getNotificationType,
+  NotificationData,
+  NotificationTypeFilter,
+} from '@/stores/notificationStore';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
 interface NotificationsResponse {
@@ -119,8 +125,8 @@ export function useNotifications() {
     filterByType,
     countByType,
     fetchNotifications: query.refetch,
-    markAsRead,
-    markAllAsRead,
-    deleteNotification,
+    markAsRead: markAsRead.mutate,
+    markAllAsRead: markAllAsRead.mutate,
+    deleteNotification: deleteNotification.mutate,
   };
 }

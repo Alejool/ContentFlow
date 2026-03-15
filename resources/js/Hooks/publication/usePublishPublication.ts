@@ -1,6 +1,6 @@
+import { useSocialAccounts } from '@/Hooks/useSocialAccounts';
 import { useCampaignStore } from '@/stores/campaignStore';
 import { usePublicationStore } from '@/stores/publicationStore';
-import { useAccountsStore } from '@/stores/socialAccountsStore';
 import { Publication } from '@/types/Publication';
 import { SocialAccount } from '@/types/SocialAccount';
 import axios from 'axios';
@@ -75,7 +75,8 @@ export interface UsePublishPublicationReturn extends PublishPublicationState {
 export const usePublishPublication = (): UsePublishPublicationReturn => {
   /* ----------------------------- Global stores ----------------------------- */
 
-  const accounts = useAccountsStore((s) => s.accounts);
+  const { data: accountsData = [] } = useSocialAccounts();
+  const accounts = accountsData;
   const campaigns = useCampaignStore((s) => s.campaigns);
   const isCampaignLoading = useCampaignStore((s) => s.isLoading);
   const fetchCampaigns = useCampaignStore((s) => s.fetchCampaigns);

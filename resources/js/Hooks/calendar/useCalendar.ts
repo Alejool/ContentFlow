@@ -1,20 +1,25 @@
+import {
+  useBulkUpdateEvents,
+  useCalendarEvents,
+  useDeleteEvent,
+  useUpdateEvent,
+} from '@/Hooks/useCalendarEvents';
 import { useCalendarStore } from '@/stores/calendarStore';
 import { useManageContentUIStore } from '@/stores/manageContentUIStore';
 import axios from 'axios';
 import { addMonths, setMonth, setYear, subMonths } from 'date-fns';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
 export const useCalendar = () => {
   const {
-    events,
     currentMonth,
-    isLoading,
     platformFilter,
     statusFilter,
     campaignFilter,
     view,
     selectedEvents,
+    filters,
     setCurrentMonth,
     setPlatformFilter,
     setStatusFilter,
@@ -23,22 +28,17 @@ export const useCalendar = () => {
     toggleEventSelection,
     clearSelection,
     selectAll,
-    fetchEvents,
-    updateEvent,
-    bulkUpdateEvents,
-    deleteEvent,
     exportToGoogleCalendar,
     exportToOutlook,
   } = useCalendarStore(
     useShallow((s) => ({
-      events: s.events,
       currentMonth: s.currentMonth,
-      isLoading: s.isLoading,
       platformFilter: s.platformFilter,
       statusFilter: s.statusFilter,
       campaignFilter: s.campaignFilter,
       view: s.view,
       selectedEvents: s.selectedEvents,
+      filters: s.filters,
       setCurrentMonth: s.setCurrentMonth,
       setPlatformFilter: s.setPlatformFilter,
       setStatusFilter: s.setStatusFilter,
@@ -47,10 +47,6 @@ export const useCalendar = () => {
       toggleEventSelection: s.toggleEventSelection,
       clearSelection: s.clearSelection,
       selectAll: s.selectAll,
-      fetchEvents: s.fetchEvents,
-      updateEvent: s.updateEvent,
-      bulkUpdateEvents: s.bulkUpdateEvents,
-      deleteEvent: s.deleteEvent,
       exportToGoogleCalendar: s.exportToGoogleCalendar,
       exportToOutlook: s.exportToOutlook,
     })),
@@ -58,64 +54,47 @@ export const useCalendar = () => {
 
   const { openEditModal, openViewDetailsModal } = useManageContentUIStore();
 
-  useEffect(() => {
-    fetchEvents();
-  }, [currentMonth, fetchEvents]);
+  // TanStack Query handles fetching, caching, and refetching
+  const { data: events = [], isLoading, refetch } = useCalendarEvents({ currentMonth, filters });
+
+  const updateEvent = useUpdateEvent();
+  const bulkUpdate = useBulkUpdateEvents();
+  const deleteEventMutation = useDeleteEvent();
 
   const filteredEvents = useMemo(() => {
     return events.filter((e) => {
-      // Platform filter
       if (platformFilter !== 'all') {
         if (platformFilter === 'user_event') {
-          // Only show user events
           if (e.type !== 'user_event') return false;
         } else {
-          // Show events matching the selected platform
           if (e.type === 'user_event') return false;
-
-          // Check both platform and extendedProps.platform for compatibility
           const eventPlatform = (e.platform || e.extendedProps?.platform)?.toLowerCase();
           if (!eventPlatform || eventPlatform !== platformFilter.toLowerCase()) return false;
         }
       }
-
-      // Status filter
       if (statusFilter !== 'all' && e.status !== statusFilter) return false;
-
-      // Campaign filter
       if (campaignFilter && e.extendedProps.campaign_id !== campaignFilter) return false;
-
       return true;
     });
   }, [events, platformFilter, statusFilter, campaignFilter]);
 
-  const nextMonth = useCallback(() => {
-    setCurrentMonth(addMonths(currentMonth, 1));
-  }, [currentMonth, setCurrentMonth]);
-
-  const prevMonth = useCallback(() => {
-    setCurrentMonth(subMonths(currentMonth, 1));
-  }, [currentMonth, setCurrentMonth]);
-
-  const goToToday = useCallback(() => {
-    setCurrentMonth(new Date());
-  }, [setCurrentMonth]);
-
+  const nextMonth = useCallback(
+    () => setCurrentMonth(addMonths(currentMonth, 1)),
+    [currentMonth, setCurrentMonth],
+  );
+  const prevMonth = useCallback(
+    () => setCurrentMonth(subMonths(currentMonth, 1)),
+    [currentMonth, setCurrentMonth],
+  );
+  const goToToday = useCallback(() => setCurrentMonth(new Date()), [setCurrentMonth]);
   const goToMonth = useCallback(
-    (month: number, year: number) => {
-      setCurrentMonth(setYear(setMonth(new Date(), month), year));
-    },
+    (month: number, year: number) => setCurrentMonth(setYear(setMonth(new Date(), month), year)),
     [setCurrentMonth],
   );
 
   const handleEventDrop = useCallback(
     async (id: string, newDate: string, type: string) => {
-      try {
-        return await updateEvent(id, newDate, type);
-      } catch (error) {
-        // Re-throw the error so it can be caught by the caller
-        throw error;
-      }
+      return updateEvent.mutateAsync({ id, newDate, type });
     },
     [updateEvent],
   );
@@ -125,22 +104,13 @@ export const useCalendar = () => {
       try {
         const type = event.type;
         const resourceId = event.id.split('_').pop();
+        if (!resourceId || resourceId === 'undefined') return;
 
-        if (!resourceId || resourceId === 'undefined') {
-          return;
-        }
-
-        if (type === 'user_event') {
-          // Detailed handling of user_event if needed elsewhere,
-          // for now ModernCalendar handles its own modal locally or via prop
-          return;
-        }
+        if (type === 'user_event') return;
 
         if (type === 'post') {
           const pubId = event.extendedProps?.publication_id;
-          if (!pubId) {
-            return;
-          }
+          if (!pubId) return;
           const response = await axios.get(`/api/v1/publications/${pubId}`);
           const data = response.data.publication || response.data.data;
           if (data) (data as any).__type = 'publication';
@@ -156,17 +126,15 @@ export const useCalendar = () => {
           return;
         }
 
-        // Fallback for other types (e.g., campaigns)
         const response = await axios.get(`/api/v1/campaigns/${resourceId}`);
         const data = response.data.campaign || response.data.data || response.data;
-
         if (response.data.campaign) {
           if (data) (data as any).__type = 'campaign';
           openEditModal(data);
         } else {
           openViewDetailsModal(data);
         }
-      } catch (error) {}
+      } catch {}
     },
     [openEditModal, openViewDetailsModal],
   );
@@ -174,9 +142,18 @@ export const useCalendar = () => {
   const handleBulkMove = useCallback(
     async (newDate: Date) => {
       const selectedIds = Array.from(selectedEvents);
-      return await bulkUpdateEvents(selectedIds, newDate.toISOString());
+      return bulkUpdate.mutateAsync({
+        eventIds: selectedIds,
+        newDate: newDate.toISOString(),
+        operation: 'move',
+      });
     },
-    [selectedEvents, bulkUpdateEvents],
+    [selectedEvents, bulkUpdate],
+  );
+
+  const deleteEvent = useCallback(
+    (id: string) => deleteEventMutation.mutateAsync(id),
+    [deleteEventMutation],
   );
 
   return {
@@ -189,6 +166,7 @@ export const useCalendar = () => {
     campaignFilter,
     view,
     selectedEvents,
+    filters,
     setPlatformFilter,
     setStatusFilter,
     setCampaignFilter,
@@ -206,6 +184,6 @@ export const useCalendar = () => {
     deleteEvent,
     exportToGoogleCalendar,
     exportToOutlook,
-    refreshEvents: fetchEvents,
+    refreshEvents: refetch,
   };
 };

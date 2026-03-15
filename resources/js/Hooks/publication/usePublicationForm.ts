@@ -4,16 +4,21 @@ import {
 } from '@/Components/Content/Publication/common/ContentTypeSelector';
 import { CONTENT_TYPE_DISPLAY } from '@/Constants/contentTypes';
 import { useContentTypeSuggestion } from '@/Hooks/publication/useContentTypeSuggestion';
+import {
+  useCreatePublication,
+  useUpdatePublication,
+} from '@/Hooks/publication/usePublicationsList';
 import { useS3Upload } from '@/Hooks/useS3Upload';
+import { queryKeys } from '@/lib/queryKeys';
 import { PublicationFormData, publicationSchema } from '@/schemas/publication';
 import { useMediaStore } from '@/stores/mediaStore';
-import { usePublicationStore } from '@/stores/publicationStore';
 import { useUploadQueue } from '@/stores/uploadQueueStore';
 import { PageProps } from '@/types';
 import { Publication } from '@/types/Publication';
 import { validateVideoDuration } from '@/Utils/validationUtils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { usePage } from '@inertiajs/react';
+import { useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { startTransition, useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -66,9 +71,10 @@ export const usePublicationForm = ({
   const { props } = usePage<PageProps>();
   const user = props.auth.user;
 
-  // Selectors for Publication Store
-  const createPublication = usePublicationStore((s) => s.createPublication);
-  const updatePublicationStore = usePublicationStore((s) => s.updatePublicationStore);
+  // TanStack Query mutations (replaces Zustand store calls)
+  const queryClient = useQueryClient();
+  const createPublicationMutation = useCreatePublication();
+  const updatePublicationMutation = useUpdatePublication();
 
   // Selectors for Media Store
   const mediaFiles = useMediaStore((s) => s.mediaFiles);
@@ -1083,19 +1089,11 @@ export const usePublicationForm = ({
       await axios.post(route('api.v1.publications.cancel', publication.id));
       toast.success(t('publications.messages.cancelSuccess') || 'Publicación cancelada');
 
-      // Proactive store update
-      usePublicationStore.getState().setPublishingPlatforms(publication.id, []);
-      usePublicationStore.getState().updatePublication(publication.id, {
-        status: 'failed' as any,
-      });
-
-      // Optionally reload or sync store
-      usePublicationStore.getState().fetchPublicationById(publication.id);
+      // Invalidate TanStack Query cache
+      queryClient.invalidateQueries({ queryKey: queryKeys.publications.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.calendar.all });
     } catch (err) {
-      // toast.error(
-      //   t("publications.messages.cancelError") ||
-      //     "Error al cancelar la publicación",
-      // );
+      // silent
     }
   };
 
@@ -1192,27 +1190,22 @@ export const usePublicationForm = ({
       const contentType = data.content_type || 'post';
       const useGlobalSchedule = data.use_global_schedule;
 
-      // Para encuestas (polls), la lógica es diferente
-      if (contentType === 'poll') {
-        // Si use_global_schedule está desactivado, NO enviar scheduled_at global
-        // Cada red social tendrá su propia fecha en accountSchedules
-        if (!useGlobalSchedule) {
-          scheduledAtValue = null;
-        } else if (currentStatus === 'scheduled' && !scheduledAtValue) {
-          // Solo si use_global_schedule está activo y no hay fecha, establecer una por defecto
-          const defaultDate = new Date();
-          defaultDate.setMinutes(defaultDate.getMinutes() + 2);
-          scheduledAtValue = defaultDate.toISOString();
-          setValue('scheduled_at', scheduledAtValue, { shouldDirty: true });
-        }
-      } else {
-        // Para otros tipos de contenido, mantener la lógica original
-        if (currentStatus === 'scheduled' && !scheduledAtValue) {
-          const defaultDate = new Date();
-          defaultDate.setMinutes(defaultDate.getMinutes() + 2);
-          scheduledAtValue = defaultDate.toISOString();
-          setValue('scheduled_at', scheduledAtValue, { shouldDirty: true });
-        }
+      // Regla única: solo enviar scheduled_at global si:
+      // 1. use_global_schedule está activo
+      // 2. Hay cuentas seleccionadas
+      // 3. No todas las cuentas tienen fecha individual
+      const allAccountsHaveIndividualSchedule =
+        socialAccounts.length > 0 && socialAccounts.every((id) => !!accountSchedules[id]);
+
+      const shouldSendScheduledAt =
+        !!scheduledAtValue &&
+        scheduledAtValue.trim() !== '' &&
+        useGlobalSchedule &&
+        socialAccounts.length > 0 &&
+        !allAccountsHaveIndividualSchedule;
+
+      if (!shouldSendScheduledAt) {
+        scheduledAtValue = null;
       }
 
       const finalStatus = (() => {
@@ -1236,12 +1229,6 @@ export const usePublicationForm = ({
       })();
 
       formData.append('status', finalStatus);
-
-      // Solo enviar scheduled_at si realmente hay una fecha programada Y no es una encuesta sin programación global
-      const shouldSendScheduledAt =
-        scheduledAtValue &&
-        scheduledAtValue.trim() !== '' &&
-        !(contentType === 'poll' && !useGlobalSchedule);
 
       if (shouldSendScheduledAt) {
         formData.append('scheduled_at', scheduledAtValue);
@@ -1386,16 +1373,9 @@ export const usePublicationForm = ({
 
       let result: any;
       if (publication) {
-        result = await updatePublicationStore(publication.id, formData);
-
-        // Force refresh the publication to ensure we have the latest data
-        if (result) {
-          const freshPublication = await usePublicationStore
-            .getState()
-            .fetchPublicationById(publication.id);
-        }
+        result = await updatePublicationMutation.mutateAsync({ id: publication.id, formData });
       } else {
-        result = await createPublication(formData);
+        result = await createPublicationMutation.mutateAsync(formData);
       }
 
       if (result) {
