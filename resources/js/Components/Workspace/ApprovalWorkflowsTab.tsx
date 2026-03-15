@@ -525,12 +525,10 @@ export default function ApprovalWorkflowsTab({
                       className="border-none bg-transparent px-0 focus:ring-0"
                       containerClassName="flex-1"
                       onChange={(e: any) => {
-                        const newSteps = [...editingWorkflow.steps];
-                        newSteps[index].name = e.target.value;
-                        setEditingWorkflow({
-                          ...editingWorkflow,
-                          steps: newSteps,
-                        });
+                        const newSteps = editingWorkflow.steps.map((s, i) =>
+                          i === index ? { ...s, name: e.target.value } : s,
+                        );
+                        setEditingWorkflow({ ...editingWorkflow, steps: newSteps });
                       }}
                     />
                   </div>
@@ -563,17 +561,12 @@ export default function ApprovalWorkflowsTab({
                         size="md"
                         containerClassName="w-full sm:w-48"
                         onChange={(val: any) => {
-                          const newSteps = [...editingWorkflow.steps];
-                          if (val === '' || val === null || val === undefined) {
-                            newSteps[index].role_id = null;
-                          } else {
-                            newSteps[index].role_id = parseInt(val);
-                            newSteps[index].user_id = null; // Clear user when role is selected
-                          }
-                          setEditingWorkflow({
-                            ...editingWorkflow,
-                            steps: newSteps,
-                          });
+                          const newSteps = editingWorkflow.steps.map((s, i) =>
+                            i === index
+                              ? { ...s, role_id: val === '' || val == null ? null : parseInt(val), ...(val !== '' && val != null ? { user_id: null } : {}) }
+                              : s,
+                          );
+                          setEditingWorkflow({ ...editingWorkflow, steps: newSteps });
                         }}
                       />
                       <span className="px-1 text-center text-xs text-gray-400">
@@ -605,17 +598,12 @@ export default function ApprovalWorkflowsTab({
                         size="md"
                         containerClassName="w-full sm:w-48"
                         onChange={(val: any) => {
-                          const newSteps = [...editingWorkflow.steps];
-                          if (val === '' || val === null || val === undefined) {
-                            newSteps[index].user_id = null;
-                          } else {
-                            newSteps[index].user_id = parseInt(val);
-                            newSteps[index].role_id = null; // Clear role when user is selected
-                          }
-                          setEditingWorkflow({
-                            ...editingWorkflow,
-                            steps: newSteps,
-                          });
+                          const newSteps = editingWorkflow.steps.map((s, i) =>
+                            i === index
+                              ? { ...s, user_id: val === '' || val == null ? null : parseInt(val), ...(val !== '' && val != null ? { role_id: null } : {}) }
+                              : s,
+                          );
+                          setEditingWorkflow({ ...editingWorkflow, steps: newSteps });
                         }}
                       />
                     </div>
@@ -627,7 +615,7 @@ export default function ApprovalWorkflowsTab({
                       className="shrink-0 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10"
                       title={t('common.approvals.deleteLevel')}
                       icon={Trash2}
-                    ></Button>
+                    >{' '}</Button>
                   </div>
                 </div>
               ))}

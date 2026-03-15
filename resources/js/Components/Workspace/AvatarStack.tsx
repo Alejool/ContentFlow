@@ -1,4 +1,5 @@
 import { UnifiedAvatar } from '@/Components/common/UnifiedAvatar';
+import { Users } from 'lucide-react';
 
 interface AvatarStackProps {
   users: any[];
