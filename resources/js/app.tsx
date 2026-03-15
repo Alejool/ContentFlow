@@ -1,20 +1,20 @@
+import { AnimatedPage } from '@/Components/common/motion/AnimatedPage';
+import { InertiaProgressIndicator } from '@/Components/common/motion/InertiaProgressIndicator';
 import { ErrorBoundary } from '@/Components/common/ui/ErrorBoundary';
 import ThemedToaster from '@/Components/common/ui/ThemedToaster';
 import { ThemeProvider } from '@/Contexts/ThemeContext';
 import { ErrorInterceptor } from '@/Services/ErrorInterceptor';
+import { ariaAnnouncer } from '@/Utils/ARIAAnnouncer';
+import { FocusManager } from '@/Utils/FocusManager';
+import { FocusVisibleManager } from '@/Utils/FocusVisibleManager';
+import { QueryProvider } from '@/providers/QueryProvider';
 import { PageProps } from '@/types';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import { Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
-import { lazy, Suspense } from 'react';
-import { ServiceWorkerUpdate } from './components/ServiceWorkerUpdate';
-import { AnimatedPage } from '@/Components/common/motion/AnimatedPage';
-import { InertiaProgressIndicator } from '@/Components/common/motion/InertiaProgressIndicator';
-import { FocusVisibleManager } from '@/Utils/FocusVisibleManager';
-import { FocusManager } from '@/Utils/FocusManager';
-import { ariaAnnouncer } from '@/Utils/ARIAAnnouncer';
-import { QueryProvider } from '@/providers/QueryProvider';
 import '../css/app.css';
+import { ServiceWorkerUpdate } from './Components/ServiceWorkerUpdate';
 import './bootstrap';
 import './i18n';
 
