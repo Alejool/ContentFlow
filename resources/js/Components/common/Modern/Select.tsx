@@ -201,7 +201,10 @@ export default function Select<T extends FieldValues>({
   const currentSize = sizeConfig[size];
 
   const filteredOptions = searchable
-    ? options.filter((option) => option.label.toLowerCase().includes(searchTerm.toLowerCase()))
+    ? options.filter((option) => 
+        String(option.label).toLowerCase().includes(searchTerm.toLowerCase()) ||
+        String(option.value).toLowerCase().includes(searchTerm.toLowerCase())
+      )
     : options;
 
   useEffect(() => {
@@ -369,13 +372,14 @@ export default function Select<T extends FieldValues>({
         ? currentValues.filter((v) => v !== optionValue)
         : [...currentValues, optionValue];
       onChange(newValues);
+      setSearchTerm('');
     } else {
       if (onChange) {
         onChange(optionValue);
       }
+      setSearchTerm('');
       setIsOpen(false);
     }
-    setSearchTerm('');
   };
 
   const handleClear = (e: React.MouseEvent) => {
@@ -587,17 +591,18 @@ export default function Select<T extends FieldValues>({
               }
             >
               {searchable && (
-                <div className="sticky top-0 z-10 border-b border-gray-200 bg-white dark:border-neutral-700 dark:bg-neutral-900">
+                <div className="sticky top-0 z-10 border-b border-gray-200 bg-white p-2 dark:border-neutral-700 dark:bg-neutral-900">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+                    <Search className="absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                     <input
                       ref={inputRef}
                       type="text"
                       placeholder="Search..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className={getSearchInputStyles()}
-                      style={{ paddingLeft: '2.5rem' }}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      onClick={(e) => e.stopPropagation()}
+                      className="w-full rounded-md border border-gray-200 bg-gray-50 py-1.5 pl-8 pr-2 text-sm text-gray-900 placeholder-gray-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-primary-500"
                       aria-label="Search options"
                     />
                   </div>
@@ -614,7 +619,7 @@ export default function Select<T extends FieldValues>({
                 ) : (
                   filteredOptions.map((option) => {
                     const isSelected = multiple
-                      ? Array.isArray(value) && value.includes(option.value)
+                      ? Array.isArray(value) && value.some(v => v === option.value)
                       : option.value === value;
 
                     return (

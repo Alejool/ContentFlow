@@ -1,3 +1,4 @@
+import Button from '@/Components/common/Modern/Button';
 import Input from '@/Components/common/Modern/Input';
 import Select from '@/Components/common/Modern/Select';
 import { useTimezoneStore } from '@/stores/timezoneStore';
@@ -78,6 +79,7 @@ interface DatePickerProps<T extends FieldValues> {
   id?: string;
   useUTC?: boolean;
   showTimezone?: boolean;
+  yearRange?: { past: number; future: number };
 }
 
 const dateToCalendarDate = (d: Date): CalendarDate =>
@@ -132,32 +134,90 @@ const CustomTimeSelector = ({
   };
 
   return (
-    <div className="custom-time-selector">
-      <div className="time-selector-header">
-        <Clock className="h-4 w-4" />
-        <span className="text-base font-medium">{currentLocale === 'es' ? 'Seleccionar Hora' : 'Select Time'}</span>
+    <div className="flex w-full flex-shrink-0 flex-col border-t border-gray-100 bg-white pb-14 dark:border-neutral-800 dark:bg-neutral-900 md:w-[220px] md:border-l md:border-t-0">
+      <div className="flex h-12 items-center justify-center gap-1.5 border-b border-gray-100 bg-white px-3 text-[0.8125rem] font-semibold text-gray-700 dark:border-neutral-800 dark:bg-neutral-900 dark:text-gray-300 md:h-16 md:gap-2 md:px-4 md:text-sm">
+        <Clock className="h-3.5 w-3.5 md:h-4 md:w-4" />
+        <span>{currentLocale === 'es' ? 'Seleccionar Hora' : 'Select Time'}</span>
       </div>
-      <div className="time-selector-body">
-        <div className="time-input-group">
-          <button type="button" className="time-spinner-btn" onClick={incH}><ChevronUp className="h-4 w-4" /></button>
-          <Input id="time-hours" type="text" value={hours}
+      <div className="flex flex-1 items-center justify-center gap-3 px-2 py-4 md:gap-6 md:px-4 md:py-10">
+        <div className="flex flex-col items-center gap-1.5 md:gap-3">
+          <Button
+            type="button"
+            buttonStyle="icon"
+            variant="ghost"
+            size="xs"
+            shadow="none"
+            onClick={incH}
+            icon={ChevronUp}
+          >
+            <span className="sr-only">Increment hours</span>
+          </Button>
+          <Input 
+            id="time-hours" 
+            type="text" 
+            value={hours}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => { let v = e.target.value.replace(/\D/g, ''); if (v.length > 2) v = v.slice(-2); setHours(v); }}
             onFocus={() => setIsFocused(p => ({ ...p, h: true }))}
             onBlur={() => handleBlur('h')}
-            className="w-16 !p-2 !text-center !text-2xl font-bold" sizeType="lg" maxLength={2} activeColor={activeColor} />
-          <button type="button" className="time-spinner-btn" onClick={decH}><ChevronDown className="h-4 w-4" /></button>
-          <span className="time-label">{currentLocale === 'es' ? 'Horas' : 'Hours'}</span>
+            className="!w-10 !p-0.5 !text-center !text-lg font-bold md:!w-16 md:!p-2 md:!text-2xl" 
+            sizeType="lg" 
+            maxLength={2} 
+            activeColor={activeColor} 
+          />
+          <Button
+            type="button"
+            buttonStyle="icon"
+            variant="ghost"
+            size="xs"
+            shadow="none"
+            onClick={decH}
+            icon={ChevronDown}
+          >
+            <span className="sr-only">Decrement hours</span>
+          </Button>
+          <span className="text-[0.5625rem] font-semibold uppercase tracking-wider text-gray-400 dark:text-neutral-600 md:text-[0.6875rem]">
+            {currentLocale === 'es' ? 'Horas' : 'Hours'}
+          </span>
         </div>
-        <div className="time-separator">:</div>
-        <div className="time-input-group">
-          <button type="button" className="time-spinner-btn" onClick={incM}><ChevronUp className="h-4 w-4" /></button>
-          <Input id="time-minutes" type="text" value={minutes}
+        <div className="-mt-0.5 self-center text-xl font-semibold text-gray-400 dark:text-neutral-600 md:-mt-2 md:text-4xl">:</div>
+        <div className="flex flex-col items-center gap-1.5 md:gap-3">
+          <Button
+            type="button"
+            buttonStyle="icon"
+            variant="ghost"
+            size="xs"
+            shadow="none"
+            onClick={incM}
+            icon={ChevronUp}
+          >
+            <span className="sr-only">Increment minutes</span>
+          </Button>
+          <Input 
+            id="time-minutes" 
+            type="text" 
+            value={minutes}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => { let v = e.target.value.replace(/\D/g, ''); if (v.length > 2) v = v.slice(-2); setMinutes(v); }}
             onFocus={() => setIsFocused(p => ({ ...p, m: true }))}
             onBlur={() => handleBlur('m')}
-            className="w-16 !p-2 !text-center !text-2xl font-bold" sizeType="lg" maxLength={2} activeColor={activeColor} />
-          <button type="button" className="time-spinner-btn" onClick={decM}><ChevronDown className="h-4 w-4" /></button>
-          <span className="time-label">{currentLocale === 'es' ? 'Minutos' : 'Minutes'}</span>
+            className="!w-10 !p-0.5 !text-center !text-lg font-bold md:!w-16 md:!p-2 md:!text-2xl" 
+            sizeType="lg" 
+            maxLength={2} 
+            activeColor={activeColor} 
+          />
+          <Button
+            type="button"
+            buttonStyle="icon"
+            variant="ghost"
+            size="xs"
+            shadow="none"
+            onClick={decM}
+            icon={ChevronDown}
+          >
+            <span className="sr-only">Decrement minutes</span>
+          </Button>
+          <span className="text-[0.5625rem] font-semibold uppercase tracking-wider text-gray-400 dark:text-neutral-600 md:text-[0.6875rem]">
+            {currentLocale === 'es' ? 'Minutos' : 'Minutes'}
+          </span>
         </div>
       </div>
     </div>
@@ -188,6 +248,7 @@ const DatePickerModern = <T extends FieldValues>({
   id,
   useUTC = false,
   showTimezone = false,
+  yearRange = { past: 1, future: 50 },
 }: DatePickerProps<T>) => {
   const { i18n } = useTranslation();
   const { timezoneLabel } = useTimezoneStore();
@@ -230,16 +291,61 @@ const DatePickerModern = <T extends FieldValues>({
     : '';
 
   const [navDate, setNavDate] = useState<Date>(displayDate ?? new Date());
-  useEffect(() => { if (displayDate) setNavDate(displayDate); }, [displayDate]);
+  const [focusedValue, setFocusedValue] = useState<CalendarDate>(
+    new CalendarDate(
+      (displayDate ?? new Date()).getFullYear(),
+      (displayDate ?? new Date()).getMonth() + 1,
+      1
+    )
+  );
+  const [userNavigating, setUserNavigating] = useState(false);
+  
+  // Solo sincronizar navDate con displayDate cuando displayDate cambia Y el usuario NO está navegando
+  useEffect(() => { 
+    if (displayDate && !userNavigating) {
+      setNavDate(displayDate);
+      setFocusedValue(new CalendarDate(displayDate.getFullYear(), displayDate.getMonth() + 1, 1));
+    }
+  }, [displayDate]);
+
+  // Actualizar focusedValue cuando navDate cambia (por los selects o botones)
+  useEffect(() => {
+    setFocusedValue(new CalendarDate(navDate.getFullYear(), navDate.getMonth() + 1, 1));
+  }, [navDate]);
+  
+  // Resetear userNavigating cuando se cierra el picker
+  useEffect(() => {
+    if (!isOpen) {
+      setUserNavigating(false);
+    }
+  }, [isOpen]);
 
   const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 101 }, (_, i) => currentYear - 50 + i);
+  const years = Array.from(
+    { length: yearRange.past + yearRange.future + 1 }, 
+    (_, i) => currentYear - yearRange.past + i
+  );
   const monthsEs = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   const monthsEn = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   const months = currentLocale === 'es' ? monthsEs : monthsEn;
   const monthOptions = months.map((m, i) => ({ value: i, label: m }));
   const yearOptions = years.map(y => ({ value: y, label: y.toString() }));
-  const focusedValue = new CalendarDate(navDate.getFullYear(), navDate.getMonth() + 1, 1);
+
+  const formatDisplayDate = (date: Date | null): string => {
+    if (!date) return currentLocale === 'es' ? 'Sin fecha seleccionada' : 'No date selected';
+    
+    const options: Intl.DateTimeFormatOptions = showTimeSelect
+      ? { dateStyle: 'medium', timeStyle: 'short' }
+      : { dateStyle: 'medium' };
+    
+    const formatted = date.toLocaleString(
+      currentLocale === 'es' ? 'es-ES' : 'en-US',
+      options
+    );
+    
+    // Truncar si es muy largo (más de 30 caracteres)
+    return formatted.length > 30 ? `${formatted.substring(0, 27)}...` : formatted;
+  };
 
   return (
     <I18nProvider locale={currentLocale === 'es' ? 'es-ES' : 'en-US'}>
@@ -267,44 +373,93 @@ const DatePickerModern = <T extends FieldValues>({
           <>
             <div className="fixed inset-0 z-[9998] bg-black/10 backdrop-blur-[2px]" onClick={() => setIsOpen(false)} />
             <div
-              className="fixed left-1/2 top-1/2 z-[9999] max-h-[90vh] w-full max-w-[95vw] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-xl dark:border-neutral-800 dark:bg-neutral-900 sm:max-w-fit"
+              className="fixed left-1/2 top-1/2 z-[9999] max-h-[90vh] w-full  -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-lg border-2 border-primary-100 bg-white shadow-xl dark:border-neutral-800 dark:bg-neutral-900 sm:max-w-fit"
             >
-              <div className="flex flex-col sm:flex-row max-w-full overflow-auto">
-                <div className="relative min-w-0 pb-14 flex-shrink-0" style={{ width: showTimeSelect ? 'auto' : '100%', maxWidth: '420px' }}>
+              <div className="flex flex-col md:flex-row max-w-full justify-center overflow-auto">
+                <div className="">
                   <div
                     className="flex h-16 items-center justify-between gap-3 border-b border-gray-100 bg-white px-4 dark:border-neutral-800 dark:bg-neutral-900"
                     style={{ borderTopLeftRadius: '0.75rem', borderTopRightRadius: showTimeSelect ? 0 : '0.75rem' }}
                   >
-                    <button type="button"
-                      className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gray-50 text-gray-700 transition-all hover:bg-gray-100 hover:scale-105 active:scale-95 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700"
-                      onClick={() => setNavDate(d => { const n = new Date(d); n.setMonth(n.getMonth() - 1); return n; })}>
-                      <ChevronLeft className="h-5 w-5" />
-                    </button>
+                    <Button
+                      type="button"
+                      buttonStyle="icon"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setUserNavigating(true);
+                        setNavDate(d => { const n = new Date(d); n.setMonth(n.getMonth() - 1); return n; });
+                      }}
+                      icon={ChevronLeft}
+                    >
+                      <span className="sr-only">Previous month</span>
+                    </Button>
                     <div className="flex flex-1 items-center justify-center gap-2">
                       <div className="w-[140px]">
-                        <Select id="dp-month" options={monthOptions} value={navDate.getMonth()}
-                          onChange={(v: string | number | string[]) => setNavDate(d => { const n = new Date(d); n.setMonth(Number(v)); return n; })}
-                          size="sm" usePortal={false} />
+                        <Select 
+                          id="dp-month" 
+                          options={monthOptions} 
+                          value={navDate.getMonth()}
+                          onChange={(v: string | number | string[]) => {
+                            const month = Number(v);
+                            setUserNavigating(true);
+                            setNavDate(d => {
+                              const n = new Date(d);
+                              n.setMonth(month);
+                              return n;
+                            });
+                          }}
+                          size="sm" 
+                          usePortal={false} 
+                        />
                       </div>
                       <div className="w-[100px]">
-                        <Select id="dp-year" options={yearOptions} value={navDate.getFullYear()}
-                          onChange={(v: string | number | string[]) => setNavDate(d => { const n = new Date(d); n.setFullYear(Number(v)); return n; })}
-                          size="sm" usePortal={false} />
+                        <Select 
+                          id="dp-year" 
+                          options={yearOptions} 
+                          value={navDate.getFullYear()}
+                          onChange={(v: string | number | string[]) => {
+                            const year = Number(v);
+                            setUserNavigating(true);
+                            setNavDate(d => {
+                              const n = new Date(d);
+                              n.setFullYear(year);
+                              return n;
+                            });
+                          }}
+                          size="sm" 
+                          usePortal={false}
+                          searchable
+                        />
                       </div>
                     </div>
-                    <button type="button"
-                      className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gray-50 text-gray-700 transition-all hover:bg-gray-100 hover:scale-105 active:scale-95 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700"
-                      onClick={() => setNavDate(d => { const n = new Date(d); n.setMonth(n.getMonth() + 1); return n; })}>
-                      <ChevronRight className="h-5 w-5" />
-                    </button>
+                    <Button
+                      type="button"
+                      buttonStyle="icon"
+                      variant="ghost"
+                      size="sm"
+                      rounded="lg"
+                      shadow="none"
+                      onClick={() => {
+                        setUserNavigating(true);
+                        setNavDate(d => { const n = new Date(d); n.setMonth(n.getMonth() + 1); return n; });
+                      }}
+                      icon={ChevronRight}
+                    >
+                      <span className="sr-only">Next month</span>
+                    </Button>
                   </div>
 
                   <AriaCalendar
+                    key={`${navDate.getFullYear()}-${navDate.getMonth()}`}
                     value={calendarValue}
                     onChange={handleCalendarChange}
                     minValue={minCalendarDate}
                     focusedValue={focusedValue}
-                    onFocusChange={(fv: CalendarDate) => setNavDate(new Date(fv.year, fv.month - 1, fv.day))}
+                    onFocusChange={(fv: CalendarDate) => {
+                      setNavDate(new Date(fv.year, fv.month - 1, fv.day));
+                      setFocusedValue(fv);
+                    }}
                     className="p-3"
                   >
                     <CalendarGrid className="w-full">
@@ -321,7 +476,7 @@ const DatePickerModern = <T extends FieldValues>({
                             date={date}
                             className={({ isSelected, isDisabled, isToday, isFocused: isFoc }: { isSelected: boolean; isDisabled: boolean; isToday: boolean; isFocused: boolean }) =>
                               [
-                                'flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl text-sm font-medium transition-all duration-200',
+                                'flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg text-sm font-medium transition-all duration-200',
                                 isSelected ? 'scale-105 bg-primary-500 font-semibold text-white shadow-lg shadow-primary-500/30'
                                   : isToday ? 'border-2 border-primary-500 bg-primary-50 font-semibold text-primary-600 dark:bg-primary-500/10 dark:text-primary-400'
                                   : isDisabled ? 'cursor-not-allowed text-gray-300 dark:text-gray-700'
@@ -345,23 +500,26 @@ const DatePickerModern = <T extends FieldValues>({
                     <div className="flex flex-1 items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                       <Calendar className="h-4 w-4 flex-shrink-0 text-gray-400" />
                       <span className="truncate">
-                        {displayDate
-                          ? showTimeSelect
-                            ? displayDate.toLocaleString(currentLocale === 'es' ? 'es-ES' : 'en-US', { dateStyle: 'medium', timeStyle: 'short' })
-                            : displayDate.toLocaleDateString(currentLocale === 'es' ? 'es-ES' : 'en-US', { dateStyle: 'medium' })
-                          : currentLocale === 'es' ? 'Sin fecha seleccionada' : 'No date selected'}
+                        {formatDisplayDate(displayDate)}
                       </span>
                       {showTimezone && useUTC && (
                         <span className="ml-1 text-xs text-gray-400 dark:text-gray-500">({timezoneLabel()})</span>
                       )}
                     </div>
                     {isClearable && displayDate && (
-                      <button type="button"
+                      <Button
+                        type="button"
+                        buttonStyle="ghost"
+                        variant="ghost"
+                        size="sm"
+                        rounded="lg"
+                        shadow="none"
+                        className="!gap-1.5"
                         onClick={e => { e.stopPropagation(); handleDateChange(null); setIsOpen(false); }}
-                        className="flex items-center gap-1.5 rounded-lg bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700 transition-all hover:bg-gray-200 active:scale-95 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700">
-                        <X className="h-4 w-4" />
+                        icon={X}
+                      >
                         {currentLocale === 'es' ? 'Limpiar' : 'Clear'}
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </div>
@@ -378,44 +536,6 @@ const DatePickerModern = <T extends FieldValues>({
             </div>
           </>
         )}
-
-        <style>{`
-          .custom-time-selector {
-            background-color: #ffffff; border-left: 1px solid #f3f4f6;
-            width: 220px; max-width: 220px; display: flex; flex-direction: column; padding-bottom: 3.5rem;
-            flex-shrink: 0;
-          }
-          .dark .custom-time-selector { background-color: #171717; border-left-color: #262626; }
-          .time-selector-header {
-            display: flex; align-items: center; gap: 0.5rem; justify-content: center;
-            padding: 1rem; height: 4rem;
-            background: #ffffff;
-            border-bottom: 1px solid #f3f4f6; border-top-right-radius: 0.75rem;
-            font-weight: 600; font-size: 0.875rem; color: #374151;
-          }
-          .dark .time-selector-header { background: #171717; border-bottom-color:#262626; color:#d1d5db; }
-          .time-selector-body { display:flex; align-items:center; justify-content:center; gap:1.5rem; padding:2.5rem 1rem; flex:1; }
-          .time-input-group { display:flex; flex-direction:column; align-items:center; gap:0.75rem; }
-          .time-spinner-btn {
-            width:100%; padding:0.625rem;
-            background:#f9fafb;
-            border:1px solid #e5e7eb; border-radius:0.75rem; color:#6b7280;
-            cursor:pointer; transition:all 0.2s ease; display:flex; align-items:center; justify-content:center;
-          }
-          .time-spinner-btn:hover { background:${getColor(activeColor, '10')}; border-color:${getColor(activeColor, '50')}; color:${getColor(activeColor)}; transform:translateY(-1px); }
-          .time-spinner-btn:active { transform:translateY(0); }
-          .dark .time-spinner-btn { background:#262626; border-color:#404040; color:#9ca3af; }
-          .dark .time-spinner-btn:hover { background:${getColor(activeColor, '10')}; border-color:${getColor(activeColor, '50')}; color:${getColor(activeColor)}; }
-          .time-separator { font-size:2rem; font-weight:600; color:#9ca3af; align-self:center; margin-top:-0.5rem; }
-          .dark .time-separator { color:#737373; }
-          .time-label { font-size:0.6875rem; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; }
-          .dark .time-label { color:#737373; }
-          @media (max-width:640px) {
-            .custom-time-selector { width:100% !important; max-width:100% !important; border-left:none !important; border-top:1px solid #f3f4f6; }
-            .dark .custom-time-selector { border-top-color:#262626; }
-            .time-selector-header { border-top-right-radius:0; }
-          }
-        `}</style>
       </div>
     </I18nProvider>
   );
