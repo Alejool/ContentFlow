@@ -212,7 +212,14 @@ class UpdatePublicationRequest extends FormRequest
         'date',
         function ($attribute, $value, $fail) use ($publication) {
           if (!$publication || !$value) return;
-          
+
+          // If all selected accounts have individual schedules, skip global schedule validation
+          $selectedAccounts = $this->input('social_accounts', []);
+          $accountSchedules = $this->input('social_account_schedules', []);
+          if (!empty($selectedAccounts) && count($accountSchedules) >= count($selectedAccounts)) {
+            return;
+          }
+
           $contentType = $this->input('content_type', $publication->content_type ?? 'post');
           
           $scheduledDate = Carbon::parse($value);
@@ -403,9 +410,20 @@ class UpdatePublicationRequest extends FormRequest
       $contentType = $this->input('content_type', $publication->content_type) ?? 'post';
       
       // Get social account IDs (use existing if not changed)
-      $socialAccountIds = $this->has('social_accounts') 
+      // Normalize: the frontend may send a JSON-encoded string "[]" or an array of IDs
+      $rawSocialAccounts = $this->has('social_accounts')
         ? $this->input('social_accounts', [])
         : $publication->socialAccounts->pluck('id')->toArray();
+
+      if (is_string($rawSocialAccounts)) {
+        $decoded = json_decode($rawSocialAccounts, true);
+        $rawSocialAccounts = is_array($decoded) ? $decoded : [];
+      }
+
+      $socialAccountIds = array_values(array_filter(
+        array_map('intval', (array) $rawSocialAccounts),
+        fn($id) => $id > 0,
+      ));
       
       // Get media files - include both UploadedFile instances and metadata arrays
       $newMediaFiles = collect($this->input('media', []))

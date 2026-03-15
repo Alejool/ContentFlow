@@ -134,7 +134,14 @@ class StorePublicationRequest extends FormRequest
         'date',
         function ($attribute, $value, $fail) {
           if (!$value) return;
-          
+
+          // If all selected accounts have individual schedules, skip global schedule validation
+          $selectedAccounts = $this->input('social_accounts', []);
+          $accountSchedules = $this->input('social_account_schedules', []);
+          if (!empty($selectedAccounts) && count($accountSchedules) >= count($selectedAccounts)) {
+            return;
+          }
+
           $contentType = $this->input('content_type', 'post');
           
           $scheduledDate = Carbon::parse($value);
@@ -253,7 +260,12 @@ class StorePublicationRequest extends FormRequest
       $contentType = $this->input('content_type', 'post');
       
       // Get social account IDs
-      $socialAccountIds = $this->input('social_accounts', []);
+      $rawSocialAccounts = $this->input('social_accounts', []);
+      if (is_string($rawSocialAccounts)) {
+          $decoded = json_decode($rawSocialAccounts, true);
+          $rawSocialAccounts = is_array($decoded) ? $decoded : array_filter([$rawSocialAccounts]);
+      }
+      $socialAccountIds = array_values(array_filter((array) $rawSocialAccounts));
       
       // Get media files - include both UploadedFile instances and metadata arrays
       $mediaFiles = collect($this->input('media', []))
