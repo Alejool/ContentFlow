@@ -1,14 +1,14 @@
 import DatePickerModern from '@/Components/common/Modern/DatePicker';
 import Label from '@/Components/common/Modern/Label';
+import Switch from '@/Components/common/Modern/Switch';
 import { useTimezoneStore } from '@/stores/timezoneStore';
-import { addDays, addMonths, addWeeks, addYears, format, parseISO } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { parseISO } from 'date-fns';
 import {
   AlertCircle,
   Calendar as CalendarIcon,
-  Clock,
   ChevronLeft,
   ChevronRight,
+  Clock,
 } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 
@@ -613,32 +613,24 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
           </div>
         ) : (
           <div className="animate-in fade-in slide-in-from-top-2 space-y-4 duration-300">
-            <div className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-neutral-800/50">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t('publications.modal.schedule.recurrence.enable') || 'Activar repetición'}
-              </span>
-              <label className="relative inline-flex cursor-pointer items-center">
-                <input
-                  type="checkbox"
-                  className="peer sr-only"
-                  checked={isRecurring}
-                  onChange={(e) => {
-                    const isChecked = e.target.checked;
-                    const updateData: any = { is_recurring: isChecked };
+            <Switch
+              label={t('publications.modal.schedule.recurrence.enable') || 'Activar repetición'}
+              isSelected={isRecurring}
+              onChange={(isChecked) => {
+                const updateData: any = { is_recurring: isChecked };
 
-                    // CRITICAL: If disabling recurrence, clear the days to avoid
-                    // stale validation errors in the form state.
-                    if (!isChecked) {
-                      updateData.recurrence_days = [];
-                    }
+                // CRITICAL: If disabling recurrence, clear the days to avoid
+                // stale validation errors in the form state.
+                if (!isChecked) {
+                  updateData.recurrence_days = [];
+                }
 
-                    onRecurrenceChange?.(updateData);
-                  }}
-                  disabled={disabled}
-                />
-                <div className="peer h-6 w-11 rounded-full bg-gray-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-primary-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-primary-800"></div>
-              </label>
-            </div>
+                onRecurrenceChange?.(updateData);
+              }}
+              isDisabled={disabled}
+              size="md"
+              containerClassName="rounded-lg border border-gray-100 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-neutral-800/50"
+            />
 
             {isRecurring && (
               <div className="space-y-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-neutral-700 dark:bg-neutral-900">

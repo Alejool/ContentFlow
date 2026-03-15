@@ -3,9 +3,8 @@ import {
   getMediaRulesForContentType,
   type ContentType,
 } from '@/Components/Content/Publication/common/ContentTypeSelector';
-import ImageCropper from '@/Components/Content/Publication/common/edit/ImageCropper';
-import { AlertTriangle, Crop, FileImage, Info, Loader2, Upload, Video, X } from 'lucide-react';
-import React, { memo, useMemo, useRef, useState } from 'react';
+import { AlertTriangle, FileImage, Info, Loader2, Upload, Video, X } from 'lucide-react';
+import React, { memo, useMemo, useRef } from 'react';
 
 interface MediaUploadSectionProps {
   mediaPreviews: {
@@ -74,10 +73,6 @@ const MediaUploadSection = memo(
     contentType = 'post',
   }: MediaUploadSectionProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [croppingImage, setCroppingImage] = useState<{
-      tempId: string;
-      url: string;
-    } | null>(null);
 
     // Obtener reglas de medios según el tipo de contenido
     const mediaRules = useMemo(() => getMediaRulesForContentType(contentType), [contentType]);
@@ -159,17 +154,6 @@ const MediaUploadSection = memo(
       return true;
     }, [mediaRules, mediaCounts]);
 
-    const handleCropComplete = (croppedBlob: Blob) => {
-      if (!croppingImage || !onUpdateFile) return;
-
-      const file = new File([croppedBlob], 'cropped-image.jpg', {
-        type: 'image/jpeg',
-      });
-
-      onUpdateFile(croppingImage.tempId, file);
-      setCroppingImage(null);
-    };
-
     const getUploadAreaStyles = () => {
       if (disabled || isAnyMediaProcessing || (lockedBy && !lockedBy.isSelf)) {
         return 'bg-gray-100 dark:bg-neutral-800/90 cursor-not-allowed opacity-60 border-gray-300 dark:border-neutral-700';
@@ -231,7 +215,6 @@ const MediaUploadSection = memo(
                         thumbnail={thumbnails[preview.tempId]}
                         onRemove={() => onRemoveMedia(preview.tempId)}
                         onSetThumbnail={(file) => onSetThumbnail(preview.tempId, file)}
-                        onCrop={(tempId, url) => setCroppingImage({ tempId, url })}
                         onClearThumbnail={() => onClearThumbnail(preview.tempId)}
                         disabled={disabled || isAnyMediaProcessing}
                         progress={uploadProgress?.[preview.tempId]}
@@ -319,15 +302,6 @@ const MediaUploadSection = memo(
             </div>
           )}
         </div>
-
-        {croppingImage && (
-          <ImageCropper
-            isOpen={true}
-            onClose={() => setCroppingImage(null)}
-            image={croppingImage.url}
-            onCropComplete={handleCropComplete}
-          />
-        )}
       </>
     );
   },
@@ -340,7 +314,6 @@ const MediaPreviewItem = memo(
     thumbnail,
     onRemove,
     onSetThumbnail,
-    onCrop,
     onClearThumbnail,
     disabled,
     progress,
@@ -354,7 +327,6 @@ const MediaPreviewItem = memo(
     thumbnail?: File;
     onRemove: () => void;
     onSetThumbnail: (file: File) => void;
-    onCrop: (tempId: string, url: string) => void;
     onClearThumbnail: () => void;
     disabled?: boolean;
     progress?: number;
@@ -452,20 +424,6 @@ const MediaPreviewItem = memo(
             className="absolute right-2 top-2 z-30 rounded-full bg-red-500/80 p-1.5 text-white opacity-0 backdrop-blur-sm transition-colors hover:bg-red-600 group-hover/item:opacity-100"
           >
             <X className="h-3 w-3" />
-          </button>
-        )}
-
-        {!disabled && !preview.type.includes('video') && !isProcessing && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onCrop(preview.tempId, preview.url);
-            }}
-            className="absolute right-10 top-2 z-30 rounded-full bg-black/60 p-1.5 text-white opacity-0 backdrop-blur-sm transition-colors hover:bg-black/80 group-hover/item:opacity-100"
-            title="Crop Image"
-          >
-            <Crop className="h-3 w-3" />
           </button>
         )}
       </div>

@@ -1,5 +1,6 @@
 import Button from '@/Components/common/Modern/Button';
 import DatePickerModern from '@/Components/common/Modern/DatePicker';
+import Switch from '@/Components/common/Modern/Switch';
 import YouTubeThumbnailUploader from '@/Components/common/ui/YouTubeThumbnailUploader';
 import { CONTENT_TYPE_CONFIG, ContentType } from '@/Constants/contentTypes';
 import { formatDateTimeStyled } from '@/Utils/dateHelpers';
@@ -77,35 +78,6 @@ interface SocialAccountsSectionProps {
   thumbnails?: Record<string, { file?: File; url?: string }>;
   publication?: { media_files?: { file_type?: string; mime_type?: string; file_name?: string }[] };
 }
-
-const VisualCheckbox = memo(function VisualCheckbox({
-    isChecked,
-    onToggle,
-    disabled = false,
-  }: {
-    isChecked: boolean;
-    onToggle: (e?: React.MouseEvent) => void;
-    disabled?: boolean;
-  }) {
-    return (
-      <div className="relative">
-        <div
-          role="checkbox"
-          aria-checked={isChecked}
-          tabIndex={disabled ? -1 : 0}
-          className={`flex h-5 w-5 items-center justify-center rounded border-2 transition-all duration-200 ${
-            isChecked
-              ? 'border-primary-500 bg-primary-500'
-              : 'border-gray-300 bg-white dark:bg-neutral-800'
-          } ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} `}
-          onClick={disabled ? undefined : onToggle}
-          onKeyDown={(e) => { if (!disabled && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); onToggle(); } }}
-        >
-          {isChecked && <Check className="h-3 w-3 stroke-[3] text-white" />}
-        </div>
-      </div>
-    );
-  });
 
 const SchedulePopoverContent = memo(
   ({
@@ -331,13 +303,14 @@ const SocialAccountItem = memo(
           data-platform={account.platform}
         >
           <div className="flex flex-1 items-center gap-3">
-            <VisualCheckbox
-              isChecked={!!isCheckedActually}
-              onToggle={(e) => {
-                e?.stopPropagation();
+            <Switch
+              isSelected={!!isCheckedActually}
+              onChange={() => {
                 if (!isInternalDisabled) onToggle();
               }}
-              disabled={isInternalDisabled}
+              isDisabled={isInternalDisabled}
+              size="xs"
+              containerClassName="shrink-0"
             />
 
             <div className="flex flex-1 flex-col">

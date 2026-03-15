@@ -1,4 +1,5 @@
 import { DateTimePicker } from '@/Components/common/DateTimePicker';
+import Switch from '@/Components/common/Modern/Switch';
 
 interface ScheduleSettingsProps {
   schedulePost: boolean;
@@ -19,15 +20,14 @@ export default function ScheduleSettings({
         Configuración
       </h3>
 
-      <label className="mb-3 flex cursor-pointer items-center gap-2">
-        <input
-          type="checkbox"
-          checked={schedulePost}
-          onChange={(e) => onScheduleChange(e.target.checked)}
-          className="rounded"
-        />
-        <span className="text-sm text-gray-700 dark:text-gray-300">Programar publicación</span>
-      </label>
+      <Switch
+        label="Programar publicación"
+        isSelected={schedulePost}
+        onChange={onScheduleChange}
+        size="sm"
+        labelPosition="right"
+        containerClassName="mb-3"
+      />
 
       {schedulePost && (
         <div className="ml-7">
