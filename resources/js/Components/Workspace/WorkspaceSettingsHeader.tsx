@@ -1,4 +1,5 @@
 import WorkspaceInfoBadge from "@/Components/Workspace/WorkspaceInfoBadge";
+import { WorkspaceLogo } from "@/Components/Workspace/WorkspaceLogo";
 import { Globe, Lock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -16,13 +17,13 @@ export default function WorkspaceSettingsHeader({
         <div className="flex-1">
           <div className="flex items-center justify-start gap-4 ">
             <div
-              className={`h-10 w-10 ${!workspace.white_label_logo_url ? "bg-gradient-to-br from-primary-500 to-primary-600" : ""} rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-lg overflow-hidden`}
+              className={`relative h-10 w-10 bg-primary-500 ${!workspace.white_label_logo_url ? "bg-primary-500 " : ""} rounded-lg flex items-center justify-center text-white font-bold text-lg  overflow-hidden`}
             >
               {workspace.white_label_logo_url ? (
-                <img
+                <WorkspaceLogo
                   src={workspace.white_label_logo_url}
                   alt={workspace.name}
-                  className="w-full h-full object-contain p-1"
+                  fallback={workspace.name}
                 />
               ) : (
                 workspace.name.charAt(0).toUpperCase()
