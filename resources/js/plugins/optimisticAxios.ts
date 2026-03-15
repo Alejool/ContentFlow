@@ -10,9 +10,26 @@
  * Requirements: 9.3, 3.3
  */
 
-import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import type { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios';
 import useOptimisticStore from '../stores/optimisticStore';
 import type { OptimisticOperation } from '../types/optimistic';
+
+// Extend InternalAxiosRequestConfig to include our custom fields
+declare module 'axios' {
+  interface InternalAxiosRequestConfig {
+    optimistic?: boolean;
+    optimisticData?: any;
+    resource?: string;
+    rollbackOnError?: boolean;
+    originalData?: any;
+    operationType?: 'create' | 'update' | 'delete';
+    resourceId?: string | number;
+    maxRetries?: number;
+    onSuccess?: (data: any) => void;
+    onError?: (error: Error) => void;
+    onRollback?: () => void;
+  }
+}
 
 /**
  * Configuration interface for the optimistic interceptor
