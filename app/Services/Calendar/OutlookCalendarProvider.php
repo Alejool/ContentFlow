@@ -322,7 +322,7 @@ class OutlookCalendarProvider implements ExternalCalendarProvider
     // Add link to system
     $appUrl = config('app.url');
     $lines[] = '';
-    $lines[] = '🔗 Ver en Contenflow: ' . $appUrl . '/content';
+    $lines[] = '🔗 Ver en Intellipost: ' . $appUrl . '/content';
 
     return implode("\n", $lines);
   }

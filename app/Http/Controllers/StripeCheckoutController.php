@@ -26,7 +26,7 @@ class StripeCheckoutController extends Controller
                     'price_data' => [
                         'currency' => 'usd',
                         'product_data' => [
-                            'name' => 'Plan Premium - Contenflow',
+                            'name' => 'Plan Premium - Intellipost',
                             'description' => 'Acceso completo a todas las funcionalidades',
                         ],
                         'unit_amount' => 2999, // $29.99 en centavos
