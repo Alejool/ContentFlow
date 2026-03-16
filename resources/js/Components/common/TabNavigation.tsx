@@ -51,23 +51,28 @@ function TabNavigation({
 
   // Si es draggable o variant es 'draggable', usar DraggableTabs
   if (isDraggable || variant === 'draggable') {
-    const draggableTabs: DraggableTab[] = visibleTabs.map((tab) => ({
-      id: tab.key,
-      label: tab.label,
-      icon: tab.icon,
-      badge: tab.badge,
-      enabled: tab.enabled,
-      locked: tab.locked,
-      planRequired: tab.planRequired,
-    }));
+    const draggableTabs: DraggableTab[] = visibleTabs.map((tab) => {
+      const draggableTab: DraggableTab = {
+        id: tab.key,
+        label: tab.label,
+        enabled: tab.enabled,
+      };
+
+      if (tab.icon !== undefined) draggableTab.icon = tab.icon;
+      if (tab.badge !== undefined) draggableTab.badge = tab.badge;
+      if (tab.locked !== undefined) draggableTab.locked = tab.locked;
+      if (tab.planRequired !== undefined) draggableTab.planRequired = tab.planRequired;
+
+      return draggableTab;
+    });
 
     return (
       <DraggableTabs
         tabs={draggableTabs}
         activeTab={activeTab}
         onTabChange={onTabChange}
-        onTabOrderChange={onTabOrderChange}
-        tabOrder={tabOrder}
+        {...(onTabOrderChange && { onTabOrderChange })}
+        {...(tabOrder && { tabOrder })}
         isDraggable={true}
         currentPlan={currentPlan}
         className={className}
@@ -124,7 +129,7 @@ function TabNavigation({
           ? 'bg-primary-500 text-white'
           : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700';
       case 'underline':
-        return `border-b-2 rounded-none ${
+        return `border-b-2 rounded-lg ${
           isActive
             ? 'border-primary-500 text-primary-600 dark:text-primary-400'
             : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
@@ -152,10 +157,12 @@ function TabNavigation({
           <Button
             key={tab.key}
             onClick={() => onTabChange(tab.key)}
-            variant={isActive ? 'primary' : 'ghost'}
+            variant={'ghost'}
+            {...(variant === 'underline' && { buttonStyle: 'underline' as const })}
             size={size}
             className={`${getVariantClasses(isActive)} ${variant === 'underline' ? 'flex-1' : ''}`}
-            icon={Icon}
+            disabled={!tab.enabled}
+            {...(Icon && { icon: Icon })}
           >
             <span className="flex items-center gap-2">
               {tab.label}

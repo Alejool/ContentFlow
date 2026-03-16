@@ -4,7 +4,7 @@ import { ButtonHTMLAttributes, ComponentType, ReactNode, forwardRef, isValidElem
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
   variant?: 'primary' | 'danger' | 'secondary' | 'success' | 'ghost' | 'warning';
-  buttonStyle?: 'solid' | 'outline' | 'gradient' | 'ghost' | 'icon';
+  buttonStyle?: 'solid' | 'outline' | 'gradient' | 'ghost' | 'icon' | 'underline';
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   loading?: boolean;
   loadingText?: string;
@@ -143,6 +143,19 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             rounded-full
             p-3
             hover:bg-primary-500/15
+          `;
+        case 'underline':
+          return `
+            ${colors.text}
+            bg-transparent
+            border-0
+            border-b-2
+            border-transparent
+            rounded-sm
+            shadow-none
+            hover:border-primary-500
+            hover:text-primary-600
+            dark:hover:text-primary-400
           `;
         case 'gradient':
           return `

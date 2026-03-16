@@ -33,7 +33,7 @@ export default function MediaPreviewButton({
 
   if (!mediaFiles || mediaFiles.length === 0) return null;
 
-  const firstMedia = mediaFiles[0];
+  const firstMedia = mediaFiles[0]!;
   const isVideo = firstMedia.file_type?.includes('video');
   const mediaUrl = firstMedia.file_path.startsWith('http')
     ? firstMedia.file_path
@@ -43,7 +43,7 @@ export default function MediaPreviewButton({
     const mediaForLightbox = mediaFiles.map((m) => ({
       url: m.file_path.startsWith('http') ? m.file_path : `/storage/${m.file_path}`,
       type: (m.file_type?.includes('video') ? 'video' : 'image') as 'image' | 'video',
-      title: title,
+      ...(title && { title }),
     }));
     onPreview(mediaForLightbox, 0);
   };

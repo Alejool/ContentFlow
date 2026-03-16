@@ -165,6 +165,7 @@ export default function ContentList(props: ContentListProps) {
           {onRefresh && (
             <Button
               variant="ghost"
+              buttonStyle="outline"
               size="sm"
               onClick={onRefresh}
               loading={isLoading}
