@@ -1,12 +1,12 @@
 import {
-  getMediaRulesForContentType,
-  type ContentType,
+    getMediaRulesForContentType,
+    type ContentType,
 } from '@/Components/Content/Publication/common/ContentTypeSelector';
 import { CONTENT_TYPE_DISPLAY } from '@/Constants/contentTypes';
 import { useContentTypeSuggestion } from '@/Hooks/publication/useContentTypeSuggestion';
 import {
-  useCreatePublication,
-  useUpdatePublication,
+    useCreatePublication,
+    useUpdatePublication,
 } from '@/Hooks/publication/usePublicationsList';
 import { useS3Upload } from '@/Hooks/useS3Upload';
 import { queryKeys } from '@/lib/queryKeys';
@@ -1097,6 +1097,24 @@ export const usePublicationForm = ({
     }
   };
 
+  const handleCancelPlatform = async (platformId: number) => {
+    if (!publication?.id) return;
+    try {
+      const payload = {
+        platform_ids: [platformId],
+      };
+
+      await axios.post(route('api.v1.publications.cancel', publication.id), payload);
+      toast.success(t('publications.messages.platformCancelSuccess') || 'Plataforma cancelada');
+
+      // Invalidate TanStack Query cache
+      queryClient.invalidateQueries({ queryKey: queryKeys.publications.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.calendar.all });
+    } catch (err) {
+      toast.error(t('publications.messages.platformCancelError') || 'Error al cancelar la plataforma');
+    }
+  };
+
   const onFormSubmit = async (data: PublicationFormData) => {
     // Skip media validation for polls (they don't require media)
     if (data.content_type !== 'poll' && mediaFiles.length === 0) {
@@ -1629,6 +1647,7 @@ export const usePublicationForm = ({
     handleAccountToggle,
     handleClose,
     handleCancelPublication,
+    handleCancelPlatform,
     handleSubmit: handleSubmit(onFormSubmit, onInvalidSubmit),
     fileInputRef,
 

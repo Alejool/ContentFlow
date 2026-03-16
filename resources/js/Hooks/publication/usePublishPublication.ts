@@ -118,7 +118,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         .filter((account) => account.is_active)
         .map((account) => ({
           ...account,
-          account_name: account.account_name,
+          account_name: account.account_name ?? '',
         })),
     [accounts],
   );
@@ -531,8 +531,6 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         await fetchPublishedPlatformsFromStore(publicationId);
         usePublicationStore.getState().fetchPublicationById(publicationId);
       } catch (err: any) {
-        console.error('Failed to cancel platform', err);
-        console.error('Error response:', err.response?.data);
         toast.error('Error al cancelar la plataforma');
       }
     },
