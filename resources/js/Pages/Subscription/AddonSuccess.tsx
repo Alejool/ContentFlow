@@ -1,17 +1,17 @@
-import React, { useEffect } from 'react';
+import Button from '@/Components/common/Modern/Button';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/Components/ui/card';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/Components/ui/card';
-import Button from '@/Components/common/Modern/Button';
-import { CheckCircle, Sparkles, ArrowRight } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { ArrowRight, CheckCircle, Sparkles } from 'lucide-react';
+import { useEffect } from 'react';
 
 export default function AddonSuccess() {
   useEffect(() => {
@@ -128,7 +128,7 @@ export default function AddonSuccess() {
           {/* Additional Actions */}
           <div className="mt-8 text-center">
             <p className="text-muted-foreground mb-4 text-sm">
-              ¿Necesitas ayuda? Contáctanos en soporte@contenflow.com
+              ¿Necesitas ayuda? Contáctanos en soporte@Intellipost.com
             </p>
           </div>
         </div>
