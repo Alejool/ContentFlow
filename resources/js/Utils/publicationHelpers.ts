@@ -207,6 +207,14 @@ export function getPublicationStatusConfig(status?: string) {
       hover: 'hover:bg-blue-100 dark:hover:bg-blue-900/40',
       icon: TrendingUp,
     },
+    retrying: {
+      badge: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+      bg: 'bg-blue-50 dark:bg-blue-900/20',
+      text: 'text-blue-500',
+      border: 'border-blue-200 dark:border-blue-700',
+      hover: 'hover:bg-blue-100 dark:hover:bg-blue-900/40',
+      icon: TrendingUp,
+    },
     published: {
       badge: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
       bg: 'bg-green-50 dark:bg-green-900/20',
@@ -215,8 +223,24 @@ export function getPublicationStatusConfig(status?: string) {
       hover: 'hover:bg-green-100 dark:hover:bg-green-900/40',
       icon: CheckCircle,
     },
+    published_with_errors: {
+      badge: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
+      bg: 'bg-amber-50 dark:bg-amber-900/20',
+      text: 'text-amber-500',
+      border: 'border-amber-200 dark:border-amber-700',
+      hover: 'hover:bg-amber-100 dark:hover:bg-amber-900/40',
+      icon: CheckCircle,
+    },
+    partially_published: {
+      badge: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
+      bg: 'bg-amber-50 dark:bg-amber-900/20',
+      text: 'text-amber-500',
+      border: 'border-amber-200 dark:border-amber-700',
+      hover: 'hover:bg-amber-100 dark:hover:bg-amber-900/40',
+      icon: CheckCircle,
+    },
     failed: {
-      badge: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+      badge: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-red-400',
       bg: 'bg-red-50 dark:bg-red-900/20',
       text: 'text-red-500',
       border: 'border-red-200 dark:border-red-700',
@@ -246,7 +270,10 @@ export function getAllPublicationStatuses() {
     'approved',
     'scheduled',
     'publishing',
+    'retrying',
     'published',
+    'published_with_errors',
+    'partially_published',
     'failed',
   ] as const;
 }
@@ -263,4 +290,77 @@ export function isUserEvent(publication: Publication): boolean {
  */
 export function isSocialNetworkEvent(publication: Publication): boolean {
   return !!(publication.scheduled_at && publication.status !== 'published');
+}
+
+/**
+ * Obtiene una descripción legible del estado de la publicación
+ * Incluye información del resumen si está disponible
+ */
+export function getStatusDescription(
+  status: string,
+  summary?: {
+    total_platforms?: number;
+    published?: number;
+    failed?: number;
+    publishing?: number;
+    deleted?: number;
+  },
+): string {
+  const baseDescriptions: Record<string, string> = {
+    draft: 'Borrador',
+    pending_review: 'Pendiente de revisión',
+    approved: 'Aprobado',
+    rejected: 'Rechazado',
+    scheduled: 'Programado',
+    publishing: 'Publicando',
+    retrying: 'Reintentando',
+    published: 'Publicado',
+    published_with_errors: 'Publicado con errores',
+    partially_published: 'Publicado parcialmente',
+    failed: 'Fallido',
+  };
+
+  let description = baseDescriptions[status] || status;
+
+  // Agregar detalles del resumen si está disponible
+  if (summary && summary.total_platforms) {
+    const details: string[] = [];
+    
+    if (summary.published && summary.published > 0) {
+      details.push(`${summary.published} publicadas`);
+    }
+    if (summary.failed && summary.failed > 0) {
+      details.push(`${summary.failed} fallidas`);
+    }
+    if (summary.publishing && summary.publishing > 0) {
+      details.push(`${summary.publishing} en proceso`);
+    }
+
+    if (details.length > 0) {
+      description += ` (${details.join(', ')})`;
+    }
+  }
+
+  return description;
+}
+
+/**
+ * Obtiene un resumen corto del estado de publicación para mostrar en badges
+ */
+export function getShortStatusLabel(status: string): string {
+  const labels: Record<string, string> = {
+    draft: 'Borrador',
+    pending_review: 'En revisión',
+    approved: 'Aprobado',
+    rejected: 'Rechazado',
+    scheduled: 'Programado',
+    publishing: 'Publicando',
+    retrying: 'Reintentando',
+    published: 'Publicado',
+    published_with_errors: 'Con errores',
+    partially_published: 'Parcial',
+    failed: 'Fallido',
+  };
+
+  return labels[status] || status;
 }
