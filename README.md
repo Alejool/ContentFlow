@@ -1,7 +1,7 @@
 # ContentFlow — Social Strategy & Multimedia Hub
 
 <div align="center">
-  <img src="resources/assets/logo-with-name.png" alt="ContentFlow Logo" width="400" />
+  <img src="resources/assets/logo.svg" alt="ContentFlow Logo" width="400" />
   <p><em>Centralize your digital presence with AI-powered strategy and multi-platform automation.</em></p>
 </div>
 
