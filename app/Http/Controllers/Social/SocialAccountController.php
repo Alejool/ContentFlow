@@ -18,32 +18,33 @@ use Abraham\TwitterOAuth\TwitterOAuth;
 use Carbon\Carbon;
 use App\Services\Subscription\PlanLimitValidator;
 use App\Helpers\LogHelper;
+use Inertia\Inertia;
 
 
 class SocialAccountController extends Controller
 {
   public function index()
-  {
-    $workspaceId = Auth::user()->current_workspace_id;
-    $allowedPlatforms = [];
-    if (config('services.facebook.client_id')) $allowedPlatforms[] = 'facebook';
-    if (config('services.instagram.client_id')) $allowedPlatforms[] = 'instagram';
-    if (config('services.twitter.client_id') || config('services.twitter.consumer_key')) $allowedPlatforms[] = 'twitter';
-    if (config('services.linkedin.client_id')) $allowedPlatforms[] = 'linkedin';
-    if (config('services.tiktok.client_key')) $allowedPlatforms[] = 'tiktok';
-    if (config('services.google.client_id')) $allowedPlatforms[] = 'youtube';
+    {
+      $workspaceId = Auth::user()->current_workspace_id;
+      $allowedPlatforms = [];
+      if (config('services.facebook.client_id')) $allowedPlatforms[] = 'facebook';
+      if (config('services.instagram.client_id')) $allowedPlatforms[] = 'instagram';
+      if (config('services.twitter.client_id') || config('services.twitter.consumer_key')) $allowedPlatforms[] = 'twitter';
+      if (config('services.linkedin.client_id')) $allowedPlatforms[] = 'linkedin';
+      if (config('services.tiktok.client_key')) $allowedPlatforms[] = 'tiktok';
+      if (config('services.google.client_id')) $allowedPlatforms[] = 'youtube';
 
-    $accounts = SocialAccount::where('workspace_id', $workspaceId)
-      ->where('is_active', true)
-      ->whereIn('platform', $allowedPlatforms)
-      ->with('user:id,name')
-      ->get();
+      $accounts = SocialAccount::where('workspace_id', $workspaceId)
+        ->where('is_active', true)
+        ->whereIn('platform', $allowedPlatforms)
+        ->with('user:id,name')
+        ->get();
 
-    return response()->json([
-      'success' => true,
-      'accounts' => $accounts
-    ]);
-  }
+      return Inertia::render('SocialAccounts/Index', [
+        'accounts' => $accounts,
+        'allowedPlatforms' => $allowedPlatforms
+      ]);
+    }
 
   public function getAuthUrl(Request $request, $platform)
   {
