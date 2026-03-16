@@ -50,6 +50,23 @@ class AnalyticsController extends Controller
         $socialMedia = $this->statisticsService->getSocialMediaOverview($workspaceId);
         $engagementTrends = $this->statisticsService->getEngagementTrends($workspaceId, $startDate, $endDate);
 
+        // Detect social accounts that need reconnection
+        $problematicAccounts = SocialAccount::where('workspace_id', $workspaceId)
+            ->where(function ($q) {
+                $q->where('failure_count', '>=', 3)
+                  ->orWhere('is_active', false)
+                  ->orWhere('token_expires_at', '<=', now());
+            })
+            ->get(['id', 'platform', 'account_name', 'failure_count', 'is_active', 'token_expires_at'])
+            ->map(fn ($a) => [
+                'id'           => $a->id,
+                'platform'     => $a->platform,
+                'account_name' => $a->account_name,
+                'reason'       => $a->isTokenExpired() ? 'expired' : 'failures',
+            ])
+            ->values()
+            ->toArray();
+
         // Format data for frontend
         $stats = [
             'totalViews' => $overview['total_views'] ?? 0,
@@ -78,6 +95,7 @@ class AnalyticsController extends Controller
         return Inertia::render('Dashboard', [
             'stats' => $stats,
             'period' => $days,
+            'problematicAccounts' => $problematicAccounts,
         ]);
     }
 

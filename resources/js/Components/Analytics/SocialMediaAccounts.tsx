@@ -12,6 +12,10 @@ interface SocialMediaAccount {
   engagement_rate: number;
   reach: number;
   follower_growth_30d: number;
+  needs_reconnection?: boolean;
+  is_token_expired?: boolean;
+  failure_count?: number;
+  is_active?: boolean;
 }
 
 interface SocialMediaAccountsProps {
@@ -156,15 +160,37 @@ export default function SocialMediaAccounts({
           className="hide-scrollbars flex snap-x snap-mandatory gap-6 overflow-x-auto pb-6"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          {displayAccounts.map((account) => (
+          {displayAccounts.map((account) => {
+            const needsReconnect = account.needs_reconnection || account.is_token_expired;
+            return (
             <div
               key={account.id}
-              className={`w-[85vw] shrink-0 snap-center rounded-lg p-6 transition-all duration-300 hover:scale-[1.02] sm:w-[350px] md:w-[400px] ${
-                theme === 'dark'
-                  ? 'border border-neutral-700/30 bg-neutral-800/30 hover:border-neutral-600/50'
-                  : 'border border-gray-200 hover:border-gray-300 hover:shadow-md'
+              className={`relative w-[85vw] shrink-0 snap-center rounded-lg p-6 transition-all duration-300 hover:scale-[1.02] sm:w-[350px] md:w-[400px] ${
+                needsReconnect
+                  ? theme === 'dark'
+                    ? 'border border-amber-600/50 bg-neutral-800/30'
+                    : 'border border-amber-300 bg-amber-50/40'
+                  : theme === 'dark'
+                    ? 'border border-neutral-700/30 bg-neutral-800/30 hover:border-neutral-600/50'
+                    : 'border border-gray-200 hover:border-gray-300 hover:shadow-md'
               }`}
             >
+              {/* Reconnection warning badge */}
+              {needsReconnect && (
+                <div className="absolute right-3 top-3">
+                  <span className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
+                    theme === 'dark'
+                      ? 'bg-amber-900/40 text-amber-300'
+                      : 'bg-amber-100 text-amber-700'
+                  }`}>
+                    <AlertTriangle className="h-3 w-3" />
+                    {account.is_token_expired
+                      ? t('socialAccounts.tokenExpired', 'Token expirado')
+                      : t('socialAccounts.needsReconnection', 'Reconectar')}
+                  </span>
+                </div>
+              )}
+
               <div className="mb-4 flex items-center justify-between">
                 <h3
                   className={`text-lg font-semibold ${
@@ -178,31 +204,30 @@ export default function SocialMediaAccounts({
                     </span>
                   )}
                 </h3>
-                <span
-                  className={`rounded-full px-3 py-1 text-xs font-medium ${
-                    account.follower_growth_30d > 0
-                      ? theme === 'dark'
-                        ? 'bg-green-900/30 text-green-300'
-                        : 'bg-green-100 text-green-800'
-                      : theme === 'dark'
-                        ? 'bg-primary-900/30 text-primary-300'
-                        : 'bg-primary-100 text-primary-800'
-                  }`}
-                >
-                  {account.follower_growth_30d > 0 ? '+' : ''}
-                  {account.follower_growth_30d}
-                </span>
+                {!needsReconnect && (
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-medium ${
+                      account.follower_growth_30d > 0
+                        ? theme === 'dark'
+                          ? 'bg-green-900/30 text-green-300'
+                          : 'bg-green-100 text-green-800'
+                        : theme === 'dark'
+                          ? 'bg-primary-900/30 text-primary-300'
+                          : 'bg-primary-100 text-primary-800'
+                    }`}
+                  >
+                    {account.follower_growth_30d > 0 ? '+' : ''}
+                    {account.follower_growth_30d}
+                  </span>
+                )}
               </div>
+
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
                     {t('analytics.socialMedia.followers')}
                   </span>
-                  <span
-                    className={`font-semibold ${
-                      theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
-                    }`}
-                  >
+                  <span className={`font-semibold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
                     {account.followers.toLocaleString()}
                   </span>
                 </div>
@@ -210,11 +235,7 @@ export default function SocialMediaAccounts({
                   <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
                     {t('analytics.socialMedia.engagementRate')}
                   </span>
-                  <span
-                    className={`font-semibold ${
-                      theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
-                    }`}
-                  >
+                  <span className={`font-semibold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
                     {account.engagement_rate}%
                   </span>
                 </div>
@@ -222,17 +243,33 @@ export default function SocialMediaAccounts({
                   <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
                     {t('analytics.socialMedia.reach')}
                   </span>
-                  <span
-                    className={`font-semibold ${
-                      theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
-                    }`}
-                  >
+                  <span className={`font-semibold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
                     {account.reach.toLocaleString()}
                   </span>
                 </div>
               </div>
+
+              {/* Reconnect button at the bottom of the card */}
+              {needsReconnect && (
+                <div className={`mt-4 border-t pt-4 ${
+                  theme === 'dark' ? 'border-amber-700/30' : 'border-amber-200'
+                }`}>
+                  <Link
+                    href={route('social-accounts.index')}
+                    className={`flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                      theme === 'dark'
+                        ? 'bg-amber-900/30 text-amber-300 hover:bg-amber-900/50'
+                        : 'bg-amber-100 text-amber-800 hover:bg-amber-200'
+                    }`}
+                  >
+                    <RefreshCw className="h-3.5 w-3.5" />
+                    {t('socialAccounts.reconnectButton', 'Reconectar cuenta')}
+                  </Link>
+                </div>
+              )}
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
