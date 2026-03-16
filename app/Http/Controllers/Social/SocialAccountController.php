@@ -1001,7 +1001,7 @@ class SocialAccountController extends Controller
   public function store(Request $request)
   {
     $request->validate([
-      'platform' => 'required|string|in:facebook,instagram,twitter,youtube,tiktok',
+      'platform' => 'required|string|in:facebook,instagram,threads,twitter,youtube,tiktok',
       'account_id' => 'required|string',
       'access_token' => 'required|string',
       'refresh_token' => 'nullable|string',

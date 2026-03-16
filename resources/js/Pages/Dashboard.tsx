@@ -1,5 +1,6 @@
 import { CampaignStat } from '@/Components/Analytics/PerformanceTable';
 import { AddonsPromotionCard } from '@/Components/Dashboard/AddonsPromotionCard';
+import ExpiredTokensBanner from '@/Components/Dashboard/ExpiredTokensBanner';
 import { PublicationStatusCards } from '@/Components/Dashboard/PublicationStatusCards';
 import StatCard from '@/Components/Statistics/StatCard';
 import Skeleton from '@/Components/common/ui/Skeleton';
@@ -28,6 +29,13 @@ const PlatformPerformance = lazy(() => import('@/Components/Analytics/PlatformPe
 const SocialMediaAccounts = lazy(() => import('@/Components/Analytics/SocialMediaAccounts'));
 const EngagementChart = lazy(() => import('@/Components/Statistics/EngagementChart'));
 
+interface ProblematicAccount {
+  id: number;
+  platform: string;
+  account_name: string;
+  reason: 'expired' | 'failures';
+}
+
 interface DashboardProps {
   auth: {
     user: any;
@@ -47,9 +55,10 @@ interface DashboardProps {
     platformComparison: any[];
   };
   period: number;
+  problematicAccounts?: ProblematicAccount[];
 }
 
-export default function Dashboard({ auth, stats, status, period = 30 }: DashboardProps) {
+export default function Dashboard({ auth, stats, status, period = 30, problematicAccounts = [] }: DashboardProps) {
   const { t } = useTranslation();
   const { actualTheme: theme } = useTheme();
   const { auth: pageAuth } = usePage<any>().props;
@@ -149,6 +158,8 @@ export default function Dashboard({ auth, stats, status, period = 30 }: Dashboar
             ))}
           </div>
         </motion.div>
+
+        <ExpiredTokensBanner accounts={problematicAccounts} />
 
         {!auth.user.email_verified_at && showBanner && (
           <motion.div
