@@ -14,7 +14,7 @@ return [
     */
 
     'post' => [
-        'platforms' => ['instagram', 'twitter', 'facebook', 'linkedin', 'youtube', 'pinterest', 'tiktok'],
+        'platforms' => ['instagram', 'threads', 'twitter', 'facebook', 'linkedin', 'youtube', 'pinterest', 'tiktok'],
         'media' => [
             'required' => false,
             'min_count' => 0,
@@ -34,7 +34,7 @@ return [
     ],
 
     'story' => [
-        'platforms' => ['instagram', 'facebook', 'twitter', 'linkedin', 'youtube', 'pinterest', 'tiktok'],
+        'platforms' => ['instagram', 'threads', 'facebook', 'twitter', 'linkedin', 'youtube', 'pinterest', 'tiktok'],
         'media' => [
             'required' => true,
             'min_count' => 1,
@@ -44,7 +44,7 @@ return [
     ],
 
     'carousel' => [
-        'platforms' => ['instagram', 'facebook', 'linkedin', 'twitter', 'youtube', 'pinterest', 'tiktok'],
+        'platforms' => ['instagram', 'threads', 'facebook', 'linkedin', 'twitter', 'youtube', 'pinterest', 'tiktok'],
         'media' => [
             'required' => true,
             'min_count' => 2,
@@ -54,7 +54,7 @@ return [
     ],
 
     'poll' => [
-        'platforms' => ['twitter', 'facebook', 'instagram', 'linkedin', 'youtube', 'pinterest', 'tiktok'],
+        'platforms' => ['twitter', 'threads', 'facebook', 'instagram', 'linkedin', 'youtube', 'pinterest', 'tiktok'],
         'media' => [
             'required' => false,
             'min_count' => 0,

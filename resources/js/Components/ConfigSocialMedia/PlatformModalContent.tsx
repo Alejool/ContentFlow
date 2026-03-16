@@ -52,6 +52,8 @@ export default function PlatformModalContent({
         return <FacebookSettings settings={platformSettings} onSettingsChange={onChange} />;
       case 'instagram':
         return <InstagramSettings settings={platformSettings} onSettingsChange={onChange} />;
+      case 'threads':
+        return <ThreadsSettings settings={platformSettings} onSettingsChange={onChange} />;
       case 'tiktok':
         return <TikTokSettings settings={platformSettings} onSettingsChange={onChange} />;
       case 'twitter':

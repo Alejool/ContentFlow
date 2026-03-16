@@ -11,6 +11,7 @@ class SocialPlatformFactory
     return match ($platform) {
       'facebook' => new FacebookService($accessToken, $account),
       'instagram' => new InstagramService($accessToken, $account),
+      'threads' => new ThreadsService($accessToken, $account),
       'youtube' => new YouTubeService($accessToken, $account),
       'twitter' => new TwitterService($accessToken, $account),
       'linkedin' => new LinkedInService($accessToken, $account),

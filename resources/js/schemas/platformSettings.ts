@@ -60,12 +60,19 @@ export const youtubeSettingsSchema = z.object({
   privacy: z.enum(['public', 'unlisted', 'private']).optional(),
 });
 
+export const threadsSettingsSchema = z.object({
+  type: z.enum(['text', 'image', 'video']).optional(),
+  reply_control: z.enum(['everyone', 'accounts_you_follow', 'mentioned_only']).optional(),
+});
+
 export const getPlatformSchema = (platform: string) => {
   switch (platform.toLowerCase()) {
     case 'facebook':
       return facebookSettingsSchema;
     case 'instagram':
       return instagramSettingsSchema;
+    case 'threads':
+      return threadsSettingsSchema;
     case 'twitter':
     case 'x':
       return twitterSettingsSchema;

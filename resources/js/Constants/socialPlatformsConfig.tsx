@@ -1,7 +1,7 @@
-import { FaFacebook, FaInstagram, FaLinkedin, FaTiktok, FaYoutube } from 'react-icons/fa';
+import { FaFacebook, FaInstagram, FaTiktok, FaYoutube } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
 import IconFacebook from '../../assets/Icons/facebook.svg';
-import IconInstagram from '../../assets/Icons/instagram.svg';
+import IconThreads from '../../assets/Icons/threads.svg';
 import IconTiktok from '../../assets/Icons/tiktok.svg';
 import IconTwitter from '../../assets/Icons/x.svg';
 import IconYoutube from '../../assets/Icons/youtube.svg';
@@ -117,6 +117,29 @@ export const SOCIAL_PLATFORMS = {
     },
     active: true,
   },
+  // threads: {
+  //   id: 7,
+  //   key: 'threads',
+  //   name: 'Threads',
+  //   logo: IconThreads,
+  //   icon: FaInstagram, // Threads es de Meta, usamos FaInstagram como fallback
+  //   color: 'bg-gray-900',
+  //   textColor: 'text-gray-700',
+  //   borderColor: 'border-gray-200',
+  //   darkColor: 'dark:bg-gray-800',
+  //   darkTextColor: 'dark:text-gray-300',
+  //   darkBorderColor: 'dark:border-gray-700',
+  //   gradient: 'from-gray-800 to-gray-950',
+  //   bgClass: 'bg-gray-50',
+  //   maxVideoDuration: 300, // 5 minutes
+  //   maxVideoCount: 1,
+  //   apiLimits: {
+  //     postsPerDay: 250,
+  //     repliesPerDay: 1000,
+  //     note: 'Threads API v1.0',
+  //   },
+  //   active: true,
+  // },
   // linkedin: {
   //   id: 6,
   //   key: "linkedin",
