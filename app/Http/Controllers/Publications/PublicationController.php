@@ -716,6 +716,39 @@ class PublicationController extends Controller
       if (is_string($platformSettings)) {
         $platformSettings = json_decode($platformSettings, true) ?? [];
       }
+      
+      // VALIDACIÓN TEMPRANA: Verificar compatibilidad ANTES de despachar el job
+      $validationService = app(\App\Services\Validation\PublishValidationService::class);
+      $validation = $validationService->validatePublishRequest($publication, $request->input('platforms'));
+      
+      if (!$validation['can_publish']) {
+        \Log::warning('Publication validation failed before dispatch', [
+          'publication_id' => $publication->id,
+          'errors' => $validation['global_errors'],
+          'platform_results' => $validation['platform_results']
+        ]);
+        
+        // Construir mensaje de error detallado
+        $errorMessage = implode(' ', $validation['global_errors']);
+        
+        return $this->errorResponse(
+          $errorMessage,
+          422,
+          [
+            'validation_errors' => $validation['global_errors'],
+            'platform_results' => $validation['platform_results'],
+            'warnings' => $validation['global_warnings'] ?? []
+          ]
+        );
+      }
+      
+      // Si hay advertencias, registrarlas pero continuar
+      if (!empty($validation['global_warnings'])) {
+        \Log::info('Publication has warnings but proceeding', [
+          'publication_id' => $publication->id,
+          'warnings' => $validation['global_warnings']
+        ]);
+      }
 
       $action->execute($publication, $request->input('platforms'), [
         'thumbnails' => $request->file('thumbnails', []),

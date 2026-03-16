@@ -547,7 +547,7 @@ class SocialAccountController extends Controller
       // Paso 2: Obtener información del usuario
       $userResponse = Http::withToken($data['access_token'])
         ->get('https://api.twitter.com/2/users/me', [
-          'user.fields' => 'profile_image_url,username,name'
+          'user.fields' => 'profile_image_url,username,name,verified,verified_type,public_metrics'
         ]);
 
       $userData = $userResponse->json();
@@ -656,12 +656,24 @@ class SocialAccountController extends Controller
     $metadata = [
       'username' => $userInfo['username'] ?? null,
       'avatar' => $userInfo['profile_image_url'] ?? null,
+      'is_verified' => $userInfo['verified'] ?? false,
+      'verified_type' => $userInfo['verified_type'] ?? null, // 'blue', 'business', 'government', or null
+      'has_twitter_blue' => ($userInfo['verified_type'] ?? null) === 'blue',
+      'followers_count' => $userInfo['public_metrics']['followers_count'] ?? 0,
     ];
 
     if ($v1Creds) {
       $metadata['oauth1_token'] = $v1Creds['oauth_token'];
       $metadata['secret'] = $v1Creds['oauth_token_secret'];
     }
+    
+    \Log::info('Saving Twitter account with verification info', [
+      'username' => $userInfo['username'] ?? null,
+      'is_verified' => $metadata['is_verified'],
+      'verified_type' => $metadata['verified_type'],
+      'has_twitter_blue' => $metadata['has_twitter_blue'],
+      'has_oauth1' => !empty($v1Creds)
+    ]);
 
     $this->saveAccount([
       'platform' => 'twitter',
@@ -682,6 +694,8 @@ class SocialAccountController extends Controller
       'account_name' => $userInfo['name'] ?? null,
       'username' => $userInfo['username'] ?? null,
       'avatar' => $userInfo['profile_image_url'] ?? null,
+      'is_verified' => $metadata['is_verified'],
+      'has_twitter_blue' => $metadata['has_twitter_blue'],
     ]);
   }
 
