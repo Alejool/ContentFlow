@@ -23,7 +23,7 @@ use Inertia\Inertia;
 
 class SocialAccountController extends Controller
 {
-  public function index()
+  public function index(Request $request)
     {
       $workspaceId = Auth::user()->current_workspace_id;
       $allowedPlatforms = [];
@@ -40,6 +40,16 @@ class SocialAccountController extends Controller
         ->with('user:id,name')
         ->get();
 
+      // Si es una petición API, devolver JSON
+      if ($request->expectsJson() || $request->is('api/*')) {
+        return response()->json([
+          'success' => true,
+          'accounts' => $accounts,
+          'allowedPlatforms' => $allowedPlatforms
+        ]);
+      }
+
+      // Si es una petición web, devolver vista Inertia
       return Inertia::render('SocialAccounts/Index', [
         'accounts' => $accounts,
         'allowedPlatforms' => $allowedPlatforms
