@@ -23,13 +23,36 @@ export type Publication = {
     | 'approved'
     | 'rejected'
     | 'failed'
-    | 'retrying';
+    | 'retrying'
+    | 'published_with_errors'
+    | 'partially_published';
   is_active?: boolean;
   media_files?: MediaFile[];
   scheduled_posts?: ScheduledPost[];
   social_post_logs?: SocialPostLog[];
   approval_logs?: ApprovalLog[];
   activities?: Record<string, unknown>[];
+  publication_status_summary?: {
+    total_platforms: number;
+    published: number;
+    publishing: number;
+    pending: number;
+    failed: number;
+    deleted: number;
+    platforms: Array<{
+      platform: string;
+      account_id: number;
+      account_name: string;
+      status: string;
+      published_at?: string;
+      error?: string;
+      url?: string;
+    }>;
+    has_errors: boolean;
+    all_successful: boolean;
+    partially_successful: boolean;
+    in_progress: boolean;
+  };
   campaigns?: {
     id: number;
     name: string;
