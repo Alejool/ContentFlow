@@ -310,6 +310,7 @@ export default function ManageContentPage() {
     setDeleteConfirmation({ isOpen: false, id: null });
     if (success) {
       toast.success(t('common.deleteSuccess') || 'Elemento eliminado correctamente');
+      handleRefreshWrapped();
     } else {
       toast.error(t('common.deleteError') || 'Error al eliminar el elemento');
     }

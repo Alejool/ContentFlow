@@ -112,7 +112,7 @@ export default function RejectionReasonModal({
                   maxLength={500}
                   showCharCount
                   rows={5}
-                  error={errors.reason?.message}
+                  {...(errors.reason?.message && { error: errors.reason.message })}
                   variant="filled"
                   required
                 />
@@ -131,8 +131,7 @@ export default function RejectionReasonModal({
               </Button>
               <Button
                 type="submit"
-                variant="danger"
-                buttonStyle="gradient"
+                variant="primary"
                 loading={isSubmitting}
                 className="px-6"
                 icon={AlertCircle}
