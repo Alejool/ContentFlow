@@ -111,7 +111,7 @@ class PublishValidationService
         }
 
         // Specific validations for video content (only for posts, not for reels/stories/carousels)
-        if ($publication->mediaFiles->isNotEmpty() && $publication->content_type === 'post') {
+        if ($publication->content_type === 'post') {
             $mediaValidation = $this->validateMediaContent($publication, $platform, $account);
             $errors = array_merge($errors, $mediaValidation['errors']);
             $warnings = array_merge($warnings, $mediaValidation['warnings']);
@@ -178,17 +178,40 @@ class PublishValidationService
         $errors = [];
         $warnings = [];
         $compatible = true;
+        
+        // Si no hay archivos de media, solo validar plataformas que REQUIEREN media
+        if ($publication->mediaFiles->isEmpty()) {
+            // YouTube SIEMPRE requiere video
+            if ($platform === 'youtube') {
+                $errors[] = 'YouTube requiere un archivo de video para publicar.';
+                $compatible = false;
+            }
+            
+            // TikTok SIEMPRE requiere video
+            if ($platform === 'tiktok') {
+                $errors[] = 'TikTok requiere un archivo de video para publicar.';
+                $compatible = false;
+            }
+            
+            // Otras plataformas permiten publicaciones sin media (solo texto)
+            return [
+                'compatible' => $compatible,
+                'errors' => $errors,
+                'warnings' => $warnings
+            ];
+        }
 
+        // Si hay archivos, validar cada uno
         foreach ($publication->mediaFiles as $mediaFile) {
             // YouTube requires video files
             if ($platform === 'youtube' && !$this->isVideoFile($mediaFile)) {
-                $errors[] = __('validation.youtube_requires_video');
+                $errors[] = 'YouTube requiere archivos de video. No se pueden publicar imágenes.';
                 $compatible = false;
             }
 
             // TikTok only accepts videos
             if ($platform === 'tiktok' && !$this->isVideoFile($mediaFile)) {
-                $errors[] = __('validation.tiktok_requires_video');
+                $errors[] = 'TikTok solo acepta archivos de video. No se pueden publicar imágenes.';
                 $compatible = false;
             }
             
