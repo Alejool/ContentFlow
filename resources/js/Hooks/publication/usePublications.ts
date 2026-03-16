@@ -1,12 +1,12 @@
 import {
-  useCampaignsList,
-  useDeleteCampaign,
-  useDuplicateCampaign,
+    useCampaignsList,
+    useDeleteCampaign,
+    useDuplicateCampaign,
 } from '@/Hooks/campaign/useCampaigns';
 import {
-  useDeletePublication,
-  useDuplicatePublication,
-  usePublicationsList,
+    useDeletePublication,
+    useDuplicatePublication,
+    usePublicationsList,
 } from '@/Hooks/publication/usePublicationsList';
 import { useRealtime } from '@/Hooks/publication/useRealtime';
 import { useConfirm } from '@/Hooks/useConfirm';
@@ -14,6 +14,7 @@ import { useLogs } from '@/Hooks/useLogs';
 import { useSocialMediaAuth } from '@/Hooks/useSocialMediaAuth';
 import { ToastService } from '@/Services/ToastService';
 import { useManageContentUIStore } from '@/stores/manageContentUIStore';
+import { usePublicationStore } from '@/stores/publicationStore';
 import { PageProps } from '@/types';
 import { Publication } from '@/types/Publication';
 import { usePage } from '@inertiajs/react';
@@ -28,6 +29,7 @@ export const usePublications = () => {
   const { confirm } = useConfirm();
   const { props } = usePage<PageProps>();
   const user = props.auth.user;
+  const queryClient = useQueryClient();
 
   const [activeTabState, setActiveTabState] = useState<ContentTab>('publications');
   const [filters, setFilters] = useState<any>(() => {
@@ -189,10 +191,20 @@ export const usePublications = () => {
   }, [activeTab]);
 
   const handleRefresh = useCallback(() => {
-    if (activeTab === 'publications' || activeTab === 'approvals') pubQuery.refetch();
-    else if (activeTab === 'campaigns') campQuery.refetch();
-    else logsQuery.refetch();
-  }, [activeTab, pubQuery, campQuery, logsQuery]);
+    // Clear publication store cache before refetching to ensure fresh data
+    if (activeTab === 'publications' || activeTab === 'approvals') {
+      usePublicationStore.getState().clearPageData();
+      // Invalidate ALL publication queries to force fresh fetch without optimistic state
+      queryClient.invalidateQueries({ queryKey: queryKeys.publications.all });
+      // Force refetch after invalidation
+      pubQuery.refetch();
+    } else if (activeTab === 'campaigns') {
+      queryClient.invalidateQueries({ queryKey: queryKeys.campaigns.all });
+      campQuery.refetch();
+    } else {
+      logsQuery.refetch();
+    }
+  }, [activeTab, pubQuery, campQuery, logsQuery, queryClient]);
 
   const handleDeleteItem = useCallback(
     async (id: number) => {

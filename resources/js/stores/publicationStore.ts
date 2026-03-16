@@ -39,7 +39,7 @@ interface PublicationState {
     per_page: number;
   };
 
-  fetchPublications: (filters?: Record<string, unknown>, page?: number, useApprovalFilter?: boolean) => Promise<void>;
+  fetchPublications: (filters?: Record<string, unknown>, page?: number, useApprovalFilter?: boolean, forceRefresh?: boolean) => Promise<void>;
   fetchPublicationById: (id: number) => Promise<Publication | null>;
   fetchPublishedPlatforms: (publicationId: number) => Promise<{
     published: number[];
@@ -123,7 +123,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
     per_page: 7,
   },
 
-  fetchPublications: async (filters = {}, page = 1, useApprovalFilter = false) => {
+  fetchPublications: async (filters = {}, page = 1, useApprovalFilter = false, forceRefresh = false) => {
     set({ isLoading: true, error: null });
 
     try {
@@ -166,36 +166,41 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       const data = response.data.publications;
       const incomingItems: Publication[] = data.data ?? data ?? [];
 
-      // Preserve optimistic local state: if the store already has a more
-      // "advanced" status for an item (e.g. pending_review) and the backend
-      // still returns the old status (e.g. draft) due to cache or timing,
-      // keep the local state to avoid re-enabling buttons incorrectly.
-      const statusPriority: Record<string, number> = {
-        draft: 0,
-        rejected: 1,
-        failed: 1,
-        scheduled: 2,
-        approved: 3,
-        pending_review: 4,
-        publishing: 5,
-        published: 6,
-      };
+      // Only apply optimistic state logic if NOT a forced refresh
+      let finalItems = incomingItems;
+      
+      if (!forceRefresh) {
+        // Preserve optimistic local state: if the store already has a more
+        // "advanced" status for an item (e.g. pending_review) and the backend
+        // still returns the old status (e.g. draft) due to cache or timing,
+        // keep the local state to avoid re-enabling buttons incorrectly.
+        const statusPriority: Record<string, number> = {
+          draft: 0,
+          rejected: 1,
+          failed: 1,
+          scheduled: 2,
+          approved: 3,
+          pending_review: 4,
+          publishing: 5,
+          published: 6,
+        };
 
-      const currentPublications = get().publications;
-      const mergedItems = incomingItems.map((incoming) => {
-        const existing = currentPublications.find((p) => p.id === incoming.id);
-        if (!existing) return incoming;
-        const existingPriority = statusPriority[existing.status ?? ''] ?? 0;
-        const incomingPriority = statusPriority[incoming.status ?? ''] ?? 0;
-        // Keep local state if it's more advanced than what the backend returned
-        if (existingPriority > incomingPriority) {
-          return { ...incoming, status: existing.status };
-        }
-        return incoming;
-      });
+        const currentPublications = get().publications;
+        finalItems = incomingItems.map((incoming) => {
+          const existing = currentPublications.find((p) => p.id === incoming.id);
+          if (!existing) return incoming;
+          const existingPriority = statusPriority[existing.status ?? ''] ?? 0;
+          const incomingPriority = statusPriority[incoming.status ?? ''] ?? 0;
+          // Keep local state if it's more advanced than what the backend returned
+          if (existingPriority > incomingPriority) {
+            return { ...incoming, status: existing.status };
+          }
+          return incoming;
+        });
+      }
 
       set({
-        publications: mergedItems,
+        publications: finalItems,
         pagination: {
           current_page: data.current_page ?? 1,
           last_page: data.last_page ?? 1,

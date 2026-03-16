@@ -9,14 +9,13 @@ import {
   getLockedByFirstName,
   getLockedByName,
   getMediaUrl,
-  getStatusColors,
+  getPublicationStatusConfig,
   hasMedia,
   isProcessing,
   isVideoMedia
 } from '@/Utils/publicationHelpers';
 import {
   Calendar,
-  CheckCircle,
   Clock,
   Copy,
   Edit,
@@ -29,7 +28,7 @@ import {
   Send,
   Trash2,
   Users,
-  Video,
+  Video
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -102,24 +101,13 @@ export default function ContentCard({
   const isVideo = isVideoMedia(item);
   const itemIsProcessing = isProcessing(item);
   const mediaUrl = getMediaUrl(item);
-  const statusColors = getStatusColors(item.status);
+  const statusConfig = getPublicationStatusConfig(item.status);
   const lockedByName = getLockedByName(remoteLock || undefined);
   const lockedByFirstName = getLockedByFirstName(remoteLock || undefined);
   const isLoading = loadingStates[item.id];
   const mediaCount = countMediaFiles(item);
 
-  const statusIconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-    published: CheckCircle,
-    draft: Edit,
-    scheduled: Calendar,
-    failed: Clock,
-    pending_review: Clock,
-    approved: CheckCircle,
-    rejected: Clock,
-    publishing: Clock,
-  };
-  
-  const StatusIcon = statusIconMap[item.status || 'draft'] || Edit;
+  const StatusIcon = statusConfig.icon;
 
   // Get platform icons for publication
   const getPlatformIcons = () => {
@@ -199,7 +187,7 @@ export default function ContentCard({
           <div className="absolute right-3 top-3 z-10 flex flex-col items-end gap-2 pointer-events-none">
             {/* Status Badge */}
             <span
-              className={`flex items-center gap-1.5 rounded-lg border border-white/20 px-2.5 py-1 text-xs font-medium shadow-sm backdrop-blur-md ${statusColors}`}
+              className={`flex items-center gap-1.5 rounded-lg border border-white/20 px-2.5 py-1 text-xs font-medium shadow-sm backdrop-blur-md ${statusConfig.badge}`}
             >
               <StatusIcon className="h-3 w-3" />
               <span className="capitalize">
@@ -250,7 +238,7 @@ export default function ContentCard({
             </div>
 
             <span
-              className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium ${statusColors}`}
+              className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium ${statusConfig.badge}`}
             >
               <StatusIcon className="h-3 w-3" />
               <span className="capitalize">

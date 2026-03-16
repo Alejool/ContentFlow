@@ -11,7 +11,7 @@ import AddPublicationModal from '@/Components/Content/modals/AddPublicationModal
 import EditCampaignModal from '@/Components/Content/modals/EditCampaignModal';
 import EditPublicationModal from '@/Components/Content/modals/EditPublicationModal';
 import PublishPublicationModal from '@/Components/Content/modals/PublishPublicationModal';
-import ViewCampaignModal from '@/Components/Content/modals/ViewCampaignModal';
+import ViewPublicationModal from '@/Components/Content/modals/ViewPublicationModal';
 import { usePublicationStore } from '@/stores/publicationStore';
 
 interface ModalManagerProps {
@@ -127,7 +127,7 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
 
       {isViewDetailsModalOpen &&
         createPortal(
-          <ViewCampaignModal
+          <ViewPublicationModal
             isOpen={isViewDetailsModalOpen}
             onClose={closeViewDetailsModal}
             campaign={selectedItem as any}
