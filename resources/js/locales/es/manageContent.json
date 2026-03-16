@@ -59,6 +59,12 @@
         "publishing": "Publicando...",
         "noPermission": "Sin Permiso"
       },
+      "oauth1Required": "OAuth 1.0a requerido",
+      "oauth1Message": "Necesario para subir videos",
+      "reconnect": "Reconectar",
+      "reconnecting": "Reconectando...",
+      "reconnectWindow": "Abriendo ventana de reconexión...",
+      "reconnectError": "Error al reconectar",
       "apiLimits": "Límites API",
       "limits": {
         "requestsPerHour": "Peticiones/hora",

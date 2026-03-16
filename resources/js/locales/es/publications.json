@@ -315,6 +315,13 @@
         "sending": "Enviando",
         "duplicate": "Intento duplicado",
         "original_attempt": "Intento original:",
+        "oauth1_required": "Requiere reconexión",
+        "oauth1_video_message": "Esta cuenta necesita credenciales OAuth 1.0a para subir videos",
+        "reconnect_account": "Reconectar cuenta",
+        "reconnecting": "Iniciando reconexión...",
+        "reconnect_window": "Abriendo ventana de reconexión...",
+        "reconnect_success": "Cuenta reconectada exitosamente",
+        "reconnect_error": "Error al iniciar reconexión",
         "dragDrop": {
           "title": "Arrastra y suelta para agregar",
           "subtitle": "PNG, JPG, WebP (max 2MB)"
@@ -480,6 +487,8 @@
       "failed": "Fallidas",
       "publishing": "Publicando",
       "published": "Publicado",
+      "published_with_errors": "Publicado con errores",
+      "partially_published": "Publicado parcialmente",
       "publis": "Publicado",
       "scheduled": "Programado",
       "approved": "Aprobado",
@@ -560,6 +569,8 @@
       "deleteSuccess": "publicación eliminada éxitosamente!",
       "deleteError": "Error al eliminar publicación",
       "cancelSuccess": "Publicación cancelada exitosamente",
+      "platformCancelSuccess": "Plataforma cancelada exitosamente",
+      "platformCancelError": "Error al cancelar la plataforma",
       "fetchError": "Error al cargar Campañas",
       "error": "Ha ocurrido un error inesperado",
       "confirmDelete": {

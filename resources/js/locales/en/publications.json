@@ -308,6 +308,13 @@
         "sending": "Sending",
         "duplicate": "Duplicate attempt",
         "original_attempt": "Original attempt:",
+        "oauth1_required": "Requires reconnection",
+        "oauth1_video_message": "This account needs OAuth 1.0a credentials to upload videos",
+        "reconnect_account": "Reconnect account",
+        "reconnecting": "Starting reconnection...",
+        "reconnect_window": "Opening reconnection window...",
+        "reconnect_success": "Account reconnected successfully",
+        "reconnect_error": "Error starting reconnection",
         "dragDrop": {
           "title": "Drag and drop to add",
           "subtitle": "PNG, JPG, WebP (max 2MB)"
