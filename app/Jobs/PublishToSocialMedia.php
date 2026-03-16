@@ -49,6 +49,13 @@ class PublishToSocialMedia implements ShouldQueue
   {
     $startTime = microtime(true);
     
+    LogHelper::job('PublishToSocialMedia job started', [
+      'publication_id' => $this->publicationId,
+      'social_account_ids' => $this->socialAccountIds,
+      'attempt' => $this->attempts(),
+      'job_id' => $this->job->uuid()
+    ]);
+    
     $publication = Publication::with(['user.currentWorkspace', 'workspace'])->find($this->publicationId);
     
     if (!$publication) {
@@ -59,6 +66,12 @@ class PublishToSocialMedia implements ShouldQueue
       $this->delete();
       return;
     }
+
+    LogHelper::job('Publication loaded', [
+      'publication_id' => $publication->id,
+      'status' => $publication->status,
+      'content_type' => $publication->content_type
+    ]);
 
     $socialAccounts = SocialAccount::whereIn('id', $this->socialAccountIds)
       ->get();
@@ -74,9 +87,22 @@ class PublishToSocialMedia implements ShouldQueue
       return;
     }
 
+    LogHelper::job('Social accounts loaded', [
+      'publication_id' => $publication->id,
+      'account_count' => $socialAccounts->count(),
+      'platforms' => $socialAccounts->pluck('platform')->toArray()
+    ]);
+
     // Validate content type compatibility before publishing
     $publishValidationService = app(\App\Services\Validation\PublishValidationService::class);
     $validation = $publishValidationService->validatePublishRequest($publication, $this->socialAccountIds);
+    
+    LogHelper::job('Validation completed', [
+      'publication_id' => $publication->id,
+      'can_publish' => $validation['can_publish'],
+      'global_errors' => $validation['global_errors'] ?? [],
+      'platform_results' => $validation['platform_results']
+    ]);
     
     if (!$validation['can_publish']) {
       $errorMessage = 'Publishing validation failed: ' . implode(', ', $validation['global_errors'] ?? []);
@@ -96,6 +122,13 @@ class PublishToSocialMedia implements ShouldQueue
       $platformResult = $validation['platform_results'][$account->platform] ?? null;
       return $platformResult && $platformResult['compatible'];
     });
+
+    LogHelper::job('Compatible accounts filtered', [
+      'publication_id' => $publication->id,
+      'original_count' => $socialAccounts->count(),
+      'compatible_count' => $compatibleAccounts->count(),
+      'compatible_platforms' => $compatibleAccounts->pluck('platform')->toArray()
+    ]);
 
     if ($compatibleAccounts->isEmpty()) {
       LogHelper::publicationError('No compatible platforms found after validation', 'No compatible platforms found after validation', [
@@ -181,8 +214,12 @@ class PublishToSocialMedia implements ShouldQueue
       if ($allSuccess) {
         // All platforms succeeded - mark as published and send notification
         $publication->logActivity('published');
+        
+        // Usar el servicio de estado para actualizar
+        $statusService = app(\App\Services\Publications\PublicationStatusService::class);
+        $statusService->updatePublicationStatus($publication, true);
+        
         $publication->update([
-          'status' => 'published',
           'publish_date' => now(),
         ]);
         
@@ -199,8 +236,11 @@ class PublishToSocialMedia implements ShouldQueue
             'failed_platforms' => collect($platformResults)->filter(fn($r) => !$r['success'])->keys()->toArray(),
           ], $publisher);
           
+          // Usar el servicio de estado para actualizar
+          $statusService = app(\App\Services\Publications\PublicationStatusService::class);
+          $statusService->updatePublicationStatus($publication, true);
+          
           $publication->update([
-            'status' => 'published',
             'publish_date' => now(),
           ]);
           
