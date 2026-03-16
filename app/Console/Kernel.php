@@ -115,5 +115,12 @@ class Kernel extends ConsoleKernel
     $schedule->command('reports:send')
       ->hourly()
       ->withoutOverlapping();
+    
+    // Limpiar logs huérfanos de publicaciones cada 5 minutos
+    // Previene que el frontend muestre "publicando" indefinidamente cuando jobs fallan
+    $schedule->command('publications:clean-orphaned-logs --minutes=10 --no-interaction')
+      ->everyFiveMinutes()
+      ->withoutOverlapping()
+      ->runInBackground();
   }
 }

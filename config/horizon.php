@@ -201,10 +201,11 @@ return [
 
     'defaults' => [
         // Supervisor dedicado para publicaciones pesadas (videos grandes)
+        // Procesa jobs con prioridad dinámica basada en plan y saturación de cola
         'publishing-heavy' => [
             'connection' => 'redis',
             'queue' => ['publishing'],
-            'balance' => 'auto',
+            'balance' => 'auto', // Auto-balance distribuye según carga
             'autoScalingStrategy' => 'time',
             'maxProcesses' => 8, // Más workers para manejar Enterprise
             'minProcesses' => 2, // Siempre al menos 2 workers disponibles
@@ -214,6 +215,9 @@ return [
             'tries' => 2,
             'timeout' => 2100, // 35 minutos para videos muy grandes
             'nice' => 0,
+            // NOTA: Redis no soporta prioridad nativa en colas FIFO
+            // La priorización se maneja mediante el middleware PlanBasedPriority
+            // que ajusta el delay del job según el plan del usuario
         ],
         
         // Supervisor para operaciones en lote (bulk)
