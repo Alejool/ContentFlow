@@ -25,7 +25,7 @@ return [
     'http://100.125.246.50:5173',
     'http://leviathan-port.tail4af8a1.ts.net',
     'https://leviathan-port.tail4af8a1.ts.net',
-    'https://contenflow.fly.dev',
+    'https://Intellipost.fly.dev',
   ],
 
   'allowed_origins_patterns' => [],

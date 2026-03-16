@@ -19,7 +19,7 @@ return [
     */
 
   'stateful' => array_unique(array_merge(
-    explode(',', env('SANCTUM_STATEFUL_DOMAINS', 'localhost,127.0.0.1,contenflow.fly.dev')),
+    explode(',', env('SANCTUM_STATEFUL_DOMAINS', 'localhost,127.0.0.1,Intellipost.fly.dev')),
     [
       'localhost',
       'localhost:80',
@@ -30,7 +30,7 @@ return [
       Sanctum::currentApplicationUrlWithPort(),
       Sanctum::currentRequestHost(),
       'localhost','leviathan-port.tail4af8a1.ts.net',
-      'contenflow.fly.dev',
+      'Intellipost.fly.dev',
     ]
   )),
 
