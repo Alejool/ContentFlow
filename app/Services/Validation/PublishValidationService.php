@@ -112,7 +112,7 @@ class PublishValidationService
 
         // Specific validations for video content (only for posts, not for reels/stories/carousels)
         if ($publication->mediaFiles->isNotEmpty() && $publication->content_type === 'post') {
-            $mediaValidation = $this->validateMediaContent($publication, $platform);
+            $mediaValidation = $this->validateMediaContent($publication, $platform, $account);
             $errors = array_merge($errors, $mediaValidation['errors']);
             $warnings = array_merge($warnings, $mediaValidation['warnings']);
             if (!$mediaValidation['compatible']) {
@@ -173,7 +173,7 @@ class PublishValidationService
     /**
      * Validate media content for specific platform
      */
-    protected function validateMediaContent(Publication $publication, string $platform): array
+    protected function validateMediaContent(Publication $publication, string $platform, SocialAccount $account): array
     {
         $errors = [];
         $warnings = [];
@@ -191,6 +191,45 @@ class PublishValidationService
                 $errors[] = __('validation.tiktok_requires_video');
                 $compatible = false;
             }
+            
+            // Twitter video duration validation
+            if ($platform === 'twitter' && $this->isVideoFile($mediaFile)) {
+                $videoDuration = $mediaFile->duration ?? 0;
+                $accountMetadata = $account->account_metadata ?? [];
+                
+                // Check if account has Twitter Blue or is verified
+                $hasTwitterBlue = $accountMetadata['has_twitter_blue'] ?? false;
+                $isVerified = $accountMetadata['is_verified'] ?? false;
+                
+                // Free accounts: max 2 minutes 20 seconds (140 seconds)
+                // Blue/Verified accounts: max 10 minutes (600 seconds)
+                $maxDuration = ($hasTwitterBlue || $isVerified) ? 600 : 140;
+                
+                if ($videoDuration > $maxDuration) {
+                    if (!$hasTwitterBlue && !$isVerified) {
+                        $errors[] = sprintf(
+                            'Tu cuenta de Twitter (@%s) no permite videos de más de 2 minutos. Este video dura %s. Necesitas Twitter Blue o verificación para videos largos.',
+                            $account->account_name,
+                            $this->formatDuration($videoDuration)
+                        );
+                    } else {
+                        $errors[] = sprintf(
+                            'El video dura %s pero Twitter permite máximo 10 minutos.',
+                            $this->formatDuration($videoDuration)
+                        );
+                    }
+                    $compatible = false;
+                }
+                
+                // Warning for videos close to the limit
+                if ($videoDuration > ($maxDuration * 0.9) && $videoDuration <= $maxDuration) {
+                    $warnings[] = sprintf(
+                        'El video está cerca del límite de duración para Twitter (%s de %s permitidos).',
+                        $this->formatDuration($videoDuration),
+                        $this->formatDuration($maxDuration)
+                    );
+                }
+            }
         }
 
         return [
@@ -198,6 +237,21 @@ class PublishValidationService
             'errors' => $errors,
             'warnings' => $warnings
         ];
+    }
+    
+    /**
+     * Format duration in seconds to human readable format
+     */
+    protected function formatDuration(int $seconds): string
+    {
+        $minutes = floor($seconds / 60);
+        $remainingSeconds = $seconds % 60;
+        
+        if ($minutes > 0) {
+            return sprintf('%d:%02d min', $minutes, $remainingSeconds);
+        }
+        
+        return sprintf('%d seg', $seconds);
     }
 
     /**

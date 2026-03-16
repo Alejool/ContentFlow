@@ -353,7 +353,10 @@ class PlatformPublishService
     // Check for already published platforms to avoid re-publishing
     // Only skip if published with the SAME account_id
     $alreadyPublishedAccountIds = [];
+    $duplicateAttempts = [];
+    
     foreach ($socialAccounts as $socialAccount) {
+      // Check for successful publication
       $existingSuccessfulLog = SocialPostLog::where('publication_id', $publication->id)
         ->where('social_account_id', $socialAccount->id)
         ->where('status', 'published')
@@ -377,6 +380,49 @@ class PlatformPublishService
           'account_name' => $socialAccount->account_name,
         ];
         $allLogs[] = $existingSuccessfulLog;
+        continue;
+      }
+      
+      // Check for duplicate attempts (multiple active logs)
+      $activeLogsCount = SocialPostLog::where('publication_id', $publication->id)
+        ->where('social_account_id', $socialAccount->id)
+        ->whereIn('status', ['pending', 'publishing'])
+        ->count();
+      
+      if ($activeLogsCount > 1) {
+        LogHelper::publication('Duplicate attempt detected', [
+          'platform' => $socialAccount->platform,
+          'account_id' => $socialAccount->id,
+          'account_name' => $socialAccount->account_name,
+          'active_logs_count' => $activeLogsCount
+        ]);
+        
+        // Create a log entry for the duplicate attempt
+        $duplicateLog = SocialPostLog::create([
+          'user_id' => $publication->user_id,
+          'workspace_id' => $publication->workspace_id,
+          'social_account_id' => $socialAccount->id,
+          'publication_id' => $publication->id,
+          'platform' => $socialAccount->platform,
+          'account_name' => $socialAccount->account_name,
+          'content' => 'Intento duplicado detectado',
+          'status' => 'skipped',
+          'error_message' => 'Ya existe un intento de publicación activo para esta cuenta',
+          'retry_count' => 0,
+        ]);
+        
+        $duplicateAttempts[] = $socialAccount->id;
+        $alreadyPublishedAccountIds[] = $socialAccount->id;
+        $platformResults[$socialAccount->platform . '_' . $socialAccount->id] = [
+          'success' => false,
+          'published' => 0,
+          'failed' => 1,
+          'logs' => [$duplicateLog],
+          'skipped' => true,
+          'duplicate' => true,
+          'account_name' => $socialAccount->account_name,
+        ];
+        $allLogs[] = $duplicateLog;
       }
     }
 
