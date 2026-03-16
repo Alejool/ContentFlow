@@ -10,7 +10,7 @@ interface PublicationHeaderProps {
 export default function PublicationHeader({ title, description, status }: PublicationHeaderProps) {
   const { t } = useTranslation();
   const statusConfig = getPublicationStatusConfig(status);
-  
+
   return (
     <div>
       <div className="mb-2 flex flex-col justify-between gap-2 sm:flex-row sm:items-start">
@@ -23,9 +23,7 @@ export default function PublicationHeader({ title, description, status }: Public
           </span>
         )}
       </div>
-      <p className="text-base leading-relaxed text-gray-600 dark:text-gray-300">
-        {description}
-      </p>
+      <p className="text-base leading-relaxed text-gray-600 dark:text-gray-300">{description}</p>
     </div>
   );
 }

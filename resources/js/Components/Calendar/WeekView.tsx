@@ -1,24 +1,17 @@
 import { CalendarEvent } from '@/types/calendar';
 import { formatTime } from '@/Utils/formatDate';
 import {
-    DndContext,
-    DragEndEvent,
-    DragOverlay,
-    DragStartEvent,
-    PointerSensor,
-    useDraggable,
-    useDroppable,
-    useSensor,
-    useSensors,
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  PointerSensor,
+  useDraggable,
+  useDroppable,
+  useSensor,
+  useSensors,
 } from '@dnd-kit/core';
-import {
-    eachDayOfInterval,
-    endOfWeek,
-    format,
-    isToday,
-    parseISO,
-    startOfWeek,
-} from 'date-fns';
+import { eachDayOfInterval, endOfWeek, format, isToday, parseISO, startOfWeek } from 'date-fns';
 import { Clock } from 'lucide-react';
 import React, { useState } from 'react';
 
@@ -61,7 +54,9 @@ const DraggableWeekEvent: React.FC<DraggableWeekEventProps> = ({
       role="button"
       tabIndex={0}
       onClick={() => onEventClick?.(event)}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onEventClick?.(event); }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') onEventClick?.(event);
+      }}
       className={`relative mb-1 cursor-grab rounded-lg p-2 active:cursor-grabbing ${isSelected ? 'ring-2 ring-primary-500' : ''} ${isDragging ? 'opacity-50' : ''} transition-all hover:shadow-md`}
       style={{
         backgroundColor: event.color + '20',

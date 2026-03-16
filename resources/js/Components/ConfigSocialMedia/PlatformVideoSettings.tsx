@@ -1,8 +1,8 @@
 import VideoValidationAlert from '@/Components/Content/VideoValidationAlert';
 import {
-    PLATFORM_REQUIREMENTS,
-    validateVideoForPlatform,
-    ValidationResult,
+  PLATFORM_REQUIREMENTS,
+  validateVideoForPlatform,
+  ValidationResult,
 } from '@/Utils/videoValidation';
 import { Info } from 'lucide-react';
 import { useEffect, useState } from 'react';

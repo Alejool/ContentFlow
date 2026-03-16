@@ -21,8 +21,7 @@ export default function ApprovalsTab({ item }: ApprovalsTabProps) {
           <div className="space-y-2">
             {item.currentApprovalStep.workflow.steps?.map((step: any, index: number) => {
               const isCurrent = step.id === item.currentApprovalStep?.id;
-              const isPast =
-                step.level_number < (item.currentApprovalStep?.level_number || 0);
+              const isPast = step.level_number < (item.currentApprovalStep?.level_number || 0);
 
               return (
                 <div
@@ -81,8 +80,7 @@ export default function ApprovalsTab({ item }: ApprovalsTabProps) {
             </div>
             <div>
               <h4 className="text-sm font-bold text-green-900 dark:text-green-300">
-                {t('approvals.approved_ready_to_publish') ||
-                  '¡Flujo Completado y Aprobado!'}
+                {t('approvals.approved_ready_to_publish') || '¡Flujo Completado y Aprobado!'}
               </h4>
               <p className="text-xs text-green-700 dark:text-green-400">
                 {t('approvals.next_action.ready_to_publish') ||
@@ -122,9 +120,7 @@ export default function ApprovalsTab({ item }: ApprovalsTabProps) {
         <div>
           <ApprovalHistorySection
             logs={item.approval_logs || []}
-            workflow={
-              item.approval_request?.workflow || item.currentApprovalStep?.workflow
-            }
+            workflow={item.approval_request?.workflow || item.currentApprovalStep?.workflow}
             currentStepNumber={
               item.approval_request?.current_step?.level_number ||
               item.currentApprovalStep?.level_number

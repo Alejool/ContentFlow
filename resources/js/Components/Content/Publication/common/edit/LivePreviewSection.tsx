@@ -164,7 +164,14 @@ interface LivePreviewSectionProps {
   pollDuration?: number; // Nuevo: duración de encuesta
 }
 
-type Platform = 'twitter' | 'instagram' | 'threads' | 'linkedin' | 'facebook' | 'tiktok' | 'youtube';
+type Platform =
+  | 'twitter'
+  | 'instagram'
+  | 'threads'
+  | 'linkedin'
+  | 'facebook'
+  | 'tiktok'
+  | 'youtube';
 
 export const LivePreviewSection = ({
   content,
@@ -186,7 +193,15 @@ export const LivePreviewSection = ({
     const contentTypes = [
       {
         value: 'post',
-        platforms: ['instagram', 'threads', 'twitter', 'facebook', 'linkedin', 'youtube', 'pinterest'],
+        platforms: [
+          'instagram',
+          'threads',
+          'twitter',
+          'facebook',
+          'linkedin',
+          'youtube',
+          'pinterest',
+        ],
       },
       {
         value: 'reel',

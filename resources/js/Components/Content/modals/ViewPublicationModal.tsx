@@ -99,17 +99,17 @@ export default function ViewPublicationModal({
   ];
 
   return (
-    <Dialog open={isOpen} onClose={onClose} className='relative z-50'>
-      <div className='fixed inset-0 bg-black/30 backdrop-blur-sm' aria-hidden='true' />
+    <Dialog open={isOpen} onClose={onClose} className="relative z-50">
+      <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" aria-hidden="true" />
 
-      <div className='fixed inset-0 flex items-center justify-center p-4'>
-        <DialogPanel className='flex max-h-[90vh] w-full max-w-3xl flex-col rounded-lg border border-gray-200/50 bg-gradient-to-br from-white to-gray-50 shadow-2xl dark:border-neutral-800/50 dark:from-neutral-900 dark:to-neutral-950'>
-          <div className='flex flex-shrink-0 items-center justify-between border-b border-gray-100 p-6 dark:border-neutral-700'>
-            <DialogTitle className='flex items-center gap-2 text-2xl font-bold text-gray-900 dark:text-white'>
+      <div className="fixed inset-0 flex items-center justify-center p-4">
+        <DialogPanel className="flex max-h-[90vh] w-full max-w-3xl flex-col rounded-lg border border-gray-200/50 bg-gradient-to-br from-white to-gray-50 shadow-2xl dark:border-neutral-800/50 dark:from-neutral-900 dark:to-neutral-950">
+          <div className="flex flex-shrink-0 items-center justify-between border-b border-gray-100 p-6 dark:border-neutral-700">
+            <DialogTitle className="flex items-center gap-2 text-2xl font-bold text-gray-900 dark:text-white">
               {isActuallyPublication ? (
-                <FileText className='h-6 w-6 text-primary-500' />
+                <FileText className="h-6 w-6 text-primary-500" />
               ) : (
-                <Layers className='h-6 w-6 text-primary-500' />
+                <Layers className="h-6 w-6 text-primary-500" />
               )}
               {isActuallyPublication
                 ? t('publications.modal.show.title')
@@ -117,18 +117,18 @@ export default function ViewPublicationModal({
             </DialogTitle>
             <Button
               onClick={onClose}
-              buttonStyle='icon'
-              variant='ghost'
-              size='lg'
+              buttonStyle="icon"
+              variant="ghost"
+              size="lg"
               icon={X}
               aria-label={t('common.close', 'Close')}
             >
-              <span className='sr-only'>{t('common.close', 'Close')}</span>
+              <span className="sr-only">{t('common.close', 'Close')}</span>
             </Button>
           </div>
 
-          <div className='flex-1 overflow-y-auto p-6'>
-            <div className='space-y-6'>
+          <div className="flex-1 overflow-y-auto p-6">
+            <div className="space-y-6">
               {regularMedia.length > 0 && (
                 <MediaPreviewButton
                   mediaFiles={regularMedia}
@@ -140,17 +140,13 @@ export default function ViewPublicationModal({
                     setLightboxMedia(media);
                     setLightboxIndex(index);
                   }}
-                  height='h-64'
+                  height="h-64"
                 />
               )}
 
               <ReelsSection reels={reels} />
 
-              <PublicationHeader
-                title={title}
-                description={desc}
-                status={(item as any).status}
-              />
+              <PublicationHeader title={title} description={desc} status={(item as any).status} />
 
               <AssociatedPublicationsList publications={publications} />
 
@@ -162,11 +158,11 @@ export default function ViewPublicationModal({
                   tabs={publicationTabs}
                   activeTab={activeTab}
                   onTabChange={setActiveTab}
-                  className='mb-6 mt-8'
+                  className="mb-6 mt-8"
                 />
               )}
 
-              <div className='mt-6'>
+              <div className="mt-6">
                 {/* Overview Content */}
                 {(!isActuallyPublication || activeTab === 'overview') && (
                   <CampaignOverviewTab item={item} />
@@ -174,26 +170,19 @@ export default function ViewPublicationModal({
 
                 {/* Activity Tab */}
                 {activeTab === 'activity' && isActuallyPublication && (
-                  <div className='max-h-96 overflow-y-auto pr-2'>
+                  <div className="max-h-96 overflow-y-auto pr-2">
                     <ActivityList activities={(item as any).activities || []} />
                   </div>
                 )}
 
                 {/* Approvals Tab */}
-                {activeTab === 'approvals' && isActuallyPublication && (
-                  <ApprovalsTab item={item} />
-                )}
+                {activeTab === 'approvals' && isActuallyPublication && <ApprovalsTab item={item} />}
               </div>
             </div>
           </div>
 
-          <div className='flex flex-shrink-0 justify-end gap-3 border-t border-gray-100 p-6 dark:border-neutral-700'>
-            <Button
-              onClick={onClose}
-              variant='ghost'
-              buttonStyle='ghost'
-              size='lg'
-            >
+          <div className="flex flex-shrink-0 justify-end gap-3 border-t border-gray-100 p-6 dark:border-neutral-700">
+            <Button onClick={onClose} variant="ghost" buttonStyle="ghost" size="lg">
               {t('common.close')}
             </Button>
             {onEdit && canEdit && (
@@ -202,8 +191,8 @@ export default function ViewPublicationModal({
                   onClose();
                   onEdit(item);
                 }}
-                variant='primary'
-                size='lg'
+                variant="primary"
+                size="lg"
                 icon={Edit}
               >
                 {t('common.editInPanel')}
@@ -212,7 +201,7 @@ export default function ViewPublicationModal({
           </div>
         </DialogPanel>
       </div>
-      
+
       <MediaLightbox
         isOpen={!!lightboxMedia}
         onClose={() => setLightboxMedia(null)}

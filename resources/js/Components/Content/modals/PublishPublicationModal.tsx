@@ -238,8 +238,7 @@ export default function PublishPublicationModal({
 
     if (hasPublishingPlatforms) {
       const confirmed = await confirm({
-        title:
-          t('publications.modal.cancelAllConfirm.title') || '¿Cancelar TODAS las plataformas?',
+        title: t('publications.modal.cancelAllConfirm.title') || '¿Cancelar TODAS las plataformas?',
         message:
           t('publications.modal.cancelAllConfirm.message', {
             count: publishingPlatforms.length,
@@ -753,7 +752,8 @@ export default function PublishPublicationModal({
                       const isDuplicate = duplicatePlatforms.includes(account.id);
                       const isPublishing =
                         publishingPlatforms.includes(account.id) &&
-                        (publication?.status === 'publishing' || publication?.status === 'retrying');
+                        (publication?.status === 'publishing' ||
+                          publication?.status === 'retrying');
                       const isScheduled = scheduledPlatforms.includes(account.id);
                       const isUnpublishing = unpublishing === account.id;
                       const platformRetryInfo = retryInfo[account.id];
@@ -891,8 +891,10 @@ export default function PublishPublicationModal({
                   iconPosition="left"
                 >
                   {isPendingReview
-                    ? t('publications.modal.publish.button.pendingReview') || 'Pendiente de Revisión'
-                    : t('publications.modal.publish.button.requestApproval') || 'Solicitar Aprobación'}
+                    ? t('publications.modal.publish.button.pendingReview') ||
+                      'Pendiente de Revisión'
+                    : t('publications.modal.publish.button.requestApproval') ||
+                      'Solicitar Aprobación'}
                 </Button>
               ) : null}
             </div>

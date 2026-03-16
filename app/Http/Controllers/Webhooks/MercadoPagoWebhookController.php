@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Webhooks;
 
 use App\Helpers\AddonHelper;
 use App\Http\Controllers\Controller;
+use App\Models\WebhookEvent;
 use App\Models\Workspace\Workspace;
 use App\Models\User;
 use App\Services\SubscriptionTrackingService;
@@ -24,6 +25,13 @@ class MercadoPagoWebhookController extends Controller
 
         $type = $request->input('type');
         $data = $request->input('data');
+
+        // Deduplicación por payment ID de MercadoPago
+        $paymentId = $data['id'] ?? null;
+        if ($paymentId && !WebhookEvent::registerOrFail('mercadopago', (string) $paymentId, $type ?? 'unknown')) {
+            Log::info('MercadoPago: webhook already processed, skipping', ['payment_id' => $paymentId]);
+            return response()->json(['status' => 'already_processed'], 200);
+        }
 
         try {
             switch ($type) {

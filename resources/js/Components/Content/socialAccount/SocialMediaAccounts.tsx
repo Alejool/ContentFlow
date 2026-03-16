@@ -9,15 +9,7 @@ import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react
 import { router, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { AnimatePresence, motion } from 'framer-motion';
-import {
-  BarChart3,
-  Check,
-  ChevronDown,
-  Clock,
-  ExternalLink,
-  Loader2,
-  X
-} from 'lucide-react';
+import { BarChart3, Check, ChevronDown, Clock, ExternalLink, Loader2, X } from 'lucide-react';
 import { memo, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';

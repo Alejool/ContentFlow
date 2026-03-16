@@ -15,7 +15,8 @@ export default function PublishedPostsSection({
 
   const hasPublishedPosts =
     (socialPostLogs && socialPostLogs.length > 0) ||
-    (scheduledPosts && scheduledPosts.some((p: any) => p.status === 'posted' || p.status === 'published'));
+    (scheduledPosts &&
+      scheduledPosts.some((p: any) => p.status === 'posted' || p.status === 'published'));
 
   if (!hasPublishedPosts) return null;
 
@@ -50,8 +51,7 @@ export default function PublishedPostsSection({
             .filter((log: any) => log.published_at || log.created_at)
             .map((log: any, index: number) => {
               const publishDate = log.published_at || log.created_at;
-              const platformName =
-                log.social_account?.platform || log.platform || 'Social Network';
+              const platformName = log.social_account?.platform || log.platform || 'Social Network';
               const accountName = log.social_account?.account_name || log.account_name;
 
               return (
@@ -73,9 +73,7 @@ export default function PublishedPostsSection({
                         </span>
                       </div>
                       {accountName && (
-                        <p className="text-xs text-gray-600 dark:text-gray-400">
-                          @{accountName}
-                        </p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">@{accountName}</p>
                       )}
                     </div>
                   </div>
@@ -120,9 +118,7 @@ export default function PublishedPostsSection({
                         </span>
                       </div>
                       {accountName && (
-                        <p className="text-xs text-gray-600 dark:text-gray-400">
-                          @{accountName}
-                        </p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">@{accountName}</p>
                       )}
                     </div>
                   </div>

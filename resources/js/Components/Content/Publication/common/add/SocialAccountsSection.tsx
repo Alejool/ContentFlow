@@ -22,8 +22,8 @@ interface SocialAccount {
   id: number;
   platform: string;
   name: string;
-  account_name?: string;
-  isDisconnected?: boolean;
+  account_name?: string | undefined;
+  isDisconnected?: boolean | undefined;
 }
 
 interface SocialPostLog {
@@ -32,6 +32,7 @@ interface SocialPostLog {
   status: string;
   platform: string;
   account_name?: string;
+  error_message?: string;
 }
 
 interface VideoMetadata {
@@ -88,7 +89,7 @@ const SchedulePopoverContent = memo(
     onClose,
   }: {
     account: SocialAccount;
-    customSchedule?: string;
+    customSchedule?: string | undefined;
     onScheduleChange: (date: string) => void;
     onScheduleRemove: () => void;
     onClose: () => void;
@@ -121,14 +122,6 @@ const SchedulePopoverContent = memo(
               onScheduleRemove();
             }
           }}
-          onCalendarOpen={() => {
-            // Si no hay fecha personalizada, establecer una por defecto al abrir el calendario
-            if (!customSchedule) {
-              const defaultDate = new Date();
-              defaultDate.setMinutes(defaultDate.getMinutes() + 2);
-              onScheduleChange(defaultDate.toISOString());
-            }
-          }}
           showTimeSelect
           placeholder="Select date & time"
           dateFormat="dd/MM/yyyy HH:mm"
@@ -159,7 +152,7 @@ const ScheduleButton = memo(
     onPopoverClose,
   }: {
     account: SocialAccount;
-    customSchedule?: string;
+    customSchedule?: string | undefined;
     activePopover: number | null;
     onScheduleClick: (e: React.MouseEvent) => void;
     onScheduleChange: (date: string) => void;
@@ -198,7 +191,7 @@ const ScheduleButton = memo(
 interface SocialAccountItemProps {
   account: SocialAccount;
   isChecked: boolean;
-  customSchedule?: string;
+  customSchedule?: string | undefined;
   activePopover: number | null;
   onToggle: () => void;
   onScheduleClick: () => void;
@@ -207,24 +200,26 @@ interface SocialAccountItemProps {
   onPlatformSettingsClick: () => void;
   onPopoverClose: () => void;
   t: (key: string) => string;
-  globalSchedule?: string;
-  isPublished?: boolean;
-  isPublishing?: boolean;
-  isFailed?: boolean;
-  isUnpublishing?: boolean;
-  onCancel?: () => void;
-  disabled?: boolean;
-  durationError?: string;
+  globalSchedule?: string | undefined;
+  isPublished?: boolean | undefined;
+  isPublishing?: boolean | undefined;
+  isFailed?: boolean | undefined;
+  isUnpublishing?: boolean | undefined;
+  onCancel?: (() => void) | undefined;
+  disabled?: boolean | undefined;
+  durationError?: string | undefined;
   videoMetadata?: Record<string, VideoMetadata>;
   mediaFiles?: MediaFile[];
-  errorMessage?: string;
-  contentType?: ContentType;
-  onThumbnailChange?: (videoId: number, file: File | null) => void;
-  onThumbnailDelete?: (videoId: number) => void;
-  thumbnails?: Record<string, { file?: File; url?: string }>;
-  publication?: { media_files?: { file_type?: string; mime_type?: string; file_name?: string }[] };
-  isYouTubeThumbnailExpanded?: boolean;
-  setIsYouTubeThumbnailExpanded?: (expanded: boolean) => void;
+  errorMessage?: string | undefined;
+  contentType?: ContentType | undefined;
+  onThumbnailChange?: ((videoId: number, file: File | null) => void) | undefined;
+  onThumbnailDelete?: ((videoId: number) => void) | undefined;
+  thumbnails?: Record<string, { file?: File; url?: string }> | undefined;
+  publication?:
+    | { media_files?: { file_type?: string; mime_type?: string; file_name?: string }[] }
+    | undefined;
+  isYouTubeThumbnailExpanded?: boolean | undefined;
+  setIsYouTubeThumbnailExpanded?: ((expanded: boolean) => void) | undefined;
 }
 
 const SocialAccountItem = memo(
@@ -270,8 +265,9 @@ const SocialAccountItem = memo(
 
       const results = videos
         .map((v) => {
+          if (!v.tempId) return null;
           const metadata = videoMetadata[v.tempId];
-          if (!metadata) return null;
+          if (!metadata || metadata.duration === undefined) return null;
           const platformKey = account.platform?.toLowerCase();
           return validateVideoDuration(platformKey, metadata.duration);
         })
@@ -279,10 +275,11 @@ const SocialAccountItem = memo(
 
       if (results.length === 0) return null;
 
+      const first = results[0]!;
       const allValid = results.every((r) => r.isValid);
       return {
         allValid,
-        formattedMax: results[0].formattedMax,
+        formattedMax: first.formattedMax,
       };
     }, [mediaFiles, videoMetadata, account.platform, isCheckedActually]);
 
@@ -516,12 +513,18 @@ const SocialAccountItem = memo(
                 <div className="animate-in fade-in slide-in-from-top-2 rounded-lg border border-gray-200 bg-white p-4 duration-200 dark:border-neutral-700 dark:bg-neutral-900">
                   <YouTubeThumbnailUploader
                     videoId={mediaFiles.find((m) => m.type === 'video')?.id || 0}
-                    videoPreviewUrl={mediaFiles.find((m) => m.type === 'video')?.url}
-                    videoFileName={
-                      publication?.media_files?.find(
+                    {...(mediaFiles.find((m) => m.type === 'video')?.url
+                      ? {
+                          videoPreviewUrl: mediaFiles.find((m) => m.type === 'video')!
+                            .url as string,
+                        }
+                      : {})}
+                    {...(() => {
+                      const fn = publication?.media_files?.find(
                         (m) => m.file_type === 'video' || m.mime_type?.startsWith('video/'),
-                      )?.file_name
-                    }
+                      )?.file_name;
+                      return fn ? { videoFileName: fn } : {};
+                    })()}
                     existingThumbnail={(() => {
                       const video = mediaFiles.find((m) => m.type === 'video');
                       return video?.thumbnailUrl
@@ -593,8 +596,8 @@ const SocialAccountsSection = memo(
           id: log.social_account_id,
           platform: log.platform,
           name: log.account_name || 'Unknown',
-          account_name: log.account_name,
-          isDisconnected: true,
+          account_name: log.account_name ?? undefined,
+          isDisconnected: true as const,
         }));
 
       // Remove duplicates from disconnected accounts

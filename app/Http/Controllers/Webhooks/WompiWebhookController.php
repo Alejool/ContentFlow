@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Webhooks;
 use App\Http\Controllers\Controller;
 use App\Models\Subscription\WorkspaceSubscription;
 use App\Models\Subscription\WorkspaceAddon;
+use App\Models\WebhookEvent;
 use App\Models\Workspace\Workspace;
 use App\Services\AddonUsageService;
 use Illuminate\Http\Request;
@@ -41,7 +42,19 @@ class WompiWebhookController extends Controller
         }
 
         $event = $request->input('event');
-        $data = $request->input('data');
+        $data  = $request->input('data');
+
+        // Wompi no envía un event_id global, usamos el transaction id como identificador
+        $transactionId = $data['transaction']['id'] ?? null;
+        $eventKey      = $transactionId ? "{$event}:{$transactionId}" : null;
+
+        if ($eventKey && !WebhookEvent::registerOrFail('wompi', $eventKey, $event)) {
+            Log::info('Wompi: webhook already processed, skipping', [
+                'event'          => $event,
+                'transaction_id' => $transactionId,
+            ]);
+            return response()->json(['status' => 'already_processed']);
+        }
 
         try {
             switch ($event) {

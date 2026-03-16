@@ -22,7 +22,15 @@ const AiFieldSuggester: React.FC<AiFieldSuggesterProps> = ({
   className = '',
 }) => {
   const { t } = useTranslation();
-  const { auth, ai_enabled } = usePage<{ auth: { user?: { ai_settings?: Record<string, { enabled: boolean; api_key: string }>; locale?: string } }; ai_enabled: boolean }>().props;
+  const { auth, ai_enabled } = usePage<{
+    auth: {
+      user?: {
+        ai_settings?: Record<string, { enabled: boolean; api_key: string }>;
+        locale?: string;
+      };
+    };
+    ai_enabled: boolean;
+  }>().props;
   const [loading, setLoading] = useState(false);
 
   const isAiConfigured = useMemo(() => {

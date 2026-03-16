@@ -47,7 +47,9 @@ export default function ThreadsSettings({
             icon={MessageCircle}
             iconColor="text-gray-700"
             iconBgColor="bg-gray-100 dark:bg-gray-800"
-            selected={settings?.type === 'text' || (!settings?.type && defaultSettings.type === 'text')}
+            selected={
+              settings?.type === 'text' || (!settings?.type && defaultSettings.type === 'text')
+            }
             onSelect={(val) => handleChange('type', val)}
           />
           <PlatformCard
@@ -73,7 +75,9 @@ export default function ThreadsSettings({
 
       {/* Reply control */}
       <div className="space-y-4">
-        <SectionHeader title={t('platformSettings.threads.replyControl', '¿Quién puede responder?')} />
+        <SectionHeader
+          title={t('platformSettings.threads.replyControl', '¿Quién puede responder?')}
+        />
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <PlatformCard
             value="everyone"
@@ -81,7 +85,10 @@ export default function ThreadsSettings({
             icon={MessageCircle}
             iconColor="text-green-600"
             iconBgColor="bg-green-100 dark:bg-green-900/20"
-            selected={settings?.reply_control === 'everyone' || (!settings?.reply_control && defaultSettings.reply_control === 'everyone')}
+            selected={
+              settings?.reply_control === 'everyone' ||
+              (!settings?.reply_control && defaultSettings.reply_control === 'everyone')
+            }
             onSelect={(val) => handleChange('reply_control', val)}
           />
           <PlatformCard

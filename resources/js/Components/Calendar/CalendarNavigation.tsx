@@ -2,11 +2,11 @@ import { formatDate } from '@/Utils/i18nHelpers';
 import { CalendarView } from '@/types/calendar';
 import { format, setMonth, setYear } from 'date-fns';
 import {
-    Calendar as CalendarIcon,
-    ChevronDown,
-    ChevronLeft,
-    ChevronRight,
-    Loader2,
+  Calendar as CalendarIcon,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

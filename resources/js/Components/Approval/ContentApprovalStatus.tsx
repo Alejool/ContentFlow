@@ -44,33 +44,34 @@ export default function ContentApprovalStatus({
   const [rejectionReason, setRejectionReason] = useState('');
 
   const getStatusBadge = () => {
-    const statusConfig: Record<string, { color: string; icon: React.ElementType; label: string }> = {
-      draft: {
-        color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
-        icon: AlertCircle,
-        label: t('approval.status.draft'),
-      },
-      pending_review: {
-        color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
-        icon: Clock,
-        label: t('approval.status.pending_review'),
-      },
-      approved: {
-        color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-        icon: CheckCircle,
-        label: t('approval.status.approved'),
-      },
-      rejected: {
-        color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-        icon: XCircle,
-        label: t('approval.status.rejected'),
-      },
-      published: {
-        color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-        icon: CheckCircle,
-        label: t('approval.status.published'),
-      },
-    };
+    const statusConfig: Record<string, { color: string; icon: React.ElementType; label: string }> =
+      {
+        draft: {
+          color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+          icon: AlertCircle,
+          label: t('approval.status.draft'),
+        },
+        pending_review: {
+          color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+          icon: Clock,
+          label: t('approval.status.pending_review'),
+        },
+        approved: {
+          color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+          icon: CheckCircle,
+          label: t('approval.status.approved'),
+        },
+        rejected: {
+          color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+          icon: XCircle,
+          label: t('approval.status.rejected'),
+        },
+        published: {
+          color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+          icon: CheckCircle,
+          label: t('approval.status.published'),
+        },
+      };
 
     const config = statusConfig[approvalStatus.status] || statusConfig.draft;
     const Icon = config.icon;
@@ -348,7 +349,9 @@ export default function ContentApprovalStatus({
               id="reject-reason"
               label={t('approval.rejection_reason')}
               value={rejectionReason}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRejectionReason(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setRejectionReason(e.target.value)
+              }
               placeholder={t('approval.explain_rejection')}
               required
             />

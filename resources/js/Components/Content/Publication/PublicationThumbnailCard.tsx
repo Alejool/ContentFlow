@@ -50,14 +50,14 @@ export default function PublicationThumbnailCard({
 
   const handleClick = (e: React.MouseEvent) => {
     // NO hacer stopPropagation aquí para que el click funcione en tablas
-    
+
     // Si hay un onClick personalizado, usarlo
     if (onClick) {
       e.stopPropagation();
       onClick();
       return;
     }
-    
+
     // PRIORIDAD 1: Si hay media, abrir preview de media
     if (onPreviewMedia && itemHasMedia && !itemIsProcessing) {
       e.stopPropagation();
@@ -65,14 +65,13 @@ export default function PublicationThumbnailCard({
       onPreviewMedia(allMedia, 0);
       return;
     }
-    
   };
 
   return (
     <button
       type="button"
       onClick={handleClick}
-      className={`relative flex-shrink-0 overflow-hidden rounded-lg border-2 border-gray-200 bg-gray-100 shadow-sm transition-all  hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:border-neutral-700 dark:bg-neutral-800 ${sizeClasses[size]} ${className} cursor-pointer`}
+      className={`relative flex-shrink-0 overflow-hidden rounded-lg border-2 border-gray-200 bg-gray-100 shadow-sm transition-all hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:border-neutral-700 dark:bg-neutral-800 ${sizeClasses[size]} ${className} cursor-pointer`}
     >
       <div className="relative h-full w-full">
         {/* User Event Icon */}
@@ -131,7 +130,7 @@ export default function PublicationThumbnailCard({
 
       {/* Media Count Badge */}
       {mediaCount > 1 && (
-        <div className="absolute right-1 bottom-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-primary-600 text-[11px] font-bold text-white shadow-md dark:border-neutral-900">
+        <div className="absolute bottom-1 right-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-primary-600 text-[11px] font-bold text-white shadow-md dark:border-neutral-900">
           +{mediaCount - 1}
         </div>
       )}

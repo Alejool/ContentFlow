@@ -8,7 +8,6 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
-
 const aiPromptSchema = (t: (key: string) => string) =>
   z.object({
     prompt: z
@@ -33,7 +32,15 @@ const AiPromptSection: React.FC<AiPromptSectionProps> = ({
   className = '',
 }) => {
   const { t } = useTranslation();
-  const { auth, ai_enabled } = usePage<{ auth: { user?: { ai_settings?: Record<string, { enabled: boolean; api_key: string }>; locale?: string } }; ai_enabled: boolean }>().props;
+  const { auth, ai_enabled } = usePage<{
+    auth: {
+      user?: {
+        ai_settings?: Record<string, { enabled: boolean; api_key: string }>;
+        locale?: string;
+      };
+    };
+    ai_enabled: boolean;
+  }>().props;
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');

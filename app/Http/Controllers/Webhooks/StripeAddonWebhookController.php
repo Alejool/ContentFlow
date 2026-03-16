@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Webhooks;
 
 use App\Helpers\AddonHelper;
 use App\Http\Controllers\Controller;
+use App\Models\WebhookEvent;
 use App\Models\Workspace\Workspace;
 use App\Models\WorkspaceAddon;
 use App\Services\AddonUsageService;
@@ -37,6 +38,7 @@ class StripeAddonWebhookController extends Controller
             'body_size' => strlen($payload),
             'ip' => $request->ip(),
             'headers' => $request->headers->all(),
+            'payload_preview' => substr($payload, 0, 200), // Primeros 200 chars
         ]);
 
         // Si no hay webhook secret configurado, procesar sin verificación (SOLO PARA DEBUG)
@@ -98,27 +100,38 @@ class StripeAddonWebhookController extends Controller
      * Procesar el evento del webhook
      */
     private function processEvent($event)
-    {
-        // Manejar diferentes tipos de eventos
-        switch ($event['type']) {
-            case 'checkout.session.completed':
-                $this->handleCheckoutSessionCompleted($event['data']['object']);
-                break;
+        {
+            $eventId   = $event['id'] ?? null;
+            $eventType = $event['type'] ?? 'unknown';
 
-            case 'payment_intent.succeeded':
-                $this->handlePaymentIntentSucceeded($event['data']['object']);
-                break;
-
-            case 'charge.refunded':
-                $this->handleChargeRefunded($event['data']['object']);
-                break;
-
-            default:
-                Log::info('Unhandled Stripe webhook event', [
-                    'type' => $event['type'],
+            // Deduplicación: si ya procesamos este evento, ignorar
+            if ($eventId && !WebhookEvent::registerOrFail('stripe', $eventId, $eventType)) {
+                Log::info('Stripe webhook already processed, skipping', [
+                    'event_id'   => $eventId,
+                    'event_type' => $eventType,
                 ]);
+                return;
+            }
+
+            switch ($eventType) {
+                case 'checkout.session.completed':
+                    $this->handleCheckoutSessionCompleted($event['data']['object']);
+                    break;
+
+                case 'payment_intent.succeeded':
+                    $this->handlePaymentIntentSucceeded($event['data']['object']);
+                    break;
+
+                case 'charge.refunded':
+                    $this->handleChargeRefunded($event['data']['object']);
+                    break;
+
+                default:
+                    Log::info('Unhandled Stripe webhook event', [
+                        'type' => $eventType,
+                    ]);
+            }
         }
-    }
 
     /**
      * Manejar checkout session completado (para Stripe Checkout)

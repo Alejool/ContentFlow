@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Webhooks;
 
 use App\Helpers\AddonHelper;
 use App\Http\Controllers\Controller;
+use App\Models\WebhookEvent;
 use App\Models\Workspace\Workspace;
 use App\Models\User;
 use App\Services\SubscriptionTrackingService;
@@ -31,6 +32,13 @@ class EpaycoWebhookController extends Controller
 
         try {
             $status = $request->input('x_transaction_state');
+
+            // Deduplicación por referencia de ePayco
+            $refPayco = $request->input('x_ref_payco');
+            if ($refPayco && !WebhookEvent::registerOrFail('epayco', $refPayco, $status ?? 'unknown')) {
+                Log::info('ePayco: webhook already processed, skipping', ['ref_payco' => $refPayco]);
+                return response()->json(['status' => 'already_processed'], 200);
+            }
             
             if ($status === 'Aceptada') {
                 $this->handleApprovedPayment($request);

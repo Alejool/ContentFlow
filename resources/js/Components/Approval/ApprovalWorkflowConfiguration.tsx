@@ -452,7 +452,9 @@ export default function ApprovalWorkflowConfiguration({
                   <Input
                     id={`level-name-${index}`}
                     value={level.level_name}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleLevelChange(index, 'level_name', e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleLevelChange(index, 'level_name', e.target.value)
+                    }
                     placeholder={t('approval.level_name')}
                     disabled={!canManageWorkflow || hasPendingContent}
                     containerClassName="flex-1"

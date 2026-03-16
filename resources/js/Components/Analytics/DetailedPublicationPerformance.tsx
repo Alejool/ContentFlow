@@ -1,5 +1,5 @@
 import { SeededRandom } from '@/Utils/stableMock';
-import { 
+import {
   ChevronRight,
   Eye,
   ChevronLeft,

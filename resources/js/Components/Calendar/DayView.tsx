@@ -1,15 +1,15 @@
 import { CalendarEvent } from '@/types/calendar';
 import { formatTime } from '@/Utils/formatDate';
 import {
-    DndContext,
-    DragEndEvent,
-    DragOverlay,
-    DragStartEvent,
-    PointerSensor,
-    useDraggable,
-    useDroppable,
-    useSensor,
-    useSensors,
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  PointerSensor,
+  useDraggable,
+  useDroppable,
+  useSensor,
+  useSensors,
 } from '@dnd-kit/core';
 import { format, parseISO } from 'date-fns';
 import { Clock } from 'lucide-react';
@@ -56,7 +56,9 @@ const DraggableDayEvent: React.FC<DraggableDayEventProps> = ({
       role="button"
       tabIndex={0}
       onClick={() => onEventClick?.(event)}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onEventClick?.(event); }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') onEventClick?.(event);
+      }}
       className={`relative cursor-grab rounded-lg p-4 active:cursor-grabbing ${isSelected ? 'ring-2 ring-primary-500' : ''} ${isDragging ? 'opacity-50' : ''} border-l-4 bg-white transition-all hover:shadow-lg dark:bg-gray-800`}
       style={{ borderLeftColor: event.color }}
     >

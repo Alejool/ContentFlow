@@ -35,9 +35,7 @@ function StatusItem({ label, enabled, total, getColor }: StatusItemProps) {
         <Icon className={`h-4 w-4 ${colorClass}`} />
         <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{label}</span>
       </div>
-      <Badge
-        variant={enabled === total ? 'default' : enabled === 0 ? 'destructive' : 'secondary'}
-      >
+      <Badge variant={enabled === total ? 'default' : enabled === 0 ? 'destructive' : 'secondary'}>
         {enabled}/{total}
       </Badge>
     </div>

@@ -22,7 +22,7 @@ interface RejectionForm {
 
 /**
  * Modal de razón de rechazo usando React Aria Popover
- * 
+ *
  * Versión mejorada con:
  * - Mejor accesibilidad
  * - Focus automático en textarea
@@ -79,11 +79,7 @@ export default function RejectionReasonModalModern({
   }, [isOpen, reset]);
 
   return (
-    <Popover
-      trigger={trigger}
-      placement="center"
-      className="w-full max-w-md"
-    >
+    <Popover trigger={trigger} placement="center" className="w-full max-w-md">
       <div className="flex items-center justify-between border-b border-gray-100 p-6 dark:border-neutral-700/50">
         <h2 className="flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-white">
           <AlertCircle className="h-6 w-6 text-red-500" />
@@ -102,9 +98,7 @@ export default function RejectionReasonModalModern({
           <p className="mb-6 text-sm leading-relaxed text-gray-600 dark:text-gray-400">
             {t('approvals.rejectionReasonDescription') ||
               'Proporciona una razón detallada para el rechazo de'}{' '}
-            <span className="font-bold text-gray-900 dark:text-white">
-              "{publicationTitle}"
-            </span>
+            <span className="font-bold text-gray-900 dark:text-white">"{publicationTitle}"</span>
             {'. '}
             <span className="font-medium text-red-500 dark:text-red-400">
               {t('common.required') || 'Requerido'}
@@ -132,9 +126,7 @@ export default function RejectionReasonModalModern({
               <p className="text-sm text-red-500 dark:text-red-400">{errors.reason.message}</p>
             )}
             <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-              <span>
-                {t('common.minCharacters', { count: 10 }) || 'Mínimo 10 caracteres'}
-              </span>
+              <span>{t('common.minCharacters', { count: 10 }) || 'Mínimo 10 caracteres'}</span>
               <span className={reason.length > 500 ? 'text-red-500' : ''}>
                 {reason.length} / 500
               </span>

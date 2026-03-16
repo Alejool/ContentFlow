@@ -243,11 +243,7 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
           </div>
 
           <div className="flex justify-end gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">
-            <Button
-              variant="ghost"
-              onClick={() => setShowDeleteModal(false)}
-              disabled={isDeleting}
-            >
+            <Button variant="ghost" onClick={() => setShowDeleteModal(false)} disabled={isDeleting}>
               {t('common.cancel')}
             </Button>
             <Button

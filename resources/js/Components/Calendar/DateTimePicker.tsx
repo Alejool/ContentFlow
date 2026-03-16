@@ -80,13 +80,24 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
                   {(date: CalendarDate) => (
                     <CalendarCell
                       date={date}
-                      className={({ isSelected, isDisabled, isToday }: { isSelected: boolean; isDisabled: boolean; isToday: boolean }) =>
+                      className={({
+                        isSelected,
+                        isDisabled,
+                        isToday,
+                      }: {
+                        isSelected: boolean;
+                        isDisabled: boolean;
+                        isToday: boolean;
+                      }) =>
                         [
                           'flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg text-sm font-medium transition-all',
-                          isSelected ? 'bg-blue-500 font-bold text-white shadow scale-105'
-                            : isToday ? 'border-2 border-blue-500 font-bold text-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                            : isDisabled ? 'cursor-not-allowed opacity-30'
-                            : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600 dark:text-gray-200 dark:hover:bg-neutral-700',
+                          isSelected
+                            ? 'scale-105 bg-blue-500 font-bold text-white shadow'
+                            : isToday
+                              ? 'border-2 border-blue-500 bg-blue-50 font-bold text-blue-500 dark:bg-blue-900/20'
+                              : isDisabled
+                                ? 'cursor-not-allowed opacity-30'
+                                : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600 dark:text-gray-200 dark:hover:bg-neutral-700',
                         ].join(' ')
                       }
                     >
@@ -100,14 +111,26 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
             {/* Time row */}
             <div className="flex items-center justify-center gap-2 border-t border-gray-200 px-4 py-3 dark:border-neutral-700">
               <input
-                type="number" min={0} max={23} value={hours}
-                onChange={e => { setHours(e.target.value.padStart(2, '0')); applyTime(e.target.value, minutes); }}
+                type="number"
+                min={0}
+                max={23}
+                value={hours}
+                onChange={(e) => {
+                  setHours(e.target.value.padStart(2, '0'));
+                  applyTime(e.target.value, minutes);
+                }}
                 className="w-14 rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-center text-lg font-bold text-gray-900 focus:border-blue-500 focus:outline-none dark:border-neutral-600 dark:bg-neutral-800 dark:text-white"
               />
               <span className="text-xl font-bold text-gray-600 dark:text-gray-300">:</span>
               <input
-                type="number" min={0} max={59} value={minutes}
-                onChange={e => { setMinutes(e.target.value.padStart(2, '0')); applyTime(hours, e.target.value); }}
+                type="number"
+                min={0}
+                max={59}
+                value={minutes}
+                onChange={(e) => {
+                  setMinutes(e.target.value.padStart(2, '0'));
+                  applyTime(hours, e.target.value);
+                }}
                 className="w-14 rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-center text-lg font-bold text-gray-900 focus:border-blue-500 focus:outline-none dark:border-neutral-600 dark:bg-neutral-800 dark:text-white"
               />
             </div>
@@ -125,7 +148,10 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
               </p>
               <p className="mt-1 text-xs text-red-600 dark:text-red-300">
                 {validation.isPastDate
-                  ? t('calendar.validation.past_date_message', 'You cannot schedule events for past dates. Please select a future date and time.')
+                  ? t(
+                      'calendar.validation.past_date_message',
+                      'You cannot schedule events for past dates. Please select a future date and time.',
+                    )
                   : validation.error}
               </p>
             </div>
@@ -134,9 +160,18 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
 
         {validation.isValid && (
           <div className="text-center">
-            <p className="text-xs text-gray-500 dark:text-gray-400">{t('calendar.selected_date', 'Selected date:')}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {t('calendar.selected_date', 'Selected date:')}
+            </p>
             <p className="mt-1 text-sm font-medium text-gray-900 dark:text-white">
-              {selectedDate.toLocaleString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+              {selectedDate.toLocaleString('es-ES', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
             </p>
           </div>
         )}

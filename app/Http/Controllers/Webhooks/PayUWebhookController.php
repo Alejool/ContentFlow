@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Webhooks;
 
 use App\Helpers\AddonHelper;
 use App\Http\Controllers\Controller;
+use App\Models\WebhookEvent;
 use App\Models\Workspace\Workspace;
 use App\Models\User;
 use App\Services\SubscriptionTrackingService;
@@ -30,6 +31,13 @@ class PayUWebhookController extends Controller
             }
 
             $state = $request->input('state_pol');
+
+            // Deduplicación por transaction_id de PayU
+            $transactionId = $request->input('transaction_id');
+            if ($transactionId && !WebhookEvent::registerOrFail('payu', $transactionId, "state_{$state}")) {
+                Log::info('PayU: webhook already processed, skipping', ['transaction_id' => $transactionId]);
+                return response()->json(['status' => 'already_processed'], 200);
+            }
             
             // Estados de PayU:
             // 4 = Aprobada

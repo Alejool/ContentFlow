@@ -6,10 +6,7 @@ interface PeriodSelectorProps {
   theme?: 'light' | 'dark';
 }
 
-export default function PeriodSelector({
-  selectedPeriod,
-  onPeriodChange,
-}: PeriodSelectorProps) {
+export default function PeriodSelector({ selectedPeriod, onPeriodChange }: PeriodSelectorProps) {
   const { t } = useTranslation();
   const periods = [7, 30, 90];
 

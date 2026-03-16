@@ -3,8 +3,8 @@ import FilterSection from '@/Components/Content/common/FilterSection';
 import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
 import TableContainer from '@/Components/common/ui/TableContainer';
 import {
-    useApprovalHistory,
-    usePublicationApprovalHistory,
+  useApprovalHistory,
+  usePublicationApprovalHistory,
 } from '@/Hooks/approval/useApprovalHistory';
 import { getDateFnsLocale } from '@/Utils/dateLocales';
 import { ApprovalRequest } from '@/types/ApprovalTypes';

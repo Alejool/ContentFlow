@@ -12,7 +12,7 @@ import {
   getPublicationStatusConfig,
   hasMedia,
   isProcessing,
-  isVideoMedia
+  isVideoMedia,
 } from '@/Utils/publicationHelpers';
 import {
   Calendar,
@@ -28,7 +28,7 @@ import {
   Send,
   Trash2,
   Users,
-  Video
+  Video,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -162,7 +162,7 @@ export default function ContentCard({
             {...(onViewDetails && { onViewDetails: () => handleViewDetails(item) })}
             className="rounded-none border-0"
           />
-          <div className="absolute left-3 top-3 z-10 flex flex-col items-start gap-2 pointer-events-none">
+          <div className="pointer-events-none absolute left-3 top-3 z-10 flex flex-col items-start gap-2">
             {/* Content Type Badge - Solo para publicaciones */}
             {type === 'publication' && !remoteLock && (
               <SimpleContentTypeBadge
@@ -184,7 +184,7 @@ export default function ContentCard({
               </div>
             )}
           </div>
-          <div className="absolute right-3 top-3 z-10 flex flex-col items-end gap-2 pointer-events-none">
+          <div className="pointer-events-none absolute right-3 top-3 z-10 flex flex-col items-end gap-2">
             {/* Status Badge */}
             <span
               className={`flex items-center gap-1.5 rounded-lg border border-white/20 px-2.5 py-1 text-xs font-medium shadow-sm backdrop-blur-md ${statusConfig.badge}`}
@@ -198,7 +198,7 @@ export default function ContentCard({
             </span>
           </div>
           {remoteLock && (
-            <div className="absolute left-3 top-3 z-10 pointer-events-none">
+            <div className="pointer-events-none absolute left-3 top-3 z-10">
               <span className="flex animate-pulse items-center gap-1.5 rounded-lg border border-amber-200/50 bg-amber-100/90 px-2.5 py-1 text-xs font-bold text-amber-700 shadow-lg backdrop-blur-md dark:border-amber-700/50 dark:bg-amber-900/80 dark:text-amber-300">
                 <div className="relative">
                   <Lock className="h-3 w-3" />
@@ -343,11 +343,7 @@ export default function ContentCard({
             <div className="flex items-center gap-2">
               {item.user && (
                 <>
-                  <Avatar
-                    src={item.user.photo_url}
-                    name={item.user.name}
-                    size="xs"
-                  />
+                  <Avatar src={item.user.photo_url} name={item.user.name} size="xs" />
                   <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
                     {item.user.name}
                   </span>

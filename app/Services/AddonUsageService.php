@@ -152,28 +152,40 @@ class AddonUsageService
      * Registrar una nueva compra de addon
      */
     public function recordPurchase(
-        Workspace $workspace,
-        string $sku,
-        string $type,
-        int $amount,
-        float $price,
-        ?string $stripePaymentIntentId = null,
-        ?\DateTime $expiresAt = null
-    ): WorkspaceAddon {
-        return WorkspaceAddon::create([
-            'workspace_id' => $workspace->id,
-            'addon_sku' => $sku,
-            'addon_type' => $type,
-            'quantity' => 1,
-            'total_amount' => $amount,
-            'used_amount' => 0,
-            'price_paid' => $price,
-            'purchased_at' => now(),
-            'expires_at' => $expiresAt,
-            'is_active' => true,
-            'stripe_payment_intent_id' => $stripePaymentIntentId,
-        ]);
-    }
+            Workspace $workspace,
+            string $sku,
+            string $type,
+            int $amount,
+            float $price,
+            ?string $stripePaymentIntentId = null,
+            ?\DateTime $expiresAt = null
+        ): WorkspaceAddon {
+            // Idempotencia: si ya existe un addon con este payment_intent_id, retornarlo sin crear duplicado
+            if ($stripePaymentIntentId) {
+                $existing = WorkspaceAddon::where('stripe_payment_intent_id', $stripePaymentIntentId)->first();
+                if ($existing) {
+                    \Illuminate\Support\Facades\Log::info('AddonUsageService: duplicate purchase skipped (idempotent)', [
+                        'stripe_payment_intent_id' => $stripePaymentIntentId,
+                        'addon_id' => $existing->id,
+                    ]);
+                    return $existing;
+                }
+            }
+
+            return WorkspaceAddon::create([
+                'workspace_id' => $workspace->id,
+                'addon_sku' => $sku,
+                'addon_type' => $type,
+                'quantity' => 1,
+                'total_amount' => $amount,
+                'used_amount' => 0,
+                'price_paid' => $price,
+                'purchased_at' => now(),
+                'expires_at' => $expiresAt,
+                'is_active' => true,
+                'stripe_payment_intent_id' => $stripePaymentIntentId,
+            ]);
+        }
 
     /**
      * Resetear el uso de addons cuando se cambia de plan
