@@ -30,15 +30,20 @@ export default function SettingsTabs({
   currentPlan = 'demo',
 }: SettingsTabsProps) {
   // Convertir tabs al formato esperado por TabNavigation
-  const navigationTabs: TabNavigationType[] = tabs.map((tab) => ({
-    key: tab.id,
-    label: tab.label,
-    icon: tab.icon,
-    enabled: tab.enabled,
-    planRequired: tab.planRequired,
-    locked: tab.locked,
-    badge: tab.badge,
-  }));
+  const navigationTabs: TabNavigationType[] = tabs.map((tab) => {
+    const navTab: TabNavigationType = {
+      key: tab.id,
+      label: tab.label,
+      icon: tab.icon,
+    };
+
+    if (tab.enabled !== undefined) navTab.enabled = tab.enabled;
+    if (tab.planRequired !== undefined) navTab.planRequired = tab.planRequired;
+    if (tab.locked !== undefined) navTab.locked = tab.locked;
+    if (tab.badge !== undefined) navTab.badge = tab.badge;
+
+    return navTab;
+  });
 
   return (
     <div className="mb-8">
@@ -46,8 +51,8 @@ export default function SettingsTabs({
         tabs={navigationTabs}
         activeTab={activeTab}
         onTabChange={onTabChange}
-        onTabOrderChange={onTabOrderChange}
-        tabOrder={tabOrder}
+        {...(onTabOrderChange && { onTabOrderChange })}
+        {...(tabOrder && { tabOrder })}
         isDraggable={isDraggable}
         currentPlan={currentPlan}
         variant="draggable"

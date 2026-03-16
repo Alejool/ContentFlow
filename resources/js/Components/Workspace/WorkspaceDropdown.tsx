@@ -29,7 +29,7 @@ export default function WorkspaceDropdown({
       className={`group flex w-full items-center justify-center gap-3 rounded-lg p-3 transition-all duration-300 focus:outline-none hover:bg-gray-100 dark:hover:bg-neutral-800/50`}
     >
       <div
-        className={`relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg bg-primary-600 text-lg font-bold text-white shadow-md transition-all duration-300 group-hover:scale-110`}
+        className={`relative h-10 w-10 flex  items-center justify-center overflow-hidden rounded-lg bg-primary-600 text-md font-bold text-white shadow-md transition-all duration-300 group-hover:scale-110`}
       >
         {current_workspace?.white_label_logo_url ? (
           <WorkspaceLogo
@@ -72,11 +72,11 @@ export default function WorkspaceDropdown({
   );
 
   return (
-    <div className="relative px-4 py-2">
+    <div className="relative px-4 py-2 flex justify-center item-center">
       <Popover
         trigger={trigger}
         placement={isSidebarOpen ? 'bottom' : 'right'}
-        className={isSidebarOpen ? 'w-full' : 'w-72'}
+        className={'w-72'}
       >
         {/* Workspace list */}
         <div className="border-b border-gray-100 p-2 dark:border-neutral-800">
