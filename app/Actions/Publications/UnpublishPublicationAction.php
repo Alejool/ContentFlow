@@ -20,14 +20,21 @@ class UnpublishPublicationAction
     }
 
     if ($result['success']) {
-      $remaining = $publication->socialPostLogs()
-        ->where('status', 'published')
-        ->count();
-
-      if ($remaining === 0) {
-        $publication->update(['status' => 'draft']);
-        
-        // Eliminar automáticamente las publicaciones recurrentes programadas
+      // Recargar la relación para obtener los datos más recientes
+      $publication->load('socialPostLogs');
+      
+      // Usar el servicio de estado para determinar el nuevo estado
+      $statusService = app(\App\Services\Publications\PublicationStatusService::class);
+      $statusService->updatePublicationStatus($publication, true);
+      
+      \Log::info('UnpublishPublicationAction: Status updated after unpublish', [
+        'publication_id' => $publication->id,
+        'new_status' => $publication->status,
+        'status_summary' => $publication->publication_status_summary
+      ]);
+      
+      // Si el estado es draft, eliminar publicaciones recurrentes programadas
+      if ($publication->status === 'draft') {
         $deletedRecurringPosts = $publication->scheduled_posts()
           ->where('status', 'pending')
           ->where('is_recurring_instance', true)
