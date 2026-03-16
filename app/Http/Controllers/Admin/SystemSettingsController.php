@@ -4,8 +4,16 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\SystemSetting;
+use App\Models\User;
+use App\Models\Workspace\Workspace;
+use App\Models\Publications\Publication;
+use App\Models\Subscription\Subscription;
+use App\Models\Social\SocialAccount;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use Carbon\Carbon;
 use Inertia\Inertia;
 
 class SystemSettingsController extends Controller
@@ -59,18 +67,164 @@ class SystemSettingsController extends Controller
             ],
         ];
 
-        // Opcional: agregar estadísticas del sistema
-        $stats = [
-            'total_users' => \App\Models\User::count(),
-            'active_subscriptions' => \App\Models\Subscription\Subscription::where('stripe_status', 'active')->count(),
-            'total_publications' => \App\Models\Publications\Publication::count(),
-            'system_health' => 'healthy',
-        ];
+        $stats = $this->buildDashboardStats();
+        $recentActivity = $this->getRecentSettingsActivity();
 
         return Inertia::render('Admin/Dashboard', [
             'systemStatus' => $systemStatus,
             'stats' => $stats,
+            'recentActivity' => $recentActivity,
         ]);
+    }
+
+    /**
+     * Build comprehensive system statistics
+     */
+    private function buildDashboardStats(): array
+    {
+        $now = Carbon::now();
+        $thirtyDaysAgo = $now->copy()->subDays(30);
+        $sevenDaysAgo = $now->copy()->subDays(7);
+
+        // Users
+        $totalUsers = User::count();
+        $newUsersLast30d = User::where('created_at', '>=', $thirtyDaysAgo)->count();
+        $newUsersLast7d = User::where('created_at', '>=', $sevenDaysAgo)->count();
+        $verifiedUsers = User::whereNotNull('email_verified_at')->count();
+
+        // Workspaces
+        $totalWorkspaces = Workspace::count();
+        $activeWorkspaces = Workspace::whereHas('publications', function ($q) use ($thirtyDaysAgo) {
+            $q->where('created_at', '>=', $thirtyDaysAgo);
+        })->count();
+
+        // Subscriptions — cuenta todos los gateways activos
+        $activeSubscriptions = Subscription::where(function ($q) {
+            $q->where('stripe_status', 'active')
+              ->orWhere('status', 'active');
+        })->count();
+
+        $trialSubscriptions = Subscription::where('trial_ends_at', '>', $now)->count();
+
+        $subscriptionsByPlan = Subscription::where(function ($q) {
+            $q->where('stripe_status', 'active')->orWhere('status', 'active');
+        })
+        ->select('plan', DB::raw('count(*) as total'))
+        ->groupBy('plan')
+        ->pluck('total', 'plan')
+        ->toArray();
+
+        // Publications
+        $totalPublications = Publication::withoutGlobalScopes()->count();
+        $publishedPublications = Publication::withoutGlobalScopes()->where('status', 'published')->count();
+        $failedPublications = Publication::withoutGlobalScopes()->where('status', 'failed')->count();
+        $pendingReview = Publication::withoutGlobalScopes()->where('status', 'pending_review')->count();
+        $newPublicationsLast30d = Publication::withoutGlobalScopes()
+            ->where('created_at', '>=', $thirtyDaysAgo)->count();
+
+        // Social accounts
+        $totalSocialAccounts = SocialAccount::count();
+        $socialAccountsByPlatform = SocialAccount::select('platform', DB::raw('count(*) as total'))
+            ->groupBy('platform')
+            ->pluck('total', 'platform')
+            ->toArray();
+
+        // System health — checks reales
+        $systemHealth = $this->checkSystemHealth($failedPublications);
+
+        return [
+            // Usuarios
+            'total_users' => $totalUsers,
+            'new_users_30d' => $newUsersLast30d,
+            'new_users_7d' => $newUsersLast7d,
+            'verified_users' => $verifiedUsers,
+            'unverified_users' => $totalUsers - $verifiedUsers,
+
+            // Workspaces
+            'total_workspaces' => $totalWorkspaces,
+            'active_workspaces_30d' => $activeWorkspaces,
+
+            // Suscripciones
+            'active_subscriptions' => $activeSubscriptions,
+            'trial_subscriptions' => $trialSubscriptions,
+            'subscriptions_by_plan' => $subscriptionsByPlan,
+
+            // Publicaciones
+            'total_publications' => $totalPublications,
+            'published_publications' => $publishedPublications,
+            'failed_publications' => $failedPublications,
+            'pending_review' => $pendingReview,
+            'new_publications_30d' => $newPublicationsLast30d,
+
+            // Redes sociales
+            'total_social_accounts' => $totalSocialAccounts,
+            'social_accounts_by_platform' => $socialAccountsByPlatform,
+
+            // Salud del sistema
+            'system_health' => $systemHealth['status'],
+            'system_health_issues' => $systemHealth['issues'],
+        ];
+    }
+
+    /**
+     * Check real system health indicators
+     */
+    private function checkSystemHealth(int $failedPublications): array
+    {
+        $issues = [];
+
+        // Publicaciones fallidas recientes
+        $recentFailed = Publication::withoutGlobalScopes()
+            ->where('status', 'failed')
+            ->where('updated_at', '>=', Carbon::now()->subHours(24))
+            ->count();
+
+        if ($recentFailed > 10) {
+            $issues[] = "High publication failure rate: {$recentFailed} in last 24h";
+        }
+
+        // Verificar conectividad a DB (si llegamos aquí, la DB funciona)
+        // Verificar si hay settings sin valor
+        $nullSettings = SystemSetting::whereNull('value')->orWhere('value', '')->count();
+        if ($nullSettings > 0) {
+            $issues[] = "{$nullSettings} system settings with empty values";
+        }
+
+        // Usuarios sin verificar > 50% del total
+        $totalUsers = User::count();
+        $unverified = User::whereNull('email_verified_at')->count();
+        if ($totalUsers > 0 && ($unverified / $totalUsers) > 0.5) {
+            $issues[] = "More than 50% of users are unverified ({$unverified}/{$totalUsers})";
+        }
+
+        $status = match(true) {
+            count($issues) === 0 => 'healthy',
+            count($issues) <= 2 => 'warning',
+            default => 'critical',
+        };
+
+        return ['status' => $status, 'issues' => $issues];
+    }
+
+    /**
+     * Get recent system settings activity (real data)
+     */
+    private function getRecentSettingsActivity(): array
+    {
+        return SystemSetting::with('updatedBy:id,name')
+            ->whereNotNull('updated_by')
+            ->orderBy('updated_at', 'desc')
+            ->limit(8)
+            ->get()
+            ->map(fn($s) => [
+                'key' => $s->key,
+                'label' => $s->label,
+                'category' => $s->category,
+                'value' => $this->castValue($s->value, $s->type),
+                'updated_at' => $s->updated_at->toISOString(),
+                'updated_by' => $s->updatedBy?->name ?? 'System',
+            ])
+            ->toArray();
     }
 
     /**
