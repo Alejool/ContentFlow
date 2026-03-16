@@ -741,9 +741,20 @@ class PublicationController extends Controller
   {
     $result = $action->execute($publication, $request->input('platform_ids'));
 
-    return $result['success']
-      ? $this->successResponse(['details' => $result], 'Unpublished successfully')
-      : $this->errorResponse('Failed to unpublish', 500, $result);
+    if ($result['success']) {
+      // Recargar la publicación para obtener el estado actualizado
+      $publication->refresh();
+      
+      // Limpiar caché
+      $this->clearPublicationCache($publication->workspace_id);
+      
+      // Emitir evento de actualización
+      broadcast(new PublicationUpdated($publication))->toOthers();
+      
+      return $this->successResponse(['details' => $result, 'publication' => $publication], 'Unpublished successfully');
+    }
+    
+    return $this->errorResponse('Failed to unpublish', 500, $result);
   }
 
   public function destroy(Publication $publication, DeletePublicationAction $action)
@@ -1489,13 +1500,6 @@ class PublicationController extends Controller
       return $this->errorResponse('You do not have permission to cancel this publication.', 403);
     }
 
-    $oldStatus = $publication->status;
-
-    $allowedStatuses = ['publishing', 'processing', 'scheduled', 'pending_review'];
-    if (!in_array($oldStatus, $allowedStatuses)) {
-      return $this->errorResponse('This publication cannot be cancelled in its current state.', 422);
-    }
-
     // Check if specific platform(s) should be cancelled
     $platformIds = $request->input('platform_ids', []);
 
@@ -1509,6 +1513,19 @@ class PublicationController extends Controller
 
     if (!empty($platformIds) && is_array($platformIds) && count($platformIds) > 0) {
       \Log::info('Canceling specific platforms', ['platform_ids' => $platformIds]);
+
+      // Guardar el estado anterior antes de cualquier modificación
+      $oldStatus = $publication->status;
+
+      // Verificar que los logs de las plataformas específicas estén en un estado cancelable
+      $cancellableLogs = $publication->socialPostLogs()
+        ->whereIn('social_account_id', $platformIds)
+        ->whereIn('status', ['pending', 'publishing'])
+        ->count();
+
+      if ($cancellableLogs === 0) {
+        return $this->errorResponse('No hay plataformas en estado de publicación que puedan ser canceladas.', 422);
+      }
 
       // Cancel only specific platforms - mark as failed and clear retry flags
       $updated = $publication->socialPostLogs()
@@ -1575,6 +1592,17 @@ class PublicationController extends Controller
     }
 
     // Cancel all platforms (original behavior)
+    // Verificar que haya logs en estado cancelable
+    $cancellableLogsCount = $publication->socialPostLogs()
+      ->whereIn('status', ['pending', 'publishing'])
+      ->count();
+
+    if ($cancellableLogsCount === 0) {
+      return $this->errorResponse('No hay plataformas en estado de publicación que puedan ser canceladas.', 422);
+    }
+
+    $oldStatus = $publication->status;
+
     $publication->update([
       'status' => 'failed',
       'updated_at' => now(),
