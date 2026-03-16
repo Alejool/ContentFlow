@@ -525,7 +525,24 @@ class PublishToSocialMedia implements ShouldQueue
       return;
     }
 
+    // Update publication status
     $publication->update(['status' => 'failed']);
+    
+    // CRITICAL: Update all pending/publishing logs to failed
+    // This prevents the frontend from showing "publishing" forever
+    $updatedLogs = SocialPostLog::where('publication_id', $this->publicationId)
+      ->whereIn('social_account_id', $this->socialAccountIds)
+      ->whereIn('status', ['pending', 'publishing'])
+      ->update([
+        'status' => 'failed',
+        'error_message' => $this->sanitizeErrorMessage($exception->getMessage()),
+        'updated_at' => now()
+      ]);
+    
+    Log::info('Updated orphaned logs to failed status', [
+      'publication_id' => $this->publicationId,
+      'updated_count' => $updatedLogs
+    ]);
     
     $publisher = User::find($publication->published_by);
     $publication->logActivity('failed', [
@@ -533,6 +550,15 @@ class PublishToSocialMedia implements ShouldQueue
       'error' => $exception->getMessage(),
       'attempts' => $this->attempts()
     ], $publisher);
+    
+    // Broadcast final status update
+    event(new PublicationStatusUpdated(
+      userId: $publication->user_id,
+      publicationId: $publication->id,
+      status: 'failed',
+      workspaceId: $publication->workspace_id,
+      socialAccountIds: $this->socialAccountIds
+    ));
 
     // ONLY send notification here after ALL retries exhausted
     $socialAccounts = SocialAccount::whereIn('id', $this->socialAccountIds)->get();

@@ -97,6 +97,25 @@ class PublishPublicationAction
 
     $publication->logActivity('publishing', ['platforms' => $platformIds]);
 
+    // Determine priority based on workspace plan and queue status
+    $workspace = $publication->workspace;
+    $planSlug = $workspace->getPlanName();
+    $priority = \App\Jobs\Middleware\PlanBasedPriority::getPriorityForPlan($planSlug);
+    
+    // Check queue depth to adjust priority dynamically
+    $queueDepth = \Illuminate\Support\Facades\Redis::llen('queues:publishing');
+    
+    // If queue is empty or very small, boost priority for immediate processing
+    if ($queueDepth < 3) {
+      $priority += 50; // Boost priority when queue is not saturated
+      LogHelper::publication('Boosting priority due to low queue depth', [
+        'publication_id' => $publication->id,
+        'queue_depth' => $queueDepth,
+        'original_priority' => $priority - 50,
+        'boosted_priority' => $priority
+      ]);
+    }
+
     $publication->update([
       'status' => 'publishing',
       'published_by' => auth()->id(),
@@ -167,6 +186,20 @@ class PublishPublicationAction
     $queueSize = $queueInfo['pending_jobs'];
     $estimatedWaitMinutes = $queueInfo['estimated_wait_minutes'];
     $effectivePriority = $queueInfo['effective_priority'];
+    
+    // Check queue depth to adjust priority dynamically
+    $queueDepth = \Illuminate\Support\Facades\Redis::llen('queues:publishing');
+    
+    // If queue is empty or very small, boost priority for immediate processing
+    if ($queueDepth < 3) {
+      $effectivePriority += 50; // Boost priority when queue is not saturated
+      LogHelper::publication('Boosting priority due to low queue depth', [
+        'publication_id' => $publication->id,
+        'queue_depth' => $queueDepth,
+        'original_priority' => $queueInfo['effective_priority'],
+        'boosted_priority' => $effectivePriority
+      ]);
+    }
 
     LogHelper::job('Dispatching PublishToSocialMedia job', [
       'publication_id' => $publication->id,
@@ -174,6 +207,7 @@ class PublishPublicationAction
       'platforms' => $socialAccounts->pluck('platform')->toArray(),
       'plan' => $planSlug,
       'queue_size' => $queueSize,
+      'queue_depth' => $queueDepth,
       'effective_priority' => $effectivePriority,
       'estimated_position' => $queueInfo['estimated_position'],
       'estimated_wait_minutes' => $estimatedWaitMinutes
@@ -186,13 +220,19 @@ class PublishPublicationAction
       $publication->id,
       $socialAccounts->pluck('id')->toArray()
     )->onQueue('publishing');
+    
+    // Store priority in Redis for the job to use
+    $jobId = $job->id ?? uniqid('job_', true);
+    \Illuminate\Support\Facades\Redis::setex("job:priority:{$jobId}", 3600, $effectivePriority);
 
     // Log de prioridad
     Log::info('Job dispatched with priority', [
       'publication_id' => $publication->id,
+      'job_id' => $jobId,
       'plan' => $planSlug,
       'file_priority' => $priority,
-      'effective_priority' => $effectivePriority
+      'effective_priority' => $effectivePriority,
+      'queue_depth' => $queueDepth
     ]);
 
     // Notificar al usuario sobre la posición en cola si hay espera
