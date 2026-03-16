@@ -137,12 +137,12 @@ const PublicationTable = memo(
                               onEdit={onEdit}
                               onDelete={onDelete}
                               onPublish={onPublish}
-                              onEditRequest={onEditRequest}
-                              onViewDetails={onViewDetails}
-                              onDuplicate={onDuplicate}
-                              remoteLock={remoteLocks[item.id]}
-                              permissions={permissions || []}
-                              onPreviewMedia={onPreviewMedia}
+                              {...(onEditRequest && { onEditRequest })}
+                              {...(onViewDetails && { onViewDetails })}
+                              {...(onDuplicate && { onDuplicate })}
+                              {...(remoteLocks[item.id] && { remoteLock: remoteLocks[item.id] })}
+                              {...(permissions && { permissions })}
+                              {...(onPreviewMedia && { onPreviewMedia })}
                             />
                           </tr>
                         ))}
@@ -194,12 +194,12 @@ const PublicationTable = memo(
                     onEdit={onEdit}
                     onDelete={onDelete}
                     onPublish={onPublish}
-                    onEditRequest={onEditRequest}
-                    onViewDetails={onViewDetails}
-                    onDuplicate={onDuplicate}
+                    {...(onEditRequest && { onEditRequest })}
+                    {...(onViewDetails && { onViewDetails })}
+                    {...(onDuplicate && { onDuplicate })}
                     remoteLocks={remoteLocks}
-                    permissions={permissions}
-                    onPreviewMedia={onPreviewMedia}
+                    {...(permissions && { permissions })}
+                    {...(onPreviewMedia && { onPreviewMedia })}
                   />
                 </div>
 
@@ -222,7 +222,7 @@ const PublicationTable = memo(
             onPageChange={onPageChange || (() => {})}
             onPerPageChange={onPerPageChange || (() => {})}
             t={t}
-            isLoading={isLoading}
+            {...(isLoading !== undefined && { isLoading })}
           />
         )}
       </TableContainer>

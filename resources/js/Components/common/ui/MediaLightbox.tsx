@@ -1,3 +1,4 @@
+import Button from '@/Components/common/Modern/Button';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -59,30 +60,44 @@ export default function MediaLightbox({
   if (!isOpen || mediaArray.length === 0) return null;
 
   const currentMedia = mediaArray[currentIndex];
+  
+  // Safety check: if currentMedia is undefined, return null
+  if (!currentMedia) return null;
 
   return createPortal(
     <div className="animate-in fade-in fixed inset-0 z-[10000] flex items-center justify-center bg-black/95 p-4 backdrop-blur-md duration-300">
-      <button
+      <Button
         onClick={onClose}
-        className="absolute right-6 top-6 z-50 rounded-full bg-white/10 p-2.5 text-white/70 transition-all hover:scale-110 hover:bg-white/20 hover:text-white active:scale-95"
+        buttonStyle="icon"
+        icon={X}
+        className="absolute right-6 top-6 z-50 !text-white"
+        aria-label="Close lightbox"
       >
-        <X className="h-6 w-6" />
-      </button>
+        {''}
+      </Button>
 
       {mediaArray.length > 1 && (
         <>
-          <button
+          <Button
             onClick={handlePrev}
-            className="group absolute left-6 z-50 rounded-full bg-white/10 p-3 text-white/70 transition-all hover:scale-110 hover:bg-white/20 hover:text-white active:scale-95"
+            buttonStyle="icon"
+            variant="ghost"
+            icon={ChevronLeft}
+            className="absolute left-6 z-50 !text-white"
+            aria-label="Previous media"
           >
-            <ChevronLeft className="h-8 w-8 transition-transform group-hover:-translate-x-0.5" />
-          </button>
-          <button
+           {''}
+          </Button>
+          <Button
             onClick={handleNext}
-            className="group absolute right-6 z-50 rounded-full bg-white/10 p-3 text-white/70 transition-all hover:scale-110 hover:bg-white/20 hover:text-white active:scale-95"
+            buttonStyle="icon"
+            variant="ghost"
+            icon={ChevronRight}
+            className="absolute right-6 z-50 !text-white"
+            aria-label="Next media"
           >
-            <ChevronRight className="h-8 w-8 transition-transform group-hover:translate-x-0.5" />
-          </button>
+            {''}
+          </Button>
         </>
       )}
 
@@ -111,7 +126,7 @@ export default function MediaLightbox({
         </div>
 
         {mediaArray.length > 1 && (
-          <div className="absolute bottom-10 z-50 flex gap-2.5 rounded-full bg-black/20 p-2 backdrop-blur-sm">
+          <div className="absolute bottom-10 z-50 flex max-w-full gap-2.5 overflow-x-auto rounded-full bg-black/20 p-2 backdrop-blur-sm">
             {mediaArray.map((media, idx) => (
               <button
                 key={`${media.url}-${idx}`}
@@ -123,10 +138,46 @@ export default function MediaLightbox({
                   }
                 }}
                 aria-label={`Go to media ${idx + 1} of ${mediaArray.length}`}
-                className={`h-2.5 w-2.5 rounded-full transition-all duration-300 ${
-                  idx === currentIndex ? 'w-8 bg-primary-500' : 'bg-white/40 hover:bg-white/60'
+                className={`h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-200 ${
+                  idx === currentIndex
+                    ? 'scale-105 border-primary-500 dark:border-primary-400'
+                    : 'border-transparent hover:border-gray-400'
                 }`}
-              />
+              >
+                {media.type === 'video' ? (
+                  <video
+                    src={media.url}
+                    className="h-full w-full object-cover"
+                    muted
+                    loop
+                    playsInline
+                    onError={(e) => {
+                      // Fallback to icon if video fails to load
+                      e.currentTarget.style.display = 'none';
+                      const parent = e.currentTarget.parentElement;
+                      if (parent) {
+                        parent.innerHTML = `
+                          <div class="flex h-full w-full items-center justify-center bg-gray-800">
+                            <svg class="h-6 w-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" />
+                            </svg>
+                          </div>
+                        `;
+                      }
+                    }}
+                  />
+                ) : (
+                  <img
+                    src={media.url}
+                    alt={`Thumbnail ${idx + 1}`}
+                    className="h-full w-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src =
+                        'https://images.unsplash.com/photo-1579546929662-711aa81148cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80';
+                    }}
+                  />
+                )}
+              </button>
             ))}
           </div>
         )}

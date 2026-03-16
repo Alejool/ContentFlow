@@ -60,8 +60,8 @@ class PlanBasedPriority
                 return null;
             }
 
-            // Obtener el plan del workspace
-            $planSlug = $workspace->subscription_plan ?? 'free';
+            // Obtener el plan del workspace usando el método getPlanName()
+            $planSlug = $workspace->getPlanName();
             
             $priority = self::PLAN_PRIORITIES[$planSlug] ?? self::PLAN_PRIORITIES['free'];
             
@@ -90,18 +90,18 @@ class PlanBasedPriority
     {
         // Para PublishToSocialMedia
         if (isset($job->publicationId)) {
-            $publication = Publication::with('workspace')->find($job->publicationId);
+            $publication = Publication::with(['workspace.subscription', 'workspace.subscriptions'])->find($job->publicationId);
             return $publication?->workspace;
         }
 
         // Para otros jobs que tengan workspace_id directamente
         if (isset($job->workspaceId)) {
-            return \App\Models\Workspace::find($job->workspaceId);
+            return \App\Models\Workspace::with(['subscription', 'subscriptions'])->find($job->workspaceId);
         }
 
         // Para jobs que tengan user_id
         if (isset($job->userId)) {
-            $user = User::with('currentWorkspace')->find($job->userId);
+            $user = User::with(['currentWorkspace.subscription', 'currentWorkspace.subscriptions'])->find($job->userId);
             return $user?->currentWorkspace;
         }
 

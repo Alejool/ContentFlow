@@ -1,5 +1,7 @@
-import CampaignMediaCarousel from '@/Components/Campaigns/CampaignMediaCarousel';
 import { Avatar } from '@/Components/common/Avatar';
+import Button from '@/Components/common/Modern/Button';
+import MediaLightbox from '@/Components/common/ui/MediaLightbox';
+import MediaPreviewButton from '@/Components/common/ui/MediaPreviewButton';
 import ActivityList from '@/Components/Content/ActivityList';
 import ApprovalHistorySection from '@/Components/Content/Publication/common/edit/ApprovalHistorySection';
 import ReelsCarousel from '@/Components/Content/ReelsCarousel';
@@ -30,6 +32,15 @@ export default function ViewCampaignModal({
   const { auth } = usePage<any>().props;
   const [activeTab, setActiveTab] = useState('overview');
   const [hashtagsExpanded, setHashtagsExpanded] = useState(false);
+  const [lightboxMedia, setLightboxMedia] = useState<
+    | {
+        url: string;
+        type: 'image' | 'video';
+        title?: string;
+      }[]
+    | null
+  >(null);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
   const canEdit = auth.current_workspace?.permissions?.includes('manage-content');
 
   // Get fresh data from publicationStore if this is a publication
@@ -136,9 +147,18 @@ export default function ViewCampaignModal({
           <div className="flex-1 overflow-y-auto p-6">
             <div className="space-y-6">
               {regularMedia.length > 0 && (
-                <div className="relative h-64 w-full overflow-hidden rounded-lg bg-gray-100 dark:bg-neutral-900">
-                  <CampaignMediaCarousel mediaFiles={regularMedia} />
-                </div>
+                <MediaPreviewButton
+                  mediaFiles={regularMedia}
+                  title={title}
+                  onPreview={(
+                    media: { url: string; type: 'image' | 'video'; title?: string }[],
+                    index: number,
+                  ) => {
+                    setLightboxMedia(media);
+                    setLightboxIndex(index);
+                  }}
+                  height="h-64"
+                />
               )}
 
               {/* Reels Section */}
@@ -667,27 +687,38 @@ export default function ViewCampaignModal({
           </div>
 
           <div className="flex flex-shrink-0 justify-end gap-3 border-t border-gray-100 p-6 dark:border-neutral-700">
+            <Button
+              onClick={onClose}
+              variant="secondary"
+              buttonStyle="solid"
+              size="lg"
+            >
+              {t('common.close')}
+            </Button>
             {onEdit && canEdit && (
-              <button
+              <Button
                 onClick={() => {
                   onClose();
                   onEdit(item);
                 }}
-                className="flex items-center gap-2 rounded-lg bg-primary-600 px-6 py-2.5 font-bold text-white shadow-lg shadow-primary-500/20 transition-all hover:bg-primary-700 active:scale-95"
+                variant="primary"
+                buttonStyle="gradient"
+                size="lg"
+                icon={Edit}
               >
-                <Edit className="h-4 w-4" />
                 {t('common.editInPanel')}
-              </button>
+              </Button>
             )}
-            <button
-              onClick={onClose}
-              className="rounded-lg bg-gray-100 px-6 py-2.5 font-medium text-gray-700 transition-colors hover:bg-gray-200 dark:bg-neutral-700 dark:text-white dark:hover:bg-neutral-600"
-            >
-              {t('common.close')}
-            </button>
           </div>
         </DialogPanel>
       </div>
+      
+      <MediaLightbox
+        isOpen={!!lightboxMedia}
+        onClose={() => setLightboxMedia(null)}
+        media={lightboxMedia}
+        initialIndex={lightboxIndex}
+      />
     </Dialog>
   );
 }

@@ -289,29 +289,39 @@ const SocialAccountItem = memo(
     return (
       <>
         <div
-          className={`relative flex min-h-[80px] items-start rounded-lg border p-3 transition-all ${
-            isInternalDisabled ? 'cursor-default opacity-80' : ''
+          className={`relative flex min-h-[80px] items-start rounded-lg border-2 p-3 transition-all ${
+            isInternalDisabled ? 'cursor-default opacity-80' : 'cursor-pointer'
           } ${
             isFailed || durationError
-              ? 'border-red-500 bg-red-50 shadow-sm dark:bg-red-900/20'
+              ? 'border-red-500 bg-red-50 shadow-md dark:border-red-600 dark:bg-red-900/30'
               : isUnpublishing
-                ? 'border-amber-500 bg-amber-50 shadow-sm dark:bg-amber-900/20'
+                ? 'border-amber-500 bg-amber-50 shadow-md dark:border-amber-600 dark:bg-amber-900/30'
                 : isCheckedActually
-                  ? `border-primary-500 bg-primary-50 shadow-sm dark:bg-primary-900/20`
-                  : 'border-gray-200 hover:bg-gray-50 dark:border-neutral-600 dark:hover:bg-neutral-700/5'
+                  ? `border-primary-500 bg-primary-100 shadow-lg ring-2 ring-primary-200 dark:border-primary-400 dark:bg-primary-900/40 dark:ring-primary-800`
+                  : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50 dark:border-neutral-600 dark:bg-neutral-800/30 dark:hover:border-neutral-500 dark:hover:bg-neutral-700/20'
           }`}
           data-platform={account.platform}
+          onClick={() => {
+            if (!isInternalDisabled) onToggle();
+          }}
         >
           <div className="flex flex-1 items-center gap-3">
-            <Switch
-              isSelected={!!isCheckedActually}
-              onChange={() => {
-                if (!isInternalDisabled) onToggle();
-              }}
-              isDisabled={isInternalDisabled}
-              size="xs"
-              containerClassName="shrink-0"
-            />
+            <div className="relative shrink-0">
+              <Switch
+                isSelected={!!isCheckedActually}
+                onChange={() => {
+                  if (!isInternalDisabled) onToggle();
+                }}
+                isDisabled={isInternalDisabled}
+                size="sm"
+                containerClassName="shrink-0"
+              />
+              {isCheckedActually && !isInternalDisabled && (
+                <div className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary-500 shadow-md dark:bg-primary-400">
+                  <Check className="h-3 w-3 text-white" />
+                </div>
+              )}
+            </div>
 
             <div className="flex flex-1 flex-col">
               <div className="flex items-center gap-2">

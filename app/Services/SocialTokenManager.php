@@ -105,13 +105,32 @@ class SocialTokenManager
       };
 
       if ($response && isset($response['access_token'])) {
-        $account->update([
+        // Preserve account_metadata (especially OAuth 1.0a credentials for Twitter)
+        $updateData = [
           'access_token' => $response['access_token'],
           'refresh_token' => $response['refresh_token'] ?? $account->refresh_token,
           'token_expires_at' => isset($response['expires_in']) ? now()->addSeconds($response['expires_in']) : $account->token_expires_at,
           'failure_count' => 0,
           'is_active' => true,
-        ]);
+        ];
+
+        // For Twitter, explicitly preserve OAuth 1.0a credentials in metadata
+        if (in_array($account->platform, ['twitter', 'x'])) {
+          $currentMetadata = $account->account_metadata ?? [];
+          
+          // Only update if OAuth 1.0a credentials exist (don't overwrite with empty)
+          if (isset($currentMetadata['oauth1_token']) && isset($currentMetadata['secret'])) {
+            $updateData['account_metadata'] = $currentMetadata;
+            
+            LogHelper::social('twitter.token_refresh_preserved_oauth1', [
+              'account_id' => $account->id,
+              'has_oauth1_token' => true,
+              'has_secret' => true
+            ]);
+          }
+        }
+
+        $account->update($updateData);
 
         return $response['access_token'];
       }

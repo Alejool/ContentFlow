@@ -241,19 +241,42 @@ class PublishToSocialMedia implements ShouldQueue
           'attempt' => $this->attempts(),
         ], $publisher);
 
-        // If not the last attempt, update status to 'retrying'
-        if ($this->attempts() < $this->tries) {
-          $publication->update(['status' => 'retrying']);
+        // If this is the last attempt, mark as failed and send notification
+        if ($this->attempts() >= $this->tries) {
+          $publication->update(['status' => 'failed']);
           
           // Broadcast status change
           event(new PublicationStatusUpdated(
             userId: $publication->user_id,
             publicationId: $publication->id,
-            status: 'retrying',
+            status: 'failed',
             workspaceId: $publication->workspace_id,
             socialAccountIds: $this->socialAccountIds
           ));
+          
+          // Send failure notification immediately
+          $errorMessage = empty($platformResults) 
+            ? ($result['message'] ?? 'Initialization failed') 
+            : 'All platforms failed';
+          $this->sendGeneralFailureNotification($publication, $errorMessage, $platformResults);
+          
+          // Delete job to prevent further retries
+          $this->delete();
+          
+          return; // Exit without throwing exception
         }
+        
+        // If not the last attempt, update status to 'retrying'
+        $publication->update(['status' => 'retrying']);
+        
+        // Broadcast status change
+        event(new PublicationStatusUpdated(
+          userId: $publication->user_id,
+          publicationId: $publication->id,
+          status: 'retrying',
+          workspaceId: $publication->workspace_id,
+          socialAccountIds: $this->socialAccountIds
+        ));
         
         // Throw exception to trigger retry mechanism
         throw new \Exception('All platforms failed: ' . (empty($platformResults) ? ($result['message'] ?? 'Initialization failed') : 'All platforms failed'));

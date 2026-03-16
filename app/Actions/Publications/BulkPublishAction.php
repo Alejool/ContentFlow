@@ -56,7 +56,7 @@ class BulkPublishAction
             throw new \Exception('Workspace not found');
         }
 
-        $planSlug = $workspace->subscription_plan ?? 'free';
+        $planSlug = $workspace->getPlanName();
 
         // Validar límites del plan para operaciones en lote
         $this->validateBulkLimits($publicationIds, $planSlug);

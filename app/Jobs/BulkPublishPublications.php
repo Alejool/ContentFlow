@@ -62,7 +62,7 @@ class BulkPublishPublications implements ShouldQueue
         }
 
         // Obtener el plan y calcular prioridad
-        $planSlug = $workspace->subscription_plan ?? 'free';
+        $planSlug = $workspace->getPlanName();
         $queueService = app(QueuePriorityService::class);
         $effectivePriority = $queueService->getEffectivePriority('bulk', $planSlug);
 

@@ -1,5 +1,7 @@
+import { Avatar } from '@/Components/common/Avatar';
 import Button from '@/Components/common/Modern/Button';
 import SimpleContentTypeBadge from '@/Components/Content/common/SimpleContentTypeBadge';
+import PublicationThumbnailCard from '@/Components/Content/Publication/PublicationThumbnailCard';
 import { usePublicationActions } from '@/Hooks/publication/usePublicationActions';
 import { formatDateString } from '@/Utils/dateHelpers';
 import {
@@ -10,8 +12,7 @@ import {
   getStatusColors,
   hasMedia,
   isProcessing,
-  isVideoMedia,
-  prepareMediaForPreview,
+  isVideoMedia
 } from '@/Utils/publicationHelpers';
 import {
   Calendar,
@@ -30,7 +31,6 @@ import {
   Users,
   Video,
 } from 'lucide-react';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface ContentCardProps {
@@ -86,13 +86,11 @@ export default function ContentCard({
   } = usePublicationActions({
     onEdit,
     onDelete,
-    onPublish,
-    onViewDetails,
-    onDuplicate,
-    permissions,
+    ...(onPublish && { onPublish }),
+    ...(onViewDetails && { onViewDetails }),
+    ...(onDuplicate && { onDuplicate }),
+    ...(permissions && { permissions }),
   });
-
-  const [imageError, setImageError] = useState(false);
 
   // Early return after all hooks
   if (!item) {
@@ -105,22 +103,23 @@ export default function ContentCard({
   const itemIsProcessing = isProcessing(item);
   const mediaUrl = getMediaUrl(item);
   const statusColors = getStatusColors(item.status);
-  const lockedByName = getLockedByName(remoteLock);
-  const lockedByFirstName = getLockedByFirstName(remoteLock);
+  const lockedByName = getLockedByName(remoteLock || undefined);
+  const lockedByFirstName = getLockedByFirstName(remoteLock || undefined);
   const isLoading = loadingStates[item.id];
   const mediaCount = countMediaFiles(item);
 
-  const StatusIcon =
-    {
-      published: CheckCircle,
-      draft: Edit,
-      scheduled: Calendar,
-      failed: Clock,
-      pending_review: Clock,
-      approved: CheckCircle,
-      rejected: Clock,
-      publishing: Clock,
-    }[item.status || 'draft'] || Edit;
+  const statusIconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+    published: CheckCircle,
+    draft: Edit,
+    scheduled: Calendar,
+    failed: Clock,
+    pending_review: Clock,
+    approved: CheckCircle,
+    rejected: Clock,
+    publishing: Clock,
+  };
+  
+  const StatusIcon = statusIconMap[item.status || 'draft'] || Edit;
 
   // Get platform icons for publication
   const getPlatformIcons = () => {
@@ -131,7 +130,7 @@ export default function ContentCard({
         {item.accounts.slice(0, 3).map((account: any, index: number) => (
           <div
             key={index}
-            className="flex h-5 w-5 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700"
+            className="flex h-5 w-5 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700"
             title={account.provider}
           >
             <span className="text-xs font-bold text-gray-600 dark:text-gray-300">
@@ -151,18 +150,10 @@ export default function ContentCard({
     if (window.getSelection()?.toString()) return;
 
     // Trigger view details or edit - USA EL HANDLER DEL HOOK
-    if (onViewDetails) {
+    if (onViewDetails !== undefined) {
       handleViewDetails(item);
-    } else if (onEdit) {
+    } else if (onEdit !== undefined) {
       handleEdit(item, remoteLock);
-    }
-  };
-
-  const handleMediaClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (onPreviewMedia && itemHasMedia && !itemIsProcessing) {
-      const allMedia = prepareMediaForPreview(item);
-      onPreviewMedia(allMedia, 0);
     }
   };
 
@@ -172,49 +163,18 @@ export default function ContentCard({
       onClick={handleCardClick}
     >
       {(itemHasMedia || itemIsProcessing) && (
-        <div
-          className="relative h-40 cursor-zoom-in overflow-hidden bg-gray-100 dark:bg-gray-700"
-          onClick={handleMediaClick}
-        >
-          <div className="relative h-full w-full">
-            {itemIsProcessing ? (
-              <div className="flex h-full w-full animate-pulse flex-col items-center justify-center bg-gray-100 dark:bg-gray-800">
-                <div className="mb-2 flex items-center justify-center rounded-full bg-blue-100 p-3 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
-                  <Clock className="h-6 w-6 animate-spin" />
-                </div>
-                <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                  {t('common.processing')}...
-                </span>
-              </div>
-            ) : !imageError && mediaUrl ? (
-              <img
-                src={mediaUrl}
-                alt={item.title || 'Media'}
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                loading="lazy"
-                onError={() => setImageError(true)}
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center bg-gray-200 dark:bg-gray-700">
-                <div className="text-center">
-                  <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-gray-300 p-3 text-gray-500 dark:bg-gray-600">
-                    {isVideo ? <Video className="h-6 w-6" /> : <ImageIcon className="h-6 w-6" />}
-                  </div>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {isVideo ? t('common.videoTypes.video') : t('common.videoTypes.post')}
-                  </span>
-                </div>
-              </div>
-            )}
-            {!itemIsProcessing && isVideo && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/10 transition-colors group-hover:bg-black/20">
-                <div className="rounded-full bg-white/90 p-2.5 shadow-lg backdrop-blur-sm dark:bg-gray-900/90">
-                  <Video className="h-5 w-5 text-primary-600 dark:text-primary-400" />
-                </div>
-              </div>
-            )}
-          </div>
-          <div className="absolute left-3 top-3 z-10 flex flex-col items-start gap-2">
+        <div className="relative overflow-hidden bg-gray-100 dark:bg-gray-700">
+          <PublicationThumbnailCard
+            publication={item}
+            {...(mediaUrl && { mediaUrl })}
+            isVideo={isVideo}
+            mediaCount={mediaCount.total}
+            size="card"
+            {...(onPreviewMedia && { onPreviewMedia })}
+            {...(onViewDetails && { onViewDetails: () => handleViewDetails(item) })}
+            className="rounded-none border-0"
+          />
+          <div className="absolute left-3 top-3 z-10 flex flex-col items-start gap-2 pointer-events-none">
             {/* Content Type Badge - Solo para publicaciones */}
             {type === 'publication' && !remoteLock && (
               <SimpleContentTypeBadge
@@ -236,10 +196,10 @@ export default function ContentCard({
               </div>
             )}
           </div>
-          <div className="absolute right-3 top-3 z-10 flex flex-col items-end gap-2">
+          <div className="absolute right-3 top-3 z-10 flex flex-col items-end gap-2 pointer-events-none">
             {/* Status Badge */}
             <span
-              className={`flex items-center gap-1.5 rounded-full border border-white/20 px-2.5 py-1 text-xs font-medium shadow-sm backdrop-blur-md ${statusColors}`}
+              className={`flex items-center gap-1.5 rounded-lg border border-white/20 px-2.5 py-1 text-xs font-medium shadow-sm backdrop-blur-md ${statusColors}`}
             >
               <StatusIcon className="h-3 w-3" />
               <span className="capitalize">
@@ -250,11 +210,11 @@ export default function ContentCard({
             </span>
           </div>
           {remoteLock && (
-            <div className="absolute left-3 top-3 z-10">
-              <span className="flex animate-pulse items-center gap-1.5 rounded-full border border-amber-200/50 bg-amber-100/90 px-2.5 py-1 text-xs font-bold text-amber-700 shadow-lg backdrop-blur-md dark:border-amber-700/50 dark:bg-amber-900/80 dark:text-amber-300">
+            <div className="absolute left-3 top-3 z-10 pointer-events-none">
+              <span className="flex animate-pulse items-center gap-1.5 rounded-lg border border-amber-200/50 bg-amber-100/90 px-2.5 py-1 text-xs font-bold text-amber-700 shadow-lg backdrop-blur-md dark:border-amber-700/50 dark:bg-amber-900/80 dark:text-amber-300">
                 <div className="relative">
                   <Lock className="h-3 w-3" />
-                  <div className="absolute -right-0.5 -top-0.5 h-2 w-2 animate-ping rounded-full bg-amber-500" />
+                  <div className="absolute -right-0.5 -top-0.5 h-2 w-2 animate-ping rounded-lg bg-amber-500" />
                 </div>
                 <span className="capitalize">{lockedByFirstName}</span>
               </span>
@@ -290,7 +250,7 @@ export default function ContentCard({
             </div>
 
             <span
-              className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${statusColors}`}
+              className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium ${statusColors}`}
             >
               <StatusIcon className="h-3 w-3" />
               <span className="capitalize">
@@ -326,11 +286,11 @@ export default function ContentCard({
         <div className="mt-auto space-y-2">
           {remoteLock && item.status !== 'pending_review' && (
             <div className="flex items-center gap-2 rounded-lg border border-amber-100 bg-amber-50 p-2 dark:border-amber-800/30 dark:bg-amber-900/20">
-              <div className="relative flex h-5 w-5 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-800 dark:text-amber-400">
+              <div className="relative flex h-5 w-5 items-center justify-center rounded-lg bg-amber-100 text-amber-600 dark:bg-amber-800 dark:text-amber-400">
                 <Lock className="h-3 w-3" />
                 <span className="absolute -right-1 -top-1 flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75"></span>
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500"></span>
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-lg bg-amber-400 opacity-75"></span>
+                  <span className="relative inline-flex h-2 w-2 rounded-lg bg-amber-500"></span>
                 </span>
               </div>
               <span className="text-xs font-semibold text-amber-700 dark:text-amber-400">
@@ -340,7 +300,7 @@ export default function ContentCard({
           )}
           {item.status === 'pending_review' && (
             <div className="flex items-center gap-2 rounded-lg border border-yellow-100 bg-yellow-50 p-2 dark:border-yellow-800/30 dark:bg-yellow-900/20">
-              <div className="relative flex h-5 w-5 items-center justify-center rounded-full bg-yellow-100 text-yellow-600 dark:bg-yellow-800 dark:text-yellow-400">
+              <div className="relative flex h-5 w-5 items-center justify-center rounded-lg bg-yellow-100 text-yellow-600 dark:bg-yellow-800 dark:text-yellow-400">
                 <Clock className="h-3 w-3" />
               </div>
               <div className="flex flex-col">
@@ -359,7 +319,7 @@ export default function ContentCard({
           {type === 'publication' && item.accounts && item.accounts.length > 0 && (
             <div className="flex items-center justify-between">
               <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                <span className="flex items-center gap-1 rounded-full bg-black/50 px-2 py-1 text-xs font-medium text-white">
+                <span className="flex items-center gap-1 rounded-lg bg-black/50 px-2 py-1 text-xs font-medium text-white">
                   <Loader2 className="h-3 w-3 animate-spin" />{' '}
                   {t('publications.gallery.processing', {
                     defaultValue: 'Generating Preview...',
@@ -392,32 +352,20 @@ export default function ContentCard({
           )}
 
           <div className="flex items-center justify-between pt-2">
-            {item.scheduled_at ? (
-              <div className="flex items-center gap-2">
-                <Calendar className="h-3.5 w-3.5 text-gray-400" />
-                <span className="text-xs text-gray-600 dark:text-gray-300">
-                  {formatDateString(item.scheduled_at, {
-                    day: 'numeric',
-                    month: 'short',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </span>
-              </div>
-            ) : (
-              item.created_at && (
-                <div className="flex items-center gap-2">
-                  <Clock className="h-3.5 w-3.5 text-gray-400" />
-                  <span className="text-xs text-gray-600 dark:text-gray-300">
-                    {formatDateString(item.created_at, {
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric',
-                    })}
+            <div className="flex items-center gap-2">
+              {item.user && (
+                <>
+                  <Avatar
+                    src={item.user.photo_url}
+                    name={item.user.name}
+                    size="xs"
+                  />
+                  <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
+                    {item.user.name}
                   </span>
-                </div>
-              )
-            )}
+                </>
+              )}
+            </div>
 
             {type === 'publication' && itemHasMedia && (
               <div className="flex items-center gap-1">
@@ -432,6 +380,37 @@ export default function ContentCard({
               </div>
             )}
           </div>
+
+          {(item.scheduled_at || item.created_at) && (
+            <div className="flex items-center gap-2 pt-1">
+              {item.scheduled_at ? (
+                <>
+                  <Calendar className="h-3.5 w-3.5 text-gray-400" />
+                  <span className="text-xs text-gray-600 dark:text-gray-300">
+                    {formatDateString(item.scheduled_at, {
+                      day: 'numeric',
+                      month: 'short',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </span>
+                </>
+              ) : (
+                item.created_at && (
+                  <>
+                    <Clock className="h-3.5 w-3.5 text-gray-400" />
+                    <span className="text-xs text-gray-600 dark:text-gray-300">
+                      {formatDateString(item.created_at, {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                      })}
+                    </span>
+                  </>
+                )
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -446,7 +425,7 @@ export default function ContentCard({
                     handlePublish(item);
                   }}
                   disabled={isLoading?.publishing}
-                  loading={isLoading?.publishing}
+                  {...(isLoading?.publishing !== undefined && { loading: isLoading.publishing })}
                   variant="primary"
                   size="md"
                   icon={Rocket}
@@ -461,7 +440,7 @@ export default function ContentCard({
                     handleSubmitForApproval(item);
                   }}
                   disabled={isLoading?.submitting}
-                  loading={isLoading?.submitting}
+                  {...(isLoading?.submitting !== undefined && { loading: isLoading.submitting })}
                   variant="primary"
                   size="md"
                   icon={Send}
@@ -570,7 +549,7 @@ export default function ContentCard({
               size="md"
               icon={Trash2}
               disabled={isLoading?.deleting}
-              loading={isLoading?.deleting}
+              {...(isLoading?.deleting !== undefined && { loading: isLoading.deleting })}
             >
               <span className="sr-only">{t('common.delete')}</span>
             </Button>

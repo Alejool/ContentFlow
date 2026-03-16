@@ -23,7 +23,11 @@ export function PublicationItem({
     const platformSummary = publication.platform_status_summary;
     if (!platformSummary) return null;
 
-    const platforms = Object.values(platformSummary);
+    // Solo contar plataformas que tienen un estado activo (no 'idle' o sin estado)
+    const platforms = Object.values(platformSummary).filter(
+      (p) => p.status && p.status !== 'idle' && p.status !== 'pending_selection'
+    );
+    
     const total = platforms.length;
     const published = platforms.filter((p) => p.status === 'published').length;
     const failed = platforms.filter((p) => p.status === 'failed').length;

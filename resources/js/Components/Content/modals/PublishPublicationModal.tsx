@@ -1,5 +1,6 @@
 import Button from '@/Components/common/Modern/Button';
 import YouTubeThumbnailUploader from '@/Components/common/ui/YouTubeThumbnailUploader';
+import PlatformCard from '@/Components/Content/modals/publish/PlatformCard';
 import RejectionReasonModal from '@/Components/Content/modals/RejectionReasonModal';
 import { CONTENT_TYPE_CONFIG } from '@/Constants/contentTypes';
 import { getPlatformConfig } from '@/Constants/socialPlatforms';
@@ -9,10 +10,9 @@ import { usePublicationStore } from '@/stores/publicationStore';
 import { Publication } from '@/types/Publication';
 import { formatDateTimeStyled } from '@/Utils/dateHelpers';
 import { formatDateTime } from '@/Utils/formatDate';
-import { validateVideoDuration } from '@/Utils/validationUtils';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { usePage } from '@inertiajs/react';
-import { AlertCircle, CheckCircle, Clock, Loader2, Share2, X, XCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle, ChevronDown, Clock, Share2, X, XCircle } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -124,6 +124,7 @@ export default function PublishPublicationModal({
   const [activePlatformSettings, setActivePlatformSettings] = useState<string | null>(null);
   const [platformSettings, setPlatformSettings] = useState<Record<string, any>>({});
   const [rejectionModalOpen, setRejectionModalOpen] = useState(false);
+  const [isYouTubeThumbnailExpanded, setIsYouTubeThumbnailExpanded] = useState(true);
 
   const {
     connectedAccounts,
@@ -224,6 +225,41 @@ export default function PublishPublicationModal({
     }
   };
 
+  const handleCloseModal = async () => {
+    if (!publication) {
+      onClose();
+      return;
+    }
+
+    // Si hay plataformas publicando o reintentando, preguntar si quiere cancelar
+    const hasPublishingPlatforms =
+      publishingPlatforms.length > 0 &&
+      (publication.status === 'publishing' || publication.status === 'retrying');
+
+    if (hasPublishingPlatforms) {
+      const confirmed = await confirm({
+        title:
+          t('publications.modal.cancelAllConfirm.title') || '¿Cancelar TODAS las plataformas?',
+        message:
+          t('publications.modal.cancelAllConfirm.message', {
+            count: publishingPlatforms.length,
+          }) ||
+          `¿Estás seguro de que deseas cancelar la publicación en TODAS las plataformas (${publishingPlatforms.length})? Se detendrán todos los reintentos. Las plataformas que ya se publicaron no se verán afectadas.`,
+        confirmText: t('publications.modal.cancelAllConfirm.confirm') || 'Sí, cancelar todas',
+        cancelText: t('publications.modal.cancelAllConfirm.cancel') || 'No',
+        type: 'danger',
+      });
+
+      if (confirmed) {
+        await handleCancelPublication(publication.id);
+        if (onSuccess) onSuccess();
+        onClose(publication.id);
+      }
+    } else {
+      onClose(publication.id);
+    }
+  };
+
   const { fetchPublicationById } = usePublicationStore();
 
   useEffect(() => {
@@ -299,11 +335,12 @@ export default function PublishPublicationModal({
 
   // Filter connected accounts based on content type compatibility
   const getCompatibleAccounts = () => {
-    if (!publication.content_type) return connectedAccounts;
+    const contentType = publication.content_type;
+    if (!contentType) return connectedAccounts;
 
     return connectedAccounts.filter((account) => {
       const supportedTypes = getSupportedContentTypes(account.platform);
-      return supportedTypes.includes(publication.content_type);
+      return supportedTypes.includes(contentType);
     });
   };
 
@@ -709,401 +746,41 @@ export default function PublishPublicationModal({
                 ) : (
                   <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                     {compatibleAccounts.map((account) => {
-                      const iconSrc = getPlatformIcon(account.platform);
                       const isSelected = selectedPlatforms.includes(account.id);
                       const isPublished = publishedPlatforms.includes(account.id);
                       const isFailed = failedPlatforms.includes(account.id);
                       const isRemovedPlatform = removedPlatforms.includes(account.id);
-                      const isDuplicate = duplicatePlatforms.includes(account.id); // Estado de duplicado
-                      // Mostrar "publishing" si la publicación está en estado "publishing" o "retrying" Y está en la lista
+                      const isDuplicate = duplicatePlatforms.includes(account.id);
                       const isPublishing =
                         publishingPlatforms.includes(account.id) &&
-                        (publication?.status === 'publishing' ||
-                          publication?.status === 'retrying');
+                        (publication?.status === 'publishing' || publication?.status === 'retrying');
                       const isScheduled = scheduledPlatforms.includes(account.id);
                       const isUnpublishing = unpublishing === account.id;
-
-                      // Get retry information for this platform
                       const platformRetryInfo = retryInfo[account.id];
-                      const isRetrying = platformRetryInfo?.is_retrying || false;
-                      const retryStatus = platformRetryInfo?.retry_status || null;
-                      const isDuplicateAttempt = platformRetryInfo?.is_duplicate || false;
-                      const originalAttemptAt = platformRetryInfo?.original_attempt_at;
 
                       return (
-                        <div key={account.id} className="relative w-full">
-                          <div
-                            onClick={() => {
-                              // Solo permitir toggle si no está publicado, programado, reintentando, duplicado, o activamente publicando
-                              if (
-                                !isPublished &&
-                                !isScheduled &&
-                                !isPublishing &&
-                                !isRetrying &&
-                                !isDuplicate &&
-                                !isDuplicateAttempt
-                              ) {
-                                togglePlatform(account.id);
-                              }
-                            }}
-                            className={`relative flex h-[110px] w-full flex-col gap-3 rounded-lg p-4 transition-all ${
-                              !isPublished &&
-                              !isScheduled &&
-                              !isPublishing &&
-                              !isRetrying &&
-                              !isDuplicate &&
-                              !isDuplicateAttempt
-                                ? 'cursor-pointer'
-                                : 'cursor-default'
-                            } ${
-                              isDuplicate || isDuplicateAttempt
-                                ? 'border border-orange-500 bg-orange-50 dark:bg-orange-900/20'
-                                : isPublishing || isRetrying
-                                  ? 'border border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20'
-                                  : isPublished
-                                    ? 'border border-green-500 bg-green-50 dark:bg-green-900/20'
-                                    : isScheduled
-                                      ? 'border border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                                      : isFailed
-                                        ? 'border border-red-500 bg-red-50 dark:bg-red-900/20'
-                                        : isRemovedPlatform
-                                          ? 'border border-gray-500 bg-gray-50 dark:bg-gray-900/20'
-                                          : isSelected
-                                            ? 'border border-primary-600 bg-primary-50 ring-2 ring-primary-400/50 dark:bg-primary-900/30 dark:ring-primary-500/50'
-                                            : 'border border-gray-300 bg-white hover:border-primary-400 hover:shadow-md dark:border-neutral-700 dark:bg-neutral-900/30 dark:hover:border-primary-600'
-                            }`}
-                          >
-                            {/* Publishing Overlay */}
-                            {(isPublishing || isRetrying) && !isFailed && (
-                              <div className="animate-in fade-in absolute inset-0 z-30 flex flex-col items-center justify-center rounded-lg bg-white/95 backdrop-blur-sm duration-300 dark:bg-neutral-900/95">
-                                <div className="flex flex-col items-center gap-2">
-                                  <div className="relative flex-shrink-0">
-                                    <div className="h-10 w-10 rounded-full border border-yellow-200 dark:border-yellow-900" />
-                                    <div className="absolute inset-0 h-10 w-10 animate-spin rounded-full border border-yellow-500 border-t-transparent" />
-                                  </div>
-
-                                  <div className="flex flex-col items-center gap-0.5">
-                                    <span className="text-sm font-bold capitalize tracking-wide text-yellow-800 dark:text-yellow-300">
-                                      {account.platform}
-                                    </span>
-                                    <span className="text-xs font-medium text-yellow-600 dark:text-yellow-400">
-                                      {isRetrying && retryStatus
-                                        ? `${t('publications.status.retrying') || 'Reintentando'} ${retryStatus}`
-                                        : publication?.status === 'retrying'
-                                          ? t('publications.status.retrying') || 'Reintentando'
-                                          : t('publications.modal.publish.publishing')}
-                                    </span>
-                                  </div>
-                                </div>
-
-                                {/* Cancel button for individual platform */}
-                                <button
-                                  onClick={async (e) => {
-                                    e.stopPropagation();
-                                    if (!publication) return;
-
-                                    const confirmed = await confirm({
-                                      title:
-                                        t('publications.modal.cancel_platform.title', {
-                                          platform: account.platform,
-                                        }) || `¿Cancelar ${account.platform}?`,
-                                      message:
-                                        t('publications.modal.cancel_platform.message', {
-                                          platform: account.platform,
-                                        }) ||
-                                        `¿Estás seguro de que deseas cancelar la publicación en ${account.platform}? Se detendrán todos los reintentos para esta plataforma.`,
-                                      confirmText:
-                                        t('publications.modal.cancel_platform.confirm') ||
-                                        'Sí, cancelar',
-                                      cancelText:
-                                        t('publications.modal.cancel_platform.cancel') || 'No',
-                                      type: 'warning',
-                                    });
-
-                                    if (confirmed) {
-                                      await handleCancelPlatform(publication.id, account.id);
-                                    }
-                                  }}
-                                  className="mt-3 rounded-md border border-yellow-300 bg-white px-3 py-1.5 text-xs font-medium text-yellow-700 transition-colors hover:bg-yellow-50 hover:text-yellow-900 dark:border-yellow-700 dark:bg-neutral-800 dark:text-yellow-400 dark:hover:bg-neutral-700 dark:hover:text-yellow-200"
-                                >
-                                  {t('common.cancel') || 'Cancelar'}
-                                </button>
-                              </div>
-                            )}
-
-                            {/* Failed Overlay */}
-                            {isFailed && !isPublished && !isScheduled && (
-                              <div className="animate-in fade-in absolute inset-0 z-30 flex flex-col items-center justify-center rounded-lg bg-red-50/95 backdrop-blur-sm duration-300 dark:bg-red-900/30">
-                                <div className="flex flex-col items-center gap-2">
-                                  <XCircle className="h-10 w-10 text-red-600 dark:text-red-400" />
-                                  <div className="flex flex-col items-center gap-0.5">
-                                    <span className="text-sm font-bold capitalize tracking-wide text-red-800 dark:text-red-300">
-                                      {account.platform}
-                                    </span>
-                                    <span className="text-xs font-medium text-red-600 dark:text-red-400">
-                                      {t('publications.modal.publish.failed') || 'Falló'}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Unpublishing Overlay */}
-                            {isUnpublishing && (
-                              <div className="animate-in fade-in absolute inset-0 z-30 flex flex-col items-center justify-center rounded-lg bg-white/95 backdrop-blur-sm duration-300 dark:bg-neutral-900/95">
-                                <div className="flex flex-col items-center gap-2">
-                                  <Loader2 className="h-10 w-10 animate-spin text-amber-600 dark:text-amber-400" />
-                                  <span className="text-xs font-bold uppercase tracking-wide text-amber-600 dark:text-amber-400">
-                                    {t('publications.modal.publish.unpublishing') ||
-                                      'Despublicando...'}
-                                  </span>
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Duplicate Attempt Overlay */}
-                            {(isDuplicate || isDuplicateAttempt) &&
-                              !isPublished &&
-                              !isScheduled && (
-                                <div className="animate-in fade-in absolute inset-0 z-30 flex flex-col items-center justify-center rounded-lg bg-orange-50/95 backdrop-blur-sm duration-300 dark:bg-orange-900/30">
-                                  <div className="flex flex-col items-center gap-2">
-                                    <div className="relative flex-shrink-0">
-                                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/50">
-                                        <svg
-                                          className="h-6 w-6 text-orange-600 dark:text-orange-400"
-                                          fill="none"
-                                          stroke="currentColor"
-                                          viewBox="0 0 24 24"
-                                        >
-                                          <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
-                                          />
-                                        </svg>
-                                      </div>
-                                    </div>
-                                    <div className="flex flex-col items-center gap-0.5">
-                                      <span className="text-sm font-bold capitalize tracking-wide text-orange-800 dark:text-orange-300">
-                                        {account.platform}
-                                      </span>
-                                      <span className="text-center text-xs font-medium text-orange-600 dark:text-orange-400">
-                                        {t('publications.modal.publish.duplicate') ||
-                                          'Intento duplicado'}
-                                      </span>
-                                      {originalAttemptAt && (
-                                        <span className="mt-1 text-center text-xs text-orange-500 dark:text-orange-500">
-                                          {t('publications.modal.publish.original_attempt') ||
-                                            'Intento original:'}{' '}
-                                          {new Date(originalAttemptAt).toLocaleString()}
-                                        </span>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-
-                            {/* Published Overlay */}
-                            {isPublished &&
-                              !isUnpublishing &&
-                              (() => {
-                                // Buscar el log de esta cuenta para obtener el post_url
-                                const postLog = publication.social_post_logs?.find(
-                                  (log: any) =>
-                                    log.social_account_id === account.id &&
-                                    log.status === 'published',
-                                );
-                                const postUrl = postLog?.post_url;
-
-                                return (
-                                  <div className="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-lg bg-green-50/80 backdrop-blur-[2px] dark:bg-green-900/30">
-                                    <div className="flex flex-col items-center gap-2">
-                                      <CheckCircle className="h-10 w-10 text-green-600 dark:text-green-400" />
-                                      <div className="flex flex-col items-center gap-0.5">
-                                        <span className="text-sm font-bold capitalize tracking-wide text-green-800 dark:text-green-300">
-                                          {account.platform}
-                                        </span>
-                                        <span className="text-xs font-medium text-green-600 dark:text-green-400">
-                                          {t('publications.modal.publish.published')}
-                                        </span>
-                                      </div>
-
-                                      {/* Enlace a la publicación si existe */}
-                                      {postUrl && (
-                                        <a
-                                          href={postUrl}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          onClick={(e) => e.stopPropagation()}
-                                          className="pointer-events-auto mt-2 flex items-center gap-1.5 rounded-md bg-green-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600"
-                                        >
-                                          <svg
-                                            className="h-3.5 w-3.5"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                          >
-                                            <path
-                                              strokeLinecap="round"
-                                              strokeLinejoin="round"
-                                              strokeWidth={2}
-                                              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                                            />
-                                          </svg>
-                                          {t('publications.modal.publish.viewPost') ||
-                                            'Ver publicación'}
-                                        </a>
-                                      )}
-                                    </div>
-                                  </div>
-                                );
-                              })()}
-
-                            {/* Video Duration Warning */}
-                            {!isPublishing &&
-                              !isUnpublishing &&
-                              !isPublished &&
-                              (() => {
-                                const mediaFiles = publication.media_files || [];
-                                const video = mediaFiles.find(
-                                  (m: any) =>
-                                    m.file_type === 'video' || m.mime_type?.startsWith('video/'),
-                                );
-                                if (!video) return null;
-
-                                const duration = video.metadata?.duration || 0;
-                                const validation = validateVideoDuration(
-                                  account.platform,
-                                  duration,
-                                );
-
-                                if (validation.maxDuration === Infinity || validation.isValid)
-                                  return null;
-
-                                return (
-                                  <div className="absolute left-2 top-2 z-10 flex animate-pulse items-center gap-1 rounded-md border border-red-200 bg-red-50 px-2 py-1 text-[10px] font-bold text-red-600 shadow-sm dark:border-red-800/30 dark:bg-red-900/30 dark:text-red-400">
-                                    <XCircle className="h-3 w-3" />
-                                    <span className="leading-none">
-                                      MAX {validation.formattedMax}
-                                    </span>
-                                  </div>
-                                );
-                              })()}
-
-                            {/* Platform Logo and Info */}
-                            <div className="z-10 flex items-center gap-3">
-                              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg p-1">
-                                <img
-                                  src={iconSrc}
-                                  alt={account.platform}
-                                  className="h-full w-full object-contain"
-                                />
-                              </div>
-                              <div className="min-w-0 flex-1 text-left">
-                                <div className="truncate text-base font-bold capitalize text-gray-900 dark:text-white">
-                                  {account.platform}
-                                </div>
-                                <div className="truncate text-xs text-gray-600 dark:text-gray-400">
-                                  @{account.account_name}
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Connected By Info */}
-                            {account.user?.name &&
-                              !isPublishing &&
-                              !isUnpublishing &&
-                              !isPublished && (
-                                <div className="z-10 truncate text-[10px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                                  {t('manageContent.socialMedia.status.connectedBy') ||
-                                    'Conectado por'}
-                                  : {account.user.name}
-                                </div>
-                              )}
-                          </div>
-
-                          {/* Scheduled Badge - Outside the card */}
-                          {isScheduled && !isPublishing && !isUnpublishing && (
-                            <div className="absolute -top-3 right-2 z-40">
-                              <div className="flex flex-col items-end gap-1">
-                                <span className="flex items-center gap-1.5 rounded-full border border-white bg-gradient-to-r from-blue-600 to-blue-700 px-3 py-1.5 text-xs font-bold text-white shadow-lg dark:border-neutral-800">
-                                  <Clock className="h-3.5 w-3.5" />
-                                  {t('publications.status.scheduled')?.toUpperCase() ||
-                                    'PROGRAMADO'}
-                                </span>
-                                {(() => {
-                                  const schedPost = publication.scheduled_posts?.find(
-                                    (sp) => sp.social_account_id === account.id,
-                                  );
-                                  return schedPost?.scheduled_at ? (
-                                    <span className="rounded-full bg-white px-2 py-0.5 text-[10px] text-gray-600 shadow-sm dark:bg-neutral-800 dark:text-gray-400">
-                                      {formatDateTimeStyled(
-                                        schedPost.scheduled_at,
-                                        'short',
-                                        'short',
-                                      )}
-                                    </span>
-                                  ) : null;
-                                })()}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Removed Badge - Outside the card */}
-                          {isRemovedPlatform &&
-                            !isPublishing &&
-                            !isUnpublishing &&
-                            !isPublished && (
-                              <div className="absolute -top-3 right-2 z-40">
-                                <span className="flex items-center gap-1.5 rounded-full border border-white bg-gradient-to-r from-gray-600 to-gray-700 px-3 py-1.5 text-xs font-bold text-white shadow-lg dark:border-neutral-800">
-                                  <XCircle className="h-3.5 w-3.5" />
-                                  {t('publications.modal.publish.removed')?.toUpperCase() ||
-                                    'REMOVIDO'}
-                                </span>
-                              </div>
-                            )}
-
-                          {/* Failed Badge - Discrete corner badge */}
-                          {isFailed &&
-                            !isScheduled &&
-                            !isPublished &&
-                            !isPublishing &&
-                            !isUnpublishing &&
-                            !isRetrying && (
-                              <div className="absolute left-2 top-2 z-10">
-                                <span className="flex items-center gap-1 rounded-md border border-red-300 bg-red-100 px-2 py-1 text-[10px] font-bold text-red-700 shadow-sm dark:border-red-800 dark:bg-red-900/40 dark:text-red-400">
-                                  <XCircle className="h-3 w-3" />
-                                  {t('publications.modal.publish.failed') || 'Falló'}
-                                </span>
-                              </div>
-                            )}
-
-                          {/* Unpublish Button */}
-                          {isPublished && !isUnpublishing && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleUnpublishWithConfirm(account.id, account.platform);
-                              }}
-                              disabled={isUnpublishing}
-                              className="absolute right-3 top-3 z-30 rounded-full bg-red-500 p-2 text-white shadow-lg transition-colors hover:bg-red-600 disabled:opacity-50"
-                              title="Despublicar"
-                            >
-                              <X className="h-4 w-4" />
-                            </button>
-                          )}
-
-                          {publication && getRecurringPosts && getPublishedRecurringPosts && (
-                            <RecurringPostsSection
-                              publication={publication}
-                              accountId={account.id}
-                              getRecurringPosts={getRecurringPosts}
-                              getPublishedRecurringPosts={getPublishedRecurringPosts}
-                              t={t}
-                            />
-                          )}
-                        </div>
+                        <PlatformCard
+                          key={account.id}
+                          account={account}
+                          publication={publication}
+                          isSelected={isSelected}
+                          isPublished={isPublished}
+                          isFailed={isFailed}
+                          isRemovedPlatform={isRemovedPlatform}
+                          isDuplicate={isDuplicate}
+                          isPublishing={isPublishing}
+                          isScheduled={isScheduled}
+                          isUnpublishing={isUnpublishing}
+                          platformRetryInfo={platformRetryInfo}
+                          onToggle={() => togglePlatform(account.id)}
+                          onCancelPlatform={handleCancelPlatform}
+                          onUnpublish={handleUnpublishWithConfirm}
+                          confirm={confirm}
+                          t={t}
+                          RecurringPostsSection={RecurringPostsSection}
+                          getRecurringPosts={getRecurringPosts}
+                          getPublishedRecurringPosts={getPublishedRecurringPosts}
+                        />
                       );
                     })}
                   </div>
@@ -1112,39 +789,52 @@ export default function PublishPublicationModal({
 
               {isYoutubeSelected() && videoFiles.length > 0 && (
                 <div className="mb-6">
-                  <div className="mb-4 flex items-center gap-2">
-                    <img
-                      src={getPlatformConfig('youtube').logo}
-                      className="h-5 w-5"
-                      alt="YouTube"
-                    />
-                    <h4 className="font-semibold text-gray-900 dark:text-white">
-                      {t('publications.modal.publish.youtubeThumbnails')}
+                  <button
+                    type="button"
+                    onClick={() => setIsYouTubeThumbnailExpanded(!isYouTubeThumbnailExpanded)}
+                    className="mb-3 flex w-full items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 hover:text-primary-600 dark:border-neutral-700 dark:bg-neutral-800/50 dark:text-gray-300 dark:hover:bg-neutral-700 dark:hover:text-primary-400"
+                  >
+                    <div className="flex items-center gap-2">
+                      <img
+                        src={getPlatformConfig('youtube').logo}
+                        className="h-5 w-5"
+                        alt="YouTube"
+                      />
+                      <span className="font-semibold">
+                        {t('publications.modal.publish.youtubeThumbnails') || 'YouTube Thumbnails'}
+                      </span>
                       {isLoadingThumbnails && (
                         <span className="ml-2 text-xs text-gray-500">
-                          {t('publications.modal.publish.loading')}
+                          {t('publications.modal.publish.loading') || 'Cargando...'}
                         </span>
                       )}
-                    </h4>
-                  </div>
-
-                  {isLoadingThumbnails ? (
-                    <div className="py-4 text-center">
-                      <div className="mx-auto h-8 w-8 animate-spin rounded-full border-b-2 border-primary-500"></div>
                     </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {videoData.map((data) => (
-                        <YouTubeThumbnailUploader
-                          key={data.videoId}
-                          videoId={data.videoId}
-                          videoFileName={data.videoFileName}
-                          videoPreviewUrl={data.videoPreviewUrl}
-                          existingThumbnail={data.existingThumbnail}
-                          onThumbnailChange={handleThumbnailChange}
-                          onThumbnailDelete={handleThumbnailDelete}
-                        />
-                      ))}
+                    <ChevronDown
+                      className={`h-4 w-4 transition-transform duration-200 ${isYouTubeThumbnailExpanded ? 'rotate-180' : ''}`}
+                    />
+                  </button>
+
+                  {isYouTubeThumbnailExpanded && (
+                    <div className="animate-in fade-in slide-in-from-top-2 duration-200">
+                      {isLoadingThumbnails ? (
+                        <div className="py-4 text-center">
+                          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-b-2 border-primary-500"></div>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {videoData.map((data) => (
+                            <YouTubeThumbnailUploader
+                              key={data.videoId}
+                              videoId={data.videoId}
+                              videoFileName={data.videoFileName}
+                              videoPreviewUrl={data.videoPreviewUrl}
+                              existingThumbnail={data.existingThumbnail}
+                              onThumbnailChange={handleThumbnailChange}
+                              onThumbnailDelete={handleThumbnailDelete}
+                            />
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -1152,41 +842,15 @@ export default function PublishPublicationModal({
             </div>
 
             <div className="sticky bottom-0 z-20 flex gap-3 border-t border-gray-200/50 bg-gradient-to-r from-gray-50 via-white to-gray-50/80 p-4 shadow-sm backdrop-blur-md dark:border-neutral-800/50 dark:from-neutral-900 dark:via-neutral-900/95 dark:to-neutral-800/90 dark:shadow-neutral-950/20">
-              <button
+              <Button
                 type="button"
-                onClick={async () => {
-                  // Si hay plataformas publicando o reintentando, preguntar si quiere cancelar
-                  const hasPublishingPlatforms =
-                    publishingPlatforms.length > 0 &&
-                    (publication.status === 'publishing' || publication.status === 'retrying');
-
-                  if (hasPublishingPlatforms) {
-                    const confirmed = await confirm({
-                      title:
-                        t('publications.modal.cancelAllConfirm.title') ||
-                        '¿Cancelar TODAS las plataformas?',
-                      message:
-                        t('publications.modal.cancelAllConfirm.message', {
-                          count: publishingPlatforms.length,
-                        }) ||
-                        `¿Estás seguro de que deseas cancelar la publicación en TODAS las plataformas (${publishingPlatforms.length})? Se detendrán todos los reintentos. Las plataformas que ya se publicaron no se verán afectadas.`,
-                      confirmText:
-                        t('publications.modal.cancelAllConfirm.confirm') || 'Sí, cancelar todas',
-                      cancelText: t('publications.modal.cancelAllConfirm.cancel') || 'No',
-                      type: 'danger',
-                    });
-
-                    if (confirmed) {
-                      await handleCancelPublication(publication.id);
-                      if (onSuccess) onSuccess();
-                      onClose(publication.id);
-                    }
-                  } else {
-                    onClose(publication.id);
-                  }
-                }}
+                onClick={handleCloseModal}
                 disabled={unpublishing !== null}
-                className="flex-1 rounded-lg bg-gray-100 px-4 py-3 font-medium text-gray-700 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-neutral-700 dark:text-white dark:hover:bg-neutral-600"
+                variant="secondary"
+                buttonStyle="solid"
+                size="lg"
+                className="flex-1"
+                rounded="lg"
               >
                 {publishingPlatforms.length > 0 &&
                 (publication.status === 'publishing' || publication.status === 'retrying')
@@ -1194,46 +858,42 @@ export default function PublishPublicationModal({
                       count: publishingPlatforms.length,
                     }) || `Cancelar Todas (${publishingPlatforms.length})`
                   : t('publications.modal.publish.button.cancel') || 'Cerrar'}
-              </button>
+              </Button>
               {canPublishDirectly ? (
-                <button
+                <Button
                   type="button"
                   onClick={handlePublishWithNotifications}
                   disabled={selectedPlatforms.length === 0 || publishing}
-                  className="flex flex-[2] items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-primary-500 to-primary-600 px-4 py-3 font-medium text-white transition-all hover:from-primary-600 hover:to-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  variant="primary"
+                  buttonStyle="gradient"
+                  size="lg"
+                  className="flex-[2]"
+                  rounded="lg"
+                  loading={publishing}
+                  loadingText={t('publications.modal.publish.publishing') || 'Publicando...'}
+                  icon={Share2}
+                  iconPosition="left"
                 >
-                  {publishing ? (
-                    <>
-                      <div className="h-4 w-4 animate-spin rounded-full border-b-2 border-white"></div>
-                      {t('publications.modal.publish.publishing')}
-                    </>
-                  ) : (
-                    <>
-                      <Share2 className="h-4 w-4" />
-                      {t('publications.modal.publish.button.publish')}{' '}
-                      {selectedPlatforms.length > 0 && `(${selectedPlatforms.length})`}
-                    </>
-                  )}
-                </button>
+                  {t('publications.modal.publish.button.publish') || 'Publicar'}{' '}
+                  {selectedPlatforms.length > 0 && `(${selectedPlatforms.length})`}
+                </Button>
               ) : canManageContent ? (
-                <button
+                <Button
                   type="button"
                   onClick={handleRequestApproval}
                   disabled={publishing || isPendingReview}
-                  className="flex flex-[2] items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-primary-500 to-primary-600 px-4 py-3 font-medium text-white transition-all hover:from-primary-600 hover:to-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  variant="primary"
+                  buttonStyle="gradient"
+                  size="lg"
+                  className="flex-[2]"
+                  rounded="lg"
+                  icon={isPendingReview ? Clock : CheckCircle}
+                  iconPosition="left"
                 >
-                  {isPendingReview ? (
-                    <>
-                      <Clock className="h-4 w-4" />
-                      {t('publications.modal.publish.button.pendingReview')}
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle className="h-4 w-4" />
-                      {t('publications.modal.publish.button.requestApproval')}
-                    </>
-                  )}
-                </button>
+                  {isPendingReview
+                    ? t('publications.modal.publish.button.pendingReview') || 'Pendiente de Revisión'
+                    : t('publications.modal.publish.button.requestApproval') || 'Solicitar Aprobación'}
+                </Button>
               ) : null}
             </div>
 

@@ -94,7 +94,7 @@ const SimpleContentTypeBadge = memo(
 
     return (
       <div
-        className={`inline-flex items-center rounded-full border font-bold uppercase tracking-wider ${borderColor} ${color} ${sizeClasses[size]} ${className} `}
+        className={`inline-flex items-center rounded-lg border font-bold uppercase tracking-wider ${borderColor} ${color} ${sizeClasses[size]} ${className} `}
       >
         {IconComponent && (
           <IconComponent

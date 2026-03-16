@@ -11,6 +11,7 @@
     "select": "Select",
     "more": "More",
     "active": "Active",
+    "selected": "Selected",
     "completed": "Completed",
     "inactive": "Inactive",
     "available": "Available",

@@ -161,7 +161,7 @@ class PublishPublicationAction
 
     // Obtener información de la cola antes de despachar
     $queuePriorityService = app(\App\Services\Queue\QueuePriorityService::class);
-    $planSlug = $publication->workspace->subscription_plan ?? 'free';
+    $planSlug = $publication->workspace->getPlanName();
     
     $queueInfo = $queuePriorityService->getQueuePositionForPlan('publishing', $planSlug);
     $queueSize = $queueInfo['pending_jobs'];

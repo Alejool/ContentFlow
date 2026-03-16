@@ -1,11 +1,18 @@
+import { Avatar } from '@/Components/common/Avatar';
 import Button from '@/Components/common/Modern/Button';
 import SimpleContentTypeBadge from '@/Components/Content/common/SimpleContentTypeBadge';
-import PublicationThumbnail from '@/Components/Content/Publication/PublicationThumbnail';
+import PublicationThumbnailCard from '@/Components/Content/Publication/PublicationThumbnailCard';
 import SocialAccountsDisplay from '@/Components/Content/Publication/SocialAccountsDisplay';
 import { usePublicationActions } from '@/Hooks/publication/usePublicationActions';
 import { usePublicationStore } from '@/stores/publicationStore';
 import { Publication } from '@/types/Publication';
-import { countMediaFiles, getLockedByName } from '@/Utils/publicationHelpers';
+import {
+  countMediaFiles,
+  getLockedByName,
+  getMediaUrl,
+  hasMedia,
+  isVideoMedia
+} from '@/Utils/publicationHelpers';
 import {
   Calendar,
   Clock,
@@ -87,10 +94,10 @@ const PublicationRow = memo(
       onEdit,
       onDelete,
       onPublish,
-      onViewDetails,
-      onDuplicate,
-      onEditRequest,
-      permissions,
+      ...(onViewDetails && { onViewDetails }),
+      ...(onDuplicate && { onDuplicate }),
+      ...(onEditRequest && { onEditRequest }),
+      ...(permissions && { permissions }),
     });
 
     const publishingPlatforms = useMemo(() => {
@@ -101,82 +108,27 @@ const PublicationRow = memo(
       return countMediaFiles(item);
     }, [item]);
 
-    const lockedByName = getLockedByName(remoteLock);
+    const lockedByName = getLockedByName(remoteLock || undefined);
     const isLoading = loadingStates[item.id];
+    const itemHasMedia = hasMedia(item);
+    const isVideo = isVideoMedia(item);
+    const mediaUrl = getMediaUrl(item);
 
     return (
       <>
         <td className="text-center"></td>
-        <td className="">
+        <td >
           <div className="flex items-center gap-4">
-            <div
-              role="button"
-              tabIndex={0}
-              className="flex h-12 w-12 flex-shrink-0 cursor-zoom-in items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800"
-              onClick={(e) => {
-                e.stopPropagation();
-                const hasMedia = item.media_files && item.media_files.length > 0;
-                if (hasMedia && onPreviewMedia) {
-                  const allMedia = (item.media_files || []).map((media: {
-                    file_type?: string;
-                    file_path: string;
-                    thumbnail?: { file_path: string };
-                  }) => {
-                    const isV = media.file_type?.includes('video');
-                    let mUrl = media.thumbnail?.file_path || media.file_path;
-
-                    if (!mUrl && media.file_type === 'image') {
-                      mUrl = media.file_path;
-                    }
-
-                    return {
-                      url: isV
-                        ? media.file_path.startsWith('http')
-                          ? media.file_path
-                          : `/storage/${media.file_path}`
-                        : mUrl.startsWith('http')
-                          ? mUrl
-                          : `/storage/${mUrl}`,
-                      type: (isV ? 'video' : 'image') as 'image' | 'video',
-                      title: item.title,
-                    };
-                  });
-
-                  onPreviewMedia(allMedia, 0);
-                }
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  const hasMedia = item.media_files && item.media_files.length > 0;
-                  if (hasMedia && onPreviewMedia) {
-                    const allMedia = (item.media_files || []).map((media: {
-                      file_type?: string;
-                      file_path: string;
-                      thumbnail?: { file_path: string };
-                    }) => {
-                      const isV = media.file_type?.includes('video');
-                      let mUrl = media.thumbnail?.file_path || media.file_path;
-                      if (!mUrl && media.file_type === 'image') mUrl = media.file_path;
-                      return {
-                        url: isV
-                          ? media.file_path.startsWith('http') ? media.file_path : `/storage/${media.file_path}`
-                          : mUrl.startsWith('http') ? mUrl : `/storage/${mUrl}`,
-                        type: (isV ? 'video' : 'image') as 'image' | 'video',
-                        title: item.title,
-                      };
-                    });
-                    onPreviewMedia(allMedia, 0);
-                  }
-                }
-              }}
-            >
-              {(item as Publication & { type?: string }).type === 'user_event' ? (
-                <Calendar className="h-6 w-6 text-primary-500" />
-              ) : (
-                <PublicationThumbnail publication={item} t={t} />
-              )}
-            </div>
+            <PublicationThumbnailCard
+              publication={item}
+              {...(mediaUrl && { mediaUrl })}
+              isVideo={isVideo}
+              mediaCount={mediaCount.total}
+              size="md"
+              {...(onPreviewMedia && { onPreviewMedia })}
+              {...(onViewDetails && { onViewDetails: () => handleViewDetails(item) })}
+              className="relative z-10"
+            />
             <div className="min-w-0 max-w-md">
               <h3
                 className="truncate text-sm font-medium text-gray-900 dark:text-white"
@@ -188,8 +140,8 @@ const PublicationRow = memo(
               {/* Content Type Badge */}
               <div className="mt-1">
                 <SimpleContentTypeBadge
-                  contentType={item.content_type}
-                  mediaFiles={item.media_files}
+                  contentType={item.content_type ?? 'post'}
+                  {...(item.media_files && { mediaFiles: item.media_files })}
                   size="sm"
                 />
               </div>
@@ -204,17 +156,18 @@ const PublicationRow = memo(
                   <div className="mt-1 flex flex-wrap gap-1">
                     {Object.entries(item.platform_settings)
                       .slice(0, 2)
-                      .map(([platform, settings]: [string, { type?: string }]) => {
-                        if (!settings || !settings.type) return null;
+                      .map(([platform, settings]: [string, unknown]) => {
+                        const typedSettings = settings as { type?: string } | undefined;
+                        if (!typedSettings || !typedSettings.type) return null;
 
                         const typeLabel =
-                          settings.type === 'poll'
+                          typedSettings.type === 'poll'
                             ? 'Poll'
-                            : settings.type === 'thread'
+                            : typedSettings.type === 'thread'
                               ? 'Thread'
-                              : settings.type === 'reel'
+                              : typedSettings.type === 'reel'
                                 ? 'Reel'
-                                : settings.type === 'short'
+                                : typedSettings.type === 'short'
                                   ? 'Short'
                                   : 'Post';
                         const colorClass =
@@ -263,9 +216,9 @@ const PublicationRow = memo(
                     <span className="text-[10px] font-bold uppercase tracking-tight text-yellow-700 dark:text-yellow-400">
                       {t('publications.table.pendingAdminReview') || 'Pendiente de revisión'}
                     </span>
-                    {item.currentApprovalStep?.role?.name && (
+                    {item.current_approval_step?.name && (
                       <span className="text-[9px] text-yellow-600 dark:text-yellow-500">
-                        {t('approvals.approver_role')}: {item.currentApprovalStep.role.name}
+                        {t('approvals.approver_role')}: {item.current_approval_step.name}
                       </span>
                     )}
                   </div>
@@ -279,7 +232,7 @@ const PublicationRow = memo(
                       const publishingAccounts = connectedAccounts.filter((acc) =>
                         publishingPlatforms.includes(acc.id),
                       );
-                      if (publishingAccounts.length === 1) {
+                      if (publishingAccounts.length === 1 && publishingAccounts[0]) {
                         const platformName =
                           publishingAccounts[0].platform.charAt(0).toUpperCase() +
                           publishingAccounts[0].platform.slice(1);
@@ -327,20 +280,12 @@ const PublicationRow = memo(
         <td className="px-6 py-4">
           {item.user && (
             <div className="flex items-center">
-              <div className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-full bg-gray-200 dark:bg-neutral-700">
-                {item.user.photo_url ? (
-                  <img
-                    src={item.user.photo_url}
-                    alt={item.user.name}
-                    className="h-full w-full object-cover"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center text-xs font-medium uppercase text-gray-500">
-                    {item.user.name.charAt(0)}
-                  </div>
-                )}
-              </div>
+              <Avatar
+                src={item.user.photo_url}
+                name={item.user.name}
+                size="md"
+                className="flex-shrink-0"
+              />
               <div className="ml-3 hidden xl:block">
                 <p className="max-w-[100px] truncate text-sm font-medium text-gray-900 dark:text-white">
                   {item.user.name}
@@ -395,7 +340,6 @@ const PublicationRow = memo(
             publication={item}
             connectedAccounts={connectedAccounts}
             publishingPlatforms={publishingPlatforms}
-            t={t}
             compact={true}
           />
         </td>
@@ -411,7 +355,7 @@ const PublicationRow = memo(
                       await handlePublish(item);
                     }}
                     disabled={isLoading?.publishing || isLoading?.editing || isLoading?.deleting}
-                    loading={isLoading?.publishing}
+                    {...(isLoading?.publishing !== undefined && { loading: isLoading.publishing })}
                     variant="success"
                     buttonStyle="icon"
                     size="sm"
@@ -426,7 +370,7 @@ const PublicationRow = memo(
                       handleSubmitForApproval(item);
                     }}
                     disabled={isLoading?.submitting}
-                    loading={isLoading?.submitting}
+                    {...(isLoading?.submitting !== undefined && { loading: isLoading.submitting })}
                     variant="primary"
                     buttonStyle="icon"
                     size="sm"
@@ -478,7 +422,7 @@ const PublicationRow = memo(
                 disabled={
                   isLoading?.publishing || isLoading?.editing || isLoading?.deleting || !!remoteLock
                 }
-                loading={isLoading?.editing}
+                {...(isLoading?.editing !== undefined && { loading: isLoading.editing })}
                 variant={item.status === 'published' ? 'warning' : 'primary'}
                 buttonStyle="icon"
                 size="sm"
@@ -496,7 +440,7 @@ const PublicationRow = memo(
                   handleDuplicate(item.id);
                 }}
                 disabled={isLoading?.publishing || isLoading?.editing || isLoading?.deleting}
-                loading={isLoading?.duplicating}
+                {...(isLoading?.duplicating !== undefined && { loading: isLoading.duplicating })}
                 variant="secondary"
                 buttonStyle="icon"
                 size="sm"
@@ -515,7 +459,7 @@ const PublicationRow = memo(
                   await handleDelete(item, isUserEvent);
                 }}
                 disabled={isLoading?.publishing || isLoading?.editing || isLoading?.deleting}
-                loading={isLoading?.deleting}
+                {...(isLoading?.deleting !== undefined && { loading: isLoading.deleting })}
                 variant="danger"
                 buttonStyle="icon"
                 size="sm"

@@ -9,7 +9,7 @@ import EmptyState from '@/Components/common/ui/EmptyState';
 import { VirtualGrid } from '@/Components/common/ui/VirtualList';
 import { useLockStore } from '@/stores/lockStore';
 import { Filter, LayoutGrid, List as ListIcon, RotateCcw } from 'lucide-react';
-import { useEffect, useState, useTransition } from 'react';
+import React, { useEffect, useState, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import MediaLightbox from '@/Components/common/ui/MediaLightbox';
@@ -42,7 +42,7 @@ function ContentGridItem({
   permissions,
   remoteLock,
   onPreviewMedia,
-}: ContentGridItemProps) {
+}: ContentGridItemProps): React.ReactElement | null {
   // Guard against undefined or null items
   if (!item || !item.id) {
     return null;
@@ -55,12 +55,12 @@ function ContentGridItem({
       type={mode === 'campaigns' ? 'campaign' : 'publication'}
       onEdit={onEdit}
       onDelete={onDelete}
-      onViewDetails={onViewDetails}
-      onPublish={onPublish}
-      permissions={permissions}
+      {...(onViewDetails && { onViewDetails })}
+      {...(onPublish && { onPublish })}
+      {...(permissions && { permissions })}
       remoteLock={remoteLock}
       onPreviewMedia={onPreviewMedia}
-      onDuplicate={onDuplicate}
+      {...(onDuplicate && { onDuplicate })}
     />
   );
 }
@@ -121,20 +121,22 @@ export default function ContentList(props: ContentListProps) {
   };
 
   // Wrapper para renderItem que pasa las props necesarias
-  const renderGridItem = (item: any, index: number) => (
-    <ContentGridItem
-      item={item}
-      mode={mode}
-      onEdit={props.onEdit}
-      onDelete={props.onDelete}
-      onDuplicate={props.onDuplicate}
-      onViewDetails={props.onViewDetails}
-      onPublish={props.onPublish}
-      permissions={props.permissions}
-      remoteLock={remoteLocks[item?.id]}
-      onPreviewMedia={handlePreviewMedia}
-    />
-  );
+  const renderGridItem = (item: any, index: number): React.ReactElement | null => {
+    return (
+      <ContentGridItem
+        item={item}
+        mode={mode}
+        onEdit={props.onEdit}
+        onDelete={props.onDelete}
+        {...(props.onDuplicate && { onDuplicate: props.onDuplicate })}
+        {...(props.onViewDetails && { onViewDetails: props.onViewDetails })}
+        {...(props.onPublish && { onPublish: props.onPublish })}
+        {...(props.permissions && { permissions: props.permissions })}
+        remoteLock={remoteLocks[item?.id]}
+        onPreviewMedia={handlePreviewMedia}
+      />
+    );
+  };
 
   useEffect(() => {
     if (isLoading) {
@@ -252,7 +254,7 @@ export default function ContentList(props: ContentListProps) {
                   }
                 : () => {}
             }
-            onResetFilters={props.onResetFilters}
+            {...(props.onResetFilters && { onResetFilters: props.onResetFilters })}
             filters={props.filters}
           />
         </div>
@@ -301,34 +303,42 @@ export default function ContentList(props: ContentListProps) {
           )}
         </div>
       ) : (
-        <div className="w-full overflow-hidden overflow-x-auto rounded-lg border border-gray-100 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
+        <div className="w-full rounded-lg border border-gray-100 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
           {mode === 'campaigns' ? (
             <CampaignTable
-              {...props}
+              items={props.items}
+              onEdit={props.onEdit}
+              onDelete={props.onDelete}
               isLoading={smoothLoading}
+              pagination={props.pagination}
+              onPageChange={props.onPageChange}
               t={t}
               expandedCampaigns={props.expandedCampaigns || []}
               toggleExpand={props.toggleExpand || (() => {})}
               onViewDetails={props.onViewDetails || (() => {})}
-              onPerPageChange={props.onPerPageChange}
+              {...(props.onDuplicate && { onDuplicate: props.onDuplicate })}
+              {...(props.onPerPageChange && { onPerPageChange: props.onPerPageChange })}
+              {...(props.permissions && { permissions: props.permissions })}
             />
           ) : (
             <PublicationTable
-              {...props}
-              isLoading={smoothLoading}
+              items={props.items}
               t={t}
               connectedAccounts={props.connectedAccounts || []}
+              onEdit={props.onEdit}
+              onDelete={props.onDelete}
               onPublish={props.onPublish || (() => {})}
-              onViewDetails={props.onViewDetails}
-              onPerPageChange={props.onPerPageChange}
+              isLoading={smoothLoading}
+              pagination={props.pagination}
+              onPageChange={props.onPageChange}
               remoteLocks={remoteLocks}
-              onPreviewMedia={(item: any) => {
-                const allM = (item.media_files || []).map((m: any) => ({
-                  url: m.file_path.startsWith('http') ? m.file_path : `/storage/${m.file_path}`,
-                  type: (m.file_type?.includes('video') ? 'video' : 'image') as 'image' | 'video',
-                  title: item.title,
-                }));
-                handlePreviewMedia(allM, 0);
+              {...(props.onEditRequest && { onEditRequest: props.onEditRequest })}
+              {...(props.onViewDetails && { onViewDetails: props.onViewDetails })}
+              {...(props.onDuplicate && { onDuplicate: props.onDuplicate })}
+              {...(props.onPerPageChange && { onPerPageChange: props.onPerPageChange })}
+              {...(props.permissions && { permissions: props.permissions })}
+              onPreviewMedia={(media, initialIndex = 0) => {
+                handlePreviewMedia(media, initialIndex);
               }}
             />
           )}

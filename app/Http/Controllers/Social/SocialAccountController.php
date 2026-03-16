@@ -17,6 +17,7 @@ use App\Models\Social\SocialPostLog;
 use Abraham\TwitterOAuth\TwitterOAuth;
 use Carbon\Carbon;
 use App\Services\Subscription\PlanLimitValidator;
+use App\Helpers\LogHelper;
 
 
 class SocialAccountController extends Controller
@@ -409,7 +410,19 @@ class SocialAccountController extends Controller
 
       if ($isV1First) {
         // NUEVO FLUJO: V1 primero, ahora redirigir a V2
+        // Guardar en session Y en cache (fallback por si session expira)
+        $state = session('social_auth_state') ?? Str::random(40);
         session(['twitter_v1_creds' => $v1Creds]);
+        
+        // También guardar en cache con TTL de 1 hora (más robusto que session)
+        Cache::put("twitter_v1_creds_{$state}", $v1Creds, now()->addHour());
+        
+        LogHelper::social('twitter.v1_creds_stored', [
+          'screen_name' => $v1Creds['screen_name'],
+          'state' => substr($state, 0, 10) . '...',
+          'stored_in_session' => true,
+          'stored_in_cache' => true
+        ]);
 
         $platform = request()->is('auth/x/*') ? 'x' : 'twitter';
         
@@ -569,12 +582,40 @@ class SocialAccountController extends Controller
       ]);
 
       // Recuperar tokens OAuth 1.0a guardados previamente
+      // Intentar primero desde session, luego desde cache (fallback)
       $v1Creds = session('twitter_v1_creds');
+      
+      if (!$v1Creds && $request->state) {
+        $v1Creds = Cache::get("twitter_v1_creds_{$request->state}");
+        
+        if ($v1Creds) {
+          LogHelper::social('twitter.v1_creds_recovered_from_cache', [
+            'state' => substr($request->state, 0, 10) . '...',
+            'screen_name' => $v1Creds['screen_name'] ?? 'unknown'
+          ]);
+        }
+      }
 
       if (!$v1Creds) {
-        \Log::warning('OAuth 1.0a tokens not found in session, saving with v2 only');
-        // Guardar solo con v2
+        \Log::warning('OAuth 1.0a tokens not found in session or cache', [
+          'session_id' => session()->getId(),
+          'state' => $request->state ? substr($request->state, 0, 10) . '...' : 'none',
+          'has_oauth_token' => session()->has('oauth_token'),
+          'has_oauth_token_secret' => session()->has('oauth_token_secret'),
+          'all_session_keys' => array_keys(session()->all())
+        ]);
+        
+        \Log::error('Twitter account saved without OAuth 1.0a credentials - video uploads will not work', [
+          'user_id' => $userInfo['id'],
+          'username' => $userInfo['username']
+        ]);
+        
         return $this->saveTwitterAccountAndClose($userInfo, $data, null);
+      }
+      
+      // Limpiar cache después de usar
+      if ($request->state) {
+        Cache::forget("twitter_v1_creds_{$request->state}");
       }
 
       // Verificar que sea la misma cuenta

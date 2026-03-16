@@ -23,8 +23,8 @@ export function Avatar({
 }: AvatarProps) {
   return (
     <UnifiedAvatar
-      src={src}
-      defaultIcon={defaultIcon}
+      {...(src !== undefined && { src })}
+      {...(defaultIcon !== undefined && { defaultIcon })}
       name={name}
       size={size}
       className={className}

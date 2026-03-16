@@ -1,5 +1,7 @@
+import { Avatar } from '@/Components/common/Avatar';
 import Button from '@/Components/common/Modern/Button';
 import SimpleContentTypeBadge from '@/Components/Content/common/SimpleContentTypeBadge';
+import PublicationThumbnailCard from '@/Components/Content/Publication/PublicationThumbnailCard';
 import SocialAccountsDisplay from '@/Components/Content/Publication/SocialAccountsDisplay';
 import { usePublicationActions } from '@/Hooks/publication/usePublicationActions';
 import { Publication } from '@/types/Publication';
@@ -9,8 +11,7 @@ import {
   getLockedByName,
   getMediaUrl,
   hasMedia,
-  isVideoMedia,
-  prepareMediaForPreview,
+  isVideoMedia
 } from '@/Utils/publicationHelpers';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import {
@@ -20,16 +21,14 @@ import {
   Copy,
   Edit,
   Eye,
-  Image as ImageIcon,
   Loader2,
   Lock,
   MoreVertical,
   Rocket,
   Trash2,
-  Video,
-  XCircle,
+  XCircle
 } from 'lucide-react';
-import { memo, useState } from 'react';
+import { memo } from 'react';
 
 interface PublicationMobileRowProps {
   items: Publication[];
@@ -90,8 +89,6 @@ const PublicationMobileRow = memo(
       permissions: permissions || [],
     });
 
-    const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
-
     const getStatusIcon = (status: string) => {
       switch (status) {
         case 'published':
@@ -121,10 +118,6 @@ const PublicationMobileRow = memo(
       return formatPublicationDate(dateString);
     };
 
-    const handleImageError = (id: number) => {
-      setImageErrors((prev) => ({ ...prev, [id]: true }));
-    };
-
     return (
       <div className="w-full space-y-3 px-1">
         {items.map((item) => {
@@ -132,9 +125,9 @@ const PublicationMobileRow = memo(
           const isLoading = loadingStates[item.id];
           const isVideo = isVideoMedia(item);
           const mediaUrl = getMediaUrl(item);
-          const hasImageError = imageErrors[item.id];
           const lock = remoteLocks[item.id];
           const lockedByName = getLockedByName(lock);
+          const itemHasMedia = hasMedia(item);
 
           return (
             <div
@@ -145,64 +138,37 @@ const PublicationMobileRow = memo(
                 containIntrinsicSize: '0 88px',
               }}
             >
-              <div className="flex items-start gap-3 p-4">
-                {/* Thumbnail - clickable para preview */}
-                {hasMedia(item) && mediaUrl ? (
-                  <button
-                    type="button"
-                    className="relative flex-shrink-0 cursor-pointer transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded-lg"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (onPreviewMedia) {
-                        const allMedia = prepareMediaForPreview(item);
-                        onPreviewMedia(allMedia, 0);
-                      }
-                    }}
-                  >
-                    <div className="relative h-20 w-20 overflow-hidden rounded-lg border-2 border-gray-200 bg-gray-100 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
-                      {(item as Publication & { type?: string }).type === 'user_event' ? (
-                        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20">
-                          <Calendar className="h-10 w-10 text-primary-600 dark:text-primary-400" />
-                        </div>
-                      ) : !hasImageError ? (
-                        <img
-                          src={mediaUrl}
-                          alt={item.title || 'Preview'}
-                          className="h-full w-full object-cover"
-                          loading="lazy"
-                          onError={() => handleImageError(item.id)}
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center bg-gray-100 text-gray-400 dark:bg-neutral-800">
-                          {isVideo ? (
-                            <Video className="h-8 w-8" />
-                          ) : (
-                            <ImageIcon className="h-8 w-8" />
-                          )}
-                        </div>
-                      )}
-                      {isVideo && !hasImageError && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-[1px]">
-                          <div className="rounded-full bg-white/90 p-2 shadow-lg">
-                            <Video className="h-6 w-6 text-primary-600" />
-                          </div>
-                        </div>
-                      )}
-                      {mediaCount.total > 1 && (
-                        <div className="absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-primary-600 text-[11px] font-bold text-white shadow-md dark:border-neutral-900">
-                          +{mediaCount.total - 1}
-                        </div>
-                      )}
-                    </div>
-                  </button>
-                ) : (
-                  <div className="flex h-20 w-20 items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 dark:border-neutral-700 dark:bg-neutral-900/30">
-                    <ImageIcon className="h-8 w-8 text-gray-300 dark:text-neutral-700" />
-                  </div>
+              <div className={`flex gap-3 p-4 ${hasMedia(item) && mediaUrl ? 'flex-col md:flex-row md:items-start' : 'flex-col'}`}>
+                {/* Thumbnail - solo si hay media */}
+                {itemHasMedia && mediaUrl && (
+                  <PublicationThumbnailCard
+                    publication={item}
+                    mediaUrl={mediaUrl}
+                    isVideo={isVideo}
+                    mediaCount={mediaCount.total}
+                    size="responsive"
+                    {...(onPreviewMedia && { onPreviewMedia })}
+                    {...(onViewDetails && { onViewDetails: () => handleViewDetails(item) })}
+                    className="relative z-10"
+                  />
                 )}
 
                 {/* Main content */}
                 <div className="min-w-0 flex-1">
+                  {/* Author info - debajo de la foto/video */}
+                  {item.user && (
+                    <div className="mb-2 flex items-center gap-2">
+                      <Avatar
+                        src={item.user.photo_url}
+                        name={item.user.name}
+                        size="xs"
+                      />
+                      <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                        {item.user.name}
+                      </span>
+                    </div>
+                  )}
+
                   <div className="mb-2">
                     <h3 className="truncate text-base font-bold leading-tight text-gray-900 dark:text-white">
                       {item.title || t('publications.table.untitled')}
