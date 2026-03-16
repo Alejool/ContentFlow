@@ -1,13 +1,13 @@
 import { LucideIcon } from 'lucide-react';
 import { ReactNode } from 'react';
 import {
-    Menu as AriaMenu,
-    MenuItem as AriaMenuItem,
-    MenuTrigger,
-    Popover,
-    Separator,
-    type MenuItemProps,
-    type MenuProps
+  Menu as AriaMenu,
+  MenuItem as AriaMenuItem,
+  MenuTrigger,
+  Popover,
+  Separator,
+  type MenuItemProps,
+  type MenuProps,
 } from 'react-aria-components';
 
 interface ModernMenuProps<T> extends Omit<MenuProps<T>, 'children'> {
@@ -39,10 +39,7 @@ export function Menu<T extends object>({
         placement={placement}
         className="min-w-[12rem] overflow-auto rounded-lg border border-gray-200 bg-white p-1 shadow-2xl outline-none dark:border-neutral-800 dark:bg-neutral-900"
       >
-        <AriaMenu
-          {...props}
-          className="outline-none"
-        >
+        <AriaMenu {...props} className="outline-none">
           {children}
         </AriaMenu>
       </Popover>
@@ -50,7 +47,12 @@ export function Menu<T extends object>({
   );
 }
 
-export function MenuItem({ icon: Icon, variant = 'default', children, ...props }: ModernMenuItemProps) {
+export function MenuItem({
+  icon: Icon,
+  variant = 'default',
+  children,
+  ...props
+}: ModernMenuItemProps) {
   const variantStyles = {
     default: 'text-gray-700 hover:bg-gray-50 dark:text-neutral-300 dark:hover:bg-neutral-800',
     danger: 'text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20',

@@ -6,4 +6,3 @@ export { default as CreatorInfo } from './CreatorInfo';
 export { default as PublicationHeader } from './PublicationHeader';
 export { default as PublishedPostsSection } from './PublishedPostsSection';
 export { default as ReelsSection } from './ReelsSection';
-

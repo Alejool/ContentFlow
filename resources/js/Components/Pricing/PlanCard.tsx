@@ -1,16 +1,27 @@
 import Button from '@/Components/common/Modern/Button';
 import { Badge } from '@/Components/ui/badge';
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
 } from '@/Components/ui/card';
 import { PLAN_FEATURES, type PlanId } from '@/Constants/plans';
 import { cn } from '@/lib/utils';
-import { ArrowRight, Award, Check, ChevronDown, ChevronUp, Lock, Shield, Sparkles, Star, Zap } from 'lucide-react';
+import {
+  ArrowRight,
+  Award,
+  Check,
+  ChevronDown,
+  ChevronUp,
+  Lock,
+  Shield,
+  Sparkles,
+  Star,
+  Zap,
+} from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -451,14 +462,16 @@ export default function PlanCard({
                 {t('pricing.missingFeatures', 'Te estás perdiendo')}
               </p>
               <ul className="space-y-2">
-                {(showAllMissing ? missingFeatures : missingFeatures.slice(0, 3)).map((feature, index) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <Lock className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-gray-300 dark:text-neutral-600" />
-                    <span className="text-xs italic leading-tight text-gray-400 dark:text-neutral-500">
-                      {feature}
-                    </span>
-                  </li>
-                ))}
+                {(showAllMissing ? missingFeatures : missingFeatures.slice(0, 3)).map(
+                  (feature, index) => (
+                    <li key={index} className="flex items-start gap-2">
+                      <Lock className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-gray-300 dark:text-neutral-600" />
+                      <span className="text-xs italic leading-tight text-gray-400 dark:text-neutral-500">
+                        {feature}
+                      </span>
+                    </li>
+                  ),
+                )}
               </ul>
               {missingFeatures.length > 3 && (
                 <button
@@ -683,16 +696,18 @@ export default function PlanCard({
                 {t('pricing.missingFeatures', 'Lo que te estás perdiendo')}
               </p>
               <ul className="space-y-3">
-                {(showAllMissing ? missingFeatures : missingFeatures.slice(0, 4)).map((feature, index) => (
-                  <li key={index} className="group/item flex items-start gap-3">
-                    <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border border-gray-100 bg-gray-50 dark:border-neutral-700/50 dark:bg-neutral-800/50">
-                      <Lock className="h-2.5 w-2.5 text-gray-400 dark:text-neutral-500" />
-                    </div>
-                    <span className="text-sm italic text-gray-400 dark:text-neutral-500">
-                      {feature}
-                    </span>
-                  </li>
-                ))}
+                {(showAllMissing ? missingFeatures : missingFeatures.slice(0, 4)).map(
+                  (feature, index) => (
+                    <li key={index} className="group/item flex items-start gap-3">
+                      <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border border-gray-100 bg-gray-50 dark:border-neutral-700/50 dark:bg-neutral-800/50">
+                        <Lock className="h-2.5 w-2.5 text-gray-400 dark:text-neutral-500" />
+                      </div>
+                      <span className="text-sm italic text-gray-400 dark:text-neutral-500">
+                        {feature}
+                      </span>
+                    </li>
+                  ),
+                )}
               </ul>
               {missingFeatures.length > 4 && (
                 <button
@@ -707,7 +722,10 @@ export default function PlanCard({
                   ) : (
                     <>
                       <ChevronDown className="h-4 w-4" />
-                      {t('pricing.showMore', `Ver ${missingFeatures.length - 4} más características`)}
+                      {t(
+                        'pricing.showMore',
+                        `Ver ${missingFeatures.length - 4} más características`,
+                      )}
                     </>
                   )}
                 </button>

@@ -21,14 +21,14 @@ interface ContextMenuProps {
 
 /**
  * ContextMenu usando React Aria Popover
- * 
+ *
  * Menú contextual con:
  * - Secciones separadas por dividers
  * - Variantes de items (default, danger)
  * - Estados disabled
  * - Iconos opcionales
  * - Navegación por teclado
- * 
+ *
  * @example
  * <ContextMenu
  *   trigger={<button>Acciones</button>}
@@ -53,9 +53,7 @@ export function ContextMenu({ trigger, sections, placement = 'bottom end' }: Con
       <div className="py-1">
         {sections.map((section, sectionIndex) => (
           <div key={sectionIndex}>
-            {sectionIndex > 0 && (
-              <div className="my-1 h-px bg-gray-200 dark:bg-neutral-700" />
-            )}
+            {sectionIndex > 0 && <div className="my-1 h-px bg-gray-200 dark:bg-neutral-700" />}
             {section.items.map((item, itemIndex) => (
               <button
                 key={itemIndex}
@@ -104,12 +102,7 @@ export function ContentActionsMenu({
     <ContextMenu
       trigger={
         <button className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-neutral-800">
-          <svg
-            className="h-5 w-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"

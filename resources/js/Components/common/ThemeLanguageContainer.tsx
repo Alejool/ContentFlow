@@ -72,11 +72,7 @@ export default function ThemeLanguageContainer({
             rounded="lg"
             className="!p-2"
           >
-            {isMobileMenuOpen ? (
-              <X className="h-5 w-5" />
-            ) : (
-              <Menu className="h-5 w-5" />
-            )}
+            {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
 
           {/* Menú desplegable */}

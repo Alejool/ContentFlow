@@ -115,8 +115,8 @@ export class OnboardingErrorBoundary extends Component<Props, State> {
             </h2>
 
             <p className="mb-6 text-center text-gray-600 dark:text-gray-400">
-              We encountered an error while loading the onboarding experience. Don&apos;t worry, your
-              progress has been saved.
+              We encountered an error while loading the onboarding experience. Don&apos;t worry,
+              your progress has been saved.
             </p>
 
             {import.meta.env.DEV && this.state.error && (

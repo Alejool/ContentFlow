@@ -196,7 +196,8 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
                 <div className="mt-2 flex justify-end gap-1">
                   {upload.isPausable && upload.status === 'uploading' && (
                     <Button
-                      buttonStyle="outline" variant="secondary"
+                      buttonStyle="outline"
+                      variant="secondary"
                       size="sm"
                       onClick={() => {
                         /* TODO: implement pause */
@@ -205,7 +206,12 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
                       Pause
                     </Button>
                   )}
-                  <Button buttonStyle="outline" variant="secondary" size="sm" onClick={() => handleCancel(upload.id)}>
+                  <Button
+                    buttonStyle="outline"
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handleCancel(upload.id)}
+                  >
                     Cancel
                   </Button>
                 </div>
@@ -229,12 +235,22 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
 
                 <div className="flex justify-end gap-1">
                   {upload.canRetry && (
-                    <Button buttonStyle="outline" variant="secondary" size="sm" onClick={() => handleRetry(upload.id)}>
+                    <Button
+                      buttonStyle="outline"
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => handleRetry(upload.id)}
+                    >
                       <RotateCcw className="mr-1 h-3 w-3" />
                       Retry
                     </Button>
                   )}
-                  <Button buttonStyle="outline" variant="secondary" size="sm" onClick={() => handleRemove(upload.id)}>
+                  <Button
+                    buttonStyle="outline"
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handleRemove(upload.id)}
+                  >
                     Remove
                   </Button>
                 </div>

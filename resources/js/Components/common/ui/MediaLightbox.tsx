@@ -60,7 +60,7 @@ export default function MediaLightbox({
   if (!isOpen || mediaArray.length === 0) return null;
 
   const currentMedia = mediaArray[currentIndex];
-  
+
   // Safety check: if currentMedia is undefined, return null
   if (!currentMedia) return null;
 
@@ -86,7 +86,7 @@ export default function MediaLightbox({
             className="absolute left-6 z-50 !text-white"
             aria-label="Previous media"
           >
-           {''}
+            {''}
           </Button>
           <Button
             onClick={handleNext}

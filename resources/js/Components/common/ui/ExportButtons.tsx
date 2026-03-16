@@ -51,11 +51,12 @@ export default function ExportButtons({
 
           toast.success(
             t('common.exportCompleted', {
-              defaultValue: 'Exportación completada. Datos de los últimos {{days}} días (desde {{date}})',
+              defaultValue:
+                'Exportación completada. Datos de los últimos {{days}} días (desde {{date}})',
               days,
               date: formattedDate,
             }),
-            { duration: 5000 }
+            { duration: 5000 },
           );
         }
       } else {
@@ -83,7 +84,11 @@ export default function ExportButtons({
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Export error:', error);
-      toast.error(t('common.exportError', { defaultValue: 'Error al exportar. Por favor, intenta de nuevo.' }));
+      toast.error(
+        t('common.exportError', {
+          defaultValue: 'Error al exportar. Por favor, intenta de nuevo.',
+        }),
+      );
     } finally {
       setIsExporting(false);
     }

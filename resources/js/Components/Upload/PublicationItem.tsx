@@ -25,14 +25,17 @@ export function PublicationItem({
 
     // Solo contar plataformas que tienen un estado activo (no 'idle' o sin estado)
     const platforms = Object.values(platformSummary).filter(
-      (p) => p.status && p.status !== 'idle' && p.status !== 'pending_selection'
+      (p) => p.status && p.status !== 'idle' && p.status !== 'pending_selection',
     );
-    
+
     const total = platforms.length;
     const published = platforms.filter((p) => p.status === 'published').length;
     const failed = platforms.filter((p) => p.status === 'failed').length;
     const publishing = platforms.filter(
-      (p) => (p.status as string) === 'publishing' || (p.status as string) === 'pending' || (p.status as string) === 'retrying',
+      (p) =>
+        (p.status as string) === 'publishing' ||
+        (p.status as string) === 'pending' ||
+        (p.status as string) === 'retrying',
     ).length;
 
     return { total, published, failed, publishing };
@@ -158,7 +161,10 @@ export function PublicationItem({
         </div>
       </div>
 
-      <PlatformProgress publication={publication} {...(onCancelPlatform ? { onCancelPlatform } : {})} />
+      <PlatformProgress
+        publication={publication}
+        {...(onCancelPlatform ? { onCancelPlatform } : {})}
+      />
     </div>
   );
 }

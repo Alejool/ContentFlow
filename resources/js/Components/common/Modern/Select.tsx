@@ -201,9 +201,10 @@ export default function Select<T extends FieldValues>({
   const currentSize = sizeConfig[size];
 
   const filteredOptions = searchable
-    ? options.filter((option) => 
-        String(option.label).toLowerCase().includes(searchTerm.toLowerCase()) ||
-        String(option.value).toLowerCase().includes(searchTerm.toLowerCase())
+    ? options.filter(
+        (option) =>
+          String(option.label).toLowerCase().includes(searchTerm.toLowerCase()) ||
+          String(option.value).toLowerCase().includes(searchTerm.toLowerCase()),
       )
     : options;
 
@@ -619,7 +620,7 @@ export default function Select<T extends FieldValues>({
                 ) : (
                   filteredOptions.map((option) => {
                     const isSelected = multiple
-                      ? Array.isArray(value) && value.some(v => v === option.value)
+                      ? Array.isArray(value) && value.some((v) => v === option.value)
                       : option.value === value;
 
                     return (

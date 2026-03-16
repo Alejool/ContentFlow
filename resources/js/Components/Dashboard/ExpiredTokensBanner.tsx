@@ -62,9 +62,11 @@ export default function ExpiredTokensBanner({ accounts }: Props) {
                     </span>{' '}
                     &mdash; {acc.account_name}{' '}
                     <span className="text-amber-600 dark:text-amber-500">
-                      ({acc.reason === 'expired'
+                      (
+                      {acc.reason === 'expired'
                         ? t('dashboard.expiredTokens.reasonExpired', 'token expired')
-                        : t('dashboard.expiredTokens.reasonFailures', 'repeated failures')})
+                        : t('dashboard.expiredTokens.reasonFailures', 'repeated failures')}
+                      )
                     </span>
                   </li>
                 ))}

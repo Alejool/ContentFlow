@@ -49,7 +49,9 @@ export function PublicationStatusCards({
 
   const nudge = (dir: 'left' | 'right') => {
     isPaused.current = true;
-    setTimeout(() => { isPaused.current = false; }, 5000);
+    setTimeout(() => {
+      isPaused.current = false;
+    }, 5000);
     const next = dir === 'right' ? activeIndex + 1 : activeIndex - 1;
     goTo(Math.max(0, Math.min(total - 1, next)));
   };
@@ -72,16 +74,16 @@ export function PublicationStatusCards({
   if (variant === 'carousel') {
     return (
       <div
-        className={cn('relative overflow-hidden py-6 px-3', className)}
-        onMouseEnter={() => { isPaused.current = true; }}
-        onMouseLeave={() => { isPaused.current = false; }}
+        className={cn('relative overflow-hidden px-3 py-6', className)}
+        onMouseEnter={() => {
+          isPaused.current = true;
+        }}
+        onMouseLeave={() => {
+          isPaused.current = false;
+        }}
       >
         {/* motion track */}
-        <motion.div
-          ref={trackRef}
-          style={{ x }}
-          className="flex gap-3"
-        >
+        <motion.div ref={trackRef} style={{ x }} className="flex gap-3">
           {statuses.map((statusKey, index) => {
             const statusConfig = getPublicationStatusConfig(statusKey);
             const StatusIcon = statusConfig.icon;
@@ -100,9 +102,19 @@ export function PublicationStatusCards({
                   isActive && 'shadow-md',
                 )}
               >
-                <div className={cn('absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-5', statusConfig.bg)} />
+                <div
+                  className={cn(
+                    'absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-5',
+                    statusConfig.bg,
+                  )}
+                />
 
-                <div className={cn('relative z-10 mb-2 rounded-full p-2 sm:mb-3 sm:p-2.5', statusConfig.bg)}>
+                <div
+                  className={cn(
+                    'relative z-10 mb-2 rounded-full p-2 sm:mb-3 sm:p-2.5',
+                    statusConfig.bg,
+                  )}
+                >
                   <StatusIcon className={cn('h-4 w-4 sm:h-5 sm:w-5', statusConfig.text)} />
                 </div>
 
@@ -110,14 +122,22 @@ export function PublicationStatusCards({
                   {t(`publications.status.${statusKey}`)}
                 </p>
 
-                <p className={cn('relative z-10 text-xl font-bold tabular-nums sm:text-2xl text-gray-900 dark:text-white', loading && 'animate-pulse')}>
+                <p
+                  className={cn(
+                    'relative z-10 text-xl font-bold tabular-nums text-gray-900 dark:text-white sm:text-2xl',
+                    loading && 'animate-pulse',
+                  )}
+                >
                   {loading ? '...' : count.toLocaleString()}
                 </p>
 
                 <motion.div
                   animate={{ width: isActive ? '100%' : '0%' }}
                   transition={{ duration: 0.4 }}
-                  className={cn('absolute bottom-0 left-0 h-0.5', statusConfig.text.replace('text-', 'bg-'))}
+                  className={cn(
+                    'absolute bottom-0 left-0 h-0.5',
+                    statusConfig.text.replace('text-', 'bg-'),
+                  )}
                 />
               </motion.div>
             );
@@ -140,7 +160,9 @@ export function PublicationStatusCards({
           disabled={activeIndex === total - 1}
           className={cn(
             'absolute -right-1 top-1/2 z-10 -translate-y-1/2 rounded-full border border-gray-200 bg-white p-1.5 shadow-md transition-all duration-200 dark:border-neutral-700 dark:bg-neutral-800',
-            activeIndex === total - 1 ? 'pointer-events-none opacity-0' : 'opacity-100 hover:scale-110',
+            activeIndex === total - 1
+              ? 'pointer-events-none opacity-0'
+              : 'opacity-100 hover:scale-110',
           )}
         >
           <ChevronRight className="h-4 w-4 text-gray-600 dark:text-gray-300" />
@@ -151,10 +173,18 @@ export function PublicationStatusCards({
           {statuses.map((_, i) => (
             <button
               key={i}
-              onClick={() => { isPaused.current = true; setTimeout(() => { isPaused.current = false; }, 5000); goTo(i); }}
+              onClick={() => {
+                isPaused.current = true;
+                setTimeout(() => {
+                  isPaused.current = false;
+                }, 5000);
+                goTo(i);
+              }}
               className={cn(
                 'h-1.5 rounded-full transition-all duration-300',
-                i === activeIndex ? 'w-4 bg-gray-500 dark:bg-gray-300' : 'w-1.5 bg-gray-300 dark:bg-gray-600',
+                i === activeIndex
+                  ? 'w-4 bg-gray-500 dark:bg-gray-300'
+                  : 'w-1.5 bg-gray-300 dark:bg-gray-600',
               )}
             />
           ))}
@@ -165,7 +195,9 @@ export function PublicationStatusCards({
 
   if (variant === 'advanced') {
     return (
-      <div className={cn('grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-4 lg:grid-cols-7', className)}>
+      <div
+        className={cn('grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-4 lg:grid-cols-7', className)}
+      >
         {statuses.map((statusKey, index) => (
           <PublicationStatusCard
             key={statusKey}

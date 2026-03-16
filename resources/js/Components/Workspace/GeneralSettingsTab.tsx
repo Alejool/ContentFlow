@@ -6,15 +6,15 @@ import { WorkspaceTimezoneSettings } from '@/Components/Workspace/WorkspaceTimez
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router, usePage } from '@inertiajs/react';
 import {
-    AlertTriangle,
-    Copy,
-    Globe,
-    Info,
-    Lock,
-    SettingsIcon,
-    Shield,
-    Trash2,
-    UserCheck,
+  AlertTriangle,
+  Copy,
+  Globe,
+  Info,
+  Lock,
+  SettingsIcon,
+  Shield,
+  Trash2,
+  UserCheck,
 } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';

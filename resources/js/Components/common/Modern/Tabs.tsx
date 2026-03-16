@@ -76,18 +76,18 @@ const SortableTabItem = ({
         isDisabled={tab.disabled}
         {...(isDraggable && !tab.locked && !tab.disabled ? attributes : {})}
         {...(isDraggable && !tab.locked && !tab.disabled ? listeners : {})}
-        className={({ isSelected, isHovered, isFocusVisible, isDisabled }: {
+        className={({
+          isSelected,
+          isHovered,
+          isFocusVisible,
+          isDisabled,
+        }: {
           isSelected: boolean;
           isHovered: boolean;
           isFocusVisible: boolean;
           isDisabled: boolean;
         }) => {
-          const baseClasses = `
-            flex select-none items-center justify-center gap-2 whitespace-nowrap font-bold transition-all duration-200
-            ${sizeClasses[size]}
-            ${isDisabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}
-            ${isFocusVisible ? 'outline-none ring-2 ring-primary-500 ring-offset-2' : ''}
-          `;
+          const baseClasses = `flex select-none items-center justify-center gap-2 whitespace-nowrap font-bold transition-all duration-200 ${sizeClasses[size]} ${isDisabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} ${isFocusVisible ? 'outline-none ring-2 ring-primary-500 ring-offset-2' : ''} `;
 
           if (variant === 'boxed') {
             return `${baseClasses} rounded-lg ${
@@ -112,9 +112,7 @@ const SortableTabItem = ({
               />
             )}
             {Icon && (
-              <Icon
-                className={`${iconSizes[size]} ${isSelected ? 'text-white' : 'opacity-70'}`}
-              />
+              <Icon className={`${iconSizes[size]} ${isSelected ? 'text-white' : 'opacity-70'}`} />
             )}
             <span>{tab.label}</span>
             {hasBadge && (
@@ -263,18 +261,18 @@ export default function Tabs({
             key={tab.id}
             id={tab.id}
             isDisabled={isDisabled}
-            className={({ isSelected, isHovered, isFocusVisible, isDisabled: disabled }: {
+            className={({
+              isSelected,
+              isHovered,
+              isFocusVisible,
+              isDisabled: disabled,
+            }: {
               isSelected: boolean;
               isHovered: boolean;
               isFocusVisible: boolean;
               isDisabled: boolean;
             }) => {
-              const baseClasses = `
-                flex items-center justify-center gap-2 whitespace-nowrap font-bold transition-all duration-200
-                ${sizeClasses[size]}
-                ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}
-                ${isFocusVisible ? 'outline-none ring-2 ring-primary-500 ring-offset-2' : ''}
-              `;
+              const baseClasses = `flex items-center justify-center gap-2 whitespace-nowrap font-bold transition-all duration-200 ${sizeClasses[size]} ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} ${isFocusVisible ? 'outline-none ring-2 ring-primary-500 ring-offset-2' : ''} `;
 
               if (variant === 'pills') {
                 return `${baseClasses} rounded-lg ${
@@ -287,7 +285,7 @@ export default function Tabs({
               }
 
               if (variant === 'underline') {
-                return `${baseClasses} border-b-2 rounded-none ${
+                return `${baseClasses} rounded-none border-b-2 ${
                   isSelected
                     ? 'border-primary-500 text-primary-600 dark:text-primary-400'
                     : isHovered && !disabled

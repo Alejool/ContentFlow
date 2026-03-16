@@ -2,11 +2,11 @@ import { parseColor } from '@react-stately/color';
 import { CheckCircle, TriangleAlert } from 'lucide-react';
 import { useState } from 'react';
 import {
-    ColorArea as AriaColorArea,
-    Label as AriaLabel,
-    ColorSlider,
-    ColorThumb,
-    SliderTrack
+  ColorArea as AriaColorArea,
+  Label as AriaLabel,
+  ColorSlider,
+  ColorThumb,
+  SliderTrack,
 } from 'react-aria-components';
 
 import Label from '@/Components/common/Modern/Label';
@@ -85,9 +85,7 @@ export default function ColorArea({
         </Label>
       )}
 
-      {hint && (
-        <p className="mb-2 text-sm text-gray-500 dark:text-neutral-500">{hint}</p>
-      )}
+      {hint && <p className="mb-2 text-sm text-gray-500 dark:text-neutral-500">{hint}</p>}
 
       <div className="space-y-4">
         {/* Color Area Picker */}
@@ -159,7 +157,10 @@ export default function ColorArea({
 
         {/* Error Message */}
         {error && (
-          <div className="flex items-start gap-2 rounded-lg py-2 text-sm text-primary-600" role="alert">
+          <div
+            className="flex items-start gap-2 rounded-lg py-2 text-sm text-primary-600"
+            role="alert"
+          >
             <TriangleAlert className="h-4 w-4 flex-shrink-0" />
             <span>{error}</span>
           </div>
@@ -167,7 +168,10 @@ export default function ColorArea({
 
         {/* Success Message */}
         {success && !error && (
-          <div className="flex items-start gap-2 rounded-lg py-2 text-sm text-green-600" role="status">
+          <div
+            className="flex items-start gap-2 rounded-lg py-2 text-sm text-green-600"
+            role="status"
+          >
             <CheckCircle className="h-4 w-4 flex-shrink-0" />
             <span>{success}</span>
           </div>

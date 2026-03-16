@@ -1,9 +1,9 @@
 import { CheckCircle, TriangleAlert } from 'lucide-react';
 import { ReactNode } from 'react';
 import {
-    ListBox as AriaListBox,
-    ListBoxItem as AriaListBoxItem,
-    Text
+  ListBox as AriaListBox,
+  ListBoxItem as AriaListBoxItem,
+  Text,
 } from 'react-aria-components';
 
 import Label from '@/Components/common/Modern/Label';
@@ -106,9 +106,7 @@ export default function ListBox({
         </Label>
       )}
 
-      {hint && !label && (
-        <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">{hint}</p>
-      )}
+      {hint && !label && <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">{hint}</p>}
 
       <AriaListBox
         aria-label={label || 'List'}
@@ -157,14 +155,10 @@ export default function ListBox({
             id={item.id}
             textValue={item.textValue || item.label}
             className={({ isSelected, isHovered, isFocusVisible, isDisabled }) => {
-              const baseClasses = `
-                flex items-center gap-3 ${sizeClasses[size]} cursor-pointer transition-all duration-150
-                ${isDisabled ? 'cursor-not-allowed opacity-50' : ''}
-                ${isFocusVisible ? 'outline-none ring-2 ring-inset ring-primary-500' : ''}
-              `;
+              const baseClasses = `flex items-center gap-3 ${sizeClasses[size]} cursor-pointer transition-all duration-150 ${isDisabled ? 'cursor-not-allowed opacity-50' : ''} ${isFocusVisible ? 'outline-none ring-2 ring-inset ring-primary-500' : ''} `;
 
               if (isSelected) {
-                return `${baseClasses} bg-primary-500 text-white font-semibold`;
+                return `${baseClasses} bg-primary-500 font-semibold text-white`;
               }
 
               if (isHovered && !isDisabled) {
@@ -176,10 +170,8 @@ export default function ListBox({
           >
             {({ isSelected }) => (
               <>
-                {item.icon && (
-                  <div className={`flex-shrink-0 ${iconSizes[size]}`}>{item.icon}</div>
-                )}
-                <div className="flex-1 min-w-0">
+                {item.icon && <div className={`flex-shrink-0 ${iconSizes[size]}`}>{item.icon}</div>}
+                <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
                     <span className="truncate font-medium">{item.label}</span>
                     {isSelected && selectionMode !== 'none' && (
@@ -190,9 +182,7 @@ export default function ListBox({
                     <Text
                       slot="description"
                       className={`mt-0.5 truncate text-xs ${
-                        isSelected
-                          ? 'text-white/80'
-                          : 'text-gray-500 dark:text-gray-400'
+                        isSelected ? 'text-white/80' : 'text-gray-500 dark:text-gray-400'
                       }`}
                     >
                       {item.description}

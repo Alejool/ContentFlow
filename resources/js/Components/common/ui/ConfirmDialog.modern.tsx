@@ -14,7 +14,7 @@ interface ConfirmDialogProps {
 
 /**
  * ConfirmDialog usando React Aria Popover
- * 
+ *
  * Versión mejorada del diálogo de confirmación con:
  * - Mejor accesibilidad
  * - Posicionamiento automático
@@ -63,11 +63,7 @@ export default function ConfirmDialogModern({
   const styles = getTypeStyles();
 
   return (
-    <Popover
-      trigger={trigger}
-      placement="center"
-      className="w-full max-w-md"
-    >
+    <Popover trigger={trigger} placement="center" className="w-full max-w-md">
       <div className="p-6">
         <div className="flex items-start gap-4">
           <div
@@ -77,9 +73,7 @@ export default function ConfirmDialogModern({
           </div>
 
           <div className="flex-1">
-            <h3 className="mb-2 text-lg font-bold text-gray-900 dark:text-white">
-              {title}
-            </h3>
+            <h3 className="mb-2 text-lg font-bold text-gray-900 dark:text-white">{title}</h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">{message}</p>
           </div>
 
@@ -113,17 +107,17 @@ export default function ConfirmDialogModern({
 
 /**
  * Hook para usar ConfirmDialog de forma imperativa
- * 
+ *
  * @example
  * const confirm = useConfirmDialog();
- * 
+ *
  * const handleDelete = async () => {
  *   const confirmed = await confirm({
  *     title: '¿Eliminar publicación?',
  *     message: 'Esta acción no se puede deshacer',
  *     type: 'danger'
  *   });
- *   
+ *
  *   if (confirmed) {
  *     // Proceder con eliminación
  *   }

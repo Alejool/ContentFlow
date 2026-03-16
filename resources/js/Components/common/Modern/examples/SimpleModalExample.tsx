@@ -3,7 +3,7 @@ import { X } from 'lucide-react';
 
 /**
  * Ejemplo simple de modal usando Popover
- * 
+ *
  * Este ejemplo muestra cómo crear un modal básico con:
  * - Botón de cierre
  * - Header con título
@@ -21,9 +21,7 @@ export function SimpleModalExample() {
     <Popover trigger={trigger} placement="center" className="w-full max-w-md">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 dark:border-neutral-700">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-          Título del Modal
-        </h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Título del Modal</h2>
         <button
           className="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-neutral-800 dark:hover:text-gray-300"
           aria-label="Cerrar"

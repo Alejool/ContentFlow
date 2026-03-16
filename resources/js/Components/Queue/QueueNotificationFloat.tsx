@@ -105,7 +105,7 @@ export default function QueueNotificationFloat({
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0">{getIcon()}</div>
 
-            <div className="flex-1 min-w-0">
+            <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between gap-2">
                 <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                   {getTitle()}

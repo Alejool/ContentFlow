@@ -563,7 +563,11 @@ export default function ApprovalWorkflowsTab({
                         onChange={(val: any) => {
                           const newSteps = editingWorkflow.steps.map((s, i) =>
                             i === index
-                              ? { ...s, role_id: val === '' || val == null ? null : parseInt(val), ...(val !== '' && val != null ? { user_id: null } : {}) }
+                              ? {
+                                  ...s,
+                                  role_id: val === '' || val == null ? null : parseInt(val),
+                                  ...(val !== '' && val != null ? { user_id: null } : {}),
+                                }
                               : s,
                           );
                           setEditingWorkflow({ ...editingWorkflow, steps: newSteps });
@@ -600,7 +604,11 @@ export default function ApprovalWorkflowsTab({
                         onChange={(val: any) => {
                           const newSteps = editingWorkflow.steps.map((s, i) =>
                             i === index
-                              ? { ...s, user_id: val === '' || val == null ? null : parseInt(val), ...(val !== '' && val != null ? { role_id: null } : {}) }
+                              ? {
+                                  ...s,
+                                  user_id: val === '' || val == null ? null : parseInt(val),
+                                  ...(val !== '' && val != null ? { role_id: null } : {}),
+                                }
                               : s,
                           );
                           setEditingWorkflow({ ...editingWorkflow, steps: newSteps });
@@ -615,7 +623,9 @@ export default function ApprovalWorkflowsTab({
                       className="shrink-0 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10"
                       title={t('common.approvals.deleteLevel')}
                       icon={Trash2}
-                    >{' '}</Button>
+                    >
+                      {' '}
+                    </Button>
                   </div>
                 </div>
               ))}

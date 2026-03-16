@@ -31,7 +31,7 @@ export default function OptimizedImage({
 
     // Preload de la imagen
     const preloadImage = new Image();
-    
+
     // Timeout de 5 segundos para evitar carga infinita
     timeoutRef.current = setTimeout(() => {
       if (status === 'loading') {
@@ -78,7 +78,7 @@ export default function OptimizedImage({
       },
       {
         rootMargin: '50px', // Cargar 50px antes de que sea visible
-      }
+      },
     );
 
     observerRef.current.observe(img);

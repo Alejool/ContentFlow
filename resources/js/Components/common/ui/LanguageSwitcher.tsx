@@ -20,8 +20,7 @@ export default function LanguageSwitcher() {
   const getBaseLang = (lang: string) => lang.split('-')[0];
   const currentLangCode = getBaseLang(i18n.resolvedLanguage || i18n.language || 'es');
 
-  const currentLanguage =
-    languages.find((lang) => lang.code === currentLangCode) ?? languages[0];
+  const currentLanguage = languages.find((lang) => lang.code === currentLangCode) ?? languages[0];
 
   const nextLanguage = languages.find((lang) => lang.code !== currentLangCode) ?? languages[1];
 
