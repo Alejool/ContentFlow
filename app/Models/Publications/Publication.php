@@ -757,7 +757,7 @@ class Publication extends Model
         'label' => 'Post',
         'description' => 'Standard social media post',
         'icon' => 'FileText',
-        'platforms' => ['instagram', 'twitter', 'facebook', 'linkedin', 'youtube', 'pinterest'],
+        'platforms' => ['instagram', 'threads', 'twitter', 'facebook', 'linkedin', 'youtube', 'pinterest'],
       ],
       'reel' => [
         'label' => 'Reel/Short',
@@ -775,13 +775,13 @@ class Publication extends Model
         'label' => 'Poll',
         'description' => 'Interactive poll/survey',
         'icon' => 'BarChart3',
-        'platforms' => ['twitter', 'facebook'],
+        'platforms' => ['twitter', 'threads', 'facebook'],
       ],
       'carousel' => [
         'label' => 'Carousel',
         'description' => 'Multiple images/slides',
         'icon' => 'Images',
-        'platforms' => ['instagram', 'linkedin', 'pinterest'],
+        'platforms' => ['instagram', 'threads', 'linkedin', 'pinterest'],
       ],
     ];
   }

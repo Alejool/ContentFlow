@@ -61,42 +61,39 @@ class UpdatePublicationAction
       
       // Determine which media files to validate
       $mediaFiles = $newFiles;
-      if (!$mediaChanged || empty($data['removed_media_ids'])) {
-        // Include existing media files if not being removed
-        $existingMedia = $publication->mediaFiles()
-          ->when(!empty($data['removed_media_ids']), function ($query) use ($data) {
-            return $query->whereNotIn('media_files.id', $data['removed_media_ids']);
-          })
-          ->get();
-        
-        \Log::info('🔍 UpdatePublicationAction: Media files for validation', [
-          'publication_id' => $publication->id,
-          'content_type' => $contentType,
-          'new_files_count' => count($newFiles),
-          'existing_media_count' => $existingMedia->count(),
-          'removed_media_ids' => $data['removed_media_ids'] ?? [],
-          'existing_media_ids' => $existingMedia->pluck('id')->toArray(),
-        ]);
-        
-        // Convert existing media to a format compatible with validation
-        // For existing media, we create mock UploadedFile objects with the mime type
-        foreach ($existingMedia as $media) {
-          $mockFile = new class($media->mime_type, $media->duration) {
-            private $mimeType;
-            private $duration;
-            public function __construct($mimeType, $duration = null) {
-              $this->mimeType = $mimeType;
-              $this->duration = $duration;
-            }
-            public function getMimeType() {
-              return $this->mimeType;
-            }
-            public function getDuration() {
-              return $this->duration;
-            }
-          };
-          $mediaFiles[] = $mockFile;
-        }
+      // Always include existing media files (excluding removed ones) for validation
+      $existingMedia = $publication->mediaFiles()
+        ->when(!empty($data['removed_media_ids']), function ($query) use ($data) {
+          return $query->whereNotIn('media_files.id', $data['removed_media_ids']);
+        })
+        ->get();
+      
+      \Log::info('🔍 UpdatePublicationAction: Media files for validation', [
+        'publication_id' => $publication->id,
+        'content_type' => $contentType,
+        'new_files_count' => count($newFiles),
+        'existing_media_count' => $existingMedia->count(),
+        'removed_media_ids' => $data['removed_media_ids'] ?? [],
+        'existing_media_ids' => $existingMedia->pluck('id')->toArray(),
+      ]);
+      
+      // Convert existing media to a format compatible with validation
+      foreach ($existingMedia as $media) {
+        $mockFile = new class($media->mime_type, $media->duration) {
+          private $mimeType;
+          private $duration;
+          public function __construct($mimeType, $duration = null) {
+            $this->mimeType = $mimeType;
+            $this->duration = $duration;
+          }
+          public function getMimeType() {
+            return $this->mimeType;
+          }
+          public function getDuration() {
+            return $this->duration;
+          }
+        };
+        $mediaFiles[] = $mockFile;
       }
       
       \Log::info('🔍 UpdatePublicationAction: Total media files for validation', [

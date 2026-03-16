@@ -2,12 +2,13 @@ import { type ContentType } from '@/Components/Content/Publication/common/Conten
 import { FacebookPreview } from '@/Components/Content/Publication/previews/FacebookPreview';
 import { InstagramPreview } from '@/Components/Content/Publication/previews/InstagramPreview';
 import { LinkedInPreview } from '@/Components/Content/Publication/previews/LinkedInPreview';
+import { ThreadsPreview } from '@/Components/Content/Publication/previews/ThreadsPreview';
 import { TikTokPreview } from '@/Components/Content/Publication/previews/TikTokPreview';
 import { TwitterPreview } from '@/Components/Content/Publication/previews/TwitterPreview';
 import { YouTubePreview } from '@/Components/Content/Publication/previews/YouTubePreview';
 import { REEL_COMPATIBLE_PLATFORMS } from '@/Constants/contentTypes';
 import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatformsConfig';
-import { Facebook, Instagram, Linkedin, Music2, Twitter, Youtube } from 'lucide-react';
+import { AtSign, Facebook, Instagram, Linkedin, Music2, Twitter, Youtube } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -163,7 +164,7 @@ interface LivePreviewSectionProps {
   pollDuration?: number; // Nuevo: duración de encuesta
 }
 
-type Platform = 'twitter' | 'instagram' | 'linkedin' | 'facebook' | 'tiktok' | 'youtube';
+type Platform = 'twitter' | 'instagram' | 'threads' | 'linkedin' | 'facebook' | 'tiktok' | 'youtube';
 
 export const LivePreviewSection = ({
   content,
@@ -185,7 +186,7 @@ export const LivePreviewSection = ({
     const contentTypes = [
       {
         value: 'post',
-        platforms: ['instagram', 'twitter', 'facebook', 'linkedin', 'youtube', 'pinterest'],
+        platforms: ['instagram', 'threads', 'twitter', 'facebook', 'linkedin', 'youtube', 'pinterest'],
       },
       {
         value: 'reel',
@@ -197,11 +198,11 @@ export const LivePreviewSection = ({
       },
       {
         value: 'poll',
-        platforms: ['twitter'], // Solo Twitter soporta encuestas nativas
+        platforms: ['twitter', 'threads'],
       },
       {
         value: 'carousel',
-        platforms: ['instagram', 'facebook', 'linkedin'],
+        platforms: ['instagram', 'threads', 'facebook', 'linkedin'],
       },
     ];
 
@@ -213,6 +214,7 @@ export const LivePreviewSection = ({
     const allTabs: { id: Platform; label: string; icon: any }[] = [
       { id: 'twitter', label: 'Twitter', icon: Twitter },
       { id: 'instagram', label: 'Instagram', icon: Instagram },
+      { id: 'threads', label: 'Threads', icon: AtSign },
       { id: 'linkedin', label: 'LinkedIn', icon: Linkedin },
       { id: 'facebook', label: 'Facebook', icon: Facebook },
       { id: 'youtube', label: 'YouTube', icon: Youtube },
@@ -324,6 +326,9 @@ export const LivePreviewSection = ({
             )}
             {activePlatform === 'instagram' && (
               <InstagramPreview content={content} mediaUrls={mediaUrls} user={user} />
+            )}
+            {activePlatform === 'threads' && (
+              <ThreadsPreview content={content} mediaUrls={mediaUrls} user={user} />
             )}
             {activePlatform === 'linkedin' && (
               <LinkedInPreview content={content} mediaUrls={mediaUrls} user={user} />

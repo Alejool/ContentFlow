@@ -429,7 +429,7 @@ const SocialAccountItem = memo(
                   </div>
                   {onCancel && (
                     <Button
-                      variant="danger"
+                      variant="primary"
                       size="xs"
                       onClick={(e) => {
                         e.stopPropagation();
