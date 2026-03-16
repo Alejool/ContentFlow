@@ -1,4 +1,14 @@
 import { Publication } from '@/types/Publication';
+import {
+  Calendar,
+  CheckCircle,
+  Clock,
+  Edit,
+  Eye,
+  Sparkles,
+  TrendingUp,
+} from 'lucide-react';
+import type React from 'react';
 import { formatDateTime } from './formatDate';
 
 /**
@@ -148,21 +158,89 @@ export function getStatusIcon(status: string) {
 }
 
 /**
- * Obtiene los colores de estado de una publicación
+ * Obtiene la configuración completa de un estado de publicación
+ * Incluye colores, iconos y toda la información visual necesaria
  */
-export function getStatusColors(status?: string): string {
-  const colors = {
-    published: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-    draft: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400',
-    scheduled: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-    failed: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-    pending_review: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
-    approved: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
-    rejected: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-    publishing: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+export function getPublicationStatusConfig(status?: string) {
+  type StatusIcon = React.ComponentType<{ className?: string }>;
+
+  const defaultConfig = {
+    badge: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400',
+    bg: 'bg-gray-50 dark:bg-gray-900/20',
+    text: 'text-gray-500',
+    border: 'border-gray-200 dark:border-gray-700',
+    hover: 'hover:bg-gray-100 dark:hover:bg-gray-900/40',
+    icon: Edit as StatusIcon,
   };
 
-  return colors[status as keyof typeof colors] || colors.draft;
+  const configMap: Record<string, typeof defaultConfig> = {
+    draft: { ...defaultConfig },
+    pending_review: {
+      badge: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
+      bg: 'bg-amber-50 dark:bg-amber-900/20',
+      text: 'text-amber-500',
+      border: 'border-amber-200 dark:border-amber-700',
+      hover: 'hover:bg-amber-100 dark:hover:bg-amber-900/40',
+      icon: Eye,
+    },
+    approved: {
+      badge: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+      bg: 'bg-purple-50 dark:bg-purple-900/20',
+      text: 'text-purple-500',
+      border: 'border-purple-200 dark:border-purple-700',
+      hover: 'hover:bg-purple-100 dark:hover:bg-purple-900/40',
+      icon: Sparkles,
+    },
+    scheduled: {
+      badge: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+      bg: 'bg-sky-50 dark:bg-sky-900/20',
+      text: 'text-sky-500',
+      border: 'border-sky-200 dark:border-sky-700',
+      hover: 'hover:bg-sky-100 dark:hover:bg-sky-900/40',
+      icon: Calendar,
+    },
+    publishing: {
+      badge: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+      bg: 'bg-blue-50 dark:bg-blue-900/20',
+      text: 'text-blue-500',
+      border: 'border-blue-200 dark:border-blue-700',
+      hover: 'hover:bg-blue-100 dark:hover:bg-blue-900/40',
+      icon: TrendingUp,
+    },
+    published: {
+      badge: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+      bg: 'bg-green-50 dark:bg-green-900/20',
+      text: 'text-green-500',
+      border: 'border-green-200 dark:border-green-700',
+      hover: 'hover:bg-green-100 dark:hover:bg-green-900/40',
+      icon: CheckCircle,
+    },
+    failed: {
+      badge: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+      bg: 'bg-red-50 dark:bg-red-900/20',
+      text: 'text-red-500',
+      border: 'border-red-200 dark:border-red-700',
+      hover: 'hover:bg-red-100 dark:hover:bg-red-900/40',
+      icon: Clock,
+    },
+    rejected: {
+      badge: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+      bg: 'bg-red-50 dark:bg-red-900/20',
+      text: 'text-red-500',
+      border: 'border-red-200 dark:border-red-700',
+      hover: 'hover:bg-red-100 dark:hover:bg-red-900/40',
+      icon: Clock,
+    },
+  };
+
+  return configMap[status || 'draft'] || defaultConfig;
+}
+
+/**
+ * Obtiene todos los estados de publicación disponibles
+ */
+export function getAllPublicationStatuses() {
+  return ['draft', 'pending_review', 'approved', 'scheduled', 'publishing', 'published', 'failed'] as const;
 }
 
 /**
