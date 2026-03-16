@@ -1,8 +1,11 @@
 import { getPlatformConfig } from '@/Constants/socialPlatforms';
+import { queryKeys } from '@/lib/queryKeys';
 import { formatDateTimeStyled } from '@/Utils/dateHelpers';
 import { validateVideoDuration } from '@/Utils/validationUtils';
-import { Check, CheckCircle, Clock, Loader2, X, XCircle } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
+import { AlertTriangle, Check, CheckCircle, Clock, Loader2, RefreshCw, X, XCircle } from 'lucide-react';
 import { memo } from 'react';
+import toast from 'react-hot-toast';
 
 interface PlatformCardProps {
   account: any;
@@ -53,6 +56,16 @@ const PlatformCard = memo(
     const retryStatus = platformRetryInfo?.retry_status || null;
     const isDuplicateAttempt = platformRetryInfo?.is_duplicate || false;
     const originalAttemptAt = platformRetryInfo?.original_attempt_at;
+    
+    const queryClient = useQueryClient();
+
+    // Check if this is a Twitter account with video content but missing OAuth 1.0a credentials
+    const isTwitter = ['twitter', 'x'].includes(account.platform?.toLowerCase());
+    const hasVideo = publication?.media_files?.some(
+      (m: any) => m.file_type === 'video' || m.mime_type?.startsWith('video/')
+    );
+    const hasOAuth1 = account.account_metadata?.oauth1_token && account.account_metadata?.secret;
+    const needsOAuth1Reconnection = isTwitter && hasVideo && !hasOAuth1;
 
     const canToggle =
       !isPublished &&
@@ -60,7 +73,81 @@ const PlatformCard = memo(
       !isPublishing &&
       !isRetrying &&
       !isDuplicate &&
-      !isDuplicateAttempt;
+      !isDuplicateAttempt &&
+      !needsOAuth1Reconnection;
+
+    const handleReconnect = async (e: React.MouseEvent) => {
+      e.stopPropagation();
+      
+      // Show toast message
+      const toastId = toast.loading(
+        t('publications.modal.publish.reconnecting') || 'Iniciando reconexión...'
+      );
+      
+      try {
+        // Get auth URL for the platform
+        const response = await fetch(`/social-accounts/auth-url/${account.platform}`, {
+          headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+            'Accept': 'application/json',
+          },
+        });
+        
+        const data = await response.json();
+        
+        if (data.url) {
+          toast.success(
+            t('publications.modal.publish.reconnect_window') || 'Abriendo ventana de reconexión...',
+            { id: toastId }
+          );
+          
+          // Open OAuth window
+          const width = 600;
+          const height = 700;
+          const left = window.screen.width / 2 - width / 2;
+          const top = window.screen.height / 2 - height / 2;
+          
+          const authWindow = window.open(
+            data.url,
+            'oauth',
+            `width=${width},height=${height},left=${left},top=${top}`
+          );
+          
+          // Listen for successful reconnection
+          const handleAuthMessage = (event: MessageEvent) => {
+            if (event.data?.type === 'social_auth_callback' && event.data.success) {
+              toast.success(
+                t('publications.modal.publish.reconnect_success') || 'Cuenta reconectada exitosamente',
+                { id: toastId }
+              );
+              
+              // Invalidate social accounts cache to refresh the data
+              queryClient.invalidateQueries({ queryKey: queryKeys.socialAccounts.all });
+              
+              // Clean up listener
+              window.removeEventListener('message', handleAuthMessage);
+            }
+          };
+          
+          window.addEventListener('message', handleAuthMessage);
+          
+          // Clean up listener after 5 minutes (timeout)
+          setTimeout(() => {
+            window.removeEventListener('message', handleAuthMessage);
+          }, 5 * 60 * 1000);
+        } else {
+          toast.error(
+            t('publications.modal.publish.reconnect_error') || 'Error al iniciar reconexión',
+            { id: toastId }
+          );
+        }
+      } catch (error) {
+        toast.error(
+          t('publications.modal.publish.reconnect_error') || 'Error al iniciar reconexión',
+          { id: toastId }
+        );
+      }
+    };
 
     return (
       <div className="relative w-full">
@@ -209,6 +296,35 @@ const PlatformCard = memo(
                     </span>
                   )}
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* OAuth 1.0a Missing Overlay for Twitter Video */}
+          {needsOAuth1Reconnection && !isPublishing && !isUnpublishing && (
+            <div className="animate-in fade-in absolute inset-0 z-30 flex flex-col items-center justify-center rounded-lg bg-amber-50/95 backdrop-blur-sm duration-300 dark:bg-amber-900/30">
+              <div className="flex flex-col items-center gap-2 px-3">
+                <AlertTriangle className="h-10 w-10 text-amber-600 dark:text-amber-400" />
+                <div className="flex flex-col items-center gap-0.5">
+                  <span className="text-sm font-bold capitalize tracking-wide text-amber-800 dark:text-amber-300">
+                    {account.platform}
+                  </span>
+                  <span className="text-center text-xs font-medium text-amber-700 dark:text-amber-400">
+                    {t('publications.modal.publish.oauth1_required') || 'Requiere reconexión'}
+                  </span>
+                  <span className="mt-1 text-center text-[10px] leading-tight text-amber-600 dark:text-amber-500">
+                    {t('publications.modal.publish.oauth1_video_message') || 
+                      'Esta cuenta necesita credenciales OAuth 1.0a para subir videos'}
+                  </span>
+                </div>
+                
+                <button
+                  onClick={handleReconnect}
+                  className="pointer-events-auto mt-2 flex items-center gap-1.5 rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600"
+                >
+                  <RefreshCw className="h-3.5 w-3.5" />
+                  {t('publications.modal.publish.reconnect_account') || 'Reconectar cuenta'}
+                </button>
               </div>
             </div>
           )}

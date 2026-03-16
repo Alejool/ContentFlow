@@ -72,8 +72,8 @@ export default function PlatformCard({
           >
             {account.platform.charAt(0).toUpperCase() + account.platform.slice(1)}
           </div>
-          {account.name && (
-            <div className="text-xs text-gray-500 dark:text-gray-400">{account.name}</div>
+          {account.account_name && (
+            <div className="text-xs text-gray-500 dark:text-gray-400">{account.account_name}</div>
           )}
         </div>
       </div>
