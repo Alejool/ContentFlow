@@ -1,5 +1,7 @@
-import Logo from '@/../assets/logo.png';
+import Logo from '@/../assets/logo.svg';
+import Button from '@/Components/common/Modern/Button';
 import ThemeLanguageContainer from '@/Components/common/ThemeLanguageContainer';
+import OptimizedImage from '@/Components/common/ui/OptimizedImage';
 import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatforms';
 import { useTheme } from '@/Hooks/useTheme';
 import { Head, Link } from '@inertiajs/react';
@@ -85,11 +87,12 @@ export default function Welcome({
     const supportedLanguages = ['en', 'es'];
 
     const defaultLang = supportedLanguages.includes(browserLang) ? browserLang : 'es';
+    const currentLang = i18n.language ?? 'es';
 
-    if (i18n.language !== defaultLang) {
+    if (currentLang !== defaultLang) {
       i18n.changeLanguage(defaultLang);
     }
-  }, []);
+  }, [i18n]);
 
   useEffect(() => {
     // Force orange theme for welcome page
@@ -244,11 +247,12 @@ export default function Welcome({
               <div className="flex h-16 items-center justify-between md:h-20">
                 <div className="flex flex-shrink-0 items-center">
                   <Link href="/" className="flex items-center">
-                    <div className="w-20 md:w-28">
-                      <img
+                    <div className="">
+                      <OptimizedImage
                         src={Logo}
-                        alt="ContentFlow Logo"
-                        className="h-auto w-full object-contain"
+                        alt=""
+                        eager={true}
+                        className=" w-48 h-autow-full object-contain"
                       />
                     </div>
                   </Link>
@@ -276,7 +280,6 @@ export default function Welcome({
                 >
                   <span className="flex items-center gap-1 text-sm font-medium text-primary-600 dark:text-primary-400">
                     <motion.div
-                      animate={{ rotate: [0, 360] }}
                       transition={{
                         duration: 2,
                         repeat: Infinity,
@@ -437,135 +440,161 @@ export default function Welcome({
 
                 {/* Animated Feature Carousel */}
                 <div className="relative mx-auto max-w-6xl">
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={currentFeatureIndex}
-                      initial={{ opacity: 0, x: 100 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -100 }}
-                      transition={{ duration: 0.5, ease: 'easeInOut' }}
-                      className="relative"
-                    >
-                      <div className="relative overflow-hidden rounded-lg bg-primary-500 p-1">
-                        <div className="relative rounded-lg bg-white p-8 dark:bg-gray-900 md:p-12">
-                          <div className="grid items-center gap-8 md:grid-cols-2">
-                            {/* Left side - Icon and Title */}
-                            <motion.div
-                              initial={{ opacity: 0, y: 20 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: 0.2, duration: 0.5 }}
-                              className="text-center md:text-left"
-                            >
-                              <motion.div
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                transition={{
-                                  delay: 0.3,
-                                  type: 'spring',
-                                  stiffness: 200,
-                                }}
-                                className="mb-6 inline-flex h-24 w-24 items-center justify-center rounded-lg bg-primary-500 text-white shadow-2xl"
-                              >
-                                {features[currentFeatureIndex].icon}
-                              </motion.div>
-                              <h3 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">
-                                {features[currentFeatureIndex].title}
-                              </h3>
-                              <p className="text-lg text-gray-600 dark:text-gray-300">
-                                {features[currentFeatureIndex].description}
-                              </p>
-                            </motion.div>
-
-                            {/* Right side - Highlights */}
-                            <motion.div
-                              initial={{ opacity: 0, y: 20 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: 0.4, duration: 0.5 }}
-                              className="space-y-4"
-                            >
-                              {features[currentFeatureIndex].highlights.map((highlight, idx) => (
+                  {features.length > 0 && (
+                    <>
+                      <AnimatePresence mode="wait">
+                        <motion.div
+                          key={currentFeatureIndex}
+                          initial={{ opacity: 0, x: 100 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -100 }}
+                          transition={{ duration: 0.5, ease: 'easeInOut' }}
+                          className="relative"
+                        >
+                          <div className="relative overflow-hidden rounded-lg bg-primary-500 p-1">
+                            <div className="relative rounded-lg bg-white p-8 dark:bg-gray-900 md:p-12">
+                              <div className="grid items-center gap-8 md:grid-cols-2">
+                                {/* Left side - Icon and Title */}
                                 <motion.div
-                                  key={idx}
-                                  initial={{ opacity: 0, x: 20 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  transition={{
-                                    delay: 0.5 + idx * 0.1,
-                                    duration: 0.4,
-                                  }}
-                                  className="flex items-start gap-3 rounded-lg bg-gray-50 p-4 transition-colors hover:bg-gray-100 dark:bg-gray-800/50 dark:hover:bg-gray-800"
+                                  initial={{ opacity: 0, y: 20 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ delay: 0.2, duration: 0.5 }}
+                                  className="text-center md:text-left"
                                 >
                                   <motion.div
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
                                     transition={{
-                                      delay: 0.6 + idx * 0.1,
+                                      delay: 0.3,
                                       type: 'spring',
+                                      stiffness: 200,
                                     }}
-                                    className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary-500"
+                                    className="mb-6 inline-flex h-24 w-24 items-center justify-center rounded-lg bg-primary-500 text-white shadow-2xl"
                                   >
-                                    <CheckCircle2 className="h-4 w-4 text-white" />
+                                    {features[currentFeatureIndex]?.icon}
                                   </motion.div>
-                                  <span className="font-medium text-gray-700 dark:text-gray-300">
-                                    {highlight}
-                                  </span>
+                                  <h3 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">
+                                    {features[currentFeatureIndex]?.title}
+                                  </h3>
+                                  <p className="text-lg text-gray-600 dark:text-gray-300">
+                                    {features[currentFeatureIndex]?.description}
+                                  </p>
                                 </motion.div>
-                              ))}
-                            </motion.div>
+
+                                {/* Right side - Highlights */}
+                                <motion.div
+                                  initial={{ opacity: 0, y: 20 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ delay: 0.4, duration: 0.5 }}
+                                  className="space-y-4"
+                                >
+                                  {features[currentFeatureIndex]?.highlights.map(
+                                    (highlight, idx) => (
+                                      <motion.div
+                                        key={idx}
+                                        initial={{ opacity: 0, x: 20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{
+                                          delay: 0.5 + idx * 0.1,
+                                          duration: 0.4,
+                                        }}
+                                        className="flex items-start gap-3 rounded-lg bg-gray-50 p-4 transition-colors hover:bg-gray-100 dark:bg-gray-800/50 dark:hover:bg-gray-800"
+                                      >
+                                        <motion.div
+                                          initial={{ scale: 0 }}
+                                          animate={{ scale: 1 }}
+                                          transition={{
+                                            delay: 0.6 + idx * 0.1,
+                                            type: 'spring',
+                                          }}
+                                          className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary-500"
+                                        >
+                                          <CheckCircle2 className="h-4 w-4 text-white" />
+                                        </motion.div>
+                                        <span className="font-medium text-gray-700 dark:text-gray-300">
+                                          {highlight}
+                                        </span>
+                                      </motion.div>
+                                    ),
+                                  )}
+                                </motion.div>
+                              </div>
+                            </div>
                           </div>
-                        </div>
+                        </motion.div>
+                      </AnimatePresence>
+
+                      {/* Pagination Dots */}
+                      <div className="mt-8 flex justify-center gap-3">
+                        {features.map((_, index) => (
+                          <motion.button
+                            key={index}
+                            onClick={() => setCurrentFeatureIndex(index)}
+                            className={`relative h-3 rounded-full transition-all duration-300 ${
+                              index === currentFeatureIndex
+                                ? 'w-12 bg-primary-600'
+                                : 'w-3 bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500'
+                            }`}
+                            whileHover={{ scale: 1.2 }}
+                            whileTap={{ scale: 0.9 }}
+                          >
+                            {index === currentFeatureIndex && (
+                              <motion.div
+                                className="absolute inset-0 rounded-full bg-primary-600"
+                                initial={{ width: 0 }}
+                                animate={{ width: '100%' }}
+                                transition={{ duration: 5, ease: 'linear' }}
+                              />
+                            )}
+                          </motion.button>
+                        ))}
                       </div>
-                    </motion.div>
-                  </AnimatePresence>
 
-                  {/* Pagination Dots */}
-                  <div className="mt-8 flex justify-center gap-3">
-                    {features.map((_, index) => (
-                      <motion.button
-                        key={index}
-                        onClick={() => setCurrentFeatureIndex(index)}
-                        className={`relative h-3 rounded-full transition-all duration-300 ${
-                          index === currentFeatureIndex
-                            ? 'w-12 bg-primary-600'
-                            : 'w-3 bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500'
-                        }`}
-                        whileHover={{ scale: 1.2 }}
-                        whileTap={{ scale: 0.9 }}
-                      >
-                        {index === currentFeatureIndex && (
-                          <motion.div
-                            className="absolute inset-0 rounded-full bg-primary-600"
-                            initial={{ width: 0 }}
-                            animate={{ width: '100%' }}
-                            transition={{ duration: 5, ease: 'linear' }}
-                          />
-                        )}
-                      </motion.button>
-                    ))}
-                  </div>
-
-                  {/* Navigation Arrows */}
-                  <div className="pointer-events-none absolute left-0 right-0 top-1/2 flex -translate-y-1/2 justify-between px-4">
-                    <motion.button
-                      onClick={() =>
-                        setCurrentFeatureIndex(
-                          (prev) => (prev - 1 + features.length) % features.length,
-                        )
-                      }
-                      className="pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full bg-white text-gray-700 shadow-lg transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-                      whileHover={{ scale: 1.1, x: -5 }}
-                      whileTap={{ scale: 0.9 }}
-                    >
-                      <ArrowRight className="h-6 w-6 rotate-180" />
-                    </motion.button>
-                    <motion.button
-                      onClick={() => setCurrentFeatureIndex((prev) => (prev + 1) % features.length)}
-                      className="pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full bg-white text-gray-700 shadow-lg transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-                      whileHover={{ scale: 1.1, x: 5 }}
-                      whileTap={{ scale: 0.9 }}
-                    >
-                      <ArrowRight className="h-6 w-6" />
-                    </motion.button>
-                  </div>
+                      {/* Navigation Arrows */}
+                      <div className="pointer-events-none absolute left-0 right-0 top-1/2 flex -translate-y-1/2 justify-between px-4">
+                        <motion.div
+                          whileHover={{ scale: 1.1, x: -5 }}
+                          whileTap={{ scale: 0.9 }}
+                          className="pointer-events-auto"
+                        >
+                          <Button
+                            onClick={() =>
+                              setCurrentFeatureIndex(
+                                (prev) => (prev - 1 + features.length) % features.length,
+                              )
+                            }
+                            buttonStyle="solid"
+                            variant="ghost"
+                            size="md"
+                            rounded="full"
+                            shadow="lg"
+                            className="!h-12 !w-12 !p-0"
+                          >
+                            <ArrowRight className="h-6 w-6 rotate-180" />
+                          </Button>
+                        </motion.div>
+                        <motion.div
+                          whileHover={{ scale: 1.1, x: 5 }}
+                          whileTap={{ scale: 0.9 }}
+                          className="pointer-events-auto"
+                        >
+                          <Button
+                            onClick={() =>
+                              setCurrentFeatureIndex((prev) => (prev + 1) % features.length)
+                            }
+                            buttonStyle="solid"
+                            variant="ghost"
+                            size="md"
+                            rounded="full"
+                            shadow="lg"
+                            className="!h-12 !w-12 !p-0"
+                          >
+                            <ArrowRight className="h-6 w-6" />
+                          </Button>
+                        </motion.div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </motion.div>
 
@@ -792,9 +821,9 @@ export default function Welcome({
                 <div className="mb-4 flex items-center md:mb-0">
                   <Link href="/" className="flex items-center">
                     <div className="w-20 md:w-28">
-                      <img
+                      <OptimizedImage
                         src={Logo}
-                        alt="ContentFlow Logo"
+                        alt="logo empresa"
                         className="h-auto w-full object-contain"
                       />
                     </div>
