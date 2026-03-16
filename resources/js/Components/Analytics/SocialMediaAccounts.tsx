@@ -1,7 +1,7 @@
 import PieChart from '@/Components/Statistics/PieChart';
 import { SeededRandom } from '@/Utils/stableMock';
 import { Link } from '@inertiajs/react';
-import { AlertTriangle, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
+import { AlertTriangle, ChevronLeft, ChevronRight, Plus, RefreshCw, Share2 } from 'lucide-react';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -37,20 +37,20 @@ export default function SocialMediaAccounts({
     {
       id: 101,
       platform: 'instagram',
-      account_name: 'contentflow_oficial (Imaginaria)',
-      followers: 15420,
-      engagement_rate: 4.2,
-      reach: 45000,
-      follower_growth_30d: 350,
+      account_name: 'Ejemplo Demo',
+      followers: 1250,
+      engagement_rate: 3.2,
+      reach: 3500,
+      follower_growth_30d: 45,
     },
     {
       id: 102,
       platform: 'tiktok',
-      account_name: 'contentflow.app (Imaginaria)',
-      followers: 54000,
-      engagement_rate: 8.5,
-      reach: 154000,
-      follower_growth_30d: 1500,
+      account_name: 'Ejemplo Demo',
+      followers: 2100,
+      engagement_rate: 4.1,
+      reach: 5800,
+      follower_growth_30d: 78,
     },
   ];
 
@@ -64,10 +64,10 @@ export default function SocialMediaAccounts({
               return {
                 ...acc,
                 account_name: `${acc.account_name} (Datos Simulados)`,
-                followers: rng.nextInt(1000, 6000),
+                followers: rng.nextInt(500, 2000),
                 engagement_rate: 3.5,
-                reach: rng.nextInt(5000, 25000),
-                follower_growth_30d: rng.nextInt(10, 210),
+                reach: rng.nextInt(1000, 5000),
+                follower_growth_30d: rng.nextInt(10, 100),
               };
             }
             return acc;
@@ -123,9 +123,27 @@ export default function SocialMediaAccounts({
       )}
 
       {accounts.length === 0 && (
-        <div className="mb-4 rounded-lg border border-orange-200 bg-orange-50 p-4 text-sm text-orange-800 dark:border-orange-800/50 dark:bg-orange-900/20 dark:text-orange-300">
-          <strong>Modo de demostración:</strong> No tienes cuentas conectadas. Se están mostrando
-          datos de prueba.
+        <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800/50 dark:bg-blue-900/20">
+          <div className="flex items-start gap-3">
+            <div className="rounded-full bg-blue-100 p-2 dark:bg-blue-900/40">
+              <Share2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div className="flex-1">
+              <h4 className="mb-1 font-semibold text-blue-900 dark:text-blue-100">
+                {t('socialAccounts.demoMode.title', 'Datos de Demostración')}
+              </h4>
+              <p className="mb-3 text-sm text-blue-800 dark:text-blue-300">
+                {t('socialAccounts.demoMode.description', 'No tienes cuentas sociales conectadas. Los datos mostrados son ejemplos para que conozcas la interfaz.')}
+              </p>
+              <Link
+                href={route('social-accounts.index')}
+                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
+              >
+                <Plus className="h-4 w-4" />
+                {t('socialAccounts.connectAccount', 'Conectar Cuenta Social')}
+              </Link>
+            </div>
+          </div>
         </div>
       )}
 

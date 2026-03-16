@@ -9,7 +9,7 @@ import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react
 import { router, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { AnimatePresence, motion } from 'framer-motion';
-import { BarChart3, Check, ChevronDown, Clock, ExternalLink, Loader2, X } from 'lucide-react';
+import { AlertTriangle, BarChart3, Check, ChevronDown, Clock, ExternalLink, Loader2, RefreshCw, X } from 'lucide-react';
 import { memo, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -519,7 +519,59 @@ const SocialMediaAccounts = memo(() => {
                           })()} */}
 
                             {/* Action buttons */}
-                            <div className="flex w-full gap-2">
+                            <div className="flex w-full flex-col gap-2">
+                              {/* OAuth 1.0a Warning for Twitter */}
+                              {(() => {
+                                const isTwitter = ['twitter', 'x'].includes(account.platform?.toLowerCase());
+                                const hasOAuth1 = account.accountDetails?.account_metadata?.oauth1_token && 
+                                                 account.accountDetails?.account_metadata?.secret;
+                                const needsOAuth1 = isTwitter && account.isConnected && !hasOAuth1;
+                                
+                                if (!needsOAuth1) return null;
+                                
+                                return (
+                                  <div className="rounded-lg border border-amber-200 bg-amber-50 p-2.5 dark:border-amber-800/50 dark:bg-amber-900/20">
+                                    <div className="mb-2 flex items-start gap-2">
+                                      <AlertTriangle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-amber-600 dark:text-amber-400" />
+                                      <div className="flex-1">
+                                        <p className="text-[10px] font-bold leading-tight text-amber-800 dark:text-amber-300">
+                                          {t('manageContent.socialMedia.oauth1Required') || 'OAuth 1.0a requerido'}
+                                        </p>
+                                        <p className="mt-0.5 text-[9px] leading-tight text-amber-700 dark:text-amber-400">
+                                          {t('manageContent.socialMedia.oauth1Message') || 'Necesario para subir videos'}
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <motion.button
+                                      whileTap={{ scale: 0.97 }}
+                                      onClick={async (e) => {
+                                        e.stopPropagation();
+                                        const toastId = toast.loading(t('manageContent.socialMedia.reconnecting') || 'Reconectando...');
+                                        try {
+                                          const response = await axios.get(`/social-accounts/auth-url/${account.platform}`);
+                                          if (response.data?.url) {
+                                            toast.success(t('manageContent.socialMedia.reconnectWindow') || 'Abriendo ventana...', { id: toastId });
+                                            const width = 600;
+                                            const height = 700;
+                                            const left = window.screen.width / 2 - width / 2;
+                                            const top = window.screen.height / 2 - height / 2;
+                                            window.open(response.data.url, 'oauth', `width=${width},height=${height},left=${left},top=${top}`);
+                                          } else {
+                                            toast.error(t('manageContent.socialMedia.reconnectError') || 'Error', { id: toastId });
+                                          }
+                                        } catch (error) {
+                                          toast.error(t('manageContent.socialMedia.reconnectError') || 'Error', { id: toastId });
+                                        }
+                                      }}
+                                      className="flex w-full items-center justify-center gap-1.5 rounded-md bg-amber-600 px-3 py-1.5 text-[11px] font-bold text-white transition-colors hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600"
+                                    >
+                                      <RefreshCw className="h-3 w-3" />
+                                      {t('manageContent.socialMedia.reconnect') || 'Reconectar'}
+                                    </motion.button>
+                                  </div>
+                                );
+                              })()}
+                              
                               <motion.button
                                 whileTap={{ scale: 0.97 }}
                                 onClick={() => handleConnectionToggle(account)}
