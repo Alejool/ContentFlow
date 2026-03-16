@@ -80,11 +80,11 @@ seed: ## Ejecutar seeders
 	$(COMPOSE) exec $(APP) php artisan db:seed
 
 psql: ## Conectar a PostgreSQL
-	$(COMPOSE) exec $(PGSQL) psql -U contenflow -d ContentFlow
+	$(COMPOSE) exec $(PGSQL) psql -U Intellipost -d ContentFlow
 
 backup: ## Crear backup de base de datos
 	@echo "$(GREEN)Creando backup...$(NC)"
-	$(COMPOSE) exec -T $(PGSQL) pg_dump -U contenflow ContentFlow > backup_$$(date +%Y%m%d_%H%M%S).sql
+	$(COMPOSE) exec -T $(PGSQL) pg_dump -U Intellipost ContentFlow > backup_$$(date +%Y%m%d_%H%M%S).sql
 	@echo "$(GREEN)Backup creado.$(NC)"
 
 # Caché y Optimización
@@ -146,7 +146,7 @@ health: ## Verificar salud de servicios
 	@$(COMPOSE) ps
 	@echo ""
 	@echo "PostgreSQL:"
-	@$(COMPOSE) exec $(PGSQL) pg_isready -U contenflow && echo "  ✓ OK" || echo "  ✗ ERROR"
+	@$(COMPOSE) exec $(PGSQL) pg_isready -U Intellipost && echo "  ✓ OK" || echo "  ✗ ERROR"
 	@echo "Redis:"
 	@$(COMPOSE) exec redis redis-cli ping > /dev/null && echo "  ✓ OK" || echo "  ✗ ERROR"
 
