@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 // Constants
 // ---------------------------------------------------------------------------
 const MULTIPART_THRESHOLD = 5 * 1024 * 1024; // 5 MB
-const CHUNK_SIZE = 5 * 1024 * 1024;           // 5 MB (S3 minimum)
+const CHUNK_SIZE = 5 * 1024 * 1024; // 5 MB (S3 minimum)
 const CONCURRENCY = 3;
 const MAX_RETRIES = 3;
 
@@ -61,8 +61,13 @@ const getErrorMessage = (error: unknown, retryCount: number): string => {
   return 'Upload failed';
 };
 
-const extractVideoMetadata = (file: File): Promise<{
-  duration: number; width: number; height: number; aspectRatio: number;
+const extractVideoMetadata = (
+  file: File,
+): Promise<{
+  duration: number;
+  width: number;
+  height: number;
+  aspectRatio: number;
 }> =>
   new Promise((resolve, reject) => {
     const video = document.createElement('video');
@@ -72,7 +77,10 @@ const extractVideoMetadata = (file: File): Promise<{
       URL.revokeObjectURL(video.src);
       resolve({ duration: Math.floor(duration), width, height, aspectRatio: width / height });
     };
-    video.onerror = () => { URL.revokeObjectURL(video.src); reject(new Error('Failed to load video metadata')); };
+    video.onerror = () => {
+      URL.revokeObjectURL(video.src);
+      reject(new Error('Failed to load video metadata'));
+    };
     video.src = URL.createObjectURL(file);
   });
 
@@ -106,7 +114,12 @@ const handleProgress = (
 const uploadSingle = async (file: File, id: string, startTime: number) => {
   const { data: signData } = await axios.post(
     route('api.v1.uploads.sign'),
-    { filename: file.name, content_type: file.type, file_size: file.size, pending_bytes: calculatePendingBytes(id) },
+    {
+      filename: file.name,
+      content_type: file.type,
+      file_size: file.size,
+      pending_bytes: calculatePendingBytes(id),
+    },
     { timeout: 30_000 },
   );
 
@@ -133,13 +146,22 @@ const uploadMultipart = async (file: File, id: string, startTime: number) => {
   if (!uploadId || !key) {
     const { data } = await axios.post(
       route('api.v1.uploads.multipart.init'),
-      { filename: file.name, content_type: file.type, file_size: file.size, pending_bytes: calculatePendingBytes(id) },
+      {
+        filename: file.name,
+        content_type: file.type,
+        file_size: file.size,
+        pending_bytes: calculatePendingBytes(id),
+      },
       { timeout: 30_000 },
     );
     uploadId = data.uploadId;
     key = data.key;
     useUploadQueue.getState().updateUpload(id, {
-      uploadId, s3Key: key, isPausable: true, uploadedParts: [], abortController: new AbortController(),
+      uploadId,
+      s3Key: key,
+      isPausable: true,
+      uploadedParts: [],
+      abortController: new AbortController(),
     });
   } else {
     useUploadQueue.getState().updateUpload(id, { abortController: new AbortController() });
@@ -148,7 +170,9 @@ const uploadMultipart = async (file: File, id: string, startTime: number) => {
   const totalParts = Math.ceil(file.size / CHUNK_SIZE);
   const parts: { ETag: string; PartNumber: number }[] = [...completedParts];
   const partProgress: Record<number, number> = {};
-  completedParts.forEach((p) => { partProgress[p.PartNumber] = CHUNK_SIZE; });
+  completedParts.forEach((p) => {
+    partProgress[p.PartNumber] = CHUNK_SIZE;
+  });
 
   const uploadPart = async (partNumber: number) => {
     const start = (partNumber - 1) * CHUNK_SIZE;
@@ -175,7 +199,13 @@ const uploadMultipart = async (file: File, id: string, startTime: number) => {
         const eta = speed > 0 ? (file.size - totalUploaded) / speed : 0;
         useUploadQueue.getState().updateUpload(id, {
           progress: Math.round((totalUploaded / file.size) * 100),
-          stats: { eta, speed, startTime, bytesUploaded: totalUploaded, lastUpdateTime: Date.now() },
+          stats: {
+            eta,
+            speed,
+            startTime,
+            bytesUploaded: totalUploaded,
+            lastUpdateTime: Date.now(),
+          },
         });
       },
     });
@@ -185,8 +215,9 @@ const uploadMultipart = async (file: File, id: string, startTime: number) => {
     return { ETag: etag, PartNumber: partNumber };
   };
 
-  const remaining = Array.from({ length: totalParts }, (_, i) => i + 1)
-    .filter((n) => !completedParts.some((p) => p.PartNumber === n));
+  const remaining = Array.from({ length: totalParts }, (_, i) => i + 1).filter(
+    (n) => !completedParts.some((p) => p.PartNumber === n),
+  );
 
   for (let i = 0; i < remaining.length; i += CONCURRENCY) {
     const batch = remaining.slice(i, i + CONCURRENCY);
@@ -207,8 +238,16 @@ const uploadMultipart = async (file: File, id: string, startTime: number) => {
 // ---------------------------------------------------------------------------
 // The actual mutationFn — pure async, no hook deps
 // ---------------------------------------------------------------------------
-interface UploadInput { file: File; tempId: string }
-interface UploadResult { key: string; filename: string; mime_type: string; size: number }
+interface UploadInput {
+  file: File;
+  tempId: string;
+}
+interface UploadResult {
+  key: string;
+  filename: string;
+  mime_type: string;
+  size: number;
+}
 
 const performUpload = async ({ file, tempId }: UploadInput): Promise<UploadResult> => {
   const { addUpload, updateUpload, removeUpload } = useUploadQueue.getState();
@@ -222,15 +261,20 @@ const performUpload = async ({ file, tempId }: UploadInput): Promise<UploadResul
   }
 
   addUpload(tempId, file);
-  updateUpload(tempId, { status: 'uploading', progress: 0, abortController: new AbortController() });
+  updateUpload(tempId, {
+    status: 'uploading',
+    progress: 0,
+    abortController: new AbortController(),
+  });
 
   const startTime = Date.now();
 
   try {
     const isVideo = file.type.startsWith('video/');
-    const result = (file.size >= MULTIPART_THRESHOLD || isVideo)
-      ? await uploadMultipart(file, tempId, startTime)
-      : await uploadSingle(file, tempId, startTime);
+    const result =
+      file.size >= MULTIPART_THRESHOLD || isVideo
+        ? await uploadMultipart(file, tempId, startTime)
+        : await uploadSingle(file, tempId, startTime);
 
     updateUpload(tempId, { status: 'completed', progress: 100, s3Key: result.key });
     useMediaStore.getState().updateFile(tempId, {
@@ -246,13 +290,27 @@ const performUpload = async ({ file, tempId }: UploadInput): Promise<UploadResul
         if (isVideo) {
           try {
             const m = await extractVideoMetadata(file);
-            if (m.duration > 0) metadata = { duration: m.duration, width: m.width, height: m.height, aspect_ratio: m.aspectRatio };
-          } catch { /* skip metadata on error */ }
+            if (m.duration > 0)
+              metadata = {
+                duration: m.duration,
+                width: m.width,
+                height: m.height,
+                aspect_ratio: m.aspectRatio,
+              };
+          } catch {
+            /* skip metadata on error */
+          }
         }
 
         const { data } = await axios.post(
           route('api.v1.publications.attach-media', currentUpload.publicationId),
-          { key: result.key, filename: file.name, mime_type: file.type, size: file.size, ...metadata },
+          {
+            key: result.key,
+            filename: file.name,
+            mime_type: file.type,
+            size: file.size,
+            ...metadata,
+          },
         );
 
         if (data.media_file?.id) {
@@ -281,7 +339,12 @@ const performUpload = async ({ file, tempId }: UploadInput): Promise<UploadResul
     const canRetry = retryCount < MAX_RETRIES && isRetryableError(error);
     const errorMessage = getErrorMessage(error, retryCount);
 
-    updateUpload(tempId, { status: 'error', error: errorMessage, lastError: error.message, canRetry });
+    updateUpload(tempId, {
+      status: 'error',
+      error: errorMessage,
+      lastError: error.message,
+      canRetry,
+    });
     useMediaStore.getState().updateFile(tempId, { status: 'failed' });
 
     throw error; // let useMutation handle retry
@@ -295,11 +358,11 @@ export const useS3Upload = () => {
   const { t } = useTranslation();
 
   // Zustand — granular state (progress, stats, errors, pause/resume/cancel)
-  const queue        = useUploadQueue((s) => s.queue);
-  const pauseUpload  = useUploadQueue((s) => s.pauseUpload);
+  const queue = useUploadQueue((s) => s.queue);
+  const pauseUpload = useUploadQueue((s) => s.pauseUpload);
   const resumeUpload = useUploadQueue((s) => s.resumeUpload);
   const cancelUpload = useUploadQueue((s) => s.cancelUpload);
-  const retryUpload  = useUploadQueue((s) => s.retryUpload);
+  const retryUpload = useUploadQueue((s) => s.retryUpload);
 
   // Derived maps for consumers
   const progress: Record<string, number> = {};
@@ -309,8 +372,8 @@ export const useS3Upload = () => {
 
   for (const item of Object.values(queue)) {
     progress[item.id] = item.progress;
-    if (item.stats)  stats[item.id]  = item.stats;
-    if (item.error)  errors[item.id] = item.error;
+    if (item.stats) stats[item.id] = item.stats;
+    if (item.error) errors[item.id] = item.error;
     if (item.status === 'uploading') isUploading = true;
   }
 
@@ -329,7 +392,9 @@ export const useS3Upload = () => {
       const currentUpload = useUploadQueue.getState().queue[tempId];
       if (currentUpload?.publicationId) {
         toast.success(
-          t('publications.messages.mediaAttached', { defaultValue: `${file.name} vinculado correctamente` }),
+          t('publications.messages.mediaAttached', {
+            defaultValue: `${file.name} vinculado correctamente`,
+          }),
           { duration: 3000 },
         );
       }
@@ -341,7 +406,10 @@ export const useS3Upload = () => {
       const retryCount = useUploadQueue.getState().queue[tempId]?.retryCount ?? 0;
       const canRetry = retryCount < MAX_RETRIES && isRetryableError(error);
       // Only toast when we've exhausted retries or it's non-retryable
-      if (!canRetry || (axios.isAxiosError(error) && (error as AxiosError).response?.status === 402)) {
+      if (
+        !canRetry ||
+        (axios.isAxiosError(error) && (error as AxiosError).response?.status === 402)
+      ) {
         toast.error(getErrorMessage(error, retryCount));
       }
     },
@@ -365,7 +433,7 @@ export const useS3Upload = () => {
     cancelUpload,
     retryUpload,
     // Expose raw mutation state for consumers that want finer control
-    uploadStatus: mutation.status,   // 'idle' | 'pending' | 'success' | 'error'
+    uploadStatus: mutation.status, // 'idle' | 'pending' | 'success' | 'error'
     uploadError: mutation.error,
     resetUpload: mutation.reset,
   };

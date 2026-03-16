@@ -22,7 +22,9 @@ export function convertDate(date: string): string {
   const dateObj = new Date(date);
   const fechaNormalizada = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
   const locale =
-    (window as { APP_LOCALE?: string }).APP_LOCALE || Intl.DateTimeFormat().resolvedOptions().locale || 'es-ES';
+    (window as { APP_LOCALE?: string }).APP_LOCALE ||
+    Intl.DateTimeFormat().resolvedOptions().locale ||
+    'es-ES';
   return fechaNormalizada.toLocaleDateString(locale, {
     year: 'numeric',
     month: 'long',

@@ -13,7 +13,9 @@ declare module '@inertiajs/react' {
   }
 
   export function usePage<T = PageProps>(): Page<T>;
-  export function useForm<T = Record<string, unknown>>(data?: T): {
+  export function useForm<T = Record<string, unknown>>(
+    data?: T,
+  ): {
     data: T;
     setData: (key: keyof T, value: unknown) => void;
     post: (url: string, options?: Record<string, unknown>) => void;
@@ -37,7 +39,13 @@ declare module '@inertiajs/react' {
   };
 
   export const Head: ComponentType<{ title?: string; children?: ReactNode }>;
-  export const Link: ComponentType<{ href: string; method?: string; children?: ReactNode; className?: string; [key: string]: unknown }>;
+  export const Link: ComponentType<{
+    href: string;
+    method?: string;
+    children?: ReactNode;
+    className?: string;
+    [key: string]: unknown;
+  }>;
 
   export default Link;
 }

@@ -7,7 +7,7 @@ const getWorkspaceTimezone = () => {
 };
 
 const getUserLocale = () =>
-  (window as unknown as Record<string, unknown>).APP_LOCALE as string ||
+  ((window as unknown as Record<string, unknown>).APP_LOCALE as string) ||
   document.documentElement.lang ||
   Intl.DateTimeFormat().resolvedOptions().locale;
 

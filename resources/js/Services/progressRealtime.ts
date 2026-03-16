@@ -291,36 +291,38 @@ async function pollUploadProgress() {
     const { uploads } = response.data;
 
     // Update each upload with polled progress
-    Object.entries(uploads || {}).forEach(([uploadId, progressData]: [string, Record<string, unknown>]) => {
-      const upload = uploadStore.queue[uploadId];
-      if (upload) {
-        // Check for completion or failure
-        if (progressData.status === 'completed') {
-          uploadStore.updateUpload(uploadId, {
-            status: 'completed',
-            progress: 100,
-            s3Key: progressData.s3_key as string | undefined,
-          });
-        } else if (progressData.status === 'failed') {
-          uploadStore.updateUpload(uploadId, {
-            status: 'error',
-            progress: 0,
-            error: (progressData.error as string) || 'Upload failed',
-          });
-        } else {
-          uploadStore.updateUpload(uploadId, {
-            progress: Math.min(100, Math.max(0, (progressData.progress as number) || 0)),
-            stats: {
-              eta: (progressData.eta as number) || 0,
-              speed: (progressData.speed as number) || 0,
-              startTime: upload.stats?.startTime || Date.now(),
-              bytesUploaded: (progressData.bytes_uploaded as number) || 0,
-              lastUpdateTime: Date.now(),
-            },
-          });
+    Object.entries(uploads || {}).forEach(
+      ([uploadId, progressData]: [string, Record<string, unknown>]) => {
+        const upload = uploadStore.queue[uploadId];
+        if (upload) {
+          // Check for completion or failure
+          if (progressData.status === 'completed') {
+            uploadStore.updateUpload(uploadId, {
+              status: 'completed',
+              progress: 100,
+              s3Key: progressData.s3_key as string | undefined,
+            });
+          } else if (progressData.status === 'failed') {
+            uploadStore.updateUpload(uploadId, {
+              status: 'error',
+              progress: 0,
+              error: (progressData.error as string) || 'Upload failed',
+            });
+          } else {
+            uploadStore.updateUpload(uploadId, {
+              progress: Math.min(100, Math.max(0, (progressData.progress as number) || 0)),
+              stats: {
+                eta: (progressData.eta as number) || 0,
+                speed: (progressData.speed as number) || 0,
+                startTime: upload.stats?.startTime || Date.now(),
+                bytesUploaded: (progressData.bytes_uploaded as number) || 0,
+                lastUpdateTime: Date.now(),
+              },
+            });
+          }
         }
-      }
-    });
+      },
+    );
   } catch (error) {
     // Check for timeout or network errors
     if (axios.isAxiosError(error)) {
@@ -361,32 +363,35 @@ async function pollProcessingProgress() {
     const { jobs } = response.data;
 
     // Update each job with polled progress
-    Object.entries(jobs || {}).forEach(([jobId, progressData]: [string, Record<string, unknown>]) => {
-      const job = processingStore.jobs[jobId];
-      if (job) {
-        const isCompleted = (progressData.progress as number) >= 100 || progressData.status === 'completed';
-        const isFailed = progressData.status === 'failed';
+    Object.entries(jobs || {}).forEach(
+      ([jobId, progressData]: [string, Record<string, unknown>]) => {
+        const job = processingStore.jobs[jobId];
+        if (job) {
+          const isCompleted =
+            (progressData.progress as number) >= 100 || progressData.status === 'completed';
+          const isFailed = progressData.status === 'failed';
 
-        processingStore.updateJob(jobId, {
-          progress: Math.min(100, Math.max(0, (progressData.progress as number) || 0)),
-          status: isFailed ? 'failed' : isCompleted ? 'completed' : 'processing',
-          error: (progressData.error as string) || job.error,
-          stats: {
-            eta: (progressData.eta as number) || 0,
-            currentStep: (progressData.current_step as string) || '',
-            totalSteps: (progressData.total_steps as number) || 0,
-            completedSteps: (progressData.completed_steps as number) || 0,
-          },
-        });
+          processingStore.updateJob(jobId, {
+            progress: Math.min(100, Math.max(0, (progressData.progress as number) || 0)),
+            status: isFailed ? 'failed' : isCompleted ? 'completed' : 'processing',
+            error: (progressData.error as string) || job.error,
+            stats: {
+              eta: (progressData.eta as number) || 0,
+              currentStep: (progressData.current_step as string) || '',
+              totalSteps: (progressData.total_steps as number) || 0,
+              completedSteps: (progressData.completed_steps as number) || 0,
+            },
+          });
 
-        // If completed or failed, remove after delay
-        if (isCompleted || isFailed) {
-          setTimeout(() => {
-            processingStore.removeJob(jobId);
-          }, 3000);
+          // If completed or failed, remove after delay
+          if (isCompleted || isFailed) {
+            setTimeout(() => {
+              processingStore.removeJob(jobId);
+            }, 3000);
+          }
         }
-      }
-    });
+      },
+    );
   } catch (error) {
     // Handle timeout or network errors
     if (axios.isAxiosError(error)) {

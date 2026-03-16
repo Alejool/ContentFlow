@@ -31,14 +31,17 @@ export const useLogStore = create<LogState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       // Limpiar filtros vacíos
-      const cleanFilters = Object.entries(filters).reduce((acc, [key, value]) => {
-        if (Array.isArray(value) && value.length > 0) {
-          acc[key] = value;
-        } else if (value && !Array.isArray(value) && value !== 'all') {
-          acc[key] = value;
-        }
-        return acc;
-      }, {} as Record<string, unknown>);
+      const cleanFilters = Object.entries(filters).reduce(
+        (acc, [key, value]) => {
+          if (Array.isArray(value) && value.length > 0) {
+            acc[key] = value;
+          } else if (value && !Array.isArray(value) && value !== 'all') {
+            acc[key] = value;
+          }
+          return acc;
+        },
+        {} as Record<string, unknown>,
+      );
       const response = await axios.get('/api/v1/logs', {
         params: { ...cleanFilters, page },
         paramsSerializer: {

@@ -546,7 +546,8 @@ export class CacheManager {
       }
 
       if (deletedCount > 0) {
-        if (this.isDevelopment) console.log(`[CacheManager] Removed ${deletedCount} expired entries`);
+        if (this.isDevelopment)
+          console.log(`[CacheManager] Removed ${deletedCount} expired entries`);
       }
     } catch {
       // Ignore errors
@@ -768,7 +769,9 @@ export class CacheManager {
             });
 
             if (this.isDevelopment) {
-              console.log(`[CacheManager] stale-while-revalidate background update: ${request.url}`);
+              console.log(
+                `[CacheManager] stale-while-revalidate background update: ${request.url}`,
+              );
             }
           }
           return networkResponse;

@@ -131,25 +131,28 @@ export function ThemeProvider({
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, [theme, isInitialized]);
 
-  const setTheme = useCallback(async (newTheme: Theme) => {
-    setThemeState(newTheme);
+  const setTheme = useCallback(
+    async (newTheme: Theme) => {
+      setThemeState(newTheme);
 
-    const workspaceIdStr = workspaceId ? String(workspaceId) : null;
+      const workspaceIdStr = workspaceId ? String(workspaceId) : null;
 
-    if (workspaceIdStr) {
-      try {
-        await themeStorage.saveThemePreference(workspaceIdStr, newTheme);
-      } catch {}
-    } else {
-      localStorage.setItem('theme', newTheme);
-    }
+      if (workspaceIdStr) {
+        try {
+          await themeStorage.saveThemePreference(workspaceIdStr, newTheme);
+        } catch {}
+      } else {
+        localStorage.setItem('theme', newTheme);
+      }
 
-    if (isAuthenticated) {
-      try {
-        await axios.patch(route('api.v1.profile.theme.update'), { theme: newTheme });
-      } catch {}
-    }
-  }, [workspaceId, isAuthenticated]);
+      if (isAuthenticated) {
+        try {
+          await axios.patch(route('api.v1.profile.theme.update'), { theme: newTheme });
+        } catch {}
+      }
+    },
+    [workspaceId, isAuthenticated],
+  );
 
   const toggleTheme = useCallback(() => {
     let newTheme: Theme;
@@ -183,7 +186,7 @@ export function ThemeProvider({
 
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('set-theme', handleSetTheme as EventListener);
-    
+
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('set-theme', handleSetTheme as EventListener);

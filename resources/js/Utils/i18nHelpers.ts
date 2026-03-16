@@ -177,7 +177,8 @@ export const formatRelativeTime = (date: Date | string | number, locale?: string
  * Obtiene la configuración regional del navegador
  */
 export const getBrowserLocale = (): string => {
-  const browserLang = navigator.language || (navigator as unknown as { userLanguage: string }).userLanguage;
+  const browserLang =
+    navigator.language || (navigator as unknown as { userLanguage: string }).userLanguage;
   return browserLang.split('-')[0]; // 'es-ES' -> 'es'
 };
 

@@ -96,7 +96,14 @@ export type Publication = {
     string,
     {
       platform: string;
-      status: 'published' | 'failed' | 'pending' | 'publishing' | 'retrying' | 'success' | 'orphaned';
+      status:
+        | 'published'
+        | 'failed'
+        | 'pending'
+        | 'publishing'
+        | 'retrying'
+        | 'success'
+        | 'orphaned';
       published_at?: string;
       error?: string;
       url?: string;

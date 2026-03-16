@@ -335,4 +335,3 @@ export const performanceValidator = new PerformanceValidator();
 // Export for testing
 export { PERFORMANCE_TARGETS, PerformanceValidator };
 export type { PerformanceMetrics, PerformanceReport, ValidationResult };
-

@@ -11,7 +11,10 @@ interface UseStickyOnScrollOptions {
  * @param enabled - Si el hook está habilitado. Default: true
  * @returns isSticky - Boolean que indica si el elemento debe ser sticky
  */
-export function useStickyOnScroll({ threshold = 50, enabled = true }: UseStickyOnScrollOptions = {}) {
+export function useStickyOnScroll({
+  threshold = 50,
+  enabled = true,
+}: UseStickyOnScrollOptions = {}) {
   const [isSticky, setIsSticky] = useState(false);
 
   useEffect(() => {

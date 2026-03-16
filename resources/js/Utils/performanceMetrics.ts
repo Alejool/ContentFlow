@@ -480,4 +480,3 @@ export const performanceMetrics = new PerformanceMetricsTracker();
 
 // Export class for custom instances
 export { PerformanceMetricsTracker };
-

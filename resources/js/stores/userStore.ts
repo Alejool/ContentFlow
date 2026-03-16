@@ -25,7 +25,9 @@ interface UserState {
   error: string | null;
   setUser: (user: User | null) => void;
   updateProfile: (data: Record<string, unknown>) => Promise<{ success: boolean; message?: string }>;
-  updatePassword: (data: Record<string, unknown>) => Promise<{ success: boolean; message?: string }>;
+  updatePassword: (
+    data: Record<string, unknown>,
+  ) => Promise<{ success: boolean; message?: string }>;
 }
 
 export const useUserStore = create<UserState>((set, _get) => ({

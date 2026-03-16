@@ -31,7 +31,9 @@ export const validateVideoDuration = (
   platformKey: string,
   durationInSeconds: number,
 ): DurationValidationResult => {
-  const platform = (SOCIAL_PLATFORMS as Record<string, { maxVideoDuration?: number }>)[platformKey.toLowerCase()];
+  const platform = (SOCIAL_PLATFORMS as Record<string, { maxVideoDuration?: number }>)[
+    platformKey.toLowerCase()
+  ];
 
   if (!platform || !platform.maxVideoDuration) {
     return {

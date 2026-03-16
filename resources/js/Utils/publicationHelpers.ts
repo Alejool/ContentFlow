@@ -1,13 +1,5 @@
 import { Publication } from '@/types/Publication';
-import {
-  Calendar,
-  CheckCircle,
-  Clock,
-  Edit,
-  Eye,
-  Sparkles,
-  TrendingUp,
-} from 'lucide-react';
+import { Calendar, CheckCircle, Clock, Edit, Eye, Sparkles, TrendingUp } from 'lucide-react';
 import type React from 'react';
 import { formatDateTime } from './formatDate';
 
@@ -81,26 +73,28 @@ export function getMediaUrl(publication: Publication): string | null {
 export function prepareMediaForPreview(publication: Publication) {
   if (!hasMedia(publication)) return [];
 
-  return (publication.media_files || []).map((media: { file_type?: string; thumbnail?: { file_path?: string }; file_path: string }) => {
-    const isVideo = media.file_type?.includes('video');
-    let mediaUrl = media.thumbnail?.file_path || media.file_path;
+  return (publication.media_files || []).map(
+    (media: { file_type?: string; thumbnail?: { file_path?: string }; file_path: string }) => {
+      const isVideo = media.file_type?.includes('video');
+      let mediaUrl = media.thumbnail?.file_path || media.file_path;
 
-    if (!mediaUrl && media.file_type === 'image') {
-      mediaUrl = media.file_path;
-    }
+      if (!mediaUrl && media.file_type === 'image') {
+        mediaUrl = media.file_path;
+      }
 
-    return {
-      url: isVideo
-        ? media.file_path.startsWith('http')
-          ? media.file_path
-          : `/storage/${media.file_path}`
-        : mediaUrl.startsWith('http')
-          ? mediaUrl
-          : `/storage/${mediaUrl}`,
-      type: (isVideo ? 'video' : 'image') as 'image' | 'video',
-      title: publication.title,
-    };
-  });
+      return {
+        url: isVideo
+          ? media.file_path.startsWith('http')
+            ? media.file_path
+            : `/storage/${media.file_path}`
+          : mediaUrl.startsWith('http')
+            ? mediaUrl
+            : `/storage/${mediaUrl}`,
+        type: (isVideo ? 'video' : 'image') as 'image' | 'video',
+        title: publication.title,
+      };
+    },
+  );
 }
 
 /**
@@ -118,7 +112,10 @@ export function formatPublicationDate(dateString?: string): string {
 /**
  * Obtiene el nombre del usuario que tiene bloqueada la publicación
  */
-export function getLockedByName(remoteLock?: { user_name?: string; user?: { name?: string } }): string {
+export function getLockedByName(remoteLock?: {
+  user_name?: string;
+  user?: { name?: string };
+}): string {
   if (!remoteLock) return '';
   return remoteLock.user_name || remoteLock.user?.name || 'Usuario';
 }
@@ -126,7 +123,10 @@ export function getLockedByName(remoteLock?: { user_name?: string; user?: { name
 /**
  * Obtiene el primer nombre del usuario que tiene bloqueada la publicación
  */
-export function getLockedByFirstName(remoteLock?: { user_name?: string; user?: { name?: string } }): string {
+export function getLockedByFirstName(remoteLock?: {
+  user_name?: string;
+  user?: { name?: string };
+}): string {
   const fullName = getLockedByName(remoteLock);
   return fullName.split(' ')[0] ?? '';
 }
@@ -240,7 +240,15 @@ export function getPublicationStatusConfig(status?: string) {
  * Obtiene todos los estados de publicación disponibles
  */
 export function getAllPublicationStatuses() {
-  return ['draft', 'pending_review', 'approved', 'scheduled', 'publishing', 'published', 'failed'] as const;
+  return [
+    'draft',
+    'pending_review',
+    'approved',
+    'scheduled',
+    'publishing',
+    'published',
+    'failed',
+  ] as const;
 }
 
 /**

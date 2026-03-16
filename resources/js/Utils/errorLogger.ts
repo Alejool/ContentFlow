@@ -65,7 +65,11 @@ class ErrorLogger {
       severity?: ErrorLog['severity'];
     },
   ): ErrorLog {
-    const err = error as Error & { code?: string; response?: { status?: number; data?: unknown }; status?: number };
+    const err = error as Error & {
+      code?: string;
+      response?: { status?: number; data?: unknown };
+      status?: number;
+    };
     const errorLog: ErrorLog = {
       id: `error-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       timestamp: Date.now(),
@@ -311,4 +315,3 @@ export const errorLogger = new ErrorLogger();
 
 // Export class for custom instances
 export { ErrorLogger };
-

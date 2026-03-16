@@ -252,7 +252,7 @@ export default function Welcome({
                         src={Logo}
                         alt=""
                         eager={true}
-                        className=" w-48 h-autow-full object-contain"
+                        className="h-autow-full w-48 object-contain"
                       />
                     </div>
                   </Link>

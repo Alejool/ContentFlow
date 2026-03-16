@@ -67,7 +67,11 @@ i18n
 
 // Set global Zod error map using a dynamic call to i18n.t
 // this ensures it always uses the current language.
-z.setErrorMap(makeZodErrorMap((key: string, options?: Record<string, unknown>) => i18n.t(key, options as Record<string, unknown>)));
+z.setErrorMap(
+  makeZodErrorMap((key: string, options?: Record<string, unknown>) =>
+    i18n.t(key, options as Record<string, unknown>),
+  ),
+);
 
 i18n.on('languageChanged', (_lng) => {
   axios.defaults.headers.common['Accept-Language'] = i18n.language;

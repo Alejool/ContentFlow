@@ -137,7 +137,9 @@ export function setupOptimisticInterceptor(axiosInstance: AxiosInstance): () => 
 
         // Log in development mode
         if (import.meta.env.DEV) {
-          console.log(`[OptimisticAxios] Registered operation: ${operationId} for ${config.resource}`);
+          console.log(
+            `[OptimisticAxios] Registered operation: ${operationId} for ${config.resource}`,
+          );
         }
       }
 

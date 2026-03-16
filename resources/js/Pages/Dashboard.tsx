@@ -58,7 +58,13 @@ interface DashboardProps {
   problematicAccounts?: ProblematicAccount[];
 }
 
-export default function Dashboard({ auth, stats, status, period = 30, problematicAccounts = [] }: DashboardProps) {
+export default function Dashboard({
+  auth,
+  stats,
+  status,
+  period = 30,
+  problematicAccounts = [],
+}: DashboardProps) {
   const { t } = useTranslation();
   const { actualTheme: theme } = useTheme();
   const { auth: pageAuth } = usePage<any>().props;
@@ -291,7 +297,12 @@ export default function Dashboard({ auth, stats, status, period = 30, problemati
           ))}
         </div>
 
-        <PublicationStatusCards variant="carousel" stats={pubStats} loading={loadingPubStats} className="mb-8" />
+        <PublicationStatusCards
+          variant="carousel"
+          stats={pubStats}
+          loading={loadingPubStats}
+          className="mb-8"
+        />
 
         {/* Add-ons Promotion Card con Carrusel */}
         <div className="mb-8">

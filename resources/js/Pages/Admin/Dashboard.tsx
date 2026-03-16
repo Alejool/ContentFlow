@@ -1,9 +1,5 @@
 import { Card, CardContent } from '@/Components/ui/card';
-import {
-    AlertTriangle,
-    CheckCircle,
-    XCircle
-} from 'lucide-react';
+import { AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 
 interface SystemStatus {
   plans: Record<string, boolean>;
@@ -101,7 +97,9 @@ function StatCard({
   border: string;
 }) {
   return (
-    <Card className={`border bg-white dark:bg-gray-800 ${border} transition-shadow hover:shadow-lg`}>
+    <Card
+      className={`border bg-white dark:bg-gray-800 ${border} transition-shadow hover:shadow-lg`}
+    >
       <CardContent className="pt-6">
         <div className="flex items-start justify-between">
           <div className="min-w-0 flex-1">
@@ -221,9 +219,10 @@ export default function AdminDashboard({ systemStatus, stats, recentActivity = [
     {
       title: 'Social Accounts',
       value: stats?.total_social_accounts ?? 0,
-      sub: Object.entries(stats?.social_accounts_by_platform ?? {})
-        .map(([p, n]) => `${p}: ${n}`)
-        .join(' · ') || undefined,
+      sub:
+        Object.entries(stats?.social_accounts_by_platform ?? {})
+          .map(([p, n]) => `${p}: ${n}`)
+          .join(' · ') || undefined,
       icon: Share2,
       color: 'text-pink-600 dark:text-pink-400',
       bg: 'bg-pink-100 dark:bg-pink-900/30',
@@ -268,8 +267,7 @@ export default function AdminDashboard({ systemStatus, stats, recentActivity = [
       <AdminNavigation currentRoute="/admin/dashboard" />
 
       <div className="min-h-screen bg-gray-50 py-6 dark:bg-gray-900">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6">
-
+        <div className="mx-auto max-w-7xl space-y-6 px-4 sm:px-6 lg:px-8">
           {/* Primary KPIs */}
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
             {primaryMetrics.map((m) => (
@@ -287,7 +285,7 @@ export default function AdminDashboard({ systemStatus, stats, recentActivity = [
           {/* Health issues banner */}
           {(stats?.system_health_issues?.length ?? 0) > 0 && (
             <Card className="border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-900/20">
-              <CardContent className="pt-4 pb-4">
+              <CardContent className="pb-4 pt-4">
                 <div className="flex items-start gap-3">
                   <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-yellow-600 dark:text-yellow-400" />
                   <div>
@@ -476,7 +474,6 @@ export default function AdminDashboard({ systemStatus, stats, recentActivity = [
               </Card>
             </div>
           </div>
-
         </div>
       </div>
     </AuthenticatedLayout>

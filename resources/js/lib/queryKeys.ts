@@ -50,7 +50,8 @@ export const queryKeys = {
 
   logs: {
     all: ['logs'] as const,
-    list: (filters: Record<string, unknown>, page: number) => ['logs', 'list', filters, page] as const,
+    list: (filters: Record<string, unknown>, page: number) =>
+      ['logs', 'list', filters, page] as const,
   },
 
   members: {

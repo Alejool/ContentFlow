@@ -6,10 +6,10 @@
 
 import { useEffect, useState } from 'react';
 import {
-    getServiceWorkerStatus,
-    isStandalone,
-    registerServiceWorker,
-    skipWaiting,
+  getServiceWorkerStatus,
+  isStandalone,
+  registerServiceWorker,
+  skipWaiting,
 } from '../Utils/registerServiceWorker';
 
 interface UseServiceWorkerReturn {
@@ -32,8 +32,12 @@ export function useServiceWorker(): UseServiceWorkerReturn {
     checkStatus();
 
     registerServiceWorker({
-      onSuccess: () => { checkStatus(); },
-      onUpdate: () => { setHasUpdate(true); },
+      onSuccess: () => {
+        checkStatus();
+      },
+      onUpdate: () => {
+        setHasUpdate(true);
+      },
       onOnline: () => {},
       onOffline: () => {},
     });
@@ -41,10 +45,14 @@ export function useServiceWorker(): UseServiceWorkerReturn {
     setStandalone(isStandalone());
 
     const mediaQuery = window.matchMedia('(display-mode: standalone)');
-    const handleChange = (e: MediaQueryListEvent) => { setStandalone(e.matches); };
+    const handleChange = (e: MediaQueryListEvent) => {
+      setStandalone(e.matches);
+    };
     mediaQuery.addEventListener('change', handleChange);
 
-    return () => { mediaQuery.removeEventListener('change', handleChange); };
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange);
+    };
   }, []);
 
   async function checkStatus() {
@@ -61,5 +69,12 @@ export function useServiceWorker(): UseServiceWorkerReturn {
     window.location.reload();
   }
 
-  return { isSupported, isRegistered, isActive, hasUpdate, isStandalone: standalone, updateServiceWorker };
+  return {
+    isSupported,
+    isRegistered,
+    isActive,
+    hasUpdate,
+    isStandalone: standalone,
+    updateServiceWorker,
+  };
 }

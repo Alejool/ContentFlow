@@ -39,7 +39,12 @@ interface PublicationState {
     per_page: number;
   };
 
-  fetchPublications: (filters?: Record<string, unknown>, page?: number, useApprovalFilter?: boolean, forceRefresh?: boolean) => Promise<void>;
+  fetchPublications: (
+    filters?: Record<string, unknown>,
+    page?: number,
+    useApprovalFilter?: boolean,
+    forceRefresh?: boolean,
+  ) => Promise<void>;
   fetchPublicationById: (id: number) => Promise<Publication | null>;
   fetchPublishedPlatforms: (publicationId: number) => Promise<{
     published: number[];
@@ -59,7 +64,10 @@ interface PublicationState {
   deletePublication: (id: number) => Promise<boolean>;
   duplicatePublication: (id: number) => Promise<boolean>;
 
-  publishPublication: (id: number, formData: FormData) => Promise<{ success: boolean; data?: unknown }>;
+  publishPublication: (
+    id: number,
+    formData: FormData,
+  ) => Promise<{ success: boolean; data?: unknown }>;
   unpublishPublication: (
     id: number,
     platformIds: number[],
@@ -123,22 +131,30 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
     per_page: 7,
   },
 
-  fetchPublications: async (filters = {}, page = 1, useApprovalFilter = false, forceRefresh = false) => {
+  fetchPublications: async (
+    filters = {},
+    page = 1,
+    useApprovalFilter = false,
+    forceRefresh = false,
+  ) => {
     set({ isLoading: true, error: null });
 
     try {
       // Limpiar filtros vacíos
-      const cleanFilters = Object.entries(filters).reduce((acc, [key, value]) => {
-        // Keep status even if "all" — backend needs it to know user wants everything
-        if (key === 'status') {
-          if (value) acc[key] = value;
-        } else if (Array.isArray(value) && value.length > 0) {
-          acc[key] = value;
-        } else if (value && !Array.isArray(value) && value !== 'all') {
-          acc[key] = value;
-        }
-        return acc;
-      }, {} as Record<string, unknown>);
+      const cleanFilters = Object.entries(filters).reduce(
+        (acc, [key, value]) => {
+          // Keep status even if "all" — backend needs it to know user wants everything
+          if (key === 'status') {
+            if (value) acc[key] = value;
+          } else if (Array.isArray(value) && value.length > 0) {
+            acc[key] = value;
+          } else if (value && !Array.isArray(value) && value !== 'all') {
+            acc[key] = value;
+          }
+          return acc;
+        },
+        {} as Record<string, unknown>,
+      );
 
       // Use different endpoint based on approval filter
       const endpoint = useApprovalFilter
@@ -168,7 +184,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
       // Only apply optimistic state logic if NOT a forced refresh
       let finalItems = incomingItems;
-      
+
       if (!forceRefresh) {
         // Preserve optimistic local state: if the store already has a more
         // "advanced" status for an item (e.g. pending_review) and the backend
@@ -332,7 +348,10 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       // 1. Process social_post_logs if they are part of the update
       // This ensures that platform status caches (published, publishing, etc.)
       // are always in sync with the latest data from Echo or API.
-      const logs = updated.social_post_logs || (updated as Publication & { socialPostLogs?: Publication['social_post_logs'] }).socialPostLogs;
+      const logs =
+        updated.social_post_logs ||
+        (updated as Publication & { socialPostLogs?: Publication['social_post_logs'] })
+          .socialPostLogs;
 
       const newPlatformStatusUpdates: Partial<PublicationState> = {};
 
@@ -342,7 +361,16 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
         const publishing: number[] = [];
         const removed: number[] = [];
         const duplicates: number[] = []; // Plataformas con intentos duplicados
-        const retryInfoUpdates: Record<number, { retry_count: number; is_retrying: boolean; retry_status: string; is_duplicate: boolean; original_attempt_at?: string }> = {};
+        const retryInfoUpdates: Record<
+          number,
+          {
+            retry_count: number;
+            is_retrying: boolean;
+            retry_status: string;
+            is_duplicate: boolean;
+            original_attempt_at?: string;
+          }
+        > = {};
 
         // Determine which social accounts have pending scheduled posts
         // to avoid marking them as "available" prematurely
@@ -355,59 +383,67 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
         // Agrupar logs por social_account_id para detectar duplicados
         type SocialPostLog = NonNullable<Publication['social_post_logs']>[number];
-        const logsByAccount = logs.reduce((acc: Record<string, SocialPostLog[]>, log: SocialPostLog) => {
-          if (!acc[log.social_account_id]) {
-            acc[log.social_account_id] = [];
-          }
-          acc[log.social_account_id].push(log);
-          return acc;
-        }, {});
+        const logsByAccount = logs.reduce(
+          (acc: Record<string, SocialPostLog[]>, log: SocialPostLog) => {
+            if (!acc[log.social_account_id]) {
+              acc[log.social_account_id] = [];
+            }
+            acc[log.social_account_id].push(log);
+            return acc;
+          },
+          {},
+        );
 
-        Object.entries(logsByAccount).forEach(([accountId, accountLogs]: [string, SocialPostLog[]]) => {
-          const socialAccountId = parseInt(accountId);
-          if (scheduledIds.has(socialAccountId)) return;
+        Object.entries(logsByAccount).forEach(
+          ([accountId, accountLogs]: [string, SocialPostLog[]]) => {
+            const socialAccountId = parseInt(accountId);
+            if (scheduledIds.has(socialAccountId)) return;
 
-          // Ordenar logs por fecha de creación (más reciente primero)
-          const sortedLogs = (accountLogs as SocialPostLog[]).sort(
-            (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-          );
+            // Ordenar logs por fecha de creación (más reciente primero)
+            const sortedLogs = (accountLogs as SocialPostLog[]).sort(
+              (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+            );
 
-          const latestLog = sortedLogs[0];
-          const status = latestLog.status;
-          const attempts = latestLog.attempts || 0;
-          const maxAttempts = latestLog.max_attempts || 3;
+            const latestLog = sortedLogs[0];
+            const status = latestLog.status;
+            const attempts = latestLog.attempts || 0;
+            const maxAttempts = latestLog.max_attempts || 3;
 
-          // Detectar intentos duplicados: si hay múltiples logs activos (publishing/pending)
-          const activeAttempts = sortedLogs.filter(
-            (log) => log.status === 'publishing' || log.status === 'pending',
-          );
+            // Detectar intentos duplicados: si hay múltiples logs activos (publishing/pending)
+            const activeAttempts = sortedLogs.filter(
+              (log) => log.status === 'publishing' || log.status === 'pending',
+            );
 
-          const isDuplicate = activeAttempts.length > 1;
-          const originalAttempt = isDuplicate ? sortedLogs[sortedLogs.length - 1] : null;
+            const isDuplicate = activeAttempts.length > 1;
+            const originalAttempt = isDuplicate ? sortedLogs[sortedLogs.length - 1] : null;
 
-          // Actualizar retry info con información de duplicados
-          retryInfoUpdates[socialAccountId] = {
-            retry_count: attempts,
-            is_retrying: latestLog.is_retrying || false,
-            retry_status: latestLog.retry_status || status,
-            is_duplicate: isDuplicate,
-            original_attempt_at: originalAttempt?.created_at,
-          };
+            // Actualizar retry info con información de duplicados
+            retryInfoUpdates[socialAccountId] = {
+              retry_count: attempts,
+              is_retrying: latestLog.is_retrying || false,
+              retry_status: latestLog.retry_status || status,
+              is_duplicate: isDuplicate,
+              original_attempt_at: originalAttempt?.created_at,
+            };
 
-          if (isDuplicate) {
-            duplicates.push(socialAccountId);
-          } else if (status === 'published' || status === 'success') {
-            published.push(socialAccountId);
-          } else if (status === 'failed' || (status === 'pending' && attempts >= maxAttempts)) {
-            // Mark as failed if explicitly failed OR if all retry attempts exhausted
-            failed.push(socialAccountId);
-          } else if ((status === 'publishing' || status === 'pending') && attempts < maxAttempts) {
-            // Only show as publishing if actively in progress and retries remain
-            publishing.push(socialAccountId);
-          } else if (status === 'removed_on_platform' || status === 'deleted') {
-            removed.push(socialAccountId);
-          }
-        });
+            if (isDuplicate) {
+              duplicates.push(socialAccountId);
+            } else if (status === 'published' || status === 'success') {
+              published.push(socialAccountId);
+            } else if (status === 'failed' || (status === 'pending' && attempts >= maxAttempts)) {
+              // Mark as failed if explicitly failed OR if all retry attempts exhausted
+              failed.push(socialAccountId);
+            } else if (
+              (status === 'publishing' || status === 'pending') &&
+              attempts < maxAttempts
+            ) {
+              // Only show as publishing if actively in progress and retries remain
+              publishing.push(socialAccountId);
+            } else if (status === 'removed_on_platform' || status === 'deleted') {
+              removed.push(socialAccountId);
+            }
+          },
+        );
 
         newPlatformStatusUpdates.publishedPlatforms = {
           ...state.publishedPlatforms,

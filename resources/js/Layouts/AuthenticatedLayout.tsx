@@ -192,7 +192,9 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
                 role="main"
                 aria-label="Main content"
               >
-                <header className={`${isHeaderSticky ? 'sticky top-0' : 'relative'} z-40 flex min-w-0 flex-col border-b border-gray-200/50 bg-white/80 backdrop-blur-xl transition-all duration-300 dark:border-neutral-800 dark:bg-black/80 lg:sticky lg:top-0`}>
+                <header
+                  className={`${isHeaderSticky ? 'sticky top-0' : 'relative'} z-40 flex min-w-0 flex-col border-b border-gray-200/50 bg-white/80 backdrop-blur-xl transition-all duration-300 dark:border-neutral-800 dark:bg-black/80 lg:sticky lg:top-0`}
+                >
                   {!route().current('workspaces.*') && (
                     <div className="w-full">
                       <ActiveWorkspace />

@@ -44,7 +44,10 @@ const VALIDATION_RULES = {
   },
 };
 
-export const publicationSchema = (t: (key: string, ...args: unknown[]) => string, contentType: string = 'post') => {
+export const publicationSchema = (
+  t: (key: string, ...args: unknown[]) => string,
+  contentType: string = 'post',
+) => {
   const rules =
     VALIDATION_RULES[contentType as keyof typeof VALIDATION_RULES] || VALIDATION_RULES.post;
 

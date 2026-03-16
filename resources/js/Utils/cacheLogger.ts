@@ -349,4 +349,3 @@ export const cacheLogger = new CacheLogger();
 
 // Export class for custom instances
 export { CacheLogger };
-

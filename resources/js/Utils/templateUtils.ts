@@ -75,7 +75,11 @@ export function formatHashtags(hashtags: string[]): string {
  */
 export function applyTemplateToForm(
   template: PublicationTemplate,
-  setValue: (name: string, value: string, options?: { shouldValidate?: boolean; shouldDirty?: boolean }) => void,
+  setValue: (
+    name: string,
+    value: string,
+    options?: { shouldValidate?: boolean; shouldDirty?: boolean },
+  ) => void,
 ): void {
   // Populate title
   setValue('title', template.name, {

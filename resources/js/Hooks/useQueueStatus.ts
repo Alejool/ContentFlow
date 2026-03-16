@@ -53,7 +53,7 @@ export function useQueueStatus(publicationId?: number) {
                   queuePosition: 0,
                   estimatedWaitMinutes: 0,
                 }
-              : null
+              : null,
           );
         }
       }
@@ -67,7 +67,7 @@ export function useQueueStatus(publicationId?: number) {
                   ...prev,
                   status: 'published',
                 }
-              : null
+              : null,
           );
 
           // Limpiar después de 3 segundos
@@ -84,7 +84,7 @@ export function useQueueStatus(publicationId?: number) {
                   ...prev,
                   status: 'failed',
                 }
-              : null
+              : null,
           );
         }
       }

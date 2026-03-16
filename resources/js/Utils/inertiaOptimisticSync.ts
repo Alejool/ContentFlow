@@ -19,7 +19,10 @@ export function isInertiaPage(): boolean {
     return false;
   }
 
-  return !!(window as unknown as Record<string, unknown>).Inertia || document.getElementById('app')?.hasAttribute('data-page');
+  return (
+    !!(window as unknown as Record<string, unknown>).Inertia ||
+    document.getElementById('app')?.hasAttribute('data-page')
+  );
 }
 
 /**
