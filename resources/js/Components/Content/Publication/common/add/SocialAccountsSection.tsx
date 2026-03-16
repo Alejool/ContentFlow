@@ -67,6 +67,7 @@ interface SocialAccountsSectionProps {
   failedAccountIds?: number[];
   unpublishing?: number | null;
   onCancel?: () => void;
+  onCancelPlatform?: (platformId: number) => void;
   error?: string;
   durationErrors?: Record<number, string>;
   videoMetadata?: Record<string, VideoMetadata>;
@@ -563,6 +564,7 @@ const SocialAccountsSection = memo(
     failedAccountIds,
     unpublishing,
     onCancel,
+    onCancelPlatform,
     error,
     durationErrors = {},
     videoMetadata = {},
@@ -693,7 +695,7 @@ const SocialAccountsSection = memo(
                 isPublishing={isPublishing}
                 isFailed={isFailed}
                 isUnpublishing={isIndividualUnpublishing}
-                onCancel={onCancel}
+                onCancel={onCancelPlatform ? () => onCancelPlatform(account.id) : onCancel}
                 disabled={disabled || account.isDisconnected}
                 durationError={durationErrors[account.id]}
                 videoMetadata={videoMetadata}

@@ -108,6 +108,7 @@ const EditPublicationModal = ({
     handleAccountToggle,
     handleClose,
     handleCancelPublication,
+    handleCancelPlatform,
     handleSubmit,
     platformSettings,
     setPlatformSettings,
@@ -912,7 +913,7 @@ const EditPublicationModal = ({
                     publishedAccountIds={publishedAccountIds}
                     publishingAccountIds={publishingAccountIds}
                     failedAccountIds={failedAccountIds}
-                    onCancel={handleCancelPublication}
+                    onCancelPlatform={handleCancelPlatform}
                     error={errors.social_accounts?.message as string}
                     durationErrors={durationErrors}
                     videoMetadata={videoMetadata}

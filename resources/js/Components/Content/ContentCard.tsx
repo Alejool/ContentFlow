@@ -2,33 +2,34 @@ import { Avatar } from '@/Components/common/Avatar';
 import Button from '@/Components/common/Modern/Button';
 import SimpleContentTypeBadge from '@/Components/Content/common/SimpleContentTypeBadge';
 import PublicationThumbnailCard from '@/Components/Content/Publication/PublicationThumbnailCard';
+import { PublicationStatusBadge } from '@/Components/Content/PublicationStatusBadge';
 import { usePublicationActions } from '@/Hooks/publication/usePublicationActions';
 import { formatDateString } from '@/Utils/dateHelpers';
 import {
-  countMediaFiles,
-  getLockedByFirstName,
-  getLockedByName,
-  getMediaUrl,
-  getPublicationStatusConfig,
-  hasMedia,
-  isProcessing,
-  isVideoMedia,
+    countMediaFiles,
+    getLockedByFirstName,
+    getLockedByName,
+    getMediaUrl,
+    getPublicationStatusConfig,
+    hasMedia,
+    isProcessing,
+    isVideoMedia,
 } from '@/Utils/publicationHelpers';
 import {
-  Calendar,
-  Clock,
-  Copy,
-  Edit,
-  Eye,
-  FileText,
-  Image as ImageIcon,
-  Loader2,
-  Lock,
-  Rocket,
-  Send,
-  Trash2,
-  Users,
-  Video,
+    Calendar,
+    Clock,
+    Copy,
+    Edit,
+    Eye,
+    FileText,
+    Image as ImageIcon,
+    Loader2,
+    Lock,
+    Rocket,
+    Send,
+    Trash2,
+    Users,
+    Video,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -186,16 +187,20 @@ export default function ContentCard({
           </div>
           <div className="pointer-events-none absolute right-3 top-3 z-10 flex flex-col items-end gap-2">
             {/* Status Badge */}
-            <span
-              className={`flex items-center gap-1.5 rounded-lg border border-white/20 px-2.5 py-1 text-xs font-medium shadow-sm backdrop-blur-md ${statusConfig.badge}`}
-            >
-              <StatusIcon className="h-3 w-3" />
-              <span className="capitalize">
-                {type === 'campaign'
-                  ? t(`campaigns.filters.${item.status || 'active'}`)
-                  : t(`publications.status.${item.status || 'draft'}`)}
+            {type === 'publication' ? (
+              <div className="rounded-lg border border-white/20 shadow-sm backdrop-blur-md">
+                <PublicationStatusBadge publication={item} />
+              </div>
+            ) : (
+              <span
+                className={`flex items-center gap-1.5 rounded-lg border border-white/20 px-2.5 py-1 text-xs font-medium shadow-sm backdrop-blur-md ${statusConfig.badge}`}
+              >
+                <StatusIcon className="h-3 w-3" />
+                <span className="capitalize">
+                  {t(`campaigns.filters.${item.status || 'active'}`)}
+                </span>
               </span>
-            </span>
+            )}
           </div>
           {remoteLock && (
             <div className="pointer-events-none absolute left-3 top-3 z-10">
@@ -237,16 +242,18 @@ export default function ContentCard({
               </div>
             </div>
 
-            <span
-              className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium ${statusConfig.badge}`}
-            >
-              <StatusIcon className="h-3 w-3" />
-              <span className="capitalize">
-                {type === 'campaign'
-                  ? t(`campaigns.filters.${item.status || 'active'}`)
-                  : t(`publications.status.${item.status || 'draft'}`)}
+            {type === 'publication' ? (
+              <PublicationStatusBadge publication={item} />
+            ) : (
+              <span
+                className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium ${statusConfig.badge}`}
+              >
+                <StatusIcon className="h-3 w-3" />
+                <span className="capitalize">
+                  {t(`campaigns.filters.${item.status || 'active'}`)}
+                </span>
               </span>
-            </span>
+            )}
           </div>
 
           <h3 className="line-clamp-2 text-base font-bold text-gray-900 transition-colors group-hover:text-primary-600 dark:text-white dark:group-hover:text-primary-400">
