@@ -1,4 +1,5 @@
-import Logo from '@/../assets/logo-with-name-1024.png';
+import Logo from '@/../assets/logo.svg';
+import OptimizedImage from '@/Components/common/ui/OptimizedImage';
 import ResponsiveNavLink from '@/Components/common/ui/ResponsiveNavLink';
 import { useStickyOnScroll } from '@/Hooks/useStickyOnScroll';
 import { useTheme } from '@/Hooks/useTheme';
@@ -14,7 +15,6 @@ import {
   Menu,
   User,
 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import NotificationButton from './NotificationButton';
 import ProfileDropdown from './ProfileDropdown';
@@ -29,49 +29,14 @@ function NavLogo({
   fallbackSrc: string;
   isWhiteLabel: boolean;
 }) {
-  const [status, setStatus] = useState<'loading' | 'loaded' | 'error'>('loading');
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    setStatus('loading');
-    const img = new Image();
-    timerRef.current = setTimeout(() => setStatus('error'), 5000);
-    img.onload = () => {
-      clearTimeout(timerRef.current!);
-      setStatus('loaded');
-    };
-    img.onerror = () => {
-      clearTimeout(timerRef.current!);
-      setStatus('error');
-    };
-    img.src = src;
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, [src]);
-
-  // Si el whiteLabelLogo falla, caer al logo por defecto
-  const finalSrc = status === 'error' && isWhiteLabel ? fallbackSrc : src;
-  const isShowingFallback = status === 'error' && isWhiteLabel;
-
   return (
-    <div className="relative flex items-center justify-center">
-      {status === 'loading' && (
-        <div
-          className={`overflow-hidden rounded bg-gray-200 dark:bg-neutral-700 ${
-            isWhiteLabel ? 'h-12 w-24' : 'h-20 w-32'
-          }`}
-        >
-          <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/40 to-transparent dark:via-white/10" />
-        </div>
-      )}
-      <img
-        src={isShowingFallback ? fallbackSrc : src}
-        alt="Logo"
-        onLoad={() => setStatus('loaded')}
-        className={`w-auto object-contain transition-opacity duration-300 ${
-          status === 'loading' ? 'absolute opacity-0' : 'opacity-100'
-        } ${isShowingFallback || !isWhiteLabel ? 'h-20' : 'h-12'}`}
+    <div className="flex items-center justify-center">
+      <OptimizedImage
+        src={src}
+        fallbackSrc={fallbackSrc}
+        alt=""
+        eager={true}
+        className={`w-auto object-contain ${isWhiteLabel ? 'h-24' : 'h-20'}`}
       />
     </div>
   );
