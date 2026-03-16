@@ -4,6 +4,7 @@ import { Link } from '@inertiajs/react';
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import Button from './Modern/Button';
 
 interface ThemeLanguageContainerProps {
   isWelcome?: boolean;
@@ -63,16 +64,20 @@ export default function ThemeLanguageContainer({
       {/* Mobile con menú hamburguesa */}
       <div className="md:hidden">
         <div className="flex items-center space-x-2">
-          <button
+          <Button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="rounded-lg p-2 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+            buttonStyle="icon"
+            variant="ghost"
+            size="sm"
+            rounded="lg"
+            className="!p-2"
           >
             {isMobileMenuOpen ? (
-              <X className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+              <X className="h-5 w-5" />
             ) : (
-              <Menu className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+              <Menu className="h-5 w-5" />
             )}
-          </button>
+          </Button>
 
           {/* Menú desplegable */}
           {isMobileMenuOpen && (

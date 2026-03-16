@@ -1,7 +1,8 @@
 import { useTheme } from '@/Hooks/useTheme';
-import { Moon, Sun, Monitor } from 'lucide-react';
-import { useState } from 'react';
 import { transitionTheme } from '@/Utils/themeTransition';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Monitor, Moon, Sun } from 'lucide-react';
+import { useState } from 'react';
 
 export default function ThemeSwitcher() {
   const { theme, toggleTheme, actualTheme } = useTheme();
@@ -40,34 +41,45 @@ export default function ThemeSwitcher() {
   const { Icon, NextIcon, nextTheme, label } = getThemeInfo();
 
   return (
-    <button
+    <motion.button
       onClick={handleToggle}
-      className="group relative rounded-lg border border-gray-300/50 bg-gray-100/70 p-2 text-gray-600 shadow-sm transition-all duration-300 hover:border-primary-400/50 hover:bg-gray-200 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600/50 dark:bg-gray-800/70 dark:text-gray-300 dark:hover:border-primary-600/50 dark:hover:bg-gray-700"
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      className="group relative overflow-hidden rounded-lg border border-gray-200/30 bg-white/60 p-2 backdrop-blur-md transition-all duration-300 hover:border-primary-200/40 hover:bg-white/70 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-700/30 dark:bg-neutral-800/40 dark:hover:border-primary-500/20 dark:hover:bg-neutral-800/60"
       aria-label={`Toggle theme (current: ${label})`}
       title={`Switch to ${nextTheme} mode`}
       disabled={isAnimating}
     >
-      <div className="relative flex h-10 w-10 items-center justify-center">
-        <Icon
-          className={`h-6 w-6 transition-all duration-500 ease-out ${
-            isAnimating
-              ? 'rotate-180 scale-0 opacity-0'
-              : 'scale-100 opacity-100 group-hover:rotate-12 group-hover:scale-110'
-          }`}
-        />
+      <div className="relative flex h-8 w-8 items-center justify-center">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={theme}
+            initial={{ scale: 0.5, opacity: 0, rotate: -180 }}
+            animate={{ scale: 1, opacity: 1, rotate: 0 }}
+            exit={{ scale: 0.5, opacity: 0, rotate: 180 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+          >
+            <Icon className="h-5 w-5 text-gray-700 transition-all duration-300 group-hover:scale-110 dark:text-gray-300" />
+          </motion.div>
+        </AnimatePresence>
 
-        <div
-          className={`absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full border border-gray-300 bg-gradient-to-br from-gray-50 to-gray-100 shadow-sm transition-all duration-500 ease-out dark:border-gray-600 dark:from-gray-800 dark:to-gray-900 ${
-            isAnimating
-              ? '-rotate-90 scale-0 opacity-0'
-              : 'scale-100 opacity-100 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:scale-110'
+        <motion.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className={`absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border border-gray-200/40 bg-white/80 shadow-md backdrop-blur-sm transition-all duration-300 dark:border-neutral-600/40 dark:bg-neutral-800/80 ${
+            isAnimating ? 'scale-0 opacity-0' : 'scale-100 opacity-100'
           }`}
         >
-          <NextIcon className="h-3 w-3 text-gray-700 dark:text-gray-300" />
-        </div>
+          <NextIcon className="h-2.5 w-2.5 text-gray-600 dark:text-gray-400" />
+        </motion.div>
 
-        <div className="absolute -left-0.5 -top-0.5 h-2 w-2 rounded-full bg-primary-500 opacity-0 transition-all duration-300 group-hover:animate-pulse group-hover:opacity-100 dark:bg-primary-400" />
+        <motion.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 0, opacity: 0 }}
+          whileHover={{ scale: 1, opacity: 1 }}
+          className="absolute -left-0.5 -top-0.5 h-2 w-2 rounded-full bg-primary-500 dark:bg-primary-400"
+        />
       </div>
-    </button>
+    </motion.button>
   );
 }
