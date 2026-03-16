@@ -1,5 +1,6 @@
 import { CampaignStat } from '@/Components/Analytics/PerformanceTable';
 import { AddonsPromotionCard } from '@/Components/Dashboard/AddonsPromotionCard';
+import { PublicationStatusCards } from '@/Components/Dashboard/PublicationStatusCards';
 import StatCard from '@/Components/Statistics/StatCard';
 import Skeleton from '@/Components/common/ui/Skeleton';
 import { useDashboardStats } from '@/Hooks/useDashboardStats';
@@ -16,8 +17,6 @@ import {
   Heart,
   Mail,
   MousePointer2,
-  Sparkles,
-  Target,
   TrendingUp,
   Users,
   X,
@@ -253,7 +252,6 @@ export default function Dashboard({ auth, stats, status, period = 30 }: Dashboar
               value: stats.totalEngagement,
               icon: <Heart className="h-6 w-6" />,
               variant: 1 as const,
-              format: undefined,
             },
             {
               title: t('dashboard.avgEngagementRate'),
@@ -274,7 +272,7 @@ export default function Dashboard({ auth, stats, status, period = 30 }: Dashboar
                 value={stat.value}
                 icon={stat.icon}
                 color="primary"
-                format={stat.format}
+                {...(stat.format && { format: stat.format })}
                 variant={stat.variant}
                 theme={theme}
               />
@@ -282,62 +280,7 @@ export default function Dashboard({ auth, stats, status, period = 30 }: Dashboar
           ))}
         </div>
 
-        <div className="mb-8 grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-4 lg:grid-cols-7">
-          {[
-            {
-              key: 'draft',
-              color: 'gray',
-              icon: FileText,
-            },
-            {
-              key: 'pending_review',
-              color: 'primary',
-              icon: Eye,
-            },
-            {
-              key: 'approved',
-              color: 'purple',
-              icon: Sparkles,
-            },
-            {
-              key: 'scheduled',
-              color: 'sky',
-              icon: Calendar,
-            },
-            {
-              key: 'publishing',
-              color: 'blue',
-              icon: TrendingUp,
-            },
-            {
-              key: 'published',
-              color: 'green',
-              icon: Target,
-            },
-            { key: 'failed', color: 'red', icon: X },
-          ].map((status) => (
-            <div
-              key={status.key}
-              className="flex flex-col items-center rounded-lg border border-gray-100 bg-white p-3 text-center shadow-sm transition-all dark:border-neutral-700 dark:bg-neutral-800/50 sm:p-4"
-            >
-              <div
-                className={`mb-1.5 rounded-full p-1.5 sm:mb-2 sm:p-2 bg-${status.color === 'sky' ? 'sky' : status.color}-50 dark:bg-${status.color === 'sky' ? 'sky' : status.color}-900/20`}
-              >
-                <status.icon
-                  className={`h-3 w-3 sm:h-4 sm:w-4 text-${
-                    status.color === 'sky' ? 'sky' : status.color
-                  }-500`}
-                />
-              </div>
-              <p className="mb-0.5 text-[10px] font-medium text-gray-500 dark:text-gray-400 sm:mb-1 sm:text-xs">
-                {t(`publications.status.${status.key}`)}
-              </p>
-              <p className="text-lg font-bold text-gray-900 dark:text-white sm:text-xl">
-                {loadingPubStats ? '...' : pubStats[status.key] || 0}
-              </p>
-            </div>
-          ))}
-        </div>
+        <PublicationStatusCards variant="carousel" stats={pubStats} loading={loadingPubStats} className="mb-8" />
 
         {/* Add-ons Promotion Card con Carrusel */}
         <div className="mb-8">
