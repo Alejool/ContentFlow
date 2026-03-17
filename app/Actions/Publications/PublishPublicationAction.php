@@ -7,6 +7,7 @@ use App\Models\Publications\Publication;
 use App\Models\Social\ScheduledPost;
 use App\Models\Social\SocialAccount;
 use App\Services\Media\MediaProcessingService;
+use App\Services\Validation\PublishValidationService;
 use App\Events\PublicationStatusUpdated;
 use Illuminate\Support\Facades\Log;
 use App\Services\Publish\PlatformPublishService;
@@ -16,7 +17,8 @@ class PublishPublicationAction
 {
   public function __construct(
     protected MediaProcessingService $mediaService,
-    protected PlatformPublishService $platformPublishService
+    protected PlatformPublishService $platformPublishService,
+    protected PublishValidationService $validationService
   ) {}
 
   public function execute(Publication $publication, array $platformIds, array $options = []): void
@@ -62,6 +64,62 @@ class PublishPublicationAction
     if ($socialAccounts->isEmpty()) {
       throw new \Exception("No valid social accounts found for publishing.");
     }
+
+    // VALIDATE PLATFORM COMPATIBILITY BEFORE PUBLISHING
+    // Filter out incompatible platforms and log reasons
+    $validAccounts = collect();
+    $invalidAccounts = collect();
+    
+    // Force fresh load of media files
+    $publication->load('mediaFiles');
+    
+    foreach ($socialAccounts as $account) {
+      $validation = $this->validationService->validatePlatformCompatibility($publication, $account);
+      
+      if ($validation['compatible']) {
+        $validAccounts->push($account);
+      } else {
+        $invalidAccounts->push([
+          'account' => $account,
+          'errors' => $validation['errors'],
+          'warnings' => $validation['warnings']
+        ]);
+        
+        Log::warning('Platform incompatible, skipping', [
+          'publication_id' => $publication->id,
+          'account_id' => $account->id,
+          'platform' => $account->platform,
+          'account_name' => $account->account_name,
+          'errors' => $validation['errors']
+        ]);
+      }
+    }
+    
+    // If no valid accounts remain, throw exception with details
+    if ($validAccounts->isEmpty()) {
+      $errorMessages = $invalidAccounts->map(function ($item) {
+        return "{$item['account']->platform} (@{$item['account']->account_name}): " . implode(', ', $item['errors']);
+      })->implode(' | ');
+      
+      throw new \Exception("Ninguna plataforma es compatible con esta publicación. Razones: {$errorMessages}");
+    }
+    
+    // Log if some platforms were filtered out
+    if ($invalidAccounts->isNotEmpty()) {
+      Log::info('Some platforms filtered out due to incompatibility', [
+        'publication_id' => $publication->id,
+        'total_requested' => $socialAccounts->count(),
+        'valid_accounts' => $validAccounts->count(),
+        'invalid_accounts' => $invalidAccounts->count(),
+        'invalid_details' => $invalidAccounts->map(fn($item) => [
+          'platform' => $item['account']->platform,
+          'errors' => $item['errors']
+        ])->toArray()
+      ]);
+    }
+    
+    // Continue with only valid accounts
+    $socialAccounts = $validAccounts;
 
     // Handle Thumbnails for Publish (if any)
     if (!empty($options['thumbnails'] ?? [])) {

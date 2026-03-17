@@ -51,7 +51,11 @@ class PublishValidationService
     /**
      * Validate content type compatibility with platform
      */
-    protected function validatePlatformCompatibility(Publication $publication, SocialAccount $account): array
+    /**
+     * Validate platform compatibility for a publication and account
+     * This is now public to allow API endpoints to check compatibility
+     */
+    public function validatePlatformCompatibility(Publication $publication, SocialAccount $account): array
     {
         $platform = $account->platform;
         $contentType = $publication->content_type;
@@ -208,6 +212,42 @@ class PublishValidationService
                 $errors[] = 'YouTube requiere archivos de video. No se pueden publicar imágenes.';
                 $compatible = false;
             }
+            
+            // YouTube video duration validation
+            if ($platform === 'youtube' && $this->isVideoFile($mediaFile)) {
+                $videoDuration = $mediaFile->duration ?? 0;
+                $accountMetadata = $account->account_metadata ?? [];
+                
+                // YouTube limits:
+                // - Unverified accounts: 15 minutes (900 seconds)
+                // - Verified accounts: 12 hours (43200 seconds) or unlimited
+                $isVerified = $accountMetadata['is_verified'] ?? false;
+                $maxDuration = $isVerified ? 43200 : 900; // 12 hours vs 15 minutes
+                
+                if ($videoDuration > $maxDuration) {
+                    if (!$isVerified) {
+                        $errors[] = sprintf(
+                            'Tu cuenta de YouTube no está verificada y solo permite videos de hasta 15 minutos. Este video dura %s. Verifica tu cuenta en YouTube para subir videos más largos.',
+                            $this->formatDuration($videoDuration)
+                        );
+                    } else {
+                        $errors[] = sprintf(
+                            'El video dura %s pero YouTube permite máximo 12 horas para cuentas verificadas.',
+                            $this->formatDuration($videoDuration)
+                        );
+                    }
+                    $compatible = false;
+                }
+                
+                // Warning for videos close to the limit
+                if ($videoDuration > ($maxDuration * 0.9) && $videoDuration <= $maxDuration) {
+                    $warnings[] = sprintf(
+                        'El video está cerca del límite de duración para YouTube (%s de %s permitidos).',
+                        $this->formatDuration($videoDuration),
+                        $this->formatDuration($maxDuration)
+                    );
+                }
+            }
 
             // TikTok only accepts videos
             if ($platform === 'tiktok' && !$this->isVideoFile($mediaFile)) {
@@ -282,9 +322,24 @@ class PublishValidationService
      */
     protected function isVideoFile($mediaFile): bool
     {
-        $videoExtensions = ['mp4', 'mov', 'avi', 'mkv', 'webm', 'm4v'];
-        $extension = strtolower(pathinfo($mediaFile->filename, PATHINFO_EXTENSION));
-        return in_array($extension, $videoExtensions);
+        // Primero verificar el campo file_type que ya está en la BD
+        if (isset($mediaFile->file_type)) {
+            return $mediaFile->file_type === 'video';
+        }
+        
+        // Fallback: verificar por extensión usando el campo correcto (file_name, no filename)
+        if (isset($mediaFile->file_name)) {
+            $videoExtensions = ['mp4', 'mov', 'avi', 'mkv', 'webm', 'm4v', 'flv', 'wmv'];
+            $extension = strtolower(pathinfo($mediaFile->file_name, PATHINFO_EXTENSION));
+            return in_array($extension, $videoExtensions);
+        }
+        
+        // Fallback adicional: verificar mime_type
+        if (isset($mediaFile->mime_type)) {
+            return str_starts_with($mediaFile->mime_type, 'video/');
+        }
+        
+        return false;
     }
 
     /**
@@ -498,11 +553,31 @@ class PublishValidationService
                     $errors[] = __('validation.facebook_carousel_max_media', ['count' => $mediaFiles->count()]);
                     $compatible = false;
                 }
+                
+                // Facebook does NOT support mixing images and videos in carousels
+                $hasImages = $mediaFiles->where('file_type', 'image')->count() > 0;
+                $hasVideos = $mediaFiles->where('file_type', 'video')->count() > 0;
+                
+                if ($hasImages && $hasVideos) {
+                    $errors[] = __('validation.facebook_carousel_mixed_media');
+                    $compatible = false;
+                }
                 break;
 
             case 'linkedin':
                 if ($mediaFiles->count() > 9) {
                     $errors[] = __('validation.linkedin_carousel_max_media', ['count' => $mediaFiles->count()]);
+                    $compatible = false;
+                }
+                break;
+
+            case 'twitter':
+                // Twitter does NOT support mixing images and videos
+                $hasImages = $mediaFiles->where('file_type', 'image')->count() > 0;
+                $hasVideos = $mediaFiles->where('file_type', 'video')->count() > 0;
+                
+                if ($hasImages && $hasVideos) {
+                    $errors[] = __('validation.twitter_carousel_mixed_media');
                     $compatible = false;
                 }
                 break;

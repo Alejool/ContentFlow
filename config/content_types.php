@@ -11,10 +11,13 @@ return [
     | This configuration defines the validation rules for each content type
     | including supported platforms and media requirements.
     |
+    | IMPORTANT: Platform compatibility is defined in App\Constants\ContentTypes
+    | to ensure consistency between frontend and backend.
+    |
     */
 
     'post' => [
-        'platforms' => ['instagram', 'threads', 'twitter', 'facebook', 'linkedin', 'youtube', 'pinterest', 'tiktok'],
+        'platforms' => ContentTypes::POST_COMPATIBLE_PLATFORMS,
         'media' => [
             'required' => false,
             'min_count' => 0,
@@ -34,7 +37,7 @@ return [
     ],
 
     'story' => [
-        'platforms' => ['instagram', 'threads', 'facebook', 'twitter', 'linkedin', 'youtube', 'pinterest', 'tiktok'],
+        'platforms' => ContentTypes::STORY_COMPATIBLE_PLATFORMS,
         'media' => [
             'required' => true,
             'min_count' => 1,
@@ -44,7 +47,7 @@ return [
     ],
 
     'carousel' => [
-        'platforms' => ['instagram', 'threads', 'facebook', 'linkedin', 'twitter', 'youtube', 'pinterest', 'tiktok'],
+        'platforms' => ContentTypes::CAROUSEL_COMPATIBLE_PLATFORMS,
         'media' => [
             'required' => true,
             'min_count' => 2,
@@ -54,7 +57,7 @@ return [
     ],
 
     'poll' => [
-        'platforms' => ['twitter', 'threads', 'facebook', 'instagram', 'linkedin', 'youtube', 'pinterest', 'tiktok'],
+        'platforms' => ContentTypes::POLL_COMPATIBLE_PLATFORMS,
         'media' => [
             'required' => false,
             'min_count' => 0,

@@ -98,13 +98,22 @@ class PlatformPublishService
     }
 
     // CLEANUP STALE LOGS
-    // Remove any logs for these accounts/publication that are NOT in the new list
+    // Remove any FAILED or SKIPPED logs for these accounts/publication that are NOT in the new list
     // This ensures that if media changed, old failed logs are removed
+    // We keep 'published' logs to avoid re-publishing
     if (!empty($allLogIds)) {
-      SocialPostLog::where('publication_id', $publication->id)
+      $deletedCount = SocialPostLog::where('publication_id', $publication->id)
         ->whereIn('social_account_id', $socialAccounts->pluck('id'))
         ->whereNotIn('id', $allLogIds)
+        ->whereIn('status', ['failed', 'skipped']) // Only delete failed/skipped, not published
         ->delete();
+      
+      if ($deletedCount > 0) {
+        Log::info('Cleaned up stale logs', [
+          'publication_id' => $publication->id,
+          'deleted_count' => $deletedCount
+        ]);
+      }
     }
 
     return $preparedLogs;
@@ -186,9 +195,18 @@ class PlatformPublishService
   private function buildSocialPostDTO(Publication $publication, SocialAccount $socialAccount, SocialPostLog $postLog): SocialPostDTO
   {
     $mediaPaths = [];
+    
+    // Para carruseles, necesitamos TODAS las imágenes, no solo la primera
+    $isCarousel = $publication->content_type === 'carousel';
+    
     if ($socialAccount->platform === 'youtube' || $socialAccount->platform === 'tiktok') {
       $mediaFile = $publication->mediaFiles->first();
       if ($mediaFile) {
+        $mediaPaths[] = $this->resolveFilePath($mediaFile->file_path);
+      }
+    } elseif ($isCarousel) {
+      // Para carruseles, agregar TODAS las imágenes
+      foreach ($publication->mediaFiles as $mediaFile) {
         $mediaPaths[] = $this->resolveFilePath($mediaFile->file_path);
       }
     } else {
@@ -353,7 +371,6 @@ class PlatformPublishService
     // Check for already published platforms to avoid re-publishing
     // Only skip if published with the SAME account_id
     $alreadyPublishedAccountIds = [];
-    $duplicateAttempts = [];
     
     foreach ($socialAccounts as $socialAccount) {
       // Check for successful publication
@@ -383,47 +400,7 @@ class PlatformPublishService
         continue;
       }
       
-      // Check for duplicate attempts (multiple active logs)
-      $activeLogsCount = SocialPostLog::where('publication_id', $publication->id)
-        ->where('social_account_id', $socialAccount->id)
-        ->whereIn('status', ['pending', 'publishing'])
-        ->count();
-      
-      if ($activeLogsCount > 1) {
-        LogHelper::publication('Duplicate attempt detected', [
-          'platform' => $socialAccount->platform,
-          'account_id' => $socialAccount->id,
-          'account_name' => $socialAccount->account_name,
-          'active_logs_count' => $activeLogsCount
-        ]);
-        
-        // Create a log entry for the duplicate attempt
-        $duplicateLog = SocialPostLog::create([
-          'user_id' => $publication->user_id,
-          'workspace_id' => $publication->workspace_id,
-          'social_account_id' => $socialAccount->id,
-          'publication_id' => $publication->id,
-          'platform' => $socialAccount->platform,
-          'account_name' => $socialAccount->account_name,
-          'content' => 'Intento duplicado detectado',
-          'status' => 'skipped',
-          'error_message' => 'Ya existe un intento de publicación activo para esta cuenta',
-          'retry_count' => 0,
-        ]);
-        
-        $duplicateAttempts[] = $socialAccount->id;
-        $alreadyPublishedAccountIds[] = $socialAccount->id;
-        $platformResults[$socialAccount->platform . '_' . $socialAccount->id] = [
-          'success' => false,
-          'published' => 0,
-          'failed' => 1,
-          'logs' => [$duplicateLog],
-          'skipped' => true,
-          'duplicate' => true,
-          'account_name' => $socialAccount->account_name,
-        ];
-        $allLogs[] = $duplicateLog;
-      }
+      // Skip duplicate detection - createPendingLog already handles log reuse properly
     }
 
     // Filter out already published accounts (by account ID, not platform)

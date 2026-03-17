@@ -50,7 +50,8 @@ class InstagramService extends BaseSocialService
         'trace' => $e->getTraceAsString()
       ]);
       
-      return PostResultDTO::failure($e->getMessage());
+      $friendlyMessage = $this->extractInstagramErrorMessage($e);
+      return PostResultDTO::failure($friendlyMessage);
     }
   }
 
@@ -393,6 +394,77 @@ class InstagramService extends BaseSocialService
       }, $comments);
     } catch (\Exception $e) {
       return [];
+    }
+  }
+
+  /**
+   * Extract user-friendly error message from Instagram API response
+   */
+  private function extractInstagramErrorMessage(\Exception $e): string
+  {
+    if (!($e instanceof \GuzzleHttp\Exception\ClientException)) {
+      return $e->getMessage();
+    }
+
+    try {
+      $responseBody = $e->getResponse()->getBody()->getContents();
+      $errorData = json_decode($responseBody, true);
+      
+      $errorCode = $errorData['error']['code'] ?? null;
+      $errorMessage = $errorData['error']['message'] ?? null;
+      $errorType = $errorData['error']['type'] ?? null;
+      
+      // Map common Instagram errors to user-friendly messages
+      if ($errorCode) {
+        $friendlyMessage = match($errorCode) {
+          190 => 'Tu sesión de Instagram ha expirado. Reconecta tu cuenta desde la configuración.',
+          100 => 'Parámetros inválidos. Verifica el formato del contenido.',
+          200 => 'No tienes permisos para publicar en esta cuenta de Instagram.',
+          368 => 'Temporalmente bloqueado por Instagram. Intenta nuevamente en unos minutos.',
+          default => null
+        };
+        
+        if ($friendlyMessage) {
+          return $friendlyMessage;
+        }
+      }
+      
+      // Check for specific error patterns in message
+      if ($errorMessage) {
+        if (str_contains($errorMessage, 'video file is too large')) {
+          return 'El video es demasiado grande para Instagram. Tamaño máximo: 100MB para feed, 4GB para reels.';
+        }
+        if (str_contains($errorMessage, 'video is too long')) {
+          return 'El video es demasiado largo. Instagram permite hasta 60 segundos en feed, 90 segundos en reels.';
+        }
+        if (str_contains($errorMessage, 'video is too short')) {
+          return 'El video es demasiado corto. Instagram requiere al menos 3 segundos.';
+        }
+        if (str_contains($errorMessage, 'Invalid image format')) {
+          return 'Formato de imagen no válido. Instagram acepta JPG y PNG.';
+        }
+        if (str_contains($errorMessage, 'Invalid video format')) {
+          return 'Formato de video no válido. Instagram acepta MP4 y MOV.';
+        }
+        if (str_contains($errorMessage, 'rate limit')) {
+          return 'Has excedido el límite de publicaciones de Instagram. Intenta más tarde.';
+        }
+        if (str_contains($errorMessage, 'media_url') || str_contains($errorMessage, 'download')) {
+          return 'Instagram no pudo descargar tu archivo. Verifica que la URL sea accesible públicamente.';
+        }
+        if (str_contains($errorMessage, 'processing')) {
+          return 'Instagram está procesando tu contenido. Esto puede tardar unos minutos.';
+        }
+        if (str_contains($errorMessage, 'Business account')) {
+          return 'Esta función requiere una cuenta de Instagram Business o Creator.';
+        }
+        
+        return $errorMessage;
+      }
+      
+      return $e->getMessage();
+    } catch (\Exception $parseError) {
+      return $e->getMessage();
     }
   }
 }

@@ -37,7 +37,8 @@ class ThreadsService extends BaseSocialService
         'trace' => $e->getTraceAsString()
       ]);
       
-      return PostResultDTO::failure($e->getMessage());
+      $friendlyMessage = $this->extractThreadsErrorMessage($e);
+      return PostResultDTO::failure($friendlyMessage);
     }
   }
 
@@ -335,5 +336,72 @@ class ThreadsService extends BaseSocialService
     }
     
     return $username;
+  }
+
+  /**
+   * Extract user-friendly error message from Threads API response
+   */
+  private function extractThreadsErrorMessage(\Exception $e): string
+  {
+    if (!($e instanceof \GuzzleHttp\Exception\ClientException)) {
+      return $e->getMessage();
+    }
+
+    try {
+      $responseBody = $e->getResponse()->getBody()->getContents();
+      $errorData = json_decode($responseBody, true);
+      
+      $errorCode = $errorData['error']['code'] ?? null;
+      $errorMessage = $errorData['error']['message'] ?? null;
+      
+      // Map common Threads errors to user-friendly messages
+      if ($errorCode) {
+        $friendlyMessage = match($errorCode) {
+          190 => 'Tu sesión de Threads ha expirado. Reconecta tu cuenta desde la configuración.',
+          100 => 'Parámetros inválidos. Verifica el formato del contenido.',
+          200 => 'No tienes permisos para publicar en esta cuenta de Threads.',
+          368 => 'Temporalmente bloqueado por Threads. Intenta nuevamente en unos minutos.',
+          default => null
+        };
+        
+        if ($friendlyMessage) {
+          return $friendlyMessage;
+        }
+      }
+      
+      // Check for specific error patterns in message
+      if ($errorMessage) {
+        if (str_contains($errorMessage, 'text is too long')) {
+          return 'El texto es demasiado largo. Threads permite hasta 500 caracteres.';
+        }
+        if (str_contains($errorMessage, 'video is too large')) {
+          return 'El video es demasiado grande para Threads. Tamaño máximo: 1GB.';
+        }
+        if (str_contains($errorMessage, 'video is too long')) {
+          return 'El video es demasiado largo. Threads permite hasta 5 minutos.';
+        }
+        if (str_contains($errorMessage, 'Invalid image format')) {
+          return 'Formato de imagen no válido. Threads acepta JPG y PNG.';
+        }
+        if (str_contains($errorMessage, 'Invalid video format')) {
+          return 'Formato de video no válido. Threads acepta MP4 y MOV.';
+        }
+        if (str_contains($errorMessage, 'rate limit')) {
+          return 'Has excedido el límite de publicaciones de Threads. Intenta más tarde.';
+        }
+        if (str_contains($errorMessage, 'media_url') || str_contains($errorMessage, 'download')) {
+          return 'Threads no pudo descargar tu archivo. Verifica que la URL sea accesible públicamente.';
+        }
+        if (str_contains($errorMessage, 'processing')) {
+          return 'Threads está procesando tu contenido. Esto puede tardar unos minutos.';
+        }
+        
+        return $errorMessage;
+      }
+      
+      return $e->getMessage();
+    } catch (\Exception $parseError) {
+      return $e->getMessage();
+    }
   }
 }

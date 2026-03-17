@@ -9,6 +9,7 @@ use App\Services\Scheduling\SchedulingService;
 use App\Services\Publications\ContentTypeValidationService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\ValidationException;
 

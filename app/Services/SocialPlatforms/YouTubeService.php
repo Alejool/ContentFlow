@@ -535,9 +535,19 @@ class YouTubeService extends BaseSocialService
 
     // Try to parse the actual JSON error message from YouTube
     $apiMessage = null;
+    $isQuotaError = false;
     try {
       $jsonError = json_decode($responseBody, true);
       $apiMessage = $jsonError['error']['message'] ?? null;
+      
+      // Check if this is a quota error
+      if ($apiMessage && (
+        str_contains($apiMessage, 'exceeded the number of videos') || 
+        str_contains($apiMessage, 'upload limit') ||
+        str_contains($apiMessage, 'quota')
+      )) {
+        $isQuotaError = true;
+      }
     } catch (\Exception $parseException) {
       // Failed to parse JSON, stick to defaults
     }
@@ -552,8 +562,13 @@ class YouTubeService extends BaseSocialService
     // Use the actual API message if available and meaningful
     if ($apiMessage) {
       // Check for specific error message about exceeded upload limit
-      if (str_contains($apiMessage, 'exceeded the number of videos') || str_contains($apiMessage, 'upload limit')) {
+      if ($isQuotaError) {
         $errorMessage = 'You have reached your daily YouTube upload limit. Please try again in 24 hours.';
+        
+        // Create a custom exception that signals this should not be retried
+        $exception = new \Exception($errorMessage);
+        $exception->isQuotaError = true; // Custom property to identify quota errors
+        throw $exception;
       } else {
         // Use the YouTube message directly as it's usually descriptive enough
         $errorMessage = $apiMessage;

@@ -146,6 +146,13 @@ class PublishToSocialMedia implements ShouldQueue
 
     $publication->update(['status' => 'publishing']);
     
+    // Reset any stale 'publishing' logs from previous failed attempts to 'pending'
+    // This prevents duplicate detection issues on retries
+    SocialPostLog::where('publication_id', $publication->id)
+      ->whereIn('social_account_id', $this->socialAccountIds)
+      ->where('status', 'publishing')
+      ->update(['status' => 'pending']);
+    
     // Update all pending logs to publishing status
     SocialPostLog::where('publication_id', $publication->id)
       ->whereIn('social_account_id', $this->socialAccountIds)
@@ -182,7 +189,16 @@ class PublishToSocialMedia implements ShouldQueue
       $platformResults = $result['platform_results'] ?? [];
       $publisher = User::find($publication->published_by);
 
-      if (empty($platformResults)) {
+      // Check if all platforms were already published (empty results but no errors)
+      $allAlreadyPublished = empty($platformResults) && empty($result['errors']) && !empty($result['logs']);
+
+      if ($allAlreadyPublished) {
+        // All platforms were already published, treat as success
+        Log::info('All platforms already published, treating as success', [
+          'publication_id' => $publication->id,
+          'logs_count' => count($result['logs'])
+        ]);
+      } elseif (empty($platformResults)) {
         foreach ($socialAccounts as $account) {
           $publication->logActivity('failed_on_platform', [
             'platform' => $account->platform,
@@ -205,10 +221,10 @@ class PublishToSocialMedia implements ShouldQueue
         }
       }
 
-      $anySuccess = collect($platformResults)
+      $anySuccess = $allAlreadyPublished || collect($platformResults)
         ->contains(fn($r) => !empty($r['success']));
       
-      $allSuccess = collect($platformResults)
+      $allSuccess = $allAlreadyPublished || collect($platformResults)
         ->every(fn($r) => !empty($r['success']));
 
       if ($allSuccess) {
@@ -330,6 +346,53 @@ class PublishToSocialMedia implements ShouldQueue
       ]);
 
       $publisher = User::find($publication->published_by);
+      
+      // Check if this is a quota error (non-retryable)
+      $isQuotaError = isset($e->isQuotaError) && $e->isQuotaError === true;
+      $isQuotaErrorByMessage = str_contains($e->getMessage(), 'daily YouTube upload limit') || 
+                                str_contains($e->getMessage(), 'quota') ||
+                                str_contains($e->getMessage(), 'exceeded the number of videos');
+      
+      if ($isQuotaError || $isQuotaErrorByMessage) {
+        // Quota errors should not be retried - mark as failed immediately
+        Log::warning('Quota error detected, marking as failed without retry', [
+          'publication_id' => $publication->id,
+          'error' => $e->getMessage()
+        ]);
+        
+        foreach ($socialAccounts as $account) {
+          $publication->logActivity('failed_on_platform', [
+            'platform' => $account->platform,
+            'error' => $e->getMessage(),
+            'note' => 'Quota exceeded - not retryable',
+            'attempt' => $this->attempts()
+          ], $publisher);
+        }
+        
+        $publication->logActivity('failed', [
+          'reason' => 'Quota exceeded',
+          'error' => $e->getMessage(),
+          'attempt' => $this->attempts()
+        ], $publisher);
+        
+        $publication->update(['status' => 'failed']);
+        
+        event(new PublicationStatusUpdated(
+          userId: $publication->user_id,
+          publicationId: $publication->id,
+          status: 'failed',
+          workspaceId: $publication->workspace_id,
+          socialAccountIds: $this->socialAccountIds
+        ));
+        
+        $this->sendGeneralFailureNotification($publication, $e->getMessage(), []);
+        
+        // Delete job to prevent retries
+        $this->delete();
+        return;
+      }
+      
+      // For other errors, log and allow retry
       foreach ($socialAccounts as $account) {
         $publication->logActivity('failed_on_platform', [
           'platform' => $account->platform,
