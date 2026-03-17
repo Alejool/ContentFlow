@@ -1,11 +1,11 @@
 import Button from '@/Components/common/Modern/Button';
 import { getPlatformConfig } from '@/Constants/socialPlatforms';
 import {
-    formatDurationLimit,
-    formatFileSizeLimit,
-    getUpgradeMessage,
-    useValidateVideo,
-    type VideoValidationResult,
+  formatDurationLimit,
+  formatFileSizeLimit,
+  getUpgradeMessage,
+  useValidateVideo,
+  type VideoValidationResult,
 } from '@/Hooks/usePlatformCapabilities';
 import { AlertTriangle, CheckCircle, RefreshCw, XCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -13,19 +13,19 @@ import { useTranslation } from 'react-i18next';
 
 /**
  * VideoValidationAlert Component
- * 
+ *
  * Purpose: Shows validation errors/warnings when content EXCEEDS platform limits
- * 
+ *
  * IMPORTANT DISTINCTION:
  * - This component is for platforms that SUPPORT the content type but the content exceeds their limits
  * - Example: YouTube allows videos, but unverified accounts can't upload >15 minutes
  * - Example: Twitter allows videos, but non-premium accounts limited to 2 minutes
- * 
+ *
  * This is DIFFERENT from platform incompatibility:
  * - Platform incompatibility = platform doesn't support the content type at all
  * - Example: carousel on Twitter (Twitter doesn't support carousel)
  * - Those cases should show in the "incompatibleAccounts" banner, NOT here
- * 
+ *
  * Usage:
  * - Only pass compatible account IDs (accounts that support the content type)
  * - Shows errors when content exceeds limits (duration, file size)
@@ -192,10 +192,7 @@ export default function VideoValidationAlert({
                     {/* Errors List */}
                     <div className="space-y-2">
                       {result.errors.map((error, idx) => (
-                        <div
-                          key={idx}
-                          className="rounded-md bg-red-50 p-3 dark:bg-red-900/20"
-                        >
+                        <div key={idx} className="rounded-md bg-red-50 p-3 dark:bg-red-900/20">
                           <p className="text-sm font-medium text-red-900 dark:text-red-100">
                             • {error.message}
                           </p>

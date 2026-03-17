@@ -23,6 +23,7 @@ interface ModalFooterProps {
   submitStyle?: 'solid' | 'outline' | 'gradient' | 'ghost';
   cancelStyle?: 'solid' | 'outline' | 'gradient' | 'ghost';
   hideSubmit?: boolean;
+  disableSubmit?: boolean;
   style?: React.CSSProperties;
   activeColor?: string;
   children?: React.ReactNode;
@@ -49,6 +50,7 @@ export default function ModalFooter({
   submitStyle = 'gradient',
   cancelStyle = 'outline',
   hideSubmit = false,
+  disableSubmit = false,
   style,
   activeColor,
   children,
@@ -117,7 +119,7 @@ export default function ModalFooter({
                   onPrimarySubmit();
                 }
               }}
-              disabled={isSubmitting}
+              disabled={isSubmitting || disableSubmit}
               loading={isSubmitting}
               variant={submitVariant}
               buttonStyle={submitStyle}

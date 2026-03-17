@@ -51,16 +51,16 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
 
   // CRITICAL: Get FRESH data from stores to ensure reactivity when background processes update them
   const publications = usePublicationStore((s) => s.publications);
-  
+
   // IMPORTANT: Stabilize publication data while publishing to prevent re-renders
   // that cause connectedAccounts to become empty momentarily
   const [stablePublication, setStablePublication] = React.useState<Publication | null>(null);
-  
+
   React.useEffect(() => {
     if (isPublishModalOpen && targetIsPublication && selectedItem?.id) {
       const freshPub = publications.find((p) => p.id === selectedItem.id) as Publication;
       const pubToUse = freshPub || (selectedItem as Publication);
-      
+
       // Only update if not currently publishing to prevent data flickering
       if (!publishing) {
         setStablePublication(pubToUse);
@@ -70,13 +70,13 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
       setStablePublication(null);
     }
   }, [isPublishModalOpen, targetIsPublication, selectedItem?.id, publications, publishing]);
-  
-  const currentPub = stablePublication || (
-    targetIsPublication && selectedItem?.id
+
+  const currentPub =
+    stablePublication ||
+    (targetIsPublication && selectedItem?.id
       ? (publications.find((p) => p.id === selectedItem.id) as Publication) ||
         (selectedItem as Publication)
-      : null
-  );
+      : null);
 
   // Debug log to track publication updates
   if (currentPub && isEditModalOpen) {

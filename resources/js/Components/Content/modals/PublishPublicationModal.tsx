@@ -365,7 +365,7 @@ export default function PublishPublicationModal({
   };
 
   const compatibleAccounts = getCompatibleAccounts();
-  
+
   // incompatibleAccounts = platforms that DON'T support this content type at all
   // Example: carousel on Twitter, carousel on LinkedIn
   const incompatibleAccounts = connectedAccounts.filter(
@@ -730,27 +730,30 @@ export default function PublishPublicationModal({
               {/* Video Validation Alert - Shows when content EXCEEDS platform limits */}
               {/* This is different from incompatibleAccounts which shows when platform doesn't support the content type */}
               {(() => {
-                const videoFile = publication?.media_files?.find(m => m.file_type === 'video');
+                const videoFile = publication?.media_files?.find((m) => m.file_type === 'video');
                 if (!videoFile) return null;
-                
+
                 const videoDuration = videoFile.metadata?.duration;
                 const fileSizeMb = videoFile.size ? videoFile.size / (1024 * 1024) : 0;
-                
+
                 if (!videoDuration || !fileSizeMb) return null;
-                
+
                 // Only validate for compatible accounts (accounts that support this content type)
-                const compatibleSelectedAccounts = selectedPlatforms.filter(id => 
-                  compatibleAccounts.some(acc => acc.id === id)
+                const compatibleSelectedAccounts = selectedPlatforms.filter((id) =>
+                  compatibleAccounts.some((acc) => acc.id === id),
                 );
-                
+
                 if (compatibleSelectedAccounts.length === 0) return null;
-                
+
                 return (
                   <VideoValidationAlert
                     selectedAccountIds={compatibleSelectedAccounts}
                     videoDuration={videoDuration}
                     fileSizeMb={fileSizeMb}
-                    onValidationComplete={(valid: boolean, results: import('@/Hooks/usePlatformCapabilities').VideoValidationResult[]) => {
+                    onValidationComplete={(
+                      valid: boolean,
+                      results: import('@/Hooks/usePlatformCapabilities').VideoValidationResult[],
+                    ) => {
                       // Results show which accounts can't publish due to limits
                       console.log('Video validation:', valid, results);
                     }}

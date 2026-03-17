@@ -3,7 +3,16 @@ import { queryKeys } from '@/lib/queryKeys';
 import { formatDateTimeStyled } from '@/Utils/dateHelpers';
 import { validateVideoDuration } from '@/Utils/validationUtils';
 import { useQueryClient } from '@tanstack/react-query';
-import { AlertTriangle, Check, CheckCircle, Clock, Loader2, RefreshCw, X, XCircle } from 'lucide-react';
+import {
+  AlertTriangle,
+  Check,
+  CheckCircle,
+  Clock,
+  Loader2,
+  RefreshCw,
+  X,
+  XCircle,
+} from 'lucide-react';
 import { memo } from 'react';
 import toast from 'react-hot-toast';
 
@@ -67,13 +76,13 @@ const PlatformCard = memo(
     const retryStatus = platformRetryInfo?.retry_status || null;
     const isDuplicateAttempt = platformRetryInfo?.is_duplicate || false;
     const originalAttemptAt = platformRetryInfo?.original_attempt_at;
-    
+
     const queryClient = useQueryClient();
 
     // Check if this is a Twitter account with video content but missing OAuth 1.0a credentials
     const isTwitter = ['twitter', 'x'].includes(account.platform?.toLowerCase());
     const hasVideo = publication?.media_files?.some(
-      (m: any) => m.file_type === 'video' || m.mime_type?.startsWith('video/')
+      (m: any) => m.file_type === 'video' || m.mime_type?.startsWith('video/'),
     );
     const hasOAuth1 = account.account_metadata?.oauth1_token && account.account_metadata?.secret;
     const needsOAuth1Reconnection = isTwitter && hasVideo && !hasOAuth1;
@@ -90,73 +99,78 @@ const PlatformCard = memo(
 
     const handleReconnect = async (e: React.MouseEvent) => {
       e.stopPropagation();
-      
+
       // Show toast message
       const toastId = toast.loading(
-        t('publications.modal.publish.reconnecting') || 'Iniciando reconexión...'
+        t('publications.modal.publish.reconnecting') || 'Iniciando reconexión...',
       );
-      
+
       try {
         // Get auth URL for the platform
         const response = await fetch(`/social-accounts/auth-url/${account.platform}`, {
           headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-            'Accept': 'application/json',
+            'X-CSRF-TOKEN':
+              document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+            Accept: 'application/json',
           },
         });
-        
+
         const data = await response.json();
-        
+
         if (data.url) {
           toast.success(
             t('publications.modal.publish.reconnect_window') || 'Abriendo ventana de reconexión...',
-            { id: toastId }
+            { id: toastId },
           );
-          
+
           // Open OAuth window
           const width = 600;
           const height = 700;
           const left = window.screen.width / 2 - width / 2;
           const top = window.screen.height / 2 - height / 2;
-          
+
           const authWindow = window.open(
             data.url,
             'oauth',
-            `width=${width},height=${height},left=${left},top=${top}`
+            `width=${width},height=${height},left=${left},top=${top}`,
           );
-          
+
           // Listen for successful reconnection
           const handleAuthMessage = (event: MessageEvent) => {
             if (event.data?.type === 'social_auth_callback' && event.data.success) {
               toast.success(
-                t('publications.modal.publish.reconnect_success') || 'Cuenta reconectada exitosamente',
-                { id: toastId }
+                t('publications.modal.publish.reconnect_success') ||
+                  'Cuenta reconectada exitosamente',
+                { id: toastId },
               );
-              
+
               // Invalidate social accounts cache to refresh the data
               queryClient.invalidateQueries({ queryKey: queryKeys.socialAccounts.all });
-              
+
               // Clean up listener
               window.removeEventListener('message', handleAuthMessage);
             }
           };
-          
+
           window.addEventListener('message', handleAuthMessage);
-          
+
           // Clean up listener after 5 minutes (timeout)
-          setTimeout(() => {
-            window.removeEventListener('message', handleAuthMessage);
-          }, 5 * 60 * 1000);
+          setTimeout(
+            () => {
+              window.removeEventListener('message', handleAuthMessage);
+            },
+            5 * 60 * 1000,
+          );
         } else {
           toast.error(
             t('publications.modal.publish.reconnect_error') || 'Error al iniciar reconexión',
-            { id: toastId }
+            { id: toastId },
           );
         }
       } catch (error) {
         toast.error(
           t('publications.modal.publish.reconnect_error') || 'Error al iniciar reconexión',
-          { id: toastId }
+          { id: toastId },
         );
       }
     };
@@ -175,20 +189,20 @@ const PlatformCard = memo(
             !canPublish && !isPublished && !isScheduled
               ? 'border-red-300 bg-red-50/50 opacity-75 dark:border-red-700 dark:bg-red-900/20'
               : isDuplicate || isDuplicateAttempt
-              ? 'border-orange-500 bg-orange-50 shadow-md dark:border-orange-600 dark:bg-orange-900/30'
-              : isPublishing || isRetrying
-                ? 'border-yellow-500 bg-yellow-50 shadow-md dark:border-yellow-600 dark:bg-yellow-900/30'
-                : isPublished
-                  ? 'border-green-500 bg-green-50 shadow-md dark:border-green-600 dark:bg-green-900/30'
-                  : isScheduled
-                    ? 'border-blue-500 bg-blue-50 shadow-md dark:border-blue-600 dark:bg-blue-900/30'
-                    : isFailed
-                      ? 'border-red-500 bg-red-50 shadow-md dark:border-red-600 dark:bg-red-900/30'
-                      : isRemovedPlatform
-                        ? 'border-gray-500 bg-gray-50 shadow-md dark:border-gray-600 dark:bg-gray-900/30'
-                        : isSelected
-                          ? 'border-primary-600 bg-primary-100 shadow-lg ring-4 ring-primary-300/60 dark:border-primary-400 dark:bg-primary-900/50 dark:ring-primary-600/50'
-                          : 'border-gray-300 bg-white hover:border-primary-400 hover:shadow-md dark:border-neutral-700 dark:bg-neutral-900/30 dark:hover:border-primary-500'
+                ? 'border-orange-500 bg-orange-50 shadow-md dark:border-orange-600 dark:bg-orange-900/30'
+                : isPublishing || isRetrying
+                  ? 'border-yellow-500 bg-yellow-50 shadow-md dark:border-yellow-600 dark:bg-yellow-900/30'
+                  : isPublished
+                    ? 'border-green-500 bg-green-50 shadow-md dark:border-green-600 dark:bg-green-900/30'
+                    : isScheduled
+                      ? 'border-blue-500 bg-blue-50 shadow-md dark:border-blue-600 dark:bg-blue-900/30'
+                      : isFailed
+                        ? 'border-red-500 bg-red-50 shadow-md dark:border-red-600 dark:bg-red-900/30'
+                        : isRemovedPlatform
+                          ? 'border-gray-500 bg-gray-50 shadow-md dark:border-gray-600 dark:bg-gray-900/30'
+                          : isSelected
+                            ? 'border-primary-600 bg-primary-100 shadow-lg ring-4 ring-primary-300/60 dark:border-primary-400 dark:bg-primary-900/50 dark:ring-primary-600/50'
+                            : 'border-gray-300 bg-white hover:border-primary-400 hover:shadow-md dark:border-neutral-700 dark:bg-neutral-900/30 dark:hover:border-primary-500'
           }`}
         >
           {/* Publishing Overlay */}
@@ -313,11 +327,11 @@ const PlatformCard = memo(
                     {t('publications.modal.publish.oauth1_required') || 'Requiere reconexión'}
                   </span>
                   <span className="mt-1 text-center text-[10px] leading-tight text-amber-600 dark:text-amber-500">
-                    {t('publications.modal.publish.oauth1_video_message') || 
+                    {t('publications.modal.publish.oauth1_video_message') ||
                       'Esta cuenta necesita credenciales OAuth 1.0a para subir videos'}
                   </span>
                 </div>
-                
+
                 {/* <button
                   onClick={handleReconnect}
                   className="pointer-events-auto mt-2 flex items-center gap-1.5 rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600"
@@ -330,33 +344,41 @@ const PlatformCard = memo(
           )}
 
           {/* Capability Error Overlay - Platform cannot publish this content */}
-          {!canPublish && !isPublishing && !isUnpublishing && !isPublished && !isScheduled && capabilityErrors.length > 0 && (
-            <div className="animate-in fade-in absolute inset-0 z-30 flex flex-col items-center justify-center rounded-lg bg-red-50/95 backdrop-blur-sm duration-300 dark:bg-red-900/30">
-              <div className="flex flex-col items-center gap-2 px-3">
-                <XCircle className="h-10 w-10 text-red-600 dark:text-red-400" />
-                <div className="flex flex-col items-center gap-0.5">
-                  <span className="text-sm font-bold capitalize tracking-wide text-red-800 dark:text-red-300">
-                    {account.platform}
-                  </span>
-                  <span className="text-center text-xs font-medium text-red-700 dark:text-red-400">
-                    {t('publications.modal.publish.cannot_publish') || 'No se puede publicar'}
-                  </span>
-                  <div className="mt-2 max-w-[200px] space-y-1">
-                    {capabilityErrors.map((error, idx) => (
-                      <div key={idx} className="text-center text-[10px] leading-tight text-red-600 dark:text-red-500">
-                        • {error}
-                      </div>
-                    ))}
-                  </div>
-                  {upgradeMessage && (
-                    <div className="mt-2 rounded-lg border border-red-200 bg-red-100 px-2 py-1 text-center text-[10px] font-medium text-red-700 dark:border-red-800 dark:bg-red-900/40 dark:text-red-400">
-                      💡 {upgradeMessage}
+          {!canPublish &&
+            !isPublishing &&
+            !isUnpublishing &&
+            !isPublished &&
+            !isScheduled &&
+            capabilityErrors.length > 0 && (
+              <div className="animate-in fade-in absolute inset-0 z-30 flex flex-col items-center justify-center rounded-lg bg-red-50/95 backdrop-blur-sm duration-300 dark:bg-red-900/30">
+                <div className="flex flex-col items-center gap-2 px-3">
+                  <XCircle className="h-10 w-10 text-red-600 dark:text-red-400" />
+                  <div className="flex flex-col items-center gap-0.5">
+                    <span className="text-sm font-bold capitalize tracking-wide text-red-800 dark:text-red-300">
+                      {account.platform}
+                    </span>
+                    <span className="text-center text-xs font-medium text-red-700 dark:text-red-400">
+                      {t('publications.modal.publish.cannot_publish') || 'No se puede publicar'}
+                    </span>
+                    <div className="mt-2 max-w-[200px] space-y-1">
+                      {capabilityErrors.map((error, idx) => (
+                        <div
+                          key={idx}
+                          className="text-center text-[10px] leading-tight text-red-600 dark:text-red-500"
+                        >
+                          • {error}
+                        </div>
+                      ))}
                     </div>
-                  )}
+                    {upgradeMessage && (
+                      <div className="mt-2 rounded-lg border border-red-200 bg-red-100 px-2 py-1 text-center text-[10px] font-medium text-red-700 dark:border-red-800 dark:bg-red-900/40 dark:text-red-400">
+                        💡 {upgradeMessage}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
           {/* Published Overlay */}
           {isPublished &&

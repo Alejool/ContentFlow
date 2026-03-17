@@ -1,5 +1,9 @@
 import { Publication } from '@/types/Publication';
-import { getPublicationStatusConfig, getShortStatusLabel, getStatusDescription } from '@/Utils/publicationHelpers';
+import {
+  getPublicationStatusConfig,
+  getShortStatusLabel,
+  getStatusDescription,
+} from '@/Utils/publicationHelpers';
 import { AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import { useMemo } from 'react';
 
@@ -64,9 +68,7 @@ export function PublicationStatusBadge({
         {statusInfo.label}
       </span>
       {statusInfo.description && statusInfo.description !== statusInfo.label && (
-        <span className="text-xs text-gray-500 dark:text-gray-400">
-          {statusInfo.description}
-        </span>
+        <span className="text-xs text-gray-500 dark:text-gray-400">{statusInfo.description}</span>
       )}
     </div>
   );
