@@ -13,4 +13,13 @@ return [
     'tiktok_requires_video' => 'TikTok requiere archivos de video. No se pueden publicar imágenes.',
     'poll_recommendation' => 'Las encuestas funcionan mejor en: :platforms',
     'reel_recommendation' => 'Los reels/videos cortos son ideales para: :platforms',
+    
+    // Carousel validation messages
+    'carousel_min_media' => 'El contenido de carrusel requiere al menos 2 archivos multimedia.',
+    'instagram_carousel_max_media' => 'Los carruseles de Instagram no pueden tener más de 10 archivos multimedia. Cantidad actual: :count.',
+    'instagram_carousel_mixed_media' => 'Los carruseles de Instagram con imágenes y videos mezclados pueden no mostrarse de manera óptima.',
+    'facebook_carousel_max_media' => 'Los carruseles de Facebook no pueden tener más de 10 archivos multimedia. Cantidad actual: :count.',
+    'facebook_carousel_mixed_media' => 'Facebook no permite mezclar imágenes y videos en el mismo carrusel. Por favor usa solo imágenes o solo videos.',
+    'linkedin_carousel_max_media' => 'Los carruseles de LinkedIn no pueden tener más de 9 archivos multimedia. Cantidad actual: :count.',
+    'twitter_carousel_mixed_media' => 'Twitter/X no permite combinar videos e imágenes en la misma publicación.',
 ];

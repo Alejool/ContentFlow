@@ -26,6 +26,8 @@ return [
     'instagram_carousel_max_media' => 'Instagram carousels cannot have more than 10 media files. Current count: :count.',
     'instagram_carousel_mixed_media' => 'Instagram carousels with mixed images and videos may not display optimally.',
     'facebook_carousel_max_media' => 'Facebook carousels cannot have more than 10 media files. Current count: :count.',
+    'facebook_carousel_mixed_media' => 'Facebook does not support mixing images and videos in the same carousel. Please use only images or only videos.',
+    'twitter_carousel_mixed_media' => 'Twitter/X does not allow combining videos and images in the same post.',
     'linkedin_carousel_max_media' => 'LinkedIn carousels cannot have more than 9 media files. Current count: :count.',
 
     // Content type compatibility
