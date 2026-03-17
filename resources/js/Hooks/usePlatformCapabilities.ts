@@ -178,7 +178,10 @@ export const formatFileSizeLimit = (mb: number): string => {
 /**
  * Get platform-specific upgrade message
  */
-export const getUpgradeMessage = (platform: string, capabilities: PlatformCapabilities): string | null => {
+export const getUpgradeMessage = (
+  platform: string,
+  capabilities: PlatformCapabilities,
+): string | null => {
   switch (platform) {
     case 'youtube':
       if (!capabilities.long_uploads_allowed) {

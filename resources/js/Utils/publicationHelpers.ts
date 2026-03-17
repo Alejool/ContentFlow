@@ -325,7 +325,7 @@ export function getStatusDescription(
   // Agregar detalles del resumen si está disponible
   if (summary && summary.total_platforms) {
     const details: string[] = [];
-    
+
     if (summary.published && summary.published > 0) {
       details.push(`${summary.published} publicadas`);
     }

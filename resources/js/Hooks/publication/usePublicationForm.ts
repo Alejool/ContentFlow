@@ -1,12 +1,12 @@
 import {
-    getMediaRulesForContentType,
-    type ContentType,
+  getMediaRulesForContentType,
+  type ContentType,
 } from '@/Components/Content/Publication/common/ContentTypeSelector';
 import { CONTENT_TYPE_DISPLAY } from '@/Constants/contentTypes';
 import { useContentTypeSuggestion } from '@/Hooks/publication/useContentTypeSuggestion';
 import {
-    useCreatePublication,
-    useUpdatePublication,
+  useCreatePublication,
+  useUpdatePublication,
 } from '@/Hooks/publication/usePublicationsList';
 import { useS3Upload } from '@/Hooks/useS3Upload';
 import { queryKeys } from '@/lib/queryKeys';
@@ -557,12 +557,14 @@ export const usePublicationForm = ({
 
     // Check if we have videos with duration metadata
     const videoFiles = completedFiles.filter((f) => f.type.startsWith('video/'));
-    
+
     // If we have multiple files, always suggest content type (could be carousel)
     // If we have videos, check if they have duration metadata
-    const shouldSuggest = completedFiles.length > 1 || 
-      (videoFiles.length > 0 && videoFiles.some(f => videoMetadata[f.tempId]?.duration !== undefined));
-    
+    const shouldSuggest =
+      completedFiles.length > 1 ||
+      (videoFiles.length > 0 &&
+        videoFiles.some((f) => videoMetadata[f.tempId]?.duration !== undefined));
+
     if (!shouldSuggest) return;
 
     const videoFilesWithDuration = videoFiles.filter((f) => {
@@ -604,10 +606,11 @@ export const usePublicationForm = ({
         onSuccess: (result) => {
           if (result && result.should_change && result.suggested_type !== currentType) {
             const fileCount = completedFiles.length;
-            const message = fileCount > 1
-              ? `Tipo de contenido cambiado automáticamente a "${result.suggested_type}" (${fileCount} archivos detectados).`
-              : `Tipo de contenido cambiado automáticamente a "${result.suggested_type}" basado en la duración del video.`;
-            
+            const message =
+              fileCount > 1
+                ? `Tipo de contenido cambiado automáticamente a "${result.suggested_type}" (${fileCount} archivos detectados).`
+                : `Tipo de contenido cambiado automáticamente a "${result.suggested_type}" basado en la duración del video.`;
+
             toast.success(message, {
               duration: 4000,
             });
@@ -864,7 +867,7 @@ export const usePublicationForm = ({
             });
 
             // Add the current file being processed if not already in mediaFiles
-            const currentFileExists = mediaFiles.some(f => f.tempId === item.tempId);
+            const currentFileExists = mediaFiles.some((f) => f.tempId === item.tempId);
             if (!currentFileExists) {
               allMediaData.push({
                 mime_type: item.file?.type || 'video/mp4',
@@ -873,8 +876,8 @@ export const usePublicationForm = ({
               });
             } else {
               // Update the metadata for the current file
-              const currentFileIndex = allMediaData.findIndex((_, idx) => 
-                mediaFiles[idx]?.tempId === item.tempId
+              const currentFileIndex = allMediaData.findIndex(
+                (_, idx) => mediaFiles[idx]?.tempId === item.tempId,
               );
               if (currentFileIndex !== -1) {
                 allMediaData[currentFileIndex] = {
@@ -895,10 +898,11 @@ export const usePublicationForm = ({
                 onSuccess: (result) => {
                   if (result && result.should_change && result.suggested_type !== currentType) {
                     const fileCount = allMediaData.length;
-                    const message = fileCount > 1
-                      ? `Tipo de contenido cambiado automáticamente a "${result.suggested_type}" (${fileCount} archivos detectados).`
-                      : `Tipo de contenido cambiado automáticamente a "${result.suggested_type}" basado en la duración del video (${(duration / 60).toFixed(1)} minutos).`;
-                    
+                    const message =
+                      fileCount > 1
+                        ? `Tipo de contenido cambiado automáticamente a "${result.suggested_type}" (${fileCount} archivos detectados).`
+                        : `Tipo de contenido cambiado automáticamente a "${result.suggested_type}" basado en la duración del video (${(duration / 60).toFixed(1)} minutos).`;
+
                     toast.success(message, {
                       duration: 4000,
                     });
@@ -1133,7 +1137,9 @@ export const usePublicationForm = ({
       queryClient.invalidateQueries({ queryKey: queryKeys.publications.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.calendar.all });
     } catch (err) {
-      toast.error(t('publications.messages.platformCancelError') || 'Error al cancelar la plataforma');
+      toast.error(
+        t('publications.messages.platformCancelError') || 'Error al cancelar la plataforma',
+      );
     }
   };
 
