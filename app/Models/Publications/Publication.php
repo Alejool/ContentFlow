@@ -733,24 +733,16 @@ class Publication extends Model
 
   /**
    * Get supported content types for a platform
+   * Uses ContentTypes constants to ensure consistency with frontend
    */
   public static function getSupportedContentTypes(string $platform): array
   {
-    $supportedTypes = [
-      'instagram' => ['post', 'reel', 'story', 'carousel'],
-      'twitter' => ['post', 'poll'],
-      'tiktok' => ['reel'],
-      'youtube' => ['post', 'reel'],
-      'facebook' => ['post', 'story', 'poll', 'reel'],
-      'linkedin' => ['post', 'carousel'],
-      'pinterest' => ['post', 'carousel'],
-    ];
-
-    return $supportedTypes[strtolower($platform)] ?? ['post'];
+    return \App\Constants\ContentTypes::getSupportedContentTypes($platform);
   }
 
   /**
-   * Get all available content types
+   * Get all available content types with their metadata
+   * Uses ContentTypes constants for platform compatibility
    */
   public static function getAllContentTypes(): array
   {
@@ -759,31 +751,31 @@ class Publication extends Model
         'label' => 'Post',
         'description' => 'Standard social media post',
         'icon' => 'FileText',
-        'platforms' => ['instagram', 'threads', 'twitter', 'facebook', 'linkedin', 'youtube', 'pinterest'],
+        'platforms' => \App\Constants\ContentTypes::POST_COMPATIBLE_PLATFORMS,
       ],
       'reel' => [
         'label' => 'Reel/Short',
         'description' => 'Short vertical video',
         'icon' => 'Video',
-        'platforms' => ['instagram', 'tiktok', 'youtube', 'facebook'],
+        'platforms' => \App\Constants\ContentTypes::REEL_COMPATIBLE_PLATFORMS,
       ],
       'story' => [
         'label' => 'Story',
         'description' => 'Temporary 24h content',
         'icon' => 'Clock',
-        'platforms' => ['instagram', 'facebook'],
+        'platforms' => \App\Constants\ContentTypes::STORY_COMPATIBLE_PLATFORMS,
       ],
       'poll' => [
         'label' => 'Poll',
         'description' => 'Interactive poll/survey',
         'icon' => 'BarChart3',
-        'platforms' => ['twitter', 'threads', 'facebook'],
+        'platforms' => \App\Constants\ContentTypes::POLL_COMPATIBLE_PLATFORMS,
       ],
       'carousel' => [
         'label' => 'Carousel',
         'description' => 'Multiple images/slides',
         'icon' => 'Images',
-        'platforms' => ['instagram', 'threads', 'linkedin', 'pinterest'],
+        'platforms' => \App\Constants\ContentTypes::CAROUSEL_COMPATIBLE_PLATFORMS,
       ],
     ];
   }

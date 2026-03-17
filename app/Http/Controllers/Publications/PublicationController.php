@@ -665,13 +665,16 @@ class PublicationController extends Controller
       if (in_array($publication->status, ['publishing', 'retrying'])) {
         $requestedPlatforms = $request->input('platforms', []);
         
-        // Get platforms currently being published
+        // Get platforms currently being published (only recent logs from last 5 minutes)
+        // This prevents false positives from crashed jobs
         $publishingPlatforms = \App\Models\SocialPostLog::where('publication_id', $publication->id)
           ->whereIn('status', ['pending', 'publishing'])
+          ->where('updated_at', '>=', now()->subMinutes(5))
           ->whereIn('id', function ($query) use ($publication) {
             $query->selectRaw('MAX(id)')
               ->from('social_post_logs')
               ->where('publication_id', $publication->id)
+              ->where('updated_at', '>=', now()->subMinutes(5))
               ->groupBy('social_account_id');
           })
           ->pluck('social_account_id')
@@ -681,6 +684,13 @@ class PublicationController extends Controller
         $conflictingPlatforms = array_intersect($requestedPlatforms, $publishingPlatforms);
         
         if (!empty($conflictingPlatforms)) {
+          \Log::warning('Conflicting platforms detected', [
+            'publication_id' => $publication->id,
+            'requested' => $requestedPlatforms,
+            'publishing' => $publishingPlatforms,
+            'conflicting' => $conflictingPlatforms
+          ]);
+          
           return $this->errorResponse(
             __('publications.errors.already_publishing'),
             422,

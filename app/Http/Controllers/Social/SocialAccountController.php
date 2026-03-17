@@ -728,7 +728,7 @@ class SocialAccountController extends Controller
 
       $channelResponse = Http::withToken($data['access_token'])
         ->get('https://www.googleapis.com/youtube/v3/channels', [
-          'part' => 'snippet',
+          'part' => 'snippet,status',
           'mine' => 'true'
         ]);
 
@@ -739,11 +739,16 @@ class SocialAccountController extends Controller
       }
 
       $channelInfo = $channelData['items'][0]['snippet'];
+      $channelStatus = $channelData['items'][0]['status'] ?? [];
 
       $userInfoResponse = Http::withToken($data['access_token'])
         ->get('https://www.googleapis.com/oauth2/v3/userinfo');
       $userInfo = $userInfoResponse->json();
       $userEmail = $userInfo['email'] ?? null;
+      
+      // Determinar si la cuenta está verificada
+      // YouTube considera verificada si tiene más de 100k suscriptores o si tiene el badge de verificación
+      $isVerified = ($channelStatus['longUploadsStatus'] ?? 'disallowed') === 'allowed';
 
       $this->saveAccount([
         'platform' => 'youtube',
@@ -753,7 +758,9 @@ class SocialAccountController extends Controller
           'avatar' => $channelInfo['thumbnails']['default']['url'] ?? null,
           'description' => $channelInfo['description'] ?? null,
           'username' => $channelInfo['customUrl'] ?? null,
-          'email' => $userEmail
+          'email' => $userEmail,
+          'is_verified' => $isVerified,
+          'long_uploads_enabled' => $isVerified,
         ],
         'access_token' => $data['access_token'],
         'refresh_token' => $data['refresh_token'] ?? null,
@@ -761,11 +768,19 @@ class SocialAccountController extends Controller
           ? now()->addSeconds($data['expires_in'])
           : null,
       ]);
+      
+      \Log::info('Saving YouTube account with verification info', [
+        'channel_id' => $channelData['items'][0]['id'],
+        'channel_name' => $channelInfo['title'] ?? null,
+        'is_verified' => $isVerified,
+        'long_uploads_status' => $channelStatus['longUploadsStatus'] ?? 'unknown'
+      ]);
 
       return $this->closeWindowWithMessage('success', [
         'platform' => 'youtube',
         'account_name' => $channelInfo['title'] ?? null,
         'avatar' => $channelInfo['thumbnails']['default']['url'] ?? null,
+        'is_verified' => $isVerified,
       ]);
     } catch (\Exception $e) {
       return $this->handleOAuthError('Error processing authentication: ' . $e->getMessage());

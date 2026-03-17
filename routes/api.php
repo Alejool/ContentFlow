@@ -95,3 +95,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     require __DIR__ . '/api/v1/addons.php';
   });
 });
+
+// Publication validation endpoints
+Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
+    Route::get('/publications/{publication}/capabilities', [App\Http\Controllers\Api\V1\PublicationValidationController::class, 'getPlatformCapabilities'])
+        ->name('api.v1.publications.capabilities');
+});
