@@ -6,8 +6,6 @@ interface PollFieldsProps {
   options: string[];
   duration: number;
   onChange: (data: { options: string[]; duration: number }) => void;
-  register?: (name: string) => object;
-  setValue?: (name: string, value: unknown, options?: object) => void;
   t: (key: string) => string;
   errors?: {
     options?: string;
@@ -19,8 +17,6 @@ export default function PollFields({
   options = ['', ''],
   duration = 24,
   onChange,
-  register: _register,
-  setValue,
   t,
   errors = {},
 }: PollFieldsProps) {
@@ -28,21 +24,12 @@ export default function PollFields({
     const newOptions = [...options];
     newOptions[index] = value;
     onChange({ options: newOptions, duration });
-
-    // Update form values if setValue is available
-    if (setValue) {
-      setValue('poll_options', newOptions, { shouldValidate: true });
-    }
   };
 
   const handleAddOption = () => {
     if (options.length < 4) {
       const newOptions = [...options, ''];
       onChange({ options: newOptions, duration });
-
-      if (setValue) {
-        setValue('poll_options', newOptions, { shouldValidate: true });
-      }
     }
   };
 
@@ -50,20 +37,12 @@ export default function PollFields({
     if (options.length > 2) {
       const newOptions = options.filter((_, i) => i !== index);
       onChange({ options: newOptions, duration });
-
-      if (setValue) {
-        setValue('poll_options', newOptions, { shouldValidate: true });
-      }
     }
   };
 
   const handleDurationChange = (value: string) => {
     const numValue = parseInt(value) || 24;
     onChange({ options, duration: numValue });
-
-    if (setValue) {
-      setValue('poll_duration_hours', numValue, { shouldValidate: true });
-    }
   };
 
   return (

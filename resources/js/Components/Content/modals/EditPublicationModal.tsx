@@ -34,6 +34,9 @@ import { Lock, Save } from 'lucide-react';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useWatch } from 'react-hook-form';
 import { Trans } from 'react-i18next';
+import PlatformCharacterValidator from '@/Components/Content/Publication/common/PlatformCharacterValidator';
+import VideoValidationAlert from '@/Components/Content/modals/publish/VideoValidationAlert';
+import { useTokenHealth } from '@/Hooks/useTokenHealth';
 
 const parseUserAgent = (userAgent?: string): string => {
   if (!userAgent) return 'Unknown Device';
@@ -81,6 +84,9 @@ const EditPublicationModal = ({
   const [isTimelineExpanded, setIsTimelineExpanded] = useState(false);
   const [isApprovalHistoryExpanded, setIsApprovalHistoryExpanded] = useState(false);
   const [isYouTubeThumbnailExpanded, setIsYouTubeThumbnailExpanded] = useState(true);
+
+  const { invalidAccountIds, expiringSoonAccountIds } = useTokenHealth();
+  const [isTextValid, setIsTextValid] = useState(true);
 
   const modalRef = useModalFocusTrap(isOpen);
 
@@ -236,39 +242,41 @@ const EditPublicationModal = ({
   // Auto-deselect incompatible platforms when capabilities are loaded
   useEffect(() => {
     if (!capabilities || capabilitiesLoading || !isOpen) return;
-    
+
     const currentSelected = selectedSocialAccounts || [];
     const incompatibleAccounts: number[] = [];
     const incompatibleReasons: Record<number, string[]> = {};
-    
+
     currentSelected.forEach((accountId: number) => {
       if (!canPublishToAccount(accountId)) {
         incompatibleAccounts.push(accountId);
         incompatibleReasons[accountId] = getAccountErrors(accountId);
       }
     });
-    
+
     if (incompatibleAccounts.length > 0) {
-      const newSelected = currentSelected.filter((id: number) => !incompatibleAccounts.includes(id));
-      
+      const newSelected = currentSelected.filter(
+        (id: number) => !incompatibleAccounts.includes(id),
+      );
+
       // Update form value
       setValue('social_accounts', newSelected, { shouldDirty: true });
-      
+
       // Show toast notification explaining why platforms were deselected
       incompatibleAccounts.forEach((accountId) => {
         const account = socialAccounts.find((a) => a.id === accountId);
         if (account) {
-          const reasons = incompatibleReasons[accountId];
+          const reasons = incompatibleReasons[accountId] || [];
           toast.error(
             `${account.platform} (@${account.account_name}) fue desmarcado: ${reasons.join(', ')}`,
-            { duration: 6000 }
+            { duration: 6000 },
           );
         }
       });
-      
+
       console.log('Auto-deselected incompatible platforms:', {
         incompatibleAccounts,
-        reasons: incompatibleReasons
+        reasons: incompatibleReasons,
       });
     }
   }, [capabilities, capabilitiesLoading, isOpen, publication?.id]);
@@ -799,18 +807,21 @@ const EditPublicationModal = ({
                     ))}
 
                   {/* Video Validation Alert */}
-                  {mediaFiles.some(f => f.type?.startsWith('video/')) && (
+                  {mediaFiles.some((f) => f.type?.startsWith('video/')) && (
                     <VideoValidationAlert
                       selectedAccountIds={watched.social_accounts || []}
-                      videoDuration={(() => {
-                        const videoFile = mediaFiles.find(f => f.type?.startsWith('video/'));
-                        return videoFile ? videoMetadata[videoFile.tempId]?.duration : undefined;
+                      {...(() => {
+                        const videoFile = mediaFiles.find((f) => f.type?.startsWith('video/'));
+                        const duration = videoFile
+                          ? videoMetadata[videoFile.tempId]?.duration
+                          : undefined;
+                        return duration !== undefined ? { videoDuration: duration } : {};
                       })()}
                       fileSizeMb={(() => {
-                        const videoFile = mediaFiles.find(f => f.type?.startsWith('video/'));
-                        return videoFile?.size ? videoFile.size / (1024 * 1024) : 0;
+                        const videoFile = mediaFiles.find((f) => f.type?.startsWith('video/'));
+                        return videoFile?.file?.size ? videoFile.file.size / (1024 * 1024) : 0;
                       })()}
-                      onValidationComplete={(valid, results) => {
+                      onValidationComplete={(valid: boolean, results: any) => {
                         // Opcional: puedes usar esto para mostrar errores
                         console.log('Video validation:', valid, results);
                       }}
@@ -854,6 +865,15 @@ const EditPublicationModal = ({
                     disabled={hasPublishedPlatform || isContentSectionDisabled}
                     contentType={content_type}
                   />
+
+                  <div className="mt-2">
+                    <PlatformCharacterValidator
+                      text={watched.description || ''}
+                      selectedAccountIds={watched.social_accounts || []}
+                      socialAccounts={socialAccounts as any}
+                      onValidChange={setIsTextValid}
+                    />
+                  </div>
                 </div>
 
                 {/* ==================== SECCIÓN: CAMPOS ESPECÍFICOS DE POLL ==================== */}
@@ -870,8 +890,6 @@ const EditPublicationModal = ({
                           shouldValidate: true,
                         });
                       }}
-                      register={register}
-                      setValue={setValue}
                       t={t}
                       errors={{
                         options: errors.poll_options?.message as string,
@@ -987,6 +1005,8 @@ const EditPublicationModal = ({
                     videoMetadata={videoMetadata}
                     mediaFiles={mediaFiles}
                     disabled={isContentSectionDisabled || !allowConfiguration || !canManageAccounts}
+                    invalidTokenAccountIds={invalidAccountIds}
+                    expiringSoonAccountIds={expiringSoonAccountIds}
                     {...(publication?.social_post_logs
                       ? { socialPostLogs: publication.social_post_logs }
                       : {})}
@@ -1006,7 +1026,7 @@ const EditPublicationModal = ({
                       if (video) clearThumbnail(video.tempId);
                     }}
                     thumbnails={thumbnails as any}
-                    publication={publication}
+                    publication={publication ?? undefined}
                   />
                 </div>
 
@@ -1179,6 +1199,7 @@ const EditPublicationModal = ({
         <ModalFooter
           onClose={handleClose}
           isSubmitting={isSubmitting || isContentSectionDisabled}
+          disableSubmit={!isTextValid}
           formId="edit-publication-form"
           submitText={
             uploading

@@ -22,8 +22,11 @@ import { ToastService } from '@/Services/ToastService';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { FileText, Hash, Save, Target } from 'lucide-react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useWatch } from 'react-hook-form';
+import PlatformCharacterValidator from '@/Components/Content/Publication/common/PlatformCharacterValidator';
+import VideoValidationAlert from '@/Components/Content/modals/publish/VideoValidationAlert';
+import { useTokenHealth } from '@/Hooks/useTokenHealth';
 
 interface AddPublicationModalProps {
   isOpen: boolean;
@@ -42,6 +45,9 @@ export default function AddPublicationModal({
   const canManageAccounts = auth.current_workspace?.permissions?.includes('manage-accounts');
   const planId = auth.current_workspace?.plan?.toLowerCase() || 'demo';
   const hasRecurrenceAccess = ['demo', 'professional', 'enterprise'].includes(planId);
+
+  const { invalidAccountIds, expiringSoonAccountIds } = useTokenHealth();
+  const [isTextValid, setIsTextValid] = useState(true);
 
   const {
     t,
@@ -404,18 +410,21 @@ export default function AddPublicationModal({
                 )}
 
                 {/* Video Validation Alert */}
-                {mediaFiles.some(f => f.type?.startsWith('video/')) && (
+                {mediaFiles.some((f) => f.type?.startsWith('video/')) && (
                   <VideoValidationAlert
                     selectedAccountIds={watched.social_accounts || []}
-                    videoDuration={(() => {
-                      const videoFile = mediaFiles.find(f => f.type?.startsWith('video/'));
-                      return videoFile ? videoMetadata[videoFile.tempId]?.duration : undefined;
+                    {...(() => {
+                      const videoFile = mediaFiles.find((f) => f.type?.startsWith('video/'));
+                      const duration = videoFile
+                        ? videoMetadata[videoFile.tempId]?.duration
+                        : undefined;
+                      return duration !== undefined ? { videoDuration: duration } : {};
                     })()}
                     fileSizeMb={(() => {
-                      const videoFile = mediaFiles.find(f => f.type?.startsWith('video/'));
-                      return videoFile?.size ? videoFile.size / (1024 * 1024) : 0;
+                      const videoFile = mediaFiles.find((f) => f.type?.startsWith('video/'));
+                      return videoFile?.file?.size ? videoFile.file.size / (1024 * 1024) : 0;
                     })()}
-                    onValidationComplete={(valid, results) => {
+                    onValidationComplete={(valid: boolean, results: any) => {
                       console.log('Video validation:', valid, results);
                     }}
                   />
@@ -462,6 +471,8 @@ export default function AddPublicationModal({
                       : {})}
                     contentType={content_type}
                     disabled={!canManageAccounts}
+                    invalidTokenAccountIds={invalidAccountIds}
+                    expiringSoonAccountIds={expiringSoonAccountIds}
                   />
                 </div>
 
@@ -562,19 +573,20 @@ export default function AddPublicationModal({
                       }}
                       onSuggest={(data) => {
                         if (data.title)
-                          setValue('title', data.title, {
+                          setValue('title', data.title as string, {
                             shouldValidate: true,
                           });
                         if (data.description)
-                          setValue('description', data.description, {
+                          setValue('description', data.description as string, {
                             shouldValidate: true,
                           });
-                        if (data.goal) setValue('goal', data.goal, { shouldValidate: true });
+                        if (data.goal)
+                          setValue('goal', data.goal as string, { shouldValidate: true });
                         if (data.hashtags) {
-                          setValue('hashtags', data.hashtags, {
+                          setValue('hashtags', data.hashtags as string, {
                             shouldValidate: true,
                           });
-                          handleHashtagChange(data.hashtags);
+                          handleHashtagChange(data.hashtags as string);
                         }
                       }}
                     />
@@ -621,6 +633,15 @@ export default function AddPublicationModal({
                     showCharCount
                     hint={`Maximum ${content_type === 'reel' ? 300 : content_type === 'story' ? 150 : content_type === 'poll' ? 280 : 700} characters`}
                   />
+
+                  <div className="mt-2">
+                    <PlatformCharacterValidator
+                      text={watched.description || ''}
+                      selectedAccountIds={watched.social_accounts || []}
+                      socialAccounts={socialAccounts as any}
+                      onValidChange={setIsTextValid}
+                    />
+                  </div>
 
                   {fieldVisibility.showGoal && (
                     <Input
@@ -711,6 +732,7 @@ export default function AddPublicationModal({
           <ModalFooter
             onClose={handleClose}
             isSubmitting={isSubmitting || uploading} // Block on upload too
+            disableSubmit={!isTextValid}
             formId="add-publication-form"
             submitText={
               uploading ? `Uploading...` : t('publications.button.add') || 'Save Publication'
