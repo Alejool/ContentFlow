@@ -5,6 +5,7 @@ use App\Http\Controllers\Logs\SocialPostLogController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
+  Route::get('/social-accounts/token-health', [SocialAccountController::class, 'tokenHealth'])->name('social-accounts.token-health');
   Route::apiResource('social-accounts', SocialAccountController::class)->names([
     'index' => 'index',
     'store' => 'store',

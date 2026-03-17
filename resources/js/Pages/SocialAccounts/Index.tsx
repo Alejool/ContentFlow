@@ -60,7 +60,9 @@ export default function Index({ accounts, allowedPlatforms }: SocialAccountsInde
   };
 
   const handleDisconnect = async (accountId: number) => {
-    if (!confirm(t('socialAccounts.confirmDisconnect', '¿Estás seguro de desconectar esta cuenta?'))) {
+    if (
+      !confirm(t('socialAccounts.confirmDisconnect', '¿Estás seguro de desconectar esta cuenta?'))
+    ) {
       return;
     }
 

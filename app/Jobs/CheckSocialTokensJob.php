@@ -8,9 +8,12 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Social\SocialAccount;
+use App\Models\User;
+use App\Notifications\SocialTokenExpiryNotification;
 use App\Services\SocialTokenManager;
 use App\Helpers\LogHelper;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 class CheckSocialTokensJob implements ShouldQueue
 {
@@ -107,6 +110,54 @@ class CheckSocialTokensJob implements ShouldQueue
                     ];
                 })->toArray()
             ]);
+        }
+
+        // Proactively notify workspace owners about tokens expiring soon
+        $this->sendExpiryNotifications();
+    }
+
+    /**
+     * Find accounts expiring within 7 days and send notification to workspace owners.
+     * Uses a cache key to avoid sending the same notification more than once per day.
+     */
+    private function sendExpiryNotifications(): void
+    {
+        $thresholds = [1, 3, 7]; // Days before expiry to notify
+
+        foreach ($thresholds as $days) {
+            $windowStart = now()->addDays($days - 1);
+            $windowEnd   = now()->addDays($days);
+
+            $accounts = SocialAccount::where('is_active', true)
+                ->whereNotNull('token_expires_at')
+                ->whereBetween('token_expires_at', [$windowStart, $windowEnd])
+                ->with('user:id,name,email')
+                ->get();
+
+            foreach ($accounts as $account) {
+                // De-duplicate: only notify once per day per account per threshold
+                $cacheKey = "token_expiry_notif_{$account->id}_{$days}d";
+                if (Cache::has($cacheKey)) {
+                    continue;
+                }
+
+                // Notify the account owner
+                $owner = $account->user;
+                if ($owner) {
+                    $daysLeft = (int) ceil($account->token_expires_at->diffInHours(now()) / 24);
+                    $owner->notify(new SocialTokenExpiryNotification($account, $daysLeft));
+
+                    LogHelper::social('token_check.expiry_notification_sent', [
+                        'account_id'  => $account->id,
+                        'platform'    => $account->platform,
+                        'days_left'   => $daysLeft,
+                        'user_id'     => $owner->id,
+                    ]);
+                }
+
+                // Cache for 23 hours to avoid duplicate notifications
+                Cache::put($cacheKey, true, now()->addHours(23));
+            }
         }
     }
 }

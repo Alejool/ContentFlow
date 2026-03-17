@@ -13,11 +13,11 @@ import React, { memo, useMemo, useState } from 'react';
  * Check if a platform is compatible with the selected content type
  * IMPORTANT: This only checks if the platform SUPPORTS the content type
  * NOT if the content meets the platform's limits (duration, file size, etc.)
- * 
+ *
  * Examples:
  * - carousel on Twitter = NOT compatible (Twitter doesn't support carousel)
  * - video on YouTube = compatible (even if video is too long for unverified account)
- * 
+ *
  * For limit validation, use VideoValidationAlert component
  */
 function isPlatformCompatible(platform: string, contentType?: ContentType): boolean {
@@ -57,7 +57,6 @@ interface MediaFile {
   mime_type?: string;
   file_type?: string;
   file_name?: string;
-  [key: string]: unknown;
 }
 
 interface SocialAccountsSectionProps {
@@ -87,6 +86,10 @@ interface SocialAccountsSectionProps {
   onThumbnailDelete?: (videoId: number) => void;
   thumbnails?: Record<string, { file?: File; url?: string }>;
   publication?: { media_files?: { file_type?: string; mime_type?: string; file_name?: string }[] };
+  /** Account IDs whose token is expired or invalid — their toggle will be disabled */
+  invalidTokenAccountIds?: number[];
+  /** Account IDs whose token is expiring within 7 days — shown with a warning badge */
+  expiringSoonAccountIds?: number[];
 }
 
 const SchedulePopoverContent = memo(
@@ -229,6 +232,10 @@ interface SocialAccountItemProps {
     | undefined;
   isYouTubeThumbnailExpanded?: boolean | undefined;
   setIsYouTubeThumbnailExpanded?: ((expanded: boolean) => void) | undefined;
+  /** Token is expired or invalid — disables toggle */
+  isTokenInvalid?: boolean;
+  /** Token expiring in ≤7 days — shows amber warning badge */
+  isTokenExpiringSoon?: boolean;
 }
 
 const SocialAccountItem = memo(
@@ -262,10 +269,17 @@ const SocialAccountItem = memo(
     isYouTubeThumbnailExpanded = true,
     setIsYouTubeThumbnailExpanded,
     contentType,
+    isTokenInvalid = false,
+    isTokenExpiringSoon = false,
   }: SocialAccountItemProps) => {
     const isPlatformIncompatible = !isPlatformCompatible(account.platform, contentType);
     const isInternalDisabled =
-      isPublished || isPublishing || isUnpublishing || disabled || isPlatformIncompatible;
+      isPublished ||
+      isPublishing ||
+      isUnpublishing ||
+      disabled ||
+      isPlatformIncompatible ||
+      isTokenInvalid;
     const isCheckedActually = isChecked || isPublished || isPublishing || isUnpublishing;
 
     const complianceInfo = React.useMemo(() => {
@@ -344,6 +358,19 @@ const SocialAccountItem = memo(
                       </div>
                     </div>
                   </div>
+                )}
+                {/* Token health badges */}
+                {isTokenInvalid && (
+                  <span className="flex items-center gap-1 rounded-full bg-red-100 px-1.5 py-0.5 text-[9px] font-bold uppercase text-red-700 dark:bg-red-900/40 dark:text-red-300">
+                    <AlertTriangle className="h-2.5 w-2.5" />
+                    Token inválido
+                  </span>
+                )}
+                {!isTokenInvalid && isTokenExpiringSoon && (
+                  <span className="flex items-center gap-1 rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold uppercase text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+                    <Clock className="h-2.5 w-2.5" />
+                    Token por vencer
+                  </span>
                 )}
                 {account.isDisconnected && (
                   <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold uppercase text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
@@ -468,28 +495,40 @@ const SocialAccountItem = memo(
                         {errorMessage}
                       </div>
                       {/* Botón de reconexión si el error es de OAuth 1.0a */}
-                      {(errorMessage.includes('OAuth 1.0a') || errorMessage.includes('credenciales')) && account.platform === 'twitter' && (
-                        <button
-                          onClick={async (e) => {
-                            e.stopPropagation();
-                            try {
-                              const response = await fetch(`/social-accounts/auth-url/twitter`);
-                              const data = await response.json();
-                              if (data.success && data.url) {
-                                window.location.href = data.url;
+                      {(errorMessage.includes('OAuth 1.0a') ||
+                        errorMessage.includes('credenciales')) &&
+                        account.platform === 'twitter' && (
+                          <button
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              try {
+                                const response = await fetch(`/social-accounts/auth-url/twitter`);
+                                const data = await response.json();
+                                if (data.success && data.url) {
+                                  window.location.href = data.url;
+                                }
+                              } catch (error) {
+                                console.error('Error al obtener URL de reconexión:', error);
                               }
-                            } catch (error) {
-                              console.error('Error al obtener URL de reconexión:', error);
-                            }
-                          }}
-                          className="flex items-center justify-center gap-1 rounded border border-blue-300 bg-blue-50 px-2 py-1 text-[10px] font-medium text-blue-700 transition-colors hover:bg-blue-100 dark:border-blue-700 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50"
-                        >
-                          <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                          </svg>
-                          Reconectar cuenta ahora
-                        </button>
-                      )}
+                            }}
+                            className="flex items-center justify-center gap-1 rounded border border-blue-300 bg-blue-50 px-2 py-1 text-[10px] font-medium text-blue-700 transition-colors hover:bg-blue-100 dark:border-blue-700 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50"
+                          >
+                            <svg
+                              className="h-3 w-3"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                              />
+                            </svg>
+                            Reconectar cuenta ahora
+                          </button>
+                        )}
                     </div>
                   )}
                 </div>
@@ -609,6 +648,8 @@ const SocialAccountsSection = memo(
     onThumbnailDelete,
     thumbnails,
     publication,
+    invalidTokenAccountIds = [],
+    expiringSoonAccountIds = [],
   }: SocialAccountsSectionProps) => {
     const [activePopover, setActivePopover] = useState<number | null>(null);
     const [isYouTubeThumbnailExpanded, setIsYouTubeThumbnailExpanded] = useState(true);
@@ -741,6 +782,8 @@ const SocialAccountsSection = memo(
                 isYouTubeThumbnailExpanded={isYouTubeThumbnailExpanded}
                 setIsYouTubeThumbnailExpanded={setIsYouTubeThumbnailExpanded}
                 contentType={contentType}
+                isTokenInvalid={invalidTokenAccountIds.includes(account.id)}
+                isTokenExpiringSoon={expiringSoonAccountIds.includes(account.id)}
               />
             );
           })}

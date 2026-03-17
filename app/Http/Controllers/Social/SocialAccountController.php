@@ -1074,6 +1074,51 @@ class SocialAccountController extends Controller
     }
   }
 
+  /**
+   * GET /api/v1/social-accounts/token-health
+   *
+   * Returns the token health status for every social account in the
+   * current workspace. Used by the frontend to disable accounts whose
+   * tokens are invalid or about to expire.
+   */
+  public function tokenHealth(): \Illuminate\Http\JsonResponse
+  {
+    $workspaceId = Auth::user()->current_workspace_id;
+
+    $accounts = SocialAccount::where('workspace_id', $workspaceId)
+      ->where('is_active', true)
+      ->get(['id', 'platform', 'account_name', 'is_active', 'token_expires_at', 'failure_count']);
+
+    $result = $accounts->map(function (SocialAccount $account) {
+      $expiresAt   = $account->token_expires_at;
+      $now         = now();
+
+      if (!$account->is_active || $account->failure_count >= 3) {
+        $status       = 'expired';
+        $daysRemaining = null;
+      } elseif ($expiresAt && $expiresAt->isPast()) {
+        $status       = 'expired';
+        $daysRemaining = null;
+      } elseif ($expiresAt && $expiresAt->diffInDays($now) <= 7) {
+        $status       = 'expiring_soon';
+        $daysRemaining = (int) ceil($expiresAt->diffInHours($now) / 24);
+      } else {
+        $status       = 'valid';
+        $daysRemaining = null;
+      }
+
+      return [
+        'id'             => $account->id,
+        'platform'       => $account->platform,
+        'account_name'   => $account->account_name,
+        'status'         => $status,
+        'days_remaining' => $daysRemaining,
+      ];
+    })->values()->toArray();
+
+    return response()->json(['accounts' => $result]);
+  }
+
   public function destroy(Request $request, $id)
   {
     try {

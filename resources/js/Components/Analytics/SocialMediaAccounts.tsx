@@ -133,7 +133,10 @@ export default function SocialMediaAccounts({
                 {t('socialAccounts.demoMode.title', 'Datos de Demostración')}
               </h4>
               <p className="mb-3 text-sm text-blue-800 dark:text-blue-300">
-                {t('socialAccounts.demoMode.description', 'No tienes cuentas sociales conectadas. Los datos mostrados son ejemplos para que conozcas la interfaz.')}
+                {t(
+                  'socialAccounts.demoMode.description',
+                  'No tienes cuentas sociales conectadas. Los datos mostrados son ejemplos para que conozcas la interfaz.',
+                )}
               </p>
               <Link
                 href={route('social-accounts.index')}
