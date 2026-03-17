@@ -27,6 +27,12 @@ interface PlatformCardProps {
   RecurringPostsSection?: React.ComponentType<any>;
   getRecurringPosts?: (pubId: number, accId: number) => any[];
   getPublishedRecurringPosts?: (pubId: number, accId: number) => any[];
+  // Capabilities props
+  canPublish?: boolean;
+  capabilityErrors?: string[];
+  capabilityWarnings?: string[];
+  upgradeMessage?: string | null;
+  capabilityMetadata?: any;
 }
 
 const PlatformCard = memo(
@@ -50,6 +56,11 @@ const PlatformCard = memo(
     RecurringPostsSection,
     getRecurringPosts,
     getPublishedRecurringPosts,
+    canPublish = true,
+    capabilityErrors = [],
+    capabilityWarnings = [],
+    upgradeMessage = null,
+    capabilityMetadata,
   }: PlatformCardProps) => {
     const iconSrc = getPlatformConfig(account.platform).logo;
     const isRetrying = platformRetryInfo?.is_retrying || false;
@@ -74,7 +85,8 @@ const PlatformCard = memo(
       !isRetrying &&
       !isDuplicate &&
       !isDuplicateAttempt &&
-      !needsOAuth1Reconnection;
+      !needsOAuth1Reconnection &&
+      canPublish; // Add capability check
 
     const handleReconnect = async (e: React.MouseEvent) => {
       e.stopPropagation();
@@ -158,9 +170,11 @@ const PlatformCard = memo(
             }
           }}
           className={`relative flex h-[110px] w-full flex-col gap-3 rounded-lg border-2 p-4 transition-all ${
-            canToggle ? 'cursor-pointer' : 'cursor-default'
+            canToggle ? 'cursor-pointer' : 'cursor-not-allowed'
           } ${
-            isDuplicate || isDuplicateAttempt
+            !canPublish && !isPublished && !isScheduled
+              ? 'border-red-300 bg-red-50/50 opacity-75 dark:border-red-700 dark:bg-red-900/20'
+              : isDuplicate || isDuplicateAttempt
               ? 'border-orange-500 bg-orange-50 shadow-md dark:border-orange-600 dark:bg-orange-900/30'
               : isPublishing || isRetrying
                 ? 'border-yellow-500 bg-yellow-50 shadow-md dark:border-yellow-600 dark:bg-yellow-900/30'
@@ -262,7 +276,7 @@ const PlatformCard = memo(
           )}
 
           {/* Duplicate Attempt Overlay */}
-          {(isDuplicate || isDuplicateAttempt) && !isPublished && !isScheduled && (
+          {/* {(isDuplicate || isDuplicateAttempt) && !isPublished && !isScheduled && (
             <div className="animate-in fade-in absolute inset-0 z-30 flex flex-col items-center justify-center rounded-lg bg-orange-50/95 backdrop-blur-sm duration-300 dark:bg-orange-900/30">
               <div className="flex flex-col items-center gap-2">
                 <div className="relative flex-shrink-0">
@@ -282,31 +296,17 @@ const PlatformCard = memo(
                     </svg>
                   </div>
                 </div>
-                <div className="flex flex-col items-center gap-0.5">
-                  <span className="text-sm font-bold capitalize tracking-wide text-orange-800 dark:text-orange-300">
-                    {account.platform}
-                  </span>
-                  <span className="text-center text-xs font-medium text-orange-600 dark:text-orange-400">
-                    {t('publications.modal.publish.duplicate') || 'Intento duplicado'}
-                  </span>
-                  {originalAttemptAt && (
-                    <span className="mt-1 text-center text-xs text-orange-500 dark:text-orange-500">
-                      {t('publications.modal.publish.original_attempt') || 'Intento original:'}{' '}
-                      {new Date(originalAttemptAt).toLocaleString()}
-                    </span>
-                  )}
-                </div>
               </div>
             </div>
-          )}
+          )} */}
 
           {/* OAuth 1.0a Missing Overlay for Twitter Video */}
           {needsOAuth1Reconnection && !isPublishing && !isUnpublishing && (
             <div className="animate-in fade-in absolute inset-0 z-30 flex flex-col items-center justify-center rounded-lg bg-amber-50/95 backdrop-blur-sm duration-300 dark:bg-amber-900/30">
               <div className="flex flex-col items-center gap-2 px-3">
-                <AlertTriangle className="h-10 w-10 text-amber-600 dark:text-amber-400" />
+                <AlertTriangle className="h-7 w-7 text-amber-600 dark:text-amber-400" />
                 <div className="flex flex-col items-center gap-0.5">
-                  <span className="text-sm font-bold capitalize tracking-wide text-amber-800 dark:text-amber-300">
+                  <span className="text-xs font-bold capitalize tracking-wide text-amber-800 dark:text-amber-300">
                     {account.platform}
                   </span>
                   <span className="text-center text-xs font-medium text-amber-700 dark:text-amber-400">
@@ -318,13 +318,42 @@ const PlatformCard = memo(
                   </span>
                 </div>
                 
-                <button
+                {/* <button
                   onClick={handleReconnect}
                   className="pointer-events-auto mt-2 flex items-center gap-1.5 rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600"
                 >
                   <RefreshCw className="h-3.5 w-3.5" />
                   {t('publications.modal.publish.reconnect_account') || 'Reconectar cuenta'}
-                </button>
+                </button> */}
+              </div>
+            </div>
+          )}
+
+          {/* Capability Error Overlay - Platform cannot publish this content */}
+          {!canPublish && !isPublishing && !isUnpublishing && !isPublished && !isScheduled && capabilityErrors.length > 0 && (
+            <div className="animate-in fade-in absolute inset-0 z-30 flex flex-col items-center justify-center rounded-lg bg-red-50/95 backdrop-blur-sm duration-300 dark:bg-red-900/30">
+              <div className="flex flex-col items-center gap-2 px-3">
+                <XCircle className="h-10 w-10 text-red-600 dark:text-red-400" />
+                <div className="flex flex-col items-center gap-0.5">
+                  <span className="text-sm font-bold capitalize tracking-wide text-red-800 dark:text-red-300">
+                    {account.platform}
+                  </span>
+                  <span className="text-center text-xs font-medium text-red-700 dark:text-red-400">
+                    {t('publications.modal.publish.cannot_publish') || 'No se puede publicar'}
+                  </span>
+                  <div className="mt-2 max-w-[200px] space-y-1">
+                    {capabilityErrors.map((error, idx) => (
+                      <div key={idx} className="text-center text-[10px] leading-tight text-red-600 dark:text-red-500">
+                        • {error}
+                      </div>
+                    ))}
+                  </div>
+                  {upgradeMessage && (
+                    <div className="mt-2 rounded-lg border border-red-200 bg-red-100 px-2 py-1 text-center text-[10px] font-medium text-red-700 dark:border-red-800 dark:bg-red-900/40 dark:text-red-400">
+                      💡 {upgradeMessage}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}
@@ -403,6 +432,15 @@ const PlatformCard = memo(
                 </div>
               );
             })()}
+
+          {/* Capability Warnings Badge */}
+          {/* {canPublish && capabilityWarnings.length > 0 && !isPublishing && !isUnpublishing && !isPublished && (
+            <div className="absolute left-2 top-2 z-10 flex items-center gap-1 rounded-lg border border-amber-200 bg-amber-50 px-2 py-1 text-[10px] font-bold text-amber-600 shadow-sm dark:border-amber-800/30 dark:bg-amber-900/30 dark:text-amber-400"
+                 title={capabilityWarnings.join(', ')}>
+              <AlertTriangle className="h-3 w-3" />
+              <span className="leading-none">{capabilityWarnings.length} {t('common.warning', 'Advertencia')}</span>
+            </div>
+          )} */}
 
           {/* Platform Logo and Info */}
           <div className="z-10 flex items-center gap-3">

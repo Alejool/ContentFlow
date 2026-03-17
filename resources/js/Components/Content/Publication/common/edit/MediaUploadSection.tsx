@@ -1,7 +1,7 @@
 import Label from '@/Components/common/Modern/Label';
 import {
-  getMediaRulesForContentType,
-  type ContentType,
+    getMediaRulesForContentType,
+    type ContentType,
 } from '@/Components/Content/Publication/common/ContentTypeSelector';
 import { AlertTriangle, FileImage, Info, Loader2, Upload, Video, X } from 'lucide-react';
 import React, { memo, useMemo, useRef } from 'react';
@@ -274,8 +274,10 @@ const MediaUploadSection = memo(
                 type="file"
                 className="hidden"
                 multiple={
-                  !mediaRules.videoOnly &&
-                  (mediaRules.maxCount ? mediaRules.maxCount > 1 : (mediaRules.maxImages || 1) > 1)
+                  mediaRules.maxCount
+                    ? mediaRules.maxCount > 1
+                    : !mediaRules.videoOnly &&
+                      ((mediaRules.maxImages || 1) > 1 || (mediaRules.maxVideos || 0) > 1)
                 }
                 accept={acceptedFileTypes}
                 onChange={(e) => onFileChange(e.target.files)}

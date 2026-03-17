@@ -19,6 +19,7 @@ import { useContentType } from '@/Hooks/publication/useContentType';
 import { usePublicationForm } from '@/Hooks/publication/usePublicationForm';
 import { usePublishedPlatforms } from '@/Hooks/publication/usePublicationsList';
 import { useModalFocusTrap } from '@/Hooks/useModalFocusTrap';
+import { usePublicationCapabilities } from '@/Hooks/usePublicationCapabilities';
 import { usePublicationLock } from '@/Hooks/usePublicationLock';
 import { useSocialAccounts } from '@/Hooks/useSocialAccounts';
 import toast from '@/Utils/toast';
@@ -223,6 +224,54 @@ const EditPublicationModal = ({
   const content_type = (useWatch({ control, name: 'content_type' }) as ContentType) || 'post';
   const poll_options = useWatch({ control, name: 'poll_options' }) || ['', ''];
   const poll_duration_hours = useWatch({ control, name: 'poll_duration_hours' }) || 24;
+
+  // Fetch platform capabilities for this publication
+  const {
+    capabilities,
+    loading: capabilitiesLoading,
+    canPublishToAccount,
+    getAccountErrors,
+  } = usePublicationCapabilities(publication?.id || null);
+
+  // Auto-deselect incompatible platforms when capabilities are loaded
+  useEffect(() => {
+    if (!capabilities || capabilitiesLoading || !isOpen) return;
+    
+    const currentSelected = selectedSocialAccounts || [];
+    const incompatibleAccounts: number[] = [];
+    const incompatibleReasons: Record<number, string[]> = {};
+    
+    currentSelected.forEach((accountId: number) => {
+      if (!canPublishToAccount(accountId)) {
+        incompatibleAccounts.push(accountId);
+        incompatibleReasons[accountId] = getAccountErrors(accountId);
+      }
+    });
+    
+    if (incompatibleAccounts.length > 0) {
+      const newSelected = currentSelected.filter((id: number) => !incompatibleAccounts.includes(id));
+      
+      // Update form value
+      setValue('social_accounts', newSelected, { shouldDirty: true });
+      
+      // Show toast notification explaining why platforms were deselected
+      incompatibleAccounts.forEach((accountId) => {
+        const account = socialAccounts.find((a) => a.id === accountId);
+        if (account) {
+          const reasons = incompatibleReasons[accountId];
+          toast.error(
+            `${account.platform} (@${account.account_name}) fue desmarcado: ${reasons.join(', ')}`,
+            { duration: 6000 }
+          );
+        }
+      });
+      
+      console.log('Auto-deselected incompatible platforms:', {
+        incompatibleAccounts,
+        reasons: incompatibleReasons
+      });
+    }
+  }, [capabilities, capabilitiesLoading, isOpen, publication?.id]);
 
   // Use content type hook for field visibility
   const { fieldVisibility } = useContentType(content_type);
@@ -748,6 +797,25 @@ const EditPublicationModal = ({
                         allMediaFiles={publication?.media_files || []}
                       />
                     ))}
+
+                  {/* Video Validation Alert */}
+                  {mediaFiles.some(f => f.type?.startsWith('video/')) && (
+                    <VideoValidationAlert
+                      selectedAccountIds={watched.social_accounts || []}
+                      videoDuration={(() => {
+                        const videoFile = mediaFiles.find(f => f.type?.startsWith('video/'));
+                        return videoFile ? videoMetadata[videoFile.tempId]?.duration : undefined;
+                      })()}
+                      fileSizeMb={(() => {
+                        const videoFile = mediaFiles.find(f => f.type?.startsWith('video/'));
+                        return videoFile?.size ? videoFile.size / (1024 * 1024) : 0;
+                      })()}
+                      onValidationComplete={(valid, results) => {
+                        // Opcional: puedes usar esto para mostrar errores
+                        console.log('Video validation:', valid, results);
+                      }}
+                    />
+                  )}
                 </div>
 
                 {/* ==================== SECCIÓN: CONTENIDO DE LA PUBLICACIÓN ==================== */}

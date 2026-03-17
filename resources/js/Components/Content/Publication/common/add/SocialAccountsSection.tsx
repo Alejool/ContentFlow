@@ -11,6 +11,14 @@ import React, { memo, useMemo, useState } from 'react';
 
 /**
  * Check if a platform is compatible with the selected content type
+ * IMPORTANT: This only checks if the platform SUPPORTS the content type
+ * NOT if the content meets the platform's limits (duration, file size, etc.)
+ * 
+ * Examples:
+ * - carousel on Twitter = NOT compatible (Twitter doesn't support carousel)
+ * - video on YouTube = compatible (even if video is too long for unverified account)
+ * 
+ * For limit validation, use VideoValidationAlert component
  */
 function isPlatformCompatible(platform: string, contentType?: ContentType): boolean {
   if (!contentType) return true;
@@ -329,7 +337,7 @@ const SocialAccountItem = memo(
                     <Info className="h-3.5 w-3.5 text-amber-500 dark:text-amber-400" />
                     <div className="pointer-events-none absolute bottom-full left-0 z-50 mb-2 hidden group-hover:block">
                       <div className="whitespace-nowrap rounded-lg border border-gray-700 bg-gray-900 px-3 py-1.5 text-xs text-white shadow-lg dark:bg-neutral-800">
-                        {`This platform doesn't support ${contentType} content`}
+                        {`${account.platform} doesn't support ${contentType} content type`}
                         <div className="absolute left-4 top-full -mt-px">
                           <div className="border-4 border-transparent border-t-gray-900 dark:border-t-neutral-800"></div>
                         </div>
@@ -455,8 +463,33 @@ const SocialAccountItem = memo(
                     {t('publications.modal.publish.failed') || 'Fallido'}
                   </div>
                   {errorMessage && (
-                    <div className="rounded border border-red-200 bg-red-50 px-2 py-1 text-[10px] text-red-600 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
-                      {errorMessage}
+                    <div className="flex flex-col gap-1.5">
+                      <div className="rounded border border-red-200 bg-red-50 px-2 py-1 text-[10px] text-red-600 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
+                        {errorMessage}
+                      </div>
+                      {/* Botón de reconexión si el error es de OAuth 1.0a */}
+                      {(errorMessage.includes('OAuth 1.0a') || errorMessage.includes('credenciales')) && account.platform === 'twitter' && (
+                        <button
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            try {
+                              const response = await fetch(`/social-accounts/auth-url/twitter`);
+                              const data = await response.json();
+                              if (data.success && data.url) {
+                                window.location.href = data.url;
+                              }
+                            } catch (error) {
+                              console.error('Error al obtener URL de reconexión:', error);
+                            }
+                          }}
+                          className="flex items-center justify-center gap-1 rounded border border-blue-300 bg-blue-50 px-2 py-1 text-[10px] font-medium text-blue-700 transition-colors hover:bg-blue-100 dark:border-blue-700 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50"
+                        >
+                          <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                          </svg>
+                          Reconectar cuenta ahora
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>

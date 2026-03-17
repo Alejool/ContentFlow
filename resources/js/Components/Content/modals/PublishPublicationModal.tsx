@@ -1,11 +1,13 @@
 import Button from '@/Components/common/Modern/Button';
 import YouTubeThumbnailUploader from '@/Components/common/ui/YouTubeThumbnailUploader';
 import PlatformCard from '@/Components/Content/modals/publish/PlatformCard';
+import VideoValidationAlert from '@/Components/Content/modals/publish/VideoValidationAlert';
 import RejectionReasonModal from '@/Components/Content/modals/RejectionReasonModal';
 import { CONTENT_TYPE_CONFIG } from '@/Constants/contentTypes';
 import { getPlatformConfig } from '@/Constants/socialPlatforms';
 import { usePublishPublication } from '@/Hooks/publication/usePublishPublication';
 import { useConfirm } from '@/Hooks/useConfirm';
+import { usePublicationCapabilities } from '@/Hooks/usePublicationCapabilities';
 import { usePublicationStore } from '@/stores/publicationStore';
 import { Publication } from '@/types/Publication';
 import { formatDateTimeStyled } from '@/Utils/dateHelpers';
@@ -126,8 +128,21 @@ export default function PublishPublicationModal({
   const [rejectionModalOpen, setRejectionModalOpen] = useState(false);
   const [isYouTubeThumbnailExpanded, setIsYouTubeThumbnailExpanded] = useState(true);
 
+  // Fetch platform capabilities for this publication
+  const {
+    capabilities,
+    loading: capabilitiesLoading,
+    error: capabilitiesError,
+    getAccountCapability,
+    canPublishToAccount,
+    getAccountErrors,
+    getAccountWarnings,
+    getUpgradeMessage,
+  } = usePublicationCapabilities(publication?.id || null);
+
   const {
     connectedAccounts,
+    isLoadingAccounts,
     selectedPlatforms,
     publishedPlatforms,
     failedPlatforms,
@@ -281,6 +296,7 @@ export default function PublishPublicationModal({
   }, [isOpen, publication?.id]);
 
   // Listen for real-time publication status updates
+  // IMPORTANT: Don't update while actively publishing to prevent data flickering
   useEffect(() => {
     if (!isOpen || !publication || !auth.user?.id || !window.Echo) {
       return;
@@ -290,9 +306,12 @@ export default function PublishPublicationModal({
 
     const handleStatusUpdate = (event: any) => {
       if (event.publicationId === publication.id) {
-        // Refresh published platforms and publication data
-        fetchPublishedPlatforms(publication.id);
-        fetchPublicationById(publication.id);
+        // Only refresh if not currently publishing to prevent modal re-render issues
+        if (!publishing) {
+          // Refresh published platforms and publication data
+          fetchPublishedPlatforms(publication.id);
+          fetchPublicationById(publication.id);
+        }
       }
     };
 
@@ -301,7 +320,7 @@ export default function PublishPublicationModal({
     return () => {
       channel.stopListening('.PublicationStatusUpdated', handleStatusUpdate);
     };
-  }, [isOpen, publication?.id, auth.user?.id]);
+  }, [isOpen, publication?.id, auth.user?.id, publishing]);
 
   // Early return after all hooks
   if (!publication) return null;
@@ -333,6 +352,8 @@ export default function PublishPublicationModal({
   };
 
   // Filter connected accounts based on content type compatibility
+  // IMPORTANT: This only checks if the platform SUPPORTS the content type
+  // NOT if the content meets the platform's limits (duration, file size, etc.)
   const getCompatibleAccounts = () => {
     const contentType = publication.content_type;
     if (!contentType) return connectedAccounts;
@@ -344,6 +365,9 @@ export default function PublishPublicationModal({
   };
 
   const compatibleAccounts = getCompatibleAccounts();
+  
+  // incompatibleAccounts = platforms that DON'T support this content type at all
+  // Example: carousel on Twitter, carousel on LinkedIn
   const incompatibleAccounts = connectedAccounts.filter(
     (account) => !compatibleAccounts.includes(account),
   );
@@ -703,26 +727,46 @@ export default function PublishPublicationModal({
                 </div>
               )}
 
-              <div className="mb-6">
-                <div className="mb-4 flex items-center justify-between">
-                  <div className="flex gap-2">
-                    <button
-                      onClick={selectAll}
-                      className="text-sm font-medium text-primary-500 hover:text-primary-600"
-                    >
-                      {t('publications.modal.publish.selectAll')}
-                    </button>
-                    <span className="text-gray-400 dark:text-gray-600">|</span>
-                    <button
-                      onClick={deselectAll}
-                      className="text-sm font-medium text-primary-500 hover:text-primary-600"
-                    >
-                      {t('publications.modal.publish.deselectAll')}
-                    </button>
-                  </div>
-                </div>
+              {/* Video Validation Alert - Shows when content EXCEEDS platform limits */}
+              {/* This is different from incompatibleAccounts which shows when platform doesn't support the content type */}
+              {(() => {
+                const videoFile = publication?.media_files?.find(m => m.file_type === 'video');
+                if (!videoFile) return null;
+                
+                const videoDuration = videoFile.metadata?.duration;
+                const fileSizeMb = videoFile.size ? videoFile.size / (1024 * 1024) : 0;
+                
+                if (!videoDuration || !fileSizeMb) return null;
+                
+                // Only validate for compatible accounts (accounts that support this content type)
+                const compatibleSelectedAccounts = selectedPlatforms.filter(id => 
+                  compatibleAccounts.some(acc => acc.id === id)
+                );
+                
+                if (compatibleSelectedAccounts.length === 0) return null;
+                
+                return (
+                  <VideoValidationAlert
+                    selectedAccountIds={compatibleSelectedAccounts}
+                    videoDuration={videoDuration}
+                    fileSizeMb={fileSizeMb}
+                    onValidationComplete={(valid: boolean, results: import('@/Hooks/usePlatformCapabilities').VideoValidationResult[]) => {
+                      // Results show which accounts can't publish due to limits
+                      console.log('Video validation:', valid, results);
+                    }}
+                  />
+                );
+              })()}
 
-                {compatibleAccounts.length === 0 ? (
+              <div className="mb-6">
+                {isLoadingAccounts ? (
+                  <div className="rounded-lg bg-gray-50 py-12 text-center dark:bg-neutral-900/50">
+                    <div className="mx-auto h-8 w-8 animate-spin rounded-full border-b-2 border-primary-500"></div>
+                    <p className="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                      {t('publications.modal.publish.loadingAccounts') || 'Cargando cuentas...'}
+                    </p>
+                  </div>
+                ) : compatibleAccounts.length === 0 ? (
                   <div className="rounded-lg bg-gray-50 py-8 text-center dark:bg-neutral-900/50">
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       {connectedAccounts.length === 0 ? (
@@ -755,6 +799,13 @@ export default function PublishPublicationModal({
                       const isUnpublishing = unpublishing === account.id;
                       const platformRetryInfo = retryInfo[account.id];
 
+                      // Get capabilities for this account
+                      const accountCapability = getAccountCapability(account.id);
+                      const canPublish = canPublishToAccount(account.id);
+                      const errors = getAccountErrors(account.id);
+                      const warnings = getAccountWarnings(account.id);
+                      const upgradeMessage = getUpgradeMessage(account.id);
+
                       return (
                         <PlatformCard
                           key={account.id}
@@ -777,6 +828,12 @@ export default function PublishPublicationModal({
                           RecurringPostsSection={RecurringPostsSection}
                           getRecurringPosts={getRecurringPosts}
                           getPublishedRecurringPosts={getPublishedRecurringPosts}
+                          // Capabilities props
+                          canPublish={canPublish}
+                          capabilityErrors={errors}
+                          capabilityWarnings={warnings}
+                          upgradeMessage={upgradeMessage}
+                          capabilityMetadata={accountCapability?.metadata}
                         />
                       );
                     })}

@@ -2,7 +2,7 @@ import { usePublishPublication } from '@/Hooks/publication/usePublishPublication
 import { useManageContentUIStore } from '@/stores/manageContentUIStore';
 import { Campaign } from '@/types/Campaign';
 import { Publication } from '@/types/Publication';
-import { memo } from 'react';
+import React, { memo } from 'react';
 import { createPortal } from 'react-dom';
 
 // Modals
@@ -36,7 +36,7 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
     closeViewDetailsModal,
   } = manageContentUI;
 
-  const { fetchPublishedPlatforms } = usePublishPublication();
+  const { fetchPublishedPlatforms, publishing } = usePublishPublication();
 
   // Helper to determine item type safely
   const isCampaignItem =
@@ -51,11 +51,32 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
 
   // CRITICAL: Get FRESH data from stores to ensure reactivity when background processes update them
   const publications = usePublicationStore((s) => s.publications);
-  const currentPub =
+  
+  // IMPORTANT: Stabilize publication data while publishing to prevent re-renders
+  // that cause connectedAccounts to become empty momentarily
+  const [stablePublication, setStablePublication] = React.useState<Publication | null>(null);
+  
+  React.useEffect(() => {
+    if (isPublishModalOpen && targetIsPublication && selectedItem?.id) {
+      const freshPub = publications.find((p) => p.id === selectedItem.id) as Publication;
+      const pubToUse = freshPub || (selectedItem as Publication);
+      
+      // Only update if not currently publishing to prevent data flickering
+      if (!publishing) {
+        setStablePublication(pubToUse);
+      }
+    } else if (!isPublishModalOpen) {
+      // Reset when modal closes
+      setStablePublication(null);
+    }
+  }, [isPublishModalOpen, targetIsPublication, selectedItem?.id, publications, publishing]);
+  
+  const currentPub = stablePublication || (
     targetIsPublication && selectedItem?.id
       ? (publications.find((p) => p.id === selectedItem.id) as Publication) ||
         (selectedItem as Publication)
-      : null;
+      : null
+  );
 
   // Debug log to track publication updates
   if (currentPub && isEditModalOpen) {

@@ -403,6 +403,24 @@ export default function AddPublicationModal({
                   </div>
                 )}
 
+                {/* Video Validation Alert */}
+                {mediaFiles.some(f => f.type?.startsWith('video/')) && (
+                  <VideoValidationAlert
+                    selectedAccountIds={watched.social_accounts || []}
+                    videoDuration={(() => {
+                      const videoFile = mediaFiles.find(f => f.type?.startsWith('video/'));
+                      return videoFile ? videoMetadata[videoFile.tempId]?.duration : undefined;
+                    })()}
+                    fileSizeMb={(() => {
+                      const videoFile = mediaFiles.find(f => f.type?.startsWith('video/'));
+                      return videoFile?.size ? videoFile.size / (1024 * 1024) : 0;
+                    })()}
+                    onValidationComplete={(valid, results) => {
+                      console.log('Video validation:', valid, results);
+                    }}
+                  />
+                )}
+
                 {/* ==================== SECCIÓN: REDES SOCIALES ==================== */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700">
