@@ -65,6 +65,22 @@ const mobileNavigationItems = [
   { nameKey: 'nav.workspaces', href: 'workspaces.index', lucideIcon: Layers },
 ];
 
+const safeRoute = (name: string, params?: Record<string, any>): string => {
+  try {
+    return route(name, params);
+  } catch {
+    return '#';
+  }
+};
+
+const safeIsActive = (name: string): boolean => {
+  try {
+    return !!route().current(name);
+  } catch {
+    return false;
+  }
+};
+
 export default function MobileNavbar({
   user,
   showingNavigationDropdown,
@@ -74,7 +90,7 @@ export default function MobileNavbar({
   const { actualTheme } = useTheme();
   const { auth } = usePage().props as any;
 
-  const isProfileActive = !!route().current('profile.edit');
+  const isProfileActive = safeIsActive('profile.edit');
 
   const whiteLabelLogo = auth?.current_workspace?.white_label_logo_url;
 
@@ -96,7 +112,7 @@ export default function MobileNavbar({
 
   return (
     <nav
-      className={`${isSticky ? 'sticky top-0' : 'relative'} z-50 w-full shadow-lg backdrop-blur-2xl transition-all duration-300 lg:hidden py-2 ${
+      className={`${isSticky ? 'sticky top-0' : 'relative'} z-50 w-full py-2 shadow-lg backdrop-blur-2xl transition-all duration-300 lg:hidden ${
         actualTheme === 'dark'
           ? 'border-b border-neutral-800 bg-neutral-900/90'
           : 'border-b border-gray-200 bg-white/90'
@@ -154,11 +170,11 @@ export default function MobileNavbar({
           >
             <div className="space-y-1 px-4 py-6">
               {filteredMobileNavigationItems.map((item) => {
-                const isActive = !!route().current(item.href);
+                const isActive = safeIsActive(item.href);
                 return (
                   <ResponsiveNavLink
                     key={item.href}
-                    href={route(item.href)}
+                    href={safeRoute(item.href)}
                     active={isActive}
                     className={`flex items-center space-x-3 rounded-lg px-4 py-3 transition-all duration-300 ${
                       isActive
@@ -183,7 +199,7 @@ export default function MobileNavbar({
                 className={`mt-4 border-t pt-4 ${actualTheme === 'dark' ? 'border-neutral-800' : 'border-gray-100'}`}
               >
                 <ResponsiveNavLink
-                  href={route('logout')}
+                  href={safeRoute('logout')}
                   method="post"
                   as="button"
                   className={`flex w-full items-center justify-center space-x-3 rounded-lg border px-4 py-3 font-bold transition-all duration-300 ${

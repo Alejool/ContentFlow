@@ -46,8 +46,10 @@ export const queryKeys = {
 
   socialAccounts: {
     all: ['social-accounts'] as const,
-    capabilities: (accountId?: number | null) => 
-      accountId ? ['social-accounts', 'capabilities', accountId] as const : ['social-accounts', 'capabilities'] as const,
+    capabilities: (accountId?: number | null) =>
+      accountId
+        ? (['social-accounts', 'capabilities', accountId] as const)
+        : (['social-accounts', 'capabilities'] as const),
   },
 
   logs: {
