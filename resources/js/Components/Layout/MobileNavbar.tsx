@@ -36,7 +36,7 @@ function NavLogo({
         fallbackSrc={fallbackSrc}
         alt=""
         eager={true}
-        className={`w-auto object-contain ${isWhiteLabel ? 'h-24' : 'h-20'}`}
+        className={`w-auto object-contain ${isWhiteLabel ? 'h-16' : 'h-20'}`}
       />
     </div>
   );
@@ -96,7 +96,7 @@ export default function MobileNavbar({
 
   return (
     <nav
-      className={`${isSticky ? 'sticky top-0' : 'relative'} z-50 w-full shadow-lg backdrop-blur-2xl transition-all duration-300 lg:hidden ${
+      className={`${isSticky ? 'sticky top-0' : 'relative'} z-50 w-full shadow-lg backdrop-blur-2xl transition-all duration-300 lg:hidden py-2 ${
         actualTheme === 'dark'
           ? 'border-b border-neutral-800 bg-neutral-900/90'
           : 'border-b border-gray-200 bg-white/90'
