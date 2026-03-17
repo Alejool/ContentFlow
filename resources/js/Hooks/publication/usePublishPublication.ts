@@ -41,6 +41,7 @@ export interface PublishPublicationState {
 
 export interface UsePublishPublicationReturn extends PublishPublicationState {
   connectedAccounts: SocialAccount[];
+  isLoadingAccounts: boolean;
   fetchPublishedPlatforms: (publicationId: number) => Promise<void>;
   loadExistingThumbnails: (publication: Publication) => Promise<void>;
   handleUnpublish: (publicationId: number, accountId: number, platform: string) => Promise<boolean>;
@@ -75,7 +76,7 @@ export interface UsePublishPublicationReturn extends PublishPublicationState {
 export const usePublishPublication = (): UsePublishPublicationReturn => {
   /* ----------------------------- Global stores ----------------------------- */
 
-  const { data: accountsData = [] } = useSocialAccounts();
+  const { data: accountsData = [], isLoading: isLoadingAccounts } = useSocialAccounts();
   const accounts = accountsData;
   const campaigns = useCampaignStore((s) => s.campaigns);
   const isCampaignLoading = useCampaignStore((s) => s.isLoading);
@@ -542,6 +543,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
   return {
     connectedAccounts: activeAccounts,
     activeAccounts,
+    isLoadingAccounts,
 
     selectedPlatforms,
     publishedPlatforms,
