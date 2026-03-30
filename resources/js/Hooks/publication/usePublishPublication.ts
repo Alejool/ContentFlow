@@ -15,6 +15,7 @@ export interface PublishPublicationState {
   selectedPlatforms: number[];
   publishedPlatforms: number[];
   publishing: boolean;
+  optimisticPublishingPlatforms: number[]; // Platforms submitted but WebSocket not yet confirmed
   failedPlatforms: number[];
   publishingPlatforms: number[];
   scheduledPlatforms: number[];
@@ -102,6 +103,9 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
 
   const [selectedPlatforms, setSelectedPlatforms] = useState<number[]>([]);
   const [publishing, setPublishing] = useState(false);
+  // Optimistic set: platforms the user just submitted — blocks re-selection immediately,
+  // before the WebSocket/store updates publishingPlatforms.
+  const [optimisticPublishingPlatforms, setOptimisticPublishingPlatforms] = useState<number[]>([]);
   const [unpublishing, setUnpublishing] = useState<number | null>(null);
   const [youtubeThumbnails, setYoutubeThumbnails] = useState<Record<number, File | null>>({});
   const [existingThumbnails, setExistingThumbnails] = useState<
@@ -137,7 +141,11 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     if (!currentPublicationId) return;
 
     const handlePublicationUpdate = () => {
-      fetchPublishedPlatformsFromStore(currentPublicationId);
+      fetchPublishedPlatformsFromStore(currentPublicationId).then(() => {
+        // Once the store has the real publishingPlatforms, clear the optimistic ones
+        // so we don't double-show the spinner.
+        setOptimisticPublishingPlatforms([]);
+      });
     };
 
     window.addEventListener('publication-started', handlePublicationUpdate);
@@ -187,6 +195,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
 
   const resetState = useCallback(() => {
     setSelectedPlatforms([]);
+    setOptimisticPublishingPlatforms([]);
     setYoutubeThumbnails({});
     setExistingThumbnails({});
     setUnpublishing(null);
@@ -316,6 +325,14 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         return;
       }
 
+      // Prevent toggling if platform is optimistically publishing (submitted but WebSocket not yet arrived)
+      if (optimisticPublishingPlatforms.includes(accountId)) {
+        toast.error(
+          'Esta plataforma ya está siendo publicada. Espera a que termine el proceso actual.',
+        );
+        return;
+      }
+
       // Prevent toggling if platform has duplicate attempts
       if (duplicatePlatforms.includes(accountId)) {
         toast.error(
@@ -337,6 +354,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     [
       publishedPlatforms,
       scheduledPlatforms,
+      optimisticPublishingPlatforms,
       duplicatePlatforms,
       retryInfoCache,
       currentPublicationId,
@@ -387,11 +405,18 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         return false;
       }
 
+      // Mark platforms as optimistically publishing IMMEDIATELY — this blocks
+      // re-selection before the WebSocket/store update arrives.
+      const platformsBeingSubmitted = [...selectedPlatforms];
+      setOptimisticPublishingPlatforms((prev) => [
+        ...new Set([...prev, ...platformsBeingSubmitted]),
+      ]);
+
       setPublishing(true);
       try {
         const formData = new FormData();
 
-        selectedPlatforms.forEach((id) => formData.append('platforms[]', id.toString()));
+        platformsBeingSubmitted.forEach((id) => formData.append('platforms[]', id.toString()));
 
         Object.entries(youtubeThumbnails).forEach(([videoId, file]) => {
           if (file) {
@@ -402,7 +427,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         // Only send platform settings for selected platforms to reduce payload size
         if (platformSettings && Object.keys(platformSettings).length > 0) {
           const selectedAccountPlatforms = new Set(
-            selectedPlatforms
+            platformsBeingSubmitted
               .map((id) => {
                 const account = accounts.find((acc) => acc.id === id);
                 return account?.platform?.toLowerCase();
@@ -425,26 +450,40 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         const { success, data } = await publishPublication(publication.id, formData);
 
         if (!success) {
+          // Request failed — roll back optimistic state so user can retry
+          setOptimisticPublishingPlatforms((prev) =>
+            prev.filter((id) => !platformsBeingSubmitted.includes(id)),
+          );
           toast.error(data || 'Publishing failed');
           return false;
         }
 
         toast.success('Publishing started');
 
-        // Immediate local state update for faster UI response
-        usePublicationStore.getState().setPublishingPlatforms(publication.id, selectedPlatforms);
+        // Clear selected platforms — they are now "in flight"
+        setSelectedPlatforms([]);
+
+        // Update store so publishingPlatforms reflects the new state
+        usePublicationStore.getState().setPublishingPlatforms(publication.id, [
+          ...publishingPlatforms,
+          ...platformsBeingSubmitted,
+        ]);
 
         window.dispatchEvent(new CustomEvent('publication-started'));
         setYoutubeThumbnails({});
         return true;
       } catch {
+        // Roll back on unexpected error
+        setOptimisticPublishingPlatforms((prev) =>
+          prev.filter((id) => !platformsBeingSubmitted.includes(id)),
+        );
         toast.error('Publishing failed');
         return false;
       } finally {
         setPublishing(false);
       }
     },
-    [selectedPlatforms, youtubeThumbnails, publishPublication],
+    [selectedPlatforms, publishingPlatforms, youtubeThumbnails, publishPublication, accounts],
   );
 
   /* --------------------------- Review Handling ---------------------------- */
@@ -549,8 +588,9 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     publishedPlatforms,
     failedPlatforms,
     removedPlatforms,
-    duplicatePlatforms, // Agregar estado de duplicados
+    duplicatePlatforms,
     publishingPlatforms,
+    optimisticPublishingPlatforms,
     scheduledPlatforms,
     publishing,
     unpublishing,

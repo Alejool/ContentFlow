@@ -1,5 +1,5 @@
 import { Publication } from '@/types/Publication';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { create } from 'zustand';
 import { useCalendarStore } from './calendarStore';
 
@@ -208,7 +208,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
           const existingPriority = statusPriority[existing.status ?? ''] ?? 0;
           const incomingPriority = statusPriority[incoming.status ?? ''] ?? 0;
           // Keep local state if it's more advanced than what the backend returned
-          if (existingPriority > incomingPriority) {
+          if (existingPriority > incomingPriority && existing.status !== undefined) {
             return { ...incoming, status: existing.status };
           }
           return incoming;
@@ -388,7 +388,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
             if (!acc[log.social_account_id]) {
               acc[log.social_account_id] = [];
             }
-            acc[log.social_account_id].push(log);
+            acc[log.social_account_id]!.push(log);
             return acc;
           },
           {},
@@ -405,6 +405,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
             );
 
             const latestLog = sortedLogs[0];
+            if (!latestLog) return;
             const status = latestLog.status;
             const attempts = latestLog.attempts || 0;
             const maxAttempts = latestLog.max_attempts || 3;
@@ -418,13 +419,22 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
             const originalAttempt = isDuplicate ? sortedLogs[sortedLogs.length - 1] : null;
 
             // Actualizar retry info con información de duplicados
-            retryInfoUpdates[socialAccountId] = {
+            const retryInfo: {
+              retry_count: number;
+              is_retrying: boolean;
+              retry_status: string;
+              is_duplicate: boolean;
+              original_attempt_at?: string;
+            } = {
               retry_count: attempts,
               is_retrying: latestLog.is_retrying || false,
               retry_status: latestLog.retry_status || status,
               is_duplicate: isDuplicate,
-              original_attempt_at: originalAttempt?.created_at,
             };
+            if (originalAttempt?.created_at) {
+              retryInfo.original_attempt_at = originalAttempt.created_at;
+            }
+            retryInfoUpdates[socialAccountId] = retryInfo;
 
             if (isDuplicate) {
               duplicates.push(socialAccountId);
@@ -439,7 +449,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
             ) {
               // Only show as publishing if actively in progress and retries remain
               publishing.push(socialAccountId);
-            } else if (status === 'removed_on_platform' || status === 'deleted') {
+            } else if (status === 'deleted' || status === 'orphaned') {
               removed.push(socialAccountId);
             }
           },
@@ -583,12 +593,28 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
   publishPublication: async (id, formData) => {
     try {
+      // Generate a unique key per publish attempt to prevent duplicate requests
+      // (e.g. double-click or network retry while the first request is still in flight).
+      const idempotencyKey = `${id}-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+
       const response = await axios.post(route('api.v1.publications.publish', id), formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Idempotency-Key': idempotencyKey,
+        },
       });
       return { success: response.data.success, data: response.data };
     } catch (error) {
-      const axiosError = error as AxiosError<{ message?: string }>;
+      const axiosError = error as AxiosError<{ message?: string; code?: string }>;
+
+      // 409 = duplicate in-flight request — surface a clear message
+      if (axiosError.response?.status === 409) {
+        return {
+          success: false,
+          data: 'Ya hay una publicación en proceso. Por favor espera unos segundos.',
+        };
+      }
+
       return {
         success: false,
         data: axiosError.response?.data?.message ?? 'Failed to publish',

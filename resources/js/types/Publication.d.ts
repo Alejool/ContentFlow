@@ -31,7 +31,7 @@ export type Publication = {
   scheduled_posts?: ScheduledPost[];
   social_post_logs?: SocialPostLog[];
   approval_logs?: ApprovalLog[];
-  activities?: Record<string, unknown>[];
+  activities?: PublicationActivity[];
   publication_status_summary?: {
     total_platforms: number;
     published: number;
@@ -193,6 +193,10 @@ export type ScheduledPost = {
 };
 
 export type SocialPostLog = {
+  attempts: number;
+  max_attempts: number;
+  retry_status: string;
+  is_retrying: boolean;
   id: number;
   social_account_id: number;
   status: 'published' | 'failed' | 'deleted' | 'pending' | 'publishing' | 'success' | 'orphaned';
@@ -260,5 +264,18 @@ export type MediaFile = {
     publication_id: number;
     media_file_id: number;
     order: number;
+  };
+};
+
+export type PublicationActivity = {
+  id: number;
+  type: string;
+  status?: string;
+  details?: any;
+  created_at: string;
+  user?: {
+    id: number;
+    name: string;
+    photo_url?: string;
   };
 };
