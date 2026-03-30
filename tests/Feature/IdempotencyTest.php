@@ -210,7 +210,6 @@ class IdempotencyTest extends TestCase
         $stripeDuplicate = WebhookEvent::registerOrFail('stripe', $eventId, 'test.event');
         $this->assertFalse($stripeDuplicate);
     }
-}
 
     /** @test */
     public function mercadopago_webhook_is_idempotent()
