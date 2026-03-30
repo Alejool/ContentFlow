@@ -82,10 +82,7 @@ export function useRemoveWorkspaceMember(workspaceId: number) {
   return useMutation({
     mutationFn: (userId: number) =>
       axios.delete<MembersResponse>(
-        route('api.v1.workspaces.members.remove', {
-          idOrSlug: workspaceId,
-          user: userId,
-        }),
+        `/api/v1/workspaces/${workspaceId}/members/${userId}`
       ),
     // Optimistic update: remove member immediately
     onMutate: async (userId) => {

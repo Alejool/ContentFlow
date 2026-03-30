@@ -2,9 +2,10 @@ import Button from '@/Components/common/Modern/Button';
 import Input from '@/Components/common/Modern/Input';
 import Select from '@/Components/common/Modern/Select';
 import Modal from '@/Components/common/ui/Modal';
+import { getRoleConfig } from '@/Utils/roleHelpers';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
-import { Mail, Shield, UserPlus } from 'lucide-react';
+import { Mail, UserPlus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
@@ -64,11 +65,21 @@ export default function InviteMemberModal({
 
   const roleOptions = roles
     .filter((role) => role.slug !== 'owner')
-    .map((role) => ({
-      value: role.id,
-      label: role.name,
-      icon: <Shield className="h-4 w-4" />,
-    }));
+    .map((role) => {
+      const config = getRoleConfig(role.slug);
+      const Icon = config.icon;
+      return {
+        value: role.id,
+        label: role.name,
+        icon: (
+          <span
+            className={`inline-flex h-5 w-5 items-center justify-center rounded ${config.badgeClass} bg-opacity-30`}
+          >
+            <Icon className={`h-3 w-3 ${config.textColor}`} />
+          </span>
+        ),
+      };
+    });
 
   const onSubmit = async (data: InviteFormData) => {
     if (!workspace?.id) {
@@ -136,6 +147,21 @@ export default function InviteMemberModal({
               value={watch('role_id')}
               onChange={(val) => setValue('role_id', Number(val), { shouldValidate: true })}
               placeholder={t('workspace.invite_modal.role_placeholder')}
+              icon={(() => {
+                const roleId = watch('role_id');
+                if (!roleId) return undefined;
+                const selectedRole = roles.find((r) => r.id === roleId);
+                if (!selectedRole) return undefined;
+                const selectedConfig = getRoleConfig(selectedRole.slug);
+                const SelectedIcon = selectedConfig.icon;
+                return (
+                  <span
+                    className={`inline-flex h-5 w-5 items-center justify-center rounded ${selectedConfig.badgeClass} bg-opacity-30`}
+                  >
+                    <SelectedIcon className={`h-3 w-3 ${selectedConfig.textColor}`} />
+                  </span>
+                );
+              })()}
             />
             {errors.role_id && (
               <p className="mt-1 text-xs text-red-500">{errors.role_id.message}</p>

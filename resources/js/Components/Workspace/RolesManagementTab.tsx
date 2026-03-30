@@ -1,20 +1,17 @@
 // Roles Management Tab - Updated with delete functionality
 import Button from '@/Components/common/Modern/Button';
 import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
+import { getRoleConfig } from '@/Utils/roleHelpers';
 import { router } from '@inertiajs/react';
 import axios from 'axios';
 import {
   AlertCircle,
   Edit2,
-  Eye,
   Info,
-  PencilLine,
   Shield,
   ShieldAlert,
   ShieldCheck,
   Trash2,
-  User,
-  UserStar,
 } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -192,40 +189,26 @@ export default function RolesManagementTab({
 
             return (
               <div
-                key={role.id}
-                className={`rounded-lg border p-5 transition-all duration-300 hover:shadow-lg ${
-                  isCurrentRole
-                    ? 'border-primary-300 bg-gradient-to-br from-primary-50 to-white dark:border-primary-700 dark:from-primary-900/10 dark:to-neutral-950'
-                    : 'border-gray-200 bg-gradient-to-br from-white to-gray-50 dark:border-neutral-800 dark:from-neutral-900 dark:to-neutral-950'
-                }`}
-              >
-                <div className="mb-4 flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`flex h-10 w-10 items-center justify-center rounded-lg ${
-                        role.slug === 'owner'
-                          ? 'bg-gradient-to-br from-primary-500 to-primary-600'
-                          : role.slug === 'admin'
-                            ? 'bg-gradient-to-br from-blue-500 to-cyan-500'
-                            : role.slug === 'editor'
-                              ? 'bg-gradient-to-br from-purple-500 to-pink-500'
-                              : role.slug === 'member'
-                                ? 'bg-gradient-to-br from-emerald-500 to-green-500'
-                                : 'bg-gradient-to-br from-slate-500 to-gray-500'
-                      }`}
-                    >
-                      {role.slug === 'owner' ? (
-                        <UserStar className="h-5 w-5 text-white" />
-                      ) : role.slug === 'admin' ? (
-                        <Shield className="h-5 w-5 text-white" />
-                      ) : role.slug === 'editor' ? (
-                        <PencilLine className="h-5 w-5 text-white" />
-                      ) : role.slug === 'viewer' ? (
-                        <Eye className="h-5 w-5 text-white" />
-                      ) : (
-                        <User className="h-5 w-5 text-white" />
-                      )}
-                    </div>
+                  key={role.id}
+                  className={`rounded-lg border p-5 transition-all duration-300 hover:shadow-lg ${
+                    isCurrentRole
+                      ? 'border-primary-300 bg-gradient-to-br from-primary-50 to-white dark:border-primary-700 dark:from-primary-900/10 dark:to-neutral-950'
+                      : 'border-gray-200 bg-gradient-to-br from-white to-gray-50 dark:border-neutral-800 dark:from-neutral-900 dark:to-neutral-950'
+                  }`}
+                >
+                  <div className="mb-4 flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      {(() => {
+                        const config = getRoleConfig(role.slug);
+                        const RoleIcon = config.icon;
+                        return (
+                          <div
+                            className={`flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br ${config.gradient}`}
+                          >
+                            <RoleIcon className="h-5 w-5 text-white" />
+                          </div>
+                        );
+                      })()}
                     <div>
                       <h4 className="flex items-center gap-2 font-bold text-gray-900 dark:text-white">
                         {role.name}

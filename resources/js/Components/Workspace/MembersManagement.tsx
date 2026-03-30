@@ -2,7 +2,8 @@ import Button from '@/Components/common/Modern/Button';
 import Select from '@/Components/common/Modern/Select';
 import ConfirmDialog from '@/Components/common/ui/ConfirmDialog';
 import InviteMemberModal from '@/Components/Workspace/InviteMemberModal';
-import { getRoleStyle, ROLE_STYLES } from '@/Constants/RoleConstants';
+import { getRoleStyle } from '@/Constants/RoleConstants';
+import { getRoleConfig } from '@/Utils/roleHelpers';
 import {
   useRemoveWorkspaceMember,
   useUpdateMemberRole,
@@ -42,7 +43,7 @@ export default function MembersManagement({ roles = [], workspace }: MembersMana
   }, {});
 
   const currentUser = members.find((u: any) => Number(u.id) === Number(auth.user.id));
-  const userRoleSlug = currentUser?.pivot?.role?.slug || currentUser?.role?.slug;
+  const userRoleSlug = currentUser?.pivot?.role?.slug || currentUser?.role?.slug || '';
   const canManageMembers =
     ['owner', 'admin'].includes(userRoleSlug) ||
     Number(current_workspace.created_by) === Number(auth.user.id);
@@ -66,8 +67,8 @@ export default function MembersManagement({ roles = [], workspace }: MembersMana
   const handleRemoveMember = async () => {
     if (!canManageMembers || !userToRemove) return;
     removeMember.mutate(userToRemove, {
-      onSuccess: () => toast.success(t('workspace.invite_modal.messages.success')),
-      onError: () => toast.error(t('workspace.invite_modal.messages.error')),
+      onSuccess: () => toast.success(t('workspace.messages.member_removed', { defaultValue: 'Miembro eliminado correctamente' })),
+      onError: () => toast.error(t('workspace.messages.member_remove_error', { defaultValue: 'Error al eliminar el miembro' })),
       onSettled: () => setUserToRemove(null),
     });
   };
@@ -82,26 +83,40 @@ export default function MembersManagement({ roles = [], workspace }: MembersMana
     {
       label: t('workspace.owners'),
       value: roleDistribution[roles.find((r) => r.slug === 'owner')?.id] || 0,
-      icon: ROLE_STYLES.owner.icon,
-      color: ROLE_STYLES.owner.color,
+      icon: getRoleStyle('owner').icon,
+      color: getRoleStyle('owner').color,
     },
     {
       label: t('workspace.admins'),
       value: roleDistribution[roles.find((r) => r.slug === 'admin')?.id] || 0,
-      icon: ROLE_STYLES.admin.icon,
-      color: ROLE_STYLES.admin.color,
+      icon: getRoleStyle('admin').icon,
+      color: getRoleStyle('admin').color,
     },
     {
       label: t('workspace.members'),
       value: roleDistribution[roles.find((r) => r.slug === 'member')?.id] || 0,
-      icon: ROLE_STYLES.member.icon,
-      color: ROLE_STYLES.member.color,
+      icon: getRoleStyle('member').icon,
+      color: getRoleStyle('member').color,
     },
   ];
 
   const roleOptions = roles
     .filter((r) => r.slug !== 'owner')
-    .map((r) => ({ value: r.id, label: r.name }));
+    .map((r) => {
+      const config = getRoleConfig(r.slug);
+      const Icon = config.icon;
+      return {
+        value: r.id,
+        label: r.name,
+        icon: (
+          <span
+            className={`inline-flex h-5 w-5 items-center justify-center rounded ${config.badgeClass} bg-opacity-30`}
+          >
+            <Icon className={`h-3 w-3 ${config.textColor}`} />
+          </span>
+        ),
+      };
+    });
 
   if (isLoading) {
     return (
@@ -114,34 +129,13 @@ export default function MembersManagement({ roles = [], workspace }: MembersMana
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
-        {stats.map((stat) => (
-          <div
-            key={stat.label}
-            className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm dark:border-neutral-700 dark:bg-neutral-800 md:p-4"
-          >
-            <div className="flex flex-col justify-between gap-2 md:flex-row md:items-center">
-              <div>
-                <p className="text-xs font-medium text-gray-600 dark:text-gray-400 md:text-sm">
-                  {stat.label}
-                </p>
-                <p className="mt-1 text-xl font-bold text-gray-900 dark:text-white md:text-2xl">
-                  {stat.value}
-                </p>
-              </div>
-              <stat.icon className={`h-6 w-6 md:h-8 md:w-8 ${stat.color} opacity-80`} />
-            </div>
-          </div>
-        ))}
-      </div>
-
       <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
         <div className="flex items-center justify-between border-b border-gray-200 bg-gray-50/50 p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
             {t('workspace.workspace_members')}
           </h3>
           {canManageMembers && (
-            <Button onClick={() => setIsInviteModalOpen(true)} size="sm" icon={UserPlus}>
+            <Button onClick={() => setIsInviteModalOpen(true)} size="md" icon={UserPlus}>
               <span className="hidden md:inline">{t('workspace.invite_member')}</span>
               <span className="md:hidden">{t('workspace.invite')}</span>
             </Button>
@@ -196,29 +190,42 @@ export default function MembersManagement({ roles = [], workspace }: MembersMana
                   {isCreator || !canManageMembers ? (
                     <span
                       className={`rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wider ${
-                        getRoleStyle(currentRole.slug).badge
+                        getRoleStyle(currentRole.slug ?? 'member').badge
                       }`}
                     >
                       {isCreator ? t('workspace.owners') : currentRole.name}
                     </span>
                   ) : (
-                    <div className="w-32 md:w-36">
-                      <Select
-                        id={`role-${member.id}`}
-                        options={roleOptions}
-                        value={roleId}
-                        onChange={(val) => handleRoleChange(member.id, Number(val))}
-                        size="sm"
-                        variant="outlined"
-                        containerClassName="m-0"
-                      />
+                    <div className="w-36 md:w-40">
+                      {(() => {
+                        const selectedConfig = getRoleConfig(currentRole.slug ?? 'member');
+                        const SelectedIcon = selectedConfig.icon;
+                        return (
+                          <Select
+                            id={`role-${member.id}`}
+                            options={roleOptions}
+                            value={roleId}
+                            onChange={(val) => handleRoleChange(member.id, Number(val))}
+                            size="md"
+                            variant="outlined"
+                            containerClassName="m-0"
+                            icon={
+                              <span
+                                className={`inline-flex h-5 w-5 items-center justify-center rounded ${selectedConfig.badgeClass} bg-opacity-30`}
+                              >
+                                <SelectedIcon className={`h-3 w-3 ${selectedConfig.textColor}`} />
+                              </span>
+                            }
+                          />
+                        );
+                      })()}
                     </div>
                   )}
 
                   {canManageMembers && !isMe && !isCreator && (
                     <Button
                       onClick={() => initiateRemoveMember(member.id)}
-                      variant="ghost"
+                      buttonStyle="icon"
                       size="xs"
                       className="flex-shrink-0 rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
                       title={t('workspace.remove_member')}
