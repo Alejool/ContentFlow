@@ -4,6 +4,7 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use App\Jobs\CheckSocialTokensJob;
 
 class Kernel extends ConsoleKernel
 {
@@ -23,7 +24,7 @@ class Kernel extends ConsoleKernel
     $schedule->command('social:check-tokens')->daily();
 
     // Verificar y refrescar tokens cada 2 horas
-    $schedule->job(new \App\Jobs\CheckSocialTokensJob)
+    $schedule->job(new CheckSocialTokensJob)
       ->everyTwoHours()
       ->withoutOverlapping();
 

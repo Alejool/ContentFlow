@@ -6,11 +6,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
   Route::get('/social-accounts/token-health', [SocialAccountController::class, 'tokenHealth'])->name('social-accounts.token-health');
-  Route::apiResource('social-accounts', SocialAccountController::class)->names([
+  Route::apiResource('social-accounts', SocialAccountController::class)->only([
+    'index',
+    'store',
+    'destroy',
+  ])->names([
     'index' => 'index',
     'store' => 'store',
-    'show' => 'show',
-    'update' => 'update',
     'destroy' => 'destroy',
   ]);
 

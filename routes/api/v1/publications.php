@@ -33,7 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/{publication}/platform-config/{accountId}', [PublicationPreviewController::class, 'updatePlatformConfig'])->name('platform-config.update')->whereNumber('publication')->whereNumber('accountId');
     Route::get('/{publication}/saved-configurations', [PublicationPreviewController::class, 'getSavedConfigurations'])->name('saved-configurations')->whereNumber('publication');
     Route::post('/{publication}/generate-thumbnail', [PublicationPreviewController::class, 'generateThumbnail'])->name('generate-thumbnail')->whereNumber('publication');
-    Route::post('/{publication}/publish', [PublicationController::class, 'publish'])->name('publish')->middleware('rate.limit');
+    Route::post('/{publication}/publish', [PublicationController::class, 'publish'])->name('publish')->middleware(['rate.limit', 'idempotent.publish']);
     Route::post('/{publication}/unpublish', [PublicationController::class, 'unpublish'])->name('unpublish');
     Route::post('/{publication}/reject', [PublicationController::class, 'reject'])->name('reject');
     Route::post('/{publication}/cancel', [PublicationController::class, 'cancel'])->name('cancel')->whereNumber('publication');
