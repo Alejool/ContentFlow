@@ -16,6 +16,7 @@ Route::middleware('auth:sanctum')->prefix('workspaces')->name('workspaces.')->gr
   Route::get('/{idOrSlug}/members', [WorkspaceController::class, 'members'])->name('members');
   Route::post('/{idOrSlug}/invite', [WorkspaceController::class, 'invite'])->name('invite');
   Route::put('/{idOrSlug}/members/{user}/role', [WorkspaceController::class, 'updateMemberRole'])->name('members.update-role');
+  Route::delete('/{idOrSlug}/members/{user}', [WorkspaceController::class, 'removeMember'])->name('members.remove');
   Route::post('/{idOrSlug}/roles', [WorkspaceController::class, 'storeRole'])->name('roles.store');
   Route::get('/{idOrSlug}/permissions', [WorkspaceController::class, 'permissions'])->name('permissions');
 

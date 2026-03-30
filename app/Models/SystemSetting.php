@@ -31,7 +31,6 @@ class SystemSetting extends Model
         parent::boot();
 
         static::saved(function ($setting) {
-            \Log::info("SystemSetting saved: {$setting->key} = {$setting->value}");
             
             // Limpiar caché específico del setting
             Cache::forget("system_setting:{$setting->key}");
@@ -81,13 +80,18 @@ class SystemSetting extends Model
     public static function get(string $key, $default = null)
     {
         return Cache::remember("system_setting:{$key}", 60, function () use ($key, $default) {
-            $setting = static::where('key', $key)->first();
-            
-            if (!$setting) {
+            try {
+                $setting = static::where('key', $key)->first();
+                
+                if (!$setting) {
+                    return $default;
+                }
+
+                return static::castValue($setting->value, $setting->type);
+            } catch (\Exception $e) {
+                // Return default if table doesn't exist yet
                 return $default;
             }
-
-            return static::castValue($setting->value, $setting->type);
         });
     }
 
@@ -97,13 +101,17 @@ class SystemSetting extends Model
      */
     public static function getFresh(string $key, $default = null)
     {
-        $setting = static::where('key', $key)->first();
-        
-        if (!$setting) {
+        try {
+            $setting = static::where('key', $key)->first();
+            
+            if (!$setting) {
+                return $default;
+            }
+
+            return static::castValue($setting->value, $setting->type);
+        } catch (\Exception $e) {
             return $default;
         }
-
-        return static::castValue($setting->value, $setting->type);
     }
 
     /**

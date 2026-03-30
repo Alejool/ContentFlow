@@ -89,13 +89,37 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command('social:check-tokens')->daily();
         $schedule->command('youtube:process-playlist-queue')->everyFiveMinutes();
         $schedule->command('app:send-event-reminders')->everyMinute();
-
         // Reset monthly usage metrics on the first day of each month
         $schedule->command('usage:reset-monthly')
             ->monthlyOn(1, '00:00')
             ->timezone('UTC');
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        $exceptions->render(function (\Illuminate\Database\QueryException $e, $request) {
+            $message = $e->getMessage();
+            if (str_contains($message, 'relation "users" does not exist') || str_contains($message, 'Base table or view not found')) {
+                try {
+                    auth()->guard('web')->logout();
+                    $request->session()->invalidate();
+                    $request->session()->regenerateToken();
+                } catch (\Throwable $th) {
+                    // Ignore errors during emergency logout
+                }
+                
+                // Si la tabla que falta no es users, o estamos en la pagina principal y sigue fallando, 
+                // para evitar un bucle devolvemos la vista o simplemente dejamos que siga si no podemos solucionarlo.
+                if ($request->is('/')) {
+                    // Si ya estamos en root y falla la DB (ej. system_settings no existe), dejamos que el error se muestre
+                    // O podemos enviar un error limpio en vez de un loop.
+                    if (!str_contains($message, 'users')) {
+                         return response()->view('errors.500', ['exception' => $e], 500)->throwResponse();
+                    }
+                }
+                
+                return redirect('/');
+            }
+        });
+
         $exceptions->render(function (MethodNotAllowedHttpException $e, $request) {
             LogHelper::error('405 Method Not Allowed', [
                 'url' => $request->fullUrl(),
