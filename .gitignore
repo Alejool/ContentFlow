@@ -163,3 +163,6 @@ fly.toml
 # Ignore example/demo files in components
 *.example.tsx
 *.examples.tsx
+
+
+docker-compose.dev-other-config
