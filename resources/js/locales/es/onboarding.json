@@ -33,8 +33,8 @@
     },
     "errors": {
       "nameRequired": "El nombre del negocio es requerido",
-      "industryRequired": "Por favor selecciona una industria",
-      "sizeRequired": "Por favor selecciona el tamaño de tu equipo"
+      "industryRequired": "Selecciona una industria",
+      "sizeRequired": "Selecciona el tamaño de tu equipo"
     },
     "optional": "Opcional",
     "skip": "Saltar este paso",
@@ -177,7 +177,7 @@
   "errors": {
     "loadFailed": "Error al cargar la incorporación",
     "actionFailed": "Error al realizar la acción",
-    "tryAgain": "Por favor, inténtalo de nuevo",
+    "tryAgain": "Inténtalo de nuevo",
     "networkError": "Ocurrió un error de red",
     "retry": "Reintentar"
   },

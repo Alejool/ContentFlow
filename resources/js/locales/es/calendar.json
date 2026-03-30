@@ -184,25 +184,25 @@
     },
     "error": {
       "title": "Algo salió mal",
-      "description": "Ocurrió un error al renderizar el calendario. Por favor, intenta de nuevo.",
+      "description": "Ocurrió un error al renderizar el calendario. Intenta de nuevo.",
       "retry": "Intentar de nuevo",
       "retry_button": "Reintentar",
-      "persist": "Si el problema persiste, por favor contacta con soporte."
+      "persist": "Si el problema persiste contacta con soporte."
     },
     "validation": {
       "invalid_date": "Fecha Inválida",
       "past_date_error": "No se Puede Programar en el Pasado",
-      "past_date_message": "No puedes programar eventos para fechas pasadas. Por favor, selecciona una fecha y hora futura.",
+      "past_date_message": "No puedes programar eventos para fechas pasadas. Selecciona una fecha y hora futura.",
       "date_required": "La fecha es obligatoria",
-      "invalid_format": "Formato de fecha inválido. Por favor, usa una fecha válida."
+      "invalid_format": "Formato de fecha inválido. Usa una fecha válida."
     },
     "selected_date": "Fecha seleccionada:",
     "sync": {
       "error": {
         "title": "Error de Sincronización",
         "failed": "Error al sincronizar con {provider}",
-        "token_expired": "Tu conexión con {provider} ha expirado. Por favor, reconecta.",
-        "unavailable": "{provider} no está disponible actualmente. Por favor, intenta más tarde.",
+        "token_expired": "Tu conexión con {provider} ha expirado. Reconecta.",
+        "unavailable": "{provider} no está disponible actualmente. Intenta más tarde.",
         "unknown": "Ocurrió un error de sincronización desconocido",
         "dismiss": "Descartar error",
         "retry": "Reintentar sincronización",
@@ -214,7 +214,7 @@
     },
     "conflict": {
       "title": "Conflicto de Datos Detectado",
-      "description": "Este evento ha sido modificado por otro usuario. Por favor, elige qué versión mantener.",
+      "description": "Este evento ha sido modificado por otro usuario. Elige qué versión mantener.",
       "event": "Evento",
       "field_label": "Campo en conflicto",
       "your_version": "Tu Versión",

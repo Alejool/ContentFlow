@@ -1,4 +1,4 @@
-﻿{
+{
   "approvals": {
     "approve": "Aprobar",
     "reject": "Rechazar",
@@ -28,7 +28,7 @@
     "approvedBy": "Aprobado por",
     "rejectedBy": "Rechazado por",
     "publicationRejected": "Publicación Rechazada",
-    "rejectionMessage": "Tu publicación ha sido rechazada. Por favor, revisa los comentarios y realiza los ajustes necesarios.",
+    "rejectionMessage": "Tu publicación ha sido rechazada. Revisa los comentarios y realiza los ajustes necesarios.",
     "noReasonProvided": "No se proporcionó una razón.",
     "editPublication": "Editar Publicación",
     "searchPlaceholder": "Buscar por título de publicación...",

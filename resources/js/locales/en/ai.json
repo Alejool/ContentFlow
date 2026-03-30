@@ -2,7 +2,7 @@
   "aiChat": {
     "title": "AI Assistant",
     "subtitle": "Intelligent recommendations for your campaigns",
-    "campaignsAvailable": "campaigns available",
+    "campaignsAvailable": "Campaigns available",
     "chatTitle": "Chat ContentFlow",
     "online": "Online",
     "thinking": "Thinking...",
@@ -37,7 +37,7 @@
   },
   "aiAssistant": {
     "welcomeMessage": "I am here to help you with your social media campaigns. You can ask me about creating new campaigns, improving existing ones, or analyzing your content performance.",
-    "error": "I apologize, but I encountered an error processing your request. Please try again later.",
+    "error": "I apologize, but I encountered an error processing your request. Try again later.",
     "notEnabled": "AI service is not enabled or configured.",
     "suggestion": "Suggestion",
     "thinking": "Thinking...",

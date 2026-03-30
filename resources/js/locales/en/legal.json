@@ -13,7 +13,7 @@
           "title": "1. Introduction",
           "content": [
             "Welcome to ContentFlow (\"we\", \"our\", or \"the Platform\"). We are committed to protecting your privacy and ensuring that your personal data is handled securely and transparently. This Privacy Policy describes how we collect, use, disclose, and protect your information when you use our website and services (collectively, the \"Service\").",
-            "By accessing or using the Service, you agree to the practices described in this policy. If you do not agree with this policy, please do not use our services."
+            "By accessing or using the Service, you agree to the practices described in this policy. If you do not agree with this policy do not use our services."
           ]
         },
         "infoCollected": {
@@ -91,13 +91,13 @@
         },
         "contact": {
           "title": "9. Contact",
-          "content": "If you have questions or concerns about this Privacy Policy, please contact us at:"
+          "content": "If you have questions or concerns about this Privacy Policy contact us at:"
         }
       }
     },
     "termsOfService": {
       "title": "Terms of Service",
-      "subtitle": "Please read these terms carefully before using our platform.",
+      "subtitle": "Read these terms carefully before using our platform.",
       "sections": {
         "acceptance": {
           "title": "1. Acceptance of Terms",
@@ -141,7 +141,7 @@
         },
         "contact": {
           "title": "9. Contact",
-          "content": "If you have any questions about these Terms, please contact us at:"
+          "content": "If you have any questions about these Terms contact us at:"
         }
       }
     },

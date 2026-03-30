@@ -110,10 +110,10 @@
         "connectSuccess": "Cuenta conectada exitosamente",
         "disconnectSuccess": "Cuenta desconectada exitosamente",
         "authError": "Error de autenticación",
-        "unauthorized": "No autorizado. Por favor inicia sesión nuevamente.",
+        "unauthorized": "No autorizado. Inicia sesión nuevamente.",
         "loadError": "No se pudieron cargar las cuentas conectadas",
         "disconnectError": "Error al desconectar",
-        "popupBlocked": "El navegador bloqueó la ventana emergente. Por favor permite ventanas emergentes para este sitio.",
+        "popupBlocked": "El navegador bloqueó la ventana emergente. Permite ventanas emergentes para este sitio.",
         "urlError": "No se pudo obtener la URL de autenticación",
         "connectError": "Error al conectar con",
         "cannotDisconnectPublishing": "No puedes desconectar esta cuenta mientras hay publicaciones en proceso",
@@ -133,7 +133,7 @@
       "blockerModal": {
         "titlePublishing": "No se puede desconectar",
         "titleScheduled": "No se puede desconectar",
-        "messagePublishing": "Esta cuenta tiene publicaciones que se están publicando en este momento. Por favor, espera a que terminen antes de desconectar.",
+        "messagePublishing": "Esta cuenta tiene publicaciones que se están publicando en este momento. Espera a que terminen antes de desconectar.",
         "messageScheduled": "Esta cuenta tiene publicaciones programadas. Debes eliminarlas de las publicaciones antes de poder desconectar esta cuenta.",
         "table": {
           "publication": "Publicación",

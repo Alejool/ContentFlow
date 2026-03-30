@@ -1,4 +1,4 @@
-﻿{
+{
   "publications": {
     "title": "Publications",
     "subtitle": "Manage your publications",
@@ -148,7 +148,7 @@
           "scheduledAtRequired": "Schedule date is required if global schedule is enabled",
           "recurrenceDaysRequired": "Select at least one day for weekly recurrence",
           "recurrence_days": "Invalid recurrence days",
-          "durationErrors": "Please fix the duration errors before saving.",
+          "durationErrors": "Fix the duration errors before saving.",
           "recurrenceEndDateRequired": "End date is required for recurring publications",
           "pollOptionsRequired": "Polls require at least 2 options",
           "pollDurationRequired": "Poll duration must be between 1 and 168 hours",
@@ -238,7 +238,7 @@
           "cancel": "Cancel"
         },
         "configurationLocked": "Configuration Locked",
-        "configurationLockedHint": "You need approval to configure networks and scheduling. Please request a review first.",
+        "configurationLockedHint": "You need approval to configure networks and scheduling. Request a review first.",
         "configurationLockedHintAdmin": "You must approve the publication before configuring networks.",
         "contentLocked": "Content Locked",
         "contentLockedHint": "To edit the content (title, description or files), you must unpublish the post from all platforms.",
@@ -285,7 +285,7 @@
         "selectAll": "Select All",
         "deselectAll": "Deselect All",
         "noConnectedAccounts": "No accounts found.",
-        "connectAccounts": "Please connect your accounts first.",
+        "connectAccounts": "Connect your accounts first.",
         "noCompatibleAccounts": "No accounts compatible with this content type.",
         "changeContentType": "Change the content type or connect compatible accounts.",
         "published": "Published",
@@ -321,7 +321,7 @@
           "subtitle": "PNG, JPG, WebP (max 2MB)"
         },
         "modal": {
-          "title": "Unpublish ",
+          "title": "Unpublish",
           "message": "Are you sure you want to unpublish? This will remove the publication from this platform.",
           "confirmText": "Unpublish",
           "cancelText": "Cancel",
@@ -350,7 +350,7 @@
         "rejectedBanner": {
           "title": "Publication Rejected",
           "message": "This publication has been rejected by {{name}}.",
-          "footer": "Please make the necessary adjustments and resubmit for review."
+          "footer": "Make the necessary adjustments and resubmit for review."
         },
         "alreadyPublishedBanner": {
           "title": "Active Publication",
@@ -406,20 +406,20 @@
         "imageRequired": "Image is required",
         "hashtagValid": "Hashtag must be valid",
         "hashtagMax": "Hashtag must be at least 10 characters long",
-        "scheduleDateRequired": "Please select a date to schedule on the selected networks or uncheck the schedule option",
+        "scheduleDateRequired": "Select a date to schedule on the selected networks or uncheck the schedule option",
         "scheduleRequired": "You must schedule a date for all selected networks or set a global date.",
         "scheduledAtRequired": "Scheduled date is required when you select social networks",
-        "socialAccountsRequired": "Please select at least one social media account",
+        "socialAccountsRequired": "Select at least one social media account",
         "singleVideo": "You can only upload one video per publication.",
         "scheduledMinDifference": "The date must be at least 1 minute after the current time",
         "videoTooLong": "Video too long for {{platform}} (max {{max}})",
         "videoComplies": "Meets duration requirements for {{platform}}",
         "recurrenceDaysRequired": "Select at least one day for weekly recurrence",
         "recurrence_days": "Invalid recurrence days",
-        "durationErrors": "Please fix the duration errors before saving.",
+        "durationErrors": "Fix the duration errors before saving.",
         "pollOptionsRequired": "Polls require at least 2 options",
         "pollDurationRequired": "Poll duration must be between 1 and 168 hours",
-        "content_type_not_supported": "Content type ':type' is not supported by :platforms. Please select compatible platforms or change the content type.",
+        "content_type_not_supported": "Content type ':type' is not supported by :platforms. Select compatible platforms or change the content type.",
         "reel_requires_one_video": "Reels require exactly 1 video file",
         "reel_requires_video_only": "Reels require video files only (no images)",
         "carousel_requires_multiple": "Carousels require at least 2 media files (maximum 10)",

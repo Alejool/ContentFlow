@@ -1,4 +1,4 @@
-﻿{
+{
   "common": {
     "locale": "es-ES",
     "deleteConfirmTitle": "Confirmar eliminación",
@@ -268,11 +268,11 @@
       "retry": "Reintentar",
       "dismiss": "Descartar",
       "retryAttempt": "Intento {{count}} de 3",
-      "maxRetriesReached": "Se alcanzó el máximo de intentos. Por favor verifica tu conexión o intenta cargar un archivo más pequeño.",
-      "networkError": "Error de red. Por favor verifica tu conexión e intenta nuevamente.",
-      "validationError": "Falló la validación del archivo. Por favor verifica el archivo e intenta nuevamente.",
-      "uploadFailed": "Falló la carga. Por favor intenta nuevamente.",
-      "processingFailed": "Falló el procesamiento. Por favor intenta nuevamente.",
+      "maxRetriesReached": "Se alcanzó el máximo de intentos. Verifica tu conexión o intenta cargar un archivo más pequeño.",
+      "networkError": "Error de red. Verifica tu conexión e intenta nuevamente.",
+      "validationError": "Falló la validación del archivo. Verifica el archivo e intenta nuevamente.",
+      "uploadFailed": "Falló la carga. Intenta nuevamente.",
+      "processingFailed": "Falló el procesamiento. Intenta nuevamente.",
       "resume_prompt": {
         "title": "Cargas Incompletas Detectadas",
         "description": "Tienes {{count}} carga incompleta de una sesión anterior.",
@@ -350,7 +350,7 @@
     "messages": {
       "checkingSubscription": "Verificando suscripción...",
       "loadingPlans": "Cargando planes...",
-      "generationInProgress": "Ya hay una generación en proceso. Por favor espera."
+      "generationInProgress": "Ya hay una generación en proceso. Espera."
     }
   }
 }

@@ -33,8 +33,8 @@
     },
     "errors": {
       "nameRequired": "Business name is required",
-      "industryRequired": "Please select an industry",
-      "sizeRequired": "Please select your team size"
+      "industryRequired": "Select an industry",
+      "sizeRequired": "Select your team size"
     },
     "optional": "Optional",
     "skip": "Skip this step",
@@ -177,7 +177,7 @@
   "errors": {
     "loadFailed": "Failed to load onboarding",
     "actionFailed": "Failed to perform action",
-    "tryAgain": "Please try again",
+    "tryAgain": "Try again",
     "networkError": "Network error occurred",
     "retry": "Try Again"
   },

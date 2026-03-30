@@ -1,4 +1,4 @@
-﻿{
+{
   "workspace": {
     "my_workspaces": "My Workspaces",
     "create_new": "Create New Workspace",
@@ -36,7 +36,7 @@
     "danger_zone": "Danger Zone",
     "delete_workspace_description": "Irreversible actions for this workspace",
     "delete_workspace": "Delete Workspace",
-    "delete_workspace_warning": "Once you delete a workspace, there is no going back. Please be certain.",
+    "delete_workspace_warning": "Once you delete a workspace, there is no going back. Be certain.",
     "delete_button": "Delete Workspace",
     "delete_confirmation_title": "Delete Workspace?",
     "delete_confirmation_message": "Are you sure you want to delete this workspace? All data including content, campaigns, and team members will be permanently removed. This action cannot be undone.",
@@ -67,8 +67,8 @@
       "cancel": "Cancel",
       "submit": "Invite Member",
       "validation": {
-        "email": "Please enter a valid email",
-        "role": "Please select a role",
+        "email": "Enter a valid email",
+        "role": "Select a role",
         "nameRequired": "Workspace name is required"
       },
       "messages": {
@@ -91,7 +91,7 @@
         "success": "Integrations updated successfully",
         "test_success": "Connection tested successfully",
         "test_error": "Error testing connection",
-        "enter_url": "Please enter a {{type}} webhook URL first."
+        "enter_url": "Enter a {{type}} webhook URL first."
       },
       "communication": "Communication Integrations",
       "communication_description": "Connect your workspace to external communication platforms",

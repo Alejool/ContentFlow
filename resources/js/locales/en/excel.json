@@ -16,7 +16,7 @@
     "downloadError": "Error downloading template",
     "invalidFileType": "Invalid file type. Use .xlsx, .xls or .csv",
     "fileTooLarge": "File is too large. Maximum 10MB",
-    "noFileSelected": "Please select a file",
+    "noFileSelected": "Select a file",
     "importSuccess": "Import successful",
     "importPartial": "Partial import",
     "importError": "Error importing file",

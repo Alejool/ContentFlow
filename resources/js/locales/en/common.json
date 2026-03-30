@@ -183,8 +183,8 @@
       "title": "All platforms"
     },
     "errors": {
-      "checkFormErrors": "Please check the errors in the form",
-      "ffmpeg_load": "Error loading the video processor. Please ensure you have a stable connection and SharedArrayBuffer support.",
+      "checkFormErrors": "Check the errors in the form",
+      "ffmpeg_load": "Error loading the video processor. Ensure you have a stable connection and SharedArrayBuffer support.",
       "processing_failed": "Error processing the video.",
       "no_shared_array_buffer": "Your browser or environment does not support the necessary features to process video locally (SharedArrayBuffer).",
       "video_load": "Error loading the video for processing."
@@ -202,7 +202,7 @@
       },
       "locked": {
         "title": "Basic approvals enabled",
-        "description": "You currently have access to basic approvals. To set up multi-level approval workflows, please upgrade your plan."
+        "description": "You currently have access to basic approvals. To set up multi-level approval workflows upgrade your plan."
       },
       "title": "Approval Workflows",
       "subtitle": "Define sequential review routes for your publications.",
@@ -256,11 +256,11 @@
       "retry": "Retry",
       "dismiss": "Dismiss",
       "retryAttempt": "Retry attempt {{count}} of 3",
-      "maxRetriesReached": "Maximum retry attempts reached. Please check your connection or try uploading a smaller file.",
-      "networkError": "Network error occurred. Please check your connection and try again.",
-      "validationError": "File validation failed. Please check the file and try again.",
-      "uploadFailed": "Upload failed. Please try again.",
-      "processingFailed": "Processing failed. Please try again.",
+      "maxRetriesReached": "Maximum retry attempts reached. Check your connection or try uploading a smaller file.",
+      "networkError": "Network error occurred. Check your connection and try again.",
+      "validationError": "File validation failed. Check the file and try again.",
+      "uploadFailed": "Upload failed. Try again.",
+      "processingFailed": "Processing failed. Try again.",
       "resume_prompt": {
         "title": "Incomplete Uploads Detected",
         "description": "You have {{count}} incomplete upload from a previous session.",
@@ -338,7 +338,7 @@
     "messages": {
       "checkingSubscription": "Checking subscription...",
       "loadingPlans": "Loading plans...",
-      "generationInProgress": "A generation is already in progress. Please wait."
+      "generationInProgress": "A generation is already in progress. Wait."
     }
   }
 }

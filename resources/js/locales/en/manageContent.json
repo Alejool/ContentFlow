@@ -78,12 +78,12 @@
           "publication": "Publication"
         },
         "cancelButton": "Keep connected",
-        "confirmButton": "Disconnect "
+        "confirmButton": "Disconnect"
       },
       "blockerModal": {
         "titlePublishing": "Cannot Disconnect",
         "titleScheduled": "Cannot Disconnect",
-        "messagePublishing": "This account has publications that are currently being published. Please wait for them to finish before disconnecting.",
+        "messagePublishing": "This account has publications that are currently being published. Wait for them to finish before disconnecting.",
         "messageScheduled": "This account has scheduled publications. You must remove them from the publications before you can disconnect this account.",
         "table": {
           "publication": "Publication",
@@ -129,7 +129,7 @@
         "connectSuccess": "Account connected successfully",
         "disconnectSuccess": "Account disconnected successfully",
         "authError": "Authentication error",
-        "unauthorized": "Unauthorized. Please log in again.",
+        "unauthorized": "Unauthorized. Log in again.",
         "loadError": "Could not load connected accounts",
         "disconnectError": "Error disconnecting",
         "cannotDisconnectPublishing": "You cannot disconnect this account while there are publications in progress",

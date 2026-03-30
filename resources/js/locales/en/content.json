@@ -58,7 +58,7 @@
           "publication": "Publication"
         },
         "cancelButton": "Keep connected",
-        "confirmButton": "Disconnect "
+        "confirmButton": "Disconnect"
       },
       "validation": {
         "facebook": {
@@ -95,7 +95,7 @@
         "connectSuccess": "Account connected successfully",
         "disconnectSuccess": "Account disconnected successfully",
         "authError": "Authentication error",
-        "unauthorized": "Unauthorized. Please log in again.",
+        "unauthorized": "Unauthorized. Log in again.",
         "loadError": "Could not load connected accounts",
         "disconnectError": "Error disconnecting"
       }

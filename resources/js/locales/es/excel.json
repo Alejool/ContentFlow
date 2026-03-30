@@ -16,7 +16,7 @@
     "downloadError": "Error al descargar la plantilla",
     "invalidFileType": "Tipo de archivo inválido. Use .xlsx, .xls o .csv",
     "fileTooLarge": "El archivo es demasiado grande. Máximo 10MB",
-    "noFileSelected": "Por favor selecciona un archivo",
+    "noFileSelected": "Selecciona un archivo",
     "importSuccess": "Importación exitosa",
     "importPartial": "Importación parcial",
     "importError": "Error al importar el archivo",

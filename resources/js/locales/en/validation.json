@@ -13,14 +13,14 @@
     "invalid_type": "Invalid data type.",
     "passwords_do_not_match": "Passwords do not match.",
     "invalid_phone": "Invalid phone number format.",
-    "check_errors": "Please check the errors in the form.",
+    "check_errors": "Check the errors in the form.",
     "phoneNotValid": "The number is not valid for the selected country.",
     "phoneInvalid": "Invalid phone number.",
     "phoneValid": "Valid number.",
     "auth": {
       "failed": "These credentials do not match our records.",
       "password": "The provided password is incorrect.",
-      "throttle": "Too many login attempts. Please try again in {{seconds}} seconds."
+      "throttle": "Too many login attempts. Try again in {{seconds}} seconds."
     }
   }
 }

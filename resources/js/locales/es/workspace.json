@@ -1,4 +1,4 @@
-﻿{
+{
   "workspace": {
     "my_workspaces": "Mis Espacios de Trabajo",
     "create_new": "Crear Nuevo Espacio",
@@ -36,16 +36,16 @@
     "danger_zone": "Zona de Peligro",
     "delete_workspace_description": "Acciones irreversibles para este espacio de trabajo",
     "delete_workspace": "Eliminar Espacio",
-    "delete_workspace_warning": "Una vez eliminado, no hay vuelta atrás. Por favor, asegúrate.",
+    "delete_workspace_warning": "Una vez eliminado, no hay vuelta atrás. Asegúrate.",
     "delete_button": "Eliminar Espacio",
     "delete_confirmation_title": "¿Eliminar Espacio?",
     "delete_confirmation_message": "¿Estás seguro de que quieres eliminar este espacio de trabajo? Todos los datos, incluyendo contenido, campañas y miembros del equipo serán eliminados permanentemente. Esta acción no se puede deshacer.",
     "confirm_delete": "Sí, eliminar espacio",
     "general_settings": "Ajustes Generales",
     "manage_workspace": "Gestionar espacio {{name}}",
-    "owners": "Propietarios",
-    "admins": "Administradores",
-    "editors": "Editores",
+    "owners": "Propietario",
+    "admins": "Administrador",
+    "editors": "Editor",
     "creator": "Creador",
     "total_in_workspace": "Total en el espacio",
     "viewers": "Visores",
@@ -67,8 +67,8 @@
       "cancel": "Cancelar",
       "submit": "Invitar Miembro",
       "validation": {
-        "email": "Por favor introduce un correo válido",
-        "role": "Por favor selecciona un rol",
+        "email": "Introduce un correo válido",
+        "role": "Selecciona un rol",
         "nameRequired": "El nombre del espacio es obligatorio"
       },
       "messages": {
@@ -91,7 +91,7 @@
         "success": "Integraciones actualizadas exitosamente",
         "test_success": "Conexión probada exitosamente",
         "test_error": "Error al probar la conexión",
-        "enter_url": "Por favor ingresa una URL de webhook de {{type}} primero."
+        "enter_url": "Ingresa una URL de webhook de {{type}} primero."
       },
       "communication": "Integraciones de Comunicación",
       "communication_description": "Conecta tu espacio con plataformas de comunicación externas",

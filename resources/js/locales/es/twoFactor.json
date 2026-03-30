@@ -42,12 +42,12 @@
     "hint": "Esta verificación será válida por 30 días en este dispositivo."
   },
   "errors": {
-    "invalidCode": "Código de verificación inválido. Por favor verifica tu aplicación de autenticación e intenta nuevamente.",
+    "invalidCode": "Código de verificación inválido. Verifica tu aplicación de autenticación e intenta nuevamente.",
     "codeMustBe6Digits": "El código debe tener 6 dígitos",
     "codeOnlyNumbers": "El código debe contener solo números",
-    "sessionExpired": "La sesión ha expirado. Por favor actualiza la página e intenta nuevamente.",
+    "sessionExpired": "La sesión ha expirado. Actualiza la página e intenta nuevamente.",
     "alreadyConfigured": "2FA ya está configurado para tu cuenta",
     "notConfigured": "2FA no está configurado para tu cuenta",
-    "verificationExpired": "Tu verificación de 2FA ha expirado. Por favor verifica nuevamente."
+    "verificationExpired": "Tu verificación de 2FA ha expirado. Verifica nuevamente."
   }
 }
