@@ -149,6 +149,7 @@ export default function PublishPublicationModal({
     removedPlatforms,
     duplicatePlatforms, // Agregar estado de duplicados
     publishingPlatforms,
+    optimisticPublishingPlatforms,
     scheduledPlatforms,
     publishing,
     unpublishing,
@@ -797,7 +798,9 @@ export default function PublishPublicationModal({
                       const isFailed = failedPlatforms.includes(account.id);
                       const isRemovedPlatform = removedPlatforms.includes(account.id);
                       const isDuplicate = duplicatePlatforms.includes(account.id);
-                      const isPublishing = publishingPlatforms.includes(account.id);
+                      const isPublishing =
+                        publishingPlatforms.includes(account.id) ||
+                        optimisticPublishingPlatforms.includes(account.id);
                       const isScheduled = scheduledPlatforms.includes(account.id);
                       const isUnpublishing = unpublishing === account.id;
                       const platformRetryInfo = retryInfo[account.id];

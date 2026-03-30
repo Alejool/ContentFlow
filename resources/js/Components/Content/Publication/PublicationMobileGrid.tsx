@@ -23,21 +23,30 @@ interface PublicationMobileGridProps {
   permissions?: string[];
 }
 
-const PublicationMobileGrid = memo(
-  function PublicationMobileGrid({
-    items,
-    t,
-    connectedAccounts,
-    getStatusColor,
-    onEdit,
-    onDelete,
-    onPublish,
-    onEditRequest,
-    onViewDetails,
-    onDuplicate,
-    permissions,
-  }: PublicationMobileGridProps) => {
-    const { auth } = usePage<{ auth: { user?: { id: number }; current_workspace?: { approval_workflow?: { is_enabled?: boolean }; user_role_slug?: string } } }>().props;
+interface PageProps {
+  auth: {
+    user?: { id: number };
+    current_workspace?: {
+      approval_workflow?: { is_enabled?: boolean };
+      user_role_slug?: string;
+    };
+  };
+}
+
+const PublicationMobileGrid = memo(function PublicationMobileGrid({
+  items,
+  t,
+  connectedAccounts,
+  getStatusColor,
+  onEdit,
+  onDelete,
+  onPublish,
+  onEditRequest,
+  onViewDetails,
+  onDuplicate,
+  permissions,
+}: PublicationMobileGridProps) {
+    const { auth } = usePage<PageProps>().props;
     const currentWorkspace = auth.current_workspace;
 
     const [isSubmittingForApproval, setIsSubmittingForApproval] = useState<Record<number, boolean>>(
@@ -332,7 +341,6 @@ const PublicationMobileGrid = memo(
         })}
       </div>
     );
-  },
-);
+});
 
 export default PublicationMobileGrid;

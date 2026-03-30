@@ -1,24 +1,10 @@
-import ApprovalHistorySection from '@/Components/Content/Publication/common/edit/ApprovalHistorySection';
+import ApprovalHistorySection, { ApprovalHistorySectionProps, ApprovalLog } from '@/Components/Content/Publication/common/edit/ApprovalHistorySection';
 import { AlertCircle, CheckCircle, ChevronDown, ChevronUp, Shield } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-interface ApprovalLog {
-  action: string;
-  created_at: string;
-  [key: string]: unknown;
-}
-
-interface ApprovalWorkflow {
-  [key: string]: unknown;
-}
-
-interface ApprovalHistoryCompactoProps {
-  logs: ApprovalLog[];
+interface ApprovalHistoryCompactoProps extends ApprovalHistorySectionProps {
   isExpanded: boolean;
   onToggle: () => void;
-  workflow?: ApprovalWorkflow;
-  currentStepNumber?: number;
-  approvalStatus?: 'pending' | 'approved' | 'rejected' | 'cancelled';
 }
 
 const ApprovalHistoryCompacto = ({
@@ -33,9 +19,11 @@ const ApprovalHistoryCompacto = ({
   const getLatestApprovalStatus = () => {
     if (!logs || logs.length === 0) return null;
 
-    const sortedLogs = [...logs].sort(
-      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-    );
+    const sortedLogs = [...logs].sort((a, b) => {
+      const dateA = new Date(a.created_at || a.requested_at || 0).getTime();
+      const dateB = new Date(b.created_at || b.requested_at || 0).getTime();
+      return dateB - dateA;
+    });
 
     return sortedLogs[0];
   };
@@ -93,14 +81,14 @@ const ApprovalHistoryCompacto = ({
               <span className="font-medium text-gray-900 dark:text-white">
                 {t('approvals.historyTitle')}
               </span>
-              {latestLog && (
-                <span
-                  className={`flex items-center gap-1 rounded-full px-2 py-1 text-xs ${getStatusColor(latestLog.action)}`}
-                >
-                  {getStatusIcon(latestLog.action)}
-                  {getStatusText(latestLog.action)}
-                </span>
-              )}
+                  {latestLog && (
+                    <span
+                      className={`flex items-center gap-1 rounded-full px-2 py-1 text-xs ${getStatusColor(latestLog.action || 'pending')}`}
+                    >
+                      {getStatusIcon(latestLog.action || 'pending')}
+                      {getStatusText(latestLog.action || 'pending')}
+                    </span>
+                  )}
             </div>
           </div>
         </div>

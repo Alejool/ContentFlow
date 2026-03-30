@@ -11,10 +11,12 @@ import {
   FileText,
   Home,
   Layers,
+  Loader2,
   LogOut,
   Menu,
   User,
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import NotificationButton from './NotificationButton';
 import ProfileDropdown from './ProfileDropdown';
@@ -88,7 +90,27 @@ export default function MobileNavbar({
 }: MobileNavbarProps) {
   const { t } = useTranslation();
   const { actualTheme } = useTheme();
-  const { auth } = usePage().props as any;
+  const { auth } = usePage<{
+    auth: {
+      current_workspace?: {
+        white_label_logo_url?: string;
+        permissions?: string[];
+      };
+    };
+  }>().props;
+
+  const [loadingHref, setLoadingHref] = useState<string | null>(null);
+
+  // Escuchar eventos reales de navegación de Inertia para limpiar el estado
+  useEffect(() => {
+    const handleFinish = () => setLoadingHref(null);
+    document.addEventListener('inertia:finish', handleFinish);
+    document.addEventListener('inertia:error', handleFinish);
+    return () => {
+      document.removeEventListener('inertia:finish', handleFinish);
+      document.removeEventListener('inertia:error', handleFinish);
+    };
+  }, []);
 
   const isProfileActive = safeIsActive('profile.edit');
 
@@ -118,6 +140,19 @@ export default function MobileNavbar({
           : 'border-b border-gray-200 bg-white/90'
       }`}
     >
+      {/* Barra de progreso de carga */}
+      <AnimatePresence>
+        {loadingHref && (
+          <motion.div
+            key="loading-bar"
+            initial={{ scaleX: 0, opacity: 1 }}
+            animate={{ scaleX: 0.85 }}
+            exit={{ scaleX: 1, opacity: 0 }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+            className="absolute left-0 top-0 h-0.5 w-full origin-left bg-primary-500"
+          />
+        )}
+      </AnimatePresence>
       <div className="mx-auto w-full max-w-7xl">
         <div className="flex h-16 items-center justify-between px-4">
           <div className="flex items-center">
@@ -176,7 +211,14 @@ export default function MobileNavbar({
                     key={item.href}
                     href={safeRoute(item.href)}
                     active={isActive}
+                    onClick={() => {
+                      if (loadingHref) return;
+                      setLoadingHref(item.href);
+                      setShowingNavigationDropdown(false);
+                    }}
                     className={`flex items-center space-x-3 rounded-lg px-4 py-3 transition-all duration-300 ${
+                      loadingHref && loadingHref !== item.href ? 'pointer-events-none opacity-50' : ''
+                    } ${
                       isActive
                         ? `bg-primary-600 text-white shadow-sm`
                         : `${
@@ -186,9 +228,13 @@ export default function MobileNavbar({
                           }`
                     }`}
                   >
-                    <item.lucideIcon
-                      className={`h-5 w-5 ${isActive ? 'text-white' : 'text-gray-400'}`}
-                    />
+                    {loadingHref === item.href ? (
+                      <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+                    ) : (
+                      <item.lucideIcon
+                        className={`h-5 w-5 ${isActive ? 'text-white' : 'text-gray-400'}`}
+                      />
+                    )}
                     <span className="font-bold">{t(item.nameKey)}</span>
                     {isActive && <div className="ml-auto h-1.5 w-1.5 rounded-full bg-white"></div>}
                   </ResponsiveNavLink>

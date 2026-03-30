@@ -1,15 +1,10 @@
 import PublicationTimeline from '@/Components/Content/Publication/common/edit/PublicationTimeline';
 import { ChevronDown, ChevronUp, History } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-
-interface TimelineActivity {
-  created_at: string;
-  status?: string;
-  [key: string]: unknown;
-}
+import { PublicationActivity } from '@/types/Publication';
 
 interface TimelineCompactoProps {
-  activities: TimelineActivity[];
+  activities: PublicationActivity[];
   isExpanded: boolean;
   onToggle: () => void;
 }
@@ -79,9 +74,9 @@ const TimelineCompacto = ({ activities, isExpanded, onToggle }: TimelineCompacto
               </span>
               {lastActivity && (
                 <span
-                  className={`rounded-full px-2 py-1 text-xs ${getStatusColor(lastActivity.status)}`}
+                  className={`rounded-full px-2 py-1 text-xs ${getStatusColor(lastActivity.status || 'pending')}`}
                 >
-                  {getStatusText(lastActivity.status)}
+                  {getStatusText(lastActivity.status || 'pending')}
                 </span>
               )}
             </div>

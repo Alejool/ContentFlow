@@ -1,4 +1,5 @@
 import { getDateFnsLocale } from '@/Utils/dateLocales';
+import { PublicationActivity } from '@/types/Publication';
 import { format } from 'date-fns';
 import {
   Activity,
@@ -15,18 +16,6 @@ import {
   XCircle,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-
-interface PublicationActivity {
-  id: number;
-  type: string;
-  details: any;
-  created_at: string;
-  user?: {
-    id: number;
-    name: string;
-    photo_url?: string;
-  };
-}
 
 interface PublicationTimelineProps {
   activities: PublicationActivity[];

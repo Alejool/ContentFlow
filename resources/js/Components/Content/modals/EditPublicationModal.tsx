@@ -870,7 +870,7 @@ const EditPublicationModal = ({
                     <PlatformCharacterValidator
                       text={watched.description || ''}
                       selectedAccountIds={watched.social_accounts || []}
-                      socialAccounts={socialAccounts as any}
+                      socialAccounts={socialAccounts}
                       onValidChange={setIsTextValid}
                     />
                   </div>
@@ -964,7 +964,7 @@ const EditPublicationModal = ({
                   </div>
 
                   <SocialAccountsSection
-                    socialAccounts={socialAccounts as any}
+                    socialAccounts={socialAccounts}
                     selectedAccounts={watched.social_accounts || []}
                     accountSchedules={accountSchedules}
                     t={t}
