@@ -1,7 +1,7 @@
 import Label from '@/Components/common/Modern/Label';
 import {
-  getMediaRulesForContentType,
-  type ContentType,
+    getMediaRulesForContentType,
+    type ContentType,
 } from '@/Components/Content/Publication/common/ContentTypeSelector';
 import { AlertTriangle, FileImage, Info, Loader2, Upload, Video, X } from 'lucide-react';
 import React, { memo, useMemo, useRef } from 'react';
@@ -92,15 +92,15 @@ const MediaUploadSection = memo(
         // Solo videos (para reels)
         types.push('video/mp4', 'video/mov', 'video/avi');
       } else if (mediaRules.imageOnly) {
-        // Solo imágenes
-        types.push('image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp');
+        // Solo imágenes (incluyendo SVG)
+        types.push('image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml');
       } else {
         // Verificar si aún se pueden agregar imágenes
         if (
           mediaRules.maxImages === undefined ||
           (mediaRules.maxImages > 0 && mediaCounts.images < mediaRules.maxImages)
         ) {
-          types.push('image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp');
+          types.push('image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml');
         }
         // Verificar si aún se pueden agregar videos
         if (
@@ -464,7 +464,7 @@ const VideoPreview = memo(
             type="file"
             id={`edit-thumb-${preview.tempId}`}
             className="hidden"
-            accept="image/jpeg,image/jpg,image/png,image/gif"
+            accept="image/jpeg,image/jpg,image/png,image/gif,image/svg+xml,image/webp"
             onChange={(e) => {
               const file = e.target.files?.[0];
               if (file) onSetThumbnail(file);
