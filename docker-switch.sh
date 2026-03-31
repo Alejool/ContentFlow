@@ -1,4 +1,4 @@
-#!/bin/bash
+﻿#!/bin/bash
 
 # Script para cambiar entre entornos Docker (dev/prod)
 
@@ -11,21 +11,21 @@ fi
 
 case $ENV in
     dev)
-        echo "🔄 Cambiando a entorno de DESARROLLO..."
+        echo "­ƒöä Cambiando a entorno de DESARROLLO..."
         docker-compose down
         docker-compose -f docker-compose.dev.yml down
         docker-compose -f docker-compose.dev.yml up -d --build
-        echo "✅ Entorno DEV levantado en http://localhost"
+        echo "Ô£à Entorno DEV levantado en http://localhost"
         ;;
     prod)
-        echo "🔄 Cambiando a entorno de PRODUCCIÓN..."
+        echo "­ƒöä Cambiando a entorno de PRODUCCI├ôN..."
         docker-compose -f docker-compose.dev.yml down
         docker-compose down
         docker-compose up -d --build
-        echo "✅ Entorno PROD levantado en http://localhost"
+        echo "Ô£à Entorno PROD levantado en http://localhost"
         ;;
     *)
-        echo "❌ Opción inválida. Usa: dev o prod"
+        echo "ÔØî Opci├│n inv├ílida. Usa: dev o prod"
         exit 1
         ;;
 esac

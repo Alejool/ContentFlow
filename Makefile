@@ -14,7 +14,7 @@ YELLOW = \033[1;33m
 NC = \033[0m
 
 help: ## Mostrar esta ayuda
-	@echo "ContentFlow - Comandos Docker"
+	@echo "Intellipost - Comandos Docker"
 	@echo ""
 	@echo "Uso: make [comando]"
 	@echo ""
@@ -80,11 +80,11 @@ seed: ## Ejecutar seeders
 	$(COMPOSE) exec $(APP) php artisan db:seed
 
 psql: ## Conectar a PostgreSQL
-	$(COMPOSE) exec $(PGSQL) psql -U Intellipost -d ContentFlow
+	$(COMPOSE) exec $(PGSQL) psql -U Intellipost -d Intellipost
 
 backup: ## Crear backup de base de datos
 	@echo "$(GREEN)Creando backup...$(NC)"
-	$(COMPOSE) exec -T $(PGSQL) pg_dump -U Intellipost ContentFlow > backup_$$(date +%Y%m%d_%H%M%S).sql
+	$(COMPOSE) exec -T $(PGSQL) pg_dump -U Intellipost Intellipost > backup_$$(date +%Y%m%d_%H%M%S).sql
 	@echo "$(GREEN)Backup creado.$(NC)"
 
 # Caché y Optimización
