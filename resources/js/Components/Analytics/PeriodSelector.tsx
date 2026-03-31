@@ -7,9 +7,9 @@ interface PeriodOption {
 }
 
 const PERIOD_OPTIONS: PeriodOption[] = [
-  { days: 7,   labelKey: 'analytics.period.7d',   fallback: '7d' },
-  { days: 30,  labelKey: 'analytics.period.30d',  fallback: '30d' },
-  { days: 90,  labelKey: 'analytics.period.90d',  fallback: '90d' },
+  { days: 7, labelKey: 'analytics.period.7d', fallback: '7d' },
+  { days: 30, labelKey: 'analytics.period.30d', fallback: '30d' },
+  { days: 90, labelKey: 'analytics.period.90d', fallback: '90d' },
 ];
 
 interface PeriodSelectorProps {

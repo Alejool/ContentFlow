@@ -1,27 +1,27 @@
 import { SeededRandom } from '@/Utils/stableMock';
 import {
-    ChevronLeft,
-    ChevronRight,
-    Eye,
-    Heart,
-    MousePointer2,
-    Search,
-    TrendingUp,
-    Users,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  Heart,
+  MousePointer2,
+  Search,
+  TrendingUp,
+  Users,
 } from 'lucide-react';
 import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-    Bar,
-    BarChart,
-    CartesianGrid,
-    Legend,
-    Line,
-    LineChart,
-    ResponsiveContainer,
-    Tooltip,
-    XAxis,
-    YAxis,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
 } from 'recharts';
 
 interface PlatformBreakdown {

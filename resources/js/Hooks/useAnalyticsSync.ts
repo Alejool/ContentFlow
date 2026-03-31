@@ -8,23 +8,23 @@ type SyncPhase = 'idle' | 'dispatching' | 'waiting' | 'done' | 'locked';
 
 interface SyncState {
   phase: SyncPhase;
-  retryAfter: number;   // seconds until next manual sync allowed
+  retryAfter: number; // seconds until next manual sync allowed
   lastSyncedAt: Date | null;
 }
 
-const POLL_INTERVAL_MS  = 4000;   // check for new data every 4s
-const POLL_TIMEOUT_MS   = 90000;  // give up after 90s
-const COOLDOWN_SECONDS  = 900;    // 15 min — must match backend
+const POLL_INTERVAL_MS = 4000; // check for new data every 4s
+const POLL_TIMEOUT_MS = 90000; // give up after 90s
+const COOLDOWN_SECONDS = 900; // 15 min — must match backend
 
 export function useAnalyticsSync(workspaceId: number | undefined) {
   const queryClient = useQueryClient();
-  const pollTimer   = useRef<ReturnType<typeof setInterval> | null>(null);
-  const pollStart   = useRef<number>(0);
-  const toastId     = useRef<string | undefined>(undefined);
+  const pollTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pollStart = useRef<number>(0);
+  const toastId = useRef<string | undefined>(undefined);
 
   const [state, setState] = useState<SyncState>({
-    phase:        'idle',
-    retryAfter:   0,
+    phase: 'idle',
+    retryAfter: 0,
     lastSyncedAt: null,
   });
 
@@ -53,7 +53,7 @@ export function useAnalyticsSync(workspaceId: number | undefined) {
         if (data.locked && data.retry_after_seconds > 0) {
           setState((prev) => ({
             ...prev,
-            phase:      'locked',
+            phase: 'locked',
             retryAfter: data.retry_after_seconds,
           }));
         }
@@ -75,9 +75,7 @@ export function useAnalyticsSync(workspaceId: number | undefined) {
     pollStart.current = Date.now();
 
     // Snapshot current totals to detect when data actually changed
-    const cached = queryClient.getQueryData<any>(
-      queryKeys.analyticsData.period(30, workspaceId!),
-    );
+    const cached = queryClient.getQueryData<any>(queryKeys.analyticsData.period(30, workspaceId!));
     const baselineViews = cached?.overview?.total_views ?? -1;
 
     pollTimer.current = setInterval(async () => {
@@ -88,13 +86,11 @@ export function useAnalyticsSync(workspaceId: number | undefined) {
       await queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
 
       // Check if data changed
-      const fresh = queryClient.getQueryData<any>(
-        queryKeys.analyticsData.period(30, workspaceId!),
-      );
+      const fresh = queryClient.getQueryData<any>(queryKeys.analyticsData.period(30, workspaceId!));
       const freshViews = fresh?.overview?.total_views ?? -1;
 
       const dataChanged = freshViews !== baselineViews && freshViews !== -1;
-      const timedOut    = elapsed >= POLL_TIMEOUT_MS;
+      const timedOut = elapsed >= POLL_TIMEOUT_MS;
 
       if (dataChanged || timedOut) {
         stopPolling();
@@ -110,8 +106,8 @@ export function useAnalyticsSync(workspaceId: number | undefined) {
 
         setState((prev) => ({
           ...prev,
-          phase:        'locked',
-          retryAfter:   COOLDOWN_SECONDS,
+          phase: 'locked',
+          retryAfter: COOLDOWN_SECONDS,
           lastSyncedAt: new Date(),
         }));
       }
@@ -123,7 +119,13 @@ export function useAnalyticsSync(workspaceId: number | undefined) {
 
   // ── Main sync trigger ───────────────────────────────────────────────────
   const sync = useCallback(async () => {
-    if (!workspaceId || state.phase === 'dispatching' || state.phase === 'waiting' || state.phase === 'locked') return;
+    if (
+      !workspaceId ||
+      state.phase === 'dispatching' ||
+      state.phase === 'waiting' ||
+      state.phase === 'locked'
+    )
+      return;
 
     setState((prev) => ({ ...prev, phase: 'dispatching' }));
 
@@ -135,7 +137,6 @@ export function useAnalyticsSync(workspaceId: number | undefined) {
 
       setState((prev) => ({ ...prev, phase: 'waiting' }));
       startPolling();
-
     } catch (err: any) {
       const retryAfter = err?.response?.data?.retry_after_seconds ?? 0;
 
@@ -146,7 +147,7 @@ export function useAnalyticsSync(workspaceId: number | undefined) {
         });
         setState((prev) => ({
           ...prev,
-          phase:      'locked',
+          phase: 'locked',
           retryAfter: retryAfter,
         }));
       } else {
@@ -161,9 +162,9 @@ export function useAnalyticsSync(workspaceId: number | undefined) {
   return {
     sync,
     isBusy,
-    phase:        state.phase,
-    locked:       state.phase === 'locked',
-    retryAfter:   state.retryAfter,
+    phase: state.phase,
+    locked: state.phase === 'locked',
+    retryAfter: state.retryAfter,
     lastSyncedAt: state.lastSyncedAt,
   };
 }

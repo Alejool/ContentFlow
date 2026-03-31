@@ -116,7 +116,8 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
             <p className="text-lg text-gray-600 dark:text-gray-400">{t('analytics.subtitle')}</p>
             {lastSyncedAt && (
               <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
-                {t('analytics.lastSynced', 'Última actualización')}: {lastSyncedAt.toLocaleTimeString()}
+                {t('analytics.lastSynced', 'Última actualización')}:{' '}
+                {lastSyncedAt.toLocaleTimeString()}
               </p>
             )}
           </div>
@@ -147,8 +148,8 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
             >
               <RefreshCw className={`h-4 w-4 ${isBusy ? 'animate-spin' : ''}`} />
               {phase === 'dispatching' && 'Iniciando...'}
-              {phase === 'waiting'     && 'Actualizando...'}
-              {phase === 'locked'      && `${Math.ceil(retryAfter / 60)}m`}
+              {phase === 'waiting' && 'Actualizando...'}
+              {phase === 'locked' && `${Math.ceil(retryAfter / 60)}m`}
               {(phase === 'idle' || phase === 'done') && 'Actualizar'}
             </button>
           </div>
@@ -257,21 +258,26 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
                   {t('analytics.charts.detailedPublications', 'Rendimiento de Publicaciones')}
                 </h2>
                 <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                  {t('analytics.publications.subtitle', 'Seguimiento detallado por publicación — vistas, clicks, engagement y alcance por plataforma')}
+                  {t(
+                    'analytics.publications.subtitle',
+                    'Seguimiento detallado por publicación — vistas, clicks, engagement y alcance por plataforma',
+                  )}
                 </p>
                 {selectedPeriod > 90 && (
-                  <span className={`mt-1 inline-flex w-fit items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                    isDark ? 'bg-blue-900/30 text-blue-300' : 'bg-blue-50 text-blue-700'
-                  }`}>
-                    {t('analytics.publications.aggregated_note', 'Datos agregados por semana para este período')}
+                  <span
+                    className={`mt-1 inline-flex w-fit items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                      isDark ? 'bg-blue-900/30 text-blue-300' : 'bg-blue-50 text-blue-700'
+                    }`}
+                  >
+                    {t(
+                      'analytics.publications.aggregated_note',
+                      'Datos agregados por semana para este período',
+                    )}
                   </span>
                 )}
               </div>
               <Suspense fallback={<Skeleton className="h-[400px] w-full rounded-lg" />}>
-                <DetailedPublicationPerformance
-                  publications={detailedPublications}
-                  theme={theme}
-                />
+                <DetailedPublicationPerformance publications={detailedPublications} theme={theme} />
               </Suspense>
             </div>
           </div>
@@ -330,9 +336,11 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
           </div>
         )}
 
-        {campaigns.length === 0 && socialMedia.length === 0 && detailedPublications.length === 0 && (
-          <EmptyState config={getEmptyStateByKey('analytics', t)!} />
-        )}
+        {campaigns.length === 0 &&
+          socialMedia.length === 0 &&
+          detailedPublications.length === 0 && (
+            <EmptyState config={getEmptyStateByKey('analytics', t)!} />
+          )}
       </div>
     </AuthenticatedLayout>
   );
