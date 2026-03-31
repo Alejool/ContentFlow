@@ -1,4 +1,5 @@
 import CommandPalette from '@/Components/CommandPalette/CommandPalette';
+import { DevCacheIndicator } from '@/Components/DevCacheIndicator';
 import GlobalUploadIndicator from '@/Components/GlobalUploadIndicator';
 import ActiveWorkspace from '@/Components/Layout/ActiveWorkspace';
 import MobileNavbar from '@/Components/Layout/MobileNavbar';
