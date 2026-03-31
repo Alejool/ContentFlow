@@ -58,7 +58,7 @@ class PublicationTemplateSeeder extends Seeder
                 'category' => 'educational',
                 'preview_image' => '/images/templates/how-to.jpg',
                 'content' => [
-                    'text' => "📚 How to [Achieve Goal]:\n\nStep 1: [First Action]\nStep 2: [Second Action]\nStep 3: [Third Action]\nStep 4: [Fourth Action]\n\n💡 Pro Tip: [Additional insight]\n\nSave this for later! 🔖",
+                    'text' => "📚 How to [Achieve Goal]:\n\nStep 1: [First Action]\nStep 2: [Second Action]\nStep 3: [Third Action]\nStep 4: [Fourth Action]\n\n Pro Tip: [Additional insight]\n\nSave this for later! 🔖",
                     'hashtags' => ['#HowTo', '#Tutorial', '#Tips'],
                 ],
                 'is_active' => true,
@@ -82,7 +82,7 @@ class PublicationTemplateSeeder extends Seeder
                 'category' => 'educational',
                 'preview_image' => '/images/templates/quick-tips.jpg',
                 'content' => [
-                    'text' => "💡 Quick Tip Tuesday!\n\n[Specific actionable tip]\n\nWhy it works:\n[Brief explanation]\n\nTry it today and let us know how it goes! 👇",
+                    'text' => " Quick Tip Tuesday!\n\n[Specific actionable tip]\n\nWhy it works:\n[Brief explanation]\n\nTry it today and let us know how it goes! 👇",
                     'hashtags' => ['#TipTuesday', '#QuickTip', '#LifeHack'],
                 ],
                 'is_active' => true,
