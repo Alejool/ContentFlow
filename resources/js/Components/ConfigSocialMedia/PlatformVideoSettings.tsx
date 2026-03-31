@@ -1,8 +1,7 @@
 import VideoValidationAlert from '@/Components/Content/VideoValidationAlert';
-import { PLATFORM_REQUIREMENTS, validateVideoForPlatform } from '@/Utils/videoValidation';
 import type { ValidationResult } from '@/Utils/videoValidation';
+import { PLATFORM_REQUIREMENTS, validateVideoForPlatform } from '@/Utils/videoValidation';
 import { Info } from 'lucide-react';
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface PlatformVideoSettingsProps {
@@ -26,15 +25,10 @@ export default function PlatformVideoSettings({
   children,
 }: PlatformVideoSettingsProps) {
   const { t } = useTranslation();
-  const [validation, setValidation] = useState<ValidationResult | null>(null);
 
-  useEffect(() => {
-    if (!videoMetadata || !videoMetadata.width || !videoMetadata.height) {
-      setValidation(null);
-      return;
-    }
-
-    const result = validateVideoForPlatform(
+  const validation = useMemo<ValidationResult | null>(() => {
+    if (!videoMetadata?.width || !videoMetadata?.height) return null;
+    return validateVideoForPlatform(
       {
         duration: videoMetadata.duration,
         width: videoMetadata.width,
@@ -47,8 +41,6 @@ export default function PlatformVideoSettings({
       currentType,
       t,
     );
-
-    setValidation(result);
   }, [videoMetadata, platform, currentType, t]);
 
   const requirements = PLATFORM_REQUIREMENTS[platform];

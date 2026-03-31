@@ -3,8 +3,8 @@ import { getMediaRulesForContentType } from '@/Components/Content/Publication/co
 import { CONTENT_TYPE_DISPLAY } from '@/Constants/contentTypes';
 import { useContentTypeSuggestion } from '@/Hooks/publication/useContentTypeSuggestion';
 import {
-    useCreatePublication,
-    useUpdatePublication,
+  useCreatePublication,
+  useUpdatePublication,
 } from '@/Hooks/publication/usePublicationsList';
 import { useS3Upload } from '@/Hooks/useS3Upload';
 import { queryKeys } from '@/lib/queryKeys';

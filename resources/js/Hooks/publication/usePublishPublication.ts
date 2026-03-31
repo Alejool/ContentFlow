@@ -464,10 +464,12 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         setSelectedPlatforms([]);
 
         // Update store so publishingPlatforms reflects the new state
-        usePublicationStore.getState().setPublishingPlatforms(publication.id, [
-          ...publishingPlatforms,
-          ...platformsBeingSubmitted,
-        ]);
+        usePublicationStore
+          .getState()
+          .setPublishingPlatforms(publication.id, [
+            ...publishingPlatforms,
+            ...platformsBeingSubmitted,
+          ]);
 
         window.dispatchEvent(new CustomEvent('publication-started'));
         setYoutubeThumbnails({});

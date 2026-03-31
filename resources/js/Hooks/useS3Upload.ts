@@ -420,7 +420,7 @@ export const useS3Upload = () => {
 
   // Public uploadFile — accepts optional context parameter
   const uploadFile = useCallback(
-    (file: File, tempId: string, context?: 'publication' | 'profile' | 'workspace') => 
+    (file: File, tempId: string, context?: 'publication' | 'profile' | 'workspace') =>
       mutation.mutateAsync({ file, tempId, context }),
     [mutation.mutateAsync],
   );

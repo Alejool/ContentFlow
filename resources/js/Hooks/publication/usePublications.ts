@@ -1,12 +1,12 @@
 import {
-    useCampaignsList,
-    useDeleteCampaign,
-    useDuplicateCampaign,
+  useCampaignsList,
+  useDeleteCampaign,
+  useDuplicateCampaign,
 } from '@/Hooks/campaign/useCampaigns';
 import {
-    useDeletePublication,
-    useDuplicatePublication,
-    usePublicationsList,
+  useDeletePublication,
+  useDuplicatePublication,
+  usePublicationsList,
 } from '@/Hooks/publication/usePublicationsList';
 import { useRealtime } from '@/Hooks/publication/useRealtime';
 import { useConfirm } from '@/Hooks/useConfirm';

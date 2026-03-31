@@ -1,5 +1,6 @@
 import FacebookSettings from '@/Components/ConfigSocialMedia/FacebookSettings';
 import InstagramSettings from '@/Components/ConfigSocialMedia/InstagramSettings';
+import ThreadsSettings from '@/Components/ConfigSocialMedia/ThreadsSettings';
 import TikTokSettings from '@/Components/ConfigSocialMedia/TikTokSettings';
 import TwitterSettings from '@/Components/ConfigSocialMedia/TwitterSettings';
 import YoutubeSettings from '@/Components/ConfigSocialMedia/YoutubeSettings';
