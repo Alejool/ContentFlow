@@ -17,7 +17,7 @@ class CreateTestWorkspaceCommand extends Command
 
         // Crear usuario de prueba si no existe
         $user = User::firstOrCreate(
-            ['email' => 'test@contentflow.com'],
+            ['email' => 'test@Intellipost.com'],
             [
                 'name' => 'Test User',
                 'password' => bcrypt('password'),
