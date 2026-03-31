@@ -100,7 +100,7 @@ export function initProcessingProgressRealtime(userId: number) {
       // Update existing job
       store.updateJob(jobId, {
         progress,
-        stats,
+        ...(stats !== undefined && { stats }),
       });
     } else {
       // Add new job if it doesn't exist
@@ -110,7 +110,7 @@ export function initProcessingProgressRealtime(userId: number) {
         type: 'video_processing',
         progress,
         status: 'processing',
-        stats,
+        ...(stats !== undefined && { stats }),
         startTime: Date.now(),
       });
     }
