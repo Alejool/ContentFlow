@@ -1,5 +1,17 @@
 import { useTranslation } from 'react-i18next';
 
+interface PeriodOption {
+  days: number;
+  labelKey: string;
+  fallback: string;
+}
+
+const PERIOD_OPTIONS: PeriodOption[] = [
+  { days: 7,   labelKey: 'analytics.period.7d',   fallback: '7d' },
+  { days: 30,  labelKey: 'analytics.period.30d',  fallback: '30d' },
+  { days: 90,  labelKey: 'analytics.period.90d',  fallback: '90d' },
+];
+
 interface PeriodSelectorProps {
   selectedPeriod: number;
   onPeriodChange: (days: number) => void;
@@ -8,21 +20,20 @@ interface PeriodSelectorProps {
 
 export default function PeriodSelector({ selectedPeriod, onPeriodChange }: PeriodSelectorProps) {
   const { t } = useTranslation();
-  const periods = [7, 30, 90];
 
   return (
-    <div className="mb-6 flex w-fit rounded-lg bg-neutral-100 p-1 dark:bg-neutral-800">
-      {periods.map((days) => (
+    <div className="flex w-fit rounded-lg bg-neutral-100 p-1 dark:bg-neutral-800">
+      {PERIOD_OPTIONS.map(({ days, labelKey, fallback }) => (
         <button
           key={days}
           onClick={() => onPeriodChange(days)}
-          className={`rounded-md px-4 py-2 text-sm font-medium transition-all ${
+          className={`rounded-md px-3 py-2 text-sm font-medium transition-all ${
             selectedPeriod === days
               ? 'bg-white text-gray-900 shadow-sm dark:bg-neutral-700 dark:text-white'
               : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
           }`}
         >
-          {days} {t('analytics.days')}
+          {t(labelKey, fallback)}
         </button>
       ))}
     </div>

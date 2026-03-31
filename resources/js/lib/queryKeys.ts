@@ -74,6 +74,7 @@ export const queryKeys = {
   },
 
   dashboard: {
+    all: ['dashboard'] as const,
     stats: (workspaceId: number) => ['dashboard', 'stats', workspaceId] as const,
   },
 

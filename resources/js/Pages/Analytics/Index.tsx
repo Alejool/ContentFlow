@@ -2,11 +2,12 @@ import StatCard from '@/Components/Statistics/StatCard';
 import EmptyState from '@/Components/common/EmptyState';
 import Skeleton from '@/Components/common/ui/Skeleton';
 import { useAnalyticsData } from '@/Hooks/useAnalyticsData';
+import { useAnalyticsSync } from '@/Hooks/useAnalyticsSync';
 import { useTheme } from '@/Hooks/useTheme';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { getEmptyStateByKey } from '@/Utils/emptyStateMapper';
-import { Head, usePage } from '@inertiajs/react';
-import { Eye, Heart, LockKeyhole, MousePointer2, TrendingUp, Users } from 'lucide-react';
+import { Head, router, usePage } from '@inertiajs/react';
+import { Eye, Heart, LockKeyhole, MousePointer2, RefreshCw, TrendingUp, Users } from 'lucide-react';
 import { Suspense, lazy, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { CampaignStat } from '../../Components/Analytics/PerformanceTable';
@@ -83,6 +84,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
 
   // TanStack Query — caches data per period so switching is instant after first load
   const { data: queryStats, isFetching } = useAnalyticsData(selectedPeriod, workspaceId);
+  const { sync, isBusy, phase, locked, retryAfter, lastSyncedAt } = useAnalyticsSync(workspaceId);
 
   // Use query data when available, fall back to Inertia SSR props for initial render
   const stats = queryStats ?? initialStats;
@@ -112,13 +114,44 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
               )}
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-400">{t('analytics.subtitle')}</p>
+            {lastSyncedAt && (
+              <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
+                {t('analytics.lastSynced', 'Última actualización')}: {lastSyncedAt.toLocaleTimeString()}
+              </p>
+            )}
           </div>
 
-          <PeriodSelector
-            selectedPeriod={selectedPeriod}
-            onPeriodChange={handlePeriodChange}
-            theme={theme}
-          />
+          <div className="flex flex-wrap items-center gap-3">
+            <PeriodSelector
+              selectedPeriod={selectedPeriod}
+              onPeriodChange={handlePeriodChange}
+              theme={theme}
+            />
+
+            {/* Manual sync button */}
+            <button
+              onClick={sync}
+              disabled={isBusy || locked}
+              title={
+                locked
+                  ? `Próxima actualización disponible en ${Math.ceil(retryAfter / 60)} min`
+                  : isBusy
+                    ? 'Actualizando datos...'
+                    : 'Actualizar datos desde las redes sociales'
+              }
+              className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 ${
+                isDark
+                  ? 'bg-neutral-700 text-gray-200 hover:bg-neutral-600'
+                  : 'bg-white text-gray-700 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50'
+              }`}
+            >
+              <RefreshCw className={`h-4 w-4 ${isBusy ? 'animate-spin' : ''}`} />
+              {phase === 'dispatching' && 'Iniciando...'}
+              {phase === 'waiting'     && 'Actualizando...'}
+              {phase === 'locked'      && `${Math.ceil(retryAfter / 60)}m`}
+              {(phase === 'idle' || phase === 'done') && 'Actualizar'}
+            </button>
+          </div>
         </div>
 
         <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -215,6 +248,35 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
           </Suspense>
         )}
 
+        {/* Publication performance — visible for all plans */}
+        {(detailedPublications.length > 0 || campaigns.length > 0) && (
+          <div className="mb-8">
+            <div className="rounded-lg border border-gray-100 bg-white p-6 shadow-lg transition-colors duration-300 dark:border-neutral-700/50 dark:bg-neutral-800/50 dark:backdrop-blur-sm">
+              <div className="mb-5 flex flex-col gap-1">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                  {t('analytics.charts.detailedPublications', 'Rendimiento de Publicaciones')}
+                </h2>
+                <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                  {t('analytics.publications.subtitle', 'Seguimiento detallado por publicación — vistas, clicks, engagement y alcance por plataforma')}
+                </p>
+                {selectedPeriod > 90 && (
+                  <span className={`mt-1 inline-flex w-fit items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                    isDark ? 'bg-blue-900/30 text-blue-300' : 'bg-blue-50 text-blue-700'
+                  }`}>
+                    {t('analytics.publications.aggregated_note', 'Datos agregados por semana para este período')}
+                  </span>
+                )}
+              </div>
+              <Suspense fallback={<Skeleton className="h-[400px] w-full rounded-lg" />}>
+                <DetailedPublicationPerformance
+                  publications={detailedPublications}
+                  theme={theme}
+                />
+              </Suspense>
+            </div>
+          </div>
+        )}
+
         {socialMedia.length > 0 && (
           <div className="mb-8">
             <Suspense fallback={<Skeleton className="h-[300px] w-full rounded-lg" />}>
@@ -223,7 +285,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
           </div>
         )}
 
-        {/* Advanced analytics — gated by plan */}
+        {/* Advanced platform analytics — gated by plan */}
         {hasAdvancedAnalytics ? (
           <>
             {detailedPlatforms.length > 0 && (
@@ -239,30 +301,10 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
                     <DetailedPlatformChart platforms={detailedPlatforms} theme={theme} />
                   </Suspense>
                 </div>
-                {detailedPublications.length > 0 && (
-                  <div className="my-8">
-                    <div className="mb-4 rounded-lg bg-white p-6 shadow-lg transition-colors duration-300 dark:border-neutral-700/50 dark:bg-neutral-800/50 dark:backdrop-blur-sm">
-                      <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                        {t('analytics.charts.detailedPublications')}
-                      </h2>
-                      <p className={`mt-1 text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                        {t('analytics.advanced.platform_breakdown')}
-                      </p>
-
-                      <Suspense fallback={<Skeleton className="h-[400px] w-full rounded-lg" />}>
-                        <DetailedPublicationPerformance
-                          publications={detailedPublications}
-                          theme={theme}
-                        />
-                      </Suspense>
-                    </div>
-                  </div>
-                )}
               </div>
             )}
           </>
         ) : (
-          // Upgrade prompt for basic plans
           <div className="relative mb-8 overflow-hidden rounded-2xl border border-primary-200/50 shadow-lg dark:border-primary-800/30">
             <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-white/80 p-8 backdrop-blur-sm dark:bg-neutral-900/80">
               <div className="rounded-full bg-primary-100 p-4 dark:bg-primary-900/40">
@@ -281,7 +323,6 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
                 {t('analytics.advanced.upgrade_cta')}
               </button>
             </div>
-            {/* Blurred dummy content */}
             <div className="pointer-events-none select-none p-6 opacity-20">
               <Skeleton className="mb-4 h-8 w-48 rounded-lg" />
               <Skeleton className="h-[300px] w-full rounded-lg" />
@@ -289,7 +330,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
           </div>
         )}
 
-        {campaigns.length === 0 && socialMedia.length === 0 && (
+        {campaigns.length === 0 && socialMedia.length === 0 && detailedPublications.length === 0 && (
           <EmptyState config={getEmptyStateByKey('analytics', t)!} />
         )}
       </div>

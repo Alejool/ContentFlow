@@ -1,26 +1,27 @@
 import { SeededRandom } from '@/Utils/stableMock';
 import {
-  ChevronRight,
-  Eye,
-  ChevronLeft,
-  Heart,
-  MousePointer2,
-  Search,
-  TrendingUp,
-  Users,
+    ChevronLeft,
+    ChevronRight,
+    Eye,
+    Heart,
+    MousePointer2,
+    Search,
+    TrendingUp,
+    Users,
 } from 'lucide-react';
 import { useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Legend,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
+    Bar,
+    BarChart,
+    CartesianGrid,
+    Legend,
+    Line,
+    LineChart,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis,
 } from 'recharts';
 
 interface PlatformBreakdown {
@@ -90,6 +91,7 @@ const StatCard = ({ icon: Icon, label, value, color, isDark }: StatCardProps) =>
 );
 
 export default function DetailedPublicationPerformance({ publications, theme = 'light' }: Props) {
+  const { t } = useTranslation();
   const isDark = theme === 'dark';
   const [searchTerm, setSearchTerm] = useState('');
   const scrollContainerRef = useRef<HTMLDivElement>(null);
