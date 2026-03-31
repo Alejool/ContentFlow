@@ -103,4 +103,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     Route::get('/publications/{publication}/capabilities', [App\Http\Controllers\Api\V1\PublicationValidationController::class, 'getPlatformCapabilities'])
         ->name('api.v1.publications.capabilities');
+    
+    // Content verification endpoints
+    Route::prefix('content-verification')->name('api.v1.content-verification.')->group(function () {
+        Route::get('/publications/{publication}/status', [App\Http\Controllers\Api\ContentVerificationController::class, 'getPublicationStatus'])
+            ->name('publication-status');
+        Route::post('/logs/{postLog}/verify', [App\Http\Controllers\Api\ContentVerificationController::class, 'verifyContent'])
+            ->name('verify');
+        Route::get('/workspace/stats', [App\Http\Controllers\Api\ContentVerificationController::class, 'getWorkspaceStats'])
+            ->name('workspace-stats');
+    });
 });

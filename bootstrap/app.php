@@ -91,6 +91,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command('social:check-tokens')->daily();
         $schedule->command('youtube:process-playlist-queue')->everyFiveMinutes();
         $schedule->command('app:send-event-reminders')->everyMinute();
+        // Verificar contenido publicado cada 6 horas (4 veces al día)
+        $schedule->command('content:verify-status --days=7 --limit=200')
+            ->everySixHours()
+            ->withoutOverlapping();
         // Reset monthly usage metrics on the first day of each month
         $schedule->command('usage:reset-monthly')
             ->monthlyOn(1, '00:00')
