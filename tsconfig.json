@@ -1,37 +1,57 @@
 {
   "compilerOptions": {
+    // Target & Language
     "target": "ES2022",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "useDefineForClassFields": true,
+
+    // JSX
     "jsx": "react-jsx",
+
+    // Module System
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "verbatimModuleSyntax": true,
+    "resolveJsonModule": true,
     "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+
+    // Emit
+    "noEmit": true,
+    "isolatedModules": true,
+
+    // Type Checking - Strict
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "exactOptionalPropertyTypes": true,
-    "noEmit": true,
-    "isolatedModules": true,
-    "esModuleInterop": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedSideEffectImports": true,
+
+    // Interop
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "useDefineForClassFields": true,
-    "allowSyntheticDefaultImports": true,
 
+    // Types
+    "types": ["vite/client"],
+
+    // Path Aliases
     "baseUrl": ".",
     "paths": {
       "@/*": ["resources/js/*"],
+      "@components/*": ["resources/js/components/*"],
+      "@hooks/*": ["resources/js/hooks/*"],
+      "@utils/*": ["resources/js/utils/*"],
       "ziggy-js": ["./vendor/tightenco/ziggy"]
-    },
-    
-    "types": ["vite/client"]
+    }
   },
   "include": [
     "resources/js/**/*",
     "tests/Javascript/**/*",
     "./vendor/tightenco/ziggy/**/*.js"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "public", "storage", "vendor"]
 }
