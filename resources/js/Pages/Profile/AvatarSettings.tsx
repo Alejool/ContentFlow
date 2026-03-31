@@ -1,6 +1,8 @@
+import FileUploadButton from '@/Components/common/FileUploadButton';
 import Button from '@/Components/common/Modern/Button';
+import { router } from '@inertiajs/react';
 import axios from 'axios';
-import { Upload, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -21,8 +23,8 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
   const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleFileChange = async (files: FileList | null) => {
+    const file = files?.[0];
     if (!file) return;
 
     // Validar tamaño (max 2MB)
@@ -31,9 +33,10 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
       return;
     }
 
-    // Validar tipo
-    if (!file.type.startsWith('image/')) {
-      toast.error(t('profile.invalid_file_type', 'Solo se permiten archivos de imagen'));
+    // Validar tipo (incluyendo SVG)
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/svg+xml', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      toast.error(t('profile.invalid_file_type', 'Solo se permiten archivos de imagen (JPG, PNG, GIF, SVG, WebP)'));
       return;
     }
 
@@ -68,13 +71,16 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
             : null;
         setPreviewUrl(newPhotoUrl);
         setImageError(false);
+        setImageLoaded(false);
 
         toast.success(t('profile.avatar_uploaded', 'Foto subida correctamente'));
 
-        // Recargar para actualizar en toda la app
-        setTimeout(() => {
-          window.location.reload();
-        }, 500);
+        // Actualizar el estado global de Inertia sin recargar la página
+        router.reload({ 
+          only: ['auth'],
+          preserveScroll: true,
+          preserveState: true,
+        });
       } else {
         toast.error(
           response.data.message || t('profile.avatar_update_failed', 'Error al subir la foto'),
@@ -105,13 +111,17 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
 
       if (response.data.success) {
         setPreviewUrl(null);
+        setImageError(false);
+        setImageLoaded(false);
 
         toast.success(t('profile.avatar_removed', 'Avatar eliminado correctamente'));
 
-        // Recargar para actualizar en toda la app
-        setTimeout(() => {
-          window.location.reload();
-        }, 500);
+        // Actualizar el estado global de Inertia sin recargar la página
+        router.reload({ 
+          only: ['auth'],
+          preserveScroll: true,
+          preserveState: true,
+        });
       } else {
         toast.error(
           response.data.message || t('profile.avatar_remove_failed', 'Error al eliminar el avatar'),
@@ -199,30 +209,22 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
       {/* Controles de subida */}
       <div className="space-y-3">
         <div className="flex flex-col gap-2">
-          <input
-            type="file"
-            accept="image/jpeg,image/jpg,image/png,image/gif"
+          <FileUploadButton
+            accept="image/jpeg,image/jpg,image/png,image/gif,image/svg+xml,image/webp"
             onChange={handleFileChange}
-            className="hidden"
-            id="avatar-upload"
-            disabled={processing}
+            label={t('profile.choose_file', 'Elegir Archivo')}
+            loading={processing}
+            loadingLabel={t('profile.uploading', 'Subiendo...')}
+            variant="primary"
+            size="md"
+            className="w-full"
           />
-          <label
-            htmlFor="avatar-upload"
-            className={`inline-flex items-center justify-center gap-2 rounded-lg border-2 border-primary-600 bg-transparent px-4 py-2.5 text-sm font-medium text-primary-600 transition-all duration-200 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:hover:bg-primary-900/20 ${
-              processing ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
-            }`}
-          >
-            <Upload size={16} />
-            {processing
-              ? t('profile.uploading', 'Subiendo...')
-              : t('profile.choose_file', 'Elegir Archivo')}
-          </label>
           {previewUrl && (
             <Button
               type="button"
               variant="ghost"
-              size="sm"
+              buttonStyle='ghost'
+              size="md"
               icon={X}
               onClick={handleRemovePhoto}
               disabled={processing}
@@ -233,7 +235,7 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
           )}
         </div>
         <p className="text-center text-xs text-gray-500 dark:text-gray-400">
-          {t('profile.avatar_requirements', 'Máximo 2MB. Formatos: JPG, PNG, GIF')}
+          {t('profile.avatar_requirements', 'Máximo 2MB. Formatos: JPG, PNG, GIF, SVG, WebP')}
         </p>
       </div>
     </div>
