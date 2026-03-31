@@ -19,4 +19,9 @@ return [
     'token' => 'This password reset token is invalid.',
     'user' => "We can't find a user with that email address.",
 
+    // Custom app messages
+    'workspace_email_not_found' => 'We could not find a user with that email address.',
+    'workspace_role_required' => 'Please select a role for the new member.',
+    'login_user_not_found' => 'We could not find a user with that email address.',
+
 ];

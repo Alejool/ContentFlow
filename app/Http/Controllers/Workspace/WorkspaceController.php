@@ -454,8 +454,8 @@ class WorkspaceController extends Controller
       'email' => 'required|email|exists:users,email',
       'role_id' => 'required|exists:roles,id'
     ], [
-      'email.exists' => 'We could not find a user with this email address in our system.',
-      'role_id.required' => 'Please select a role for the new member.',
+      'email.exists' => __('passwords.workspace_email_not_found'),
+      'role_id.required' => __('passwords.workspace_role_required'),
     ]);
 
     // Prevent inviting with Owner role

@@ -52,7 +52,7 @@ class LoginRequest extends FormRequest
         if (!$user) {
             Log::warning('Login: User not found', ['email' => $credentials['email']]);
             throw ValidationException::withMessages([
-                'email' => 'User not found in the system'
+                'email' => __('passwords.login_user_not_found'),
             ]);
         }
 
