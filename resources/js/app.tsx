@@ -11,9 +11,10 @@ import { QueryProvider } from '@/providers/QueryProvider';
 import { PageProps } from '@/types';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
-import { Suspense } from 'react';
+import React, { Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import '../css/app.css';
+import { DevCacheIndicator } from './Components/DevCacheIndicator';
 import { ServiceWorkerUpdate } from './Components/ServiceWorkerUpdate';
 import './bootstrap';
 import './i18n';
@@ -33,14 +34,14 @@ const appName = import.meta.env.VITE_APP_NAME || 'contentFlow';
 const loadI18n = () => import('./i18n');
 
 createInertiaApp<PageProps>({
-  title: (title) => `${title} - ${appName}`,
-  resolve: (name) => {
+  title: (title: any) => `${title} - ${appName}`,
+  resolve: (name: string) => {
     const cleanName = name.startsWith('/') ? name.slice(1) : name;
     // Lazy loading agresivo por rutas
     return resolvePageComponent(`./Pages/${cleanName}.tsx`, import.meta.glob('./Pages/**/*.tsx'));
   },
 
-  setup({ el, App, props }) {
+  setup({ el, App, props }: { el: HTMLElement; App: React.ComponentType<any>; props: any }) {
     const root = createRoot(el);
 
     const user = props.initialPage.props.auth?.user;
@@ -57,7 +58,7 @@ createInertiaApp<PageProps>({
         <QueryProvider>
           <ThemeProvider
             isAuthenticated={!!user}
-            initialTheme={user?.theme as 'light' | 'dark' | undefined}
+            initialTheme={user?.theme === 'light' || user?.theme === 'dark' ? user.theme : undefined}
             workspaceId={user?.current_workspace_id}
           >
             <Suspense
@@ -73,6 +74,7 @@ createInertiaApp<PageProps>({
             </Suspense>
             <ThemedToaster />
             <ServiceWorkerUpdate />
+            <DevCacheIndicator />
             <InertiaProgressIndicator color="#ad421e" />
           </ThemeProvider>
         </QueryProvider>
