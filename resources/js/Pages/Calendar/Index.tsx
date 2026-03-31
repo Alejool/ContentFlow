@@ -404,7 +404,6 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                       selectedEvents={selectedEvents}
                       onToggleSelection={toggleEventSelection}
                       PlatformIcon={PlatformIcon}
-                      auth={auth}
                     />
                   )}
                 </>
@@ -461,10 +460,13 @@ export default function CalendarIndex({ auth }: { auth: any }) {
         PlatformIcon={PlatformIcon}
         canEdit={true}
         canDelete={
-          selectedEvent &&
-          ['user_event', 'event'].includes(String(selectedEvent.type)) &&
-          (Number(selectedEvent.user?.id) === Number(auth.user?.id) ||
-            (!selectedEvent.user?.id && selectedEvent.extendedProps?.user_name === auth.user?.name))
+          !!(
+            selectedEvent &&
+            ['user_event', 'event'].includes(String(selectedEvent.type)) &&
+            (Number(selectedEvent.user?.id) === Number(auth.user?.id) ||
+              (!selectedEvent.user?.id &&
+                selectedEvent.extendedProps?.user_name === auth.user?.name))
+          )
         }
       />
 
