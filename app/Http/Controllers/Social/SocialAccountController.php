@@ -421,50 +421,48 @@ class SocialAccountController extends Controller
 
       if ($isV1First) {
         // NUEVO FLUJO: V1 primero, ahora redirigir a V2
-        // Guardar en session Y en cache (fallback por si session expira)
-        $state = session('social_auth_state') ?? Str::random(40);
-        session(['twitter_v1_creds' => $v1Creds]);
-        
-        // También guardar en cache con TTL de 1 hora (más robusto que session)
-        Cache::put("twitter_v1_creds_{$state}", $v1Creds, now()->addHour());
-        
-        LogHelper::social('twitter.v1_creds_stored', [
-          'screen_name' => $v1Creds['screen_name'],
-          'state' => substr($state, 0, 10) . '...',
-          'stored_in_session' => true,
-          'stored_in_cache' => true
-        ]);
-
         $platform = request()->is('auth/x/*') ? 'x' : 'twitter';
-        
+
         $codeVerifier = Str::random(128);
         $codeChallenge = strtr(rtrim(
           base64_encode(hash('sha256', $codeVerifier, true)),
           '='
         ), '+/', '-_');
 
-        $state = session('social_auth_state') ?? Str::random(40);
+        // Generar el nuevo state para V2 ANTES de guardarlo en cache
+        // para que el cache key coincida con el state que llegará en el callback de V2
+        $newState = Str::random(40);
 
+        // Guardar V1 creds en session Y en cache usando el NUEVO state de V2
         session([
+          'twitter_v1_creds'    => $v1Creds,
           'twitter_code_verifier' => $codeVerifier,
-          'social_auth_state' => $state
+          'social_auth_state'   => $newState,
+        ]);
+        Cache::put("twitter_v1_creds_{$newState}", $v1Creds, now()->addHour());
+
+        LogHelper::social('twitter.v1_creds_stored', [
+          'screen_name'       => $v1Creds['screen_name'],
+          'state'             => substr($newState, 0, 10) . '...',
+          'stored_in_session' => true,
+          'stored_in_cache'   => true,
         ]);
 
         $oauth2Url = 'https://twitter.com/i/oauth2/authorize?' . http_build_query([
-          'client_id' => config('services.twitter.client_id'),
-          'redirect_uri' => url("/auth/{$platform}/callback"),
-          'response_type' => 'code',
-          'scope' => 'tweet.read tweet.write users.read offline.access',
-          'state' => $state,
-          'code_challenge' => $codeChallenge,
-          'code_challenge_method' => 'S256'
+          'client_id'             => config('services.twitter.client_id'),
+          'redirect_uri'          => url("/auth/{$platform}/callback"),
+          'response_type'         => 'code',
+          'scope'                 => 'tweet.read tweet.write users.read offline.access',
+          'state'                 => $newState,
+          'code_challenge'        => $codeChallenge,
+          'code_challenge_method' => 'S256',
         ]);
 
         return view('auth.twitter-transition', [
-          'oauth2Url' => $oauth2Url,
-          'platform' => $platform,
-          'step' => 'v2',
-          'screen_name' => $v1Creds['screen_name']
+          'oauth2Url'   => $oauth2Url,
+          'platform'    => $platform,
+          'step'        => 'v2',
+          'screen_name' => $v1Creds['screen_name'],
         ]);
       } else {
         // FLUJO VIEJO: V2 primero, V1 segundo (compatibilidad)
