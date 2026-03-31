@@ -1,5 +1,6 @@
 import { useTheme } from '@/Hooks/useTheme';
-import { AlertCircle, CheckCircle, Info, LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { AlertCircle, CheckCircle, Info } from 'lucide-react';
 import { ReactNode } from 'react';
 
 interface LabelProps {

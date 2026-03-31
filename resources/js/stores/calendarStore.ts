@@ -1,17 +1,16 @@
-import { DataConflict } from '@/Components/Calendar/ConflictResolutionModal';
-import { CalendarEvent, CalendarFilters, CalendarView } from '@/types/calendar';
+import type { CalendarEvent, CalendarFilters, CalendarView, DataConflict } from '@/types/calendar';
 import axios from 'axios';
 import {
-  addDays,
-  addMonths,
-  addWeeks,
-  endOfMonth,
-  endOfWeek,
-  startOfMonth,
-  startOfWeek,
-  subDays,
-  subMonths,
-  subWeeks,
+    addDays,
+    addMonths,
+    addWeeks,
+    endOfMonth,
+    endOfWeek,
+    startOfMonth,
+    startOfWeek,
+    subDays,
+    subMonths,
+    subWeeks,
 } from 'date-fns';
 import { create } from 'zustand';
 

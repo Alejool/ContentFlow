@@ -1,15 +1,13 @@
-import React, { memo } from 'react';
-import { AlertTriangle, Check, Clock, Info, X } from 'lucide-react';
-import Switch from '@/Components/common/Modern/Switch';
 import Button from '@/Components/common/Modern/Button';
-import { Avatar } from '@/Components/common/Avatar';
+import Switch from '@/Components/common/Modern/Switch';
 import YouTubeThumbnailUploader from '@/Components/common/ui/YouTubeThumbnailUploader';
 import { formatDateTimeStyled } from '@/Utils/dateHelpers';
 import { validateVideoDuration } from '@/Utils/validationUtils';
-import { SocialAccountItemProps } from './types';
+import { AlertTriangle, Check, ChevronDown, Clock, Info, X } from 'lucide-react';
+import React, { memo } from 'react';
 import { isPlatformCompatible } from './helpers';
 import ScheduleButton from './ScheduleButton';
-import { ChevronDown } from 'lucide-react';
+import type { SocialAccountItemProps } from './types';
 
 const SocialAccountItem = memo(
   ({

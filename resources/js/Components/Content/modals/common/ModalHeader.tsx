@@ -1,4 +1,5 @@
-import { LucideIcon, Sparkles, X } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { Sparkles, X } from 'lucide-react';
 import React from 'react';
 
 interface ModalHeaderProps {

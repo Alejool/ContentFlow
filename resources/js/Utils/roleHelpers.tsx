@@ -6,16 +6,8 @@
  * Used by InviteMemberModal, RolesManagementTab, RoleBadge, etc.
  */
 
-import {
-  Crown,
-  Eye,
-  LucideIcon,
-  PencilLine,
-  Shield,
-  ShieldCheck,
-  User,
-  UserCog,
-} from 'lucide-react';
+import { Crown, Eye, PencilLine, Shield, ShieldCheck, User, UserCog } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 export interface RoleConfig {
   /** Role slug (e.g. 'owner', 'admin', 'editor') */

@@ -1,12 +1,12 @@
 import {
-  useCampaignsList,
-  useDeleteCampaign,
-  useDuplicateCampaign,
+    useCampaignsList,
+    useDeleteCampaign,
+    useDuplicateCampaign,
 } from '@/Hooks/campaign/useCampaigns';
 import {
-  useDeletePublication,
-  useDuplicatePublication,
-  usePublicationsList,
+    useDeletePublication,
+    useDuplicatePublication,
+    usePublicationsList,
 } from '@/Hooks/publication/usePublicationsList';
 import { useRealtime } from '@/Hooks/publication/useRealtime';
 import { useConfirm } from '@/Hooks/useConfirm';
@@ -16,8 +16,8 @@ import { queryKeys } from '@/lib/queryKeys';
 import { ToastService } from '@/Services/ToastService';
 import { useManageContentUIStore } from '@/stores/manageContentUIStore';
 import { usePublicationStore } from '@/stores/publicationStore';
-import { PageProps } from '@/types';
-import { Publication } from '@/types/Publication';
+import type { PageProps } from '@/types';
+import type { Publication } from '@/types/Publication';
 import { usePage } from '@inertiajs/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo, useState } from 'react';

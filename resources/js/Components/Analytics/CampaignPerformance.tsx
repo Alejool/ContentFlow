@@ -4,7 +4,7 @@ import { Search, TrendingUp } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PerformanceDetailModal from './PerformanceDetailModal';
-import { CampaignStat } from './PerformanceTable';
+import type { CampaignStat } from './PerformanceTable';
 
 interface CampaignPerformanceProps {
   campaigns: CampaignStat[];

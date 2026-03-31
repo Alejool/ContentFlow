@@ -2,7 +2,8 @@
 import { createContextualCan } from '@casl/react';
 import { usePage } from '@inertiajs/react';
 import { createContext, ReactNode, useContext } from 'react';
-import { AppAbility, defineAbilityFor } from './ability';
+import { defineAbilityFor } from './ability';
+import type { AppAbility } from './ability';
 
 // Create context
 export const AbilityContext = createContext<AppAbility>(undefined!);

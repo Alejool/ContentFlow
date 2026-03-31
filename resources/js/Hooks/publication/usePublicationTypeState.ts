@@ -1,5 +1,5 @@
-import { ContentType } from '@/Constants/contentTypes';
-import { Publication } from '@/types/Publication';
+import type { ContentType } from '@/Constants/contentTypes';
+import type { Publication } from '@/types/Publication';
 import { useCallback, useRef, useState } from 'react';
 
 interface TypeSpecificState {

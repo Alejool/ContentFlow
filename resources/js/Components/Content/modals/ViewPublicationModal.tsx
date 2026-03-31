@@ -10,8 +10,8 @@ import CreatorInfo from '@/Components/Content/modals/ViewPublicationModal/Creato
 import PublicationHeader from '@/Components/Content/modals/ViewPublicationModal/PublicationHeader';
 import ReelsSection from '@/Components/Content/modals/ViewPublicationModal/ReelsSection';
 import { usePublicationStore } from '@/stores/publicationStore';
-import { Campaign } from '@/types/Campaign';
-import { Publication } from '@/types/Publication';
+import type { Campaign } from '@/types/Campaign';
+import type { Publication } from '@/types/Publication';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { usePage } from '@inertiajs/react';
 import { Edit, FileText, Layers, X } from 'lucide-react';

@@ -1,4 +1,4 @@
-import { type ContentType } from '@/Components/Content/Publication/common/ContentTypeSelector';
+import type { ContentType } from '@/Components/Content/Publication/common/ContentTypeSelector';
 import { FacebookPreview } from '@/Components/Content/Publication/previews/FacebookPreview';
 import { InstagramPreview } from '@/Components/Content/Publication/previews/InstagramPreview';
 import { LinkedInPreview } from '@/Components/Content/Publication/previews/LinkedInPreview';

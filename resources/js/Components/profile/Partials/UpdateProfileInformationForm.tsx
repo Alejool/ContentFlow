@@ -9,7 +9,7 @@ import { Link } from '@inertiajs/react';
 import { CheckCircle, Mail, MailWarning, Send, User as UserIcon } from 'lucide-react';
 import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import type { CountryCode } from 'libphonenumber-js';
+import { CountryCode } from 'libphonenumber-js';
 
 // List of supported countries (LatAm + US + España)
 const SUPPORTED_COUNTRIES: CountryCode[] = [

@@ -8,7 +8,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/Components/ui/card';
-import { PLAN_FEATURES, type PlanId } from '@/Constants/plans';
+import { PLAN_FEATURES } from '@/Constants/plans';
+import type { PlanId } from '@/Constants/plans';
 import { cn } from '@/lib/utils';
 import {
   ArrowRight,

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { useValidateVideo, type VideoValidationResult } from './usePlatformCapabilities';
+import { useValidateVideo } from './usePlatformCapabilities';
+import type { VideoValidationResult } from './usePlatformCapabilities';
 
 export interface PlatformCapability {
   account_id: number;

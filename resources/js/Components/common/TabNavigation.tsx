@@ -1,6 +1,7 @@
-import DraggableTabs, { DraggableTab } from '@/Components/common/DraggableTabs';
+import DraggableTabs from '@/Components/common/DraggableTabs';
+import type { DraggableTab } from '@/Components/common/DraggableTabs';
 import Button from '@/Components/common/Modern/Button';
-import { LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 export interface Tab {
   id?: string;

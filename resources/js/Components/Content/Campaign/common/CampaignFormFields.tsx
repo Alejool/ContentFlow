@@ -4,7 +4,7 @@ import Input from '@/Components/common/Modern/Input';
 import Textarea from '@/Components/common/Modern/Textarea';
 import { FileText, Target } from 'lucide-react';
 import React from 'react';
-import { FieldErrors, UseFormRegister, UseFormSetValue } from 'react-hook-form';
+import type { FieldErrors, UseFormRegister, UseFormSetValue } from 'react-hook-form';
 
 interface CampaignFormFieldsProps {
   register: UseFormRegister<any>;

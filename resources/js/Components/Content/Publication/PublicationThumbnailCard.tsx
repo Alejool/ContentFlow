@@ -1,4 +1,4 @@
-import { Publication } from '@/types/Publication';
+import type { Publication } from '@/types/Publication';
 import { hasMedia, isProcessing, prepareMediaForPreview } from '@/Utils/publicationHelpers';
 import { Calendar, Clock, Image as ImageIcon, Video } from 'lucide-react';
 import { useState } from 'react';

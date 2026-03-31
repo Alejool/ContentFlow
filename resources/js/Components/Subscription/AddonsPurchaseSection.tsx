@@ -6,7 +6,8 @@ import Input from '@/Components/common/Modern/Input';
 import { CarouselPagination, CarouselDots } from '@/Components/common/CarouselPagination';
 import { GatewaySelector } from '@/Components/Payment/GatewaySelector';
 import { ActiveAddonsCards } from './ActiveAddonsCards';
-import { TabNavigation, Tab } from '@/Components/common/TabNavigation';
+import { TabNavigation } from '@/Components/common/TabNavigation';
+import type { Tab } from '@/Components/common/TabNavigation';
 import { AddonPriceDisplay } from './AddonPriceDisplay';
 
 interface AddonPackage {

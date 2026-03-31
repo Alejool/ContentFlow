@@ -5,25 +5,25 @@ import { useTimezoneStore } from '@/stores/timezoneStore';
 import { toLocalDate, toUTC } from '@/Utils/timezoneUtils';
 import { CalendarDate } from '@internationalized/date';
 import {
-  Calendar,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  ChevronUp,
-  Clock,
-  X,
+    Calendar,
+    ChevronDown,
+    ChevronLeft,
+    ChevronRight,
+    ChevronUp,
+    Clock,
+    X,
 } from 'lucide-react';
 import React, { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Calendar as AriaCalendar,
-  CalendarCell,
-  CalendarGrid,
-  CalendarGridBody,
-  CalendarGridHeader,
-  CalendarHeaderCell,
-  I18nProvider,
+    Calendar as AriaCalendar,
+    CalendarCell,
+    CalendarGrid,
+    CalendarGridBody,
+    CalendarGridHeader,
+    CalendarHeaderCell,
+    I18nProvider,
 } from 'react-aria-components';
-import { FieldValues, UseFormRegister } from 'react-hook-form';
+import type { FieldValues, UseFormRegister } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 const getColor = (color: string, alpha: string = '1'): string => {
@@ -669,3 +669,4 @@ const DatePickerModern = <T extends FieldValues>({
 
 export default DatePickerModern;
 export { DatePickerModern as DatePicker };
+

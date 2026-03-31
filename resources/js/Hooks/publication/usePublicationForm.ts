@@ -1,7 +1,5 @@
-import {
-    getMediaRulesForContentType,
-    type ContentType,
-} from '@/Components/Content/Publication/common/ContentTypeSelector';
+import type { ContentType } from '@/Components/Content/Publication/common/ContentTypeSelector';
+import { getMediaRulesForContentType } from '@/Components/Content/Publication/common/ContentTypeSelector';
 import { CONTENT_TYPE_DISPLAY } from '@/Constants/contentTypes';
 import { useContentTypeSuggestion } from '@/Hooks/publication/useContentTypeSuggestion';
 import {
@@ -10,11 +8,12 @@ import {
 } from '@/Hooks/publication/usePublicationsList';
 import { useS3Upload } from '@/Hooks/useS3Upload';
 import { queryKeys } from '@/lib/queryKeys';
-import { PublicationFormData, publicationSchema } from '@/schemas/publication';
+import type { PublicationFormData } from '@/schemas/publication';
+import { publicationSchema } from '@/schemas/publication';
 import { useMediaStore } from '@/stores/mediaStore';
 import { useUploadQueue } from '@/stores/uploadQueueStore';
-import { PageProps } from '@/types';
-import { Publication } from '@/types/Publication';
+import type { PageProps } from '@/types';
+import type { Publication } from '@/types/Publication';
 import { validateVideoDuration } from '@/Utils/validationUtils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { usePage } from '@inertiajs/react';

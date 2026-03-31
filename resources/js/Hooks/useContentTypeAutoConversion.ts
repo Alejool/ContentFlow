@@ -1,4 +1,5 @@
-import { suggestContentType, type ContentTypeSuggestion } from '@/Utils/contentTypeUtils';
+import { suggestContentType } from '@/Utils/contentTypeUtils';
+import type { ContentTypeSuggestion } from '@/Utils/contentTypeUtils';
 import { useCallback, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';

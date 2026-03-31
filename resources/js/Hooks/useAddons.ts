@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import type { AddonBalance, AddonPackages, AddonSummary, WorkspaceAddon } from '@/types/addon';
 import axios from 'axios';
-import type { AddonPackages, AddonSummary, AddonBalance, WorkspaceAddon } from '@/types/addon';
+import { useEffect, useState } from 'react';
 
 interface UseAddonsReturn {
   packages: AddonPackages | null;

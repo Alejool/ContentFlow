@@ -1,4 +1,5 @@
-import { PasswordFormData, passwordSchema } from '@/schemas/user';
+import { passwordSchema } from '@/schemas/user';
+import type { PasswordFormData } from '@/schemas/user';
 import { useUserStore } from '@/stores/userStore';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';

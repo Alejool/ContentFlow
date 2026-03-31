@@ -1,5 +1,5 @@
-import { Publication } from '@/types/Publication';
-import axios, { AxiosError } from 'axios';
+import type { Publication } from '@/types/Publication';
+import axios, { type AxiosError } from 'axios';
 import { create } from 'zustand';
 import { useCalendarStore } from './calendarStore';
 

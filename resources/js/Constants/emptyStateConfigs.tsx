@@ -1,7 +1,7 @@
+import type { EmptyStateConfig } from '@/Components/common/EmptyState';
 import { router } from '@inertiajs/react';
-import { BarChart3, Calendar, FileVideo, Search, Plus, FileText } from 'lucide-react';
-import { TFunction } from 'i18next';
-import { EmptyStateConfig } from '@/Components/common/EmptyState';
+import type { TFunction } from 'i18next';
+import { BarChart3, Calendar, FileText, FileVideo, Plus, Search } from 'lucide-react';
 
 /**
  * Empty State Configurations

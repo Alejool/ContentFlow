@@ -1,7 +1,7 @@
-import { TFunction } from 'i18next';
 import ContentSection from '@/Components/Content/Publication/common/edit/ContentSection';
+import type { TFunction } from 'i18next';
+import type { FieldErrors, UseFormRegister, UseFormSetValue } from 'react-hook-form';
 import { SectionHeader } from '../common/SectionHeader';
-import { UseFormRegister, UseFormSetValue, FieldErrors } from 'react-hook-form';
 
 interface ContentFormSectionProps {
   t: TFunction;

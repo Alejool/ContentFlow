@@ -1,7 +1,8 @@
-import React, { HTMLAttributes, forwardRef } from 'react';
-import { LazyMotion, domAnimation, m, HTMLMotionProps } from 'framer-motion';
+import { getTransition, getVariant, hoverVariants } from '@/config/animationVariants';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
-import { hoverVariants, getVariant, getTransition } from '@/config/animationVariants';
+import type { HTMLMotionProps } from 'framer-motion';
+import { LazyMotion, domAnimation, m } from 'framer-motion';
+import { HTMLAttributes, forwardRef } from 'react';
 
 /**
  * Hover effect variants for cards

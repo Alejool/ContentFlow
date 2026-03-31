@@ -1,4 +1,5 @@
-import { useCommandPalette, type CommandItem } from '@/Hooks/useCommandPalette';
+import { useCommandPalette } from '@/Hooks/useCommandPalette';
+import type { CommandItem } from '@/Hooks/useCommandPalette';
 import {
   Combobox,
   ComboboxInput,

@@ -9,7 +9,7 @@ import { Head, router, usePage } from '@inertiajs/react';
 import { Eye, Heart, LockKeyhole, MousePointer2, TrendingUp, Users } from 'lucide-react';
 import { Suspense, lazy, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CampaignStat } from '../../Components/Analytics/PerformanceTable';
+import type { CampaignStat } from '../../Components/Analytics/PerformanceTable';
 import PeriodSelector from '../../Components/Analytics/PeriodSelector';
 
 const EngagementChart = lazy(() => import('@/Components/Statistics/EngagementChart'));

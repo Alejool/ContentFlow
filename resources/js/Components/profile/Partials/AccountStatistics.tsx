@@ -1,31 +1,12 @@
-import { PageProps } from '@/../../app/Types/inertia';
+import type { PageProps } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { Calendar, CheckCircle, Clock, LucideIcon, MailWarning, Shield } from 'lucide-react';
+import { Calendar, CheckCircle, Clock, MailWarning, Shield } from 'lucide-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  email_verified_at: string | null;
-  created_at: string;
-  last_login_at?: string | null;
-  [key: string]: any;
-}
 
 interface AccountStatisticsProps {
   className?: string;
   status?: string | null;
-}
-
-interface StatItem {
-  icon: LucideIcon;
-  title: string;
-  value: string;
-  color: string;
-  bgColor: string;
-  iconElement?: React.ReactNode;
 }
 
 export default function AccountStatistics({

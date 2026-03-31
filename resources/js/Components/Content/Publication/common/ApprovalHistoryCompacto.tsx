@@ -1,4 +1,5 @@
-import ApprovalHistorySection, { ApprovalHistorySectionProps, ApprovalLog } from '@/Components/Content/Publication/common/edit/ApprovalHistorySection';
+import type { ApprovalHistorySectionProps } from '@/Components/Content/Publication/common/edit/ApprovalHistorySection';
+import ApprovalHistorySection from '@/Components/Content/Publication/common/edit/ApprovalHistorySection';
 import { AlertCircle, CheckCircle, ChevronDown, ChevronUp, Shield } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 

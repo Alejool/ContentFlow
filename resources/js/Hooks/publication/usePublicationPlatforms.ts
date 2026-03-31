@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { usePublicationStore } from '@/stores/publicationStore';
-import { Publication } from '@/types/Publication';
+import type { Publication } from '@/types/Publication';
 
 export const usePublicationPlatforms = (publication: Publication | null) => {
   const { publishedPlatforms, publishingPlatforms, failedPlatforms } = usePublicationStore();

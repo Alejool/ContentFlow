@@ -9,7 +9,7 @@ import { usePublishPublication } from '@/Hooks/publication/usePublishPublication
 import { useConfirm } from '@/Hooks/useConfirm';
 import { usePublicationCapabilities } from '@/Hooks/usePublicationCapabilities';
 import { usePublicationStore } from '@/stores/publicationStore';
-import { Publication } from '@/types/Publication';
+import type { Publication } from '@/types/Publication';
 import { formatDateTimeStyled } from '@/Utils/dateHelpers';
 import { formatDateTime } from '@/Utils/formatDate';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';

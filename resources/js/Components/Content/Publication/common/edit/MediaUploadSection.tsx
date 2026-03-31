@@ -1,8 +1,6 @@
 import Label from '@/Components/common/Modern/Label';
-import {
-    getMediaRulesForContentType,
-    type ContentType,
-} from '@/Components/Content/Publication/common/ContentTypeSelector';
+import { getMediaRulesForContentType } from '@/Components/Content/Publication/common/ContentTypeSelector';
+import type { ContentType } from '@/Components/Content/Publication/common/ContentTypeSelector';
 import { AlertTriangle, FileImage, Info, Loader2, Upload, Video, X } from 'lucide-react';
 import React, { memo, useMemo, useRef } from 'react';
 

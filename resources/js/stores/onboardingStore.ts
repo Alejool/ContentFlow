@@ -1,12 +1,8 @@
 import type { OnboardingState } from '@/types/onboarding';
-import {
-  createNetworkError,
-  getErrorMessage,
-  isOnline,
-  retryWithBackoff,
-  type RetryOptions,
-} from '@/Utils/networkErrorHandler';
-import { offlineQueue, type QueuedAction } from '@/Utils/offlineQueue';
+import { createNetworkError, getErrorMessage, isOnline, retryWithBackoff } from '@/Utils/networkErrorHandler';
+import type { RetryOptions } from '@/Utils/networkErrorHandler';
+import { offlineQueue } from '@/Utils/offlineQueue';
+import type { QueuedAction } from '@/Utils/offlineQueue';
 import { router } from '@inertiajs/react';
 import axios from 'axios';
 import { create } from 'zustand';

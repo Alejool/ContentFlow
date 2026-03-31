@@ -1,4 +1,4 @@
-import { AbilityBuilder, createMongoAbility, MongoAbility } from '@casl/ability';
+import { AbilityBuilder, createMongoAbility, type MongoAbility } from '@casl/ability';
 
 export type Actions =
   | 'create'

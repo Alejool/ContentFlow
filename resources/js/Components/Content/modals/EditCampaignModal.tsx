@@ -1,5 +1,5 @@
 import { useContentManagement } from '@/Hooks/useContentManagement';
-import { Campaign } from '@/types/Campaign';
+import type { Campaign } from '@/types/Campaign';
 import { AlertTriangle, Target } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';

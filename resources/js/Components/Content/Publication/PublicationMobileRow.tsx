@@ -4,7 +4,7 @@ import SimpleContentTypeBadge from '@/Components/Content/common/SimpleContentTyp
 import PublicationThumbnailCard from '@/Components/Content/Publication/PublicationThumbnailCard';
 import SocialAccountsDisplay from '@/Components/Content/Publication/SocialAccountsDisplay';
 import { usePublicationActions } from '@/Hooks/publication/usePublicationActions';
-import { Publication } from '@/types/Publication';
+import type { Publication } from '@/types/Publication';
 import {
   countMediaFiles,
   formatPublicationDate,

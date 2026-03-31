@@ -1,7 +1,7 @@
 import { CarouselDots, CarouselPagination } from '@/Components/common/CarouselPagination';
 import Button from '@/Components/common/Modern/Button';
 import { getPlatformConfig } from '@/Constants/socialPlatforms';
-import { MediaFile, Publication } from '@/types';
+import type { MediaFile, Publication } from '@/types';
 import { formatDateTimeString } from '@/Utils/dateHelpers';
 import { Head, useForm } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';

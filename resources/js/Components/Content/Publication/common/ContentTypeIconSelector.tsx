@@ -1,6 +1,7 @@
 import Button from '@/Components/common/Modern/Button';
 import { REEL_COMPATIBLE_PLATFORMS } from '@/Constants/contentTypes';
-import { BarChart3, Clock, FileText, Images, type LucideIcon, Video } from 'lucide-react';
+import { BarChart3, Clock, FileText, Images, Video } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { useMemo } from 'react';
 
 export type ContentType = 'post' | 'reel' | 'story' | 'poll' | 'carousel';

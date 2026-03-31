@@ -1,21 +1,22 @@
+import type { DragEndEvent } from '@dnd-kit/core';
 import {
-  DndContext,
-  DragEndEvent,
-  KeyboardSensor,
-  PointerSensor,
-  closestCenter,
-  useSensor,
-  useSensors,
+    DndContext,
+    KeyboardSensor,
+    PointerSensor,
+    closestCenter,
+    useSensor,
+    useSensors,
 } from '@dnd-kit/core';
 import {
-  SortableContext,
-  arrayMove,
-  horizontalListSortingStrategy,
-  sortableKeyboardCoordinates,
-  useSortable,
+    SortableContext,
+    arrayMove,
+    horizontalListSortingStrategy,
+    sortableKeyboardCoordinates,
+    useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripHorizontal, LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { GripHorizontal } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 export interface DraggableTab {

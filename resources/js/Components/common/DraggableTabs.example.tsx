@@ -6,7 +6,8 @@
  */
 
 import { useState } from 'react';
-import DraggableTabs, { DraggableTab } from './DraggableTabs';
+import DraggableTabs from './DraggableTabs';
+import type { DraggableTab } from './DraggableTabs';
 import {
   Folder,
   Calendar,

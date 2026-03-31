@@ -1,18 +1,9 @@
-import { CalendarEvent } from '@/types/calendar';
+import type { CalendarEvent, DataConflict } from '@/types/calendar';
 import { AlertTriangle, Clock, User } from 'lucide-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export interface DataConflict {
-  eventId: string;
-  field: string;
-  localValue: unknown;
-  serverValue: unknown;
-  localTimestamp: Date;
-  serverTimestamp: Date;
-  localUser?: string;
-  serverUser?: string;
-}
+export type { DataConflict };
 
 interface ConflictResolutionModalProps {
   conflict: DataConflict;

@@ -1,7 +1,7 @@
 import CampaignTags from '@/Components/Content/Publication/CampaignTags';
 import PublicationThumbnail from '@/Components/Content/Publication/PublicationThumbnail';
 import SocialAccountsDisplay from '@/Components/Content/Publication/SocialAccountsDisplay';
-import { Publication } from '@/types/Publication';
+import type { Publication } from '@/types/Publication';
 import { usePage } from '@inertiajs/react';
 import { Copy, Edit, Eye, Image, Repeat, Rocket, Trash2, Video } from 'lucide-react';
 

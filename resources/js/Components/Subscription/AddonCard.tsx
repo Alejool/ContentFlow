@@ -1,6 +1,6 @@
-import { Sparkles, HardDrive, FileText, Users, Package } from 'lucide-react';
+import type { ActiveAddon } from '@/Hooks/useActiveAddons';
+import { FileText, HardDrive, Package, Sparkles, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { ActiveAddon } from '@/Hooks/useActiveAddons';
 
 interface AddonCardProps {
   addon: ActiveAddon;

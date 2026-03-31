@@ -7,7 +7,7 @@ import { TableHeader } from '@/Components/Content/Publication/TableHeader';
 import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
 import EmptyState from '@/Components/common/ui/EmptyState';
 import TableContainer from '@/Components/common/ui/TableContainer';
-import { Campaign } from '@/types/Campaign';
+import type { Campaign } from '@/types/Campaign';
 import React, { Fragment, memo } from 'react';
 
 interface CampaignTableProps {

@@ -1,7 +1,7 @@
-import { LucideIcon } from 'lucide-react';
 import { Link } from '@inertiajs/react';
-import { useTranslation } from 'react-i18next';
+import type { LucideIcon } from 'lucide-react';
 import { Sparkles, Zap } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface UsageCardProps {
   label: string;

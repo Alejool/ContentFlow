@@ -1,7 +1,7 @@
 import Label from '@/Components/common/Modern/Label';
 import { CheckCircle, TriangleAlert } from 'lucide-react';
 import { TextareaHTMLAttributes, isValidElement, useState } from 'react';
-import { FieldValues, Path, UseFormRegister } from 'react-hook-form';
+import type { FieldValues, Path, UseFormRegister } from 'react-hook-form';
 
 interface TextareaProps<T extends FieldValues = FieldValues> extends Omit<
   TextareaHTMLAttributes<HTMLTextAreaElement>,

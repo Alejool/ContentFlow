@@ -1,5 +1,5 @@
-import { Campaign } from '@/types/Campaign';
-import { Publication } from '@/types/Publication';
+import type { Campaign } from '@/types/Campaign';
+import type { Publication } from '@/types/Publication';
 import { create } from 'zustand';
 
 type SelectedItem = Campaign | Publication | null;

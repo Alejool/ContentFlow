@@ -1,6 +1,6 @@
-import { EmptyStateConfig } from '@/Components/common/EmptyState';
+import type { EmptyStateConfig } from '@/Components/common/EmptyState';
 import { emptyStateConfigs, getEmptyStateConfigs } from '@/Constants/emptyStateConfigs';
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 
 /**
  * Empty State Context Mapping

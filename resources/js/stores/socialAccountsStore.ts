@@ -1,4 +1,4 @@
-import { SocialAccount } from '@/types/SocialAccount';
+import type { SocialAccount } from '@/types/SocialAccount';
 import axios from 'axios';
 import { create } from 'zustand';
 

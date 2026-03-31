@@ -1,13 +1,7 @@
 import Select from '@/Components/common/Modern/Select';
 import Input from '@/Components/common/Modern/Input';
-import {
-  getCountries,
-  getCountryCallingCode,
-  parsePhoneNumber,
-  isPossiblePhoneNumber,
-  isValidPhoneNumber,
-  type CountryCode,
-} from 'libphonenumber-js';
+import { getCountries, getCountryCallingCode, parsePhoneNumber, isPossiblePhoneNumber, isValidPhoneNumber } from 'libphonenumber-js';
+import type { CountryCode } from 'libphonenumber-js';
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Phone, CheckCircle, TriangleAlert } from 'lucide-react';

@@ -1,7 +1,7 @@
 import { usePublishPublication } from '@/Hooks/publication/usePublishPublication';
 import { useManageContentUIStore } from '@/stores/manageContentUIStore';
-import { Campaign } from '@/types/Campaign';
-import { Publication } from '@/types/Publication';
+import type { Campaign } from '@/types/Campaign';
+import type { Publication } from '@/types/Publication';
 import React, { memo } from 'react';
 import { createPortal } from 'react-dom';
 

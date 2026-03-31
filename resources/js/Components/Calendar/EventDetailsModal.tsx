@@ -1,7 +1,7 @@
 import Button from '@/Components/common/Modern/Button';
 import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
 import { formatTime } from '@/Utils/formatDate';
-import { CalendarEvent } from '@/types/calendar';
+import type { CalendarEvent } from '@/types/calendar';
 import { format, parseISO } from 'date-fns';
 import {
     AlertCircle,

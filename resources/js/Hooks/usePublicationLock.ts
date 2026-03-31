@@ -1,6 +1,6 @@
 import { useLockStore } from '@/stores/lockStore';
 import { usePublicationStore } from '@/stores/publicationStore';
-import { Publication } from '@/types/Publication';
+import type { Publication } from '@/types/Publication';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { useCallback, useEffect, useRef, useState } from 'react';

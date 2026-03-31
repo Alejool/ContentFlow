@@ -1,9 +1,9 @@
-import React, { memo } from 'react';
 import Button from '@/Components/common/Modern/Button';
 import DatePickerModern from '@/Components/common/Modern/DatePicker';
 import { parseISO } from 'date-fns';
 import { X } from 'lucide-react';
-import { SocialAccount } from './types';
+import { memo } from 'react';
+import type { SocialAccount } from './types';
 
 interface SchedulePopoverContentProps {
   account: SocialAccount;

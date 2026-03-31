@@ -1,10 +1,10 @@
-import React from 'react';
-import { Link } from '@inertiajs/react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import Button from '@/Components/common/Modern/Button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Progress } from '@/Components/ui/progress';
-import { Sparkles, HardDrive, Plus } from 'lucide-react';
 import type { AddonSummary } from '@/types/addon';
+import { Link } from '@inertiajs/react';
+import { HardDrive, Plus, Sparkles } from 'lucide-react';
+import React from 'react';
 
 interface AddonBalanceWidgetProps {
   summary: AddonSummary | null;

@@ -2,7 +2,7 @@ import Label from '@/Components/common/Modern/Label';
 import { AlertCircle, Check, CheckCircle, ChevronDown, Search, X } from 'lucide-react';
 import { ReactNode, isValidElement, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { FieldValues, Path, UseFormRegister } from 'react-hook-form';
+import type { FieldValues, Path, UseFormRegister } from 'react-hook-form';
 
 interface DropdownPortalProps {
   children: React.ReactNode;

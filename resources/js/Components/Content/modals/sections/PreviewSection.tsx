@@ -1,5 +1,5 @@
-import { TFunction } from 'i18next';
 import { LivePreviewSection } from '@/Components/Content/Publication/common/edit/LivePreviewSection';
+import type { TFunction } from 'i18next';
 import { SectionHeader } from '../common/SectionHeader';
 
 interface PreviewSectionProps {

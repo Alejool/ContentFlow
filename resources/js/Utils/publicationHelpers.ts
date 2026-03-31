@@ -1,4 +1,4 @@
-import { Publication } from '@/types/Publication';
+import type { Publication } from '@/types/Publication';
 import { Calendar, CheckCircle, Clock, Edit, Eye, Sparkles, TrendingUp } from 'lucide-react';
 import type React from 'react';
 import { formatDateTime } from './formatDate';

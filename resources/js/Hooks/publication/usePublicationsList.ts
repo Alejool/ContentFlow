@@ -1,5 +1,5 @@
 import { queryKeys } from '@/lib/queryKeys';
-import { Publication } from '@/types/Publication';
+import type { Publication } from '@/types/Publication';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 

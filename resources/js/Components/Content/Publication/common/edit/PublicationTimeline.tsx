@@ -1,5 +1,5 @@
 import { getDateFnsLocale } from '@/Utils/dateLocales';
-import { PublicationActivity } from '@/types/Publication';
+import type { PublicationActivity } from '@/types/Publication';
 import { format } from 'date-fns';
 import {
   Activity,

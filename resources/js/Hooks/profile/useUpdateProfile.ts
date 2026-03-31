@@ -1,4 +1,5 @@
-import { UserProfileFormData, userProfileSchema } from '@/schemas/user';
+import { userProfileSchema } from '@/schemas/user';
+import type { UserProfileFormData } from '@/schemas/user';
 import { useUserStore } from '@/stores/userStore';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';

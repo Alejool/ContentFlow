@@ -1,13 +1,13 @@
 import AiFieldSuggester from '@/Components/AiAssistant/AiFieldSuggester';
 import CampaignSelector from '@/Components/Content/Publication/common/CampaignSelector';
-import { ContentType } from '@/Components/Content/Publication/common/ContentTypeIconSelector';
+import type { ContentType } from '@/Components/Content/Publication/common/ContentTypeIconSelector';
 import Input from '@/Components/common/Modern/Input';
 import Textarea from '@/Components/common/Modern/Textarea';
 import { useContentType } from '@/Hooks/publication/useContentType';
 import { getFieldsConfig, isFieldRequired } from '@/constants/contentTypes';
 import { FileText, Hash, HelpCircle, Target } from 'lucide-react';
 import { memo } from 'react';
-import { FieldErrors, UseFormRegister, UseFormSetValue } from 'react-hook-form';
+import type { FieldErrors, UseFormRegister, UseFormSetValue } from 'react-hook-form';
 
 interface ContentSectionProps {
   register: UseFormRegister<any>;

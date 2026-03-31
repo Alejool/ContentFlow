@@ -35,7 +35,8 @@ import TabNavigation from '@/Components/common/TabNavigation';
 
 import { useCanApprove } from '@/Hooks/approval/useCanApprove';
 import { usePendingApprovals } from '@/Hooks/approval/usePendingApprovals';
-import { ContentTab, usePublications } from '@/Hooks/publication/usePublications';
+import { usePublications } from '@/Hooks/publication/usePublications';
+import type { ContentTab } from '@/Hooks/publication/usePublications';
 import { useManageContentUIStore } from '@/stores/manageContentUIStore';
 import { useShallow } from 'zustand/react/shallow';
 

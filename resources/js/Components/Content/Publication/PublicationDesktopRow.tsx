@@ -5,7 +5,7 @@ import PublicationThumbnailCard from '@/Components/Content/Publication/Publicati
 import SocialAccountsDisplay from '@/Components/Content/Publication/SocialAccountsDisplay';
 import { usePublicationActions } from '@/Hooks/publication/usePublicationActions';
 import { usePublicationStore } from '@/stores/publicationStore';
-import { Publication } from '@/types/Publication';
+import type { Publication } from '@/types/Publication';
 import {
   countMediaFiles,
   getLockedByName,

@@ -1,4 +1,5 @@
-import { CONTENT_TYPE_CONFIG, ContentType } from '@/Constants/contentTypes';
+import type { ContentType } from '@/Constants/contentTypes';
+import { CONTENT_TYPE_CONFIG } from '@/Constants/contentTypes';
 import { AlertCircle } from 'lucide-react';
 import { useMemo } from 'react';
 import ContentTypeIconSelector from './ContentTypeIconSelector';

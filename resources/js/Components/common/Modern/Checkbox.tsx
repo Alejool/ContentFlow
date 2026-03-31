@@ -1,7 +1,8 @@
 import { useTheme } from '@/Hooks/useTheme';
-import { AlertCircle, Check, CheckCircle, LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { AlertCircle, Check, CheckCircle } from 'lucide-react';
 import { ReactNode } from 'react';
-import { FieldValues, Path, UseFormRegister } from 'react-hook-form';
+import type { FieldValues, Path, UseFormRegister } from 'react-hook-form';
 
 interface CheckboxProps<T extends FieldValues = FieldValues> {
   id: string;

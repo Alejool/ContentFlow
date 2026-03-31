@@ -1,5 +1,5 @@
-import { TFunction } from 'i18next';
 import PollFields from '@/Components/Content/Publication/common/PollFields';
+import type { TFunction } from 'i18next';
 
 interface PollSectionProps {
   t: TFunction;

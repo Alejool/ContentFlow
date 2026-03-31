@@ -1,5 +1,6 @@
 import { useTheme } from '@/Hooks/useTheme';
-import { LucideIcon, Minus, TrendingDown, TrendingUp } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { Minus, TrendingDown, TrendingUp } from 'lucide-react';
 import React from 'react';
 
 import Skeleton from '../common/ui/Skeleton';

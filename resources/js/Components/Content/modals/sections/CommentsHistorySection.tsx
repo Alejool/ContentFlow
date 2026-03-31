@@ -1,7 +1,7 @@
 import { CommentsSection } from '@/Components/Content/Publication/comments/CommentsSection';
 import ApprovalHistoryCompacto from '@/Components/Content/Publication/common/ApprovalHistoryCompacto';
 import TimelineCompacto from '@/Components/Content/Publication/common/TimelineCompacto';
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 import { SectionHeader } from '../common/SectionHeader';
 
 interface CommentsHistorySectionProps {

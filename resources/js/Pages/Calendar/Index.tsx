@@ -11,7 +11,7 @@ import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
 import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatformsConfig';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useCampaignStore } from '@/stores/campaignStore';
-import { CalendarEvent } from '@/types/calendar';
+import type { CalendarEvent } from '@/types/calendar';
 import { getEmptyStateByKey } from '@/Utils/emptyStateMapper';
 import { Head } from '@inertiajs/react';
 import { eachDayOfInterval, endOfMonth, startOfMonth } from 'date-fns';

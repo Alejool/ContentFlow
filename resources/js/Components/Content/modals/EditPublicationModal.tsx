@@ -1,7 +1,7 @@
 import PlatformSettingsModal from '@/Components/ConfigSocialMedia/PlatformSettingsModal';
 import { CommentsSection } from '@/Components/Content/Publication/comments/CommentsSection';
 import ApprovalHistoryCompacto from '@/Components/Content/Publication/common/ApprovalHistoryCompacto';
-import { ContentType } from '@/Components/Content/Publication/common/ContentTypeIconSelector';
+import type { ContentType } from '@/Components/Content/Publication/common/ContentTypeIconSelector';
 import ContentTypeSelectorBar from '@/Components/Content/Publication/common/ContentTypeSelectorBar';
 import PlatformCharacterValidator from '@/Components/Content/Publication/common/PlatformCharacterValidator';
 import PollFields from '@/Components/Content/Publication/common/PollFields';
@@ -29,7 +29,7 @@ import toast from '@/Utils/toast';
 import { queryKeys } from '@/lib/queryKeys';
 import { useCampaignStore } from '@/stores/campaignStore';
 import { useUploadQueue } from '@/stores/uploadQueueStore';
-import { Publication } from '@/types/Publication';
+import type { Publication } from '@/types/Publication';
 import { usePage } from '@inertiajs/react';
 import { useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';

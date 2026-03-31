@@ -1,8 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import type { CalendarFilters } from '@/types/calendar';
+import { usePage } from '@inertiajs/react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { endOfMonth, endOfWeek, startOfMonth, startOfWeek } from 'date-fns';
-import { CalendarEvent, CalendarFilters } from '@/types/calendar';
-import { usePage } from '@inertiajs/react';
 
 interface FetchEventsParams {
   currentMonth: Date;

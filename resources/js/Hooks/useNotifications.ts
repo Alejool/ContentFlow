@@ -1,9 +1,6 @@
 import { queryKeys } from '@/lib/queryKeys';
-import {
-  getNotificationType,
-  NotificationData,
-  NotificationTypeFilter,
-} from '@/stores/notificationStore';
+import { getNotificationType } from '@/stores/notificationStore';
+import type { NotificationData, NotificationTypeFilter } from '@/stores/notificationStore';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 

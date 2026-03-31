@@ -2,7 +2,7 @@ import { VirtualList } from '@/Components/common/ui/VirtualList';
 import NotificationItem from '@/Components/Notifications/NotificationItem';
 import { useNotifications } from '@/Hooks/useNotifications';
 import { useTheme } from '@/Hooks/useTheme';
-import { type NotificationTypeFilter } from '@/stores/notificationStore';
+import type { NotificationTypeFilter } from '@/stores/notificationStore';
 import {
   Dialog,
   DialogPanel,

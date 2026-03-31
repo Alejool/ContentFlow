@@ -1,6 +1,5 @@
-import { TFunction } from 'i18next';
-import { i18n } from 'i18next';
 import ScheduleSection from '@/Components/Content/modals/common/ScheduleSection';
+import type { TFunction, i18n } from 'i18next';
 import { SectionHeader } from '../common/SectionHeader';
 
 interface SchedulingFormSectionProps {

@@ -1,8 +1,9 @@
 import AiFieldSuggester from '@/Components/AiAssistant/AiFieldSuggester';
 import PlatformSettingsModal from '@/Components/ConfigSocialMedia/PlatformSettingsModal';
 import CampaignSelector from '@/Components/Content/Publication/common/CampaignSelector';
-import { ContentType } from '@/Components/Content/Publication/common/ContentTypeIconSelector';
+import type { ContentType } from '@/Components/Content/Publication/common/ContentTypeIconSelector';
 import ContentTypeSelectorBar from '@/Components/Content/Publication/common/ContentTypeSelectorBar';
+import PlatformCharacterValidator from '@/Components/Content/Publication/common/PlatformCharacterValidator';
 import PollFields from '@/Components/Content/Publication/common/PollFields';
 import SocialAccountsSection from '@/Components/Content/Publication/common/add/SocialAccountsSection';
 import MediaUploadSection from '@/Components/Content/Publication/common/edit/MediaUploadSection';
@@ -10,6 +11,7 @@ import ModalFooter from '@/Components/Content/modals/common/ModalFooter';
 import ModalHeader from '@/Components/Content/modals/common/ModalHeader';
 import PublicationStatusSection from '@/Components/Content/modals/common/PublicationStatusSection';
 import ScheduleSection from '@/Components/Content/modals/common/ScheduleSection';
+import VideoValidationAlert from '@/Components/Content/modals/publish/VideoValidationAlert';
 import Input from '@/Components/common/Modern/Input';
 import Textarea from '@/Components/common/Modern/Textarea';
 import { useCampaigns } from '@/Hooks/campaign/useCampaigns';
@@ -18,15 +20,13 @@ import { usePublicationForm } from '@/Hooks/publication/usePublicationForm';
 import { useConfirm } from '@/Hooks/useConfirm';
 import { useS3Upload } from '@/Hooks/useS3Upload';
 import { useSocialAccounts } from '@/Hooks/useSocialAccounts';
+import { useTokenHealth } from '@/Hooks/useTokenHealth';
 import { ToastService } from '@/Services/ToastService';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { FileText, Hash, Save, Target } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useWatch } from 'react-hook-form';
-import PlatformCharacterValidator from '@/Components/Content/Publication/common/PlatformCharacterValidator';
-import VideoValidationAlert from '@/Components/Content/modals/publish/VideoValidationAlert';
-import { useTokenHealth } from '@/Hooks/useTokenHealth';
 
 interface AddPublicationModalProps {
   isOpen: boolean;

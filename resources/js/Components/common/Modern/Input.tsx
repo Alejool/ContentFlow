@@ -1,6 +1,6 @@
 import { CheckCircle, Eye, EyeOff, TriangleAlert } from 'lucide-react';
 import { InputHTMLAttributes, ReactNode, forwardRef, isValidElement, useState } from 'react';
-import { FieldValues, Path, UseFormRegister } from 'react-hook-form';
+import type { FieldValues, Path, UseFormRegister } from 'react-hook-form';
 
 import Label from '@/Components/common/Modern/Label';
 

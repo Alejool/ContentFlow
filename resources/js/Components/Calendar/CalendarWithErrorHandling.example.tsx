@@ -6,7 +6,7 @@
  */
 
 import { useCalendarStore } from '@/stores/calendarStore';
-import { SyncError } from '@/types/errors';
+import type { SyncError } from '@/types/errors';
 import { validateDate } from '@/Utils/dateValidation';
 import React, { useState } from 'react';
 import { CalendarErrorBoundary } from './CalendarErrorBoundary';

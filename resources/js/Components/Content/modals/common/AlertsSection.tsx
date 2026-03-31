@@ -1,4 +1,4 @@
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 import { AlertCircle, Lock } from 'lucide-react';
 import { Trans } from 'react-i18next';
 

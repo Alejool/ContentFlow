@@ -8,7 +8,7 @@ import { ariaAnnouncer } from '@/Utils/ARIAAnnouncer';
 import { FocusManager } from '@/Utils/FocusManager';
 import { FocusVisibleManager } from '@/Utils/FocusVisibleManager';
 import { QueryProvider } from '@/providers/QueryProvider';
-import { PageProps } from '@/types';
+import type { PageProps } from '@/types';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import React, { Suspense } from 'react';
@@ -27,7 +27,7 @@ FocusManager.initialize();
 // Initialize ARIA announcer for screen reader support
 ariaAnnouncer.initialize();
 
-const appName = import.meta.env.VITE_APP_NAME || 'Intellipost';
+const appName = import.meta.env['VITE_APP_NAME'] || 'Intellipost';
 
 // Lazy load i18n
 const loadI18n = () => import('./i18n');

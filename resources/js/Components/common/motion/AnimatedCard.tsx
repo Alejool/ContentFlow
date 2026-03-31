@@ -4,9 +4,10 @@
  * Card with hover animations and accessibility features
  */
 
-import React, { HTMLAttributes } from 'react';
-import { LazyMotion, domAnimation, m, MotionProps } from 'framer-motion';
 import { prefersReducedMotion } from '@/Utils/themeTransition';
+import type { MotionProps } from 'framer-motion';
+import { LazyMotion, domAnimation, m } from 'framer-motion';
+import React, { HTMLAttributes } from 'react';
 
 interface AnimatedCardProps extends HTMLAttributes<HTMLDivElement> {
   hoverable?: boolean;

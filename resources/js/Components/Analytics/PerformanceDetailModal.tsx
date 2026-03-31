@@ -1,6 +1,7 @@
 import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
 import { useTranslation } from 'react-i18next';
-import PerformanceTable, { CampaignStat } from './PerformanceTable';
+import PerformanceTable from './PerformanceTable';
+import type { CampaignStat } from './PerformanceTable';
 
 interface PerformanceDetailModalProps {
   isOpen: boolean;

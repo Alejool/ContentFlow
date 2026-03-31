@@ -1,5 +1,6 @@
 import RadioInput from '@/Components/common/Modern/RadioInput';
-import { Check, LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { Check } from 'lucide-react';
 
 interface OptionCardProps {
   value: string;

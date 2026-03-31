@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import {
   Button as AriaButton,
   Popover as AriaPopover,
-  PopoverProps as AriaPopoverProps,
+  type PopoverProps as AriaPopoverProps,
   Dialog,
   DialogTrigger,
 } from 'react-aria-components';

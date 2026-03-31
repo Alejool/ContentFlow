@@ -1,6 +1,6 @@
+import type { ValidationResult } from '@/Utils/videoValidation';
 import { AlertCircle, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { ValidationResult } from '@/Utils/videoValidation';
 
 interface VideoValidationAlertProps {
   validation: ValidationResult;

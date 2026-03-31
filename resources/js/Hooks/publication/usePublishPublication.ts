@@ -1,8 +1,8 @@
 import { useSocialAccounts } from '@/Hooks/useSocialAccounts';
 import { useCampaignStore } from '@/stores/campaignStore';
 import { usePublicationStore } from '@/stores/publicationStore';
-import { Publication } from '@/types/Publication';
-import { SocialAccount } from '@/types/SocialAccount';
+import type { Publication } from '@/types/Publication';
+import type { SocialAccount } from '@/types/SocialAccount';
 import axios from 'axios';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';

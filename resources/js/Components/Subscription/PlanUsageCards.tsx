@@ -1,7 +1,7 @@
 import { CarouselPagination } from '@/Components/common/CarouselPagination';
 import AnimatedPagination from '@/Components/common/ui/AnimatedPagination';
 import { useSubscriptionUsage } from '@/Hooks/useSubscriptionUsage';
-import { PageProps as InertiaPageProps } from '@inertiajs/core';
+import type { PageProps as InertiaPageProps } from '@inertiajs/core';
 import { usePage } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FileText, HardDrive, Share2, Sparkles, Users, Zap } from 'lucide-react';

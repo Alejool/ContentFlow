@@ -4,7 +4,7 @@ import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
 import EmptyState from '@/Components/common/ui/EmptyState';
 import TableContainer from '@/Components/common/ui/TableContainer';
 import { formatDate } from '@/Utils/i18nHelpers';
-import { SocialPostLog } from '@/types/Publication';
+import type { SocialPostLog } from '@/types/Publication';
 import {
   AlertCircle,
   CheckCircle,

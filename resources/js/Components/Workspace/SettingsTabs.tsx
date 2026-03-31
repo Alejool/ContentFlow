@@ -1,4 +1,5 @@
-import { TabNavigation, Tab as TabNavigationType } from '@/Components/common/TabNavigation';
+import { TabNavigation } from '@/Components/common/TabNavigation';
+import type { Tab as TabNavigationType } from '@/Components/common/TabNavigation';
 
 interface Tab {
   id: string;

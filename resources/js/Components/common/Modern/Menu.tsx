@@ -1,14 +1,7 @@
-import { LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { ReactNode } from 'react';
-import {
-  Menu as AriaMenu,
-  MenuItem as AriaMenuItem,
-  MenuTrigger,
-  Popover,
-  Separator,
-  type MenuItemProps,
-  type MenuProps,
-} from 'react-aria-components';
+import { Menu as AriaMenu, MenuItem as AriaMenuItem, MenuTrigger, Popover, Separator } from 'react-aria-components';
+import type { MenuItemProps, MenuProps } from 'react-aria-components';
 
 interface ModernMenuProps<T> extends Omit<MenuProps<T>, 'children'> {
   children: ReactNode;

@@ -1,6 +1,7 @@
-import { Campaign } from '@/types/Campaign';
-import { Publication } from '@/types/Publication';
-import axios, { AxiosResponse } from 'axios';
+import type { Campaign } from '@/types/Campaign';
+import type { Publication } from '@/types/Publication';
+import type { AxiosResponse } from 'axios';
+import axios from 'axios';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';

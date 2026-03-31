@@ -1,4 +1,4 @@
-import { ContentType } from '@/Components/Content/Publication/common/ContentTypeIconSelector';
+import type { ContentType } from '@/Components/Content/Publication/common/ContentTypeIconSelector';
 import { useMemo } from 'react';
 
 interface ContentTypeConfig {

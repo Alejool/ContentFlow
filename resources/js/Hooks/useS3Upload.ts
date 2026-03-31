@@ -1,7 +1,7 @@
 import { useMediaStore } from '@/stores/mediaStore';
 import { useUploadQueue } from '@/stores/uploadQueueStore';
 import { useMutation } from '@tanstack/react-query';
-import axios, { AxiosError } from 'axios';
+import axios, { type AxiosError } from 'axios';
 import { useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';

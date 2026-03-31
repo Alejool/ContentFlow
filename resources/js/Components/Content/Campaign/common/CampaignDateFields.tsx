@@ -1,7 +1,7 @@
 import DatePickerModern from '@/Components/common/Modern/DatePicker';
 import { format, parseISO } from 'date-fns';
 import React from 'react';
-import { FieldErrors, UseFormSetValue } from 'react-hook-form';
+import type { FieldErrors, UseFormSetValue } from 'react-hook-form';
 
 interface CampaignDateFieldsProps {
   startDate?: string;

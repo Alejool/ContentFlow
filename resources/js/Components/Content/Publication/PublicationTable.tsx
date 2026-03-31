@@ -6,7 +6,7 @@ import { TableHeader } from '@/Components/Content/Publication/TableHeader';
 import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
 import EmptyState from '@/Components/common/ui/EmptyState';
 import TableContainer from '@/Components/common/ui/TableContainer';
-import { Publication } from '@/types/Publication';
+import type { Publication } from '@/types/Publication';
 import { memo, useCallback, useEffect, useState } from 'react';
 
 interface PublicationTableProps {

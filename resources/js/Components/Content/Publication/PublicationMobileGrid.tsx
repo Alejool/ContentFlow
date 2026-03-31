@@ -2,7 +2,7 @@ import Button from '@/Components/common/Modern/Button';
 import SimpleContentTypeBadge from '@/Components/Content/common/SimpleContentTypeBadge';
 import PublicationThumbnail from '@/Components/Content/Publication/PublicationThumbnail';
 import SocialAccountsDisplay from '@/Components/Content/Publication/SocialAccountsDisplay';
-import { Publication } from '@/types/Publication';
+import type { Publication } from '@/types/Publication';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { Clock, Copy, Edit, Eye, Folder, Image, Rocket, Send, Trash2, Video } from 'lucide-react';

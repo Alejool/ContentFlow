@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { campaignSchema } from '@/schemas/campaign';
-import { Campaign } from '@/types/Campaign';
+import type { Campaign } from '@/types/Campaign';
 
 export const useEditCampaignForm = (t: (key: string) => string, campaign: Campaign | null) => {
   const schema = useMemo(() => campaignSchema(t), [t]);

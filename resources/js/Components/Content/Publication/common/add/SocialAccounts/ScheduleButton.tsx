@@ -1,7 +1,7 @@
-import React, { memo } from 'react';
 import { Clock } from 'lucide-react';
-import { SocialAccount } from './types';
+import React, { memo } from 'react';
 import SchedulePopoverContent from './SchedulePopoverContent';
+import type { SocialAccount } from './types';
 
 interface ScheduleButtonProps {
   account: SocialAccount;

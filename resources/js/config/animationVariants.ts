@@ -1,4 +1,4 @@
-import { Transition, Variants } from 'framer-motion';
+import type { Transition, Variants } from 'framer-motion';
 
 /**
  * Animation variants configuration for Framer Motion

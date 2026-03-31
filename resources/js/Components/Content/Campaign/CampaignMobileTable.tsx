@@ -1,4 +1,4 @@
-import { Campaign } from '@/types/Campaign';
+import type { Campaign } from '@/types/Campaign';
 import { usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { getDateFnsLocale } from '@/Utils/dateLocales';

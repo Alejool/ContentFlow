@@ -1,5 +1,5 @@
-import { SocialAccount as GlobalSocialAccount } from '@/types/SocialAccount';
-import { ContentType } from '@/Constants/contentTypes';
+import type { SocialAccount as GlobalSocialAccount } from '@/types/SocialAccount';
+import type { ContentType } from '@/Constants/contentTypes';
 
 export interface SocialAccount extends Partial<GlobalSocialAccount> {
   id: number;

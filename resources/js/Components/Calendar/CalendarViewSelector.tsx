@@ -1,4 +1,4 @@
-import { CalendarView } from '@/types/calendar';
+import type { CalendarView } from '@/types/calendar';
 import { Calendar, CalendarDays, CalendarRange } from 'lucide-react';
 import React, { useEffect } from 'react';
 

@@ -1,4 +1,4 @@
-import { Publication } from '@/types/Publication';
+import type { Publication } from '@/types/Publication';
 
 /**
  * Verifica si un usuario puede publicar directamente una publicación

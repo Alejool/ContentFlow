@@ -1,7 +1,7 @@
-import React from 'react';
+import type { SyncError } from '@/types/errors';
 import { AlertCircle, RefreshCw, X } from 'lucide-react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { SyncError } from '@/types/errors';
 
 interface SyncErrorDisplayProps {
   error: SyncError;

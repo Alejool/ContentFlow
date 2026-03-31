@@ -1,4 +1,5 @@
-import { toast as hotToast, ToastOptions } from 'react-hot-toast';
+import type { ToastOptions } from 'react-hot-toast';
+import { toast as hotToast } from 'react-hot-toast';
 
 /**
  * Custom toast wrapper that can be used throughout the application

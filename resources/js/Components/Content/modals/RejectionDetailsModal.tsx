@@ -1,4 +1,4 @@
-import { Publication } from '@/types/Publication';
+import type { Publication } from '@/types/Publication';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
