@@ -25,6 +25,7 @@ class UploadController extends Controller
       'content_type' => 'required|string',
       'file_size'    => 'nullable|integer|min:1', // bytes — sent by frontend
       'pending_bytes' => 'nullable|integer|min:0', // bytes of files already queued for upload
+      'context'      => 'nullable|string|in:publication,profile,workspace', // upload context
     ]);
 
     // --- Storage limit pre-check ---
@@ -57,6 +58,7 @@ class UploadController extends Controller
 
     $filename = $request->input('filename');
     $contentType = $request->input('content_type');
+    $context = $request->input('context', 'publication'); // default to publication for backward compatibility
     $user = $request->user();
 
     // Validate content type against allowed types
@@ -64,7 +66,7 @@ class UploadController extends Controller
       'image/jpeg',
       'image/png',
       'image/gif',
-      'image/svg+xml', // SVG support enabled
+      'image/svg+xml', // SVG support enabled for profile/workspace only
       'video/mp4',
       'application/pdf',
     ];
@@ -78,7 +80,21 @@ class UploadController extends Controller
     // Extract file extension for validation
     $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 
-    // Check for executable extensions (excluding svg which is now allowed)
+    // Block SVG files for publications (social media platforms don't support SVG)
+    if (($extension === 'svg' || $contentType === 'image/svg+xml') && $context === 'publication') {
+      Log::info('SVG file blocked for publication context', [
+        'filename' => $filename,
+        'content_type' => $contentType,
+        'context' => $context,
+        'user_id' => $request->user()?->id,
+      ]);
+
+      return response()->json([
+        'error' => 'SVG files are not supported by social media platforms. Please use JPG, PNG, GIF, or WebP.'
+      ], 400);
+    }
+
+    // Check for executable extensions
     $executableExtensions = ['exe', 'bat', 'cmd', 'com', 'pif', 'scr', 'vbs', 'js', 'jar', 'sh', 'php', 'py'];
 
     if (in_array($extension, $executableExtensions)) {

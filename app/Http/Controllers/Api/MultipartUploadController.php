@@ -23,6 +23,7 @@ class MultipartUploadController extends Controller
       'content_type' => 'required|string',
       'file_size' => 'nullable|integer|min:1',
       'pending_bytes' => 'nullable|integer|min:0', // bytes of files already queued for upload
+      'context' => 'nullable|string|in:publication,profile,workspace', // upload context
     ]);
 
     // --- Storage limit pre-check ---
@@ -55,6 +56,7 @@ class MultipartUploadController extends Controller
 
     $filename = $request->input('filename');
     $contentType = $request->input('content_type');
+    $context = $request->input('context', 'publication'); // default to publication for backward compatibility
     $user = $request->user();
 
     // Validate content type against allowed types
@@ -62,6 +64,7 @@ class MultipartUploadController extends Controller
       'image/jpeg',
       'image/png',
       'image/gif',
+      'image/svg+xml', // SVG support enabled for profile/workspace only
       'video/mp4',
       'application/pdf',
     ];
@@ -74,6 +77,21 @@ class MultipartUploadController extends Controller
 
     // Check for executable extensions
     $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+
+    // Block SVG files for publications (social media platforms don't support SVG)
+    if (($extension === 'svg' || $contentType === 'image/svg+xml') && $context === 'publication') {
+      Log::info('SVG file blocked for publication context in multipart upload', [
+        'filename' => $filename,
+        'content_type' => $contentType,
+        'context' => $context,
+        'user_id' => $request->user()?->id,
+      ]);
+
+      return response()->json([
+        'error' => 'SVG files are not supported by social media platforms. Please use JPG, PNG, GIF, or WebP.'
+      ], 400);
+    }
+
     $executableExtensions = ['exe', 'bat', 'cmd', 'com', 'pif', 'scr', 'vbs', 'js', 'jar', 'sh', 'php', 'py'];
 
     if (in_array($extension, $executableExtensions)) {
