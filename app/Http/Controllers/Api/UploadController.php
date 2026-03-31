@@ -75,6 +75,9 @@ class UploadController extends Controller
       ], 400);
     }
 
+    // Extract file extension for validation
+    $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+
     // Check for executable extensions (excluding svg which is now allowed)
     $executableExtensions = ['exe', 'bat', 'cmd', 'com', 'pif', 'scr', 'vbs', 'js', 'jar', 'sh', 'php', 'py'];
 
@@ -89,8 +92,6 @@ class UploadController extends Controller
         'error' => 'Executable files are not allowed'
       ], 400);
     }
-
-    $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
     
     // Usar el nuevo servicio de rutas organizadas
     $key = S3PathService::publicationPath(
