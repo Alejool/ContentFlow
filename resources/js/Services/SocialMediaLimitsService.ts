@@ -165,13 +165,13 @@ class SocialMediaLimitsService {
     // Sugerencia para videos largos
     if (allErrors.some((e) => e.toLowerCase().includes('demasiado largo'))) {
       suggestions.push(
-        '💡 Considera recortar el video o publicar solo en plataformas que soporten videos largos (YouTube, Facebook)',
+        ' Considera recortar el video o publicar solo en plataformas que soporten videos largos (YouTube, Facebook)',
       );
     }
 
     // Sugerencia para archivos grandes
     if (allErrors.some((e) => e.toLowerCase().includes('demasiado grande'))) {
-      suggestions.push('💡 Comprime el video para reducir su tamaño sin perder mucha calidad');
+      suggestions.push(' Comprime el video para reducir su tamaño sin perder mucha calidad');
     }
 
     // Sugerencia para verificación
