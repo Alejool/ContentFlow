@@ -593,9 +593,9 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
   publishPublication: async (id, formData) => {
     try {
-      // Generate a unique key per publish attempt to prevent duplicate requests
+      // Generate a unique UUID v4 key per publish attempt to prevent duplicate requests
       // (e.g. double-click or network retry while the first request is still in flight).
-      const idempotencyKey = `${id}-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+      const idempotencyKey = crypto.randomUUID();
 
       const response = await axios.post(route('api.v1.publications.publish', id), formData, {
         headers: {

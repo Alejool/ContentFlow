@@ -93,14 +93,14 @@ const MediaUploadSection = memo(
         types.push('video/mp4', 'video/mov', 'video/avi');
       } else if (mediaRules.imageOnly) {
         // Solo imágenes
-        types.push('image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp');
+        types.push('image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml');
       } else {
         // Verificar si aún se pueden agregar imágenes
         if (
           mediaRules.maxImages === undefined ||
           (mediaRules.maxImages > 0 && mediaCounts.images < mediaRules.maxImages)
         ) {
-          types.push('image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp');
+          types.push('image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml');
         }
         // Verificar si aún se pueden agregar videos
         if (

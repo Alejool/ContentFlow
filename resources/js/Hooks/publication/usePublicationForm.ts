@@ -1,12 +1,12 @@
 import {
-  getMediaRulesForContentType,
-  type ContentType,
+    getMediaRulesForContentType,
+    type ContentType,
 } from '@/Components/Content/Publication/common/ContentTypeSelector';
 import { CONTENT_TYPE_DISPLAY } from '@/Constants/contentTypes';
 import { useContentTypeSuggestion } from '@/Hooks/publication/useContentTypeSuggestion';
 import {
-  useCreatePublication,
-  useUpdatePublication,
+    useCreatePublication,
+    useUpdatePublication,
 } from '@/Hooks/publication/usePublicationsList';
 import { useS3Upload } from '@/Hooks/useS3Upload';
 import { queryKeys } from '@/lib/queryKeys';
@@ -768,26 +768,6 @@ export const usePublicationForm = ({
       return;
     }
 
-    // Block SVG files for security reasons (can contain malicious scripts)
-    const svgFiles = newFiles.filter(
-      (file) => file.type === 'image/svg+xml' || file.name.toLowerCase().endsWith('.svg'),
-    );
-
-    if (svgFiles.length > 0) {
-      const fileNames = svgFiles.map((f) => f.name).join(', ');
-      toast.error(
-        t('publications.modal.upload.errors.svgNotAllowed', {
-          defaultValue: `SVG files are not allowed for security reasons: ${fileNames}`,
-          files: fileNames,
-        }),
-      );
-      setImageError(
-        t('publications.modal.upload.errors.svgNotAllowed', {
-          defaultValue: 'SVG files are not allowed for security reasons',
-        }),
-      );
-      return;
-    }
     const videoFiles = newFiles.filter((f) => f.type.startsWith('video/'));
 
     const newMediaItems = newFiles.map((file) => ({
