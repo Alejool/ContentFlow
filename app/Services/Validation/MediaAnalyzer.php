@@ -231,7 +231,7 @@ class MediaAnalyzer
 
         // Fallback por extensión
         $videoExtensions = ['mp4', 'mov', 'avi', 'wmv', 'flv', 'webm', 'mkv'];
-        $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
+        $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'];
 
         if (in_array($extension, $videoExtensions)) {
             return 'video';

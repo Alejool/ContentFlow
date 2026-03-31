@@ -336,9 +336,9 @@ class UpdatePublicationRequest extends FormRequest
       'media_keep_ids' => 'nullable|array',
       'removed_media_ids' => 'nullable|array',
       'thumbnails' => 'nullable|array',
-      'thumbnails.*' => 'file|mimes:jpeg,png,jpg|max:5120',
+      'thumbnails.*' => 'file|mimes:jpeg,png,jpg,gif,svg,webp|max:5120',
       'removed_thumbnail_ids' => 'nullable|array',
-      'youtube_thumbnail' => 'nullable|file|mimes:jpeg,png,jpg|max:5120',
+      'youtube_thumbnail' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,webp|max:5120',
       'youtube_thumbnail_video_id' => 'nullable|exists:media_files,id',
       // Recurrence
       'is_recurring' => 'nullable|boolean',

@@ -169,7 +169,7 @@ class MediaProcessingService
   {
     // Validate thumbnail file
     $validator = app(\App\Services\FileValidatorService::class);
-    $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml', 'image/webp'];
     
     $validationResult = $validator->validate($thumbFile, $allowedMimeTypes);
     
