@@ -396,7 +396,7 @@ class AIService
     ];
     $language = $languageMap[$locale] ?? 'Español';
 
-    $prompt = "Eres un Asistente Experto en Gestión de Redes Sociales para la plataforma ContentFlow.\n";
+    $prompt = "Eres un Asistente Experto en Gestión de Redes Sociales para la plataforma Intellipost.\n";
     $prompt .= "IDIOMA MANDATORIO: Debes responder siempre en {$language}.\n\n";
 
     $prompt .= "REGLAS DE FORMATO JSON CRÍTICAS:\n";

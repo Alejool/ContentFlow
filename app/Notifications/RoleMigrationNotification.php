@@ -48,7 +48,7 @@ class RoleMigrationNotification extends Notification implements ShouldQueue
             ->line($this->explanation)
             ->line('This change does not affect your access to existing content. If you have any questions, please contact your workspace administrator.')
             ->action('View Workspace', url('/workspaces/' . $this->workspaceName))
-            ->line('Thank you for using ContentFlow!');
+            ->line('Thank you for using Intellipost!');
     }
 
     /**

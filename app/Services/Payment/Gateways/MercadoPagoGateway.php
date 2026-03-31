@@ -45,7 +45,7 @@ class MercadoPagoGateway implements PaymentGatewayInterface
             $preference = $client->create([
                 'items' => [
                     [
-                        'title' => "Plan {$planConfig['name']} - ContentFlow",
+                        'title' => "Plan {$planConfig['name']} - Intellipost",
                         'description' => $planConfig['description'] ?? '',
                         'quantity' => 1,
                         'currency_id' => 'COP',

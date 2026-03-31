@@ -365,8 +365,8 @@ class HandleInertiaRequests extends Middleware
             [
               'id' => 'step-1',
               'version' => '1.1', // Version to force cache refresh
-              'title' => 'Welcome to ContentFlow',
-              'description' => "Welcome! ContentFlow helps you manage and schedule social media content across multiple platforms. Let's take a quick tour of the key features.",
+              'title' => 'Welcome to Intellipost',
+              'description' => "Welcome! Intellipost helps you manage and schedule social media content across multiple platforms. Let's take a quick tour of the key features.",
               'targetSelector' => 'main',
               'position' => 'bottom',
               'highlightPadding' => 8,

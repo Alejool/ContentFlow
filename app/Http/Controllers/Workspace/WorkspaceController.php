@@ -524,12 +524,12 @@ class WorkspaceController extends Controller
         $eventType = 'test_connection';
         if ($validated['type'] === 'slack') {
           $payload = [
-            'text' => "Test notification from ContentFlow for workspace: {$workspace->name}",
+            'text' => "Test notification from Intellipost for workspace: {$workspace->name}",
             'url' => $url,
           ];
         } else {
           $payload = [
-            'content' => "Test notification from ContentFlow for workspace: {$workspace->name}",
+            'content' => "Test notification from Intellipost for workspace: {$workspace->name}",
             'url' => $url,
           ];
         }

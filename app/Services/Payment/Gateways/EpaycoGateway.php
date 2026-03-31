@@ -53,7 +53,7 @@ class EpaycoGateway implements PaymentGatewayInterface
 
         try {
             $payment = $this->epayco->charge->create([
-                'name' => "Plan {$planConfig['name']} - ContentFlow",
+                'name' => "Plan {$planConfig['name']} - Intellipost",
                 'description' => $planConfig['description'] ?? 'Suscripción mensual',
                 'currency' => 'cop',
                 'amount' => (string)$this->convertUsdToCop($planConfig['price']),

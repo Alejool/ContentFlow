@@ -63,7 +63,7 @@ class PayUGateway implements PaymentGatewayInterface
             $params = [
                 'merchantId' => $this->merchantId,
                 'accountId' => $this->accountId,
-                'description' => "Plan {$planConfig['name']} - ContentFlow",
+                'description' => "Plan {$planConfig['name']} - Intellipost",
                 'referenceCode' => $referenceCode,
                 'amount' => $amount,
                 'tax' => 0,

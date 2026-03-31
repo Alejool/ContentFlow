@@ -43,7 +43,7 @@ class MercadoPagoManualGateway implements PaymentGatewayInterface
         $preferenceData = [
             'items' => [
                 [
-                    'title' => "Plan {$planConfig['name']} - ContentFlow",
+                    'title' => "Plan {$planConfig['name']} - Intellipost",
                     'description' => $planConfig['description'] ?? '',
                     'quantity' => 1,
                     'currency_id' => 'COP',

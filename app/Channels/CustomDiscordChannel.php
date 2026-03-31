@@ -38,7 +38,7 @@ class CustomDiscordChannel
         ->withoutVerifying()
         ->post($url, [
           'content' => $message,
-          'username' => 'ContentFlow Bot',
+          'username' => 'Intellipost Bot',
         ]);
 
       $success = $response->status() === 204 || ($response->successful() && !str_contains($response->header('Content-Type'), 'text/html'));

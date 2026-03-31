@@ -27,7 +27,7 @@ class TrialEndedNotification extends Notification implements ShouldQueue
             ->subject('Tu prueba gratuita ha terminado')
             ->greeting("Hola {$notifiable->name},")
             ->line('Tu prueba gratuita ha terminado y tu cuenta ha sido cambiada al plan gratuito.')
-            ->line('Puedes continuar usando ContentFlow con las funcionalidades del plan gratuito.')
+            ->line('Puedes continuar usando Intellipost con las funcionalidades del plan gratuito.')
             ->action('Ver Planes', url('/subscription/plans'))
             ->line('Actualiza en cualquier momento para desbloquear más funcionalidades.');
     }
