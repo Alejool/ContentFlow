@@ -149,7 +149,7 @@ export function PublicationStatusCards({
           onClick={() => nudge('left')}
           disabled={activeIndex === 0}
           className={cn(
-            'absolute -left-1 top-1/2 z-10 -translate-y-1/2 rounded-full border border-gray-200 bg-white p-1.5 shadow-md transition-all duration-200 dark:border-neutral-700 dark:bg-neutral-800',
+            'absolute left-1 top-1/2 z-10 -translate-y-1/2 rounded-full border border-gray-200 bg-white p-1.5 shadow-md transition-all duration-200 dark:border-neutral-700 dark:bg-neutral-800',
             activeIndex === 0 ? 'pointer-events-none opacity-0' : 'opacity-100 hover:scale-110',
           )}
         >
@@ -159,7 +159,7 @@ export function PublicationStatusCards({
           onClick={() => nudge('right')}
           disabled={activeIndex === total - 1}
           className={cn(
-            'absolute -right-1 top-1/2 z-10 -translate-y-1/2 rounded-full border border-gray-200 bg-white p-1.5 shadow-md transition-all duration-200 dark:border-neutral-700 dark:bg-neutral-800',
+            'absolute right-1 top-1/2 z-10 -translate-y-1/2 rounded-full border border-gray-200 bg-white p-1.5 shadow-md transition-all duration-200 dark:border-neutral-700 dark:bg-neutral-800',
             activeIndex === total - 1
               ? 'pointer-events-none opacity-0'
               : 'opacity-100 hover:scale-110',
