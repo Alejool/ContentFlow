@@ -1,14 +1,14 @@
-# ContentFlow — Social Strategy & Multimedia Hub
+# Intellipost — Social Strategy & Multimedia Hub
 
 <div align="center">
-  <img src="resources/assets/logo.svg" alt="ContentFlow Logo" width="400" />
+  <img src="resources/assets/logo.svg" alt="Intellipost Logo" width="400" />
   <p><em>Centralize your digital presence with AI-powered strategy and multi-platform automation.</em></p>
 </div>
 
 ---
 
 ## 🌟 Vision
-**ContentFlow** is an enterprise-grade multimedia content management platform designed for creators, marketing agencies, and modern teams. It bridges the gap between raw ideas and published excellence by centralizing social media strategy, AI-assisted creation, and multi-tenant collaboration into a single, cohesive interface.
+**Intellipost** is an enterprise-grade multimedia content management platform designed for creators, marketing agencies, and modern teams. It bridges the gap between raw ideas and published excellence by centralizing social media strategy, AI-assisted creation, and multi-tenant collaboration into a single, cohesive interface.
 
 ## 🚀 Core Functionalities
 
@@ -19,7 +19,7 @@ Manage and publish content across leading platforms from a single dashboard:
 - **Twitter (X)**: Thread builder, content splitting, and native poll support.
 
 ### 🤖 Intelligent AI Engine
-ContentFlow integrates a multi-provider AI layer (DeepSeek, Gemini, OpenAI, Claude) to assist you:
+Intellipost integrates a multi-provider AI layer (DeepSeek, Gemini, OpenAI, Claude) to assist you:
 - **Content Strategy**: Tools to generate content plans tailored to your niche.
 - **Micro-Copywriting**: Assistance in generating captions, hashtags, and engagement-focused titles.
 - **Media Optimization**: Suggestions for publishing times and platform-specific formatting.
@@ -28,7 +28,7 @@ ContentFlow integrates a multi-provider AI layer (DeepSeek, Gemini, OpenAI, Clau
 Manage your entire editorial timeline with an interactive drag-and-drop calendar. View scheduled posts, user events, and campaign milestones at a glance, ensuring a consistent brand voice across all channels.
 
 ### 🏢 Agency-Ready Workspaces
-Built with scalability in mind, ContentFlow supports multi-tenancy:
+Built with scalability in mind, Intellipost supports multi-tenancy:
 - **Isolated Environments**: Keep clients, projects, or brands completely separate with dedicated workspaces.
 - **Role-Based Access Control (RBAC)**: Fine-grained permissions (Owner, Admin, Editor, Viewer).
 - **Real-time Collaboration**: Live presence indicators and editing locks to prevent content overwrites.
@@ -40,7 +40,7 @@ Unified metrics tracking to understand your global impact:
 - Campaign-level ROI analysis.
 
 ### ⚡ Progressive Web App (PWA) Features
-ContentFlow is a fully-featured Progressive Web App with offline capabilities:
+Intellipost is a fully-featured Progressive Web App with offline capabilities:
 - **Installable**: Install the app on your device like a native application
 - **Optimistic UI**: Instant feedback on all actions with automatic rollback on errors
 - **Offline Mode**: Continue working without internet connection
@@ -51,7 +51,7 @@ ContentFlow is a fully-featured Progressive Web App with offline capabilities:
 
 ## 🏗️ Architecture & Technology Stack
 
-ContentFlow follows a **Hybrid Monolith** architecture, combining the robustness of a traditional backend with the fluidity of a modern SPA.
+Intellipost follows a **Hybrid Monolith** architecture, combining the robustness of a traditional backend with the fluidity of a modern SPA.
 
 ### 🛠️ The Stack
 - **Backend**: [Laravel 11](https://laravel.com/) (PHP 8.2+) — Utilizing Service-Action patterns for decoupled logic.
@@ -88,7 +88,7 @@ graph TD
 ## 📁 Repository Structure
 
 ```text
-ContentFlow/
+Intellipost/
 ├── app/
 │   ├── Actions/             # Unitary business logic (Create, Update, Publish)
 │   ├── Http/Controllers/    # Inertia & API controllers
@@ -115,8 +115,8 @@ ContentFlow/
 ### Installation
 1. **Clone the repo**
    ```bash
-   git clone https://github.com/Alejool/ContentFlow.git
-   cd ContentFlow
+   git clone https://github.com/Alejool/Intellipost.git
+   cd Intellipost
    ```
 2. **Setup Dependencies**
    ```bash
@@ -139,31 +139,31 @@ ContentFlow/
 
 ## 📱 Progressive Web App (PWA) Installation
 
-ContentFlow can be installed as a Progressive Web App on your device for a native app-like experience.
+Intellipost can be installed as a Progressive Web App on your device for a native app-like experience.
 
 ### Desktop Installation
 
 #### Chrome/Edge/Brave
-1. Visit the ContentFlow application in your browser
+1. Visit the Intellipost application in your browser
 2. Look for the install icon (⊕) in the address bar
 3. Click "Install" when prompted
 4. The app will open in a standalone window
 
 #### Safari (macOS)
-1. Visit the ContentFlow application
+1. Visit the Intellipost application
 2. Click "File" → "Add to Dock"
 3. The app will be added to your Dock
 
 ### Mobile Installation
 
 #### Android (Chrome)
-1. Open ContentFlow in Chrome
+1. Open Intellipost in Chrome
 2. Tap the menu (⋮) → "Install app" or "Add to Home screen"
 3. Confirm installation
 4. Launch from your home screen
 
 #### iOS (Safari)
-1. Open ContentFlow in Safari
+1. Open Intellipost in Safari
 2. Tap the Share button (□↑)
 3. Scroll and tap "Add to Home Screen"
 4. Tap "Add"
@@ -171,7 +171,7 @@ ContentFlow can be installed as a Progressive Web App on your device for a nativ
 
 ### PWA Features
 
-Once installed, ContentFlow provides:
+Once installed, Intellipost provides:
 
 - **Offline Access**: Continue working without internet connection
 - **Fast Loading**: Instant startup with smart caching
@@ -181,7 +181,7 @@ Once installed, ContentFlow provides:
 
 ### Browser Requirements
 
-ContentFlow PWA works best on:
+Intellipost PWA works best on:
 - **Chrome/Edge**: Version 90+
 - **Safari**: Version 15+ (iOS 15+)
 - **Firefox**: Version 90+
@@ -204,7 +204,7 @@ All actions performed offline are automatically synchronized when your connectio
 
 ### Optimistic UI
 
-ContentFlow uses optimistic updates to provide instant feedback:
+Intellipost uses optimistic updates to provide instant feedback:
 - Changes appear immediately in the UI
 - Operations are confirmed with the server in the background
 - Automatic rollback if an operation fails
@@ -216,7 +216,7 @@ This creates a fast, responsive experience even on slow connections.
 
 ## 🔒 Security Features
 
-ContentFlow implements enterprise-grade security measures to protect your data and ensure system reliability.
+Intellipost implements enterprise-grade security measures to protect your data and ensure system reliability.
 
 ### Rate Limiting
 
@@ -389,7 +389,7 @@ npm run build -- --analyze
 
 - **[API Reference](resources/js/docs/API_REFERENCE.md)**: Complete API documentation for hooks, stores, and utilities
 - **[Integration Guide](resources/js/docs/INTEGRATION_GUIDE.md)**: Step-by-step guide for integrating optimistic updates
-- **[PWA Installation Guide](resources/js/docs/PWA_INSTALLATION_GUIDE.md)**: How to install and use ContentFlow as a PWA
+- **[PWA Installation Guide](resources/js/docs/PWA_INSTALLATION_GUIDE.md)**: How to install and use Intellipost as a PWA
 - **[Troubleshooting Guide](resources/js/docs/TROUBLESHOOTING.md)**: Common issues and solutions
 - **[PWA Setup Guide](resources/js/docs/OPTIMISTIC_PWA_SETUP.md)**: Setup and configuration details
 - **[Performance Guide](resources/js/docs/PERFORMANCE_MEASUREMENT_GUIDE.md)**: Performance optimization tips
@@ -413,18 +413,18 @@ npm run build -- --analyze
 We believe in the power of community! Here's how you can support the project:
 
 - **⭐ Star the Repository**: Show your support and help others find the project.
-- **🐛 Report Bugs**: Found an issue? Open a [GitHub Issue](https://github.com/Alejool/ContentFlow/issues).
+- **🐛 Report Bugs**: Found an issue? Open a [GitHub Issue](https://github.com/Alejool/Intellipost/issues).
 - **💡 Feature Requests**: Have a great idea? Let us know in the discussions.
 - **💻 Contribute Code**: Pull requests are always welcome! Please read our `CONTRIBUTING.md` (coming soon).
 
 ---
 
 ## 📄 License
-ContentFlow is open-sourced software licensed under the [MIT license](LICENSE).
+Intellipost is open-sourced software licensed under the [MIT license](LICENSE).
 
 ---
 
 <div align="center">
-  Built with ❤️ by the ContentFlow Team.
+  Built with ❤️ by the Intellipost Team.
 </div>
 
