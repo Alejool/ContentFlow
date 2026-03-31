@@ -1,16 +1,27 @@
 import { useConfirm } from '@/Hooks/useConfirm';
-import { useS3Upload } from '@/Hooks/useS3Upload';
-import { useUploadQueue } from '@/stores/uploadQueueStore';
-import { useProcessingProgress } from '@/stores/processingProgressStore';
-import axios from 'axios';
-import { AlertTriangle, CheckCircle2, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { UploadItem } from './Upload/UploadItem';
-import { PublicationItem } from './Upload/PublicationItem';
-import { ProgressDisplay } from './Upload/ProgressDisplay';
 import { usePublicationStatus } from '@/Hooks/usePublicationStatus';
+import { useS3Upload } from '@/Hooks/useS3Upload';
 import { useUploadWarning } from '@/Hooks/useUploadWarning';
+import { useProcessingProgress } from '@/stores/processingProgressStore';
+import { useUploadQueue } from '@/stores/uploadQueueStore';
+import axios from 'axios';
+import {
+    AlertTriangle,
+    CheckCircle2,
+    ChevronDown,
+    ChevronUp,
+    Cpu,
+    FileUp,
+    Loader2,
+    Minus,
+    Radio
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { ProgressDisplay } from './Upload/ProgressDisplay';
+import { PublicationItem } from './Upload/PublicationItem';
+
+type Tab = 'uploads' | 'processing' | 'publications';
 
 export default function GlobalUploadIndicator() {
   const queue = useUploadQueue((state) => state.queue);
@@ -27,11 +38,9 @@ export default function GlobalUploadIndicator() {
   const cancelJob = useProcessingProgress((state) => state.cancelJob);
 
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
+  const [activeTab, setActiveTab] = useState<Tab>('uploads');
   const [dismissedIds, setDismissedIds] = useState<number[]>([]);
-  const [uploadProgressUpdates, setUploadProgressUpdates] = useState<Record<string, number>>({});
-  const [processingProgressUpdates, setProcessingProgressUpdates] = useState<
-    Record<string, number>
-  >({});
 
   const { t } = useTranslation();
   const { confirm, ConfirmDialog } = useConfirm();
@@ -44,13 +53,11 @@ export default function GlobalUploadIndicator() {
     (u) => u.status === 'uploading' || u.status === 'pending' || u.status === 'paused',
   );
   const errorUploads = uploads.filter((u) => u.status === 'error');
-
   const activePublications = publications.filter(
     (p) => p.status === 'processing' || p.status === 'publishing',
   );
   const failedPublications = publications.filter((p) => p.status === 'failed');
   const completedPublications = publications.filter((p) => p.status === 'published');
-
   const activeJobs = jobs.filter((j) => j.status === 'processing' || j.status === 'queued');
   const failedJobs = jobs.filter((j) => j.status === 'failed');
 
@@ -64,34 +71,15 @@ export default function GlobalUploadIndicator() {
 
   useUploadWarning(activeUploads.length > 0);
 
-  // Progress update responsiveness: 500ms for uploads, 1s for processing
+  // Auto-select tab with activity
   useEffect(() => {
-    const uploadInterval = setInterval(() => {
-      const updates: Record<string, number> = {};
-      activeUploads.forEach((upload) => {
-        updates[upload.id] = Date.now();
-      });
-      setUploadProgressUpdates(updates);
-    }, 500); // 500ms for uploads
-
-    return () => clearInterval(uploadInterval);
-  }, [activeUploads.length]);
-
-  useEffect(() => {
-    const processingInterval = setInterval(() => {
-      const updates: Record<string, number> = {};
-      activeJobs.forEach((job) => {
-        updates[job.id] = Date.now();
-      });
-      setProcessingProgressUpdates(updates);
-    }, 1000); // 1s for processing
-
-    return () => clearInterval(processingInterval);
-  }, [activeJobs.length]);
+    if (activeUploads.length > 0) setActiveTab('uploads');
+    else if (activeJobs.length > 0) setActiveTab('processing');
+    else if (activePublications.length > 0) setActiveTab('publications');
+  }, [activeUploads.length, activeJobs.length, activePublications.length]);
 
   const handleCancelPublication = async (e: React.MouseEvent, id: number) => {
     e.stopPropagation();
-
     const isConfirmed = await confirm({
       title: t('publications.modal.cancel_confirmation.title') || 'Cancelar Publicación',
       message: t('publications.modal.cancel_confirmation.message') || '¿Cancelar esta publicación?',
@@ -99,51 +87,23 @@ export default function GlobalUploadIndicator() {
       cancelText: t('publications.modal.cancel_confirmation.cancel') || 'No, continuar',
       type: 'danger',
     });
-
     if (!isConfirmed) return;
-
-    try {
-      await axios.post(route('api.v1.publications.cancel', id));
-    } catch (err) {}
+    try { await axios.post(route('api.v1.publications.cancel', id)); } catch {}
   };
 
-  const handleCancelPlatform = async (
-    publicationId: number,
-    platformId: number,
-    platformName: string,
-  ) => {
+  const handleCancelPlatform = async (publicationId: number, platformId: number, platformName: string) => {
     const isConfirmed = await confirm({
-      title:
-        t('publications.modal.cancel_platform.title', {
-          platform: platformName,
-        }) || '¿Cancelar ' + platformName + '?',
-      message:
-        t('publications.modal.cancel_platform.message', {
-          platform: platformName,
-        }) ||
-        '¿Estás seguro de que deseas cancelar la publicación en ' +
-          platformName +
-          '? Se detendrán todos los reintentos para esta plataforma.',
+      title: t('publications.modal.cancel_platform.title', { platform: platformName }) || `¿Cancelar ${platformName}?`,
+      message: t('publications.modal.cancel_platform.message', { platform: platformName }) || `¿Cancelar la publicación en ${platformName}?`,
       confirmText: t('publications.modal.cancel_platform.confirm') || 'Sí, cancelar',
       cancelText: t('publications.modal.cancel_platform.cancel') || 'No',
       type: 'warning',
     });
-
     if (!isConfirmed) return;
-
     try {
-      await axios.post(route('api.v1.publications.cancel', publicationId), {
-        platform_ids: [platformId],
-      });
-
-      // Force refresh of publication status after canceling
-      // This will trigger a re-fetch of the publication data
-      window.dispatchEvent(
-        new CustomEvent('publication-cancelled', {
-          detail: { publicationId, platformId },
-        }),
-      );
-    } catch (err) {}
+      await axios.post(route('api.v1.publications.cancel', publicationId), { platform_ids: [platformId] });
+      window.dispatchEvent(new CustomEvent('publication-cancelled', { detail: { publicationId, platformId } }));
+    } catch {}
   };
 
   const handleDismissPublication = (e: React.MouseEvent, id: number) => {
@@ -151,284 +111,269 @@ export default function GlobalUploadIndicator() {
     setDismissedIds((prev) => [...prev, id]);
   };
 
-  const handlePauseUpload = (id: string) => {
-    pauseUpload(id);
-  };
-
-  const handleResumeUpload = (id: string) => {
-    resumeUploadWithLogic(id);
-  };
-
   const handleCancelUpload = async (id: string) => {
     const isConfirmed = await confirm({
-      title: t('publications.modal.cancel_confirmation.title') || 'Cancel Upload',
-      message:
-        t('publications.modal.upload.cancel_message') ||
-        'Are you sure you want to cancel this upload?',
-      confirmText: t('publications.modal.cancel_confirmation.confirm') || 'Yes, cancel',
-      cancelText: t('publications.modal.cancel_confirmation.cancel') || 'No, continue',
+      title: 'Cancel Upload',
+      message: 'Are you sure you want to cancel this upload?',
+      confirmText: 'Yes, cancel',
+      cancelText: 'No, continue',
       type: 'danger',
     });
-
     if (!isConfirmed) return;
-
-    // Use the hook's cancelUpload which includes cleanup
     await cancelUploadWithCleanup(id);
   };
 
   const handleCancelJob = async (id: string) => {
     const isConfirmed = await confirm({
-      title: t('publications.modal.cancel_confirmation.title') || 'Cancel Processing',
-      message:
-        t('publications.modal.processing.cancel_message') ||
-        'Are you sure you want to cancel this processing job?',
-      confirmText: t('publications.modal.cancel_confirmation.confirm') || 'Yes, cancel',
-      cancelText: t('publications.modal.cancel_confirmation.cancel') || 'No, continue',
+      title: 'Cancel Processing',
+      message: 'Are you sure you want to cancel this processing job?',
+      confirmText: 'Yes, cancel',
+      cancelText: 'No, continue',
       type: 'danger',
     });
-
     if (!isConfirmed) return;
-
     cancelJob(id);
-  };
-
-  const handleRetryUpload = (id: string) => {
-    retryUpload(id);
   };
 
   if (uploads.length === 0 && publications.length === 0 && jobs.length === 0) return null;
 
-  const getHeaderIcon = () => {
-    if (totalActive > 0) {
-      return <Loader2 className="text-primary h-4 w-4 animate-spin" />;
-    }
-    if (hasErrors) {
-      return <AlertTriangle className="h-4 w-4 text-red-500" />;
-    }
-    return <CheckCircle2 className="h-4 w-4 text-green-500" />;
-  };
+  // Status icon
+  const statusIcon = totalActive > 0
+    ? <Loader2 className="h-3.5 w-3.5 animate-spin text-primary-400" />
+    : hasErrors
+      ? <AlertTriangle className="h-3.5 w-3.5 text-red-400" />
+      : <CheckCircle2 className="h-3.5 w-3.5 text-green-400" />;
 
-  const getHeaderText = () => {
-    if (totalActive > 0) {
-      if (activeUploads.length > 0 && activePublications.length > 0) {
-        return t('publications.modal.upload.activeTasks', {
-          count: totalActive,
-          defaultValue: `${totalActive} tareas activas`,
-        });
-      }
-      if (activePublications.length > 0) {
-        return t('publications.modal.upload.publishingSocial', {
-          count: activePublications.length,
-          defaultValue: `Publicando (${activePublications.length})`,
-        });
-      }
-      return t('publications.modal.upload.uploadingFiles', {
-        count: activeUploads.length,
-        defaultValue: `Subiendo (${activeUploads.length})`,
-      });
-    }
-    if (hasErrors) {
-      return t('publications.modal.upload.uploadFailed', {
-        defaultValue: 'Algo salió mal',
-      });
-    }
-    if (hasCompleted) {
-      return t('publications.modal.upload.uploadsCompleted', {
-        defaultValue: 'Completado',
-      });
-    }
-    return t('publications.modal.upload.uploadsCompleted', {
-      defaultValue: 'Completado',
-    });
-  };
+  // Status dot color
+  const dotColor = totalActive > 0 ? 'bg-primary-400 animate-pulse' : hasErrors ? 'bg-red-400' : 'bg-green-400';
+
+  // Minimized pill
+  if (isMinimized) {
+    return (
+      <>
+        <button
+          onClick={() => setIsMinimized(false)}
+          className="fixed bottom-4 right-4 z-[9999] flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-2 shadow-lg transition-all hover:shadow-xl dark:border-neutral-700 dark:bg-neutral-800"
+          title="Expand upload indicator"
+        >
+          <div className={`h-2 w-2 rounded-full ${dotColor}`} />
+          {statusIcon}
+          {totalActive > 0 && (
+            <span className="text-xs font-bold text-gray-700 dark:text-neutral-200">{totalActive}</span>
+          )}
+        </button>
+        <ConfirmDialog />
+      </>
+    );
+  }
+
+  const tabs: { id: Tab; label: string; icon: React.ReactNode; count: number; activeCount: number }[] = [
+    {
+      id: 'uploads',
+      label: 'Archivos',
+      icon: <FileUp className="h-3.5 w-3.5" />,
+      count: uploads.length,
+      activeCount: activeUploads.length,
+    },
+    {
+      id: 'processing',
+      label: 'Procesando',
+      icon: <Cpu className="h-3.5 w-3.5" />,
+      count: jobs.length,
+      activeCount: activeJobs.length,
+    },
+    {
+      id: 'publications',
+      label: 'Plataformas',
+      icon: <Radio className="h-3.5 w-3.5" />,
+      count: publications.length,
+      activeCount: activePublications.length,
+    },
+  ].filter((tab) => tab.count > 0);
 
   return (
     <>
-      <div className="fixed bottom-4 right-4 z-[100] w-80 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-2xl dark:border-neutral-700 dark:bg-neutral-800">
-        {/* Header */}
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="flex w-full items-center justify-between bg-gradient-to-r from-gray-50 to-gray-100 p-3 transition-colors hover:from-gray-100 hover:to-gray-50 dark:from-neutral-700/50 dark:to-neutral-700/30 dark:hover:from-neutral-700/70 dark:hover:to-neutral-700/50"
-          aria-label={
-            isExpanded
-              ? t('common.collapse', {
-                  defaultValue: 'Collapse upload indicator',
-                })
-              : t('common.expand', { defaultValue: 'Expand upload indicator' })
-          }
-          aria-expanded={isExpanded}
-        >
-          <div className="flex items-center gap-2.5">
-            {getHeaderIcon()}
-            <span className="text-sm font-semibold text-gray-800 dark:text-neutral-100">
-              {getHeaderText()}
+      <div className="fixed bottom-4 right-4 z-[9999] w-80 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-neutral-700 dark:bg-neutral-900">
+
+        {/* Header — same style as DevCacheIndicator */}
+        <div className="flex items-center justify-between border-b border-gray-200 px-4 py-2.5 dark:border-neutral-700">
+          <div className="flex items-center gap-2">
+            <div className={`h-2 w-2 rounded-full ${dotColor}`} />
+            <span className="text-sm font-semibold text-gray-900 dark:text-white">
+              {totalActive > 0
+                ? `${totalActive} tarea${totalActive > 1 ? 's' : ''} activa${totalActive > 1 ? 's' : ''}`
+                : hasErrors
+                  ? 'Algo salió mal'
+                  : 'Completado'}
             </span>
           </div>
-          <div className="flex items-center gap-2">
-            {totalActive > 0 && (
-              <span className="text-primary dark:text-primary-light bg-primary/10 dark:bg-primary/20 rounded-full px-2 py-0.5 text-xs font-bold">
-                {totalActive}
-              </span>
-            )}
-            {isExpanded ? (
-              <ChevronDown className="h-4 w-4 text-gray-500 dark:text-neutral-400" />
-            ) : (
-              <ChevronUp className="h-4 w-4 text-gray-500 dark:text-neutral-400" />
-            )}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="rounded p-1 hover:bg-gray-100 dark:hover:bg-neutral-700"
+              title={isExpanded ? 'Colapsar' : 'Expandir'}
+            >
+              {isExpanded
+                ? <ChevronDown className="h-4 w-4 text-gray-500 dark:text-neutral-400" />
+                : <ChevronUp className="h-4 w-4 text-gray-500 dark:text-neutral-400" />}
+            </button>
+            <button
+              onClick={() => setIsMinimized(true)}
+              className="rounded p-1 hover:bg-gray-100 dark:hover:bg-neutral-700"
+              title="Minimizar"
+            >
+              <Minus className="h-4 w-4 text-gray-500 dark:text-neutral-400" />
+            </button>
           </div>
-        </button>
+        </div>
 
-        {/* Content */}
         {isExpanded && (
-          <div className="custom-scrollbar max-h-96 overflow-y-auto">
-            {/* File Uploads Section */}
-            {uploads.length > 0 && (
-              <div>
-                <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50/70 px-3 py-2 dark:border-neutral-700 dark:bg-neutral-700/30">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">
-                    {t('common.files') || 'Archivos'}
-                  </span>
-                  <span className="text-[10px] font-semibold text-gray-500 dark:text-neutral-400">
-                    {activeUploads.length} activos
-                  </span>
-                </div>
-                {uploads.map((upload) => (
-                  <div
-                    key={upload.id}
-                    className="border-b border-gray-100 p-3 last:border-0 dark:border-neutral-700"
-                  >
-                    <div className="mb-2 flex items-start justify-between">
-                      <span
-                        className="max-w-[200px] truncate text-xs font-medium text-neutral-900 dark:text-neutral-100"
-                        title={upload.file.name}
-                      >
-                        {upload.file.name}
-                      </span>
-                    </div>
-                    <ProgressDisplay
-                      percentage={upload.progress}
-                      eta={upload.stats?.eta}
-                      speed={upload.stats?.speed}
-                      status={upload.status}
-                      onPause={
-                        upload.isPausable && upload.status === 'uploading'
-                          ? () => handlePauseUpload(upload.id)
-                          : undefined
-                      }
-                      onResume={
-                        upload.status === 'paused' ? () => handleResumeUpload(upload.id) : undefined
-                      }
-                      onCancel={
-                        upload.status === 'uploading' || upload.status === 'paused'
-                          ? () => handleCancelUpload(upload.id)
-                          : undefined
-                      }
-                      onRetry={
-                        upload.status === 'error' && upload.canRetry
-                          ? () => handleRetryUpload(upload.id)
-                          : undefined
-                      }
-                      isPausable={upload.isPausable}
-                      isPaused={upload.status === 'paused'}
-                      error={upload.error}
-                      retryCount={upload.retryCount}
-                      canRetry={upload.canRetry}
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
+          <div className="flex" style={{ height: '320px' }}>
 
-            {/* Processing Jobs Section */}
-            {jobs.length > 0 && (
-              <div
-                className={
-                  uploads.length > 0 ? 'border-t-2 border-gray-200 dark:border-neutral-600' : ''
-                }
-              >
-                <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50/70 px-3 py-2 dark:border-neutral-700 dark:bg-neutral-700/30">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">
-                    {t('common.processing') || 'Processing'}
-                  </span>
-                  <span className="text-[10px] font-semibold text-gray-500 dark:text-neutral-400">
-                    {activeJobs.length} {t('common.active') || 'active'}
-                  </span>
-                </div>
-                {jobs.map((job) => (
-                  <div
-                    key={job.id}
-                    className="border-b border-gray-100 p-3 last:border-0 dark:border-neutral-700"
-                  >
-                    <div className="mb-2 flex items-start justify-between">
-                      <div className="flex-1">
-                        <span className="block text-xs font-medium text-neutral-900 dark:text-neutral-100">
-                          {job.type === 'video_processing' &&
-                            (t('common.video_processing') || 'Video Processing')}
-                          {job.type === 'reel_generation' &&
-                            (t('common.reel_generation') || 'Reel Generation')}
-                          {job.type === 'thumbnail_generation' &&
-                            (t('common.thumbnail_generation') || 'Thumbnail Generation')}
-                        </span>
-                        {job.stats?.currentStep && (
-                          <span className="text-[10px] text-gray-500 dark:text-neutral-400">
-                            {job.stats.currentStep} ({job.stats.completedSteps}/
-                            {job.stats.totalSteps})
-                          </span>
-                        )}
+            {/* Sidebar tabs */}
+            <div className="flex w-24 flex-shrink-0 flex-col border-r border-gray-100 bg-gray-50/80 py-2 dark:border-neutral-700 dark:bg-neutral-800/60">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex flex-col items-center gap-1.5 px-2 py-3 text-center transition-colors ${
+                    activeTab === tab.id
+                      ? 'bg-white text-primary-600 dark:bg-neutral-900 dark:text-primary-400'
+                      : 'text-gray-500 hover:bg-white/60 hover:text-gray-700 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-200'
+                  }`}
+                >
+                  {tab.icon}
+                  <span className="text-[10px] font-medium leading-tight">{tab.label}</span>
+                  {tab.activeCount > 0 && (
+                    <span className="rounded-full bg-primary-100 px-1.5 py-0.5 text-[9px] font-bold text-primary-700 dark:bg-primary-900/40 dark:text-primary-300">
+                      {tab.activeCount}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* Content panel */}
+            <div className="custom-scrollbar flex-1 overflow-y-auto">
+
+              {/* Uploads tab */}
+              {activeTab === 'uploads' && (
+                <div>
+                  <div className="sticky top-0 flex items-center justify-between border-b border-gray-100 bg-gray-50/90 px-3 py-1.5 dark:border-neutral-700 dark:bg-neutral-800/90">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-neutral-500">
+                      Archivos
+                    </span>
+                    <span className="text-[10px] text-gray-400 dark:text-neutral-500">
+                      {activeUploads.length} activos
+                    </span>
+                  </div>
+                  {uploads.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-10 text-gray-400 dark:text-neutral-500">
+                      <FileUp className="mb-2 h-8 w-8 opacity-30" />
+                      <span className="text-xs">Sin archivos</span>
+                    </div>
+                  ) : (
+                    uploads.map((upload) => (
+                      <div key={upload.id} className="border-b border-gray-100 p-3 last:border-0 dark:border-neutral-700/60">
+                        <p className="mb-1.5 truncate text-xs font-medium text-gray-800 dark:text-neutral-100" title={upload.file.name}>
+                          {upload.file.name}
+                        </p>
+                        <ProgressDisplay
+                          percentage={upload.progress}
+                          eta={upload.stats?.eta}
+                          speed={upload.stats?.speed}
+                          status={upload.status}
+                          onPause={upload.isPausable && upload.status === 'uploading' ? () => pauseUpload(upload.id) : undefined}
+                          onResume={upload.status === 'paused' ? () => resumeUploadWithLogic(upload.id) : undefined}
+                          onCancel={upload.status === 'uploading' || upload.status === 'paused' ? () => handleCancelUpload(upload.id) : undefined}
+                          onRetry={upload.status === 'error' && upload.canRetry ? () => retryUpload(upload.id) : undefined}
+                          isPausable={upload.isPausable}
+                          isPaused={upload.status === 'paused'}
+                          error={upload.error}
+                          retryCount={upload.retryCount}
+                          canRetry={upload.canRetry}
+                        />
                       </div>
-                    </div>
-                    <ProgressDisplay
-                      percentage={job.progress}
-                      eta={job.stats?.eta}
-                      status={
-                        job.status === 'queued'
-                          ? 'pending'
-                          : job.status === 'processing'
-                            ? 'uploading'
-                            : job.status
-                      }
-                      onCancel={
-                        job.status === 'processing' || job.status === 'queued'
-                          ? () => handleCancelJob(job.id)
-                          : undefined
-                      }
-                      isPausable={false}
-                      isPaused={false}
-                      error={job.error}
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Publications Section */}
-            {publications.length > 0 && (
-              <div
-                className={
-                  uploads.length > 0 || jobs.length > 0
-                    ? 'border-t-2 border-gray-200 dark:border-neutral-600'
-                    : ''
-                }
-              >
-                <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50/70 px-3 py-2 dark:border-neutral-700 dark:bg-neutral-700/30">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">
-                    {t('common.publications') || 'Publicaciones'}
-                  </span>
-                  <span className="text-[10px] font-semibold text-gray-500 dark:text-neutral-400">
-                    {activePublications.length} en curso
-                  </span>
+                    ))
+                  )}
                 </div>
-                {publications.map((publication) => (
-                  <PublicationItem
-                    key={publication.id}
-                    publication={publication}
-                    onCancel={handleCancelPublication}
-                    onDismiss={handleDismissPublication}
-                    onCancelPlatform={handleCancelPlatform}
-                  />
-                ))}
-              </div>
-            )}
+              )}
+
+              {/* Processing tab */}
+              {activeTab === 'processing' && (
+                <div>
+                  <div className="sticky top-0 flex items-center justify-between border-b border-gray-100 bg-gray-50/90 px-3 py-1.5 dark:border-neutral-700 dark:bg-neutral-800/90">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-neutral-500">
+                      Procesando
+                    </span>
+                    <span className="text-[10px] text-gray-400 dark:text-neutral-500">
+                      {activeJobs.length} activos
+                    </span>
+                  </div>
+                  {jobs.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-10 text-gray-400 dark:text-neutral-500">
+                      <Cpu className="mb-2 h-8 w-8 opacity-30" />
+                      <span className="text-xs">Sin tareas</span>
+                    </div>
+                  ) : (
+                    jobs.map((job) => (
+                      <div key={job.id} className="border-b border-gray-100 p-3 last:border-0 dark:border-neutral-700/60">
+                        <p className="mb-0.5 text-xs font-medium text-gray-800 dark:text-neutral-100">
+                          {job.type === 'video_processing' && 'Video Processing'}
+                          {job.type === 'reel_generation' && 'Reel Generation'}
+                          {job.type === 'thumbnail_generation' && 'Thumbnail Generation'}
+                        </p>
+                        {job.stats?.currentStep && (
+                          <p className="mb-1.5 text-[10px] text-gray-400 dark:text-neutral-500">
+                            {job.stats.currentStep} ({job.stats.completedSteps}/{job.stats.totalSteps})
+                          </p>
+                        )}
+                        <ProgressDisplay
+                          percentage={job.progress}
+                          eta={job.stats?.eta}
+                          status={job.status === 'queued' ? 'pending' : job.status === 'processing' ? 'uploading' : job.status}
+                          onCancel={job.status === 'processing' || job.status === 'queued' ? () => handleCancelJob(job.id) : undefined}
+                          isPausable={false}
+                          isPaused={false}
+                          error={job.error}
+                        />
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+
+              {/* Publications tab */}
+              {activeTab === 'publications' && (
+                <div>
+                  <div className="sticky top-0 flex items-center justify-between border-b border-gray-100 bg-gray-50/90 px-3 py-1.5 dark:border-neutral-700 dark:bg-neutral-800/90">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-neutral-500">
+                      Plataformas
+                    </span>
+                    <span className="text-[10px] text-gray-400 dark:text-neutral-500">
+                      {activePublications.length} en curso
+                    </span>
+                  </div>
+                  {publications.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-10 text-gray-400 dark:text-neutral-500">
+                      <Radio className="mb-2 h-8 w-8 opacity-30" />
+                      <span className="text-xs">Sin publicaciones</span>
+                    </div>
+                  ) : (
+                    publications.map((publication) => (
+                      <PublicationItem
+                        key={publication.id}
+                        publication={publication}
+                        onCancel={handleCancelPublication}
+                        onDismiss={handleDismissPublication}
+                        onCancelPlatform={handleCancelPlatform}
+                      />
+                    ))
+                  )}
+                </div>
+              )}
+
+            </div>
           </div>
         )}
       </div>
