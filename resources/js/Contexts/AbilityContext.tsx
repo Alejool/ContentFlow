@@ -1,9 +1,10 @@
 // @ts-ignore - CASL React module resolution issue in Docker environment
 import { createContextualCan } from '@casl/react';
 import { usePage } from '@inertiajs/react';
-import { createContext, ReactNode, useContext } from 'react';
-import { defineAbilityFor } from './ability';
+import type { ReactNode } from 'react';
+import { createContext, useContext } from 'react';
 import type { AppAbility } from './ability';
+import { defineAbilityFor } from './ability';
 
 // Create context
 export const AbilityContext = createContext<AppAbility>(undefined!);
@@ -29,8 +30,8 @@ interface AbilityProviderProps {
  * ```
  */
 export function AbilityProvider({ children }: AbilityProviderProps) {
-  const { auth } = usePage<any>().props;
-  const ability = defineAbilityFor(auth.user, auth.current_workspace);
+  const { auth } = usePage<any>().props ?? {};
+  const ability = defineAbilityFor(auth?.user, auth?.current_workspace);
 
   return <AbilityContext.Provider value={ability}>{children}</AbilityContext.Provider>;
 }
