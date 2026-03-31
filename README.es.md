@@ -139,7 +139,7 @@ Intellipost/
 
 - **⭐ Star al Repositorio**: Muestra tu apoyo y ayuda a otros a encontrar el proyecto.
 - **🐛 Reportar Errores**: ¿Encontraste un problema? Abre un [ GitHub Issue](https://github.com/Alejool/Intellipost/issues).
-- **💡 Sugerir Funcionalidades**: ¿Tienes una gran idea? Cuéntanos en las discusiones.
+- ** Sugerir Funcionalidades**: ¿Tienes una gran idea? Cuéntanos en las discusiones.
 - **💻 Contribuir Código**: ¡Los pull requests siempre son bienvenidos! Por favor, lee nuestro `CONTRIBUTING.md` (próximamente).
 
 ---

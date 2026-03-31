@@ -414,7 +414,7 @@ We believe in the power of community! Here's how you can support the project:
 
 - **⭐ Star the Repository**: Show your support and help others find the project.
 - **🐛 Report Bugs**: Found an issue? Open a [GitHub Issue](https://github.com/Alejool/Intellipost/issues).
-- **💡 Feature Requests**: Have a great idea? Let us know in the discussions.
+- ** Feature Requests**: Have a great idea? Let us know in the discussions.
 - **💻 Contribute Code**: Pull requests are always welcome! Please read our `CONTRIBUTING.md` (coming soon).
 
 ---
