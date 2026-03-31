@@ -30,6 +30,7 @@ use App\Http\Middleware\CheckApiWorkspacePlan;
 use App\Http\Middleware\CheckMaintenanceMode;
 use App\Http\Middleware\CheckNewRegistrations;
 use App\Http\Middleware\LogContextMiddleware;
+use App\Http\Middleware\CheckPurchasesEnabled;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -79,6 +80,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'idempotent.publish' => IdempotentPublish::class,
             'workspace.role' => CheckWorkspaceRole::class,
             'api.plan' => CheckApiWorkspacePlan::class,
+            'purchases.enabled' => CheckPurchasesEnabled::class,
         ]);
     })
     ->withSchedule(function ($schedule) {
@@ -93,6 +95,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command('usage:reset-monthly')
             ->monthlyOn(1, '00:00')
             ->timezone('UTC');
+        // Daily subscription status check: validate expired subscriptions, process grace periods, send warnings
+        $schedule->command('subscription:check-status')->daily();
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (\Illuminate\Database\QueryException $e, $request) {

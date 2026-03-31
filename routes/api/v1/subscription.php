@@ -16,7 +16,7 @@ Route::prefix('subscription')->name('subscription.')->group(function () {
     Route::get('/check-active', [SubscriptionController::class, 'checkActiveSubscription'])->name('check-active');
     
     // Solo owner puede gestionar suscripción
-    Route::middleware('workspace.owner')->group(function () {
+    Route::middleware(['workspace.owner', 'purchases.enabled'])->group(function () {
         Route::post('/checkout', [SubscriptionController::class, 'createCheckoutSession'])->name('checkout');
         Route::post('/cancel', [SubscriptionController::class, 'cancelSubscription'])->name('cancel');
         Route::post('/resume', [SubscriptionController::class, 'resumeSubscription'])->name('resume');

@@ -34,7 +34,7 @@ use App\Http\Controllers\Subscription\AddonsController;
 Route::get('/portal/{token}', [ClientPortalController::class, 'renderPortal'])->name('portal.view');
 
 // Stripe Checkout Routes
-Route::prefix('checkout')->name('checkout.')->group(function () {
+Route::prefix('checkout')->name('checkout.')->middleware('purchases.enabled')->group(function () {
   Route::post('/create-session', [StripeCheckoutController::class, 'createCheckoutSession'])->name('create-session');
   Route::get('/success', [StripeCheckoutController::class, 'success'])->name('success');
   Route::get('/cancel', [StripeCheckoutController::class, 'cancel'])->name('cancel');
@@ -138,7 +138,7 @@ Route::middleware('auth')->group(function () {
     
     // Add-ons routes
     Route::get('/addons', [AddonsController::class, 'index'])->name('addons');
-    Route::post('/addons/purchase', [AddonsController::class, 'purchase'])->name('addons.purchase');
+    Route::post('/addons/purchase', [AddonsController::class, 'purchase'])->middleware('purchases.enabled')->name('addons.purchase');
     Route::get('/addons/success', [\App\Http\Controllers\Subscription\AddonPurchaseController::class, 'success'])->name('addons.success');
     Route::get('/addons/cancelled', [\App\Http\Controllers\Subscription\AddonPurchaseController::class, 'cancelled'])->name('addons.cancelled');
   });

@@ -26,7 +26,7 @@ Route::prefix('payment')->name('payment.')->group(function () {
         ->name('pricing');
 
     // Rutas protegidas (requieren autenticación)
-    Route::middleware(['auth:sanctum'])->group(function () {
+    Route::middleware(['auth:sanctum', 'purchases.enabled'])->group(function () {
         
         // Crear checkout para suscripción
         Route::post('/checkout/subscription', [UnifiedPaymentController::class, 'createSubscriptionCheckout'])

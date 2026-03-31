@@ -5,6 +5,9 @@ namespace App\Providers;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use App\Events\Subscription\LimitReached;
 use App\Events\Subscription\LimitWarning;
+use App\Events\Subscription\SubscriptionDowngraded;
+use App\Events\Subscription\RenewalFailed;
+use App\Events\Subscription\GracePeriodStarted;
 use App\Listeners\Subscription\NotifyUsageLimitsChanged;
 
 // Approval workflow events
@@ -40,6 +43,11 @@ class EventServiceProvider extends ServiceProvider
         LimitWarning::class => [
             [NotifyUsageLimitsChanged::class, 'handleLimitWarning'],
         ],
+
+        // Subscription control events (listeners added in tasks 8 & 9)
+        SubscriptionDowngraded::class => [],
+        RenewalFailed::class => [],
+        GracePeriodStarted::class => [],
         
         // Approval workflow events
         ContentSubmittedForApproval::class => [

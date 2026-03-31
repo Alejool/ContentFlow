@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\SystemSettingsController;
 use App\Http\Controllers\Admin\SystemNotificationController;
+use App\Http\Controllers\Admin\AdminSubscriptionControlController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,4 +29,8 @@ Route::middleware(['auth', 'verified', 'super-admin'])->prefix('admin')->name('a
     // System Notifications
     Route::get('/system-notifications', [SystemNotificationController::class, 'index'])->name('system-notifications');
     Route::post('/system-notifications/send', [SystemNotificationController::class, 'send'])->name('system-notifications.send');
+
+    // Subscription Control Panel
+    Route::get('/subscription-control', [AdminSubscriptionControlController::class, 'index'])->name('subscription-control');
+    Route::put('/subscription-control/settings', [AdminSubscriptionControlController::class, 'update'])->name('subscription-control.update');
 });

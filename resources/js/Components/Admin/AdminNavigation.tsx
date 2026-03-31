@@ -1,7 +1,7 @@
-import { router } from '@inertiajs/react';
-import { Settings, Bell, LayoutDashboard } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import SettingsTabs from '@/Components/Workspace/SettingsTabs';
+import { router } from '@inertiajs/react';
+import { Bell, CreditCard, LayoutDashboard, Settings } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface AdminNavigationProps {
   currentRoute?: string;
@@ -28,6 +28,12 @@ export default function AdminNavigation({ currentRoute }: AdminNavigationProps) 
       label: t('admin.navigation.system_notifications'),
       href: '/admin/system-notifications',
       icon: Bell,
+    },
+    {
+      id: 'subscription-control',
+      label: 'Control de Suscripciones',
+      href: '/admin/subscription-control',
+      icon: CreditCard,
     },
   ];
 

@@ -23,6 +23,13 @@ class AppServiceProvider extends ServiceProvider
    */
   public function register(): void
   {
+    // Subscription services
+    $this->app->singleton(\App\Services\Subscription\DemoModeService::class);
+    $this->app->singleton(\App\Services\Subscription\SubscriptionControlService::class);
+    $this->app->singleton(\App\Services\Subscription\PlanValidator::class);
+    $this->app->singleton(\App\Services\Subscription\GracePeriodManager::class);
+    $this->app->singleton(\App\Services\Subscription\RenewalService::class);
+
     // Bind OnboardingService interface
     $this->app->bind(
       \App\Interfaces\OnboardingServiceInterface::class,
