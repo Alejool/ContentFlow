@@ -111,7 +111,7 @@ const handleProgress = (
   });
 };
 
-const uploadSingle = async (file: File, id: string, startTime: number) => {
+const uploadSingle = async (file: File, id: string, startTime: number, context?: string) => {
   const { data: signData } = await axios.post(
     route('api.v1.uploads.sign'),
     {
@@ -119,6 +119,7 @@ const uploadSingle = async (file: File, id: string, startTime: number) => {
       content_type: file.type,
       file_size: file.size,
       pending_bytes: calculatePendingBytes(id),
+      context: context || 'publication', // default to publication
     },
     { timeout: 30_000 },
   );
@@ -137,7 +138,7 @@ const uploadSingle = async (file: File, id: string, startTime: number) => {
   return { key: signData.key, filename: file.name, mime_type: file.type, size: file.size };
 };
 
-const uploadMultipart = async (file: File, id: string, startTime: number) => {
+const uploadMultipart = async (file: File, id: string, startTime: number, context?: string) => {
   const existing = useUploadQueue.getState().queue[id];
   let uploadId = existing?.uploadId;
   let key = existing?.s3Key;
@@ -151,6 +152,7 @@ const uploadMultipart = async (file: File, id: string, startTime: number) => {
         content_type: file.type,
         file_size: file.size,
         pending_bytes: calculatePendingBytes(id),
+        context: context || 'publication', // default to publication
       },
       { timeout: 30_000 },
     );
@@ -241,6 +243,8 @@ const uploadMultipart = async (file: File, id: string, startTime: number) => {
 interface UploadInput {
   file: File;
   tempId: string;
+  context?: 'publication' | 'profile' | 'workspace'; // upload context for validation
+}
 }
 interface UploadResult {
   key: string;
@@ -249,7 +253,7 @@ interface UploadResult {
   size: number;
 }
 
-const performUpload = async ({ file, tempId }: UploadInput): Promise<UploadResult> => {
+const performUpload = async ({ file, tempId, context }: UploadInput): Promise<UploadResult> => {
   const { addUpload, updateUpload, removeUpload } = useUploadQueue.getState();
 
   const existing = useUploadQueue.getState().queue[tempId];
@@ -273,8 +277,8 @@ const performUpload = async ({ file, tempId }: UploadInput): Promise<UploadResul
     const isVideo = file.type.startsWith('video/');
     const result =
       file.size >= MULTIPART_THRESHOLD || isVideo
-        ? await uploadMultipart(file, tempId, startTime)
-        : await uploadSingle(file, tempId, startTime);
+        ? await uploadMultipart(file, tempId, startTime, context)
+        : await uploadSingle(file, tempId, startTime, context);
 
     updateUpload(tempId, { status: 'completed', progress: 100, s3Key: result.key });
     useMediaStore.getState().updateFile(tempId, {
@@ -415,9 +419,10 @@ export const useS3Upload = () => {
     },
   });
 
-  // Public uploadFile — same signature as before for backwards compat
+  // Public uploadFile — accepts optional context parameter
   const uploadFile = useCallback(
-    (file: File, tempId: string) => mutation.mutateAsync({ file, tempId }),
+    (file: File, tempId: string, context?: 'publication' | 'profile' | 'workspace') => 
+      mutation.mutateAsync({ file, tempId, context }),
     [mutation.mutateAsync],
   );
 
