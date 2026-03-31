@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import { DateTimePicker } from '@/Components/common/DateTimePicker';
 import Modal from '@/Components/common/ui/Modal';
+import SocialMediaLimitsService, { ValidationResponse } from '@/Services/SocialMediaLimitsService';
+import { Publication } from '@/types/Publication';
+import { formatDateString } from '@/Utils/dateHelpers';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import PlatformConfigCard from './PlatformConfigCard';
 import ValidationLimitsCard from './ValidationLimitsCard';
-import { Publication } from '@/types/Publication';
-import { DateTimePicker } from '@/Components/common/DateTimePicker';
-import axios from 'axios';
-import { useTranslation } from 'react-i18next';
-import { formatDateString } from '@/Utils/dateHelpers';
-import SocialMediaLimitsService, { ValidationResponse } from '@/Services/SocialMediaLimitsService';
 
 interface MediaInfo {
   duration?: number;
@@ -514,7 +514,7 @@ export default function PublishPreviewModal({
                       validationData.recommendations.length > 0 && (
                         <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
                           <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-blue-900 dark:text-blue-300">
-                            <span className="text-lg">💡</span>
+                            <span className="text-lg"></span>
                             <span>Recomendaciones</span>
                           </div>
                           <ul className="space-y-2">
@@ -575,7 +575,7 @@ export default function PublishPreviewModal({
                   previewData.optimization_suggestions.length > 0 && (
                     <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
                       <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-blue-900 dark:text-blue-300">
-                        <span className="text-lg">💡</span>
+                        <span className="text-lg"></span>
                         <span>Sugerencias</span>
                       </div>
                       <ul className="list-disc space-y-1.5 pl-6">

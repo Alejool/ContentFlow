@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 interface MediaInfo {
   extension?: string;
@@ -159,7 +159,7 @@ export default function ContentValidationPanel({
       {hasRecommendations && (
         <div className="rounded-md border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-900/20">
           <div className="mb-2 flex items-center gap-2">
-            <span className="text-base">💡</span>
+            <span className="text-base"></span>
             <span className="text-sm font-semibold text-blue-900 dark:text-blue-300">
               Recomendaciones
             </span>

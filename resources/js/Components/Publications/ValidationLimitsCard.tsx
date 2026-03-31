@@ -1,6 +1,4 @@
-import React from 'react';
-import { ValidationResult } from '@/Services/SocialMediaLimitsService';
-import SocialMediaLimitsService from '@/Services/SocialMediaLimitsService';
+import SocialMediaLimitsService, { ValidationResult } from '@/Services/SocialMediaLimitsService';
 
 interface ValidationLimitsCardProps {
   result: ValidationResult;
@@ -147,7 +145,7 @@ export default function ValidationLimitsCard({
                     }`}
                   >
                     <p className="font-medium">{error}</p>
-                    {helpMessage && <p className="mt-1 text-xs opacity-80">💡 {helpMessage}</p>}
+                    {helpMessage && <p className="mt-1 text-xs opacity-80"> {helpMessage}</p>}
                   </div>
                 </li>
               );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface Quality {
@@ -248,7 +248,7 @@ export default function PlatformConfigCard({
             </div>
             {config.suggestion && (
               <div className="flex items-start gap-1.5 rounded-md bg-blue-50 p-2 dark:bg-blue-900/20">
-                <span className="flex-shrink-0 text-sm">💡</span>
+                <span className="flex-shrink-0 text-sm"></span>
                 <span className="text-xs leading-relaxed text-blue-900 dark:text-blue-200">
                   {config.suggestion}
                 </span>
