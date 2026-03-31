@@ -9,6 +9,9 @@ use App\Http\Controllers\Api\ApiAuthController;
 
 Route::get('/health', [HealthController::class, 'check']);
 
+// Dev cache info (solo desarrollo)
+Route::get('/dev/cache-info', \App\Http\Controllers\Api\DevCacheInfoController::class);
+
 Route::post('/auth/google', [AuthController::class, 'handleGoogleAuth']);
 
 // ============================================================
