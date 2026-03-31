@@ -29,7 +29,6 @@
     "exactOptionalPropertyTypes": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
-    "noUncheckedSideEffectImports": true,
 
     // Interop
     "skipLibCheck": true,
