@@ -302,13 +302,22 @@ class TwitterService extends BaseSocialService
       
       // Handle 403 Forbidden specifically
       if ($statusCode === 403) {
+        // Check for API credits error (Twitter Developer Portal issue)
+        $errorMessage = $errorData['error']['message'] ?? $errorData['errors'][0]['message'] ?? $errorData['detail'] ?? '';
+        if (str_contains($errorMessage, 'enrolled account does not have any credits') || 
+            str_contains($errorMessage, 'does not have any credits')) {
+          return 'Tu cuenta de desarrollador de Twitter no tiene créditos API disponibles. ' .
+                 'Twitter requiere un plan de pago (Basic $100/mes o superior) para subir videos. ' .
+                 'Visita https://developer.twitter.com/en/portal/products para actualizar tu plan, ' .
+                 'o publica solo texto e imágenes que no requieren créditos adicionales.';
+        }
+        
         // Check if it's a video upload issue
         if (str_contains($e->getRequest()->getUri()->getPath(), 'media/upload')) {
           return 'Esta cuenta de Twitter no puede subir videos porque le faltan credenciales OAuth 1.0a. Por favor, desconecta y vuelve a conectar esta cuenta desde la configuración de tu workspace para habilitar la subida de videos.';
         }
         
         // Check for specific 403 error messages
-        $errorMessage = $errorData['error']['message'] ?? $errorData['errors'][0]['message'] ?? null;
         if ($errorMessage) {
           if (str_contains($errorMessage, 'not authorized') || str_contains($errorMessage, 'forbidden')) {
             return 'No tienes permisos para realizar esta acción en Twitter. Reconecta tu cuenta desde la configuración.';
@@ -321,6 +330,15 @@ class TwitterService extends BaseSocialService
       // Twitter API v2 error format
       if (isset($errorData['detail'])) {
         $detail = $errorData['detail'];
+        
+        // Check for API credits error in detail field
+        if (str_contains($detail, 'enrolled account does not have any credits') || 
+            str_contains($detail, 'does not have any credits')) {
+          return 'Tu cuenta de desarrollador de Twitter no tiene créditos API disponibles. ' .
+                 'Twitter requiere un plan de pago (Basic $100/mes o superior) para subir videos. ' .
+                 'Visita https://developer.twitter.com/en/portal/products para actualizar tu plan, ' .
+                 'o publica solo texto e imágenes que no requieren créditos adicionales.';
+        }
         
         // Map common Twitter errors to user-friendly messages
         if (str_contains($detail, 'not allowed to post a video longer than')) {
@@ -346,7 +364,18 @@ class TwitterService extends BaseSocialService
       // Twitter API v1.1 error format
       if (isset($errorData['errors']) && is_array($errorData['errors'])) {
         $errors = array_map(fn($err) => $err['message'] ?? 'Error desconocido', $errorData['errors']);
-        return implode('. ', $errors);
+        $errorString = implode('. ', $errors);
+        
+        // Check for credits error in v1.1 format
+        if (str_contains($errorString, 'enrolled account does not have any credits') || 
+            str_contains($errorString, 'does not have any credits')) {
+          return 'Tu cuenta de desarrollador de Twitter no tiene créditos API disponibles. ' .
+                 'Twitter requiere un plan de pago (Basic $100/mes o superior) para subir videos. ' .
+                 'Visita https://developer.twitter.com/en/portal/products para actualizar tu plan, ' .
+                 'o publica solo texto e imágenes que no requieren créditos adicionales.';
+        }
+        
+        return $errorString;
       }
       
       // Fallback to original exception message
@@ -661,6 +690,13 @@ class TwitterService extends BaseSocialService
         throw new \Exception('V1 FINALIZE Failed: ' . json_encode($finData));
       } catch (\Throwable $e) {
         LogHelper::socialError('twitter.v1_chunked_upload_failed', $e->getMessage(), ['error' => $e->getMessage()]);
+        
+        // Extract friendly error message if it's a ClientException
+        if ($e instanceof ClientException) {
+          $friendlyError = $this->extractTwitterErrorMessage($e);
+          throw new \Exception($friendlyError);
+        }
+        
         throw new \Exception("Twitter Auth V1 Video Upload Failed. Details: " . $e->getMessage());
       }
     }
