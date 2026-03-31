@@ -6,15 +6,15 @@ import { useProcessingProgress } from '@/stores/processingProgressStore';
 import { useUploadQueue } from '@/stores/uploadQueueStore';
 import axios from 'axios';
 import {
-    AlertTriangle,
-    CheckCircle2,
-    Cpu,
-    FileUp,
-    Loader2,
-    Minus,
-    Radio,
-    Trash2,
-    X,
+  AlertTriangle,
+  CheckCircle2,
+  Cpu,
+  FileUp,
+  Loader2,
+  Minus,
+  Radio,
+  Trash2,
+  X,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -172,9 +172,9 @@ export default function GlobalUploadIndicator() {
 
   // Tabs config — only show tabs that have items
   const tabs: { id: Tab; icon: React.ReactNode; count: number; activeCount: number; title: string }[] = [
-    { id: 'uploads',      icon: <FileUp className="h-4 w-4" />, count: uploads.length,      activeCount: activeUploads.length,      title: 'Archivos' },
-    { id: 'processing',   icon: <Cpu className="h-4 w-4" />,    count: jobs.length,          activeCount: activeJobs.length,         title: 'Procesando' },
-    { id: 'publications', icon: <Radio className="h-4 w-4" />,  count: publications.length,  activeCount: activePublications.length,  title: 'Plataformas' },
+    { id: 'uploads' as const,      icon: <FileUp className="h-4 w-4" />, count: uploads.length,      activeCount: activeUploads.length,      title: 'Archivos' },
+    { id: 'processing' as const,   icon: <Cpu className="h-4 w-4" />,    count: jobs.length,          activeCount: activeJobs.length,         title: 'Procesando' },
+    { id: 'publications' as const, icon: <Radio className="h-4 w-4" />,  count: publications.length,  activeCount: activePublications.length,  title: 'Plataformas' },
   ].filter((tab) => tab.count > 0);
 
   return (

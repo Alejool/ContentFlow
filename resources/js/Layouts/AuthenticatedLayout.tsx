@@ -236,7 +236,6 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
 
             <CommandPalette />
           </div>
-          <GlobalUploadIndicator />
           {/* Corner widgets: stacked bottom-right. DevMode sits above Upload when both are active */}
           <div className="fixed bottom-4 right-4 z-[9999] flex flex-col items-end gap-2">
             <DevCacheIndicator />
