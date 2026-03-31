@@ -1,14 +1,14 @@
-# ContentFlow Security Overview
+# Intellipost Security Overview
 
 ## Introduction
 
-This document provides a comprehensive overview of ContentFlow's security architecture, features, and best practices. It serves as a central reference for understanding how the application protects user data and maintains system integrity.
+This document provides a comprehensive overview of Intellipost's security architecture, features, and best practices. It serves as a central reference for understanding how the application protects user data and maintains system integrity.
 
 ## Security Architecture
 
 ### Defense in Depth
 
-ContentFlow implements multiple layers of security:
+Intellipost implements multiple layers of security:
 
 ```
 ┌─────────────────────────────────────────┐
@@ -463,7 +463,7 @@ $post->update($data); // No permission check
 ## Contact
 
 For security issues:
-- **Email**: security@contentflow.com
+- **Email**: security@Intellipost.com
 - **PGP Key**: [Link to public key]
 - **Bug Bounty**: [Link to program if available]
 

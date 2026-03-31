@@ -1,6 +1,6 @@
-# Guía Completa de Docker para ContentFlow
+# Guía Completa de Docker para Intellipost
 
-Esta guía proporciona información detallada sobre el uso de Docker en el proyecto ContentFlow.
+Esta guía proporciona información detallada sobre el uso de Docker en el proyecto Intellipost.
 
 ## Tabla de Contenidos
 
@@ -166,7 +166,7 @@ docker-compose logs --tail=100 app
 
 ```bash
 # Crear backup manual
-docker-compose exec mysql mysqldump -u root -p contentflow > backup_$(date +%Y%m%d).sql
+docker-compose exec mysql mysqldump -u root -p Intellipost > backup_$(date +%Y%m%d).sql
 
 # Backup automático con script
 docker-compose exec mysql sh -c 'mysqldump -u root -p$MYSQL_ROOT_PASSWORD $MYSQL_DATABASE' > backup.sql
@@ -179,10 +179,10 @@ docker-compose exec mysql sh -c 'mysqldump -u root -p$MYSQL_ROOT_PASSWORD $MYSQL
 
 ```bash
 # Desde archivo SQL
-docker-compose exec -T mysql mysql -u root -p contentflow < backup.sql
+docker-compose exec -T mysql mysql -u root -p Intellipost < backup.sql
 
 # Desde archivo comprimido
-gunzip < backup.sql.gz | docker-compose exec -T mysql mysql -u root -p contentflow
+gunzip < backup.sql.gz | docker-compose exec -T mysql mysql -u root -p Intellipost
 ```
 
 ### Backup de Archivos

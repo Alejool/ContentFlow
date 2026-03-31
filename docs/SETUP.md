@@ -1,6 +1,6 @@
-# ContentFlow - Guía de Configuración
+# Intellipost - Guía de Configuración
 
-Esta guía te ayudará a configurar ContentFlow en tu entorno local o de producción.
+Esta guía te ayudará a configurar Intellipost en tu entorno local o de producción.
 
 ## 📋 Requisitos Previos
 
@@ -25,8 +25,8 @@ Esta guía te ayudará a configurar ContentFlow en tu entorno local o de producc
 ### 1. Clonar el Repositorio
 
 ```bash
-git clone https://github.com/Alejool/ContentFlow.git
-cd ContentFlow
+git clone https://github.com/Alejool/Intellipost.git
+cd Intellipost
 ```
 
 ### 2. Configurar Variables de Entorno
@@ -46,7 +46,7 @@ Variables importantes a configurar:
 DB_CONNECTION=mysql
 DB_HOST=mysql
 DB_PORT=3306
-DB_DATABASE=contentflow
+DB_DATABASE=Intellipost
 DB_USERNAME=root
 DB_PASSWORD=tu_password_seguro
 
@@ -148,9 +148,9 @@ sudo systemctl start mysql
 
 # Crear base de datos
 mysql -u root -p
-CREATE DATABASE contentflow;
-CREATE USER 'contentflow'@'localhost' IDENTIFIED BY 'password';
-GRANT ALL PRIVILEGES ON contentflow.* TO 'contentflow'@'localhost';
+CREATE DATABASE Intellipost;
+CREATE USER 'Intellipost'@'localhost' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON Intellipost.* TO 'Intellipost'@'localhost';
 FLUSH PRIVILEGES;
 EXIT;
 ```
@@ -159,8 +159,8 @@ EXIT;
 
 ```bash
 # Clonar repositorio
-git clone https://github.com/Alejool/ContentFlow.git
-cd ContentFlow
+git clone https://github.com/Alejool/Intellipost.git
+cd Intellipost
 
 # Instalar dependencias
 composer install
@@ -292,7 +292,7 @@ Ver documentación de AWS para políticas de acceso público/privado según tus 
 Agregar a crontab:
 
 ```bash
-* * * * * cd /path/to/contentflow && php artisan schedule:run >> /dev/null 2>&1
+* * * * * cd /path/to/Intellipost && php artisan schedule:run >> /dev/null 2>&1
 ```
 
 Con Docker:
@@ -303,27 +303,27 @@ docker-compose exec app php artisan schedule:work
 
 ### Configurar Supervisor (Producción)
 
-Crear archivo `/etc/supervisor/conf.d/contentflow.conf`:
+Crear archivo `/etc/supervisor/conf.d/Intellipost.conf`:
 
 ```ini
 [program:contentflow-horizon]
 process_name=%(program_name)s
-command=php /path/to/contentflow/artisan horizon
+command=php /path/to/Intellipost/artisan horizon
 autostart=true
 autorestart=true
 user=www-data
 redirect_stderr=true
-stdout_logfile=/path/to/contentflow/storage/logs/horizon.log
+stdout_logfile=/path/to/Intellipost/storage/logs/horizon.log
 stopwaitsecs=3600
 
 [program:contentflow-reverb]
 process_name=%(program_name)s
-command=php /path/to/contentflow/artisan reverb:start
+command=php /path/to/Intellipost/artisan reverb:start
 autostart=true
 autorestart=true
 user=www-data
 redirect_stderr=true
-stdout_logfile=/path/to/contentflow/storage/logs/reverb.log
+stdout_logfile=/path/to/Intellipost/storage/logs/reverb.log
 ```
 
 Recargar supervisor:

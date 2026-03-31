@@ -1,6 +1,6 @@
 # Documentación API
 
-Documentación completa de la API REST de ContentFlow.
+Documentación completa de la API REST de Intellipost.
 
 ## Archivos Disponibles
 
@@ -48,7 +48,7 @@ La API usa autenticación basada en tokens JWT:
 
 ```bash
 # Obtener token
-curl -X POST https://api.contentflow.com/v1/auth/login \
+curl -X POST https://api.Intellipost.com/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"user@example.com","password":"password"}'
 ```

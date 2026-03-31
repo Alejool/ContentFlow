@@ -1,6 +1,6 @@
-# ContentFlow - Documentación del Sistema
+# Intellipost - Documentación del Sistema
 
-Documentación técnica del sistema ContentFlow organizada por categorías.
+Documentación técnica del sistema Intellipost organizada por categorías.
 
 ## 📁 Estructura de Documentación
 

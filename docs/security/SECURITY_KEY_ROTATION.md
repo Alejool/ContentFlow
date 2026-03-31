@@ -2,7 +2,7 @@
 
 ## Overview
 
-ContentFlow encrypts sensitive data including social media tokens using Laravel's encryption system (AES-256-CBC). This guide covers the process of rotating encryption keys to maintain security best practices.
+Intellipost encrypts sensitive data including social media tokens using Laravel's encryption system (AES-256-CBC). This guide covers the process of rotating encryption keys to maintain security best practices.
 
 ## Why Rotate Encryption Keys?
 
@@ -15,7 +15,7 @@ Regular key rotation is a security best practice that:
 
 ## What Gets Encrypted?
 
-ContentFlow encrypts the following sensitive data:
+Intellipost encrypts the following sensitive data:
 - Social media access tokens (OAuth tokens)
 - Social media refresh tokens
 - Two-factor authentication secrets
@@ -159,10 +159,10 @@ php artisan down
 2. **Restore database backup**:
 ```bash
 # For PostgreSQL
-pg_restore -d contentflow backup_file.dump
+pg_restore -d Intellipost backup_file.dump
 
 # For MySQL
-mysql contentflow < backup_file.sql
+mysql Intellipost < backup_file.sql
 ```
 
 3. **Restore .env file**:

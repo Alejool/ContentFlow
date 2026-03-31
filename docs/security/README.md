@@ -1,6 +1,6 @@
 # Documentación de Seguridad
 
-Guías y mejores prácticas de seguridad para ContentFlow.
+Guías y mejores prácticas de seguridad para Intellipost.
 
 ## Documentos Principales
 

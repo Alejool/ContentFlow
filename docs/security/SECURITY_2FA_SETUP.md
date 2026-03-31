@@ -2,7 +2,7 @@
 
 ## Overview
 
-ContentFlow requires all administrator accounts to use Two-Factor Authentication (2FA) for enhanced security. This guide covers the setup process, usage, and recovery procedures.
+Intellipost requires all administrator accounts to use Two-Factor Authentication (2FA) for enhanced security. This guide covers the setup process, usage, and recovery procedures.
 
 ## What is 2FA?
 
@@ -12,7 +12,7 @@ Two-Factor Authentication adds an extra layer of security by requiring two forms
 
 ## Supported Authenticator Apps
 
-ContentFlow uses the industry-standard TOTP (Time-based One-Time Password) protocol, compatible with:
+Intellipost uses the industry-standard TOTP (Time-based One-Time Password) protocol, compatible with:
 
 - **Google Authenticator** (iOS, Android)
 - **Authy** (iOS, Android, Desktop)
@@ -32,7 +32,7 @@ When an administrator logs in without 2FA configured, they are automatically red
 1. Open your authenticator app
 2. Select "Add Account" or "Scan QR Code"
 3. Scan the QR code displayed on the setup page
-4. The app will add a new entry for ContentFlow
+4. The app will add a new entry for Intellipost
 
 **Alternative**: If you can't scan the QR code, manually enter the secret key shown below the QR code.
 
@@ -220,7 +220,7 @@ Access these logs through the admin panel under "Audit Logs".
 
 ### TOTP Algorithm
 
-ContentFlow uses the standard TOTP algorithm (RFC 6238):
+Intellipost uses the standard TOTP algorithm (RFC 6238):
 - **Algorithm**: HMAC-SHA1
 - **Time Step**: 30 seconds
 - **Code Length**: 6 digits

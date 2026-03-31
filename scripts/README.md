@@ -1,6 +1,6 @@
 # Scripts de Docker Helper
 
-Este directorio contiene scripts útiles para facilitar el trabajo con Docker en el proyecto ContentFlow.
+Este directorio contiene scripts útiles para facilitar el trabajo con Docker en el proyecto Intellipost.
 
 ## 📋 Scripts Disponibles
 

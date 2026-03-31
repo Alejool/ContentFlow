@@ -1,6 +1,6 @@
 # Componentes Modernos - React Aria Components
 
-Colección de componentes UI modernos construidos con React Aria Components para ContentFlow.
+Colección de componentes UI modernos construidos con React Aria Components para Intellipost.
 
 ## 🎯 Filosofía
 
@@ -419,4 +419,4 @@ Ver `CHANGELOG.md` para historial de cambios.
 
 ## 📄 Licencia
 
-Uso interno de ContentFlow.
+Uso interno de Intellipost.

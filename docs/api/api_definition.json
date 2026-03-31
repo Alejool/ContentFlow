@@ -1,11 +1,11 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "ContentFlow Enterprise API",
-    "description": "API completa para la integración programática con ContentFlow. Disponible exclusivamente para clientes del plan Enterprise.",
+    "title": "Intellipost Enterprise API",
+    "description": "API completa para la integración programática con Intellipost. Disponible exclusivamente para clientes del plan Enterprise.",
     "version": "1.0.0",
     "contact": {
-      "email": "enterprise-support@contentflow.app"
+      "email": "enterprise-support@Intellipost.app"
     }
   },
   "servers": [

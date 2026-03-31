@@ -67,7 +67,7 @@ docker-compose exec app php artisan optimize:clear
 ### Backup
 ```bash
 # Backup de base de datos
-docker-compose exec mysql mysqldump -u root -p contentflow > backup.sql
+docker-compose exec mysql mysqldump -u root -p Intellipost > backup.sql
 
 # Backup de archivos
 docker-compose exec app tar -czf storage_backup.tar.gz storage/

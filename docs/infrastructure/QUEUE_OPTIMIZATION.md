@@ -67,7 +67,7 @@ Nuevo comando `php artisan queue:monitor-publishing`:
 
 ```env
 # Horizon
-HORIZON_NAME="ContentFlow"
+HORIZON_NAME="Intellipost"
 HORIZON_PATH=horizon
 
 # Redis para colas

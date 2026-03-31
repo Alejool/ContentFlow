@@ -1,6 +1,6 @@
 <?php
 /**
- * ContentFlow API Documentation Download
+ * Intellipost API Documentation Download
  * 
  * Automatically serves the correct documentation version based on browser language
  * or explicit language parameter.

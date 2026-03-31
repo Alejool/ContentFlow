@@ -2,11 +2,11 @@
 
 ## Overview
 
-ContentFlow includes a comprehensive security monitoring and alerting system that notifies administrators of suspicious activities in real-time. This guide covers setup, configuration, and best practices for security alerts.
+Intellipost includes a comprehensive security monitoring and alerting system that notifies administrators of suspicious activities in real-time. This guide covers setup, configuration, and best practices for security alerts.
 
 ## Alert Types
 
-ContentFlow monitors and alerts on the following security events:
+Intellipost monitors and alerts on the following security events:
 
 ### 1. Failed Authentication Attempts
 - Multiple failed login attempts from the same IP or user
@@ -122,7 +122,7 @@ MAIL_PORT=2525
 MAIL_USERNAME=your_username
 MAIL_PASSWORD=your_password
 MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS=noreply@contentflow.com
+MAIL_FROM_ADDRESS=noreply@Intellipost.com
 MAIL_FROM_NAME="${APP_NAME}"
 ```
 
@@ -149,7 +149,7 @@ Details:
 Action Required:
 Review the audit logs and consider blocking this IP address if the activity continues.
 
-View Audit Logs: https://contentflow.com/admin/audit-logs?ip=192.168.1.100
+View Audit Logs: https://Intellipost.com/admin/audit-logs?ip=192.168.1.100
 ```
 
 ### Slack Alerts
@@ -179,7 +179,7 @@ SECURITY_ALERTS_SLACK_WEBHOOK=https://hooks.slack.com/services/YOUR/WEBHOOK/URL
 • Attempts: 5 in 15 minutes
 • Time: 2026-02-19 10:30:00 UTC
 
-<https://contentflow.com/admin/audit-logs?ip=192.168.1.100|View Audit Logs>
+<https://Intellipost.com/admin/audit-logs?ip=192.168.1.100|View Audit Logs>
 ```
 
 ### Discord Alerts
@@ -207,7 +207,7 @@ SECURITY_ALERTS_DISCORD_WEBHOOK=https://discord.com/api/webhooks/YOUR/WEBHOOK/UR
 **Attempts:** 5 in 15 minutes
 **Time:** 2026-02-19 10:30:00 UTC
 
-[View Audit Logs](https://contentflow.com/admin/audit-logs?ip=192.168.1.100)
+[View Audit Logs](https://Intellipost.com/admin/audit-logs?ip=192.168.1.100)
 ```
 
 ### Database Logging
@@ -306,7 +306,7 @@ Prevent alert spam:
 
 ## Auto-Blocking
 
-ContentFlow can automatically block suspicious IPs.
+Intellipost can automatically block suspicious IPs.
 
 **⚠️ Warning**: Use with caution! Auto-blocking can lock out legitimate users.
 
@@ -429,7 +429,7 @@ public function handle(SecurityAlertEvent $event)
             'payload' => [
                 'summary' => $event->title,
                 'severity' => $event->severity,
-                'source' => 'ContentFlow',
+                'source' => 'Intellipost',
             ],
         ]);
     }

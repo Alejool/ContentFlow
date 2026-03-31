@@ -1,4 +1,4 @@
-# ContentFlow API Documentation - Apache Configuration
+# Intellipost API Documentation - Apache Configuration
 
 # Enable rewrite engine
 <IfModule mod_rewrite.c>

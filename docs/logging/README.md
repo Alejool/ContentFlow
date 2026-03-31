@@ -1,6 +1,6 @@
 # Documentación de Logging
 
-Sistema de logs estructurado y monitoreo de ContentFlow.
+Sistema de logs estructurado y monitoreo de Intellipost.
 
 ## Documentos Disponibles
 

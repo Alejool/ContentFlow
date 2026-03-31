@@ -1,6 +1,6 @@
 # Documentación de Funcionalidades
 
-Guías de características específicas del sistema ContentFlow.
+Guías de características específicas del sistema Intellipost.
 
 ## Funcionalidades Documentadas
 

@@ -1,4 +1,4 @@
-# ContentFlow API — Complete Enterprise Reference v1
+# Intellipost API — Complete Enterprise Reference v1
 
 **Version:** 1.0  
 **Base URL:** `https://your-domain.com/api/v1`  
@@ -32,7 +32,7 @@
 
 ## 1. Authentication and Tokens
 
-ContentFlow uses **Laravel Sanctum** for API authentication. The system implements an **access token + refresh token** scheme with automatic rotation for maximum security.
+Intellipost uses **Laravel Sanctum** for API authentication. The system implements an **access token + refresh token** scheme with automatic rotation for maximum security.
 
 > **Only available for Enterprise plan.** Free, Starter, or Professional plans will receive a `402 Payment Required` error when attempting to generate tokens.
 

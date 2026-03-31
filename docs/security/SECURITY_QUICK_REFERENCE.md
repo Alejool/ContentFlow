@@ -2,7 +2,7 @@
 
 ## Overview
 
-Quick reference guide for ContentFlow's security features. For detailed documentation, see the full guides linked in each section.
+Quick reference guide for Intellipost's security features. For detailed documentation, see the full guides linked in each section.
 
 ## Rate Limiting
 

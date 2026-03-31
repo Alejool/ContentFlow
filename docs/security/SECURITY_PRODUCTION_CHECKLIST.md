@@ -2,7 +2,7 @@
 
 ## Overview
 
-This checklist ensures all security features are properly configured before deploying ContentFlow to production. Complete each section and verify all items before going live.
+This checklist ensures all security features are properly configured before deploying Intellipost to production. Complete each section and verify all items before going live.
 
 ## Pre-Deployment Checklist
 
@@ -332,7 +332,7 @@ This checklist ensures all security features are properly configured before depl
 
 ### Contact Information
 
-- **Security Team**: security@contentflow.com
+- **Security Team**: security@Intellipost.com
 - **On-Call**: [Phone Number]
 - **Emergency**: [Phone Number]
 - **Legal**: [Contact]

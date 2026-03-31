@@ -1,4 +1,4 @@
-# ContentFlow API — Referencia Completa Enterprise v1
+# Intellipost API — Referencia Completa Enterprise v1
 
 **Versión:** 1.0  
 **Base URL:** `https://tu-dominio.com/api/v1`  
@@ -32,7 +32,7 @@
 
 ## 1. Autenticación y Tokens
 
-ContentFlow usa **Laravel Sanctum** para la autenticación API. El sistema implementa un esquema de **access token + refresh token** con rotación automática para máxima seguridad.
+Intellipost usa **Laravel Sanctum** para la autenticación API. El sistema implementa un esquema de **access token + refresh token** con rotación automática para máxima seguridad.
 
 > **Solo disponible para el plan Enterprise.** Los planes Free, Starter o Professional recibirán un error `402 Payment Required` al intentar generar tokens.
 
@@ -1942,7 +1942,7 @@ Devuelve el historial completo de acciones realizadas sobre la publicación (cre
 POST /api/v1/publications/{id}/portal-token
 ```
 
-Genera un token temporal para compartir una vista de preview de la publicación con un cliente externo sin cuenta en ContentFlow.
+Genera un token temporal para compartir una vista de preview de la publicación con un cliente externo sin cuenta en Intellipost.
 
 ---
 
@@ -2060,7 +2060,7 @@ Historial de todos los envíos a redes sociales del workspace.
 
 ## 9. Subida de Archivos (Upload)
 
-ContentFlow usa **S3 de AWS** para el almacenamiento de media. El flujo recomendado es la **subida directa desde el cliente** para evitar limitaciones de tamaño en el servidor.
+Intellipost usa **S3 de AWS** para el almacenamiento de media. El flujo recomendado es la **subida directa desde el cliente** para evitar limitaciones de tamaño en el servidor.
 
 ### Tipos de Archivo Permitidos
 
@@ -2686,6 +2686,6 @@ draft → pending_review → approved → publishing → published
 
 ---
 
-*Para soporte técnico Enterprise, contacta a tu gestor de cuenta dedicado o escribe a enterprise-support@contentflow.app*
+*Para soporte técnico Enterprise, contacta a tu gestor de cuenta dedicado o escribe a enterprise-support@Intellipost.app*
 
-*© 2026 ContentFlow — Todos los derechos reservados*
+*© 2026 Intellipost — Todos los derechos reservados*

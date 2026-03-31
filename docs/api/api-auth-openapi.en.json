@@ -1,11 +1,11 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "ContentFlow API - Authentication",
-    "description": "Authentication API for ContentFlow Enterprise. Token system with access token (24h) and refresh token (30 days) with automatic rotation.",
+    "title": "Intellipost API - Authentication",
+    "description": "Authentication API for Intellipost Enterprise. Token system with access token (24h) and refresh token (30 days) with automatic rotation.",
     "version": "1.0.0",
     "contact": {
-      "name": "ContentFlow API Support",
+      "name": "Intellipost API Support",
       "url": "https://your-domain.com/docs"
     }
   },

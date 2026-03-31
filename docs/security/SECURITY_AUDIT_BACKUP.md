@@ -2,7 +2,7 @@
 
 ## Overview
 
-ContentFlow maintains comprehensive audit logs for all critical security events. This guide covers backup procedures, retention policies, and compliance considerations for audit logs.
+Intellipost maintains comprehensive audit logs for all critical security events. This guide covers backup procedures, retention policies, and compliance considerations for audit logs.
 
 ## Why Backup Audit Logs?
 
@@ -16,7 +16,7 @@ Audit logs are critical for:
 
 ## What Gets Logged?
 
-ContentFlow logs the following critical events:
+Intellipost logs the following critical events:
 
 ### Authentication Events
 - Successful logins
@@ -281,10 +281,10 @@ If audit logs are included in database backups:
 
 ```bash
 # Restore entire database
-pg_restore -d contentflow backup_file.dump
+pg_restore -d Intellipost backup_file.dump
 
 # Or restore only audit_logs table
-pg_restore -d contentflow -t audit_logs backup_file.dump
+pg_restore -d Intellipost -t audit_logs backup_file.dump
 ```
 
 ### Restore from Separate Backup
