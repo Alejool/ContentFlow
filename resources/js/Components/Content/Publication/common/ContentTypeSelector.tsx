@@ -315,28 +315,28 @@ export default function ContentTypeSelector({
               {selectedType === 'reel' && (
                 <div className="border-t border-gray-200 pt-2 dark:border-neutral-700">
                   <p className="text-xs italic text-gray-500 dark:text-gray-400">
-                    💡 Los Reels/Shorts deben ser videos verticales (9:16) de corta duración
+                     Los Reels/Shorts deben ser videos verticales (9:16) de corta duración
                   </p>
                 </div>
               )}
               {selectedType === 'story' && (
                 <div className="border-t border-gray-200 pt-2 dark:border-neutral-700">
                   <p className="text-xs italic text-gray-500 dark:text-gray-400">
-                    💡 Las Stories desaparecen después de 24 horas
+                     Las Stories desaparecen después de 24 horas
                   </p>
                 </div>
               )}
               {selectedType === 'carousel' && (
                 <div className="border-t border-gray-200 pt-2 dark:border-neutral-700">
                   <p className="text-xs italic text-gray-500 dark:text-gray-400">
-                    💡 Los carousels requieren mínimo 2 elementos
+                     Los carousels requieren mínimo 2 elementos
                   </p>
                 </div>
               )}
               {selectedType === 'poll' && (
                 <div className="border-t border-gray-200 pt-2 dark:border-neutral-700">
                   <p className="text-xs italic text-gray-500 dark:text-gray-400">
-                    💡 Las encuestas permiten interacción directa con tu audiencia
+                     Las encuestas permiten interacción directa con tu audiencia
                   </p>
                 </div>
               )}

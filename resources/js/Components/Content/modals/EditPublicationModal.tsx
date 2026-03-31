@@ -348,6 +348,10 @@ const EditPublicationModal = ({
     return publication?.social_post_logs?.some((log: any) => log.status === 'published');
   }, [publication]);
 
+  const hasPublishingPlatform = useMemo(() => {
+    return publication?.social_post_logs?.some((log: any) => log.status === 'publishing');
+  }, [publication]);
+
   const { data: platformsData } = usePublishedPlatforms(isOpen ? publication?.id : null);
 
   const { auth } = usePage<any>().props;
@@ -557,7 +561,7 @@ const EditPublicationModal = ({
                 }
               }}
               t={t}
-              disabled={hasPublishedPlatform || isContentSectionDisabled}
+              disabled={hasPublishedPlatform || hasPublishingPlatform || isContentSectionDisabled}
               mediaFiles={mediaFiles}
             />
           }
@@ -577,7 +581,7 @@ const EditPublicationModal = ({
               }
             }}
             t={t}
-            disabled={hasPublishedPlatform || isContentSectionDisabled}
+            disabled={hasPublishedPlatform || hasPublishingPlatform || isContentSectionDisabled}
             mediaFiles={mediaFiles}
           />
         </div>
@@ -607,6 +611,7 @@ const EditPublicationModal = ({
                   {!isLockedByMe &&
                     isLockedByOther &&
                     !hasPublishedPlatform &&
+                    !hasPublishingPlatform &&
                     allowConfiguration &&
                     publication?.status !== 'pending_review' && (
                       <AlertCard
@@ -769,7 +774,7 @@ const EditPublicationModal = ({
                   )}
 
                   {/* Alerta: Publicación aprobada */}
-                  {publication?.status === 'approved' && !hasPublishedPlatform && (
+                  {publication?.status === 'approved' && !hasPublishedPlatform && !hasPublishingPlatform && (
                     <AlertCard
                       type="info"
                       title={
@@ -814,7 +819,7 @@ const EditPublicationModal = ({
                           setIsDragOver(false);
                           handleFileChange(e.dataTransfer.files);
                         }}
-                        disabled={hasPublishedPlatform || isMediaSectionDisabled}
+                        disabled={hasPublishedPlatform || hasPublishingPlatform || isMediaSectionDisabled}
                         isAnyMediaProcessing={isAnyMediaProcessing}
                         uploadProgress={uploadProgress}
                         uploadStats={uploadStats}
@@ -858,15 +863,20 @@ const EditPublicationModal = ({
                     </h3>
                   </div>
 
-                  {hasPublishedPlatform && (
+                  {(hasPublishedPlatform || hasPublishingPlatform) && (
                     <AlertCard
                       type="info"
                       title={
-                        t('publications.modal.edit.contentLocked') || 'Publication partially live'
+                        hasPublishingPlatform
+                          ? t('publications.modal.edit.contentPublishing') || 'Publicación en Proceso'
+                          : t('publications.modal.edit.contentLocked') || 'Contenido Bloqueado'
                       }
                       message={
-                        t('publications.modal.edit.contentLockedHint') ||
-                        'This publication is live on some platforms. Changes will apply to pending and future uploads.'
+                        hasPublishingPlatform
+                          ? t('publications.modal.edit.contentPublishingHint') ||
+                            'La publicación se está publicando en algunas plataformas. Debes esperar a que termine el proceso para poder editar el contenido.'
+                          : t('publications.modal.edit.contentLockedHint') ||
+                            'Para editar el contenido (título, descripción o archivos), debes despublicar la publicación de todas las plataformas.'
                       }
                       className="animate-in fade-in slide-in-from-top-4"
                     />
@@ -882,7 +892,7 @@ const EditPublicationModal = ({
                     campaigns={campaigns}
                     publication={publication}
                     onHashtagChange={handleHashtagChange}
-                    disabled={hasPublishedPlatform || isContentSectionDisabled}
+                    disabled={hasPublishedPlatform || hasPublishingPlatform || isContentSectionDisabled}
                     contentType={content_type}
                   />
 

@@ -1,11 +1,11 @@
 import Button from '@/Components/common/Modern/Button';
 import { getPlatformConfig } from '@/Constants/socialPlatforms';
 import {
-  formatDurationLimit,
-  formatFileSizeLimit,
-  getUpgradeMessage,
-  useValidateVideo,
-  type VideoValidationResult,
+    formatDurationLimit,
+    formatFileSizeLimit,
+    getUpgradeMessage,
+    useValidateVideo,
+    type VideoValidationResult,
 } from '@/Hooks/usePlatformCapabilities';
 import { AlertTriangle, CheckCircle, RefreshCw, XCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -223,7 +223,7 @@ export default function VideoValidationAlert({
                         return (
                           <div className="mt-3 rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-700 dark:bg-blue-900/30">
                             <div className="flex items-start gap-2">
-                              <span className="text-lg">💡</span>
+                              <span className="text-lg"></span>
                               <div className="flex-1">
                                 <p className="text-xs font-bold text-blue-900 dark:text-blue-100">
                                   {t('common.tip') || 'Consejo'}:
