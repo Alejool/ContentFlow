@@ -95,6 +95,12 @@ return [
       'prefix_indexes' => true,
       'search_path' => 'public',
       'sslmode' => 'prefer',
+      // Optimizaciones para database cache/queue
+      'options' => extension_loaded('pdo_pgsql') ? [
+        PDO::ATTR_PERSISTENT => env('DB_PERSISTENT', false),  // Activar para demo
+        PDO::ATTR_EMULATE_PREPARES => false,
+        PDO::ATTR_STRINGIFY_FETCHES => false,
+      ] : [],
     ],
 
     'sqlsrv' => [
