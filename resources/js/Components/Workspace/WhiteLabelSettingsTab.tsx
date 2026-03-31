@@ -284,7 +284,7 @@ export default function WhiteLabelSettingsTab({
                         <input
                           type="file"
                           className="hidden"
-                          accept="image/jpeg,image/jpg,image/png,image/gif,image/svg+xml,image/webp"
+                          accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                           onChange={handleLogoChange}
                           disabled={uploading}
                         />
@@ -366,7 +366,7 @@ export default function WhiteLabelSettingsTab({
                         <input
                           type="file"
                           className="hidden"
-                          accept="image/jpeg,image/jpg,image/png,image/gif,image/svg+xml,image/webp"
+                          accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                           onChange={handleFaviconChange}
                           disabled={uploading}
                         />

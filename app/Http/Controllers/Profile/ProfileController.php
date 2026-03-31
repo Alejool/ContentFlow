@@ -166,7 +166,7 @@ class ProfileController extends Controller
   {
     try {
       $request->validate([
-        'avatar' => 'required|image|mimes:jpeg,jpg,png,gif,svg,webp|max:2048', // 2MB max, incluyendo SVG
+        'avatar' => 'required|image|mimes:jpeg,jpg,png,gif,webp|max:2048', // 2MB max
         'name' => 'required|string',
       ]);
 

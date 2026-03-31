@@ -33,10 +33,10 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
       return;
     }
 
-    // Validar tipo (incluyendo SVG)
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/svg+xml', 'image/webp'];
+    // Validar tipo
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
     if (!validTypes.includes(file.type)) {
-      toast.error(t('profile.invalid_file_type', 'Solo se permiten archivos de imagen (JPG, PNG, GIF, SVG, WebP)'));
+      toast.error(t('profile.invalid_file_type', 'Solo se permiten archivos de imagen (JPG, PNG, GIF, WebP)'));
       return;
     }
 
@@ -210,7 +210,7 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
       <div className="space-y-3">
         <div className="flex flex-col gap-2">
           <FileUploadButton
-            accept="image/jpeg,image/jpg,image/png,image/gif,image/svg+xml,image/webp"
+            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
             onChange={handleFileChange}
             label={t('profile.choose_file', 'Elegir Archivo')}
             loading={processing}
@@ -235,7 +235,7 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
           )}
         </div>
         <p className="text-center text-xs text-gray-500 dark:text-gray-400">
-          {t('profile.avatar_requirements', 'Máximo 2MB. Formatos: JPG, PNG, GIF, SVG, WebP')}
+          {t('profile.avatar_requirements', 'Máximo 2MB. Formatos: JPG, PNG, GIF, WebP')}
         </p>
       </div>
     </div>

@@ -4,7 +4,7 @@ import React, { useRef } from 'react';
 interface FileUploadButtonProps {
   /**
    * Tipos de archivo aceptados (MIME types separados por coma)
-   * @example "image/jpeg,image/png,image/svg+xml"
+   * @example "image/jpeg,image/png,image/webp"
    */
   accept?: string;
   
@@ -75,7 +75,7 @@ interface FileUploadButtonProps {
  * @example
  * // Uso básico para imágenes
  * <FileUploadButton
- *   accept="image/jpeg,image/png,image/svg+xml"
+ *   accept="image/jpeg,image/png,image/webp"
  *   onChange={handleFileChange}
  *   label="Elegir Imagen"
  * />
@@ -99,7 +99,7 @@ interface FileUploadButtonProps {
  * />
  */
 export default function FileUploadButton({
-  accept = 'image/jpeg,image/jpg,image/png,image/gif,image/svg+xml',
+  accept = 'image/jpeg,image/jpg,image/png,image/gif,image/webp',
   multiple = false,
   onChange,
   label = 'Elegir Archivo',
