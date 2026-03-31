@@ -33,7 +33,7 @@ export const FacebookPreview = memo(
             <Avatar src={user?.avatar} name={user?.name || 'User'} size="md" />
             <div>
               <div className="cursor-pointer text-[15px] font-semibold leading-tight hover:underline">
-                {user?.name || 'ContentFlow User'}
+                {user?.name || 'Intellipost User'}
               </div>
               <div className="flex items-center gap-1 text-[13px] leading-tight text-gray-500 dark:text-[#b0b3b8]">
                 {publishedAt

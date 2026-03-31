@@ -2,16 +2,16 @@ import { SeededRandom } from '@/Utils/stableMock';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useRef } from 'react';
 import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Legend,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
+    Bar,
+    BarChart,
+    CartesianGrid,
+    Legend,
+    Line,
+    LineChart,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis,
 } from 'recharts';
 
 interface DailyMetric {
@@ -49,7 +49,7 @@ export default function DetailedPlatformChart({ platforms, theme = 'light' }: Pr
     {
       id: 201,
       platform: 'youtube',
-      account_name: 'ContentFlow Channel',
+      account_name: 'Intellipost Channel',
       current_followers: 12500,
       total_engagement: 4500,
       avg_engagement_rate: 6.5,

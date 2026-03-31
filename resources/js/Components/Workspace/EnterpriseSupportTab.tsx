@@ -27,7 +27,7 @@ export default function EnterpriseSupportTab() {
       title: t('workspace.enterprise.integrations.title') || 'Custom Integrations',
       description:
         t('workspace.enterprise.integrations.description') ||
-        'Need to connect ContentFlow with your own CRM or ERP? Our team can build custom integrations tailored to your workflow.',
+        'Need to connect Intellipost with your own CRM or ERP? Our team can build custom integrations tailored to your workflow.',
       icon: Zap,
       action: t('workspace.enterprise.integrations.action') || 'Request Integration',
       color: 'amber',

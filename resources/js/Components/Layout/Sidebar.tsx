@@ -143,7 +143,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
                   <img
                     id="sidebar-logo"
                     src={Logo}
-                    alt={`${auth?.current_workspace?.name || 'ContentFlow'} logo`}
+                    alt={`${auth?.current_workspace?.name || 'Intellipost'} logo`}
                     onLoad={() => setLogoLoaded(true)}
                     onError={() => setLogoError(true)}
                     className={`transition-opacity duration-300 ${logoLoaded ? 'opacity-100' : 'opacity-0'} ${
@@ -161,7 +161,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
                   >
                     {auth?.current_workspace?.white_label_logo_url
                       ? auth.current_workspace.name
-                      : 'ContentFlow'}
+                      : 'Intellipost'}
                   </h1>
                   <p className={`text-xs ${classes.subtitleColor}`}>
                     {auth?.current_workspace?.white_label_logo_url

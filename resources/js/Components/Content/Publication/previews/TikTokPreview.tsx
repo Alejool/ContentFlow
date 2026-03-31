@@ -99,7 +99,7 @@ export const TikTokPreview = memo(({ content, mediaUrls, user }: TikTokPreviewPr
         </div>
         <div className="flex items-center gap-2 text-xs text-white">
           <Music className="h-3 w-3 animate-pulse" />
-          <span className="truncate">Original Sound - {user?.name || 'ContentFlow User'}</span>
+          <span className="truncate">Original Sound - {user?.name || 'Intellipost User'}</span>
         </div>
       </div>
 

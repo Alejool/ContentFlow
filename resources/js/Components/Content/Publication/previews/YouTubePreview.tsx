@@ -59,7 +59,7 @@ export const YouTubePreview = memo(
             <div className="flex items-center gap-3">
               <Avatar src={user?.avatar} name={user?.name || 'User'} size="md" />
               <div className="flex flex-col">
-                <span className="text-[15px] font-bold">{user?.name || 'ContentFlow User'}</span>
+                <span className="text-[15px] font-bold">{user?.name || 'Intellipost User'}</span>
                 <span className="text-xs text-gray-500 dark:text-neutral-400">0 subscribers</span>
               </div>
               <button

@@ -4,14 +4,14 @@ import { formatTime } from '@/Utils/formatDate';
 import { CalendarEvent } from '@/types/calendar';
 import { format, parseISO } from 'date-fns';
 import {
-  AlertCircle,
-  Calendar,
-  Clock,
-  Edit2,
-  ExternalLink,
-  Link as LinkIcon,
-  Tag,
-  Trash2,
+    AlertCircle,
+    Calendar,
+    Clock,
+    Edit2,
+    ExternalLink,
+    Link as LinkIcon,
+    Tag,
+    Trash2,
 } from 'lucide-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -214,7 +214,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
               <LinkIcon className="mt-0.5 h-5 w-5 text-gray-400" />
               <div className="flex-1">
                 <div className="mb-1 text-sm font-medium text-gray-500 dark:text-gray-400">
-                  {t('calendar.eventDetails.viewPublication') || 'Ver en ContentFlow'}
+                  {t('calendar.eventDetails.viewPublication') || 'Ver en Intellipost'}
                 </div>
                 <a
                   href={`${event.extendedProps.slug}?id=${event.publicationId || event.extendedProps.publication_id}`}

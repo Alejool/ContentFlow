@@ -5,22 +5,22 @@ import { formatDateString, formatDateTimeStyled } from '@/Utils/dateHelpers';
 import { useForm } from '@inertiajs/react';
 import axios from 'axios';
 import {
-  AlertTriangle,
-  CheckCircle2,
-  Clock,
-  Copy,
-  Download,
-  Eye,
-  EyeOff,
-  FileCode2,
-  FileText,
-  Info,
-  Key,
-  Loader2,
-  Plus,
-  RefreshCw,
-  Trash2,
-  XCircle,
+    AlertTriangle,
+    CheckCircle2,
+    Clock,
+    Copy,
+    Download,
+    Eye,
+    EyeOff,
+    FileCode2,
+    FileText,
+    Info,
+    Key,
+    Loader2,
+    Plus,
+    RefreshCw,
+    Trash2,
+    XCircle,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -260,7 +260,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
                 </h3>
                 <p className="mt-1 text-sm text-gray-500 dark:text-neutral-400">
                   {t('workspace.api.description') ||
-                    'Gestiona todos los tokens de acceso a la API de ContentFlow.'}
+                    'Gestiona todos los tokens de acceso a la API de Intellipost.'}
                 </p>
               </div>
             </div>
