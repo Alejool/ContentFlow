@@ -768,6 +768,27 @@ export const usePublicationForm = ({
       return;
     }
 
+    // Block SVG files for publications (social media platforms don't support SVG)
+    const svgFiles = newFiles.filter(
+      (file) => file.type === 'image/svg+xml' || file.name.toLowerCase().endsWith('.svg'),
+    );
+
+    if (svgFiles.length > 0) {
+      const fileNames = svgFiles.map((f) => f.name).join(', ');
+      toast.error(
+        t('publications.modal.upload.errors.svgNotAllowed', {
+          defaultValue: `SVG files are not supported by social media platforms: ${fileNames}`,
+          files: fileNames,
+        }),
+      );
+      setImageError(
+        t('publications.modal.upload.errors.svgNotAllowed', {
+          defaultValue: 'SVG files are not supported by social media platforms',
+        }),
+      );
+      return;
+    }
+
     const videoFiles = newFiles.filter((f) => f.type.startsWith('video/'));
 
     const newMediaItems = newFiles.map((file) => ({

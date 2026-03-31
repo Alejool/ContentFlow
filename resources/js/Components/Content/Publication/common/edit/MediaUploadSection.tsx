@@ -92,15 +92,15 @@ const MediaUploadSection = memo(
         // Solo videos (para reels)
         types.push('video/mp4', 'video/mov', 'video/avi');
       } else if (mediaRules.imageOnly) {
-        // Solo imágenes
-        types.push('image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml');
+        // Solo imágenes (sin SVG - no soportado por redes sociales)
+        types.push('image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp');
       } else {
         // Verificar si aún se pueden agregar imágenes
         if (
           mediaRules.maxImages === undefined ||
           (mediaRules.maxImages > 0 && mediaCounts.images < mediaRules.maxImages)
         ) {
-          types.push('image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml');
+          types.push('image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp');
         }
         // Verificar si aún se pueden agregar videos
         if (
