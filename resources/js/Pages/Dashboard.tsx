@@ -165,8 +165,6 @@ export default function Dashboard({
           </div>
         </motion.div>
 
-        <ExpiredTokensBanner accounts={problematicAccounts} />
-
         {!auth.user.email_verified_at && showBanner && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
