@@ -13,9 +13,9 @@ import { formatTime } from '@/Utils/formatDate';
 import { formatDate } from '@/Utils/i18nHelpers';
 import { useLockStore } from '@/stores/lockStore';
 import type { CalendarView } from '@/types/calendar';
+import type { DragEndEvent } from '@dnd-kit/core';
 import {
     DndContext,
-    DragEndEvent,
     PointerSensor,
     useDraggable,
     useDroppable,

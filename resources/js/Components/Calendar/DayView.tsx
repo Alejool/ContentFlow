@@ -1,10 +1,9 @@
 import type { CalendarEvent } from '@/types/calendar';
 import { formatTime } from '@/Utils/formatDate';
+import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import {
     DndContext,
-    DragEndEvent,
     DragOverlay,
-    DragStartEvent,
     PointerSensor,
     useDraggable,
     useDroppable,
