@@ -169,7 +169,7 @@ Watcher para reiniciar Octane automáticamente en cambios.
 ### deploy.sh
 Script de deployment automatizado.
 
-## 💡 Tips
+##  Tips
 
 1. **Alias útiles**: Agregar a tu `.bashrc` o `.bash_profile`:
    ```bash

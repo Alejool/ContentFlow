@@ -123,7 +123,7 @@ storage/logs/
 └── errors-2024-02-21.log
 ```
 
-## 💡 Ejemplos Prácticos
+##  Ejemplos Prácticos
 
 ### Encontrar todos los errores de un usuario:
 ```bash
