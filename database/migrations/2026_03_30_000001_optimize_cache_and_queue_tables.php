@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
+    // Deshabilitar transacciones para permitir VACUUM
+    public $withinTransaction = false;
+
     public function up(): void
     {
         // Optimizar tabla cache
