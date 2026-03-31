@@ -3,6 +3,7 @@ import TabNavigation from '@/Components/common/TabNavigation';
 import MediaLightbox from '@/Components/common/ui/MediaLightbox';
 import MediaPreviewButton from '@/Components/common/ui/MediaPreviewButton';
 import ActivityList from '@/Components/Content/ActivityList';
+import ClientPortalButton from '@/Components/Content/ClientPortalButton';
 import ApprovalsTab from '@/Components/Content/modals/ViewPublicationModal/ApprovalsTab';
 import AssociatedPublicationsList from '@/Components/Content/modals/ViewPublicationModal/AssociatedPublicationsList';
 import CampaignOverviewTab from '@/Components/Content/modals/ViewPublicationModal/CampaignOverviewTab';
@@ -181,23 +182,30 @@ export default function ViewPublicationModal({
             </div>
           </div>
 
-          <div className="flex flex-shrink-0 justify-end gap-3 border-t border-gray-100 p-6 dark:border-neutral-700">
-            <Button onClick={onClose} variant="ghost" buttonStyle="ghost" size="lg">
-              {t('common.close')}
-            </Button>
-            {onEdit && canEdit && (
-              <Button
-                onClick={() => {
-                  onClose();
-                  onEdit(item);
-                }}
-                variant="primary"
-                size="lg"
-                icon={Edit}
-              >
-                {t('common.editInPanel')}
+          <div className="flex flex-shrink-0 justify-between gap-3 border-t border-gray-100 p-6 dark:border-neutral-700">
+            <div>
+              {isActuallyPublication && item.id && (
+                <ClientPortalButton publicationId={item.id} status={(item as any).status} />
+              )}
+            </div>
+            <div className="flex gap-3">
+              <Button onClick={onClose} variant="ghost" buttonStyle="ghost" size="lg">
+                {t('common.close')}
               </Button>
-            )}
+              {onEdit && canEdit && (
+                <Button
+                  onClick={() => {
+                    onClose();
+                    onEdit(item);
+                  }}
+                  variant="primary"
+                  size="lg"
+                  icon={Edit}
+                >
+                  {t('common.editInPanel')}
+                </Button>
+              )}
+            </div>
           </div>
         </DialogPanel>
       </div>
