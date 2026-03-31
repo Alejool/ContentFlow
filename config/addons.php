@@ -2,7 +2,7 @@
 
 /**
  * ============================================================================
- * CONFIGURACIÓN DE ADD-ONS - ContentFlow
+ * CONFIGURACIÓN DE ADD-ONS - Intellipost
  * ============================================================================
  *
  * Este archivo define los paquetes adicionales (add-ons) disponibles para compra.

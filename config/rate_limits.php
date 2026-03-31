@@ -2,7 +2,7 @@
 
 /**
  * ============================================================================
- * CONFIGURACIÓN DE LÍMITES GRANULARES - ContentFlow
+ * CONFIGURACIÓN DE LÍMITES GRANULARES - Intellipost
  * ============================================================================
  *
  * Este archivo define límites adicionales más específicos para cada plan.

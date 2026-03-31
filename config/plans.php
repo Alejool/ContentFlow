@@ -2,7 +2,7 @@
 
 /**
  * ============================================================================
- * CONFIGURACIÓN DE PLANES - ContentFlow (Backend)
+ * CONFIGURACIÓN DE PLANES - Intellipost (Backend)
  * ============================================================================
  *
  * Este archivo define los planes de suscripción disponibles en el sistema.
