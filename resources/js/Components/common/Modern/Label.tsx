@@ -1,15 +1,14 @@
 import { useTheme } from '@/Hooks/useTheme';
 import type { LucideIcon } from 'lucide-react';
-import { AlertCircle, CheckCircle, Info } from 'lucide-react';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 interface LabelProps {
   id?: string;
   htmlFor?: string;
   children: ReactNode;
-  error?: string;
-  success?: string;
-  info?: string;
+  error?: string | undefined;
+  success?: string | undefined;
+  info?: string | undefined;
   required?: boolean;
   disabled?: boolean;
   className?: string;
@@ -38,7 +37,6 @@ export default function Label({
   disabled = false,
   className = '',
   containerClassName = '',
-  icon: Icon,
   theme: propTheme,
   size = 'md',
   variant = 'default',
@@ -124,18 +122,7 @@ export default function Label({
     }
   };
 
-  const getIconStyles = () => {
-    if (error) {
-      return theme === 'dark' ? 'text-primary-400' : 'text-primary-500';
-    }
-    if (success) {
-      return theme === 'dark' ? 'text-green-400' : 'text-green-500';
-    }
-    if (info) {
-      return theme === 'dark' ? 'text-blue-400' : 'text-blue-500';
-    }
-    return theme === 'dark' ? 'text-gray-400' : 'text-gray-500';
-  };
+
 
   const getBadgeStyles = () => {
     const base = `rounded-full font-semibold ${currentSize.badge}`;
@@ -213,45 +200,7 @@ export default function Label({
     }
   };
 
-  const getMessageStyles = (type: 'error' | 'success' | 'info') => {
-    const base = 'flex items-start gap-2 px-3 py-2 rounded-lg text-sm mt-2';
 
-    if (theme === 'dark') {
-      switch (type) {
-        case 'error':
-          return `${base} text-primary-300 bg-primary-900/30 border border-primary-800/50`;
-        case 'success':
-          return `${base} text-green-300 bg-green-900/30 border border-green-800/50`;
-        case 'info':
-          return `${base} text-blue-300 bg-blue-900/30 border border-blue-800/50`;
-      }
-    } else {
-      switch (type) {
-        case 'error':
-          return `${base} text-primary-600 bg-primary-50/80 border border-primary-100`;
-        case 'success':
-          return `${base} text-green-600 bg-green-50/80 border border-green-100`;
-        case 'info':
-          return `${base} text-blue-600 bg-blue-50/80 border border-blue-100`;
-      }
-    }
-  };
-
-  const renderIcon = () => {
-    if (error) {
-      return <AlertCircle className={`${currentSize.icon} ${getIconStyles()}`} />;
-    }
-    if (success) {
-      return <CheckCircle className={`${currentSize.icon} ${getIconStyles()}`} />;
-    }
-    if (info) {
-      return <Info className={`${currentSize.icon} ${getIconStyles()}`} />;
-    }
-    if (Icon) {
-      return <Icon className={`${currentSize.icon} ${getIconStyles()}`} />;
-    }
-    return null;
-  };
 
   return (
     <div className={`mb-1 space-y-2 ${containerClassName}`}>
@@ -262,6 +211,14 @@ export default function Label({
           className={`${getLabelStyles()} ${className}`}
           title={tooltip}
           onClick={onClick}
+          onKeyDown={(e) => {
+            if (onClick && (e.key === 'Enter' || e.key === ' ')) {
+              e.preventDefault();
+              onClick();
+            }
+          }}
+          tabIndex={onClick ? 0 : undefined}
+          role={onClick ? 'button' : undefined}
           {...props}
         >
           {withIndicator && (

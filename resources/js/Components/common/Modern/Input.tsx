@@ -1,7 +1,7 @@
-import { CheckCircle, Eye, EyeOff, TriangleAlert } from 'lucide-react';
-import { InputHTMLAttributes, ReactNode, forwardRef, isValidElement, useState } from 'react';
+import { forwardRef, isValidElement, useState } from 'react';
+import type { InputHTMLAttributes, ReactNode } from 'react';
 import type { FieldValues, Path, UseFormRegister } from 'react-hook-form';
-
+import { CheckCircle, Eye, EyeOff, TriangleAlert } from 'lucide-react';
 import Label from '@/Components/common/Modern/Label';
 
 interface InputProps<T extends FieldValues = FieldValues> extends Omit<
@@ -10,14 +10,14 @@ interface InputProps<T extends FieldValues = FieldValues> extends Omit<
 > {
   id: string;
   label?: string;
-  error?: string;
-  success?: string;
+  error?: string | undefined;
+  success?: string | undefined;
   register?: UseFormRegister<T>;
   name?: Path<T>;
   showPasswordToggle?: boolean;
   containerClassName?: string;
   icon?: any;
-  hint?: string;
+  hint?: string | undefined;
   prefix?: ReactNode;
   suffix?: ReactNode;
   variant?: 'default' | 'outlined' | 'filled';
@@ -156,7 +156,7 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
     return (
       <div className={`${containerClassName}`}>
         {(label || hint) && (
-          <div>
+          <div className="flex justify-between items-center mb-2">
             {label && (
               <Label
                 htmlFor={id}
@@ -166,13 +166,12 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
                 success={success}
                 variant="default"
                 align="left"
-                className="mb-2"
               >
                 {label}
               </Label>
             )}
-            {hint && !label && (
-              <span className="ml-auto text-xs text-gray-500 dark:text-gray-400">{hint}</span>
+            {hint && (
+              <span className="text-xs text-gray-500 dark:text-gray-400">{hint}</span>
             )}
           </div>
         )}

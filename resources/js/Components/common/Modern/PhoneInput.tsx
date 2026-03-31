@@ -1,15 +1,16 @@
-import Select from '@/Components/common/Modern/Select';
-import Input from '@/Components/common/Modern/Input';
-import { getCountries, getCountryCallingCode, parsePhoneNumber, isPossiblePhoneNumber, isValidPhoneNumber } from 'libphonenumber-js';
+import { getCountryCallingCode, parsePhoneNumber, isPossiblePhoneNumber, isValidPhoneNumber } from 'libphonenumber-js';
 import type { CountryCode } from 'libphonenumber-js';
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Phone, CheckCircle, TriangleAlert } from 'lucide-react';
+import { CheckCircle, TriangleAlert } from 'lucide-react';
+import Select from '@/Components/common/Modern/Select';
 
 interface PhoneInputProps {
   value?: string;
   onChange: (value: string) => void;
-  error?: string;
+  error?: string | undefined;
+  success?: string | undefined;
+  hint?: string | undefined;
   disabled?: boolean;
   label?: string;
   placeholder?: string;
@@ -46,14 +47,7 @@ const COUNTRY_NAMES: Record<string, string> = {
   ES: 'España',
 };
 
-// Componente de bandera
-const FlagEmoji = ({ countryCode }: { countryCode: string }) => {
-  const codePoints = countryCode
-    .toUpperCase()
-    .split('')
-    .map((char) => 127397 + char.charCodeAt(0));
-  return <span className="text-xl leading-none">{String.fromCodePoint(...codePoints)}</span>;
-};
+
 
 export default function PhoneInput({
   value = '',

@@ -1,15 +1,13 @@
-import Button from '@/Components/common/Modern/Button';
 import Input from '@/Components/common/Modern/Input';
 import Textarea from '@/Components/common/Modern/Textarea';
 import PhoneInput from '@/Components/common/Modern/PhoneInput';
-import ConnectedAccounts from '@/Components/profile/Partials/ConnectedAccounts';
 import AvatarSettings from '@/Pages/Profile/AvatarSettings';
 import { useUser } from '@/Hooks/useUser';
 import { Link } from '@inertiajs/react';
 import { CheckCircle, Mail, MailWarning, Send, User as UserIcon } from 'lucide-react';
 import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { CountryCode } from 'libphonenumber-js';
+import type { CountryCode } from 'libphonenumber-js';
 
 // List of supported countries (LatAm + US + España)
 const SUPPORTED_COUNTRIES: CountryCode[] = [
@@ -53,7 +51,7 @@ export default function UpdateProfileInformation({
 }: UpdateProfileInformationProps) {
   const { t } = useTranslation();
 
-  const { register, handleSubmit, errors, isSubmitting, hasChanges, user, control } =
+  const { register, handleSubmit, errors, isSubmitting, user, control } =
     useUser(initialUser);
 
   return (

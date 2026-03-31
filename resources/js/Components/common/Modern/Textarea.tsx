@@ -1,6 +1,7 @@
 import Label from '@/Components/common/Modern/Label';
 import { CheckCircle, TriangleAlert } from 'lucide-react';
-import { TextareaHTMLAttributes, isValidElement, useState } from 'react';
+import { isValidElement, useState } from 'react';
+import type { TextareaHTMLAttributes } from 'react';
 import type { FieldValues, Path, UseFormRegister } from 'react-hook-form';
 
 interface TextareaProps<T extends FieldValues = FieldValues> extends Omit<
@@ -9,13 +10,13 @@ interface TextareaProps<T extends FieldValues = FieldValues> extends Omit<
 > {
   id: string;
   label?: string;
-  error?: string;
-  success?: string;
+  error?: string | undefined;
+  success?: string | undefined;
+  hint?: string | undefined;
   register?: UseFormRegister<T>;
   name?: Path<T>;
   containerClassName?: string;
   icon?: any;
-  hint?: string;
   size?: 'sm' | 'md' | 'lg';
   variant?: 'default' | 'outlined' | 'filled';
   required?: boolean;
@@ -37,7 +38,6 @@ export default function Textarea<T extends FieldValues>({
   className = '',
   containerClassName = '',
   icon: Icon,
-  hint,
   size = 'md',
   variant = 'default',
   required = false,
