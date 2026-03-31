@@ -221,57 +221,61 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
                       }}
                       className="flex h-full w-full items-center justify-center"
                     >
-                      {mediaFiles[currentMediaIndex].file_type.startsWith('image/') ? (
-                        <div className="relative max-h-[600px] max-w-full">
-                          <img
-                            src={mediaFiles[currentMediaIndex].file_path}
-                            alt={`Preview ${currentMediaIndex + 1}`}
-                            loading="lazy"
-                            className="max-h-[600px] max-w-full object-contain transition-all duration-500 group-hover:scale-[1.02]"
-                            onError={(e) => {
-                              const target = e.currentTarget;
-                              target.style.display = 'none';
-                              const parent = target.parentElement;
-                              if (parent) {
-                                const fallback = document.createElement('div');
-                                fallback.className =
-                                  'flex flex-col items-center gap-4 p-12 text-center text-neutral-400';
-                                fallback.innerHTML = `
+                      {(() => {
+                        const currentFile = mediaFiles[currentMediaIndex];
+                        if (!currentFile) return null;
+                        return currentFile.file_type.startsWith('image/') ? (
+                          <div className="relative max-h-[600px] max-w-full">
+                            <img
+                              src={currentFile.file_path}
+                              alt={`Preview ${currentMediaIndex + 1}`}
+                              loading="lazy"
+                              className="max-h-[600px] max-w-full object-contain transition-all duration-500 group-hover:scale-[1.02]"
+                              onError={(e) => {
+                                const target = e.currentTarget;
+                                target.style.display = 'none';
+                                const parent = target.parentElement;
+                                if (parent) {
+                                  const fallback = document.createElement('div');
+                                  fallback.className =
+                                    'flex flex-col items-center gap-4 p-12 text-center text-neutral-400';
+                                  fallback.innerHTML = `
                                   <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                   </svg>
                                   <p class="text-sm font-medium">Error al cargar la imagen</p>
                                 `;
-                                parent.appendChild(fallback);
-                              }
-                            }}
-                          />
-                        </div>
-                      ) : mediaFiles[currentMediaIndex].file_type.startsWith('video/') ? (
-                        <video
-                          src={mediaFiles[currentMediaIndex].file_path}
-                          controls
-                          preload="metadata"
-                          className="max-h-[600px] max-w-full object-contain"
-                        >
-                          Tu navegador no soporta la reproducción de video.
-                        </video>
-                      ) : (
-                        <div className="flex flex-col items-center gap-4 p-12 text-center">
-                          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 dark:bg-zinc-700">
-                            <AlertCircle className="h-8 w-8 text-gray-400" />
+                                  parent.appendChild(fallback);
+                                }
+                              }}
+                            />
                           </div>
-                          <div>
-                            <p className="font-bold text-gray-900 dark:text-white">
-                              Vista previa limitada
-                            </p>
-                            <p className="mt-1 text-sm text-gray-400">
-                              Este archivo de tipo "{mediaFiles[currentMediaIndex].file_type}" se
-                              procesará para el canal final.
-                            </p>
+                        ) : currentFile.file_type.startsWith('video/') ? (
+                          <video
+                            src={currentFile.file_path}
+                            controls
+                            preload="metadata"
+                            className="max-h-[600px] max-w-full object-contain"
+                          >
+                            Tu navegador no soporta la reproducción de video.
+                          </video>
+                        ) : (
+                          <div className="flex flex-col items-center gap-4 p-12 text-center">
+                            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 dark:bg-zinc-700">
+                              <AlertCircle className="h-8 w-8 text-gray-400" />
+                            </div>
+                            <div>
+                              <p className="font-bold text-gray-900 dark:text-white">
+                                Vista previa limitada
+                              </p>
+                              <p className="mt-1 text-sm text-gray-400">
+                                Este archivo de tipo "{currentFile.file_type}" se procesará para el
+                                canal final.
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        );
+                      })()}
                     </motion.div>
                   </AnimatePresence>
 
