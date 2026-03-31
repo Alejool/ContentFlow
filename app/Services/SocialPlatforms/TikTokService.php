@@ -526,4 +526,50 @@ class TikTokService extends BaseSocialService
       return $e->getMessage();
     }
   }
+
+  /**
+   * Check if content still exists on TikTok
+   *
+   * @param string $postId TikTok video ID
+   * @return array ['exists' => bool, 'reason' => string|null, 'metrics' => array|null]
+   */
+  public function checkContentStatus(string $postId): array
+  {
+    try {
+      $this->ensureValidToken();
+
+      // TikTok uses publish_id for status checks
+      $statusData = $this->checkVideoStatus($postId);
+
+      if (isset($statusData['status']) && $statusData['status'] === 'PUBLISH_COMPLETE') {
+        return [
+          'exists' => true,
+          'metrics' => $statusData['metrics'] ?? null,
+        ];
+      }
+
+      if (isset($statusData['status']) && in_array($statusData['status'], ['FAILED', 'DELETED'])) {
+        return [
+          'exists' => false,
+          'reason' => 'Video ' . strtolower($statusData['status']) . ' on TikTok',
+        ];
+      }
+
+      return [
+        'exists' => false,
+        'reason' => 'Video not found on TikTok',
+      ];
+    } catch (\Exception $e) {
+      Log::error('TikTok checkContentStatus failed', [
+        'post_id' => $postId,
+        'error' => $e->getMessage()
+      ]);
+
+      return [
+        'exists' => false,
+        'reason' => 'Error checking video status: ' . $e->getMessage(),
+      ];
+    }
+  }
 }
+

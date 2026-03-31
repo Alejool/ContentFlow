@@ -1816,4 +1816,64 @@ class FacebookService extends BaseSocialService
       return $e->getMessage();
     }
   }
+
+  /**
+   * Check if content still exists on Facebook
+   *
+   * @param string $postId Facebook post ID
+   * @return array ['exists' => bool, 'reason' => string|null, 'metrics' => array|null]
+   */
+  public function checkContentStatus(string $postId): array
+  {
+    try {
+      $this->ensureValidToken();
+
+      $response = $this->client->get("https://graph.facebook.com/" . self::API_VERSION . "/{$postId}", [
+        'query' => [
+          'fields' => 'id,message,created_time,reactions.summary(true),comments.summary(true),shares',
+          'access_token' => $this->accessToken,
+        ],
+      ]);
+
+      $data = json_decode($response->getBody(), true);
+
+      if (isset($data['id'])) {
+        return [
+          'exists' => true,
+          'metrics' => [
+            'likes' => $data['reactions']['summary']['total_count'] ?? 0,
+            'comments' => $data['comments']['summary']['total_count'] ?? 0,
+            'shares' => $data['shares']['count'] ?? 0,
+          ],
+        ];
+      }
+
+      return [
+        'exists' => false,
+        'reason' => 'Content not found on Facebook',
+      ];
+    } catch (ClientException $e) {
+      $statusCode = $e->getResponse()->getStatusCode();
+
+      if ($statusCode === 404 || $statusCode === 400) {
+        return [
+          'exists' => false,
+          'reason' => 'Content deleted or no longer accessible',
+        ];
+      }
+
+      throw $e;
+    } catch (\Exception $e) {
+      Log::error('Facebook checkContentStatus failed', [
+        'post_id' => $postId,
+        'error' => $e->getMessage()
+      ]);
+
+      return [
+        'exists' => false,
+        'reason' => 'Error checking content status: ' . $e->getMessage(),
+      ];
+    }
+  }
 }
+

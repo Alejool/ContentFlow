@@ -5,6 +5,8 @@ namespace App\Services\SocialPlatforms;
 use App\DTOs\SocialPostDTO;
 use App\DTOs\PostResultDTO;
 use App\Helpers\LogHelper;
+use GuzzleHttp\Exception\ClientException;
+use Illuminate\Support\Facades\Log;
 
 class ThreadsService extends BaseSocialService
 {
@@ -404,4 +406,63 @@ class ThreadsService extends BaseSocialService
       return $e->getMessage();
     }
   }
+
+  /**
+   * Check if content still exists on Threads
+   *
+   * @param string $postId Threads media ID
+   * @return array ['exists' => bool, 'reason' => string|null, 'metrics' => array|null]
+   */
+  public function checkContentStatus(string $postId): array
+  {
+    try {
+      $this->ensureValidToken();
+
+      $response = $this->client->get("https://graph.threads.net/v1.0/{$postId}", [
+        'query' => [
+          'fields' => 'id,text,timestamp,like_count,reply_count',
+          'access_token' => $this->accessToken,
+        ],
+      ]);
+
+      $data = json_decode($response->getBody(), true);
+
+      if (isset($data['id'])) {
+        return [
+          'exists' => true,
+          'metrics' => [
+            'likes' => $data['like_count'] ?? 0,
+            'replies' => $data['reply_count'] ?? 0,
+          ],
+        ];
+      }
+
+      return [
+        'exists' => false,
+        'reason' => 'Content not found on Threads',
+      ];
+    } catch (ClientException $e) {
+      $statusCode = $e->getResponse()->getStatusCode();
+
+      if ($statusCode === 404 || $statusCode === 400) {
+        return [
+          'exists' => false,
+          'reason' => 'Content deleted or no longer accessible',
+        ];
+      }
+
+      throw $e;
+    } catch (\Exception $e) {
+      Log::error('Threads checkContentStatus failed', [
+        'post_id' => $postId,
+        'error' => $e->getMessage()
+      ]);
+
+      return [
+        'exists' => false,
+        'reason' => 'Error checking content status: ' . $e->getMessage(),
+      ];
+    }
+  }
 }
+

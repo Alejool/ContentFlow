@@ -1120,4 +1120,69 @@ class TwitterService extends BaseSocialService
 
     return [];
   }
+
+  /**
+   * Check if content still exists on Twitter/X
+   *
+   * @param string $postId Twitter tweet ID
+   * @return array ['exists' => bool, 'reason' => string|null, 'metrics' => array|null]
+   */
+  public function checkContentStatus(string $postId): array
+  {
+    try {
+      $this->ensureValidToken();
+
+      $response = $this->client->get("https://api.twitter.com/2/tweets/{$postId}", [
+        'headers' => [
+          'Authorization' => "Bearer {$this->accessToken}",
+        ],
+        'query' => [
+          'tweet.fields' => 'public_metrics,created_at',
+        ],
+      ]);
+
+      $data = json_decode($response->getBody(), true);
+
+      if (isset($data['data']['id'])) {
+        $metrics = $data['data']['public_metrics'] ?? [];
+
+        return [
+          'exists' => true,
+          'metrics' => [
+            'likes' => $metrics['like_count'] ?? 0,
+            'retweets' => $metrics['retweet_count'] ?? 0,
+            'replies' => $metrics['reply_count'] ?? 0,
+            'views' => $metrics['impression_count'] ?? 0,
+          ],
+        ];
+      }
+
+      return [
+        'exists' => false,
+        'reason' => 'Tweet not found on Twitter/X',
+      ];
+    } catch (ClientException $e) {
+      $statusCode = $e->getResponse()->getStatusCode();
+
+      if ($statusCode === 404) {
+        return [
+          'exists' => false,
+          'reason' => 'Tweet deleted or no longer accessible',
+        ];
+      }
+
+      throw $e;
+    } catch (\Exception $e) {
+      Log::error('Twitter checkContentStatus failed', [
+        'post_id' => $postId,
+        'error' => $e->getMessage()
+      ]);
+
+      return [
+        'exists' => false,
+        'reason' => 'Error checking tweet status: ' . $e->getMessage(),
+      ];
+    }
+  }
 }
+

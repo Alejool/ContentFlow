@@ -4,6 +4,8 @@ namespace App\Services\SocialPlatforms;
 
 use App\DTOs\SocialPostDTO;
 use App\DTOs\PostResultDTO;
+use GuzzleHttp\Exception\ClientException;
+use Illuminate\Support\Facades\Log;
 
 class InstagramService extends BaseSocialService
 {
@@ -467,4 +469,63 @@ class InstagramService extends BaseSocialService
       return $e->getMessage();
     }
   }
+
+  /**
+   * Check if content still exists on Instagram
+   *
+   * @param string $postId Instagram media ID
+   * @return array ['exists' => bool, 'reason' => string|null, 'metrics' => array|null]
+   */
+  public function checkContentStatus(string $postId): array
+  {
+    try {
+      $this->ensureValidToken();
+
+      $response = $this->client->get("https://graph.facebook.com/v18.0/{$postId}", [
+        'query' => [
+          'fields' => 'id,media_type,like_count,comments_count,timestamp',
+          'access_token' => $this->accessToken,
+        ],
+      ]);
+
+      $data = json_decode($response->getBody(), true);
+
+      if (isset($data['id'])) {
+        return [
+          'exists' => true,
+          'metrics' => [
+            'likes' => $data['like_count'] ?? 0,
+            'comments' => $data['comments_count'] ?? 0,
+          ],
+        ];
+      }
+
+      return [
+        'exists' => false,
+        'reason' => 'Content not found on Instagram',
+      ];
+    } catch (ClientException $e) {
+      $statusCode = $e->getResponse()->getStatusCode();
+
+      if ($statusCode === 404 || $statusCode === 400) {
+        return [
+          'exists' => false,
+          'reason' => 'Content deleted or no longer accessible',
+        ];
+      }
+
+      throw $e;
+    } catch (\Exception $e) {
+      Log::error('Instagram checkContentStatus failed', [
+        'post_id' => $postId,
+        'error' => $e->getMessage()
+      ]);
+
+      return [
+        'exists' => false,
+        'reason' => 'Error checking content status: ' . $e->getMessage(),
+      ];
+    }
+  }
 }
+
