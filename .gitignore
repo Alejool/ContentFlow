@@ -24,6 +24,7 @@ yarn-error.log
 .env.production
 .env.local
 .env.docker
+.env.demo
 database.sqlite
 backups/*.sql
 dump.sql
