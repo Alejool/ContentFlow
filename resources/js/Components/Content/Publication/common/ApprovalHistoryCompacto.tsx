@@ -82,14 +82,14 @@ const ApprovalHistoryCompacto = ({
               <span className="font-medium text-gray-900 dark:text-white">
                 {t('approvals.historyTitle')}
               </span>
-                  {latestLog && (
-                    <span
-                      className={`flex items-center gap-1 rounded-full px-2 py-1 text-xs ${getStatusColor(latestLog.action || 'pending')}`}
-                    >
-                      {getStatusIcon(latestLog.action || 'pending')}
-                      {getStatusText(latestLog.action || 'pending')}
-                    </span>
-                  )}
+              {latestLog && (
+                <span
+                  className={`flex items-center gap-1 rounded-full px-2 py-1 text-xs ${getStatusColor(latestLog.action || 'pending')}`}
+                >
+                  {getStatusIcon(latestLog.action || 'pending')}
+                  {getStatusText(latestLog.action || 'pending')}
+                </span>
+              )}
             </div>
           </div>
         </div>

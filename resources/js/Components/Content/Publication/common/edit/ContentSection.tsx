@@ -79,7 +79,7 @@ const ContentSection = memo(
             {...(disabled !== undefined && { disabled })}
           />
         </div>
-        <div className='space-y-4'>
+        <div className="space-y-4">
           {shouldShowTitle && (
             <Input
               id="title"

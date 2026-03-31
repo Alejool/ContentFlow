@@ -3,15 +3,7 @@ import { queryKeys } from '@/lib/queryKeys';
 import { formatDateTimeStyled } from '@/Utils/dateHelpers';
 import { validateVideoDuration } from '@/Utils/validationUtils';
 import { useQueryClient } from '@tanstack/react-query';
-import {
-    AlertTriangle,
-    Check,
-    CheckCircle,
-    Clock,
-    Loader2,
-    X,
-    XCircle
-} from 'lucide-react';
+import { AlertTriangle, Check, CheckCircle, Clock, Loader2, X, XCircle } from 'lucide-react';
 import { memo } from 'react';
 import toast from 'react-hot-toast';
 
@@ -371,7 +363,7 @@ const PlatformCard = memo(
                     </div>
                     {upgradeMessage && (
                       <div className="mt-2 rounded-lg border border-red-200 bg-red-100 px-2 py-1 text-center text-[10px] font-medium text-red-700 dark:border-red-800 dark:bg-red-900/40 dark:text-red-400">
-                         {upgradeMessage}
+                        {upgradeMessage}
                       </div>
                     )}
                   </div>

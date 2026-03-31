@@ -100,10 +100,7 @@ export default function ApprovalHistorySection({
 
   // Filtrar solo logs de acciones completadas (approved, rejected)
   const completedLogs = useMemo(
-    () =>
-      logs.filter(
-        (log) => log.action === 'approved' || log.action === 'rejected',
-      ),
+    () => logs.filter((log) => log.action === 'approved' || log.action === 'rejected'),
     [logs],
   );
 
@@ -118,11 +115,11 @@ export default function ApprovalHistorySection({
       {hasActiveRequest && workflow && workflowSteps.length > 0 && (
         <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/50">
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-900 dark:text-gray-100">
               {t('approvals.workflow_status') || 'Estado del Flujo'}
             </h3>
             {workflow.name && (
-              <span className="rounded-full bg-primary-50 px-2.5 py-1 text-[10px] font-bold text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 border border-primary-100 dark:border-primary-800">
+              <span className="rounded-full border border-primary-100 bg-primary-50 px-2.5 py-1 text-[10px] font-bold text-primary-700 dark:border-primary-800 dark:bg-primary-900/30 dark:text-primary-400">
                 {workflow.name}
               </span>
             )}
@@ -175,7 +172,7 @@ export default function ApprovalHistorySection({
                       <div
                         className={`flex h-9 w-9 items-center justify-center rounded-full border-2 transition-all duration-300 ${
                           isCurrent
-                            ? 'border-primary-500 bg-primary-500 text-white shadow-[0_0_15px_rgba(var(--color-primary-500),0.4)] scale-110'
+                            ? 'scale-110 border-primary-500 bg-primary-500 text-white shadow-[0_0_15px_rgba(var(--color-primary-500),0.4)]'
                             : isPast || isCompleted
                               ? 'border-green-500 bg-green-500 text-white'
                               : 'border-gray-200 bg-white text-gray-400 dark:border-neutral-700 dark:bg-neutral-800'
@@ -194,14 +191,14 @@ export default function ApprovalHistorySection({
 
                   {/* Step Info */}
                   <div className="text-center">
-                    <div className="text-[11px] font-bold text-gray-900 dark:text-white line-clamp-1">
+                    <div className="line-clamp-1 text-[11px] font-bold text-gray-900 dark:text-white">
                       {step.name}
                     </div>
                     <div className="flex items-center justify-center gap-1 text-[10px] text-gray-500 dark:text-gray-400">
                       {step.user ? (
-                        <span className="truncate max-w-[80px]">{step.user.name}</span>
+                        <span className="max-w-[80px] truncate">{step.user.name}</span>
                       ) : (
-                        <span className="truncate max-w-[80px]">
+                        <span className="max-w-[80px] truncate">
                           {step.role?.name || t('approvals.no_role_assigned') || 'Sin rol'}
                         </span>
                       )}
@@ -236,7 +233,7 @@ export default function ApprovalHistorySection({
       {/* Approval History - Solo mostrar si hay logs completados */}
       {completedLogs.length > 0 && (
         <div className="space-y-4">
-          <h4 className="flex items-center gap-2 text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">
+          <h4 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-gray-900 dark:text-white">
             <Clock className="h-4 w-4 text-primary-500" />
             {t('approvals.historyTitle') || 'Historial de Aprobación'}
           </h4>

@@ -774,19 +774,21 @@ const EditPublicationModal = ({
                   )}
 
                   {/* Alerta: Publicación aprobada */}
-                  {publication?.status === 'approved' && !hasPublishedPlatform && !hasPublishingPlatform && (
-                    <AlertCard
-                      type="info"
-                      title={
-                        t('publications.modal.edit.approvedEditWarning') || 'Publicación Aprobada'
-                      }
-                      message={
-                        t('publications.modal.edit.approvedEditWarningHint') ||
-                        "Esta publicación ya fue aprobada. Si realizas cambios, volverá a estado 'Pendiente' y requerirá una nueva aprobación."
-                      }
-                      className="animate-in fade-in slide-in-from-top-4"
-                    />
-                  )}
+                  {publication?.status === 'approved' &&
+                    !hasPublishedPlatform &&
+                    !hasPublishingPlatform && (
+                      <AlertCard
+                        type="info"
+                        title={
+                          t('publications.modal.edit.approvedEditWarning') || 'Publicación Aprobada'
+                        }
+                        message={
+                          t('publications.modal.edit.approvedEditWarningHint') ||
+                          "Esta publicación ya fue aprobada. Si realizas cambios, volverá a estado 'Pendiente' y requerirá una nueva aprobación."
+                        }
+                        className="animate-in fade-in slide-in-from-top-4"
+                      />
+                    )}
 
                   {fieldVisibility.showMediaSection &&
                     (!isDataReady ? (
@@ -819,7 +821,9 @@ const EditPublicationModal = ({
                           setIsDragOver(false);
                           handleFileChange(e.dataTransfer.files);
                         }}
-                        disabled={hasPublishedPlatform || hasPublishingPlatform || isMediaSectionDisabled}
+                        disabled={
+                          hasPublishedPlatform || hasPublishingPlatform || isMediaSectionDisabled
+                        }
                         isAnyMediaProcessing={isAnyMediaProcessing}
                         uploadProgress={uploadProgress}
                         uploadStats={uploadStats}
@@ -855,7 +859,7 @@ const EditPublicationModal = ({
                 </div>
 
                 {/* ==================== SECCIÓN: CONTENIDO DE LA PUBLICACIÓN ==================== */}
-                <div className="space-y-2 mt-6">
+                <div className="mt-6 space-y-2">
                   <div className="flex items-center gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700">
                     <div className="h-5 w-1 rounded-full bg-primary-500"></div>
                     <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
@@ -868,7 +872,8 @@ const EditPublicationModal = ({
                       type="info"
                       title={
                         hasPublishingPlatform
-                          ? t('publications.modal.edit.contentPublishing') || 'Publicación en Proceso'
+                          ? t('publications.modal.edit.contentPublishing') ||
+                            'Publicación en Proceso'
                           : t('publications.modal.edit.contentLocked') || 'Contenido Bloqueado'
                       }
                       message={
@@ -892,7 +897,9 @@ const EditPublicationModal = ({
                     campaigns={campaigns}
                     publication={publication}
                     onHashtagChange={handleHashtagChange}
-                    disabled={hasPublishedPlatform || hasPublishingPlatform || isContentSectionDisabled}
+                    disabled={
+                      hasPublishedPlatform || hasPublishingPlatform || isContentSectionDisabled
+                    }
                     contentType={content_type}
                   />
 

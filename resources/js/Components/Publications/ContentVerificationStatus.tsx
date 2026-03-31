@@ -71,10 +71,10 @@ export default function ContentVerificationStatus({
   return (
     <div
       className={cn(
-        'inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-sm',
+        'inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm',
         config.bgColor,
         config.borderColor,
-        className
+        className,
       )}
     >
       <Icon className={cn('h-4 w-4', config.color)} />
