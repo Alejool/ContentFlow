@@ -245,7 +245,6 @@ interface UploadInput {
   tempId: string;
   context?: 'publication' | 'profile' | 'workspace'; // upload context for validation
 }
-}
 interface UploadResult {
   key: string;
   filename: string;
