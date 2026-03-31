@@ -46,6 +46,7 @@ return [
     'platforms' => [
         'facebook' => 'Facebook',
         'instagram' => 'Instagram',
+        'threads' => 'Threads',
         'tiktok' => 'TikTok',
         'youtube' => 'YouTube',
         'twitter' => 'Twitter',

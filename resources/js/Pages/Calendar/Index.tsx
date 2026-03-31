@@ -1,69 +1,49 @@
-import Button from "@/Components/common/Modern/Button";
-import { DynamicModal } from "@/Components/common/Modern/DynamicModal";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { formatTime } from "@/Utils/formatDate";
-import { Head } from "@inertiajs/react";
-import EmptyState from "@/Components/common/EmptyState";
-import { getEmptyStateByKey } from "@/Utils/emptyStateMapper";
-import {
-  eachDayOfInterval,
-  endOfMonth,
-  format,
-  isSameDay,
-  isSameMonth,
-  isToday,
-  parseISO,
-  startOfMonth,
-} from "date-fns";
-import {
-  Calendar as CalendarIcon,
-  Filter,
-  Loader2,
-  Trash2,
-} from "lucide-react";
-import React, { useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
-import { useTranslation } from "react-i18next";
-import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatformsConfig";
-import { CalendarViewSelector } from "@/Components/Calendar/CalendarViewSelector";
-import { CalendarNavigation } from "@/Components/Calendar/CalendarNavigation";
-import { MonthView } from "@/Components/Calendar/MonthView";
-import { WeekView } from "@/Components/Calendar/WeekView";
-import { DayView } from "@/Components/Calendar/DayView";
-import { FilterPanel } from "@/Components/Calendar/FilterPanel";
-import { EventDetailsModal } from "@/Components/Calendar/EventDetailsModal";
-import { CalendarEvent } from "@/types/calendar";
-import { useCampaignStore } from "@/stores/campaignStore";
+import { CalendarNavigation } from '@/Components/Calendar/CalendarNavigation';
+import { CalendarViewSelector } from '@/Components/Calendar/CalendarViewSelector';
+import { DayView } from '@/Components/Calendar/DayView';
+import { EventDetailsModal } from '@/Components/Calendar/EventDetailsModal';
+import { FilterPanel } from '@/Components/Calendar/FilterPanel';
+import { MonthView } from '@/Components/Calendar/MonthView';
+import { WeekView } from '@/Components/Calendar/WeekView';
+import EmptyState from '@/Components/common/EmptyState';
+import Button from '@/Components/common/Modern/Button';
+import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
+import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatformsConfig';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { useCampaignStore } from '@/stores/campaignStore';
+import { CalendarEvent } from '@/types/calendar';
+import { getEmptyStateByKey } from '@/Utils/emptyStateMapper';
+import { Head } from '@inertiajs/react';
+import { eachDayOfInterval, endOfMonth, startOfMonth } from 'date-fns';
+import { Calendar as CalendarIcon, Filter } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
-const PlatformIcon = ({
-  platform,
-  className,
-}: {
-  platform?: string;
-  className?: string;
-}) => {
+const PlatformIcon = ({ platform, className }: { platform?: string; className?: string }) => {
   const platformKey = platform?.toLowerCase();
-  
+
   // Handle user events
-  if (["user_event", "event", "events"].includes(platformKey || "")) {
+  if (['user_event', 'event', 'events'].includes(platformKey || '')) {
     return <CalendarIcon className={`text-primary-500 ${className}`} />;
   }
-  
+
   // Get platform config from SOCIAL_PLATFORMS
-  const platformConfig = platformKey && SOCIAL_PLATFORMS[platformKey as keyof typeof SOCIAL_PLATFORMS];
-  
+  const platformConfig =
+    platformKey && SOCIAL_PLATFORMS[platformKey as keyof typeof SOCIAL_PLATFORMS];
+
   if (platformConfig) {
     const Icon = platformConfig.icon;
     return <Icon className={`${platformConfig.textColor} ${className}`} />;
   }
-  
+
   // Fallback for unknown platforms
   return <CalendarIcon className={`text-gray-500 ${className}`} />;
 };
 
-import { useCalendarStore } from "@/stores/calendarStore";
-import { useShallow } from "zustand/react/shallow";
-import { BulkActionsBar } from "@/Components/Calendar/BulkActionsBar";
+import { BulkActionsBar } from '@/Components/Calendar/BulkActionsBar';
+import { useCalendarStore } from '@/stores/calendarStore';
+import { useShallow } from 'zustand/react/shallow';
 
 export default function CalendarIndex({ auth }: { auth: any }) {
   const { t, i18n } = useTranslation();
@@ -136,9 +116,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
   );
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [eventToDelete, setEventToDelete] = useState<CalendarEvent | null>(
-    null,
-  );
+  const [eventToDelete, setEventToDelete] = useState<CalendarEvent | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [showEventDetailsModal, setShowEventDetailsModal] = useState(false);
 
@@ -180,9 +158,9 @@ export default function CalendarIndex({ auth }: { auth: any }) {
 
     const success = await deleteEvent(eventToDelete.id);
     if (success) {
-      toast.success(t("calendar.userEvents.modal.messages.successDelete"));
+      toast.success(t('calendar.userEvents.modal.messages.successDelete'));
     } else {
-      toast.error(t("calendar.userEvents.modal.messages.errorDelete"));
+      toast.error(t('calendar.userEvents.modal.messages.errorDelete'));
     }
     setShowDeleteModal(false);
     setEventToDelete(null);
@@ -197,17 +175,17 @@ export default function CalendarIndex({ auth }: { auth: any }) {
   const handleUpdateEventDate = async (eventId: string, newDate: Date) => {
     // Check if dropping to a past date
     const now = new Date();
-    
+
     if (newDate < now) {
       const confirmed = window.confirm(
-        t('calendar.warnings.pastDate') || 
-        '¿Estás seguro de que quieres mover este evento a una fecha/hora pasada?'
+        t('calendar.warnings.pastDate') ||
+          '¿Estás seguro de que quieres mover este evento a una fecha/hora pasada?',
       );
       if (!confirmed) {
         throw new Error('User cancelled');
       }
     }
-    
+
     const success = await updateEvent(eventId, newDate.toISOString(), '');
     if (success) {
       toast.success(t('calendar.messages.eventUpdated') || 'Evento actualizado');
@@ -218,21 +196,21 @@ export default function CalendarIndex({ auth }: { auth: any }) {
   };
 
   const platforms = [
-    "all",
-    "events",
-    "instagram",
-    "facebook",
-    "twitter",
-    "linkedin",
-    "youtube",
-    "tiktok",
+    'all',
+    'events',
+    'instagram',
+    'facebook',
+    'twitter',
+    'linkedin',
+    'youtube',
+    'tiktok',
   ];
 
   return (
     <AuthenticatedLayout
       user={auth.user}
       header={
-        <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+        <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
           Planificador
         </h2>
       }
@@ -240,11 +218,11 @@ export default function CalendarIndex({ auth }: { auth: any }) {
       <Head title="Planificador de Contenido" />
 
       <div className="py-8">
-        <div className="max-w-[1600px] mx-auto sm:px-6 lg:px-8">
-          <div className="bg-white dark:bg-black overflow-hidden shadow-xl sm:rounded-lg border border-gray-100 dark:border-gray-800">
+        <div className="mx-auto max-w-[1600px] sm:px-6 lg:px-8">
+          <div className="overflow-hidden border border-gray-100 bg-white shadow-xl dark:border-gray-800 dark:bg-black sm:rounded-lg">
             <div className="p-6">
               {/* Toolbar */}
-              <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-6">
+              <div className="mb-8 flex flex-col items-center justify-between gap-6 md:flex-row">
                 {/* Calendar Navigation */}
                 <CalendarNavigation
                   currentDate={currentDate}
@@ -256,34 +234,31 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                   isLoading={loading}
                 />
 
-                <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-center md:justify-end">
+                <div className="flex w-full flex-wrap items-center justify-center gap-3 md:w-auto md:justify-end">
                   {/* View Selector */}
-                  <CalendarViewSelector
-                    currentView={view}
-                    onViewChange={setView}
-                  />
+                  <CalendarViewSelector currentView={view} onViewChange={setView} />
 
-                  <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1 mr-2 flex-wrap gap-1">
+                  <div className="mr-2 flex flex-wrap items-center gap-1 rounded-lg bg-gray-100 p-1 dark:bg-gray-800">
                     {platforms.map((p) => (
                       <button
                         key={p}
                         onClick={() => setPlatformFilter(p)}
-                        className={`p-2 rounded-md transition-all flex items-center gap-2 ${platformFilter === p ? "bg-white dark:bg-gray-700 shadow text-primary-600" : "text-gray-400 hover:text-gray-600"}`}
+                        className={`flex items-center gap-2 rounded-md p-2 transition-all ${platformFilter === p ? 'bg-white text-primary-600 shadow dark:bg-gray-700' : 'text-gray-400 hover:text-gray-600'}`}
                         title={p}
                       >
-                        {p === "all" ? (
-                          <Filter className="w-4 h-4" />
+                        {p === 'all' ? (
+                          <Filter className="h-4 w-4" />
                         ) : (
                           <PlatformIcon
-                            platform={p === "events" ? "user_event" : p}
-                            className="w-4 h-4"
+                            platform={p === 'events' ? 'user_event' : p}
+                            className="h-4 w-4"
                           />
                         )}
-                        <span className="text-xs font-medium hidden lg:inline capitalize">
-                          {p === "all"
-                            ? t("calendar.filters.all")
-                            : p === "events"
-                              ? t("calendar.filters.events")
+                        <span className="hidden text-xs font-medium capitalize lg:inline">
+                          {p === 'all'
+                            ? t('calendar.filters.all')
+                            : p === 'events'
+                              ? t('calendar.filters.events')
                               : p}
                         </span>
                       </button>
@@ -318,23 +293,27 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                         now.setHours(0, 0, 0, 0);
                         const targetDate = new Date(newDate);
                         targetDate.setHours(0, 0, 0, 0);
-                        
+
                         if (targetDate < now) {
                           // Show warning for past date
                           const confirmed = window.confirm(
-                            t('calendar.warnings.pastDate') || 
-                            '¿Estás seguro de que quieres mover este evento a una fecha pasada?'
+                            t('calendar.warnings.pastDate') ||
+                              '¿Estás seguro de que quieres mover este evento a una fecha pasada?',
                           );
                           if (!confirmed) {
                             return; // Cancel the drop
                           }
                         }
-                        
+
                         const success = await updateEvent(eventId, newDate.toISOString(), '');
                         if (success) {
-                          toast.success(t('calendar.messages.eventUpdated') || 'Evento actualizado');
+                          toast.success(
+                            t('calendar.messages.eventUpdated') || 'Evento actualizado',
+                          );
                         } else {
-                          toast.error(t('calendar.messages.updateFailed') || 'Error al actualizar evento');
+                          toast.error(
+                            t('calendar.messages.updateFailed') || 'Error al actualizar evento',
+                          );
                         }
                       }}
                       onEventDelete={handleDeleteEvent}
@@ -346,7 +325,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                       t={t}
                     />
                   )}
-                  
+
                   {view === 'week' && (
                     <WeekView
                       currentDate={currentDate}
@@ -354,22 +333,30 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                       onEventDrop={async (event, newDate) => {
                         // Check if dropping to a past date/time
                         const now = new Date();
-                        
+
                         if (newDate < now) {
                           const confirmed = window.confirm(
-                            t('calendar.warnings.pastDate') || 
-                            '¿Estás seguro de que quieres mover este evento a una fecha/hora pasada?'
+                            t('calendar.warnings.pastDate') ||
+                              '¿Estás seguro de que quieres mover este evento a una fecha/hora pasada?',
                           );
                           if (!confirmed) {
                             return;
                           }
                         }
-                        
-                        const success = await updateEvent(event.id, newDate.toISOString(), event.type);
+
+                        const success = await updateEvent(
+                          event.id,
+                          newDate.toISOString(),
+                          event.type,
+                        );
                         if (success) {
-                          toast.success(t('calendar.messages.eventUpdated') || 'Evento actualizado');
+                          toast.success(
+                            t('calendar.messages.eventUpdated') || 'Evento actualizado',
+                          );
                         } else {
-                          toast.error(t('calendar.messages.updateFailed') || 'Error al actualizar evento');
+                          toast.error(
+                            t('calendar.messages.updateFailed') || 'Error al actualizar evento',
+                          );
                         }
                       }}
                       onEventClick={handleEventClick}
@@ -378,7 +365,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                       PlatformIcon={PlatformIcon}
                     />
                   )}
-                  
+
                   {view === 'day' && (
                     <DayView
                       currentDate={currentDate}
@@ -386,22 +373,30 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                       onEventDrop={async (event, newDate) => {
                         // Check if dropping to a past date/time
                         const now = new Date();
-                        
+
                         if (newDate < now) {
                           const confirmed = window.confirm(
-                            t('calendar.warnings.pastDate') || 
-                            '¿Estás seguro de que quieres mover este evento a una fecha/hora pasada?'
+                            t('calendar.warnings.pastDate') ||
+                              '¿Estás seguro de que quieres mover este evento a una fecha/hora pasada?',
                           );
                           if (!confirmed) {
                             return;
                           }
                         }
-                        
-                        const success = await updateEvent(event.id, newDate.toISOString(), event.type);
+
+                        const success = await updateEvent(
+                          event.id,
+                          newDate.toISOString(),
+                          event.type,
+                        );
                         if (success) {
-                          toast.success(t('calendar.messages.eventUpdated') || 'Evento actualizado');
+                          toast.success(
+                            t('calendar.messages.eventUpdated') || 'Evento actualizado',
+                          );
                         } else {
-                          toast.error(t('calendar.messages.updateFailed') || 'Error al actualizar evento');
+                          toast.error(
+                            t('calendar.messages.updateFailed') || 'Error al actualizar evento',
+                          );
                         }
                       }}
                       onEventClick={handleEventClick}
@@ -425,15 +420,15 @@ export default function CalendarIndex({ auth }: { auth: any }) {
           setShowDeleteModal(false);
           setEventToDelete(null);
         }}
-        title={t("calendar.userEvents.modal.actions.delete")}
+        title={t('calendar.userEvents.modal.actions.delete')}
         size="md"
       >
         <div className="space-y-4">
           <p className="text-gray-600 dark:text-gray-300">
-            {t("calendar.userEvents.modal.actions.deleteConfirm")}
+            {t('calendar.userEvents.modal.actions.deleteConfirm')}
           </p>
 
-          <div className="flex justify-end gap-3 mt-6">
+          <div className="mt-6 flex justify-end gap-3">
             <Button
               variant="secondary"
               onClick={() => {
@@ -441,10 +436,10 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                 setEventToDelete(null);
               }}
             >
-              {t("calendar.userEvents.modal.actions.cancel")}
+              {t('calendar.userEvents.modal.actions.cancel')}
             </Button>
             <Button variant="danger" onClick={confirmDelete}>
-              {t("calendar.userEvents.modal.actions.delete")}
+              {t('calendar.userEvents.modal.actions.delete')}
             </Button>
           </div>
         </div>
@@ -481,10 +476,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
         onClearSelection={clearSelection}
         onSelectAll={selectAll}
         onBulkMove={async (newDate) => {
-          const success = await bulkUpdateEvents(
-            Array.from(selectedEvents),
-            newDate.toISOString()
-          );
+          const success = await bulkUpdateEvents(Array.from(selectedEvents), newDate.toISOString());
           if (success) {
             toast.success(`${selectedEvents.size} eventos movidos exitosamente`);
           } else {
@@ -502,9 +494,9 @@ export default function CalendarIndex({ auth }: { auth: any }) {
         onUndo={async () => {
           const success = await undoBulkOperation();
           if (success) {
-            toast.success('Operación deshecha exitosamente');
+            toast.success(t('calendar.bulkActions.undoSuccess'));
           } else {
-            toast.error('Error al deshacer operación');
+            toast.error(t('calendar.bulkActions.undoError'));
           }
         }}
         canUndo={canUndo && isUndoAvailable()}

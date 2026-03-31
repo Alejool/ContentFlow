@@ -1,4 +1,4 @@
-﻿{
+{
   "platformSettings": {
     "status": "Estado",
     "save": "Guardar Cambios",
@@ -11,8 +11,8 @@
     "configure": "Configurar red",
     "configureAll": "Configurar todas",
     "messages": {
-      "success": "Configuración guardada exitosamente ",
-      "error": "Error al guardar la configuración "
+      "success": "Configuración guardada exitosamente",
+      "error": "Error al guardar la configuración"
     },
     "preview": {
       "view": "Ver vista previa"

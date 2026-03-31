@@ -1,148 +1,254 @@
-# 🚀 Desarrollo Rápido con Docker + Octane
+# ContentFlow - Guía de Desarrollo
 
-## ⚡ Inicio Rápido
+## 🚀 Inicio Rápido
 
-### Windows
+### Opción 1: Comando único
 ```bash
-dev-start.bat
+make dev-setup
 ```
 
-### Linux/Mac
+### Opción 2: Paso a paso
 ```bash
-chmod +x dev-start.sh
-./dev-start.sh
+# 1. Iniciar servicios
+make dev-up
+
+# 2. Instalar dependencias
+make dev-install
+
+# 3. Configurar aplicación
+make dev-artisan cmd="key:generate"
+make dev-migrate
+
+# 4. Ver URLs disponibles
+make dev-urls
 ```
 
-## 🎯 Características
+## 🔧 Comandos Principales
 
-### ✅ Hot Reload Ultra-Rápido
-- **Laravel Octane (Swoole)**: Servidor de alto rendimiento con `--watch` activado
-- **Vite HMR**: Hot Module Replacement instantáneo para React
-- **Volúmenes optimizados**: Uso de `cached` para mejor performance en Windows/Mac
-
-### 💓 Indicador de Estado en Tiempo Real
-El sistema incluye un **indicador visual** en la esquina inferior derecha que muestra:
-- ✅ **Verde**: Sistema actualizado y funcionando
-- 🔄 **Rojo**: Reconectando o servicios caídos
-- Actualización cada 5 segundos
-
-### 🔍 Health Check Endpoint
+### Gestión de Servicios
 ```bash
-curl http://localhost/api/health
+make dev-up          # Iniciar todos los servicios
+make dev-down        # Detener todos los servicios
+make dev-restart     # Reiniciar servicios principales
+make dev-status      # Ver estado de contenedores
+make dev-logs        # Ver logs en tiempo real
 ```
 
-Respuesta:
-```json
-{
-  "status": "ok",
-  "timestamp": "2024-01-15T10:30:00Z",
-  "deployment": 1705315800,
-  "services": {
-    "database": true,
-    "redis": true,
-    "octane": true
-  },
-  "version": "1.0.0"
-}
+### Desarrollo
+```bash
+make dev-shell       # Acceder al contenedor
+make dev-artisan cmd="migrate"     # Ejecutar Artisan
+make dev-composer cmd="require package"  # Composer
+make dev-npm cmd="install"         # NPM
+make dev-tinker      # Laravel Tinker
 ```
 
-## 📊 Servicios Disponibles
+### Base de Datos
+```bash
+make dev-migrate     # Ejecutar migraciones
+make dev-fresh       # Recrear DB con seeders (⚠️ destructivo)
+make dev-psql        # Conectar a PostgreSQL
+```
+
+### Testing
+```bash
+make dev-test                    # Todos los tests
+make dev-test filter="UserTest"  # Test específico
+make dev-coverage               # Con coverage
+```
+
+## 🌐 URLs de Desarrollo
 
 | Servicio | URL | Descripción |
 |----------|-----|-------------|
-| Aplicación | http://localhost | Laravel + React |
-| Vite HMR | http://localhost:5173 | Hot Module Replacement |
-| Health Check | http://localhost/api/health | Estado del sistema |
-| Reverb | ws://localhost:8081 | WebSocket real-time |
-| PostgreSQL | localhost:5432 | Base de datos |
-| Redis | localhost:6379 | Cache/Queue |
+| **Aplicación** | http://localhost | App principal |
+| **Vite HMR** | http://localhost:5173 | Hot Module Replacement |
+| **WebSocket** | ws://localhost:8081 | Reverb WebSockets |
+| **Redis Commander** | http://localhost:8082 | UI de Redis (con `--profile tools`) |
+| **Mailpit** | http://localhost:8025 | Captura de emails (con `--profile tools`) |
 
-## 🛠️ Comandos Útiles
-
-### Ver logs en tiempo real
+### Herramientas de Desarrollo
 ```bash
-docker-compose -f docker-compose.dev.yml logs -f
+# Iniciar herramientas adicionales
+make dev-tools-up
+
+# Detener herramientas
+make dev-tools-down
 ```
 
-### Ver logs de un servicio específico
+## 🔄 Diferencias con Producción
+
+### Dockerfile.dev vs Dockerfile
+- **Desarrollo**: Xdebug disponible, errores visibles, OPcache con revalidación
+- **Producción**: Optimizado, sin debugging, OPcache sin revalidación
+
+### docker-compose.dev.yml vs docker-compose.yml
+- **Desarrollo**: Mailpit para emails, Redis Commander siempre disponible
+- **Producción**: Servicios optimizados, herramientas en `--profile tools`
+
+### Configuración PHP
+- **Dev**: `display_errors=On`, `opcache.validate_timestamps=1`
+- **Prod**: `display_errors=Off`, `opcache.validate_timestamps=0`
+
+## 🔀 Cambiar Entre Entornos
+
+### Usando Makefile
 ```bash
-docker-compose -f docker-compose.dev.yml logs -f app
-docker-compose -f docker-compose.dev.yml logs -f vite
+make switch-to-dev   # Cambiar a desarrollo
+make switch-to-prod  # Cambiar a producción
 ```
 
-### Reiniciar un servicio
+### Usando script
 ```bash
-docker-compose -f docker-compose.dev.yml restart app
+bash scripts/switch-env.sh dev   # Desarrollo
+bash scripts/switch-env.sh prod  # Producción
 ```
 
-### Ejecutar comandos Artisan
+## 🐛 Debugging
+
+### Habilitar Xdebug
+1. Descomenta las líneas de Xdebug en `Dockerfile.dev`
+2. Reconstruye la imagen:
+   ```bash
+   make dev-rebuild
+   ```
+3. Configura tu IDE para escuchar en puerto 9003
+
+### Ver Logs Detallados
 ```bash
-docker-compose -f docker-compose.dev.yml exec app php artisan migrate
-docker-compose -f docker-compose.dev.yml exec app php artisan cache:clear
+make dev-logs-app     # Solo aplicación
+make dev-logs-queue   # Solo colas
+make dev-logs-reverb  # Solo WebSockets
 ```
 
-### Detener todo
+### Octane Hot Reload
+El contenedor `app` usa `--watch` automáticamente. Los cambios en PHP se reflejan sin reiniciar.
+
+Para recargar manualmente:
 ```bash
-docker-compose -f docker-compose.dev.yml down
+make dev-octane-reload
 ```
 
-### Limpiar todo (incluyendo volúmenes)
-```bash
-docker-compose -f docker-compose.dev.yml down -v
+## 📧 Emails en Desarrollo
+
+Mailpit captura todos los emails enviados:
+- **Web UI**: http://localhost:8025
+- **SMTP**: localhost:1025
+
+Configuración en `.env.docker.dev`:
+```env
+MAIL_HOST=mailpit
+MAIL_PORT=1025
 ```
 
-## 🔥 Optimizaciones Aplicadas
+## 🗄️ Base de Datos
 
-1. **Octane con Swoole**: 10x más rápido que PHP-FPM tradicional
-2. **Watch Mode**: Detecta cambios automáticamente sin reiniciar
-3. **Volúmenes cached**: Mejor performance en sistemas de archivos compartidos
-4. **Health checks optimizados**: Intervalos de 5s para detección rápida
-5. **Polling en Vite**: `CHOKIDAR_USEPOLLING=true` para Windows
-6. **Redis como cache**: Respuestas instantáneas
-
-## 🎨 Componente Visual
-
-El `SystemHealthIndicator` se muestra automáticamente en todas las páginas autenticadas y:
-- No requiere configuración adicional
-- Se actualiza cada 5 segundos
-- Muestra estado de servicios críticos
-- Indica cuando hay cambios en el deployment
-
-## 🐛 Troubleshooting
-
-### Los cambios no se reflejan
+### Conexión Directa
 ```bash
-# Reiniciar Octane
-docker-compose -f docker-compose.dev.yml restart app
+# Desde el host
+psql -h localhost -U contenflow -d ContentFlow
 
-# Limpiar caché
-docker-compose -f docker-compose.dev.yml exec app php artisan optimize:clear
+# Desde contenedor
+make dev-psql
 ```
 
-### Vite no conecta
+### Datos Compartidos
+Los volúmenes de PostgreSQL y Redis son compartidos entre dev y prod:
+- `contentflow_pgsql_data_shared`
+- `contentflow_redis_data_shared`
+
+## ⚡ Performance Tips
+
+### Volúmenes Nombrados
+Las dependencias usan volúmenes nombrados para mejor performance en Windows:
+- `cf_vendor_dev` - Composer packages
+- `cf_node_modules_dev` - NPM packages
+- `cf_public_build_dev` - Assets compilados
+
+### Bind Mounts
+Solo el código fuente usa bind mounts para hot-reload inmediato.
+
+## 🔧 Troubleshooting
+
+### Contenedor no inicia
 ```bash
-# Verificar que el puerto 5173 esté libre
-# Reiniciar Vite
-docker-compose -f docker-compose.dev.yml restart vite
+make dev-logs-app
 ```
 
-### Base de datos no conecta
+### Permisos de archivos
 ```bash
-# Ver logs de PostgreSQL
-docker-compose -f docker-compose.dev.yml logs pgsql
-
-# Verificar health check
-docker-compose -f docker-compose.dev.yml ps
+make dev-fix-permissions
 ```
 
-## 📈 Performance
+### Limpiar y empezar de cero
+```bash
+make dev-down
+make dev-rebuild
+make dev-setup
+```
 
-Con esta configuración deberías ver:
-- **Hot reload**: < 500ms
-- **Cambios PHP**: 1-2s (Octane watch)
-- **Cambios React**: Instantáneo (Vite HMR)
-- **Health check**: < 100ms
+### Puerto ocupado
+Si el puerto 80 está ocupado:
+```bash
+# Editar docker-compose.dev.yml
+ports:
+  - "8080:80"  # Usar puerto 8080
+```
 
----
+## 📁 Estructura de Archivos Dev
 
-**Nota**: Para producción, usa `docker-compose.yml` en lugar de `docker-compose.dev.yml`
+```
+├── docker-compose.dev.yml     # Orquestación desarrollo
+├── Dockerfile.dev             # Imagen multi-stage dev
+├── .env.docker.dev           # Variables de entorno dev
+├── docker/php/php_dev.ini    # Configuración PHP dev
+└── scripts/
+    ├── switch-env.sh         # Cambiar entornos
+    └── cleanup-root-docs.sh  # Limpiar documentación
+```
+
+## 🎯 Flujo de Trabajo Típico
+
+1. **Inicio del día**:
+   ```bash
+   make dev-up
+   make dev-logs-app  # Verificar que todo esté OK
+   ```
+
+2. **Desarrollo**:
+   - Editar código (hot-reload automático)
+   - Ver logs: `make dev-logs`
+   - Tests: `make dev-test`
+
+3. **Cambios en DB**:
+   ```bash
+   make dev-artisan cmd="make:migration CreateUsersTable"
+   make dev-migrate
+   ```
+
+4. **Nuevas dependencias**:
+   ```bash
+   make dev-composer cmd="require vendor/package"
+   make dev-npm cmd="install new-package"
+   ```
+
+5. **Final del día**:
+   ```bash
+   make dev-down  # Opcional, los contenedores pueden quedarse corriendo
+   ```
+
+## 🚨 Notas Importantes
+
+- **Hot Reload**: Cambios en PHP se reflejan automáticamente con `--watch`
+- **Assets**: Vite maneja HMR automáticamente en puerto 5173
+- **Emails**: Todos van a Mailpit, no se envían realmente
+- **Storage**: Usa filesystem local, no S3
+- **Logs**: Más verbosos que en producción
+- **Performance**: Optimizado para desarrollo, no para producción
+
+## 📚 Recursos Adicionales
+
+- [Docker Compose Dev Override](https://docs.docker.com/compose/extends/)
+- [Laravel Octane](https://laravel.com/docs/octane)
+- [Vite HMR](https://vitejs.dev/guide/features.html#hot-module-replacement)
+- [Mailpit](https://github.com/axllent/mailpit)

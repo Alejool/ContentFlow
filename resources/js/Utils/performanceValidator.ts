@@ -1,12 +1,12 @@
 /**
  * Performance Validator
- * 
+ *
  * Validates and measures performance metrics for:
  * - Optimistic updates (< 50ms)
  * - Cache response times (< 100ms)
  * - PWA score (> 90)
  * - Lighthouse metrics
- * 
+ *
  * Requirements: Task 19.3
  */
 
@@ -80,7 +80,9 @@ class PerformanceValidator {
         const lcpObserver = new PerformanceObserver((list) => {
           const entries = list.getEntries();
           const lastEntry = entries[entries.length - 1];
-          this.metrics.largestContentfulPaint = lastEntry.startTime;
+          if (lastEntry) {
+            this.metrics.largestContentfulPaint = lastEntry.startTime;
+          }
         });
         lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
 
@@ -88,14 +90,14 @@ class PerformanceValidator {
         let clsValue = 0;
         const clsObserver = new PerformanceObserver((list) => {
           for (const entry of list.getEntries()) {
-            if (!(entry as any).hadRecentInput) {
-              clsValue += (entry as any).value;
+            if (!(entry as unknown as { hadRecentInput: boolean }).hadRecentInput) {
+              clsValue += (entry as unknown as { value: number }).value;
               this.metrics.cumulativeLayoutShift = clsValue;
             }
           }
         });
         clsObserver.observe({ entryTypes: ['layout-shift'] });
-      } catch (error) {
+      } catch {
         // Failed to initialize observers
       }
     }
@@ -132,7 +134,7 @@ class PerformanceValidator {
    */
   async measureCacheResponse(request: Request): Promise<Response | null> {
     const start = performance.now();
-    
+
     try {
       // Try to get from cache
       const cache = await caches.open('dynamic-cache');
@@ -142,7 +144,7 @@ class PerformanceValidator {
       this.metrics.cacheResponseTime = duration;
 
       return response || null;
-    } catch (error) {
+    } catch {
       return null;
     }
   }
@@ -193,7 +195,8 @@ class PerformanceValidator {
         metric: 'Optimistic Update Time',
         value: this.metrics.optimisticUpdateTime || 0,
         target: PERFORMANCE_TARGETS.OPTIMISTIC_UPDATE_TIME,
-        passed: (this.metrics.optimisticUpdateTime || 0) < PERFORMANCE_TARGETS.OPTIMISTIC_UPDATE_TIME,
+        passed:
+          (this.metrics.optimisticUpdateTime || 0) < PERFORMANCE_TARGETS.OPTIMISTIC_UPDATE_TIME,
         unit: 'ms',
       },
       {
@@ -207,14 +210,16 @@ class PerformanceValidator {
         metric: 'First Contentful Paint',
         value: this.metrics.firstContentfulPaint || 0,
         target: PERFORMANCE_TARGETS.FIRST_CONTENTFUL_PAINT,
-        passed: (this.metrics.firstContentfulPaint || 0) < PERFORMANCE_TARGETS.FIRST_CONTENTFUL_PAINT,
+        passed:
+          (this.metrics.firstContentfulPaint || 0) < PERFORMANCE_TARGETS.FIRST_CONTENTFUL_PAINT,
         unit: 'ms',
       },
       {
         metric: 'Largest Contentful Paint',
         value: this.metrics.largestContentfulPaint || 0,
         target: PERFORMANCE_TARGETS.LARGEST_CONTENTFUL_PAINT,
-        passed: (this.metrics.largestContentfulPaint || 0) < PERFORMANCE_TARGETS.LARGEST_CONTENTFUL_PAINT,
+        passed:
+          (this.metrics.largestContentfulPaint || 0) < PERFORMANCE_TARGETS.LARGEST_CONTENTFUL_PAINT,
         unit: 'ms',
       },
       {
@@ -235,13 +240,14 @@ class PerformanceValidator {
         metric: 'Cumulative Layout Shift',
         value: this.metrics.cumulativeLayoutShift || 0,
         target: PERFORMANCE_TARGETS.CUMULATIVE_LAYOUT_SHIFT,
-        passed: (this.metrics.cumulativeLayoutShift || 0) < PERFORMANCE_TARGETS.CUMULATIVE_LAYOUT_SHIFT,
+        passed:
+          (this.metrics.cumulativeLayoutShift || 0) < PERFORMANCE_TARGETS.CUMULATIVE_LAYOUT_SHIFT,
         unit: 'score',
       },
     ];
 
     // Calculate overall score
-    const passedCount = validations.filter(v => v.passed).length;
+    const passedCount = validations.filter((v) => v.passed).length;
     const overallScore = (passedCount / validations.length) * 100;
     const passed = overallScore >= 70; // 70% pass rate
 
@@ -264,7 +270,7 @@ class PerformanceValidator {
   /**
    * Log performance report to console
    */
-  private logReport(report: PerformanceReport): void {
+  private logReport(_report: PerformanceReport): void {
     // Logging disabled
   }
 
@@ -297,14 +303,14 @@ class PerformanceValidator {
 
     // Check for service worker
     const hasServiceWorker = 'serviceWorker' in navigator;
-    
+
     // Check for manifest
     const manifestLink = document.querySelector('link[rel="manifest"]');
     const hasManifest = !!manifestLink;
 
     // Check if HTTPS (or localhost)
-    const isSecure = window.location.protocol === 'https:' || 
-                     window.location.hostname === 'localhost';
+    const isSecure =
+      window.location.protocol === 'https:' || window.location.hostname === 'localhost';
 
     const installable = hasServiceWorker && hasManifest && isSecure;
 
@@ -314,7 +320,7 @@ class PerformanceValidator {
   /**
    * Run Lighthouse audit programmatically (requires lighthouse npm package)
    */
-  async runLighthouseAudit(): Promise<any> {
+  async runLighthouseAudit(): Promise<unknown> {
     if (typeof window === 'undefined') {
       return null;
     }
@@ -328,4 +334,4 @@ export const performanceValidator = new PerformanceValidator();
 
 // Export for testing
 export { PERFORMANCE_TARGETS, PerformanceValidator };
-export type { PerformanceMetrics, ValidationResult, PerformanceReport };
+export type { PerformanceMetrics, PerformanceReport, ValidationResult };

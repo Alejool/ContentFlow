@@ -42,12 +42,12 @@
     "hint": "This verification will be valid for 30 days on this device."
   },
   "errors": {
-    "invalidCode": "Invalid verification code. Please check your authenticator app and try again.",
+    "invalidCode": "Invalid verification code. Check your authenticator app and try again.",
     "codeMustBe6Digits": "Code must be 6 digits",
     "codeOnlyNumbers": "Code must contain only numbers",
-    "sessionExpired": "Session expired. Please refresh the page and try again.",
+    "sessionExpired": "Session expired. Refresh the page and try again.",
     "alreadyConfigured": "2FA is already configured for your account",
     "notConfigured": "2FA is not configured for your account",
-    "verificationExpired": "Your 2FA verification has expired. Please verify again."
+    "verificationExpired": "Your 2FA verification has expired. Verify again."
   }
 }

@@ -1,9 +1,9 @@
-import React from "react";
-import Skeleton from "@/Components/common/ui/Skeleton";
+import React from 'react';
+import Skeleton from '@/Components/common/ui/Skeleton';
 
 const PageHeaderSkeleton = () => {
   return (
-    <div className="space-y-4 mb-6">
+    <div className="mb-6 space-y-4">
       <div className="flex items-center justify-between">
         <div className="space-y-2">
           <Skeleton className="h-8 w-48" />
@@ -11,7 +11,7 @@ const PageHeaderSkeleton = () => {
         </div>
         <Skeleton className="h-10 w-32 rounded-lg" />
       </div>
-      
+
       {/* Tabs or filters */}
       <div className="flex items-center gap-2">
         <Skeleton className="h-9 w-24 rounded-lg" />

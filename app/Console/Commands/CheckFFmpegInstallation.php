@@ -29,7 +29,7 @@ class CheckFFmpegInstallation extends Command
             $this->error('❌ FFmpeg NO está instalado o no es accesible');
             $this->warn('   Salida: ' . implode("\n   ", $output));
             $this->newLine();
-            $this->warn('💡 Para instalar FFmpeg en Windows:');
+            $this->warn(' Para instalar FFmpeg en Windows:');
             $this->line('   1. Descarga desde: https://www.gyan.dev/ffmpeg/builds/');
             $this->line('   2. Extrae el archivo ZIP');
             $this->line('   3. Agrega la carpeta bin al PATH del sistema');

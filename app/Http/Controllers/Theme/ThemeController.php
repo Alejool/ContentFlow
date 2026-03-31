@@ -38,7 +38,7 @@ class ThemeController extends Controller
   {
     $validated = $request->validate([
       'theme' => ['nullable', Rule::in(['light', 'dark', 'system'])],
-      'theme_color' => ['nullable', 'string', 'in:orange,blue,purple,green,yellow,pink,red,indigo,teal,sky'],
+      'theme_color' => ['nullable', 'string', 'regex:/^(orange|blue|purple|green|yellow|pink|red|indigo|teal|sky|#[a-fA-F0-9]{6})$/'],
     ]);
 
     $user = Auth::user();

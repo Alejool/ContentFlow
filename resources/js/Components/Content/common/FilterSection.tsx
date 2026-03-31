@@ -1,21 +1,23 @@
-import { DatePicker as DatePickerModern } from "@/Components/common/Modern/DatePicker";
-import Input from "@/Components/common/Modern/Input";
-import Select from "@/Components/common/Modern/Select";
-import ExportButtons from "@/Components/common/ui/ExportButtons";
-import { getPlatformOptions } from "@/Constants/socialPlatforms";
-import { format, parseISO } from "date-fns";
-import { Filter, Search, RotateCcw } from "lucide-react";
+import { DatePicker as DatePickerModern } from '@/Components/common/Modern/DatePicker';
+import Input from '@/Components/common/Modern/Input';
+import Select from '@/Components/common/Modern/Select';
+import ExportButtons from '@/Components/common/ui/ExportButtons';
+import { CONTENT_TYPES } from '@/Constants/contentTypes';
+import { getPlatformOptions } from '@/Constants/socialPlatforms';
+import { format, parseISO } from 'date-fns';
+import { Filter, RotateCcw, Search } from 'lucide-react';
 
 // Constant to avoid creating new object on every render
 const EMPTY_FILTERS = {};
 
 interface FilterSectionProps {
-  mode: "campaigns" | "publications" | "logs" | "approvals" | "integrations";
+  mode: 'campaigns' | 'publications' | 'logs' | 'approvals' | 'integrations';
   t: (key: string) => string;
   search: string;
   setSearch: (value: string) => void;
   statusFilter: string;
   platformFilter?: string | string[];
+  contentTypeFilter?: string | string[];
   sortFilter?: string;
   dateStart?: string;
   dateEnd?: string;
@@ -31,7 +33,8 @@ export default function FilterSection({
   setSearch,
   statusFilter,
   platformFilter,
-  sortFilter = "newest",
+  contentTypeFilter,
+  sortFilter = 'newest',
   dateStart,
   dateEnd,
   handleFilterChange,
@@ -39,127 +42,130 @@ export default function FilterSection({
   filters = EMPTY_FILTERS,
 }: FilterSectionProps) {
   const statusCampaignsOptions = [
-    { value: "all", label: t("campaigns.filters.all") },
-    { value: "active", label: t("campaigns.filters.active") },
-    { value: "inactive", label: t("campaigns.filters.inactive") },
-    { value: "completed", label: t("campaigns.filters.completed") },
-    { value: "deleted", label: t("campaigns.filters.deleted") },
-    { value: "paused", label: t("campaigns.filters.paused") },
+    { value: 'all', label: t('campaigns.filters.all') },
+    { value: 'active', label: t('campaigns.filters.active') },
+    { value: 'inactive', label: t('campaigns.filters.inactive') },
+    { value: 'completed', label: t('campaigns.filters.completed') },
+    { value: 'deleted', label: t('campaigns.filters.deleted') },
+    { value: 'paused', label: t('campaigns.filters.paused') },
   ];
 
   const statusPublicationsOptions = [
-    { value: "all", label: t("publications.filters.all") },
-    { value: "published", label: t("publications.filters.published") },
-    { value: "draft", label: t("publications.filters.draft") },
-    { value: "scheduled", label: t("publications.filters.scheduled") },
-    { value: "pending_review", label: t("publications.filters.pending_review") },
-    { value: "failed", label: t("publications.filters.failed") },
+    { value: 'all', label: t('publications.filters.all') },
+    { value: 'published', label: t('publications.filters.published') },
+    { value: 'draft', label: t('publications.filters.draft') },
+    { value: 'scheduled', label: t('publications.filters.scheduled') },
+    {
+      value: 'pending_review',
+      label: t('publications.filters.pending_review'),
+    },
+    { value: 'failed', label: t('publications.filters.failed') },
   ];
 
   const statusLogsOptions = [
-    "all",
-    "published",
-    "success",
-    "failed",
-    "pending",
-    "publishing",
-    "orphaned",
-    "deleted",
-    "removed_on_platform",
+    'all',
+    'published',
+    'success',
+    'failed',
+    'pending',
+    'publishing',
+    'orphaned',
+    'deleted',
+    'removed_on_platform',
   ].map((status) => ({
     value: status,
     label: t(`logs.status.${status}`),
   }));
 
   const statusApprovalsOptions = [
-    { value: "all", label: t("approvals.filters.all") },
-    { value: "approved", label: t("approvals.filters.approved") },
-    { value: "rejected", label: t("approvals.filters.rejected") },
+    { value: 'all', label: t('approvals.filters.all') },
+    { value: 'approved', label: t('approvals.filters.approved') },
+    { value: 'rejected', label: t('approvals.filters.rejected') },
   ];
 
   const statusIntegrationsOptions = [
-    { value: "", label: t("workspace.activity.all_statuses") },
-    { value: "success", label: t("common.success") },
-    { value: "failed", label: t("common.failed") },
+    { value: '', label: t('workspace.activity.all_statuses') },
+    { value: 'success', label: t('common.success') },
+    { value: 'failed', label: t('common.failed') },
   ];
 
   const channelIntegrationsOptions = [
-    { value: "", label: t("workspace.activity.all_channels") },
-    { value: "slack", label: "Slack" },
-    { value: "discord", label: "Discord" },
-  ];
-
-  const platformOptions = [
-    { value: "facebook", label: "Facebook" },
-    { value: "instagram", label: "Instagram" },
-    { value: "twitter", label: "Twitter" },
-    { value: "youtube", label: "YouTube" },
-    { value: "tiktok", label: "TikTok" },
+    { value: '', label: t('workspace.activity.all_channels') },
+    { value: 'slack', label: 'Slack' },
+    { value: 'discord', label: 'Discord' },
   ];
 
   const activePlatformOptions = getPlatformOptions();
 
-  const sortOptions = [
-    { value: "newest", label: t("common.sort.newest") || "Más recientes" },
-    { value: "oldest", label: t("common.sort.oldest") || "Más antiguos" },
-    { value: "title_asc", label: t("common.sort.title_asc") || "Título (A-Z)" },
+  // Content type options with translations
+  const contentTypeOptions = [
     {
-      value: "title_desc",
-      label: t("common.sort.title_desc") || "Título (Z-A)",
+      value: 'all',
+      label: t('publications.filters.all_types') || 'Todos los tipos',
+    },
+    ...Object.values(CONTENT_TYPES).map((type) => ({
+      value: type,
+      label: t(`publications.content_types.${type}`) || type,
+    })),
+  ];
+
+  const sortOptions = [
+    { value: 'newest', label: t('common.sort.newest') || 'Más recientes' },
+    { value: 'oldest', label: t('common.sort.oldest') || 'Más antiguos' },
+    { value: 'title_asc', label: t('common.sort.title_asc') || 'Título (A-Z)' },
+    {
+      value: 'title_desc',
+      label: t('common.sort.title_desc') || 'Título (Z-A)',
     },
   ];
 
-  const activeColor = "primary-500";
-  const showPlatformFilter = mode === "publications" || mode === "logs";
+  const activeColor = 'primary-500';
+  const showPlatformFilter = mode === 'publications' || mode === 'logs';
+  const showContentTypeFilter = mode === 'publications';
 
   const getExportEndpoint = () => {
     switch (mode) {
-      case "publications":
-        return "/api/v1/publications/export";
-      case "campaigns":
-        return "/api/v1/campaigns/export";
-      case "logs":
-        return "/api/v1/logs/export";
+      case 'publications':
+        return '/api/v1/publications/export';
+      case 'campaigns':
+        return '/api/v1/campaigns/export';
+      case 'logs':
+        return '/api/v1/logs/export';
       default:
-        return "";
+        return '';
     }
   };
 
-  const showExportButtons = ["publications", "campaigns", "logs"].includes(mode);
+  const showExportButtons = ['publications', 'campaigns', 'logs'].includes(mode);
 
   return (
-    <div className="bg-white dark:bg-neutral-800/50 p-4 rounded-lg border border-gray-100 dark:border-neutral-700 shadow-sm mt-4">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
-          <Filter className="w-4 h-4" />
-          Filtros
+    <div className="mt-4 rounded-lg border border-gray-100 bg-white p-4 shadow-sm dark:border-neutral-700 dark:bg-neutral-800/50">
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+          <Filter className="h-4 w-4" />
+          {t('common.filters.title')}
         </h3>
         <div className="flex items-center gap-2">
-          {showExportButtons && (
-            <ExportButtons 
-              endpoint={getExportEndpoint()} 
-              filters={filters}
-            />
-          )}
+          {showExportButtons && <ExportButtons endpoint={getExportEndpoint()} filters={filters} />}
           {onResetFilters && (
             <button
               onClick={() => {
                 onResetFilters();
-                setSearch("");
+                setSearch('');
               }}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded-lg transition-colors"
+              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-primary-600 dark:text-gray-400 dark:hover:bg-neutral-700 dark:hover:text-primary-400"
             >
-              <RotateCcw className="w-3.5 h-3.5" />
-              Reiniciar
+              <RotateCcw className="h-3.5 w-3.5" />
+              {t('logs.filters.clear')}
             </button>
           )}
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         <div className="md:col-span-2 lg:col-span-3 xl:col-span-2">
           <Input
             id="search"
-            placeholder={t("common.search")}
+            placeholder={t('common.search')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             icon={Search}
@@ -169,49 +175,46 @@ export default function FilterSection({
           />
         </div>
 
-        {mode !== "integrations" && (
+        {mode !== 'integrations' && (
           <div>
             <Select<any>
               id="status-filter"
               options={
-                mode === "campaigns"
+                mode === 'campaigns'
                   ? statusCampaignsOptions
-                  : mode === "logs"
+                  : mode === 'logs'
                     ? statusLogsOptions
-                    : mode === "approvals"
+                    : mode === 'approvals'
                       ? statusApprovalsOptions
                       : statusPublicationsOptions
               }
               value={statusFilter}
               variant="outlined"
               onChange={(val) => {
-                handleFilterChange(
-                  mode === "approvals" ? "action" : "status",
-                  String(val),
-                );
+                handleFilterChange('status', String(val));
               }}
               size="md"
               icon={Filter}
-              placeholder={t("common.status.title") || "Estado"}
+              placeholder={t('common.status.title') || 'Estado'}
               activeColor={activeColor}
             />
           </div>
         )}
 
-        {mode === "integrations" && (
+        {mode === 'integrations' && (
           <>
             <div>
               <Select<any>
                 id="integrations-channel-filter"
                 options={channelIntegrationsOptions}
-                value={platformFilter || ""}
+                value={platformFilter || ''}
                 variant="outlined"
                 onChange={(val) => {
-                  handleFilterChange("channel", String(val));
+                  handleFilterChange('channel', String(val));
                 }}
                 size="md"
                 icon={Filter}
-                placeholder={t("workspace.activity.all_channels")}
+                placeholder={t('workspace.activity.all_channels')}
                 activeColor={activeColor}
               />
             </div>
@@ -222,27 +225,33 @@ export default function FilterSection({
                 value={statusFilter}
                 variant="outlined"
                 onChange={(val) => {
-                  handleFilterChange("status", String(val));
+                  handleFilterChange('status', String(val));
                 }}
                 size="md"
                 icon={Filter}
-                placeholder={t("workspace.activity.all_statuses")}
+                placeholder={t('workspace.activity.all_statuses')}
                 activeColor={activeColor}
               />
             </div>
           </>
         )}
 
-        {showPlatformFilter && (
+        {showContentTypeFilter && (
           <div>
             <Select<any>
-              id="platform-filter"
-              options={activePlatformOptions}
-              value={Array.isArray(platformFilter) ? platformFilter : platformFilter ? [platformFilter] : []}
+              id="content-type-filter"
+              options={contentTypeOptions}
+              value={
+                Array.isArray(contentTypeFilter)
+                  ? contentTypeFilter
+                  : contentTypeFilter
+                    ? [contentTypeFilter]
+                    : []
+              }
               variant="outlined"
-              onChange={(val) => handleFilterChange("platform", val)}
+              onChange={(val) => handleFilterChange('content_type', val as string | string[])}
               size="md"
-              placeholder={t("common.platform.title") || "Plataforma"}
+              placeholder={t('publications.filters.content_type') || 'Tipo de contenido'}
               activeColor={activeColor}
               multiple
               clearable
@@ -250,7 +259,30 @@ export default function FilterSection({
           </div>
         )}
 
-        {mode !== "approvals" && mode !== "integrations" && (
+        {showPlatformFilter && (
+          <div>
+            <Select<any>
+              id="platform-filter"
+              options={activePlatformOptions}
+              value={
+                Array.isArray(platformFilter)
+                  ? platformFilter
+                  : platformFilter
+                    ? [platformFilter]
+                    : []
+              }
+              variant="outlined"
+              onChange={(val) => handleFilterChange('platform', val as string | string[])}
+              size="md"
+              placeholder={t('common.platform.title') || 'Plataforma'}
+              activeColor={activeColor}
+              multiple
+              clearable
+            />
+          </div>
+        )}
+
+        {mode !== 'approvals' && mode !== 'integrations' && (
           <div>
             <Select<any>
               id="sort-filter"
@@ -258,16 +290,16 @@ export default function FilterSection({
               value={sortFilter}
               variant="outlined"
               onChange={(val) => {
-                handleFilterChange("sort", String(val));
+                handleFilterChange('sort', String(val));
               }}
               size="md"
-              placeholder={t("common.sort.title") || "Ordenar"}
+              placeholder={t('common.sort.title') || 'Ordenar'}
               activeColor={activeColor}
             />
           </div>
         )}
 
-        {mode !== "approvals" && mode !== "integrations" && (
+        {mode !== 'approvals' && mode !== 'integrations' && (
           <>
             <div>
               <DatePickerModern
@@ -275,13 +307,8 @@ export default function FilterSection({
                 allowPastDates={true}
                 selected={dateStart ? parseISO(dateStart) : null}
                 dateFormat="dd/MM/yyyy HH:mm"
-                onChange={(d) =>
-                  handleFilterChange(
-                    "date_start",
-                    d ? format(d, "yyyy-MM-dd") : "",
-                  )
-                }
-                placeholder="Inicio"
+                onChange={(d) => handleFilterChange('date_start', d ? format(d, 'yyyy-MM-dd') : '')}
+                placeholder={t('common.filters.startDate')}
                 withPortal
                 variant="outlined"
                 size="md"
@@ -293,13 +320,8 @@ export default function FilterSection({
                 selected={dateEnd ? parseISO(dateEnd) : null}
                 allowPastDates={true}
                 dateFormat="dd/MM/yyyy HH:mm"
-                onChange={(d) =>
-                  handleFilterChange(
-                    "date_end",
-                    d ? format(d, "yyyy-MM-dd") : "",
-                  )
-                }
-                placeholder="Fin"
+                onChange={(d) => handleFilterChange('date_end', d ? format(d, 'yyyy-MM-dd') : '')}
+                placeholder={t('common.filters.endDate')}
                 withPortal
                 activeColor={activeColor}
                 size="md"

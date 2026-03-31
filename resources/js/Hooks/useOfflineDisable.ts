@@ -24,24 +24,22 @@ interface UseOfflineDisableReturn {
 
 /**
  * useOfflineDisable Hook
- * 
+ *
  * Provides utilities to disable features when offline.
  * Returns disabled state and props to spread on components.
- * 
+ *
  * Requirements: 6.3
- * 
+ *
  * @example
  * const { isDisabled, offlineProps } = useOfflineDisable({ requiresConnection: true });
- * 
+ *
  * return (
  *   <button {...offlineProps}>
  *     Submit
  *   </button>
  * );
  */
-export function useOfflineDisable(
-  options: UseOfflineDisableOptions = {}
-): UseOfflineDisableReturn {
+export function useOfflineDisable(options: UseOfflineDisableOptions = {}): UseOfflineDisableReturn {
   const { isOnline } = useOffline();
   const {
     requiresConnection = false,

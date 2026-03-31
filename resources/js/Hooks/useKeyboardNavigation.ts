@@ -1,6 +1,6 @@
 /**
  * Keyboard Navigation Hook
- * 
+ *
  * Provides keyboard navigation utilities for accessible components
  */
 
@@ -21,7 +21,7 @@ interface KeyboardNavigationOptions {
 
 export function useKeyboardNavigation(
   ref: RefObject<HTMLElement>,
-  options: KeyboardNavigationOptions
+  options: KeyboardNavigationOptions,
 ): void {
   const {
     onEscape,
@@ -105,7 +105,18 @@ export function useKeyboardNavigation(
           break;
       }
     },
-    [enabled, onEscape, onEnter, onArrowUp, onArrowDown, onArrowLeft, onArrowRight, onTab, onHome, onEnd]
+    [
+      enabled,
+      onEscape,
+      onEnter,
+      onArrowUp,
+      onArrowDown,
+      onArrowLeft,
+      onArrowRight,
+      onTab,
+      onHome,
+      onEnd,
+    ],
   );
 
   useEffect(() => {
@@ -123,16 +134,13 @@ export function useKeyboardNavigation(
 /**
  * Focus trap hook for modals and dialogs
  */
-export function useFocusTrap(
-  containerRef: RefObject<HTMLElement>,
-  enabled: boolean = true
-): void {
+export function useFocusTrap(containerRef: RefObject<HTMLElement>, enabled: boolean = true): void {
   useEffect(() => {
     if (!enabled || !containerRef.current) return;
 
     const container = containerRef.current;
     const focusableElements = container.querySelectorAll<HTMLElement>(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
     );
 
     const firstElement = focusableElements[0];
@@ -171,7 +179,7 @@ export function useFocusTrap(
 export function useRovingTabIndex(
   containerRef: RefObject<HTMLElement>,
   itemSelector: string = '[role="menuitem"], [role="option"]',
-  orientation: 'horizontal' | 'vertical' = 'vertical'
+  orientation: 'horizontal' | 'vertical' = 'vertical',
 ): void {
   useEffect(() => {
     if (!containerRef.current) return;
@@ -181,7 +189,7 @@ export function useRovingTabIndex(
 
     const updateTabIndex = () => {
       const items = Array.from(container.querySelectorAll<HTMLElement>(itemSelector));
-      
+
       items.forEach((item, index) => {
         if (index === currentIndex) {
           item.setAttribute('tabindex', '0');

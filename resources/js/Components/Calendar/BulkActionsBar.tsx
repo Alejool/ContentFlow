@@ -1,10 +1,9 @@
-import Button from "@/Components/common/Modern/Button";
-import { DynamicModal } from "@/Components/common/Modern/DynamicModal";
-import { Calendar, X, Undo2, Trash2 } from "lucide-react";
-import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import Button from '@/Components/common/Modern/Button';
+import DatePickerModern from '@/Components/common/Modern/DatePicker';
+import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
+import { Calendar, Trash2, Undo2, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface BulkActionsBarProps {
   selectedCount: number;
@@ -45,7 +44,7 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
     // Validate that the selected date is not in the past
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     if (selectedDate < today) {
       return; // Date is in the past
     }
@@ -61,7 +60,7 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
 
   const handleBulkDelete = async () => {
     if (!onBulkDelete) return;
-    
+
     setIsDeleting(true);
     try {
       await onBulkDelete(selectedEventIds);
@@ -75,22 +74,23 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
 
   return (
     <>
-      <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 animate-slide-up">
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 px-6 py-4">
+      <div className="animate-slide-up fixed bottom-6 left-1/2 z-50 -translate-x-1/2 transform">
+        <div className="rounded-xl border border-gray-200 bg-white px-6 py-4 shadow-2xl dark:border-gray-700 dark:bg-gray-800">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900/30">
                 <span className="text-sm font-bold text-primary-600 dark:text-primary-400">
                   {selectedCount}
                 </span>
               </div>
               <div>
                 <div className="text-sm font-semibold text-gray-900 dark:text-white">
-                  {selectedCount} {t(selectedCount === 1 ? "calendar.event" : "calendar.events.count")}{" "}
-                  {t("calendar.selected")}
+                  {selectedCount}{' '}
+                  {t(selectedCount === 1 ? 'calendar.event' : 'calendar.events.count')}{' '}
+                  {t('calendar.selected')}
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-400">
-                  {t("calendar.of")} {totalEvents} {t("calendar.total")}
+                  {t('calendar.of')} {totalEvents} {t('calendar.total')}
                 </div>
               </div>
             </div>
@@ -105,7 +105,7 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
                   onClick={onSelectAll}
                   className="whitespace-nowrap"
                 >
-                  {t("calendar.selectAll")}
+                  {t('calendar.selectAll')}
                 </Button>
               )}
 
@@ -115,10 +115,10 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
                   size="sm"
                   onClick={onUndo}
                   className="whitespace-nowrap"
-                  title={t("calendar.undoLastOperation")}
+                  title={t('calendar.undoLastOperation')}
                 >
-                  <Undo2 className="w-4 h-4 mr-2" />
-                  {t("calendar.undo")}
+                  <Undo2 className="mr-2 h-4 w-4" />
+                  {t('calendar.undo')}
                 </Button>
               )}
 
@@ -129,14 +129,14 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
                 className="whitespace-nowrap"
                 icon={Calendar}
               >
-                {t("calendar.moveEvents")}
+                {t('calendar.moveEvents')}
               </Button>
               <button
                 onClick={onClearSelection}
-                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                title={t("calendar.clearSelection")}
+                className="rounded-lg p-2 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
+                title={t('calendar.clearSelection')}
               >
-                <X className="w-5 h-5 text-gray-500" />
+                <X className="h-5 w-5 text-gray-500" />
               </button>
             </div>
           </div>
@@ -146,52 +146,49 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
       <DynamicModal
         isOpen={showMoveModal}
         onClose={() => setShowMoveModal(false)}
-        title={t("calendar.moveSelectedEvents")}
+        title={t('calendar.moveSelectedEvents')}
         size="md"
       >
         <div className="space-y-6">
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+          <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
             <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
-                <Calendar className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/40">
+                <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               </div>
               <div className="flex-1">
-                <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-1">
-                  {t("calendar.movingEvents", { count: selectedCount })}
+                <h4 className="mb-1 text-sm font-semibold text-blue-900 dark:text-blue-100">
+                  {t('calendar.movingEvents', { count: selectedCount })}
                 </h4>
                 <p className="text-sm text-blue-700 dark:text-blue-300">
-                  {t("calendar.selectNewDateTime")}
+                  {t('calendar.selectNewDateTime')}
                 </p>
               </div>
             </div>
           </div>
 
           <div className="space-y-3">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              {t("calendar.newDateAndTime")}
-            </label>
-            <div className="flex justify-center">
-              <DatePicker
-                selected={selectedDate}
-                onChange={(date: Date | null) => {
-                  if (date) {
-                    // Ensure the date is set to start of day
-                    const newDate = new Date(date);
-                    newDate.setHours(0, 0, 0, 0);
-                    setSelectedDate(newDate);
-                  }
-                }}
-                minDate={new Date()}
-                dateFormat="MMMM d, yyyy"
-                inline
-                className="border border-gray-300 dark:border-gray-600 rounded-lg"
-              />
-            </div>
+            <DatePickerModern
+              label={t('calendar.newDateAndTime')}
+              selected={selectedDate}
+              onChange={(date: Date | null) => {
+                if (date) {
+                  const newDate = new Date(date);
+                  newDate.setHours(0, 0, 0, 0);
+                  setSelectedDate(newDate);
+                }
+              }}
+              minDate={new Date()}
+              allowPastDates={false}
+              isClearable={false}
+              showTimeSelect={false}
+              variant="outlined"
+              size="lg"
+            />
             <div className="text-center">
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                {t("calendar.selected_date")}
+                {t('calendar.selected_date')}
               </p>
-              <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
+              <p className="mt-1 text-sm font-medium text-gray-900 dark:text-white">
                 {selectedDate.toLocaleDateString('es-ES', {
                   weekday: 'long',
                   year: 'numeric',
@@ -199,19 +196,15 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
                   day: 'numeric',
                 })}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                {t("calendar.preserveOriginalTime")}
+              <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                {t('calendar.preserveOriginalTime')}
               </p>
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <Button
-              variant="ghost"
-              onClick={() => setShowMoveModal(false)}
-              disabled={isMoving}
-            >
-              {t("common.cancel")}
+          <div className="flex justify-end gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">
+            <Button variant="ghost" onClick={() => setShowMoveModal(false)} disabled={isMoving}>
+              {t('common.cancel')}
             </Button>
             <Button
               variant="primary"
@@ -220,7 +213,7 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
               loading={isMoving}
               icon={Calendar}
             >
-              {t("calendar.moveCount", { count: selectedCount })}
+              {t('calendar.moveCount', { count: selectedCount })}
             </Button>
           </div>
         </div>
@@ -229,42 +222,38 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
       <DynamicModal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
-        title={t("calendar.deleteSelectedEvents")}
+        title={t('calendar.deleteSelectedEvents')}
         size="md"
       >
         <div className="space-y-6">
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+          <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
             <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/40 flex items-center justify-center">
-                <Trash2 className="w-5 h-5 text-red-600 dark:text-red-400" />
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/40">
+                <Trash2 className="h-5 w-5 text-red-600 dark:text-red-400" />
               </div>
               <div className="flex-1">
-                <h4 className="text-sm font-semibold text-red-900 dark:text-red-100 mb-1">
-                  {t("calendar.confirmDelete")}
+                <h4 className="mb-1 text-sm font-semibold text-red-900 dark:text-red-100">
+                  {t('calendar.confirmDelete')}
                 </h4>
                 <p className="text-sm text-red-700 dark:text-red-300">
-                  {t("calendar.deleteWarning", { count: selectedCount })}
+                  {t('calendar.deleteWarning', { count: selectedCount })}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <Button
-              variant="secondary"
-              onClick={() => setShowDeleteModal(false)}
-              disabled={isDeleting}
-            >
-              {t("common.cancel")}
+          <div className="flex justify-end gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">
+            <Button variant="ghost" onClick={() => setShowDeleteModal(false)} disabled={isDeleting}>
+              {t('common.cancel')}
             </Button>
             <Button
-              variant="danger"
+              variant="primary"
               onClick={handleBulkDelete}
               disabled={isDeleting}
               loading={isDeleting}
             >
-              <Trash2 className="w-4 h-4 mr-2" />
-              {t("calendar.deleteCount", { count: selectedCount })}
+              <Trash2 className="mr-2 h-4 w-4" />
+              {t('calendar.deleteCount', { count: selectedCount })}
             </Button>
           </div>
         </div>

@@ -1,6 +1,6 @@
 /**
  * Service Worker Registration Utility
- * 
+ *
  * Handles registration, updates, and lifecycle of the service worker
  */
 
@@ -15,52 +15,45 @@ export interface ServiceWorkerConfig {
  * Register the service worker
  */
 export async function registerServiceWorker(config: ServiceWorkerConfig = {}): Promise<void> {
-  // Check if service workers are supported
   if (!('serviceWorker' in navigator)) {
     return;
   }
 
-  // Only register in production or when explicitly enabled
-  const isDev = import.meta.env.DEV;
-  if (isDev) {
+  if (import.meta.env.DEV) {
     return;
   }
 
   try {
-    // Register the service worker
     const registration = await navigator.serviceWorker.register('/sw.js', {
       scope: '/',
     });
 
-    // Check for updates
     registration.addEventListener('updatefound', () => {
       const newWorker = registration.installing;
-      
+
       if (!newWorker) return;
 
       newWorker.addEventListener('statechange', () => {
         if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-          // New service worker available
           config.onUpdate?.(registration);
         }
       });
     });
 
-    // Handle successful registration
     if (registration.active) {
       config.onSuccess?.(registration);
     }
 
-    // Check for updates periodically (every hour)
-    setInterval(() => {
-      registration.update();
-    }, 60 * 60 * 1000);
-
-  } catch (error) {
+    setInterval(
+      () => {
+        registration.update();
+      },
+      60 * 60 * 1000,
+    );
+  } catch {
     // Service worker registration failed
   }
 
-  // Listen for online/offline events
   window.addEventListener('online', () => {
     config.onOnline?.();
   });
@@ -80,10 +73,8 @@ export async function unregisterServiceWorker(): Promise<boolean> {
 
   try {
     const registration = await navigator.serviceWorker.ready;
-    const success = await registration.unregister();
-    
-    return success;
-  } catch (error) {
+    return await registration.unregister();
+  } catch {
     return false;
   }
 }
@@ -113,10 +104,8 @@ export async function clearAllCaches(): Promise<void> {
 
   try {
     const cacheNames = await caches.keys();
-    await Promise.all(
-      cacheNames.map((cacheName) => caches.delete(cacheName))
-    );
-  } catch (error) {
+    await Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)));
+  } catch {
     // Failed to clear caches
   }
 }
@@ -133,12 +122,7 @@ export async function getServiceWorkerStatus(): Promise<{
   const supported = 'serviceWorker' in navigator;
 
   if (!supported) {
-    return {
-      supported: false,
-      registered: false,
-      active: false,
-      waiting: false,
-    };
+    return { supported: false, registered: false, active: false, waiting: false };
   }
 
   try {
@@ -150,13 +134,8 @@ export async function getServiceWorkerStatus(): Promise<{
       active: !!registration?.active,
       waiting: !!registration?.waiting,
     };
-  } catch (error) {
-    return {
-      supported: true,
-      registered: false,
-      active: false,
-      waiting: false,
-    };
+  } catch {
+    return { supported: true, registered: false, active: false, waiting: false };
   }
 }
 
@@ -166,7 +145,7 @@ export async function getServiceWorkerStatus(): Promise<{
 export function isStandalone(): boolean {
   return (
     window.matchMedia('(display-mode: standalone)').matches ||
-    (window.navigator as any).standalone === true
+    (window.navigator as unknown as { standalone?: boolean }).standalone === true
   );
 }
 

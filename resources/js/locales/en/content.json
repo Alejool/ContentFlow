@@ -1,6 +1,6 @@
 {
   "Content": {
-    "configureNetworks": "Configure your scheduled publications",
+    "configureNetworks": "Scheduled publications",
     "title": "Content Management",
     "subtitle": "Organize and manage your multimedia content elegantly and efficiently",
     "createNew": "Create New",
@@ -58,7 +58,7 @@
           "publication": "Publication"
         },
         "cancelButton": "Keep connected",
-        "confirmButton": "Disconnect "
+        "confirmButton": "Disconnect"
       },
       "validation": {
         "facebook": {
@@ -95,7 +95,7 @@
         "connectSuccess": "Account connected successfully",
         "disconnectSuccess": "Account disconnected successfully",
         "authError": "Authentication error",
-        "unauthorized": "Unauthorized. Please log in again.",
+        "unauthorized": "Unauthorized. Log in again.",
         "loadError": "Could not load connected accounts",
         "disconnectError": "Error disconnecting"
       }

@@ -11,7 +11,7 @@ interface CalendarWithCacheProps {
 /**
  * Calendar wrapper component that integrates React Query caching
  * with the Zustand calendar store.
- * 
+ *
  * This component:
  * - Uses React Query to fetch and cache calendar events (5-minute cache)
  * - Automatically refetches when date range or filters change
@@ -23,7 +23,13 @@ export function CalendarWithCache({ onEventClick }: CalendarWithCacheProps) {
   const { currentMonth, filters, setEvents, setLoading, setError } = useCalendarStore();
 
   // Use React Query hook for cached data fetching
-  const { data: events, isLoading, error, isError, isFetching } = useCalendarEvents({
+  const {
+    data: events,
+    isLoading,
+    error,
+    isError,
+    isFetching,
+  } = useCalendarEvents({
     currentMonth,
     filters,
   });
@@ -35,7 +41,7 @@ export function CalendarWithCache({ onEventClick }: CalendarWithCacheProps) {
       setEvents(events);
     }
     setLoading(isLoading);
-    
+
     if (isError && error) {
       setError(error instanceof Error ? error.message : 'Failed to fetch calendar events');
     } else {

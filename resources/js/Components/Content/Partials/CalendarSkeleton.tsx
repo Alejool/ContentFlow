@@ -7,10 +7,10 @@ export function CalendarSkeleton() {
     <div className="animate-pulse">
       {/* Calendar header skeleton */}
       <div className="mb-4 flex items-center justify-between">
-        <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded"></div>
+        <div className="h-8 w-48 rounded bg-gray-200 dark:bg-gray-700"></div>
         <div className="flex gap-2">
-          <div className="h-8 w-24 bg-gray-200 dark:bg-gray-700 rounded"></div>
-          <div className="h-8 w-24 bg-gray-200 dark:bg-gray-700 rounded"></div>
+          <div className="h-8 w-24 rounded bg-gray-200 dark:bg-gray-700"></div>
+          <div className="h-8 w-24 rounded bg-gray-200 dark:bg-gray-700"></div>
         </div>
       </div>
 
@@ -18,16 +18,14 @@ export function CalendarSkeleton() {
       <div className="grid grid-cols-7 gap-2">
         {/* Day headers */}
         {Array.from({ length: 7 }).map((_, i) => (
-          <div key={`header-${i}`} className="h-8 bg-gray-200 dark:bg-gray-700 rounded"></div>
+          <div key={`header-${i}`} className="h-8 rounded bg-gray-200 dark:bg-gray-700"></div>
         ))}
-        
+
         {/* Calendar days */}
         {Array.from({ length: 35 }).map((_, i) => (
-          <div key={`day-${i}`} className="h-24 bg-gray-100 dark:bg-gray-800 rounded p-2">
-            <div className="h-4 w-8 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
-            {i % 3 === 0 && (
-              <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded"></div>
-            )}
+          <div key={`day-${i}`} className="h-24 rounded bg-gray-100 p-2 dark:bg-gray-800">
+            <div className="mb-2 h-4 w-8 rounded bg-gray-200 dark:bg-gray-700"></div>
+            {i % 3 === 0 && <div className="h-6 rounded bg-gray-200 dark:bg-gray-700"></div>}
           </div>
         ))}
       </div>
@@ -73,13 +71,13 @@ export function LoadingOverlay({ message = 'Processing...', show }: LoadingOverl
 
   return (
     <div
-      className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center"
+      className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm dark:bg-gray-900/80"
       role="alert"
       aria-live="polite"
       aria-busy="true"
     >
       <CalendarSpinner size="lg" />
-      <p className="mt-4 text-gray-700 dark:text-gray-300 font-medium">{message}</p>
+      <p className="mt-4 font-medium text-gray-700 dark:text-gray-300">{message}</p>
     </div>
   );
 }

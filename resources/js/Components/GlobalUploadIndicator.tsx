@@ -1,36 +1,47 @@
-import { useConfirm } from "@/Hooks/useConfirm";
-import { useS3Upload } from "@/Hooks/useS3Upload";
-import { useUploadQueue } from "@/stores/uploadQueueStore";
-import { useProcessingProgress } from "@/stores/processingProgressStore";
-import axios from "axios";
-import { AlertTriangle, CheckCircle2, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
-import { useTranslation } from "react-i18next";
-import { UploadItem } from "./Upload/UploadItem";
-import { PublicationItem } from "./Upload/PublicationItem";
-import { ProgressDisplay } from "./Upload/ProgressDisplay";
-import { usePublicationStatus } from "@/Hooks/usePublicationStatus";
-import { useUploadWarning } from "@/Hooks/useUploadWarning";
+import { useConfirm } from '@/Hooks/useConfirm';
+import { usePublicationStatus } from '@/Hooks/usePublicationStatus';
+import { useS3Upload } from '@/Hooks/useS3Upload';
+import { useUploadWarning } from '@/Hooks/useUploadWarning';
+import { useProcessingProgress } from '@/stores/processingProgressStore';
+import { useUploadQueue } from '@/stores/uploadQueueStore';
+import axios from 'axios';
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Cpu,
+  FileUp,
+  Loader2,
+  Minus,
+  Radio,
+  Trash2,
+  X,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { ProgressDisplay } from './Upload/ProgressDisplay';
+import { PublicationItem } from './Upload/PublicationItem';
+
+type Tab = 'uploads' | 'processing' | 'publications';
 
 export default function GlobalUploadIndicator() {
   const queue = useUploadQueue((state) => state.queue);
   const removeUpload = useUploadQueue((state) => state.removeUpload);
   const retryUpload = useUploadQueue((state) => state.retryUpload);
-  
-  const { 
-    pauseUpload, 
-    resumeUpload: resumeUploadWithLogic, 
-    cancelUpload: cancelUploadWithCleanup 
+
+  const {
+    pauseUpload,
+    resumeUpload: resumeUploadWithLogic,
+    cancelUpload: cancelUploadWithCleanup,
   } = useS3Upload();
-  
+
   const processingJobs = useProcessingProgress((state) => state.jobs);
   const cancelJob = useProcessingProgress((state) => state.cancelJob);
-  
-  const [isExpanded, setIsExpanded] = useState(false);
+
+  const [isMinimized, setIsMinimized] = useState(false);
+  const [isClosed, setIsClosed] = useState(false);
+  const [activeTab, setActiveTab] = useState<Tab>('uploads');
   const [dismissedIds, setDismissedIds] = useState<number[]>([]);
-  const [uploadProgressUpdates, setUploadProgressUpdates] = useState<Record<string, number>>({});
-  const [processingProgressUpdates, setProcessingProgressUpdates] = useState<Record<string, number>>({});
-  
+
   const { t } = useTranslation();
   const { confirm, ConfirmDialog } = useConfirm();
 
@@ -38,306 +49,287 @@ export default function GlobalUploadIndicator() {
   const uploads = Object.values(queue);
   const jobs = Object.values(processingJobs);
 
-  const activeUploads = uploads.filter((u) => u.status === "uploading" || u.status === "pending" || u.status === "paused");
-  const errorUploads = uploads.filter((u) => u.status === "error");
-
-  const activePublications = publications.filter(
-    (p) => p.status === "processing" || p.status === "publishing"
+  const activeUploads = uploads.filter(
+    (u) => u.status === 'uploading' || u.status === 'pending' || u.status === 'paused',
   );
-  const failedPublications = publications.filter((p) => p.status === "failed");
-  const completedPublications = publications.filter((p) => p.status === "published");
-  
-  const activeJobs = jobs.filter((j) => j.status === "processing" || j.status === "queued");
-  const failedJobs = jobs.filter((j) => j.status === "failed");
+  const errorUploads = uploads.filter((u) => u.status === 'error');
+  const activePublications = publications.filter(
+    (p) => p.status === 'processing' || p.status === 'publishing',
+  );
+  const failedPublications = publications.filter((p) => p.status === 'failed');
+  const activeJobs = jobs.filter((j) => j.status === 'processing' || j.status === 'queued');
+  const failedJobs = jobs.filter((j) => j.status === 'failed');
 
   const totalActive = activeUploads.length + activePublications.length + activeJobs.length;
   const hasErrors = errorUploads.length > 0 || failedPublications.length > 0 || failedJobs.length > 0;
-  const hasCompleted = completedPublications.length > 0 || uploads.some((u) => u.status === "completed") || jobs.some((j) => j.status === "completed");
 
   useUploadWarning(activeUploads.length > 0);
-  
-  // Progress update responsiveness: 500ms for uploads, 1s for processing
+
+  // Re-open if new activity arrives after closing
   useEffect(() => {
-    const uploadInterval = setInterval(() => {
-      const updates: Record<string, number> = {};
-      activeUploads.forEach((upload) => {
-        updates[upload.id] = Date.now();
-      });
-      setUploadProgressUpdates(updates);
-    }, 500); // 500ms for uploads
+    if (totalActive > 0) setIsClosed(false);
+  }, [totalActive]);
 
-    return () => clearInterval(uploadInterval);
-  }, [activeUploads.length]);
-
+  // Auto-select tab with activity
   useEffect(() => {
-    const processingInterval = setInterval(() => {
-      const updates: Record<string, number> = {};
-      activeJobs.forEach((job) => {
-        updates[job.id] = Date.now();
-      });
-      setProcessingProgressUpdates(updates);
-    }, 1000); // 1s for processing
-
-    return () => clearInterval(processingInterval);
-  }, [activeJobs.length]);
+    if (activeUploads.length > 0) setActiveTab('uploads');
+    else if (activeJobs.length > 0) setActiveTab('processing');
+    else if (activePublications.length > 0) setActiveTab('publications');
+  }, [activeUploads.length, activeJobs.length, activePublications.length]);
 
   const handleCancelPublication = async (e: React.MouseEvent, id: number) => {
     e.stopPropagation();
-
-    const isConfirmed = await confirm({
-      title: t("publications.modal.cancel_confirmation.title") || "Cancelar Publicación",
-      message: t("publications.modal.cancel_confirmation.message") || "¿Cancelar esta publicación?",
-      confirmText: t("publications.modal.cancel_confirmation.confirm") || "Sí, cancelar",
-      cancelText: t("publications.modal.cancel_confirmation.cancel") || "No, continuar",
-      type: "danger",
+    const ok = await confirm({
+      title: 'Cancelar Publicación',
+      message: '¿Cancelar esta publicación?',
+      confirmText: 'Sí, cancelar',
+      cancelText: 'No',
+      type: 'danger',
     });
-
-    if (!isConfirmed) return;
-
-    try {
-      await axios.post(route("api.v1.publications.cancel", id));
-    } catch (err) {
-      }
+    if (!ok) return;
+    try { await axios.post(route('api.v1.publications.cancel', id)); } catch {}
   };
 
   const handleCancelPlatform = async (publicationId: number, platformId: number, platformName: string) => {
-    const isConfirmed = await confirm({
-      title: t("publications.modal.cancel_platform.title", { platform: platformName }) || "¿Cancelar " + platformName + "?",
-      message: t("publications.modal.cancel_platform.message", { platform: platformName }) || "¿Estás seguro de que deseas cancelar la publicación en " + platformName + "? Se detendrán todos los reintentos para esta plataforma.",
-      confirmText: t("publications.modal.cancel_platform.confirm") || "Sí, cancelar",
-      cancelText: t("publications.modal.cancel_platform.cancel") || "No",
-      type: "warning",
+    const ok = await confirm({
+      title: `¿Cancelar ${platformName}?`,
+      message: `¿Cancelar la publicación en ${platformName}?`,
+      confirmText: 'Sí, cancelar',
+      cancelText: 'No',
+      type: 'warning',
     });
-
-    if (!isConfirmed) return;
-
+    if (!ok) return;
     try {
-      await axios.post(route("api.v1.publications.cancel", publicationId), {
-        platform_ids: [platformId]
-      });
-      
-      // Force refresh of publication status after canceling
-      // This will trigger a re-fetch of the publication data
-      window.dispatchEvent(new CustomEvent('publication-cancelled', { 
-        detail: { publicationId, platformId } 
-      }));
-    } catch (err) {
-      }
+      await axios.post(route('api.v1.publications.cancel', publicationId), { platform_ids: [platformId] });
+      window.dispatchEvent(new CustomEvent('publication-cancelled', { detail: { publicationId, platformId } }));
+    } catch {}
   };
 
   const handleDismissPublication = (e: React.MouseEvent, id: number) => {
     e.stopPropagation();
     setDismissedIds((prev) => [...prev, id]);
   };
-  
-  const handlePauseUpload = (id: string) => {
-    pauseUpload(id);
-  };
-  
-  const handleResumeUpload = (id: string) => {
-    resumeUploadWithLogic(id);
-  };
-  
-  const handleCancelUpload = async (id: string) => {
-    const isConfirmed = await confirm({
-      title: t("publications.modal.cancel_confirmation.title") || "Cancel Upload",
-      message: t("publications.modal.upload.cancel_message") || "Are you sure you want to cancel this upload?",
-      confirmText: t("publications.modal.cancel_confirmation.confirm") || "Yes, cancel",
-      cancelText: t("publications.modal.cancel_confirmation.cancel") || "No, continue",
-      type: "danger",
-    });
 
-    if (!isConfirmed) return;
-    
-    // Use the hook's cancelUpload which includes cleanup
+  const handleRemoveUpload = (id: string) => removeUpload(id);
+
+  const handleCancelUpload = async (id: string) => {
+    const ok = await confirm({
+      title: 'Cancel Upload',
+      message: 'Are you sure you want to cancel this upload?',
+      confirmText: 'Yes, cancel',
+      cancelText: 'No',
+      type: 'danger',
+    });
+    if (!ok) return;
     await cancelUploadWithCleanup(id);
   };
-  
-  const handleCancelJob = async (id: string) => {
-    const isConfirmed = await confirm({
-      title: t("publications.modal.cancel_confirmation.title") || "Cancel Processing",
-      message: t("publications.modal.processing.cancel_message") || "Are you sure you want to cancel this processing job?",
-      confirmText: t("publications.modal.cancel_confirmation.confirm") || "Yes, cancel",
-      cancelText: t("publications.modal.cancel_confirmation.cancel") || "No, continue",
-      type: "danger",
-    });
 
-    if (!isConfirmed) return;
-    
+  const handleCancelJob = async (id: string) => {
+    const ok = await confirm({
+      title: 'Cancel Processing',
+      message: 'Are you sure you want to cancel this job?',
+      confirmText: 'Yes, cancel',
+      cancelText: 'No',
+      type: 'danger',
+    });
+    if (!ok) return;
     cancelJob(id);
-  };
-  
-  const handleRetryUpload = (id: string) => {
-    retryUpload(id);
   };
 
   if (uploads.length === 0 && publications.length === 0 && jobs.length === 0) return null;
+  if (isClosed) return <ConfirmDialog />;
 
-  const getHeaderIcon = () => {
-    if (totalActive > 0) {
-      return <Loader2 className="w-4 h-4 text-primary animate-spin" />;
-    }
-    if (hasErrors) {
-      return <AlertTriangle className="w-4 h-4 text-red-500" />;
-    }
-    return <CheckCircle2 className="w-4 h-4 text-green-500" />;
-  };
+  // Colors & icon based on status
+  const dotColor = totalActive > 0 ? 'bg-primary-500' : hasErrors ? 'bg-red-500' : 'bg-green-500';
+  const circleColor = totalActive > 0 ? 'bg-primary-500' : hasErrors ? 'bg-red-500' : 'bg-green-500';
+  const statusIcon = totalActive > 0
+    ? <Loader2 className="h-5 w-5 animate-spin text-white" />
+    : hasErrors
+      ? <AlertTriangle className="h-5 w-5 text-white" />
+      : <CheckCircle2 className="h-5 w-5 text-white" />;
 
-  const getHeaderText = () => {
-    if (totalActive > 0) {
-      if (activeUploads.length > 0 && activePublications.length > 0) {
-        return t("publications.modal.upload.activeTasks", {
-          count: totalActive,
-          defaultValue: `${totalActive} tareas activas`,
-        });
-      }
-      if (activePublications.length > 0) {
-        return t("publications.modal.upload.publishingSocial", {
-          count: activePublications.length,
-          defaultValue: `Publicando (${activePublications.length})`,
-        });
-      }
-      return t("publications.modal.upload.uploadingFiles", {
-        count: activeUploads.length,
-        defaultValue: `Subiendo (${activeUploads.length})`,
-      });
-    }
-    if (hasErrors) {
-      return t("publications.modal.upload.uploadFailed", { defaultValue: "Algo salió mal" });
-    }
-    if (hasCompleted) {
-      return t("publications.modal.upload.uploadsCompleted", { defaultValue: "Completado" });
-    }
-    return t("publications.modal.upload.uploadsCompleted", { defaultValue: "Completado" });
-  };
-
-  return (
-    <>
-      <div className="fixed bottom-4 right-4 z-[100] w-80 bg-white dark:bg-neutral-800 rounded-lg shadow-2xl border border-gray-200 dark:border-neutral-700 overflow-hidden">
-        {/* Header */}
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="w-full flex items-center justify-between p-3 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-neutral-700/50 dark:to-neutral-700/30 hover:from-gray-100 hover:to-gray-50 dark:hover:from-neutral-700/70 dark:hover:to-neutral-700/50 transition-colors"
-          aria-label={isExpanded ? t("common.collapse", { defaultValue: "Collapse upload indicator" }) : t("common.expand", { defaultValue: "Expand upload indicator" })}
-          aria-expanded={isExpanded}
+  // ── Minimized: just a circle icon, same as DevCacheIndicator ──
+  if (isMinimized) {
+    return (
+      <>
+        <div
+          className="relative cursor-pointer self-end"
+          onClick={() => setIsMinimized(false)}
         >
-          <div className="flex items-center gap-2.5">
-            {getHeaderIcon()}
-            <span className="font-semibold text-sm text-gray-800 dark:text-neutral-100">
-              {getHeaderText()}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
+          <div className={`${circleColor} rounded-full p-3 shadow-lg transition-transform hover:scale-110`}>
+            {statusIcon}
             {totalActive > 0 && (
-              <span className="text-xs font-bold text-primary dark:text-primary-light bg-primary/10 dark:bg-primary/20 px-2 py-0.5 rounded-full">
+              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[9px] font-bold text-gray-800 shadow">
                 {totalActive}
               </span>
             )}
-            {isExpanded ? (
-              <ChevronDown className="w-4 h-4 text-gray-500 dark:text-neutral-400" />
-            ) : (
-              <ChevronUp className="w-4 h-4 text-gray-500 dark:text-neutral-400" />
-            )}
           </div>
-        </button>
+        </div>
+        <ConfirmDialog />
+      </>
+    );
+  }
+
+  // Tabs config — only show tabs that have items
+  const tabs: { id: Tab; icon: React.ReactNode; count: number; activeCount: number; title: string }[] = [
+    { id: 'uploads' as const,      icon: <FileUp className="h-4 w-4" />, count: uploads.length,      activeCount: activeUploads.length,      title: 'Archivos' },
+    { id: 'processing' as const,   icon: <Cpu className="h-4 w-4" />,    count: jobs.length,          activeCount: activeJobs.length,         title: 'Procesando' },
+    { id: 'publications' as const, icon: <Radio className="h-4 w-4" />,  count: publications.length,  activeCount: activePublications.length,  title: 'Plataformas' },
+  ].filter((tab) => tab.count > 0);
+
+  return (
+    <>
+      <div className="w-72 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-neutral-700 dark:bg-gray-800">
+
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-gray-200 px-3 py-2 dark:border-neutral-700">
+          <div className="flex items-center gap-2">
+            <div className={`h-2 w-2 rounded-full ${dotColor} ${totalActive > 0 ? 'animate-pulse' : ''}`} />
+            <span className="text-sm font-semibold text-gray-900 dark:text-white">
+              {totalActive > 0
+                ? `${totalActive} activo${totalActive > 1 ? 's' : ''}`
+                : hasErrors ? 'Error' : 'Completado'}
+            </span>
+          </div>
+          <div className="flex items-center gap-0.5">
+            {/* Minimize to circle */}
+            <button
+              onClick={() => setIsMinimized(true)}
+              className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-neutral-700 dark:hover:text-neutral-200"
+              title="Minimizar"
+            >
+              <Minus className="h-3.5 w-3.5" />
+            </button>
+            {/* Close completely */}
+            <button
+              onClick={() => setIsClosed(true)}
+              className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-neutral-700 dark:hover:text-neutral-200"
+              title="Cerrar"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Icon-only tab bar */}
+        {tabs.length > 1 && (
+          <div className="flex border-b border-gray-100 dark:border-neutral-700">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                title={tab.title}
+                className={`relative flex flex-1 items-center justify-center py-2 transition-colors ${
+                  activeTab === tab.id
+                    ? 'border-b-2 border-primary-500 text-primary-600 dark:text-primary-400'
+                    : 'text-gray-400 hover:text-gray-600 dark:hover:text-neutral-300'
+                }`}
+              >
+                {tab.icon}
+                {tab.activeCount > 0 && (
+                  <span className="absolute right-2 top-1 h-1.5 w-1.5 rounded-full bg-primary-500" />
+                )}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Content */}
-        {isExpanded && (
-          <div className="max-h-96 overflow-y-auto custom-scrollbar">
-            {/* File Uploads Section */}
-            {uploads.length > 0 && (
-              <div>
-                <div className="bg-gray-50/70 dark:bg-neutral-700/30 px-3 py-2 flex items-center justify-between border-b border-gray-100 dark:border-neutral-700">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">
-                    {t("common.files") || "Archivos"}
-                  </span>
-                  <span className="text-[10px] font-semibold text-gray-500 dark:text-neutral-400">
-                    {activeUploads.length} activos
-                  </span>
+        <div className="custom-scrollbar max-h-64 overflow-y-auto">
+
+          {/* Uploads */}
+          {activeTab === 'uploads' && (
+            <>
+              {uploads.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 text-gray-300 dark:text-neutral-600">
+                  <FileUp className="mb-1 h-6 w-6" />
+                  <span className="text-xs">Sin archivos</span>
                 </div>
-                {uploads.map((upload) => (
-                  <div key={upload.id} className="p-3 border-b border-gray-100 dark:border-neutral-700 last:border-0">
-                    <div className="flex justify-between items-start mb-2">
-                      <span
-                        className="text-xs font-medium truncate max-w-[200px] text-neutral-900 dark:text-neutral-100"
-                        title={upload.file.name}
-                      >
+              ) : (
+                uploads.map((upload) => (
+                  <div key={upload.id} className="flex items-start gap-2 border-b border-gray-100 px-3 py-2 last:border-0 dark:border-neutral-700/60">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-xs font-medium text-gray-800 dark:text-neutral-100" title={upload.file.name}>
                         {upload.file.name}
-                      </span>
+                      </p>
+                      <ProgressDisplay
+                        percentage={upload.progress}
+                        eta={upload.stats?.eta}
+                        speed={upload.stats?.speed}
+                        status={upload.status}
+                        onPause={upload.isPausable && upload.status === 'uploading' ? () => pauseUpload(upload.id) : undefined}
+                        onResume={upload.status === 'paused' ? () => resumeUploadWithLogic(upload.id) : undefined}
+                        onCancel={upload.status === 'uploading' || upload.status === 'paused' ? () => handleCancelUpload(upload.id) : undefined}
+                        onRetry={upload.status === 'error' && upload.canRetry ? () => retryUpload(upload.id) : undefined}
+                        isPausable={upload.isPausable}
+                        isPaused={upload.status === 'paused'}
+                        error={upload.error}
+                        retryCount={upload.retryCount}
+                        canRetry={upload.canRetry}
+                      />
                     </div>
-                    <ProgressDisplay
-                      percentage={upload.progress}
-                      eta={upload.stats?.eta}
-                      speed={upload.stats?.speed}
-                      status={upload.status}
-                      onPause={upload.isPausable && upload.status === "uploading" ? () => handlePauseUpload(upload.id) : undefined}
-                      onResume={upload.status === "paused" ? () => handleResumeUpload(upload.id) : undefined}
-                      onCancel={(upload.status === "uploading" || upload.status === "paused") ? () => handleCancelUpload(upload.id) : undefined}
-                      onRetry={upload.status === "error" && upload.canRetry ? () => handleRetryUpload(upload.id) : undefined}
-                      isPausable={upload.isPausable}
-                      isPaused={upload.status === "paused"}
-                      error={upload.error}
-                      retryCount={upload.retryCount}
-                      canRetry={upload.canRetry}
-                    />
+                    {/* Remove from list */}
+                    {(upload.status === 'completed' || upload.status === 'error') && (
+                      <button
+                        onClick={() => handleRemoveUpload(upload.id)}
+                        className="mt-0.5 flex-shrink-0 rounded p-0.5 text-gray-300 hover:bg-gray-100 hover:text-red-400 dark:hover:bg-neutral-700"
+                        title="Eliminar de la lista"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    )}
                   </div>
-                ))}
-              </div>
-            )}
-            
-            {/* Processing Jobs Section */}
-            {jobs.length > 0 && (
-              <div className={uploads.length > 0 ? "border-t-2 border-gray-200 dark:border-neutral-600" : ""}>
-                <div className="bg-gray-50/70 dark:bg-neutral-700/30 px-3 py-2 flex items-center justify-between border-b border-gray-100 dark:border-neutral-700">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">
-                    {t("common.processing") || "Processing"}
-                  </span>
-                  <span className="text-[10px] font-semibold text-gray-500 dark:text-neutral-400">
-                    {activeJobs.length} {t("common.active") || "active"}
-                  </span>
+                ))
+              )}
+            </>
+          )}
+
+          {/* Processing */}
+          {activeTab === 'processing' && (
+            <>
+              {jobs.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 text-gray-300 dark:text-neutral-600">
+                  <Cpu className="mb-1 h-6 w-6" />
+                  <span className="text-xs">Sin tareas</span>
                 </div>
-                {jobs.map((job) => (
-                  <div key={job.id} className="p-3 border-b border-gray-100 dark:border-neutral-700 last:border-0">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="flex-1">
-                        <span className="text-xs font-medium text-neutral-900 dark:text-neutral-100 block">
-                          {job.type === "video_processing" && (t("common.video_processing") || "Video Processing")}
-                          {job.type === "reel_generation" && (t("common.reel_generation") || "Reel Generation")}
-                          {job.type === "thumbnail_generation" && (t("common.thumbnail_generation") || "Thumbnail Generation")}
-                        </span>
-                        {job.stats?.currentStep && (
-                          <span className="text-[10px] text-gray-500 dark:text-neutral-400">
-                            {job.stats.currentStep} ({job.stats.completedSteps}/{job.stats.totalSteps})
-                          </span>
-                        )}
-                      </div>
-                    </div>
+              ) : (
+                jobs.map((job) => (
+                  <div key={job.id} className="border-b border-gray-100 px-3 py-2 last:border-0 dark:border-neutral-700/60">
+                    <p className="mb-0.5 text-xs font-medium text-gray-800 dark:text-neutral-100">
+                      {job.type === 'video_processing' && 'Video Processing'}
+                      {job.type === 'reel_generation' && 'Reel Generation'}
+                      {job.type === 'thumbnail_generation' && 'Thumbnail Generation'}
+                    </p>
+                    {job.stats?.currentStep && (
+                      <p className="mb-1 text-[10px] text-gray-400 dark:text-neutral-500">
+                        {job.stats.currentStep} ({job.stats.completedSteps}/{job.stats.totalSteps})
+                      </p>
+                    )}
                     <ProgressDisplay
                       percentage={job.progress}
                       eta={job.stats?.eta}
-                      status={job.status === "queued" ? "pending" : job.status === "processing" ? "uploading" : job.status}
-                      onCancel={(job.status === "processing" || job.status === "queued") ? () => handleCancelJob(job.id) : undefined}
+                      status={job.status === 'queued' ? 'pending' : job.status === 'processing' ? 'uploading' : job.status}
+                      onCancel={job.status === 'processing' || job.status === 'queued' ? () => handleCancelJob(job.id) : undefined}
                       isPausable={false}
                       isPaused={false}
                       error={job.error}
                     />
                   </div>
-                ))}
-              </div>
-            )}
+                ))
+              )}
+            </>
+          )}
 
-            {/* Publications Section */}
-            {publications.length > 0 && (
-              <div className={(uploads.length > 0 || jobs.length > 0) ? "border-t-2 border-gray-200 dark:border-neutral-600" : ""}>
-                <div className="bg-gray-50/70 dark:bg-neutral-700/30 px-3 py-2 flex items-center justify-between border-b border-gray-100 dark:border-neutral-700">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">
-                    {t("common.publications") || "Publicaciones"}
-                  </span>
-                  <span className="text-[10px] font-semibold text-gray-500 dark:text-neutral-400">
-                    {activePublications.length} en curso
-                  </span>
+          {/* Publications */}
+          {activeTab === 'publications' && (
+            <>
+              {publications.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 text-gray-300 dark:text-neutral-600">
+                  <Radio className="mb-1 h-6 w-6" />
+                  <span className="text-xs">Sin publicaciones</span>
                 </div>
-                {publications.map((publication) => (
+              ) : (
+                publications.map((publication) => (
                   <PublicationItem
                     key={publication.id}
                     publication={publication}
@@ -345,11 +337,12 @@ export default function GlobalUploadIndicator() {
                     onDismiss={handleDismissPublication}
                     onCancelPlatform={handleCancelPlatform}
                   />
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+                ))
+              )}
+            </>
+          )}
+
+        </div>
       </div>
 
       <ConfirmDialog />

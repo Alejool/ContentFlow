@@ -13,6 +13,8 @@ use App\Models\PublicationTemplate;
 
 use App\Services\AIService;
 use App\Services\OnboardingService;
+use App\Services\SystemConfigService;
+use App\Services\PlanFilterService;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -48,6 +50,7 @@ class HandleInertiaRequests extends Middleware
           'email' => $user->email,
           'email_verified_at' => $user->email_verified_at,
           'locale' => $user->locale ?? 'es',
+          'timezone' => $user->timezone ?? 'UTC',
           'created_at' => $user->created_at,
           'photo_url' => $user->photo_url,
           'theme' => $user->theme,
@@ -84,6 +87,7 @@ class HandleInertiaRequests extends Middleware
                 $ws->user_role = $isOwner ? 'Owner' : ($role ? $role->name : 'Member');
                 $ws->user_role_slug = $isOwner ? 'owner' : ($role ? $role->slug : 'member');
                 $ws->role = (object)['name' => $ws->user_role, 'slug' => $ws->user_role_slug];
+                $ws->timezone = $ws->timezone ?? 'UTC';
                 return $ws;
               });
           } catch (\Exception $e) {
@@ -96,6 +100,13 @@ class HandleInertiaRequests extends Middleware
           try {
             // Force fresh user to avoid stale state in Octane/Swoole
             $user = $request->user() ? $request->user()->fresh() : null;
+            
+            Log::info('Current Workspace Debug', [
+              'user_id' => $user?->id,
+              'current_workspace_id' => $user?->current_workspace_id,
+              'has_user' => !is_null($user)
+            ]);
+            
             if (!$user)
               return null;
 
@@ -108,11 +119,16 @@ class HandleInertiaRequests extends Middleware
                   'users' => function ($query) use ($user) {
                     $query->where('users.id', $user->id)
                       ->select('users.id', 'users.name', 'users.email', 'users.photo_url')
-                      ->withPivot('role_id', 'created_at');
+                      ->withPivot('role_id', 'assigned_by', 'assigned_at', 'created_at', 'updated_at');
                   },
                   'creator:id,name,email'
                 ])
                 ->first();
+                
+              Log::info('Current Workspace Found', [
+                'workspace_id' => $currentWorkspace?->id,
+                'workspace_name' => $currentWorkspace?->name
+              ]);
             }
 
             if (!$currentWorkspace) {
@@ -122,16 +138,26 @@ class HandleInertiaRequests extends Middleware
                   'users' => function ($query) use ($user) {
                     $query->where('users.id', $user->id)
                       ->select('users.id', 'users.name', 'users.email', 'users.photo_url')
-                      ->withPivot('role_id', 'created_at');
+                      ->withPivot('role_id', 'assigned_by', 'assigned_at', 'created_at', 'updated_at');
                   },
                   'creator:id,name,email'
                 ])
                 ->first();
 
+              Log::info('First Workspace Fallback', [
+                'first_workspace_id' => $firstWorkspace?->id,
+                'first_workspace_name' => $firstWorkspace?->name
+              ]);
+
               if ($firstWorkspace) {
                 $currentWorkspace = $firstWorkspace;
                 $user->current_workspace_id = $firstWorkspace->id;
                 $user->save();
+                
+                Log::info('Updated user current_workspace_id', [
+                  'user_id' => $user->id,
+                  'new_current_workspace_id' => $firstWorkspace->id
+                ]);
               }
             }
 
@@ -159,6 +185,48 @@ class HandleInertiaRequests extends Middleware
               } else {
                 $currentWorkspace->permissions = $role ? $role->permissions->pluck('slug')->toArray() : [];
               }
+
+              $currentWorkspace->plan = $currentWorkspace->getPlanName();
+              $currentWorkspace->features = $currentWorkspace->getPlanFeatures();
+              
+              // ✅ AGREGAR TIMEZONE DEL WORKSPACE
+              $currentWorkspace->timezone = $currentWorkspace->timezone ?? 'UTC';
+              
+              // ✅ AGREGAR INFORMACIÓN DEL WORKFLOW DE APROBACIÓN
+              $workflow = $currentWorkspace->approvalWorkflow()->with(['levels.role'])->first();
+              if ($workflow && $workflow->is_enabled) {
+                $currentWorkspace->approval_workflow = [
+                  'id' => $workflow->id,
+                  'name' => $workflow->name ?? 'Flujo de Aprobación',
+                  'is_enabled' => true,
+                  'is_multi_level' => $workflow->is_multi_level,
+                  'levels' => $workflow->levels->map(function($level) {
+                    return [
+                      'id' => $level->id,
+                      'level_number' => $level->level_number,
+                      'level_name' => $level->level_name,
+                      'role' => $level->role ? [
+                        'id' => $level->role->id,
+                        'name' => $level->role->name,
+                        'slug' => $level->role->slug,
+                      ] : null,
+                    ];
+                  })->toArray(),
+                ];
+              } else {
+                $currentWorkspace->approval_workflow = null;
+              }
+              
+              Log::info('Current Workspace Final', [
+                'id' => $currentWorkspace->id,
+                'name' => $currentWorkspace->name,
+                'role' => $currentWorkspace->user_role
+              ]);
+            } else {
+              Log::warning('No current workspace found for user', [
+                'user_id' => $user->id,
+                'user_email' => $user->email
+              ]);
             }
 
             return $currentWorkspace;
@@ -176,7 +244,70 @@ class HandleInertiaRequests extends Middleware
         'location' => $request->url(),
       ],
       'ai_enabled' => fn() => app(AIService::class)->isAiEnabled(),
-      
+
+      // System configuration - shared globally
+      'systemFeatures' => function () {
+        try {
+          $systemConfig = app(SystemConfigService::class);
+          return [
+            'ai' => $systemConfig->isFeatureEnabled('ai'),
+            'analytics' => $systemConfig->isFeatureEnabled('analytics'),
+            'reels' => $systemConfig->isFeatureEnabled('reels'),
+            'approval_workflows' => $systemConfig->isFeatureEnabled('approval_workflows'),
+            'calendar_sync' => $systemConfig->isFeatureEnabled('calendar_sync'),
+            'bulk_operations' => $systemConfig->isFeatureEnabled('bulk_operations'),
+            'white_label' => $systemConfig->isFeatureEnabled('white_label'),
+          ];
+        } catch (\Exception $e) {
+          Log::error('Inertia System Features Share Error: ' . $e->getMessage());
+          return [
+            'ai' => true,
+            'analytics' => true,
+            'reels' => true,
+            'approval_workflows' => true,
+            'calendar_sync' => true,
+            'bulk_operations' => true,
+            'white_label' => true,
+          ];
+        }
+      },
+
+      'systemAddons' => function () {
+        try {
+          $systemConfig = app(SystemConfigService::class);
+          return [
+            'ai_credits' => $systemConfig->isAddonAvailable('ai_credits'),
+            'storage' => $systemConfig->isAddonAvailable('storage'),
+            'team_members' => $systemConfig->isAddonAvailable('team_members'),
+            'publications' => $systemConfig->isAddonAvailable('publications'),
+          ];
+        } catch (\Exception $e) {
+          Log::error('Inertia System Addons Share Error: ' . $e->getMessage());
+          return [
+            'ai_credits' => true,
+            'storage' => true,
+            'team_members' => true,
+            'publications' => true,
+          ];
+        }
+      },
+
+      'visibleUsageMetrics' => function () {
+        try {
+          $planFilter = app(PlanFilterService::class);
+          return $planFilter->getVisibleUsageMetrics();
+        } catch (\Exception $e) {
+          Log::error('Inertia Visible Usage Metrics Share Error: ' . $e->getMessage());
+          return [
+            'publications' => true,
+            'social_accounts' => true,
+            'storage' => true,
+            'ai_requests' => true,
+            'team_members' => true,
+          ];
+        }
+      },
+
       // Onboarding data
       'onboarding' => function () use ($request) {
         try {
@@ -187,7 +318,7 @@ class HandleInertiaRequests extends Middleware
 
           $onboardingService = app(OnboardingService::class);
           $state = $onboardingService->getOnboardingState($user);
-          
+
           // Only return onboarding data if not complete
           if ($state->completed_at) {
             return null;
@@ -213,7 +344,7 @@ class HandleInertiaRequests extends Middleware
           return null;
         }
       },
-      
+
       'tourSteps' => function () use ($request) {
         try {
           $user = $request->user();
@@ -223,7 +354,7 @@ class HandleInertiaRequests extends Middleware
 
           $onboardingService = app(OnboardingService::class);
           $state = $onboardingService->getOnboardingState($user);
-          
+
           // Only return tour steps if onboarding is not complete
           if ($state->completed_at) {
             return [];
@@ -296,7 +427,7 @@ class HandleInertiaRequests extends Middleware
           return [];
         }
       },
-      
+
       'availablePlatforms' => function () use ($request) {
         try {
           $user = $request->user();
@@ -306,7 +437,7 @@ class HandleInertiaRequests extends Middleware
 
           $onboardingService = app(OnboardingService::class);
           $state = $onboardingService->getOnboardingState($user);
-          
+
           // Only return platforms if onboarding is not complete
           if ($state->completed_at) {
             return [];
@@ -320,7 +451,7 @@ class HandleInertiaRequests extends Middleware
           return [];
         }
       },
-      
+
       'connectedAccounts' => function () use ($request) {
         try {
           $user = $request->user();
@@ -346,7 +477,7 @@ class HandleInertiaRequests extends Middleware
           return [];
         }
       },
-      
+
       'templates' => function () use ($request) {
         try {
           $user = $request->user();
@@ -356,7 +487,7 @@ class HandleInertiaRequests extends Middleware
 
           $onboardingService = app(OnboardingService::class);
           $state = $onboardingService->getOnboardingState($user);
-          
+
           // Only return templates if onboarding is not complete
           if ($state->completed_at) {
             return [];

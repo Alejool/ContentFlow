@@ -26,10 +26,11 @@ export function useExternalCalendarStatus() {
           status: conn.status,
           errorMessage: conn.errorMessage || conn.error_message,
           syncEnabled: conn.syncEnabled ?? conn.sync_enabled ?? false,
-          syncConfig: conn.syncConfig || conn.sync_config || {
-            syncCampaigns: [],
-            syncPlatforms: [],
-          },
+          syncConfig: conn.syncConfig ||
+            conn.sync_config || {
+              syncCampaigns: [],
+              syncPlatforms: [],
+            },
         }));
         setConnections(connections);
         return connections;
@@ -58,20 +59,18 @@ export function useConnectCalendar() {
     onSuccess: (data) => {
       // Open OAuth window in popup (like social networks)
       if (data.auth_url) {
-        const authWindow = window.open(
-          data.auth_url,
-          'oauth',
-          'width=600,height=700'
-        );
+        const authWindow = window.open(data.auth_url, 'oauth', 'width=600,height=700');
 
         // Listen for messages from the popup
         const handleMessage = (event: MessageEvent) => {
           if (event.origin !== window.location.origin) return;
-          
+
           if (event.data.type === 'external_calendar_callback') {
             // Refetch connection status
-            queryClient.invalidateQueries({ queryKey: ['external-calendar-status'] });
-            
+            queryClient.invalidateQueries({
+              queryKey: ['external-calendar-status'],
+            });
+
             // Clean up listener
             window.removeEventListener('message', handleMessage);
           }
@@ -85,7 +84,9 @@ export function useConnectCalendar() {
             clearInterval(pollTimer);
             window.removeEventListener('message', handleMessage);
             // Refetch connection status after OAuth completes
-            queryClient.invalidateQueries({ queryKey: ['external-calendar-status'] });
+            queryClient.invalidateQueries({
+              queryKey: ['external-calendar-status'],
+            });
           }
         }, 500);
       }

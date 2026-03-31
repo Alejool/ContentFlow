@@ -229,6 +229,10 @@ class StatisticsService
         'total_posts' => $latestMetrics->posts_count ?? 0,
         'reach' => $latestMetrics->reach ?? 0,
         'impressions' => $latestMetrics->impressions ?? 0,
+        'needs_reconnection' => $account->needsReconnection(),
+        'is_token_expired' => $account->isTokenExpired(),
+        'failure_count' => $account->failure_count,
+        'is_active' => $account->is_active,
       ];
     });
   }

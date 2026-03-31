@@ -14,7 +14,7 @@ export function useContentValidation() {
    */
   const validateContent = async (
     publicationId: number,
-    platformIds: number[]
+    platformIds: number[],
   ): Promise<ContentValidationResult | null> => {
     if (!publicationId || !platformIds || platformIds.length === 0) {
       setValidationError('Datos de validación incompletos');
@@ -28,7 +28,7 @@ export function useContentValidation() {
     try {
       const response = await axios.post<{ data: ContentValidationResult }>(
         `/api/v1/publications/${publicationId}/validate`,
-        { platform_ids: platformIds }
+        { platform_ids: platformIds },
       );
 
       setValidationResult(response.data.data);
@@ -58,7 +58,7 @@ export function useContentValidation() {
     return (
       (validationResult.warnings?.length ?? 0) > 0 ||
       Object.values(validationResult.platform_results || {}).some(
-        (r) => (r.warnings?.length ?? 0) > 0
+        (r) => (r.warnings?.length ?? 0) > 0,
       )
     );
   };

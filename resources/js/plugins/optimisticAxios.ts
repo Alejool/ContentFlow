@@ -1,18 +1,35 @@
 /**
  * Axios Interceptor for Optimistic Updates
- * 
+ *
  * This plugin intercepts axios requests and responses to automatically handle
  * optimistic updates. When a request is marked as optimistic, it:
  * 1. Registers the operation in the Optimistic Store
  * 2. Updates the UI immediately with optimistic data
  * 3. Confirms or rolls back based on server response
- * 
+ *
  * Requirements: 9.3, 3.3
  */
 
-import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import type { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios';
 import useOptimisticStore from '../stores/optimisticStore';
 import type { OptimisticOperation } from '../types/optimistic';
+
+// Extend InternalAxiosRequestConfig to include our custom fields
+declare module 'axios' {
+  interface InternalAxiosRequestConfig {
+    optimistic?: boolean;
+    optimisticData?: unknown;
+    resource?: string;
+    rollbackOnError?: boolean;
+    originalData?: unknown;
+    operationType?: 'create' | 'update' | 'delete';
+    resourceId?: string | number;
+    maxRetries?: number;
+    onSuccess?: (data: unknown) => void;
+    onError?: (error: Error) => void;
+    onRollback?: () => void;
+  }
+}
 
 /**
  * Configuration interface for the optimistic interceptor
@@ -20,30 +37,30 @@ import type { OptimisticOperation } from '../types/optimistic';
 export interface InterceptorConfig {
   /** Enable optimistic updates for this request */
   optimistic?: boolean;
-  
+
   /** Data to show optimistically in the UI */
-  optimisticData?: any;
-  
+  optimisticData?: unknown;
+
   /** Resource type (e.g., 'posts', 'reels', 'publications') */
   resource?: string;
-  
+
   /** Whether to rollback on error (default: true) */
   rollbackOnError?: boolean;
-  
+
   /** Original data before update (for rollback) */
-  originalData?: any;
-  
+  originalData?: unknown;
+
   /** Operation type (auto-detected from HTTP method if not provided) */
   operationType?: 'create' | 'update' | 'delete';
-  
+
   /** Resource ID (for update/delete operations) */
   resourceId?: string | number;
-  
+
   /** Maximum retry attempts for network errors */
   maxRetries?: number;
-  
+
   /** Callbacks */
-  onSuccess?: (data: any) => void;
+  onSuccess?: (data: unknown) => void;
   onError?: (error: Error) => void;
   onRollback?: () => void;
 }
@@ -74,7 +91,7 @@ function detectOperationType(method?: string): 'create' | 'update' | 'delete' {
 
 /**
  * Setup optimistic interceptors on an axios instance
- * 
+ *
  * @param axiosInstance - The axios instance to configure
  * @returns Cleanup function to remove interceptors
  */
@@ -86,17 +103,17 @@ export function setupOptimisticInterceptor(axiosInstance: AxiosInstance): () => 
       if (config.optimistic && config.resource) {
         const requestKey = getRequestKey(config);
         const operationId = `${config.resource}-${Date.now()}-${Math.random()}`;
-        
+
         // Store the mapping
         requestOperationMap.set(requestKey, operationId);
-        
+
         // Attach operation ID to config for response interceptor
         (config as any).__optimisticId = operationId;
         (config as any).__requestKey = requestKey;
-        
+
         // Detect operation type if not provided
         const operationType = config.operationType || detectOperationType(config.method);
-        
+
         // Create optimistic operation
         const operation: OptimisticOperation = {
           id: operationId,
@@ -114,20 +131,23 @@ export function setupOptimisticInterceptor(axiosInstance: AxiosInstance): () => 
           onError: config.onError,
           onRollback: config.onRollback,
         };
-        
+
         // Register operation in store
         useOptimisticStore.getState().addOperation(operation);
-        
+
         // Log in development mode
         if (import.meta.env.DEV) {
-          }
+          console.log(
+            `[OptimisticAxios] Registered operation: ${operationId} for ${config.resource}`,
+          );
+        }
       }
-      
+
       return config;
     },
     (error) => {
       return Promise.reject(error);
-    }
+    },
   );
 
   // Response interceptor
@@ -137,19 +157,20 @@ export function setupOptimisticInterceptor(axiosInstance: AxiosInstance): () => 
       const config = response.config as any;
       const operationId = config.__optimisticId;
       const requestKey = config.__requestKey;
-      
+
       if (operationId && requestKey) {
         // Confirm the operation with server data
         useOptimisticStore.getState().confirmOperation(operationId, response.data);
-        
+
         // Clean up mapping
         requestOperationMap.delete(requestKey);
-        
+
         // Log in development mode
         if (import.meta.env.DEV) {
-          }
+          console.log(`[OptimisticAxios] Confirmed operation: ${operationId}`);
+        }
       }
-      
+
       return response;
     },
     (error: AxiosError) => {
@@ -157,25 +178,26 @@ export function setupOptimisticInterceptor(axiosInstance: AxiosInstance): () => 
       const config = error.config as any;
       const operationId = config?.__optimisticId;
       const requestKey = config?.__requestKey;
-      
+
       if (operationId && requestKey) {
         const rollbackOnError = config.rollbackOnError !== false; // Default to true
-        
+
         if (rollbackOnError) {
           // Rollback the operation
           useOptimisticStore.getState().rollbackOperation(operationId, error);
-          
+
           // Clean up mapping
           requestOperationMap.delete(requestKey);
-          
+
           // Log in development mode
           if (import.meta.env.DEV) {
-            }
+            console.log(`[OptimisticAxios] Rolled back operation: ${operationId}`);
+          }
         }
       }
-      
+
       return Promise.reject(error);
-    }
+    },
   );
 
   // Return cleanup function

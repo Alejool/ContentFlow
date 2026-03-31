@@ -1,4 +1,4 @@
-import { flushSync } from "react-dom";
+import { flushSync } from 'react-dom';
 
 /**
  * Theme transition options
@@ -15,9 +15,9 @@ export interface ThemeTransitionOptions {
  * @returns true if user prefers reduced motion, false otherwise
  */
 export function prefersReducedMotion(): boolean {
-  if (typeof window === "undefined") return false;
-  
-  const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+  if (typeof window === 'undefined') return false;
+
+  const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
   return mediaQuery.matches;
 }
 
@@ -39,11 +39,11 @@ export function instantTransition(callback: () => void): void {
  */
 export function transitionTheme(
   callback: () => void,
-  options?: ThemeTransitionOptions
+  options?: ThemeTransitionOptions,
 ): Promise<void> {
   const {
     duration = 250,
-    easing = "cubic-bezier(0.4, 0, 0.2, 1)",
+    easing = 'cubic-bezier(0.4, 0, 0.2, 1)',
     respectReducedMotion = true,
     event,
   } = options || {};
@@ -55,15 +55,21 @@ export function transitionTheme(
   }
 
   // Si no hay soporte para View Transition API, ejecutar directamente
-  if (!(document as any).startViewTransition) {
+  if (
+    !(
+      document as Document & {
+        startViewTransition?: (cb: () => void) => { finished: Promise<void> };
+      }
+    ).startViewTransition
+  ) {
     callback();
     return Promise.resolve();
   }
 
   // Apply custom duration and easing if provided
-  if (duration !== 250 || easing !== "cubic-bezier(0.4, 0, 0.2, 1)") {
-    document.documentElement.style.setProperty("--theme-transition-duration", `${duration}ms`);
-    document.documentElement.style.setProperty("--theme-transition-easing", easing);
+  if (duration !== 250 || easing !== 'cubic-bezier(0.4, 0, 0.2, 1)') {
+    document.documentElement.style.setProperty('--theme-transition-duration', `${duration}ms`);
+    document.documentElement.style.setProperty('--theme-transition-easing', easing);
   }
 
   // Capturar posición del cursor si está disponible
@@ -75,16 +81,18 @@ export function transitionTheme(
     const xPercent = (x / window.innerWidth) * 100;
     const yPercent = (y / window.innerHeight) * 100;
 
-    document.documentElement.style.setProperty("--x", `${xPercent}%`);
-    document.documentElement.style.setProperty("--y", `${yPercent}%`);
+    document.documentElement.style.setProperty('--x', `${xPercent}%`);
+    document.documentElement.style.setProperty('--y', `${yPercent}%`);
   } else {
     // Si no hay evento, usar el centro de la pantalla
-    document.documentElement.style.setProperty("--x", "50%");
-    document.documentElement.style.setProperty("--y", "50%");
+    document.documentElement.style.setProperty('--x', '50%');
+    document.documentElement.style.setProperty('--y', '50%');
   }
 
   // Iniciar la transición
-  const transition = (document as any).startViewTransition(() => {
+  const transition = (
+    document as Document & { startViewTransition?: (cb: () => void) => { finished: Promise<void> } }
+  ).startViewTransition!(() => {
     flushSync(() => {
       callback();
     });

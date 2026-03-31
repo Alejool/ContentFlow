@@ -1,7 +1,7 @@
-import { Publication } from "@/types/Publication";
-import { usePage } from "@inertiajs/react";
-import axios from "axios";
-import { useEffect, useState } from "react";
+import { Publication } from '@/types/Publication';
+import { usePage } from '@inertiajs/react';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 
 interface UsePublicationStatusOptions {
   dismissedIds: number[];
@@ -17,10 +17,10 @@ export function usePublicationStatus({ dismissedIds }: UsePublicationStatusOptio
 
     try {
       setIsFetching(true);
-      const response = await axios.get(route("api.v1.publications.index"), {
+      const response = await axios.get(route('api.v1.publications.index'), {
         params: {
-          status: "processing,publishing,retrying,failed,published",
-          simplified: "true",
+          status: 'processing,publishing,retrying,failed,published',
+          simplified: 'true',
         },
         signal,
       });
@@ -32,13 +32,17 @@ export function usePublicationStatus({ dismissedIds }: UsePublicationStatusOptio
 
         const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
         const filtered = items.filter((item) => {
-          if (item.status === "processing" || item.status === "publishing" || item.status === "retrying") {
+          if (
+            item.status === 'processing' ||
+            item.status === 'publishing' ||
+            item.status === 'retrying'
+          ) {
             return true;
           }
 
-          if (item.status === "failed" || item.status === "published") {
+          if (item.status === 'failed' || item.status === 'published') {
             if (dismissedIds.includes(item.id)) return false;
-            const updatedAt = new Date(item.updated_at || "");
+            const updatedAt = new Date(item.updated_at || '');
             return updatedAt > fiveMinutesAgo;
           }
 
@@ -48,10 +52,10 @@ export function usePublicationStatus({ dismissedIds }: UsePublicationStatusOptio
         setPublications(filtered);
       }
     } catch (err) {
-      if (axios.isCancel(err) || (err as any)?.name === "CanceledError") {
+      if (axios.isCancel(err) || (err as any)?.name === 'CanceledError') {
         return;
       }
-      } finally {
+    } finally {
       setIsFetching(false);
     }
   };
@@ -72,14 +76,14 @@ export function usePublicationStatus({ dismissedIds }: UsePublicationStatusOptio
     // WebSocket real-time updates
     if (props.auth?.user?.id && window.Echo) {
       const channel = window.Echo.private(`users.${props.auth.user.id}`);
-      channel.listen(".PublicationStatusUpdated", () => {
+      channel.listen('.PublicationStatusUpdated', () => {
         fetchPublications(abortController.signal);
       });
 
       return () => {
         if (interval) clearInterval(interval);
         abortController.abort();
-        channel.stopListening(".PublicationStatusUpdated");
+        channel.stopListening('.PublicationStatusUpdated');
       };
     }
 
@@ -95,18 +99,18 @@ export function usePublicationStatus({ dismissedIds }: UsePublicationStatusOptio
     const handlePublicationStarted = () => {
       fetchPublications(abortController.signal);
     };
-    
+
     const handlePublicationCancelled = () => {
       fetchPublications(abortController.signal);
     };
 
-    window.addEventListener("publication-started", handlePublicationStarted);
-    window.addEventListener("publication-cancelled", handlePublicationCancelled);
+    window.addEventListener('publication-started', handlePublicationStarted);
+    window.addEventListener('publication-cancelled', handlePublicationCancelled);
 
     return () => {
       abortController.abort();
-      window.removeEventListener("publication-started", handlePublicationStarted);
-      window.removeEventListener("publication-cancelled", handlePublicationCancelled);
+      window.removeEventListener('publication-started', handlePublicationStarted);
+      window.removeEventListener('publication-cancelled', handlePublicationCancelled);
     };
   }, []);
 

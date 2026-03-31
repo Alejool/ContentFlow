@@ -1,9 +1,9 @@
 /**
  * Background Sync Manager
- * 
+ *
  * Manages background synchronization of offline operations using Service Worker Sync API.
  * Implements exponential backoff retry logic and FIFO operation execution.
- * 
+ *
  * Requirements: 5.1, 5.2, 5.3, 5.4
  */
 
@@ -13,55 +13,36 @@ const DB_NAME = 'background-sync-db';
 const DB_VERSION = 1;
 const STORE_NAME = 'sync-operations';
 
-/**
- * BackgroundSyncManager Class
- * 
- * Handles registration, persistence, and execution of background sync operations.
- * Uses IndexedDB for persistence to survive page reloads and browser restarts.
- */
 class BackgroundSyncManager {
   private db: IDBDatabase | null = null;
   private initPromise: Promise<void> | null = null;
 
-  /**
-   * Initialize IndexedDB connection
-   */
   private async init(): Promise<void> {
-    if (this.db) {
-      return;
-    }
-
-    if (this.initPromise) {
-      return this.initPromise;
-    }
+    if (this.db) return;
+    if (this.initPromise) return this.initPromise;
 
     this.initPromise = new Promise((resolve, reject) => {
       const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-      request.onerror = () => {
-        reject(request.error);
-      };
+      request.onerror = () => reject(request.error);
 
       request.onsuccess = () => {
         this.db = request.result;
-        if (import.meta.env.DEV) {
-          }
+        if (import.meta.env.DEV) console.log('[BackgroundSyncManager] IndexedDB initialized');
         resolve();
       };
 
       request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result;
-        
-        // Create object store if it doesn't exist
         if (!db.objectStoreNames.contains(STORE_NAME)) {
-          const objectStore = db.createObjectStore(STORE_NAME, { keyPath: 'id' });
-          
-          // Create indexes for efficient querying
+          const objectStore = db.createObjectStore(STORE_NAME, {
+            keyPath: 'id',
+          });
           objectStore.createIndex('timestamp', 'timestamp', { unique: false });
-          objectStore.createIndex('retryCount', 'retryCount', { unique: false });
-          
-          if (import.meta.env.DEV) {
-            }
+          objectStore.createIndex('retryCount', 'retryCount', {
+            unique: false,
+          });
+          if (import.meta.env.DEV) console.log('[BackgroundSyncManager] Object store created');
         }
       };
     });
@@ -71,21 +52,11 @@ class BackgroundSyncManager {
 
   /**
    * Register a sync operation
-   * 
-   * Adds an operation to the sync queue and persists it in IndexedDB.
-   * Automatically registers a Service Worker sync event if available.
-   * 
-   * @param operation - The sync operation to register
-   * @returns Promise that resolves when operation is registered
-   * 
    * Requirements: 5.1, 5.2
    */
   async registerSync(operation: SyncOperation): Promise<void> {
     await this.init();
-
-    if (!this.db) {
-      throw new Error('[BackgroundSyncManager] Database not initialized');
-    }
+    if (!this.db) throw new Error('[BackgroundSyncManager] Database not initialized');
 
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction([STORE_NAME], 'readwrite');
@@ -93,57 +64,34 @@ class BackgroundSyncManager {
       const request = store.add(operation);
 
       request.onsuccess = () => {
-        if (import.meta.env.DEV) {
-          }
-        
-        // Register Service Worker sync if available
+        if (import.meta.env.DEV)
+          console.log(`[BackgroundSyncManager] Registered sync: ${operation.id}`);
         this.registerServiceWorkerSync().catch((error) => {
-          });
-        
+          if (import.meta.env.DEV)
+            console.warn('[BackgroundSyncManager] SW sync registration failed:', error);
+        });
         resolve();
       };
 
-      request.onerror = () => {
-        reject(request.error);
-      };
+      request.onerror = () => reject(request.error);
     });
   }
 
-  /**
-   * Register Service Worker sync event
-   * 
-   * Registers a 'sync-operations' tag with the Service Worker Sync API.
-   * This will trigger the sync event when the browser has connectivity.
-   */
   private async registerServiceWorkerSync(): Promise<void> {
     if ('serviceWorker' in navigator && 'sync' in ServiceWorkerRegistration.prototype) {
-      try {
-        const registration = await navigator.serviceWorker.ready;
-        await registration.sync.register('sync-operations');
-        
-        if (import.meta.env.DEV) {
-          }
-      } catch (error) {
-        throw error;
-      }
+      const registration = await navigator.serviceWorker.ready;
+      await registration.sync.register('sync-operations');
+      if (import.meta.env.DEV) console.log('[BackgroundSyncManager] SW sync registered');
     }
   }
 
   /**
-   * Get all pending sync operations
-   * 
-   * Retrieves all operations from IndexedDB sorted by timestamp (FIFO).
-   * 
-   * @returns Promise that resolves to array of sync operations
-   * 
+   * Get all pending sync operations sorted by timestamp (FIFO)
    * Requirements: 5.4
    */
   async getPendingSyncs(): Promise<SyncOperation[]> {
     await this.init();
-
-    if (!this.db) {
-      throw new Error('[BackgroundSyncManager] Database not initialized');
-    }
+    if (!this.db) throw new Error('[BackgroundSyncManager] Database not initialized');
 
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction([STORE_NAME], 'readonly');
@@ -153,28 +101,17 @@ class BackgroundSyncManager {
 
       request.onsuccess = () => {
         const operations = request.result as SyncOperation[];
-        // Sort by timestamp to ensure FIFO order
         operations.sort((a, b) => a.timestamp - b.timestamp);
         resolve(operations);
       };
 
-      request.onerror = () => {
-        reject(request.error);
-      };
+      request.onerror = () => reject(request.error);
     });
   }
 
-  /**
-   * Remove a sync operation from the queue
-   * 
-   * @param id - The operation ID to remove
-   */
   private async removeOperation(id: string): Promise<void> {
     await this.init();
-
-    if (!this.db) {
-      throw new Error('[BackgroundSyncManager] Database not initialized');
-    }
+    if (!this.db) throw new Error('[BackgroundSyncManager] Database not initialized');
 
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction([STORE_NAME], 'readwrite');
@@ -182,28 +119,17 @@ class BackgroundSyncManager {
       const request = store.delete(id);
 
       request.onsuccess = () => {
-        if (import.meta.env.DEV) {
-          }
+        if (import.meta.env.DEV) console.log(`[BackgroundSyncManager] Removed operation: ${id}`);
         resolve();
       };
 
-      request.onerror = () => {
-        reject(request.error);
-      };
+      request.onerror = () => reject(request.error);
     });
   }
 
-  /**
-   * Update a sync operation
-   * 
-   * @param operation - The operation to update
-   */
   private async updateOperation(operation: SyncOperation): Promise<void> {
     await this.init();
-
-    if (!this.db) {
-      throw new Error('[BackgroundSyncManager] Database not initialized');
-    }
+    if (!this.db) throw new Error('[BackgroundSyncManager] Database not initialized');
 
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction([STORE_NAME], 'readwrite');
@@ -211,70 +137,44 @@ class BackgroundSyncManager {
       const request = store.put(operation);
 
       request.onsuccess = () => {
-        if (import.meta.env.DEV) {
-          }
+        if (import.meta.env.DEV)
+          console.log(`[BackgroundSyncManager] Updated operation: ${operation.id}`);
         resolve();
       };
 
-      request.onerror = () => {
-        reject(request.error);
-      };
+      request.onerror = () => reject(request.error);
     });
   }
 
   /**
-   * Execute sync operations
-   * 
-   * Executes all pending sync operations in FIFO order.
-   * Called by the Service Worker sync event handler.
-   * 
-   * @param tag - The sync tag (should be 'sync-operations')
-   * @returns Promise that resolves when all operations are processed
-   * 
+   * Execute all pending sync operations in FIFO order
    * Requirements: 5.2, 5.4
    */
   async executeSync(tag: string): Promise<void> {
-    if (tag !== 'sync-operations') {
-      return;
-    }
+    if (tag !== 'sync-operations') return;
 
-    if (import.meta.env.DEV) {
-      }
+    if (import.meta.env.DEV) console.log('[BackgroundSyncManager] Executing sync...');
 
     const operations = await this.getPendingSyncs();
 
     if (operations.length === 0) {
-      if (import.meta.env.DEV) {
-        }
+      if (import.meta.env.DEV) console.log('[BackgroundSyncManager] No pending operations');
       return;
     }
 
-    // Execute operations in FIFO order
     for (const operation of operations) {
       try {
         await this.executeSingleOperation(operation);
         await this.removeOperation(operation.id);
-        
-        if (import.meta.env.DEV) {
-          }
+        if (import.meta.env.DEV) console.log(`[BackgroundSyncManager] Synced: ${operation.id}`);
       } catch (error) {
-        // Handle retry logic
         await this.handleOperationFailure(operation, error as Error);
       }
     }
 
-    if (import.meta.env.DEV) {
-      }
+    if (import.meta.env.DEV) console.log('[BackgroundSyncManager] Sync complete');
   }
 
-  /**
-   * Execute a single sync operation
-   * 
-   * Makes the HTTP request for a sync operation.
-   * 
-   * @param operation - The operation to execute
-   * @returns Promise that resolves with the response
-   */
   private async executeSingleOperation(operation: SyncOperation): Promise<Response> {
     const response = await fetch(operation.url, {
       method: operation.method,
@@ -290,14 +190,7 @@ class BackgroundSyncManager {
   }
 
   /**
-   * Handle operation failure with exponential backoff retry
-   * 
-   * Implements exponential backoff retry logic (1s, 2s, 4s).
-   * After maxRetries (3), marks operation as failed.
-   * 
-   * @param operation - The failed operation
-   * @param error - The error that occurred
-   * 
+   * Handle operation failure with exponential backoff retry (1s, 2s, 4s)
    * Requirements: 5.3
    */
   private async handleOperationFailure(operation: SyncOperation, error: Error): Promise<void> {
@@ -308,52 +201,35 @@ class BackgroundSyncManager {
     };
 
     if (updatedOperation.retryCount >= maxRetries) {
-      // Max retries reached - mark as failed and remove from queue
       await this.removeOperation(operation.id);
-      
-      // Notify about failed operation (could be stored in a failed operations store)
       this.notifyOperationFailed(operation, error);
     } else {
-      // Update retry count and keep in queue
       await this.updateOperation(updatedOperation);
-      
-      // Calculate exponential backoff delay: 1s, 2s, 4s
       const delay = Math.pow(2, updatedOperation.retryCount - 1) * 1000;
-      
+
       if (import.meta.env.DEV) {
-        `
+        console.log(
+          `[BackgroundSyncManager] Retry ${updatedOperation.retryCount}/${maxRetries} for ${operation.id} in ${delay}ms`,
         );
       }
-      
-      // Schedule retry by re-registering SW sync
+
       setTimeout(() => {
         this.registerServiceWorkerSync().catch((err) => {
-          });
+          if (import.meta.env.DEV)
+            console.warn('[BackgroundSyncManager] Retry registration failed:', err);
+        });
       }, delay);
     }
   }
 
-  /**
-   * Notify about failed operation
-   * 
-   * Sends a message to all clients about the failed operation.
-   * Clients can handle this to show user notifications.
-   * 
-   * @param operation - The failed operation
-   * @param error - The error that occurred
-   */
   private notifyOperationFailed(operation: SyncOperation, error: Error): void {
-    // In Service Worker context, notify clients
     if (typeof self !== 'undefined' && 'clients' in self) {
-      (self as any).clients.matchAll().then((clients: any[]) => {
+      (self as ServiceWorkerGlobalScope).clients.matchAll().then((clients: readonly Client[]) => {
         clients.forEach((client) => {
           client.postMessage({
             type: 'SYNC_OPERATION_FAILED',
             operation,
-            error: {
-              message: error.message,
-              stack: error.stack,
-            },
+            error: { message: error.message, stack: error.stack },
           });
         });
       });
@@ -362,43 +238,25 @@ class BackgroundSyncManager {
 
   /**
    * Retry failed operations manually
-   * 
-   * Allows manual retry of operations that have failed.
-   * Resets retry count and re-registers sync.
-   * 
    * Requirements: 5.3
    */
   async retryFailed(): Promise<void> {
     const operations = await this.getPendingSyncs();
-    
-    // Reset retry counts
+
     for (const operation of operations) {
       if (operation.retryCount > 0) {
-        await this.updateOperation({
-          ...operation,
-          retryCount: 0,
-        });
+        await this.updateOperation({ ...operation, retryCount: 0 });
       }
     }
-    
-    // Trigger sync
+
     await this.registerServiceWorkerSync();
-    
-    if (import.meta.env.DEV) {
-      }
+    if (import.meta.env.DEV)
+      console.log('[BackgroundSyncManager] Retry triggered for failed operations');
   }
 
-  /**
-   * Clear all sync operations
-   * 
-   * Removes all operations from the queue.
-   */
   async clearAll(): Promise<void> {
     await this.init();
-
-    if (!this.db) {
-      throw new Error('[BackgroundSyncManager] Database not initialized');
-    }
+    if (!this.db) throw new Error('[BackgroundSyncManager] Database not initialized');
 
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction([STORE_NAME], 'readwrite');
@@ -406,28 +264,20 @@ class BackgroundSyncManager {
       const request = store.clear();
 
       request.onsuccess = () => {
-        if (import.meta.env.DEV) {
-          }
+        if (import.meta.env.DEV) console.log('[BackgroundSyncManager] All operations cleared');
         resolve();
       };
 
-      request.onerror = () => {
-        reject(request.error);
-      };
+      request.onerror = () => reject(request.error);
     });
   }
 
-  /**
-   * Close database connection
-   */
   close(): void {
     if (this.db) {
       this.db.close();
       this.db = null;
       this.initPromise = null;
-      
-      if (import.meta.env.DEV) {
-        }
+      if (import.meta.env.DEV) console.log('[BackgroundSyncManager] Connection closed');
     }
   }
 }

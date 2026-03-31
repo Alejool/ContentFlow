@@ -1,5 +1,5 @@
-import React from "react";
-import { Upload } from "lucide-react";
+import React from 'react';
+import { Upload } from 'lucide-react';
 
 interface AddMoreButtonProps {
   onClick: () => void;
@@ -17,12 +17,12 @@ const AddMoreButton: React.FC<AddMoreButtonProps> = ({ onClick }) => {
     <div
       role="button"
       tabIndex={0}
-      className="flex items-center justify-center aspect-video border-2 border-dashed border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+      className="flex aspect-video cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 transition-colors hover:bg-gray-50"
       onClick={onClick}
       onKeyDown={handleKeyDown}
     >
       <div className="text-center">
-        <Upload className="w-6 h-6 mx-auto text-gray-400" />
+        <Upload className="mx-auto h-6 w-6 text-gray-400" />
         <span className="text-xs text-gray-500">Add more</span>
       </div>
     </div>

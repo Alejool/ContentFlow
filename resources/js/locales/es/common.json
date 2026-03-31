@@ -1,5 +1,6 @@
-﻿{
+{
   "common": {
+    "locale": "es-ES",
     "deleteConfirmTitle": "Confirmar eliminación",
     "deleteConfirm": "¿Estás seguro de que deseas eliminar este elemento? Esta acción no se puede deshacer.",
     "deleteSuccess": "Elemento eliminado correctamente",
@@ -9,9 +10,19 @@
     "deleting": "Eliminando...",
     "select": "Seleccionar",
     "more": "Más",
+    "active": "Activa",
+    "selected": "Seleccionado",
+    "inactive": "Inactiva",
+    "completed": "Completada",
+    "paused": "Pausada",
+    "available": "Disponible",
+    "name": "Nombre",
+    "type": "Tipo",
     "confirm": "Confirmar",
     "progress": "Progreso",
     "dismiss": "Descartar",
+    "never": "Nunca",
+    "never_expires": "No expira",
     "viewAll": "Ver todo",
     "new": "Nuevo",
     "saving": "Guardando...",
@@ -30,13 +41,20 @@
     "cancel": "Cancelar",
     "continue": "Continuar",
     "delete": "Eliminar",
+    "duplicate": "Duplicar",
     "edit": "Editar",
+    "view": "Ver",
+    "viewDetails": "Ver Detalles",
+    "approved": "Aprobado",
+    "rejected": "Rechazado",
+    "pending": "Pendiente",
+    "upgradePlan": "Actualizar Plan",
     "analytics": "Analíticas",
     "aiChat": "Chat IA",
     "logout": "Cerrar Sesión",
     "localizationExamples": "Ejemplos de Localización",
-    "read_more":"Leer más",
-    "show_less":"Leer menos",
+    "read_more": "Leer más",
+    "show_less": "Leer menos",
     "affected_publications": "Publicaciones afectadas:",
     "more_items": "más...",
     "today": "Hoy",
@@ -81,6 +99,11 @@
     "expand": "Expandir",
     "error": "Error",
     "next": "Siguiente",
+    "tabs": {
+      "overview": "Resumen",
+      "activity": "Actividad",
+      "approvals": "Aprobaciones"
+    },
     "previous": "Anterior",
     "showing": "Mostrando",
     "of": "de",
@@ -97,6 +120,7 @@
     "save_changes": "Guardar Cambios",
     "noCreditCard": "No requiere tarjeta de crédito",
     "unknown": "Desconocido",
+    "notSet": "No establecido",
     "platformConnect": "Plataforma",
     "understood": "Entendido",
     "untitled": "Sin título",
@@ -106,11 +130,14 @@
     "copy": "Copiar",
     "download": "Descargar",
     "openInNewTab": "Abrir en nueva pestaña",
-    "created": "Creado",
+    "created": "Fecha de creación",
+    "expires": "Expiración",
+    "actions": "Acciones",
     "creator": "Creador",
     "me": "Yo",
     "readOnly": "Solo lectura",
     "lastUpdated": "Última Actualización",
+    "last_used": "Último uso",
     "startDate": "Fecha de Inicio",
     "endDate": "Fecha de Fin",
     "viewOnPlatform": "Ver en plataforma",
@@ -136,12 +163,18 @@
     "item": "Elemento",
     "files": "Archivos",
     "publications": "Publicaciones",
+    "publicationsPerMonth": "publicaciones/mes",
+    "socialAccount": "red social",
+    "socialAccounts": "redes sociales",
+    "storage": "almacenamiento",
     "vistas": "Vistas",
     "clics": "Clics",
     "engagement": "Engagement",
     "filters": {
       "all": "Todos",
-      "title": "Filtros"
+      "title": "Filtros",
+      "startDate": "Inicio",
+      "endDate": "Fin"
     },
     "status": {
       "active": "Activa",
@@ -158,11 +191,11 @@
       "title_asc": "Título (A-Z)",
       "title_desc": "Título (Z-A)"
     },
-    "platform":{
+    "platform": {
       "title": "Ninguna plataforma"
     },
     "errors": {
-      "checkFormErrors": "Por favor, revisa los errores en el formulario",
+      "checkFormErrors": "Revisa los errores en el formulario",
       "ffmpeg_load": "Error al cargar el procesador de video. Asegúrate de tener una conexión estable y soporte para SharedArrayBuffer.",
       "processing_failed": "Error al procesar el video.",
       "no_shared_array_buffer": "Tu navegador o entorno no soporta las funciones necesarias para procesar video localmente (SharedArrayBuffer).",
@@ -174,10 +207,48 @@
       "entries": "entradas",
       "info": "Mostrando {{from}} a {{to}} de {{total}} resultados"
     },
-    "tabs": {
-        "overview": "Resumen",
-        "activity": "Actividad",
-        "approvals": "Aprobaciones"
+    "approvals": {
+      "tabs": {
+        "pending": "Pendientes",
+        "history": "Historial"
+      },
+      "locked": {
+        "title": "Aprobaciones básicas habilitadas",
+        "description": "Actualmente tienes acceso a aprobaciones básicas. Para configurar flujos de aprobación multi-nivel, sube de plan."
+      },
+      "title": "Flujos de Aprobación",
+      "subtitle": "Define rutas de revisión secuenciales para tus publicaciones.",
+      "invite": "Invitar",
+      "createWorkflow": "Crear Flujo",
+      "noWorkflowsTitle": "No hay flujos personalizados",
+      "noWorkflowsDesc": "Todas las publicaciones usarán el flujo básico de una sola firma hasta que definas uno nuevo. Define una cadena de mando para revisiones más estrictas.",
+      "configureFirstWorkflow": "Configurar mi primer flujo",
+      "levelsConfigured": "niveles configurados",
+      "activeWorkflowNote": "Nota: Solo puede haber un flujo activo a la vez por workspace. El sistema usará el primer flujo activo que encuentre para todas las nuevas publicaciones que requieran aprobación.",
+      "createFlow": "Crear Flujo",
+      "editFlow": "Editar Flujo",
+      "configureSequence": "Configura la secuencia de aprobaciones.",
+      "workflowName": "Nombre del Flujo",
+      "approvalLevels": "Niveles de Aprobación",
+      "newRole": "Nuevo Rol",
+      "addLevel": "Añadir Nivel",
+      "level": "Nivel",
+      "anyRole": "Cualquier Rol",
+      "or": "O",
+      "anyUser": "Cualquier Usuario",
+      "deleteLevel": "Eliminar nivel",
+      "errors": {
+        "fetch": "Error al cargar los flujos",
+        "save": "Error al guardar el flujo",
+        "delete": "Error al eliminar el flujo",
+        "multiLevelEnterprise": "El flujo multi-nivel es exclusivo para planes Enterprise o Demo."
+      },
+      "success": {
+        "created": "Flujo creado con éxito",
+        "updated": "Flujo actualizado con éxito",
+        "deleted": "Flujo eliminado"
+      },
+      "confirmDelete": "¿Estás seguro de que quieres eliminar este flujo?"
     },
     "upload": {
       "progress": "Progreso de carga",
@@ -197,11 +268,11 @@
       "retry": "Reintentar",
       "dismiss": "Descartar",
       "retryAttempt": "Intento {{count}} de 3",
-      "maxRetriesReached": "Se alcanzó el máximo de intentos. Por favor verifica tu conexión o intenta cargar un archivo más pequeño.",
-      "networkError": "Error de red. Por favor verifica tu conexión e intenta nuevamente.",
-      "validationError": "Falló la validación del archivo. Por favor verifica el archivo e intenta nuevamente.",
-      "uploadFailed": "Falló la carga. Por favor intenta nuevamente.",
-      "processingFailed": "Falló el procesamiento. Por favor intenta nuevamente.",
+      "maxRetriesReached": "Se alcanzó el máximo de intentos. Verifica tu conexión o intenta cargar un archivo más pequeño.",
+      "networkError": "Error de red. Verifica tu conexión e intenta nuevamente.",
+      "validationError": "Falló la validación del archivo. Verifica el archivo e intenta nuevamente.",
+      "uploadFailed": "Falló la carga. Intenta nuevamente.",
+      "processingFailed": "Falló el procesamiento. Intenta nuevamente.",
       "resume_prompt": {
         "title": "Cargas Incompletas Detectadas",
         "description": "Tienes {{count}} carga incompleta de una sesión anterior.",
@@ -244,6 +315,42 @@
         "description": "Comienza a crear contenido para gestionar y programar tus publicaciones en redes sociales.",
         "action": "Crear Contenido"
       }
+    },
+    "frequencies": {
+      "daily": "Diario",
+      "weekly": "Semanal",
+      "monthly": "Mensual",
+      "yearly": "Anual"
+    },
+    "units": {
+      "days": "días",
+      "weeks": "semanas",
+      "months": "meses",
+      "years": "años"
+    },
+    "days": {
+      "sun": "D",
+      "mon": "L",
+      "tue": "M",
+      "wed": "X",
+      "thu": "J",
+      "fri": "V",
+      "sat": "S"
+    },
+    "videoTypes": {
+      "reel": "Reel",
+      "short": "Short",
+      "standard": "Video estándar",
+      "feed": "Feed",
+      "story": "Historia",
+      "video": "Video",
+      "tweet": "Tweet",
+      "post": "Publicación"
+    },
+    "messages": {
+      "checkingSubscription": "Verificando suscripción...",
+      "loadingPlans": "Cargando planes...",
+      "generationInProgress": "Ya hay una generación en proceso. Espera."
     }
   }
 }

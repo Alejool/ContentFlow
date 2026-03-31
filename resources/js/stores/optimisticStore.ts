@@ -5,13 +5,13 @@ import { syncWithInertia } from '../utils/inertiaOptimisticSync';
 
 /**
  * Optimistic Store - Manages optimistic updates with rollback capability
- * 
+ *
  * This store maintains a queue of pending operations and provides methods to:
  * - Add optimistic operations
  * - Confirm successful operations
  * - Rollback failed operations
  * - Persist and restore state from localStorage
- * 
+ *
  * Requirements: 2.1, 2.2, 2.3, 2.4, 2.5
  */
 const useOptimisticStore = create<OptimisticState>((set, get) => ({
@@ -21,7 +21,7 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
   isOnline: typeof navigator !== 'undefined' ? navigator.onLine : true,
 
   // Actions
-  
+
   /**
    * Add a new optimistic operation to the queue
    * Requirements: 2.1, 9.4
@@ -30,17 +30,20 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
     set((state) => {
       const newOps = new Map(state.operations);
       newOps.set(operation.id, operation);
-      
+
       // Log in development mode
       if (import.meta.env.DEV) {
-        }
-      
+        console.log(
+          `[OptimisticStore] Added operation: ${operation.id} (${operation.type} ${operation.resource})`,
+        );
+      }
+
       return { operations: newOps };
     });
-    
+
     // Sync with Inertia.js state (Requirements: 9.4)
     syncWithInertia(operation, 'pending');
-    
+
     // Auto-persist after adding operation
     get().persist();
   },
@@ -49,11 +52,11 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
    * Confirm an operation as successful and update with server data
    * Requirements: 2.2, 9.4
    */
-  confirmOperation: (id: string, serverData: any) => {
+  confirmOperation: (id: string, serverData: unknown) => {
     set((state) => {
       const newOps = new Map(state.operations);
       const op = newOps.get(id);
-      
+
       if (op) {
         const updatedOp: OptimisticOperation = {
           ...op,
@@ -61,26 +64,28 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
           completedAt: Date.now(),
         };
         newOps.set(id, updatedOp);
-        
+
         // Log in development mode
         if (import.meta.env.DEV) {
-          }
-        
+          console.log(`[OptimisticStore] Confirmed operation: ${id}`);
+        }
+
         // Sync with Inertia.js state (Requirements: 9.4)
         syncWithInertia(updatedOp, 'success', serverData);
-        
+
         // Execute success callback if provided
         if (op.onSuccess) {
           try {
             op.onSuccess(serverData);
-          } catch (error) {
-            }
+          } catch (_error) {
+            console.warn('[OptimisticStore] onSuccess callback error:', _error);
+          }
         }
       }
-      
+
       return { operations: newOps };
     });
-    
+
     // Auto-persist after confirming operation
     get().persist();
   },
@@ -93,11 +98,11 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
     set((state) => {
       const newOps = new Map(state.operations);
       const op = newOps.get(id);
-      
+
       if (op) {
         // Remove from pending operations
         newOps.delete(id);
-        
+
         // Create failed operation record
         const failedOp: OptimisticOperation = {
           ...op,
@@ -105,11 +110,11 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
           completedAt: Date.now(),
           error: {
             message: error.message,
-            code: (error as any).code,
-            details: (error as any).response?.data,
+            code: (error as NodeJS.ErrnoException).code,
+            details: (error as { response?: { data?: unknown } }).response?.data,
           },
         };
-        
+
         // Log comprehensive error details
         // Requirements: 3.5, 10.3
         errorLogger.logError(error, {
@@ -125,14 +130,12 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
           },
           severity: 'error',
         });
-        
+
         // Log in development mode
         if (import.meta.env.DEV) {
-          }
-        
-        // Sync with Inertia.js state (Requirements: 9.4)
-        syncWithInertia(failedOp, 'failed');
-        
+          console.log(`[OptimisticStore] Rolled back operation: ${id} - ${error.message}`);
+        }
+
         // Execute error callback if provided
         if (op.onError) {
           try {
@@ -146,7 +149,7 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
             });
           }
         }
-        
+
         // Execute rollback callback if provided
         if (op.onRollback) {
           try {
@@ -160,16 +163,16 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
             });
           }
         }
-        
+
         return {
           operations: newOps,
           failedOperations: [...state.failedOperations, failedOp],
         };
       }
-      
+
       return state;
     });
-    
+
     // Auto-persist after rollback
     get().persist();
   },
@@ -190,10 +193,10 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
   persist: () => {
     try {
       const state = get();
-      
+
       // Convert Map to array for serialization
       const operationsArray = Array.from(state.operations.entries());
-      
+
       // Serialize operations (excluding non-serializable fields like Promise)
       const serializedOps = operationsArray.map(([id, op]) => [
         id,
@@ -213,7 +216,7 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
           // Note: callbacks and request promise are not persisted
         },
       ]);
-      
+
       const dataToStore = {
         operations: serializedOps,
         failedOperations: state.failedOperations.map((op) => ({
@@ -232,13 +235,15 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
         })),
         timestamp: Date.now(),
       };
-      
+
       localStorage.setItem('optimistic-operations', JSON.stringify(dataToStore));
-      
+
       if (import.meta.env.DEV) {
-        }
-    } catch (error) {
+        console.log(`[OptimisticStore] Persisted ${state.operations.size} operations`);
       }
+    } catch {
+      // Ignore storage errors
+    }
   },
 
   /**
@@ -248,34 +253,35 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
   restore: () => {
     try {
       const stored = localStorage.getItem('optimistic-operations');
-      
+
       if (stored) {
         const data = JSON.parse(stored);
-        
+
         // Convert array back to Map
         const operationsMap = new Map<string, OptimisticOperation>(
-          data.operations.map(([id, op]: [string, any]) => [
+          data.operations.map(([id, op]: [string, unknown]) => [
             id,
             {
               ...op,
               // Create a resolved promise for restored operations
               request: Promise.resolve(op.optimisticData),
             },
-          ])
+          ]),
         );
-        
+
         set({
           operations: operationsMap,
           failedOperations: data.failedOperations || [],
         });
-        
+
         if (import.meta.env.DEV) {
-          - data.timestamp,
-          });
+          const age = Math.round((Date.now() - data.timestamp) / 1000);
+          console.log(`[OptimisticStore] Restored ${operationsMap.size} operations (age: ${age}s)`);
         }
       }
-    } catch (error) {
-      }
+    } catch {
+      // Ignore storage errors
+    }
   },
 }));
 

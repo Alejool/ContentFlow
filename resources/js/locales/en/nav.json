@@ -10,6 +10,7 @@
     "socialNetworks": "Social Networks",
     "logout": "Log Out",
     "notifications": "Notifications",
-    "workspaces": "Workspaces"
+    "workspaces": "Workspaces",
+    "workspace_branding": "Workspace Branding"
   }
 }

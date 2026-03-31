@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\Api\MultipartUploadController;
+use App\Http\Controllers\Api\ProgressController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -11,9 +12,16 @@ Route::middleware('auth:sanctum')->group(function () {
   Route::post('/{uploadId}/pause', [UploadController::class, 'pauseUpload'])->name('pause');
   Route::get('/{uploadId}/resume', [UploadController::class, 'resumeUpload'])->name('resume');
 
+  // Progress tracking endpoints
+  Route::get('/progress', [ProgressController::class, 'getUploadProgress'])->name('progress.get');
+  Route::post('/progress/update', [ProgressController::class, 'updateUploadProgress'])->name('progress.update');
+
   Route::prefix('multipart')->name('multipart.')->group(function () {
     Route::post('/init', [MultipartUploadController::class, 'initiate'])->name('init')->middleware('rate.limit');
     Route::post('/sign-part', [MultipartUploadController::class, 'signPart'])->name('sign-part');
     Route::post('/complete', [MultipartUploadController::class, 'complete'])->name('complete');
   });
+  
+  // Content type suggestions
+  Route::post('/suggest-content-type', [\App\Http\Controllers\Api\ContentTypeController::class, 'suggestType'])->name('suggest-content-type');
 });

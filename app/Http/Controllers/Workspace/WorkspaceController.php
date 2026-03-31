@@ -3,18 +3,24 @@
 namespace App\Http\Controllers\Workspace;
 
 use App\Traits\ApiResponse;
+use App\Services\Storage\S3PathService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 use App\Notifications\WorkspaceRemovedNotification;
 
 use App\Models\User;
 use App\Models\Logs\WebhookLog;
 use App\Models\Workspace\Workspace;
-use App\Models\Role\Role;;
+use App\Models\Role\Role;
 
 class WorkspaceController extends Controller
 {
@@ -94,9 +100,26 @@ class WorkspaceController extends Controller
     }
   }
 
-  public function switch(Workspace $workspace)
+  public function switch($idOrSlug)
   {
+    Log::info('Workspace Switch Attempt', ['idOrSlug' => $idOrSlug]);
+
+    $workspace = Workspace::where(function ($q) use ($idOrSlug) {
+      if (is_numeric($idOrSlug)) {
+        $q->where('id', $idOrSlug);
+      }
+      $q->orWhere('slug', $idOrSlug);
+    })->first();
+
+    if (!$workspace) {
+      Log::error('Workspace Not Found during switch', ['idOrSlug' => $idOrSlug]);
+      abort(404, "Workspace [{$idOrSlug}] not found.");
+    }
+
+    Log::info('Workspace Found', ['id' => $workspace->id, 'slug' => $workspace->slug]);
+
     if (!Auth::user()->workspaces()->where('workspaces.id', $workspace->id)->exists()) {
+      Log::warning('User does not belong to workspace', ['user_id' => Auth::id(), 'workspace_id' => $workspace->id]);
       abort(403);
     }
 
@@ -111,28 +134,62 @@ class WorkspaceController extends Controller
     return redirect()->route('dashboard')->with('message', "Switched to {$workspace->name}");
   }
 
-  public function settings(Request $request, Workspace $workspace)
+  public function settings(Request $request, $idOrSlug)
   {
+    $workspace = Workspace::where(function ($q) use ($idOrSlug) {
+      if (is_numeric($idOrSlug)) {
+        $q->where('id', $idOrSlug);
+      }
+      $q->orWhere('slug', $idOrSlug);
+    })->firstOrFail();
 
     if (!$workspace->users()->where('users.id', Auth::id())->exists()) {
       abort(403);
     }
 
+    // Get all permissions
+    $permissions = \App\Models\Permission\Permission::all()->map(function ($permission) {
+      $translationKey = "permissions.{$permission->slug}";
+      
+      return [
+        'id' => $permission->id,
+        'slug' => $permission->slug,
+        'name' => __("{$translationKey}.name", [], app()->getLocale()) ?: $permission->name,
+        'display_name' => __("{$translationKey}.name", [], app()->getLocale()) ?: $permission->name,
+        'description' => __("{$translationKey}.description", [], app()->getLocale()) ?: $permission->description,
+      ];
+    });
+
+    // Obtener características del plan actual
+    $planFeatures = $workspace->getPlanFeatures();
+    
+    // Agregar features al workspace para que estén disponibles en el frontend
+    $workspaceData = $workspace->load(['users', 'subscription']);
+    $workspaceData->features = $planFeatures;
+
     if ($request->wantsJson() || $request->is('api/*')) {
       return $this->successResponse([
-        'workspace' => $workspace->load('users'),
+        'workspace' => $workspaceData,
         'roles' => Role::with('permissions')->get(),
+        'permissions' => $permissions,
       ]);
     }
 
     return Inertia::render('Workspace/Settings', [
-      'workspace' => $workspace->load('users'),
+      'workspace' => $workspaceData,
       'roles' => Role::with('permissions')->get(),
+      'permissions' => $permissions,
     ]);
   }
 
-  public function update(Request $request, Workspace $workspace)
+  public function update(Request $request, $idOrSlug)
   {
+    $workspace = Workspace::where(function ($q) use ($idOrSlug) {
+      if (is_numeric($idOrSlug)) {
+        $q->where('id', $idOrSlug);
+      }
+      $q->orWhere('slug', $idOrSlug);
+    })->firstOrFail();
 
     if (Auth::id() !== $workspace->created_by) {
       abort(403, 'Only the workspace owner can update workspace settings');
@@ -154,16 +211,119 @@ class WorkspaceController extends Controller
     return redirect()->back()->with('message', 'Workspace updated successfully.');
   }
 
-  public function members($workspaceId)
+  /**
+   * Update white-label settings for enterprise workspaces.
+   */
+  public function updateWhiteLabel(Request $request, $idOrSlug)
   {
-    $workspace = Workspace::with([
+    $workspace = Workspace::where(function ($q) use ($idOrSlug) {
+      if (is_numeric($idOrSlug)) {
+        $q->where('id', $idOrSlug);
+      }
+      $q->orWhere('slug', $idOrSlug);
+    })->firstOrFail();
+
+    Log::info('ENTRY: updateWhiteLabel', [
+      'workspace_slug' => $workspace->slug,
+      'has_file_logo' => $request->hasFile('logo'),
+      'has_file_favicon' => $request->hasFile('favicon'),
+      'primary_color' => $request->primary_color
+    ]);
+
+    if (Auth::id() !== $workspace->created_by) {
+      abort(403, 'Only the workspace owner can update white-label settings');
+    }
+
+    // Check if the workspace is on the enterprise plan
+    if ($workspace->getPlanName() !== 'enterprise') {
+      return $this->errorResponse('This feature is only available for Enterprise plans.', 403);
+    }
+
+    $request->validate([
+      'logo_key' => 'nullable|string',
+      'favicon_key' => 'nullable|string',
+      'primary_color' => ['nullable', 'string', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
+    ]);
+
+    $data = [
+      'white_label_primary_color' => $request->primary_color,
+    ];
+
+    try {
+      if ($request->logo_key) {
+        $oldLogo = $workspace->white_label_logo_url;
+        
+        // Construir la URL desde la clave S3
+        $disk = config('filesystems.default') === 's3' ? 's3' : 'public';
+        $data['white_label_logo_url'] = Storage::disk($disk)->url($request->logo_key);
+
+        Log::info('Logo updated from S3 key', ['key' => $request->logo_key, 'url' => $data['white_label_logo_url']]);
+
+        // Delete old logo if exists
+        if ($oldLogo && str_contains($oldLogo, 'workspaces/')) {
+          $oldPath = parse_url($oldLogo, PHP_URL_PATH);
+          $oldPath = ltrim($oldPath, '/');
+          if (Storage::disk($disk)->exists($oldPath)) {
+            Storage::disk($disk)->delete($oldPath);
+            Log::info('Deleted old logo', ['path' => $oldPath]);
+          }
+        }
+      }
+
+      if ($request->favicon_key) {
+        $oldFavicon = $workspace->white_label_favicon_url;
+        
+        // Construir la URL desde la clave S3
+        $disk = config('filesystems.default') === 's3' ? 's3' : 'public';
+        $data['white_label_favicon_url'] = Storage::disk($disk)->url($request->favicon_key);
+
+        Log::info('Favicon updated from S3 key', ['key' => $request->favicon_key, 'url' => $data['white_label_favicon_url']]);
+
+        // Delete old favicon if exists
+        if ($oldFavicon && str_contains($oldFavicon, 'workspaces/')) {
+          $oldPath = parse_url($oldFavicon, PHP_URL_PATH);
+          $oldPath = ltrim($oldPath, '/');
+          if (Storage::disk($disk)->exists($oldPath)) {
+            Storage::disk($disk)->delete($oldPath);
+            Log::info('Deleted old favicon', ['path' => $oldPath]);
+          }
+        }
+      }
+
+      $workspace->update($data);
+    } catch (\Exception $e) {
+      Log::error('WHITE_LABEL_CRITICAL_FAILURE', [
+        'message' => $e->getMessage(),
+        'exception' => get_class($e),
+        'file' => $e->getFile(),
+        'line' => $e->getLine(),
+        'trace' => substr($e->getTraceAsString(), 0, 500)
+      ]);
+      return $this->errorResponse('Branding Error: ' . $e->getMessage(), 500);
+    }
+
+    if ($request->wantsJson() || $request->is('api/*')) {
+      return $this->successResponse(['workspace' => $workspace, 'data' => $data], 'White-label settings updated successfully.');
+    }
+
+    return redirect()->back()->with('message', 'White-label settings updated successfully.');
+  }
+
+  public function members(Request $request, $idOrSlug)
+  {
+    $workspace = Workspace::where(function ($q) use ($idOrSlug) {
+      if (is_numeric($idOrSlug)) {
+        $q->where('id', $idOrSlug);
+      }
+      $q->orWhere('slug', $idOrSlug);
+    })->with([
       'users' => function ($query) {
         $query->select('users.id', 'users.name', 'users.email', 'users.photo_url', 'users.created_at')
           ->withPivot('role_id', 'created_at');
       }
-    ])->findOrFail($workspaceId);
+    ])->firstOrFail();
 
-    if (!Auth::user()->workspaces()->where('workspaces.id', $workspaceId)->exists()) {
+    if (!Auth::user()->workspaces()->where('workspaces.id', $workspace->id)->exists()) {
       abort(403);
     }
 
@@ -180,11 +340,16 @@ class WorkspaceController extends Controller
     ]);
   }
 
-  public function updateMemberRole(Request $request, $workspaceId, $userId)
+  public function updateMemberRole(Request $request, $idOrSlug, $userId)
   {
-    $workspace = Workspace::findOrFail($workspaceId);
+    $workspace = Workspace::where(function ($q) use ($idOrSlug) {
+      if (is_numeric($idOrSlug)) {
+        $q->where('id', $idOrSlug);
+      }
+      $q->orWhere('slug', $idOrSlug);
+    })->firstOrFail();
 
-    if (!Auth::user()->hasPermission('manage-team', $workspaceId)) {
+    if (!Auth::user()->hasPermission('manage-team', $workspace->id)) {
       abort(403, 'You do not have permission to manage members');
     }
 
@@ -216,11 +381,16 @@ class WorkspaceController extends Controller
     return $this->successResponse(null, 'Member role updated successfully');
   }
 
-  public function removeMember($workspaceId, $userId)
+  public function removeMember($idOrSlug, $userId)
   {
-    $workspace = Workspace::findOrFail($workspaceId);
+    $workspace = Workspace::where(function ($q) use ($idOrSlug) {
+      if (is_numeric($idOrSlug)) {
+        $q->where('id', $idOrSlug);
+      }
+      $q->orWhere('slug', $idOrSlug);
+    })->firstOrFail();
 
-    if (!Auth::user()->hasPermission('manage-team', $workspaceId)) {
+    if (!Auth::user()->hasPermission('manage-team', $workspace->id)) {
       abort(403, 'You do not have permission to manage members');
     }
 
@@ -238,7 +408,14 @@ class WorkspaceController extends Controller
 
     $workspace->users()->detach($userId);
 
-    if ($removedUser && $removedUser->current_workspace_id === (int)$workspaceId) {
+    // Clear team members cache
+    Cache::forget("workspace.{$workspace->id}.team_members.count");
+    
+    // Notify via WebSocket about team member removal
+    $notificationService = app(\App\Services\Subscription\UsageLimitsNotificationService::class);
+    $notificationService->notifyLimitsUpdated($workspace, 'team_member_removed');
+
+    if ($removedUser && $removedUser->current_workspace_id === (int)$workspace->id) {
       $firstWorkspace = $removedUser->workspaces()->first();
       $removedUser->update(['current_workspace_id' => $firstWorkspace ? $firstWorkspace->id : null]);
     }
@@ -251,12 +428,26 @@ class WorkspaceController extends Controller
     ]);
   }
 
-  public function invite(Request $request, $workspaceId)
+  public function invite(Request $request, $idOrSlug)
   {
-    $workspace = Workspace::findOrFail($workspaceId);
+    $workspace = Workspace::where(function ($q) use ($idOrSlug) {
+      if (is_numeric($idOrSlug)) {
+        $q->where('id', $idOrSlug);
+      }
+      $q->orWhere('slug', $idOrSlug);
+    })->firstOrFail();
 
-    if (!Auth::user()->hasPermission('manage-team', $workspaceId)) {
+    if (!Auth::user()->hasPermission('manage-team', $workspace->id)) {
       abort(403, 'You do not have permission to invite members');
+    }
+
+    // Check member limits
+    if (!$workspace->canAddTeamMember()) {
+      $usageService = app(\App\Services\WorkspaceUsageService::class);
+      return response()->json([
+        'success' => false,
+        'message' => $usageService->getLimitReachedMessage($workspace, 'team_members')
+      ], 422);
     }
 
     $validated = $request->validate([
@@ -288,14 +479,28 @@ class WorkspaceController extends Controller
     // Attach user to workspace with role
     $workspace->users()->attach($user->id, ['role_id' => $validated['role_id']]);
 
+    // Clear team members cache
+    Cache::forget("workspace.{$workspace->id}.team_members.count");
+    
+    // Notify via WebSocket about team member addition
+    $notificationService = app(\App\Services\Subscription\UsageLimitsNotificationService::class);
+    $notificationService->notifyLimitsUpdated($workspace, 'team_member_added');
+
     return response()->json(['success' => true, 'message' => __('messages.workspace.member_added')]);
   }
 
   /**
    * Test Slack/Discord webhook connections for a workspace
    */
-  public function testWebhook(Request $request, Workspace $workspace)
+  public function testWebhook(Request $request, $idOrSlug)
   {
+    $workspace = Workspace::where(function ($q) use ($idOrSlug) {
+      if (is_numeric($idOrSlug)) {
+        $q->where('id', $idOrSlug);
+      }
+      $q->orWhere('slug', $idOrSlug);
+    })->firstOrFail();
+
     if (!Auth::user()->hasPermission('manage-team', $workspace->id)) {
       abort(403);
     }
@@ -378,8 +583,15 @@ class WorkspaceController extends Controller
   /**
    * Get recent workspace activity (webhook logs)
    */
-  public function activity(Request $request, Workspace $workspace)
+  public function activity(Request $request, $idOrSlug)
   {
+    $workspace = Workspace::where(function ($q) use ($idOrSlug) {
+      if (is_numeric($idOrSlug)) {
+        $q->where('id', $idOrSlug);
+      }
+      $q->orWhere('slug', $idOrSlug);
+    })->firstOrFail();
+
     if (!Auth::user()->workspaces()->where('workspaces.id', $workspace->id)->exists()) {
       abort(403);
     }
@@ -401,11 +613,34 @@ class WorkspaceController extends Controller
     return $this->successResponse($logs->toArray());
   }
 
+  public function permissions()
+  {
+    $permissions = \App\Models\Permission\Permission::all()->map(function ($permission) {
+      $translationKey = "permissions.{$permission->slug}";
+      
+      return [
+        'id' => $permission->id,
+        'slug' => $permission->slug,
+        'name' => __("{$translationKey}.name", [], app()->getLocale()) ?: $permission->name,
+        'description' => __("{$translationKey}.description", [], app()->getLocale()) ?: $permission->description,
+      ];
+    });
+
+    return $this->successResponse($permissions);
+  }
+
   /**
    * Show a workspace (switches current workspace and redirects to dashboard)
    */
-  public function show(Workspace $workspace)
+  public function show($idOrSlug)
   {
+    $workspace = Workspace::where(function ($q) use ($idOrSlug) {
+      if (is_numeric($idOrSlug)) {
+        $q->where('id', $idOrSlug);
+      }
+      $q->orWhere('slug', $idOrSlug);
+    })->firstOrFail();
+
     // Verify user belongs to workspace
     if (!Auth::user()->workspaces()->where('workspaces.id', $workspace->id)->exists()) {
       abort(403);
@@ -416,8 +651,54 @@ class WorkspaceController extends Controller
     return redirect()->route('dashboard')->with('message', "Switched to workspace: {$workspace->name}");
   }
 
-  public function destroy(Workspace $workspace)
+  public function storeRole(Request $request, $idOrSlug)
   {
+    $workspace = Workspace::where(function ($q) use ($idOrSlug) {
+      if (is_numeric($idOrSlug)) {
+        $q->where('id', $idOrSlug);
+      }
+      $q->orWhere('slug', $idOrSlug);
+    })->firstOrFail();
+
+    if (!Auth::user()->hasPermission('manage-team', $workspace->id)) {
+      abort(403, 'You do not have permission to create roles');
+    }
+
+    $validated = $request->validate([
+      'name' => 'required|string|max:255|unique:roles,name',
+      'description' => 'nullable|string|max:1000',
+      'permissions' => 'nullable|array',
+      'permissions.*' => 'exists:permissions,id',
+      'approval_participant' => 'nullable|boolean',
+    ]);
+
+    return DB::transaction(function () use ($validated) {
+      $role = Role::create([
+        'name' => $validated['name'],
+        'slug' => Str::slug($validated['name']),
+        'description' => $validated['description'] ?? null,
+        'approval_participant' => $validated['approval_participant'] ?? false,
+      ]);
+
+      if (!empty($validated['permissions'])) {
+        $role->permissions()->sync($validated['permissions']);
+      }
+
+      return $this->successResponse([
+        'role' => $role->load('permissions')
+      ], 'Role created successfully', 201);
+    });
+  }
+
+  public function destroy($idOrSlug)
+  {
+    $workspace = Workspace::where(function ($q) use ($idOrSlug) {
+      if (is_numeric($idOrSlug)) {
+        $q->where('id', $idOrSlug);
+      }
+      $q->orWhere('slug', $idOrSlug);
+    })->firstOrFail();
+
     // STRICT CHECK: Only the creator can delete the workspace
     if (Auth::id() !== $workspace->created_by) {
       abort(403, 'Only the workspace owner can delete this workspace.');

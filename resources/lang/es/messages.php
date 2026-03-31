@@ -43,6 +43,10 @@ return [
         'updated' => 'Perfil actualizado exitosamente',
         'validation_failed' => 'Validación fallida',
         'current_password_incorrect' => 'La contraseña actual es incorrecta',
+        'password_updated' => 'Contraseña actualizada exitosamente',
+        'avatar_uploaded' => 'Avatar subido exitosamente',
+        'avatar_deleted' => 'Avatar eliminado exitosamente',
+        'oauth_password_change_not_allowed' => 'No puedes cambiar la contraseña porque iniciaste sesión con Google. Para mayor seguridad, administra tu contraseña desde tu cuenta de Google.',
     ],
 
     // Mensajes de Campaña

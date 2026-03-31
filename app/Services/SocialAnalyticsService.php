@@ -25,9 +25,14 @@ class SocialAnalyticsService
   public function fetchAccountMetrics(SocialAccount $account): array
   {
     try {
-      $token = $this->tokenManager->getValidToken($account);
-      $service = $this->getPlatformService($account->platform, $token);
+      // Verificar si la cuenta está activa antes de intentar sincronizar
+      if (!$account->is_active) {
+        Log::info("Skipping metrics fetch for inactive account {$account->id} ({$account->platform})");
+        return [];
+      }
 
+      $token = $this->tokenManager->getValidToken($account);
+      $service = $this->getPlatformService($account->platform, $token, $account);
       $info = $service->getAccountInfo();
       $normalized = $this->normalizeAccountMetrics($account->platform, $info);
 
@@ -74,7 +79,20 @@ class SocialAnalyticsService
 
       return $normalized;
     } catch (\Exception $e) {
-      Log::error("Failed to fetch metrics for {$account->platform} (Account: {$account->id}): " . $e->getMessage());
+      $errorMessage = $e->getMessage();
+      
+      // Si es un error de autenticación/token, no registrar como error sino como info
+      if (str_contains($errorMessage, 'reconnection required') || 
+          str_contains($errorMessage, 'No access token available') ||
+          str_contains($errorMessage, '401 Unauthorized') ||
+          str_contains($errorMessage, 'Invalid OAuth') ||
+          str_contains($errorMessage, 'access_token_invalid')) {
+        Log::info("Account {$account->id} ({$account->platform}) needs reconnection, skipping metrics fetch");
+        return [];
+      }
+      
+      // Para otros errores, sí registrar como error
+      Log::error("Failed to fetch metrics for {$account->platform} (Account: {$account->id}): " . $errorMessage);
       return [];
     }
   }
@@ -85,8 +103,14 @@ class SocialAnalyticsService
   public function syncRecentPostsMetrics(SocialAccount $account, int $days = 7): void
   {
     try {
+      // Verificar si la cuenta está activa antes de intentar sincronizar
+      if (!$account->is_active) {
+        Log::info("Skipping post metrics sync for inactive account {$account->id} ({$account->platform})");
+        return;
+      }
+
       $token = $this->tokenManager->getValidToken($account);
-      $service = $this->getPlatformService($account->platform, $token);
+      $service = $this->getPlatformService($account->platform, $token, $account);
 
       $posts = $account->postLogs()
         ->where('status', 'published')
@@ -128,7 +152,20 @@ class SocialAnalyticsService
         }
       }
     } catch (\Exception $e) {
-      Log::error("Failed to start post sync for account {$account->id}: " . $e->getMessage());
+      $errorMessage = $e->getMessage();
+      
+      // Si es un error de autenticación/token, no registrar como error sino como info
+      if (str_contains($errorMessage, 'reconnection required') || 
+          str_contains($errorMessage, 'No access token available') ||
+          str_contains($errorMessage, '401 Unauthorized') ||
+          str_contains($errorMessage, 'Invalid OAuth') ||
+          str_contains($errorMessage, 'access_token_invalid')) {
+        Log::info("Account {$account->id} ({$account->platform}) needs reconnection, skipping post metrics sync");
+        return;
+      }
+      
+      // Para otros errores, sí registrar como error
+      Log::error("Failed to start post sync for account {$account->id}: " . $errorMessage);
     }
   }
 
@@ -198,9 +235,9 @@ class SocialAnalyticsService
   /**
    * Get platform service instance
    */
-  protected function getPlatformService(string $platform, string $token)
+  protected function getPlatformService(string $platform, string $token, ?SocialAccount $account = null)
   {
-    return SocialPlatformFactory::make($platform, $token);
+    return SocialPlatformFactory::make($platform, $token, $account);
   }
 
   /**

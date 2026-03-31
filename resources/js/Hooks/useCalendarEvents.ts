@@ -1,11 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { 
-  endOfMonth, 
-  endOfWeek, 
-  startOfMonth, 
-  startOfWeek 
-} from 'date-fns';
+import { endOfMonth, endOfWeek, startOfMonth, startOfWeek } from 'date-fns';
 import { CalendarEvent, CalendarFilters } from '@/types/calendar';
 import { usePage } from '@inertiajs/react';
 
@@ -30,13 +25,13 @@ interface BulkUpdateParams {
 export function useCalendarEvents({ currentMonth, filters }: FetchEventsParams) {
   const { auth } = usePage<any>().props;
   const workspaceId = auth?.user?.current_workspace_id;
-  
+
   const start = startOfWeek(startOfMonth(currentMonth)).toISOString();
   const end = endOfWeek(endOfMonth(currentMonth)).toISOString();
 
   // Build query params with filters
   const params: any = { start, end };
-  
+
   if (filters.platforms.length > 0) {
     params.platforms = filters.platforms.join(',');
   }

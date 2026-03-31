@@ -1,7 +1,7 @@
-import { Publication } from "@/types/Publication";
-import axios from "axios";
-import { create } from "zustand";
-import { useCalendarStore } from "./calendarStore";
+import { Publication } from '@/types/Publication';
+import axios, { AxiosError } from 'axios';
+import { create } from 'zustand';
+import { useCalendarStore } from './calendarStore';
 
 interface PublicationState {
   publications: Publication[];
@@ -12,7 +12,22 @@ interface PublicationState {
   publishingPlatforms: Record<number, number[]>;
   scheduledPlatforms: Record<number, number[]>;
   removedPlatforms: Record<number, number[]>;
-  retryInfo: Record<number, Record<number, { retry_count: number; is_retrying: boolean; retry_status: string }>>;
+  duplicatePlatforms: Record<number, number[]>; // Plataformas con intentos duplicados
+  recurringPosts: Record<number, Record<number, unknown[]>>; // publicationId -> accountId -> posts[]
+  publishedRecurringPosts: Record<number, Record<number, unknown[]>>; // publicationId -> accountId -> posts[]
+  retryInfo: Record<
+    number,
+    Record<
+      number,
+      {
+        retry_count: number;
+        is_retrying: boolean;
+        retry_status: string;
+        is_duplicate: boolean; // Indica si es un intento duplicado
+        original_attempt_at?: string; // Timestamp del intento original
+      }
+    >
+  >;
 
   isLoading: boolean;
   error: string | null;
@@ -24,7 +39,12 @@ interface PublicationState {
     per_page: number;
   };
 
-  fetchPublications: (filters?: any, page?: number) => Promise<void>;
+  fetchPublications: (
+    filters?: Record<string, unknown>,
+    page?: number,
+    useApprovalFilter?: boolean,
+    forceRefresh?: boolean,
+  ) => Promise<void>;
   fetchPublicationById: (id: number) => Promise<Publication | null>;
   fetchPublishedPlatforms: (publicationId: number) => Promise<{
     published: number[];
@@ -40,21 +60,18 @@ interface PublicationState {
   removePublication: (id: number) => void;
 
   createPublication: (formData: FormData) => Promise<Publication | null>;
-  updatePublicationStore: (
-    id: number,
-    formData: FormData,
-  ) => Promise<Publication | null>;
+  updatePublicationStore: (id: number, formData: FormData) => Promise<Publication | null>;
   deletePublication: (id: number) => Promise<boolean>;
   duplicatePublication: (id: number) => Promise<boolean>;
 
   publishPublication: (
     id: number,
     formData: FormData,
-  ) => Promise<{ success: boolean; data?: any }>;
+  ) => Promise<{ success: boolean; data?: unknown }>;
   unpublishPublication: (
     id: number,
     platformIds: number[],
-  ) => Promise<{ success: boolean; data?: any }>;
+  ) => Promise<{ success: boolean; data?: unknown }>;
   setCurrentPublication: (publication: Publication | null) => void;
 
   getPublicationById: (id: number) => Publication | undefined;
@@ -63,23 +80,31 @@ interface PublicationState {
   getRemovedPlatforms: (publicationId: number) => number[];
   getPublishingPlatforms: (publicationId: number) => number[];
   getScheduledPlatforms: (publicationId: number) => number[];
-  getRetryInfo: (publicationId: number, platformId: number) => { retry_count: number; is_retrying: boolean; retry_status: string } | null;
+  getDuplicatePlatforms: (publicationId: number) => number[]; // Getter para plataformas duplicadas
+  getRetryInfo: (
+    publicationId: number,
+    platformId: number,
+  ) => {
+    retry_count: number;
+    is_retrying: boolean;
+    retry_status: string;
+    is_duplicate: boolean;
+    original_attempt_at?: string;
+  } | null;
 
   setPublishedPlatforms: (publicationId: number, accountIds: number[]) => void;
   setFailedPlatforms: (publicationId: number, accountIds: number[]) => void;
   setRemovedPlatforms: (publicationId: number, accountIds: number[]) => void;
   setPublishingPlatforms: (publicationId: number, accountIds: number[]) => void;
   setScheduledPlatforms: (publicationId: number, accountIds: number[]) => void;
+  setDuplicatePlatforms: (publicationId: number, accountIds: number[]) => void; // Setter para plataformas duplicadas
 
   clearPageData: () => void;
   clearError: () => void;
   reset: () => void;
 
-  acquireLock: (
-    id: number,
-    force?: boolean,
-  ) => Promise<{ success: boolean; data?: any }>;
-  releaseLock: (id: number) => Promise<{ success: boolean; data?: any }>;
+  acquireLock: (id: number, force?: boolean) => Promise<{ success: boolean; data?: unknown }>;
+  releaseLock: (id: number) => Promise<{ success: boolean; data?: unknown }>;
 }
 
 export const usePublicationStore = create<PublicationState>((set, get) => ({
@@ -91,6 +116,9 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
   publishingPlatforms: {},
   scheduledPlatforms: {},
   removedPlatforms: {},
+  duplicatePlatforms: {}, // Inicializar estado de duplicados
+  recurringPosts: {},
+  publishedRecurringPosts: {},
   retryInfo: {},
 
   isLoading: false,
@@ -103,25 +131,37 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
     per_page: 7,
   },
 
-  fetchPublications: async (filters = {}, page = 1) => {
+  fetchPublications: async (
+    filters = {},
+    page = 1,
+    useApprovalFilter = false,
+    forceRefresh = false,
+  ) => {
     set({ isLoading: true, error: null });
-
-    // CRITICAL: Clear previous page data to prevent memory bloat
-    // Only keep data for the current page being viewed
-    // TEMPORARILY DISABLED FOR DEBUGGING
-    // get().clearPageData();
 
     try {
       // Limpiar filtros vacíos
-      const cleanFilters = Object.entries(filters).reduce((acc, [key, value]) => {
-        if (Array.isArray(value) && value.length > 0) {
-          acc[key] = value;
-        } else if (value && !Array.isArray(value) && value !== 'all') {
-          acc[key] = value;
-        }
-        return acc;
-      }, {} as any);
-      const response = await axios.get(route("api.v1.publications.index"), {
+      const cleanFilters = Object.entries(filters).reduce(
+        (acc, [key, value]) => {
+          // Keep status even if "all" — backend needs it to know user wants everything
+          if (key === 'status') {
+            if (value) acc[key] = value;
+          } else if (Array.isArray(value) && value.length > 0) {
+            acc[key] = value;
+          } else if (value && !Array.isArray(value) && value !== 'all') {
+            acc[key] = value;
+          }
+          return acc;
+        },
+        {} as Record<string, unknown>,
+      );
+
+      // Use different endpoint based on approval filter
+      const endpoint = useApprovalFilter
+        ? route('api.v1.publications.pending-approvals')
+        : route('api.v1.publications.index');
+
+      const response = await axios.get(endpoint, {
         params: { ...cleanFilters, page },
         paramsSerializer: {
           indexes: null,
@@ -129,31 +169,66 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
             const searchParams = new URLSearchParams();
             Object.entries(params).forEach(([key, value]) => {
               if (Array.isArray(value)) {
-                value.forEach(v => searchParams.append(`${key}[]`, String(v)));
+                value.forEach((v) => searchParams.append(`${key}[]`, String(v)));
               } else if (value !== null && value !== undefined) {
                 searchParams.append(key, String(value));
               }
             });
             return searchParams.toString();
-          }
-        }
+          },
+        },
       });
 
       const data = response.data.publications;
+      const incomingItems: Publication[] = data.data ?? data ?? [];
+
+      // Only apply optimistic state logic if NOT a forced refresh
+      let finalItems = incomingItems;
+
+      if (!forceRefresh) {
+        // Preserve optimistic local state: if the store already has a more
+        // "advanced" status for an item (e.g. pending_review) and the backend
+        // still returns the old status (e.g. draft) due to cache or timing,
+        // keep the local state to avoid re-enabling buttons incorrectly.
+        const statusPriority: Record<string, number> = {
+          draft: 0,
+          rejected: 1,
+          failed: 1,
+          scheduled: 2,
+          approved: 3,
+          pending_review: 4,
+          publishing: 5,
+          published: 6,
+        };
+
+        const currentPublications = get().publications;
+        finalItems = incomingItems.map((incoming) => {
+          const existing = currentPublications.find((p) => p.id === incoming.id);
+          if (!existing) return incoming;
+          const existingPriority = statusPriority[existing.status ?? ''] ?? 0;
+          const incomingPriority = statusPriority[incoming.status ?? ''] ?? 0;
+          // Keep local state if it's more advanced than what the backend returned
+          if (existingPriority > incomingPriority && existing.status !== undefined) {
+            return { ...incoming, status: existing.status };
+          }
+          return incoming;
+        });
+      }
 
       set({
-        publications: data.data ?? [],
+        publications: finalItems,
         pagination: {
-          current_page: data.current_page,
-          last_page: data.last_page,
-          total: data.total,
-          per_page: data.per_page,
+          current_page: data.current_page ?? 1,
+          last_page: data.last_page ?? 1,
+          total: data.total ?? (Array.isArray(data) ? data.length : 0),
+          per_page: data.per_page ?? 12,
         },
         isLoading: false,
       });
-    } catch (error: any) {
-       set({
-        error: error.message ?? "Failed to fetch publications",
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
+      set({
+        error: axiosError.message ?? 'Failed to fetch publications',
         isLoading: false,
       });
     }
@@ -169,20 +244,19 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
     set({ error: null });
     try {
-      const response = await axios.get(route("api.v1.publications.show", id));
+      const response = await axios.get(route('api.v1.publications.show', id));
       const publication = response.data.publication;
 
       set((state) => ({
-        publications: state.publications.map((p) =>
-          p.id === id ? publication : p,
-        ),
+        publications: state.publications.map((p) => (p.id === id ? publication : p)),
         currentPublication: publication,
       }));
 
       return publication;
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
       set({
-        error: error.message ?? "Failed to fetch publication",
+        error: axiosError.message ?? 'Failed to fetch publication',
       });
       return null;
     }
@@ -191,15 +265,30 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
   fetchPublishedPlatforms: async (publicationId: number) => {
     try {
       const response = await axios.get(
-        route("api.v1.publications.published-platforms", publicationId),
+        route('api.v1.publications.published-platforms', publicationId),
       );
 
-      const published = response.data.published_platforms ?? [];
-      const failed = response.data.failed_platforms ?? [];
-      const publishing = response.data.publishing_platforms ?? [];
-      const removed = response.data.removed_platforms ?? [];
-      const scheduled = response.data.scheduled_platforms ?? [];
+      const published = Array.isArray(response.data.published_platforms)
+        ? response.data.published_platforms
+        : [];
+      const failed = Array.isArray(response.data.failed_platforms)
+        ? response.data.failed_platforms
+        : [];
+      const publishing = Array.isArray(response.data.publishing_platforms)
+        ? response.data.publishing_platforms
+        : [];
+      const removed = Array.isArray(response.data.removed_platforms)
+        ? response.data.removed_platforms
+        : [];
+      const scheduled = Array.isArray(response.data.scheduled_platforms)
+        ? response.data.scheduled_platforms
+        : typeof response.data.scheduled_platforms === 'object' &&
+            response.data.scheduled_platforms !== null
+          ? Object.values(response.data.scheduled_platforms)
+          : [];
       const retry_info = response.data.retry_info ?? {};
+      const recurring_posts = response.data.recurring_posts ?? {};
+      const published_recurring_posts = response.data.published_recurring_posts ?? {};
 
       set((state) => ({
         publishedPlatforms: {
@@ -226,6 +315,14 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
           ...state.retryInfo,
           [publicationId]: retry_info,
         },
+        recurringPosts: {
+          ...state.recurringPosts,
+          [publicationId]: recurring_posts,
+        },
+        publishedRecurringPosts: {
+          ...state.publishedRecurringPosts,
+          [publicationId]: published_recurring_posts,
+        },
       }));
 
       return { published, failed, publishing, removed, scheduled, retry_info };
@@ -251,7 +348,10 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       // 1. Process social_post_logs if they are part of the update
       // This ensures that platform status caches (published, publishing, etc.)
       // are always in sync with the latest data from Echo or API.
-      const logs = updated.social_post_logs || (updated as any).socialPostLogs;
+      const logs =
+        updated.social_post_logs ||
+        (updated as Publication & { socialPostLogs?: Publication['social_post_logs'] })
+          .socialPostLogs;
 
       const newPlatformStatusUpdates: Partial<PublicationState> = {};
 
@@ -260,36 +360,100 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
         const failed: number[] = [];
         const publishing: number[] = [];
         const removed: number[] = [];
-        const scheduled: number[] = [];
+        const duplicates: number[] = []; // Plataformas con intentos duplicados
+        const retryInfoUpdates: Record<
+          number,
+          {
+            retry_count: number;
+            is_retrying: boolean;
+            retry_status: string;
+            is_duplicate: boolean;
+            original_attempt_at?: string;
+          }
+        > = {};
 
         // Determine which social accounts have pending scheduled posts
         // to avoid marking them as "available" prematurely
         const publication = state.publications.find((p) => p.id === id);
         const scheduledIds = new Set(
           publication?.scheduled_posts
-            ?.filter((sp) => sp.status === "pending")
+            ?.filter((sp) => sp.status === 'pending')
             .map((sp) => sp.social_account_id) || [],
         );
 
-        logs.forEach((log: any) => {
-          if (scheduledIds.has(log.social_account_id)) return;
+        // Agrupar logs por social_account_id para detectar duplicados
+        type SocialPostLog = NonNullable<Publication['social_post_logs']>[number];
+        const logsByAccount = logs.reduce(
+          (acc: Record<string, SocialPostLog[]>, log: SocialPostLog) => {
+            if (!acc[log.social_account_id]) {
+              acc[log.social_account_id] = [];
+            }
+            acc[log.social_account_id]!.push(log);
+            return acc;
+          },
+          {},
+        );
 
-          const status = log.status;
-          const attempts = log.attempts || 0;
-          const maxAttempts = log.max_attempts || 3;
+        Object.entries(logsByAccount).forEach(
+          ([accountId, accountLogs]: [string, SocialPostLog[]]) => {
+            const socialAccountId = parseInt(accountId);
+            if (scheduledIds.has(socialAccountId)) return;
 
-          if (status === "published" || status === "success") {
-            published.push(log.social_account_id);
-          } else if (status === "failed" || (status === "pending" && attempts >= maxAttempts)) {
-            // Mark as failed if explicitly failed OR if all retry attempts exhausted
-            failed.push(log.social_account_id);
-          } else if ((status === "publishing" || status === "pending") && attempts < maxAttempts) {
-            // Only show as publishing if actively in progress and retries remain
-            publishing.push(log.social_account_id);
-          } else if (status === "removed_on_platform" || status === "deleted") {
-            removed.push(log.social_account_id);
-          }
-        });
+            // Ordenar logs por fecha de creación (más reciente primero)
+            const sortedLogs = (accountLogs as SocialPostLog[]).sort(
+              (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+            );
+
+            const latestLog = sortedLogs[0];
+            if (!latestLog) return;
+            const status = latestLog.status;
+            const attempts = latestLog.attempts || 0;
+            const maxAttempts = latestLog.max_attempts || 3;
+
+            // Detectar intentos duplicados: si hay múltiples logs activos (publishing/pending)
+            const activeAttempts = sortedLogs.filter(
+              (log) => log.status === 'publishing' || log.status === 'pending',
+            );
+
+            const isDuplicate = activeAttempts.length > 1;
+            const originalAttempt = isDuplicate ? sortedLogs[sortedLogs.length - 1] : null;
+
+            // Actualizar retry info con información de duplicados
+            const retryInfo: {
+              retry_count: number;
+              is_retrying: boolean;
+              retry_status: string;
+              is_duplicate: boolean;
+              original_attempt_at?: string;
+            } = {
+              retry_count: attempts,
+              is_retrying: latestLog.is_retrying || false,
+              retry_status: latestLog.retry_status || status,
+              is_duplicate: isDuplicate,
+            };
+            if (originalAttempt?.created_at) {
+              retryInfo.original_attempt_at = originalAttempt.created_at;
+            }
+            retryInfoUpdates[socialAccountId] = retryInfo;
+
+            if (isDuplicate) {
+              duplicates.push(socialAccountId);
+            } else if (status === 'published' || status === 'success') {
+              published.push(socialAccountId);
+            } else if (status === 'failed' || (status === 'pending' && attempts >= maxAttempts)) {
+              // Mark as failed if explicitly failed OR if all retry attempts exhausted
+              failed.push(socialAccountId);
+            } else if (
+              (status === 'publishing' || status === 'pending') &&
+              attempts < maxAttempts
+            ) {
+              // Only show as publishing if actively in progress and retries remain
+              publishing.push(socialAccountId);
+            } else if (status === 'deleted' || status === 'orphaned') {
+              removed.push(socialAccountId);
+            }
+          },
+        );
 
         newPlatformStatusUpdates.publishedPlatforms = {
           ...state.publishedPlatforms,
@@ -307,13 +471,22 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
           ...state.removedPlatforms,
           [id]: Array.from(new Set(removed)),
         };
+        newPlatformStatusUpdates.duplicatePlatforms = {
+          ...state.duplicatePlatforms,
+          [id]: Array.from(new Set(duplicates)),
+        };
+        newPlatformStatusUpdates.retryInfo = {
+          ...state.retryInfo,
+          [id]: {
+            ...state.retryInfo[id],
+            ...retryInfoUpdates,
+          },
+        };
       }
 
       return {
         ...newPlatformStatusUpdates,
-        publications: state.publications.map((p) =>
-          p.id === id ? { ...p, ...updated } : p,
-        ),
+        publications: state.publications.map((p) => (p.id === id ? { ...p, ...updated } : p)),
         currentPublication:
           state.currentPublication?.id === id
             ? { ...state.currentPublication, ...updated }
@@ -324,20 +497,15 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
   removePublication: (id) =>
     set((state) => ({
       publications: state.publications.filter((p) => p.id !== id),
-      currentPublication:
-        state.currentPublication?.id === id ? null : state.currentPublication,
+      currentPublication: state.currentPublication?.id === id ? null : state.currentPublication,
     })),
 
   createPublication: async (formData) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post(
-        route("api.v1.publications.store"),
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        },
-      );
+      const response = await axios.post(route('api.v1.publications.store'), formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
       const publication = response.data.publication;
       if (publication) {
         get().addPublication(publication);
@@ -346,9 +514,10 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       // Refresh calendar store to reflect changes
       useCalendarStore.getState().fetchEvents();
       return publication;
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
       set({
-        error: error.response?.data?.message ?? "Failed to create publication",
+        error: axiosError.response?.data?.message ?? 'Failed to create publication',
         isLoading: false,
       });
       throw error;
@@ -359,16 +528,12 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       // Ensure _method is PUT for Laravel to handle multipart/form-data with PUT
-      if (!formData.has("_method")) {
-        formData.append("_method", "PUT");
+      if (!formData.has('_method')) {
+        formData.append('_method', 'PUT');
       }
-      const response = await axios.post(
-        route("api.v1.publications.update", id),
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        },
-      );
+      const response = await axios.post(route('api.v1.publications.update', id), formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
       const publication = response.data.publication || response.data.data;
       if (publication) {
         get().updatePublication(id, publication);
@@ -377,9 +542,10 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       // Refresh calendar store to reflect updated publication
       useCalendarStore.getState().fetchEvents();
       return publication;
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
       set({
-        error: error.response?.data?.message ?? "Failed to update publication",
+        error: axiosError.response?.data?.message ?? 'Failed to update publication',
         isLoading: false,
       });
       throw error;
@@ -389,14 +555,15 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
   deletePublication: async (id) => {
     set({ isLoading: true, error: null });
     try {
-      await axios.delete(route("api.v1.publications.destroy", id));
+      await axios.delete(route('api.v1.publications.destroy', id));
       get().removePublication(id);
       set({ isLoading: false });
       useCalendarStore.getState().fetchEvents();
       return true;
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
       set({
-        error: error.response?.data?.message ?? "Failed to delete publication",
+        error: axiosError.response?.data?.message ?? 'Failed to delete publication',
         isLoading: false,
       });
       return false;
@@ -406,9 +573,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
   duplicatePublication: async (id) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post(
-        route("api.v1.publications.duplicate", id),
-      );
+      const response = await axios.post(route('api.v1.publications.duplicate', id));
       const publication = response.data.publication;
       if (publication) {
         get().addPublication(publication);
@@ -416,10 +581,10 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       set({ isLoading: false });
       useCalendarStore.getState().fetchEvents();
       return true;
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
       set({
-        error:
-          error.response?.data?.message ?? "Failed to duplicate publication",
+        error: axiosError.response?.data?.message ?? 'Failed to duplicate publication',
         isLoading: false,
       });
       return false;
@@ -428,41 +593,51 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
   publishPublication: async (id, formData) => {
     try {
-      const response = await axios.post(
-        route("api.v1.publications.publish", id),
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
+      // Generate a unique UUID v4 key per publish attempt to prevent duplicate requests
+      // (e.g. double-click or network retry while the first request is still in flight).
+      const idempotencyKey = crypto.randomUUID();
+
+      const response = await axios.post(route('api.v1.publications.publish', id), formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Idempotency-Key': idempotencyKey,
         },
-      );
+      });
       return { success: response.data.success, data: response.data };
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string; code?: string }>;
+
+      // 409 = duplicate in-flight request — surface a clear message
+      if (axiosError.response?.status === 409) {
+        return {
+          success: false,
+          data: 'Ya hay una publicación en proceso. Por favor espera unos segundos.',
+        };
+      }
+
       return {
         success: false,
-        data: error.response?.data?.message ?? "Failed to publish",
+        data: axiosError.response?.data?.message ?? 'Failed to publish',
       };
     }
   },
 
   unpublishPublication: async (id, platformIds) => {
     try {
-      const response = await axios.post(
-        route("api.v1.publications.unpublish", id),
-        {
-          platform_ids: platformIds,
-        },
-      );
+      const response = await axios.post(route('api.v1.publications.unpublish', id), {
+        platform_ids: platformIds,
+      });
       return { success: true, data: response.data };
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
       return {
         success: false,
-        data: error.response?.data?.message ?? "Failed to unpublish",
+        data: axiosError.response?.data?.message ?? 'Failed to unpublish',
       };
     }
   },
 
-  setCurrentPublication: (publication) =>
-    set({ currentPublication: publication }),
+  setCurrentPublication: (publication) => set({ currentPublication: publication }),
 
   getPublicationById: (id) => get().publications.find((p) => p.id === id),
 
@@ -475,7 +650,15 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
   getPublishingPlatforms: (id) => get().publishingPlatforms[id] ?? [],
 
   getScheduledPlatforms: (id) => get().scheduledPlatforms[id] ?? [],
-  
+
+  getDuplicatePlatforms: (id) => get().duplicatePlatforms[id] ?? [], // Getter para plataformas duplicadas
+
+  getRecurringPosts: (publicationId: number, accountId: number) =>
+    get().recurringPosts[publicationId]?.[accountId] ?? [],
+
+  getPublishedRecurringPosts: (publicationId: number, accountId: number) =>
+    get().publishedRecurringPosts[publicationId]?.[accountId] ?? [],
+
   getRetryInfo: (publicationId, platformId) => {
     const info = get().retryInfo[publicationId];
     return info?.[platformId] ?? null;
@@ -506,8 +689,13 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       scheduledPlatforms: { ...state.scheduledPlatforms, [id]: accounts },
     })),
 
-  clearPageData: () =>
+  setDuplicatePlatforms: (id, accounts) =>
     set((state) => ({
+      duplicatePlatforms: { ...state.duplicatePlatforms, [id]: accounts },
+    })),
+
+  clearPageData: () =>
+    set((_state) => ({
       // Clear publications array to free memory
       publications: [],
       // Clear all platform caches as they're page-specific
@@ -516,6 +704,9 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       publishingPlatforms: {},
       scheduledPlatforms: {},
       removedPlatforms: {},
+      duplicatePlatforms: {}, // Limpiar cache de duplicados
+      recurringPosts: {},
+      publishedRecurringPosts: {},
       retryInfo: {},
       // Keep currentPublication if user is editing something
       // This prevents losing data if modal is open
@@ -531,6 +722,8 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       failedPlatforms: {},
       publishingPlatforms: {},
       scheduledPlatforms: {},
+      recurringPosts: {},
+      publishedRecurringPosts: {},
       retryInfo: {},
       isLoading: false,
       error: null,
@@ -538,30 +731,28 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
   acquireLock: async (id, force = false) => {
     try {
-      const response = await axios.post(route("api.v1.publications.lock", id), {
+      const response = await axios.post(route('api.v1.publications.lock', id), {
         force,
       });
       return { success: response.data.success, data: response.data };
-    } catch (error: any) {
-      // Don't set global store error for locks as it's often background/ephemeral
-      // Just return the error state so the hook can handle it (e.g. 423 Locked)
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
       return {
         success: false,
-        data: error.response?.data ?? { message: "Failed to acquire lock" },
+        data: axiosError.response?.data ?? { message: 'Failed to acquire lock' },
       };
     }
   },
 
   releaseLock: async (id) => {
     try {
-      const response = await axios.post(
-        route("api.v1.publications.unlock", id),
-      );
+      const response = await axios.post(route('api.v1.publications.unlock', id));
       return { success: true, data: response.data };
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
       return {
         success: false,
-        data: error.response?.data ?? { message: "Failed to release lock" },
+        data: axiosError.response?.data ?? { message: 'Failed to release lock' },
       };
     }
   },

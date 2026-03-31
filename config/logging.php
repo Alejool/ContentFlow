@@ -4,6 +4,7 @@ use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
 use Monolog\Processor\PsrLogMessageProcessor;
+use App\Logging\JsonFormatter;
 
 return [
 
@@ -11,11 +12,6 @@ return [
     |--------------------------------------------------------------------------
     | Default Log Channel
     |--------------------------------------------------------------------------
-    |
-    | This option defines the default log channel that is utilized to write
-    | messages to your logs. The value provided here should match one of
-    | the channels present in the list of "channels" configured below.
-    |
     */
 
     'default' => env('LOG_CHANNEL', 'daily'),
@@ -24,11 +20,6 @@ return [
     |--------------------------------------------------------------------------
     | Deprecations Log Channel
     |--------------------------------------------------------------------------
-    |
-    | This option controls the log channel that should be used to log warnings
-    | regarding deprecated PHP and library features. This allows you to get
-    | your application ready for upcoming major versions of dependencies.
-    |
     */
 
     'deprecations' => [
@@ -40,14 +31,6 @@ return [
     |--------------------------------------------------------------------------
     | Log Channels
     |--------------------------------------------------------------------------
-    |
-    | Here you may configure the log channels for your application. Laravel
-    | utilizes the Monolog PHP logging library, which includes a variety
-    | of powerful log handlers and formatters that you're free to use.
-    |
-    | Available drivers: "single", "daily", "slack", "syslog",
-    |                    "errorlog", "monolog", "custom", "stack"
-    |
     */
 
     'channels' => [
@@ -73,13 +56,48 @@ return [
             'replace_placeholders' => true,
         ],
 
-        // Logs organizados por contexto
+        // ========================================
+        // LOGS ESTRUCTURADOS POR MÓDULO (JSON)
+        // ========================================
+
+        'uploads' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/uploads.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 30,
+            'tap' => [App\Logging\CustomizeFormatter::class],
+        ],
+
         'publications' => [
             'driver' => 'daily',
             'path' => storage_path('logs/publications.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => 30,
-            'replace_placeholders' => true,
+            'tap' => [App\Logging\CustomizeFormatter::class],
+        ],
+
+        'campaigns' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/campaigns.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 30,
+            'tap' => [App\Logging\CustomizeFormatter::class],
+        ],
+
+        'billing' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/billing.log'),
+            'level' => env('LOG_LEVEL', 'info'),
+            'days' => 90, // Mantener más tiempo por auditoría
+            'tap' => [App\Logging\CustomizeFormatter::class],
+        ],
+
+        'api' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/api.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 30,
+            'tap' => [App\Logging\CustomizeFormatter::class],
         ],
 
         'jobs' => [
@@ -87,15 +105,15 @@ return [
             'path' => storage_path('logs/jobs.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => 30,
-            'replace_placeholders' => true,
+            'tap' => [App\Logging\CustomizeFormatter::class],
         ],
 
         'auth' => [
             'driver' => 'daily',
             'path' => storage_path('logs/auth.log'),
-            'level' => env('LOG_LEVEL', 'debug'),
+            'level' => env('LOG_LEVEL', 'info'),
             'days' => 90, // Mantener más tiempo por seguridad
-            'replace_placeholders' => true,
+            'tap' => [App\Logging\CustomizeFormatter::class],
         ],
 
         'social' => [
@@ -103,7 +121,7 @@ return [
             'path' => storage_path('logs/social.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => 30,
-            'replace_placeholders' => true,
+            'tap' => [App\Logging\CustomizeFormatter::class],
         ],
 
         'errors' => [
@@ -111,13 +129,33 @@ return [
             'path' => storage_path('logs/errors.log'),
             'level' => 'error',
             'days' => 60,
-            'replace_placeholders' => true,
+            'tap' => [App\Logging\CustomizeFormatter::class],
         ],
+
+        'performance' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/performance.log'),
+            'level' => env('LOG_LEVEL', 'info'),
+            'days' => 14,
+            'tap' => [App\Logging\CustomizeFormatter::class],
+        ],
+
+        'security' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/security.log'),
+            'level' => env('LOG_LEVEL', 'warning'),
+            'days' => 90,
+            'tap' => [App\Logging\CustomizeFormatter::class],
+        ],
+
+        // ========================================
+        // CANALES EXTERNOS
+        // ========================================
 
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),
-            'username' => env('LOG_SLACK_USERNAME', 'Laravel Log'),
+            'username' => env('LOG_SLACK_USERNAME', 'ContentFlow'),
             'emoji' => env('LOG_SLACK_EMOJI', ':boom:'),
             'level' => env('LOG_LEVEL', 'critical'),
             'replace_placeholders' => true,

@@ -1,11 +1,11 @@
-import { PasswordFormData, passwordSchema } from "@/schemas/user";
-import { useUserStore } from "@/stores/userStore";
-import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
-import { useState } from "react";
-import { useForm as useHookForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
-import { useTranslation } from "react-i18next";
+import { PasswordFormData, passwordSchema } from '@/schemas/user';
+import { useUserStore } from '@/stores/userStore';
+import { zodResolver } from '@hookform/resolvers/zod';
+import axios from 'axios';
+import { useState } from 'react';
+import { useForm as useHookForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 export const useUpdatePassword = () => {
   const { t } = useTranslation();
@@ -21,9 +21,9 @@ export const useUpdatePassword = () => {
   } = useHookForm<PasswordFormData>({
     resolver: zodResolver(passwordSchema(t)),
     defaultValues: {
-      current_password: "",
-      password: "",
-      password_confirmation: "",
+      current_password: '',
+      password: '',
+      password_confirmation: '',
     },
   });
 
@@ -34,10 +34,10 @@ export const useUpdatePassword = () => {
       if (result.success) {
         reset();
         setIsSuccess(true);
-        toast.success(result.message || t("profile.password.successTitle"));
+        toast.success(result.message || t('profile.password.successTitle'));
         setTimeout(() => setIsSuccess(false), 3000);
       } else {
-        toast.error(result.message || t("profile.update_error"));
+        toast.error(result.message || t('profile.update_error'));
       }
     } catch (error: any) {
       if (axios.isAxiosError(error) && error.response?.data?.errors) {
@@ -47,7 +47,7 @@ export const useUpdatePassword = () => {
           toast.error(value[0]);
         });
       } else {
-        toast.error(error.message || t("profile.update_error"));
+        toast.error(error.message || t('profile.update_error'));
       }
     }
   };

@@ -1,4 +1,4 @@
-﻿{
+{
   "platformSettings": {
     "status": "Status",
     "save": "Save Changes",
@@ -11,8 +11,8 @@
     "configure": "Configure Network",
     "configureAll": "Configure All",
     "messages": {
-      "success": "Configuration saved successfully ",
-      "error": "Error saving configuration "
+      "success": "Configuration saved successfully",
+      "error": "Error saving configuration"
     },
     "preview": {
       "view": "View Preview"

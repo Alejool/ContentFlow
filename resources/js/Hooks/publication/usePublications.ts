@@ -1,82 +1,66 @@
-import { useRealtime } from "@/Hooks/publication/useRealtime";
-import { useConfirm } from "@/Hooks/useConfirm";
-import { useSocialMediaAuth } from "@/Hooks/useSocialMediaAuth";
-import { ToastService } from "@/Services/ToastService";
-import { useCampaignStore } from "@/stores/campaignStore";
-import { useLogStore } from "@/stores/logStore";
-import { useManageContentUIStore } from "@/stores/manageContentUIStore";
-import { usePublicationStore } from "@/stores/publicationStore";
-import { PageProps } from "@/types";
-import { Publication } from "@/types/Publication";
-import { usePage } from "@inertiajs/react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { useShallow } from "zustand/react/shallow";
+import {
+  useCampaignsList,
+  useDeleteCampaign,
+  useDuplicateCampaign,
+} from '@/Hooks/campaign/useCampaigns';
+import {
+  useDeletePublication,
+  useDuplicatePublication,
+  usePublicationsList,
+} from '@/Hooks/publication/usePublicationsList';
+import { useRealtime } from '@/Hooks/publication/useRealtime';
+import { useConfirm } from '@/Hooks/useConfirm';
+import { useLogs } from '@/Hooks/useLogs';
+import { useSocialMediaAuth } from '@/Hooks/useSocialMediaAuth';
+import { queryKeys } from '@/lib/queryKeys';
+import { ToastService } from '@/Services/ToastService';
+import { useManageContentUIStore } from '@/stores/manageContentUIStore';
+import { usePublicationStore } from '@/stores/publicationStore';
+import { PageProps } from '@/types';
+import { Publication } from '@/types/Publication';
+import { usePage } from '@inertiajs/react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useShallow } from 'zustand/react/shallow';
 
-export type ContentTab =
-  | "publications"
-  | "campaigns"
-  | "logs"
-  | "calendar"
-  | "approvals";
+export type ContentTab = 'publications' | 'campaigns' | 'logs' | 'calendar' | 'approvals';
 
 export const usePublications = () => {
   const { t } = useTranslation();
   const { confirm } = useConfirm();
   const { props } = usePage<PageProps>();
   const user = props.auth.user;
+  const queryClient = useQueryClient();
 
-  const {
-    publications,
-    pubPagination,
-    isPubLoading,
-    fetchPublications,
-    deletePublicationAction,
-    duplicatePublicationAction,
-  } = usePublicationStore(
-    useShallow((s) => ({
-      publications: s.publications,
-      pubPagination: s.pagination,
-      isPubLoading: s.isLoading,
-      fetchPublications: s.fetchPublications,
-      deletePublicationAction: s.deletePublication,
-      duplicatePublicationAction: s.duplicatePublication,
-    })),
+  const [activeTabState, setActiveTabState] = useState<ContentTab>('publications');
+  const [filters, setFilters] = useState<any>(() => {
+    const saved = localStorage.getItem(`contentPage_filters_${activeTabState}`);
+    return saved ? JSON.parse(saved) : {};
+  });
+  const [page, setPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
+
+  // TanStack Query hooks — only fetch when the relevant tab is active
+  const pubQuery = usePublicationsList(
+    { ...filters, per_page: itemsPerPage },
+    page,
+    activeTabState === 'approvals',
   );
+  const campQuery = useCampaignsList({ ...filters, per_page: itemsPerPage }, page);
+  const logsQuery = useLogs({ ...filters, per_page: itemsPerPage }, page);
 
-  const {
-    campaigns,
-    campPagination,
-    isCampLoading,
-    fetchCampaigns,
-    deleteCampaignAction,
-    duplicateCampaignAction,
-  } = useCampaignStore(
-    useShallow((s) => ({
-      campaigns: s.campaigns,
-      campPagination: s.pagination,
-      isCampLoading: s.isLoading,
-      fetchCampaigns: s.fetchCampaigns,
-      deleteCampaignAction: s.deleteCampaign,
-      duplicateCampaignAction: s.duplicateCampaign,
-    })),
-  );
+  // Mutations
+  const deletePub = useDeletePublication();
+  const duplicatePub = useDuplicatePublication();
+  const deleteCamp = useDeleteCampaign();
+  const duplicateCamp = useDuplicateCampaign();
 
-  const { logs, logPagination, isLogsLoading, fetchLogs } = useLogStore(
-    useShallow((s) => ({
-      logs: s.logs,
-      logPagination: s.pagination,
-      isLogsLoading: s.isLoading,
-      fetchLogs: s.fetchLogs,
-    })),
-  );
-
-  const { fetchAccounts, accounts: connectedAccounts } = useSocialMediaAuth();
+  const { accounts: connectedAccounts } = useSocialMediaAuth();
 
   // Realtime updates
   useRealtime(user?.id);
 
-  // Shared UI store for modals and tabs with shallow comparison to prevent unnecessary re-renders
   const {
     activeTab,
     setActiveTab,
@@ -115,272 +99,177 @@ export const usePublications = () => {
     })),
   );
 
-  const [filters, setFilters] = useState<any>(() => {
-    const saved = localStorage.getItem(`contentPage_filters_${activeTab}`);
-    return saved ? JSON.parse(saved) : {};
-  });
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  // Derived data per tab
+  const publications = pubQuery.data?.data ?? [];
+  const campaigns = campQuery.data?.data ?? [];
+  const logs = logsQuery.data?.data ?? [];
 
-  // Use a ref to prevent loops from effect triggers
-  const lastFetchRef = useRef<string>("");
-
-  const fetchData = useCallback(
-    async (page = 1) => {
-      const fetchKey = `${activeTab}-${JSON.stringify(filters)}-${page}`;
-      // Prevent duplicate fetches in the same render cycle or loop
-      if (
-        lastFetchRef.current === fetchKey &&
-        (isPubLoading || isCampLoading || isLogsLoading)
-      ) {
-        return;
+  const pubPagination = pubQuery.data
+    ? {
+        current_page: pubQuery.data.current_page,
+        last_page: pubQuery.data.last_page,
+        total: pubQuery.data.total,
+        per_page: pubQuery.data.per_page,
       }
-      lastFetchRef.current = fetchKey;
+    : { current_page: 1, last_page: 1, total: 0, per_page: itemsPerPage };
 
-      switch (activeTab) {
-        case "publications":
-          await fetchPublications({ ...filters, per_page: itemsPerPage }, page);
-          break;
-        case "campaigns":
-          await fetchCampaigns({ ...filters, per_page: itemsPerPage }, page);
-          break;
-        case "logs":
-          await fetchLogs({ ...filters, per_page: itemsPerPage }, page);
-          break;
-        case "approvals":
-          await fetchPublications({ ...filters, per_page: itemsPerPage }, page);
-          break;
+  const campPagination = campQuery.data
+    ? {
+        current_page: campQuery.data.current_page,
+        last_page: campQuery.data.last_page,
+        total: campQuery.data.total,
+        per_page: campQuery.data.per_page,
       }
-    },
-    [
-      activeTab,
-      filters,
-      itemsPerPage,
-      fetchPublications,
-      fetchCampaigns,
-      fetchLogs,
-      isPubLoading,
-      isCampLoading,
-      isLogsLoading,
-    ],
-  );
+    : { current_page: 1, last_page: 1, total: 0, per_page: itemsPerPage };
+
+  const logPagination = logsQuery.data
+    ? {
+        current_page: logsQuery.data.current_page,
+        last_page: logsQuery.data.last_page,
+        total: logsQuery.data.total,
+        per_page: logsQuery.data.per_page,
+      }
+    : { current_page: 1, last_page: 1, total: 0, per_page: itemsPerPage };
+
+  const items =
+    activeTab === 'publications' || activeTab === 'approvals'
+      ? publications
+      : activeTab === 'campaigns'
+        ? campaigns
+        : logs;
+
+  const pagination =
+    activeTab === 'publications' || activeTab === 'approvals'
+      ? pubPagination
+      : activeTab === 'campaigns'
+        ? campPagination
+        : logPagination;
+
+  const isPubLoading = pubQuery.isLoading || pubQuery.isFetching;
+  const isCampLoading = campQuery.isLoading || campQuery.isFetching;
+  const isLogsLoading = logsQuery.isLoading || logsQuery.isFetching;
+
+  const isLoading =
+    activeTab === 'publications' || activeTab === 'approvals'
+      ? isPubLoading
+      : activeTab === 'campaigns'
+        ? isCampLoading
+        : isLogsLoading;
+
+  const handlePageChange = useCallback((newPage: number) => {
+    setPage(newPage);
+  }, []);
 
   const handlePerPageChange = useCallback((val: number) => {
     setItemsPerPage(val);
-    // Scroll to top to prevent blank spaces in virtualized table
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    // fetchData will be called by useEffect when itemsPerPage changes
+    setPage(1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
-  useEffect(() => {
-    fetchData(1); // Always reset to page 1 when filters or perPage change
-  }, [
-    activeTab,
-    filters,
-    itemsPerPage,
-    (props.auth.user as any)?.current_workspace_id,
-  ]); // Run when tab, filters, perPage or workspace change
-
-  useEffect(() => {
-    fetchAccounts();
-  }, []); // Only fetch accounts once on mount
-
-  const items = (() => {
-    switch (activeTab) {
-      case "publications":
-        return publications;
-      case "campaigns":
-        return campaigns;
-      case "logs":
-        return logs;
-      default:
-        return [];
-    }
-  })();
-
-  const pagination = (() => {
-    switch (activeTab) {
-      case "publications":
-        return pubPagination;
-      case "campaigns":
-        return campPagination;
-      case "logs":
-        return logPagination;
-      default:
-        return { current_page: 1, last_page: 1, total: 0, per_page: 10 };
-    }
-  })();
-
-  const isLoading = (() => {
-    switch (activeTab) {
-      case "publications":
-      case "approvals":
-        return isPubLoading;
-      case "campaigns":
-        return isCampLoading;
-      case "logs":
-        return isLogsLoading;
-      default:
-        return false;
-    }
-  })();
-
-  const handlePageChange = useCallback(
-    (page: number) => {
-      fetchData(page);
+  const handleFilterChange = useCallback(
+    (newFilters: any) => {
+      setFilters(newFilters);
+      setPage(1);
+      localStorage.setItem(`contentPage_filters_${activeTab}`, JSON.stringify(newFilters));
     },
-    [fetchData],
+    [activeTab],
   );
-
-  const handleFilterChange = useCallback((newFilters: any) => {
-    setFilters(newFilters);
-    localStorage.setItem(
-      `contentPage_filters_${activeTab}`,
-      JSON.stringify(newFilters),
-    );
-  }, [activeTab]);
 
   const handleSingleFilterChange = useCallback(
     (key: string, value: any) => {
       const newFilters = { ...filters, [key]: value };
-      // Si el valor es undefined o null, remover la key
-      // Pero si es un array vacío, mantenerlo (significa "sin filtro de plataforma")
-      if (value === undefined || value === null) {
-        delete newFilters[key];
-      }
+      if (value === undefined || value === null) delete newFilters[key];
       setFilters(newFilters);
-      localStorage.setItem(
-        `contentPage_filters_${activeTab}`,
-        JSON.stringify(newFilters),
-      );
+      setPage(1);
+      localStorage.setItem(`contentPage_filters_${activeTab}`, JSON.stringify(newFilters));
     },
     [filters, activeTab],
   );
 
   const handleResetFilters = useCallback(() => {
     setFilters({});
+    setPage(1);
     localStorage.removeItem(`contentPage_filters_${activeTab}`);
   }, [activeTab]);
 
-  const handleRefresh = useCallback(async () => {
-    await fetchData(pagination.current_page);
-    // If there is a selected item, refresh it from the new publications list
-    if (selectedItem && activeTab === "approvals") {
-      const updated = usePublicationStore
-        .getState()
-        .publications.find((p) => p.id === selectedItem.id);
-      if (updated) {
-        setSelectedItem(updated);
-      }
+  const handleRefresh = useCallback(() => {
+    // Clear publication store cache before refetching to ensure fresh data
+    if (activeTab === 'publications' || activeTab === 'approvals') {
+      usePublicationStore.getState().clearPageData();
+      // Invalidate ALL publication queries to force fresh fetch without optimistic state
+      queryClient.invalidateQueries({ queryKey: queryKeys.publications.all });
+      // Force refetch after invalidation
+      pubQuery.refetch();
+    } else if (activeTab === 'campaigns') {
+      queryClient.invalidateQueries({ queryKey: queryKeys.campaigns.all });
+      campQuery.refetch();
+    } else {
+      logsQuery.refetch();
     }
-  }, [
-    fetchData,
-    pagination.current_page,
-    selectedItem,
-    activeTab,
-    setSelectedItem,
-  ]);
+  }, [activeTab, pubQuery, campQuery, logsQuery, queryClient]);
 
   const handleDeleteItem = useCallback(
     async (id: number) => {
-      const isCampaign = activeTab === "campaigns";
+      const isCampaign = activeTab === 'campaigns';
       const confirmed = await confirm({
-        title: isCampaign ? "Campaign" : "Publication",
+        title: isCampaign ? 'Campaign' : 'Publication',
         message: isCampaign
-          ? "Are you sure you want to delete this campaign? All associated publications will be unlinked"
-          : "Are you sure you want to delete this publication?",
-        confirmText: "Delete",
-        type: "danger",
+          ? 'Are you sure you want to delete this campaign? All associated publications will be unlinked'
+          : 'Are you sure you want to delete this publication?',
+        confirmText: 'Delete',
+        type: 'danger',
       });
 
       if (confirmed) {
-        let success = false;
         if (isCampaign) {
-          success = await deleteCampaignAction(id);
+          await deleteCamp.mutateAsync(id);
         } else {
-          success = await deletePublicationAction(id);
-        }
-
-        if (success) {
-          fetchData(pagination.current_page);
+          await deletePub.mutateAsync(id);
         }
       }
     },
-    [
-      activeTab,
-      confirm,
-      deleteCampaignAction,
-      deletePublicationAction,
-      fetchData,
-      pagination.current_page,
-    ],
+    [activeTab, confirm, deleteCamp, deletePub],
   );
 
   const handleDuplicateItem = useCallback(
     async (id: number) => {
-      const isCampaign = activeTab === "campaigns";
-      let success = false;
-      if (isCampaign) {
-        success = await duplicateCampaignAction(id);
-      } else {
-        success = await duplicatePublicationAction(id);
-      }
-
-      if (success) {
+      const isCampaign = activeTab === 'campaigns';
+      try {
+        if (isCampaign) {
+          await duplicateCamp.mutateAsync(id);
+        } else {
+          await duplicatePub.mutateAsync(id);
+        }
         ToastService.success(
           t(
             isCampaign
-              ? "campaigns.messages.duplicateSuccess"
-              : "publications.messages.duplicateSuccess",
+              ? 'campaigns.messages.duplicateSuccess'
+              : 'publications.messages.duplicateSuccess',
           ),
         );
-        fetchData(pagination.current_page);
-      } else {
+      } catch {
         ToastService.error(
-          t(
-            isCampaign
-              ? "campaigns.messages.error"
-              : "publications.messages.error",
-          ),
+          t(isCampaign ? 'campaigns.messages.error' : 'publications.messages.error'),
         );
       }
     },
-    [
-      activeTab,
-      duplicateCampaignAction,
-      duplicatePublicationAction,
-      fetchData,
-      pagination.current_page,
-    ],
+    [activeTab, duplicateCamp, duplicatePub, t],
   );
 
   const handleEditRequest = useCallback(
-    (item: Publication) => {
-      openEditModal(item);
-    },
+    (item: Publication) => openEditModal(item),
     [openEditModal],
   );
 
   const stableOpenAddModal = useCallback(() => openAddModal(), [openAddModal]);
-  const stableCloseAddModal = useCallback(
-    () => closeAddModal(),
-    [closeAddModal],
-  );
-  const stableOpenEditModal = useCallback(
-    (item: any) => openEditModal(item),
-    [openEditModal],
-  );
-  const stableCloseEditModal = useCallback(
-    () => closeEditModal(),
-    [closeEditModal],
-  );
+  const stableCloseAddModal = useCallback(() => closeAddModal(), [closeAddModal]);
+  const stableOpenEditModal = useCallback((item: any) => openEditModal(item), [openEditModal]);
+  const stableCloseEditModal = useCallback(() => closeEditModal(), [closeEditModal]);
   const stableOpenPublishModal = useCallback(
     (item: any) => openPublishModal(item),
     [openPublishModal],
   );
-  const stableClosePublishModal = useCallback(
-    () => closePublishModal(),
-    [closePublishModal],
-  );
+  const stableClosePublishModal = useCallback(() => closePublishModal(), [closePublishModal]);
   const stableOpenViewDetailsModal = useCallback(
     (item: any) => openViewDetailsModal(item),
     [openViewDetailsModal],
@@ -447,19 +336,20 @@ export const usePublications = () => {
       pagination,
       isLoading,
       handlePageChange,
+      handlePerPageChange,
       handleRefresh,
       isAddModalOpen,
       isEditModalOpen,
       isPublishModalOpen,
       isViewDetailsModalOpen,
-      openAddModal,
-      closeAddModal,
-      openEditModal,
-      closeEditModal,
-      openPublishModal,
-      closePublishModal,
-      openViewDetailsModal,
-      closeViewDetailsModal,
+      stableOpenAddModal,
+      stableCloseAddModal,
+      stableOpenEditModal,
+      stableCloseEditModal,
+      stableOpenPublishModal,
+      stableClosePublishModal,
+      stableOpenViewDetailsModal,
+      stableCloseViewDetailsModal,
       handleDeleteItem,
       handleDuplicateItem,
       handleEditRequest,

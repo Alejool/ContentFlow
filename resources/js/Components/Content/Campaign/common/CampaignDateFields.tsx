@@ -1,7 +1,7 @@
-import DatePickerModern from "@/Components/common/Modern/DatePicker";
-import { format, parseISO } from "date-fns";
-import React from "react";
-import { FieldErrors, UseFormSetValue } from "react-hook-form";
+import DatePickerModern from '@/Components/common/Modern/DatePicker';
+import { format, parseISO } from 'date-fns';
+import React from 'react';
+import { FieldErrors, UseFormSetValue } from 'react-hook-form';
 
 interface CampaignDateFieldsProps {
   startDate?: string;
@@ -22,9 +22,9 @@ const CampaignDateFields: React.FC<CampaignDateFieldsProps> = ({
   t,
   disabled = false,
 }) => {
-  const activeColor = "primary-500";
+  const activeColor = 'primary-500';
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
       <div className="form-group">
         <DatePickerModern
           register={undefined}
@@ -32,14 +32,14 @@ const CampaignDateFields: React.FC<CampaignDateFieldsProps> = ({
           dateFormat="dd/MM/yyyy"
           name="start_date"
           error={errors.start_date?.message as string}
-          label={t("campaigns.modal.add.startDate")}
+          label={t('campaigns.modal.add.startDate')}
           selected={startDate ? parseISO(startDate) : null}
           onChange={(date: Date | null) =>
-            setValue("start_date", date ? format(date, "yyyy-MM-dd") : "", {
+            setValue('start_date', date ? format(date, 'yyyy-MM-dd') : '', {
               shouldValidate: true,
             })
           }
-          placeholder={t("campaigns.modal.add.placeholders.startDate")}
+          placeholder={t('campaigns.modal.add.placeholders.startDate')}
           size="lg"
           variant="filled"
           withPortal
@@ -54,17 +54,15 @@ const CampaignDateFields: React.FC<CampaignDateFieldsProps> = ({
           dateFormat="dd/MM/yyyy"
           name="end_date"
           error={errors.end_date?.message as string}
-          label={t("campaigns.modal.add.endDate")}
+          label={t('campaigns.modal.add.endDate')}
           selected={endDate ? parseISO(endDate) : null}
           onChange={(date: Date | null) =>
-            setValue("end_date", date ? format(date, "yyyy-MM-dd") : "", {
+            setValue('end_date', date ? format(date, 'yyyy-MM-dd') : '', {
               shouldValidate: true,
             })
           }
-          placeholder={t("campaigns.modal.add.placeholders.endDate")}
-          minDate={
-            watch("start_date") ? new Date(watch("start_date")!) : undefined
-          }
+          placeholder={t('campaigns.modal.add.placeholders.endDate')}
+          minDate={watch('start_date') ? new Date(watch('start_date')!) : undefined}
           size="lg"
           variant="filled"
           withPortal

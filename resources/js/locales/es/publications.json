@@ -1,10 +1,28 @@
-﻿{
+{
   "publications": {
     "title": "Publicaciones",
     "subtitle": "Gestionar tus publicaciones",
     "modal": {
       "sections": {
         "details": "Detalles del Contenido"
+      },
+      "contentType": {
+        "label": "Tipo de contenido",
+        "value": "Video",
+        "filteredByPlatforms": "Filtrado por plataformas seleccionadas",
+        "locked": "El tipo de contenido está bloqueado después de subir archivos multimedia"
+      },
+      "poll": {
+        "question": "Pregunta de la Encuesta",
+        "questionPlaceholder": "Escribe tu pregunta aqui",
+        "title": "Opciones de Encuesta",
+        "options": "Opciones de la Encuesta (2-4 opciones)",
+        "optionPlaceholder": "Opción",
+        "addOption": "Agregar Opción",
+        "duration": "Duración de la Encuesta",
+        "hours": "horas",
+        "durationHint": "Twitter: 5min-7días, Facebook: 1-7días",
+        "note": "Las encuestas solo están disponibles en Twitter y Facebook. Asegúrate de seleccionar plataformas compatibles."
       },
       "media": {
         "uploadingPending": "Subiendo Pendiente",
@@ -36,6 +54,7 @@
         "publishedOn": "Publicado el",
         "publications": "Publicaciones",
         "scheduledPosts": "Publicaciones Programadas",
+        "socialNetworkPublications": "Publicaciones en Redes Sociales",
         "associatedPublications": "Publicaciones Asociadas",
         "accountMissingTitle": "Cuenta Desconectada",
         "accountMissingText": "Esta publicación se publica en una cuenta ({{account}}) que ya no está conectada. Al editarla se crear una nueva versión para tu cuenta actual. ¿Continuar?",
@@ -44,7 +63,7 @@
         "selectSocialAccounts": "Seleccionar Cuentas",
         "associatedPublicationsRequired": "Publicaciones Asociadas es requerida",
         "lockedBySession": "Bloqueado por sesión",
-        "noCampaigns":"No hay campañas",
+        "noCampaigns": "No hay campañas",
         "dragDrop": {
           "title": "Arrastra y suelta para ordenar",
           "subtitle": "Sube tus archivos multimedia aquí"
@@ -58,12 +77,37 @@
           "startDate": "12/12/2025",
           "endDate": "12/12/2026"
         },
+        "validation": {
+          "mediaRequired": "Archivo es requerido",
+          "titleRequired": "El título es obligatorio",
+          "titleLength": "El título no puede exceder los 70 caracteres",
+          "descMin": "La descripción debe tener al menos 10 caracteres",
+          "descMax": "La descripción no puede exceder los 700 caracteres",
+          "objRequired": "El objetivo es obligatorio",
+          "objMax": "El objetivo no puede exceder los 200 caracteres",
+          "hashtagsRequired": "Los hashtags son obligatorios",
+          "hashtagValid": "Los hashtags deben estar separados por comas",
+          "hashtagMax": "Máximo 10 hashtags permitidos",
+          "scheduledMinDifference": "La fecha debe ser al menos 1 minuto después de la actual",
+          "scheduledAtRequired": "La fecha es requerida si la programación global está activada",
+          "pollScheduleRequired": "La fecha de programación es requerida para encuestas cuando se activa la programación global",
+          "recurrenceDaysRequired": "Selected al menos un día para la recurrencia semanal",
+          "recurrence_days": "Días de repetición no válidos",
+          "durationErrors": "Corrige los errores de duracin antes de guardar.",
+          "recurrenceEndDateRequired": "La fecha de finalización es requerida para publicaciones recurrentes",
+          "pollOptionsRequired": "Las encuestas requieren al menos 2 opciones",
+          "pollDurationRequired": "La duración de la encuesta debe estar entre 1 y 168 horas",
+          "imageRequired": "Debes agregar al menos una imagen o video",
+          "scheduleRequired": "Debes programar una fecha para todas las redes seleccionadas o establecer una fecha global"
+        },
         "button": {
           "save": "Actualizar",
           "cancel": "Cancelar"
         },
         "contentLocked": "Contenido Bloqueado",
         "contentLockedHint": "Para editar el contenido (título, descripción o archivos), debes despublicar la publicación de todas las plataformas.",
+        "contentPublishing": "Publicación en Proceso",
+        "contentPublishingHint": "La publicación se está publicando en algunas plataformas. Debes esperar a que termine el proceso para poder editar el contenido.",
         "approvedEditWarning": "Publicación Aprobada",
         "approvedEditWarningHint": "Esta publicación ya fue aprobada. Si realizas cambios, volverá a estado 'Pendiente' y requerirá una nueva aprobación.",
         "lockedByOther": "publicación bloqueada por otro usuario",
@@ -77,12 +121,35 @@
         "description": "Define una fecha única para publicar en todas las redes sociales seleccionadas a la vez.",
         "placeholder": "Seleccionar fecha y hora",
         "instantWarning": "Para publicar inmediatamente, usa el botón Publicar del modal.",
-        "useGlobal": "Programación Global"
+        "useGlobal": "Programación Global",
+        "recurrence": {
+          "title": "Repetir publicación (Recurrencia)",
+          "locked_title": "Recurrencia bloqueada",
+          "locked_desc": "Mejora tu plan para programar repeticiones automáticas (cada X días/semanas) de tus publicaciones.",
+          "enable": "Activar repetición",
+          "frequency": "Frecuencia",
+          "interval": "Cada",
+          "days": "Repetir los días",
+          "ends": "Fecha de finalización",
+          "ends_placeholder": "Selecciona cuándo termina la recurrencia",
+          "end_date_required": "La fecha de fin es obligatoria para publicaciones recurrentes",
+          "preview_title": "Próximas fechas de publicación",
+          "preview_note": "Estas fechas son estimadas y se reflejarán en el calendario al guardar.",
+          "select_accounts": "Redes con recurrencia",
+          "select_accounts_desc": "Selecciona qué redes publicarán de forma recurrente. Las demás solo publicarán una vez.",
+          "all_accounts": "Aplicar a todas",
+          "single_account_note": "Esta red publicará de forma recurrente según la configuración."
+        }
       },
       "add": {
         "title": "Agregar publicación",
         "titleField": "título",
         "subtitle": "Crear una publicación",
+        "mediaSection": "Archivos Multimedia",
+        "contentSection": "Contenido",
+        "socialAccountsSection": "Redes Sociales",
+        "scheduleSection": "Programación",
+        "campaignSection": "Campaña",
         "name": "Nombre",
         "description": "descripción",
         "image": "Imagen",
@@ -101,11 +168,14 @@
         "creating": "Creando",
         "optionalSchedule": "Programación Opcional",
         "selectSocialAccounts": "Seleccionar Cuentas",
-        "noCampaigns":"No hay campañas",
+        "noCampaigns": "No hay campañas",
         "dragDrop": {
           "title": "Arrastra y suelta para ordenar",
           "subtitle": "Sube tus archivos multimedia aquí"
         },
+        "recurrence_days": "Días de repetición",
+        "poll_options": "Opciones de encuesta",
+        "poll_duration_hours": "Duración de la encuesta",
         "placeholders": {
           "title": "título",
           "description": "descripción",
@@ -124,6 +194,14 @@
         "title": "Editar publicación",
         "titleField": "título",
         "subtitle": "Actualizar la publicación existente",
+        "mediaSection": "Archivos Multimedia",
+        "contentSection": "Contenido",
+        "socialAccountsSection": "Redes Sociales",
+        "scheduleSection": "Programación",
+        "previewSection": "Vista Previa",
+        "historySection": "Historial",
+        "commentsSection": "Comentarios Internos",
+        "youtubeThumbnailSection": "Miniatura de YouTube",
         "description": "descripción",
         "hashtags": "Hashtags",
         "schedulePublication": "Programar publicación",
@@ -146,10 +224,12 @@
         "accountMissingText": "Esta publicación se public en una cuenta ({{account}}) que ya no está conectada. Al editarla se crear una nueva versión para tu cuenta actual. ¿Continuar?",
         "selectSocialAccounts": "Seleccionar Cuentas",
         "lockedBySession": "Bloqueado por sesión",
+        "questionField": "Pregunta",
         "dragDrop": {
           "title": "Arrastra y suelta para ordenar",
           "subtitle": "Sube tus archivos multimedia aquí"
         },
+        "recurrence_days": "Días de repetición",
         "placeholders": {
           "title": "Arrastra y suelta para ordenar",
           "description": "descripción",
@@ -168,6 +248,8 @@
         "configurationLockedHintAdmin": "Debes aprobar la publicación antes de configurar las redes.",
         "contentLocked": "Contenido Bloqueado",
         "contentLockedHint": "Para editar el contenido (título, descripción o archivos), debes despublicar la publicación de todas las plataformas.",
+        "contentPublishing": "Publicación en Proceso",
+        "contentPublishingHint": "La publicación se está publicando en algunas plataformas. Debes esperar a que termine el proceso para poder editar el contenido.",
         "approvedEditWarning": "Publicación Aprobada",
         "approvedEditWarningHint": "Esta publicación ya fue aprobada. Si realizas cambios, volverá a estado 'Pendiente' y requerirá una nueva aprobación.",
         "pendingReviewWarning": "En Revisión",
@@ -194,7 +276,7 @@
       "comments": {
         "title": "Comentarios Internos",
         "placeholder": "Escribe un comentario...",
-        "noComments": "No hay comentarios aún. ¡Inicia la conversacin!",
+        "noComments": "No hay comentarios aún. ¡Inicia la conversación!",
         "loading": "Cargando comentarios...",
         "deleteConfirm": "¿Estás seguro de que quieres eliminar este comentario?",
         "deleteConfirmTitle": "Eliminar Comentario",
@@ -206,7 +288,7 @@
         "replyingTo": "Respondiendo a"
       },
       "manageContent": {
-        "configureNetworks": "Configura tus publicaciones programadas"
+        "configureNetworks": "Programadas tus publicaciones"
       },
       "publish": {
         "title": "Publicar",
@@ -214,7 +296,9 @@
         "selectAll": "Seleccionar Todo",
         "deselectAll": "Deseleccionar Todo",
         "noConnectedAccounts": "No se encontraron cuentas sociales conectadas.",
-        "connectAccounts": "Por favor, conecta tus cuentas primero.",
+        "connectAccounts": "Conecta tus cuentas primero.",
+        "noCompatibleAccounts": "No hay cuentas compatibles con este tipo de contenido.",
+        "changeContentType": "Cambia el tipo de contenido o conecta cuentas compatibles.",
         "published": "Publicado",
         "viewPost": "Ver publicación",
         "loading": "Cargando...",
@@ -223,6 +307,7 @@
         "removed": "Removido",
         "failed": "Fallido",
         "scheduled": "Programado",
+        "recurringPosts": "Publicaciones Recurrentes",
         "youtube": "YouTube",
         "youtubeThumbnails": "Thumbnails de YouTube",
         "author": "@Alejandro Olarte",
@@ -232,6 +317,16 @@
         "completed": "completadas",
         "inProgress": "en curso",
         "sending": "Enviando",
+        "duplicate": "Intento duplicado",
+        "original_attempt": "Intento original:",
+        "oauth1_required": "Requiere reconexión",
+        "oauth1_video_message": "Esta cuenta necesita credenciales OAuth 1.0a para subir videos",
+        "reconnect_account": "Reconectar cuenta",
+        "cannot_publish": "No se puede publicar",
+        "reconnecting": "Iniciando reconexión...",
+        "reconnect_window": "Abriendo ventana de reconexión...",
+        "reconnect_success": "Cuenta reconectada exitosamente",
+        "reconnect_error": "Error al iniciar reconexión",
         "dragDrop": {
           "title": "Arrastra y suelta para agregar",
           "subtitle": "PNG, JPG, WebP (max 2MB)"
@@ -287,6 +382,11 @@
           "message": "Esta publicación ya está publicada en las siguientes cuentas:",
           "hint": "Puedes publicar en cuentas adicionales seleccionándolas a continuación."
         },
+        "incompatibleAccountsBanner": {
+          "title": "Cuentas No Compatibles",
+          "message": "Las siguientes cuentas no son compatibles con el tipo de contenido \"{contentType}\":",
+          "hint": "Estas cuentas no aparecerán en las opciones de publicación."
+        },
         "publishedInOtherAccountBanner": {
           "title": "Publicado en Cuenta Diferente",
           "message": "Esta publicación fue publicada en una cuenta de {{platform}} que ya no está conectada.",
@@ -320,8 +420,9 @@
         "publishDateRequired": "Fecha de publicación es requerida",
         "publishedOnRequired": "Publicado el es requerido",
         "associatedPublicationsRequired": "Publicaciones Asociadas es requerida",
-        "descriptionRequired": "descripción es requerida",
-        "hashtagsRequired": "Hashtags es requerido",
+        "descriptionRequired": "La descripción es requerida",
+        "hashtagsRequired": "Hashtags son requeridos",
+        "questionRequired": "La pregunta es requerida",
         "schedulePublicationRequired": "Programar publicación es requerido",
         "nameLength": "Nombre debe tener al menos 10 caracteres",
         "descriptionLength": "descripción debe tener al menos 10 caracteres",
@@ -330,16 +431,31 @@
         "imageRequired": "Imagen es requerida",
         "hashtagValid": "Hashtag debe tener al menos 10 caracteres",
         "hashtagMax": "Hashtag debe tener menos de 10 caracteres",
-        "scheduleDateRequired": "Por favor, selecciona una fecha para programar la publicación o desmarca la opcin de programar",
+        "scheduleDateRequired": "Selecciona una fecha para programar la publicación o desmarca la opcin de programar",
         "scheduleRequired": "Debes programar una fecha para todas las redes seleccionadas o establecer una fecha global.",
         "scheduledAtRequired": "La fecha programada es requerida cuando seleccionas redes sociales",
-        "socialAccountsRequired": "Por favor, selecciona al menos una red social",
+        "socialAccountsRequired": "Selecciona al menos una red social",
         "allSchedulesRequired": "Todas las redes deben tener una fecha o activa la fecha global",
         "singleVideo": "Solo puedes subir un video por publicación.",
         "scheduledMinDifference": "La fecha debe ser al menos 1 minuto después de la actual",
         "videoTooLong": "Video demasiado largo para {{platform}} (mx {{max}})",
         "videoComplies": "Cumple con la duracin para {{platform}}",
-        "durationErrors": "Por favor, corrige los errores de duracin antes de guardar."
+        "recurrenceDaysRequired": "Selected al menos un día para la recurrencia semanal",
+        "recurrence_days": "Días de repetición no válidos",
+        "durationErrors": "Corrige los errores de duracin antes de guardar.",
+        "pollOptionsRequired": "Las encuestas requieren al menos 2 opciones",
+        "pollDurationRequired": "La duración de la encuesta debe estar entre 1 y 168 horas",
+        "content_type_not_supported": "El tipo de contenido ':type' no es compatible con :platforms. Selecciona plataformas compatibles o cambia el tipo de contenido.",
+        "reel_requires_one_video": "Los reels requieren exactamente 1 archivo de video",
+        "reel_requires_video_only": "Los reels requieren solo archivos de video (sin imágenes)",
+        "carousel_requires_multiple": "Los carruseles requieren al menos 2 archivos multimedia (máximo 10)",
+        "story_requires_one": "Las historias requieren exactamente 1 archivo multimedia (imagen o video)",
+        "poll_not_supported": "Las encuestas solo están disponibles en Twitter",
+        "cross_platform_incompatibility": "El tipo de contenido seleccionado no es compatible con todas las plataformas seleccionadas",
+        "invalid_media_type": "Tipo de archivo multimedia no válido para el tipo de contenido seleccionado",
+        "media_required": "Se requieren archivos multimedia para este tipo de contenido",
+        "media_min_count": "Se requieren al menos :min archivos multimedia",
+        "media_max_count": "Máximo :max archivos multimedia permitidos"
       },
       "processing": {
         "cancel_message": "¿Estás seguro de que deseas cancelar este proceso? El trabajo en curso se detendrá."
@@ -371,10 +487,12 @@
     },
     "status": {
       "draft": "Borrador",
-      "pending_review": "Pendiente de revisión",      
+      "pending_review": "Pendiente de revisión",
       "failed": "Fallidas",
       "publishing": "Publicando",
       "published": "Publicado",
+      "published_with_errors": "Publicado con errores",
+      "partially_published": "Publicado parcialmente",
       "publis": "Publicado",
       "scheduled": "Programado",
       "approved": "Aprobado",
@@ -387,9 +505,9 @@
       "processing": "Procesando",
       "waiting": "Esperando",
       "retrying": "Reintentando"
-
     },
     "scheduled_for": "Programado para",
+    "scheduledPosts": "Publicaciones Programadas",
     "button": {
       "add": "Agregar publicación",
       "edit": "Editar publicación",
@@ -397,7 +515,15 @@
       "close": "Cerrar",
       "save": "Guardar cambios",
       "approve": "Aprobar",
-      "reject": "Rechazar"
+      "reject": "Rechazar",
+      "publish": "Publicar",
+      "view": "Ver",
+      "viewDetails": "Ver Detalles",
+      "duplicate": "Duplicar",
+      "request": "Solicitar",
+      "sendForReview": "Enviar a Revisión",
+      "sending": "Enviando...",
+      "inReview": "En Revisión"
     },
     "table": {
       "name": "Nombre",
@@ -412,9 +538,17 @@
       "noMedia": "Sin multimedia",
       "loading": "Cargando...",
       "linkedAccount": "Cuentas Asociadas",
+      "untitled": "Sin título",
+      "noDescription": "Sin descripción",
+      "platforms": "Plataformas",
+      "linkedAccounts": "Cuentas vinculadas",
+      "createdBy": "Creado por",
+      "manualEvent": "Evento Manual",
+      "socialNetworkEvent": "Evento de Red Social",
       "emptyState": {
         "title": "No se encontraron publicaciones",
         "description": "Crea una publicación para comenzar a publicar contenido.",
+        "searchEmpty": "No se encontraron publicaciones que coincidan con la búsqueda.",
         "button": "Agregar publicación"
       },
       "lockedBy": "Bloqueado por:",
@@ -424,19 +558,22 @@
       "publishingOnBy": "Publicando en {{platform}} por {{user}}",
       "publishingOnMultipleBy": "Publicando en {{count}} redes por {{user}}",
       "rejectedBy": "Rechazado por",
-      "pendingAdminReview": "Pendiente de revisión"
+      "pendingAdminReview": "Pendiente de revisión",
+      "editingBy": "Editando:"
     },
     "messages": {
-      "addSuccess": "publicación agregada eéxitosamente!",
-      "createSuccess": "publicación creada eéxitosamente!",
+      "addSuccess": "publicación agregada éxitosamente!",
+      "createSuccess": "publicación creada éxitosamente!",
       "duplicateSuccess": "publicación duplicada con éxito!",
       "addError": "Error al agregar publicación",
-      "updateSuccess": "publicación actualizada eéxitosamente!",
+      "updateSuccess": "publicación actualizada éxitosamente!",
       "updateError": "Error al actualizar publicación",
       "mediaAttached": "Archivo multimedia adjuntado con éxito a '{{title}}' (Carga en segundo plano)",
-      "deleteSuccess": "publicación eliminada eéxitosamente!",
+      "deleteSuccess": "publicación eliminada éxitosamente!",
       "deleteError": "Error al eliminar publicación",
       "cancelSuccess": "Publicación cancelada exitosamente",
+      "platformCancelSuccess": "Plataforma cancelada exitosamente",
+      "platformCancelError": "Error al cancelar la plataforma",
       "fetchError": "Error al cargar Campañas",
       "error": "Ha ocurrido un error inesperado",
       "confirmDelete": {
@@ -465,13 +602,22 @@
     "filters": {
       "title": "Filtros de publicación",
       "all": "Todo",
+      "all_types": "Todos los tipos",
+      "content_type": "Tipo de contenido",
       "published": "Publicadas",
       "draft": "Borrador",
-      "approved": "Aprobadas",      
-      "scheduled": "Programadas",    
+      "approved": "Aprobadas",
+      "scheduled": "Programadas",
       "pending_review": "Pendiente de revisión",
-      "rejected": "Rechazadas",    
+      "rejected": "Rechazadas",
       "failed": "Fallidas"
+    },
+    "content_types": {
+      "post": "Publicación",
+      "reel": "Reel",
+      "story": "Historia",
+      "carousel": "Carrusel",
+      "poll": "Encuesta"
     },
     "gallery": {
       "sendingToSocial": "Enviando a plataformas sociales...",

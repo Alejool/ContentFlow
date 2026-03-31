@@ -5,21 +5,51 @@ namespace App\Actions\Publications;
 use App\Models\Publications\Publication;
 use App\Services\Media\MediaProcessingService;
 use App\Services\Scheduling\SchedulingService;
+use App\Services\Publications\ContentTypeValidationService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class CreatePublicationAction
 {
   public function __construct(
     protected MediaProcessingService $mediaService,
-    protected SchedulingService $schedulingService
-  ) {
-  }
+    protected SchedulingService $schedulingService,
+    protected ContentTypeValidationService $validationService
+  ) {}
 
   public function execute(array $data, array $files = []): Publication
   {
-    return DB::transaction(function () use ($data, $files) {
+    // Default content_type to 'post' if not provided
+    $contentType = $data['content_type'] ?? 'post';
+    
+    // Check if there are files currently uploading - skip validation if so
+    $hasUploadingFiles = isset($data['has_uploading_files']) && 
+                        ($data['has_uploading_files'] === '1' || $data['has_uploading_files'] === true);
+    $uploadingFilesCount = (int) ($data['uploading_files_count'] ?? 0);
+    
+    if ($hasUploadingFiles) {
+      \Log::info('⏭️ CreatePublicationAction: Skipping content type validation - files uploading', [
+        'uploading_files_count' => $uploadingFilesCount,
+        'content_type' => $contentType
+      ]);
+    } else {
+      // Validate content type before DB transaction only if no files are uploading
+      $validation = $this->validationService->validateContentType(
+        $contentType,
+        $data['social_accounts'] ?? [],
+        $files
+      );
+      
+      if (!$validation->isValid) {
+        throw ValidationException::withMessages([
+          'content_type' => $validation->errors
+        ]);
+      }
+    }
+    
+    return DB::transaction(function () use ($data, $files, $contentType) {
       // Determine status based on scheduled_at
       $status = $data['status'] ?? 'draft';
       if (!empty($data['scheduled_at']) && $status === 'draft') {
@@ -29,6 +59,7 @@ class CreatePublicationAction
       $publication = Publication::create([
         'title' => $data['title'],
         'description' => $data['description'],
+        'content_type' => $contentType,
         'hashtags' => $data['hashtags'] ?? '',
         'goal' => $data['goal'] ?? '',
         'slug' => Str::slug($data['title']),
@@ -39,10 +70,25 @@ class CreatePublicationAction
         'status' => $status,
         'publish_date' => $status === 'published' ? now() : null,
         'scheduled_at' => $data['scheduled_at'] ?? null,
+        'is_recurring' => $data['is_recurring'] ?? false,
         'platform_settings' => is_string($data['platform_settings'] ?? null)
           ? json_decode($data['platform_settings'], true)
           : ($data['platform_settings'] ?? Auth::user()->global_platform_settings),
+        // Poll fields
+        'poll_options' => $data['poll_options'] ?? null,
+        'poll_duration_hours' => $data['poll_duration_hours'] ?? null,
       ]);
+
+      // Create recurrence settings if publication is recurring
+      if (!empty($data['is_recurring'])) {
+        $publication->recurrenceSettings()->create([
+          'recurrence_type' => $data['recurrence_type'] ?? 'daily',
+          'recurrence_interval' => isset($data['recurrence_interval']) ? (int)$data['recurrence_interval'] : 1,
+          'recurrence_days' => $data['recurrence_days'] ?? null,
+          'recurrence_end_date' => $data['recurrence_end_date'] ?? null,
+          'recurrence_accounts' => $data['recurrence_accounts'] ?? null,
+        ]);
+      }
 
       if (isset($data['campaign_id'])) {
         $publication->campaigns()->attach($data['campaign_id']);

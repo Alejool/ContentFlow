@@ -1,4 +1,4 @@
-import { Variants, Transition } from 'framer-motion';
+import { Transition, Variants } from 'framer-motion';
 
 /**
  * Animation variants configuration for Framer Motion
@@ -28,11 +28,11 @@ export const hoverVariants = {
   // Lift effect with shadow and translation
   lift: {
     initial: { y: 0, boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)' },
-    hover: { 
-      y: -4, 
+    hover: {
+      y: -4,
       boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
     },
-    hoverReduced: { 
+    hoverReduced: {
       boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
     },
     transition: transitions.normal,
@@ -59,16 +59,16 @@ export const hoverVariants = {
 export const focusVariants = {
   // Ring focus indicator
   ring: {
-    initial: { 
+    initial: {
       boxShadow: '0 0 0 0px rgba(255, 109, 31, 0)',
       outline: 'none',
     },
-    focus: { 
+    focus: {
       boxShadow: '0 0 0 2px rgba(255, 109, 31, 0.4)',
       outline: '2px solid rgba(255, 109, 31, 0.5)',
       outlineOffset: '2px',
     },
-    focusReduced: { 
+    focusReduced: {
       boxShadow: '0 0 0 2px rgba(255, 109, 31, 0.4)',
       outline: '2px solid rgba(255, 109, 31, 0.5)',
       outlineOffset: '2px',
@@ -106,11 +106,11 @@ export const actionVariants = {
   // Success feedback with scale and color
   success: {
     initial: { scale: 1, backgroundColor: 'transparent' },
-    animate: { 
+    animate: {
       scale: [1, 1.05, 1],
       backgroundColor: ['transparent', 'rgba(34, 197, 94, 0.1)', 'transparent'],
     },
-    animateReduced: { 
+    animateReduced: {
       backgroundColor: 'rgba(34, 197, 94, 0.1)',
     },
     transition: { duration: 0.5, ease: 'easeInOut' },
@@ -119,11 +119,11 @@ export const actionVariants = {
   // Error feedback with shake
   error: {
     initial: { x: 0, backgroundColor: 'transparent' },
-    animate: { 
+    animate: {
       x: [-10, 10, -10, 10, 0],
       backgroundColor: ['transparent', 'rgba(239, 68, 68, 0.1)', 'transparent'],
     },
-    animateReduced: { 
+    animateReduced: {
       backgroundColor: 'rgba(239, 68, 68, 0.1)',
     },
     transition: { duration: 0.4, ease: 'easeInOut' },
@@ -132,15 +132,15 @@ export const actionVariants = {
   // Loading feedback with pulse
   loading: {
     initial: { opacity: 1 },
-    animate: { 
+    animate: {
       opacity: [1, 0.5, 1],
     },
-    animateReduced: { 
+    animateReduced: {
       opacity: 0.7,
     },
-    transition: { 
-      duration: 1.5, 
-      repeat: Infinity, 
+    transition: {
+      duration: 1.5,
+      repeat: Infinity,
       ease: 'easeInOut',
     },
   } as Variants,
@@ -189,8 +189,8 @@ export const pageVariants = {
 export function getVariant(
   variants: Variants,
   state: string,
-  prefersReducedMotion: boolean
-): any {
+  prefersReducedMotion: boolean,
+): Variants[string] {
   if (prefersReducedMotion && `${state}Reduced` in variants) {
     return variants[`${state}Reduced`];
   }
@@ -203,10 +203,7 @@ export function getVariant(
  * @param prefersReducedMotion - Whether reduced motion is preferred
  * @returns The appropriate transition configuration
  */
-export function getTransition(
-  transition: Transition,
-  prefersReducedMotion: boolean
-): Transition {
+export function getTransition(transition: Transition, prefersReducedMotion: boolean): Transition {
   if (prefersReducedMotion) {
     return transitions.instant;
   }

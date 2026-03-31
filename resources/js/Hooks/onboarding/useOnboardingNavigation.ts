@@ -4,7 +4,7 @@ import { useOnboardingNavigationStore } from '@/stores/onboardingNavigationStore
 
 /**
  * Hook for managing onboarding navigation
- * 
+ *
  * Provides utilities for:
  * - Tracking navigation history during onboarding
  * - Navigating between tour steps
@@ -49,7 +49,7 @@ export function useOnboardingNavigation() {
     (path: string, stepId?: string, stepType?: 'tour' | 'wizard' | 'template') => {
       navigateToStep(path, stepId, stepType);
     },
-    [navigateToStep]
+    [navigateToStep],
   );
 
   /**
@@ -64,7 +64,7 @@ export function useOnboardingNavigation() {
       setLastTourStep(stepId);
       navigateToStep(path, stepId, 'tour');
     },
-    [tourNavigationEnabled, setLastTourStep, navigateToStep]
+    [tourNavigationEnabled, setLastTourStep, navigateToStep],
   );
 
   /**
@@ -74,7 +74,7 @@ export function useOnboardingNavigation() {
     (path: string) => {
       return currentPath === path;
     },
-    [currentPath]
+    [currentPath],
   );
 
   /**

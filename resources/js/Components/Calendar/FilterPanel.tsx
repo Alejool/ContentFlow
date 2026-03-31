@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { FaFilter, FaTimes } from 'react-icons/fa';
-import { CalendarFilters, Platform, PublicationStatus } from '@/types/calendar';
-import { Campaign } from '@/stores/campaignStore';
 import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatformsConfig';
+import { Campaign } from '@/stores/campaignStore';
+import { CalendarFilters, Platform, PublicationStatus } from '@/types/calendar';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { FaFilter } from 'react-icons/fa';
 
 interface FilterPanelProps {
   filters: CalendarFilters;
@@ -36,39 +36,37 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
 
   // Convert SOCIAL_PLATFORMS to Platform array
   const platforms: Platform[] = Object.values(SOCIAL_PLATFORMS)
-    .filter(p => p.active)
-    .map(p => ({
+    .filter((p) => p.active)
+    .map((p) => ({
       id: p.key,
       name: p.name,
       icon: p.logo,
     }));
 
-  const hasActiveFilters = 
-    filters.platforms.length > 0 || 
-    filters.campaigns.length > 0 || 
-    filters.statuses.length > 0;
+  const hasActiveFilters =
+    filters.platforms.length > 0 || filters.campaigns.length > 0 || filters.statuses.length > 0;
 
   const handlePlatformToggle = (platformId: string) => {
     const newPlatforms = filters.platforms.includes(platformId)
-      ? filters.platforms.filter(p => p !== platformId)
+      ? filters.platforms.filter((p) => p !== platformId)
       : [...filters.platforms, platformId];
-    
+
     onFiltersChange({ ...filters, platforms: newPlatforms });
   };
 
   const handleCampaignToggle = (campaignId: string) => {
     const newCampaigns = filters.campaigns.includes(campaignId)
-      ? filters.campaigns.filter(c => c !== campaignId)
+      ? filters.campaigns.filter((c) => c !== campaignId)
       : [...filters.campaigns, campaignId];
-    
+
     onFiltersChange({ ...filters, campaigns: newCampaigns });
   };
 
   const handleStatusToggle = (status: string) => {
     const newStatuses = filters.statuses.includes(status)
-      ? filters.statuses.filter(s => s !== status)
+      ? filters.statuses.filter((s) => s !== status)
       : [...filters.statuses, status];
-    
+
     onFiltersChange({ ...filters, statuses: newStatuses });
   };
 
@@ -109,16 +107,16 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+    <div className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex items-center justify-between border-b border-gray-200 p-4 dark:border-gray-700">
         <div className="flex items-center gap-3">
           <FaFilter className="text-gray-500 dark:text-gray-400" />
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
             {t('calendar.filters', 'Filters')}
           </h3>
           {hasActiveFilters && (
-            <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400 rounded-full">
+            <span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
               {filters.platforms.length + filters.campaigns.length + filters.statuses.length}
             </span>
           )}
@@ -127,14 +125,14 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
           {hasActiveFilters && (
             <button
               onClick={handleClearAll}
-              className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="text-sm text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
             >
               {t('calendar.clear_all', 'Clear All')}
             </button>
           )}
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
           >
             {isExpanded ? '−' : '+'}
           </button>
@@ -143,7 +141,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
 
       {/* Results Counter */}
       {hasActiveFilters && (
-        <div className="px-4 py-2 bg-blue-50 dark:bg-blue-900/10 border-b border-gray-200 dark:border-gray-700">
+        <div className="border-b border-gray-200 bg-blue-50 px-4 py-2 dark:border-gray-700 dark:bg-blue-900/10">
           <p className="text-sm text-gray-700 dark:text-gray-300">
             {t('calendar.showing_filtered', 'Showing {{count}} of {{total}} events', {
               count: filteredCount,
@@ -155,10 +153,10 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
 
       {/* Filter Content */}
       {isExpanded && (
-        <div className="p-4 space-y-6">
+        <div className="space-y-6 p-4">
           {/* Platform Filters */}
           <div>
-            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+            <h4 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
               {t('calendar.filter_by_platform', 'Platform')}
             </h4>
             <div className="flex flex-wrap gap-2">
@@ -166,13 +164,11 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                 <button
                   key={platform.id}
                   onClick={() => handlePlatformToggle(platform.id)}
-                  className={`
-                    px-3 py-2 rounded-lg text-sm font-medium transition-all
-                    ${filters.platforms.includes(platform.id)
-                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 ring-2 ring-blue-500'
-                      : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                    }
-                  `}
+                  className={`rounded-lg px-3 py-2 text-sm font-medium transition-all ${
+                    filters.platforms.includes(platform.id)
+                      ? 'bg-blue-100 text-blue-800 ring-2 ring-blue-500 dark:bg-blue-900/30 dark:text-blue-400'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                  } `}
                 >
                   {platform.name}
                 </button>
@@ -183,7 +179,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
           {/* Campaign Filters */}
           {campaigns.length > 0 && (
             <div>
-              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              <h4 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
                 {t('calendar.filter_by_campaign', 'Campaign')}
               </h4>
               <div className="flex flex-wrap gap-2">
@@ -191,13 +187,11 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                   <button
                     key={campaign.id}
                     onClick={() => handleCampaignToggle(campaign.id.toString())}
-                    className={`
-                      px-3 py-2 rounded-lg text-sm font-medium transition-all
-                      ${filters.campaigns.includes(campaign.id.toString())
-                        ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400 ring-2 ring-purple-500'
-                        : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                      }
-                    `}
+                    className={`rounded-lg px-3 py-2 text-sm font-medium transition-all ${
+                      filters.campaigns.includes(campaign.id.toString())
+                        ? 'bg-purple-100 text-purple-800 ring-2 ring-purple-500 dark:bg-purple-900/30 dark:text-purple-400'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                    } `}
                   >
                     {campaign.name || campaign.title}
                   </button>
@@ -208,7 +202,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
 
           {/* Status Filters */}
           <div>
-            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+            <h4 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
               {t('calendar.filter_by_status', 'Status')}
             </h4>
             <div className="flex flex-wrap gap-2">
@@ -216,13 +210,11 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                 <button
                   key={status}
                   onClick={() => handleStatusToggle(status)}
-                  className={`
-                    px-3 py-2 rounded-lg text-sm font-medium transition-all
-                    ${filters.statuses.includes(status)
+                  className={`rounded-lg px-3 py-2 text-sm font-medium transition-all ${
+                    filters.statuses.includes(status)
                       ? `${getStatusColor(status)} ring-2 ring-current`
-                      : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                    }
-                  `}
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                  } `}
                 >
                   {getStatusLabel(status)}
                 </button>

@@ -1,5 +1,5 @@
-import { LucideIcon, Sparkles, X } from "lucide-react";
-import React from "react";
+import { LucideIcon, Sparkles, X } from 'lucide-react';
+import React from 'react';
 
 interface ModalHeaderProps {
   t: (key: string) => string;
@@ -8,9 +8,10 @@ interface ModalHeaderProps {
   subtitle?: string;
   icon?: LucideIcon;
   iconColor?: string;
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   style?: React.CSSProperties;
   rightElement?: React.ReactNode;
+  centerElement?: React.ReactNode;
 }
 
 const ModalHeader: React.FC<ModalHeaderProps> = ({
@@ -19,46 +20,56 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({
   title,
   subtitle,
   icon: Icon = Sparkles,
-  iconColor = "text-primary-500",
-  size = "lg",
+  iconColor = 'text-primary-500',
+  size = 'lg',
   style,
   rightElement,
+  centerElement,
 }) => {
   const sizeClasses = {
-    sm: { title: "text-base", icon: "w-4 h-4" },
-    md: { title: "text-lg", icon: "w-5 h-5" },
-    lg: { title: "text-xl", icon: "w-5 h-5" },
-    xl: { title: "text-2xl", icon: "w-6 h-6" },
+    sm: { title: 'text-base', icon: 'w-4 h-4' },
+    md: { title: 'text-lg', icon: 'w-5 h-5' },
+    lg: { title: 'text-xl', icon: 'w-5 h-5' },
+    xl: { title: 'text-2xl', icon: 'w-6 h-6' },
   };
 
   const currentSize = sizeClasses[size];
 
   return (
     <div
-      className="px-6 py-4 border-b border-gray-200/50 dark:border-neutral-800/50 bg-gradient-to-r from-gray-50 via-white to-gray-50/80 dark:from-neutral-900 dark:via-neutral-900/95 dark:to-neutral-800/90 flex items-center justify-between sticky top-0 z-20 backdrop-blur-md shadow-sm dark:shadow-neutral-950/20"
+      className="sticky top-0 z-20 bg-gradient-to-r from-gray-50 via-white to-gray-50/80 backdrop-blur-md dark:from-neutral-900 dark:via-neutral-900/95 dark:to-neutral-800/90"
       style={style}
     >
-      <div>
-        <h2
-          className={`${currentSize.title} font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2`}
-        >
-          <Icon className={`${currentSize.icon} ${iconColor}`} />
-          {t(title) || title}
-        </h2>
-        {subtitle && (
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-            {t(subtitle) || subtitle}
-          </p>
-        )}
-      </div>
-      <div className="flex items-center gap-4 ">
-        {rightElement}
-        <button
-          onClick={onClose}
-          className="p-1.5 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded-lg transition-colors text-gray-400 dark:text-gray-500"
-        >
-          <X className="w-5 h-5" />
-        </button>
+      <div className="flex items-center justify-between gap-4 px-6 py-4">
+        {/* Left: Title and subtitle */}
+        <div className="flex-shrink-0">
+          <h2
+            className={`${currentSize.title} flex items-center gap-2 font-bold text-gray-900 dark:text-gray-100`}
+          >
+            <Icon className={`${currentSize.icon} ${iconColor}`} />
+            {t(title) || title}
+          </h2>
+          {subtitle && (
+            <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
+              {t(subtitle) || subtitle}
+            </p>
+          )}
+        </div>
+
+        {/* Center: centerElement (visible only on md+ screens) */}
+        {centerElement && <div className="hidden flex-1 md:block">{centerElement}</div>}
+
+        {/* Right: rightElement and close button */}
+        <div className="flex flex-shrink-0 items-center gap-4">
+          {/* rightElement visible only on screens smaller than md */}
+          {rightElement && <div>{rightElement}</div>}
+          <button
+            onClick={onClose}
+            className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 dark:text-gray-500 dark:hover:bg-neutral-700"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
       </div>
     </div>
   );

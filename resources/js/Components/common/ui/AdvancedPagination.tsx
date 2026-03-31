@@ -1,5 +1,5 @@
-import Select from "@/Components/common/Modern/Select";
-import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
+import Select from '@/Components/common/Modern/Select';
+import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 
 interface AdvancedPaginationProps {
   currentPage: number;
@@ -30,7 +30,7 @@ export default function AdvancedPagination({
       for (let i = 1; i <= lastPage; i++) pages.push(i);
     } else {
       pages.push(1);
-      if (currentPage > 3) pages.push("ellipsis-1");
+      if (currentPage > 3) pages.push('ellipsis-1');
 
       const start = Math.max(2, currentPage - 1);
       const end = Math.min(lastPage - 1, currentPage + 1);
@@ -39,25 +39,23 @@ export default function AdvancedPagination({
         if (!pages.includes(i)) pages.push(i);
       }
 
-      if (currentPage < lastPage - 2) pages.push("ellipsis-2");
+      if (currentPage < lastPage - 2) pages.push('ellipsis-2');
       if (!pages.includes(lastPage)) pages.push(lastPage);
     }
     return pages;
   };
 
-  const perPageOptions = [5, 10, 15, 20, 25];
+  const perPageOptions = [8, 12, 16, 24, 28];
   const selectOptions = perPageOptions.map((opt) => ({
     value: opt,
     label: opt.toString(),
   }));
 
   return (
-    <div className="px-6 py-4 border-t border-gray-100 dark:border-neutral-700/50 flex flex-col lg:flex-row items-center justify-between gap-4">
-      <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+    <div className="flex flex-col items-center justify-between gap-4 border-t border-gray-100 px-6 py-4 dark:border-neutral-700/50 lg:flex-row">
+      <div className="flex flex-col items-center gap-4 text-sm text-gray-500 dark:text-gray-400 sm:flex-row">
         <div className="flex items-center gap-2">
-          <span>
-            {t("common.pagination.show", { defaultValue: "Mostrar" })}
-          </span>
+          <span>{t('common.pagination.show', { defaultValue: 'Mostrar' })}</span>
           <div className="w-20">
             <Select
               id="per-page"
@@ -68,15 +66,12 @@ export default function AdvancedPagination({
               size="sm"
             />
           </div>
-          <span>
-            {t("common.pagination.entries", { defaultValue: "entradas" })}
-          </span>
+          <span>{t('common.pagination.entries', { defaultValue: 'entradas' })}</span>
         </div>
         {total !== undefined && (
           <span className="hidden sm:inline">
-            {t("common.pagination.info", {
-              defaultValue:
-                "Mostrando {{from}} a {{to}} de {{total}} resultados",
+            {t('common.pagination.info', {
+              defaultValue: 'Mostrando {{from}} a {{to}} de {{total}} resultados',
               from: (currentPage - 1) * perPage + 1,
               to: Math.min(currentPage * perPage, total),
               total,
@@ -89,19 +84,19 @@ export default function AdvancedPagination({
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1 || isLoading}
-          className="p-2 rounded-lg border border-gray-200 dark:border-neutral-700 hover:bg-gray-50 dark:hover:bg-neutral-700 disabled:opacity-50 text-gray-800 dark:text-white transition-colors"
-          title={t("common.previous")}
-          aria-label={t("common.previous", { defaultValue: "Previous page" })}
+          className="rounded-lg border border-gray-200 p-2 text-gray-800 transition-colors hover:bg-gray-50 disabled:opacity-50 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-700"
+          title={t('common.previous')}
+          aria-label={t('common.previous', { defaultValue: 'Previous page' })}
         >
-          <ChevronLeft className="w-4 h-4" />
+          <ChevronLeft className="h-4 w-4" />
         </button>
 
-        <div className="flex items-center gap-1 mx-2">
+        <div className="mx-2 flex items-center gap-1">
           {getPageNumbers().map((page, idx) => {
-            if (typeof page === "string") {
+            if (typeof page === 'string') {
               return (
                 <div key={`ellipsis-${idx}`} className="p-2">
-                  <MoreHorizontal className="w-4 h-4 text-gray-400" />
+                  <MoreHorizontal className="h-4 w-4 text-gray-400" />
                 </div>
               );
             }
@@ -110,13 +105,13 @@ export default function AdvancedPagination({
                 key={page}
                 onClick={() => onPageChange(page)}
                 disabled={isLoading}
-                className={`min-w-[40px] h-10 px-3 rounded-lg text-sm font-medium transition-all ${
+                className={`h-10 min-w-[40px] rounded-lg px-3 text-sm font-medium transition-all ${
                   currentPage === page
-                    ? "bg-primary-500 text-white shadow-lg shadow-primary-500/30"
-                    : "hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-600 dark:text-gray-400"
+                    ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/30'
+                    : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-neutral-700'
                 }`}
-                aria-label={`${t("common.page", { defaultValue: "Page" })} ${page}`}
-                aria-current={currentPage === page ? "page" : undefined}
+                aria-label={`${t('common.page', { defaultValue: 'Page' })} ${page}`}
+                aria-current={currentPage === page ? 'page' : undefined}
               >
                 {page}
               </button>
@@ -127,11 +122,11 @@ export default function AdvancedPagination({
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === lastPage || isLoading}
-          className="p-2 rounded-lg border border-gray-200 dark:border-neutral-700 hover:bg-gray-50 dark:hover:bg-neutral-700 disabled:opacity-50 text-gray-800 dark:text-white  transition-colors"
-          title={t("common.next")}
-          aria-label={t("common.next", { defaultValue: "Next page" })}
+          className="rounded-lg border border-gray-200 p-2 text-gray-800 transition-colors hover:bg-gray-50 disabled:opacity-50 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-700"
+          title={t('common.next')}
+          aria-label={t('common.next', { defaultValue: 'Next page' })}
         >
-          <ChevronRight className="w-4 h-4" />
+          <ChevronRight className="h-4 w-4" />
         </button>
       </div>
     </div>

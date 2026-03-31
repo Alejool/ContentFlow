@@ -1,4 +1,4 @@
-import toast, { ToastOptions } from "react-hot-toast";
+import toast, { ToastOptions } from 'react-hot-toast';
 
 interface CustomToastOptions extends ToastOptions {
   action?: {
@@ -37,7 +37,6 @@ class ToastServiceClass {
   warning(message: string, options?: CustomToastOptions): string {
     return toast(message, {
       duration: this.defaultDuration,
-      icon: "⚠️",
       ...options,
     });
   }
@@ -48,7 +47,6 @@ class ToastServiceClass {
   info(message: string, options?: CustomToastOptions): string {
     return toast(message, {
       duration: this.defaultDuration,
-      icon: "ℹ️",
       ...options,
     });
   }
@@ -61,9 +59,9 @@ class ToastServiceClass {
     messages: {
       loading: string;
       success: string | ((data: T) => string);
-      error: string | ((error: any) => string);
+      error: string | ((error: Error) => string);
     },
-    options?: ToastOptions
+    options?: ToastOptions,
   ): Promise<T> {
     return toast.promise(promise, messages, options);
   }
@@ -86,7 +84,7 @@ class ToastServiceClass {
    * Show validation errors from Laravel
    */
   validationErrors(errors: Record<string, string[]>): void {
-    Object.entries(errors).forEach(([field, messages]) => {
+    Object.entries(errors).forEach(([_field, messages]) => {
       messages.forEach((message) => {
         this.error(message);
       });
@@ -96,12 +94,7 @@ class ToastServiceClass {
   /**
    * Show toast from flash message
    */
-  fromFlash(flash: {
-    success?: string;
-    error?: string;
-    warning?: string;
-    info?: string;
-  }): void {
+  fromFlash(flash: { success?: string; error?: string; warning?: string; info?: string }): void {
     if (flash.success) {
       this.success(flash.success);
     }

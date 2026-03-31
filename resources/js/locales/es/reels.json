@@ -14,7 +14,7 @@
       "deleteError": "Error al eliminar los reels",
       "deletedWithVideo": "Video y reels asociados eliminados",
       "alreadyGenerated": "Ya existen reels generados. Elimínalos primero para generar nuevos.",
-      "alreadyProcessing": "Ya hay reels en proceso de generación. Por favor espera a que terminen.",
+      "alreadyProcessing": "Ya hay reels en proceso de generación. Espera a que terminen.",
       "confirmRegenerate": "Ya existen reels generados. ¿Deseas eliminarlos y generar nuevos?",
       "confirmDelete": "¿Estás seguro de que deseas eliminar este reel?",
       "reelDeleted": "Reel eliminado correctamente"

@@ -11,19 +11,22 @@ export type CardHoverEffect = 'lift' | 'glow' | 'scale';
 /**
  * Props for MotionCard component
  */
-export interface MotionCardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onAnimationStart' | 'onDragStart' | 'onDragEnd' | 'onDrag'> {
+export interface MotionCardProps extends Omit<
+  HTMLAttributes<HTMLDivElement>,
+  'onAnimationStart' | 'onDragStart' | 'onDragEnd' | 'onDrag'
+> {
   /**
    * Hover effect to apply
    * @default 'lift'
    */
   hoverEffect?: CardHoverEffect;
-  
+
   /**
    * Whether to respect reduced motion preferences
    * @default true
    */
   respectReducedMotion?: boolean;
-  
+
   /**
    * Additional Framer Motion props
    */
@@ -32,12 +35,12 @@ export interface MotionCardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'o
 
 /**
  * MotionCard Component
- * 
+ *
  * A div component wrapped with Framer Motion for card microinteractions.
  * Provides hover effects (lift, glow, scale) with reduced motion support.
- * 
+ *
  * Requirements: 3.1, 3.5
- * 
+ *
  * @example
  * ```tsx
  * <MotionCard hoverEffect="lift" className="p-4 bg-white rounded-lg">
@@ -56,7 +59,7 @@ export const MotionCard = forwardRef<HTMLDivElement, MotionCardProps>(
       className,
       ...divProps
     },
-    ref
+    ref,
   ) => {
     const { prefersReducedMotion } = useReducedMotion();
     const shouldReduceMotion = respectReducedMotion && prefersReducedMotion;
@@ -76,7 +79,7 @@ export const MotionCard = forwardRef<HTMLDivElement, MotionCardProps>(
           whileHover={getVariant(selectedHoverVariant, hoverState, shouldReduceMotion)}
           transition={getTransition(
             selectedHoverVariant.transition || { duration: 0.25 },
-            shouldReduceMotion
+            shouldReduceMotion,
           )}
           {...divProps}
           {...motionProps}
@@ -85,7 +88,7 @@ export const MotionCard = forwardRef<HTMLDivElement, MotionCardProps>(
         </m.div>
       </LazyMotion>
     );
-  }
+  },
 );
 
 MotionCard.displayName = 'MotionCard';

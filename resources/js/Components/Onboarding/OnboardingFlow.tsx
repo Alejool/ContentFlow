@@ -1,13 +1,15 @@
-import { useEffect, useState, lazy, Suspense, useCallback } from "react";
-import { useTranslation } from "react-i18next";
-import { useOnboarding } from "@/Contexts/OnboardingContext";
-import { OnboardingErrorBoundary } from "./OnboardingErrorBoundary";
-import type { TourStep, SocialPlatform, PublicationTemplate } from "@/types/onboarding";
+import { useOnboarding } from '@/Contexts/OnboardingContext';
+import type { PublicationTemplate, SocialPlatform, TourStep } from '@/types/onboarding';
+import { Building2, Gem, Link2, Target } from 'lucide-react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { OnboardingErrorBoundary } from './OnboardingErrorBoundary';
 
 // Lazy load onboarding components to reduce initial bundle size
-const TourOverlay = lazy(() => import("./TourOverlay"));
-const SetupWizard = lazy(() => import("./SetupWizard"));
-// TemplateGallery removed
+const BusinessInfoStep = lazy(() => import('./BusinessInfoStep'));
+const PlanSelectionStep = lazy(() => import('./PlanSelectionStep'));
+const TourOverlay = lazy(() => import('./TourOverlay'));
+const SetupWizard = lazy(() => import('./SetupWizard'));
 
 interface OnboardingFlowProps {
   tourSteps: TourStep[];
@@ -16,20 +18,26 @@ interface OnboardingFlowProps {
   templates: PublicationTemplate[];
 }
 
-type OnboardingStage = "tour" | "wizard" | "templates" | "complete";
+type OnboardingStage =
+  | 'businessInfo'
+  | 'planSelection'
+  | 'tour'
+  | 'wizard'
+  | 'templates'
+  | 'complete';
 
 /**
  * OnboardingFlow orchestrates the complete onboarding experience.
- * 
+ *
  * It determines the current onboarding stage based on state and renders
  * the appropriate component (Tour, Wizard, or Templates).
- * 
+ *
  * Features:
  * - Determines current onboarding stage
  * - Renders appropriate component (Tour, Wizard, Templates)
  * - Handles stage transitions
  * - Shows progress indicator
- * 
+ *
  * Requirements: 5.3, 5.4
  */
 export default function OnboardingFlow({
@@ -38,29 +46,46 @@ export default function OnboardingFlow({
   connectedAccounts = [],
   templates,
 }: OnboardingFlowProps) {
-  const { state, completeTourStep, skipTour, nextTourStep } = useOnboarding();
-  
+  const { state, completeBusinessInfo, selectPlan, completeTourStep, skipTour, nextTourStep } =
+    useOnboarding();
+
   // Determine initial stage based on current state to avoid flash
   const determineCurrentStage = useCallback((): OnboardingStage => {
+    // If business info not completed, show business info
+    if (!state.businessInfoCompleted) {
+      return 'businessInfo';
+    }
+
+    // If plan not selected, show plan selection
+    if (!state.planSelected) {
+      return 'planSelection';
+    }
+
     // If tour not completed or skipped, show tour
     if (!state.tourCompleted && !state.tourSkipped) {
-      return "tour";
+      return 'tour';
     }
 
     // If wizard not completed or skipped, show wizard
     if (!state.wizardCompleted && !state.wizardSkipped) {
-      return "wizard";
+      return 'wizard';
     }
 
     // All stages complete
-    return "complete";
-  }, [state.tourCompleted, state.tourSkipped, state.wizardCompleted, state.wizardSkipped]);
-  
+    return 'complete';
+  }, [
+    state.businessInfoCompleted,
+    state.planSelected,
+    state.tourCompleted,
+    state.tourSkipped,
+    state.wizardCompleted,
+    state.wizardSkipped,
+  ]);
+
   const [currentStage, setCurrentStage] = useState<OnboardingStage>(() => determineCurrentStage());
 
   // Debug logging
-  useEffect(() => {
-    }, []);
+  useEffect(() => {}, []);
 
   // Determine current onboarding stage based on state
   useEffect(() => {
@@ -70,6 +95,8 @@ export default function OnboardingFlow({
       setCurrentStage(stage);
     }
   }, [
+    state.businessInfoCompleted,
+    state.planSelected,
     state.tourCompleted,
     state.tourSkipped,
     state.wizardCompleted,
@@ -80,13 +107,46 @@ export default function OnboardingFlow({
   ]);
 
   /**
+   * Handles business info completion
+   */
+  const handleBusinessInfoComplete = async (data: BusinessInfoData) => {
+    await completeBusinessInfo(data);
+  };
+
+  /**
+   * Handles business info skip
+   */
+  const handleBusinessInfoSkip = async () => {
+    await completeBusinessInfo({
+      businessName: '',
+      businessIndustry: '',
+      businessGoals: '',
+      businessSize: '',
+    });
+  };
+
+  /**
+   * Handles plan selection
+   */
+  const handlePlanSelect = async (planId: string) => {
+    await selectPlan(planId);
+  };
+
+  /**
+   * Handles plan selection skip
+   */
+  const handlePlanSkip = async () => {
+    await selectPlan('free');
+  };
+
+  /**
    * Handles tour completion
    */
   const handleTourComplete = async () => {
     const lastStep = tourSteps[tourSteps.length - 1];
     if (lastStep) {
       await completeTourStep(lastStep.id);
-      }
+    }
     // Stage will automatically transition via useEffect
   };
 
@@ -122,7 +182,7 @@ export default function OnboardingFlow({
   };
 
   // Don't render anything if onboarding is complete
-  if (currentStage === "complete") {
+  if (currentStage === 'complete') {
     return null;
   }
 
@@ -134,12 +194,43 @@ export default function OnboardingFlow({
         completionPercentage={state.completionPercentage}
       />
 
+      {/* Business Info Stage */}
+      {currentStage === 'businessInfo' && (
+        <OnboardingErrorBoundary>
+          <Suspense fallback={<OnboardingLoadingFallback />}>
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+              <div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-lg bg-white p-8 shadow-2xl dark:bg-neutral-800">
+                <BusinessInfoStep
+                  onComplete={handleBusinessInfoComplete}
+                  onSkip={handleBusinessInfoSkip}
+                />
+              </div>
+            </div>
+          </Suspense>
+        </OnboardingErrorBoundary>
+      )}
+
+      {/* Plan Selection Stage */}
+      {currentStage === 'planSelection' && (
+        <OnboardingErrorBoundary>
+          <Suspense fallback={<OnboardingLoadingFallback />}>
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+              <div className="max-h-[90vh] w-full max-w-7xl overflow-y-auto rounded-lg bg-white p-8 shadow-2xl dark:bg-neutral-800">
+                <PlanSelectionStep onComplete={handlePlanSelect} onSkip={handlePlanSkip} />
+              </div>
+            </div>
+          </Suspense>
+        </OnboardingErrorBoundary>
+      )}
+
       {/* Tour Stage */}
-      {currentStage === "tour" && tourSteps.length > 0 && (
+      {currentStage === 'tour' && tourSteps.length > 0 && (
         <OnboardingErrorBoundary>
           <Suspense fallback={<OnboardingLoadingFallback />}>
             <TourOverlay
-              currentStep={tourSteps[Math.min(state.tourCurrentStep, tourSteps.length - 1)] || tourSteps[0]}
+              currentStep={
+                tourSteps[Math.min(state.tourCurrentStep, tourSteps.length - 1)] || tourSteps[0]
+              }
               totalSteps={tourSteps.length}
               onNext={nextTourStep}
               onSkip={handleTourSkip}
@@ -150,7 +241,7 @@ export default function OnboardingFlow({
       )}
 
       {/* Wizard Stage */}
-      {currentStage === "wizard" && (
+      {currentStage === 'wizard' && (
         <OnboardingErrorBoundary>
           <Suspense fallback={<OnboardingLoadingFallback />}>
             <SetupWizard
@@ -178,69 +269,36 @@ function OnboardingProgressIndicator({
   completionPercentage: number;
 }) {
   const { t } = useTranslation();
-  
+
   // Don't show progress indicator during tour (tour has its own progress)
-  if (currentStage === "tour" || currentStage === "complete") {
+  if (currentStage === 'tour' || currentStage === 'complete') {
     return null;
   }
 
   const stages = [
-    { id: "tour", label: t('progress.stages.tour'), icon: "🎯" },
-    { id: "wizard", label: t('progress.stages.connect'), icon: "🔗" },
-    // Templates stage removed
+    {
+      id: 'businessInfo',
+      label: t('onboarding.progress.stages.businessInfo'),
+      Icon: Building2,
+    },
+    {
+      id: 'planSelection',
+      label: t('onboarding.progress.stages.plan'),
+      Icon: Gem,
+    },
+    { id: 'tour', label: t('onboarding.progress.stages.tour'), Icon: Target },
+    {
+      id: 'wizard',
+      label: t('onboarding.progress.stages.connect'),
+      Icon: Link2,
+    },
   ];
 
   const currentStageIndex = stages.findIndex((s) => s.id === currentStage);
 
   return (
-    <div className="fixed top-4 right-4 z-40 bg-white dark:bg-neutral-800 rounded-lg shadow-lg p-4 max-w-xs">
-      <div className="flex items-center justify-between mb-3">
-        <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
-          {t('progress.title')}
-        </h4>
-        <span className="text-xs text-gray-500 dark:text-gray-400">
-          {completionPercentage}%
-        </span>
-      </div>
-
-      {/* Progress Bar */}
-      <div className="w-full bg-gray-200 dark:bg-neutral-700 rounded-full h-2 mb-3">
-        <div
-          className="bg-primary-600 h-2 rounded-full transition-all duration-300"
-          style={{ width: `${completionPercentage}%` }}
-        />
-      </div>
-
-      {/* Stage Indicators */}
-      <div className="flex items-center justify-between">
-        {stages.map((stage, index) => (
-          <div
-            key={stage.id}
-            className="flex flex-col items-center gap-1"
-          >
-            <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm transition-colors ${
-                index < currentStageIndex
-                  ? "bg-green-100 dark:bg-green-900/20 text-green-600"
-                  : index === currentStageIndex
-                  ? "bg-primary-100 dark:bg-primary-900/20 text-primary-600"
-                  : "bg-gray-100 dark:bg-neutral-700 text-gray-400"
-              }`}
-            >
-              {index < currentStageIndex ? "✓" : stage.icon}
-            </div>
-            <span
-              className={`text-xs ${
-                index <= currentStageIndex
-                  ? "text-gray-900 dark:text-white font-medium"
-                  : "text-gray-400"
-              }`}
-            >
-              {stage.label}
-            </span>
-          </div>
-        ))}
-      </div>
+    <div className="fixed right-6 top-6 z-[99] w-80 rounded-lg border border-gray-200 bg-white p-6 shadow-2xl dark:border-neutral-700 dark:bg-neutral-800">
+      {/* Header */}
     </div>
   );
 }
@@ -251,11 +309,9 @@ function OnboardingProgressIndicator({
 function OnboardingLoadingFallback() {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-xl p-8 flex flex-col items-center gap-4">
-        <div className="w-12 h-12 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
-        <p className="text-gray-700 dark:text-gray-300 text-sm font-medium">
-          Loading...
-        </p>
+      <div className="flex flex-col items-center gap-4 rounded-lg bg-white p-8 shadow-xl dark:bg-neutral-800">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary-200 border-t-primary-600" />
+        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Loading...</p>
       </div>
     </div>
   );

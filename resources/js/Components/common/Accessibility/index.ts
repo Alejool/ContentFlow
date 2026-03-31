@@ -1,6 +1,6 @@
 /**
  * Accessibility Components Index
- * 
+ *
  * Centralized exports for all accessibility components
  */
 

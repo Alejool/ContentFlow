@@ -37,7 +37,7 @@ export interface CalendarEvent {
     remind_at?: string;
     is_public?: boolean;
     user_name?: string;
-    [key: string]: any;
+    [key: string]: unknown;
   };
 }
 
@@ -61,14 +61,14 @@ export interface Campaign {
   color: string;
 }
 
-export type PublicationStatus = 
-  | 'draft' 
-  | 'published' 
-  | 'publishing' 
-  | 'failed' 
-  | 'pending_review' 
-  | 'approved' 
-  | 'scheduled' 
+export type PublicationStatus =
+  | 'draft'
+  | 'published'
+  | 'publishing'
+  | 'failed'
+  | 'pending_review'
+  | 'approved'
+  | 'scheduled'
   | 'rejected'
   | 'retrying';
 

@@ -1,6 +1,6 @@
 /**
  * Animated Card Component
- * 
+ *
  * Card with hover animations and accessibility features
  */
 
@@ -57,11 +57,7 @@ export const AnimatedCard: React.FC<AnimatedCardProps> = ({
 
   return (
     <LazyMotion features={domAnimation}>
-      <Component
-        className={baseClasses}
-        {...motionProps}
-        {...(props as any)}
-      >
+      <Component className={baseClasses} {...motionProps} {...(props as any)}>
         {children}
       </Component>
     </LazyMotion>

@@ -23,11 +23,11 @@ export interface NetworkError extends Error {
 export function createNetworkError(
   message: string,
   status?: number,
-  statusText?: string
+  statusText?: string,
 ): NetworkError {
   const error = new Error(message) as NetworkError;
-  error.status = status;
-  error.statusText = statusText;
+  if (status !== undefined) error.status = status;
+  if (statusText !== undefined) error.statusText = statusText;
   error.isNetworkError = true;
   error.isRetryable = isRetryableError(status);
   return error;
@@ -38,7 +38,7 @@ export function createNetworkError(
  */
 function isRetryableError(status?: number): boolean {
   if (!status) return true; // Network errors without status are retryable
-  
+
   // Retry on server errors (5xx) and specific client errors
   return (
     status >= 500 || // Server errors
@@ -55,7 +55,7 @@ function calculateDelay(
   attempt: number,
   initialDelay: number,
   maxDelay: number,
-  backoffMultiplier: number
+  backoffMultiplier: number,
 ): number {
   const delay = initialDelay * Math.pow(backoffMultiplier, attempt);
   return Math.min(delay, maxDelay);
@@ -73,7 +73,7 @@ function sleep(ms: number): Promise<void> {
  */
 export async function retryWithBackoff<T>(
   fn: () => Promise<T>,
-  options: RetryOptions = {}
+  options: RetryOptions = {},
 ): Promise<T> {
   const {
     maxRetries = 3,
@@ -104,7 +104,7 @@ export async function retryWithBackoff<T>(
 
       // Calculate delay and wait
       const delay = calculateDelay(attempt, initialDelay, maxDelay, backoffMultiplier);
-      
+
       // Call retry callback if provided
       if (onRetry) {
         onRetry(attempt + 1, lastError);
@@ -123,7 +123,7 @@ export async function retryWithBackoff<T>(
 export async function fetchWithRetry(
   url: string,
   options: RequestInit = {},
-  retryOptions: RetryOptions = {}
+  retryOptions: RetryOptions = {},
 ): Promise<Response> {
   return retryWithBackoff(async () => {
     try {
@@ -134,7 +134,7 @@ export async function fetchWithRetry(
         throw createNetworkError(
           `HTTP ${response.status}: ${response.statusText}`,
           response.status,
-          response.statusText
+          response.statusText,
         );
       }
 
@@ -156,7 +156,7 @@ export function getErrorMessage(error: unknown): string {
   if (!error) return 'An unknown error occurred';
 
   const networkError = error as NetworkError;
-  
+
   if (networkError.isNetworkError) {
     if (!networkError.status) {
       return 'Unable to connect. Please check your internet connection.';
@@ -168,7 +168,7 @@ export function getErrorMessage(error: unknown): string {
       case 401:
         return 'You need to log in to continue.';
       case 403:
-        return 'You don\'t have permission to perform this action.';
+        return "You don't have permission to perform this action.";
       case 404:
         return 'The requested resource was not found.';
       case 408:
@@ -222,13 +222,13 @@ export function waitForOnline(): Promise<void> {
  * Queue for offline actions
  */
 class OfflineQueue {
-  private queue: Array<() => Promise<any>> = [];
+  private queue: Array<() => Promise<unknown>> = [];
   private processing = false;
 
   /**
    * Adds an action to the queue
    */
-  enqueue(action: () => Promise<any>): void {
+  enqueue(action: () => Promise<unknown>): void {
     this.queue.push(action);
     this.processQueue();
   }

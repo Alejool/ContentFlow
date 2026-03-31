@@ -98,6 +98,7 @@ return [
 
     'waits' => [
         'redis:publishing' => 300, // Alerta si espera más de 5 minutos
+        'redis:bulk' => 600, // Alerta si operaciones en lote esperan más de 10 minutos
         'redis:notifications' => 30, // Alerta si notificaciones esperan más de 30 segundos
         'redis:default' => 60,
     ],
@@ -200,19 +201,39 @@ return [
 
     'defaults' => [
         // Supervisor dedicado para publicaciones pesadas (videos grandes)
+        // Procesa jobs con prioridad dinámica basada en plan y saturación de cola
         'publishing-heavy' => [
             'connection' => 'redis',
             'queue' => ['publishing'],
-            'balance' => 'auto',
+            'balance' => 'auto', // Auto-balance distribuye según carga
             'autoScalingStrategy' => 'time',
-            'maxProcesses' => 5, // Máximo 5 publicaciones simultáneas
-            'minProcesses' => 1, // Siempre al menos 1 worker disponible
+            'maxProcesses' => 8, // Más workers para manejar Enterprise
+            'minProcesses' => 2, // Siempre al menos 2 workers disponibles
             'maxTime' => 0,
             'maxJobs' => 0,
             'memory' => 256, // Más memoria para videos grandes
             'tries' => 2,
             'timeout' => 2100, // 35 minutos para videos muy grandes
             'nice' => 0,
+            // NOTA: Redis no soporta prioridad nativa en colas FIFO
+            // La priorización se maneja mediante el middleware PlanBasedPriority
+            // que ajusta el delay del job según el plan del usuario
+        ],
+        
+        // Supervisor para operaciones en lote (bulk)
+        'bulk-operations' => [
+            'connection' => 'redis',
+            'queue' => ['bulk'],
+            'balance' => 'auto',
+            'autoScalingStrategy' => 'time',
+            'maxProcesses' => 5, // Más workers para Enterprise (hasta 10 batches concurrentes)
+            'minProcesses' => 1,
+            'maxTime' => 0,
+            'maxJobs' => 0,
+            'memory' => 512, // Mucha más memoria para batches grandes de Enterprise
+            'tries' => 1, // No reintentar batches completos
+            'timeout' => 1800, // 30 minutos para batches grandes de Enterprise
+            'nice' => 5, // Menor prioridad del sistema que publishing
         ],
         
         // Supervisor para notificaciones y tareas rápidas
@@ -251,7 +272,13 @@ return [
     'environments' => [
         'production' => [
             'publishing-heavy' => [
-                'maxProcesses' => 8, // Más workers en producción
+                'maxProcesses' => 15, // MUCHO más para Enterprise (hasta 15 workers)
+                'minProcesses' => 3,
+                'balanceMaxShift' => 3,
+                'balanceCooldown' => 3,
+            ],
+            'bulk-operations' => [
+                'maxProcesses' => 10, // Hasta 10 batches concurrentes para Enterprise
                 'minProcesses' => 2,
                 'balanceMaxShift' => 2,
                 'balanceCooldown' => 5,
@@ -272,6 +299,10 @@ return [
 
         'local' => [
             'publishing-heavy' => [
+                'maxProcesses' => 3,
+                'minProcesses' => 1,
+            ],
+            'bulk-operations' => [
                 'maxProcesses' => 2,
                 'minProcesses' => 1,
             ],

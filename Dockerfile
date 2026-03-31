@@ -6,6 +6,7 @@ FROM php:8.4-alpine AS production
 RUN apk add --no-cache \
     bash \
     curl \
+    wget \
     git \
     unzip \
     icu-dev \
@@ -94,7 +95,7 @@ ENV VITE_REVERB_APP_KEY=$VITE_REVERB_APP_KEY \
     VITE_REVERB_SCHEME=$VITE_REVERB_SCHEME \
     NODE_ENV=production
 
-RUN npm install --include=dev \
+RUN npm install --include=dev --legacy-peer-deps \
     && npm run build \
     && rm -rf node_modules
 

@@ -11,19 +11,22 @@ export type LinkHoverEffect = 'subtle' | 'underline' | 'glow';
 /**
  * Props for MotionLink component
  */
-export interface MotionLinkProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'onAnimationStart' | 'onDragStart' | 'onDragEnd' | 'onDrag'> {
+export interface MotionLinkProps extends Omit<
+  AnchorHTMLAttributes<HTMLAnchorElement>,
+  'onAnimationStart' | 'onDragStart' | 'onDragEnd' | 'onDrag'
+> {
   /**
    * Hover effect to apply
    * @default 'subtle'
    */
   hoverEffect?: LinkHoverEffect;
-  
+
   /**
    * Whether to respect reduced motion preferences
    * @default true
    */
   respectReducedMotion?: boolean;
-  
+
   /**
    * Additional Framer Motion props
    */
@@ -32,12 +35,12 @@ export interface MotionLinkProps extends Omit<AnchorHTMLAttributes<HTMLAnchorEle
 
 /**
  * MotionLink Component
- * 
+ *
  * An anchor component wrapped with Framer Motion for link microinteractions.
  * Provides hover effects (subtle, underline, glow) with reduced motion support.
- * 
+ *
  * Requirements: 3.1, 3.5
- * 
+ *
  * @example
  * ```tsx
  * <MotionLink href="/about" hoverEffect="subtle">
@@ -55,7 +58,7 @@ export const MotionLink = forwardRef<HTMLAnchorElement, MotionLinkProps>(
       className,
       ...anchorProps
     },
-    ref
+    ref,
   ) => {
     const { prefersReducedMotion } = useReducedMotion();
     const shouldReduceMotion = respectReducedMotion && prefersReducedMotion;
@@ -74,9 +77,8 @@ export const MotionLink = forwardRef<HTMLAnchorElement, MotionLinkProps>(
     const hoverState = shouldReduceMotion ? 'hoverReduced' : 'hover';
 
     // Add underline effect via className if needed
-    const linkClassName = hoverEffect === 'underline' 
-      ? `${className || ''} hover:underline`.trim()
-      : className;
+    const linkClassName =
+      hoverEffect === 'underline' ? `${className || ''} hover:underline`.trim() : className;
 
     return (
       <LazyMotion features={domAnimation}>
@@ -87,7 +89,7 @@ export const MotionLink = forwardRef<HTMLAnchorElement, MotionLinkProps>(
           whileHover={getVariant(selectedHoverVariant, hoverState, shouldReduceMotion)}
           transition={getTransition(
             selectedHoverVariant.transition || { duration: 0.15 },
-            shouldReduceMotion
+            shouldReduceMotion,
           )}
           {...anchorProps}
           {...motionProps}
@@ -96,7 +98,7 @@ export const MotionLink = forwardRef<HTMLAnchorElement, MotionLinkProps>(
         </m.a>
       </LazyMotion>
     );
-  }
+  },
 );
 
 MotionLink.displayName = 'MotionLink';

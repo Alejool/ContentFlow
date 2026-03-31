@@ -1,15 +1,15 @@
-import { useCallback } from "react";
-import { router } from "@inertiajs/react";
-import type { PublicationTemplate } from "@/types/onboarding";
-import { useOnboardingStore } from "@/stores/onboardingStore";
+import { useCallback } from 'react';
+import { router } from '@inertiajs/react';
+import type { PublicationTemplate } from '@/types/onboarding';
+import { useOnboardingStore } from '@/stores/onboardingStore';
 import {
   storeTemplateInSession,
   applyTemplateToForm as applyTemplateToFormUtil,
-} from "@/Utils/templateUtils";
+} from '@/Utils/templateUtils';
 
 /**
  * Hook for integrating publication templates with the publication editor.
- * 
+ *
  * This hook provides functionality to:
  * - Apply template content to the publication form
  * - Track template usage
@@ -20,7 +20,7 @@ export function useTemplateIntegration() {
 
   /**
    * Applies a template to the publication editor and tracks usage.
-   * 
+   *
    * @param template - The template to apply
    * @param onSuccess - Optional callback after successful template selection
    */
@@ -31,8 +31,7 @@ export function useTemplateIntegration() {
         storeTemplateInSession(template);
 
         // Track template selection in onboarding state (don't wait for it)
-        selectTemplate(template.id).catch(err => {
-          });
+        selectTemplate(template.id).catch((err) => {});
 
         // Navigate to content page immediately
         router.visit('/content', {
@@ -40,31 +39,30 @@ export function useTemplateIntegration() {
           onSuccess: () => {
             onSuccess?.();
           },
-          onError: (errors) => {
-            },
+          onError: (errors) => {},
         });
       } catch (error) {
         throw error;
       }
     },
-    [selectTemplate]
+    [selectTemplate],
   );
 
   /**
    * Populates form fields with template content.
    * This is used when the template is applied within an existing form context.
-   * 
+   *
    * @param template - The template to apply
    * @param setValue - React Hook Form setValue function
    */
   const populateFormWithTemplate = useCallback(
     (
       template: PublicationTemplate,
-      setValue: (name: string, value: any, options?: any) => void
+      setValue: (name: string, value: any, options?: any) => void,
     ) => {
       applyTemplateToFormUtil(template, setValue);
     },
-    []
+    [],
   );
 
   return {

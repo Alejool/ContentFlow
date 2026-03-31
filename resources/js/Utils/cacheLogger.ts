@@ -2,7 +2,7 @@
  * Cache Decision Logger
  * Logs cache decisions for debugging and performance analysis
  * Only active in development mode
- * 
+ *
  * Requirements: 10.4
  */
 
@@ -37,9 +37,9 @@ class CacheLogger {
       persistToStorage: config.persistToStorage !== false,
       consoleOutput: config.consoleOutput !== false,
     };
-    
+
     this.isDevelopment = import.meta.env.DEV;
-    
+
     // Only restore logs in development mode
     if (this.isDevelopment && this.config.persistToStorage) {
       this.restoreLogs();
@@ -102,7 +102,7 @@ class CacheLogger {
   /**
    * Output cache decision to console with formatting
    */
-  private outputToConsole(log: CacheDecisionLog): void {
+  private outputToConsole(_log: CacheDecisionLog): void {
     // Logging disabled
   }
 
@@ -119,16 +119,16 @@ class CacheLogger {
 
     if (filter) {
       if (filter.strategy) {
-        filtered = filtered.filter(log => log.strategy === filter.strategy);
+        filtered = filtered.filter((log) => log.strategy === filter.strategy);
       }
       if (filter.result) {
-        filtered = filtered.filter(log => log.result === filter.result);
+        filtered = filtered.filter((log) => log.result === filter.result);
       }
       if (filter.url) {
-        filtered = filtered.filter(log => log.url.includes(filter.url));
+        filtered = filtered.filter((log) => log.url.includes(filter.url));
       }
       if (filter.since) {
-        filtered = filtered.filter(log => log.timestamp >= filter.since);
+        filtered = filtered.filter((log) => log.timestamp >= filter.since);
       }
     }
 
@@ -163,7 +163,7 @@ class CacheLogger {
     let cacheHits = 0;
     let networkErrors = 0;
 
-    this.logs.forEach(log => {
+    this.logs.forEach((log) => {
       // Count by strategy
       stats.byStrategy[log.strategy] = (stats.byStrategy[log.strategy] || 0) + 1;
 
@@ -202,7 +202,7 @@ class CacheLogger {
   } {
     const strategyTimes: Record<string, number[]> = {};
 
-    this.logs.forEach(log => {
+    this.logs.forEach((log) => {
       if (!strategyTimes[log.strategy]) {
         strategyTimes[log.strategy] = [];
       }
@@ -231,7 +231,7 @@ class CacheLogger {
     });
 
     // Calculate cache efficiency (cache hits vs total requests)
-    const cacheHits = this.logs.filter(log => log.result === 'cache-hit').length;
+    const cacheHits = this.logs.filter((log) => log.result === 'cache-hit').length;
     const cacheEfficiency = this.logs.length > 0 ? (cacheHits / this.logs.length) * 100 : 0;
 
     return {
@@ -247,11 +247,11 @@ class CacheLogger {
    */
   clearLogs(): void {
     this.logs = [];
-    
+
     if (this.config.persistToStorage) {
       try {
         localStorage.removeItem(this.STORAGE_KEY);
-      } catch (error) {
+      } catch {
         // Failed to clear logs from storage
       }
     }
@@ -262,8 +262,8 @@ class CacheLogger {
    */
   clearOldLogs(olderThan: number): void {
     const cutoff = Date.now() - olderThan;
-    this.logs = this.logs.filter(log => log.timestamp >= cutoff);
-    
+    this.logs = this.logs.filter((log) => log.timestamp >= cutoff);
+
     if (this.config.persistToStorage) {
       this.persistLogs();
     }
@@ -276,7 +276,7 @@ class CacheLogger {
     try {
       const serialized = JSON.stringify(this.logs);
       localStorage.setItem(this.STORAGE_KEY, serialized);
-    } catch (error) {
+    } catch {
       // Failed to persist logs
     }
   }
@@ -290,7 +290,7 @@ class CacheLogger {
       if (stored) {
         this.logs = JSON.parse(stored);
       }
-    } catch (error) {
+    } catch {
       // Failed to restore logs
     }
   }
@@ -306,8 +306,18 @@ class CacheLogger {
    * Export logs as CSV
    */
   exportLogsCSV(): string {
-    const headers = ['ID', 'Timestamp', 'URL', 'Method', 'Strategy', 'Result', 'Response Time (ms)', 'Cache Age (ms)', 'Size (bytes)'];
-    const rows = this.logs.map(log => [
+    const headers = [
+      'ID',
+      'Timestamp',
+      'URL',
+      'Method',
+      'Strategy',
+      'Result',
+      'Response Time (ms)',
+      'Cache Age (ms)',
+      'Size (bytes)',
+    ];
+    const rows = this.logs.map((log) => [
       log.id,
       new Date(log.timestamp).toISOString(),
       log.url,
@@ -320,7 +330,7 @@ class CacheLogger {
     ]);
 
     const csv = [headers, ...rows]
-      .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
       .join('\n');
 
     return csv;

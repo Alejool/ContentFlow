@@ -1,15 +1,16 @@
-import Button from "@/Components/common/Modern/Button";
-import Input from "@/Components/common/Modern/Input";
-import Select from "@/Components/common/Modern/Select";
-import Modal from "@/Components/common/ui/Modal";
-import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
-import { Mail, Shield, UserPlus } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
-import { z } from "zod";
+import Button from '@/Components/common/Modern/Button';
+import Input from '@/Components/common/Modern/Input';
+import Select from '@/Components/common/Modern/Select';
+import Modal from '@/Components/common/ui/Modal';
+import { getRoleConfig } from '@/Utils/roleHelpers';
+import { zodResolver } from '@hookform/resolvers/zod';
+import axios from 'axios';
+import { Mail, UserPlus } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
 
 interface InviteMemberModalProps {
   isOpen: boolean;
@@ -22,10 +23,10 @@ interface InviteMemberModalProps {
 const getInviteSchema = (t: any) =>
   z.object({
     email: z.preprocess(
-      (val) => (typeof val === "string" ? val.trim() : val),
-      z.string().email(t("workspace.invite_modal.validation.email")),
+      (val) => (typeof val === 'string' ? val.trim() : val),
+      z.string().email(t('workspace.invite_modal.validation.email')),
     ),
-    role_id: z.number().min(1, t("workspace.invite_modal.validation.role")),
+    role_id: z.number().min(1, t('workspace.invite_modal.validation.role')),
   });
 
 type InviteFormData = {
@@ -53,8 +54,8 @@ export default function InviteMemberModal({
   } = useForm<InviteFormData>({
     resolver: zodResolver(getInviteSchema(t)),
     defaultValues: {
-      email: "",
-      role_id: roles.find((r) => r.slug === "member")?.id || roles[0]?.id,
+      email: '',
+      role_id: roles.find((r) => r.slug === 'member')?.id || roles[0]?.id,
     },
   });
 
@@ -63,27 +64,32 @@ export default function InviteMemberModal({
   }, [errors]);
 
   const roleOptions = roles
-    .filter((role) => role.slug !== "owner")
-    .map((role) => ({
-      value: role.id,
-      label: role.name,
-      icon: <Shield className="w-4 h-4" />,
-    }));
+    .filter((role) => role.slug !== 'owner')
+    .map((role) => {
+      const config = getRoleConfig(role.slug);
+      const Icon = config.icon;
+      return {
+        value: role.id,
+        label: role.name,
+        icon: (
+          <span
+            className={`inline-flex h-5 w-5 items-center justify-center rounded ${config.badgeClass} bg-opacity-30`}
+          >
+            <Icon className={`h-3 w-3 ${config.textColor}`} />
+          </span>
+        ),
+      };
+    });
 
   const onSubmit = async (data: InviteFormData) => {
     if (!workspace?.id) {
-      toast.error(t("workspace.invite_modal.messages.missing_info"));
+      toast.error(t('workspace.invite_modal.messages.missing_info'));
       return;
     }
     setIsSubmitting(true);
     try {
-      const response = await axios.post(
-        route("api.v1.workspaces.invite", workspace.id),
-        data,
-      );
-      toast.success(
-        response.data.message || t("workspace.invite_modal.messages.success"),
-      );
+      const response = await axios.post(route('api.v1.workspaces.invite', workspace.id), data);
+      toast.success(response.data.message || t('workspace.invite_modal.messages.success'));
       reset();
       onSuccess();
       onClose();
@@ -94,9 +100,7 @@ export default function InviteMemberModal({
         const errorMessage = error.response.data.errors[firstErrorField][0];
         toast.error(errorMessage);
       } else {
-        const message =
-          error.response?.data?.message ||
-          t("workspace.invite_modal.messages.error");
+        const message = error.response?.data?.message || t('workspace.invite_modal.messages.error');
         toast.error(message);
       }
     } finally {
@@ -106,17 +110,17 @@ export default function InviteMemberModal({
 
   return (
     <Modal show={isOpen} onClose={onClose} maxWidth="md">
-      <div className="p-4 md:p-6 overflow-x-hidden">
-        <div className="flex flex-col md:flex-row md:items-center gap-3 mb-6">
-          <div className="bg-primary-100 dark:bg-primary-900/30 p-2 rounded-lg w-fit shrink-0">
-            <UserPlus className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+      <div className="overflow-x-hidden p-4 md:p-6">
+        <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center">
+          <div className="w-fit shrink-0 rounded-lg bg-primary-100 p-2 dark:bg-primary-900/30">
+            <UserPlus className="h-6 w-6 text-primary-600 dark:text-primary-400" />
           </div>
           <div className="min-w-0">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white truncate">
-              {t("workspace.invite_modal.title")}
+            <h2 className="truncate text-xl font-bold text-gray-900 dark:text-white">
+              {t('workspace.invite_modal.title')}
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
-              {t("workspace.invite_modal.subtitle", { name: workspace?.name })}
+            <p className="truncate text-sm text-gray-500 dark:text-gray-400">
+              {t('workspace.invite_modal.subtitle', { name: workspace?.name })}
             </p>
           </div>
         </div>
@@ -124,52 +128,64 @@ export default function InviteMemberModal({
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <Input
             id="email"
-            label={t("workspace.invite_modal.email_label")}
+            label={t('workspace.invite_modal.email_label')}
             type="email"
-            placeholder={t("workspace.invite_modal.email_placeholder")}
+            placeholder={t('workspace.invite_modal.email_placeholder')}
             register={register}
             error={errors.email?.message}
             icon={Mail}
             required
           />
 
-          <div className="space-y-1 relative">
+          <div className="relative space-y-1">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              {t("workspace.invite_modal.role_label")}
+              {t('workspace.invite_modal.role_label')}
             </label>
             <Select
               id="role_id"
               options={roleOptions}
-              value={watch("role_id")}
-              onChange={(val) =>
-                setValue("role_id", Number(val), { shouldValidate: true })
-              }
-              placeholder={t("workspace.invite_modal.role_placeholder")}
+              value={watch('role_id')}
+              onChange={(val) => setValue('role_id', Number(val), { shouldValidate: true })}
+              placeholder={t('workspace.invite_modal.role_placeholder')}
+              icon={(() => {
+                const roleId = watch('role_id');
+                if (!roleId) return undefined;
+                const selectedRole = roles.find((r) => r.id === roleId);
+                if (!selectedRole) return undefined;
+                const selectedConfig = getRoleConfig(selectedRole.slug);
+                const SelectedIcon = selectedConfig.icon;
+                return (
+                  <span
+                    className={`inline-flex h-5 w-5 items-center justify-center rounded ${selectedConfig.badgeClass} bg-opacity-30`}
+                  >
+                    <SelectedIcon className={`h-3 w-3 ${selectedConfig.textColor}`} />
+                  </span>
+                );
+              })()}
             />
             {errors.role_id && (
-              <p className="text-xs text-red-500 mt-1">
-                {errors.role_id.message}
-              </p>
+              <p className="mt-1 text-xs text-red-500">{errors.role_id.message}</p>
             )}
           </div>
 
-          <div className="flex flex-col md:flex-row justify-end gap-3 pt-4">
+          <div className="flex flex-col justify-end gap-3 pt-4 md:flex-row">
             <Button
-              variant="secondary"
+              variant="ghost"
+              buttonStyle="outline"
               onClick={onClose}
               type="button"
               disabled={isSubmitting}
-              className="w-full md:w-auto order-2 md:order-1"
+              className="order-2 w-full md:order-1 md:w-auto"
             >
-              {t("workspace.invite_modal.cancel")}
+              {t('workspace.invite_modal.cancel')}
             </Button>
             <Button
               type="submit"
               loading={isSubmitting}
               icon={UserPlus}
-              className="w-full md:w-auto order-1 md:order-2"
+              className="order-1 w-full md:order-2 md:w-auto"
             >
-              {t("workspace.invite_modal.submit")}
+              {t('workspace.invite_modal.submit')}
             </Button>
           </div>
         </form>

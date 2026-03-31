@@ -62,7 +62,8 @@ class TikTokService extends BaseSocialService
         @unlink($tempFile);
       }
       
-      return PostResultDTO::failure($e->getMessage());
+      $friendlyMessage = $this->extractTikTokErrorMessage($e);
+      return PostResultDTO::failure($friendlyMessage);
     }
   }
 
@@ -468,4 +469,107 @@ class TikTokService extends BaseSocialService
 
     return [];
   }
+
+  /**
+   * Extract user-friendly error message from TikTok API response
+   */
+  private function extractTikTokErrorMessage(\Exception $e): string
+  {
+    if (!($e instanceof ClientException)) {
+      return $e->getMessage();
+    }
+
+    try {
+      $responseBody = $e->getResponse()->getBody()->getContents();
+      $errorData = json_decode($responseBody, true);
+      
+      $errorCode = $errorData['error']['code'] ?? null;
+      $errorMessage = $errorData['error']['message'] ?? null;
+      
+      // Map common TikTok errors to user-friendly messages
+      if ($errorCode) {
+        $friendlyMessage = match($errorCode) {
+          'invalid_video_format' => 'El formato del video no es compatible con TikTok. Usa MP4, MOV o WEBM.',
+          'video_too_large' => 'El video supera el límite de 4GB de TikTok. Comprime el video e intenta nuevamente.',
+          'video_too_short' => 'El video es demasiado corto. TikTok requiere videos de al menos 3 segundos.',
+          'video_too_long' => 'El video es demasiado largo. TikTok permite videos de hasta 10 minutos.',
+          'invalid_access_token' => 'Tu sesión de TikTok ha expirado. Reconecta tu cuenta desde la configuración.',
+          'rate_limit_exceeded' => 'Has excedido el límite de publicaciones de TikTok. Intenta nuevamente en unos minutos.',
+          'insufficient_permissions' => 'Tu cuenta de TikTok no tiene permisos para publicar videos. Verifica los permisos de la aplicación.',
+          'video_processing_failed' => 'TikTok no pudo procesar tu video. Verifica que el archivo no esté corrupto.',
+          default => $errorMessage ?? "Error de TikTok: {$errorCode}"
+        };
+        
+        return $friendlyMessage;
+      }
+      
+      // Check for specific error patterns in message
+      if ($errorMessage) {
+        if (str_contains($errorMessage, 'file size')) {
+          return 'El video supera el límite de tamaño de TikTok (4GB máximo).';
+        }
+        if (str_contains($errorMessage, 'duration')) {
+          return 'La duración del video no cumple con los requisitos de TikTok (3 segundos a 10 minutos).';
+        }
+        if (str_contains($errorMessage, 'format') || str_contains($errorMessage, 'codec')) {
+          return 'El formato o códec del video no es compatible con TikTok. Usa MP4 con H.264.';
+        }
+        if (str_contains($errorMessage, 'quota') || str_contains($errorMessage, 'limit')) {
+          return 'Has alcanzado tu límite de publicaciones en TikTok. Intenta más tarde.';
+        }
+        
+        return $errorMessage;
+      }
+      
+      return $e->getMessage();
+    } catch (\Exception $parseError) {
+      return $e->getMessage();
+    }
+  }
+
+  /**
+   * Check if content still exists on TikTok
+   *
+   * @param string $postId TikTok video ID
+   * @return array ['exists' => bool, 'reason' => string|null, 'metrics' => array|null]
+   */
+  public function checkContentStatus(string $postId): array
+  {
+    try {
+      $this->ensureValidToken();
+
+      // TikTok uses publish_id for status checks
+      $statusData = $this->checkVideoStatus($postId);
+
+      if (isset($statusData['status']) && $statusData['status'] === 'PUBLISH_COMPLETE') {
+        return [
+          'exists' => true,
+          'metrics' => $statusData['metrics'] ?? null,
+        ];
+      }
+
+      if (isset($statusData['status']) && in_array($statusData['status'], ['FAILED', 'DELETED'])) {
+        return [
+          'exists' => false,
+          'reason' => 'Video ' . strtolower($statusData['status']) . ' on TikTok',
+        ];
+      }
+
+      return [
+        'exists' => false,
+        'reason' => 'Video not found on TikTok',
+      ];
+    } catch (\Exception $e) {
+      Log::error('TikTok checkContentStatus failed', [
+        'post_id' => $postId,
+        'error' => $e->getMessage()
+      ]);
+
+      return [
+        'exists' => false,
+        'reason' => 'Error checking video status: ' . $e->getMessage(),
+      ];
+    }
+  }
 }
+

@@ -1,8 +1,8 @@
-import defaultTheme from 'tailwindcss/defaultTheme.js';
-import forms from '@tailwindcss/forms';
 import { addDynamicIconSelectors } from "@iconify/tailwind";
-import customTheme, { enhancedTheme } from './resources/js/theme.ts';
+import forms from '@tailwindcss/forms';
+import defaultTheme from 'tailwindcss/defaultTheme.js';
 import plugin from 'tailwindcss/plugin.js';
+import customTheme, { enhancedTheme } from './resources/js/theme.ts';
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -118,6 +118,7 @@ export default {
       
       keyframes: {
         shimmer: {
+          '0%': { transform: 'translateX(-100%)' },
           '100%': { transform: 'translateX(100%)' },
         },
         'fade-in': {
@@ -135,7 +136,7 @@ export default {
       },
       
       animation: {
-        shimmer: 'shimmer 2s infinite',
+        shimmer: 'shimmer 1.4s infinite',
         'fade-in': 'fade-in 0.25s ease-in-out',
         'slide-in': 'slide-in 0.25s ease-in-out',
         'scale-in': 'scale-in 0.25s ease-in-out',

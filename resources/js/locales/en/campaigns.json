@@ -4,6 +4,8 @@
     "subtitle": "Analyze the impact and performance of your campaigns and publications.",
     "noPublications": "No associated publications",
     "scheduledPosts": "Scheduled Posts",
+    "inCampaigns": "In {{count}} campaign",
+    "inCampaigns_plural": "In {{count}} campaigns",
     "create": "Create Campaign",
     "table": {
       "name": "Name",

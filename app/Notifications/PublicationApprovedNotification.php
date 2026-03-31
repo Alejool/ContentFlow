@@ -17,7 +17,7 @@ class PublicationApprovedNotification extends BaseNotification
 
     public function via($notifiable): array
     {
-        return ['database', 'broadcast', 'mail'];
+        return ['database', 'broadcast'];
     }
 
     public function toMail($notifiable)

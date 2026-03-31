@@ -1,5 +1,5 @@
-import React from "react";
-import Skeleton from "@/Components/common/ui/Skeleton";
+import React from 'react';
+import Skeleton from '@/Components/common/ui/Skeleton';
 
 interface FormSkeletonProps {
   fields?: number;
@@ -15,7 +15,7 @@ const FormSkeleton = ({ fields = 4, hasSubmitButton = true }: FormSkeletonProps)
           <Skeleton className="h-10 w-full rounded-lg" />
         </div>
       ))}
-      
+
       {hasSubmitButton && (
         <div className="flex justify-end pt-4">
           <Skeleton className="h-10 w-32 rounded-lg" />

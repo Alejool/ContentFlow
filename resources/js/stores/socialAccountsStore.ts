@@ -1,6 +1,6 @@
-import { SocialAccount } from "@/types/SocialAccount";
-import axios from "axios";
-import { create } from "zustand";
+import { SocialAccount } from '@/types/SocialAccount';
+import axios from 'axios';
+import { create } from 'zustand';
 
 interface AccountsStore {
   accounts: SocialAccount[];
@@ -73,7 +73,7 @@ export const useAccountsStore = create<AccountsStore>((set) => ({
   fetchAccounts: async () => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.get("/api/v1/social-accounts");
+      const response = await axios.get('/api/v1/social-accounts');
       const accounts = response.data.accounts || [];
 
       const processedAccounts = accounts.map((acc: SocialAccount) => ({
@@ -87,11 +87,10 @@ export const useAccountsStore = create<AccountsStore>((set) => ({
         lastUpdated: new Date(),
       });
       return processedAccounts;
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as import('axios').AxiosError<{ message?: string }>;
       const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "Failed to fetch accounts";
+        axiosError.response?.data?.message || axiosError.message || 'Failed to fetch accounts';
       set({
         error: errorMessage,
         isLoading: false,

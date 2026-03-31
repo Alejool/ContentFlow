@@ -1,7 +1,7 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { usePage } from "@inertiajs/react";
-import axios from "axios";
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { usePage } from '@inertiajs/react';
+import axios from 'axios';
 
 export const useUpdate = (schema) => {
   const user = usePage().props.auth.user;
@@ -15,19 +15,19 @@ export const useUpdate = (schema) => {
   } = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
-      name: user?.name || "",
-      email: user?.email || "",
+      name: user?.name || '',
+      email: user?.email || '',
     },
   });
 
   const watchedValues = {
-    name: watch("name"),
-    email: watch("email"),
+    name: watch('name'),
+    email: watch('email'),
   };
 
   const submitHandler = async (data) => {
     try {
-      const response = await axios.patch(route("profile.update"), data);
+      const response = await axios.patch(route('profile.update'), data);
       return response.data;
     } catch (error) {
       if (error.response?.data?.errors) {

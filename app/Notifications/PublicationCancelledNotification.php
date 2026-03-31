@@ -67,7 +67,7 @@ class PublicationCancelledNotification extends BaseNotification
     
     $description = "⚠️ Publicación cancelada: \"{$this->publication->title}\"\n\n";
     $description .= "📊 Estado: Cancelado\n\n";
-    $description .= "💡 La publicación fue cancelada por el usuario.\n";
+    $description .= " La publicación fue cancelada por el usuario.\n";
     $description .= "Los trabajos en cola han sido detenidos.";
 
     return [

@@ -1,0 +1,59 @@
+# docker-compose.override.yml.example
+# 
+# Este archivo es un template para configuración de desarrollo local.
+# Copia este archivo a docker-compose.override.yml y personaliza según tus necesidades.
+# 
+# IMPORTANTE: docker-compose.override.yml NO debe commitearse (ya está en .gitignore)
+# 
+# Uso:
+#   cp docker-compose.override.yml.example docker-compose.override.yml
+#   docker-compose up -d
+# 
+# Docker Compose automáticamente fusiona docker-compose.yml con docker-compose.override.yml
+
+services:
+  # Configuración de desarrollo para app
+  app:
+    environment:
+      - APP_DEBUG=true
+      - LOG_LEVEL=debug
+      - TELESCOPE_ENABLED=true
+    volumes:
+      # cached mejora performance en Mac/Windows
+      - ./:/var/www/html:cached
+
+  # Configuración de desarrollo para vite
+  vite:
+    # En desarrollo, asegurar que siempre use el puerto correcto
+    environment:
+      - VITE_HMR_HOST=localhost
+      - NODE_ENV=development
+
+  # MailHog para testing de emails en desarrollo
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: contentflow_mailhog_dev
+    ports:
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # Web UI
+    networks:
+      - laravel
+
+  # Adminer para gestión de base de datos (alternativa ligera a pgAdmin)
+  adminer:
+    image: adminer:latest
+    container_name: contentflow_adminer_dev
+    restart: unless-stopped
+    ports:
+      - "8083:8080"
+    environment:
+      - ADMINER_DEFAULT_SERVER=pgsql
+    networks:
+      - laravel
+
+# Volúmenes específicos para desarrollo (opcional)
+# volumes:
+#   pgsql_data:
+#     name: contentflow_pgsql_data_dev
+#   redis_data:
+#     name: contentflow_redis_data_dev

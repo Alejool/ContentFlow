@@ -2,12 +2,13 @@
 
 namespace App\Services\SocialPlatforms;
 
-use Illuminate\Support\Facades\Log;
+use App\Helpers\LogHelper;
 use GuzzleHttp\Exception\ClientException;
 use League\OAuth1\Client\Server\Twitter;
 use League\OAuth1\Client\Credentials\TokenCredentials;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 use App\DTOs\SocialPostDTO;
 use App\DTOs\PostResultDTO;
@@ -18,11 +19,54 @@ class TwitterService extends BaseSocialService
   public function publish(SocialPostDTO $post): PostResultDTO
   {
     $this->ensureValidToken();
-    $mediaIds = [];
+    
+    // Validación preventiva: verificar si hay video y si la cuenta tiene OAuth 1.0a
     $rawPath = $post->mediaPaths[0] ?? null;
+    if ($rawPath) {
+      $resolvedUrl = $this->resolveUrl($rawPath);
+      $extension = strtolower(pathinfo(parse_url($resolvedUrl, PHP_URL_PATH), PATHINFO_EXTENSION));
+      $videoExtensions = ['mp4', 'mov', 'avi', 'mkv', 'webm', 'flv', 'wmv', 'm4v'];
+      
+      LogHelper::social('twitter.preventive_validation', [
+        'raw_path' => $rawPath,
+        'resolved_url' => $resolvedUrl,
+        'detected_extension' => $extension,
+        'is_video' => in_array($extension, $videoExtensions),
+        'video_extensions' => $videoExtensions
+      ]);
+      
+      if (in_array($extension, $videoExtensions)) {
+        // Es un video, verificar OAuth 1.0a
+        $accountInfo = $this->getAccountInfoFromDb();
+        $hasOAuth1 = isset($accountInfo['account_metadata']['oauth1_token']) 
+                     && isset($accountInfo['account_metadata']['secret']);
+        
+        if (!$hasOAuth1) {
+          LogHelper::socialError('twitter.video_blocked_no_oauth1', 'Video upload blocked - missing OAuth 1.0a', [
+            'account_id' => $this->socialAccount?->id,
+            'account_name' => $this->socialAccount?->account_name,
+            'detected_extension' => $extension
+          ]);
+          
+          return PostResultDTO::failure(
+            'Esta cuenta de Twitter no puede subir videos porque le faltan credenciales OAuth 1.0a. ' .
+            'Por favor, desconecta y vuelve a conectar esta cuenta desde la configuración de tu workspace para habilitar la subida de videos.'
+          );
+        }
+      }
+    }
+    
+    $mediaIds = [];
+    
+    // Check if this is a carousel (multiple images)
+    $platformSettings = $post->platformSettings['twitter'] ?? [];
+    $isCarousel = ($platformSettings['type'] ?? '') === 'carousel' && count($post->mediaPaths) > 1;
 
     try {
-      if ($rawPath) {
+      // Process ALL media files for carousel, or just the first one for single media
+      $mediaPaths = $isCarousel ? $post->mediaPaths : (empty($post->mediaPaths) ? [] : [$post->mediaPaths[0]]);
+      
+      foreach ($mediaPaths as $index => $rawPath) {
         $resolvedUrl = $this->resolveUrl($rawPath);
         $mediaPath = $this->downloadMedia($resolvedUrl);
 
@@ -30,6 +74,14 @@ class TwitterService extends BaseSocialService
           $mimeType = mime_content_type($mediaPath);
           $mediaCategory = $this->getMediaCategory($mimeType);
           $fileSize = filesize($mediaPath);
+
+          LogHelper::social('twitter.media_analysis', [
+            'index' => $index + 1,
+            'mime_type' => $mimeType,
+            'category' => $mediaCategory,
+            'file_size_mb' => round($fileSize / 1024 / 1024, 2),
+            'will_use_large_upload' => ($mediaCategory === 'tweet_video' || $fileSize > 5 * 1024 * 1024)
+          ]);
 
           if ($mediaCategory === 'tweet_video' || $fileSize > 5 * 1024 * 1024) {
             $mediaId = $this->uploadLargeMediaV2($mediaPath, $mimeType, $mediaCategory);
@@ -40,13 +92,18 @@ class TwitterService extends BaseSocialService
             $mediaId = $this->uploadMediaV2($mediaPath, $mediaCategory);
           }
           $mediaIds[] = $mediaId;
+          
+          LogHelper::social('twitter.media_uploaded', [
+            'index' => $index + 1,
+            'total' => count($mediaPaths),
+            'media_id' => $mediaId
+          ]);
         } finally {
           if (file_exists($mediaPath)) unlink($mediaPath);
         }
       }
 
       $content = $post->content;
-      $platformSettings = $post->platformSettings['twitter'] ?? [];
       $isPoll = ($platformSettings['type'] ?? '') === 'poll';
 
       if ($isPoll) {
@@ -77,11 +134,18 @@ class TwitterService extends BaseSocialService
   {
     $pollOptions = array_filter($settings['poll_options'] ?? [], fn($opt) => !empty(trim($opt)));
     if (count($pollOptions) >= 2) {
+      // Handle both minutes (legacy) and hours (new format)
+      $durationHours = $settings['poll_duration_hours'] ?? ($settings['poll_duration'] ?? 1440) / 60;
+      $durationMinutes = (int)($durationHours * 60);
+      
+      // Twitter API limits: 5 minutes to 10080 minutes (7 days)
+      $durationMinutes = max(5, min(10080, $durationMinutes));
+      
       $tweetData = [
         'text' => $content,
         'poll' => [
           'options' => array_values($pollOptions),
-          'duration_minutes' => (int)($settings['poll_duration'] ?? 1440)
+          'duration_minutes' => $durationMinutes
         ]
       ];
       $result = $this->sendTweetWithRetry($tweetData);
@@ -215,12 +279,110 @@ class TwitterService extends BaseSocialService
     try {
       return $this->sendTweet($tweetData);
     } catch (ClientException $e) {
-      if ($e->getResponse()->getStatusCode() === 401) {
-        Log::info('Twitter token expired during sendTweet, refreshing...', ['account_id' => $this->socialAccount?->id]);
+      $statusCode = $e->getResponse()->getStatusCode();
+      
+      if ($statusCode === 401) {
+        LogHelper::social('twitter.token_expired_refreshing', ['account_id' => $this->socialAccount?->id]);
         $this->refreshToken();
         return $this->sendTweet($tweetData);
       }
-      throw $e;
+      
+      // Extract user-friendly error message from Twitter API response
+      $errorMessage = $this->extractTwitterErrorMessage($e);
+      throw new \Exception($errorMessage);
+    }
+  }
+  
+  private function extractTwitterErrorMessage(ClientException $e): string
+  {
+    try {
+      $statusCode = $e->getResponse()->getStatusCode();
+      $responseBody = $e->getResponse()->getBody()->getContents();
+      $errorData = json_decode($responseBody, true);
+      
+      // Handle 403 Forbidden specifically
+      if ($statusCode === 403) {
+        // Check for API credits error (Twitter Developer Portal issue)
+        $errorMessage = $errorData['error']['message'] ?? $errorData['errors'][0]['message'] ?? $errorData['detail'] ?? '';
+        if (str_contains($errorMessage, 'enrolled account does not have any credits') || 
+            str_contains($errorMessage, 'does not have any credits')) {
+          return 'Tu cuenta de desarrollador de Twitter no tiene créditos API disponibles. ' .
+                 'Twitter requiere un plan de pago (Basic $100/mes o superior) para subir videos. ' .
+                 'Visita https://developer.twitter.com/en/portal/products para actualizar tu plan, ' .
+                 'o publica solo texto e imágenes que no requieren créditos adicionales.';
+        }
+        
+        // Check if it's a video upload issue
+        if (str_contains($e->getRequest()->getUri()->getPath(), 'media/upload')) {
+          return 'Esta cuenta de Twitter no puede subir videos porque le faltan credenciales OAuth 1.0a. Por favor, desconecta y vuelve a conectar esta cuenta desde la configuración de tu workspace para habilitar la subida de videos.';
+        }
+        
+        // Check for specific 403 error messages
+        if ($errorMessage) {
+          if (str_contains($errorMessage, 'not authorized') || str_contains($errorMessage, 'forbidden')) {
+            return 'No tienes permisos para realizar esta acción en Twitter. Reconecta tu cuenta desde la configuración.';
+          }
+        }
+        
+        return 'Acceso denegado por Twitter. Verifica los permisos de tu cuenta y reconéctala desde la configuración.';
+      }
+      
+      // Twitter API v2 error format
+      if (isset($errorData['detail'])) {
+        $detail = $errorData['detail'];
+        
+        // Check for API credits error in detail field
+        if (str_contains($detail, 'enrolled account does not have any credits') || 
+            str_contains($detail, 'does not have any credits')) {
+          return 'Tu cuenta de desarrollador de Twitter no tiene créditos API disponibles. ' .
+                 'Twitter requiere un plan de pago (Basic $100/mes o superior) para subir videos. ' .
+                 'Visita https://developer.twitter.com/en/portal/products para actualizar tu plan, ' .
+                 'o publica solo texto e imágenes que no requieren créditos adicionales.';
+        }
+        
+        // Map common Twitter errors to user-friendly messages
+        if (str_contains($detail, 'not allowed to post a video longer than')) {
+          return 'Tu cuenta de Twitter no permite publicar videos de más de 2 minutos. Necesitas Twitter Blue o verificación para videos largos.';
+        }
+        
+        if (str_contains($detail, 'media size')) {
+          return 'El video es demasiado grande para Twitter. Tamaño máximo: 512 MB.';
+        }
+        
+        if (str_contains($detail, 'suspended')) {
+          return 'Tu cuenta de Twitter está suspendida. Contacta con el soporte de Twitter.';
+        }
+        
+        if (str_contains($detail, 'rate limit')) {
+          return 'Has excedido el límite de publicaciones de Twitter. Intenta más tarde.';
+        }
+        
+        // Return the original detail if no specific mapping
+        return $detail;
+      }
+      
+      // Twitter API v1.1 error format
+      if (isset($errorData['errors']) && is_array($errorData['errors'])) {
+        $errors = array_map(fn($err) => $err['message'] ?? 'Error desconocido', $errorData['errors']);
+        $errorString = implode('. ', $errors);
+        
+        // Check for credits error in v1.1 format
+        if (str_contains($errorString, 'enrolled account does not have any credits') || 
+            str_contains($errorString, 'does not have any credits')) {
+          return 'Tu cuenta de desarrollador de Twitter no tiene créditos API disponibles. ' .
+                 'Twitter requiere un plan de pago (Basic $100/mes o superior) para subir videos. ' .
+                 'Visita https://developer.twitter.com/en/portal/products para actualizar tu plan, ' .
+                 'o publica solo texto e imágenes que no requieren créditos adicionales.';
+        }
+        
+        return $errorString;
+      }
+      
+      // Fallback to original exception message
+      return $e->getMessage();
+    } catch (\Exception $parseError) {
+      // If we can't parse the error, return the original exception message
+      return $e->getMessage();
     }
   }
 
@@ -261,7 +423,7 @@ class TwitterService extends BaseSocialService
     $oauthToken = $accountInfo['account_metadata']['oauth1_token'] ?? null;
     $oauthSecret = $accountInfo['account_metadata']['secret'] ?? null;
 
-    Log::info('TwitterService Debug: Checking V1 Creds', [
+    LogHelper::social('twitter.v1_creds_check', [
       'has_token' => !empty($oauthToken),
       'has_secret' => !empty($oauthSecret),
       'token_preview' => substr($oauthToken ?? '', 0, 5) . '...',
@@ -330,41 +492,52 @@ class TwitterService extends BaseSocialService
           throw new \Exception('Twitter V1 Error Raw: ' . $body);
         } catch (\Throwable $e) {
           $lastException = $e;
-          Log::warning('Twitter V1 upload attempt ' . ($attempts + 1) . ' failed: ' . $e->getMessage());
+          LogHelper::social('twitter.v1_upload_retry', ['attempt' => ($attempts + 1), 'error' => $e->getMessage()]);
           $attempts++;
           sleep(2);
         }
       }
 
+      // Extract friendly error message before throwing
+      if ($lastException instanceof ClientException) {
+        $friendlyError = $this->extractTwitterErrorMessage($lastException);
+        throw new \Exception($friendlyError);
+      }
+      
       $finalError = $lastException ? $lastException->getMessage() : 'Unknown V1 Error';
-      throw new \Exception("Twitter Auth V1 Failed. Please reconnect your account. Details: " . $finalError);
+      throw new \Exception("No se pudo subir el archivo a Twitter. Por favor, reconecta tu cuenta desde la configuración. Detalles: " . $finalError);
     }
 
     // Fallback: Use OAuth 2.0 Bearer Token (Existing Logic)
     // Note: This often fails for media on some endpoints but we keep as fallback
-    $response = $this->client->post('https://upload.twitter.com/1.1/media/upload.json', [
-      'headers' => [
-        'Authorization' => "Bearer {$this->accessToken}",
-      ],
-      'multipart' => [
-        [
-          'name' => 'media',
-          'contents' => fopen($mediaPath, 'r'),
+    try {
+      $response = $this->client->post('https://upload.twitter.com/1.1/media/upload.json', [
+        'headers' => [
+          'Authorization' => "Bearer {$this->accessToken}",
         ],
-        [
-          'name' => 'media_category',
-          'contents' => $mediaCategory,
+        'multipart' => [
+          [
+            'name' => 'media',
+            'contents' => fopen($mediaPath, 'r'),
+          ],
+          [
+            'name' => 'media_category',
+            'contents' => $mediaCategory,
+          ],
         ],
-      ],
-    ]);
+      ]);
+    } catch (ClientException $e) {
+      $friendlyError = $this->extractTwitterErrorMessage($e);
+      throw new \Exception($friendlyError);
+    }
 
-    Log::info('Twitter v2 Media Upload Response', ['body' => (string)$response->getBody()]);
+    LogHelper::api('twitter.v2_media_upload_response', ['body' => (string)$response->getBody()]);
 
     $result = json_decode($response->getBody(), true);
 
     if (!isset($result['media_id_string'])) {
       $errorMsg = $result['error'] ?? json_encode($result);
-      throw new \Exception('Media upload failed: ' . $errorMsg);
+      throw new \Exception('No se pudo subir el archivo a Twitter: ' . $errorMsg);
     }
 
     return $result['media_id_string'];
@@ -375,11 +548,14 @@ class TwitterService extends BaseSocialService
    */
   private function getAccountInfoFromDb(): array
   {
-    // Ideally we should pass the full account model to the service,
-    // but for now we query or assume we have it.
-    // Since BaseSocialService usually doesn't store the full model, we need to fetch it
-    // using the access token or just hope it was passed.
-    // Assuming we need to fetch the account that owns this access token.
+    // Use the socialAccount property from BaseSocialService if available
+    if ($this->socialAccount) {
+      // Refresh from database to get latest data
+      $this->socialAccount->refresh();
+      return $this->socialAccount->toArray();
+    }
+    
+    // Fallback: query by access token
     $account = SocialAccount::where('access_token', $this->accessToken)->first();
     return $account ? $account->toArray() : [];
   }
@@ -394,15 +570,25 @@ class TwitterService extends BaseSocialService
   {
     $fileSize = filesize($mediaPath);
     
-    Log::info('Twitter large media upload starting', [
+    LogHelper::social('twitter.large_media_upload_starting', [
       'file_size_mb' => round($fileSize / 1024 / 1024, 2),
-      'category' => $category
+      'category' => $category,
+      'has_social_account' => $this->socialAccount !== null,
+      'social_account_id' => $this->socialAccount?->id
     ]);
     
     // Check for OAuth 1.0a credentials in metadata
     $accountInfo = $this->getAccountInfoFromDb();
     $oauthToken = $accountInfo['account_metadata']['oauth1_token'] ?? null;
     $oauthSecret = $accountInfo['account_metadata']['secret'] ?? null;
+
+    LogHelper::social('twitter.oauth_credentials_check', [
+      'has_account_info' => !empty($accountInfo),
+      'has_metadata' => isset($accountInfo['account_metadata']),
+      'has_oauth1_token' => !empty($oauthToken),
+      'has_secret' => !empty($oauthSecret),
+      'account_id' => $accountInfo['id'] ?? null
+    ]);
 
     if ($oauthToken && $oauthSecret) {
       // Use League\OAuth1 + Guzzle for manual Chunked Upload
@@ -448,7 +634,7 @@ class TwitterService extends BaseSocialService
         if (!isset($initData['media_id_string'])) throw new \Exception('V1 INIT Failed: ' . ($initData['error'] ?? json_encode($initData)));
         $mediaId = $initData['media_id_string'];
         
-        Log::info('Twitter upload initialized', ['media_id' => $mediaId]);
+        LogHelper::social('twitter.upload_initialized', ['media_id' => $mediaId]);
 
         $chunkSize = 2 * 1024 * 1024;
         $handle = fopen($mediaPath, 'rb');
@@ -475,7 +661,7 @@ class TwitterService extends BaseSocialService
           $progress = round(($uploadedBytes / $fileSize) * 100, 1);
           
           if ($segmentIndex % 5 == 0) { // Log cada 5 chunks
-            Log::info('Twitter upload progress', [
+            LogHelper::social('twitter.upload_progress', [
               'progress' => "{$progress}%",
               'uploaded_mb' => round($uploadedBytes / 1024 / 1024, 2)
             ]);
@@ -485,7 +671,7 @@ class TwitterService extends BaseSocialService
         }
         fclose($handle);
         
-        Log::info('Twitter upload chunks completed', ['segments' => $segmentIndex]);
+        LogHelper::social('twitter.upload_chunks_completed', ['segments' => $segmentIndex]);
 
         $finHeaders = $server->getHeaders($tokenCredentials, 'POST', $uploadUrl, [
           'command' => 'FINALIZE',
@@ -498,29 +684,65 @@ class TwitterService extends BaseSocialService
         $finData = json_decode($finResponse->getBody(), true);
 
         if (isset($finData['media_id_string'])) {
-          Log::info('Twitter upload completed', ['media_id' => $finData['media_id_string']]);
+          LogHelper::social('twitter.upload_completed', ['media_id' => $finData['media_id_string']]);
           return $finData['media_id_string'];
         }
         throw new \Exception('V1 FINALIZE Failed: ' . json_encode($finData));
       } catch (\Throwable $e) {
-        Log::error('Twitter V1 Chunked Upload Failed', ['error' => $e->getMessage()]);
+        LogHelper::socialError('twitter.v1_chunked_upload_failed', $e->getMessage(), ['error' => $e->getMessage()]);
+        
+        // Extract friendly error message if it's a ClientException
+        if ($e instanceof ClientException) {
+          $friendlyError = $this->extractTwitterErrorMessage($e);
+          throw new \Exception($friendlyError);
+        }
+        
         throw new \Exception("Twitter Auth V1 Video Upload Failed. Details: " . $e->getMessage());
       }
     }
 
-    // OAuth 2.0 flow
-    $initResponse = $this->client->post('https://upload.twitter.com/1.1/media/upload.json', [
-      'headers' => [
-        'Authorization' => "Bearer {$this->accessToken}",
-      ],
-      'form_params' => [
-        'command' => 'INIT',
-        'total_bytes' => $fileSize,
-        'media_type' => $mimeType,
-        'media_category' => $category,
-      ],
-      'timeout' => 60
-    ]);
+    // OAuth 2.0 flow - Note: Twitter API v1.1 media upload requires OAuth 1.0a for videos
+    if ($category === 'tweet_video') {
+      LogHelper::socialError('twitter.video_upload_requires_oauth1', 'Account missing OAuth 1.0a credentials', [
+        'account_id' => $this->socialAccount?->id,
+        'account_name' => $this->socialAccount?->account_name,
+        'has_oauth2' => !empty($this->accessToken)
+      ]);
+      
+      throw new \Exception(
+        'Esta cuenta de Twitter no puede subir videos porque le faltan credenciales OAuth 1.0a. ' .
+        'Por favor, desconecta y vuelve a conectar esta cuenta desde la configuración de tu workspace para habilitar la subida de videos.'
+      );
+    }
+    
+    try {
+      $initResponse = $this->client->post('https://upload.twitter.com/1.1/media/upload.json', [
+        'headers' => [
+          'Authorization' => "Bearer {$this->accessToken}",
+        ],
+        'form_params' => [
+          'command' => 'INIT',
+          'total_bytes' => $fileSize,
+          'media_type' => $mimeType,
+          'media_category' => $category,
+        ],
+        'timeout' => 60
+      ]);
+    } catch (ClientException $e) {
+      if ($e->getResponse()->getStatusCode() === 403) {
+        LogHelper::socialError('twitter.video_upload_403', 'Twitter API 403 Forbidden', [
+          'account_id' => $this->socialAccount?->id,
+          'status_code' => 403
+        ]);
+        
+        throw new \Exception(
+          'Twitter rechazó la subida del video (403 Forbidden). ' .
+          'Los videos requieren autenticación OAuth 1.0a. ' .
+          'Por favor, desconecta y vuelve a conectar esta cuenta desde la configuración de tu workspace.'
+        );
+      }
+      throw $e;
+    }
 
     $initData = json_decode($initResponse->getBody(), true);
 
@@ -530,7 +752,7 @@ class TwitterService extends BaseSocialService
     }
 
     $mediaId = $initData['media_id_string'];
-    Log::info('Twitter upload initialized (OAuth2)', ['media_id' => $mediaId]);
+    LogHelper::social('twitter.upload_initialized_oauth2', ['media_id' => $mediaId]);
     
     $chunkSize = 2 * 1024 * 1024;
     $handle = fopen($mediaPath, 'rb');
@@ -559,7 +781,7 @@ class TwitterService extends BaseSocialService
         $progress = round(($uploadedBytes / $fileSize) * 100, 1);
         
         if ($segmentIndex % 5 == 0) {
-          Log::info('Twitter upload progress', [
+          LogHelper::social('twitter.upload_progress', [
             'progress' => "{$progress}%",
             'uploaded_mb' => round($uploadedBytes / 1024 / 1024, 2)
           ]);
@@ -573,7 +795,7 @@ class TwitterService extends BaseSocialService
       }
     }
     
-    Log::info('Twitter upload chunks completed', ['segments' => $segmentIndex]);
+    LogHelper::social('twitter.upload_chunks_completed', ['segments' => $segmentIndex]);
 
     $finalizeResponse = $this->client->post('https://upload.twitter.com/1.1/media/upload.json', [
       'headers' => [
@@ -593,7 +815,7 @@ class TwitterService extends BaseSocialService
       throw new \Exception('FINALIZE failed: ' . $errorMsg);
     }
 
-    Log::info('Twitter upload completed', ['media_id' => $finalizeData['media_id_string']]);
+    LogHelper::social('twitter.upload_completed', ['media_id' => $finalizeData['media_id_string']]);
     return $finalizeData['media_id_string'];
   }
 
@@ -724,7 +946,7 @@ class TwitterService extends BaseSocialService
       ]);
       
       $fileSizeMB = round(filesize($tempFile) / 1024 / 1024, 2);
-      Log::info('Twitter media downloaded', ['size_mb' => $fileSizeMB]);
+      LogHelper::social('twitter.media_downloaded', ['size_mb' => $fileSizeMB]);
       
       return $tempFile;
     } catch (\Exception $e) {
@@ -732,7 +954,7 @@ class TwitterService extends BaseSocialService
         @unlink($tempFile);
       }
       
-      Log::error('Twitter media download failed', [
+      LogHelper::socialError('twitter.media_download_failed', $e->getMessage(), [
         'url' => $url,
         'error' => $e->getMessage()
       ]);
@@ -810,7 +1032,7 @@ class TwitterService extends BaseSocialService
         ];
       }
     } catch (\Exception $e) {
-      Log::warning('Twitter analytics error', ['post_id' => $postId, 'error' => $e->getMessage()]);
+      LogHelper::social('twitter.analytics_error', ['post_id' => $postId, 'error' => $e->getMessage()]);
     }
 
     return [
@@ -837,7 +1059,7 @@ class TwitterService extends BaseSocialService
       ]);
       return true;
     } catch (\Exception $e) {
-      Log::error('Twitter validateCredentials failed', ['error' => $e->getMessage()]);
+      LogHelper::socialError('twitter.validate_credentials_failed', $e->getMessage(), ['error' => $e->getMessage()]);
       return false;
     }
   }
@@ -864,11 +1086,11 @@ class TwitterService extends BaseSocialService
         try {
           $response = $request();
         } catch (\Exception $retryError) {
-          Log::error('Twitter deletePost retry failed', ['post_id' => $postId, 'error' => $retryError->getMessage()]);
+          LogHelper::socialError('twitter.delete_post_retry_failed', $retryError->getMessage(), ['post_id' => $postId, 'error' => $retryError->getMessage()]);
           return false;
         }
       } else {
-        Log::error('Twitter deletePost error', ['post_id' => $postId, 'error' => $e->getMessage()]);
+        LogHelper::socialError('twitter.delete_post_error', $e->getMessage(), ['post_id' => $postId, 'error' => $e->getMessage()]);
         return false;
       }
     }
@@ -891,11 +1113,76 @@ class TwitterService extends BaseSocialService
     // Twitter API v2 doesn't provide easy access to replies without elevated access
     // Would need to search for tweets mentioning the original tweet
     // For now, return empty array - can be implemented with elevated API access
-    Log::info('Twitter getPostComments called but not fully implemented', [
+    LogHelper::social('twitter.get_post_comments_not_implemented', [
       'postId' => $postId,
       'note' => 'Requires elevated API access for reply search'
     ]);
 
     return [];
   }
+
+  /**
+   * Check if content still exists on Twitter/X
+   *
+   * @param string $postId Twitter tweet ID
+   * @return array ['exists' => bool, 'reason' => string|null, 'metrics' => array|null]
+   */
+  public function checkContentStatus(string $postId): array
+  {
+    try {
+      $this->ensureValidToken();
+
+      $response = $this->client->get("https://api.twitter.com/2/tweets/{$postId}", [
+        'headers' => [
+          'Authorization' => "Bearer {$this->accessToken}",
+        ],
+        'query' => [
+          'tweet.fields' => 'public_metrics,created_at',
+        ],
+      ]);
+
+      $data = json_decode($response->getBody(), true);
+
+      if (isset($data['data']['id'])) {
+        $metrics = $data['data']['public_metrics'] ?? [];
+
+        return [
+          'exists' => true,
+          'metrics' => [
+            'likes' => $metrics['like_count'] ?? 0,
+            'retweets' => $metrics['retweet_count'] ?? 0,
+            'replies' => $metrics['reply_count'] ?? 0,
+            'views' => $metrics['impression_count'] ?? 0,
+          ],
+        ];
+      }
+
+      return [
+        'exists' => false,
+        'reason' => 'Tweet not found on Twitter/X',
+      ];
+    } catch (ClientException $e) {
+      $statusCode = $e->getResponse()->getStatusCode();
+
+      if ($statusCode === 404) {
+        return [
+          'exists' => false,
+          'reason' => 'Tweet deleted or no longer accessible',
+        ];
+      }
+
+      throw $e;
+    } catch (\Exception $e) {
+      Log::error('Twitter checkContentStatus failed', [
+        'post_id' => $postId,
+        'error' => $e->getMessage()
+      ]);
+
+      return [
+        'exists' => false,
+        'reason' => 'Error checking tweet status: ' . $e->getMessage(),
+      ];
+    }
+  }
 }
+

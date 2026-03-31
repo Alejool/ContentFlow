@@ -3,6 +3,7 @@
 namespace App\Services\SocialPlatforms;
 
 use GuzzleHttp\Exception\ClientException;
+use App\Helpers\LogHelper;
 use Illuminate\Support\Facades\Log;
 
 use App\DTOs\SocialPostDTO;
@@ -23,11 +24,68 @@ class FacebookService extends BaseSocialService
     $rawPath = $post->mediaPaths[0] ?? null;
 
     try {
+      // Check platform settings for content type
+      $platformSettings = $post->platformSettings['facebook'] ?? [];
+      $contentType = $platformSettings['type'] ?? 'post';
+      
+      // Check if this is a poll
+      $isPoll = $contentType === 'poll';
+
+      if ($isPoll) {
+        $pollResult = $this->handlePoll($pageId, $content, $platformSettings);
+        if ($pollResult) {
+          return PostResultDTO::success(
+            postId: $pollResult,
+            postUrl: "https://facebook.com/{$pollResult}",
+            rawData: ['platform' => 'facebook', 'type' => 'poll']
+          );
+        }
+      }
+
+      // Check if this is a story
+      $isStory = $contentType === 'story';
+      
+      if ($isStory) {
+        $storyResult = $this->handleStoryUpload($pageId, $rawPath, $content);
+        if ($storyResult) {
+          // Result format: "postId|url"
+          $parts = explode('|', $storyResult, 2);
+          $postId = $parts[0];
+          $storyUrl = $parts[1] ?? "https://facebook.com/{$pageId}";
+          
+          return PostResultDTO::success(
+            postId: $postId,
+            postUrl: $storyUrl,
+            rawData: ['platform' => 'facebook', 'type' => 'story']
+          );
+        }
+      }
+
+      // Check if this is a reel
+      $isReel = $contentType === 'reel';
+      
+      // Check if this is a carousel
+      $isCarousel = $contentType === 'carousel' && count($mediaFiles) > 1;
+
+      if ($isCarousel) {
+        // Handle carousel with multiple images
+        $postId = $this->uploadCarousel($pageId, $mediaFiles, $content);
+        return PostResultDTO::success(
+          postId: $postId,
+          postUrl: "https://facebook.com/{$postId}",
+          rawData: ['platform' => 'facebook', 'type' => 'carousel']
+        );
+      }
+
       if (!empty($rawPath)) {
         $isVideo = str_contains($rawPath, '.mp4') || str_contains($rawPath, '.mov') || str_contains($rawPath, '.avi') || str_contains($rawPath, '.m4v');
 
         if ($isVideo) {
-          $postId = $this->handleVideoUpload($pageId, $rawPath, $content, $post->title);
+          if ($isReel) {
+            $postId = $this->handleReelUpload($pageId, $rawPath, $content, $post->title);
+          } else {
+            $postId = $this->handleVideoUpload($pageId, $rawPath, $content, $post->title);
+          }
         } else {
           $postId = $this->uploadPhoto($pageId, $rawPath, $content);
         }
@@ -35,13 +93,17 @@ class FacebookService extends BaseSocialService
         $postId = $this->publishTextPost($pageId, $content, $link);
       }
 
+      $postType = $isReel ? 'reel' : 'post';
+      $postUrl = $isReel ? "https://facebook.com/reel/{$postId}" : "https://facebook.com/{$postId}";
+
       return PostResultDTO::success(
         postId: $postId,
-        postUrl: "https://facebook.com/{$postId}",
-        rawData: ['platform' => 'facebook']
+        postUrl: $postUrl,
+        rawData: ['platform' => 'facebook', 'type' => $postType]
       );
     } catch (\Exception $e) {
-      return PostResultDTO::failure($e->getMessage(), ['trace' => $e->getTraceAsString()]);
+      $friendlyMessage = $this->extractFacebookErrorMessage($e);
+      return PostResultDTO::failure($friendlyMessage, ['trace' => $e->getTraceAsString()]);
     }
   }
 
@@ -52,15 +114,36 @@ class FacebookService extends BaseSocialService
   {
     $isUrl = str_starts_with($rawPath, 'http://') || str_starts_with($rawPath, 'https://');
     
-    // Si es una URL (S3 u otra), usar upload resumible directamente
+    // Si es una URL (S3 u otra), intentar primero upload directo, luego resumible
     if ($isUrl) {
-      Log::info('Facebook video from URL detected, using resumable upload', [
+      LogHelper::social('facebook.video_from_url_detected', [
         'url' => $rawPath,
         'is_s3' => str_contains($rawPath, 's3.amazonaws.com')
       ]);
       
-      // Siempre usar upload resumible para URLs (más confiable, evita timeouts 504)
-      return $this->uploadVideoFromUrl($pageId, $rawPath, $content, $title);
+      try {
+        // Intentar primero el método directo (más simple y rápido)
+        return $this->uploadVideo($pageId, $rawPath, $content, $title);
+      } catch (\Exception $e) {
+        LogHelper::social('facebook.direct_upload_failed_fallback', [
+          'error' => $e->getMessage(),
+          'url' => $rawPath
+        ]);
+        
+        // Verificar si es un error específico de archivo problemático
+        if (str_contains($e->getMessage(), 'There was a problem uploading your video file')) {
+          LogHelper::social('facebook.problematic_video_file', [
+            'url' => $rawPath,
+            'error' => $e->getMessage()
+          ]);
+          
+          // Aún así, intentar el método resumible una vez más
+          // Pero con información adicional para debugging
+        }
+        
+        // Si falla, usar upload resumible como fallback
+        return $this->uploadVideoFromUrl($pageId, $rawPath, $content, $title);
+      }
     }
     
     // Es un path local
@@ -72,7 +155,7 @@ class FacebookService extends BaseSocialService
     
     $fileSizeMB = filesize($localPath) / 1024 / 1024;
     
-    Log::info('Facebook video upload decision', [
+    LogHelper::social('facebook.video_upload_decision', [
       'file_size_mb' => round($fileSizeMB, 2),
       'use_resumable' => $fileSizeMB > 50,
       'source' => 'local'
@@ -83,10 +166,485 @@ class FacebookService extends BaseSocialService
     if ($fileSizeMB > 50) {
       return $this->uploadVideoResumable($pageId, $localPath, $content, $title);
     } else {
-      // Para archivos pequeños, convertir a URL pública y usar resumible también
+      // Para archivos pequeños, convertir a URL pública y usar método directo
       $publicUrl = $this->getPublicUrl($rawPath);
-      return $this->uploadVideoFromUrl($pageId, $publicUrl, $content, $title);
+      return $this->uploadVideo($pageId, $publicUrl, $content, $title);
     }
+  }
+
+  /**
+   * Handle Facebook Reel upload
+   */
+  private function handleReelUpload(string $pageId, string $rawPath, string $content, ?string $title): string
+  {
+    $isUrl = str_starts_with($rawPath, 'http://') || str_starts_with($rawPath, 'https://');
+    
+    LogHelper::social('facebook.reel_upload_starting', [
+      'pageId' => $pageId,
+      'is_url' => $isUrl,
+      'path' => $rawPath
+    ]);
+    
+    // Facebook Reels use the same upload mechanism as regular videos
+    // but with different endpoint and parameters
+    if ($isUrl) {
+      return $this->uploadReelFromUrl($pageId, $rawPath, $content, $title);
+    }
+    
+    // For local files, convert to public URL and use URL method
+    $localPath = storage_path('app/' . $rawPath);
+    
+    if (!file_exists($localPath)) {
+      throw new \Exception("Reel video file not found: {$localPath}");
+    }
+    
+    $publicUrl = $this->getPublicUrl($rawPath);
+    return $this->uploadReelFromUrl($pageId, $publicUrl, $content, $title);
+  }
+
+  /**
+   * Upload Facebook Reel from URL
+   */
+  private function uploadReelFromUrl(string $pageId, string $videoUrl, string $description, ?string $title): string
+  {
+    Log::info('Facebook Reel upload from URL starting', [
+      'pageId' => $pageId,
+      'url' => $videoUrl
+    ]);
+
+    // Facebook Reels endpoint
+    $endpoint = "https://graph.facebook.com/" . self::API_VERSION . "/{$pageId}/video_reels";
+
+    $params = [
+      'upload_phase' => 'start',
+      'access_token' => $this->accessToken,
+    ];
+
+    try {
+      // Step 1: Initialize reel upload
+      $response = $this->client->post($endpoint, [
+        'form_params' => $params,
+        'timeout' => 60
+      ]);
+      
+      $initResult = json_decode($response->getBody(), true);
+      $videoId = $initResult['video_id'] ?? null;
+      $uploadUrl = $initResult['upload_url'] ?? null;
+
+      if (!$videoId || !$uploadUrl) {
+        Log::error('Facebook Reel initialization failed', [
+          'response' => $initResult
+        ]);
+        throw new \Exception("Failed to initialize Facebook Reel upload");
+      }
+
+      Log::info('Facebook Reel upload initialized', [
+        'video_id' => $videoId,
+        'upload_url' => $uploadUrl
+      ]);
+
+      // Step 2: Upload video to the provided URL
+      $videoResponse = $this->client->post($uploadUrl, [
+        'form_params' => [
+          'source' => $videoUrl,
+          'access_token' => $this->accessToken,
+        ],
+        'timeout' => 600 // 10 minutes for video processing
+      ]);
+
+      $uploadResult = json_decode($videoResponse->getBody(), true);
+      
+      if (!$uploadResult['success'] ?? false) {
+        throw new \Exception("Failed to upload video for Facebook Reel");
+      }
+
+      // Step 3: Finalize reel with metadata
+      $finalizeParams = [
+        'upload_phase' => 'finish',
+        'video_id' => $videoId,
+        'description' => $description,
+        'access_token' => $this->accessToken,
+      ];
+
+      if ($title) {
+        $finalizeParams['title'] = $title;
+      }
+
+      $finalizeResponse = $this->client->post($endpoint, [
+        'form_params' => $finalizeParams,
+        'timeout' => 300
+      ]);
+
+      $finalizeResult = json_decode($finalizeResponse->getBody(), true);
+      $reelId = $finalizeResult['id'] ?? $videoId;
+
+      if (!$reelId) {
+        Log::error('Facebook Reel finalization failed', [
+          'response' => $finalizeResult
+        ]);
+        throw new \Exception("Failed to finalize Facebook Reel");
+      }
+      
+      Log::info('Facebook Reel published successfully', [
+        'reel_id' => $reelId,
+        'pageId' => $pageId
+      ]);
+
+      return $reelId;
+
+    } catch (\Exception $e) {
+      Log::error('Facebook Reel upload failed', [
+        'error' => $e->getMessage(),
+        'pageId' => $pageId,
+        'url' => $videoUrl
+      ]);
+      
+      // Fallback to regular video upload if reel upload fails
+      Log::info('Falling back to regular video upload for Facebook');
+      return $this->uploadVideo($pageId, $videoUrl, $description, $title);
+    }
+  }
+
+  /**
+   * Handle Facebook Story upload
+   * Stories can be images or videos and are published to the page's stories
+   */
+  private function handleStoryUpload(string $pageId, ?string $rawPath, string $content): string
+  {
+    if (empty($rawPath)) {
+      throw new \Exception("Stories require media (image or video)");
+    }
+
+    $isUrl = str_starts_with($rawPath, 'http://') || str_starts_with($rawPath, 'https://');
+    $isVideo = str_contains($rawPath, '.mp4') || str_contains($rawPath, '.mov') || 
+               str_contains($rawPath, '.avi') || str_contains($rawPath, '.m4v');
+    
+    LogHelper::social('facebook.story_upload_starting', [
+      'pageId' => $pageId,
+      'is_url' => $isUrl,
+      'is_video' => $isVideo,
+      'path' => $rawPath
+    ]);
+    
+    // Get public URL if it's a local file
+    if (!$isUrl) {
+      $localPath = storage_path('app/' . $rawPath);
+      
+      if (!file_exists($localPath)) {
+        throw new \Exception("Story media file not found: {$localPath}");
+      }
+      
+      $rawPath = $this->getPublicUrl($rawPath);
+    }
+    
+    // Upload story based on media type
+    if ($isVideo) {
+      return $this->uploadVideoStory($pageId, $rawPath);
+    } else {
+      return $this->uploadPhotoStory($pageId, $rawPath);
+    }
+  }
+
+  /**
+   * Upload a photo story to Facebook
+   * Uses the correct Facebook Stories API
+   */
+  private function uploadPhotoStory(string $pageId, string $photoUrl): string
+  {
+    Log::info('Facebook Photo Story upload starting', [
+      'pageId' => $pageId,
+      'url' => $photoUrl
+    ]);
+
+    try {
+      // Step 1: Upload photo to Facebook (unpublished)
+      $uploadEndpoint = "https://graph.facebook.com/" . self::API_VERSION . "/{$pageId}/photos";
+      
+      $uploadParams = [
+        'url' => $photoUrl,
+        'published' => false, // Don't publish as regular post
+        'access_token' => $this->accessToken,
+      ];
+
+      $uploadResponse = $this->client->post($uploadEndpoint, [
+        'form_params' => $uploadParams,
+        'timeout' => 120
+      ]);
+      
+      $uploadResult = json_decode($uploadResponse->getBody(), true);
+      $photoId = $uploadResult['id'] ?? null;
+
+      if (!$photoId) {
+        Log::error('Facebook Photo upload failed', [
+          'response' => $uploadResult
+        ]);
+        throw new \Exception("Failed to upload photo to Facebook");
+      }
+
+      Log::info('Facebook Photo uploaded, now publishing as story', [
+        'photo_id' => $photoId,
+        'pageId' => $pageId
+      ]);
+
+      // Step 2: Publish as story using photo_stories endpoint
+      $storyEndpoint = "https://graph.facebook.com/" . self::API_VERSION . "/{$pageId}/photo_stories";
+      
+      $storyParams = [
+        'photo_id' => $photoId,
+        'access_token' => $this->accessToken,
+      ];
+
+      $storyResponse = $this->client->post($storyEndpoint, [
+        'form_params' => $storyParams,
+        'timeout' => 60
+      ]);
+      
+      $storyResult = json_decode($storyResponse->getBody(), true);
+      $postId = $storyResult['post_id'] ?? null;
+
+      if (!$postId) {
+        Log::error('Facebook Photo Story publish failed', [
+          'response' => $storyResult
+        ]);
+        throw new \Exception("Failed to publish photo story to Facebook");
+      }
+
+      // Get the actual story URL from Facebook
+      $storyUrl = $this->getStoryUrl($pageId, $postId);
+
+      Log::info('Facebook Photo Story published successfully', [
+        'post_id' => $postId,
+        'photo_id' => $photoId,
+        'pageId' => $pageId,
+        'story_url' => $storyUrl
+      ]);
+
+      return (string) $postId . '|' . $storyUrl;
+
+    } catch (ClientException $e) {
+      $errorMessage = $this->extractFacebookErrorMessage($e);
+      Log::error('Facebook Photo Story upload error', [
+        'error' => $errorMessage,
+        'pageId' => $pageId
+      ]);
+      throw new \Exception($errorMessage);
+    }
+  }
+
+  /**
+   * Upload a video story to Facebook
+   * Uses the correct Facebook Stories API with 3-phase upload
+   */
+  private function uploadVideoStory(string $pageId, string $videoUrl): string
+  {
+    Log::info('Facebook Video Story upload starting', [
+      'pageId' => $pageId,
+      'url' => $videoUrl
+    ]);
+
+    try {
+      // Step 1: Initialize upload session
+      $initEndpoint = "https://graph.facebook.com/" . self::API_VERSION . "/{$pageId}/video_stories";
+      
+      $initParams = [
+        'upload_phase' => 'start',
+        'access_token' => $this->accessToken,
+      ];
+
+      $initResponse = $this->client->post($initEndpoint, [
+        'form_params' => $initParams,
+        'timeout' => 60
+      ]);
+      
+      $initResult = json_decode($initResponse->getBody(), true);
+      $videoId = $initResult['video_id'] ?? null;
+      $uploadUrl = $initResult['upload_url'] ?? null;
+
+      if (!$videoId || !$uploadUrl) {
+        Log::error('Facebook Video Story initialization failed', [
+          'response' => $initResult
+        ]);
+        throw new \Exception("Failed to initialize Facebook Video Story upload");
+      }
+
+      Log::info('Facebook Video Story upload initialized', [
+        'video_id' => $videoId,
+        'upload_url' => $uploadUrl
+      ]);
+
+      // Step 2: Upload video file
+      // Add access_token to the upload URL
+      $uploadUrlWithToken = $uploadUrl . '?access_token=' . $this->accessToken;
+      
+      $uploadResponse = $this->client->post($uploadUrlWithToken, [
+        'headers' => [
+          'file_url' => $videoUrl,
+        ],
+        'timeout' => 600 // 10 minutes for video upload
+      ]);
+
+      $uploadResult = json_decode($uploadResponse->getBody(), true);
+      
+      if (!($uploadResult['success'] ?? false)) {
+        Log::error('Facebook Video Story upload failed', [
+          'response' => $uploadResult
+        ]);
+        throw new \Exception("Failed to upload video file for Facebook Story");
+      }
+
+      Log::info('Facebook Video uploaded, now finalizing story', [
+        'video_id' => $videoId
+      ]);
+
+      // Step 3: Finalize and publish story
+      $finalizeParams = [
+        'video_id' => $videoId,
+        'upload_phase' => 'finish',
+        'access_token' => $this->accessToken,
+      ];
+
+      $finalizeResponse = $this->client->post($initEndpoint, [
+        'form_params' => $finalizeParams,
+        'timeout' => 120
+      ]);
+
+      $finalizeResult = json_decode($finalizeResponse->getBody(), true);
+      $postId = $finalizeResult['post_id'] ?? null;
+
+      if (!$postId) {
+        Log::error('Facebook Video Story finalization failed', [
+          'response' => $finalizeResult
+        ]);
+        throw new \Exception("Failed to finalize Facebook Video Story");
+      }
+
+      // Step 4: Get the actual story URL from Facebook
+      $storyUrl = $this->getStoryUrl($pageId, $postId);
+
+      Log::info('Facebook Video Story published successfully', [
+        'post_id' => $postId,
+        'video_id' => $videoId,
+        'pageId' => $pageId,
+        'story_url' => $storyUrl
+      ]);
+
+      return (string) $postId . '|' . $storyUrl;
+
+    } catch (ClientException $e) {
+      $errorMessage = $this->extractFacebookErrorMessage($e);
+      Log::error('Facebook Video Story upload error', [
+        'error' => $errorMessage,
+        'pageId' => $pageId
+      ]);
+      throw new \Exception($errorMessage);
+    }
+  }
+
+  /**
+   * Get the actual story URL from Facebook API
+   * Tries multiple times with delays to handle Facebook's API sync delay
+   */
+  private function getStoryUrl(string $pageId, string $postId): string
+  {
+    $maxAttempts = 3;
+    $delaySeconds = 2;
+    
+    for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+      try {
+        Log::info('Fetching story URL from Facebook API', [
+          'pageId' => $pageId,
+          'post_id' => $postId,
+          'attempt' => $attempt
+        ]);
+        
+        // Add delay before fetching (except first attempt)
+        if ($attempt > 1) {
+          Log::info('Waiting for Facebook API sync', [
+            'seconds' => $delaySeconds,
+            'attempt' => $attempt
+          ]);
+          sleep($delaySeconds);
+        }
+        
+        $endpoint = "https://graph.facebook.com/" . self::API_VERSION . "/{$pageId}/stories";
+        
+        $response = $this->client->get($endpoint, [
+          'query' => [
+            'access_token' => $this->accessToken,
+            'fields' => 'id,post_id,url,creation_time',
+          ],
+          'timeout' => 30
+        ]);
+        
+        $result = json_decode($response->getBody(), true);
+        $stories = $result['data'] ?? [];
+        
+        Log::info('Stories API response', [
+          'stories_count' => count($stories),
+          'looking_for_post_id' => $postId,
+          'attempt' => $attempt
+        ]);
+        
+        // Log all stories for debugging
+        foreach ($stories as $index => $story) {
+          Log::debug('Story in response', [
+            'index' => $index,
+            'story_id' => $story['id'] ?? null,
+            'post_id' => $story['post_id'] ?? null,
+            'url' => $story['url'] ?? null,
+            'creation_time' => $story['creation_time'] ?? null
+          ]);
+        }
+        
+        // Try to find by post_id first
+        foreach ($stories as $story) {
+          $storyPostId = $story['post_id'] ?? null;
+          $storyUrl = $story['url'] ?? null;
+          
+          if ($storyPostId == $postId && $storyUrl) {
+            Log::info('Found matching story URL by post_id', [
+              'post_id' => $postId,
+              'url' => $storyUrl,
+              'attempt' => $attempt
+            ]);
+            return $storyUrl;
+          }
+        }
+        
+        // If not found by post_id, try the most recent story (first in array)
+        // This is a fallback since Facebook just published this story
+        if ($attempt === $maxAttempts && !empty($stories)) {
+          $latestStory = $stories[0];
+          $latestUrl = $latestStory['url'] ?? null;
+          
+          if ($latestUrl) {
+            Log::warning('Using latest story URL as fallback', [
+              'post_id' => $postId,
+              'latest_story_post_id' => $latestStory['post_id'] ?? null,
+              'url' => $latestUrl
+            ]);
+            return $latestUrl;
+          }
+        }
+        
+      } catch (\Exception $e) {
+        Log::error('Failed to get story URL', [
+          'error' => $e->getMessage(),
+          'post_id' => $postId,
+          'pageId' => $pageId,
+          'attempt' => $attempt
+        ]);
+      }
+    }
+    
+    // If all attempts failed, construct a direct story URL
+    // Format: https://www.facebook.com/profile.php?id={pageId}&sk=stories
+    Log::warning('All attempts to get story URL failed, using profile stories URL', [
+      'post_id' => $postId,
+      'pageId' => $pageId
+    ]);
+    
+    return "https://www.facebook.com/profile.php?id={$pageId}&sk=stories";
   }
 
   /**
@@ -409,7 +967,49 @@ class FacebookService extends BaseSocialService
       }
     }
     
-    Log::info('Download completed', ['temp_file' => $tempFile]);
+    // Validar que el archivo se descargó correctamente
+    if (!file_exists($tempFile) || filesize($tempFile) === 0) {
+      throw new \Exception('Downloaded file is empty or does not exist');
+    }
+    
+    // Validar que es un archivo de video válido
+    $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mimeType = finfo_file($fileInfo, $tempFile);
+    finfo_close($fileInfo);
+    
+    // Obtener información adicional del archivo para diagnóstico
+    $fileSize = filesize($tempFile);
+    $fileSizeMB = round($fileSize / 1024 / 1024, 2);
+    
+    // Intentar obtener información del video usando ffprobe si está disponible
+    $videoInfo = [];
+    if (function_exists('shell_exec')) {
+      $ffprobeOutput = @shell_exec("ffprobe -v quiet -print_format json -show_format -show_streams " . escapeshellarg($tempFile) . " 2>/dev/null");
+      if ($ffprobeOutput) {
+        $videoInfo = json_decode($ffprobeOutput, true) ?? [];
+      }
+    }
+    
+    Log::info('Download completed with detailed info', [
+      'temp_file' => $tempFile,
+      'file_size' => $fileSize,
+      'file_size_mb' => $fileSizeMB,
+      'mime_type' => $mimeType,
+      'video_info' => $videoInfo
+    ]);
+    
+    // Verificar que es un tipo de archivo de video válido
+    $validVideoTypes = ['video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/webm'];
+    if (!in_array($mimeType, $validVideoTypes)) {
+      @unlink($tempFile);
+      throw new \Exception("Invalid video file type: {$mimeType}. Expected video format.");
+    }
+    
+    // Verificar tamaño mínimo (evitar archivos corruptos)
+    if ($fileSize < 1024) { // Menos de 1KB
+      @unlink($tempFile);
+      throw new \Exception("File too small ({$fileSize} bytes), possibly corrupted");
+    }
     
     return $tempFile;
   }
@@ -539,6 +1139,37 @@ class FacebookService extends BaseSocialService
     return $result['id'];
   }
 
+  private function handlePoll($pageId, $content, $settings)
+  {
+    $pollOptions = array_filter($settings['poll_options'] ?? [], fn($opt) => !empty(trim($opt)));
+    
+    if (count($pollOptions) < 2) {
+      throw new \Exception("Facebook polls require at least 2 options");
+    }
+
+    if (count($pollOptions) > 2) {
+      throw new \Exception("Facebook polls support maximum 2 options");
+    }
+
+    // Facebook Graph API doesn't support creating polls through the regular feed endpoint
+    // Facebook polls are only available through Facebook's native interface
+    // We'll create a regular post with poll-like content as a fallback
+    
+    \Log::info("Facebook polls are not supported through Graph API, creating text post with poll options", [
+      'page_id' => $pageId,
+      'poll_options' => $pollOptions
+    ]);
+    
+    // Create a text post that looks like a poll
+    $pollText = $content . "\n\n📊 Poll Options:\n";
+    foreach ($pollOptions as $index => $option) {
+      $pollText .= ($index + 1) . ". " . $option . "\n";
+    }
+    $pollText .= "\n💬 Comment with your choice!";
+    
+    return $this->publishTextPost($pageId, $pollText);
+  }
+
   private function uploadPhoto($pageId, $photoUrl, $caption)
   {
     $endpoint = "https://graph.facebook.com/" . self::API_VERSION . "/{$pageId}/photos";
@@ -554,6 +1185,153 @@ class FacebookService extends BaseSocialService
 
     // Photos usually return a 'post_id' if they are published as part of a post
     return $result['post_id'] ?? $result['id'] ?? null;
+  }
+
+  /**
+   * Upload carousel with multiple images OR multiple videos to Facebook
+   * NOTE: Facebook does NOT support mixing images and videos in carousels
+   * This should be validated before calling this method
+   */
+  private function uploadCarousel($pageId, array $mediaPaths, $caption)
+  {
+    LogHelper::social('facebook.carousel_upload_starting', [
+      'pageId' => $pageId,
+      'media_count' => count($mediaPaths)
+    ]);
+
+    // Detect if this is a video carousel or image carousel
+    $firstMediaPath = $mediaPaths[0];
+    $isVideoCarousel = $this->isVideoFile($firstMediaPath);
+    
+    LogHelper::social('facebook.carousel_type_detected', [
+      'type' => $isVideoCarousel ? 'video' : 'image',
+      'media_count' => count($mediaPaths)
+    ]);
+
+    // Step 1: Upload all media without publishing (unpublished)
+    $mediaIds = [];
+    
+    if ($isVideoCarousel) {
+      // Upload videos
+      foreach ($mediaPaths as $index => $mediaPath) {
+        $endpoint = "https://graph.facebook.com/" . self::API_VERSION . "/{$pageId}/videos";
+        
+        $params = [
+          'file_url' => $mediaPath,
+          'published' => 'false', // Important: don't publish yet
+          'access_token' => $this->accessToken,
+        ];
+
+        try {
+          $response = $this->client->post($endpoint, [
+            'form_params' => $params,
+            'timeout' => 600 // Videos may take longer
+          ]);
+          $result = json_decode($response->getBody(), true);
+          
+          if (isset($result['id'])) {
+            $mediaIds[] = $result['id'];
+            LogHelper::social('facebook.carousel_video_uploaded', [
+              'index' => $index + 1,
+              'video_id' => $result['id']
+            ]);
+          } else {
+            throw new \Exception("Failed to upload video " . ($index + 1) . " for carousel");
+          }
+        } catch (\Exception $e) {
+          LogHelper::socialError('facebook.carousel_video_upload_failed', $e->getMessage(), [
+            'index' => $index + 1,
+            'media_path' => $mediaPath
+          ]);
+          throw new \Exception("Failed to upload video " . ($index + 1) . " for carousel: " . $e->getMessage());
+        }
+      }
+    } else {
+      // Upload images
+      foreach ($mediaPaths as $index => $mediaPath) {
+        $endpoint = "https://graph.facebook.com/" . self::API_VERSION . "/{$pageId}/photos";
+        
+        $params = [
+          'url' => $mediaPath,
+          'published' => 'false', // Important: don't publish yet
+          'access_token' => $this->accessToken,
+        ];
+
+        try {
+          $response = $this->client->post($endpoint, ['form_params' => $params]);
+          $result = json_decode($response->getBody(), true);
+          
+          if (isset($result['id'])) {
+            $mediaIds[] = $result['id'];
+            LogHelper::social('facebook.carousel_photo_uploaded', [
+              'index' => $index + 1,
+              'photo_id' => $result['id']
+            ]);
+          } else {
+            throw new \Exception("Failed to upload photo " . ($index + 1) . " for carousel");
+          }
+        } catch (\Exception $e) {
+          LogHelper::socialError('facebook.carousel_photo_upload_failed', $e->getMessage(), [
+            'index' => $index + 1,
+            'media_path' => $mediaPath
+          ]);
+          throw new \Exception("Failed to upload photo " . ($index + 1) . " for carousel: " . $e->getMessage());
+        }
+      }
+    }
+
+    // Step 2: Create the carousel post with all uploaded media
+    $endpoint = "https://graph.facebook.com/" . self::API_VERSION . "/{$pageId}/feed";
+    
+    $attachedMedia = [];
+    foreach ($mediaIds as $mediaId) {
+      $attachedMedia[] = ['media_fbid' => $mediaId];
+    }
+
+    $params = [
+      'message' => $caption,
+      'attached_media' => json_encode($attachedMedia),
+      'access_token' => $this->accessToken,
+    ];
+
+    try {
+      $response = $this->client->post($endpoint, ['form_params' => $params]);
+      $result = json_decode($response->getBody(), true);
+
+      if (!isset($result['id'])) {
+        throw new \Exception("Failed to create carousel post: " . json_encode($result));
+      }
+
+      LogHelper::social('facebook.carousel_published', [
+        'post_id' => $result['id'],
+        'media_type' => $isVideoCarousel ? 'video' : 'image',
+        'media_count' => count($mediaIds)
+      ]);
+
+      return $result['id'];
+    } catch (\Exception $e) {
+      LogHelper::socialError('facebook.carousel_publish_failed', $e->getMessage(), [
+        'media_ids' => $mediaIds,
+        'media_type' => $isVideoCarousel ? 'video' : 'image'
+      ]);
+      throw new \Exception("Failed to publish carousel: " . $e->getMessage());
+    }
+  }
+
+  /**
+   * Check if a file path is a video based on extension
+   */
+  private function isVideoFile(string $path): bool
+  {
+    $videoExtensions = ['.mp4', '.mov', '.avi', '.m4v', '.mkv', '.webm', '.flv', '.wmv'];
+    
+    foreach ($videoExtensions as $ext) {
+      if (str_contains(strtolower($path), $ext)) {
+        return true;
+      }
+    }
+    
+    return false;
   }
 
   private function uploadVideo($pageId, $videoUrl, $description, $title = null)
@@ -964,4 +1742,138 @@ class FacebookService extends BaseSocialService
     }
     return $multipart;
   }
+
+  /**
+   * Extract user-friendly error message from Facebook API response
+   */
+  private function extractFacebookErrorMessage(\Exception $e): string
+  {
+    if (!($e instanceof \GuzzleHttp\Exception\ClientException)) {
+      return $e->getMessage();
+    }
+
+    try {
+      $responseBody = $e->getResponse()->getBody()->getContents();
+      $errorData = json_decode($responseBody, true);
+      
+      $errorCode = $errorData['error']['code'] ?? null;
+      $errorMessage = $errorData['error']['message'] ?? null;
+      $errorSubcode = $errorData['error']['error_subcode'] ?? null;
+      
+      // Map common Facebook errors to user-friendly messages
+      if ($errorCode) {
+        $friendlyMessage = match($errorCode) {
+          190 => 'Tu sesión de Facebook ha expirado. Reconecta tu cuenta desde la configuración.',
+          100 => 'Parámetros inválidos. Verifica el formato del contenido.',
+          200 => 'No tienes permisos para publicar en esta página de Facebook.',
+          368 => 'Temporalmente bloqueado por Facebook. Intenta nuevamente en unos minutos.',
+          1363041 => 'El video supera el límite de tamaño de Facebook (4GB máximo).',
+          1363037 => 'El video es demasiado largo. Facebook permite hasta 240 minutos.',
+          1363033 => 'Formato de video no válido. Facebook acepta MP4, MOV y otros formatos comunes.',
+          default => null
+        };
+        
+        if ($friendlyMessage) {
+          return $friendlyMessage;
+        }
+      }
+      
+      // Check for specific error patterns in message
+      if ($errorMessage) {
+        if (str_contains($errorMessage, 'video file is too large') || str_contains($errorMessage, 'file size')) {
+          return 'El video es demasiado grande para Facebook. Tamaño máximo: 4GB.';
+        }
+        if (str_contains($errorMessage, 'video is too long') || str_contains($errorMessage, 'duration')) {
+          return 'El video es demasiado largo. Facebook permite hasta 240 minutos (4 horas).';
+        }
+        if (str_contains($errorMessage, 'Invalid video format') || str_contains($errorMessage, 'codec')) {
+          return 'Formato de video no válido. Facebook acepta MP4, MOV con códec H.264.';
+        }
+        if (str_contains($errorMessage, 'rate limit') || str_contains($errorMessage, 'too many')) {
+          return 'Has excedido el límite de publicaciones de Facebook. Intenta más tarde.';
+        }
+        if (str_contains($errorMessage, 'problem uploading your video file')) {
+          return 'Facebook no pudo procesar tu video. Verifica que el archivo no esté corrupto y que la URL sea accesible.';
+        }
+        if (str_contains($errorMessage, 'download') || str_contains($errorMessage, 'fetch')) {
+          return 'Facebook no pudo descargar tu archivo. Verifica que la URL sea accesible públicamente.';
+        }
+        if (str_contains($errorMessage, 'processing')) {
+          return 'Facebook está procesando tu contenido. Esto puede tardar unos minutos.';
+        }
+        if (str_contains($errorMessage, 'Page access token')) {
+          return 'Token de acceso inválido. Reconecta tu página de Facebook desde la configuración.';
+        }
+        if (str_contains($errorMessage, 'permissions') || str_contains($errorMessage, 'scope')) {
+          return 'Tu cuenta no tiene los permisos necesarios. Reconecta tu página de Facebook y acepta todos los permisos.';
+        }
+        
+        return $errorMessage;
+      }
+      
+      return $e->getMessage();
+    } catch (\Exception $parseError) {
+      return $e->getMessage();
+    }
+  }
+
+  /**
+   * Check if content still exists on Facebook
+   *
+   * @param string $postId Facebook post ID
+   * @return array ['exists' => bool, 'reason' => string|null, 'metrics' => array|null]
+   */
+  public function checkContentStatus(string $postId): array
+  {
+    try {
+      $this->ensureValidToken();
+
+      $response = $this->client->get("https://graph.facebook.com/" . self::API_VERSION . "/{$postId}", [
+        'query' => [
+          'fields' => 'id,message,created_time,reactions.summary(true),comments.summary(true),shares',
+          'access_token' => $this->accessToken,
+        ],
+      ]);
+
+      $data = json_decode($response->getBody(), true);
+
+      if (isset($data['id'])) {
+        return [
+          'exists' => true,
+          'metrics' => [
+            'likes' => $data['reactions']['summary']['total_count'] ?? 0,
+            'comments' => $data['comments']['summary']['total_count'] ?? 0,
+            'shares' => $data['shares']['count'] ?? 0,
+          ],
+        ];
+      }
+
+      return [
+        'exists' => false,
+        'reason' => 'Content not found on Facebook',
+      ];
+    } catch (ClientException $e) {
+      $statusCode = $e->getResponse()->getStatusCode();
+
+      if ($statusCode === 404 || $statusCode === 400) {
+        return [
+          'exists' => false,
+          'reason' => 'Content deleted or no longer accessible',
+        ];
+      }
+
+      throw $e;
+    } catch (\Exception $e) {
+      Log::error('Facebook checkContentStatus failed', [
+        'post_id' => $postId,
+        'error' => $e->getMessage()
+      ]);
+
+      return [
+        'exists' => false,
+        'reason' => 'Error checking content status: ' . $e->getMessage(),
+      ];
+    }
+  }
 }
+

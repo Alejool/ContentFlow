@@ -1,5 +1,5 @@
-import axios from "axios";
-import { create } from "zustand";
+import axios from 'axios';
+import { create } from 'zustand';
 
 export interface User {
   id: number;
@@ -9,13 +9,14 @@ export interface User {
   bio?: string | null;
   email_verified_at: string | null;
   photo_url?: string | null;
+  default_avatar_icon?: string | null;
   avatar?: string | null;
   created_at: string;
   updated_at: string;
   provider?: string | null;
   locale?: string | null;
   country_code?: string | null;
-  global_platform_settings?: Record<string, any> | null;
+  global_platform_settings?: Record<string, unknown> | null;
 }
 
 interface UserState {
@@ -23,13 +24,13 @@ interface UserState {
   isLoading: boolean;
   error: string | null;
   setUser: (user: User | null) => void;
-  updateProfile: (data: any) => Promise<{ success: boolean; message?: string }>;
+  updateProfile: (data: Record<string, unknown>) => Promise<{ success: boolean; message?: string }>;
   updatePassword: (
-    data: any,
+    data: Record<string, unknown>,
   ) => Promise<{ success: boolean; message?: string }>;
 }
 
-export const useUserStore = create<UserState>((set, get) => ({
+export const useUserStore = create<UserState>((set, _get) => ({
   user: null,
   isLoading: false,
   error: null,
@@ -39,15 +40,15 @@ export const useUserStore = create<UserState>((set, get) => ({
   updateProfile: async (data) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.patch("/api/v1/profile", data);
+      const response = await axios.patch('/api/v1/profile', data);
       if (response.data.success) {
         set({ user: response.data.user });
         return { success: true, message: response.data.message };
       }
       return { success: false, message: response.data.message };
-    } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message || "Failed to update profile";
+    } catch (error) {
+      const axiosError = error as import('axios').AxiosError<{ message?: string }>;
+      const errorMessage = axiosError.response?.data?.message || 'Failed to update profile';
       set({ error: errorMessage });
       throw error;
     } finally {
@@ -58,14 +59,14 @@ export const useUserStore = create<UserState>((set, get) => ({
   updatePassword: async (data) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.put("/api/v1/profile/password", data);
+      const response = await axios.put('/api/v1/profile/password', data);
       if (response.data.success) {
         return { success: true, message: response.data.message };
       }
       return { success: false, message: response.data.message };
-    } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message || "Failed to update password";
+    } catch (error) {
+      const axiosError = error as import('axios').AxiosError<{ message?: string }>;
+      const errorMessage = axiosError.response?.data?.message || 'Failed to update password';
       set({ error: errorMessage });
       throw error;
     } finally {

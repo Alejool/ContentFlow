@@ -1,6 +1,6 @@
 /**
  * Toast Hook
- * 
+ *
  * Manages toast notifications state
  */
 
@@ -25,7 +25,7 @@ export function useToast() {
 
       return id;
     },
-    []
+    [],
   );
 
   const removeToast = useCallback((id: string) => {
@@ -34,22 +34,22 @@ export function useToast() {
 
   const success = useCallback(
     (message: string, duration?: number) => addToast(message, 'success', duration),
-    [addToast]
+    [addToast],
   );
 
   const error = useCallback(
     (message: string, duration?: number) => addToast(message, 'error', duration),
-    [addToast]
+    [addToast],
   );
 
   const warning = useCallback(
     (message: string, duration?: number) => addToast(message, 'warning', duration),
-    [addToast]
+    [addToast],
   );
 
   const info = useCallback(
     (message: string, duration?: number) => addToast(message, 'info', duration),
-    [addToast]
+    [addToast],
   );
 
   return {

@@ -1,10 +1,22 @@
-import { getDateFnsLocale } from "@/Utils/dateLocales";
-import { canUserPublishDirectly } from "@/Utils/publicationPermissions";
-import { usePage } from "@inertiajs/react";
-import { format } from "date-fns";
+import { Avatar } from '@/Components/common/Avatar';
+import Button from '@/Components/common/Modern/Button';
+import SimpleContentTypeBadge from '@/Components/Content/common/SimpleContentTypeBadge';
+import PublicationThumbnailCard from '@/Components/Content/Publication/PublicationThumbnailCard';
+import { PublicationStatusBadge } from '@/Components/Content/PublicationStatusBadge';
+import { usePublicationActions } from '@/Hooks/publication/usePublicationActions';
+import { formatDateString } from '@/Utils/dateHelpers';
+import {
+  countMediaFiles,
+  getLockedByFirstName,
+  getLockedByName,
+  getMediaUrl,
+  getPublicationStatusConfig,
+  hasMedia,
+  isProcessing,
+  isVideoMedia,
+} from '@/Utils/publicationHelpers';
 import {
   Calendar,
-  CheckCircle,
   Clock,
   Copy,
   Edit,
@@ -14,13 +26,12 @@ import {
   Loader2,
   Lock,
   Rocket,
+  Send,
   Trash2,
   Users,
   Video,
-} from "lucide-react";
-import { useState } from "react";
-import { toast } from "react-hot-toast";
-import { useTranslation } from "react-i18next";
+} from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ContentCardProps {
   item: any;
@@ -29,7 +40,7 @@ interface ContentCardProps {
   onViewDetails?: (item: any) => void;
   onPublish?: (item: any) => void;
   onDuplicate?: (id: number) => void;
-  type: "publication" | "campaign";
+  type: 'publication' | 'campaign';
   permissions?: string[];
   remoteLock?: {
     user_id: number;
@@ -39,7 +50,7 @@ interface ContentCardProps {
   onPreviewMedia?: (
     media: {
       url: string;
-      type: "image" | "video";
+      type: 'image' | 'video';
       title?: string;
     }[],
     initialIndex?: number,
@@ -58,71 +69,46 @@ export default function ContentCard({
   remoteLock,
   onPreviewMedia,
 }: ContentCardProps) {
-  const { auth } = usePage<any>().props;
-  const currentUserId = auth.user?.id;
-  
   const { t } = useTranslation();
-  const { i18n } = useTranslation();
-  const locale = getDateFnsLocale(i18n.language);
-  const canManageContent = permissions?.includes("manage-content");
-  
+
+  // Hook centralizado - SIN lógica en el componente
+  const {
+    loadingStates,
+    canManageContent,
+    shouldShowSendToReview,
+    shouldShowPublish,
+    handleSubmitForApproval,
+    handlePublish,
+    handleEdit,
+    handleDelete,
+    handleDuplicate,
+    handleViewDetails,
+  } = usePublicationActions({
+    onEdit,
+    onDelete,
+    ...(onPublish && { onPublish }),
+    ...(onViewDetails && { onViewDetails }),
+    ...(onDuplicate && { onDuplicate }),
+    ...(permissions && { permissions }),
+  });
+
   // Early return after all hooks
   if (!item) {
     return null;
   }
-  
-  // Verificar si el usuario puede publicar directamente
-  const canPublish = canUserPublishDirectly(item, currentUserId, permissions || []) || permissions?.includes("publish");
 
-  const statusColors = {
-    published:
-      "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-    draft: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400",
-    scheduled:
-      "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
-    failed: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
-    pending_review:
-      "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
-    approved:
-      "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
-    rejected: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
-    publishing:
-      "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
-  };
+  // Usar helpers centralizados - NO lógica
+  const itemHasMedia = hasMedia(item);
+  const isVideo = isVideoMedia(item);
+  const itemIsProcessing = isProcessing(item);
+  const mediaUrl = getMediaUrl(item);
+  const statusConfig = getPublicationStatusConfig(item.status);
+  const lockedByName = getLockedByName(remoteLock || undefined);
+  const lockedByFirstName = getLockedByFirstName(remoteLock || undefined);
+  const isLoading = loadingStates[item.id];
+  const mediaCount = countMediaFiles(item);
 
-  const statusKey = (item.status || "draft") as keyof typeof statusColors;
-  const StatusIcon =
-    {
-      published: CheckCircle,
-      draft: Edit,
-      scheduled: Calendar,
-      failed: Clock,
-      pending_review: Clock,
-      approved: CheckCircle,
-      rejected: Clock,
-      publishing: Clock,
-    }[statusKey] || Edit;
-
-  // Check if there are media files
-  // Check if there are media files
-  const hasMedia = item.media_files && item.media_files.length > 0;
-  const firstMedia = hasMedia ? item.media_files[0] : null;
-  const isVideo = firstMedia?.file_type?.includes("video");
-  const isProcessing = firstMedia?.status === "processing";
-
-  // URL logic:
-  // 1. If it's a video and processing, we don't have a thumbnail yet.
-  // 2. If it's a video and completed, we should have a thumbnail. If not, fallback to file_path checks?
-  // 3. If it's an image, file_path is the image.
-
-  let mediaUrl = firstMedia?.thumbnail?.file_path || item.thumbnail;
-
-  // If no thumbnail, and it's an image, use the file path
-  if (!mediaUrl && firstMedia?.file_type === "image") {
-    mediaUrl = firstMedia.file_path;
-  }
-  // If it's a video and we don't have a thumbnail, we can't show the video as an image.
-  // Unless we want to try to show a generic video placeholder if processing.
+  const StatusIcon = statusConfig.icon;
 
   // Get platform icons for publication
   const getPlatformIcons = () => {
@@ -133,7 +119,7 @@ export default function ContentCard({
         {item.accounts.slice(0, 3).map((account: any, index: number) => (
           <div
             key={index}
-            className="w-5 h-5 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center"
+            className="flex h-5 w-5 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700"
             title={account.provider}
           >
             <span className="text-xs font-bold text-gray-600 dark:text-gray-300">
@@ -142,134 +128,86 @@ export default function ContentCard({
           </div>
         ))}
         {item.accounts.length > 3 && (
-          <span className="text-xs text-gray-500">
-            +{item.accounts.length - 3}
-          </span>
+          <span className="text-xs text-gray-500">+{item.accounts.length - 3}</span>
         )}
       </div>
     );
   };
 
-  const getLockUserName = () => {
-    if (!remoteLock) return "";
-    return remoteLock.user_name || (remoteLock as any).user?.name || "Usuario";
-  };
-
-  const lockedByName = getLockUserName();
-  const lockedByFirstName = lockedByName.split(" ")[0];
-
-  const [imageError, setImageError] = useState(false);
-
   const handleCardClick = (e: React.MouseEvent) => {
     // If user is selecting text, don't trigger click
     if (window.getSelection()?.toString()) return;
 
-    // Trigger view details or edit
-    if (onViewDetails) {
-      onViewDetails(item);
-    } else if (onEdit) {
-      onEdit(item);
-    }
-  };
-
-  const handleMediaClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (onPreviewMedia && hasMedia && !isProcessing) {
-      const allMedia = item.media_files.map((media: any) => {
-        const isV = media.file_type?.includes("video");
-        let mUrl = media.thumbnail?.file_path || media.file_path;
-
-        if (!mUrl && media.file_type === "image") {
-          mUrl = media.file_path;
-        }
-
-        return {
-          url: isV
-            ? media.file_path.startsWith("http")
-              ? media.file_path
-              : `/storage/${media.file_path}`
-            : mUrl.startsWith("http")
-              ? mUrl
-              : `/storage/${mUrl}`,
-          type: (isV ? "video" : "image") as "image" | "video",
-          title: item.title,
-        };
-      });
-
-      onPreviewMedia(allMedia, 0);
+    // Trigger view details or edit - USA EL HANDLER DEL HOOK
+    if (onViewDetails !== undefined) {
+      handleViewDetails(item);
+    } else if (onEdit !== undefined) {
+      handleEdit(item, remoteLock);
     }
   };
 
   return (
     <div
-      className="group bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col h-full cursor-pointer"
+      className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm transition-all duration-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
       onClick={handleCardClick}
     >
-      {(hasMedia || isProcessing) && (
-        <div
-          className="relative h-40 bg-gray-100 dark:bg-gray-700 overflow-hidden cursor-zoom-in"
-          onClick={handleMediaClick}
-        >
-          <div className="relative w-full h-full">
-            {isProcessing ? (
-              <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-800 animate-pulse">
-                <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900/30 mb-2 flex items-center justify-center text-blue-600 dark:text-blue-400">
-                  <Clock className="w-6 h-6 animate-spin" />
-                </div>
-                <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                  Procesando media...
-                </span>
-              </div>
-            ) : !imageError && mediaUrl ? (
-              <img
-                src={mediaUrl}
-                alt={item.title || "Media"}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                loading="lazy"
-                onError={() => setImageError(true)}
+      {(itemHasMedia || itemIsProcessing) && (
+        <div className="relative overflow-hidden bg-gray-100 dark:bg-gray-700">
+          <PublicationThumbnailCard
+            publication={item}
+            {...(mediaUrl && { mediaUrl })}
+            isVideo={isVideo}
+            mediaCount={mediaCount.total}
+            size="card"
+            {...(onPreviewMedia && { onPreviewMedia })}
+            {...(onViewDetails && { onViewDetails: () => handleViewDetails(item) })}
+            className="rounded-none border-0"
+          />
+          <div className="pointer-events-none absolute left-3 top-3 z-10 flex flex-col items-start gap-2">
+            {/* Content Type Badge - Solo para publicaciones */}
+            {type === 'publication' && !remoteLock && (
+              <SimpleContentTypeBadge
+                contentType={item.content_type}
+                mediaFiles={item.media_files}
+                size="md"
+                className="border border-white/20 shadow-sm backdrop-blur-md"
               />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
-                <div className="text-center">
-                  <div className="p-3 rounded-full bg-gray-300 dark:bg-gray-600 mb-2 mx-auto w-12 h-12 flex items-center justify-center text-gray-500">
-                    {isVideo ? (
-                      <Video className="w-6 h-6" />
-                    ) : (
-                      <ImageIcon className="w-6 h-6" />
-                    )}
-                  </div>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {isVideo ? "Video" : "Imagen"}
-                  </span>
-                </div>
-              </div>
             )}
-            {!isProcessing && isVideo && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/20 transition-colors">
-                <div className="bg-white/90 dark:bg-gray-900/90 p-2.5 rounded-full shadow-lg backdrop-blur-sm">
-                  <Video className="w-5 h-5 text-primary-600 dark:text-primary-400" />
-                </div>
+            {/* Content Type Badge cuando hay remoteLock - posición ajustada */}
+            {type === 'publication' && remoteLock && (
+              <div className="mt-12">
+                <SimpleContentTypeBadge
+                  contentType={item.content_type}
+                  mediaFiles={item.media_files}
+                  size="md"
+                  className="border border-white/20 shadow-sm backdrop-blur-md"
+                />
               </div>
             )}
           </div>
-          <div className="absolute top-3 right-3 z-10">
-            <span
-              className={`px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 shadow-sm backdrop-blur-md border border-white/20 ${statusColors[statusKey] || statusColors.draft}`}
-            >
-              <StatusIcon className="w-3 h-3" />
-              <span className="capitalize">
-                {type === "campaign"
-                  ? t(`campaigns.filters.${item.status || "active"}`)
-                  : t(`publications.status.${item.status || "draft"}`)}
+          <div className="pointer-events-none absolute right-3 top-3 z-10 flex flex-col items-end gap-2">
+            {/* Status Badge */}
+            {type === 'publication' ? (
+              <div className="rounded-lg border border-white/20 shadow-sm backdrop-blur-md">
+                <PublicationStatusBadge publication={item} />
+              </div>
+            ) : (
+              <span
+                className={`flex items-center gap-1.5 rounded-lg border border-white/20 px-2.5 py-1 text-xs font-medium shadow-sm backdrop-blur-md ${statusConfig.badge}`}
+              >
+                <StatusIcon className="h-3 w-3" />
+                <span className="capitalize">
+                  {t(`campaigns.filters.${item.status || 'active'}`)}
+                </span>
               </span>
-            </span>
+            )}
           </div>
           {remoteLock && (
-            <div className="absolute top-3 left-3 z-10">
-              <span className="px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-lg backdrop-blur-md border border-amber-200/50 bg-amber-100/90 text-amber-700 dark:bg-amber-900/80 dark:text-amber-300 dark:border-amber-700/50 animate-pulse">
+            <div className="pointer-events-none absolute left-3 top-3 z-10">
+              <span className="flex animate-pulse items-center gap-1.5 rounded-lg border border-amber-200/50 bg-amber-100/90 px-2.5 py-1 text-xs font-bold text-amber-700 shadow-lg backdrop-blur-md dark:border-amber-700/50 dark:bg-amber-900/80 dark:text-amber-300">
                 <div className="relative">
-                  <Lock className="w-3 h-3" />
-                  <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-amber-500 rounded-full animate-ping" />
+                  <Lock className="h-3 w-3" />
+                  <div className="absolute -right-0.5 -top-0.5 h-2 w-2 animate-ping rounded-lg bg-amber-500" />
                 </div>
                 <span className="capitalize">{lockedByFirstName}</span>
               </span>
@@ -278,74 +216,76 @@ export default function ContentCard({
         </div>
       )}
 
-      {!hasMedia && (
-        <div className="p-4 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900">
-          <div className="flex items-center justify-between mb-3">
+      {!itemHasMedia && (
+        <div className="border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white p-4 dark:border-gray-700 dark:from-gray-800 dark:to-gray-900">
+          <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div
-                className={`p-2 rounded-lg ${type === "campaign" ? "bg-orange-100 dark:bg-orange-900/30" : "bg-blue-100 dark:bg-blue-900/30"}`}
+                className={`rounded-lg p-2 ${type === 'campaign' ? 'bg-orange-100 dark:bg-orange-900/30' : 'bg-blue-100 dark:bg-blue-900/30'}`}
               >
-                {type === "campaign" ? (
-                  <Users className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                {type === 'campaign' ? (
+                  <Users className="h-4 w-4 text-orange-600 dark:text-orange-400" />
                 ) : (
-                  <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                 )}
               </div>
               <div className="flex flex-col">
-                <span className="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">
-                  {type === "campaign" ? "Campaña" : "Publicación"}
+                <span className="text-xs font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-300">
+                  {type === 'campaign' ? 'Campaña' : 'Publicación'}
                 </span>
                 {remoteLock && (
-                  <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1">
-                    <Lock className="w-3 h-3" />
+                  <span className="flex items-center gap-1 text-[10px] font-bold text-amber-600 dark:text-amber-400">
+                    <Lock className="h-3 w-3" />
                     {lockedByFirstName}
                   </span>
                 )}
               </div>
             </div>
 
-            <span
-              className={`px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 ${statusColors[statusKey] || statusColors.draft}`}
-            >
-              <StatusIcon className="w-3 h-3" />
-              <span className="capitalize">
-                {type === "campaign"
-                  ? t(`campaigns.filters.${item.status || "active"}`)
-                  : t(`publications.status.${item.status || "draft"}`)}
+            {type === 'publication' ? (
+              <PublicationStatusBadge publication={item} />
+            ) : (
+              <span
+                className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium ${statusConfig.badge}`}
+              >
+                <StatusIcon className="h-3 w-3" />
+                <span className="capitalize">
+                  {t(`campaigns.filters.${item.status || 'active'}`)}
+                </span>
               </span>
-            </span>
+            )}
           </div>
 
-          <h3 className="font-bold text-gray-900 dark:text-white text-base line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-            {item.title ? item.title : (item.name ?? "Sin título")}
+          <h3 className="line-clamp-2 text-base font-bold text-gray-900 transition-colors group-hover:text-primary-600 dark:text-white dark:group-hover:text-primary-400">
+            {item.title ? item.title : (item.name ?? t('publications.table.untitled'))}
           </h3>
         </div>
       )}
 
-      <div className={`${hasMedia ? "p-4" : "px-4 pb-4"} flex-1 flex flex-col`}>
-        {hasMedia && (
-          <h3 className="font-bold text-gray-900 dark:text-white text-base line-clamp-2 mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-            {item.title ? item.title : (item.name ?? "Sin título")}
+      <div className={`${itemHasMedia ? 'p-4' : 'px-4 pb-4'} flex flex-1 flex-col`}>
+        {itemHasMedia && (
+          <h3 className="mb-2 line-clamp-2 text-base font-bold text-gray-900 transition-colors group-hover:text-primary-600 dark:text-white dark:group-hover:text-primary-400">
+            {item.title ? item.title : (item.name ?? 'Sin título')}
           </h3>
         )}
 
         <div className="mb-3 flex-1">
-          <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2 break-words">
+          <p className="line-clamp-2 break-words text-sm text-gray-600 dark:text-gray-300">
             {item.description ||
               item.content?.substring(0, 120) ||
-              "Sin descripción"}
-            {!item.description && (item.content?.length || 0) > 120 && "..."}
+              t('publications.table.description')}
+            {!item.description && (item.content?.length || 0) > 120 && '...'}
           </p>
         </div>
 
-        <div className="space-y-2 mt-auto">
-          {remoteLock && item.status !== "pending_review" && (
-            <div className="flex items-center gap-2 p-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/30">
-              <div className="relative flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400">
-                <Lock className="w-3 h-3" />
-                <span className="absolute -top-1 -right-1 flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+        <div className="mt-auto space-y-2">
+          {remoteLock && item.status !== 'pending_review' && (
+            <div className="flex items-center gap-2 rounded-lg border border-amber-100 bg-amber-50 p-2 dark:border-amber-800/30 dark:bg-amber-900/20">
+              <div className="relative flex h-5 w-5 items-center justify-center rounded-lg bg-amber-100 text-amber-600 dark:bg-amber-800 dark:text-amber-400">
+                <Lock className="h-3 w-3" />
+                <span className="absolute -right-1 -top-1 flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-lg bg-amber-400 opacity-75"></span>
+                  <span className="relative inline-flex h-2 w-2 rounded-lg bg-amber-500"></span>
                 </span>
               </div>
               <span className="text-xs font-semibold text-amber-700 dark:text-amber-400">
@@ -353,42 +293,47 @@ export default function ContentCard({
               </span>
             </div>
           )}
-          {item.status === "pending_review" && (
-            <div className="flex items-center gap-2 p-2 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-100 dark:border-yellow-800/30">
-              <div className="relative flex items-center justify-center w-5 h-5 rounded-full bg-yellow-100 dark:bg-yellow-800 text-yellow-600 dark:text-yellow-400">
-                <Clock className="w-3 h-3" />
+          {item.status === 'pending_review' && (
+            <div className="flex items-center gap-2 rounded-lg border border-yellow-100 bg-yellow-50 p-2 dark:border-yellow-800/30 dark:bg-yellow-900/20">
+              <div className="relative flex h-5 w-5 items-center justify-center rounded-lg bg-yellow-100 text-yellow-600 dark:bg-yellow-800 dark:text-yellow-400">
+                <Clock className="h-3 w-3" />
               </div>
-              <span className="text-xs font-semibold text-yellow-700 dark:text-yellow-400">
-                {t("publications.table.pendingAdminReview") || "Pendiente de revisión"}
-              </span>
+              <div className="flex flex-col">
+                <span className="text-xs font-semibold text-yellow-700 dark:text-yellow-400">
+                  {t('publications.table.pendingAdminReview') || 'Pendiente de revisión'}
+                </span>
+                {item.currentApprovalStep?.role?.name && (
+                  <span className="text-[10px] text-yellow-600 dark:text-yellow-500">
+                    {t('approvals.approver_role')}: {item.currentApprovalStep.role.name}
+                  </span>
+                )}
+              </div>
             </div>
           )}
 
-          {type === "publication" &&
-            item.accounts &&
-            item.accounts.length > 0 && (
-              <div className="flex items-center justify-between">
-                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                  <span className="text-white text-xs font-medium px-2 py-1 bg-black/50 rounded-full flex gap-1 items-center">
-                    <Loader2 className="w-3 h-3 animate-spin" />{" "}
-                    {t("publications.gallery.processing", {
-                      defaultValue: "Generating Preview...",
-                    })}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    Plataformas:
-                  </span>
-                  {getPlatformIcons()}
-                </div>
+          {type === 'publication' && item.accounts && item.accounts.length > 0 && (
+            <div className="flex items-center justify-between">
+              <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                <span className="flex items-center gap-1 rounded-lg bg-black/50 px-2 py-1 text-xs font-medium text-white">
+                  <Loader2 className="h-3 w-3 animate-spin" />{' '}
+                  {t('publications.gallery.processing', {
+                    defaultValue: 'Generating Preview...',
+                  })}
+                </span>
               </div>
-            )}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  {t('publications.modal.publish.platforms')}:
+                </span>
+                {getPlatformIcons()}
+              </div>
+            </div>
+          )}
 
-          {type === "campaign" && (
+          {type === 'campaign' && (
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Users className="w-3.5 h-3.5 text-gray-400" />
+                <Users className="h-3.5 w-3.5 text-gray-400" />
                 <span className="text-xs text-gray-600 dark:text-gray-300">
                   {item.publications?.length || 0} publicaciones
                 </span>
@@ -401,185 +346,204 @@ export default function ContentCard({
             </div>
           )}
 
-          <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-700">
-            {item.scheduled_at ? (
-              <div className="flex items-center gap-2">
-                <Calendar className="w-3.5 h-3.5 text-gray-400" />
-                <span className="text-xs text-gray-600 dark:text-gray-300">
-                  {format(new Date(item.scheduled_at), "d MMM, HH:mm", {
-                    locale,
-                  })}
-                </span>
-              </div>
-            ) : (
-              item.created_at && (
-                <div className="flex items-center gap-2">
-                  <Clock className="w-3.5 h-3.5 text-gray-400" />
-                  <span className="text-xs text-gray-600 dark:text-gray-300">
-                    {format(new Date(item.created_at), "d MMM yyyy", {
-                      locale,
-                    })}
+          <div className="flex items-center justify-between pt-2">
+            <div className="flex items-center gap-2">
+              {item.user && (
+                <>
+                  <Avatar src={item.user.photo_url} name={item.user.name} size="xs" />
+                  <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
+                    {item.user.name}
                   </span>
-                </div>
-              )
-            )}
+                </>
+              )}
+            </div>
 
-            {type === "publication" && hasMedia && (
+            {type === 'publication' && itemHasMedia && (
               <div className="flex items-center gap-1">
                 {isVideo ? (
-                  <Video className="w-3.5 h-3.5 text-gray-400" />
+                  <Video className="h-3.5 w-3.5 text-gray-400" />
                 ) : (
-                  <ImageIcon className="w-3.5 h-3.5 text-gray-400" />
+                  <ImageIcon className="h-3.5 w-3.5 text-gray-400" />
                 )}
                 <span className="text-xs text-gray-500 dark:text-gray-400">
-                  {item.media_files.length}{" "}
-                  {item.media_files.length === 1 ? "archivo" : "archivos"}
+                  {mediaCount.total} {mediaCount.total === 1 ? t('common.item') : t('common.files')}
                 </span>
               </div>
             )}
           </div>
+
+          {(item.scheduled_at || item.created_at) && (
+            <div className="flex items-center gap-2 pt-1">
+              {item.scheduled_at ? (
+                <>
+                  <Calendar className="h-3.5 w-3.5 text-gray-400" />
+                  <span className="text-xs text-gray-600 dark:text-gray-300">
+                    {formatDateString(item.scheduled_at, {
+                      day: 'numeric',
+                      month: 'short',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </span>
+                </>
+              ) : (
+                item.created_at && (
+                  <>
+                    <Clock className="h-3.5 w-3.5 text-gray-400" />
+                    <span className="text-xs text-gray-600 dark:text-gray-300">
+                      {formatDateString(item.created_at, {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                      })}
+                    </span>
+                  </>
+                )
+              )}
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="p-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
+      <div className="border-t border-gray-100 bg-gray-50/50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
         <div className="flex items-center gap-2">
-          {type === "publication" && canManageContent && (
+          {type === 'publication' && canManageContent && (
             <>
-              {canPublish ? (
-                <button
+              {shouldShowPublish(item) ? (
+                <Button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onPublish?.(item);
+                    handlePublish(item);
                   }}
-                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg transition-all shadow-sm shadow-orange-200 dark:shadow-none text-sm font-semibold"
-                  title="Publicar ahora"
+                  disabled={isLoading?.publishing}
+                  {...(isLoading?.publishing !== undefined && { loading: isLoading.publishing })}
+                  variant="primary"
+                  size="md"
+                  icon={Rocket}
+                  className="flex-1"
                 >
-                  <Rocket className="w-4 h-4" />
-                  <span className="hidden sm:inline">Publicar</span>
-                </button>
-              ) : !canPublish &&
-                !item.approved_at &&
-                ["draft", "failed", "rejected"].includes(
-                  item.status || "draft",
-                ) ? (
-                <button
+                  <span className="hidden sm:inline">{t('publications.button.publish')}</span>
+                </Button>
+              ) : shouldShowSendToReview(item) ? (
+                <Button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onPublish?.(item);
+                    handleSubmitForApproval(item);
                   }}
-                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors text-sm font-semibold shadow-sm"
-                  title="Solicitar aprobación"
+                  disabled={isLoading?.submitting}
+                  {...(isLoading?.submitting !== undefined && { loading: isLoading.submitting })}
+                  variant="primary"
+                  size="md"
+                  icon={Send}
+                  className="flex-1"
                 >
-                  <Clock className="w-4 h-4" />
-                  <span className="hidden sm:inline">Solicitar</span>
-                </button>
-              ) : item.status === "published" ? (
-                <button
+                  <span className="hidden sm:inline">
+                    {isLoading?.submitting
+                      ? t('publications.button.sending')
+                      : t('publications.button.sendForReview')}
+                  </span>
+                </Button>
+              ) : item.status === 'pending_review' ? (
+                <Button disabled buttonStyle="gradient" size="md" icon={Clock} className="flex-1">
+                  <span className="hidden sm:inline">{t('publications.button.inReview')}</span>
+                </Button>
+              ) : item.status === 'published' ? (
+                <Button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onViewDetails?.(item);
+                    handleViewDetails(item);
                   }}
-                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-white hover:bg-orange-50 text-gray-700 hover:text-orange-700 border border-gray-200 hover:border-orange-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg transition-all text-sm font-semibold shadow-sm"
-                  title="Ver detalles"
+                  variant="ghost"
+                  buttonStyle="ghost"
+                  size="md"
+                  icon={Eye}
+                  className="flex-1"
                 >
-                  <Eye className="w-4 h-4" />
-                  <span className="hidden sm:inline">Ver</span>
-                </button>
+                  <span>{t('publications.button.view')}</span>
+                </Button>
               ) : (
-                <button
+                <Button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onViewDetails?.(item);
+                    handleViewDetails(item);
                   }}
-                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-white hover:bg-orange-50 text-gray-700 hover:text-orange-700 border border-gray-200 hover:border-orange-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg transition-all text-sm font-semibold shadow-sm"
-                  title="Ver detalles"
+                  variant="ghost"
+                  buttonStyle="ghost"
+                  size="md"
+                  icon={Eye}
+                  className="flex-1"
                 >
-                  <Eye className="w-4 h-4" />
-                  <span className="hidden sm:inline">Ver</span>
-                </button>
+                  <span>{t('publications.button.view')}</span>
+                </Button>
               )}
             </>
           )}
 
-          {(!canManageContent || type === "campaign") && (
-            <button
+          {(!canManageContent || type === 'campaign') && (
+            <Button
               onClick={(e) => {
                 e.stopPropagation();
-                onViewDetails?.(item);
+                handleViewDetails(item);
               }}
-              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-white hover:bg-orange-50 text-gray-700 hover:text-orange-700 border border-gray-200 hover:border-orange-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg transition-all text-sm font-semibold shadow-sm"
-              title="Ver detalles"
+              variant="ghost"
+              buttonStyle="ghost"
+              size="md"
+              icon={Eye}
+              className="flex-1"
             >
-              <Eye className="w-4 h-4" />
-              Detalles
-            </button>
+              <span>{t('publications.button.view')}</span>
+            </Button>
           )}
 
           {canManageContent && (
-            <button
+            <Button
               onClick={(e) => {
                 e.stopPropagation();
-                if (remoteLock) {
-                  toast.error(
-                    `${t("publications.table.lockedBy") || "Editando por"} ${lockedByName}`,
-                  );
-                  return;
-                }
-                onEdit(item);
+                handleEdit(item, remoteLock);
               }}
-              className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-colors shadow-sm ${
-                remoteLock
-                  ? "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed dark:bg-gray-800 dark:border-gray-700 dark:text-gray-600"
-                  : "bg-white hover:bg-orange-50 text-gray-500 hover:text-orange-600 border border-gray-200 hover:border-orange-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700"
-              }`}
+              variant={remoteLock ? 'ghost' : 'secondary'}
+              buttonStyle="icon"
+              size="md"
+              icon={remoteLock ? Lock : Edit}
               disabled={!!remoteLock}
-              title={
-                remoteLock
-                  ? `${t("publications.table.lockedBy") || "Editando por"} ${lockedByName}`
-                  : "Editar"
-              }
             >
-              {remoteLock ? (
-                <>
-                  <Lock className="w-4 h-4" />
-                  <span className="text-xs font-medium">
-                    {lockedByFirstName}
-                  </span>
-                </>
-              ) : (
-                <Edit className="w-4 h-4" />
-              )}
-            </button>
+              <span className="sr-only">{t('common.edit')}</span>
+            </Button>
           )}
 
           {canManageContent && (
-            <button
+            <Button
               onClick={(e) => {
                 e.stopPropagation();
                 if (item?.id) {
-                  onDuplicate?.(item.id);
+                  handleDuplicate(item.id);
                 }
               }}
-              className="flex items-center justify-center px-3 py-2 bg-white hover:bg-primary-50 text-gray-400 hover:text-primary-600 border border-gray-200 hover:border-primary-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 rounded-lg transition-colors shadow-sm"
-              title="Duplicar"
+              variant="secondary"
+              buttonStyle="icon"
+              size="md"
+              icon={Copy}
             >
-              <Copy className="w-4 h-4" />
-            </button>
+              <span className="sr-only">{t('publications.button.duplicate')}</span>
+            </Button>
           )}
 
           {canManageContent && (
-            <button
+            <Button
               onClick={(e) => {
                 e.stopPropagation();
                 if (item?.id) {
-                  onDelete(item.id);
+                  handleDelete(item, (item as any).type === 'user_event');
                 }
               }}
-              className="flex items-center justify-center px-3 py-2 bg-white hover:bg-red-50 text-gray-400 hover:text-red-600 border border-gray-200 hover:border-red-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 rounded-lg transition-colors shadow-sm"
-              title="Eliminar"
+              buttonStyle="icon"
+              size="md"
+              icon={Trash2}
+              disabled={isLoading?.deleting}
+              {...(isLoading?.deleting !== undefined && { loading: isLoading.deleting })}
             >
-              <Trash2 className="w-4 h-4" />
-            </button>
+              <span className="sr-only">{t('common.delete')}</span>
+            </Button>
           )}
         </div>
       </div>

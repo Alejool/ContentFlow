@@ -10,6 +10,7 @@
     "socialNetworks": "Redes Sociales",
     "logout": "Cerrar Sesión",
     "notifications": "Notificaciones",
-    "workspaces": "Espacios"
+    "workspaces": "Espacios",
+    "workspace_branding": "Marca del Espacio"
   }
 }

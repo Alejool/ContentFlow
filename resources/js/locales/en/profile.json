@@ -4,13 +4,19 @@
     "tabs": {
       "general": "General",
       "security": "Security",
+      "subscription": "Subscription & Plan",
       "accounts": "Connected Accounts",
       "ai": "Artificial Intelligence",
       "appearance": "Appearance",
       "onboarding": "Onboarding"
     },
     "title": "Profile",
-    "appearance": "Appearance",
+    "appearance": {
+      "title": "Appearance Mode",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
     "settings_description": "Update your personal information and security settings.",
     "theme": {
       "title": "Color Theme",
@@ -18,12 +24,6 @@
       "success_title": "Theme Updated!",
       "success_message": "The system color has been updated successfully.",
       "close": "Close"
-    },
-    "appearance": {
-      "title": "Appearance Mode",
-      "light": "Light",
-      "dark": "Dark",
-      "system": "System"
     },
     "language": {
       "title": "Language",
@@ -54,7 +54,7 @@
       "namePlaceholder": "Your Name",
       "emailLabel": "Email",
       "emailPlaceholder": "your.email@example.com",
-      "emailUnverified": "Your email address is not verified. Please verify it to access all features.",
+      "emailUnverified": "Your email address is not verified. Verify it to access all features.",
       "sendVerification": "Send Verification Email",
       "verificationSent": "A new verification link has been sent to your email address.",
       "applicationLanguage": "Application Language",
@@ -99,7 +99,7 @@
       "updateButton": "Update Password",
       "successTitle": "Password updated successfully!",
       "successMessage": "Your account security has been enhanced.",
-      "errorTitle": "Please correct the following errors:",
+      "errorTitle": "Correct the following errors:",
       "securityTips": "Password Security Tips:",
       "tip1": "Use at least 8 characters with a mix of letters, numbers, and symbols",
       "tip2": "Avoid using personal information or common words",
@@ -114,10 +114,10 @@
       "title": "Delete Account",
       "description": "Permanently remove your account and data",
       "warningTitle": "Warning: Irreversible Action",
-      "warningMessage": "Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.",
+      "warningMessage": "Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account download any data or information that you wish to retain.",
       "deleteButton": "Delete Account",
       "confirmTitle": "Are you sure you want to delete your account?",
-      "confirmMessage": "Please enter your password to confirm you would like to permanently delete your account.",
+      "confirmMessage": "Enter your password to confirm you would like to permanently delete your account.",
       "passwordLabel": "Password",
       "passwordPlaceholder": "Enter your password to confirm",
       "cancel": "Cancel"
@@ -147,6 +147,12 @@
       "restartLabel": "Restart Onboarding Tour",
       "restartHint": "Review the platform features and setup process again",
       "restartButton": "Restart"
+    },
+    "usage": {
+      "title": "Plan Usage",
+      "publications": "Publications",
+      "used": "used",
+      "viewDetails": "View details →"
     }
   }
 }

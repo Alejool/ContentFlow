@@ -1,6 +1,6 @@
-import { useUploadQueue } from "@/stores/uploadQueueStore";
-import { useProcessingProgress } from "@/stores/processingProgressStore";
-import axios from "axios";
+import { useProcessingProgress } from '@/stores/processingProgressStore';
+import { useUploadQueue } from '@/stores/uploadQueueStore';
+import axios from 'axios';
 
 // Polling intervals
 const UPLOAD_POLL_INTERVAL = 500; // 500ms for uploads (Requirement 1.3)
@@ -13,10 +13,47 @@ let processingPollInterval: NodeJS.Timeout | null = null;
 // Track if WebSocket is available
 let isWebSocketAvailable = false;
 
+interface UploadProgressEvent {
+  uploadId: string;
+  progress: number;
+  stats?: {
+    eta: number;
+    speed: number;
+    startTime: number;
+    bytesUploaded: number;
+  };
+}
+
+interface ProcessingProgressEvent {
+  jobId: string;
+  publicationId: number;
+  progress: number;
+  currentStep?: string;
+  completedSteps?: number;
+  totalSteps?: number;
+  eta?: number;
+}
+
+interface VideoProcessingCompletedEvent {
+  publicationId: number;
+  status: string;
+  errorMessage?: string;
+}
+
+interface VideoProcessingFailedEvent {
+  jobId: string;
+  publicationId: number;
+  error?: string;
+}
+
+interface VideoProcessingCancelledEvent {
+  jobId: string;
+}
+
 /**
  * Initialize real-time progress tracking for uploads and processing
  * Automatically falls back to polling if WebSocket is unavailable
- * 
+ *
  * @param userId - The authenticated user's ID
  */
 export function initProgressRealtime(userId: number) {
@@ -25,6 +62,8 @@ export function initProgressRealtime(userId: number) {
 
   if (isWebSocketAvailable) {
     initWebSocketListeners(userId);
+    // Still start polling as backup in case WebSocket fails
+    initPollingFallback();
   } else {
     initPollingFallback();
   }
@@ -39,32 +78,32 @@ function initWebSocketListeners(userId: number) {
   const channel = window.Echo.private(`users.${userId}`);
 
   // Listen for upload progress updates (Requirement 1.3)
-  channel.listen(".UploadProgressUpdated", (event: any) => {
+  channel.listen('.UploadProgressUpdated', (event: UploadProgressEvent) => {
     handleUploadProgressUpdate(event);
   });
 
   // Listen for processing progress updates (Requirement 3.3)
-  channel.listen(".ProcessingProgressUpdated", (event: any) => {
+  channel.listen('.ProcessingProgressUpdated', (event: ProcessingProgressEvent) => {
     handleProcessingProgressUpdate(event);
   });
 
   // Listen for video processing completion (Requirements 8.1, 8.2)
-  channel.listen(".VideoProcessingCompleted", (event: any) => {
+  channel.listen('.VideoProcessingCompleted', (event: VideoProcessingCompletedEvent) => {
     handleVideoProcessingCompleted(event);
   });
 
   // Listen for processing failures
-  channel.listen(".VideoProcessingFailed", (event: any) => {
+  channel.listen('.VideoProcessingFailed', (event: VideoProcessingFailedEvent) => {
     handleVideoProcessingFailed(event);
   });
 
   // Listen for processing cancellations
-  channel.listen(".VideoProcessingCancelled", (event: any) => {
+  channel.listen('.VideoProcessingCancelled', (event: VideoProcessingCancelledEvent) => {
     handleVideoProcessingCancelled(event);
   });
 
   // Handle WebSocket connection errors - fallback to polling
-  channel.error((error: any) => {
+  channel.error((_error: unknown) => {
     isWebSocketAvailable = false;
     initPollingFallback();
   });
@@ -73,7 +112,7 @@ function initWebSocketListeners(userId: number) {
 /**
  * Handle upload progress update events
  */
-function handleUploadProgressUpdate(event: any) {
+function handleUploadProgressUpdate(event: UploadProgressEvent) {
   const { uploadId, progress, stats } = event;
 
   const uploadStore = useUploadQueue.getState();
@@ -83,13 +122,15 @@ function handleUploadProgressUpdate(event: any) {
     // Update existing upload with new progress and stats
     uploadStore.updateUpload(uploadId, {
       progress: Math.min(100, Math.max(0, progress)),
-      stats: stats ? {
-        eta: stats.eta || 0,
-        speed: stats.speed || 0,
-        startTime: stats.startTime || upload.stats?.startTime || Date.now(),
-        bytesUploaded: stats.bytesUploaded || 0,
-        lastUpdateTime: Date.now(),
-      } : upload.stats,
+      stats: stats
+        ? {
+            eta: stats.eta || 0,
+            speed: stats.speed || 0,
+            startTime: stats.startTime || upload.stats?.startTime || Date.now(),
+            bytesUploaded: stats.bytesUploaded || 0,
+            lastUpdateTime: Date.now(),
+          }
+        : upload.stats,
     });
   }
 }
@@ -97,16 +138,8 @@ function handleUploadProgressUpdate(event: any) {
 /**
  * Handle processing progress update events
  */
-function handleProcessingProgressUpdate(event: any) {
-  const {
-    jobId,
-    publicationId,
-    progress,
-    currentStep,
-    completedSteps,
-    totalSteps,
-    eta,
-  } = event;
+function handleProcessingProgressUpdate(event: ProcessingProgressEvent) {
+  const { jobId, publicationId, progress, currentStep, completedSteps, totalSteps, eta } = event;
 
   const processingStore = useProcessingProgress.getState();
   const job = processingStore.jobs[jobId];
@@ -115,10 +148,10 @@ function handleProcessingProgressUpdate(event: any) {
     // Update existing job
     processingStore.updateJob(jobId, {
       progress: Math.min(100, Math.max(0, progress)),
-      status: "processing",
+      status: 'processing',
       stats: {
         eta: eta || 0,
-        currentStep: currentStep || "",
+        currentStep: currentStep || '',
         totalSteps: totalSteps || 0,
         completedSteps: completedSteps || 0,
       },
@@ -128,12 +161,12 @@ function handleProcessingProgressUpdate(event: any) {
     processingStore.addJob({
       id: jobId,
       publicationId,
-      type: "video_processing",
+      type: 'video_processing',
       progress: Math.min(100, Math.max(0, progress)),
-      status: "processing",
+      status: 'processing',
       stats: {
         eta: eta || 0,
-        currentStep: currentStep || "",
+        currentStep: currentStep || '',
         totalSteps: totalSteps || 0,
         completedSteps: completedSteps || 0,
       },
@@ -145,19 +178,17 @@ function handleProcessingProgressUpdate(event: any) {
 /**
  * Handle video processing completion events
  */
-function handleVideoProcessingCompleted(event: any) {
+function handleVideoProcessingCompleted(event: VideoProcessingCompletedEvent) {
   const { publicationId, status, errorMessage } = event;
 
   const processingStore = useProcessingProgress.getState();
 
   // Find job by publicationId
-  const job = Object.values(processingStore.jobs).find(
-    (j) => j.publicationId === publicationId
-  );
+  const job = Object.values(processingStore.jobs).find((j) => j.publicationId === publicationId);
 
   if (job) {
     processingStore.updateJob(job.id, {
-      status: status === "completed" ? "completed" : "failed",
+      status: status === 'completed' ? 'completed' : 'failed',
       progress: 100,
       error: errorMessage,
       completedTime: Date.now(),
@@ -173,16 +204,16 @@ function handleVideoProcessingCompleted(event: any) {
 /**
  * Handle video processing failure events
  */
-function handleVideoProcessingFailed(event: any) {
-  const { jobId, publicationId, error } = event;
+function handleVideoProcessingFailed(event: VideoProcessingFailedEvent) {
+  const { jobId, error } = event;
 
   const processingStore = useProcessingProgress.getState();
   const job = processingStore.jobs[jobId];
 
   if (job) {
     processingStore.updateJob(jobId, {
-      status: "failed",
-      error: error || "Processing failed",
+      status: 'failed',
+      error: error || 'Processing failed',
       completedTime: Date.now(),
     });
   }
@@ -191,7 +222,7 @@ function handleVideoProcessingFailed(event: any) {
 /**
  * Handle video processing cancellation events
  */
-function handleVideoProcessingCancelled(event: any) {
+function handleVideoProcessingCancelled(event: VideoProcessingCancelledEvent) {
   const { jobId } = event;
 
   const processingStore = useProcessingProgress.getState();
@@ -224,46 +255,86 @@ function initPollingFallback() {
 
 /**
  * Poll upload progress from the server
+ * NOTE: This is only for legacy server-side uploads.
+ * For direct S3 uploads, progress is handled locally in useS3Upload hook.
  */
 async function pollUploadProgress() {
   const uploadStore = useUploadQueue.getState();
   const activeUploads = Object.values(uploadStore.queue).filter(
-    (upload) => upload.status === "uploading" || upload.status === "pending"
+    (upload) => upload.status === 'uploading' || upload.status === 'pending',
   );
 
   if (activeUploads.length === 0) {
     return; // No active uploads to poll
   }
 
-  const uploadIds = activeUploads.map((upload) => upload.id);
+  // Filter out S3 direct uploads (they have uploadId or s3Key)
+  // Only poll for server-side uploads (legacy)
+  const serverUploads = activeUploads.filter(
+    (upload) => !upload.uploadId && !upload.s3Key && !upload.isPausable,
+  );
+
+  if (serverUploads.length === 0) {
+    return; // No server-side uploads to poll
+  }
+
+  const uploadIds = serverUploads.map((upload) => upload.id);
 
   try {
-    const response = await axios.get("/api/progress", {
+    const response = await axios.get('/api/v1/uploads/progress', {
       params: {
-        upload_ids: uploadIds,
+        upload_ids: uploadIds.join(','),
       },
+      timeout: 5000, // 5 second timeout
     });
 
     const { uploads } = response.data;
 
     // Update each upload with polled progress
-    Object.entries(uploads || {}).forEach(([uploadId, progressData]: [string, any]) => {
-      const upload = uploadStore.queue[uploadId];
-      if (upload) {
-        uploadStore.updateUpload(uploadId, {
-          progress: Math.min(100, Math.max(0, progressData.progress || 0)),
-          stats: {
-            eta: progressData.eta || 0,
-            speed: progressData.speed || 0,
-            startTime: upload.stats?.startTime || Date.now(),
-            bytesUploaded: progressData.bytes_uploaded || 0,
-            lastUpdateTime: Date.now(),
-          },
-        });
-      }
-    });
+    Object.entries(uploads || {}).forEach(
+      ([uploadId, progressData]: [string, Record<string, unknown>]) => {
+        const upload = uploadStore.queue[uploadId];
+        if (upload) {
+          // Check for completion or failure
+          if (progressData.status === 'completed') {
+            uploadStore.updateUpload(uploadId, {
+              status: 'completed',
+              progress: 100,
+              s3Key: progressData.s3_key as string | undefined,
+            });
+          } else if (progressData.status === 'failed') {
+            uploadStore.updateUpload(uploadId, {
+              status: 'error',
+              progress: 0,
+              error: (progressData.error as string) || 'Upload failed',
+            });
+          } else {
+            uploadStore.updateUpload(uploadId, {
+              progress: Math.min(100, Math.max(0, (progressData.progress as number) || 0)),
+              stats: {
+                eta: (progressData.eta as number) || 0,
+                speed: (progressData.speed as number) || 0,
+                startTime: upload.stats?.startTime || Date.now(),
+                bytesUploaded: (progressData.bytes_uploaded as number) || 0,
+                lastUpdateTime: Date.now(),
+              },
+            });
+          }
+        }
+      },
+    );
   } catch (error) {
+    // Check for timeout or network errors
+    if (axios.isAxiosError(error)) {
+      if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+        console.warn('Upload progress polling timed out, will retry');
+      } else if (error.response?.status === 404) {
+        // Upload not found on server - this is expected for S3 direct uploads
+        // Don't mark as failed, just log
+        console.debug('Upload not found on server (expected for S3 direct uploads)');
+      }
     }
+  }
 }
 
 /**
@@ -272,7 +343,7 @@ async function pollUploadProgress() {
 async function pollProcessingProgress() {
   const processingStore = useProcessingProgress.getState();
   const activeJobs = Object.values(processingStore.jobs).filter(
-    (job) => job.status === "processing" || job.status === "queued"
+    (job) => job.status === 'processing' || job.status === 'queued',
   );
 
   if (activeJobs.length === 0) {
@@ -282,39 +353,64 @@ async function pollProcessingProgress() {
   const jobIds = activeJobs.map((job) => job.id);
 
   try {
-    const response = await axios.get("/api/progress", {
+    const response = await axios.get('/api/v1/processing/progress', {
       params: {
-        job_ids: jobIds,
+        job_ids: jobIds.join(','),
       },
+      timeout: 5000, // 5 second timeout
     });
 
     const { jobs } = response.data;
 
     // Update each job with polled progress
-    Object.entries(jobs || {}).forEach(([jobId, progressData]: [string, any]) => {
-      const job = processingStore.jobs[jobId];
-      if (job) {
-        processingStore.updateJob(jobId, {
-          progress: Math.min(100, Math.max(0, progressData.progress || 0)),
-          status: progressData.progress >= 100 ? "completed" : "processing",
-          stats: {
-            eta: progressData.eta || 0,
-            currentStep: progressData.current_step || "",
-            totalSteps: progressData.total_steps || 0,
-            completedSteps: progressData.completed_steps || 0,
-          },
-        });
+    Object.entries(jobs || {}).forEach(
+      ([jobId, progressData]: [string, Record<string, unknown>]) => {
+        const job = processingStore.jobs[jobId];
+        if (job) {
+          const isCompleted =
+            (progressData.progress as number) >= 100 || progressData.status === 'completed';
+          const isFailed = progressData.status === 'failed';
 
-        // If completed, remove after delay
-        if (progressData.progress >= 100) {
-          setTimeout(() => {
-            processingStore.removeJob(jobId);
-          }, 3000);
+          processingStore.updateJob(jobId, {
+            progress: Math.min(100, Math.max(0, (progressData.progress as number) || 0)),
+            status: isFailed ? 'failed' : isCompleted ? 'completed' : 'processing',
+            error: (progressData.error as string) || job.error,
+            stats: {
+              eta: (progressData.eta as number) || 0,
+              currentStep: (progressData.current_step as string) || '',
+              totalSteps: (progressData.total_steps as number) || 0,
+              completedSteps: (progressData.completed_steps as number) || 0,
+            },
+          });
+
+          // If completed or failed, remove after delay
+          if (isCompleted || isFailed) {
+            setTimeout(() => {
+              processingStore.removeJob(jobId);
+            }, 3000);
+          }
         }
-      }
-    });
+      },
+    );
   } catch (error) {
+    // Handle timeout or network errors
+    if (axios.isAxiosError(error)) {
+      if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+        console.warn('Processing progress polling timed out, will retry');
+      } else if (error.response?.status === 404) {
+        // Jobs not found, they may have completed
+        activeJobs.forEach((job) => {
+          processingStore.updateJob(job.id, {
+            status: 'completed',
+            progress: 100,
+          });
+          setTimeout(() => {
+            processingStore.removeJob(job.id);
+          }, 2000);
+        });
+      }
     }
+  }
 }
 
 /**
@@ -344,7 +440,8 @@ export function cleanupProgressRealtime(userId: number) {
   if (window.Echo && isWebSocketAvailable) {
     try {
       window.Echo.leave(`users.${userId}`);
-    } catch (error) {
-      }
+    } catch {
+      // Ignore cleanup errors
+    }
   }
 }

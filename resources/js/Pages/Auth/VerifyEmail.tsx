@@ -1,7 +1,7 @@
-import { Head, Link, useForm } from "@inertiajs/react";
-import { Check, Loader2, Lock, Mail } from "lucide-react";
-import { FormEventHandler } from "react";
-import { useTranslation } from "react-i18next";
+import { Head, Link, useForm } from '@inertiajs/react';
+import { Check, Loader2, Lock, Mail } from 'lucide-react';
+import { FormEventHandler } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface VerifyEmailProps {
   status?: string;
@@ -13,44 +13,40 @@ export default function VerifyEmail({ status }: VerifyEmailProps) {
 
   const submit: FormEventHandler = (e) => {
     e.preventDefault();
-    post(route("verification.send"));
+    post(route('verification.send'));
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 flex items-center justify-center p-4">
-      <Head title={t("verification.title")} />
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 p-4">
+      <Head title={t('verification.title')} />
 
-      <div className="max-w-md w-full">
+      <div className="w-full max-w-md">
         {/* Card */}
-        <div className="bg-white rounded-lg shadow-xl overflow-hidden">
+        <div className="overflow-hidden rounded-lg bg-white shadow-xl">
           {/* Header with gradient */}
           <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-8 text-center">
-            <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <Mail className="w-10 h-10 text-purple-600" />
+            <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-white shadow-lg">
+              <Mail className="h-10 w-10 text-purple-600" />
             </div>
-            <h1 className="text-3xl font-bold text-white mb-2">
-              {t("verification.banner.title")}
-            </h1>
-            <p className="text-purple-100">
-              {t("verification.banner.message").split("?")[0]}?
-            </p>
+            <h1 className="mb-2 text-3xl font-bold text-white">{t('verification.banner.title')}</h1>
+            <p className="text-purple-100">{t('verification.banner.message').split('?')[0]}?</p>
           </div>
 
           {/* Body */}
           <div className="p-8">
-            <div className="mb-6 text-gray-600 text-center">
-              <p className="mb-4">{t("verification.banner.message")}</p>
-              <p>{t("verification.didNotReceive")}</p>
+            <div className="mb-6 text-center text-gray-600">
+              <p className="mb-4">{t('verification.banner.message')}</p>
+              <p>{t('verification.didNotReceive')}</p>
             </div>
 
-            {status === "verification-link-sent" && (
-              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+            {status === 'verification-link-sent' && (
+              <div className="mb-6 rounded-lg border border-green-200 bg-green-50 p-4">
                 <div className="flex items-center gap-3">
                   <div className="flex-shrink-0">
-                    <Check className="w-5 h-5 text-green-600" />
+                    <Check className="h-5 w-5 text-green-600" />
                   </div>
                   <p className="text-sm font-medium text-green-800">
-                    {t("verification.banner.successMessage")}
+                    {t('verification.banner.successMessage')}
                   </p>
                 </div>
               </div>
@@ -60,45 +56,45 @@ export default function VerifyEmail({ status }: VerifyEmailProps) {
               <button
                 type="submit"
                 disabled={processing}
-                className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="w-full transform rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl disabled:transform-none disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {processing ? (
                   <span className="flex items-center justify-center gap-2">
-                    <Loader2 className="animate-spin h-5 w-5" />
-                    {t("verification.banner.sending")}
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    {t('verification.banner.sending')}
                   </span>
                 ) : (
-                  t("verification.banner.resendButton")
+                  t('verification.banner.resendButton')
                 )}
               </button>
 
               <Link
-                href={route("logout")}
+                href={route('logout')}
                 method="post"
                 as="button"
-                className="w-full px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors duration-200"
+                className="w-full rounded-lg bg-gray-100 px-6 py-3 font-semibold text-gray-700 transition-colors duration-200 hover:bg-gray-200"
               >
-                {t("verification.logout")}
+                {t('verification.logout')}
               </Link>
             </form>
           </div>
 
-          <div className="px-8 py-6 bg-gray-50 border-t border-gray-100">
+          <div className="border-t border-gray-100 bg-gray-50 px-8 py-6">
             <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
-              <Lock className="w-4 h-4" />
-              <span>{t("verification.security")}</span>
+              <Lock className="h-4 w-4" />
+              <span>{t('verification.security')}</span>
             </div>
           </div>
         </div>
 
         {/* Help text */}
-        <p className="text-center text-sm text-gray-600 mt-6">
-          {t("verification.needHelp")}{" "}
+        <p className="mt-6 text-center text-sm text-gray-600">
+          {t('verification.needHelp')}{' '}
           <a
             href="mailto:support@example.com"
-            className="text-purple-600 hover:text-purple-700 font-medium"
+            className="font-medium text-purple-600 hover:text-purple-700"
           >
-            {t("verification.contactSupport")}
+            {t('verification.contactSupport')}
           </a>
         </p>
       </div>

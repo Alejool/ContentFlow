@@ -1,6 +1,6 @@
 /**
  * Animated Page Transition Component
- * 
+ *
  * Smooth page transitions with Framer Motion
  */
 

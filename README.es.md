@@ -1,14 +1,14 @@
-# ContentFlow — Hub de Estrategia Social y Multimedia
+# Intellipost — Hub de Estrategia Social y Multimedia
 
 <div align="center">
-  <img src="resources/assets/logo-with-name.png" alt="Logo de ContentFlow" width="400" />
+  <img src="resources/assets/logo.svg" alt="Logo de Intellipost" width="400" />
   <p><em>Centraliza tu presencia digital con estrategia impulsada por IA y automatización multiplataforma.</em></p>
 </div>
 
 ---
 
 ## 🌟 Visión
-**ContentFlow** es una plataforma de gestión de contenido multimedia de nivel empresarial diseñada para creadores, agencias de marketing y equipos modernos. Cierra la brecha entre las ideas en bruto y la excelencia publicada al centralizar la estrategia de redes sociales, la creación asistida por IA y la colaboración multiusuario en una interfaz única y cohesiva.
+**Intellipost** es una plataforma de gestión de contenido multimedia de nivel empresarial diseñada para creadores, agencias de marketing y equipos modernos. Cierra la brecha entre las ideas en bruto y la excelencia publicada al centralizar la estrategia de redes sociales, la creación asistida por IA y la colaboración multiusuario en una interfaz única y cohesiva.
 
 ## 🚀 Funcionalidades Principales
 
@@ -19,7 +19,7 @@ Gestiona y publica contenido en las principales plataformas desde un único pane
 - **Twitter (X)**: Constructor de hilos, división de contenido y soporte nativo para encuestas.
 
 ### 🤖 Motor de IA Inteligente
-ContentFlow integra una capa de IA multiproveedor (DeepSeek, Gemini, OpenAI, Claude) para asistirte:
+Intellipost integra una capa de IA multiproveedor (DeepSeek, Gemini, OpenAI, Claude) para asistirte:
 - **Estrategia de Contenido**: Herramientas para generar planes de contenido adaptados a tu nicho.
 - **Micro-Copywriting**: Asistencia en la generación de subtítulos, hashtags y títulos enfocados en el compromiso.
 - **Optimización de Medios**: Sugerencias de horarios de publicación y formato específico para cada plataforma.
@@ -28,7 +28,7 @@ ContentFlow integra una capa de IA multiproveedor (DeepSeek, Gemini, OpenAI, Cla
 Gestiona todo tu cronograma editorial con un calendario interactivo. Visualiza publicaciones programadas, eventos de usuario e hitos de campaña de un vistazo, asegurando una voz de marca constante en todos los canales.
 
 ### 🏢 Espacios de Trabajo para Agencias
-Diseñado pensando en la escalabilidad, ContentFlow soporta multi-tenancy:
+Diseñado pensando en la escalabilidad, Intellipost soporta multi-tenancy:
 - **Entornos Aislados**: Mantén clientes, proyectos o marcas completamente separados con espacios de trabajo dedicados.
 - **Control de Acceso Basado en Roles (RBAC)**: Permisos granulares (Propietario, Administrador, Editor, Visor).
 - **Colaboración en Tiempo Real**: Indicadores de presencia en vivo y bloqueos de edición para evitar sobreescritura de contenido.
@@ -43,7 +43,7 @@ Seguimiento unificado de métricas para entender tu impacto global:
 
 ## 🏗️ Arquitectura y Stack Tecnológico
 
-ContentFlow sigue una arquitectura de **Monolito Híbrido**, combinando la robustez de un backend tradicional con la fluidez de una SPA moderna.
+Intellipost sigue una arquitectura de **Monolito Híbrido**, combinando la robustez de un backend tradicional con la fluidez de una SPA moderna.
 
 ### 🛠️ El Stack
 - **Backend**: [Laravel 11](https://laravel.com/) (PHP 8.2+) — Utilizando patrones Service-Action para una lógica desacoplada.
@@ -78,7 +78,7 @@ graph TD
 ## 📁 Estructura del Repositorio
 
 ```text
-ContentFlow/
+Intellipost/
 ├── app/
 │   ├── Actions/             # Lógica de negocio unitaria (Crear, Actualizar, Publicar)
 │   ├── Http/Controllers/    # Controladores de Inertia y API
@@ -105,8 +105,8 @@ ContentFlow/
 ### Instalación
 1. **Clonar el repositorio**
    ```bash
-   git clone https://github.com/Alejool/ContentFlow.git
-   cd ContentFlow
+   git clone https://github.com/Alejool/Intellipost.git
+   cd Intellipost
    ```
 2. **Configurar Dependencias**
    ```bash
@@ -138,17 +138,17 @@ ContentFlow/
 ¡Creemos en el poder de la comunidad! Aquí tienes cómo puedes apoyar el proyecto:
 
 - **⭐ Star al Repositorio**: Muestra tu apoyo y ayuda a otros a encontrar el proyecto.
-- **🐛 Reportar Errores**: ¿Encontraste un problema? Abre un [ GitHub Issue](https://github.com/Alejool/ContentFlow/issues).
-- **💡 Sugerir Funcionalidades**: ¿Tienes una gran idea? Cuéntanos en las discusiones.
+- **🐛 Reportar Errores**: ¿Encontraste un problema? Abre un [ GitHub Issue](https://github.com/Alejool/Intellipost/issues).
+- ** Sugerir Funcionalidades**: ¿Tienes una gran idea? Cuéntanos en las discusiones.
 - **💻 Contribuir Código**: ¡Los pull requests siempre son bienvenidos! Por favor, lee nuestro `CONTRIBUTING.md` (próximamente).
 
 ---
 
 ## 📄 Licencia
-ContentFlow es software de código abierto bajo la [licencia MIT](LICENSE).
+Intellipost es software de código abierto bajo la [licencia MIT](LICENSE).
 
 ---
 
 <div align="center">
-  Construido con ❤️ por el equipo de ContentFlow.
+  Construido con ❤️ por el equipo de Intellipost.
 </div>

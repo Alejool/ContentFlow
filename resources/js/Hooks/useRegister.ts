@@ -1,34 +1,33 @@
-import { getErrorMessage } from "@/Utils/validation";
-import { useForm } from "@inertiajs/react";
-import axios from "axios";
-import { useState } from "react";
-import { toast } from "react-hot-toast";
-import { useTranslation } from "react-i18next";
+import { getErrorMessage } from '@/Utils/validation';
+import { useForm } from '@inertiajs/react';
+import axios from 'axios';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 export const useRegister = () => {
   const { t } = useTranslation();
-  const [generalError, setGeneralError] = useState("");
+  const [generalError, setGeneralError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState('');
 
   const { data, setData, errors, setError, reset } = useForm({
-    name: "",
-    email: "",
-    password: "",
-    password_confirmation: "",
+    name: '',
+    email: '',
+    password: '',
+    password_confirmation: '',
   });
 
   // Safe wrapper for setting errors which handles different versions of Inertia useForm
   const setFieldErrors = (payload: Record<string, any>) => {
     try {
       // @ts-ignore - handling potential version mismatch safely
-      if (typeof setError === "function") {
+      if (typeof setError === 'function') {
         Object.keys(payload).forEach((key) => {
           setError(key as any, payload[key]);
         });
       }
-    } catch (e) {
-      }
+    } catch (e) {}
   };
 
   const submitRegister = async (payload: {
@@ -38,11 +37,11 @@ export const useRegister = () => {
     password_confirmation: string;
   }) => {
     setLoading(true);
-    setGeneralError("");
-    setSuccessMessage("");
+    setGeneralError('');
+    setSuccessMessage('');
 
     if (payload.password !== payload.password_confirmation) {
-      const msg = t("validation.passwords_do_not_match");
+      const msg = t('validation.passwords_do_not_match');
       setGeneralError(msg);
       toast.error(msg);
       setLoading(false);
@@ -51,14 +50,14 @@ export const useRegister = () => {
 
     try {
       const response = await axios.post(
-        "/register",
+        '/register',
         {
           name: payload.name,
           email: payload.email,
           password: payload.password,
           password_confirmation: payload.password_confirmation,
         },
-        { headers: { Accept: "application/json" } },
+        { headers: { Accept: 'application/json' } },
       );
 
       if (response.data?.success) {
@@ -68,19 +67,16 @@ export const useRegister = () => {
         if (response.data.redirect) {
           window.location.href = response.data.redirect;
         }
-        reset("name", "email", "password", "password_confirmation");
+        reset('name', 'email', 'password', 'password_confirmation');
       }
     } catch (backendError: any) {
-      if (
-        backendError.response?.status === 422 &&
-        backendError.response?.data?.errors
-      ) {
+      if (backendError.response?.status === 422 && backendError.response?.data?.errors) {
         const errorData = backendError.response.data.errors;
         setFieldErrors(errorData);
 
         const errorMessage = Object.keys(errorData)
           .map((key) => getErrorMessage(errorData[key], t, key))
-          .join(" ");
+          .join(' ');
 
         setGeneralError(errorMessage);
         toast.error(errorMessage);
@@ -89,7 +85,7 @@ export const useRegister = () => {
         setGeneralError(backendError.response.data.message);
         toast.error(backendError.response.data.message);
       } else {
-        const msg = t("common.errors.checkFormErrors");
+        const msg = t('common.errors.checkFormErrors');
         setGeneralError(msg);
         toast.error(msg);
       }
@@ -110,8 +106,8 @@ export const useRegister = () => {
 
   const handleGoogleRegister = () => {
     setLoading(true);
-    setGeneralError("");
-    window.location.href = "/auth/google/redirect";
+    setGeneralError('');
+    window.location.href = '/auth/google/redirect';
   };
 
   return {

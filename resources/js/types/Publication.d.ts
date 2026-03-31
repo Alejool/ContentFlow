@@ -10,23 +10,49 @@ export type Publication = {
   goal?: string;
   slug?: string;
   scheduled_at?: string;
+  content_type?: 'post' | 'reel' | 'story' | 'poll' | 'carousel';
+  poll_options?: string[];
+  poll_duration_hours?: number;
   status?:
-    | "draft"
-    | "published"
-    | "scheduled"
-    | "publishing"
-    | "processing"
-    | "pending_review"
-    | "approved"
-    | "rejected"
-    | "failed"
-    | "retrying";
+    | 'draft'
+    | 'published'
+    | 'scheduled'
+    | 'publishing'
+    | 'processing'
+    | 'pending_review'
+    | 'approved'
+    | 'rejected'
+    | 'failed'
+    | 'retrying'
+    | 'published_with_errors'
+    | 'partially_published';
   is_active?: boolean;
   media_files?: MediaFile[];
   scheduled_posts?: ScheduledPost[];
   social_post_logs?: SocialPostLog[];
   approval_logs?: ApprovalLog[];
-  activities?: any[];
+  activities?: PublicationActivity[];
+  publication_status_summary?: {
+    total_platforms: number;
+    published: number;
+    publishing: number;
+    pending: number;
+    failed: number;
+    deleted: number;
+    platforms: Array<{
+      platform: string;
+      account_id: number;
+      account_name: string;
+      status: string;
+      published_at?: string;
+      error?: string;
+      url?: string;
+    }>;
+    has_errors: boolean;
+    all_successful: boolean;
+    partially_successful: boolean;
+    in_progress: boolean;
+  };
   campaigns?: {
     id: number;
     name: string;
@@ -41,11 +67,12 @@ export type Publication = {
     email: string;
     photo_url: string;
   };
-  platform_settings?: Record<string, any>;
+  platform_settings?: Record<string, unknown>;
   approved_by?: number;
   approved_at?: string;
   published_by?: number;
   published_at?: string;
+  publish_date?: string;
   rejected_by?: number;
   rejected_at?: string;
   rejection_reason?: string;
@@ -73,12 +100,33 @@ export type Publication = {
     name: string;
     photo_url?: string;
   } | null;
+  current_approval_step_id?: number | null;
+  current_approval_step?: {
+    level_number: number;
+    id: number;
+    name: string;
+    step_order: number;
+    workflow?: {
+      id: number;
+      name: string;
+      steps?: { id: number; name: string; step_order: number }[];
+    };
+  };
   approval_logs?: ApprovalLog[];
+  // Nuevo sistema simplificado: approval_request activo
+  approval_request?: import('@/types/ApprovalTypes').ApprovalRequest;
   platform_status_summary?: Record<
     string,
     {
       platform: string;
-      status: "published" | "failed" | "pending" | "publishing" | "success" | "orphaned";
+      status:
+        | 'published'
+        | 'failed'
+        | 'pending'
+        | 'publishing'
+        | 'retrying'
+        | 'success'
+        | 'orphaned';
       published_at?: string;
       error?: string;
       url?: string;
@@ -88,6 +136,23 @@ export type Publication = {
       can_unpublish?: boolean;
     }
   >;
+  is_recurring?: boolean;
+  recurrence_type?: 'daily' | 'weekly' | 'monthly' | 'yearly';
+  recurrence_interval?: number;
+  recurrence_days?: number[];
+  recurrence_end_date?: string;
+  recurrence_accounts?: number[];
+  recurrence_settings?: {
+    id: number;
+    publication_id: number;
+    recurrence_type: 'daily' | 'weekly' | 'monthly' | 'yearly';
+    recurrence_interval: number;
+    recurrence_days: number[] | null;
+    recurrence_end_date: string | null;
+    recurrence_accounts: number[] | null;
+    created_at: string;
+    updated_at: string;
+  };
 };
 
 export type ApprovalLog = {
@@ -97,7 +162,7 @@ export type ApprovalLog = {
   requested_at: string;
   reviewed_by: number | null;
   reviewed_at: string | null;
-  action: "approved" | "rejected" | null;
+  action: 'approved' | 'rejected' | null;
   rejection_reason: string | null;
   requester?: {
     id: number;
@@ -109,29 +174,32 @@ export type ApprovalLog = {
     name: string;
     photo_url?: string;
   };
+  current_step_id?: number | null;
+  current_step?: {
+    id: number;
+    name: string;
+    step_order: number;
+  };
 };
 
 export type ScheduledPost = {
   id: number;
   social_account_id: number;
   scheduled_at: string;
-  status: "pending" | "posted" | "failed";
+  status: 'pending' | 'posted' | 'failed';
   social_account?: SocialAccount;
   account_name?: string;
   platform?: string;
 };
 
 export type SocialPostLog = {
+  attempts: number;
+  max_attempts: number;
+  retry_status: string;
+  is_retrying: boolean;
   id: number;
   social_account_id: number;
-  status:
-    | "published"
-    | "failed"
-    | "deleted"
-    | "pending"
-    | "publishing"
-    | "success"
-    | "orphaned";
+  status: 'published' | 'failed' | 'deleted' | 'pending' | 'publishing' | 'success' | 'orphaned';
   social_account?: SocialAccount;
   platform: string;
   created_at: string;
@@ -141,7 +209,7 @@ export type SocialPostLog = {
   content?: string;
   post_url?: string;
   video_url?: string;
-  engagement_data?: any;
+  engagement_data?: Record<string, unknown>;
   publication?: Publication;
   campaign?: { id: number; name: string };
 };
@@ -157,7 +225,7 @@ export type SocialAccount = {
   is_active: boolean;
   last_failed_at: string;
   failure_count: number;
-  account_metadata: any;
+  account_metadata: Record<string, unknown>;
 };
 
 export type MediaFile = {
@@ -176,7 +244,7 @@ export type MediaFile = {
     duration?: number;
     width?: number;
     height?: number;
-    [key: string]: any;
+    [key: string]: unknown;
   };
   derivatives?: Array<{
     id: number;
@@ -184,7 +252,7 @@ export type MediaFile = {
     file_type: string;
     file_path: string;
     mime_type?: string;
-    [key: string]: any;
+    [key: string]: unknown;
   }>;
   thumbnail?: {
     id: number;
@@ -196,5 +264,18 @@ export type MediaFile = {
     publication_id: number;
     media_file_id: number;
     order: number;
+  };
+};
+
+export type PublicationActivity = {
+  id: number;
+  type: string;
+  status?: string;
+  details?: any;
+  created_at: string;
+  user?: {
+    id: number;
+    name: string;
+    photo_url?: string;
   };
 };

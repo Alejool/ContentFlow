@@ -27,3 +27,7 @@ Broadcast::channel('publication.{id}', function ($user, $id) {
         ? ['id' => $user->id, 'name' => $user->name, 'avatar' => $user->photo_url]
         : false;
 });
+// Channel for workspace usage limits updates
+Broadcast::channel('workspace.{workspaceId}.limits', function ($user, $workspaceId) {
+    return $user->workspaces()->where('workspaces.id', $workspaceId)->exists();
+});

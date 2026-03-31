@@ -8,6 +8,7 @@ use App\Models\Publications\Publication;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
 use App\Notifications\SocialAccountConnectedNotification;
@@ -15,35 +16,85 @@ use App\Notifications\SocialAccountDisconnectedNotification;
 use App\Models\Social\SocialPostLog;
 use Abraham\TwitterOAuth\TwitterOAuth;
 use Carbon\Carbon;
+use App\Services\Subscription\PlanLimitValidator;
+use App\Helpers\LogHelper;
+use Inertia\Inertia;
 
 
 class SocialAccountController extends Controller
 {
-  public function index()
-  {
-    $workspaceId = Auth::user()->current_workspace_id;
-    $allowedPlatforms = [];
-    if (config('services.facebook.client_id')) $allowedPlatforms[] = 'facebook';
-    if (config('services.instagram.client_id')) $allowedPlatforms[] = 'instagram';
-    if (config('services.twitter.client_id') || config('services.twitter.consumer_key')) $allowedPlatforms[] = 'twitter';
-    if (config('services.linkedin.client_id')) $allowedPlatforms[] = 'linkedin';
-    if (config('services.tiktok.client_key')) $allowedPlatforms[] = 'tiktok';
-    if (config('services.google.client_id')) $allowedPlatforms[] = 'youtube';
+  public function index(Request $request)
+    {
+      $workspaceId = Auth::user()->current_workspace_id;
+      $allowedPlatforms = [];
+      if (config('services.facebook.client_id')) $allowedPlatforms[] = 'facebook';
+      if (config('services.instagram.client_id')) $allowedPlatforms[] = 'instagram';
+      if (config('services.twitter.client_id') || config('services.twitter.consumer_key')) $allowedPlatforms[] = 'twitter';
+      if (config('services.linkedin.client_id')) $allowedPlatforms[] = 'linkedin';
+      if (config('services.tiktok.client_key')) $allowedPlatforms[] = 'tiktok';
+      if (config('services.google.client_id')) $allowedPlatforms[] = 'youtube';
 
-    $accounts = SocialAccount::where('workspace_id', $workspaceId)
-      ->where('is_active', true)
-      ->whereIn('platform', $allowedPlatforms)
-      ->with('user:id,name')
-      ->get();
+      $accounts = SocialAccount::where('workspace_id', $workspaceId)
+        ->where('is_active', true)
+        ->whereIn('platform', $allowedPlatforms)
+        ->with('user:id,name')
+        ->get();
 
-    return response()->json([
-      'success' => true,
-      'accounts' => $accounts
-    ]);
-  }
+      // Si es una petición API, devolver JSON
+      if ($request->expectsJson() || $request->is('api/*')) {
+        return response()->json([
+          'success' => true,
+          'accounts' => $accounts,
+          'allowedPlatforms' => $allowedPlatforms
+        ]);
+      }
+
+      // Si es una petición web, devolver vista Inertia
+      return Inertia::render('SocialAccounts/Index', [
+        'accounts' => $accounts,
+        'allowedPlatforms' => $allowedPlatforms
+      ]);
+    }
 
   public function getAuthUrl(Request $request, $platform)
   {
+    // Verify user has manage-accounts permission
+    $workspace = Auth::user()->currentWorkspace;
+    if (!$workspace) {
+      return response()->json([
+        'success' => false,
+        'message' => 'No workspace selected'
+      ], 403);
+    }
+
+    $role = Auth::user()->workspaces()
+      ->where('workspaces.id', $workspace->id)
+      ->first();
+    
+    if (!$role || !$role->pivot->role_id) {
+      return response()->json([
+        'success' => false,
+        'message' => 'You do not have permission to manage social accounts'
+      ], 403);
+    }
+
+    $userRole = \App\Models\Role\Role::find($role->pivot->role_id);
+    $hasPermission = $userRole && $userRole->permissions()->where('slug', 'manage-accounts')->exists();
+    
+    if (!$hasPermission) {
+      \Log::warning('User attempted to connect social account without manage-accounts permission', [
+        'user_id' => Auth::id(),
+        'workspace_id' => $workspace->id,
+        'role' => $userRole ? $userRole->slug : 'NULL',
+        'platform' => $platform
+      ]);
+      
+      return response()->json([
+        'success' => false,
+        'message' => 'You do not have permission to manage social accounts. Only users with "manage-accounts" permission can connect or disconnect social accounts.'
+      ], 403);
+    }
+
     if (strtolower($platform) === 'x') {
       $platform = 'twitter';
     }
@@ -82,27 +133,47 @@ class SocialAccountController extends Controller
 
       case 'x':
       case 'twitter':
-        // Iniciar con OAuth 2.0 primero (evita el parpadeo)
-        $codeVerifier = Str::random(128);
-        $codeChallenge = strtr(rtrim(
-          base64_encode(hash('sha256', $codeVerifier, true)),
-          '='
-        ), '+/', '-_');
+        // Iniciar con OAuth 1.0a primero (v1.1) para obtener tokens de media
+        $consumerKey = config('services.twitter.consumer_key');
+        $consumerSecret = config('services.twitter.consumer_secret');
 
-        session([
-          'twitter_code_verifier' => $codeVerifier,
-          'social_auth_state' => $state
-        ]);
+        if (!$consumerKey || !$consumerSecret) {
+          return $this->handleOAuthError('Twitter OAuth 1.0a credentials not configured');
+        }
 
-        $url = 'https://twitter.com/i/oauth2/authorize?' . http_build_query([
-          'client_id' => config('services.twitter.client_id'),
-          'redirect_uri' => url("/auth/{$platform}/callback"),
-          'response_type' => 'code',
-          'scope' => 'tweet.read tweet.write users.read offline.access',
-          'state' => $state,
-          'code_challenge' => $codeChallenge,
-          'code_challenge_method' => 'S256'
-        ]);
+        try {
+          $connection = new TwitterOAuth($consumerKey, $consumerSecret);
+          
+          $requestToken = $connection->oauth('oauth/request_token', [
+            'oauth_callback' => url("/auth/{$platform}/callback-v1")
+          ]);
+
+          session([
+            'oauth_token' => $requestToken['oauth_token'],
+            'oauth_token_secret' => $requestToken['oauth_token_secret'],
+            'social_auth_state' => $state,
+            'twitter_flow_v1_first' => true // Flag para indicar que empezamos con v1
+          ]);
+
+          // Redirigir a OAuth 1.0a
+          $url = $connection->url('oauth/authorize', [
+            'oauth_token' => $requestToken['oauth_token']
+          ]);
+        } catch (\Throwable $e) {
+          $errorMsg = $e->getMessage();
+          
+          // Detectar error de callback URL
+          if (str_contains($errorMsg, 'Callback URL not approved') || str_contains($errorMsg, '415')) {
+            return $this->handleOAuthError(
+              'La URL de callback no está aprobada en Twitter Developer Portal. ' .
+              'Por favor, agrega esta URL en tu app de Twitter: ' . 
+              url("/auth/{$platform}/callback-v1") . 
+              ' - Consulta TWITTER_CALLBACK_FIX.md para más detalles.'
+            );
+          }
+          
+          return $this->handleOAuthError('Twitter OAuth 1.0a initialization failed: ' . $errorMsg);
+        }
         break;
 
       case 'youtube':
@@ -303,7 +374,7 @@ class SocialAccountController extends Controller
   }
 
   /**
-   * Handle V1 Callback and immediately redirect to V2
+   * Handle V1 Callback - Puede ser el primer paso o el segundo según el flujo
    */
   public function handleTwitterV1Callback(Request $request)
   {
@@ -335,20 +406,75 @@ class SocialAccountController extends Controller
 
       $v1Creds = [
         'oauth_token' => $accessToken['oauth_token'],
-        'oauth_token_secret' => $accessToken['oauth_token_secret']
+        'oauth_token_secret' => $accessToken['oauth_token_secret'],
+        'user_id' => $accessToken['user_id'] ?? null,
+        'screen_name' => $accessToken['screen_name'] ?? null
       ];
 
-      // Recuperar datos de OAuth 2.0 guardados previamente
-      $v2Data = session('twitter_v2_data');
+      \Log::info('Twitter OAuth 1.0a completed', [
+        'screen_name' => $v1Creds['screen_name'],
+        'user_id' => $v1Creds['user_id']
+      ]);
 
-      if (!$v2Data) {
-        return $this->handleOAuthError('OAuth 2.0 data not found in session');
+      // Verificar si este es el PRIMER paso (nuevo flujo) o el SEGUNDO paso (flujo viejo)
+      $isV1First = session('twitter_flow_v1_first', false);
+
+      if ($isV1First) {
+        // NUEVO FLUJO: V1 primero, ahora redirigir a V2
+        $platform = request()->is('auth/x/*') ? 'x' : 'twitter';
+
+        $codeVerifier = Str::random(128);
+        $codeChallenge = strtr(rtrim(
+          base64_encode(hash('sha256', $codeVerifier, true)),
+          '='
+        ), '+/', '-_');
+
+        // Generar el nuevo state para V2 ANTES de guardarlo en cache
+        // para que el cache key coincida con el state que llegará en el callback de V2
+        $newState = Str::random(40);
+
+        // Guardar V1 creds en session Y en cache usando el NUEVO state de V2
+        session([
+          'twitter_v1_creds'    => $v1Creds,
+          'twitter_code_verifier' => $codeVerifier,
+          'social_auth_state'   => $newState,
+        ]);
+        Cache::put("twitter_v1_creds_{$newState}", $v1Creds, now()->addHour());
+
+        LogHelper::social('twitter.v1_creds_stored', [
+          'screen_name'       => $v1Creds['screen_name'],
+          'state'             => substr($newState, 0, 10) . '...',
+          'stored_in_session' => true,
+          'stored_in_cache'   => true,
+        ]);
+
+        $oauth2Url = 'https://twitter.com/i/oauth2/authorize?' . http_build_query([
+          'client_id'             => config('services.twitter.client_id'),
+          'redirect_uri'          => url("/auth/{$platform}/callback"),
+          'response_type'         => 'code',
+          'scope'                 => 'tweet.read tweet.write users.read offline.access',
+          'state'                 => $newState,
+          'code_challenge'        => $codeChallenge,
+          'code_challenge_method' => 'S256',
+        ]);
+
+        return view('auth.twitter-transition', [
+          'oauth2Url'   => $oauth2Url,
+          'platform'    => $platform,
+          'step'        => 'v2',
+          'screen_name' => $v1Creds['screen_name'],
+        ]);
+      } else {
+        // FLUJO VIEJO: V2 primero, V1 segundo (compatibilidad)
+        $v2Data = session('twitter_v2_data');
+
+        if (!$v2Data) {
+          return $this->handleOAuthError('OAuth 2.0 data not found in session');
+        }
+
+        $userInfo = $v2Data['user_info'];
+        return $this->saveTwitterAccountAndClose($userInfo, $v2Data, $v1Creds);
       }
-
-      $userInfo = $v2Data['user_info'];
-
-      // Guardar cuenta con ambos tokens (v1 y v2)
-      return $this->saveTwitterAccountAndClose($userInfo, $v2Data, $v1Creds);
     } catch (\Throwable $e) {
       return $this->handleOAuthError('Twitter V1 Auth Failed: ' . $e->getMessage());
     }
@@ -378,7 +504,7 @@ class SocialAccountController extends Controller
       }
 
       $platform = request()->is('auth/x/*') ? 'x' : 'twitter';
-      
+
       // Paso 1: Obtener tokens OAuth 2.0
       $response = Http::withBasicAuth(
         config('services.twitter.client_id'),
@@ -392,71 +518,129 @@ class SocialAccountController extends Controller
 
       $data = $response->json();
 
+      // Log para debugging
+      \Log::info('Twitter OAuth 2.0 Token Response', [
+        'status' => $response->status(),
+        'has_access_token' => isset($data['access_token']),
+        'has_refresh_token' => isset($data['refresh_token']),
+        'error' => $data['error'] ?? null
+      ]);
+
       if (!isset($data['access_token'])) {
         $errorMsg = $data['error_description'] ?? $data['error'] ?? 'Could not obtain access token';
-        return $this->handleOAuthError($errorMsg);
+        \Log::error('Twitter OAuth 2.0 token failed', ['response' => $data]);
+        
+        // Mensajes específicos
+        if (str_contains(strtolower($errorMsg), 'invalid') && str_contains(strtolower($errorMsg), 'code')) {
+          return $this->handleOAuthError('El código de autorización expiró o es inválido. Por favor, intenta conectar nuevamente.');
+        }
+
+        if (str_contains(strtolower($errorMsg), 'redirect_uri')) {
+          return $this->handleOAuthError('Error de configuración: La URL de callback no coincide. Contacta al administrador.');
+        }
+
+        return $this->handleOAuthError('Error al obtener token de acceso: ' . $errorMsg);
       }
 
       // Paso 2: Obtener información del usuario
       $userResponse = Http::withToken($data['access_token'])
         ->get('https://api.twitter.com/2/users/me', [
-          'user.fields' => 'profile_image_url,username,name'
+          'user.fields' => 'profile_image_url,username,name,verified,verified_type,public_metrics'
         ]);
 
       $userData = $userResponse->json();
 
+      // Log para debugging
+      \Log::info('Twitter API v2.0 User Response', [
+        'status' => $userResponse->status(),
+        'data' => $userData,
+        'has_data' => isset($userData['data']),
+        'has_id' => isset($userData['data']['id']) ?? false
+      ]);
+
       if (!isset($userData['data']['id'])) {
-        return $this->handleOAuthError('Could not obtain user information');
+        $errorDetail = $userData['detail'] ?? $userData['errors'][0]['message'] ?? $userData['error'] ?? 'No user data returned';
+        $errorTitle = $userData['title'] ?? '';
+        
+        \Log::error('Twitter v2.0 failed to get user info', [
+          'response' => $userData,
+          'status' => $userResponse->status()
+        ]);
+
+        // Mensajes específicos según el error
+        if ($userResponse->status() === 403 && str_contains(strtolower($errorDetail), 'suspended')) {
+          return $this->handleOAuthError('Tu cuenta de Twitter está suspendida. Por favor, resuelve el problema con Twitter antes de conectarla.');
+        }
+
+        if ($userResponse->status() === 401) {
+          return $this->handleOAuthError('No tienes autorización para acceder a esta cuenta. Verifica tus credenciales.');
+        }
+
+        if ($userResponse->status() === 429) {
+          return $this->handleOAuthError('Has excedido el límite de solicitudes de Twitter. Intenta nuevamente en unos minutos.');
+        }
+
+        return $this->handleOAuthError('No se pudo obtener información del usuario: ' . $errorDetail);
       }
 
       $userInfo = $userData['data'];
 
-      // Guardar tokens OAuth 2.0 en sesión para el siguiente paso
-      session([
-        'twitter_v2_data' => [
-          'access_token' => $data['access_token'],
-          'refresh_token' => $data['refresh_token'] ?? null,
-          'expires_in' => $data['expires_in'] ?? null,
-          'user_info' => $userInfo
-        ]
+      \Log::info('Twitter OAuth 2.0 completed', [
+        'username' => $userInfo['username'] ?? null,
+        'id' => $userInfo['id'] ?? null
       ]);
 
-      // Paso 3: Iniciar OAuth 1.0a para obtener tokens v1.1 (necesarios para subir media)
-      $consumerKey = config('services.twitter.consumer_key');
-      $consumerSecret = config('services.twitter.consumer_secret');
-
-      if (!$consumerKey || !$consumerSecret) {
-        // Si no hay credenciales v1, guardar solo con v2
-        return $this->saveTwitterAccountAndClose($userInfo, $data, null);
+      // Recuperar tokens OAuth 1.0a guardados previamente
+      // Intentar primero desde session, luego desde cache (fallback)
+      $v1Creds = session('twitter_v1_creds');
+      
+      if (!$v1Creds && $request->state) {
+        $v1Creds = Cache::get("twitter_v1_creds_{$request->state}");
+        
+        if ($v1Creds) {
+          LogHelper::social('twitter.v1_creds_recovered_from_cache', [
+            'state' => substr($request->state, 0, 10) . '...',
+            'screen_name' => $v1Creds['screen_name'] ?? 'unknown'
+          ]);
+        }
       }
 
-      $connection = new TwitterOAuth($consumerKey, $consumerSecret);
-
-      try {
-        $request_token = $connection->oauth('oauth/request_token', [
-          'oauth_callback' => url("/auth/{$platform}/callback-v1")
+      if (!$v1Creds) {
+        \Log::warning('OAuth 1.0a tokens not found in session or cache', [
+          'session_id' => session()->getId(),
+          'state' => $request->state ? substr($request->state, 0, 10) . '...' : 'none',
+          'has_oauth_token' => session()->has('oauth_token'),
+          'has_oauth_token_secret' => session()->has('oauth_token_secret'),
+          'all_session_keys' => array_keys(session()->all())
         ]);
-
-        session([
-          'oauth_token' => $request_token['oauth_token'],
-          'oauth_token_secret' => $request_token['oauth_token_secret']
+        
+        \Log::error('Twitter account saved without OAuth 1.0a credentials - video uploads will not work', [
+          'user_id' => $userInfo['id'],
+          'username' => $userInfo['username']
         ]);
-
-        // Redirigir a OAuth 1.0a
-        $v1Url = $connection->url('oauth/authorize', [
-          'oauth_token' => $request_token['oauth_token']
-        ]);
-
-        return view('auth.twitter-transition', [
-          'oauth2Url' => $v1Url,
-          'platform' => $platform,
-          'step' => 'v1'
-        ]);
-      } catch (\Throwable $e) {
-        // Si falla OAuth 1.0a, guardar solo con v2
-        \Log::warning('Twitter OAuth 1.0a failed, saving with v2 only: ' . $e->getMessage());
+        
         return $this->saveTwitterAccountAndClose($userInfo, $data, null);
       }
+      
+      // Limpiar cache después de usar
+      if ($request->state) {
+        Cache::forget("twitter_v1_creds_{$request->state}");
+      }
+
+      // Verificar que sea la misma cuenta
+      $v1ScreenName = strtolower($v1Creds['screen_name'] ?? '');
+      $v2Username = strtolower($userInfo['username'] ?? '');
+
+      if ($v1ScreenName && $v2Username && $v1ScreenName !== $v2Username) {
+        \Log::error('Twitter account mismatch', [
+          'v1_screen_name' => $v1ScreenName,
+          'v2_username' => $v2Username
+        ]);
+        return $this->handleOAuthError('Las cuentas de OAuth 1.1 y OAuth 2.0 no coinciden. Por favor, usa la misma cuenta (@' . $v1ScreenName . ') en ambos pasos.');
+      }
+
+      // Guardar cuenta con ambos tokens (v1 y v2)
+      return $this->saveTwitterAccountAndClose($userInfo, $data, $v1Creds);
     } catch (\Exception $e) {
       return $this->handleOAuthError('Error processing authentication: ' . $e->getMessage());
     }
@@ -470,12 +654,24 @@ class SocialAccountController extends Controller
     $metadata = [
       'username' => $userInfo['username'] ?? null,
       'avatar' => $userInfo['profile_image_url'] ?? null,
+      'is_verified' => $userInfo['verified'] ?? false,
+      'verified_type' => $userInfo['verified_type'] ?? null, // 'blue', 'business', 'government', or null
+      'has_twitter_blue' => ($userInfo['verified_type'] ?? null) === 'blue',
+      'followers_count' => $userInfo['public_metrics']['followers_count'] ?? 0,
     ];
 
     if ($v1Creds) {
       $metadata['oauth1_token'] = $v1Creds['oauth_token'];
       $metadata['secret'] = $v1Creds['oauth_token_secret'];
     }
+    
+    \Log::info('Saving Twitter account with verification info', [
+      'username' => $userInfo['username'] ?? null,
+      'is_verified' => $metadata['is_verified'],
+      'verified_type' => $metadata['verified_type'],
+      'has_twitter_blue' => $metadata['has_twitter_blue'],
+      'has_oauth1' => !empty($v1Creds)
+    ]);
 
     $this->saveAccount([
       'platform' => 'twitter',
@@ -496,6 +692,8 @@ class SocialAccountController extends Controller
       'account_name' => $userInfo['name'] ?? null,
       'username' => $userInfo['username'] ?? null,
       'avatar' => $userInfo['profile_image_url'] ?? null,
+      'is_verified' => $metadata['is_verified'],
+      'has_twitter_blue' => $metadata['has_twitter_blue'],
     ]);
   }
 
@@ -528,7 +726,7 @@ class SocialAccountController extends Controller
 
       $channelResponse = Http::withToken($data['access_token'])
         ->get('https://www.googleapis.com/youtube/v3/channels', [
-          'part' => 'snippet',
+          'part' => 'snippet,status',
           'mine' => 'true'
         ]);
 
@@ -539,11 +737,16 @@ class SocialAccountController extends Controller
       }
 
       $channelInfo = $channelData['items'][0]['snippet'];
+      $channelStatus = $channelData['items'][0]['status'] ?? [];
 
       $userInfoResponse = Http::withToken($data['access_token'])
         ->get('https://www.googleapis.com/oauth2/v3/userinfo');
       $userInfo = $userInfoResponse->json();
       $userEmail = $userInfo['email'] ?? null;
+      
+      // Determinar si la cuenta está verificada
+      // YouTube considera verificada si tiene más de 100k suscriptores o si tiene el badge de verificación
+      $isVerified = ($channelStatus['longUploadsStatus'] ?? 'disallowed') === 'allowed';
 
       $this->saveAccount([
         'platform' => 'youtube',
@@ -553,7 +756,9 @@ class SocialAccountController extends Controller
           'avatar' => $channelInfo['thumbnails']['default']['url'] ?? null,
           'description' => $channelInfo['description'] ?? null,
           'username' => $channelInfo['customUrl'] ?? null,
-          'email' => $userEmail
+          'email' => $userEmail,
+          'is_verified' => $isVerified,
+          'long_uploads_enabled' => $isVerified,
         ],
         'access_token' => $data['access_token'],
         'refresh_token' => $data['refresh_token'] ?? null,
@@ -561,11 +766,19 @@ class SocialAccountController extends Controller
           ? now()->addSeconds($data['expires_in'])
           : null,
       ]);
+      
+      \Log::info('Saving YouTube account with verification info', [
+        'channel_id' => $channelData['items'][0]['id'],
+        'channel_name' => $channelInfo['title'] ?? null,
+        'is_verified' => $isVerified,
+        'long_uploads_status' => $channelStatus['longUploadsStatus'] ?? 'unknown'
+      ]);
 
       return $this->closeWindowWithMessage('success', [
         'platform' => 'youtube',
         'account_name' => $channelInfo['title'] ?? null,
         'avatar' => $channelInfo['thumbnails']['default']['url'] ?? null,
+        'is_verified' => $isVerified,
       ]);
     } catch (\Exception $e) {
       return $this->handleOAuthError('Error processing authentication: ' . $e->getMessage());
@@ -661,10 +874,10 @@ class SocialAccountController extends Controller
   private function saveAccount($data)
   {
     $workspaceId = Auth::user()->current_workspace_id;
-    
+
     // Ensure account_id is a string
     $data['account_id'] = (string) $data['account_id'];
-    
+
     \Log::info('SaveAccount - Processing account', [
       'platform' => $data['platform'],
       'account_id' => $data['account_id'],
@@ -715,22 +928,37 @@ class SocialAccountController extends Controller
       $existingAccount->update($accountData);
       $account = $existingAccount;
     } else {
-      // Account doesn't exist - use updateOrCreate to handle race conditions
+      // Account doesn't exist — check plan limit before creating a new connection
+      $workspace = Auth::user()->workspaces()->find($workspaceId);
+      if ($workspace) {
+        $validator = app(PlanLimitValidator::class);
+        if (!$validator->canPerformAction($workspace, 'social_accounts')) {
+          $upgradeMsg = $validator->getUpgradeMessage($workspace, 'social_accounts');
+          return $this->closeWindowWithMessage('error', [
+            'message' => $upgradeMsg['message'],
+            'action'  => $upgradeMsg['action'],
+            'limit_type' => 'social_accounts',
+          ]);
+        }
+        // Clear accounts cache after creation
+        $validator->clearCache($workspace, 'social_accounts');
+      }
+
+      // Use the unique constraint fields (platform, account_id, workspace_id) to find or create
       $accountData['platform'] = $data['platform'];
       $accountData['account_id'] = $data['account_id'];
-      
+
       \Log::info('SaveAccount - Creating new account with updateOrCreate');
-      
-      // Use the unique constraint fields (platform, account_id, workspace_id) to find or create
+
       $account = SocialAccount::updateOrCreate(
         [
-          'platform' => $data['platform'],
-          'account_id' => $data['account_id'],
+          'platform'    => $data['platform'],
+          'account_id'  => $data['account_id'],
           'workspace_id' => $workspaceId,
         ],
         $accountData
       );
-      
+
       $isNewConnection = $account->wasRecentlyCreated;
     }
 
@@ -749,6 +977,16 @@ class SocialAccountController extends Controller
         $identifier,
         $wasReconnection
       ));
+    }
+
+    // Clear social accounts cache
+    Cache::forget("workspace.{$workspaceId}.social_accounts.count");
+    
+    // Notify via WebSocket about social account addition
+    $workspace = Auth::user()->workspaces()->find($workspaceId);
+    if ($workspace) {
+      $notificationService = app(\App\Services\Subscription\UsageLimitsNotificationService::class);
+      $notificationService->notifyLimitsUpdated($workspace, 'social_account_added');
     }
 
     return $account;
@@ -801,7 +1039,7 @@ class SocialAccountController extends Controller
   public function store(Request $request)
   {
     $request->validate([
-      'platform' => 'required|string|in:facebook,instagram,twitter,youtube,tiktok',
+      'platform' => 'required|string|in:facebook,instagram,threads,twitter,youtube,tiktok',
       'account_id' => 'required|string',
       'access_token' => 'required|string',
       'refresh_token' => 'nullable|string',
@@ -834,9 +1072,91 @@ class SocialAccountController extends Controller
     }
   }
 
+  /**
+   * GET /api/v1/social-accounts/token-health
+   *
+   * Returns the token health status for every social account in the
+   * current workspace. Used by the frontend to disable accounts whose
+   * tokens are invalid or about to expire.
+   */
+  public function tokenHealth(): \Illuminate\Http\JsonResponse
+  {
+    $workspaceId = Auth::user()->current_workspace_id;
+
+    $accounts = SocialAccount::where('workspace_id', $workspaceId)
+      ->where('is_active', true)
+      ->get(['id', 'platform', 'account_name', 'is_active', 'token_expires_at', 'failure_count']);
+
+    $result = $accounts->map(function (SocialAccount $account) {
+      $expiresAt   = $account->token_expires_at;
+      $now         = now();
+
+      if (!$account->is_active || $account->failure_count >= 3) {
+        $status       = 'expired';
+        $daysRemaining = null;
+      } elseif ($expiresAt && $expiresAt->isPast()) {
+        $status       = 'expired';
+        $daysRemaining = null;
+      } elseif ($expiresAt && $expiresAt->diffInDays($now) <= 7) {
+        $status       = 'expiring_soon';
+        $daysRemaining = (int) ceil($expiresAt->diffInHours($now) / 24);
+      } else {
+        $status       = 'valid';
+        $daysRemaining = null;
+      }
+
+      return [
+        'id'             => $account->id,
+        'platform'       => $account->platform,
+        'account_name'   => $account->account_name,
+        'status'         => $status,
+        'days_remaining' => $daysRemaining,
+      ];
+    })->values()->toArray();
+
+    return response()->json(['accounts' => $result]);
+  }
+
   public function destroy(Request $request, $id)
   {
     try {
+      // Verify user has manage-accounts permission
+      $workspace = Auth::user()->currentWorkspace;
+      if (!$workspace) {
+        return response()->json([
+          'success' => false,
+          'message' => 'No workspace selected'
+        ], 403);
+      }
+
+      $role = Auth::user()->workspaces()
+        ->where('workspaces.id', $workspace->id)
+        ->first();
+      
+      if (!$role || !$role->pivot->role_id) {
+        return response()->json([
+          'success' => false,
+          'message' => 'You do not have permission to manage social accounts'
+        ], 403);
+      }
+
+      $userRole = \App\Models\Role\Role::find($role->pivot->role_id);
+      $hasPermission = $userRole && $userRole->permissions()->where('slug', 'manage-accounts')->exists();
+      
+      if (!$hasPermission) {
+        \Log::warning('User attempted to disconnect social account without manage-accounts permission', [
+          'user_id' => Auth::id(),
+          'workspace_id' => $workspace->id,
+          'role' => $userRole ? $userRole->slug : 'NULL',
+          'account_id' => $id
+        ]);
+        
+        return response()->json([
+          'success' => false,
+          'message' => 'You do not have permission to manage social accounts. Only users with "manage-accounts" permission can connect or disconnect social accounts.'
+        ], 403);
+      }
+
       $account = SocialAccount::where('id', $id)
         ->where('workspace_id', Auth::user()->current_workspace_id)
         ->first();
@@ -943,7 +1263,7 @@ class SocialAccountController extends Controller
 
       foreach ($pendingPosts as $post) {
         $date = null;
-        
+
         // Try to get scheduled_at first
         if ($post->scheduled_at instanceof \DateTimeInterface) {
           $date = $post->scheduled_at;
@@ -1058,6 +1378,16 @@ class SocialAccountController extends Controller
 
       $account->delete();
 
+      // Clear social accounts cache
+      Cache::forget("workspace.{$account->workspace_id}.social_accounts.count");
+      
+      // Notify via WebSocket about social account removal
+      $workspace = $account->workspace;
+      if ($workspace) {
+        $notificationService = app(\App\Services\Subscription\UsageLimitsNotificationService::class);
+        $notificationService->notifyLimitsUpdated($workspace, 'social_account_removed');
+      }
+
       return response()->json([
         'success' => true,
         'message' => __('messages.social_account.disconnected'),
@@ -1070,4 +1400,61 @@ class SocialAccountController extends Controller
       ], 500);
     }
   }
+  /**
+   * Check if a social account has publications currently being published
+   *
+   * @param Request $request
+   * @param int $id
+   * @return \Illuminate\Http\JsonResponse
+   */
+  public function getPublishingStatus(Request $request, $id)
+  {
+    try {
+      \Log::info('[Publishing Status] Checking account', ['account_id' => $id, 'user_id' => Auth::id()]);
+      
+      $account = SocialAccount::where('id', $id)
+        ->where('workspace_id', Auth::user()->current_workspace_id)
+        ->first();
+
+      if (!$account) {
+        \Log::warning('[Publishing Status] Account not found', ['account_id' => $id]);
+        return response()->json([
+          'success' => false,
+          'has_publishing' => false,
+          'message' => 'Account not found'
+        ], 404);
+      }
+
+      // Check for publications currently being published (publishing status)
+      $publishingCount = SocialPostLog::where('social_account_id', $account->id)
+        ->where('status', 'publishing')
+        ->count();
+
+      \Log::info('[Publishing Status] Result', [
+        'account_id' => $id,
+        'account_name' => $account->account_name,
+        'publishing_count' => $publishingCount,
+        'has_publishing' => $publishingCount > 0
+      ]);
+
+      return response()->json([
+        'success' => true,
+        'has_publishing' => $publishingCount > 0,
+        'publishing_count' => $publishingCount
+      ]);
+    } catch (\Exception $e) {
+      \Log::error('[Publishing Status] Error', [
+        'account_id' => $id,
+        'error' => $e->getMessage(),
+        'trace' => $e->getTraceAsString()
+      ]);
+      
+      return response()->json([
+        'success' => false,
+        'has_publishing' => false,
+        'message' => 'Error checking publishing status: ' . $e->getMessage()
+      ], 500);
+    }
+  }
+
 }

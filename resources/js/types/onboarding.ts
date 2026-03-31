@@ -1,6 +1,6 @@
 /**
  * Onboarding System Type Definitions
- * 
+ *
  * This file contains all TypeScript interfaces and types for the interactive
  * onboarding system, including tour steps, tooltips, wizards, and templates.
  */
@@ -10,6 +10,8 @@
  * of a user's onboarding process.
  */
 export interface OnboardingState {
+  businessInfoCompleted: boolean;
+  planSelected: boolean;
   tourCompleted: boolean;
   tourSkipped: boolean;
   tourCurrentStep: number;

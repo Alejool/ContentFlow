@@ -1,6 +1,6 @@
 /**
  * Enhanced Theme Toggle Component
- * 
+ *
  * Accessible theme switcher with animations and keyboard support
  */
 
@@ -23,7 +23,7 @@ export const ThemeToggle: React.FC = () => {
     <div
       role="radiogroup"
       aria-label="Seleccionar tema"
-      className="inline-flex items-center gap-1 p-1 bg-theme-bg-secondary rounded-lg border border-theme-border-default"
+      className="inline-flex items-center gap-1 rounded-lg border border-theme-border-default bg-theme-bg-secondary p-1"
     >
       {themes.map(({ value, label, icon }) => {
         const isActive = theme === value;
@@ -35,23 +35,17 @@ export const ThemeToggle: React.FC = () => {
             aria-checked={isActive}
             aria-label={`Tema ${label}`}
             onClick={() => setTheme(value)}
-            className={`
-              relative px-3 py-2 rounded-md
-              text-sm font-medium
-              transition-colors duration-fast
-              focus-ring
-              ${
-                isActive
-                  ? 'text-theme-text-primary'
-                  : 'text-theme-text-tertiary hover:text-theme-text-secondary'
-              }
-            `}
+            className={`relative rounded-md px-3 py-2 text-sm font-medium transition-colors duration-fast focus-ring ${
+              isActive
+                ? 'text-theme-text-primary'
+                : 'text-theme-text-tertiary hover:text-theme-text-secondary'
+            } `}
           >
             {isActive && (
               <LazyMotion features={domAnimation}>
                 <m.div
                   layoutId="theme-toggle-bg"
-                  className="absolute inset-0 bg-theme-bg-elevated rounded-md shadow-sm border border-theme-border-default"
+                  className="absolute inset-0 rounded-md border border-theme-border-default bg-theme-bg-elevated shadow-sm"
                   initial={false}
                   transition={
                     reducedMotion
@@ -61,7 +55,7 @@ export const ThemeToggle: React.FC = () => {
                 />
               </LazyMotion>
             )}
-            
+
             <span className="relative flex items-center gap-2">
               <span aria-hidden="true">{icon}</span>
               <span>{label}</span>

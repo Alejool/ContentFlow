@@ -9,14 +9,27 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Illuminate\Support\Facades\Auth;
+use App\Services\Subscription\GranularLimitValidator;
 
 class SocialPostLogsExport implements FromQuery, WithHeadings, WithMapping, WithStyles
 {
     protected $filters;
+    protected $historyStartDate;
 
     public function __construct($filters = [])
     {
         $this->filters = $filters;
+        
+        // Get history limit based on plan
+        $user = Auth::user();
+        $workspace = $user->currentWorkspace ?? $user->workspaces()->first();
+        
+        if ($workspace) {
+            $validator = app(GranularLimitValidator::class);
+            $this->historyStartDate = $validator->getExportStartDate($workspace);
+        } else {
+            $this->historyStartDate = now()->subDays(30); // Default to 30 days
+        }
     }
 
     public function query()
@@ -24,7 +37,8 @@ class SocialPostLogsExport implements FromQuery, WithHeadings, WithMapping, With
         $workspaceId = Auth::user()->current_workspace_id;
         
         $query = SocialPostLog::where('workspace_id', $workspaceId)
-            ->with(['socialAccount', 'publication.campaigns']);
+            ->with(['socialAccount', 'publication.campaigns'])
+            ->where('created_at', '>=', $this->historyStartDate); // Apply history limit
 
         if (!empty($this->filters['status']) && $this->filters['status'] !== 'all') {
             $query->where('status', $this->filters['status']);
@@ -41,7 +55,12 @@ class SocialPostLogsExport implements FromQuery, WithHeadings, WithMapping, With
         }
 
         if (!empty($this->filters['date_start'])) {
-            $query->where('created_at', '>=', $this->filters['date_start'] . ' 00:00:00');
+            // Respect plan limits even if user specifies custom date range
+            $dateStart = max(
+                \Carbon\Carbon::parse($this->filters['date_start'] . ' 00:00:00'),
+                $this->historyStartDate
+            );
+            $query->where('created_at', '>=', $dateStart);
         }
 
         if (!empty($this->filters['date_end'])) {

@@ -1,6 +1,6 @@
 /**
  * Live Region Component
- * 
+ *
  * Announces dynamic content changes to screen readers
  * WCAG 4.1.3 - Status Messages (Level AA)
  */
@@ -55,7 +55,7 @@ export function useAnnounce() {
     options: {
       politeness?: 'polite' | 'assertive';
       timeout?: number;
-    } = {}
+    } = {},
   ) => {
     const { politeness = 'polite', timeout = 0 } = options;
 
@@ -64,7 +64,7 @@ export function useAnnounce() {
     liveRegion.setAttribute('aria-live', politeness);
     liveRegion.setAttribute('aria-atomic', 'true');
     liveRegion.className = 'sr-only';
-    
+
     document.body.appendChild(liveRegion);
 
     // Delay to ensure screen reader picks up the change

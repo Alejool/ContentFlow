@@ -1,14 +1,14 @@
 /**
  * ThemeAPIClient
- * 
+ *
  * Handles backend persistence of theme preferences via API calls.
  * Provides methods for updating, fetching, and syncing theme preferences.
  * Handles network errors gracefully.
- * 
+ *
  * Requirements: 2.4
  */
 
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 
 export type ThemePreference = 'light' | 'dark' | 'system';
 
@@ -51,13 +51,13 @@ async function fetchTheme(workspaceId: string): Promise<ThemePreference> {
     const response = await axios.get(route('api.v1.profile.theme.fetch'), {
       params: { workspace_id: workspaceId },
     });
-    
+
     const theme = response.data?.theme;
-    
+
     if (theme === 'light' || theme === 'dark' || theme === 'system') {
       return theme;
     }
-    
+
     return 'system';
   } catch (error) {
     handleAPIError('fetchTheme', error);
@@ -81,7 +81,7 @@ async function syncThemes(): Promise<void> {
 /**
  * Handle API errors with appropriate logging
  */
-function handleAPIError(operation: string, error: unknown): void {
+function handleAPIError(_operation: string, _error: unknown): void {
   // Error handling disabled
 }
 

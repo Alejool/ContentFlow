@@ -1,10 +1,10 @@
 import react from '@vitejs/plugin-react';
 import laravel from 'laravel-vite-plugin';
 import { defineConfig } from 'vite';
-import tsconfigPaths from "vite-tsconfig-paths";
 import { VitePWA } from 'vite-plugin-pwa';
+import tsconfigPaths from "vite-tsconfig-paths";
 
-const host = process.env.VITE_HMR_HOST || 'leviathan.tail4af8a1.ts.net';
+const host = process.env.VITE_HMR_HOST || 'localhost';
 const certPath = './localhost.pem';
 const keyPath = './localhost-key.pem';
 const isProduction = process.env.NODE_ENV === 'production';
@@ -34,7 +34,7 @@ export default defineConfig({
                 name: 'Social Content Manager',
                 short_name: 'ContentMgr',
                 description: 'Gestión de publicaciones y contenido social',
-                theme_color: '#4F46E5',
+                theme_color: '#c96b2cff',
                 background_color: '#ffffff',
                 display: 'standalone',
                 orientation: 'portrait-primary',
@@ -43,113 +43,106 @@ export default defineConfig({
                 categories: ['productivity', 'social'],
                 icons: [
                     {
-                        src: '/icons/icon-192x192.png',
-                        sizes: '192x192',
-                        type: 'image/png',
+                        src: '/icons/icon.svg',
+                        sizes: 'any',
+                        type: 'image/svg+xml',
                         purpose: 'any maskable'
                     },
                     {
-                        src: '/icons/icon-512x512.png',
-                        sizes: '512x512',
-                        type: 'image/png',
-                        purpose: 'any maskable'
+                        src: '/favicon.ico',
+                        sizes: '32x32',
+                        type: 'image/x-icon'
                     }
                 ],
                 screenshots: [
                     {
-                        src: '/screenshots/desktop.png',
+                        src: '/screenshots/desktop.svg',
                         sizes: '1280x720',
-                        type: 'image/png',
+                        type: 'image/svg+xml',
                         form_factor: 'wide'
                     },
                     {
-                        src: '/screenshots/mobile.png',
+                        src: '/screenshots/mobile.svg',
                         sizes: '750x1334',
-                        type: 'image/png',
+                        type: 'image/svg+xml',
                         form_factor: 'narrow'
                     }
                 ]
             },
             workbox: {
+                globDirectory: 'public/build',
                 globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
-                // Clean up old caches
+                globIgnores: ['**/node_modules/**/*', 'sw.js', 'workbox-*.js'],
                 cleanupOutdatedCaches: true,
-                // Skip waiting and claim clients immediately
                 skipWaiting: true,
                 clientsClaim: true,
-                // Runtime caching strategies
                 runtimeCaching: [
-                    // Cache-first for static assets with hash (immutable)
                     {
                         urlPattern: /\/_next\/static\/.*/i,
                         handler: 'CacheFirst',
                         options: {
                             cacheName: 'static-assets-cache',
                             expiration: {
-                                maxEntries: 150, // Reduced from 200
-                                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
+                                maxEntries: 150,
+                                maxAgeSeconds: 60 * 60 * 24 * 365
                             },
                             cacheableResponse: {
                                 statuses: [0, 200]
                             }
                         }
                     },
-                    // Network-first for API calls with shorter timeout
                     {
                         urlPattern: /^https?:\/\/.*\/api\/.*/i,
                         handler: 'NetworkFirst',
                         options: {
                             cacheName: 'api-cache',
-                            networkTimeoutSeconds: 5, // Reduced from 10
+                            networkTimeoutSeconds: 5,
                             expiration: {
-                                maxEntries: 30, // Reduced from 50
-                                maxAgeSeconds: 60 * 60 * 12 // 12 hours (reduced from 24)
+                                maxEntries: 30,
+                                maxAgeSeconds: 60 * 60 * 12
                             },
                             cacheableResponse: {
                                 statuses: [0, 200]
                             }
                         }
                     },
-                    // Stale-while-revalidate for images with optimized limits
                     {
                         urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/,
                         handler: 'StaleWhileRevalidate',
                         options: {
                             cacheName: 'image-cache',
                             expiration: {
-                                maxEntries: 60, // Reduced from 100
-                                maxAgeSeconds: 60 * 60 * 24 * 7 // 7 days (reduced from 30)
+                                maxEntries: 60,
+                                maxAgeSeconds: 60 * 60 * 24 * 7
                             },
                             cacheableResponse: {
                                 statuses: [0, 200]
                             }
                         }
                     },
-                    // Cache fonts with longer expiration
                     {
                         urlPattern: /\.(?:woff|woff2|ttf|otf|eot)$/,
                         handler: 'CacheFirst',
                         options: {
                             cacheName: 'font-cache',
                             expiration: {
-                                maxEntries: 20, // Reduced from 30
-                                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
+                                maxEntries: 20,
+                                maxAgeSeconds: 60 * 60 * 24 * 365
                             },
                             cacheableResponse: {
                                 statuses: [0, 200]
                             }
                         }
                     },
-                    // Network-first for dynamic content with shorter cache
                     {
                         urlPattern: /\/(publications|reels|calendar)\/.*/i,
                         handler: 'NetworkFirst',
                         options: {
                             cacheName: 'dynamic-content-cache',
-                            networkTimeoutSeconds: 3, // Reduced from 5
+                            networkTimeoutSeconds: 3,
                             expiration: {
-                                maxEntries: 30, // Reduced from 50
-                                maxAgeSeconds: 60 * 30 // 30 minutes (reduced from 1 hour)
+                                maxEntries: 30,
+                                maxAgeSeconds: 60 * 30
                             },
                             cacheableResponse: {
                                 statuses: [0, 200]
@@ -159,7 +152,7 @@ export default defineConfig({
                 ]
             },
             devOptions: {
-                enabled: false // Disable in development for faster builds
+                enabled: false
             }
         })
     ],
@@ -191,7 +184,7 @@ export default defineConfig({
                             return 'vendor-forms';
                         }
                         // Date libraries
-                        if (id.includes('date-fns') || id.includes('react-datepicker')) {
+                        if (id.includes('date-fns') || id.includes('react-datepicker') || id.includes('react-aria') || id.includes('@internationalized') || id.includes('@react-aria') || id.includes('@react-stately')) {
                             return 'vendor-dates';
                         }
                         // i18n
@@ -212,38 +205,25 @@ export default defineConfig({
                         // Other vendors
                         return 'vendor-other';
                     }
-                    
+
                     // Service Worker code in separate chunk
                     if (id.includes('/sw/') || id.includes('workbox')) {
                         return 'service-worker';
                     }
-                    
-                    // Stores in separate chunk
-                    if (id.includes('/stores/')) {
-                        return 'stores';
+
+                    // Merge stores + utils into a single chunk to avoid circular
+                    // dependencies (stores import utils and vice-versa).
+                    // Stores that are both statically and dynamically imported
+                    // (publicationStore, manageContentUIStore) must also live here
+                    // so Vite doesn't try to move them into a dynamic chunk.
+                    if (id.includes('/stores/') || id.includes('/Utils/')) {
+                        return 'app-core';
                     }
-                    
-                    // Utils in separate chunk
-                    if (id.includes('/Utils/')) {
-                        return 'utils';
-                    }
-                    
-                    // Pages - split by route
-                    if (id.includes('/Pages/Analytics/')) {
-                        return 'page-analytics';
-                    }
-                    if (id.includes('/Pages/Calendar/')) {
-                        return 'page-calendar';
-                    }
-                    if (id.includes('/Pages/Reels/')) {
-                        return 'page-reels';
-                    }
-                    if (id.includes('/Pages/Workspace/')) {
-                        return 'page-workspace';
-                    }
-                    if (id.includes('/Pages/Profile/')) {
-                        return 'page-profile';
-                    }
+
+                    // Let Rollup handle page-level splitting automatically.
+                    // Assigning pages to named chunks caused cycles because pages
+                    // import from app-core (formerly utils) which would then
+                    // re-enter the page chunk.
                 },
                 // Optimize chunk file names
                 chunkFileNames: (chunkInfo) => {
@@ -272,6 +252,12 @@ export default defineConfig({
         sourcemap: !isProduction,
         // CSS code splitting
         cssCodeSplit: true,
+        // Ensure manifest is generated properly
+        manifest: true,
+        // Output directory
+        outDir: 'public/build',
+        // Empty output directory before build
+        emptyOutDir: true,
     },
     server: isProduction ? {} : {
         host: '0.0.0.0',
@@ -301,7 +287,6 @@ export default defineConfig({
         allowedHosts: [
             'localhost',
             'leviathan-port.tail4af8a1.ts.net',
-            'leviathan.tail4af8a1.ts.net',
             '100.125.246.50',
             '127.0.0.1',
             '.ngrok-free.app',

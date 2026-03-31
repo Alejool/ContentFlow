@@ -105,8 +105,8 @@ return [
         OperationTerminated::class => [
             FlushOnce::class,
             FlushTemporaryContainerInstances::class,
-            // DisconnectFromDatabases::class,
-            // CollectGarbage::class,
+            DisconnectFromDatabases::class,  // ✅ Activado para database cache
+            CollectGarbage::class,            // ✅ Activado para database cache
         ],
 
         WorkerErrorOccurred::class => [
@@ -206,7 +206,7 @@ return [
     |
     */
 
-    'garbage' => 50,
+    'garbage' => 25,  // Reducido para database cache (menos memoria = más GC)
 
     /*
     |--------------------------------------------------------------------------

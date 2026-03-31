@@ -10,8 +10,8 @@ import {
   Settings,
   X,
   XCircle,
-} from "lucide-react";
-import React from "react";
+} from 'lucide-react';
+import React from 'react';
 
 export const ICON_MAP: Record<string, any> = {
   Bell,
@@ -33,11 +33,7 @@ interface DynamicIconProps {
   fallback?: React.ReactNode;
 }
 
-export default function DynamicIcon({
-  name,
-  className,
-  fallback,
-}: DynamicIconProps) {
+export default function DynamicIcon({ name, className, fallback }: DynamicIconProps) {
   const IconComponent = ICON_MAP[name];
 
   if (!IconComponent) {

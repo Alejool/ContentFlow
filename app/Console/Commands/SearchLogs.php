@@ -35,7 +35,7 @@ class SearchLogs extends Command
 
         if (!File::exists($logPath)) {
             $this->error("❌ Log file not found: {$logPath}");
-            $this->info("💡 Available logs:");
+            $this->info(" Available logs:");
             
             $logs = File::glob(storage_path('logs/*.log'));
             foreach ($logs as $log) {

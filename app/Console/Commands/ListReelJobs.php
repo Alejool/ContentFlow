@@ -99,7 +99,7 @@ class ListReelJobs extends Command
     );
 
     $this->newLine();
-    $this->info("💡 Tips:");
+    $this->info(" Tips:");
     $this->line("  • Monitor a specific file: php artisan reels:monitor <ID> --follow");
     $this->line("  • Filter by status: php artisan reels:list --status=processing");
     $this->line("  • View all jobs: php artisan reels:monitor");

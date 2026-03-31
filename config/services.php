@@ -113,4 +113,50 @@ return [
         'temperature' => (float) env('ANTHROPIC_TEMPERATURE', 0.7),
         'base_url' => env('ANTHROPIC_BASE_URL', 'https://api.anthropic.com'),
     ],
+    'stripe' => [
+        'secret' => env('STRIPE_SECRET'),
+        'public' => env('STRIPE_PUBLISH'),
+        'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
+    ],
+
+    'mercadopago' => [
+        'access_token' => env('MERCADOPAGO_ACCESS_TOKEN'),
+        'public_key' => env('MERCADOPAGO_PUBLIC_KEY'),
+        'api_url' => env('MERCADOPAGO_API_URL', 'https://api.mercadopago.com'),
+        'usd_to_cop_rate' => env('MERCADOPAGO_USD_TO_COP_RATE', 4000),
+        'webhook_secret' => env('MERCADOPAGO_WEBHOOK_SECRET'),
+    ],
+
+    'epayco' => [
+        'public_key' => env('EPAYCO_PUBLIC_KEY'),
+        'private_key' => env('EPAYCO_PRIVATE_KEY'),
+        'test_mode' => env('EPAYCO_TEST_MODE', true),
+        'usd_to_cop_rate' => env('EPAYCO_USD_TO_COP_RATE', 4000),
+        'webhook_secret' => env('EPAYCO_WEBHOOK_SECRET'),
+    ],
+
+    'payu' => [
+        'api_key' => env('PAYU_API_KEY'),
+        'api_login' => env('PAYU_API_LOGIN'),
+        'merchant_id' => env('PAYU_MERCHANT_ID'),
+        'account_id' => env('PAYU_ACCOUNT_ID'),
+        'test_mode' => env('PAYU_TEST_MODE', true),
+        'webhook_secret' => env('PAYU_WEBHOOK_SECRET'),
+        'exchange_rates' => [
+            'CO' => env('PAYU_USD_TO_COP_RATE', 4000),
+            'MX' => env('PAYU_USD_TO_MXN_RATE', 20),
+            'PE' => env('PAYU_USD_TO_PEN_RATE', 3.8),
+            'AR' => env('PAYU_USD_TO_ARS_RATE', 350),
+            'BR' => env('PAYU_USD_TO_BRL_RATE', 5),
+            'CL' => env('PAYU_USD_TO_CLP_RATE', 900),
+            'PA' => 1, // USD
+        ],
+    ],
+
+    'wompi' => [
+        'public_key' => env('WOMPI_PUBLIC_KEY'),
+        'private_key' => env('WOMPI_PRIVATE_KEY'),
+        'event_secret' => env('WOMPI_EVENT_SECRET'),
+        'test_mode' => env('WOMPI_TEST_MODE', true),
+    ],
 ];

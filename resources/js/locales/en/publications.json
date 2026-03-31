@@ -1,10 +1,28 @@
-﻿{
+{
   "publications": {
     "title": "Publications",
     "subtitle": "Manage your publications",
     "modal": {
       "sections": {
         "details": "Content Details"
+      },
+      "contentType": {
+        "label": "Content Type",
+        "value": "Video",
+        "filteredByPlatforms": "Filtered by selected platforms",
+        "locked": "Content type is locked after uploading media"
+      },
+      "poll": {
+        "question": "Poll Question",
+        "questionPlaceholder": "Enter your question",
+        "title": "Poll Options",
+        "options": "Poll Options (2-4 options)",
+        "optionPlaceholder": "Option",
+        "addOption": "Add Option",
+        "duration": "Poll Duration",
+        "hours": "hours",
+        "durationHint": "Twitter: 5min-7days, Facebook: 1-7days",
+        "note": "Polls are only supported on Twitter and Facebook. Make sure to select compatible platforms."
       },
       "media": {
         "uploadingPending": "Uploading Pending",
@@ -35,6 +53,7 @@
         "publishDate": "Publish Date",
         "publishedOn": "Published On",
         "publications": "Publications",
+        "socialNetworkPublications": "Social Network Publications",
         "associatedPublications": "Associated Publications",
         "accountMissingTitle": "Account Disconnected",
         "accountMissingText": "This publication was posted on an account ({{account}}) that is no longer connected. Editing it will create a new version for your current account(s). Proceed?",
@@ -61,6 +80,8 @@
         },
         "contentLocked": "Content Locked",
         "contentLockedHint": "To edit the content (title, description or files), you must unpublish the post from all platforms.",
+        "contentPublishing": "Publishing in Progress",
+        "contentPublishingHint": "The publication is being published to some platforms. You must wait for the process to finish before you can edit the content.",
         "approvedEditWarning": "Approved Publication",
         "approvedEditWarningHint": "This publication has already been approved. If you make changes, it will return to 'Pending' status and require a new approval.",
         "lockedByOther": "Post locked by another user",
@@ -73,6 +94,11 @@
         "title": "Add Publication",
         "titleField": "Title",
         "subtitle": "Create a publication",
+        "mediaSection": "Media Files",
+        "contentSection": "Content",
+        "socialAccountsSection": "Social Networks",
+        "scheduleSection": "Scheduling",
+        "campaignSection": "Campaign",
         "name": "Name",
         "description": "Description",
         "image": "Image",
@@ -93,11 +119,14 @@
         "selectSocialAccounts": "Select Accounts",
         "associatedPublicationsRequired": "Associated Publications is required",
         "lockedBySession": "Locked by Session",
-        "noCampaigns":"no campaign",
+        "noCampaigns": "no campaign",
         "dragDrop": {
           "title": "Drag and drop to sort",
           "subtitle": "Upload your multimedia files here"
         },
+        "recurrence_days": "Recurrence Days",
+        "poll_options": "Poll options",
+        "poll_duration_hours": "Poll duration",
         "placeholders": {
           "title": "Title",
           "description": "Description",
@@ -106,6 +135,27 @@
           "goal": "Goal",
           "startDate": "12/12/2025",
           "endDate": "12/12/2026"
+        },
+        "validation": {
+          "titleRequired": "Title is required",
+          "titleLength": "Title cannot exceed 70 characters",
+          "descMin": "Description must have at least 10 characters",
+          "descMax": "Description cannot exceed 700 characters",
+          "objRequired": "Goal is required",
+          "objMax": "Goal cannot exceed 200 characters",
+          "hashtagsRequired": "Hashtags are required",
+          "hashtagValid": "Hashtags must be separated by commas",
+          "hashtagMax": "Maximum 10 hashtags allowed",
+          "scheduledMinDifference": "The date must be at least 1 minute from the current time",
+          "scheduledAtRequired": "Schedule date is required if global schedule is enabled",
+          "recurrenceDaysRequired": "Select at least one day for weekly recurrence",
+          "recurrence_days": "Invalid recurrence days",
+          "durationErrors": "Fix the duration errors before saving.",
+          "recurrenceEndDateRequired": "End date is required for recurring publications",
+          "pollOptionsRequired": "Polls require at least 2 options",
+          "pollDurationRequired": "Poll duration must be between 1 and 168 hours",
+          "imageRequired": "You must add at least one image or video",
+          "scheduleRequired": "You must schedule a date for all selected networks or set a global date"
         },
         "button": {
           "save": "Save",
@@ -117,12 +167,38 @@
         "description": "Set a single date to publish on all selected social networks at once.",
         "placeholder": "Select date and time",
         "instantWarning": "To publish now, use the Publish button after saving.",
-        "useGlobal": "Use global schedule settings"
+        "useGlobal": "Global",
+        "recurrence": {
+          "title": "Repeat publication (Recurrence)",
+          "locked_title": "Recurrence locked",
+          "locked_desc": "Upgrade your plan to schedule automatic repetitions (every X days/weeks) for your publications.",
+          "enable": "Enable recurrence",
+          "frequency": "Frequency",
+          "interval": "Every",
+          "days": "Repeat on days",
+          "ends": "End date",
+          "ends_placeholder": "Select when recurrence ends",
+          "end_date_required": "End date is required for recurring publications",
+          "preview_title": "Upcoming publication dates",
+          "preview_note": "These dates are estimated and will be reflected in the calendar when saved.",
+          "select_accounts": "Networks with recurrence",
+          "select_accounts_desc": "Select which networks will publish recurrently. The others will only publish once.",
+          "all_accounts": "Apply to all",
+          "single_account_note": "This network will publish recurrently according to the configuration."
+        }
       },
       "edit": {
         "title": "Edit Publication",
         "titleField": "Title",
         "subtitle": "Update the existing publication",
+        "mediaSection": "Media Files",
+        "contentSection": "Content",
+        "socialAccountsSection": "Social Networks",
+        "scheduleSection": "Scheduling",
+        "previewSection": "Preview",
+        "historySection": "History",
+        "commentsSection": "Internal Comments",
+        "youtubeThumbnailSection": "YouTube Thumbnail",
         "description": "Description",
         "hashtags": "Hashtags",
         "schedulePublication": "Schedule Publication",
@@ -145,6 +221,7 @@
         "accountMissingText": "This publication was posted on an account ({{account}}) that is no longer connected. Editing it will create a new version for your current account(s). Proceed?",
         "selectSocialAccounts": "Select Accounts",
         "lockedBySession": "Locked by Session",
+        "questionField": "Question",
         "dragDrop": {
           "title": "Drag and drop to sort",
           "subtitle": "Upload your multimedia files here"
@@ -163,10 +240,12 @@
           "cancel": "Cancel"
         },
         "configurationLocked": "Configuration Locked",
-        "configurationLockedHint": "You need approval to configure networks and scheduling. Please request a review first.",
+        "configurationLockedHint": "You need approval to configure networks and scheduling. Request a review first.",
         "configurationLockedHintAdmin": "You must approve the publication before configuring networks.",
         "contentLocked": "Content Locked",
         "contentLockedHint": "To edit the content (title, description or files), you must unpublish the post from all platforms.",
+        "contentPublishing": "Publishing in Progress",
+        "contentPublishingHint": "The publication is being published to some platforms. You must wait for the process to finish before you can edit the content.",
         "approvedEditWarning": "Approved Publication",
         "approvedEditWarningHint": "This publication has already been approved. If you make changes, it will return to 'Pending' status and require a new approval.",
         "pendingReviewWarning": "Under Review",
@@ -210,7 +289,9 @@
         "selectAll": "Select All",
         "deselectAll": "Deselect All",
         "noConnectedAccounts": "No accounts found.",
-        "connectAccounts": "Please connect your accounts first.",
+        "connectAccounts": "Connect your accounts first.",
+        "noCompatibleAccounts": "No accounts compatible with this content type.",
+        "changeContentType": "Change the content type or connect compatible accounts.",
         "published": "Published",
         "viewPost": "View post",
         "loading": "Loading...",
@@ -218,6 +299,7 @@
         "platforms": "Platforms",
         "failed": "Failed",
         "scheduled": "scheduled",
+        "recurringPosts": "Recurring Posts",
         "removed": "Removed",
         "youtube": "YouTube",
         "youtubeThumbnails": "YouTube Thumbnails",
@@ -228,12 +310,22 @@
         "completed": "completed",
         "inProgress": "in progress",
         "sending": "Sending",
+        "duplicate": "Duplicate attempt",
+        "original_attempt": "Original attempt:",
+        "oauth1_required": "Requires reconnection",
+        "oauth1_video_message": "This account needs OAuth 1.0a credentials to upload videos",
+        "reconnect_account": "Reconnect account",
+        "cannot_publish": "Cannot publish",
+        "reconnecting": "Starting reconnection...",
+        "reconnect_window": "Opening reconnection window...",
+        "reconnect_success": "Account reconnected successfully",
+        "reconnect_error": "Error starting reconnection",
         "dragDrop": {
           "title": "Drag and drop to add",
           "subtitle": "PNG, JPG, WebP (max 2MB)"
         },
         "modal": {
-          "title": "Unpublish ",
+          "title": "Unpublish",
           "message": "Are you sure you want to unpublish? This will remove the publication from this platform.",
           "confirmText": "Unpublish",
           "cancelText": "Cancel",
@@ -262,12 +354,17 @@
         "rejectedBanner": {
           "title": "Publication Rejected",
           "message": "This publication has been rejected by {{name}}.",
-          "footer": "Please make the necessary adjustments and resubmit for review."
+          "footer": "Make the necessary adjustments and resubmit for review."
         },
         "alreadyPublishedBanner": {
           "title": "Active Publication",
           "message": "This publication is already published on the following accounts:",
           "hint": "You can publish to additional accounts by selecting them below."
+        },
+        "incompatibleAccountsBanner": {
+          "title": "Incompatible Accounts",
+          "message": "The following accounts are not compatible with the content type \"{contentType}\":",
+          "hint": "These accounts will not appear in the publishing options."
         },
         "publishedInOtherAccountBanner": {
           "title": "Published in Different Account",
@@ -285,6 +382,7 @@
         "notAvailable": "Preview not available for this platform"
       },
       "validation": {
+        "mediaRequired": "Media files are required",
         "descRequired": "Description is required",
         "nameRequired": "Name is required",
         "descMin": "Description must be at least 10 characters long",
@@ -302,7 +400,9 @@
         "publishDateRequired": "Publish Date is required",
         "publishedOnRequired": "Published On is required",
         "associatedPublicationsRequired": "Associated Publications is required",
-        "hashtagsRequired": "Hashtags is required",
+        "hashtagsRequired": "Hashtags are required",
+        "questionRequired": "Question is required",
+        "descriptionRequired": "Description is required",
         "schedulePublicationRequired": "Schedule Publication is required",
         "descriptionLength": "Description must be at least 10 characters long",
         "hashtagsLength": "Hashtags must be at least 10 characters long",
@@ -310,12 +410,30 @@
         "imageRequired": "Image is required",
         "hashtagValid": "Hashtag must be valid",
         "hashtagMax": "Hashtag must be at least 10 characters long",
-        "scheduleDateRequired": "Please select a date to schedule on the selected networks or uncheck the schedule option",
+        "scheduleDateRequired": "Select a date to schedule on the selected networks or uncheck the schedule option",
         "scheduleRequired": "You must schedule a date for all selected networks or set a global date.",
         "scheduledAtRequired": "Scheduled date is required when you select social networks",
-        "socialAccountsRequired": "Please select at least one social media account",
+        "socialAccountsRequired": "Select at least one social media account",
         "singleVideo": "You can only upload one video per publication.",
-        "scheduledMinDifference": "The date must be at least 1 minute after the current time"
+        "scheduledMinDifference": "The date must be at least 1 minute after the current time",
+        "videoTooLong": "Video too long for {{platform}} (max {{max}})",
+        "videoComplies": "Meets duration requirements for {{platform}}",
+        "recurrenceDaysRequired": "Select at least one day for weekly recurrence",
+        "recurrence_days": "Invalid recurrence days",
+        "durationErrors": "Fix the duration errors before saving.",
+        "pollOptionsRequired": "Polls require at least 2 options",
+        "pollDurationRequired": "Poll duration must be between 1 and 168 hours",
+        "content_type_not_supported": "Content type ':type' is not supported by :platforms. Select compatible platforms or change the content type.",
+        "reel_requires_one_video": "Reels require exactly 1 video file",
+        "reel_requires_video_only": "Reels require video files only (no images)",
+        "carousel_requires_multiple": "Carousels require at least 2 media files (maximum 10)",
+        "story_requires_one": "Stories require exactly 1 media file (image or video)",
+        "poll_not_supported": "Polls are only supported on Twitter",
+        "cross_platform_incompatibility": "The selected content type is not supported by all selected platforms",
+        "invalid_media_type": "Invalid media type for the selected content type",
+        "media_required": "Media files are required for this content type",
+        "media_min_count": "At least :min media files are required",
+        "media_max_count": "Maximum :max media files allowed"
       },
       "processing": {
         "cancel_message": "Are you sure you want to cancel this processing job? The work in progress will be stopped."
@@ -345,13 +463,22 @@
       "retrying": "Retrying"
     },
     "scheduled_for": "Scheduled for",
+    "scheduledPosts": "Scheduled post",
     "button": {
       "add": "Add Publication",
       "edit": "Edit Publication",
       "delete": "Delete Publication",
       "close": "Close",
       "approve": "Approve",
-      "reject": "Reject"
+      "reject": "Reject",
+      "publish": "Publish",
+      "view": "View",
+      "viewDetails": "View Details",
+      "duplicate": "Duplicate",
+      "request": "Request",
+      "sendForReview": "Send for Review",
+      "sending": "Sending...",
+      "inReview": "In Review"
     },
     "table": {
       "name": "Name",
@@ -363,17 +490,27 @@
       "actions": "Actions",
       "noCampaign": "No Campaign",
       "noPlatforms": "No platforms configured",
+      "noMedia": "No media",
       "loading": "Loading...",
       "linkedAccount": "Linked Accounts",
+      "untitled": "Untitled",
+      "noDescription": "No description",
+      "platforms": "Platforms",
+      "linkedAccounts": "Linked Accounts",
+      "createdBy": "Created by",
+      "manualEvent": "Manual Event",
+      "socialNetworkEvent": "Social Network Event",
       "emptyState": {
         "title": "No publications found",
         "description": "Create a publication to start publishing content.",
+        "searchEmpty": "No publications found matching the search.",
         "button": "Add Publication"
       },
       "lockedBy": "Locked by:",
       "publishingBy": "Publishing by",
       "rejectedBy": "Rejected by",
-      "pendingAdminReview": "Pending review"
+      "pendingAdminReview": "Pending review",
+      "editingBy": "Editing:"
     },
     "messages": {
       "addSuccess": "Publication added successfully!",
@@ -414,8 +551,17 @@
     "filters": {
       "title": "Publications Filters",
       "all": "All",
+      "all_types": "All types",
+      "content_type": "Content type",
       "published": "Published",
       "draft": "Draft"
+    },
+    "content_types": {
+      "post": "Post",
+      "reel": "Reel",
+      "story": "Story",
+      "carousel": "Carousel",
+      "poll": "Poll"
     },
     "gallery": {
       "sendingToSocial": "Sending to social platforms...",

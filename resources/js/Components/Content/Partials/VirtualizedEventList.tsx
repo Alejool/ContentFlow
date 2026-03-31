@@ -10,7 +10,7 @@ interface VirtualizedEventListProps {
 /**
  * Virtualized event list for days with many events
  * Shows a limited number of events with a "show more" option
- * 
+ *
  * This is a lightweight alternative to full virtualization libraries
  * for the calendar grid where each day cell has limited space.
  */
@@ -39,7 +39,7 @@ export function VirtualizedEventList({
             e.stopPropagation();
             onEventClick(event);
           }}
-          className="text-left text-xs px-2 py-1 rounded truncate hover:opacity-80 transition-opacity"
+          className="truncate rounded px-2 py-1 text-left text-xs transition-opacity hover:opacity-80"
           style={{ backgroundColor: event.color }}
           title={event.title}
         >
@@ -53,7 +53,7 @@ export function VirtualizedEventList({
             e.stopPropagation();
             // Could open a modal showing all events for this day
           }}
-          className="text-xs text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 px-2 py-1 text-left"
+          className="px-2 py-1 text-left text-xs text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400"
         >
           +{hiddenCount} more
         </button>
@@ -79,7 +79,7 @@ export const EventItem = ({
         e.stopPropagation();
         onClick(event);
       }}
-      className="text-left text-xs px-2 py-1 rounded truncate hover:opacity-80 transition-opacity"
+      className="truncate rounded px-2 py-1 text-left text-xs transition-opacity hover:opacity-80"
       style={{ backgroundColor: event.color }}
       title={event.title}
     >

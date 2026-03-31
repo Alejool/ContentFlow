@@ -29,27 +29,27 @@ const PREFERENCES_KEY = 'completion_notification_preferences';
 
 /**
  * Hook for managing completion notifications for uploads and processing jobs
- * 
+ *
  * Features:
  * - In-app notifications via notification store
  * - Browser notifications with permission checking
  * - Click handlers for navigation to completed content
  * - User preferences for notification types
- * 
+ *
  * Requirements: 8.1, 8.2, 8.3, 8.4, 8.5
  */
 export function useCompletionNotifications() {
   const uploadQueue = useUploadQueue();
   const processingProgress = useProcessingProgress();
   const notificationStore = useNotificationStore();
-  
+
   // Track previously completed items to avoid duplicate notifications
   const completedUploadsRef = useRef<Set<string>>(new Set());
   const completedJobsRef = useRef<Set<string>>(new Set());
-  
+
   // Browser notification permission state
   const browserNotificationPermission = useRef<NotificationPermission>(
-    typeof Notification !== 'undefined' ? Notification.permission : 'denied'
+    typeof Notification !== 'undefined' ? Notification.permission : 'denied',
   );
 
   /**
@@ -63,8 +63,7 @@ export function useCompletionNotifications() {
         const parsed = JSON.parse(stored);
         return { ...DEFAULT_PREFERENCES, ...parsed };
       }
-    } catch (error) {
-      }
+    } catch (error) {}
     return DEFAULT_PREFERENCES;
   }, []);
 
@@ -75,8 +74,7 @@ export function useCompletionNotifications() {
   const savePreferences = useCallback((preferences: NotificationPreferences) => {
     try {
       localStorage.setItem(PREFERENCES_KEY, JSON.stringify(preferences));
-    } catch (error) {
-      }
+    } catch (error) {}
   }, []);
 
   /**
@@ -138,10 +136,9 @@ export function useCompletionNotifications() {
 
         // Auto-close after 5 seconds
         setTimeout(() => notification.close(), 5000);
-      } catch (error) {
-        }
+      } catch (error) {}
     },
-    []
+    [],
   );
 
   /**
@@ -154,7 +151,7 @@ export function useCompletionNotifications() {
       // The notification store will handle the display via the notification center
       notificationStore.fetchNotifications();
     },
-    [notificationStore]
+    [notificationStore],
   );
 
   /**
@@ -203,7 +200,7 @@ export function useCompletionNotifications() {
         });
       }
     },
-    [showInAppNotification, showBrowserNotification, navigateToContent]
+    [showInAppNotification, showBrowserNotification, navigateToContent],
   );
 
   /**
@@ -238,7 +235,7 @@ export function useCompletionNotifications() {
         });
       }
     },
-    [showInAppNotification, showBrowserNotification, navigateToContent]
+    [showInAppNotification, showBrowserNotification, navigateToContent],
   );
 
   /**
@@ -246,7 +243,7 @@ export function useCompletionNotifications() {
    */
   useEffect(() => {
     const preferences = loadPreferences();
-    
+
     // Check for completed uploads
     Object.entries(uploadQueue.queue).forEach(([id, upload]) => {
       if (upload.status === 'completed' && !completedUploadsRef.current.has(id)) {
@@ -260,7 +257,7 @@ export function useCompletionNotifications() {
    */
   useEffect(() => {
     const preferences = loadPreferences();
-    
+
     // Check for completed jobs
     Object.entries(processingProgress.jobs).forEach(([id, job]) => {
       if (job.status === 'completed' && !completedJobsRef.current.has(id)) {

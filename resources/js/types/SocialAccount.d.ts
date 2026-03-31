@@ -1,5 +1,3 @@
-
-
 export interface SocialAccount {
   id: number;
   platform: string;
@@ -9,12 +7,10 @@ export interface SocialAccount {
   account_metadata?: {
     avatar?: string;
     username?: string;
-    [key: string]: any;
+    [key: string]: unknown;
   };
   user?: {
     id: number;
     name: string;
   };
 }
-
-

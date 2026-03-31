@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Events\UploadProgressUpdated;
 use App\Http\Controllers\Controller;
+use App\Services\Storage\S3PathService;
+use App\Services\Subscription\PlanLimitValidator;
 use Aws\S3\Exception\S3Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -18,54 +21,108 @@ class UploadController extends Controller
   public function sign(Request $request)
   {
     $request->validate([
-      'filename' => 'required|string',
+      'filename'     => 'required|string',
       'content_type' => 'required|string',
+      'file_size'    => 'nullable|integer|min:1', // bytes — sent by frontend
+      'pending_bytes' => 'nullable|integer|min:0', // bytes of files already queued for upload
+      'context'      => 'nullable|string|in:publication,profile,workspace', // upload context
     ]);
+
+    // --- Storage limit pre-check ---
+    $fileSize = (int) $request->input('file_size', 0);
+    $pendingBytes = (int) $request->input('pending_bytes', 0);
+    
+    if ($fileSize > 0) {
+      $user      = $request->user();
+      $workspace = $user?->currentWorkspace ?? $user?->workspaces()->find($user?->current_workspace_id);
+      if ($workspace) {
+        $validator = app(PlanLimitValidator::class);
+        
+        // Check if this specific file can be uploaded considering pending uploads
+        if (!$validator->canUploadSize($workspace, $fileSize, $pendingBytes)) {
+          $upgradeMsg = $validator->getUpgradeMessage($workspace, 'storage');
+          $remaining = $validator->getRemainingStorageBytes($workspace, $pendingBytes);
+          
+          return response()->json([
+            'error'       => $upgradeMsg['message'],
+            'action'      => $upgradeMsg['action'],
+            'limit_type'  => 'storage',
+            'upgrade_plan' => $upgradeMsg['suggested_plan'],
+            'remaining_bytes' => $remaining,
+            'file_size' => $fileSize,
+            'pending_bytes' => $pendingBytes,
+          ], 402);
+        }
+      }
+    }
 
     $filename = $request->input('filename');
     $contentType = $request->input('content_type');
-    
+    $context = $request->input('context', 'publication'); // default to publication for backward compatibility
+    $user = $request->user();
+
     // Validate content type against allowed types
     $allowedMimeTypes = [
       'image/jpeg',
       'image/png',
       'image/gif',
+      'image/svg+xml', // SVG support enabled for profile/workspace only
       'video/mp4',
       'application/pdf',
     ];
-    
+
     if (!in_array($contentType, $allowedMimeTypes)) {
       return response()->json([
         'error' => 'File type not allowed. Allowed types: ' . implode(', ', $allowedMimeTypes)
       ], 400);
     }
-    
-    // Check for executable extensions
+
+    // Extract file extension for validation
     $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+
+    // Block SVG files for publications (social media platforms don't support SVG)
+    if (($extension === 'svg' || $contentType === 'image/svg+xml') && $context === 'publication') {
+      Log::info('SVG file blocked for publication context', [
+        'filename' => $filename,
+        'content_type' => $contentType,
+        'context' => $context,
+        'user_id' => $request->user()?->id,
+      ]);
+
+      return response()->json([
+        'error' => 'SVG files are not supported by social media platforms. Please use JPG, PNG, GIF, or WebP.'
+      ], 400);
+    }
+
+    // Check for executable extensions
     $executableExtensions = ['exe', 'bat', 'cmd', 'com', 'pif', 'scr', 'vbs', 'js', 'jar', 'sh', 'php', 'py'];
-    
+
     if (in_array($extension, $executableExtensions)) {
-      \Log::warning('Executable file upload attempt via presigned URL', [
+      Log::warning('Executable file upload attempt via presigned URL', [
         'filename' => $filename,
         'ip' => $request->ip(),
-        'user_id' => auth()->id(),
+        'user_id' => $request->user()?->id,
       ]);
-      
+
       return response()->json([
         'error' => 'Executable files are not allowed'
       ], 400);
     }
-
-    $uuid = Str::uuid();
-    $extension = pathinfo($filename, PATHINFO_EXTENSION);
-    $key = "publications/{$uuid}.{$extension}";
+    
+    // Usar el nuevo servicio de rutas organizadas
+    $key = S3PathService::publicationPath(
+      $user->current_workspace_id,
+      $user->id,
+      $extension
+    );
+    $uuid = pathinfo($key, PATHINFO_FILENAME);
 
     if (config('filesystems.default') === 's3') {
       try {
         $client = Storage::disk('s3')->getClient();
         $bucket = config('filesystems.disks.s3.bucket');
 
-        \Log::info('Generating presigned URL', [
+        Log::info('Generating presigned URL', [
           'key' => $key,
           'bucket' => $bucket,
           'content_type' => $contentType,
@@ -81,7 +138,7 @@ class UploadController extends Controller
         $requestS3 = $client->createPresignedRequest($cmd, '+20 minutes');
         $presignedUrl = (string)$requestS3->getUri();
 
-        \Log::info('Presigned URL generated successfully', [
+        Log::info('Presigned URL generated successfully', [
           'key' => $key,
           'user_id' => auth()->id(),
         ]);
@@ -93,26 +150,26 @@ class UploadController extends Controller
           'method' => 'PUT'
         ]);
       } catch (S3Exception $e) {
-        \Log::error('S3 error generating presigned URL', [
+        Log::error('S3 error generating presigned URL', [
           'error' => $e->getMessage(),
           'aws_error_code' => $e->getAwsErrorCode(),
           'status_code' => $e->getStatusCode(),
           'key' => $key,
           'user_id' => auth()->id(),
         ]);
-        
+
         return response()->json([
           'error' => 'Failed to generate upload URL. Please check S3 configuration.',
           'details' => config('app.debug') ? $e->getMessage() : null,
         ], 500);
       } catch (\Exception $e) {
-        \Log::error('Unexpected error generating presigned URL', [
+        Log::error('Unexpected error generating presigned URL', [
           'error' => $e->getMessage(),
           'trace' => $e->getTraceAsString(),
           'key' => $key,
           'user_id' => auth()->id(),
         ]);
-        
+
         return response()->json([
           'error' => 'Failed to generate upload URL.',
           'details' => config('app.debug') ? $e->getMessage() : null,
@@ -200,7 +257,7 @@ class UploadController extends Controller
           ]);
         } catch (S3Exception $e) {
           // Log but don't fail - continue to delete the object
-          \Log::warning('Failed to abort multipart upload', [
+          Log::warning('Failed to abort multipart upload', [
             'upload_id' => $uploadId,
             'error' => $e->getMessage()
           ]);
@@ -215,7 +272,7 @@ class UploadController extends Controller
         ]);
       } catch (S3Exception $e) {
         // Object might not exist yet, which is fine
-        \Log::info('Object not found during cancellation', [
+        Log::info('Object not found during cancellation', [
           'upload_id' => $uploadId,
           's3_key' => $validated['s3_key']
         ]);
@@ -227,7 +284,7 @@ class UploadController extends Controller
 
       return response()->json(['success' => true]);
     } catch (\Exception $e) {
-      \Log::error('Upload cancellation failed', [
+      Log::error('Upload cancellation failed', [
         'upload_id' => $uploadId,
         'error' => $e->getMessage()
       ]);

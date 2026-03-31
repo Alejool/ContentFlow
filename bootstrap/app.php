@@ -16,7 +16,21 @@ use App\Http\Middleware\IsSuperAdmin;
 use App\Http\Middleware\ThrottleReelGeneration;
 use App\Http\Middleware\CustomRateLimiter;
 use App\Http\Middleware\Require2FA;
+use App\Http\Middleware\CheckSubscriptionLimits;
+use App\Http\Middleware\CheckFeatureAccess;
+use App\Http\Middleware\ThrottleByPlan;
+use App\Http\Middleware\CheckGranularLimits;
+use App\Http\Middleware\ApiRateLimiter;
+use App\Http\Middleware\CheckWorkspaceLimit;
+use App\Http\Middleware\CheckWorkspaceOwner;
+use App\Http\Middleware\IdempotentPublish;
+use App\Http\Middleware\CheckWorkspaceRole;
 use Illuminate\Routing\Middleware\CacheResponse;
+use App\Http\Middleware\CheckApiWorkspacePlan;
+use App\Http\Middleware\CheckMaintenanceMode;
+use App\Http\Middleware\CheckNewRegistrations;
+use App\Http\Middleware\LogContextMiddleware;
+use App\Http\Middleware\CheckPurchasesEnabled;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -36,13 +50,17 @@ return Application::configure(basePath: dirname(__DIR__))
             'api/*',
         ]);
         $middleware->web(append: [
+            LogContextMiddleware::class,
             SecurityHeaders::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
             SetLocale::class,
             HandleWorkspaceContext::class,
+            CheckMaintenanceMode::class,
+            CheckNewRegistrations::class,
         ]);
         $middleware->api(append: [
+            LogContextMiddleware::class,
             SecurityHeaders::class,
             SetLocale::class,
         ]);
@@ -52,6 +70,17 @@ return Application::configure(basePath: dirname(__DIR__))
             'cache.response' => CacheResponse::class,
             'rate.limit' => CustomRateLimiter::class,
             'require.2fa' => Require2FA::class,
+            'subscription.limits' => CheckSubscriptionLimits::class,
+            'feature.access' => CheckFeatureAccess::class,
+            'throttle.plan' => ThrottleByPlan::class,
+            'granular.limit' => CheckGranularLimits::class,
+            'api.rate.limit' => ApiRateLimiter::class,
+            'workspace.limit' => CheckWorkspaceLimit::class,
+            'workspace.owner' => CheckWorkspaceOwner::class,
+            'idempotent.publish' => IdempotentPublish::class,
+            'workspace.role' => CheckWorkspaceRole::class,
+            'api.plan' => CheckApiWorkspacePlan::class,
+            'purchases.enabled' => CheckPurchasesEnabled::class,
         ]);
     })
     ->withSchedule(function ($schedule) {
@@ -62,8 +91,43 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command('social:check-tokens')->daily();
         $schedule->command('youtube:process-playlist-queue')->everyFiveMinutes();
         $schedule->command('app:send-event-reminders')->everyMinute();
+        // Verificar contenido publicado cada 6 horas (4 veces al día)
+        $schedule->command('content:verify-status --days=7 --limit=200')
+            ->everySixHours()
+            ->withoutOverlapping();
+        // Reset monthly usage metrics on the first day of each month
+        $schedule->command('usage:reset-monthly')
+            ->monthlyOn(1, '00:00')
+            ->timezone('UTC');
+        // Daily subscription status check: validate expired subscriptions, process grace periods, send warnings
+        $schedule->command('subscription:check-status')->daily();
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        $exceptions->render(function (\Illuminate\Database\QueryException $e, $request) {
+            $message = $e->getMessage();
+            if (str_contains($message, 'relation "users" does not exist') || str_contains($message, 'Base table or view not found')) {
+                try {
+                    auth()->guard('web')->logout();
+                    $request->session()->invalidate();
+                    $request->session()->regenerateToken();
+                } catch (\Throwable $th) {
+                    // Ignore errors during emergency logout
+                }
+                
+                // Si la tabla que falta no es users, o estamos en la pagina principal y sigue fallando, 
+                // para evitar un bucle devolvemos la vista o simplemente dejamos que siga si no podemos solucionarlo.
+                if ($request->is('/')) {
+                    // Si ya estamos en root y falla la DB (ej. system_settings no existe), dejamos que el error se muestre
+                    // O podemos enviar un error limpio en vez de un loop.
+                    if (!str_contains($message, 'users')) {
+                         return response()->view('errors.500', ['exception' => $e], 500)->throwResponse();
+                    }
+                }
+                
+                return redirect('/');
+            }
+        });
+
         $exceptions->render(function (MethodNotAllowedHttpException $e, $request) {
             LogHelper::error('405 Method Not Allowed', [
                 'url' => $request->fullUrl(),

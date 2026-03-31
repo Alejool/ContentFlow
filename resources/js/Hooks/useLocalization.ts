@@ -1,5 +1,5 @@
-import { useTranslation } from "react-i18next";
-import { useCallback, useMemo } from "react";
+import { useTranslation } from 'react-i18next';
+import { useCallback, useMemo } from 'react';
 import {
   formatDate,
   formatNumber,
@@ -10,7 +10,7 @@ import {
   formatList,
   pluralize,
   getUserTimezone,
-} from "@/Utils/i18nHelpers";
+} from '@/Utils/i18nHelpers';
 
 /**
  * Hook personalizado para localización con utilidades adicionales
@@ -26,20 +26,18 @@ export const useLocalization = () => {
       await i18n.changeLanguage(lng);
       // Persistir en el backend si el usuario está autenticado
       try {
-        await fetch("/api/user/locale", {
-          method: "PATCH",
+        await fetch('/api/user/locale', {
+          method: 'PATCH',
           headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": document
-              .querySelector('meta[name="csrf-token"]')
-              ?.getAttribute("content") || "",
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN':
+              document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
           },
           body: JSON.stringify({ locale: lng }),
         });
-      } catch (error) {
-        }
+      } catch (error) {}
     },
-    [i18n]
+    [i18n],
   );
 
   // Funciones de formateo con el idioma actual
@@ -54,14 +52,13 @@ export const useLocalization = () => {
       percent: (value: number, decimals?: number) =>
         formatPercent(value, decimals, currentLanguage),
       compact: (value: number) => formatCompactNumber(value, currentLanguage),
-      relative: (date: Date | string | number) =>
-        formatRelativeTime(date, currentLanguage),
-      list: (items: string[], type?: "conjunction" | "disjunction") =>
+      relative: (date: Date | string | number) => formatRelativeTime(date, currentLanguage),
+      list: (items: string[], type?: 'conjunction' | 'disjunction') =>
         formatList(items, type, currentLanguage),
       plural: (count: number, singular: string, plural?: string) =>
         pluralize(count, singular, plural, currentLanguage),
     }),
-    [currentLanguage]
+    [currentLanguage],
   );
 
   return {

@@ -1,31 +1,15 @@
-import { useTheme } from "@/Hooks/useTheme";
-import {
-  Dialog,
-  DialogPanel,
-  DialogTitle,
-  Transition,
-  TransitionChild,
-} from "@headlessui/react";
-import { X } from "lucide-react";
-import React, { ReactNode, useEffect, useRef } from "react";
-import { FocusManager } from "@/Utils/FocusManager";
+import { useTheme } from '@/Hooks/useTheme';
+import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from '@headlessui/react';
+import { X } from 'lucide-react';
+import React, { ReactNode, useEffect, useRef } from 'react';
+import { FocusManager } from '@/Utils/FocusManager';
 
 interface DynamicModalProps {
   isOpen: boolean;
   onClose: () => void;
   title?: string;
   children: ReactNode;
-  size?:
-    | "sm"
-    | "md"
-    | "lg"
-    | "xl"
-    | "2xl"
-    | "3xl"
-    | "4xl"
-    | "5xl"
-    | "6xl"
-    | "7xl";
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl';
 }
 
 export const DynamicModal = ({
@@ -33,22 +17,22 @@ export const DynamicModal = ({
   onClose,
   title,
   children,
-  size = "2xl",
+  size = '2xl',
 }: DynamicModalProps) => {
   const { actualTheme } = useTheme();
   const dialogPanelRef = useRef<HTMLDivElement>(null);
 
   const sizeClasses = {
-    sm: "max-w-sm",
-    md: "max-w-md",
-    lg: "max-w-lg",
-    xl: "max-w-xl",
-    "2xl": "max-w-2xl",
-    "3xl": "max-w-3xl",
-    "4xl": "max-w-4xl",
-    "5xl": "max-w-5xl",
-    "6xl": "max-w-6xl",
-    "7xl": "max-w-7xl",
+    sm: 'max-w-sm',
+    md: 'max-w-md',
+    lg: 'max-w-lg',
+    xl: 'max-w-xl',
+    '2xl': 'max-w-2xl',
+    '3xl': 'max-w-3xl',
+    '4xl': 'max-w-4xl',
+    '5xl': 'max-w-5xl',
+    '6xl': 'max-w-6xl',
+    '7xl': 'max-w-7xl',
   };
 
   // Integrate FocusManager trapFocus when modal opens
@@ -57,7 +41,7 @@ export const DynamicModal = ({
     if (isOpen && dialogPanelRef.current) {
       // Trap focus when modal opens
       const cleanup = FocusManager.trapFocus(dialogPanelRef.current);
-      
+
       // Restore focus when modal closes
       return () => {
         cleanup();
@@ -93,16 +77,15 @@ export const DynamicModal = ({
             >
               <DialogPanel
                 ref={dialogPanelRef}
-                className={`relative transform overflow-hidden rounded-lg text-left shadow-2xl transition-all sm:my-8 w-full ${
+                className={`relative w-full transform overflow-hidden rounded-lg text-left shadow-2xl transition-all sm:my-8 ${
                   sizeClasses[size]
-                }
-                ${
-                  actualTheme === "dark"
-                    ? "bg-neutral-900 border border-neutral-800"
-                    : "bg-white border border-gray-100"
+                } ${
+                  actualTheme === 'dark'
+                    ? 'border border-neutral-800 bg-neutral-900'
+                    : 'border border-gray-100 bg-white'
                 }`}
               >
-                <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-neutral-800">
+                <div className="flex items-center justify-between border-b border-gray-100 p-6 dark:border-neutral-800">
                   {title && (
                     <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
                       {title}
@@ -110,9 +93,9 @@ export const DynamicModal = ({
                   )}
                   <button
                     onClick={onClose}
-                    className="p-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-neutral-800 text-gray-500 dark:text-gray-400"
+                    className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-neutral-800"
                   >
-                    <X className="w-5 h-5" />
+                    <X className="h-5 w-5" />
                   </button>
                 </div>
                 <div className="p-6">{children}</div>

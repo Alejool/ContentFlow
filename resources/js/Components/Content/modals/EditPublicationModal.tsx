@@ -1,64 +1,68 @@
-import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
-import { CommentsSection } from "@/Components/Content/Publication/comments/CommentsSection";
-import ApprovalHistoryCompacto from "@/Components/Content/Publication/common/ApprovalHistoryCompacto";
-import TimelineCompacto from "@/Components/Content/Publication/common/TimelineCompacto";
-import SocialAccountsSection from "@/Components/Content/Publication/common/add/SocialAccountsSection";
-import ContentSection from "@/Components/Content/Publication/common/edit/ContentSection";
-import { LivePreviewSection } from "@/Components/Content/Publication/common/edit/LivePreviewSection";
-import MediaUploadSection from "@/Components/Content/Publication/common/edit/MediaUploadSection";
-import MediaUploadSkeleton from "@/Components/Content/Publication/common/edit/MediaUploadSkeleton";
-import ModalFooter from "@/Components/Content/modals/common/ModalFooter";
-import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
-import ScheduleSection from "@/Components/Content/modals/common/ScheduleSection";
-import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
-import { useModalFocusTrap } from "@/Hooks/useModalFocusTrap";
-import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
-import { usePublicationLock } from "@/Hooks/usePublicationLock";
-import { useCampaignStore } from "@/stores/campaignStore";
-import { usePublicationStore } from "@/stores/publicationStore";
-import { useAccountsStore } from "@/stores/socialAccountsStore";
-import { useUploadQueue } from "@/stores/uploadQueueStore";
-import { Publication } from "@/types/Publication";
-import { usePage } from "@inertiajs/react";
-import { AlertCircle, Lock, Save } from "lucide-react";
-import { memo, useEffect, useMemo, useState } from "react";
-import { useWatch } from "react-hook-form";
-import { Trans } from "react-i18next";
-import PublicationStatusTimeline from "@/Components/Content/Publication/common/PublicationStatusTimeline";
-import axios from "axios";
-import toast from "react-hot-toast";
+import PlatformSettingsModal from '@/Components/ConfigSocialMedia/PlatformSettingsModal';
+import { CommentsSection } from '@/Components/Content/Publication/comments/CommentsSection';
+import ApprovalHistoryCompacto from '@/Components/Content/Publication/common/ApprovalHistoryCompacto';
+import { ContentType } from '@/Components/Content/Publication/common/ContentTypeIconSelector';
+import ContentTypeSelectorBar from '@/Components/Content/Publication/common/ContentTypeSelectorBar';
+import PlatformCharacterValidator from '@/Components/Content/Publication/common/PlatformCharacterValidator';
+import PollFields from '@/Components/Content/Publication/common/PollFields';
+import PublicationStatusTimeline from '@/Components/Content/Publication/common/PublicationStatusTimeline';
+import TimelineCompacto from '@/Components/Content/Publication/common/TimelineCompacto';
+import SocialAccountsSection from '@/Components/Content/Publication/common/add/SocialAccountsSection';
+import ContentSection from '@/Components/Content/Publication/common/edit/ContentSection';
+import { LivePreviewSection } from '@/Components/Content/Publication/common/edit/LivePreviewSection';
+import MediaUploadSection from '@/Components/Content/Publication/common/edit/MediaUploadSection';
+import MediaUploadSkeleton from '@/Components/Content/Publication/common/edit/MediaUploadSkeleton';
+import ModalFooter from '@/Components/Content/modals/common/ModalFooter';
+import ModalHeader from '@/Components/Content/modals/common/ModalHeader';
+import ScheduleSection from '@/Components/Content/modals/common/ScheduleSection';
+import VideoValidationAlert from '@/Components/Content/modals/publish/VideoValidationAlert';
+import AlertCard from '@/Components/common/Modern/AlertCard';
+import { useContentType } from '@/Hooks/publication/useContentType';
+import { usePublicationForm } from '@/Hooks/publication/usePublicationForm';
+import { usePublishedPlatforms } from '@/Hooks/publication/usePublicationsList';
+import { useModalFocusTrap } from '@/Hooks/useModalFocusTrap';
+import { usePublicationCapabilities } from '@/Hooks/usePublicationCapabilities';
+import { usePublicationLock } from '@/Hooks/usePublicationLock';
+import { useSocialAccounts } from '@/Hooks/useSocialAccounts';
+import { useTokenHealth } from '@/Hooks/useTokenHealth';
+import toast from '@/Utils/toast';
+import { queryKeys } from '@/lib/queryKeys';
+import { useCampaignStore } from '@/stores/campaignStore';
+import { useUploadQueue } from '@/stores/uploadQueueStore';
+import { Publication } from '@/types/Publication';
+import { usePage } from '@inertiajs/react';
+import { useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
+import { Lock, Save } from 'lucide-react';
+import { memo, useEffect, useMemo, useState } from 'react';
+import { useWatch } from 'react-hook-form';
+import { Trans } from 'react-i18next';
 
 const parseUserAgent = (userAgent?: string): string => {
-  if (!userAgent) return "Unknown Device";
-  let browser = "Unknown Browser";
-  if (userAgent.includes("Firefox")) browser = "Firefox";
-  else if (userAgent.includes("Edg")) browser = "Edge";
-  else if (userAgent.includes("Chrome")) browser = "Chrome";
-  else if (userAgent.includes("Safari") && !userAgent.includes("Chrome"))
-    browser = "Safari";
-  else if (userAgent.includes("Opera") || userAgent.includes("OPR"))
-    browser = "Opera";
+  if (!userAgent) return 'Unknown Device';
+  let browser = 'Unknown Browser';
+  if (userAgent.includes('Firefox')) browser = 'Firefox';
+  else if (userAgent.includes('Edg')) browser = 'Edge';
+  else if (userAgent.includes('Chrome')) browser = 'Chrome';
+  else if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) browser = 'Safari';
+  else if (userAgent.includes('Opera') || userAgent.includes('OPR')) browser = 'Opera';
 
-  let os = "";
-  if (userAgent.includes("Windows")) os = "Windows";
-  else if (userAgent.includes("Mac")) os = "macOS";
-  else if (userAgent.includes("Linux")) os = "Linux";
-  else if (userAgent.includes("Android")) os = "Android";
-  else if (
-    userAgent.includes("iOS") ||
-    userAgent.includes("iPhone") ||
-    userAgent.includes("iPad")
-  )
-    os = "iOS";
+  let os = '';
+  if (userAgent.includes('Windows')) os = 'Windows';
+  else if (userAgent.includes('Mac')) os = 'macOS';
+  else if (userAgent.includes('Linux')) os = 'Linux';
+  else if (userAgent.includes('Android')) os = 'Android';
+  else if (userAgent.includes('iOS') || userAgent.includes('iPhone') || userAgent.includes('iPad'))
+    os = 'iOS';
 
   return os ? `${browser} on ${os}` : browser;
 };
 
 const maskIpAddress = (ip?: string): string => {
-  if (!ip) return "";
-  const parts = ip.split(".");
+  if (!ip) return '';
+  const parts = ip.split('.');
   if (parts.length === 4) return `${parts[0]}.${parts[1]}.x.x`;
-  return ip.split(":")[0] + ":...";
+  return ip.split(':')[0] + ':...';
 };
 
 interface EditPublicationModalProps {
@@ -75,17 +79,21 @@ const EditPublicationModal = ({
   onSubmit,
 }: EditPublicationModalProps) => {
   const { campaigns } = useCampaignStore();
-  const { accounts: socialAccounts } = useAccountsStore();
+  const { data: socialAccounts = [] } = useSocialAccounts();
+  const queryClient = useQueryClient();
   const [isTimelineExpanded, setIsTimelineExpanded] = useState(false);
-  const [isApprovalHistoryExpanded, setIsApprovalHistoryExpanded] =
-    useState(false);
+  const [isApprovalHistoryExpanded, setIsApprovalHistoryExpanded] = useState(false);
+  const [isYouTubeThumbnailExpanded, setIsYouTubeThumbnailExpanded] = useState(true);
 
-  // Integrate focus trap for modal accessibility
-  // Requirements: 5.5
+  const { invalidAccountIds, expiringSoonAccountIds } = useTokenHealth();
+  const [isTextValid, setIsTextValid] = useState(true);
+
   const modalRef = useModalFocusTrap(isOpen);
 
-  const { isLockedByMe, isLockedByOther, lockInfo, activeUsers } =
-    usePublicationLock(publication?.id ?? null, isOpen);
+  const { isLockedByMe, isLockedByOther, lockInfo, activeUsers } = usePublicationLock(
+    publication?.id ?? null,
+    isOpen,
+  );
 
   const {
     t,
@@ -107,6 +115,7 @@ const EditPublicationModal = ({
     handleAccountToggle,
     handleClose,
     handleCancelPublication,
+    handleCancelPlatform,
     handleSubmit,
     platformSettings,
     setPlatformSettings,
@@ -126,10 +135,18 @@ const EditPublicationModal = ({
     durationErrors,
     updateFile: baseUpdateFile,
     uploadFile,
+    i18n,
   } = usePublicationForm({
     publication,
     onClose,
-    onSubmitSuccess: onSubmit,
+    onSubmitSuccess: async (success) => {
+      if (success) {
+        // Invalidate TanStack Query cache — triggers automatic refetch everywhere
+        queryClient.invalidateQueries({ queryKey: queryKeys.publications.all });
+        queryClient.invalidateQueries({ queryKey: queryKeys.calendar.all });
+      }
+      onSubmit(success);
+    },
     isOpen,
   });
 
@@ -139,7 +156,7 @@ const EditPublicationModal = ({
     baseUpdateFile(tempId, {
       file,
       url: localUrl,
-      status: "uploading",
+      status: 'uploading',
       isNew: true,
     });
 
@@ -153,46 +170,135 @@ const EditPublicationModal = ({
       }
       return result;
     } catch (err) {
-      }
+      return undefined;
+    }
   };
 
   // Delete reels when video is removed
-  const handleRemoveMediaWithReels = async (index: number) => {
-    const mediaToRemove = mediaFiles[index];
+  const handleRemoveMediaWithReels = async (tempId: string) => {
+    const mediaToRemove = mediaFiles.find((m) => m.tempId === tempId);
+    if (!mediaToRemove) return;
+
     const isVideo = mediaToRemove.type === 'video';
-    
+
     if (isVideo && publication?.id && mediaToRemove.id) {
       // Find and delete associated reels
-      const reelsToDelete = publication.media_files?.filter(
-        m => m.metadata?.original_media_id === mediaToRemove.id
-      ) || [];
-      
+      const reelsToDelete =
+        publication.media_files?.filter(
+          (m) => m.metadata?.original_media_id === mediaToRemove.id,
+        ) || [];
+
       if (reelsToDelete.length > 0) {
         try {
-          await Promise.all(
-            reelsToDelete.map(reel => axios.delete(`/api/v1/media/${reel.id}`))
-          );
+          await Promise.all(reelsToDelete.map((reel) => axios.delete(`/api/v1/media/${reel.id}`)));
           toast.success(t('reels.messages.deletedWithVideo'));
         } catch (error) {
-          }
+          console.error('Failed to delete associated reels', error);
+        }
       }
     }
-    
+
     // Call original remove handler
-    handleRemoveMedia(index);
+    handleRemoveMedia(tempId);
   };
 
   const { register } = form;
 
-  const selectedSocialAccounts =
-    useWatch({ control, name: "social_accounts" }) || [];
-  const scheduledAt = useWatch({ control, name: "scheduled_at" });
-  const useGlobalSchedule = useWatch({ control, name: "use_global_schedule" });
-  const title = useWatch({ control, name: "title" });
-  const description = useWatch({ control, name: "description" });
-  const goal = useWatch({ control, name: "goal" });
-  const hashtags = useWatch({ control, name: "hashtags" });
-  const campaign_id = useWatch({ control, name: "campaign_id" });
+  const selectedSocialAccounts = useWatch({ control, name: 'social_accounts' }) || [];
+  const scheduledAt = useWatch({ control, name: 'scheduled_at' });
+  const useGlobalSchedule = useWatch({ control, name: 'use_global_schedule' });
+  const title = useWatch({ control, name: 'title' });
+  const description = useWatch({ control, name: 'description' });
+  const goal = useWatch({ control, name: 'goal' });
+  const hashtags = useWatch({ control, name: 'hashtags' });
+  const campaign_id = useWatch({ control, name: 'campaign_id' });
+  const is_recurring = useWatch({ control, name: 'is_recurring' });
+  const recurrence_type = useWatch({ control, name: 'recurrence_type' });
+  const recurrence_interval = useWatch({
+    control,
+    name: 'recurrence_interval',
+  });
+  const recurrence_days = useWatch({ control, name: 'recurrence_days' });
+  const recurrence_end_date = useWatch({
+    control,
+    name: 'recurrence_end_date',
+  });
+  const recurrence_accounts = useWatch({
+    control,
+    name: 'recurrence_accounts',
+  });
+  const content_type = (useWatch({ control, name: 'content_type' }) as ContentType) || 'post';
+  const poll_options = useWatch({ control, name: 'poll_options' }) || ['', ''];
+  const poll_duration_hours = useWatch({ control, name: 'poll_duration_hours' }) || 24;
+
+  // Fetch platform capabilities for this publication
+  const {
+    capabilities,
+    loading: capabilitiesLoading,
+    canPublishToAccount,
+    getAccountErrors,
+  } = usePublicationCapabilities(publication?.id || null);
+
+  // Auto-deselect incompatible platforms when capabilities are loaded
+  useEffect(() => {
+    if (!capabilities || capabilitiesLoading || !isOpen) return;
+
+    const currentSelected = selectedSocialAccounts || [];
+    const incompatibleAccounts: number[] = [];
+    const incompatibleReasons: Record<number, string[]> = {};
+
+    currentSelected.forEach((accountId: number) => {
+      if (!canPublishToAccount(accountId)) {
+        incompatibleAccounts.push(accountId);
+        incompatibleReasons[accountId] = getAccountErrors(accountId);
+      }
+    });
+
+    if (incompatibleAccounts.length > 0) {
+      const newSelected = currentSelected.filter(
+        (id: number) => !incompatibleAccounts.includes(id),
+      );
+
+      // Update form value
+      setValue('social_accounts', newSelected, { shouldDirty: true });
+
+      // Show toast notification explaining why platforms were deselected
+      incompatibleAccounts.forEach((accountId) => {
+        const account = socialAccounts.find((a) => a.id === accountId);
+        if (account) {
+          const reasons = incompatibleReasons[accountId] || [];
+          toast.error(
+            `${account.platform} (@${account.account_name}) fue desmarcado: ${reasons.join(', ')}`,
+            { duration: 6000 },
+          );
+        }
+      });
+
+      console.log('Auto-deselected incompatible platforms:', {
+        incompatibleAccounts,
+        reasons: incompatibleReasons,
+      });
+    }
+  }, [capabilities, capabilitiesLoading, isOpen, publication?.id]);
+
+  // Use content type hook for field visibility
+  const { fieldVisibility } = useContentType(content_type);
+
+  // Force re-render when content_type changes
+  const [forceUpdate, setForceUpdate] = useState(0);
+  useEffect(() => {
+    setForceUpdate((prev) => prev + 1);
+  }, [content_type]);
+
+  // Get selected platform names for content type filtering
+  const selectedPlatformNames = useMemo(() => {
+    return selectedSocialAccounts
+      .map((id: number) => {
+        const account = socialAccounts.find((a) => a.id === id);
+        return account?.platform;
+      })
+      .filter(Boolean) as string[];
+  }, [selectedSocialAccounts, socialAccounts]);
 
   const watched = useMemo(
     () => ({
@@ -204,6 +310,13 @@ const EditPublicationModal = ({
       goal,
       hashtags,
       campaign_id,
+      is_recurring,
+      recurrence_type,
+      recurrence_interval,
+      recurrence_days,
+      recurrence_end_date,
+      recurrence_accounts,
+      content_type,
     }),
     [
       selectedSocialAccounts,
@@ -214,6 +327,13 @@ const EditPublicationModal = ({
       goal,
       hashtags,
       campaign_id,
+      is_recurring,
+      recurrence_type,
+      recurrence_interval,
+      recurrence_days,
+      recurrence_end_date,
+      recurrence_accounts,
+      content_type,
     ],
   );
 
@@ -225,57 +345,68 @@ const EditPublicationModal = ({
   }, [mediaFiles]);
 
   const hasPublishedPlatform = useMemo(() => {
-    return publication?.social_post_logs?.some(
-      (log: any) => log.status === "published",
-    );
+    return publication?.social_post_logs?.some((log: any) => log.status === 'published');
   }, [publication]);
 
-  const { publishedPlatforms, publishingPlatforms, failedPlatforms } =
-    usePublicationStore();
+  const hasPublishingPlatform = useMemo(() => {
+    return publication?.social_post_logs?.some((log: any) => log.status === 'publishing');
+  }, [publication]);
 
-  const fetchPublishedPlatformsFromStore = usePublicationStore(
-    (s) => s.fetchPublishedPlatforms,
-  );
+  const { data: platformsData } = usePublishedPlatforms(isOpen ? publication?.id : null);
 
   const { auth } = usePage<any>().props;
   const user = auth.user;
-  const canManage =
-    auth.current_workspace?.permissions?.includes("manage-content");
+  const canManage = auth.current_workspace?.permissions?.includes('manage-content');
+  const canManageAccounts = auth.current_workspace?.permissions?.includes('manage-accounts');
+  const planId = auth.current_workspace?.plan?.toLowerCase() || 'demo';
+  const hasRecurrenceAccess = ['demo', 'professional', 'enterprise'].includes(planId);
+  const hasAdvancedScheduling = auth.current_workspace?.features?.advanced_scheduling ?? false;
 
-  // Fetch published platforms when modal opens
+  // Auto-detect if we should use global schedule or individual schedules
+  // If there are different dates for different accounts, disable global schedule
   useEffect(() => {
-    if (isOpen && publication?.id) {
-      fetchPublishedPlatformsFromStore(publication.id);
+    if (!isOpen || !publication) return;
+
+    // Check if all account schedules are the same
+    const scheduleValues = Object.values(accountSchedules);
+    if (scheduleValues.length > 1) {
+      const allSame = scheduleValues.every((date) => date === scheduleValues[0]);
+
+      // If dates are different and global schedule is enabled, disable it
+      if (!allSame && useGlobalSchedule) {
+        setValue('use_global_schedule', false, { shouldDirty: false });
+      }
+      // If dates are all the same and global schedule is disabled, we could enable it
+      // but let's not do that automatically to avoid confusion
     }
-  }, [isOpen, publication?.id, fetchPublishedPlatformsFromStore]);
+  }, [isOpen, publication, accountSchedules, useGlobalSchedule, setValue]);
 
   const publishedAccountIds = useMemo(() => {
-    const fromStore = publishedPlatforms[publication?.id ?? 0] || [];
+    const fromQuery = platformsData?.published ?? [];
     const fromLogs =
       publication?.social_post_logs
-        ?.filter((log: any) => log.status === "published")
+        ?.filter((log: any) => log.status === 'published')
         .map((log: any) => log.social_account_id) || [];
-    return Array.from(new Set([...fromStore, ...fromLogs]));
-  }, [publication, publishedPlatforms]);
+    return Array.from(new Set([...fromQuery, ...fromLogs]));
+  }, [publication, platformsData]);
 
   const publishingAccountIds = useMemo(() => {
-    const fromStore = publishingPlatforms[publication?.id ?? 0] || [];
+    const fromQuery = platformsData?.publishing ?? [];
     const fromLogs =
       publication?.social_post_logs
-        ?.filter((log: any) => log.status === "publishing")
+        ?.filter((log: any) => log.status === 'publishing')
         .map((log: any) => log.social_account_id) || [];
-
-    return Array.from(new Set([...fromStore, ...fromLogs]));
-  }, [publication, publishingPlatforms]);
+    return Array.from(new Set([...fromQuery, ...fromLogs]));
+  }, [publication, platformsData]);
 
   const failedAccountIds = useMemo(() => {
-    const fromStore = failedPlatforms[publication?.id ?? 0] || [];
+    const fromQuery = platformsData?.failed ?? [];
     const fromLogs =
       publication?.social_post_logs
-        ?.filter((log: any) => log.status === "failed")
+        ?.filter((log: any) => log.status === 'failed')
         .map((log: any) => log.social_account_id) || [];
-    return Array.from(new Set([...fromStore, ...fromLogs]));
-  }, [publication, failedPlatforms]);
+    return Array.from(new Set([...fromQuery, ...fromLogs]));
+  }, [publication, platformsData]);
 
   const selectedPlatforms = useMemo(() => {
     return Array.from(
@@ -302,7 +433,7 @@ const EditPublicationModal = ({
 
   const hasYouTubeAccount = selectedSocialAccounts.some((id: number) => {
     const account = socialAccounts.find((a) => a.id === id);
-    return account?.platform?.toLowerCase() === "youtube";
+    return account?.platform?.toLowerCase() === 'youtube';
   });
 
   // Partial locking:
@@ -310,18 +441,18 @@ const EditPublicationModal = ({
   const isLockedByOtherEditor = isLockedByOther;
 
   // - Media section lock: if another user has lock OR media is processing OR pending review
-  const isPendingReview = publication?.status === "pending_review";
+  const isPendingReview = publication?.status === 'pending_review';
   const isMediaSectionDisabled =
     isLockedByOtherEditor || isAnyMediaProcessing || !canManage || isPendingReview;
 
   // - Content/Settings section lock: ONLY if another user has lock OR pending review
   const isContentSectionDisabled = isLockedByOtherEditor || !canManage || isPendingReview;
 
-  const canPublish = auth.current_workspace?.permissions?.includes("publish");
+  const canPublish = auth.current_workspace?.permissions?.includes('publish');
 
   // Strict check on status to avoid stale approved_at dates on failed posts
   const isApprovedStatus =
-    publication?.status === "approved" || publication?.status === "scheduled";
+    publication?.status === 'approved' || publication?.status === 'scheduled';
 
   // Check ownership
   const isOwner = publication?.user_id === auth.user.id;
@@ -332,7 +463,7 @@ const EditPublicationModal = ({
   const allowConfiguration = canPublish || isApprovedStatus;
 
   const previewContent = useMemo(() => {
-    let text = watched.description || "";
+    let text = watched.description || '';
     if (watched.hashtags) {
       const formattedHashtags = Array.isArray(watched.hashtags)
         ? watched.hashtags.join(' ')
@@ -342,58 +473,74 @@ const EditPublicationModal = ({
     return text;
   }, [watched.description, watched.hashtags]);
 
+  const handleRecurrenceChange = (data: any) => {
+    Object.entries(data).forEach(([key, val]) => {
+      setValue(key as any, val, {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true,
+      });
+    });
+  };
+
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center sm:p-6 text-gray-900 dark:text-white transition-opacity duration-200 ${isOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}
+      className={`fixed inset-0 z-50 flex items-center justify-center text-gray-900 transition-opacity duration-200 dark:text-white sm:p-6 ${isOpen ? 'visible opacity-100' : 'pointer-events-none invisible opacity-0'}`}
     >
       <div
-        className="absolute inset-0 bg-gray-900/60 dark:bg-black/70 backdrop-blur-sm"
+        className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm dark:bg-black/70"
         onClick={handleClose}
       />
 
-      <div 
+      <div
         ref={modalRef as React.RefObject<HTMLDivElement>}
-        className="relative w-full max-w-5xl bg-white backdrop-blur-2xl dark:bg-neutral-900/90 rounded-lg shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300"
+        className="animate-in fade-in zoom-in relative flex max-h-[90vh] w-full max-w-5xl flex-col rounded-lg bg-white shadow-2xl backdrop-blur-2xl duration-300 dark:bg-neutral-900/90"
       >
         <ModalHeader
           t={t}
           onClose={handleClose}
-          title={
-            canManage
-              ? "publications.modal.edit.title"
-              : "publications.modal.show.title"
-          }
+          title={canManage ? 'publications.modal.edit.title' : 'publications.modal.show.title'}
           subtitle={
-            canManage
-              ? "publications.modal.edit.subtitle"
-              : "publications.modal.show.subtitle"
+            canManage ? 'publications.modal.edit.subtitle' : 'publications.modal.show.subtitle'
           }
           rightElement={
-            <div className="flex -space-x-2 overflow-hidden mr-2 p-2">
+            <div className="mr-2 flex -space-x-2 overflow-hidden p-2">
               {activeUsers.map((user: any) => {
                 const isTheLocker = lockInfo?.user_id === user.id;
                 return (
                   <div
                     key={user.id}
-                    className={`inline-block h-7 w-7 rounded-full ring-2 ${isTheLocker ? "ring-amber-500 z-10" : "ring-white dark:ring-neutral-800"} bg-gray-200 dark:bg-neutral-700 flex-shrink-0 relative`}
-                    title={
-                      user.name + (isTheLocker ? " (Editando)" : " (Viendo)")
-                    }
+                    className={`inline-block h-7 w-7 rounded-full ring-2 ${isTheLocker ? 'z-10 ring-amber-500' : 'ring-white dark:ring-neutral-800'} relative flex-shrink-0 bg-gray-200 dark:bg-neutral-700`}
+                    title={user.name + (isTheLocker ? ' (Editando)' : ' (Viendo)')}
                   >
                     {user.avatar ? (
                       <img
                         src={user.avatar}
                         alt={user.name}
+                        loading="lazy"
                         className="h-full w-full rounded-full object-cover"
+                        onError={(e) => {
+                          // Si falla, mostrar iniciales
+                          const target = e.currentTarget;
+                          target.style.display = 'none';
+                          const parent = target.parentElement;
+                          if (parent) {
+                            const fallback = document.createElement('div');
+                            fallback.className =
+                              'h-full w-full flex items-center justify-center text-xs font-bold text-gray-500 uppercase';
+                            fallback.textContent = user.name.charAt(0);
+                            parent.appendChild(fallback);
+                          }
+                        }}
                       />
                     ) : (
-                      <div className="h-full w-full flex items-center justify-center text-xs font-bold text-gray-500 uppercase">
+                      <div className="flex h-full w-full items-center justify-center text-xs font-bold uppercase text-gray-500">
                         {user.name.charAt(0)}
                       </div>
                     )}
                     {isTheLocker && (
-                      <div className="absolute -bottom-0.5 -right-0.5 bg-amber-500 rounded-full p-0.5 shadow-sm">
-                        <Lock className="w-2 h-2 text-white" />
+                      <div className="absolute -bottom-0.5 -right-0.5 rounded-full bg-amber-500 p-0.5 shadow-sm">
+                        <Lock className="h-2 w-2 text-white" />
                       </div>
                     )}
                   </div>
@@ -401,33 +548,82 @@ const EditPublicationModal = ({
               })}
             </div>
           }
+          centerElement={
+            <ContentTypeSelectorBar
+              selectedType={content_type}
+              selectedPlatforms={selectedPlatformNames}
+              onChange={(type) => {
+                setValue('content_type', type, { shouldValidate: true });
+                // Reset type-specific fields when changing type
+                if (type !== 'poll') {
+                  setValue('poll_options', null);
+                  setValue('poll_duration_hours', null);
+                }
+              }}
+              t={t}
+              disabled={hasPublishedPlatform || hasPublishingPlatform || isContentSectionDisabled}
+              mediaFiles={mediaFiles}
+            />
+          }
         />
 
-        <div className="flex-1 overflow-y-auto custom-scrollbar">
+        {/* ContentTypeSelectorBar visible solo en pantallas menores a md */}
+        <div className="md:hidden">
+          <ContentTypeSelectorBar
+            selectedType={content_type}
+            selectedPlatforms={selectedPlatformNames}
+            onChange={(type) => {
+              setValue('content_type', type, { shouldValidate: true });
+              // Reset type-specific fields when changing type
+              if (type !== 'poll') {
+                setValue('poll_options', null);
+                setValue('poll_duration_hours', null);
+              }
+            }}
+            t={t}
+            disabled={hasPublishedPlatform || hasPublishingPlatform || isContentSectionDisabled}
+            mediaFiles={mediaFiles}
+          />
+        </div>
+
+        <div className="custom-scrollbar flex-1 overflow-y-auto">
           <form
             id="edit-publication-form"
-            onSubmit={handleSubmit}
-            className="space-y-8"
+            onSubmit={(e) => {
+              console.log('=== Form submit event triggered ===');
+              console.log('Event:', e);
+              handleSubmit(e);
+            }}
           >
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
-              {/* Left Column: Media & Content */}
-              <div className="space-y-6">
-                {/* Media Section */}
-                <div>
-                  {!isLockedByMe && isLockedByOther && !hasPublishedPlatform && allowConfiguration && publication?.status !== "approved" && (
-                    <div className="p-4 mb-6 rounded-lg border border-amber-500 bg-amber-50 dark:bg-amber-900/20 flex gap-3 text-sm text-amber-700 dark:text-amber-300 animate-in shake duration-500">
-                      <AlertCircle className="w-5 h-5 shrink-0 text-amber-500" />
-                      <div>
-                        <p className="font-semibold mb-1">
-                          {lockInfo?.locked_by === "session"
-                            ? t("publications.modal.edit.lockedBySession") ||
-                              "Sesión Duplicada"
-                            : t("publications.modal.edit.lockedByOther") ||
-                              "En cola de espera"}
-                        </p>
-                        <div className="opacity-80">
-                          {lockInfo?.locked_by === "session" ? (
-                            <>
+            {/* Hidden field to register content_type */}
+            <input type="hidden" {...register('content_type')} />
+            <input type="hidden" {...register('poll_options')} />
+            <input type="hidden" {...register('poll_duration_hours')} />
+
+            <div
+              className={`grid grid-cols-1 ${fieldVisibility.showMediaSection ? 'lg:grid-cols-12' : 'lg:grid-cols-2'} gap-6 p-6`}
+            >
+              {/* ========================================
+                  COLUMNA IZQUIERDA: MEDIA Y CONTENIDO
+                  ======================================== */}
+              <div className={` ${fieldVisibility.showMediaSection ? 'lg:col-span-7' : ''}`}>
+                <div className="space-y-6">
+                  {!isLockedByMe &&
+                    isLockedByOther &&
+                    !hasPublishedPlatform &&
+                    !hasPublishingPlatform &&
+                    allowConfiguration &&
+                    publication?.status !== 'pending_review' && (
+                      <AlertCard
+                        type="amber"
+                        title={
+                          lockInfo?.locked_by === 'session'
+                            ? t('publications.modal.edit.lockedBySession') || 'Sesión Duplicada'
+                            : t('publications.modal.edit.lockedByOther') || 'En cola de espera'
+                        }
+                        message={
+                          lockInfo?.locked_by === 'session' ? (
+                            <div className="opacity-80">
                               <Trans
                                 i18nKey="publications.modal.edit.locking.sessionMessage"
                                 values={{
@@ -439,13 +635,13 @@ const EditPublicationModal = ({
                               />
                               {lockInfo?.ip_address && (
                                 <span className="text-xs opacity-70">
-                                  {" "}
+                                  {' '}
                                   ({maskIpAddress(lockInfo.ip_address)})
                                 </span>
                               )}
-                            </>
+                            </div>
                           ) : (
-                            <>
+                            <div className="opacity-80">
                               <Trans
                                 i18nKey="publications.modal.edit.locking.userMessage"
                                 values={{
@@ -457,319 +653,602 @@ const EditPublicationModal = ({
                                 }}
                               />
                               <p className="mt-1 font-medium text-amber-600 dark:text-amber-400">
-                                Tomarás el control automáticamente cuando se
-                                libere.
+                                Tomarás el control automáticamente cuando se libere.
                               </p>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                            </div>
+                          )
+                        }
+                        className="animate-in shake duration-500"
+                      />
+                    )}
 
+                  {/* Alerta: Eres el editor actual */}
                   {isLockedByMe && activeUsers.length > 1 && (
-                    <div className="p-3 mb-6 rounded-lg border border-blue-500 bg-blue-50 dark:bg-blue-900/20 flex gap-2 text-xs text-blue-700 dark:text-blue-300">
-                      <Lock className="w-4 h-4 shrink-0" />
-                      <p>
-                        <strong>Eres el editor actual.</strong> Hay{" "}
-                        {activeUsers.length - 1} usuario(s) en espera para
-                        cuando termines.
-                      </p>
-                    </div>
-                  )}
-
-                  {publication?.status === "pending_review" && (
-                    <div className="p-4 mb-6 rounded-lg border border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 flex gap-3 text-sm animate-in fade-in slide-in-from-top-4">
-                      <AlertCircle className="w-5 h-5 shrink-0 text-yellow-500" />
-                      <div>
-                        <p className="font-semibold mb-1">
-                          {t("publications.modal.edit.pendingReviewWarning") ||
-                            "Publicación en Revisión"}
-                        </p>
-                        <p className="opacity-90">
-                          {t("publications.modal.edit.pendingReviewWarningHint") ||
-                            "Esta publicación está esperando aprobación. Debes aprobarla o rechazarla antes de poder editarla. Si la rechazas, el creador podrá hacer cambios y volver a solicitar aprobación."}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {publication?.status === "approved" && !hasPublishedPlatform && (
-                    <div className="p-4 mb-6 rounded-lg border border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 flex gap-3 text-sm animate-in fade-in slide-in-from-top-4">
-                      <AlertCircle className="w-5 h-5 shrink-0 text-blue-500" />
-                      <div>
-                        <p className="font-semibold mb-1">
-                          {t("publications.modal.edit.approvedEditWarning") ||
-                            "Publicación Aprobada"}
-                        </p>
-                        <p className="opacity-80">
-                          {t("publications.modal.edit.approvedEditWarningHint") ||
-                            "Esta publicación ya fue aprobada. Si realizas cambios, volverá a estado 'Pendiente' y requerirá una nueva aprobación."}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {hasPublishedPlatform && (
-                    <div className="p-4 mb-6 rounded-lg border border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 flex gap-3 text-sm animate-in fade-in slide-in-from-top-4">
-                      <AlertCircle className="w-5 h-5 shrink-0 text-blue-500" />
-                      <div>
-                        <p className="font-semibold mb-1">
-                          {t("publications.modal.edit.contentLocked") ||
-                            "Publication partially live"}
-                        </p>
-                        <p className="opacity-80">
-                          {t("publications.modal.edit.contentLockedHint") ||
-                            "This publication is live on some platforms. Changes will apply to pending and future uploads."}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {!isDataReady ? (
-                    <MediaUploadSkeleton />
-                  ) : (
-                    <MediaUploadSection
-                      mediaPreviews={stabilizedMediaPreviews}
-                      thumbnails={thumbnails}
-                      imageError={imageError}
-                      isDragOver={isDragOver}
-                      t={t}
-                      onFileChange={handleFileChange}
-                      onRemoveMedia={handleRemoveMediaWithReels}
-                      onSetThumbnail={(tempId, file) =>
-                        setThumbnail(tempId, file)
+                    <AlertCard
+                      type="info"
+                      title={
+                        t('publications.modal.edit.locking.youAreEditor') ||
+                        'Eres el editor actual.'
                       }
-                      onClearThumbnail={(tempId) => clearThumbnail(tempId)}
-                      onUpdateFile={updateFile}
-                      onDragOver={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setIsDragOver(true);
-                      }}
-                      onDragLeave={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setIsDragOver(false);
-                      }}
-                      onDrop={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setIsDragOver(false);
-                        handleFileChange(e.dataTransfer.files);
-                      }}
-                      disabled={hasPublishedPlatform || isMediaSectionDisabled}
-                      isAnyMediaProcessing={isAnyMediaProcessing}
-                      uploadProgress={uploadProgress}
-                      uploadStats={uploadStats}
-                      uploadErrors={uploadErrors}
-                      lockedBy={remoteLock}
-                      videoMetadata={videoMetadata}
-                      publicationId={publication?.id}
-                      allMediaFiles={publication?.media_files || []}
+                      message={
+                        t('publications.modal.edit.locking.usersWaiting', {
+                          count: activeUsers.length - 1,
+                        }) ||
+                        `Hay ${activeUsers.length - 1} usuario(s) en espera para cuando termines.`
+                      }
+                      className="text-xs"
                     />
                   )}
-                  {hasYouTubeAccount && (
-                    <div className="mt-6">
-                      <YouTubeThumbnailUploader
-                        videoId={
-                          mediaFiles.find((m) => m.type === "video")?.id || 0
+
+                  {/* Alerta: Pendiente de revisión */}
+                  {publication?.status === 'pending_review' && (
+                    <>
+                      <AlertCard
+                        type="warning"
+                        title={
+                          t('publications.modal.edit.pendingReviewWarning') ||
+                          'Publicación en Revisión'
                         }
-                        videoPreviewUrl={
-                          mediaFiles.find((m) => m.type === "video")?.url
+                        message={
+                          t('publications.modal.edit.pendingReviewWarningHint') ||
+                          'Esta publicación está esperando aprobación. Debes aprobarla o rechazarla antes de poder editarla. Si la rechazas, el creador podrá hacer cambios y volver a solicitar aprobación.'
                         }
-                        videoFileName={
-                          publication?.media_files?.find(
-                            (m) =>
-                              m.file_type === "video" ||
-                              m.mime_type?.startsWith("video/"),
-                          )?.file_name
-                        }
-                        existingThumbnail={(() => {
-                          const video = mediaFiles.find(
-                            (m) => m.type === "video",
-                          );
-                          return video?.thumbnailUrl
-                            ? { url: video.thumbnailUrl, id: video.id || 0 }
-                            : null;
-                        })()}
-                        onThumbnailChange={(videoId: number, file: File | null) => {
-                          const video = mediaFiles.find(
-                            (m) => m.type === "video",
-                          );
-                          if (video) {
-                            if (file) {
-                              setThumbnail(video.tempId, file);
-                            } else {
-                              clearThumbnail(video.tempId);
-                            }
-                          }
-                        }}
-                        onThumbnailDelete={() => {
-                          const video = mediaFiles.find(
-                            (m) => m.type === "video",
-                          );
-                          if (video) clearThumbnail(video.tempId);
-                        }}
+                        className="animate-in fade-in slide-in-from-top-4"
                       />
-                    </div>
+
+                      {/* Flujo de Aprobación */}
+                      {publication?.current_approval_step?.workflow && (
+                        <div className="animate-in fade-in slide-in-from-top-4 rounded-lg border border-primary-200 bg-gradient-to-br from-primary-50 to-blue-50 p-4 dark:border-primary-800 dark:from-primary-900/20 dark:to-blue-900/20">
+                          <h4 className="mb-3 flex items-center gap-2 text-sm font-bold text-primary-900 dark:text-primary-300">
+                            <svg
+                              className="h-4 w-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                              />
+                            </svg>
+                            {t('approvals.workflow_progress') || 'Progreso del Flujo'}
+                          </h4>
+                          <div className="space-y-2">
+                            {publication.current_approval_step.workflow.steps?.map(
+                              (step: any, index: number) => {
+                                const isCurrent = step.id === publication.current_approval_step?.id;
+                                const isPast =
+                                  step.level_number <
+                                  (publication.current_approval_step?.level_number || 0);
+
+                                return (
+                                  <div
+                                    key={step.id}
+                                    className={`flex items-center gap-3 rounded-lg p-2 transition-all ${
+                                      isCurrent
+                                        ? 'border border-primary-300 bg-primary-100 dark:border-primary-700 dark:bg-primary-900/40'
+                                        : isPast
+                                          ? 'border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20'
+                                          : 'border border-gray-200 bg-white/50 dark:border-neutral-700 dark:bg-neutral-800/50'
+                                    }`}
+                                  >
+                                    <div
+                                      className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
+                                        isCurrent
+                                          ? 'bg-primary-500 text-white'
+                                          : isPast
+                                            ? 'bg-green-500 text-white'
+                                            : 'bg-gray-300 text-gray-600 dark:bg-gray-600 dark:text-gray-300'
+                                      }`}
+                                    >
+                                      {isPast ? '✓' : index + 1}
+                                    </div>
+                                    <div className="flex-1">
+                                      <div className="text-xs font-semibold text-gray-900 dark:text-white">
+                                        {step.name}
+                                      </div>
+                                      <div className="text-[10px] text-gray-600 dark:text-gray-400">
+                                        {step.role?.name || 'Sin rol asignado'}
+                                      </div>
+                                    </div>
+                                    {isCurrent && (
+                                      <span className="rounded-full bg-primary-200 px-2 py-0.5 text-[10px] font-bold text-primary-600 dark:bg-primary-800 dark:text-primary-400">
+                                        {t('approvals.in_progress') || 'En Proceso'}
+                                      </span>
+                                    )}
+                                    {isPast && (
+                                      <span className="text-[10px] font-bold text-green-600 dark:text-green-400">
+                                        ✓ {t('common.completed') || 'Completado'}
+                                      </span>
+                                    )}
+                                  </div>
+                                );
+                              },
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {/* Alerta: Publicación aprobada */}
+                  {publication?.status === 'approved' && !hasPublishedPlatform && !hasPublishingPlatform && (
+                    <AlertCard
+                      type="info"
+                      title={
+                        t('publications.modal.edit.approvedEditWarning') || 'Publicación Aprobada'
+                      }
+                      message={
+                        t('publications.modal.edit.approvedEditWarningHint') ||
+                        "Esta publicación ya fue aprobada. Si realizas cambios, volverá a estado 'Pendiente' y requerirá una nueva aprobación."
+                      }
+                      className="animate-in fade-in slide-in-from-top-4"
+                    />
+                  )}
+
+                  {fieldVisibility.showMediaSection &&
+                    (!isDataReady ? (
+                      <MediaUploadSkeleton />
+                    ) : (
+                      <MediaUploadSection
+                        mediaPreviews={stabilizedMediaPreviews}
+                        thumbnails={thumbnails}
+                        imageError={imageError}
+                        isDragOver={isDragOver}
+                        t={t}
+                        onFileChange={handleFileChange}
+                        onRemoveMedia={handleRemoveMediaWithReels}
+                        onSetThumbnail={(tempId, file) => setThumbnail(tempId, file)}
+                        onClearThumbnail={(tempId) => clearThumbnail(tempId)}
+                        onUpdateFile={updateFile}
+                        onDragOver={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setIsDragOver(true);
+                        }}
+                        onDragLeave={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setIsDragOver(false);
+                        }}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setIsDragOver(false);
+                          handleFileChange(e.dataTransfer.files);
+                        }}
+                        disabled={hasPublishedPlatform || hasPublishingPlatform || isMediaSectionDisabled}
+                        isAnyMediaProcessing={isAnyMediaProcessing}
+                        uploadProgress={uploadProgress}
+                        uploadStats={uploadStats}
+                        uploadErrors={uploadErrors}
+                        lockedBy={remoteLock}
+                        videoMetadata={videoMetadata}
+                        publicationId={publication?.id ?? 0}
+                        allMediaFiles={publication?.media_files || []}
+                      />
+                    ))}
+
+                  {/* Video Validation Alert */}
+                  {mediaFiles.some((f) => f.type?.startsWith('video/')) && (
+                    <VideoValidationAlert
+                      selectedAccountIds={watched.social_accounts || []}
+                      {...(() => {
+                        const videoFile = mediaFiles.find((f) => f.type?.startsWith('video/'));
+                        const duration = videoFile
+                          ? videoMetadata[videoFile.tempId]?.duration
+                          : undefined;
+                        return duration !== undefined ? { videoDuration: duration } : {};
+                      })()}
+                      fileSizeMb={(() => {
+                        const videoFile = mediaFiles.find((f) => f.type?.startsWith('video/'));
+                        return videoFile?.file?.size ? videoFile.file.size / (1024 * 1024) : 0;
+                      })()}
+                      onValidationComplete={(valid: boolean, results: any) => {
+                        // Opcional: puedes usar esto para mostrar errores
+                        console.log('Video validation:', valid, results);
+                      }}
+                    />
                   )}
                 </div>
 
-                {/* Content Section */}
-                <ContentSection
-                  register={register}
-                  setValue={setValue}
-                  errors={errors}
-                  watched={watched}
-                  t={t}
-                  campaigns={campaigns}
-                  publication={publication}
-                  onHashtagChange={handleHashtagChange}
-                  disabled={hasPublishedPlatform || isContentSectionDisabled}
-                />
+                {/* ==================== SECCIÓN: CONTENIDO DE LA PUBLICACIÓN ==================== */}
+                <div className="space-y-2 mt-6">
+                  <div className="flex items-center gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700">
+                    <div className="h-5 w-1 rounded-full bg-primary-500"></div>
+                    <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                      {t('publications.modal.edit.contentSection') || 'Contenido'}
+                    </h3>
+                  </div>
 
-                {/* Comments Section */}
-                {publication?.id && (
-                  <div className="pt-6 border-t border-gray-200 dark:border-neutral-700">
-                    <CommentsSection
-                      publicationId={publication.id}
-                      currentUser={auth.user}
+                  {(hasPublishedPlatform || hasPublishingPlatform) && (
+                    <AlertCard
+                      type="info"
+                      title={
+                        hasPublishingPlatform
+                          ? t('publications.modal.edit.contentPublishing') || 'Publicación en Proceso'
+                          : t('publications.modal.edit.contentLocked') || 'Contenido Bloqueado'
+                      }
+                      message={
+                        hasPublishingPlatform
+                          ? t('publications.modal.edit.contentPublishingHint') ||
+                            'La publicación se está publicando en algunas plataformas. Debes esperar a que termine el proceso para poder editar el contenido.'
+                          : t('publications.modal.edit.contentLockedHint') ||
+                            'Para editar el contenido (título, descripción o archivos), debes despublicar la publicación de todas las plataformas.'
+                      }
+                      className="animate-in fade-in slide-in-from-top-4"
+                    />
+                  )}
+
+                  <ContentSection
+                    key={`content-section-${content_type}-${forceUpdate}`}
+                    register={register}
+                    setValue={setValue}
+                    errors={errors}
+                    watched={watched}
+                    t={t}
+                    campaigns={campaigns}
+                    publication={publication}
+                    onHashtagChange={handleHashtagChange}
+                    disabled={hasPublishedPlatform || hasPublishingPlatform || isContentSectionDisabled}
+                    contentType={content_type}
+                  />
+
+                  <div className="mt-2">
+                    <PlatformCharacterValidator
+                      text={watched.description || ''}
+                      selectedAccountIds={watched.social_accounts || []}
+                      socialAccounts={socialAccounts}
+                      onValidChange={setIsTextValid}
+                    />
+                  </div>
+                </div>
+
+                {/* ==================== SECCIÓN: CAMPOS ESPECÍFICOS DE POLL ==================== */}
+                {fieldVisibility.showPollFields && (
+                  <div className="space-y-4">
+                    <PollFields
+                      options={poll_options}
+                      duration={poll_duration_hours}
+                      onChange={(data) => {
+                        setValue('poll_options', data.options, {
+                          shouldValidate: true,
+                        });
+                        setValue('poll_duration_hours', data.duration, {
+                          shouldValidate: true,
+                        });
+                      }}
+                      t={t}
+                      errors={{
+                        options: errors.poll_options?.message as string,
+                        duration: errors.poll_duration_hours?.message as string,
+                      }}
+                    />
+                  </div>
+                )}
+
+                {/* ==================== SECCIÓN: VISTA PREVIA (Solo si tiene advanced_scheduling) ==================== */}
+                {hasRecurrenceAccess && (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 border-b border-gray-200 pb-2 pt-6 dark:border-neutral-700">
+                      <div className="h-5 w-1 rounded-full bg-primary-500"></div>
+                      <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                        {t('publications.modal.edit.previewSection') || 'Vista Previa'}
+                      </h3>
+                    </div>
+
+                    <LivePreviewSection
+                      content={previewContent}
+                      mediaUrls={stabilizedMediaPreviews.map((m) => m.url)}
+                      user={{
+                        name: auth.user.name,
+                        username: 'username',
+                        avatar: auth.user.photo_url,
+                      }}
+                      title={watched.title ?? ''}
+                      {...(publication?.published_at
+                        ? { publishedAt: publication.published_at }
+                        : {})}
+                      contentType={watched.content_type}
+                      selectedPlatforms={selectedSocialAccounts
+                        .map((id: number) => {
+                          const account = socialAccounts.find((a) => a.id === id);
+                          return account?.platform.toLowerCase() || '';
+                        })
+                        .filter(Boolean)}
+                      pollOptions={poll_options}
+                      pollDuration={poll_duration_hours}
+                      publishedLinks={
+                        publication?.social_post_logs?.reduce(
+                          (acc: Record<string, string>, log: any) => {
+                            if (log.status === 'published' && log.post_url && log.platform) {
+                              acc[log.platform.toLowerCase()] = log.post_url;
+                            }
+                            return acc;
+                          },
+                          {},
+                        ) ?? {}
+                      }
                     />
                   </div>
                 )}
               </div>
 
-              {/* Right Column: Social, Schedule, Preview, History */}
-              <div className="space-y-6">
+              {/* ========================================
+                  COLUMNA DERECHA: REDES, PROGRAMACIÓN Y VISTA PREVIA
+                  ======================================== */}
+              <div
+                className={`space-y-6 ${fieldVisibility.showMediaSection ? 'lg:col-span-5' : ''}`}
+              >
+                {/* ==================== SECCIÓN: CUENTAS DE REDES SOCIALES ==================== */}
                 <div
-                  className={`transition-opacity duration-200 ${!allowConfiguration || isContentSectionDisabled ? "opacity-50 pointer-events-none grayscale-[0.5]" : ""}`}
+                  className={`space-y-4 transition-opacity duration-200 ${!allowConfiguration || isContentSectionDisabled ? 'pointer-events-none opacity-50 grayscale-[0.5]' : ''}`}
                 >
+                  <div className="flex items-center gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700">
+                    <div className="h-5 w-1 rounded-full bg-primary-500"></div>
+                    <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                      {t('publications.modal.edit.socialAccountsSection') || 'Redes Sociales'}
+                    </h3>
+                  </div>
+
                   <SocialAccountsSection
-                    socialAccounts={socialAccounts as any}
+                    socialAccounts={socialAccounts}
                     selectedAccounts={watched.social_accounts || []}
                     accountSchedules={accountSchedules}
                     t={t}
                     onAccountToggle={handleAccountToggle}
-                    onScheduleChange={(id, date) =>
-                      setAccountSchedules((prev) => ({ ...prev, [id]: date }))
-                    }
-                    onScheduleRemove={(id) =>
+                    onScheduleChange={(id, date) => {
+                      setAccountSchedules((prev) => ({ ...prev, [id]: date }));
+
+                      if (useGlobalSchedule && date !== scheduledAt) {
+                        setValue('use_global_schedule', false, {
+                          shouldDirty: true,
+                        });
+                      }
+                    }}
+                    onScheduleRemove={(id) => {
                       setAccountSchedules((prev) => {
                         const n = { ...prev };
                         delete n[id];
                         return n;
-                      })
-                    }
-                    onPlatformSettingsClick={(platform) =>
-                      setActivePlatformSettings(platform)
-                    }
-                    globalSchedule={watched.scheduled_at ?? undefined}
+                      });
+
+                      const remainingSchedules = Object.keys(accountSchedules).filter(
+                        (key) => parseInt(key) !== id,
+                      );
+                      if (remainingSchedules.length === 0 && scheduledAt && !useGlobalSchedule) {
+                        setValue('use_global_schedule', true, {
+                          shouldDirty: true,
+                        });
+                      }
+                    }}
+                    onPlatformSettingsClick={(platform) => setActivePlatformSettings(platform)}
+                    {...(watched.scheduled_at ? { globalSchedule: watched.scheduled_at } : {})}
                     publishedAccountIds={publishedAccountIds}
                     publishingAccountIds={publishingAccountIds}
                     failedAccountIds={failedAccountIds}
-                    onCancel={handleCancelPublication}
+                    onCancelPlatform={handleCancelPlatform}
                     error={errors.social_accounts?.message as string}
                     durationErrors={durationErrors}
                     videoMetadata={videoMetadata}
                     mediaFiles={mediaFiles}
-                    disabled={isContentSectionDisabled || !allowConfiguration}
-                    socialPostLogs={publication?.social_post_logs}
+                    disabled={isContentSectionDisabled || !allowConfiguration || !canManageAccounts}
+                    invalidTokenAccountIds={invalidAccountIds}
+                    expiringSoonAccountIds={expiringSoonAccountIds}
+                    {...(publication?.social_post_logs
+                      ? { socialPostLogs: publication.social_post_logs }
+                      : {})}
+                    contentType={watched.content_type}
+                    onThumbnailChange={(_videoId: number, file: File | null) => {
+                      const video = mediaFiles.find((m) => m.type === 'video');
+                      if (video) {
+                        if (file) {
+                          setThumbnail(video.tempId, file);
+                        } else {
+                          clearThumbnail(video.tempId);
+                        }
+                      }
+                    }}
+                    onThumbnailDelete={(_videoId: number) => {
+                      const video = mediaFiles.find((m) => m.type === 'video');
+                      if (video) clearThumbnail(video.tempId);
+                    }}
+                    thumbnails={thumbnails as any}
+                    publication={publication ?? undefined}
                   />
+                </div>
 
-                  <div className="mt-8">
+                {/* ==================== SECCIÓN: PROGRAMACIÓN Y RECURRENCIA (Solo si tiene advanced_scheduling) ==================== */}
+                {hasRecurrenceAccess ? (
+                  <div
+                    className={`space-y-4 transition-opacity duration-200 ${!allowConfiguration || isContentSectionDisabled ? 'pointer-events-none opacity-50 grayscale-[0.5]' : ''}`}
+                  >
+                    <div className="flex items-center gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700">
+                      <div className="h-5 w-1 rounded-full bg-primary-500"></div>
+                      <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                        {t('publications.modal.edit.scheduleSection') || 'Programación'}
+                      </h3>
+                    </div>
+
                     <ScheduleSection
-                      scheduledAt={watched.scheduled_at ?? undefined}
+                      {...(watched.scheduled_at ? { scheduledAt: watched.scheduled_at } : {})}
                       t={t}
-                      onScheduleChange={(date) =>
-                        setValue("scheduled_at", date)
-                      }
+                      onScheduleChange={(date) => {
+                        let finalDate = date;
+                        if (!date && !watched.scheduled_at) {
+                          const defaultDate = new Date();
+                          defaultDate.setMinutes(defaultDate.getMinutes() + 2);
+                          finalDate = defaultDate.toISOString();
+                        }
+
+                        setValue('scheduled_at', finalDate, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                          shouldTouch: true,
+                        });
+                      }}
                       useGlobalSchedule={watched.use_global_schedule}
-                      onGlobalScheduleToggle={(val) =>
-                        setValue("use_global_schedule", val)
-                      }
+                      onGlobalScheduleToggle={(val) => setValue('use_global_schedule', val)}
+                      onClearAccountSchedules={() => {
+                        setAccountSchedules({});
+                      }}
                       error={errors.scheduled_at?.message as string}
                       disabled={isContentSectionDisabled || !allowConfiguration}
+                      hasRecurrenceAccess={hasRecurrenceAccess}
+                      {...(errors.recurrence_days?.message
+                        ? { recurrenceDaysError: errors.recurrence_days.message }
+                        : {})}
+                      isRecurring={watched.is_recurring}
+                      recurrenceType={watched.recurrence_type as any}
+                      recurrenceInterval={watched.recurrence_interval}
+                      recurrenceDays={watched.recurrence_days}
+                      {...(watched.recurrence_end_date
+                        ? { recurrenceEndDate: watched.recurrence_end_date }
+                        : {})}
+                      recurrenceAccounts={watched.recurrence_accounts}
+                      onRecurrenceChange={handleRecurrenceChange}
+                      i18n={i18n}
+                      {...(publication?.publish_date
+                        ? { publishDate: publication.publish_date }
+                        : {})}
+                      selectedAccounts={selectedSocialAccounts}
+                      socialAccounts={socialAccounts}
+                      accountSchedules={accountSchedules}
+                      {...(publication?.scheduled_posts
+                        ? { existingScheduledPosts: publication.scheduled_posts }
+                        : {})}
+                      {...(publication?.social_post_logs
+                        ? { socialPostLogs: publication.social_post_logs }
+                        : {})}
                     />
                   </div>
-                </div>
+                ) : (
+                  /* ==================== SECCIÓN: VISTA PREVIA (Reemplaza programación si NO tiene advanced_scheduling) ==================== */
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700">
+                      <div className="h-5 w-1 rounded-full bg-primary-500"></div>
+                      <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                        {t('publications.modal.edit.previewSection') || 'Vista Previa'}
+                      </h3>
+                    </div>
 
-                {/* Live Preview */}
-                <div
-                  className="pt-6 border-t border-gray-200 dark:border-neutral-700"
-                  data-testid="live-preview-section"
-                >
-                  <LivePreviewSection
-                    content={previewContent}
-                    mediaUrls={stabilizedMediaPreviews.map((m) => m.url)}
-                    user={{
-                      name: auth.user.name,
-                      username: "username",
-                      avatar: auth.user.photo_url,
-                    }}
-                    title={watched.title}
-                    publishedAt={publication?.published_at}
-                    publishedLinks={publication?.social_post_logs?.reduce((acc: Record<string, string>, log: any) => {
-                      if (log.status === 'published' && log.post_url && log.platform) {
-                        acc[log.platform.toLowerCase()] = log.post_url;
+                    <LivePreviewSection
+                      content={previewContent}
+                      mediaUrls={stabilizedMediaPreviews.map((m) => m.url)}
+                      user={{
+                        name: auth.user.name,
+                        username: 'username',
+                        avatar: auth.user.photo_url,
+                      }}
+                      title={watched.title ?? ''}
+                      {...(publication?.published_at
+                        ? { publishedAt: publication.published_at }
+                        : {})}
+                      contentType={watched.content_type}
+                      selectedPlatforms={selectedSocialAccounts
+                        .map((id: number) => {
+                          const account = socialAccounts.find((a) => a.id === id);
+                          return account?.platform.toLowerCase() || '';
+                        })
+                        .filter(Boolean)}
+                      pollOptions={poll_options}
+                      pollDuration={poll_duration_hours}
+                      publishedLinks={
+                        publication?.social_post_logs?.reduce(
+                          (acc: Record<string, string>, log: any) => {
+                            if (log.status === 'published' && log.post_url && log.platform) {
+                              acc[log.platform.toLowerCase()] = log.post_url;
+                            }
+                            return acc;
+                          },
+                          {},
+                        ) ?? {}
                       }
-                      return acc;
-                    }, {})}
-                  />
-                </div>
+                    />
+                  </div>
+                )}
 
-                {/* History & Timeline */}
-                <div className="pt-6 border-t border-gray-200 dark:border-neutral-700 space-y-6">
-                  {publication?.approval_logs &&
-                    publication.approval_logs.length > 0 && (
+                {/* ==================== SECCIÓN: COMENTARIOS INTERNOS ==================== */}
+                {publication?.id && (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 border-b border-gray-200 pb-2 pt-6 dark:border-neutral-700">
+                      <div className="h-5 w-1 rounded-full bg-primary-500"></div>
+                      <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                        {t('publications.modal.edit.commentsSection') || 'Comentarios Internos'}
+                      </h3>
+                    </div>
+                    <CommentsSection publicationId={publication.id} currentUser={auth.user} />
+                  </div>
+                )}
+
+                {/* ==================== SECCIÓN: HISTORIAL Y ACTIVIDAD ==================== */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 border-b border-gray-200 pb-2 pt-6 dark:border-neutral-700">
+                    <div className="h-5 w-1 rounded-full bg-primary-500"></div>
+                    <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                      {t('publications.modal.edit.historySection') || 'Historial'}
+                    </h3>
+                  </div>
+
+                  <div className="space-y-4">
+                    {publication?.approval_logs && publication.approval_logs.length > 0 && (
                       <ApprovalHistoryCompacto
                         logs={publication.approval_logs}
                         isExpanded={isApprovalHistoryExpanded}
-                        onToggle={() =>
-                          setIsApprovalHistoryExpanded(
-                            !isApprovalHistoryExpanded,
-                          )
+                        onToggle={() => setIsApprovalHistoryExpanded(!isApprovalHistoryExpanded)}
+                        workflow={
+                          publication?.approval_request?.workflow ||
+                          publication?.current_approval_step?.workflow
                         }
+                        {...(() => {
+                          const n =
+                            publication?.approval_request?.currentStep?.level_number ??
+                            publication?.current_approval_step?.level_number;
+                          return n !== undefined ? { currentStepNumber: n } : {};
+                        })()}
+                        approvalStatus={publication?.approval_request?.status ?? 'pending'}
                       />
                     )}
 
-                  {publication?.activities &&
-                    publication.activities.length > 0 && (
+                    {publication?.activities && publication.activities.length > 0 && (
                       <TimelineCompacto
                         activities={publication.activities}
                         isExpanded={isTimelineExpanded}
-                        onToggle={() =>
-                          setIsTimelineExpanded(!isTimelineExpanded)
-                        }
+                        onToggle={() => setIsTimelineExpanded(!isTimelineExpanded)}
                       />
                     )}
+                  </div>
                 </div>
               </div>
             </div>
           </form>
         </div>
+
         <ModalFooter
           onClose={handleClose}
           isSubmitting={isSubmitting || isContentSectionDisabled}
+          disableSubmit={!isTextValid}
           formId="edit-publication-form"
           submitText={
             uploading
-              ? t("publications.modal.button.saveBackground", {
-                  defaultValue: "Save & Background Upload",
+              ? t('publications.modal.button.saveBackground', {
+                  defaultValue: 'Save & Background Upload',
                 })
-              : t("publications.button.edit") || "Edit Publication"
+              : t('publications.button.edit') || 'Edit Publication'
           }
-          submitIcon={<Save className="w-4 h-4" />}
-          cancelText={t("common.cancel") || "Close"}
+          submitIcon={<Save className="h-4 w-4" />}
+          cancelText={t('common.cancel') || 'Close'}
           hideSubmit={!canManage}
         >
           {publication && (
             <PublicationStatusTimeline
               currentStatus={publication.status as string}
-              scheduledAt={publication.scheduled_at ?? undefined}
-              approvedAt={publication.approved_at ?? undefined}
-              publishedAt={publication.published_at ?? undefined}
-              rejectedAt={publication.rejected_at ?? undefined}
+              scheduledAt={publication.scheduled_at ?? null}
+              approvedAt={publication.approved_at ?? null}
+              publishedAt={publication.published_at ?? null}
+              rejectedAt={publication.rejected_at ?? null}
               compact={true}
             />
           )}
@@ -778,33 +1257,41 @@ const EditPublicationModal = ({
         <PlatformSettingsModal
           isOpen={!!activePlatformSettings}
           onClose={() => setActivePlatformSettings(null)}
-          platform={activePlatformSettings || ""}
+          platform={activePlatformSettings || ''}
           settings={
-            activePlatformSettings?.toLowerCase() === "all"
+            activePlatformSettings?.toLowerCase() === 'all'
               ? {}
-              : platformSettings[activePlatformSettings?.toLowerCase() || ""] || {}
+              : platformSettings[activePlatformSettings?.toLowerCase() || ''] || {}
           }
           onSettingsChange={(newSettings) => {
-            if (activePlatformSettings && activePlatformSettings.toLowerCase() !== "all") {
+            if (activePlatformSettings && activePlatformSettings.toLowerCase() !== 'all') {
               setPlatformSettings((prev) => ({
                 ...prev,
                 [activePlatformSettings.toLowerCase()]: newSettings,
               }));
             }
           }}
-          allPlatforms={activePlatformSettings?.toLowerCase() === "all" ? selectedPlatforms : []}
-          allSettings={activePlatformSettings?.toLowerCase() === "all" ? allPlatformSettings : {}}
+          allPlatforms={activePlatformSettings?.toLowerCase() === 'all' ? selectedPlatforms : []}
+          allSettings={activePlatformSettings?.toLowerCase() === 'all' ? allPlatformSettings : {}}
           onAllSettingsChange={(platform, newSettings) => {
             setPlatformSettings((prev) => ({
               ...prev,
               [platform]: newSettings,
             }));
           }}
-          videoMetadata={
-            mediaFiles.find((m) => m.type === "video")
-              ? videoMetadata[mediaFiles.find((m) => m.type === "video")!.tempId]
-              : undefined
-          }
+          {...(() => {
+            const vid = mediaFiles.find((m) => m.type === 'video');
+            const meta = vid ? videoMetadata[vid.tempId] : undefined;
+            if (!meta) return {};
+            return {
+              videoMetadata: {
+                duration: meta.duration,
+                ...(meta.width !== undefined ? { width: meta.width } : {}),
+                ...(meta.height !== undefined ? { height: meta.height } : {}),
+                ...(meta.aspectRatio !== undefined ? { aspectRatio: meta.aspectRatio } : {}),
+              },
+            };
+          })()}
         />
       </div>
     </div>

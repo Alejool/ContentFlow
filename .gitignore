@@ -1,4 +1,6 @@
-
+# ============================================
+# LARAVEL DEFAULTS
+# ============================================
 /.phpunit.cache
 /bootstrap/ssr
 /node_modules
@@ -8,16 +10,38 @@
 /storage/*.key
 /storage/pail
 /vendor
-.env
-.env.backup
-.env.production
-.phpactor.json
-.phpunit.result.cache
 Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
 /auth.json
+
+# ============================================
+# ARCHIVOS DE ENTORNO Y CONFIGURACIÓN SENSIBLE
+# ============================================
+.env
+.env.backup
+.env.production
+.env.local
+.env.docker
+.env.demo
+database.sqlite
+backups/*.sql
+dump.sql
+
+# ============================================
+# LOCK FILES Y DEPENDENCIAS
+# ============================================
+composer.lock
+package-lock.json
+bun.lock
+bun.lockb
+_node_modules_old
+node_modules.backup
+
+# ============================================
+# ARCHIVOS DE CONFIGURACIÓN DE EDITORES/IDEs
+# ============================================
 /.fleet
 /.idea
 /.nova
@@ -25,24 +49,98 @@ yarn-error.log
 /.zed
 /.blueprint
 /.gitattributes
-draft.yaml
-composer.lock
-bun.lockb
-laravel
-package-lock.json
-.env.example
+/.kiro/
+.phpactor.json
 .qodo
+.editorconfig
+jsconfig.json
+tsconfig.json
 
-.env
-.env.production
-.env.local
-database.sqlite
-backups/*.sql
-dump.sql
+# ============================================
+# ARCHIVOS DE TESTING Y CACHE
+# ============================================
+.phpunit.result.cache
+phpunit.xml
+phpunit.xml.dist
 
+# Vite build artifacts
+.vite/
 
-.env.docker
-.env.local
+# ============================================
+# DOCUMENTACIÓN INTERNA
+# ============================================
+# Ignorar TODOS los archivos .md en la raíz EXCEPTO los públicos
+*.md
+
+# Permitir solo documentación pública
+!README.md
+!README.es.md
+!LICENSE.md
+!CONTRIBUTING.md
+!CHANGELOG.md
+
+# Permitir toda la documentación en docs/
+!docs/
+!docs/**/*.md
+!docs/**/*.json
+!docs/**/*.html
+!docs/**/*.php
+
+# ============================================
+# SCRIPTS DE DESARROLLO LOCAL
+# ============================================
+*.bat
+*.sh
+!docker-switch.sh
+!docker-switch.bat
+
+# ============================================
+# ARCHIVOS PHP DE PRUEBA/DEBUG
+# ============================================
+fix-db-route.php
+debug_owner.php
+debug_accounts.php
+test_relationships.php
+verify_db.php
+enable-default-payment-methods.php
+test-maintenance-mode.php
+test-payment-cache.php
+test-payment-methods.php
+reprocess_media.php
+
+# Debug and test scripts for approval workflow
+check_*.php
+debug_*.php
+test_*.php
+fix_*.php
+find_*.php
+
+# Test console commands
+app/Console/Commands/Test*.php
+
+# ============================================
+# ARCHIVOS TEMPORALES
+# ============================================
+$null
+*.tmp
+*.temp
+*.backup
+/md/
+draft.yaml
+laravel
+recommendations.md
+makefile.dev
+
+# Test files temporales
+resources/js/test-import.ts
+
+# Auto-generated route files
+resources/js/ziggy.js
+
+# ============================================
+# DOCKER
+# ============================================
+.dockerignore.dev
 docker-compose.override.yml
 docker/entrypoint.sh
 docker/entrypoint-dev.sh
@@ -50,38 +148,22 @@ docker/nginx/nginx.conf
 docker/nginx/nginx.conf.dist
 docker/dev.ini
 docker/supervisor
-docker/nginx
-docker/supervisor
-docker/nginx
-phpunit.xml
-phpunit.xml.dist
 nginx.conf
 nginx.conf.dist
 dev.ini
 supervisor
-nginx
+
+# ============================================
+# DEPLOYMENT
+# ============================================
+fly.toml
+
+# ============================================
+# EXAMPLE FILES
+# ============================================
+# Ignore example/demo files in components
+*.example.tsx
+*.examples.tsx
 
 
-
-fix-db-route.php
-debug_owner.php
-debug_accounts.php
-test_relationships.php
-verify_db.php
-
-
-recommendations.md
-test_relationships.php
-test_relationships.php
-verify_db.php
-start-queue.bat
-
-
-rebuild.bat
-makefile.dev
-DOCKER-DEV.md
-
-INICIO-RAPIDO.md
-*.md
-
-.kiro
+docker-compose.dev-other-config

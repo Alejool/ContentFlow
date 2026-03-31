@@ -41,6 +41,10 @@ return [
         'updated' => 'Profile updated successfully',
         'validation_failed' => 'Validation failed',
         'current_password_incorrect' => 'Current password is incorrect',
+        'password_updated' => 'Password updated successfully',
+        'avatar_uploaded' => 'Avatar uploaded successfully',
+        'avatar_deleted' => 'Avatar deleted successfully',
+        'oauth_password_change_not_allowed' => 'You cannot change your password because you signed in with Google. For security, manage your password from your Google account.',
     ],
 
     // Campaign messages

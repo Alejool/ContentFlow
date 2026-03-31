@@ -63,9 +63,8 @@ class SyncPublicationToExternalCalendars implements ShouldQueue
                 ]);
             }
         } catch (\Exception $e) {
-            LogHelper::publicationError('Failed to sync created publication to external calendars', [
+            LogHelper::publicationError('Failed to sync created publication to external calendars', $e->getMessage(), [
                 'publication_id' => $event->publication->id,
-                'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
             // Don't throw - sync errors should not block publication creation
@@ -92,9 +91,8 @@ class SyncPublicationToExternalCalendars implements ShouldQueue
                 ]);
             }
         } catch (\Exception $e) {
-            LogHelper::publicationError('Failed to sync updated publication to external calendars', [
+            LogHelper::publicationError('Failed to sync updated publication to external calendars', $e->getMessage(), [
                 'publication_id' => $event->publication->id,
-                'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
             // Don't throw - sync errors should not block publication updates
@@ -119,9 +117,8 @@ class SyncPublicationToExternalCalendars implements ShouldQueue
                 'publication_id' => $publication->id,
             ]);
         } catch (\Exception $e) {
-            LogHelper::publicationError('Failed to sync deleted publication to external calendars', [
+            LogHelper::publicationError('Failed to sync deleted publication to external calendars', $e->getMessage(), [
                 'publication_id' => $event->publication->id,
-                'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
             // Don't throw - sync errors should not block publication deletion

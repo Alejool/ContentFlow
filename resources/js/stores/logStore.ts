@@ -1,8 +1,8 @@
-import axios from "axios";
-import { create } from "zustand";
+import axios from 'axios';
+import { create } from 'zustand';
 
 interface LogState {
-  logs: any[];
+  logs: Record<string, unknown>[];
   pagination: {
     current_page: number;
     last_page: number;
@@ -12,7 +12,7 @@ interface LogState {
   isLoading: boolean;
   error: string | null;
 
-  fetchLogs: (filters?: any, page?: number) => Promise<void>;
+  fetchLogs: (filters?: Record<string, unknown>, page?: number) => Promise<void>;
   reset: () => void;
 }
 
@@ -31,15 +31,18 @@ export const useLogStore = create<LogState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       // Limpiar filtros vacíos
-      const cleanFilters = Object.entries(filters).reduce((acc, [key, value]) => {
-        if (Array.isArray(value) && value.length > 0) {
-          acc[key] = value;
-        } else if (value && !Array.isArray(value) && value !== 'all') {
-          acc[key] = value;
-        }
-        return acc;
-      }, {} as any);
-      const response = await axios.get("/api/v1/logs", {
+      const cleanFilters = Object.entries(filters).reduce(
+        (acc, [key, value]) => {
+          if (Array.isArray(value) && value.length > 0) {
+            acc[key] = value;
+          } else if (value && !Array.isArray(value) && value !== 'all') {
+            acc[key] = value;
+          }
+          return acc;
+        },
+        {} as Record<string, unknown>,
+      );
+      const response = await axios.get('/api/v1/logs', {
         params: { ...cleanFilters, page },
         paramsSerializer: {
           indexes: null,
@@ -47,14 +50,14 @@ export const useLogStore = create<LogState>((set) => ({
             const searchParams = new URLSearchParams();
             Object.entries(params).forEach(([key, value]) => {
               if (Array.isArray(value)) {
-                value.forEach(v => searchParams.append(`${key}[]`, String(v)));
+                value.forEach((v) => searchParams.append(`${key}[]`, String(v)));
               } else if (value !== null && value !== undefined) {
                 searchParams.append(key, String(value));
               }
             });
             return searchParams.toString();
-          }
-        }
+          },
+        },
       });
       if (response.data.success) {
         set({
@@ -67,9 +70,9 @@ export const useLogStore = create<LogState>((set) => ({
           },
         });
       }
-    } catch (error: any) {
+    } catch (error) {
       set({
-        error: error.message ?? "Failed to fetch logs",
+        error: error.message ?? 'Failed to fetch logs',
       });
     } finally {
       set({ isLoading: false });

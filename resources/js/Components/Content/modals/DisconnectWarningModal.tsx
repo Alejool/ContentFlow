@@ -1,7 +1,8 @@
-import { useTheme } from "@/Hooks/useTheme";
-import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { AlertTriangle, Calendar, X } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useTheme } from '@/Hooks/useTheme';
+import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
+import { AlertTriangle, Calendar, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { formatDateTimeString } from '@/Utils/dateHelpers';
 
 interface DisconnectWarningModalProps {
   isOpen: boolean;
@@ -27,29 +28,24 @@ export default function DisconnectWarningModal({
 
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
-      <div
-        className="fixed inset-0 bg-black/30 backdrop-blur-sm"
-        aria-hidden="true"
-      />
+      <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" aria-hidden="true" />
 
       <div className="fixed inset-0 flex items-center justify-center p-4">
         <DialogPanel
           className={`w-full max-w-lg transform overflow-hidden rounded-lg p-6 text-left align-middle shadow-xl transition-all ${
-            theme === "dark"
-              ? "bg-neutral-800 border border-neutral-700"
-              : "bg-white"
+            theme === 'dark' ? 'border border-neutral-700 bg-neutral-800' : 'bg-white'
           }`}
         >
           <div className="flex items-start gap-4">
             <div className="flex-shrink-0">
               <div
-                className={`p-3 rounded-full ${
-                  theme === "dark" ? "bg-primary-900/30" : "bg-primary-100"
+                className={`rounded-full p-3 ${
+                  theme === 'dark' ? 'bg-primary-900/30' : 'bg-primary-100'
                 }`}
               >
                 <AlertTriangle
-                  className={`w-6 h-6 ${
-                    theme === "dark" ? "text-primary-400" : "text-primary-600"
+                  className={`h-6 w-6 ${
+                    theme === 'dark' ? 'text-primary-400' : 'text-primary-600'
                   }`}
                 />
               </div>
@@ -58,92 +54,80 @@ export default function DisconnectWarningModal({
             <div className="flex-1">
               <DialogTitle
                 as="h3"
-                className={`text-lg font-bold leading-6 mb-2 ${
-                  theme === "dark" ? "text-white" : "text-gray-900"
+                className={`mb-2 text-lg font-bold leading-6 ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-900'
                 }`}
               >
-                {t("Content.socialMedia.disconnectModal.title")}
+                {t('manageContent.socialMedia.disconnectModal.title')}
               </DialogTitle>
 
               <div className="mt-2 text-sm">
-                <p
-                  className={`mb-4 ${
-                    theme === "dark" ? "text-gray-300" : "text-gray-600"
-                  }`}
-                >
+                <p className={`mb-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                   <span className="font-semibold text-primary-500">
-                    {t("Content.socialMedia.disconnectModal.warning")}
+                    {t('manageContent.socialMedia.disconnectModal.warning')}
                   </span>
                   <br />
-                  {t("Content.socialMedia.disconnectModal.explanation")}
+                  {t('manageContent.socialMedia.disconnectModal.explanation')}
                 </p>
 
                 <div
-                  className={`mt-4 rounded-lg overflow-hidden border ${
-                    theme === "dark"
-                      ? "bg-neutral-900/50 border-neutral-700"
-                      : "bg-gray-50 border-gray-200"
+                  className={`mt-4 overflow-hidden rounded-lg border ${
+                    theme === 'dark'
+                      ? 'border-neutral-700 bg-neutral-900/50'
+                      : 'border-gray-200 bg-gray-50'
                   }`}
                 >
                   <div className="max-h-60 overflow-y-auto">
                     <table className="w-full text-left text-sm">
                       <thead
                         className={`${
-                          theme === "dark"
-                            ? "bg-neutral-800 text-gray-400"
-                            : "bg-gray-100 text-gray-600"
+                          theme === 'dark'
+                            ? 'bg-neutral-800 text-gray-400'
+                            : 'bg-gray-100 text-gray-600'
                         }`}
                       >
                         <tr>
                           <th className="px-4 py-2 font-medium">
-                            {t(
-                              "Content.socialMedia.disconnectModal.table.date"
-                            )}
+                            {t('manageContent.socialMedia.disconnectModal.table.date')}
                           </th>
                           <th className="px-4 py-2 font-medium">
-                            {t(
-                              "Content.socialMedia.disconnectModal.table.publication"
-                            )}
+                            {t('manageContent.socialMedia.disconnectModal.table.publication')}
                           </th>
                         </tr>
                       </thead>
                       <tbody
                         className={`divide-y ${
-                          theme === "dark"
-                            ? "divide-neutral-700 text-gray-300"
-                            : "divide-gray-200 text-gray-700"
+                          theme === 'dark'
+                            ? 'divide-neutral-700 text-gray-300'
+                            : 'divide-gray-200 text-gray-700'
                         }`}
                       >
                         {posts.map((post) => {
                           // Determine which date to show based on post status
-                          const dateToShow = post.status === 'published' 
-                            ? post.published_at 
-                            : post.scheduled_at;
-                          
+                          const dateToShow =
+                            post.status === 'published' ? post.published_at : post.scheduled_at;
+
                           return (
                             <tr key={post.id}>
-                              <td className="px-4 py-2 whitespace-nowrap">
+                              <td className="whitespace-nowrap px-4 py-2">
                                 <div className="flex items-center gap-2">
-                                  <Calendar className="w-3 h-3 opacity-60" />
+                                  <Calendar className="h-3 w-3 opacity-60" />
                                   {(() => {
                                     if (!dateToShow)
                                       return (
                                         <span className="text-xs opacity-50">
-                                          {t("common.noDate") || "Sin fecha"}
+                                          {t('common.noDate') || 'Sin fecha'}
                                         </span>
                                       );
                                     const dateObj = new Date(dateToShow);
                                     return !isNaN(dateObj.getTime())
-                                      ? dateObj.toLocaleString()
-                                      : t("common.invalidDate") ||
-                                          "Fecha inválida";
+                                      ? formatDateTimeString(dateToShow)
+                                      : t('common.invalidDate') || 'Fecha inválida';
                                   })()}
                                 </div>
                               </td>
                               <td className="px-4 py-2">
-                                {post.title ||
-                                  post.campaign?.title ||
-                                  t("common.unknown")}
+                                {post.title || post.campaign?.title || t('common.unknown')}
                               </td>
                             </tr>
                           );
@@ -157,44 +141,42 @@ export default function DisconnectWarningModal({
               <div className="mt-8 flex justify-end gap-3">
                 <button
                   type="button"
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    theme === "dark"
-                      ? "text-gray-300 hover:bg-neutral-700"
-                      : "text-gray-700 hover:bg-gray-100"
+                  className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                    theme === 'dark'
+                      ? 'text-gray-300 hover:bg-neutral-700'
+                      : 'text-gray-700 hover:bg-gray-100'
                   }`}
                   onClick={onClose}
                   disabled={isLoading}
                 >
-                  {t("Content.socialMedia.disconnectModal.cancelButton")}
+                  {t('manageContent.socialMedia.disconnectModal.cancelButton')}
                 </button>
                 <button
                   type="button"
-                  className={`px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed ${
-                    theme === "dark"
-                      ? "bg-primary-600 hover:bg-primary-700"
-                      : "bg-primary-600 hover:bg-primary-700"
+                  className={`rounded-lg px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                    theme === 'dark'
+                      ? 'bg-primary-600 hover:bg-primary-700'
+                      : 'bg-primary-600 hover:bg-primary-700'
                   }`}
                   onClick={onConfirm}
                   disabled={isLoading}
                 >
                   {isLoading
-                    ? t("common.processing")
-                    : t(
-                        "Content.socialMedia.disconnectModal.confirmButton"
-                      )}
+                    ? t('common.processing')
+                    : t('manageContent.socialMedia.disconnectModal.confirmButton')}
                 </button>
               </div>
             </div>
 
             <button
               onClick={onClose}
-              className={`flex-shrink-0 -mt-2 -mr-2 p-2 rounded-full transition-colors ${
-                theme === "dark"
-                  ? "text-gray-400 hover:bg-neutral-700"
-                  : "text-gray-400 hover:bg-gray-100"
+              className={`-mr-2 -mt-2 flex-shrink-0 rounded-full p-2 transition-colors ${
+                theme === 'dark'
+                  ? 'text-gray-400 hover:bg-neutral-700'
+                  : 'text-gray-400 hover:bg-gray-100'
               }`}
             >
-              <X className="w-5 h-5" />
+              <X className="h-5 w-5" />
             </button>
           </div>
         </DialogPanel>

@@ -2,7 +2,7 @@
 
 namespace App\Services\Video;
 
-use Illuminate\Support\Facades\Log;
+use App\Helpers\LogHelper;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -26,7 +26,7 @@ class StreamingVideoService
         $fileSize = Storage::size($s3Path);
         $fileSizeMB = round($fileSize / 1024 / 1024, 2);
         
-        Log::info('Starting streaming download', [
+        LogHelper::upload('video.streaming_download_started', [
             's3_path' => $s3Path,
             'file_size_mb' => $fileSizeMB,
             'is_large_file' => $fileSize > self::LARGE_FILE_THRESHOLD
@@ -78,7 +78,7 @@ class StreamingVideoService
             
             $downloadTime = round(microtime(true) - $startTime, 2);
             
-            Log::info('Streaming download completed', [
+            LogHelper::upload('video.streaming_download_completed', [
                 'temp_path' => $tempPath,
                 'size_mb' => round(filesize($tempPath) / 1024 / 1024, 2),
                 'time_seconds' => $downloadTime,

@@ -3,7 +3,7 @@
 namespace App\Services\Video;
 
 use App\Services\AIService;
-use Illuminate\Support\Facades\Log;
+use App\Helpers\LogHelper;
 use Illuminate\Support\Str;
 
 class VideoAnalysisService
@@ -17,7 +17,7 @@ class VideoAnalysisService
   {
     $highlights = [];
     
-    Log::info('Generating simple highlights based on duration');
+    LogHelper::upload('video.highlights_generation_started', []);
     
     // Generate highlights at regular intervals
     $count = min(5, max(1, (int)($duration / 30)));
@@ -41,7 +41,7 @@ class VideoAnalysisService
   public function analyzeVideoContent(string $videoPath): array
   {
     $startTime = microtime(true);
-    Log::info('🔍 Analyzing video content (basic mode)', ['video_path' => $videoPath]);
+    LogHelper::upload('video.analysis_started', ['video_path' => $videoPath]);
     
     $analysis = [
       'objects' => ['video', 'content'],
@@ -55,7 +55,7 @@ class VideoAnalysisService
     ];
 
     $duration = round(microtime(true) - $startTime, 3);
-    Log::info('✅ Video analysis completed', ['duration_seconds' => $duration]);
+    LogHelper::upload('video.analysis_completed', ['duration_seconds' => $duration]);
 
     return $analysis;
   }
@@ -66,7 +66,7 @@ class VideoAnalysisService
   public function generateContentSuggestions(array $videoAnalysis, string $platform): array
   {
     $startTime = microtime(true);
-    Log::info('🤖 Generating AI content suggestions', ['platform' => $platform]);
+    LogHelper::upload('ai.suggestions_generation_started', ['platform' => $platform]);
     
     try {
       $context = [
@@ -80,16 +80,16 @@ class VideoAnalysisService
         ]
       ];
 
-      Log::info('📡 Calling AI service for content suggestions');
+      LogHelper::api('ai.chat_request', ['context' => 'content_suggestions']);
       $response = $this->aiService->chat($context);
       
       $duration = round(microtime(true) - $startTime, 2);
-      Log::info('✅ AI suggestions generated', ['duration_seconds' => $duration]);
+      LogHelper::upload('ai.suggestions_generated', ['duration_seconds' => $duration]);
       
       return $this->parseAISuggestions($response['content'] ?? '');
     } catch (\Exception $e) {
       $duration = round(microtime(true) - $startTime, 2);
-      Log::warning('⚠️ AI suggestions failed, using defaults', [
+      LogHelper::apiError('ai.suggestions_failed', $e->getMessage(), [
         'error' => $e->getMessage(),
         'duration_seconds' => $duration
       ]);

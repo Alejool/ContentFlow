@@ -1,0 +1,31 @@
+{
+  "excel": {
+    "importPublications": "Import Publications",
+    "importCampaigns": "Import Campaigns",
+    "downloadTemplateTitle": "Step 1: Download the template",
+    "downloadTemplateDesc": "Download the official template with the correct format and examples.",
+    "downloadTemplate": "Download Template",
+    "uploadFileTitle": "Step 2: Upload your file",
+    "dragDropText": "Drag your file here",
+    "orClickToSelect": "or click to select",
+    "selectFile": "Select File",
+    "supportedFormats": "Formats: .xlsx, .xls, .csv (Max. 10MB)",
+    "removeFile": "Remove file",
+    "import": "Import",
+    "templateDownloaded": "Template downloaded successfully",
+    "downloadError": "Error downloading template",
+    "invalidFileType": "Invalid file type. Use .xlsx, .xls or .csv",
+    "fileTooLarge": "File is too large. Maximum 10MB",
+    "noFileSelected": "Select a file",
+    "importSuccess": "Import successful",
+    "importPartial": "Partial import",
+    "importError": "Error importing file",
+    "publications": "publications",
+    "campaigns": "campaigns",
+    "successful": "Successful",
+    "failed": "Failed",
+    "total": "Total",
+    "errors": "Errors found",
+    "row": "Row"
+  }
+}

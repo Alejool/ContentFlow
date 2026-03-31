@@ -1,22 +1,18 @@
-import PublicationThumbnail from "@/Components/Content/Publication/PublicationThumbnail";
-import SocialAccountsDisplay from "@/Components/Content/Publication/SocialAccountsDisplay";
-import { Publication } from "@/types/Publication";
-import {
-  Copy,
-  Edit,
-  Eye,
-  Folder,
-  Image,
-  Rocket,
-  Trash2,
-  Video,
-} from "lucide-react";
-import { memo } from "react";
+import Button from '@/Components/common/Modern/Button';
+import SimpleContentTypeBadge from '@/Components/Content/common/SimpleContentTypeBadge';
+import PublicationThumbnail from '@/Components/Content/Publication/PublicationThumbnail';
+import SocialAccountsDisplay from '@/Components/Content/Publication/SocialAccountsDisplay';
+import { Publication } from '@/types/Publication';
+import { usePage } from '@inertiajs/react';
+import axios from 'axios';
+import { Clock, Copy, Edit, Eye, Folder, Image, Rocket, Send, Trash2, Video } from 'lucide-react';
+import { memo, useState } from 'react';
+import toast from 'react-hot-toast';
 
 interface PublicationMobileGridProps {
   items: Publication[];
   t: (key: string) => string;
-  connectedAccounts: any[];
+  connectedAccounts: { id: number; platform: string; [key: string]: unknown }[];
   getStatusColor: (status?: string) => string;
   onEdit: (item: Publication) => void;
   onDelete: (id: number) => void;
@@ -24,96 +20,177 @@ interface PublicationMobileGridProps {
   onEditRequest?: (item: Publication) => void;
   onViewDetails?: (item: Publication) => void;
   onDuplicate?: (id: number) => void;
-  canManage: boolean;
+  permissions?: string[];
 }
 
-const PublicationMobileGrid = memo(
-  ({
-    items,
-    t,
-    connectedAccounts,
-    getStatusColor,
-    onEdit,
-    onDelete,
-    onPublish,
-    onEditRequest,
-    onViewDetails,
-    onDuplicate,
-    canManage,
-  }: PublicationMobileGridProps) => {
+interface PageProps {
+  auth: {
+    user?: { id: number };
+    current_workspace?: {
+      approval_workflow?: { is_enabled?: boolean };
+      user_role_slug?: string;
+    };
+  };
+}
+
+const PublicationMobileGrid = memo(function PublicationMobileGrid({
+  items,
+  t,
+  connectedAccounts,
+  getStatusColor,
+  onEdit,
+  onDelete,
+  onPublish,
+  onEditRequest,
+  onViewDetails,
+  onDuplicate,
+  permissions,
+}: PublicationMobileGridProps) {
+    const { auth } = usePage<PageProps>().props;
+    const currentWorkspace = auth.current_workspace;
+
+    const [isSubmittingForApproval, setIsSubmittingForApproval] = useState<Record<number, boolean>>(
+      {},
+    );
+
+    // Verificar permisos usando la misma lógica que ContentCard
+    const canManageContent = permissions?.includes('publish');
+
+    // Verificar si hay workflow habilitado
+    const hasWorkflow = currentWorkspace?.approval_workflow?.is_enabled === true;
+
+    // Verificar si el usuario es Owner (puede saltarse el workflow)
+    const isOwner = currentWorkspace?.user_role_slug === 'owner';
+
+    // Función para enviar a revisión
+    const handleSubmitForApproval = async (item: Publication, e: React.MouseEvent) => {
+      e.stopPropagation();
+
+      try {
+        setIsSubmittingForApproval((prev) => ({ ...prev, [item.id]: true }));
+
+        const response = await axios.post(`/api/v1/content/${item.id}/submit-for-approval`);
+
+        // Update stores with fresh data
+        const publication = response.data?.data?.content || response.data?.data?.publication;
+        if (publication) {
+          const publicationStoreModule = await import('@/stores/publicationStore');
+          const manageContentUIStoreModule = await import('@/stores/manageContentUIStore');
+
+          // CRITICAL: Update immediately with new status
+          publicationStoreModule.usePublicationStore.getState().updatePublication(item.id, {
+            status: publication.status,
+            current_approval_step_id: publication.current_approval_step_id,
+            currentApprovalStep: publication.currentApprovalStep,
+            approval_logs: publication.approval_logs,
+            approvalLogs: publication.approval_logs,
+            submitted_for_approval_at: publication.submitted_for_approval_at,
+            ...publication,
+          });
+
+          // Also update selectedItem if this publication is currently open in a modal
+          const selectedItem =
+            manageContentUIStoreModule.useManageContentUIStore.getState().selectedItem;
+          if (selectedItem?.id === item.id) {
+            manageContentUIStoreModule.useManageContentUIStore.getState().updateSelectedItem({
+              status: publication.status,
+              current_approval_step_id: publication.current_approval_step_id,
+              currentApprovalStep: publication.currentApprovalStep,
+              approval_logs: publication.approval_logs,
+              approvalLogs: publication.approval_logs,
+              submitted_for_approval_at: publication.submitted_for_approval_at,
+              ...publication,
+            });
+          }
+        }
+
+        toast.success('Enviado a revisión exitosamente');
+
+        // Recargar la página para actualizar el estado
+        window.location.reload();
+      } catch (error) {
+        const axiosError = error as { response?: { data?: { message?: string } } };
+        console.error('Error submitting for approval:', error);
+        toast.error(axiosError.response?.data?.message || 'Error al enviar a revisión');
+      } finally {
+        setIsSubmittingForApproval((prev) => ({ ...prev, [item.id]: false }));
+      }
+    };
+
     const countMediaFiles = (pub: Publication) => {
-      if (
-        !pub.media_files ||
-        !Array.isArray(pub.media_files) ||
-        pub.media_files.length === 0
-      ) {
+      if (!pub.media_files || !Array.isArray(pub.media_files) || pub.media_files.length === 0) {
         return { images: 0, videos: 0, total: 0 };
       }
       let images = 0;
       let videos = 0;
       pub.media_files.forEach((f) => {
         if (!f || !f.file_type) return;
-        if (f.file_type.includes("image")) images++;
-        else if (f.file_type.includes("video")) videos++;
+        if (f.file_type.includes('image')) images++;
+        else if (f.file_type.includes('video')) videos++;
       });
       return { images, videos, total: pub.media_files.length };
     };
 
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 px-1 pb-10">
+      <div className="grid grid-cols-1 gap-5 px-1 pb-10 md:grid-cols-2">
         {items.map((item) => {
           const mediaCount = countMediaFiles(item);
+          const isSubmitting = isSubmittingForApproval[item.id] || false;
+
           return (
             <div
               key={item.id}
-              className="group relative flex flex-col min-h-[16rem] rounded-lg bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+              className="group relative flex min-h-[16rem] flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-neutral-800 dark:bg-neutral-900"
             >
               {/* Primary Visual/Info Area */}
-              <div className="p-5 flex-1">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-16 h-16 rounded-lg flex-shrink-0 border border-gray-100 bg-gray-50/50 dark:border-neutral-800 dark:bg-neutral-800/50 overflow-hidden flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform duration-300">
+              <div className="flex-1 p-5">
+                <div className="mb-4 flex items-start gap-4">
+                  <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-100 bg-gray-50/50 shadow-inner transition-transform duration-300 group-hover:scale-105 dark:border-neutral-800 dark:bg-neutral-800/50">
                     <PublicationThumbnail publication={item} t={t} />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2 mb-1">
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-1 flex items-center justify-between gap-2">
+                      {/* Content Type Badge */}
+                      <SimpleContentTypeBadge
+                        contentType={item.content_type}
+                        mediaFiles={item.media_files}
+                        size="sm"
+                      />
+
                       <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-tight ${getStatusColor(item.status)}`}
+                        className={`inline-flex items-center rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase tracking-tight ${getStatusColor(item.status)}`}
                       >
-                        {item.status || "Draft"}
+                        {item.status || 'Draft'}
                       </span>
                       {mediaCount.total > 0 && (
                         <div className="flex items-center gap-1.5 opacity-60">
-                          {mediaCount.images > 0 && (
-                            <Image className="w-3 h-3" />
-                          )}
-                          {mediaCount.videos > 0 && (
-                            <Video className="w-3 h-3" />
-                          )}
+                          {mediaCount.images > 0 && <Image className="h-3 w-3" />}
+                          {mediaCount.videos > 0 && <Video className="h-3 w-3" />}
                         </div>
                       )}
                     </div>
                     <h3
-                      className="font-bold text-gray-900 dark:text-white text-lg truncate leading-snug"
-                      title={item.title || t("publications.table.untitled")}
+                      className="truncate text-lg font-bold leading-snug text-gray-900 dark:text-white"
+                      title={item.title || t('publications.table.untitled')}
                     >
-                      {item.title || t("publications.table.untitled")}
+                      {item.title || t('publications.table.untitled')}
                     </h3>
-                    <p className="text-[11px] text-gray-500 dark:text-gray-400 line-clamp-2 mt-1 font-medium leading-relaxed">
-                      {item.description || "Sin descripción"}
+                    <p className="mt-1 line-clamp-2 text-[11px] font-medium leading-relaxed text-gray-500 dark:text-gray-400">
+                      {item.description || 'Sin descripción'}
                     </p>
                   </div>
                 </div>
 
                 {/* Platform Metadata */}
-                <div className="flex flex-wrap gap-2 py-3 border-y border-gray-50 dark:border-neutral-800/50 mb-4">
+                <div className="mb-4 flex flex-wrap gap-2 border-y border-gray-50 py-3 dark:border-neutral-800/50">
                   <SocialAccountsDisplay
                     publication={item}
                     connectedAccounts={connectedAccounts}
                     compact={true}
                   />
                   {item.campaigns && item.campaigns.length > 0 && (
-                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-indigo-50/50 dark:bg-indigo-900/10 border border-indigo-100/50 dark:border-indigo-900/30">
-                      <Folder className="w-3 h-3 text-indigo-500" />
+                    <div className="flex items-center gap-1.5 rounded-lg border border-indigo-100/50 bg-indigo-50/50 px-2 py-1 dark:border-indigo-900/30 dark:bg-indigo-900/10">
+                      <Folder className="h-3 w-3 text-indigo-500" />
                       <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400">
                         {item.campaigns.length}
                       </span>
@@ -123,60 +200,139 @@ const PublicationMobileGrid = memo(
               </div>
 
               {/* Action Bar */}
-              <div className="px-5 py-4 bg-gray-50/50 dark:bg-neutral-800/20 backdrop-blur-sm flex gap-3 mt-auto border-t border-gray-50 dark:border-neutral-800">
-                {!canManage ? (
-                  <button
+              <div className="mt-auto flex gap-3 border-t border-gray-50 bg-gray-50/50 px-5 py-4 backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-800/20">
+                {!canManageContent ? (
+                  <Button
                     onClick={(e) => {
                       e.stopPropagation();
                       onViewDetails?.(item);
                     }}
-                    className="w-full py-2.5 rounded-lg bg-gray-100 dark:bg-neutral-800 text-gray-700 dark:text-gray-300 font-bold text-xs flex items-center justify-center gap-2 border border-gray-200 dark:border-neutral-700 hover:bg-gray-200 dark:hover:bg-neutral-700 transition-all active:scale-95"
+                    variant="ghost"
+                    buttonStyle="solid"
+                    size="sm"
+                    fullWidth
+                    icon={Eye}
                   >
-                    <Eye className="w-3.5 h-3.5" />
-                    {t("common.viewDetails") || "View Details"}
-                  </button>
+                    Ver Detalles
+                  </Button>
                 ) : (
                   <>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onPublish(item);
-                      }}
-                      className="flex-[2] py-2.5 rounded-lg bg-emerald-600 dark:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 hover:bg-emerald-700 dark:hover:bg-emerald-600 transition-all active:scale-95"
-                    >
-                      <Rocket className="w-3.5 h-3.5" />
-                      {t("publications.button.publish") || "Publish"}
-                    </button>
-                    <button
+                    {/* Si es Owner, puede publicar directamente sin workflow */}
+                    {isOwner &&
+                    ['draft', 'rejected', 'approved'].includes(item.status || 'draft') ? (
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onPublish(item);
+                        }}
+                        variant="success"
+                        buttonStyle="gradient"
+                        size="sm"
+                        className="flex-[2]"
+                        icon={Rocket}
+                      >
+                        {t('publications.button.publish') || 'Publicar'}
+                      </Button>
+                    ) : hasWorkflow &&
+                      !isOwner &&
+                      ['draft', 'rejected'].includes(item.status || 'draft') ? (
+                      /* Si hay workflow y NO es Owner, mostrar "Enviar a Revisión" */
+                      <Button
+                        onClick={(e) => handleSubmitForApproval(item, e)}
+                        disabled={isSubmitting}
+                        loading={isSubmitting}
+                        loadingText={t('publications.button.submitting') || 'Enviando...'}
+                        variant="primary"
+                        buttonStyle="gradient"
+                        size="sm"
+                        className="flex-[2]"
+                        icon={Send}
+                      >
+                        {t('publications.button.submitForReview') || 'Enviar a Revisión'}
+                      </Button>
+                    ) : hasWorkflow && item.status === 'pending_review' ? (
+                      /* Si está en revisión, mostrar botón disabled */
+                      <Button
+                        disabled
+                        variant="warning"
+                        buttonStyle="solid"
+                        size="sm"
+                        className="flex-[2]"
+                        icon={Clock}
+                      >
+                        {t('publications.status.pending_review') || 'En Revisión'}
+                      </Button>
+                    ) : hasWorkflow && item.status === 'approved' ? (
+                      /* Si está aprobado, mostrar botón de publicar */
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onPublish(item);
+                        }}
+                        variant="success"
+                        buttonStyle="gradient"
+                        size="sm"
+                        className="flex-[2]"
+                        icon={Rocket}
+                      >
+                        {t('publications.button.publish') || 'Publicar'}
+                      </Button>
+                    ) : (
+                      /* Sin workflow, botón normal de publicar */
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onPublish(item);
+                        }}
+                        variant="success"
+                        buttonStyle="gradient"
+                        size="sm"
+                        className="flex-[2]"
+                        icon={Rocket}
+                      >
+                        {t('publications.button.publish') || 'Publicar'}
+                      </Button>
+                    )}
+
+                    <Button
                       onClick={(e) => {
                         e.stopPropagation();
                         onEditRequest ? onEditRequest(item) : onEdit(item);
                       }}
-                      className="flex-1 py-2.5 rounded-lg bg-white dark:bg-neutral-800 text-gray-700 dark:text-gray-300 font-bold text-xs flex items-center justify-center gap-2 border border-gray-200 dark:border-neutral-700 hover:bg-gray-50 dark:hover:bg-neutral-700 transition-all active:scale-95"
+                      variant="ghost"
+                      buttonStyle="outline"
+                      size="sm"
+                      className="flex-1"
+                      icon={Edit}
                     >
-                      <Edit className="w-3.5 h-3.5" />
-                      {t("common.edit")}
-                    </button>
+                      Editar
+                    </Button>
 
-                    <button
+                    <Button
                       onClick={(e) => {
                         e.stopPropagation();
                         onDuplicate?.(item.id);
                       }}
-                      className="p-2.5 rounded-lg bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400 border border-purple-100 dark:border-purple-900/30 hover:bg-purple-100 transition-all active:scale-95"
-                      title="Duplicar"
+                      variant="secondary"
+                      buttonStyle="icon"
+                      size="sm"
+                      icon={Copy}
                     >
-                      <Copy className="w-4 h-4" />
-                    </button>
-                    <button
+                      Duplicar
+                    </Button>
+
+                    <Button
                       onClick={(e) => {
                         e.stopPropagation();
                         onDelete(item.id);
                       }}
-                      className="p-2.5 rounded-lg bg-rose-50 text-rose-500 dark:bg-rose-900/20 dark:text-rose-400 border border-rose-100 dark:border-rose-900/30 hover:bg-rose-100 transition-all active:scale-90"
+                      variant="danger"
+                      buttonStyle="icon"
+                      size="sm"
+                      icon={Trash2}
                     >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                      Eliminar
+                    </Button>
                   </>
                 )}
               </div>
@@ -185,7 +341,6 @@ const PublicationMobileGrid = memo(
         })}
       </div>
     );
-  },
-);
+});
 
 export default PublicationMobileGrid;

@@ -1,4 +1,4 @@
-import { Publication } from "./Publication";
+import { Publication } from './Publication';
 
 export type Campaign = {
   id: number;
@@ -9,7 +9,7 @@ export type Campaign = {
   budget?: number;
   start_date?: string;
   end_date?: string;
-  status?: "active" | "paused" | "completed" | "draft";
+  status?: 'active' | 'paused' | 'completed' | 'draft';
   created_at: string;
   updated_at: string;
   publications?: Publication[];

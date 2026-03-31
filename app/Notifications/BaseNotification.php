@@ -35,6 +35,7 @@ abstract class BaseNotification extends Notification implements ShouldQueue
   const PLATFORM_YOUTUBE = 'youtube';
   const PLATFORM_FACEBOOK = 'facebook';
   const PLATFORM_INSTAGRAM = 'instagram';
+  const PLATFORM_THREADS = 'threads';
   const PLATFORM_TIKTOK = 'tiktok';
   const PLATFORM_TWITTER = 'twitter';
   const PLATFORM_LINKEDIN = 'linkedin';
@@ -170,6 +171,7 @@ abstract class BaseNotification extends Notification implements ShouldQueue
       self::PLATFORM_YOUTUBE => 'Youtube',
       self::PLATFORM_FACEBOOK => 'Facebook',
       self::PLATFORM_INSTAGRAM => 'Instagram',
+      self::PLATFORM_THREADS => 'AtSign', // Threads icon
       self::PLATFORM_TIKTOK => 'Music',
       self::PLATFORM_TWITTER => 'Twitter',
       self::PLATFORM_LINKEDIN => 'Linkedin',
@@ -188,6 +190,7 @@ abstract class BaseNotification extends Notification implements ShouldQueue
       self::PLATFORM_YOUTUBE => 'YouTube',
       self::PLATFORM_FACEBOOK => 'Facebook',
       self::PLATFORM_INSTAGRAM => 'Instagram',
+      self::PLATFORM_THREADS => 'Threads',
       self::PLATFORM_TIKTOK => 'TikTok',
       self::PLATFORM_TWITTER => 'Twitter/X',
       self::PLATFORM_LINKEDIN => 'LinkedIn',

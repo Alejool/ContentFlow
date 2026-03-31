@@ -12,8 +12,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
   Route::prefix('publications')->name('publications.')->group(function () {
     Route::get('/', [PublicationController::class, 'index'])->name('index');
+    Route::get('/pending-approvals', [PublicationController::class, 'pendingApprovals'])->name('pending-approvals');
     Route::get('/stats', [PublicationController::class, 'stats'])->name('stats');
     Route::get('/export', [PublicationController::class, 'export'])->name('export');
+    Route::get('/action', [PublicationController::class, 'getPublicationAction'])->name('action');
+    Route::post('/suggest-content-type', [PublicationController::class, 'suggestContentType'])->name('suggest-content-type');
     Route::post('/', [PublicationController::class, 'store'])->name('store')->middleware('rate.limit');
     Route::get('/{publication}', [PublicationController::class, 'show'])->name('show')->whereNumber('publication');
     Route::put('/{publication}', [PublicationController::class, 'update'])->name('update')->whereNumber('publication');
@@ -23,12 +26,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/{publication}/approve', [PublicationController::class, 'approve'])->name('approve')->whereNumber('publication');
     Route::get('/{publication}/published-platforms', [PublicationController::class, 'getPublishedPlatforms'])->name('published-platforms')->whereNumber('publication');
     Route::post('/{publication}/validate', [PublicationController::class, 'validateContent'])->name('validate')->whereNumber('publication');
-    Route::post('/{publication}/preview', [PublicationPreviewController::class, 'preview'])->name('preview')->whereNumber('publication');
+    Route::post('/{publication}/validate-publish', [PublicationController::class, 'validatePublish'])->name('validate-publish')->whereNumber('publication');
+    Route::get('/{publication}/preview', [PublicationPreviewController::class, 'show'])->name('preview')->whereNumber('publication');
+    Route::get('/{publication}/preview/multi', [PublicationPreviewController::class, 'multiPlatform'])->name('preview.multi')->whereNumber('publication');
     Route::post('/{publication}/auto-optimize', [PublicationPreviewController::class, 'autoOptimize'])->name('auto-optimize')->whereNumber('publication');
     Route::put('/{publication}/platform-config/{accountId}', [PublicationPreviewController::class, 'updatePlatformConfig'])->name('platform-config.update')->whereNumber('publication')->whereNumber('accountId');
     Route::get('/{publication}/saved-configurations', [PublicationPreviewController::class, 'getSavedConfigurations'])->name('saved-configurations')->whereNumber('publication');
     Route::post('/{publication}/generate-thumbnail', [PublicationPreviewController::class, 'generateThumbnail'])->name('generate-thumbnail')->whereNumber('publication');
-    Route::post('/{publication}/publish', [PublicationController::class, 'publish'])->name('publish')->middleware('rate.limit');
+    Route::post('/{publication}/publish', [PublicationController::class, 'publish'])->name('publish')->middleware(['rate.limit', 'idempotent.publish']);
     Route::post('/{publication}/unpublish', [PublicationController::class, 'unpublish'])->name('unpublish');
     Route::post('/{publication}/reject', [PublicationController::class, 'reject'])->name('reject');
     Route::post('/{publication}/cancel', [PublicationController::class, 'cancel'])->name('cancel')->whereNumber('publication');

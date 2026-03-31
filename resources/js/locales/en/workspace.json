@@ -1,4 +1,4 @@
-﻿{
+{
   "workspace": {
     "my_workspaces": "My Workspaces",
     "create_new": "Create New Workspace",
@@ -36,7 +36,7 @@
     "danger_zone": "Danger Zone",
     "delete_workspace_description": "Irreversible actions for this workspace",
     "delete_workspace": "Delete Workspace",
-    "delete_workspace_warning": "Once you delete a workspace, there is no going back. Please be certain.",
+    "delete_workspace_warning": "Once you delete a workspace, there is no going back. Be certain.",
     "delete_button": "Delete Workspace",
     "delete_confirmation_title": "Delete Workspace?",
     "delete_confirmation_message": "Are you sure you want to delete this workspace? All data including content, campaigns, and team members will be permanently removed. This action cannot be undone.",
@@ -67,8 +67,8 @@
       "cancel": "Cancel",
       "submit": "Invite Member",
       "validation": {
-        "email": "Please enter a valid email",
-        "role": "Please select a role",
+        "email": "Enter a valid email",
+        "role": "Select a role",
         "nameRequired": "Workspace name is required"
       },
       "messages": {
@@ -91,7 +91,7 @@
         "success": "Integrations updated successfully",
         "test_success": "Connection tested successfully",
         "test_error": "Error testing connection",
-        "enter_url": "Please enter a {{type}} webhook URL first."
+        "enter_url": "Enter a {{type}} webhook URL first."
       },
       "communication": "Communication Integrations",
       "communication_description": "Connect your workspace to external communication platforms",
@@ -126,15 +126,65 @@
     "tabs": {
       "overview": "Overview",
       "general": "General",
+      "approvals": "Approvals",
       "members": "Members",
       "roles": "Roles",
       "integrations": "Integrations",
-      "notifications": "Notifications"
+      "notifications": "Notifications",
+      "white_label": "White-label",
+      "api": "API Access",
+      "support": "Enterprise Support"
     },
     "roles_management": {
       "title": "Roles & Permissions",
       "description": "Summary of available roles and their associated permissions in ContentFlow.",
-      "no_permissions": "No permissions assigned."
+      "no_permissions": "No permissions assigned.",
+      "create_role": "Create New Role",
+      "create_role_subtitle": "Define a new role and its permissions for the workspace.",
+      "role_name": "Role Name",
+      "role_name_placeholder": "e.g., Senior Editor",
+      "role_description": "Description",
+      "role_description_placeholder": "Describe the responsibilities of this role...",
+      "key_permissions_label": "Key Permissions",
+      "can_approve_content": "Can approve content in workflows",
+      "role_created_success": "Role created successfully",
+      "role_created_error": "Error creating role",
+      "name_required": "Name is required",
+      "loading_permissions": "Loading permissions..."
+    },
+    "permissions": {
+      "publish": {
+        "name": "Publish",
+        "description": "Allow publishing content to social media"
+      },
+      "approve": {
+        "name": "Approve",
+        "description": "Allow approving content for publication"
+      },
+      "view-analytics": {
+        "name": "View Analytics",
+        "description": "Allow viewing workspace analytics"
+      },
+      "manage-accounts": {
+        "name": "Manage Accounts",
+        "description": "Allow adding/removing social accounts"
+      },
+      "manage-team": {
+        "name": "Manage Team",
+        "description": "Allow inviting/removing members"
+      },
+      "manage-content": {
+        "name": "Manage Content",
+        "description": "Allow creating and editing publications"
+      },
+      "manage-campaigns": {
+        "name": "Manage Campaigns",
+        "description": "Allow creating and editing campaigns"
+      },
+      "view-content": {
+        "name": "View Content",
+        "description": "Allow viewing workspace content (read-only)"
+      }
     },
     "messages": {
       "update_success": "Workspace created successfully",
@@ -165,7 +215,8 @@
     "modal": {
       "subtitle": "Set up a new space for your team to collaborate",
       "name_label": "Workspace Name",
-      "description_hint": "A good description helps members understand the purpose of the space"
+      "description_hint": "A good description helps members understand the purpose of the space",
+      "footer_note": "You can customize settings and invite members after creating the workspace"
     },
     "settings_title": "Workspace Settings",
     "manage_general_settings": "Configure your workspace's basic information and visibility",
@@ -223,6 +274,132 @@
     "generate": "Generate",
     "refresh": "Refresh",
     "recent_activity": "Recent Activity",
-    "workspace_age": "Workspace Age"
+    "workspace_age": "Workspace Age",
+    "timezone": {
+      "title": "Workspace Timezone",
+      "description": "All dates and times in this workspace will be displayed in this timezone. This affects scheduled posts, analytics, and calendar events.",
+      "current": "Current Timezone",
+      "using_default": "Using default UTC timezone. Set a workspace timezone below.",
+      "select_label": "Select Timezone",
+      "unsaved_changes": "You have unsaved changes",
+      "no_changes": "No changes to save",
+      "update_success": "Timezone updated successfully! Reloading...",
+      "permission_required": "Only workspace owners and administrators can change the timezone.",
+      "utc": "UTC (Coordinated Universal Time)",
+      "eastern": "Eastern Time (US & Canada)",
+      "central": "Central Time (US & Canada)",
+      "mountain": "Mountain Time (US & Canada)",
+      "pacific": "Pacific Time (US & Canada)",
+      "bogota": "Bogotá, Lima, Quito",
+      "mexico": "Mexico City, Monterrey",
+      "buenos_aires": "Buenos Aires",
+      "sao_paulo": "São Paulo, Brasília",
+      "london": "London, Dublin, Lisbon",
+      "paris": "Paris, Madrid, Berlin",
+      "moscow": "Moscow, St. Petersburg",
+      "dubai": "Dubai, Abu Dhabi",
+      "mumbai": "Mumbai, Kolkata, New Delhi",
+      "beijing": "Beijing, Shanghai, Hong Kong",
+      "tokyo": "Tokyo, Osaka, Sapporo",
+      "sydney": "Sydney, Melbourne"
+    },
+    "white_label": {
+      "title": "Custom Branding (White-label)",
+      "description": "Personalize the platform with your own logo and corporate colors.",
+      "logo": "Workspace Logo",
+      "logo_help": "Recommended: PNG or SVG with transparent background.",
+      "favicon": "Favicon",
+      "favicon_help": "Ideally 32x32px or 64x64px.",
+      "primary_color": "Primary Brand Color",
+      "color_help": "This color will be used for buttons, links, and reports.",
+      "update_success": "Branding updated successfully",
+      "update_error": "Failed to update branding",
+      "enterprise_exclusive": "Enterprise-exclusive Feature",
+      "enterprise_description": "These branding settings are applied workspace-wide and will be visible to all members and in generated reports.",
+      "live_preview": "Live Preview",
+      "buttons_actions": "BUTTONS & ACTIONS",
+      "primary_button": "Primary Button",
+      "secondary_button": "Secondary Button",
+      "activity_indicator": "Activity Indicator",
+      "sidebar_header": "Sidebar Header",
+      "workspace_branding": "Workspace Branding",
+      "impact_notice": "Changes are applied immediately for all users in this workspace.",
+      "no_logo": "No Logo"
+    },
+    "api": {
+      "title": "API Access Tokens",
+      "description": "Generate tokens to authenticate requests to the ContentFlow API.",
+      "token_name_placeholder": "e.g., Marketing Automation",
+      "generate": "Generate Token",
+      "no_tokens": "No API tokens generated yet.",
+      "last_used": "Last used",
+      "token_generated": "Token Generated Successfully",
+      "token_warning": "Copy this token now. For security reasons, it will not be shown again.",
+      "revoke_confirm": "Are you sure you want to revoke this token? It will stop working immediately.",
+      "revoke_success": "Token revoked successfully",
+      "revoke_error": "Failed to revoke token",
+      "create_success": "API token created successfully",
+      "create_error": "Failed to create token",
+      "security_notice": "Security Notice",
+      "security_help": "API tokens grant full access to this workspace. Never share them or commit them to public repositories.",
+      "documentation": {
+        "title": "API Documentation",
+        "description": "Download the complete Enterprise API reference to integrate ContentFlow into your systems.",
+        "enterprise_guide_title": "Complete Enterprise Guide",
+        "enterprise_guide_description": "Markdown reference with all endpoints, request/response examples, and business logic.",
+        "enterprise_guide_badge": ".md · ~700 lines",
+        "openapi_title": "OpenAPI 3.0 Definition",
+        "openapi_description": "JSON schema directly importable into Postman, Insomnia, or any API client.",
+        "openapi_badge": ".json · OpenAPI 3.0",
+        "pdf_conversion_help": "To convert Markdown to PDF: open the file in VS Code → install the \"Markdown PDF\" extension → right-click → Export (pdf)."
+      },
+      "usage_info": {
+        "title": "How to use your API Token?",
+        "description": "Send the token in the <code>Authorization</code> header as a <strong>Bearer token</strong>. Dashboard tokens <strong>do not expire automatically</strong> — they last until you manually revoke them.",
+        "example_title": "Example Request:",
+        "refresh_token_help": "Need short-lived tokens with automatic refresh? Use the programmatic endpoint <code>POST /api/auth/token</code> — see downloadable documentation."
+      },
+      "token_types": {
+        "dashboard": "Dashboard",
+        "dashboard_description": "Created from panel, no expiration",
+        "api_access": "API · Access",
+        "api_access_description": "24h, requires refresh",
+        "api_refresh": "API · Refresh",
+        "api_refresh_description": "30 days, to renew access tokens"
+      },
+      "table": {
+        "refresh_list": "Refresh List",
+        "name": "Name",
+        "type": "Type",
+        "last_used": "Last Used",
+        "expires_status": "Expires / Status",
+        "created": "Created",
+        "actions": "Actions",
+        "never_used": "Never",
+        "revoke_token": "Revoke Token",
+        "revoke_error": "Failed to revoke token"
+      }
+    },
+    "enterprise": {
+      "info_title": "Enterprise Workspace Status",
+      "priority_queues": "Priority Publishing Queues",
+      "custom_onboarding": "Custom Onboarding Session",
+      "legal_review": "Data Processing Agreement (DPA)",
+      "dedicated_support": {
+        "title": "Dedicated Support Manager",
+        "description": "As an Enterprise customer, you have a dedicated account manager available via WhatsApp or email for priority assistance.",
+        "action": "Contact Manager"
+      },
+      "sla": {
+        "title": "Service Level Agreement (SLA)",
+        "description": "Your workspace is covered by our 99.9% uptime guarantee. We provide monthly availability reports upon request.",
+        "action": "View SLA Terms"
+      },
+      "integrations": {
+        "title": "Custom Integrations",
+        "description": "Need to connect ContentFlow with your own CRM or ERP? Our team can build custom integrations tailored to your workflow.",
+        "action": "Request Integration"
+      }
+    }
   }
 }

@@ -1,15 +1,15 @@
-import { AIResponse } from "@/Hooks/useAIChat";
-import QuickTipResponse from "./QuickTipResponse";
-import InstructionsResponse from "./InstructionsResponse";
-import DataResponse from "./DataResponse";
-import AnalysisResponse from "./AnalysisResponse";
-import ContentResponse from "./ContentResponse";
-import RecommendationResponse from "./RecommendationResponse";
-import GenericResponse from "./GenericResponse";
+import { AIResponse } from '@/Hooks/useAIChat';
+import QuickTipResponse from './QuickTipResponse';
+import InstructionsResponse from './InstructionsResponse';
+import DataResponse from './DataResponse';
+import AnalysisResponse from './AnalysisResponse';
+import ContentResponse from './ContentResponse';
+import RecommendationResponse from './RecommendationResponse';
+import GenericResponse from './GenericResponse';
 
 interface StructuredResponseRendererProps {
   aiResponse: AIResponse;
-  theme: "dark" | "light";
+  theme: 'dark' | 'light';
 }
 
 export default function StructuredResponseRenderer({
@@ -21,17 +21,17 @@ export default function StructuredResponseRenderer({
   const { type } = aiResponse;
 
   switch (type) {
-    case "quick_tip":
+    case 'quick_tip':
       return <QuickTipResponse data={aiResponse} theme={theme} />;
-    case "instructions":
+    case 'instructions':
       return <InstructionsResponse data={aiResponse} theme={theme} />;
-    case "data":
+    case 'data':
       return <DataResponse data={aiResponse} theme={theme} />;
-    case "analysis":
+    case 'analysis':
       return <AnalysisResponse data={aiResponse} theme={theme} />;
-    case "content":
+    case 'content':
       return <ContentResponse data={aiResponse} theme={theme} />;
-    case "recommendation":
+    case 'recommendation':
       return <RecommendationResponse data={aiResponse} theme={theme} />;
     default:
       return <GenericResponse data={aiResponse} theme={theme} />;

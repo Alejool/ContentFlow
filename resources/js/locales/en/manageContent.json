@@ -1,9 +1,11 @@
 {
   "manageContent": {
-    "configureNetworks": "Configure your scheduled publications",
+    "configureNetworks": "Scheduled publications",
     "title": "Content Management",
     "subtitle": "Organize and manage your multimedia content elegantly and efficiently",
     "createNew": "Create New",
+    "createPublication": "Post, reel, story...",
+    "createCampaign": "Group publications",
     "publications": "Publications",
     "campaigns": "Campaigns",
     "logs": "Logs",
@@ -47,8 +49,16 @@
       "actions": {
         "connect": "Connect",
         "disconnect": "Disconnect",
-        "processing": "Processing..."
+        "processing": "Processing...",
+        "publishing": "Publishing...",
+        "noPermission": "No Permission"
       },
+      "oauth1Required": "OAuth 1.0a required",
+      "oauth1Message": "Required for video uploads",
+      "reconnect": "Reconnect",
+      "reconnecting": "Reconnecting...",
+      "reconnectWindow": "Opening reconnection window...",
+      "reconnectError": "Error reconnecting",
       "apiLimits": "API Limits",
       "limits": {
         "requestsPerHour": "Requests/hour",
@@ -68,12 +78,12 @@
           "publication": "Publication"
         },
         "cancelButton": "Keep connected",
-        "confirmButton": "Disconnect "
+        "confirmButton": "Disconnect"
       },
       "blockerModal": {
         "titlePublishing": "Cannot Disconnect",
         "titleScheduled": "Cannot Disconnect",
-        "messagePublishing": "This account has publications that are currently being published. Please wait for them to finish before disconnecting.",
+        "messagePublishing": "This account has publications that are currently being published. Wait for them to finish before disconnecting.",
         "messageScheduled": "This account has scheduled publications. You must remove them from the publications before you can disconnect this account.",
         "table": {
           "publication": "Publication",
@@ -119,9 +129,11 @@
         "connectSuccess": "Account connected successfully",
         "disconnectSuccess": "Account disconnected successfully",
         "authError": "Authentication error",
-        "unauthorized": "Unauthorized. Please log in again.",
+        "unauthorized": "Unauthorized. Log in again.",
         "loadError": "Could not load connected accounts",
-        "disconnectError": "Error disconnecting"
+        "disconnectError": "Error disconnecting",
+        "cannotDisconnectPublishing": "You cannot disconnect this account while there are publications in progress",
+        "noPermission": "You do not have permission to manage social media accounts. Only users with 'manage-accounts' permission can connect or disconnect accounts."
       }
     }
   }

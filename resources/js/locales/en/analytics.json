@@ -2,7 +2,7 @@
   "analytics": {
     "title": "Analytics",
     "subtitle": "Visualize the performance of your campaigns and publications",
-    "days": "days",
+    "days": "Days",
     "vistas": "Views",
     "clics": "Clicks",
     "engagement": "Engagement",
@@ -26,6 +26,8 @@
       "engagementTrends": "Engagement Trends",
       "followersByPlatform": "Followers by Platform",
       "topCampaignPerformance": "Top Campaign Performance",
+      "detailedPlatforms": "Detailed Platform Analysis",
+      "detailedPublications": "Detailed Publication Performance",
       "views": "Views",
       "clicks": "Clicks",
       "engagement": "Engagement"
@@ -43,6 +45,13 @@
     "emptyState": {
       "title": "No Data Available",
       "description": "Start creating campaigns and connecting social media accounts to see your analytics here."
+    },
+    "advanced": {
+      "locked_title": "Advanced Analytics",
+      "locked_description": "Get detailed platform analysis, publication performance, and exportable reports with Professional and Enterprise plans.",
+      "upgrade_cta": "Upgrade Plan",
+      "daily_metrics": "Daily metrics updated by cron jobs",
+      "platform_breakdown": "Platform breakdown and daily evolution"
     }
   }
 }

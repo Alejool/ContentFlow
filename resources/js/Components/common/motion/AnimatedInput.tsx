@@ -1,6 +1,6 @@
 /**
  * Animated Input Component
- * 
+ *
  * Input with focus animations and accessibility features
  */
 
@@ -18,17 +18,8 @@ interface AnimatedInputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 export const AnimatedInput = forwardRef<HTMLInputElement, AnimatedInputProps>(
   (
-    {
-      label,
-      error,
-      helperText,
-      icon,
-      iconPosition = 'left',
-      id,
-      className = '',
-      ...props
-    },
-    ref
+    { label, error, helperText, icon, iconPosition = 'left', id, className = '', ...props },
+    ref,
   ) => {
     const [isFocused, setIsFocused] = useState(false);
     const reducedMotion = prefersReducedMotion();
@@ -55,7 +46,7 @@ export const AnimatedInput = forwardRef<HTMLInputElement, AnimatedInputProps>(
           {label && (
             <m.label
               htmlFor={inputId}
-              className="block text-sm font-medium text-theme-text-primary mb-1.5"
+              className="mb-1.5 block text-sm font-medium text-theme-text-primary"
               initial={false}
               animate={
                 reducedMotion
@@ -70,7 +61,7 @@ export const AnimatedInput = forwardRef<HTMLInputElement, AnimatedInputProps>(
             >
               {label}
               {props.required && (
-                <span className="text-error-500 ml-1" aria-label="requerido">
+                <span className="ml-1 text-error-500" aria-label="requerido">
                   *
                 </span>
               )}
@@ -82,7 +73,7 @@ export const AnimatedInput = forwardRef<HTMLInputElement, AnimatedInputProps>(
               <div
                 className={`absolute top-1/2 -translate-y-1/2 ${
                   iconPosition === 'left' ? 'left-3' : 'right-3'
-                } text-theme-text-tertiary pointer-events-none`}
+                } pointer-events-none text-theme-text-tertiary`}
                 aria-hidden="true"
               >
                 {icon}
@@ -103,11 +94,7 @@ export const AnimatedInput = forwardRef<HTMLInputElement, AnimatedInputProps>(
               }}
               aria-invalid={!!error}
               aria-describedby={
-                error
-                  ? `${inputId}-error`
-                  : helperText
-                  ? `${inputId}-helper`
-                  : undefined
+                error ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined
               }
               {...props}
             />
@@ -127,17 +114,14 @@ export const AnimatedInput = forwardRef<HTMLInputElement, AnimatedInputProps>(
           )}
 
           {helperText && !error && (
-            <p
-              id={`${inputId}-helper`}
-              className="mt-1.5 text-sm text-theme-text-tertiary"
-            >
+            <p id={`${inputId}-helper`} className="mt-1.5 text-sm text-theme-text-tertiary">
               {helperText}
             </p>
           )}
         </div>
       </LazyMotion>
     );
-  }
+  },
 );
 
 AnimatedInput.displayName = 'AnimatedInput';

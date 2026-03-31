@@ -1,12 +1,7 @@
-import {
-  Dialog,
-  DialogPanel,
-  Transition,
-  TransitionChild,
-} from "@headlessui/react";
-import React, { ReactNode } from "react";
+import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/react';
+import React, { ReactNode } from 'react';
 
-type MaxWidth = "sm" | "md" | "lg" | "xl" | "2xl";
+type MaxWidth = 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 
 interface ModalProps {
   children: ReactNode;
@@ -19,7 +14,7 @@ interface ModalProps {
 export default function Modal({
   children,
   show = false,
-  maxWidth = "2xl",
+  maxWidth = '2xl',
   closeable = true,
   onClose = () => {},
 }: ModalProps) {
@@ -30,11 +25,11 @@ export default function Modal({
   };
 
   const maxWidthMap: Record<MaxWidth, string> = {
-    sm: "sm:max-w-sm",
-    md: "sm:max-w-md",
-    lg: "sm:max-w-lg",
-    xl: "sm:max-w-xl",
-    "2xl": "sm:max-w-2xl",
+    sm: 'sm:max-w-sm',
+    md: 'sm:max-w-md',
+    lg: 'sm:max-w-lg',
+    xl: 'sm:max-w-xl',
+    '2xl': 'sm:max-w-2xl',
   };
   const maxWidthClass = maxWidthMap[maxWidth];
 
@@ -68,7 +63,7 @@ export default function Modal({
           leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
         >
           <DialogPanel
-            className={`mb-6 transform overflow-hidden rounded-lg bg-white dark:bg-neutral-900 shadow-xl transition-all sm:mx-auto sm:w-full ${maxWidthClass}`}
+            className={`mb-6 transform overflow-hidden rounded-lg bg-white shadow-xl transition-all dark:bg-neutral-900 sm:mx-auto sm:w-full ${maxWidthClass}`}
           >
             {children}
           </DialogPanel>

@@ -1,12 +1,12 @@
-import { UserProfileFormData, userProfileSchema } from "@/schemas/user";
-import { useUserStore } from "@/stores/userStore";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { router } from "@inertiajs/react";
-import axios from "axios";
-import { useEffect, useState } from "react";
-import { useForm as useHookForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
-import { useTranslation } from "react-i18next";
+import { UserProfileFormData, userProfileSchema } from '@/schemas/user';
+import { useUserStore } from '@/stores/userStore';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { router } from '@inertiajs/react';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { useForm as useHookForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 export const useUser = (initialUser: any) => {
   const { t, i18n } = useTranslation();
@@ -25,11 +25,11 @@ export const useUser = (initialUser: any) => {
   } = useHookForm<UserProfileFormData>({
     resolver: zodResolver(userProfileSchema(t)),
     defaultValues: {
-      name: initialUser?.name || "",
-      email: initialUser?.email || "",
-      phone: initialUser?.phone || "",
-      country_code: initialUser?.country_code || "",
-      bio: initialUser?.bio || "",
+      name: initialUser?.name || '',
+      email: initialUser?.email || '',
+      phone: initialUser?.phone || '',
+      country_code: initialUser?.country_code || '',
+      bio: initialUser?.bio || '',
       global_platform_settings: initialUser?.global_platform_settings || {},
       ai_settings: initialUser?.ai_settings || {},
     },
@@ -46,14 +46,13 @@ export const useUser = (initialUser: any) => {
   useEffect(() => {
     if (user) {
       reset({
-        name: user.name || "",
-        email: user.email || "",
-        phone: user.phone || "",
-        country_code: user.country_code || "",
-        bio: user.bio || "",
+        name: user.name || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        country_code: user.country_code || '',
+        bio: user.bio || '',
         global_platform_settings:
-          Array.isArray(user.global_platform_settings) &&
-          user.global_platform_settings.length === 0
+          Array.isArray(user.global_platform_settings) && user.global_platform_settings.length === 0
             ? {}
             : user.global_platform_settings || {},
         ai_settings:
@@ -74,9 +73,9 @@ export const useUser = (initialUser: any) => {
     if (!user) return;
     const normalizedWatched = {
       ...watchedValues,
-      phone: watchedValues.phone || "",
-      country_code: watchedValues.country_code || "",
-      bio: watchedValues.bio || "",
+      phone: watchedValues.phone || '',
+      country_code: watchedValues.country_code || '',
+      bio: watchedValues.bio || '',
       global_platform_settings: watchedValues.global_platform_settings || {},
       ai_settings: watchedValues.ai_settings || {},
     };
@@ -84,9 +83,9 @@ export const useUser = (initialUser: any) => {
     const normalizedUser = {
       name: user.name,
       email: user.email,
-      phone: user.phone || "",
-      country_code: user.country_code || "",
-      bio: user.bio || "",
+      phone: user.phone || '',
+      country_code: user.country_code || '',
+      bio: user.bio || '',
       global_platform_settings: user.global_platform_settings || {},
       ai_settings: user.ai_settings || {},
     };
@@ -99,8 +98,7 @@ export const useUser = (initialUser: any) => {
       normalizedWatched.bio !== normalizedUser.bio ||
       JSON.stringify(normalizedWatched.global_platform_settings) !==
         JSON.stringify(normalizedUser.global_platform_settings) ||
-      JSON.stringify(normalizedWatched.ai_settings) !==
-        JSON.stringify(normalizedUser.ai_settings);
+      JSON.stringify(normalizedWatched.ai_settings) !== JSON.stringify(normalizedUser.ai_settings);
 
     setHasChanges(changed);
   }, [watchedValues, user]);
@@ -109,11 +107,11 @@ export const useUser = (initialUser: any) => {
     try {
       const result = await updateProfile(data);
       if (result.success) {
-        toast.success(result.message || t("profile.update_success"));
+        toast.success(result.message || t('profile.update_success'));
         setHasChanges(false);
 
         // Reload fresh user data from server to keep Inertia props in sync
-        router.reload({ only: ["auth"] });
+        router.reload({ only: ['auth'] });
 
         // Force form to reset with the latest data from the store
         // This ensures the UI reflects what was actually saved
@@ -121,19 +119,18 @@ export const useUser = (initialUser: any) => {
           const latestUser = useUserStore.getState().user;
           if (latestUser) {
             reset({
-              name: latestUser.name || "",
-              email: latestUser.email || "",
-              phone: latestUser.phone || "",
-              country_code: latestUser.country_code || "",
-              bio: latestUser.bio || "",
-              global_platform_settings:
-                latestUser.global_platform_settings || {},
+              name: latestUser.name || '',
+              email: latestUser.email || '',
+              phone: latestUser.phone || '',
+              country_code: latestUser.country_code || '',
+              bio: latestUser.bio || '',
+              global_platform_settings: latestUser.global_platform_settings || {},
               ai_settings: latestUser.ai_settings || {},
             });
           }
         }, 100);
       } else {
-        toast.error(result.message || t("profile.update_error"));
+        toast.error(result.message || t('profile.update_error'));
       }
     } catch (error: any) {
       if (axios.isAxiosError(error) && error.response?.data?.errors) {
@@ -142,7 +139,7 @@ export const useUser = (initialUser: any) => {
           toast.error(value[0]);
         });
       } else {
-        toast.error(error.message || t("profile.update_error"));
+        toast.error(error.message || t('profile.update_error'));
       }
     }
   };
@@ -151,26 +148,23 @@ export const useUser = (initialUser: any) => {
     try {
       setIsChangingLanguage(true);
       await i18n.changeLanguage(lang);
-      localStorage.setItem("i18nextLng", lang);
+      localStorage.setItem('i18nextLng', lang);
       // Optional: Update user preference in backend via store
       await updateProfile({ locale: lang });
-      toast.success(t("profile.toast.languageChanged"));
+      toast.success(t('profile.toast.languageChanged'));
     } catch (error) {
-      toast.error(t("profile.toast.languageChangeError"));
+      toast.error(t('profile.toast.languageChangeError'));
     } finally {
       setIsChangingLanguage(false);
     }
   };
 
   const onInvalid = (errors: any) => {
-    toast.error(
-      t("validation.check_errors") ||
-        "Por favor, revisa los errores en el formulario",
-    );
+    toast.error(t('validation.check_errors') || 'Revisa los errores en el formulario');
 
     // Toast specific high-level errors if they exist
     if (errors.ai_settings) {
-      toast.error("Error en la configuración de IA");
+      toast.error('Error en la configuración de IA');
     }
   };
 

@@ -76,14 +76,14 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
     try {
       await axios.delete(`/api/v1/media/${currentReel.id}`);
       toast.success(t('reels.messages.reelDeleted'));
-      
+
       // Move to next reel or previous if this was the last one
       if (reels.length > 1) {
         if (currentIndex >= reels.length - 1) {
           setCurrentIndex(Math.max(0, currentIndex - 1));
         }
       }
-      
+
       onReelDeleted?.(currentReel.id);
     } catch (error) {
       toast.error(t('reels.messages.deleteError'));
@@ -95,11 +95,11 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
   return (
     <div className="space-y-4">
       {/* Main Video Player */}
-      <div className="relative bg-black rounded-lg overflow-hidden aspect-[9/16] max-h-[600px] mx-auto">
+      <div className="relative mx-auto aspect-[9/16] max-h-[600px] overflow-hidden rounded-lg bg-black">
         <video
           key={currentReel.id}
           src={currentReel.file_path}
-          className="w-full h-full object-contain"
+          className="h-full w-full object-contain"
           controls
           autoPlay
           loop
@@ -107,15 +107,17 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
         />
 
         {/* Platform Badge */}
-        <div className={`absolute top-4 left-4 px-3 py-1.5 rounded-full bg-gradient-to-r ${getPlatformColor(currentReel.metadata?.platform)} text-white text-sm font-bold flex items-center gap-2 shadow-lg`}>
+        <div
+          className={`absolute left-4 top-4 rounded-full bg-gradient-to-r px-3 py-1.5 ${getPlatformColor(currentReel.metadata?.platform)} flex items-center gap-2 text-sm font-bold text-white shadow-lg`}
+        >
           <span className="text-base">{getPlatformIcon(currentReel.metadata?.platform)}</span>
           <span className="capitalize">{currentReel.metadata?.platform || 'Reel'}</span>
         </div>
 
         {/* Duration Badge */}
         {currentReel.metadata?.duration && (
-          <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-black/70 backdrop-blur-sm text-white text-sm font-medium flex items-center gap-1.5 shadow-lg">
-            <Film className="w-4 h-4" />
+          <div className="absolute right-4 top-4 flex items-center gap-1.5 rounded-full bg-black/70 px-3 py-1.5 text-sm font-medium text-white shadow-lg backdrop-blur-sm">
+            <Film className="h-4 w-4" />
             {Math.floor(currentReel.metadata.duration)}s
           </div>
         )}
@@ -125,74 +127,70 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
           <>
             <button
               onClick={prevReel}
-              className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full transition-all text-white z-10"
+              className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/10 p-3 text-white backdrop-blur-sm transition-all hover:bg-white/20"
               aria-label="Previous reel"
             >
-              <ChevronLeft className="w-6 h-6" />
+              <ChevronLeft className="h-6 w-6" />
             </button>
             <button
               onClick={nextReel}
-              className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full transition-all text-white z-10"
+              className="absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/10 p-3 text-white backdrop-blur-sm transition-all hover:bg-white/20"
               aria-label="Next reel"
             >
-              <ChevronRight className="w-6 h-6" />
+              <ChevronRight className="h-6 w-6" />
             </button>
           </>
         )}
 
         {/* Action Buttons */}
-        <div className="absolute bottom-4 right-4 flex gap-2 z-10">
+        <div className="absolute bottom-4 right-4 z-10 flex gap-2">
           <button
             onClick={handleDeleteReel}
             disabled={deleting}
-            className="p-2.5 bg-red-500/80 hover:bg-red-600/80 backdrop-blur-sm rounded-full transition-all text-white disabled:opacity-50"
+            className="rounded-full bg-red-500/80 p-2.5 text-white backdrop-blur-sm transition-all hover:bg-red-600/80 disabled:opacity-50"
             title={t('reels.actions.delete')}
           >
-            <Trash2 className="w-5 h-5" />
+            <Trash2 className="h-5 w-5" />
           </button>
           <button
             onClick={handleDownload}
-            className="p-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full transition-all text-white"
+            className="rounded-full bg-white/10 p-2.5 text-white backdrop-blur-sm transition-all hover:bg-white/20"
             title={t('common.download')}
           >
-            <Download className="w-5 h-5" />
+            <Download className="h-5 w-5" />
           </button>
           <button
             onClick={handleOpenInNewTab}
-            className="p-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full transition-all text-white"
+            className="rounded-full bg-white/10 p-2.5 text-white backdrop-blur-sm transition-all hover:bg-white/20"
             title={t('common.openInNewTab')}
           >
-            <ExternalLink className="w-5 h-5" />
+            <ExternalLink className="h-5 w-5" />
           </button>
         </div>
       </div>
 
       {/* Thumbnails Navigation */}
       {reels.length > 1 && (
-        <div className="flex gap-3 overflow-x-auto pb-2 px-1">
+        <div className="flex gap-3 overflow-x-auto px-1 pb-2">
           {reels.map((reel, index) => (
             <button
               key={reel.id}
               onClick={() => setCurrentIndex(index)}
-              className={`relative flex-shrink-0 w-20 h-28 rounded-lg overflow-hidden transition-all ${
+              className={`relative h-28 w-20 flex-shrink-0 overflow-hidden rounded-lg transition-all ${
                 index === currentIndex
-                  ? 'ring-4 ring-purple-500 scale-105'
+                  ? 'scale-105 ring-4 ring-purple-500'
                   : 'opacity-60 hover:opacity-100'
               }`}
             >
-              <video
-                src={reel.file_path}
-                className="w-full h-full object-cover"
-                muted
-              />
+              <video src={reel.file_path} className="h-full w-full object-cover" muted />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               <div className="absolute bottom-1 left-1 right-1 text-center">
-                <span className="text-white text-xs font-medium">
+                <span className="text-xs font-medium text-white">
                   {getPlatformIcon(reel.metadata?.platform)}
                 </span>
               </div>
               {index === currentIndex && (
-                <div className="absolute inset-0 border-2 border-purple-500 rounded-lg" />
+                <div className="absolute inset-0 rounded-lg border-2 border-purple-500" />
               )}
             </button>
           ))}

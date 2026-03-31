@@ -3,7 +3,8 @@
 namespace App\Services\Video;
 
 use App\Models\MediaFiles\MediaFile;
-use Illuminate\Support\Facades\Log;
+use App\Services\Storage\S3PathService;
+use App\Helpers\LogHelper;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -32,7 +33,7 @@ class VideoClipGeneratorService
       // Get original video duration
       $originalDuration = $this->getVideoDuration($videoPath);
       
-      Log::info('Starting reel generation', [
+      LogHelper::upload('reel.generation_started', [
         'platform' => $platform,
         'input_file' => $videoPath,
         'file_size' => filesize($videoPath),
@@ -50,7 +51,7 @@ class VideoClipGeneratorService
       exec($checkCommand, $checkOutput, $checkCode);
       
       if ($checkCode !== 0) {
-        Log::error('FFmpeg not found or not executable', [
+        LogHelper::uploadError('reel.ffmpeg_not_found', 'FFmpeg not found or not executable', [
           'path' => $ffmpegPath,
           'output' => implode("\n", $checkOutput)
         ]);
@@ -64,7 +65,7 @@ class VideoClipGeneratorService
       
       // If video is longer than max duration, try to find the best segment
       if ($originalDuration > $specs['max_duration']) {
-        Log::info('Video exceeds max duration, selecting best segment', [
+        LogHelper::upload('reel.video_exceeds_duration', [
           'original_duration' => $originalDuration,
           'target_duration' => $targetDuration
         ]);
@@ -86,7 +87,7 @@ class VideoClipGeneratorService
             Log::info('No highlights detected, using beginning of video');
           }
         } catch (\Exception $e) {
-          Log::warning('Could not detect highlights, using beginning of video', ['error' => $e->getMessage()]);
+          LogHelper::upload('reel.highlight_detection_failed', ['error' => $e->getMessage()]);
           $startTime = 0;
         }
       }
@@ -143,7 +144,7 @@ class VideoClipGeneratorService
           escapeshellarg($outputPath)
         );
 
-        Log::info('Executing FFmpeg command (speed optimized with clipping)', [
+        LogHelper::upload('reel.ffmpeg_command_executing', [
           'command' => $command,
           'input' => $videoPath,
           'output' => $outputPath,
@@ -157,7 +158,7 @@ class VideoClipGeneratorService
         exec($command, $output, $returnCode);
 
         if ($returnCode !== 0) {
-          Log::error('FFmpeg command failed', [
+          LogHelper::uploadError('reel.ffmpeg_command_failed', 'FFmpeg command failed', [
             'return_code' => $returnCode,
             'output' => implode("\n", $output),
             'command' => $command
@@ -181,11 +182,11 @@ class VideoClipGeneratorService
       try {
         $duration = $this->getVideoDuration($outputPath);
       } catch (\Exception $e) {
-        Log::warning('Could not get video duration', ['error' => $e->getMessage()]);
+        LogHelper::upload('reel.duration_check_failed', ['error' => $e->getMessage()]);
         $duration = $targetDuration; // Use target duration as fallback
       }
 
-      Log::info('Reel generated successfully', [
+      LogHelper::upload('reel.generated_successfully', [
         'output_file' => $outputPath,
         'output_size' => filesize($outputPath),
         'final_duration' => $duration,
@@ -206,7 +207,7 @@ class VideoClipGeneratorService
         'duration' => $duration,
       ];
     } catch (\Exception $e) {
-      Log::error('Failed to create optimized reel', [
+      LogHelper::uploadError('reel.creation_failed', $e->getMessage(), [
         'error' => $e->getMessage(),
         'platform' => $platform,
         'trace' => $e->getTraceAsString()
@@ -236,7 +237,7 @@ class VideoClipGeneratorService
 
       return $clips;
     } catch (\Exception $e) {
-      Log::error('Failed to generate clips', ['error' => $e->getMessage()]);
+      LogHelper::uploadError('clips.generation_failed', $e->getMessage(), ['error' => $e->getMessage()]);
       throw $e;
     }
   }
@@ -265,7 +266,7 @@ class VideoClipGeneratorService
         // Validate clip file size
         $clipSize = filesize($outputPath);
         if ($clipSize === 0 || $clipSize === false) {
-          Log::warning('Generated clip is empty, skipping', [
+          LogHelper::upload('clip.empty_file_skipped', [
             'index' => $index,
             'output_path' => $outputPath
           ]);
@@ -285,7 +286,7 @@ class VideoClipGeneratorService
 
         @unlink($outputPath);
       } else {
-        Log::warning('Failed to generate clip', [
+        LogHelper::upload('clip.generation_failed', [
           'index' => $index,
           'return_code' => $returnCode,
           'output' => implode("\n", $output)
@@ -366,7 +367,7 @@ class VideoClipGeneratorService
       throw new \Exception("Video file is empty or inaccessible in S3: {$s3Path} (size: {$fileSize})");
     }
 
-    Log::info('Downloading video from S3', [
+    LogHelper::upload('video.s3_download_started', [
       's3_path' => $s3Path,
       'file_size' => $fileSize,
       'file_size_mb' => round($fileSize / 1024 / 1024, 2)
@@ -386,7 +387,7 @@ class VideoClipGeneratorService
       throw new \Exception("Failed to download video or file is empty: {$tempPath}");
     }
 
-    Log::info('Video downloaded successfully', [
+    LogHelper::upload('video.s3_download_completed', [
       'temp_path' => $tempPath,
       'downloaded_size' => filesize($tempPath),
       'downloaded_size_mb' => round(filesize($tempPath) / 1024 / 1024, 2)
@@ -417,13 +418,20 @@ class VideoClipGeneratorService
       throw new \Exception("Local file is empty, cannot upload: {$localPath}");
     }
 
-    Log::info('Uploading video to S3', [
+    LogHelper::upload('video.s3_upload_started', [
       'local_path' => $localPath,
       'file_size' => $fileSize
     ]);
 
     $filename = basename($localPath);
-    $s3Path = "reels/{$folder}/" . Str::uuid() . '_' . $filename;
+    
+    // Obtener workspace_id y user_id del contexto actual
+    $user = auth()->user();
+    $workspaceId = $user->current_workspace_id;
+    $userId = $user->id;
+    
+    // Usar el nuevo servicio de rutas organizadas
+    $s3Path = S3PathService::reelPath($workspaceId, $userId, $folder, $filename);
     
     $content = file_get_contents($localPath);
     if (empty($content)) {
@@ -442,7 +450,7 @@ class VideoClipGeneratorService
       throw new \Exception("Uploaded file is empty in S3: {$s3Path}");
     }
 
-    Log::info('Video uploaded successfully to S3', [
+    LogHelper::upload('video.s3_upload_completed', [
       's3_path' => $s3Path,
       'uploaded_size' => $uploadedSize
     ]);

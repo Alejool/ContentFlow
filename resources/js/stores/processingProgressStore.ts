@@ -1,11 +1,11 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
 export interface ProcessingJob {
   id: string;
   publicationId: number;
-  type: "video_processing" | "reel_generation" | "thumbnail_generation";
+  type: 'video_processing' | 'reel_generation' | 'thumbnail_generation';
   progress: number;
-  status: "queued" | "processing" | "completed" | "failed" | "cancelled";
+  status: 'queued' | 'processing' | 'completed' | 'failed' | 'cancelled';
   stats?: {
     eta: number;
     currentStep: string;
@@ -26,54 +26,60 @@ interface ProcessingProgressState {
   cancelJob: (id: string) => void;
 }
 
-export const useProcessingProgress = create<ProcessingProgressState>(
-  (set, get) => ({
-    jobs: {},
+export const useProcessingProgress = create<ProcessingProgressState>((set, _get) => ({
+  jobs: {},
 
-    addJob: (job) =>
-      set((state) => ({
+  addJob: (job) =>
+    set((state) => ({
+      jobs: {
+        ...state.jobs,
+        [job.id]: job,
+      },
+    })),
+
+  updateJob: (id, updates) =>
+    set((state) => {
+      const current = state.jobs[id];
+      if (!current) return state;
+
+      return {
         jobs: {
           ...state.jobs,
-          [job.id]: job,
+          [id]: { ...current, ...updates },
         },
-      })),
+      };
+    }),
 
-    updateJob: (id, updates) =>
-      set((state) => {
-        const current = state.jobs[id];
-        if (!current) return state;
+  removeJob: (id) =>
+    set((state) => {
+      const { [id]: _, ...rest } = state.jobs;
+      return { jobs: rest };
+    }),
 
-        return {
-          jobs: {
-            ...state.jobs,
-            [id]: { ...current, ...updates },
+  cancelJob: (id) =>
+    set((state) => {
+      const job = state.jobs[id];
+      if (!job) return state;
+
+      return {
+        jobs: {
+          ...state.jobs,
+          [id]: {
+            ...job,
+            status: 'cancelled' as const,
           },
-        };
-      }),
+        },
+      };
+    }),
+}));
 
-    removeJob: (id) =>
-      set((state) => {
-        const { [id]: _, ...rest } = state.jobs;
-        return { jobs: rest };
-      }),
-
-    cancelJob: (id) =>
-      set((state) => {
-        const job = state.jobs[id];
-        if (!job) return state;
-
-        return {
-          jobs: {
-            ...state.jobs,
-            [id]: {
-              ...job,
-              status: "cancelled" as const,
-            },
-          },
-        };
-      }),
-  }),
-);
+interface ProcessingEvent {
+  jobId: string;
+  publicationId: number;
+  progress: number;
+  stats?: ProcessingJob['stats'];
+  error?: string;
+}
 
 // WebSocket listener initialization
 export function initProcessingProgressRealtime(userId: number) {
@@ -84,7 +90,7 @@ export function initProcessingProgressRealtime(userId: number) {
   const channel = window.Echo.private(`users.${userId}`);
 
   // Listen for processing progress updates
-  channel.listen(".ProcessingProgressUpdated", (e: any) => {
+  channel.listen('.ProcessingProgressUpdated', (e: ProcessingEvent) => {
     const { jobId, publicationId, progress, stats } = e;
 
     const store = useProcessingProgress.getState();
@@ -101,9 +107,9 @@ export function initProcessingProgressRealtime(userId: number) {
       store.addJob({
         id: jobId,
         publicationId,
-        type: "video_processing",
+        type: 'video_processing',
         progress,
-        status: "processing",
+        status: 'processing',
         stats,
         startTime: Date.now(),
       });
@@ -111,15 +117,15 @@ export function initProcessingProgressRealtime(userId: number) {
   });
 
   // Listen for processing completion
-  channel.listen(".VideoProcessingCompleted", (e: any) => {
-    const { jobId, publicationId } = e;
+  channel.listen('.VideoProcessingCompleted', (e: ProcessingEvent) => {
+    const { jobId } = e;
 
     const store = useProcessingProgress.getState();
     const job = store.jobs[jobId];
 
     if (job) {
       store.updateJob(jobId, {
-        status: "completed",
+        status: 'completed',
         progress: 100,
         completedTime: Date.now(),
       });
@@ -132,7 +138,7 @@ export function initProcessingProgressRealtime(userId: number) {
   });
 
   // Listen for processing failures
-  channel.listen(".VideoProcessingFailed", (e: any) => {
+  channel.listen('.VideoProcessingFailed', (e: ProcessingEvent) => {
     const { jobId, error } = e;
 
     const store = useProcessingProgress.getState();
@@ -140,15 +146,15 @@ export function initProcessingProgressRealtime(userId: number) {
 
     if (job) {
       store.updateJob(jobId, {
-        status: "failed",
-        error: error || "Processing failed",
+        status: 'failed',
+        error: error || 'Processing failed',
         completedTime: Date.now(),
       });
     }
   });
 
   // Listen for processing cancellations
-  channel.listen(".VideoProcessingCancelled", (e: any) => {
+  channel.listen('.VideoProcessingCancelled', (e: ProcessingEvent) => {
     const { jobId } = e;
 
     const store = useProcessingProgress.getState();

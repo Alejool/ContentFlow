@@ -1,8 +1,8 @@
-import StatCard from "@/Components/Workspace/StatCard";
-import Button from "@/Components/common/Modern/Button";
-import Select from "@/Components/common/Modern/Select";
-import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
-import axios from "axios";
+import StatCard from '@/Components/Workspace/StatCard';
+import Button from '@/Components/common/Modern/Button';
+import Select from '@/Components/common/Modern/Select';
+import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
+import axios from 'axios';
 import {
   Activity,
   Bell,
@@ -13,18 +13,17 @@ import {
   Server,
   Share2,
   XCircle,
-} from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
+} from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { formatDateString, formatTimeString } from '@/Utils/dateHelpers';
 
 interface NotificationsSettingsTabProps {
   workspace: any;
 }
 
-export default function NotificationsSettingsTab({
-  workspace,
-}: NotificationsSettingsTabProps) {
+export default function NotificationsSettingsTab({ workspace }: NotificationsSettingsTabProps) {
   const { t } = useTranslation();
   const [activityData, setActivityData] = useState<any>({
     data: [],
@@ -34,24 +33,21 @@ export default function NotificationsSettingsTab({
     per_page: 15,
   });
   const [loadingActivity, setLoadingActivity] = useState(false);
-  const [channelFilter, setChannelFilter] = useState("all");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [channelFilter, setChannelFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
 
   const fetchActivity = useCallback(
-    async (page = 1, perPage = 15, channel = "all", status = "all") => {
+    async (page = 1, perPage = 15, channel = 'all', status = 'all') => {
       try {
         setLoadingActivity(true);
-        const response = await axios.get(
-          route("api.v1.workspaces.activity", workspace.id),
-          {
-            params: {
-              page,
-              per_page: perPage,
-              channel: channel !== "all" ? channel : undefined,
-              status: status !== "all" ? status : undefined,
-            },
+        const response = await axios.get(route('api.v1.workspaces.activity', workspace.id), {
+          params: {
+            page,
+            per_page: perPage,
+            channel: channel !== 'all' ? channel : undefined,
+            status: status !== 'all' ? status : undefined,
           },
-        );
+        });
         // Correctly handle the paginated response structure from ApiResponse trait
         const data = response.data;
         setActivityData({
@@ -62,7 +58,7 @@ export default function NotificationsSettingsTab({
           per_page: data.per_page || perPage,
         });
       } catch (error) {
-        toast.error(t("workspace.failed_to_fetch_activity"));
+        toast.error(t('workspace.failed_to_fetch_activity'));
       } finally {
         setLoadingActivity(false);
       }
@@ -76,30 +72,30 @@ export default function NotificationsSettingsTab({
 
   return (
     <div className="space-y-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <StatCard
           icon={Bell}
-          label={t("workspace.active_integrations")}
+          label={t('workspace.active_integrations')}
           value={activityData.data.filter((a: any) => a.success).length}
           color="purple"
         />
         <StatCard
           icon={Activity}
-          label={t("workspace.total_notifications")}
+          label={t('workspace.total_notifications')}
           value={activityData.total}
           color="blue"
         />
       </div>
 
-      <div className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-lg overflow-hidden shadow-sm">
-        <div className="p-6 border-b border-gray-100 dark:border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="overflow-hidden rounded-lg border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-sm dark:border-neutral-800 dark:from-neutral-900 dark:to-neutral-950">
+        <div className="flex flex-col justify-between gap-4 border-b border-gray-100 p-6 dark:border-neutral-800 sm:flex-row sm:items-center">
           <div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <h3 className="flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-white">
               <Activity className="h-5 w-5 text-primary-500" />
-              {t("workspace.activity_log")}
+              {t('workspace.activity_log')}
             </h3>
-            <p className="text-sm text-gray-500 dark:text-neutral-500 mt-1">
-              {t("workspace.recent_webhook_activity")}
+            <p className="mt-1 text-sm text-gray-500 dark:text-neutral-500">
+              {t('workspace.recent_webhook_activity')}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
@@ -107,9 +103,9 @@ export default function NotificationsSettingsTab({
               <Select
                 id="channel-filter"
                 options={[
-                  { value: "all", label: t("workspace.activity.all_channels") },
-                  { value: "slack", label: "Slack" },
-                  { value: "discord", label: "Discord" },
+                  { value: 'all', label: t('workspace.activity.all_channels') },
+                  { value: 'slack', label: 'Slack' },
+                  { value: 'discord', label: 'Discord' },
                 ]}
                 value={channelFilter}
                 onChange={(val) => setChannelFilter(String(val))}
@@ -122,9 +118,9 @@ export default function NotificationsSettingsTab({
               <Select
                 id="status-filter"
                 options={[
-                  { value: "all", label: t("workspace.activity.all_statuses") },
-                  { value: "sent", label: t("workspace.activity.sent") },
-                  { value: "failed", label: t("workspace.activity.failed") },
+                  { value: 'all', label: t('workspace.activity.all_statuses') },
+                  { value: 'sent', label: t('workspace.activity.sent') },
+                  { value: 'failed', label: t('workspace.activity.failed') },
                 ]}
                 value={statusFilter}
                 onChange={(val) => setStatusFilter(String(val))}
@@ -137,21 +133,12 @@ export default function NotificationsSettingsTab({
               variant="secondary"
               buttonStyle="outline"
               size="sm"
-              onClick={() =>
-                fetchActivity(
-                  1,
-                  activityData.per_page,
-                  channelFilter,
-                  statusFilter,
-                )
-              }
+              onClick={() => fetchActivity(1, activityData.per_page, channelFilter, statusFilter)}
               loading={loadingActivity}
               className="gap-2"
             >
-              <RefreshCw
-                className={`h-4 w-4 ${loadingActivity ? "animate-spin" : ""}`}
-              />
-              {t("common.refresh")}
+              <RefreshCw className={`h-4 w-4 ${loadingActivity ? 'animate-spin' : ''}`} />
+              {t('common.refresh')}
             </Button>
           </div>
         </div>
@@ -161,15 +148,15 @@ export default function NotificationsSettingsTab({
             <thead className="bg-gray-50 dark:bg-neutral-900/50">
               <tr>
                 {[
-                  t("workspace.activity.time"),
-                  t("workspace.activity.channel"),
-                  t("workspace.activity.event"),
-                  t("workspace.activity.status"),
-                  t("workspace.activity.response"),
+                  t('workspace.activity.time'),
+                  t('workspace.activity.channel'),
+                  t('workspace.activity.event'),
+                  t('workspace.activity.status'),
+                  t('workspace.activity.response'),
                 ].map((header) => (
                   <th
                     key={header}
-                    className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider"
+                    className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-neutral-400"
                   >
                     {header}
                   </th>
@@ -180,50 +167,47 @@ export default function NotificationsSettingsTab({
               {activityData.data.map((log: any) => (
                 <tr
                   key={log.id}
-                  className="hover:bg-gray-50 dark:hover:bg-neutral-900/50 transition-colors"
+                  className="transition-colors hover:bg-gray-50 dark:hover:bg-neutral-900/50"
                 >
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900 dark:text-white font-medium">
-                      {new Date(log.created_at).toLocaleDateString([], {
-                        month: "short",
-                        day: "numeric",
+                  <td className="whitespace-nowrap px-6 py-4">
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">
+                      {formatDateString(log.created_at, {
+                        month: 'short',
+                        day: 'numeric',
                       })}
                     </div>
                     <div className="text-xs text-gray-500 dark:text-neutral-500">
-                      {new Date(log.created_at).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                      {formatTimeString(log.created_at)}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="whitespace-nowrap px-6 py-4">
                     <div className="flex items-center gap-2">
                       <div
-                        className={`h-8 w-8 rounded-lg flex items-center justify-center ${
-                          log.channel === "slack"
-                            ? "bg-purple-100 dark:bg-purple-900/30"
-                            : log.channel === "discord"
-                              ? "bg-blue-100 dark:bg-blue-900/30"
-                              : "bg-gray-100 dark:bg-neutral-800"
+                        className={`flex h-8 w-8 items-center justify-center rounded-lg ${
+                          log.channel === 'slack'
+                            ? 'bg-purple-100 dark:bg-purple-900/30'
+                            : log.channel === 'discord'
+                              ? 'bg-blue-100 dark:bg-blue-900/30'
+                              : 'bg-gray-100 dark:bg-neutral-800'
                         }`}
                       >
-                        {log.channel === "slack" ? (
+                        {log.channel === 'slack' ? (
                           <Share2 className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                        ) : log.channel === "discord" ? (
+                        ) : log.channel === 'discord' ? (
                           <Server className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                         ) : (
                           <Bell className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                         )}
                       </div>
-                      <span className="text-sm font-medium text-gray-900 dark:text-white capitalize">
+                      <span className="text-sm font-medium capitalize text-gray-900 dark:text-white">
                         {log.channel}
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-sm text-gray-900 dark:text-white font-medium">
-                      {log.event_type === "community_invite"
-                        ? t("workspace.integrations.community_invite")
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">
+                      {log.event_type === 'community_invite'
+                        ? t('workspace.integrations.community_invite')
                         : log.event_type}
                     </div>
                     {log.payload?.url && (
@@ -231,19 +215,19 @@ export default function NotificationsSettingsTab({
                         href={log.payload.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-xs text-primary-500 hover:text-primary-600 flex items-center gap-1 mt-1 truncate max-w-[200px]"
+                        className="mt-1 flex max-w-[200px] items-center gap-1 truncate text-xs text-primary-500 hover:text-primary-600"
                       >
                         <ExternalLink className="h-3 w-3" />
                         {log.payload.url}
                       </a>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="whitespace-nowrap px-6 py-4">
                     <span
-                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
+                      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${
                         log.success
-                          ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-                          : "bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                          : 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400'
                       }`}
                     >
                       {log.success ? (
@@ -251,16 +235,16 @@ export default function NotificationsSettingsTab({
                       ) : (
                         <XCircle className="h-3 w-3" />
                       )}
-                      {log.success ? t("common.sent") : t("common.failed")}
+                      {log.success ? t('common.sent') : t('common.failed')}
                     </span>
                   </td>
                   <td className="px-6 py-4">
                     <div
-                      className="text-sm font-mono text-gray-500 dark:text-neutral-500 max-w-[250px] truncate"
+                      className="max-w-[250px] truncate font-mono text-sm text-gray-500 dark:text-neutral-500"
                       title={log.response}
                     >
-                      {log.status_code ? `[${log.status_code}] ` : ""}
-                      {log.response || "—"}
+                      {log.status_code ? `[${log.status_code}] ` : ''}
+                      {log.response || '—'}
                     </div>
                   </td>
                 </tr>
@@ -269,13 +253,9 @@ export default function NotificationsSettingsTab({
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center">
                     <div className="flex flex-col items-center justify-center text-gray-500 dark:text-neutral-500">
-                      <Bell className="h-12 w-12 mb-4 opacity-20" />
-                      <p className="font-medium">
-                        {t("workspace.no_activity")}
-                      </p>
-                      <p className="text-sm mt-1">
-                        {t("workspace.activity_will_appear")}
-                      </p>
+                      <Bell className="mb-4 h-12 w-12 opacity-20" />
+                      <p className="font-medium">{t('workspace.no_activity')}</p>
+                      <p className="mt-1 text-sm">{t('workspace.activity_will_appear')}</p>
                     </div>
                   </td>
                 </tr>
@@ -290,16 +270,9 @@ export default function NotificationsSettingsTab({
           total={activityData.total}
           perPage={activityData.per_page}
           onPageChange={(page) =>
-            fetchActivity(
-              page,
-              activityData.per_page,
-              channelFilter,
-              statusFilter,
-            )
+            fetchActivity(page, activityData.per_page, channelFilter, statusFilter)
           }
-          onPerPageChange={(perPage) =>
-            fetchActivity(1, perPage, channelFilter, statusFilter)
-          }
+          onPerPageChange={(perPage) => fetchActivity(1, perPage, channelFilter, statusFilter)}
           t={t}
           isLoading={loadingActivity}
         />

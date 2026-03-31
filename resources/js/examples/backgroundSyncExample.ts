@@ -1,6 +1,6 @@
 /**
  * Background Sync Manager Usage Example
- * 
+ *
  * This file demonstrates how to use the BackgroundSyncManager
  * to queue operations for background synchronization.
  */
@@ -10,7 +10,7 @@ import type { SyncOperation } from '../types/optimistic';
 
 /**
  * Example 1: Register a simple sync operation
- * 
+ *
  * This shows how to queue an operation that will be executed
  * when the browser has connectivity.
  */
@@ -25,7 +25,7 @@ export async function registerSimpleSyncOperation() {
     },
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+      Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
     },
     timestamp: Date.now(),
     retryCount: 0,
@@ -33,13 +33,12 @@ export async function registerSimpleSyncOperation() {
 
   try {
     await backgroundSyncManager.registerSync(operation);
-    } catch (error) {
-    }
+  } catch {}
 }
 
 /**
  * Example 2: Register multiple operations
- * 
+ *
  * Shows how to queue multiple operations that will be executed
  * in FIFO order (first-in, first-out).
  */
@@ -77,40 +76,38 @@ export async function registerMultipleOperations() {
   for (const operation of operations) {
     try {
       await backgroundSyncManager.registerSync(operation);
-      } catch (error) {
-      }
+    } catch {}
   }
 }
 
 /**
  * Example 3: Get pending sync operations
- * 
+ *
  * Shows how to retrieve all operations waiting to be synced.
  */
 export async function getPendingOperations() {
   try {
     const pending = await backgroundSyncManager.getPendingSyncs();
     return pending;
-  } catch (error) {
+  } catch {
     return [];
   }
 }
 
 /**
  * Example 4: Retry failed operations
- * 
+ *
  * Shows how to manually retry operations that have failed.
  */
 export async function retryFailedOperations() {
   try {
     await backgroundSyncManager.retryFailed();
-    } catch (error) {
-    }
+  } catch {}
 }
 
 /**
  * Example 5: Listen for sync operation failures
- * 
+ *
  * Shows how to listen for messages from the Service Worker
  * about failed sync operations.
  */
@@ -119,11 +116,11 @@ export function listenForSyncFailures() {
     navigator.serviceWorker.addEventListener('message', (event) => {
       if (event.data && event.data.type === 'SYNC_OPERATION_FAILED') {
         const { operation, error } = event.data;
-        
+
         // Show user notification
         showNotification(
           'Sync Failed',
-          `Operation ${operation.id} failed after 3 retries: ${error.message}`
+          `Operation ${operation.id} failed after 3 retries: ${error.message}`,
         );
       }
     });
@@ -132,14 +129,13 @@ export function listenForSyncFailures() {
 
 /**
  * Example 6: Clear all sync operations
- * 
+ *
  * Shows how to clear all pending operations (use with caution).
  */
 export async function clearAllOperations() {
   try {
     await backgroundSyncManager.clearAll();
-    } catch (error) {
-    }
+  } catch {}
 }
 
 /**
@@ -153,15 +149,15 @@ function showNotification(title: string, message: string) {
     });
   } else {
     // Fallback to console or UI notification
-    }
+  }
 }
 
 /**
  * Example 7: Integration with offline detection
- * 
+ *
  * Shows how to automatically queue operations when offline.
  */
-export async function createPublicationWithSync(publicationData: any) {
+export async function createPublicationWithSync(publicationData: Record<string, unknown>) {
   const operation: SyncOperation = {
     id: `publication-${Date.now()}-${Math.random()}`,
     url: '/api/publications',
@@ -169,7 +165,7 @@ export async function createPublicationWithSync(publicationData: any) {
     body: publicationData,
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+      Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
     },
     timestamp: Date.now(),
     retryCount: 0,
@@ -193,7 +189,7 @@ export async function createPublicationWithSync(publicationData: any) {
       }
 
       return await response.json();
-    } catch (error) {
+    } catch {
       await backgroundSyncManager.registerSync(operation);
       return { queued: true, id: operation.id };
     }

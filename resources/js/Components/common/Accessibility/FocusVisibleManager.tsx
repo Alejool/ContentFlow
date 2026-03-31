@@ -1,6 +1,6 @@
 /**
  * Focus Visible Manager
- * 
+ *
  * Manages focus-visible behavior for keyboard navigation
  * Ensures focus indicators only show for keyboard users
  */
@@ -54,7 +54,13 @@ function focusTriggersKeyboardModality(element: Element): boolean {
 export function useFocusVisible(): void {
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Tab' || e.key === 'Shift' || e.key === 'Meta' || e.key === 'Alt' || e.key === 'Control') {
+      if (
+        e.key === 'Tab' ||
+        e.key === 'Shift' ||
+        e.key === 'Meta' ||
+        e.key === 'Alt' ||
+        e.key === 'Control'
+      ) {
         hadKeyboardEvent = true;
       }
     }
@@ -77,7 +83,7 @@ export function useFocusVisible(): void {
 
       if (target.classList.contains('focus-visible')) {
         hadFocusVisibleRecently = true;
-        
+
         if (hadFocusVisibleRecentlyTimeout) {
           clearTimeout(hadFocusVisibleRecentlyTimeout);
         }

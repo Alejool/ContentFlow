@@ -4,9 +4,10 @@ namespace App\Services\SocialPlatforms;
 
 use Exception;
 use GuzzleHttp\Exception\ClientException;
-use Illuminate\Support\Facades\Log;
-use App\Models\Publication;
+use App\Helpers\LogHelper;
+use App\Models\Publications\Publication;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Log;
 
 use App\DTOs\SocialPostDTO;
 use App\DTOs\PostResultDTO;
@@ -85,9 +86,9 @@ class YouTubeService extends BaseSocialService
         'body' => fopen($tempThumbnail, 'r'),
       ]);
 
-      Log::info('Thumbnail uploaded successfully', ['video_id' => $videoId]);
+      LogHelper::social('youtube.thumbnail_uploaded', ['video_id' => $videoId]);
     } catch (\Exception $e) {
-      Log::warning('Failed to upload thumbnail', ['video_id' => $videoId, 'error' => $e->getMessage()]);
+      LogHelper::social('youtube.thumbnail_upload_failed', ['video_id' => $videoId, 'error' => $e->getMessage()]);
       // Don't throw, just log warning so video remains published
     } finally {
       if (file_exists($tempThumbnail)) {
@@ -106,7 +107,7 @@ class YouTubeService extends BaseSocialService
   {
     $tempFile = tempnam(sys_get_temp_dir(), 'youtube_upload_');
 
-    Log::info('Downloading video for YouTube', [
+    LogHelper::social('youtube.video_download_started', [
       'url' => $videoUrl,
       'temp_file' => $tempFile
     ]);
@@ -123,7 +124,7 @@ class YouTubeService extends BaseSocialService
           if ($downloadTotal > 0) {
             $progress = round(($downloadedBytes / $downloadTotal) * 100, 1);
             if ($progress % 20 == 0 && $progress > 0) { // Log cada 20%
-              Log::info('YouTube download progress', [
+              LogHelper::social('youtube.download_progress', [
                 'progress' => "{$progress}%",
                 'downloaded_mb' => round($downloadedBytes / 1024 / 1024, 2)
               ]);
@@ -133,7 +134,7 @@ class YouTubeService extends BaseSocialService
       ]);
 
       $fileSize = filesize($tempFile);
-      Log::info('Video downloaded successfully for YouTube', [
+      LogHelper::social('youtube.video_downloaded', [
         'size_mb' => round($fileSize / 1024 / 1024, 2)
       ]);
 
@@ -143,7 +144,7 @@ class YouTubeService extends BaseSocialService
         @unlink($tempFile);
       }
       
-      Log::error('Failed to download video for YouTube', [
+      LogHelper::socialError('youtube.video_download_failed', $e->getMessage(), [
         'url' => $videoUrl,
         'error' => $e->getMessage()
       ]);
@@ -163,13 +164,13 @@ class YouTubeService extends BaseSocialService
     // Opción 1: Parámetro explícito
     if (isset($data['is_short'])) {
       $isShort = (bool) $data['is_short'];
-      Log::info('Short status set explicitly', ['is_short' => $isShort]);
+      LogHelper::social('youtube.short_status_explicit', ['is_short' => $isShort]);
       return $isShort;
     }
 
     if (isset($data['type'])) {
       $isShort = strtolower($data['type']) === 'short';
-      Log::info('Short status from type parameter', ['type' => $data['type'], 'is_short' => $isShort]);
+      LogHelper::social('youtube.short_status_from_type', ['type' => $data['type'], 'is_short' => $isShort]);
       return $isShort;
     }
 
@@ -178,14 +179,14 @@ class YouTubeService extends BaseSocialService
       $duration = $this->getVideoDuration($videoFile);
       $isShort = $duration <= 60;
 
-      Log::info('Auto-detected short status', [
+      LogHelper::social('youtube.short_status_auto_detected', [
         'duration' => $duration,
         'is_short' => $isShort
       ]);
 
       return $isShort;
     } catch (\Exception $e) {
-      Log::warning('Could not determine video duration, defaulting to regular video', [
+      LogHelper::social('youtube.duration_detection_failed', [
         'error' => $e->getMessage()
       ]);
       return false;
@@ -207,7 +208,7 @@ class YouTubeService extends BaseSocialService
           return (float) $fileInfo['playtime_seconds'];
         }
       } catch (\Exception $e) {
-        Log::warning('getID3 failed', ['error' => $e->getMessage()]);
+        LogHelper::social('youtube.getid3_failed', ['error' => $e->getMessage()]);
       }
     }
 
@@ -221,7 +222,7 @@ class YouTubeService extends BaseSocialService
           return (float) trim($output);
         }
       } catch (\Exception $e) {
-        Log::warning('FFprobe failed', ['error' => $e->getMessage()]);
+        LogHelper::social('youtube.ffprobe_failed', ['error' => $e->getMessage()]);
       }
     }
 
@@ -264,7 +265,7 @@ class YouTubeService extends BaseSocialService
         $tags[] = 'shorts';
       }
 
-      Log::info('Video configured as YouTube Short', [
+      LogHelper::social('youtube.configured_as_short', [
         'title' => $title,
         'has_shorts_tag' => true
       ]);
@@ -290,7 +291,7 @@ class YouTubeService extends BaseSocialService
       $videoSize = filesize($tempFile);
       $fileSizeMB = round($videoSize / 1024 / 1024, 2);
 
-      Log::info('Initiating YouTube Resumable Upload', [
+      LogHelper::social('youtube.resumable_upload_initiated', [
         'file_size_mb' => $fileSizeMB
       ]);
 
@@ -320,7 +321,7 @@ class YouTubeService extends BaseSocialService
         throw new \Exception("YouTube API did not return an upload URL");
       }
 
-      Log::info('YouTube upload session initialized', ['upload_url' => $uploadUrl]);
+      LogHelper::social('youtube.upload_session_initialized', ['upload_url' => $uploadUrl]);
 
       // 2. Upload en chunks para archivos grandes (mejor control y progreso)
       if ($fileSizeMB > 100) {
@@ -339,7 +340,7 @@ class YouTubeService extends BaseSocialService
         throw new \Exception('YouTube API response missing video ID after resumable upload');
       }
 
-      Log::info('YouTube resumable upload completed', [
+      LogHelper::social('youtube.resumable_upload_completed', [
         'video_id' => $result['id'],
         'size_mb' => $fileSizeMB
       ]);
@@ -351,7 +352,7 @@ class YouTubeService extends BaseSocialService
         @unlink($tempFile);
       }
       
-      Log::error('YouTube upload failed', [
+      LogHelper::socialError('youtube.upload_failed', $e->getMessage(), [
         'error' => $e->getMessage()
       ]);
       
@@ -411,7 +412,7 @@ class YouTubeService extends BaseSocialService
       $chunkNumber = 0;
       $totalChunks = ceil($videoSize / $chunkSize);
 
-      Log::info('YouTube chunked upload starting', [
+      LogHelper::social('youtube.chunked_upload_starting', [
         'chunk_size_mb' => 10,
         'total_chunks' => $totalChunks
       ]);
@@ -468,7 +469,7 @@ class YouTubeService extends BaseSocialService
               throw new \Exception("Failed to upload chunk {$chunkNumber} after {$maxRetries} attempts: " . $e->getMessage());
             }
             
-            Log::warning('YouTube chunk upload failed, retrying', [
+            LogHelper::social('youtube.chunk_upload_retry', [
               'chunk' => $chunkNumber,
               'attempt' => $retryCount,
               'error' => $e->getMessage()
@@ -483,7 +484,7 @@ class YouTubeService extends BaseSocialService
         // Log progreso cada 10 chunks
         if ($chunkNumber % 10 === 0 || $chunkNumber === $totalChunks) {
           $progress = round(($chunkNumber / $totalChunks) * 100, 1);
-          Log::info('YouTube upload progress', [
+          LogHelper::social('youtube.upload_progress', [
             'progress' => "{$progress}%",
             'chunk' => "{$chunkNumber}/{$totalChunks}",
             'uploaded_mb' => round($offset / 1024 / 1024, 2)
@@ -527,16 +528,26 @@ class YouTubeService extends BaseSocialService
     $statusCode = $e->getResponse()->getStatusCode();
     $responseBody = $e->getResponse()->getBody()->getContents();
 
-    Log::error('YouTube API Error', [
+    LogHelper::apiError('youtube.api_error', 'YouTube API Error', [
       'status' => $statusCode,
       'response' => $responseBody,
     ]);
 
     // Try to parse the actual JSON error message from YouTube
     $apiMessage = null;
+    $isQuotaError = false;
     try {
       $jsonError = json_decode($responseBody, true);
       $apiMessage = $jsonError['error']['message'] ?? null;
+      
+      // Check if this is a quota error
+      if ($apiMessage && (
+        str_contains($apiMessage, 'exceeded the number of videos') || 
+        str_contains($apiMessage, 'upload limit') ||
+        str_contains($apiMessage, 'quota')
+      )) {
+        $isQuotaError = true;
+      }
     } catch (\Exception $parseException) {
       // Failed to parse JSON, stick to defaults
     }
@@ -551,8 +562,13 @@ class YouTubeService extends BaseSocialService
     // Use the actual API message if available and meaningful
     if ($apiMessage) {
       // Check for specific error message about exceeded upload limit
-      if (str_contains($apiMessage, 'exceeded the number of videos') || str_contains($apiMessage, 'upload limit')) {
+      if ($isQuotaError) {
         $errorMessage = 'You have reached your daily YouTube upload limit. Please try again in 24 hours.';
+        
+        // Create a custom exception that signals this should not be retried
+        $exception = new \Exception($errorMessage);
+        $exception->isQuotaError = true; // Custom property to identify quota errors
+        throw $exception;
       } else {
         // Use the YouTube message directly as it's usually descriptive enough
         $errorMessage = $apiMessage;
@@ -644,9 +660,9 @@ class YouTubeService extends BaseSocialService
       ]);
 
       $result = json_decode($response->getBody(), true);
-      Log::info('Token test successful', ['channel' => $result]);
+      LogHelper::social('youtube.token_test_successful', ['channel' => $result]);
     } catch (\Exception $e) {
-      Log::error('Token test failed', [
+      LogHelper::socialError('youtube.token_test_failed', $e->getMessage(), [
         'error' => $e->getMessage(),
         'no response'
       ]);
@@ -702,7 +718,7 @@ class YouTubeService extends BaseSocialService
 
       return null;
     } catch (\Exception $e) {
-      Log::warning('Failed to search playlists', ['error' => $e->getMessage()]);
+      LogHelper::socialError('youtube.playlist_search_failed', $e->getMessage(), ['error' => $e->getMessage()]);
       return null;
     }
   }
@@ -734,11 +750,11 @@ class YouTubeService extends BaseSocialService
 
       $data = json_decode($response->getBody(), true);
 
-      Log::info('Created YouTube Playlist', ['title' => $title, 'id' => $data['id'] ?? null]);
+      LogHelper::social('youtube.playlist_created', ['title' => $title, 'id' => $data['id'] ?? null]);
 
       return $data['id'] ?? null;
     } catch (\Exception $e) {
-      Log::error('Failed to create playlist', ['error' => $e->getMessage()]);
+      LogHelper::socialError('youtube.playlist_creation_failed', $e->getMessage(), ['error' => $e->getMessage()]);
       return null;
     }
   }
@@ -771,7 +787,7 @@ class YouTubeService extends BaseSocialService
       $statusCode = $response->getStatusCode();
 
       if ($statusCode === 200 || $statusCode === 201) {
-        Log::info('Added video to playlist', ['playlist_id' => $playlistId, 'video_id' => $videoId]);
+        LogHelper::social('youtube.video_added_to_playlist', ['playlist_id' => $playlistId, 'video_id' => $videoId]);
         return true;
       }
 
@@ -782,14 +798,14 @@ class YouTubeService extends BaseSocialService
         $body = json_decode($e->getResponse()->getBody()->getContents(), true);
         $message = $body['error']['message'] ?? $message;
       }
-      Log::error('Failed to add video to playlist (ClientException)', [
+      LogHelper::socialError('youtube.playlist_add_failed_client', $message, [
         'playlist_id' => $playlistId,
         'video_id' => $videoId,
         'error' => $message
       ]);
       throw new \Exception("YouTube Playlist Error: " . $message);
     } catch (\Exception $e) {
-      Log::error('Failed to add video to playlist', [
+      LogHelper::socialError('youtube.playlist_add_failed', $e->getMessage(), [
         'playlist_id' => $playlistId,
         'video_id' => $videoId,
         'error' => $e->getMessage()
@@ -806,7 +822,7 @@ class YouTubeService extends BaseSocialService
     try {
       $this->ensureValidToken();
 
-      Log::info('Attempting to delete YouTube video', ['video_id' => $postId]);
+      LogHelper::social('youtube.video_deletion_attempt', ['video_id' => $postId]);
 
       $response = $this->client->delete("https://www.googleapis.com/youtube/v3/videos", [
         'headers' => [
@@ -819,7 +835,7 @@ class YouTubeService extends BaseSocialService
       ]);
 
       $statusCode = $response->getStatusCode();
-      Log::info('YouTube video deletion response', ['video_id' => $postId, 'status' => $statusCode]);
+      LogHelper::social('youtube.video_deletion_response', ['video_id' => $postId, 'status' => $statusCode]);
 
       return $statusCode === 204 || $statusCode === 200;
     } catch (ClientException $e) {

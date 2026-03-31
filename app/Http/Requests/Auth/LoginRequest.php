@@ -80,6 +80,7 @@ class LoginRequest extends FormRequest
 
     /**
      * Update user security tracking information.
+     * Also updates country_code, country and timezone based on current IP.
      */
     protected function updateSessionSecurity(User $user): void
     {
@@ -93,11 +94,27 @@ class LoginRequest extends FormRequest
             $knownDevices[] = $fingerprint;
         }
 
-        $user->forceFill([
+        $updates = [
             'last_login_at' => now(),
             'last_login_ip' => $currentIp,
             'known_devices' => $knownDevices,
-        ])->save();
+        ];
+
+        // Update geo data if IP changed or fields are empty
+        $ipChanged = $user->last_login_ip !== $currentIp;
+        $missingGeo = empty($user->country_code) || empty($user->timezone);
+
+        if ($ipChanged || $missingGeo) {
+            $geo = app(\App\Services\GeoIpService::class)->lookup($currentIp);
+
+            if ($geo) {
+                $updates['country_code'] = $geo['country_code'];
+                $updates['country']      = $geo['country'];
+                $updates['timezone']     = $geo['timezone'] ?? $user->timezone;
+            }
+        }
+
+        $user->forceFill($updates)->save();
     }
 
     /**

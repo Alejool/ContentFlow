@@ -1,16 +1,10 @@
-import axios from "axios";
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import axios from 'axios';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 export interface NotificationData {
   id: string;
   type: string;
-  category: "application" | "system";
+  category: 'application' | 'system';
   data: {
     message?: string;
     description?: string;
@@ -40,9 +34,7 @@ interface NotificationContextType {
   getPlatformNotifications: (platform: string) => NotificationData[];
 }
 
-const NotificationContext = createContext<NotificationContextType | undefined>(
-  undefined,
-);
+const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 export const NotificationProvider = ({
   children,
@@ -57,48 +49,39 @@ export const NotificationProvider = ({
 
   const fetchNotifications = useCallback(async () => {
     try {
-      const response = await axios.get("/api/v1/notifications");
+      const response = await axios.get('/api/v1/notifications');
       const sortedNotifications = response.data.notifications.sort(
         (a: NotificationData, b: NotificationData) => {
           // Sort by read status (unread first)
           if (a.read_at === null && b.read_at !== null) return -1;
           if (a.read_at !== null && b.read_at === null) return 1;
 
-          return (
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-          );
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
         },
       );
 
       setNotifications(sortedNotifications);
       setUnreadCount(response.data.unread_count);
       setLoading(false);
-    } catch (error) {
-      }
+    } catch (error) {}
   }, []);
 
   const markAsRead = async (id: string) => {
     try {
       await axios.post(`/api/v1/notifications/${id}/read`);
       setNotifications((prev) =>
-        prev.map((n) =>
-          n.id === id ? { ...n, read_at: new Date().toISOString() } : n,
-        ),
+        prev.map((n) => (n.id === id ? { ...n, read_at: new Date().toISOString() } : n)),
       );
       setUnreadCount((prev) => Math.max(0, prev - 1));
-    } catch (error) {
-      }
+    } catch (error) {}
   };
 
   const markAllAsRead = async () => {
     try {
-      await axios.post("/api/v1/notifications/read-all");
-      setNotifications((prev) =>
-        prev.map((n) => ({ ...n, read_at: new Date().toISOString() })),
-      );
+      await axios.post('/api/v1/notifications/read-all');
+      setNotifications((prev) => prev.map((n) => ({ ...n, read_at: new Date().toISOString() })));
       setUnreadCount(0);
-    } catch (error) {
-      }
+    } catch (error) {}
   };
 
   const deleteNotification = async (id: string) => {
@@ -109,23 +92,19 @@ export const NotificationProvider = ({
       if (notification && !notification.read_at) {
         setUnreadCount((prev) => Math.max(0, prev - 1));
       }
-    } catch (error) {
-      }
+    } catch (error) {}
   };
 
   const deleteAllRead = async () => {
     try {
-      await axios.delete("/api/v1/notifications/read");
+      await axios.delete('/api/v1/notifications/read');
       setNotifications((prev) => prev.filter((n) => !n.read_at));
-    } catch (error) {
-      }
+    } catch (error) {}
   };
 
   const filterByPlatform = (platform: string | null): NotificationData[] => {
     if (!platform) return notifications;
-    return notifications.filter(
-      (n) => n.data.platform?.toLowerCase() === platform.toLowerCase(),
-    );
+    return notifications.filter((n) => n.data.platform?.toLowerCase() === platform.toLowerCase());
   };
 
   const filterByPriority = (priority: string | null): NotificationData[] => {
@@ -147,26 +126,24 @@ export const NotificationProvider = ({
     if (user?.id && (window as any).Echo) {
       const channel = (window as any).Echo.private(`users.${user.id}`);
 
-      channel.listen(".NotificationCreated", (e: any) => {
+      channel.listen('.NotificationCreated', (e: any) => {
         fetchNotifications();
       });
 
       return () => {
         if ((window as any).Echo) {
-          channel.stopListening(".NotificationCreated");
+          channel.stopListening('.NotificationCreated');
         }
       };
     }
   }, [user, fetchNotifications]);
 
   const applicationNotifications = notifications.filter(
-    (n) => n.category === "application" || n.data.category === "application",
+    (n) => n.category === 'application' || n.data.category === 'application',
   );
 
   const systemNotifications = notifications.filter(
-    (n) =>
-      (n.category === "system" || !n.category) &&
-      n.data.category !== "application",
+    (n) => (n.category === 'system' || !n.category) && n.data.category !== 'application',
   );
 
   return (
@@ -196,9 +173,7 @@ export const NotificationProvider = ({
 export const useNotificationContext = () => {
   const context = useContext(NotificationContext);
   if (!context) {
-    throw new Error(
-      "useNotificationContext must be used within a NotificationProvider",
-    );
+    throw new Error('useNotificationContext must be used within a NotificationProvider');
   }
   return context;
 };

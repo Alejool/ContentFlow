@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -22,8 +23,11 @@ use App\Models\Social\ScheduledPost;
 use App\Models\Campaigns\Campaign;
 use App\Models\Publications\PublicationComment;
 use App\Models\Calendar\ExternalCalendarEvent;
+use App\Models\ApprovalLevel;
 
 use App\Traits\HandlesUtcDates;
+use App\Events\Publications\PublicationCreated;
+use App\Events\Publications\PublicationDeleted;
 
 class Publication extends Model
 {
@@ -37,6 +41,11 @@ class Publication extends Model
     'approved_at',
     'published_at',
     'rejected_at',
+  ];
+
+  protected $dispatchesEvents = [
+    'created' => PublicationCreated::class,
+    'deleted' => PublicationDeleted::class,
   ];
 
   protected static function boot()
@@ -69,6 +78,8 @@ class Publication extends Model
     'slug',
     'image',
     'status',
+    'publication_status_summary',
+    'content_type',
     'start_date',
     'end_date',
     'publish_date',
@@ -89,6 +100,16 @@ class Publication extends Model
     'rejected_at',
     'rejection_reason',
     'portal_token',
+    'is_recurring',
+    'recurrence_type',
+    'recurrence_interval',
+    'recurrence_days',
+    'recurrence_end_date',
+    'recurrence_accounts',
+    'poll_options',
+    'poll_duration_hours',
+    'carousel_items',
+    'content_metadata',
   ];
 
   protected $appends = ['platform_status_summary', 'media_locked_by', 'approval_lock'];
@@ -101,6 +122,7 @@ class Publication extends Model
     'scheduled_at' => 'datetime',
     'hashtags' => 'array',
     'platform_settings' => 'array',
+    'publication_status_summary' => 'array',
     'workspace_id' => 'integer',
     'approved_by' => 'integer',
     'approved_at' => 'datetime',
@@ -109,6 +131,16 @@ class Publication extends Model
     'published_at' => 'datetime',
     'rejected_by' => 'integer',
     'rejected_at' => 'datetime',
+    'is_recurring' => 'boolean',
+    'recurrence_interval' => 'integer',
+    'recurrence_days' => 'array',
+    'recurrence_end_date' => 'date',
+    'recurrence_accounts' => 'array',
+    'poll_options' => 'array',
+    'poll_duration_hours' => 'integer',
+    'carousel_items' => 'array',
+    'content_metadata' => 'array',
+    'submitted_for_approval_at' => 'datetime',
   ];
 
   public function scopeDraft($query)
@@ -146,6 +178,53 @@ class Publication extends Model
     return $query->where('status', 'scheduled');
   }
 
+  // Status constants for new approval workflow
+  public const STATUS_DRAFT = 'draft';
+  public const STATUS_PENDING_REVIEW = 'pending_review';
+  public const STATUS_APPROVED = 'approved';
+  public const STATUS_REJECTED = 'rejected';
+  public const STATUS_PUBLISHED = 'published';
+
+  /**
+   * Check if the publication is in draft status.
+   */
+  public function isDraft(): bool
+  {
+    return $this->status === self::STATUS_DRAFT;
+  }
+
+  /**
+   * Check if the publication is pending review.
+   */
+  public function isPendingReview(): bool
+  {
+    return $this->status === self::STATUS_PENDING_REVIEW;
+  }
+
+  /**
+   * Check if the publication is rejected.
+   */
+  public function isRejected(): bool
+  {
+    return $this->status === 'rejected';
+  }
+
+  /**
+   * Check if the publication is published.
+   */
+  public function isPublished(): bool
+  {
+    return $this->status === self::STATUS_PUBLISHED || $this->status === 'published';
+  }
+
+  /**
+   * Get the current approval level for this publication.
+   */
+  public function getCurrentApprovalLevel(): int
+  {
+    return $this->current_approval_level ?? 0;
+  }
+
   public function isApproved(): bool
   {
     if ($this->status === 'approved' || $this->status === 'published' || $this->status === 'scheduled') {
@@ -171,32 +250,69 @@ class Publication extends Model
 
   /**
    * Check if the publication can be published.
+   * 
+   * IMPORTANT: This method only checks the publication status, NOT permissions or workflow.
+   * The actual permission and workflow checks are done in:
+   * - PublicationPolicy::publish() for authorization
+   * - ApprovalWorkflowService::canPublish() for workflow validation
+   * 
    * Can publish if:
    * - Status is 'approved' (first time publishing)
    * - Status is 'failed' (retry after failure)
    * - Status is 'published' (republish to additional platforms)
    * - Has been approved before (approved_at exists) - allows republishing
-   * - Status is 'draft' or 'rejected' (if user has publish permission)
-   * 
+   *
    * Cannot publish if:
    * - Status is 'pending_review' (must be approved or rejected first)
    * - Status is 'publishing' or 'retrying' (already in progress)
+   * - Status is 'draft' or 'rejected' (needs approval if workflow is enabled)
+   * 
+   * @param bool $hasPublishPermission Deprecated - workflow checks are now in Policy
+   * @return bool
    */
-  public function canBePublished(bool $hasPublishPermission = false): bool
+  /**
+   * Check if publication can be published based on its status.
+   * 
+   * IMPORTANT: This method only checks the publication status, NOT permissions or workflow.
+   * The actual permission and workflow checks are done in:
+   * - PublicationPolicy::publish() for authorization
+   * - ApprovalWorkflowService::canPublish() for workflow validation
+   * 
+   * Can publish if:
+   * - User is Owner (can bypass all workflow requirements)
+   * - Status is 'approved' (first time publishing)
+   * - Status is 'failed' (retry after failure)
+   * - Status is 'published' (republish to additional platforms)
+   * - Has been approved before (approved_at exists) - allows republishing
+   *
+   * Cannot publish if:
+   * - Status is 'pending_review' (must be approved or rejected first)
+   * 
+   * @param bool $isOwner Whether the user is the workspace owner (can bypass workflow)
+   * @return bool
+   */
+  public function canBePublished(bool $isOwner = false): bool
   {
-    // Never allow publishing if pending review, publishing, or retrying
-    if (in_array($this->status, ['pending_review', 'publishing', 'retrying'])) {
+    // Never allow publishing if pending review (must be approved/rejected first)
+    if ($this->status === 'pending_review') {
       return false;
     }
-    
-    // If user has publish permission, allow any status except blocked ones
-    if ($hasPublishPermission) {
+
+    // Allow publishing to different platforms even if currently publishing/retrying
+    // The controller will check for platform-specific conflicts
+    if (in_array($this->status, ['publishing', 'retrying'])) {
       return true;
     }
-    
-    // Otherwise, only allow if approved, failed, published, or was previously approved
-    return in_array($this->status, ['approved', 'failed', 'published']) || 
-           !is_null($this->approved_at);
+
+    // Owner can publish from any status (draft, rejected, approved, failed, published)
+    if ($isOwner) {
+      return true;
+    }
+
+    // For non-owners: Only allow if approved, failed, published, or was previously approved
+    // The Policy will handle workflow and permission checks
+    return in_array($this->status, ['approved', 'failed', 'published']) ||
+      !is_null($this->approved_at);
   }
 
   /**
@@ -210,7 +326,7 @@ class Publication extends Model
       $this->approved_by = null;
       $this->approved_at = null;
       $this->approved_retries_remaining = 2;
-      
+
       $this->logActivity('approval_revoked', [
         'reason' => 'Content was modified after approval'
       ]);
@@ -218,13 +334,13 @@ class Publication extends Model
   }
 
   /**
-   * Get the latest approval log for this publication.
+   * Get the latest approval log for this publication (via approval_requests).
    */
   public function getLatestApprovalLog()
   {
-    return $this->approvalLogs()
-      ->latest('requested_at')
-      ->first();
+    $request = $this->approvalRequest;
+    if (!$request) return null;
+    return $request->logs()->latest()->first();
   }
 
   /**
@@ -232,10 +348,8 @@ class Publication extends Model
    */
   public function hasPendingApproval(): bool
   {
-    return $this->status === 'pending_review' && 
-           $this->approvalLogs()
-             ->whereNull('reviewed_at')
-             ->exists();
+    return $this->status === 'pending_review' &&
+      $this->approvalRequests()->where('status', 'pending')->exists();
   }
 
   public function approver(): BelongsTo
@@ -359,9 +473,48 @@ class Publication extends Model
       ->withTimestamps();
   }
 
-  public function approvalLogs(): HasMany
+  public function approvalLogs(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
   {
-    return $this->hasMany(ApprovalLog::class)->orderBy('requested_at', 'desc');
+    return $this->hasManyThrough(
+      \App\Models\Logs\ApprovalLog::class,
+      \App\Models\Approval\ApprovalRequest::class,
+      'publication_id',       // FK on approval_requests
+      'approval_request_id',  // FK on approval_logs
+      'id',                   // local key on publications
+      'id'                    // local key on approval_requests
+    )->orderBy('approval_logs.created_at', 'desc');
+  }
+
+  /**
+   * Get the approval actions for this publication (new approval workflow).
+   */
+  public function approvalActions(): HasMany
+  {
+    return $this->hasMany(\App\Models\ApprovalAction::class, 'content_id');
+  }
+
+  /**
+   * Get the approval request for this publication (professional workflow).
+   * Returns the most recent approval request.
+   */
+  public function approvalRequest(): HasOne
+  {
+    return $this->hasOne(\App\Models\Approval\ApprovalRequest::class)
+      ->latestOfMany('created_at');
+  }
+
+  /**
+   * Get all approval requests for this publication.
+   */
+  public function approvalRequests(): HasMany
+  {
+    return $this->hasMany(\App\Models\Approval\ApprovalRequest::class)
+      ->orderBy('created_at', 'desc');
+  }
+
+  public function currentApprovalStep(): BelongsTo
+  {
+    return $this->belongsTo(ApprovalLevel::class, 'current_approval_step_id');
   }
 
   // Accessors
@@ -387,7 +540,7 @@ class Publication extends Model
     foreach ($logs as $log) {
       $socialAccount = $log->socialAccount;
       $isCurrentAccount = $socialAccount && !$socialAccount->trashed();
-      
+
       $summary[$log->social_account_id] = [
         'platform' => $log->platform,
         'status' => $log->status,
@@ -528,5 +681,102 @@ class Publication extends Model
   public function externalCalendarEvents(): HasMany
   {
     return $this->hasMany(ExternalCalendarEvent::class);
+  }
+
+  /**
+   * Get the recurrence settings for this publication.
+   */
+  public function recurrenceSettings(): \Illuminate\Database\Eloquent\Relations\HasOne
+  {
+    return $this->hasOne(PublicationRecurrenceSetting::class);
+  }
+
+  /**
+   * Check if this is a post type publication
+   */
+  public function isPost(): bool
+  {
+    return $this->content_type === 'post';
+  }
+
+  /**
+   * Check if this is a reel/short video
+   */
+  public function isReel(): bool
+  {
+    return $this->content_type === 'reel';
+  }
+
+  /**
+   * Check if this is a story
+   */
+  public function isStory(): bool
+  {
+    return $this->content_type === 'story';
+  }
+
+  /**
+   * Check if this is a poll
+   */
+  public function isPoll(): bool
+  {
+    return $this->content_type === 'poll';
+  }
+
+  /**
+   * Check if this is a carousel
+   */
+  public function isCarousel(): bool
+  {
+    return $this->content_type === 'carousel';
+  }
+
+  /**
+   * Get supported content types for a platform
+   * Uses ContentTypes constants to ensure consistency with frontend
+   */
+  public static function getSupportedContentTypes(string $platform): array
+  {
+    return \App\Constants\ContentTypes::getSupportedContentTypes($platform);
+  }
+
+  /**
+   * Get all available content types with their metadata
+   * Uses ContentTypes constants for platform compatibility
+   */
+  public static function getAllContentTypes(): array
+  {
+    return [
+      'post' => [
+        'label' => 'Post',
+        'description' => 'Standard social media post',
+        'icon' => 'FileText',
+        'platforms' => \App\Constants\ContentTypes::POST_COMPATIBLE_PLATFORMS,
+      ],
+      'reel' => [
+        'label' => 'Reel/Short',
+        'description' => 'Short vertical video',
+        'icon' => 'Video',
+        'platforms' => \App\Constants\ContentTypes::REEL_COMPATIBLE_PLATFORMS,
+      ],
+      'story' => [
+        'label' => 'Story',
+        'description' => 'Temporary 24h content',
+        'icon' => 'Clock',
+        'platforms' => \App\Constants\ContentTypes::STORY_COMPATIBLE_PLATFORMS,
+      ],
+      'poll' => [
+        'label' => 'Poll',
+        'description' => 'Interactive poll/survey',
+        'icon' => 'BarChart3',
+        'platforms' => \App\Constants\ContentTypes::POLL_COMPATIBLE_PLATFORMS,
+      ],
+      'carousel' => [
+        'label' => 'Carousel',
+        'description' => 'Multiple images/slides',
+        'icon' => 'Images',
+        'platforms' => \App\Constants\ContentTypes::CAROUSEL_COMPATIBLE_PLATFORMS,
+      ],
+    ];
   }
 }

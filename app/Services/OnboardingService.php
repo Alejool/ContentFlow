@@ -22,6 +22,61 @@ class OnboardingService implements OnboardingServiceInterface
     }
 
     /**
+     * Complete business info step
+     * 
+     * @param User $user
+     * @param array $data
+     * @return void
+     */
+    public function completeBusinessInfo(User $user, array $data): void
+    {
+        $state = $this->getOnboardingState($user);
+
+        $updateData = [
+            'business_info_completed' => true,
+            'business_name' => $data['businessName'] ?? null,
+            'business_industry' => $data['businessIndustry'] ?? null,
+            'business_goals' => $data['businessGoals'] ?? null,
+            'business_size' => $data['businessSize'] ?? null,
+        ];
+
+        $this->repository->update($user->id, $updateData);
+
+        // Record analytics asynchronously
+        dispatch(function () use ($user, $data) {
+            $this->analyticsService->recordStepCompletion($user, 'business-info', 'onboarding', null);
+        })->afterResponse();
+
+        Log::info("Business info completed for user {$user->id}");
+    }
+
+    /**
+     * Select a plan
+     * 
+     * @param User $user
+     * @param string $planId
+     * @return void
+     */
+    public function selectPlan(User $user, string $planId): void
+    {
+        $state = $this->getOnboardingState($user);
+
+        $updateData = [
+            'plan_selected' => true,
+            'selected_plan' => $planId,
+        ];
+
+        $this->repository->update($user->id, $updateData);
+
+        // Record analytics asynchronously
+        dispatch(function () use ($user, $planId) {
+            $this->analyticsService->recordStepCompletion($user, 'plan-selection', 'onboarding', null);
+        })->afterResponse();
+
+        Log::info("Plan {$planId} selected for user {$user->id}");
+    }
+
+    /**
      * Initialize onboarding for a new user
      * 
      * @param User $user
@@ -38,6 +93,13 @@ class OnboardingService implements OnboardingServiceInterface
 
         // Create new onboarding state with default values
         $data = [
+            'business_info_completed' => false,
+            'business_name' => null,
+            'business_industry' => null,
+            'business_goals' => null,
+            'business_size' => null,
+            'plan_selected' => false,
+            'selected_plan' => null,
             'tour_completed' => false,
             'tour_skipped' => false,
             'tour_current_step' => 0,
@@ -221,6 +283,8 @@ class OnboardingService implements OnboardingServiceInterface
         // Check if this was the last wizard step
         if ($stepNumber >= $this->getTotalWizardSteps()) {
             $updateData['wizard_completed'] = true;
+            $updateData['template_selected'] = true; // Auto-select template when wizard is completed
+            $updateData['template_id'] = 'default'; // Use a default template ID
             $this->checkAndMarkOnboardingComplete($user, $state);
         }
 
@@ -296,12 +360,14 @@ class OnboardingService implements OnboardingServiceInterface
             return false;
         }
 
-        // Onboarding is complete if all three stages are done (completed or skipped)
+        // Onboarding is complete if all stages are done (completed or skipped)
+        $businessInfoDone = $state->business_info_completed ?? false;
+        $planDone = $state->plan_selected ?? false;
         $tourDone = $state->tour_completed || $state->tour_skipped;
         $wizardDone = $state->wizard_completed || $state->wizard_skipped;
         $templateDone = $state->template_selected;
 
-        return $tourDone && $wizardDone && $templateDone;
+        return $businessInfoDone && $planDone && $tourDone && $wizardDone && $templateDone;
     }
 
     /**
@@ -341,6 +407,8 @@ class OnboardingService implements OnboardingServiceInterface
 
         $this->repository->update($user->id, [
             'wizard_skipped' => true,
+            'template_selected' => true, // Auto-select template when wizard is skipped
+            'template_id' => 'default', // Use a default template ID
         ]);
 
         // Record analytics asynchronously

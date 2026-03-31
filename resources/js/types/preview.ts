@@ -3,7 +3,7 @@ export interface PlatformConfiguration {
   platform: string;
   type: string;
   is_compatible: boolean;
-  custom_settings: Record<string, any>;
+  custom_settings: Record<string, unknown>;
   errors?: string[];
   warnings?: string[];
 }
@@ -11,13 +11,13 @@ export interface PlatformConfiguration {
 export interface PreviewData {
   publication_id: number;
   platform_configurations: PlatformConfiguration[];
-  validation_results?: any;
+  validation_results?: unknown;
 }
 
 export interface PublishResponse {
   success: boolean;
   message: string;
-  data?: any;
+  data?: unknown;
 }
 
 export interface ApiError {

@@ -1,6 +1,6 @@
 /**
  * Motion Components Index
- * 
+ *
  * Centralized exports for all animated components
  */
 

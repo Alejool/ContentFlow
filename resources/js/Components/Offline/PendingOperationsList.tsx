@@ -1,27 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { useOffline } from '@/Hooks/useOffline';
 import type { QueuedOperation } from '@/types/optimistic';
-import { 
-  RefreshCw, 
-  Trash2, 
-  Clock, 
+import {
+  RefreshCw,
+  Trash2,
+  Clock,
   AlertCircle,
   CheckCircle,
   Loader2,
   FileText,
   Image as ImageIcon,
   Video,
-  Calendar
+  Calendar,
 } from 'lucide-react';
 
 /**
  * PendingOperationsList Component
- * 
+ *
  * Displays a list of pending operations with:
  * - Operation status (queued, syncing, failed)
  * - Retry and discard actions
  * - Visual feedback for each operation
- * 
+ *
  * Requirements: 6.5
  */
 export const PendingOperationsList: React.FC = () => {
@@ -33,10 +33,10 @@ export const PendingOperationsList: React.FC = () => {
   // Load operations on mount and refresh periodically
   useEffect(() => {
     loadOperations();
-    
+
     // Refresh every 2 seconds to show sync progress
     const interval = setInterval(loadOperations, 2000);
-    
+
     return () => clearInterval(interval);
   }, []);
 
@@ -45,7 +45,7 @@ export const PendingOperationsList: React.FC = () => {
       const ops = await getQueuedOperations();
       setOperations(ops);
     } catch (error) {
-      } finally {
+    } finally {
       setIsLoading(false);
     }
   };
@@ -60,7 +60,7 @@ export const PendingOperationsList: React.FC = () => {
       await syncNow();
       await loadOperations();
     } catch (error) {
-      } finally {
+    } finally {
       setRetryingId(null);
     }
   };
@@ -69,8 +69,7 @@ export const PendingOperationsList: React.FC = () => {
     try {
       await clearFailed();
       await loadOperations();
-    } catch (error) {
-      }
+    } catch (error) {}
   };
 
   const getResourceIcon = (resource: string) => {
@@ -95,28 +94,28 @@ export const PendingOperationsList: React.FC = () => {
     switch (status) {
       case 'queued':
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+          <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
             <Clock className="h-3 w-3" />
             Queued
           </span>
         );
       case 'syncing':
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
+          <span className="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
             <Loader2 className="h-3 w-3 animate-spin" />
             Syncing
           </span>
         );
       case 'failed':
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
+          <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-800 dark:bg-red-900/30 dark:text-red-300">
             <AlertCircle className="h-3 w-3" />
             Failed
           </span>
         );
       case 'completed':
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+          <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-300">
             <CheckCircle className="h-3 w-3" />
             Completed
           </span>
@@ -129,13 +128,13 @@ export const PendingOperationsList: React.FC = () => {
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
-    
+
     if (diffMins < 1) return 'Just now';
     if (diffMins < 60) return `${diffMins}m ago`;
-    
+
     const diffHours = Math.floor(diffMins / 60);
     if (diffHours < 24) return `${diffHours}h ago`;
-    
+
     return date.toLocaleDateString();
   };
 
@@ -149,31 +148,28 @@ export const PendingOperationsList: React.FC = () => {
 
   if (operations.length === 0) {
     return (
-      <div className="text-center py-8">
-        <CheckCircle className="h-12 w-12 mx-auto text-green-500 mb-3" />
-        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-          All caught up!
-        </p>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-          No pending operations
-        </p>
+      <div className="py-8 text-center">
+        <CheckCircle className="mx-auto mb-3 h-12 w-12 text-green-500" />
+        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">All caught up!</p>
+        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">No pending operations</p>
       </div>
     );
   }
 
-  const failedOps = operations.filter(op => op.status === 'failed');
+  const failedOps = operations.filter((op) => op.status === 'failed');
 
   return (
     <div className="space-y-4">
       {/* Header with clear failed button */}
       {failedOps.length > 0 && (
-        <div className="flex items-center justify-between pb-3 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between border-b border-gray-200 pb-3 dark:border-gray-700">
           <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            {failedOps.length} failed operation{failedOps.length !== 1 ? 's' : ''}
+            {failedOps.length} failed operation
+            {failedOps.length !== 1 ? 's' : ''}
           </p>
           <button
             onClick={handleClearFailed}
-            className="text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium transition-colors"
+            className="text-xs font-medium text-red-600 transition-colors hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
           >
             Clear all failed
           </button>
@@ -181,22 +177,22 @@ export const PendingOperationsList: React.FC = () => {
       )}
 
       {/* Operations list */}
-      <div className="space-y-2 max-h-96 overflow-y-auto">
+      <div className="max-h-96 space-y-2 overflow-y-auto">
         {operations.map((operation) => (
           <div
             key={operation.id}
-            className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 transition-colors"
+            className="rounded-lg border border-gray-200 bg-white p-3 transition-colors hover:border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-gray-600"
           >
             <div className="flex items-start gap-3">
               {/* Resource icon */}
-              <div className="flex-shrink-0 mt-1 text-gray-500 dark:text-gray-400">
+              <div className="mt-1 flex-shrink-0 text-gray-500 dark:text-gray-400">
                 {getResourceIcon(operation.resource)}
               </div>
 
               {/* Operation details */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-2 mb-1">
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+              <div className="min-w-0 flex-1">
+                <div className="mb-1 flex items-start justify-between gap-2">
+                  <p className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">
                     {operation.description || `${operation.method} ${operation.resource}`}
                   </p>
                   {getStatusBadge(operation.status)}
@@ -208,14 +204,14 @@ export const PendingOperationsList: React.FC = () => {
 
                 {/* Error message for failed operations */}
                 {operation.status === 'failed' && operation.lastError && (
-                  <p className="text-xs text-red-600 dark:text-red-400 mt-2 line-clamp-2">
+                  <p className="mt-2 line-clamp-2 text-xs text-red-600 dark:text-red-400">
                     {operation.lastError}
                   </p>
                 )}
 
                 {/* Retry count */}
                 {operation.retryCount > 0 && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                     Retry {operation.retryCount}/{operation.maxRetries}
                   </p>
                 )}
@@ -223,16 +219,16 @@ export const PendingOperationsList: React.FC = () => {
 
               {/* Actions */}
               {operation.status === 'failed' && (
-                <div className="flex-shrink-0 flex items-center gap-1">
+                <div className="flex flex-shrink-0 items-center gap-1">
                   <button
                     onClick={() => handleRetry(operation.id)}
                     disabled={!isOnline || retryingId === operation.id}
-                    className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="rounded p-1.5 text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-400 dark:hover:bg-gray-700"
                     title="Retry operation"
                     aria-label="Retry operation"
                   >
-                    <RefreshCw 
-                      className={`h-4 w-4 ${retryingId === operation.id ? 'animate-spin' : ''}`} 
+                    <RefreshCw
+                      className={`h-4 w-4 ${retryingId === operation.id ? 'animate-spin' : ''}`}
                     />
                   </button>
                 </div>
@@ -243,8 +239,8 @@ export const PendingOperationsList: React.FC = () => {
       </div>
 
       {/* Offline notice */}
-      {!isOnline && operations.some(op => op.status === 'queued') && (
-        <div className="mt-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+      {!isOnline && operations.some((op) => op.status === 'queued') && (
+        <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-900/20">
           <p className="text-xs text-blue-800 dark:text-blue-300">
             Operations will sync automatically when you're back online
           </p>

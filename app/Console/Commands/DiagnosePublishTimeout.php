@@ -111,11 +111,11 @@ class DiagnosePublishTimeout extends Command
                     // Recomendaciones específicas por tamaño
                     if ($fileSizeMB > 500) {
                         $this->error("  ⚠️  Archivo MUY pesado (>500MB)");
-                        $this->line("  💡 Recomendación: Comprimir antes de publicar");
+                        $this->line("   Recomendación: Comprimir antes de publicar");
                         $this->line("     ffmpeg -i input.mp4 -c:v libx264 -crf 28 output.mp4");
                     } elseif ($fileSizeMB > 200) {
                         $this->warn("  ⚠️  Archivo pesado (>200MB)");
-                        $this->line("  💡 Facebook usará upload resumible (más lento pero confiable)");
+                        $this->line("   Facebook usará upload resumible (más lento pero confiable)");
                     } elseif ($fileSizeMB > 100) {
                         $this->line("  ℹ️  Facebook usará upload resumible");
                     } else {
@@ -157,11 +157,11 @@ class DiagnosePublishTimeout extends Command
                     // Detectar errores específicos de Facebook
                     if (str_contains($error, '504') || str_contains($error, 'timeout')) {
                         $this->line("      Error: Timeout (504)");
-                        $this->line("      💡 El video es muy pesado para Facebook");
-                        $this->line("      💡 Solución: Comprimir video o esperar reintento automático");
+                        $this->line("       El video es muy pesado para Facebook");
+                        $this->line("       Solución: Comprimir video o esperar reintento automático");
                     } elseif (str_contains($error, '503')) {
                         $this->line("      Error: Servicio no disponible (503)");
-                        $this->line("      💡 Facebook está temporalmente sobrecargado");
+                        $this->line("       Facebook está temporalmente sobrecargado");
                     } else {
                         $this->line("      Error: {$error}");
                     }

@@ -1,67 +1,62 @@
-import IconFacebook from "@/../assets/Icons/facebook.svg";
-import IconTiktok from "@/../assets/Icons/tiktok.svg";
-import IconTwitter from "@/../assets/Icons/x.svg";
-import IconYoutube from "@/../assets/Icons/youtube.svg";
-import { Link } from "@inertiajs/react";
-import axios from "axios";
-import { Settings } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatformsConfig';
+import { router } from '@inertiajs/react';
+import axios from 'axios';
+import { CheckCircle, Settings, XCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
-export default function ConnectedAccounts({ className = "", header = true }) {
+declare function route(name: string, params?: any): string;
+
+interface ConnectedAccount {
+  id: number;
+  platform: string;
+  name: string;
+  logo: string;
+  isConnected: boolean;
+  details?: any;
+  color: string;
+  bgClass: string;
+  textColor: string;
+  darkColor: string;
+  darkTextColor: string;
+}
+
+export default function ConnectedAccounts({ className = '' }) {
   const { t } = useTranslation();
-  const [accounts, setAccounts] = useState([
-    {
-      id: 1,
-      platform: "facebook",
-      name: "Facebook",
-      logo: IconFacebook,
-      isConnected: false,
-    },
-    // {
-    //   id: 2,
-    //   platform: "instagram",
-    //   name: "Instagram",
-    //   logo: IconInstagram,
-    //   isConnected: false,
-    // },
-    {
-      id: 3,
-      platform: "tiktok",
-      name: "TikTok",
-      logo: IconTiktok,
-      isConnected: false,
-    },
-    {
-      id: 4,
-      platform: "twitter",
-      name: "Twitter",
-      logo: IconTwitter,
-      isConnected: false,
-    },
-    {
-      id: 5,
-      platform: "youtube",
-      name: "YouTube",
-      logo: IconYoutube,
-      isConnected: false,
-    },
-  ]);
+  const [accounts, setAccounts] = useState<ConnectedAccount[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Inicializar con las plataformas activas
+    const activePlatforms = Object.values(SOCIAL_PLATFORMS)
+      .filter((platform) => platform.active)
+      .map((platform) => ({
+        id: platform.id,
+        platform: platform.key,
+        name: platform.name,
+        logo: platform.logo,
+        isConnected: false,
+        color: platform.color,
+        bgClass: platform.bgClass,
+        textColor: platform.textColor,
+        darkColor: platform.darkColor,
+        darkTextColor: platform.darkTextColor,
+      }));
+
+    setAccounts(activePlatforms);
     fetchConnectedAccounts();
   }, []);
 
   const fetchConnectedAccounts = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("/social-accounts");
+      const response = await axios.get('/social-accounts');
       if (response.data && response.data.accounts) {
         updateAccountsStatus(response.data.accounts);
       }
     } catch (error) {
-      } finally {
+      console.error('Error fetching connected accounts:', error);
+    } finally {
       setLoading(false);
     }
   };
@@ -74,8 +69,7 @@ export default function ConnectedAccounts({ className = "", header = true }) {
     setAccounts((prevAccounts) =>
       prevAccounts.map((account) => {
         const connectedAccount = connectedAccounts.find(
-          (ca: any) =>
-            ca.platform.toLowerCase() === account.platform.toLowerCase(),
+          (ca: any) => ca.platform.toLowerCase() === account.platform.toLowerCase(),
         );
 
         return {
@@ -87,84 +81,92 @@ export default function ConnectedAccounts({ className = "", header = true }) {
     );
   };
 
+  const handleAccountClick = (account: ConnectedAccount) => {
+    // Redirigir a la configuración de redes sociales
+    router.visit(route('settings.social'));
+  };
+
   return (
     <div className={className}>
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          {t("profile.connectedAccounts.title")}
-        </h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          {t("profile.connectedAccounts.description")}
-        </p>
-      </div>
-
       {loading ? (
-        <div className="flex justify-center py-8">
-          <div className="w-10 h-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+        <div className="flex justify-center py-4">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary-500 border-t-transparent"></div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {accounts.map((account) => (
-            <div
+            <button
               key={account.id}
-              className={`
-                flex items-center p-4 rounded-lg border
-                ${
-                  account.isConnected
-                    ? "bg-primary-50/50 dark:bg-primary-900/10 border-primary-200 dark:border-primary-800/30"
-                    : "bg-gray-50 dark:bg-neutral-800 border-gray-200 dark:border-neutral-700 opacity-60"
-                }
-              `}
+              onClick={() => handleAccountClick(account)}
+              className={`group relative flex flex-col items-center rounded-lg border-2 p-5 transition-all duration-200 ${
+                account.isConnected
+                  ? `${account.bgClass} ${account.darkColor} border-transparent hover:scale-105 hover:shadow-lg`
+                  : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md dark:border-neutral-700 dark:bg-neutral-800 dark:hover:border-neutral-600'
+              } cursor-pointer`}
             >
-              <div className="p-2 bg-white dark:bg-neutral-700 rounded-lg mr-4">
-                <img
-                  src={account.logo}
-                  alt={account.name}
-                  className="w-6 h-6"
-                />
+              {/* Logo */}
+              <div
+                className={`mb-3 flex h-16 w-16 items-center justify-center transition-transform group-hover:scale-105`}
+              >
+                <img src={account.logo} alt={account.name} className="h-8 w-8" />
               </div>
 
-              <div className="flex-1 min-w-0">
-                <h4 className="font-semibold text-gray-900 dark:text-gray-100 text-sm truncate">
-                  {account.name}
-                </h4>
-                <p
-                  className={`text-xs ${
-                    account.isConnected
-                      ? "text-green-600 dark:text-green-400"
-                      : "text-gray-500 dark:text-gray-500"
-                  }`}
-                >
-                  {account.isConnected
-                    ? t("profile.connectedAccounts.connected")
-                    : t("profile.connectedAccounts.notConnected")}
-                </p>
+              {/* Nombre */}
+              <h4 className="mb-2 text-base font-bold text-gray-900 dark:text-white">
+                {account.name}
+              </h4>
+
+              {/* Estado */}
+              <div
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold ${
+                  account.isConnected
+                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                    : 'bg-gray-100 text-gray-600 dark:bg-neutral-700 dark:text-gray-400'
+                } `}
+              >
+                {account.isConnected ? (
+                  <>
+                    <CheckCircle className="h-3.5 w-3.5" />
+                    {t('profile.connectedAccounts.active', 'Activa')}
+                  </>
+                ) : (
+                  <>
+                    <XCircle className="h-3.5 w-3.5" />
+                    {t('profile.connectedAccounts.inactive', 'No conectada')}
+                  </>
+                )}
               </div>
 
+              {/* Icono de configuración */}
+              <div className="absolute right-3 top-3 opacity-0 transition-opacity group-hover:opacity-100">
+                <div className="rounded-lg bg-white p-1.5 shadow-md dark:bg-neutral-700">
+                  <Settings className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                </div>
+              </div>
+
+              {/* Indicador de estado (punto) */}
               {account.isConnected && (
-                <div className="flex items-center gap-2">
-                  <Link
-                    href={route("settings.social")}
-                    className="p-1.5 rounded-lg bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 text-primary-600 dark:text-primary-400 hover:bg-gray-50 dark:hover:bg-neutral-600"
-                    title={t("platformSettings.title")}
-                  >
-                    <Settings className="w-4 h-4" />
-                  </Link>
-                  <div className="w-2 h-2 rounded-full bg-green-500" />
+                <div className="absolute left-3 top-3">
+                  <div className="relative">
+                    <div className="h-3 w-3 rounded-full bg-green-500"></div>
+                    <div className="absolute inset-0 h-3 w-3 animate-ping rounded-full bg-green-500 opacity-75"></div>
+                  </div>
                 </div>
               )}
-            </div>
+            </button>
           ))}
         </div>
       )}
 
-      <div className="mt-6 pt-6 border-t border-gray-200 dark:border-neutral-700 flex justify-center">
-        <a
-          href="/settings/social"
-          className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
+      {/* Link para gestionar */}
+      <div className="mt-6 border-t border-gray-200 pt-6 dark:border-neutral-700">
+        <button
+          onClick={() => router.visit(route('settings.social'))}
+          className="flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-primary-600 transition-colors hover:bg-primary-50 hover:text-primary-700 dark:text-primary-400 dark:hover:bg-primary-900/20 dark:hover:text-primary-300"
         >
-          {t("profile.connectedAccounts.manageLink")} →
-        </a>
+          <Settings className="h-4 w-4" />
+          {t('profile.connectedAccounts.manageLink', 'Gestionar cuentas conectadas')}
+        </button>
       </div>
     </div>
   );

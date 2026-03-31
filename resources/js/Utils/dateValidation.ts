@@ -1,4 +1,4 @@
-import { isValid, isPast, isFuture, parseISO, isDate } from 'date-fns';
+import { isDate, isPast, isValid, parseISO } from 'date-fns';
 
 export interface DateValidationResult {
   isValid: boolean;
@@ -28,7 +28,7 @@ export function validateDate(date: string | Date | null | undefined): DateValida
   if (typeof date === 'string') {
     try {
       dateObj = parseISO(date);
-    } catch (error) {
+    } catch {
       return {
         isValid: false,
         isPastDate: false,
@@ -80,7 +80,7 @@ export function validateDate(date: string | Date | null | undefined): DateValida
  */
 export function validateDateRange(
   startDate: string | Date | null | undefined,
-  endDate: string | Date | null | undefined
+  endDate: string | Date | null | undefined,
 ): DateValidationResult {
   const startValidation = validateDate(startDate);
   if (!startValidation.isValid) {
@@ -99,8 +99,8 @@ export function validateDateRange(
   }
 
   // Parse dates for comparison
-  const start = typeof startDate === 'string' ? parseISO(startDate) : startDate as Date;
-  const end = typeof endDate === 'string' ? parseISO(endDate) : endDate as Date;
+  const start = typeof startDate === 'string' ? parseISO(startDate) : (startDate as Date);
+  const end = typeof endDate === 'string' ? parseISO(endDate) : (endDate as Date);
 
   // Check if end date is after start date
   if (end <= start) {
@@ -150,11 +150,11 @@ export function isValidDateFormat(dateString: string): boolean {
  */
 export function sanitizeDateForServer(date: string | Date | null | undefined): string | null {
   const validation = validateDate(date);
-  
+
   if (!validation.isValid) {
     return null;
   }
 
-  const dateObj = typeof date === 'string' ? parseISO(date) : date as Date;
+  const dateObj = typeof date === 'string' ? parseISO(date) : (date as Date);
   return dateObj.toISOString();
 }

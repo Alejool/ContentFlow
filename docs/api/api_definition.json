@@ -1,0 +1,474 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ContentFlow Enterprise API",
+    "description": "API completa para la integración programática con ContentFlow. Disponible exclusivamente para clientes del plan Enterprise.",
+    "version": "1.0.0",
+    "contact": {
+      "email": "enterprise-support@contentflow.app"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://tu-dominio.com/api/v1",
+      "description": "Servidor de Producción"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Publication": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "title": { "type": "string" },
+          "body": { "type": "string" },
+          "description": { "type": "string" },
+          "hashtags": { "type": "string" },
+          "url": { "type": "string", "format": "uri" },
+          "goal": { "type": "string", "enum": ["brand_awareness","lead_generation","engagement","sales"] },
+          "status": { "type": "string", "enum": ["draft","pending_review","approved","scheduled","publishing","published","failed","rejected","cancelled"] },
+          "scheduled_at": { "type": "string", "format": "date-time" },
+          "published_at": { "type": "string", "format": "date-time" },
+          "platform_settings": { "type": "object" },
+          "approved_by": { "type": "integer" },
+          "approved_at": { "type": "string", "format": "date-time" },
+          "rejected_by": { "type": "integer" },
+          "rejection_reason": { "type": "string" },
+          "workspace_id": { "type": "integer" },
+          "user_id": { "type": "integer" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Workspace": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "slug": { "type": "string" },
+          "description": { "type": "string" },
+          "created_by": { "type": "integer" },
+          "slack_webhook_url": { "type": "string" },
+          "discord_webhook_url": { "type": "string" },
+          "white_label_logo_url": { "type": "string" },
+          "white_label_primary_color": { "type": "string" },
+          "users_count": { "type": "integer" }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "example": false },
+          "message": { "type": "string" },
+          "errors": { "type": "object" }
+        }
+      },
+      "Success": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "example": true },
+          "message": { "type": "string" },
+          "data": { "type": "object" }
+        }
+      }
+    }
+  },
+  "security": [
+    { "bearerAuth": [] }
+  ],
+  "paths": {
+    "/workspaces": {
+      "get": {
+        "tags": ["Workspaces"],
+        "summary": "Listar workspaces del usuario",
+        "responses": {
+          "200": { "description": "Lista de workspaces" }
+        }
+      },
+      "post": {
+        "tags": ["Workspaces"],
+        "summary": "Crear un nuevo workspace",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name"],
+                "properties": {
+                  "name": { "type": "string", "maxLength": 255 },
+                  "description": { "type": "string", "maxLength": 1000 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Workspace creado" },
+          "422": { "description": "Validación fallida" }
+        }
+      }
+    },
+    "/workspaces/{idOrSlug}/switch": {
+      "post": {
+        "tags": ["Workspaces"],
+        "summary": "Cambiar workspace activo",
+        "parameters": [
+          { "name": "idOrSlug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Workspace cambiado exitosamente" }
+        }
+      }
+    },
+    "/workspaces/{idOrSlug}/members": {
+      "get": {
+        "tags": ["Miembros"],
+        "summary": "Listar miembros del workspace",
+        "parameters": [
+          { "name": "idOrSlug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Lista de miembros con roles" }
+        }
+      }
+    },
+    "/workspaces/{idOrSlug}/invite": {
+      "post": {
+        "tags": ["Miembros"],
+        "summary": "Invitar miembro al workspace",
+        "parameters": [
+          { "name": "idOrSlug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "role_id"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "role_id": { "type": "integer" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Miembro invitado" },
+          "422": { "description": "Usuario no encontrado o ya es miembro" }
+        }
+      }
+    },
+    "/publications": {
+      "get": {
+        "tags": ["Publicaciones"],
+        "summary": "Listar publicaciones del workspace activo",
+        "parameters": [
+          { "name": "status", "in": "query", "schema": { "type": "string" }, "description": "Filtrar por estado(s) separados por coma. Ej: draft,approved" },
+          { "name": "search", "in": "query", "schema": { "type": "string" } },
+          { "name": "platform", "in": "query", "schema": { "type": "string" } },
+          { "name": "date_start", "in": "query", "schema": { "type": "string", "format": "date" } },
+          { "name": "date_end", "in": "query", "schema": { "type": "string", "format": "date" } },
+          { "name": "sort", "in": "query", "schema": { "type": "string", "enum": ["newest","oldest","title_asc","title_desc"] } },
+          { "name": "per_page", "in": "query", "schema": { "type": "integer", "default": 10 } },
+          { "name": "simplified", "in": "query", "schema": { "type": "boolean" } }
+        ],
+        "responses": {
+          "200": { "description": "Lista paginada de publicaciones" }
+        }
+      },
+      "post": {
+        "tags": ["Publicaciones"],
+        "summary": "Crear una nueva publicación",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["title", "body"],
+                "properties": {
+                  "title": { "type": "string" },
+                  "body": { "type": "string" },
+                  "description": { "type": "string" },
+                  "hashtags": { "type": "string" },
+                  "url": { "type": "string", "format": "uri" },
+                  "goal": { "type": "string", "enum": ["brand_awareness","lead_generation","engagement","sales"] },
+                  "status": { "type": "string", "enum": ["draft","scheduled"], "default": "draft" },
+                  "scheduled_at": { "type": "string", "format": "date-time" },
+                  "platform_settings": { "type": "object" },
+                  "media": { "type": "array", "items": { "type": "object" } }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Publicación creada" },
+          "402": { "description": "Límite del plan alcanzado" },
+          "403": { "description": "Sin permisos" }
+        }
+      }
+    },
+    "/publications/{id}": {
+      "get": {
+        "tags": ["Publicaciones"],
+        "summary": "Ver detalle de publicación",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Publicación con todos los detalles" },
+          "404": { "description": "No encontrada" }
+        }
+      },
+      "put": {
+        "tags": ["Publicaciones"],
+        "summary": "Actualizar publicación",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Publicación actualizada" },
+          "423": { "description": "Publicación bloqueada" }
+        }
+      },
+      "delete": {
+        "tags": ["Publicaciones"],
+        "summary": "Eliminar publicación",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Publicación eliminada" }
+        }
+      }
+    },
+    "/publications/{id}/request-review": {
+      "post": {
+        "tags": ["Publicaciones", "Aprobaciones"],
+        "summary": "Solicitar revisión de una publicación",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Publicación enviada a revisión y bloqueada" }
+        }
+      }
+    },
+    "/publications/{id}/approve": {
+      "post": {
+        "tags": ["Publicaciones", "Aprobaciones"],
+        "summary": "Aprobar publicación",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "comment": { "type": "string", "maxLength": 500 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Publicación aprobada o avanzada al siguiente paso" },
+          "403": { "description": "Sin permiso de aprobación" }
+        }
+      }
+    },
+    "/publications/{id}/reject": {
+      "post": {
+        "tags": ["Publicaciones", "Aprobaciones"],
+        "summary": "Rechazar publicación",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["reason"],
+                "properties": {
+                  "reason": { "type": "string" },
+                  "comment": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Publicación rechazada" }
+        }
+      }
+    },
+    "/publications/{id}/publish": {
+      "post": {
+        "tags": ["Publicaciones"],
+        "summary": "Publicar en redes sociales",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["platforms"],
+                "properties": {
+                  "platforms": { "type": "array", "items": { "type": "integer" } },
+                  "platform_settings": { "type": "object" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Publicación iniciada en background" },
+          "422": { "description": "Estado inválido para publicar" }
+        }
+      }
+    },
+    "/uploads/sign": {
+      "post": {
+        "tags": ["Uploads"],
+        "summary": "Obtener URL firmada de S3 para subida directa",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["filename", "content_type"],
+                "properties": {
+                  "filename": { "type": "string" },
+                  "content_type": { "type": "string", "enum": ["image/jpeg","image/png","image/gif","video/mp4","application/pdf"] },
+                  "file_size": { "type": "integer", "description": "Tamaño en bytes" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "URL firmada para subir",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "upload_url": { "type": "string" },
+                    "key": { "type": "string" },
+                    "uuid": { "type": "string" },
+                    "method": { "type": "string", "example": "PUT" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/uploads/multipart/init": {
+      "post": {
+        "tags": ["Uploads"],
+        "summary": "Iniciar subida multiparte (archivos grandes)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["filename","content_type"],
+                "properties": {
+                  "filename": { "type": "string" },
+                  "content_type": { "type": "string" },
+                  "file_size": { "type": "integer" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subida multiparte iniciada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "uploadId": { "type": "string" },
+                    "key": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/analytics/dashboard": {
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "Dashboard de métricas generales",
+        "parameters": [
+          { "name": "days", "in": "query", "schema": { "type": "integer", "default": 7 } }
+        ],
+        "responses": {
+          "200": { "description": "Estadísticas del workspace" }
+        }
+      }
+    },
+    "/analytics/social-media": {
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "Métricas por red social",
+        "parameters": [
+          { "name": "platform", "in": "query", "schema": { "type": "string" } },
+          { "name": "days", "in": "query", "schema": { "type": "integer", "default": 30 } }
+        ],
+        "responses": {
+          "200": { "description": "Métricas por plataforma" }
+        }
+      }
+    },
+    "/analytics/export": {
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "Exportar analytics",
+        "parameters": [
+          { "name": "format", "in": "query", "schema": { "type": "string", "enum": ["json","csv"], "default": "json" } },
+          { "name": "days", "in": "query", "schema": { "type": "integer", "default": 30 } }
+        ],
+        "responses": {
+          "200": { "description": "Datos de analytics en formato solicitado" }
+        }
+      }
+    },
+    "/subscription/usage": {
+      "get": {
+        "tags": ["Suscripción"],
+        "summary": "Ver uso actual del plan",
+        "responses": {
+          "200": { "description": "Métricas de uso del workspace" }
+        }
+      }
+    }
+  }
+}

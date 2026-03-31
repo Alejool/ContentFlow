@@ -1,9 +1,10 @@
-import { getErrorMessage } from "@/Utils/validation";
-import { useForm } from "@inertiajs/react";
-import axios from "axios";
-import { useState } from "react";
-import { toast } from "react-hot-toast";
-import { useTranslation } from "react-i18next";
+import { useTimezoneStore } from '@/stores/timezoneStore';
+import { getErrorMessage } from '@/Utils/validation';
+import { useForm } from '@inertiajs/react';
+import axios from 'axios';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface LoginFormData {
   email: string;
@@ -14,35 +15,35 @@ interface LoginFormData {
 
 export const useAuth = () => {
   const { t } = useTranslation();
-  const [generalError, setGeneralError] = useState<string>("");
+  const { loadTimezones } = useTimezoneStore();
+  const [generalError, setGeneralError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-  const [successMessage, setSuccessMessage] = useState<string>("");
+  const [successMessage, setSuccessMessage] = useState<string>('');
 
-  const { data, setData, processing, errors, setError } =
-    useForm<LoginFormData>({
-      email: "",
-      password: "",
-      remember: false,
-    });
+  const { data, setData, processing, errors, setError } = useForm<LoginFormData>({
+    email: '',
+    password: '',
+    remember: false,
+  });
 
   const submitLogin = async (payload: LoginFormData) => {
     setLoading(true);
-    setGeneralError("");
-    setSuccessMessage("");
+    setGeneralError('');
+    setSuccessMessage('');
 
     try {
       // Get CSRF cookie first
-      await axios.get("/sanctum/csrf-cookie");
+      await axios.get('/sanctum/csrf-cookie');
 
       // Check if user exists and has a provider
-      const checkResponse = await axios.post("/check-user", {
+      const checkResponse = await axios.post('/check-user', {
         email: payload.email,
       });
 
       const userData = checkResponse.data;
 
       if (userData.provider) {
-        const msg = t("auth.login.errors.social_account", {
+        const msg = t('auth.login.errors.social_account', {
           provider: userData.provider,
           defaultValue: `Esta cuenta usa ${userData.provider}. Por favor inicia sesión con ese servicio.`,
         });
@@ -54,17 +55,24 @@ export const useAuth = () => {
 
       // Standard Laravel Login
 
-      const loginResponse = await axios.post("/login", {
+      const loginResponse = await axios.post('/login', {
         email: payload.email,
         password: payload.password,
         remember: payload.remember,
       });
 
       if (loginResponse.data.success) {
-        setSuccessMessage(t("auth.login.success"));
-        window.location.href = loginResponse.data.redirect || "/dashboard";
+        setSuccessMessage(t('auth.login.success'));
+
+        // ✅ CARGAR TIMEZONES DESPUÉS DEL LOGIN
+        await loadTimezones();
+
+        window.location.href = loginResponse.data.redirect || '/dashboard';
       } else {
-        window.location.href = "/dashboard";
+        // ✅ CARGAR TIMEZONES TAMBIÉN EN ESTE CASO
+        await loadTimezones();
+
+        window.location.href = '/dashboard';
       }
     } catch (err: any) {
       if (err.response?.status === 422 && err.response?.data?.errors) {
@@ -76,7 +84,7 @@ export const useAuth = () => {
 
         const errorMessage = Object.keys(errorData)
           .map((key) => getErrorMessage(errorData[key], t, key))
-          .join(" ");
+          .join(' ');
 
         setGeneralError(errorMessage);
         toast.error(errorMessage);
@@ -88,8 +96,7 @@ export const useAuth = () => {
         toast.error(msg);
       } else {
         const msg =
-          t("validation.auth.failed") ||
-          "Credenciales incorrectas o error en el servidor.";
+          t('validation.auth.failed') || 'Credenciales incorrectas o error en el servidor.';
         setGeneralError(msg);
         toast.error(msg);
       }
@@ -105,20 +112,20 @@ export const useAuth = () => {
 
   const handleGoogleLogin = () => {
     setLoading(true);
-    setGeneralError("");
+    setGeneralError('');
     try {
-      const url = route("auth.google.redirect");
+      const url = route('auth.google.redirect');
 
       window.location.href = url;
     } catch (err) {
       // Fallback
-      window.location.href = "/auth/google/redirect";
+      window.location.href = '/auth/google/redirect';
     }
   };
 
   const handleFacebookLogin = () => {
-    setGeneralError("Facebook login is currently disabled during migration.");
-    toast.error("Facebook login is currently disabled during migration.");
+    setGeneralError('Facebook login is currently disabled during migration.');
+    toast.error('Facebook login is currently disabled during migration.');
   };
 
   return {

@@ -1,0 +1,78 @@
+{
+  "roles": {
+    "edit_role": "Edit Role",
+    "edit_role_subtitle": "Select permissions for this role",
+    "select_permissions": "Select the permissions this role will have",
+    "permissions": "Permissions",
+    "protected": "Protected",
+    "editor_publish_info": "When publishing, content will be sent for review if you're not an Admin. In workspaces with multi-level workflow, it must pass through all configured approval stages.",
+    "admin_publish_info": "Can publish directly without review and approve content from other users.",
+    "owner_info": "Full workspace control. This role cannot be edited or deleted.",
+    "delete_role": "Delete Role",
+    "delete_confirmation_title": "Are you sure?",
+    "delete_confirmation_message": "This action cannot be undone. The role",
+    "will_be_deleted": "will be permanently deleted",
+    "success": {
+      "updated": "Role updated successfully",
+      "assigned": "Role assigned successfully",
+      "deleted": "Role deleted successfully"
+    },
+    "errors": {
+      "update_failed": "Failed to update role",
+      "assignment_failed": "Failed to assign role",
+      "insufficient_permissions": "You don't have sufficient permissions",
+      "cannot_edit_protected": "Cannot edit this protected role (Owner, Admin or Editor)",
+      "cannot_delete_protected": "Cannot delete this protected role (Owner, Admin or Editor)",
+      "delete_failed": "Failed to delete role",
+      "role_has_users": "Cannot delete a role that has assigned users"
+    },
+    "management": {
+      "title": "Role Management",
+      "subtitle": "Manage roles and assign permissions to users"
+    },
+    "table": {
+      "user": "User",
+      "current_role": "Current Role",
+      "permissions": "Permissions",
+      "actions": "Actions"
+    },
+    "users_list": "User List",
+    "users_list_subtitle": "Assign roles to team members",
+    "insufficient_permissions_title": "Insufficient Permissions",
+    "insufficient_permissions_message": "Only administrators and owners can manage roles",
+    "permissions_list": {
+      "publish": {
+        "name": "Publish",
+        "description": "Allow publishing content to social media"
+      },
+      "approve": {
+        "name": "Approve",
+        "description": "Allow approving content for publication"
+      },
+      "view-analytics": {
+        "name": "View Analytics",
+        "description": "Allow viewing workspace analytics"
+      },
+      "manage-accounts": {
+        "name": "Manage Accounts",
+        "description": "Allow adding/removing social accounts"
+      },
+      "manage-team": {
+        "name": "Manage Team",
+        "description": "Allow inviting/removing members"
+      },
+      "manage-content": {
+        "name": "Manage Content",
+        "description": "Allow creating and editing publications"
+      },
+      "manage-campaigns": {
+        "name": "Manage Campaigns",
+        "description": "Allow creating and editing campaigns"
+      },
+      "view-content": {
+        "name": "View Content",
+        "description": "Allow viewing workspace content (read-only)"
+      }
+    }
+  }
+}

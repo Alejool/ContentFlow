@@ -1,4 +1,4 @@
-import { Transition } from "@headlessui/react";
+import { Transition } from '@headlessui/react';
 import {
   ComponentProps,
   Dispatch,
@@ -7,10 +7,9 @@ import {
   createContext,
   useContext,
   useState,
-} from "react";
+} from 'react';
 
-
-import { Link as InertiaLink } from "@inertiajs/react";
+import { Link as InertiaLink } from '@inertiajs/react';
 
 interface DropDownContextType {
   open: boolean;
@@ -18,9 +17,7 @@ interface DropDownContextType {
   toggleOpen: () => void;
 }
 
-const DropDownContext = createContext<DropDownContextType | undefined>(
-  undefined,
-);
+const DropDownContext = createContext<DropDownContextType | undefined>(undefined);
 
 interface DropdownProps {
   children: ReactNode;
@@ -47,13 +44,13 @@ interface TriggerProps {
 const Trigger = ({ children }: TriggerProps) => {
   const context = useContext(DropDownContext);
   if (!context) {
-    throw new Error("Trigger must be used within a DropdownProvider");
+    throw new Error('Trigger must be used within a DropdownProvider');
   }
   const { toggleOpen, open, setOpen } = context;
 
   return (
     <>
-      <div 
+      <div
         onClick={toggleOpen}
         role="button"
         aria-expanded={open}
@@ -69,47 +66,43 @@ const Trigger = ({ children }: TriggerProps) => {
         {children}
       </div>
       {open && (
-        <div
-          className="fixed inset-0 z-20"
-          onClick={() => setOpen(false)}
-          aria-hidden="true"
-        ></div>
+        <div className="fixed inset-0 z-20" onClick={() => setOpen(false)} aria-hidden="true"></div>
       )}
     </>
   );
 };
 
 interface ContentProps {
-  align?: "left" | "right";
-  width?: "48" | string;
+  align?: 'left' | 'right';
+  width?: '48' | string;
   contentClasses?: string;
   className?: string;
   children: ReactNode;
 }
 
 const Content = ({
-  align = "right",
-  width = "86",
-  contentClasses = "py-4 mt-3 bg-gray-50 font-bold block text-center",
-  className = "",
+  align = 'right',
+  width = '86',
+  contentClasses = 'py-4 mt-3 bg-gray-50 font-bold block text-center',
+  className = '',
   children,
 }: ContentProps) => {
   const context = useContext(DropDownContext);
   if (!context) {
-    throw new Error("Content must be used within a DropdownProvider");
+    throw new Error('Content must be used within a DropdownProvider');
   }
   const { open, setOpen } = context;
 
-  let alignmentClasses = "origin-top";
-  if (align === "left") {
-    alignmentClasses = "origin-top-left left-0";
-  } else if (align === "right") {
-    alignmentClasses = "origin-top-right right-0";
+  let alignmentClasses = 'origin-top';
+  if (align === 'left') {
+    alignmentClasses = 'origin-top-left left-0';
+  } else if (align === 'right') {
+    alignmentClasses = 'origin-top-right right-0';
   }
 
-  let widthClasses = "";
-  if (width === "48") {
-    widthClasses = "w-48";
+  let widthClasses = '';
+  if (width === '48') {
+    widthClasses = 'w-48';
   } else if (width) {
     widthClasses = `w-${width}`;
   }
@@ -125,12 +118,11 @@ const Content = ({
       leaveTo="opacity-0 scale-95"
     >
       <div
-        className={`absolute z-50 mt-2 rounded-lg shadow-2xl border border-gray-100 dark:border-neutral-700 ${alignmentClasses} ${widthClasses} ${className}`}
+        className={`absolute z-50 mt-2 rounded-lg border border-gray-100 shadow-2xl dark:border-neutral-700 ${alignmentClasses} ${widthClasses} ${className}`}
         onClick={() => setOpen(false)}
       >
         <div
-          className={`rounded-lg ring-1 ring-black ring-opacity-5 overflow-hidden
-                        ${contentClasses}`}
+          className={`overflow-hidden rounded-lg ring-1 ring-black ring-opacity-5 ${contentClasses}`}
         >
           {children}
         </div>
@@ -144,16 +136,12 @@ interface DropdownLinkProps extends ComponentProps<typeof InertiaLink> {
   children: ReactNode;
 }
 
-const DropdownLink = ({
-  className = "",
-  children,
-  ...props
-}: DropdownLinkProps) => {
+const DropdownLink = ({ className = '', children, ...props }: DropdownLinkProps) => {
   return (
     <InertiaLink
       {...props}
       className={
-        "block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 transition duration-150 ease-in-out hover:bg-gray-100 focus:bg-gray-100 focus:outline-none " +
+        'block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 transition duration-150 ease-in-out hover:bg-gray-100 focus:bg-gray-100 focus:outline-none ' +
         className
       }
     >

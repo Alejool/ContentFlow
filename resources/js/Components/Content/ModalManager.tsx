@@ -1,18 +1,18 @@
-import { usePublishPublication } from "@/Hooks/publication/usePublishPublication";
-import { useManageContentUIStore } from "@/stores/manageContentUIStore";
-import { Campaign } from "@/types/Campaign";
-import { Publication } from "@/types/Publication";
-import { memo } from "react";
-import { createPortal } from "react-dom";
+import { usePublishPublication } from '@/Hooks/publication/usePublishPublication';
+import { useManageContentUIStore } from '@/stores/manageContentUIStore';
+import { Campaign } from '@/types/Campaign';
+import { Publication } from '@/types/Publication';
+import React, { memo } from 'react';
+import { createPortal } from 'react-dom';
 
 // Modals
-import AddCampaignModal from "@/Components/Content/modals/AddCampaignModal";
-import AddPublicationModal from "@/Components/Content/modals/AddPublicationModal";
-import EditCampaignModal from "@/Components/Content/modals/EditCampaignModal";
-import EditPublicationModal from "@/Components/Content/modals/EditPublicationModal";
-import PublishPublicationModal from "@/Components/Content/modals/PublishPublicationModal";
-import ViewCampaignModal from "@/Components/Content/modals/ViewCampaignModal";
-import { usePublicationStore } from "@/stores/publicationStore";
+import AddCampaignModal from '@/Components/Content/modals/AddCampaignModal';
+import AddPublicationModal from '@/Components/Content/modals/AddPublicationModal';
+import EditCampaignModal from '@/Components/Content/modals/EditCampaignModal';
+import EditPublicationModal from '@/Components/Content/modals/EditPublicationModal';
+import PublishPublicationModal from '@/Components/Content/modals/PublishPublicationModal';
+import ViewPublicationModal from '@/Components/Content/modals/ViewPublicationModal';
+import { usePublicationStore } from '@/stores/publicationStore';
 
 interface ModalManagerProps {
   onRefresh: () => void;
@@ -36,33 +36,55 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
     closeViewDetailsModal,
   } = manageContentUI;
 
-  const { fetchPublishedPlatforms } = usePublishPublication();
+  const { fetchPublishedPlatforms, publishing } = usePublishPublication();
 
   // Helper to determine item type safely
   const isCampaignItem =
     selectedItem &&
-    ((selectedItem as any).__type === "campaign" ||
-      ("name" in selectedItem && !("title" in selectedItem)));
+    ((selectedItem as any).__type === 'campaign' ||
+      ('name' in selectedItem && !('title' in selectedItem)));
   const isPublicationItem = selectedItem && !isCampaignItem;
 
   // Logic for targeting correct modal based on selection or active tab
-  const targetIsCampaign =
-    isCampaignItem || (activeTab === "campaigns" && !selectedItem);
-  const targetIsPublication =
-    isPublicationItem || (activeTab === "publications" && !selectedItem);
+  const targetIsCampaign = isCampaignItem || (activeTab === 'campaigns' && !selectedItem);
+  const targetIsPublication = isPublicationItem || (activeTab === 'publications' && !selectedItem);
 
   // CRITICAL: Get FRESH data from stores to ensure reactivity when background processes update them
   const publications = usePublicationStore((s) => s.publications);
+
+  // IMPORTANT: Stabilize publication data while publishing to prevent re-renders
+  // that cause connectedAccounts to become empty momentarily
+  const [stablePublication, setStablePublication] = React.useState<Publication | null>(null);
+
+  React.useEffect(() => {
+    if (isPublishModalOpen && targetIsPublication && selectedItem?.id) {
+      const freshPub = publications.find((p) => p.id === selectedItem.id) as Publication;
+      const pubToUse = freshPub || (selectedItem as Publication);
+
+      // Only update if not currently publishing to prevent data flickering
+      if (!publishing) {
+        setStablePublication(pubToUse);
+      }
+    } else if (!isPublishModalOpen) {
+      // Reset when modal closes
+      setStablePublication(null);
+    }
+  }, [isPublishModalOpen, targetIsPublication, selectedItem?.id, publications, publishing]);
+
   const currentPub =
-    targetIsPublication && selectedItem?.id
+    stablePublication ||
+    (targetIsPublication && selectedItem?.id
       ? (publications.find((p) => p.id === selectedItem.id) as Publication) ||
         (selectedItem as Publication)
-      : null;
+      : null);
+
+  // Debug log to track publication updates
+  if (currentPub && isEditModalOpen) {
+  }
 
   // Determine which Add Modal to show
   // Prefer addType from store, fallback to activeTab logic
-  const showAddCampaign =
-    addType === "campaign" || (addType === null && activeTab === "campaigns");
+  const showAddCampaign = addType === 'campaign' || (addType === null && activeTab === 'campaigns');
   const showAddPublication = !showAddCampaign;
 
   return (
@@ -107,7 +129,7 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
       )}
 
       {isPublishModalOpen &&
-        activeTab === "publications" &&
+        activeTab === 'publications' &&
         createPortal(
           <PublishPublicationModal
             isOpen={isPublishModalOpen}
@@ -126,7 +148,7 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
 
       {isViewDetailsModalOpen &&
         createPortal(
-          <ViewCampaignModal
+          <ViewPublicationModal
             isOpen={isViewDetailsModalOpen}
             onClose={closeViewDetailsModal}
             campaign={selectedItem as any}

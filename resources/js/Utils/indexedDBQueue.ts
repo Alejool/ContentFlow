@@ -2,10 +2,10 @@ import type { QueuedOperation } from '../types/optimistic';
 
 /**
  * IndexedDB Queue Manager
- * 
+ *
  * Manages offline operations queue using IndexedDB for persistence.
  * Provides better storage capacity and performance than localStorage.
- * 
+ *
  * Requirements: 5.1
  */
 
@@ -30,7 +30,7 @@ class IndexedDBQueue {
    */
   private async init(): Promise<void> {
     if (this.db) return;
-    
+
     if (this.initPromise) {
       return this.initPromise;
     }
@@ -44,26 +44,23 @@ class IndexedDBQueue {
 
       request.onsuccess = () => {
         this.db = request.result;
-        if (import.meta.env.DEV) {
-          }
         resolve();
       };
 
       request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result;
-        
+
         // Create object store if it doesn't exist
         if (!db.objectStoreNames.contains(STORE_NAME)) {
-          const objectStore = db.createObjectStore(STORE_NAME, { keyPath: 'id' });
-          
+          const objectStore = db.createObjectStore(STORE_NAME, {
+            keyPath: 'id',
+          });
+
           // Create indexes for efficient querying
           objectStore.createIndex('status', 'status', { unique: false });
           objectStore.createIndex('timestamp', 'timestamp', { unique: false });
           objectStore.createIndex('resource', 'resource', { unique: false });
           objectStore.createIndex('priority', 'priority', { unique: false });
-          
-          if (import.meta.env.DEV) {
-            }
         }
       };
     });
@@ -76,13 +73,13 @@ class IndexedDBQueue {
    */
   private async processBatch(): Promise<void> {
     if (this.pendingBatch.length === 0) return;
-    
+
     const batch = [...this.pendingBatch];
     this.pendingBatch = [];
     this.batchTimeout = null;
-    
+
     await this.init();
-    
+
     return new Promise((resolve, reject) => {
       if (!this.db) {
         reject(new Error('Database not initialized'));
@@ -91,22 +88,20 @@ class IndexedDBQueue {
 
       const transaction = this.db.transaction([STORE_NAME], 'readwrite');
       const store = transaction.objectStore(STORE_NAME);
-      
+
       let completed = 0;
       let errors = 0;
-      
+
       for (const operation of batch) {
         const request = store.add(operation);
-        
+
         request.onsuccess = () => {
           completed++;
           if (completed + errors === batch.length) {
-            if (import.meta.env.DEV) {
-              }
             resolve();
           }
         };
-        
+
         request.onerror = () => {
           errors++;
           if (completed + errors === batch.length) {
@@ -123,7 +118,7 @@ class IndexedDBQueue {
   async add(operation: QueuedOperation): Promise<void> {
     // Add to pending batch
     this.pendingBatch.push(operation);
-    
+
     // Process immediately if batch is full
     if (this.pendingBatch.length >= BATCH_CONFIG.MAX_BATCH_SIZE) {
       if (this.batchTimeout !== null) {
@@ -131,7 +126,7 @@ class IndexedDBQueue {
       }
       return this.processBatch();
     }
-    
+
     // Schedule batch processing
     if (this.batchTimeout === null) {
       this.batchTimeout = window.setTimeout(() => {
@@ -145,7 +140,7 @@ class IndexedDBQueue {
    */
   async addBatch(operations: QueuedOperation[]): Promise<void> {
     await this.init();
-    
+
     return new Promise((resolve, reject) => {
       if (!this.db) {
         reject(new Error('Database not initialized'));
@@ -154,21 +149,19 @@ class IndexedDBQueue {
 
       const transaction = this.db.transaction([STORE_NAME], 'readwrite');
       const store = transaction.objectStore(STORE_NAME);
-      
+
       let completed = 0;
-      
+
       for (const operation of operations) {
         const request = store.add(operation);
-        
+
         request.onsuccess = () => {
           completed++;
           if (completed === operations.length) {
-            if (import.meta.env.DEV) {
-              }
             resolve();
           }
         };
-        
+
         request.onerror = () => {
           reject(request.error);
         };
@@ -181,7 +174,7 @@ class IndexedDBQueue {
    */
   async getAll(): Promise<QueuedOperation[]> {
     await this.init();
-    
+
     return new Promise((resolve, reject) => {
       if (!this.db) {
         reject(new Error('Database not initialized'));
@@ -207,7 +200,7 @@ class IndexedDBQueue {
    */
   async getByStatus(status: QueuedOperation['status']): Promise<QueuedOperation[]> {
     await this.init();
-    
+
     return new Promise((resolve, reject) => {
       if (!this.db) {
         reject(new Error('Database not initialized'));
@@ -234,7 +227,7 @@ class IndexedDBQueue {
    */
   async update(operation: QueuedOperation): Promise<void> {
     await this.init();
-    
+
     return new Promise((resolve, reject) => {
       if (!this.db) {
         reject(new Error('Database not initialized'));
@@ -246,8 +239,6 @@ class IndexedDBQueue {
       const request = store.put(operation);
 
       request.onsuccess = () => {
-        if (import.meta.env.DEV) {
-          }
         resolve();
       };
 
@@ -262,7 +253,7 @@ class IndexedDBQueue {
    */
   async remove(id: string): Promise<void> {
     await this.init();
-    
+
     return new Promise((resolve, reject) => {
       if (!this.db) {
         reject(new Error('Database not initialized'));
@@ -274,8 +265,6 @@ class IndexedDBQueue {
       const request = store.delete(id);
 
       request.onsuccess = () => {
-        if (import.meta.env.DEV) {
-          }
         resolve();
       };
 
@@ -290,7 +279,7 @@ class IndexedDBQueue {
    */
   async clear(): Promise<void> {
     await this.init();
-    
+
     return new Promise((resolve, reject) => {
       if (!this.db) {
         reject(new Error('Database not initialized'));
@@ -302,8 +291,6 @@ class IndexedDBQueue {
       const request = store.clear();
 
       request.onsuccess = () => {
-        if (import.meta.env.DEV) {
-          }
         resolve();
       };
 
@@ -318,7 +305,7 @@ class IndexedDBQueue {
    */
   async count(): Promise<number> {
     await this.init();
-    
+
     return new Promise((resolve, reject) => {
       if (!this.db) {
         reject(new Error('Database not initialized'));
@@ -347,9 +334,6 @@ class IndexedDBQueue {
       this.db.close();
       this.db = null;
       this.initPromise = null;
-      
-      if (import.meta.env.DEV) {
-        }
     }
   }
 }

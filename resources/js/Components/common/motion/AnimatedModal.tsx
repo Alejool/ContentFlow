@@ -1,6 +1,6 @@
 /**
  * Animated Modal Component
- * 
+ *
  * Accessible modal with animations, focus trap, and keyboard navigation
  */
 
@@ -115,13 +115,7 @@ export const AnimatedModal: React.FC<AnimatedModalProps> = ({
             {/* Modal */}
             <m.div
               ref={modalRef}
-              className={`
-                relative w-full ${sizeStyles[size]}
-                bg-theme-bg-elevated
-                rounded-xl shadow-2xl
-                border border-theme-border-default
-                overflow-hidden
-              `}
+              className={`relative w-full ${sizeStyles[size]} overflow-hidden rounded-xl border border-theme-border-default bg-theme-bg-elevated shadow-2xl`}
               variants={modalVariants}
               initial="hidden"
               animate="visible"
@@ -133,20 +127,14 @@ export const AnimatedModal: React.FC<AnimatedModalProps> = ({
               aria-describedby={description ? 'modal-description' : undefined}
             >
               {/* Header */}
-              <div className="px-6 py-4 border-b border-theme-border-default">
+              <div className="border-b border-theme-border-default px-6 py-4">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h2
-                      id="modal-title"
-                      className="text-xl font-semibold text-theme-text-primary"
-                    >
+                    <h2 id="modal-title" className="text-xl font-semibold text-theme-text-primary">
                       {title}
                     </h2>
                     {description && (
-                      <p
-                        id="modal-description"
-                        className="mt-1 text-sm text-theme-text-secondary"
-                      >
+                      <p id="modal-description" className="mt-1 text-sm text-theme-text-secondary">
                         {description}
                       </p>
                     )}
@@ -154,17 +142,11 @@ export const AnimatedModal: React.FC<AnimatedModalProps> = ({
 
                   <button
                     onClick={onClose}
-                    className="
-                      ml-4 p-2 rounded-lg
-                      text-theme-text-tertiary
-                      hover:bg-theme-interactive-hover
-                      focus-ring
-                      transition-colors duration-fast
-                    "
+                    className="ml-4 rounded-lg p-2 text-theme-text-tertiary transition-colors duration-fast focus-ring hover:bg-theme-interactive-hover"
                     aria-label="Cerrar modal"
                   >
                     <svg
-                      className="w-5 h-5"
+                      className="h-5 w-5"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -182,9 +164,7 @@ export const AnimatedModal: React.FC<AnimatedModalProps> = ({
               </div>
 
               {/* Content */}
-              <div className="px-6 py-4 max-h-[calc(100vh-200px)] overflow-y-auto">
-                {children}
-              </div>
+              <div className="max-h-[calc(100vh-200px)] overflow-y-auto px-6 py-4">{children}</div>
             </m.div>
           </div>
         )}

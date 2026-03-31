@@ -52,13 +52,20 @@ class RegisteredUserController extends Controller
             'name.required' => 'El nombre es obligatorio.',
         ]);
 
+        $createdIp = $request->ip();
+        $geo = app(\App\Services\GeoIpService::class)->lookup($createdIp);
+
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'provider' => $request->provider,
-            'provider_id' => $request->provider_id,
-            'password' => Hash::make($request->password),
-            'locale' => $request->locale ?? 'es', // Default to Spanish
+            'name'         => $request->name,
+            'email'        => $request->email,
+            'provider'     => $request->provider,
+            'provider_id'  => $request->provider_id,
+            'password'     => Hash::make($request->password),
+            'locale'       => $request->locale ?? 'es',
+            'created_ip'   => $createdIp,
+            'country_code' => $geo['country_code'] ?? null,
+            'country'      => $geo['country'] ?? null,
+            'timezone'     => $geo['timezone'] ?? 'UTC',
         ]);
 
         event(new Registered($user));

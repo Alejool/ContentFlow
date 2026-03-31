@@ -1,10 +1,10 @@
 /**
  * ARIAAnnouncer Utility
- * 
+ *
  * Manages ARIA live regions for screen reader announcements.
  * Creates polite and assertive live regions that can announce
  * dynamic content updates to assistive technologies.
- * 
+ *
  * Requirements: 7.3
  */
 
@@ -21,7 +21,11 @@ class ARIAAnnouncer {
     assertive: null,
   };
   private isInitialized = false;
-  private announcementQueue: Array<{ message: string; priority: AnnouncementPriority; timeout?: number }> = [];
+  private announcementQueue: Array<{
+    message: string;
+    priority: AnnouncementPriority;
+    timeout?: number;
+  }> = [];
   private isProcessing = false;
 
   /**
@@ -35,7 +39,7 @@ class ARIAAnnouncer {
 
     // Create polite live region
     this.liveRegions.polite = this.createLiveRegion('polite');
-    
+
     // Create assertive live region
     this.liveRegions.assertive = this.createLiveRegion('assertive');
 
@@ -52,28 +56,28 @@ class ARIAAnnouncer {
    */
   private createLiveRegion(priority: AnnouncementPriority): HTMLDivElement {
     const region = document.createElement('div');
-    
+
     // Set ARIA attributes
     region.setAttribute('role', 'status');
     region.setAttribute('aria-live', priority);
     region.setAttribute('aria-atomic', 'true');
-    
+
     // Visually hidden but accessible to screen readers
     region.style.position = 'absolute';
     region.style.left = '-10000px';
     region.style.width = '1px';
     region.style.height = '1px';
     region.style.overflow = 'hidden';
-    
+
     // Add ID for debugging
     region.id = `aria-live-region-${priority}`;
-    
+
     return region;
   }
 
   /**
    * Announce a message to screen readers
-   * 
+   *
    * @param message - The message to announce
    * @param priority - 'polite' (default) or 'assertive'
    * @param timeout - Optional timeout in ms to clear the message (default: 1000ms)
@@ -81,7 +85,7 @@ class ARIAAnnouncer {
   announce(
     message: string,
     priority: AnnouncementPriority = 'polite',
-    timeout: number = 1000
+    timeout: number = 1000,
   ): void {
     if (!this.isInitialized) {
       console.warn('ARIAAnnouncer: Not initialized. Call initialize() first.');
@@ -94,7 +98,7 @@ class ARIAAnnouncer {
 
     // Add to queue
     this.announcementQueue.push({ message, priority, timeout });
-    
+
     // Process queue if not already processing
     if (!this.isProcessing) {
       this.processQueue();
@@ -112,7 +116,7 @@ class ARIAAnnouncer {
 
     this.isProcessing = true;
     const announcement = this.announcementQueue.shift();
-    
+
     if (!announcement) {
       this.isProcessing = false;
       return;
@@ -131,11 +135,11 @@ class ARIAAnnouncer {
 
     // Clear after timeout
     if (timeout && timeout > 0) {
-      await new Promise(resolve => setTimeout(resolve, timeout));
+      await new Promise((resolve) => setTimeout(resolve, timeout));
       region.textContent = '';
-      
+
       // Small delay before next announcement
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     }
 
     // Process next in queue

@@ -1,10 +1,6 @@
 import { useState } from 'react';
 import axios, { type AxiosError } from 'axios';
-import type {
-  PreviewData,
-  PlatformConfiguration,
-  PublishResponse,
-} from '@/types/preview';
+import type { PreviewData, PlatformConfiguration, PublishResponse } from '@/types/preview';
 
 export function usePublishPreview() {
   const [previewData, setPreviewData] = useState<PreviewData | null>(null);
@@ -19,7 +15,7 @@ export function usePublishPreview() {
   const generatePreview = async (
     publicationId: number,
     platformIds: number[],
-    autoOptimize = false
+    autoOptimize = false,
   ): Promise<PreviewData | null> => {
     setIsLoading(true);
     setError(null);
@@ -31,7 +27,7 @@ export function usePublishPreview() {
         {
           platform_ids: platformIds,
           auto_optimize: autoOptimize,
-        }
+        },
       );
 
       setPreviewData(response.data.data);
@@ -50,7 +46,7 @@ export function usePublishPreview() {
    */
   const autoOptimize = async (
     publicationId: number,
-    platformIds: number[]
+    platformIds: number[],
   ): Promise<PreviewData | null> => {
     setIsOptimizing(true);
     setError(null);
@@ -60,7 +56,7 @@ export function usePublishPreview() {
         `/api/v1/publications/${publicationId}/auto-optimize`,
         {
           platform_ids: platformIds,
-        }
+        },
       );
 
       setPreviewData(response.data.data.preview);
@@ -81,7 +77,7 @@ export function usePublishPreview() {
     publicationId: number,
     accountId: number,
     type: string,
-    customSettings: Record<string, any> = {}
+    customSettings: Record<string, any> = {},
   ): Promise<PlatformConfiguration> => {
     try {
       const response = await axios.put<{ data: PlatformConfiguration }>(
@@ -89,23 +85,21 @@ export function usePublishPreview() {
         {
           type: type,
           custom_settings: customSettings,
-        }
+        },
       );
 
       // Actualizar la configuración en previewData
       setPreviewData((prev) => {
         if (!prev) return prev;
-        
-        const index = prev.platform_configurations.findIndex(
-          (c) => c.account_id === accountId
-        );
-        
+
+        const index = prev.platform_configurations.findIndex((c) => c.account_id === accountId);
+
         if (index !== -1) {
           const updated = { ...prev };
           updated.platform_configurations[index] = response.data.data;
           return updated;
         }
-        
+
         return prev;
       });
 
@@ -123,7 +117,7 @@ export function usePublishPreview() {
   const publish = async (
     publicationId: number,
     platformConfigs: PlatformConfiguration[],
-    scheduledAt: string | null = null
+    scheduledAt: string | null = null,
   ): Promise<PublishResponse | null> => {
     setIsPublishing(true);
     setError(null);
@@ -134,7 +128,7 @@ export function usePublishPreview() {
         {
           platform_configs: platformConfigs,
           scheduled_at: scheduledAt,
-        }
+        },
       );
 
       return response.data;
@@ -151,12 +145,12 @@ export function usePublishPreview() {
    * Obtiene las configuraciones guardadas
    */
   const getSavedConfigurations = async (
-    publicationId: number
+    publicationId: number,
   ): Promise<Record<string, any> | null> => {
     try {
-      const response = await axios.get<{ data: { platform_settings: Record<string, any> } }>(
-        `/api/v1/publications/${publicationId}/saved-configurations`
-      );
+      const response = await axios.get<{
+        data: { platform_settings: Record<string, any> };
+      }>(`/api/v1/publications/${publicationId}/saved-configurations`);
 
       return response.data.data.platform_settings;
     } catch (err) {
@@ -170,7 +164,7 @@ export function usePublishPreview() {
   const generateThumbnail = async (
     publicationId: number,
     platform: string,
-    timestamp = 1
+    timestamp = 1,
   ): Promise<string | null> => {
     try {
       const response = await axios.post<{ data: { thumbnail_url: string } }>(
@@ -178,7 +172,7 @@ export function usePublishPreview() {
         {
           platform: platform,
           timestamp: timestamp,
-        }
+        },
       );
 
       return response.data.data.thumbnail_url;

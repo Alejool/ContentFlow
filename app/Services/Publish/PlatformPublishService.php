@@ -7,12 +7,10 @@ use App\Services\SocialPlatforms\InstagramService;
 use App\Services\SocialPlatforms\FacebookService;
 use App\Services\SocialPlatforms\TikTokService;
 use App\Services\SocialPlatforms\TwitterService;
-use App\Notifications\VideoUploadedNotification;
 use App\Notifications\VideoDeletedNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Artisan;
 use App\Helpers\LogHelper;
 
 
@@ -27,8 +25,6 @@ use App\Events\PublicationStatusUpdated;
 use App\Jobs\VerifyYouTubeVideoStatus;
 
 use App\DTOs\SocialPostDTO;
-
-use App\Notifications\PublicationResultNotification;
 
 
 class PlatformPublishService
@@ -94,22 +90,30 @@ class PlatformPublishService
 
         $preparedLogs[$socialAccount->id] = $accountLogs;
       } catch (\Exception $e) {
-        LogHelper::publicationError('Failed to initialize logs for account', [
+        LogHelper::publicationError('Failed to initialize logs for account', $e->getMessage(), [
           'account_id' => $socialAccount->id,
-          'error' => $e->getMessage()
         ]);
         // We can't return logs for this account.
       }
     }
 
     // CLEANUP STALE LOGS
-    // Remove any logs for these accounts/publication that are NOT in the new list
+    // Remove any FAILED or SKIPPED logs for these accounts/publication that are NOT in the new list
     // This ensures that if media changed, old failed logs are removed
+    // We keep 'published' logs to avoid re-publishing
     if (!empty($allLogIds)) {
-      SocialPostLog::where('publication_id', $publication->id)
+      $deletedCount = SocialPostLog::where('publication_id', $publication->id)
         ->whereIn('social_account_id', $socialAccounts->pluck('id'))
         ->whereNotIn('id', $allLogIds)
+        ->whereIn('status', ['failed', 'skipped']) // Only delete failed/skipped, not published
         ->delete();
+      
+      if ($deletedCount > 0) {
+        Log::info('Cleaned up stale logs', [
+          'publication_id' => $publication->id,
+          'deleted_count' => $deletedCount
+        ]);
+      }
     }
 
     return $preparedLogs;
@@ -139,6 +143,11 @@ class PlatformPublishService
 
         $postLog = $this->logService->markAsPublished($postLog, $response);
 
+        // Increment usage per post
+        if ($publication->workspace) {
+          $publication->workspace->incrementUsage('publications_per_month');
+        }
+
         // YouTube Specific background tasks
         if ($socialAccount->platform === 'youtube' && $result->postId) {
           VerifyYouTubeVideoStatus::dispatch($postLog)->delay(now()->addMinutes(5));
@@ -166,10 +175,9 @@ class PlatformPublishService
         ];
       }
     } catch (\Throwable $e) {
-      LogHelper::publicationError('Publication failed', [
+      LogHelper::publicationError('Publication failed', $e->getMessage(), [
         'account' => $socialAccount->platform,
         'account_id' => $socialAccount->id,
-        'error' => $e->getMessage(),
         'trace' => $e->getTraceAsString()
       ]);
       $this->logService->markAsFailed($postLog, $e->getMessage());
@@ -187,9 +195,18 @@ class PlatformPublishService
   private function buildSocialPostDTO(Publication $publication, SocialAccount $socialAccount, SocialPostLog $postLog): SocialPostDTO
   {
     $mediaPaths = [];
+    
+    // Para carruseles, necesitamos TODAS las imágenes, no solo la primera
+    $isCarousel = $publication->content_type === 'carousel';
+    
     if ($socialAccount->platform === 'youtube' || $socialAccount->platform === 'tiktok') {
       $mediaFile = $publication->mediaFiles->first();
       if ($mediaFile) {
+        $mediaPaths[] = $this->resolveFilePath($mediaFile->file_path);
+      }
+    } elseif ($isCarousel) {
+      // Para carruseles, agregar TODAS las imágenes
+      foreach ($publication->mediaFiles as $mediaFile) {
         $mediaPaths[] = $this->resolveFilePath($mediaFile->file_path);
       }
     } else {
@@ -203,10 +220,83 @@ class PlatformPublishService
     if ($socialAccount->platform === 'youtube') {
       $metadata['thumbnail_path'] = $this->getYoutubeThumbnailPath($publication);
     }
+    
     $pSettings = $postLog->platform_settings ?? $publication->platform_settings ?? [];
 
     if (is_string($pSettings)) {
       $pSettings = json_decode($pSettings, true) ?? [];
+    }
+
+    // Add poll information to platform settings if this is a poll
+    if ($publication->content_type === 'poll') {
+      $platformKey = $socialAccount->platform;
+      if (!isset($pSettings[$platformKey])) {
+        $pSettings[$platformKey] = [];
+      }
+      
+      $pSettings[$platformKey]['type'] = 'poll';
+      $pSettings[$platformKey]['poll_options'] = $publication->poll_options ?? [];
+      $pSettings[$platformKey]['poll_duration_hours'] = $publication->poll_duration_hours ?? 24;
+    }
+
+    // Add content type information to platform settings
+    $platformKey = $socialAccount->platform;
+    if (!isset($pSettings[$platformKey])) {
+      $pSettings[$platformKey] = [];
+    }
+    
+    $pSettings[$platformKey]['content_type'] = $publication->content_type;
+    
+    // Add content-type specific settings with platform-specific mappings
+    switch ($publication->content_type) {
+      case 'reel':
+        // Map reel to platform-specific types
+        switch ($socialAccount->platform) {
+          case 'youtube':
+            $pSettings[$platformKey]['type'] = 'short';
+            break;
+          case 'facebook':
+            $pSettings[$platformKey]['type'] = 'reel';
+            // Add Facebook-specific reel settings
+            $pSettings[$platformKey]['content_type'] = 'reel';
+            break;
+          case 'instagram':
+            $pSettings[$platformKey]['type'] = 'reel';
+            $pSettings[$platformKey]['content_type'] = 'reel';
+            break;
+          case 'tiktok':
+            $pSettings[$platformKey]['type'] = 'video'; // TikTok uses 'video' type
+            break;
+          default:
+            $pSettings[$platformKey]['type'] = 'reel';
+            break;
+        }
+        
+        LogHelper::publication('Preparing reel for publishing', [
+          'publication_id' => $publication->id,
+          'platform' => $socialAccount->platform,
+          'platform_type' => $pSettings[$platformKey]['type'],
+          'media_count' => count($mediaPaths)
+        ]);
+        break;
+        
+      case 'story':
+        $pSettings[$platformKey]['type'] = 'story';
+        LogHelper::publication('Preparing story for publishing', [
+          'publication_id' => $publication->id,
+          'platform' => $socialAccount->platform,
+          'media_count' => count($mediaPaths)
+        ]);
+        break;
+        
+      case 'carousel':
+        $pSettings[$platformKey]['type'] = 'carousel';
+        LogHelper::publication('Preparing carousel for publishing', [
+          'publication_id' => $publication->id,
+          'platform' => $socialAccount->platform,
+          'media_count' => count($mediaPaths)
+        ]);
+        break;
     }
 
     return new SocialPostDTO(
@@ -253,7 +343,7 @@ class PlatformPublishService
         'playlist_name' => $campaignGroup->name,
         'status' => 'pending',
       ]);
-      
+
       ProcessYouTubePlaylistItem::dispatch($queueItem)->delay(now()->addMinutes(2));
     } catch (\Exception $e) {
       Log::warning('Failed to queue playlist operation', ['video_id' => $uploadedPostId, 'error' => $e->getMessage()]);
@@ -269,7 +359,7 @@ class PlatformPublishService
     $socialAccounts
   ): array {
 
-    LogHelper::publicationInfo('Publishing to all platforms', [
+    LogHelper::publication('Publishing to all platforms', [
       'publication_id' => $publication->id,
       'social_accounts' => $socialAccounts->pluck('id')->toArray(),
       'platforms' => $socialAccounts->pluck('platform')->toArray()
@@ -281,20 +371,22 @@ class PlatformPublishService
     // Check for already published platforms to avoid re-publishing
     // Only skip if published with the SAME account_id
     $alreadyPublishedAccountIds = [];
+    
     foreach ($socialAccounts as $socialAccount) {
+      // Check for successful publication
       $existingSuccessfulLog = SocialPostLog::where('publication_id', $publication->id)
         ->where('social_account_id', $socialAccount->id)
         ->where('status', 'published')
         ->first();
-      
+
       if ($existingSuccessfulLog) {
-        LogHelper::publicationInfo('Account already published successfully, skipping', [
+        LogHelper::publication('Account already published successfully, skipping', [
           'platform' => $socialAccount->platform,
           'account_id' => $socialAccount->id,
           'account_name' => $socialAccount->account_name,
           'log_id' => $existingSuccessfulLog->id
         ]);
-        
+
         $alreadyPublishedAccountIds[] = $socialAccount->id;
         $platformResults[$socialAccount->platform . '_' . $socialAccount->id] = [
           'success' => true,
@@ -305,14 +397,17 @@ class PlatformPublishService
           'account_name' => $socialAccount->account_name,
         ];
         $allLogs[] = $existingSuccessfulLog;
+        continue;
       }
+      
+      // Skip duplicate detection - createPendingLog already handles log reuse properly
     }
-    
+
     // Filter out already published accounts (by account ID, not platform)
-    $socialAccounts = $socialAccounts->reject(function($account) use ($alreadyPublishedAccountIds) {
+    $socialAccounts = $socialAccounts->reject(function ($account) use ($alreadyPublishedAccountIds) {
       return in_array($account->id, $alreadyPublishedAccountIds);
     });
-    
+
     if ($socialAccounts->isEmpty()) {
       Log::info('All platforms already published, nothing to do');
       return [
@@ -327,9 +422,8 @@ class PlatformPublishService
     try {
       $preparedLogsMap = $this->initializeLogs($publication, $socialAccounts);
     } catch (\Exception $e) {
-      LogHelper::publicationError('Log initialization failed globally', [
+      LogHelper::publicationError('Log initialization failed globally', $e->getMessage(), [
         'publication_id' => $publication->id,
-        'error' => $e->getMessage(),
         'trace' => $e->getTraceAsString()
       ]);
       return [
@@ -473,11 +567,10 @@ class PlatformPublishService
           }
         }
 
-        LogHelper::publicationError('Platform publication error (handled)', [
+        LogHelper::publicationError('Platform publication error (handled)', $e->getMessage(), [
           'platform' => $socialAccount->platform,
           'publication_id' => $publication->id,
           'account_id' => $socialAccount->id,
-          'error' => $e->getMessage(),
           'trace' => $e->getTraceAsString(),
         ]);
 
@@ -536,12 +629,10 @@ class PlatformPublishService
       return $result;
     } catch (\Exception $e) {
       DB::rollBack();
-      LogHelper::publicationError('Post publication failed -----> rollback', [
+      LogHelper::publicationError('Post publication failed -----> rollback', $e->getMessage(), [
         'post_log_id' => $postLog->id,
         'platform' => $postLog->platform,
-        'error' => $e->getMessage(),
         'publication_id' => $postLog->publication_id,
-        'error' => $e->getMessage()
       ]);
 
       $this->logService->markAsFailed($postLog, "Retry failed: {$e->getMessage()}");
@@ -604,7 +695,7 @@ class PlatformPublishService
     if (empty($socialAccount->access_token)) {
       throw new \Exception(
         "Access token is missing or invalid for {$socialAccount->platform} account (ID: {$socialAccount->id}). " .
-        "Please reconnect the account."
+          "Please reconnect the account."
       );
     }
 

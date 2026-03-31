@@ -1,6 +1,6 @@
 /**
  * FocusManager - Utility for managing focus state and keyboard navigation
- * 
+ *
  * Provides comprehensive focus management including:
  * - Focus tracking (current and previous focus)
  * - Programmatic focus setting with scroll options
@@ -8,7 +8,7 @@
  * - Focus trapping for modals and dialogs
  * - Focus restoration for cleanup
  * - Focusable element detection
- * 
+ *
  * Requirements: 5.1, 5.3, 5.5
  */
 
@@ -82,7 +82,7 @@ class FocusManagerClass {
    */
   getNextFocusable(direction: 'forward' | 'backward' = 'forward'): HTMLElement | null {
     const focusableElements = this.getAllFocusableElements();
-    
+
     if (focusableElements.length === 0) {
       return null;
     }
@@ -93,15 +93,16 @@ class FocusManagerClass {
 
     if (currentIndex === -1) {
       // No current focus, return first or last element
-      return direction === 'forward' 
-        ? focusableElements[0] 
+      return direction === 'forward'
+        ? focusableElements[0]
         : focusableElements[focusableElements.length - 1];
     }
 
     // Calculate next index
-    const nextIndex = direction === 'forward'
-      ? (currentIndex + 1) % focusableElements.length
-      : (currentIndex - 1 + focusableElements.length) % focusableElements.length;
+    const nextIndex =
+      direction === 'forward'
+        ? (currentIndex + 1) % focusableElements.length
+        : (currentIndex - 1 + focusableElements.length) % focusableElements.length;
 
     return focusableElements[nextIndex];
   }
@@ -123,9 +124,9 @@ class FocusManagerClass {
     const getFocusableElements = (): HTMLElement[] => {
       return Array.from(
         container.querySelectorAll<HTMLElement>(
-          'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
-        )
-      ).filter(el => this.isFocusable(el));
+          'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((el) => this.isFocusable(el));
     };
 
     // Handle tab key to trap focus
@@ -135,7 +136,7 @@ class FocusManagerClass {
       }
 
       const focusableElements = getFocusableElements();
-      
+
       if (focusableElements.length === 0) {
         event.preventDefault();
         return;
@@ -151,7 +152,7 @@ class FocusManagerClass {
           event.preventDefault();
           lastElement.focus();
         }
-      } 
+      }
       // Tab (forward)
       else {
         if (activeElement === lastElement || !container.contains(activeElement)) {
@@ -174,7 +175,7 @@ class FocusManagerClass {
     const cleanup: FocusTrapCleanup = () => {
       container.removeEventListener('keydown', handleKeyDown);
       this.focusTrapCleanups.delete(container);
-      
+
       // Restore focus to previously focused element
       if (previouslyFocused && this.isFocusable(previouslyFocused)) {
         previouslyFocused.focus();
@@ -212,7 +213,7 @@ class FocusManagerClass {
     }
 
     // Check if element is disabled
-    if ((element as any).disabled === true) {
+    if ((element as HTMLInputElement).disabled === true) {
       return false;
     }
 
@@ -233,7 +234,7 @@ class FocusManagerClass {
       '[contenteditable="true"]',
     ];
 
-    return focusableSelectors.some(selector => {
+    return focusableSelectors.some((selector) => {
       try {
         return element.matches(selector);
       } catch {
@@ -247,9 +248,10 @@ class FocusManagerClass {
    * @returns Array of focusable elements
    */
   private getAllFocusableElements(): HTMLElement[] {
-    const selector = 'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"]), [contenteditable="true"]';
+    const selector =
+      'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"]), [contenteditable="true"]';
     const elements = Array.from(document.querySelectorAll<HTMLElement>(selector));
-    return elements.filter(el => this.isFocusable(el));
+    return elements.filter((el) => this.isFocusable(el));
   }
 
   /**
@@ -284,7 +286,7 @@ class FocusManagerClass {
    * Cleanup all focus traps
    */
   cleanup(): void {
-    this.focusTrapCleanups.forEach(cleanup => cleanup());
+    this.focusTrapCleanups.forEach((cleanup) => cleanup());
     this.focusTrapCleanups.clear();
   }
 }

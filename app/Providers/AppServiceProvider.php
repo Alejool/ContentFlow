@@ -9,9 +9,11 @@ use Illuminate\Notifications\DatabaseNotification;
 use App\Observers\NotificationObserver;
 use App\Observers\UserObserver;
 use App\Observers\PublicationObserver;
+use App\Observers\MediaFileObserver;
 
 use App\Models\User;
 use App\Models\Publications\Publication;
+use App\Models\MediaFiles\MediaFile;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,6 +23,13 @@ class AppServiceProvider extends ServiceProvider
    */
   public function register(): void
   {
+    // Subscription services
+    $this->app->singleton(\App\Services\Subscription\DemoModeService::class);
+    $this->app->singleton(\App\Services\Subscription\SubscriptionControlService::class);
+    $this->app->singleton(\App\Services\Subscription\PlanValidator::class);
+    $this->app->singleton(\App\Services\Subscription\GracePeriodManager::class);
+    $this->app->singleton(\App\Services\Subscription\RenewalService::class);
+
     // Bind OnboardingService interface
     $this->app->bind(
       \App\Interfaces\OnboardingServiceInterface::class,
@@ -61,6 +70,7 @@ class AppServiceProvider extends ServiceProvider
     DatabaseNotification::observe(NotificationObserver::class);
     User::observe(UserObserver::class);
     Publication::observe(PublicationObserver::class);
+    MediaFile::observe(MediaFileObserver::class);
 
     // Register audit event listeners
     \Illuminate\Support\Facades\Event::listen(
@@ -110,6 +120,12 @@ class AppServiceProvider extends ServiceProvider
     \Illuminate\Support\Facades\Event::listen(
       \App\Events\UserCalendarEventDeleted::class,
       [\App\Listeners\SyncUserCalendarEventToExternalCalendars::class, 'handleDeleted']
+    );
+
+    // Register Stripe webhook listeners
+    \Illuminate\Support\Facades\Event::listen(
+      \Laravel\Cashier\Events\WebhookReceived::class,
+      \App\Listeners\Subscription\HandleStripeSubscriptionCreated::class
     );
   }
 }

@@ -1,4 +1,57 @@
 {
+  "businessInfo": {
+    "title": "Cuéntanos sobre tu negocio",
+    "description": "Ayúdanos a personalizar tu experiencia según tus necesidades",
+    "fields": {
+      "name": "Nombre del negocio",
+      "industry": "Industria",
+      "size": "Tamaño del equipo",
+      "goals": "¿Cuáles son tus objetivos principales?"
+    },
+    "placeholders": {
+      "name": "Ej: Mi Empresa",
+      "industry": "Selecciona tu industria",
+      "goals": "Ej: Aumentar presencia en redes sociales, generar más leads..."
+    },
+    "industries": {
+      "technology": "Tecnología",
+      "retail": "Comercio minorista",
+      "healthcare": "Salud",
+      "education": "Educación",
+      "finance": "Finanzas",
+      "marketing": "Marketing",
+      "real_estate": "Bienes raíces",
+      "hospitality": "Hospitalidad",
+      "manufacturing": "Manufactura",
+      "other": "Otro"
+    },
+    "sizes": {
+      "solo": "Solo yo",
+      "small": "2-10 personas",
+      "medium": "11-50 personas",
+      "large": "51+ personas"
+    },
+    "errors": {
+      "nameRequired": "El nombre del negocio es requerido",
+      "industryRequired": "Selecciona una industria",
+      "sizeRequired": "Selecciona el tamaño de tu equipo"
+    },
+    "optional": "Opcional",
+    "skip": "Saltar este paso",
+    "continue": "Continuar"
+  },
+  "planSelection": {
+    "title": "Elige el plan perfecto para ti",
+    "description": "Comienza gratis o elige un plan que se ajuste a tus necesidades",
+    "recommended": "Recomendado",
+    "intervals": {
+      "month": "mes",
+      "forever": "siempre"
+    },
+    "startFree": "Comenzar Gratis",
+    "selectPlan": "Seleccionar Plan",
+    "decideLater": "Decidiré más tarde"
+  },
   "tour": {
     "title": "Tour Guiado",
     "step": "Paso {{current}} de {{total}}",
@@ -99,11 +152,13 @@
     "preview": "Vista previa de plantilla {{name}}"
   },
   "progress": {
-    "title": "Comenzando",
+    "title": "Progreso de Configuración",
+    "inProgress": "En progreso",
     "stages": {
-      "tour": "Tour",
-      "connect": "Conectar",
-      "template": "Plantilla"
+      "businessInfo": "Información del Negocio",
+      "plan": "Selección de Plan",
+      "tour": "Tour Guiado",
+      "connect": "Conectar Cuentas"
     }
   },
   "platform": {
@@ -122,7 +177,7 @@
   "errors": {
     "loadFailed": "Error al cargar la incorporación",
     "actionFailed": "Error al realizar la acción",
-    "tryAgain": "Por favor, inténtalo de nuevo",
+    "tryAgain": "Inténtalo de nuevo",
     "networkError": "Ocurrió un error de red",
     "retry": "Reintentar"
   },

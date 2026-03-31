@@ -22,9 +22,18 @@ class SocialPostLogService
     string $status = 'pending'
   ): SocialPostLog {
     // Search for an existing log for this publication, account, and media file
+    // Prioritize non-published logs (pending, publishing, failed) over published ones
     $existingLog = SocialPostLog::where('publication_id', $publication->id)
       ->where('social_account_id', $socialAccount->id)
       ->where('media_file_id', $mediaFileId)
+      ->whereNotIn('status', ['published', 'skipped']) // Don't reuse published or skipped logs
+      ->orderByRaw("CASE 
+        WHEN status = 'pending' THEN 1 
+        WHEN status = 'publishing' THEN 2 
+        WHEN status = 'failed' THEN 3 
+        ELSE 4 
+      END")
+      ->orderBy('updated_at', 'desc')
       ->first();
 
     if ($existingLog) {
@@ -37,6 +46,15 @@ class SocialPostLogService
       $existingLog->error_message = null;
       $existingLog->updated_at = now();
       $existingLog->save();
+
+      Log::info('Reusing existing log', [
+        'log_id' => $existingLog->id,
+        'publication_id' => $publication->id,
+        'social_account_id' => $socialAccount->id,
+        'media_file_id' => $mediaFileId,
+        'previous_status' => $existingLog->getOriginal('status'),
+        'new_status' => $status
+      ]);
 
       return $existingLog;
     }

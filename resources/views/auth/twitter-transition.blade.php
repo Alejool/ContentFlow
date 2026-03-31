@@ -114,10 +114,14 @@
             </svg>
         </div>
         
-        <h1>{{ isset($step) && $step === 'v1' ? 'Último paso' : 'Finalizando conexión' }}</h1>
+        <h1>{{ isset($step) && $step === 'v2' ? 'Último paso' : 'Finalizando conexión' }}</h1>
         <p>
-            @if(isset($step) && $step === 'v1')
-                Completando permisos adicionales para subir contenido...
+            @if(isset($step) && $step === 'v2')
+                @if(isset($screen_name))
+                    Conectando <strong>@{{ $screen_name }}</strong> con permisos completos...
+                @else
+                    Completando permisos adicionales para publicar contenido...
+                @endif
             @else
                 Completando la autenticación con {{ ucfirst($platform) }}...
             @endif

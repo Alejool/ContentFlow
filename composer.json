@@ -13,12 +13,14 @@
         "abraham/twitteroauth": "^8.1",
         "doctrine/dbal": "^4.4",
         "dompdf/dompdf": "^3.1",
+        "epayco/epayco-php": "^1.9",
         "ezyang/htmlpurifier": "^4.19",
         "google/apiclient": "^2.19",
         "guzzlehttp/guzzle": "^7.10",
         "inertiajs/inertia-laravel": "^2.0",
         "james-heinrich/getid3": "^1.9",
         "kreait/firebase-php": "^7.18",
+        "laravel/cashier": "^16.3",
         "laravel/framework": "^11.31",
         "laravel/horizon": "^5.44",
         "laravel/octane": "^2.13",
@@ -28,7 +30,8 @@
         "laravel/tinker": "^2.9",
         "league/flysystem-aws-s3-v3": "^3.30",
         "maatwebsite/excel": "^3.1",
-        "microsoft/microsoft-graph": "^2.56",
+        "mercadopago/dx-php": "^3.8",
+        "microsoft/microsoft-graph": "^1.109",
         "pragmarx/google2fa-laravel": "^2.3",
         "predis/predis": "^3.3",
         "socialiteproviders/facebook": "^4.1",
@@ -88,7 +91,9 @@
     },
     "extra": {
         "laravel": {
-            "dont-discover": []
+            "dont-discover": [
+                "laravel/sentinel"
+            ]
         }
     },
     "config": {

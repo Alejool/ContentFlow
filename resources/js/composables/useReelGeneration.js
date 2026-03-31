@@ -17,21 +17,22 @@ export function useReelGeneration() {
     async (params) => {
       return await generateReelsInternal(params);
     },
-    10000 // 10 seconds
+    10000, // 10 seconds
   );
 
   // Debounce to prevent accidental double-clicks
   const { debouncedFn: debouncedGenerate, isDebouncing } = useDebounce(
     throttledGenerate,
-    500 // 500ms
+    500, // 500ms
   );
 
   /**
    * Generate request signature for deduplication
    */
   const getRequestSignature = (params) => {
-    const { media_file_id, publication_id, platforms, add_subtitles, language, generate_clips } = params;
-    
+    const { media_file_id, publication_id, platforms, add_subtitles, language, generate_clips } =
+      params;
+
     return JSON.stringify({
       media_file_id,
       publication_id: publication_id || 'none',
@@ -47,11 +48,11 @@ export function useReelGeneration() {
    */
   const isDuplicateRequest = (params) => {
     const signature = getRequestSignature(params);
-    
+
     if (lastRequestSignature.value === signature) {
       return true;
     }
-    
+
     return false;
   };
 
@@ -78,23 +79,21 @@ export function useReelGeneration() {
       simulateProgress();
 
       return response.data;
-
     } catch (err) {
       error.value = err.response?.data?.error || err.message || 'Error al generar reels';
-      
+
       // Handle rate limiting
       if (err.response?.status === 429) {
         const retryAfter = err.response.data?.retry_after_human || 'unos minutos';
         error.value = `Demasiadas solicitudes. Intenta de nuevo en ${retryAfter}.`;
       }
-      
+
       // Handle duplicate job
       if (err.response?.status === 409) {
         error.value = err.response.data?.error || 'Ya hay una generación en proceso.';
       }
 
       throw err;
-
     } finally {
       isGenerating.value = false;
     }

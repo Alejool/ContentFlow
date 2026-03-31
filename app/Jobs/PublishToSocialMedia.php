@@ -34,7 +34,10 @@ class PublishToSocialMedia implements ShouldQueue
    */
   public function middleware(): array
   {
-    return [new RateLimitPublishing];
+    return [
+      new RateLimitPublishing,
+      new \App\Jobs\Middleware\PlanBasedPriority,
+    ];
   }
 
   public function __construct(
@@ -46,10 +49,17 @@ class PublishToSocialMedia implements ShouldQueue
   {
     $startTime = microtime(true);
     
+    LogHelper::job('PublishToSocialMedia job started', [
+      'publication_id' => $this->publicationId,
+      'social_account_ids' => $this->socialAccountIds,
+      'attempt' => $this->attempts(),
+      'job_id' => $this->job->uuid()
+    ]);
+    
     $publication = Publication::with(['user.currentWorkspace', 'workspace'])->find($this->publicationId);
     
     if (!$publication) {
-      LogHelper::publicationError('Publication not found', [
+      LogHelper::publicationError('Publication not found', 'Publication not found', [
         'publication_id' => $this->publicationId,
         'job_id' => $this->job->uuid()
       ]);
@@ -57,25 +67,17 @@ class PublishToSocialMedia implements ShouldQueue
       return;
     }
 
-    // Log file size for monitoring
-    if ($publication->media_path) {
-      $filePath = storage_path('app/' . $publication->media_path);
-      if (file_exists($filePath)) {
-        $fileSize = filesize($filePath);
-        Log::info('Processing publication with media', [
-          'publication_id' => $publication->id,
-          'file_size_mb' => round($fileSize / 1024 / 1024, 2),
-          'timeout' => $this->timeout,
-          'attempt' => $this->attempts()
-        ]);
-      }
-    }
+    LogHelper::job('Publication loaded', [
+      'publication_id' => $publication->id,
+      'status' => $publication->status,
+      'content_type' => $publication->content_type
+    ]);
 
     $socialAccounts = SocialAccount::whereIn('id', $this->socialAccountIds)
       ->get();
 
     if ($socialAccounts->isEmpty()) {
-      LogHelper::publicationError('No social accounts found', [
+      LogHelper::publicationError('No social accounts found', 'No social accounts found', [
         'publication_id' => $publication->id,
         'social_account_ids' => $this->socialAccountIds,
         'job_id' => $this->job->uuid()
@@ -85,12 +87,84 @@ class PublishToSocialMedia implements ShouldQueue
       return;
     }
 
+    LogHelper::job('Social accounts loaded', [
+      'publication_id' => $publication->id,
+      'account_count' => $socialAccounts->count(),
+      'platforms' => $socialAccounts->pluck('platform')->toArray()
+    ]);
+
+    // Validate content type compatibility before publishing
+    $publishValidationService = app(\App\Services\Validation\PublishValidationService::class);
+    $validation = $publishValidationService->validatePublishRequest($publication, $this->socialAccountIds);
+    
+    LogHelper::job('Validation completed', [
+      'publication_id' => $publication->id,
+      'can_publish' => $validation['can_publish'],
+      'global_errors' => $validation['global_errors'] ?? [],
+      'platform_results' => $validation['platform_results']
+    ]);
+    
+    if (!$validation['can_publish']) {
+      $errorMessage = 'Publishing validation failed: ' . implode(', ', $validation['global_errors'] ?? []);
+      LogHelper::publicationError('Publishing validation failed', $errorMessage, [
+        'publication_id' => $publication->id,
+        'validation_errors' => $validation['global_errors'] ?? [],
+        'job_id' => $this->job->uuid()
+      ]);
+      
+      $publication->update(['status' => 'failed']);
+      $this->delete();
+      return;
+    }
+
+    // Filter out incompatible platforms
+    $compatibleAccounts = $socialAccounts->filter(function ($account) use ($validation) {
+      $platformResult = $validation['platform_results'][$account->platform] ?? null;
+      return $platformResult && $platformResult['compatible'];
+    });
+
+    LogHelper::job('Compatible accounts filtered', [
+      'publication_id' => $publication->id,
+      'original_count' => $socialAccounts->count(),
+      'compatible_count' => $compatibleAccounts->count(),
+      'compatible_platforms' => $compatibleAccounts->pluck('platform')->toArray()
+    ]);
+
+    if ($compatibleAccounts->isEmpty()) {
+      LogHelper::publicationError('No compatible platforms found after validation', 'No compatible platforms found after validation', [
+        'publication_id' => $publication->id,
+        'platform_results' => $validation['platform_results'],
+        'job_id' => $this->job->uuid()
+      ]);
+      $publication->update(['status' => 'failed']);
+      $this->delete();
+      return;
+    }
+
+    // Update social accounts to only compatible ones
+    $socialAccounts = $compatibleAccounts;
+
     $publication->update(['status' => 'publishing']);
+    
+    // Reset any stale 'publishing' logs from previous failed attempts to 'pending'
+    // This prevents duplicate detection issues on retries
+    SocialPostLog::where('publication_id', $publication->id)
+      ->whereIn('social_account_id', $this->socialAccountIds)
+      ->where('status', 'publishing')
+      ->update(['status' => 'pending']);
+    
+    // Update all pending logs to publishing status
+    SocialPostLog::where('publication_id', $publication->id)
+      ->whereIn('social_account_id', $this->socialAccountIds)
+      ->where('status', 'pending')
+      ->update(['status' => 'publishing']);
 
     event(new PublicationStatusUpdated(
       userId: $publication->user_id,
       publicationId: $publication->id,
-      status: 'publishing'
+      status: 'publishing',
+      workspaceId: $publication->workspace_id,
+      socialAccountIds: $this->socialAccountIds
     ));
 
     Log::info('Starting background publishing', [
@@ -106,7 +180,7 @@ class PublishToSocialMedia implements ShouldQueue
       );
       
       $publishDuration = round(microtime(true) - $startTime, 2);
-      LogHelper::jobInfo('Publishing completed', [
+      LogHelper::job('Publishing completed', [
         'publication_id' => $publication->id,
         'duration_seconds' => $publishDuration,
         'job_id' => $this->job->uuid()
@@ -115,7 +189,16 @@ class PublishToSocialMedia implements ShouldQueue
       $platformResults = $result['platform_results'] ?? [];
       $publisher = User::find($publication->published_by);
 
-      if (empty($platformResults)) {
+      // Check if all platforms were already published (empty results but no errors)
+      $allAlreadyPublished = empty($platformResults) && empty($result['errors']) && !empty($result['logs']);
+
+      if ($allAlreadyPublished) {
+        // All platforms were already published, treat as success
+        Log::info('All platforms already published, treating as success', [
+          'publication_id' => $publication->id,
+          'logs_count' => count($result['logs'])
+        ]);
+      } elseif (empty($platformResults)) {
         foreach ($socialAccounts as $account) {
           $publication->logActivity('failed_on_platform', [
             'platform' => $account->platform,
@@ -138,17 +221,21 @@ class PublishToSocialMedia implements ShouldQueue
         }
       }
 
-      $anySuccess = collect($platformResults)
+      $anySuccess = $allAlreadyPublished || collect($platformResults)
         ->contains(fn($r) => !empty($r['success']));
       
-      $allSuccess = collect($platformResults)
+      $allSuccess = $allAlreadyPublished || collect($platformResults)
         ->every(fn($r) => !empty($r['success']));
 
       if ($allSuccess) {
         // All platforms succeeded - mark as published and send notification
         $publication->logActivity('published');
+        
+        // Usar el servicio de estado para actualizar
+        $statusService = app(\App\Services\Publications\PublicationStatusService::class);
+        $statusService->updatePublicationStatus($publication, true);
+        
         $publication->update([
-          'status' => 'published',
           'publish_date' => now(),
         ]);
         
@@ -165,8 +252,11 @@ class PublishToSocialMedia implements ShouldQueue
             'failed_platforms' => collect($platformResults)->filter(fn($r) => !$r['success'])->keys()->toArray(),
           ], $publisher);
           
+          // Usar el servicio de estado para actualizar
+          $statusService = app(\App\Services\Publications\PublicationStatusService::class);
+          $statusService->updatePublicationStatus($publication, true);
+          
           $publication->update([
-            'status' => 'published',
             'publish_date' => now(),
           ]);
           
@@ -193,7 +283,9 @@ class PublishToSocialMedia implements ShouldQueue
           event(new PublicationStatusUpdated(
             userId: $publication->user_id,
             publicationId: $publication->id,
-            status: 'retrying'
+            status: 'retrying',
+            workspaceId: $publication->workspace_id,
+            socialAccountIds: $this->socialAccountIds
           ));
           
           throw new \Exception('Partial failure, retrying failed platforms: ' . implode(', ', $failedPlatforms));
@@ -205,17 +297,42 @@ class PublishToSocialMedia implements ShouldQueue
           'attempt' => $this->attempts(),
         ], $publisher);
 
-        // If not the last attempt, update status to 'retrying'
-        if ($this->attempts() < $this->tries) {
-          $publication->update(['status' => 'retrying']);
+        // If this is the last attempt, mark as failed and send notification
+        if ($this->attempts() >= $this->tries) {
+          $publication->update(['status' => 'failed']);
           
           // Broadcast status change
           event(new PublicationStatusUpdated(
             userId: $publication->user_id,
             publicationId: $publication->id,
-            status: 'retrying'
+            status: 'failed',
+            workspaceId: $publication->workspace_id,
+            socialAccountIds: $this->socialAccountIds
           ));
+          
+          // Send failure notification immediately
+          $errorMessage = empty($platformResults) 
+            ? ($result['message'] ?? 'Initialization failed') 
+            : 'All platforms failed';
+          $this->sendGeneralFailureNotification($publication, $errorMessage, $platformResults);
+          
+          // Delete job to prevent further retries
+          $this->delete();
+          
+          return; // Exit without throwing exception
         }
+        
+        // If not the last attempt, update status to 'retrying'
+        $publication->update(['status' => 'retrying']);
+        
+        // Broadcast status change
+        event(new PublicationStatusUpdated(
+          userId: $publication->user_id,
+          publicationId: $publication->id,
+          status: 'retrying',
+          workspaceId: $publication->workspace_id,
+          socialAccountIds: $this->socialAccountIds
+        ));
         
         // Throw exception to trigger retry mechanism
         throw new \Exception('All platforms failed: ' . (empty($platformResults) ? ($result['message'] ?? 'Initialization failed') : 'All platforms failed'));
@@ -229,6 +346,53 @@ class PublishToSocialMedia implements ShouldQueue
       ]);
 
       $publisher = User::find($publication->published_by);
+      
+      // Check if this is a quota error (non-retryable)
+      $isQuotaError = isset($e->isQuotaError) && $e->isQuotaError === true;
+      $isQuotaErrorByMessage = str_contains($e->getMessage(), 'daily YouTube upload limit') || 
+                                str_contains($e->getMessage(), 'quota') ||
+                                str_contains($e->getMessage(), 'exceeded the number of videos');
+      
+      if ($isQuotaError || $isQuotaErrorByMessage) {
+        // Quota errors should not be retried - mark as failed immediately
+        Log::warning('Quota error detected, marking as failed without retry', [
+          'publication_id' => $publication->id,
+          'error' => $e->getMessage()
+        ]);
+        
+        foreach ($socialAccounts as $account) {
+          $publication->logActivity('failed_on_platform', [
+            'platform' => $account->platform,
+            'error' => $e->getMessage(),
+            'note' => 'Quota exceeded - not retryable',
+            'attempt' => $this->attempts()
+          ], $publisher);
+        }
+        
+        $publication->logActivity('failed', [
+          'reason' => 'Quota exceeded',
+          'error' => $e->getMessage(),
+          'attempt' => $this->attempts()
+        ], $publisher);
+        
+        $publication->update(['status' => 'failed']);
+        
+        event(new PublicationStatusUpdated(
+          userId: $publication->user_id,
+          publicationId: $publication->id,
+          status: 'failed',
+          workspaceId: $publication->workspace_id,
+          socialAccountIds: $this->socialAccountIds
+        ));
+        
+        $this->sendGeneralFailureNotification($publication, $e->getMessage(), []);
+        
+        // Delete job to prevent retries
+        $this->delete();
+        return;
+      }
+      
+      // For other errors, log and allow retry
       foreach ($socialAccounts as $account) {
         $publication->logActivity('failed_on_platform', [
           'platform' => $account->platform,
@@ -255,14 +419,18 @@ class PublishToSocialMedia implements ShouldQueue
     event(new PublicationStatusUpdated(
       userId: $publication->user_id,
       publicationId: $publication->id,
-      status: $publication->status
+      status: $publication->status,
+      workspaceId: $publication->workspace_id,
+      socialAccountIds: $this->socialAccountIds
     ));
 
     if ($publication->published_by && $publication->published_by !== $publication->user_id) {
       event(new PublicationStatusUpdated(
         userId: $publication->published_by,
         publicationId: $publication->id,
-        status: $publication->status
+        status: $publication->status,
+        workspaceId: $publication->workspace_id,
+        socialAccountIds: $this->socialAccountIds
       ));
     }
   }
@@ -420,7 +588,24 @@ class PublishToSocialMedia implements ShouldQueue
       return;
     }
 
+    // Update publication status
     $publication->update(['status' => 'failed']);
+    
+    // CRITICAL: Update all pending/publishing logs to failed
+    // This prevents the frontend from showing "publishing" forever
+    $updatedLogs = SocialPostLog::where('publication_id', $this->publicationId)
+      ->whereIn('social_account_id', $this->socialAccountIds)
+      ->whereIn('status', ['pending', 'publishing'])
+      ->update([
+        'status' => 'failed',
+        'error_message' => $this->sanitizeErrorMessage($exception->getMessage()),
+        'updated_at' => now()
+      ]);
+    
+    Log::info('Updated orphaned logs to failed status', [
+      'publication_id' => $this->publicationId,
+      'updated_count' => $updatedLogs
+    ]);
     
     $publisher = User::find($publication->published_by);
     $publication->logActivity('failed', [
@@ -428,6 +613,15 @@ class PublishToSocialMedia implements ShouldQueue
       'error' => $exception->getMessage(),
       'attempts' => $this->attempts()
     ], $publisher);
+    
+    // Broadcast final status update
+    event(new PublicationStatusUpdated(
+      userId: $publication->user_id,
+      publicationId: $publication->id,
+      status: 'failed',
+      workspaceId: $publication->workspace_id,
+      socialAccountIds: $this->socialAccountIds
+    ));
 
     // ONLY send notification here after ALL retries exhausted
     $socialAccounts = SocialAccount::whereIn('id', $this->socialAccountIds)->get();
@@ -452,7 +646,7 @@ class PublishToSocialMedia implements ShouldQueue
       try {
         if ($publication->workspace) {
           $publication->workspace->notify(
-            new PublicationResultNotification($log, 'failed', $log->error_message)
+            new \App\Notifications\PublicationResultNotification($log, 'failed', $log->error_message)
           );
         }
       } catch (\Exception $e) {
@@ -466,7 +660,9 @@ class PublishToSocialMedia implements ShouldQueue
     event(new PublicationStatusUpdated(
       userId: $publication->user_id,
       publicationId: $publication->id,
-      status: 'failed'
+      status: 'failed',
+      workspaceId: $publication->workspace_id,
+      socialAccountIds: $this->socialAccountIds
     ));
   }
 }

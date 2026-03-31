@@ -23,6 +23,87 @@ class OnboardingController extends Controller
     }
 
     /**
+     * Complete business info step
+     * 
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function completeBusinessInfo(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'businessName' => 'nullable|string|max:255',
+            'businessIndustry' => 'nullable|string|max:255',
+            'businessGoals' => 'nullable|string|max:1000',
+            'businessSize' => 'nullable|string|max:255',
+        ]);
+
+        try {
+            $user = $request->user();
+            
+            if (!$user) {
+                return response()->json([
+                    'message' => 'User not authenticated',
+                ], 401);
+            }
+
+            $this->onboardingService->completeBusinessInfo($user, $validated);
+            
+            $state = $this->onboardingService->getOnboardingState($user);
+
+            return response()->json([
+                'message' => 'Business info completed successfully',
+                'state' => $this->formatOnboardingState($state),
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Error completing business info: ' . $e->getMessage());
+            
+            return response()->json([
+                'message' => 'Failed to complete business info',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Select a plan
+     * 
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function selectPlan(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'plan_id' => 'required|string|max:255',
+        ]);
+
+        try {
+            $user = $request->user();
+            
+            if (!$user) {
+                return response()->json([
+                    'message' => 'User not authenticated',
+                ], 401);
+            }
+
+            $this->onboardingService->selectPlan($user, $validated['plan_id']);
+            
+            $state = $this->onboardingService->getOnboardingState($user);
+
+            return response()->json([
+                'message' => 'Plan selected successfully',
+                'state' => $this->formatOnboardingState($state),
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Error selecting plan: ' . $e->getMessage());
+            
+            return response()->json([
+                'message' => 'Failed to select plan',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * Initialize onboarding for the authenticated user
      * 
      * @param Request $request
@@ -400,6 +481,9 @@ class OnboardingController extends Controller
     protected function formatOnboardingState($state): array
     {
         return [
+            'businessInfoCompleted' => $state->business_info_completed ?? false,
+            'planSelected' => $state->plan_selected ?? false,
+            'selectedPlan' => $state->selected_plan,
             'tourCompleted' => $state->tour_completed,
             'tourSkipped' => $state->tour_skipped,
             'tourCurrentStep' => $state->tour_current_step,

@@ -1,6 +1,13 @@
 <?php
 
 return [
+  'contentTypes' => [
+    'post' => 'Publicación',
+    'reel' => 'Reel',
+    'story' => 'Historia',
+    'poll' => 'Encuesta',
+    'carousel' => 'Carrusel',
+  ],
   'title' => 'Tus Publicaciones',
   'subtitle' => 'Administra y rastrea tu contenido social',
   'table' => [
@@ -21,7 +28,80 @@ return [
     'accountMissingText' => 'Esta publicación fue publicada en una cuenta (:account) que ya no está conectada. Editarla creará una nueva versión para tus cuentas actuales. ¿Proceder?',
   ],
   'validation' => [
+    'content_type_auto_changed' => 'Tipo de contenido cambiado automáticamente a :to basado en los archivos subidos',
     'scheduledMinDifference' => 'La fecha debe ser al menos 1 minuto después de la actual.',
+    'scheduledInPast' => 'La fecha programada debe estar en el futuro.',
+    'recurrenceDaysRequired' => 'Por favor selecciona al menos un día para la recurrencia semanal.',
+    'recurrenceEndDateRequired' => 'La fecha de fin es obligatoria para publicaciones recurrentes.',
+    'titleRequired' => 'El título es obligatorio.',
+    'titleLength' => 'El título no puede tener más de 70 caracteres.',
+    'descMin' => 'La descripción debe tener al menos 10 caracteres.',
+    'descMax' => 'La descripción no puede tener más de 700 caracteres.',
+    'objRequired' => 'El objetivo debe tener al menos 5 caracteres.',
+    'objMax' => 'El objetivo no puede tener más de 200 caracteres.',
+    'hashtagsRequired' => 'Los hashtags son obligatorios.',
+    'hashtagValid' => 'Debe incluir al menos un hashtag válido (que comience con #).',
+    'hashtagMax' => 'No puedes usar más de 10 hashtags.',
+    'scheduledAtRequired' => 'La fecha de programación es obligatoria si el horario global está habilitado.',
+    'scheduleRequired' => 'Debes programar una fecha para todas las redes seleccionadas o establecer una fecha global.',
+    'imageRequired' => 'Se requiere al menos una imagen o video.',
+  ],
+  'modal' => [
+    'contentType' => [
+      'label' => 'Tipo de Contenido',
+      'filteredByPlatforms' => 'Filtrado por plataformas seleccionadas',
+    ],
+    'poll' => [
+      'title' => 'Opciones de Encuesta',
+      'question' => 'Pregunta de la Encuesta',
+      'questionPlaceholder' => '¿Cuál es tu pregunta?',
+      'options' => 'Opciones de la Encuesta (2-4 opciones)',
+      'optionPlaceholder' => 'Opción',
+      'addOption' => 'Agregar Opción',
+      'duration' => 'Duración de la Encuesta',
+      'durationHours' => 'horas',
+      'note' => 'Las encuestas solo están disponibles en Twitter y Facebook. Asegúrate de seleccionar plataformas compatibles.',
+    ],
+    'live' => [
+      'title' => 'Configuración de Transmisión',
+      'startTime' => 'Hora de Inicio',
+      'duration' => 'Duración Esperada',
+      'minutes' => 'minutos',
+      'note' => 'Las transmisiones en vivo están disponibles en YouTube y Facebook. Necesitarás configurar los ajustes de streaming en cada plataforma.',
+    ],
+    'validation' => [
+      'scheduledMinDifference' => 'La fecha debe ser al menos 1 minuto después de la actual.',
+      'recurrenceDaysRequired' => 'Por favor selecciona al menos un día para la recurrencia semanal.',
+      'recurrenceEndDateRequired' => 'La fecha de fin es obligatoria para publicaciones recurrentes.',
+      'pollOptionsRequired' => 'La encuesta requiere entre 2 y 4 opciones no vacías.',
+      'pollDurationRequired' => 'La duración de la encuesta debe estar entre 1 y 168 horas.',
+      'liveStartTimeRequired' => 'La hora de inicio de la transmisión es obligatoria.',
+    ],
+    'schedule' => [
+      'title' => 'Fecha para todas las redes',
+      'useGlobal' => 'Global',
+      'description' => 'Establece una fecha única para publicar en todas las redes sociales seleccionadas a la vez.',
+      'placeholder' => 'Selecciona fecha y hora',
+      'instantWarning' => 'Para publicar inmediatamente, configura la fecha desde el modal de programación.',
+      'recurrence' => [
+        'title' => 'Repetir publicación (Recurrencia)',
+        'locked_title' => 'Recurrencia bloqueada',
+        'locked_desc' => 'Sube de plan para configurar repeticiones automáticas (cada X días/semanas) en tus publicaciones.',
+        'enable' => 'Activar repetición',
+        'frequency' => 'Frecuencia',
+        'interval' => 'Cada',
+        'days' => 'Repetir los días',
+        'ends' => 'Fecha de finalización',
+        'ends_placeholder' => 'Selecciona cuándo termina la recurrencia',
+        'end_date_required' => 'La fecha de fin es obligatoria para publicaciones recurrentes',
+        'preview_title' => 'Próximas fechas de publicación',
+        'preview_note' => 'Estas fechas son estimadas y se reflejarán en el calendario al guardar.',
+        'select_accounts' => 'Redes con recurrencia',
+        'select_accounts_desc' => 'Selecciona qué redes publicarán de forma recurrente. Las demás solo publicarán una vez.',
+        'all_accounts' => 'Aplicar a todas',
+        'single_account_note' => 'Esta red publicará de forma recurrente según la configuración.',
+      ],
+    ],
   ],
   'errors' => [
     'only_draft_failed_rejected_can_request_review' => 'Solo las publicaciones en borrador, fallidas o rechazadas pueden enviarse para revisión.',
@@ -40,5 +120,8 @@ return [
   'toast' => [
     'publishedSuccess' => '¡Publicación publicada exitosamente!',
     'publishedError' => 'Error al publicar la publicación.',
+  ],
+  'messages' => [
+    'cancelError' => 'Error al cancelar la publicación',
   ],
 ];

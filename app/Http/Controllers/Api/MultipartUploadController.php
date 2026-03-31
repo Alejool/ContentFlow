@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Services\Storage\S3PathService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Aws\S3\Exception\S3Exception;
 
@@ -19,46 +21,100 @@ class MultipartUploadController extends Controller
     $request->validate([
       'filename' => 'required|string',
       'content_type' => 'required|string',
+      'file_size' => 'nullable|integer|min:1',
+      'pending_bytes' => 'nullable|integer|min:0', // bytes of files already queued for upload
+      'context' => 'nullable|string|in:publication,profile,workspace', // upload context
     ]);
+
+    // --- Storage limit pre-check ---
+    $fileSize = (int) $request->input('file_size', 0);
+    $pendingBytes = (int) $request->input('pending_bytes', 0);
+    
+    if ($fileSize > 0) {
+      $user      = $request->user();
+      $workspace = $user?->currentWorkspace ?? $user?->workspaces()->find($user?->current_workspace_id);
+      if ($workspace) {
+        $validator = app(\App\Services\Subscription\PlanLimitValidator::class);
+        
+        // Check if this specific file can be uploaded considering pending uploads
+        if (!$validator->canUploadSize($workspace, $fileSize, $pendingBytes)) {
+          $upgradeMsg = $validator->getUpgradeMessage($workspace, 'storage');
+          $remaining = $validator->getRemainingStorageBytes($workspace, $pendingBytes);
+          
+          return response()->json([
+            'error'       => $upgradeMsg['message'],
+            'action'      => $upgradeMsg['action'],
+            'limit_type'  => 'storage',
+            'upgrade_plan' => $upgradeMsg['suggested_plan'],
+            'remaining_bytes' => $remaining,
+            'file_size' => $fileSize,
+            'pending_bytes' => $pendingBytes,
+          ], 402);
+        }
+      }
+    }
 
     $filename = $request->input('filename');
     $contentType = $request->input('content_type');
-    
+    $context = $request->input('context', 'publication'); // default to publication for backward compatibility
+    $user = $request->user();
+
     // Validate content type against allowed types
     $allowedMimeTypes = [
       'image/jpeg',
       'image/png',
       'image/gif',
+      'image/svg+xml', // SVG support enabled for profile/workspace only
       'video/mp4',
       'application/pdf',
     ];
-    
+
     if (!in_array($contentType, $allowedMimeTypes)) {
       return response()->json([
         'error' => 'File type not allowed. Allowed types: ' . implode(', ', $allowedMimeTypes)
       ], 400);
     }
-    
+
     // Check for executable extensions
     $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+
+    // Block SVG files for publications (social media platforms don't support SVG)
+    if (($extension === 'svg' || $contentType === 'image/svg+xml') && $context === 'publication') {
+      Log::info('SVG file blocked for publication context in multipart upload', [
+        'filename' => $filename,
+        'content_type' => $contentType,
+        'context' => $context,
+        'user_id' => $request->user()?->id,
+      ]);
+
+      return response()->json([
+        'error' => 'SVG files are not supported by social media platforms. Please use JPG, PNG, GIF, or WebP.'
+      ], 400);
+    }
+
     $executableExtensions = ['exe', 'bat', 'cmd', 'com', 'pif', 'scr', 'vbs', 'js', 'jar', 'sh', 'php', 'py'];
-    
+
     if (in_array($extension, $executableExtensions)) {
-      \Log::warning('Executable file upload attempt via multipart upload', [
+      Log::warning('Executable file upload attempt via multipart upload', [
         'filename' => $filename,
         'ip' => $request->ip(),
-        'user_id' => auth()->id(),
+        'user_id' => $request->user()?->id,
       ]);
-      
+
       return response()->json([
         'error' => 'Executable files are not allowed'
       ], 400);
     }
 
     // Generate unique key
-    $uuid = Str::uuid();
-    $extension = pathinfo($filename, PATHINFO_EXTENSION);
-    $key = "publications/{$uuid}.{$extension}";
+    $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+    
+    // Usar el nuevo servicio de rutas organizadas
+    $key = S3PathService::publicationPath(
+      $user->current_workspace_id,
+      $user->id,
+      $extension
+    );
 
     try {
       /** @var \Aws\S3\S3Client $client */
@@ -114,7 +170,7 @@ class MultipartUploadController extends Controller
       $presignedUrl = (string) $requestS3->getUri();
 
       return response()->json([
-        'url' => $presignedUrl,
+        'upload_url' => $presignedUrl,
       ]);
     } catch (S3Exception $e) {
       return response()->json(['error' => $e->getMessage()], 500);

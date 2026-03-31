@@ -1,4 +1,4 @@
-import { SOCIAL_PLATFORMS } from "../Constants/socialPlatformsConfig";
+import { SOCIAL_PLATFORMS } from '../Constants/socialPlatformsConfig';
 
 export interface DurationValidationResult {
   isValid: boolean;
@@ -16,7 +16,7 @@ export const formatDuration = (seconds: number): string => {
   const minutes = Math.floor((seconds % 3600) / 60);
   const remainingSeconds = seconds % 60;
 
-  let result = "";
+  let result = '';
   if (hours > 0) result += `${hours}h `;
   if (minutes > 0) result += `${minutes}m `;
   if (remainingSeconds > 0 && hours === 0) result += `${remainingSeconds}s`;
@@ -31,13 +31,15 @@ export const validateVideoDuration = (
   platformKey: string,
   durationInSeconds: number,
 ): DurationValidationResult => {
-  const platform = (SOCIAL_PLATFORMS as any)[platformKey.toLowerCase()];
+  const platform = (SOCIAL_PLATFORMS as Record<string, { maxVideoDuration?: number }>)[
+    platformKey.toLowerCase()
+  ];
 
   if (!platform || !platform.maxVideoDuration) {
     return {
       isValid: true,
       maxDuration: Infinity,
-      formattedMax: "N/A",
+      formattedMax: 'N/A',
     };
   }
 
@@ -56,12 +58,12 @@ export const validateVideoDuration = (
  */
 export const checkPublicationDurationErrors = (
   socialAccountIds: number[],
-  accounts: any[],
-  mediaFiles: any[],
-  videoMetadata: Record<string, any>,
+  accounts: { id: number; platform?: string }[],
+  mediaFiles: { type: string; tempId: string }[],
+  videoMetadata: Record<string, { duration: number }>,
 ): Record<number, string> => {
   const errors: Record<number, string> = {};
-  const videos = mediaFiles.filter((m) => m.type === "video");
+  const videos = mediaFiles.filter((m) => m.type === 'video');
 
   if (videos.length === 0) return errors;
 

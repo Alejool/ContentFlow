@@ -25,6 +25,8 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
+            'photo_url' => ['nullable', 'string'],
+            'default_avatar_icon' => ['nullable', 'string', 'in:user,briefcase,smile,star,heart,zap,crown,sparkles'],
             'locale' => ['nullable', 'string', 'in:en,es'],
             'phone' => [
                 'nullable',

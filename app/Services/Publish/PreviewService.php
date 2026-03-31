@@ -32,9 +32,9 @@ class PreviewService
         $validationResult = $this->validationService->validatePublication($publication, $platformIds);
         
         // Obtener cuentas sociales
-        $socialAccounts = SocialAccount::whereIn('id', $platformIds)
-            ->where('workspace_id', $publication->workspace_id)
-            ->get();
+        $socialAccounts = $platformIds
+            ? SocialAccount::whereIn('id', $platformIds)->where('workspace_id', $publication->workspace_id)->get()
+            : collect();
 
         // Obtener información del media
         $mediaFile = $publication->mediaFiles->first();

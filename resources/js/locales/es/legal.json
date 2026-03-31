@@ -13,7 +13,7 @@
           "title": "1. Introducción",
           "content": [
             "Bienvenido a ContentFlow (\"nosotros\", \"nuestro\" o \"la Plataforma\"). Nos comprometemos a proteger tu privacidad y asegurar que tus datos personales sean manejados de manera segura y transparente. Esta Política de Privacidad describe cómo recopilamos, usamos, divulgamos y protegemos tu información cuando utilizas nuestro sitio web y servicios (colectivamente, el \"Servicio\").",
-            "Al acceder o utilizar el Servicio, aceptas las prácticas descritas en esta política. Si no estás de acuerdo con esta política, por favor no utilices nuestros servicios."
+            "Al acceder o utilizar el Servicio, aceptas las prácticas descritas en esta política. Si no estás de acuerdo con esta política no utilices nuestros servicios."
           ]
         },
         "infoCollected": {
@@ -91,13 +91,13 @@
         },
         "contact": {
           "title": "9. Contacto",
-          "content": "Si tienes preguntas o inquietudes sobre esta Política de Privacidad, por favor contáctanos en:"
+          "content": "Si tienes preguntas o inquietudes sobre esta Política de Privacidad contáctanos en:"
         }
       }
     },
     "termsOfService": {
       "title": "Términos de Servicio",
-      "subtitle": "Por favor, lee estos términos cuidadosamente antes de usar nuestra plataforma.",
+      "subtitle": "Lee estos términos cuidadosamente antes de usar nuestra plataforma.",
       "sections": {
         "acceptance": {
           "title": "1. Aceptación de los Términos",
@@ -141,7 +141,7 @@
         },
         "contact": {
           "title": "9. Contacto",
-          "content": "Si tienes alguna pregunta sobre estos Términos, por favor contáctanos en:"
+          "content": "Si tienes alguna pregunta sobre estos Términos contáctanos en:"
         }
       }
     },

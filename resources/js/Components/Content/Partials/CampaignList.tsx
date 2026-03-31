@@ -1,12 +1,12 @@
-import CampaignTable from "@/Components/Content/Campaign/CampaignTable";
-import PublicationTable from "@/Components/Content/Publication/PublicationTable";
-import FilterSection from "@/Components/Content/common/FilterSection";
-import HeaderSection from "@/Components/Content/common/HeaderSection";
-import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
-import { useTheme } from "@/Hooks/useTheme";
-import { CampaignListProps } from "@/types/CampaignListProps";
-import { memo, useState } from "react";
-import { useTranslation } from "react-i18next";
+import CampaignTable from '@/Components/Content/Campaign/CampaignTable';
+import PublicationTable from '@/Components/Content/Publication/PublicationTable';
+import FilterSection from '@/Components/Content/common/FilterSection';
+import HeaderSection from '@/Components/Content/common/HeaderSection';
+import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
+import { useTheme } from '@/Hooks/useTheme';
+import { CampaignListProps } from '@/types/CampaignListProps';
+import { memo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const CampaignList = memo(
   ({
@@ -30,11 +30,11 @@ const CampaignList = memo(
     const { t } = useTranslation();
     const { theme } = useTheme();
 
-    const [search, setSearch] = useState("");
-    const [statusFilter, setStatusFilter] = useState("all");
-    const [platformFilter, setPlatformFilter] = useState("all");
-    const [dateStart, setDateStart] = useState("");
-    const [dateEnd, setDateEnd] = useState("");
+    const [search, setSearch] = useState('');
+    const [statusFilter, setStatusFilter] = useState('all');
+    const [platformFilter, setPlatformFilter] = useState('all');
+    const [dateStart, setDateStart] = useState('');
+    const [dateEnd, setDateEnd] = useState('');
     const [expandedCampaigns, setExpandedCampaigns] = useState<number[]>([]);
     const [showFilters, setShowFilters] = useState(false);
 
@@ -45,45 +45,45 @@ const CampaignList = memo(
     };
 
     const handleFilterChange = (key: string, value: string | string[]) => {
-      if (key === "status") setStatusFilter(Array.isArray(value) ? value[0] : value);
-      if (key === "platform") setPlatformFilter(Array.isArray(value) ? value[0] : value);
-      if (key === "date_start") setDateStart(Array.isArray(value) ? value[0] : value);
-      if (key === "date_end") setDateEnd(Array.isArray(value) ? value[0] : value);
+      if (key === 'status') setStatusFilter(Array.isArray(value) ? value[0] : value);
+      if (key === 'platform') setPlatformFilter(Array.isArray(value) ? value[0] : value);
+      if (key === 'date_start') setDateStart(Array.isArray(value) ? value[0] : value);
+      if (key === 'date_end') setDateEnd(Array.isArray(value) ? value[0] : value);
 
       if (onFilterChange) {
         onFilterChange({
-          status: key === "status" ? (Array.isArray(value) ? value[0] : value) : statusFilter,
-          platform: key === "platform" ? value : platformFilter,
-          date_start: key === "date_start" ? (Array.isArray(value) ? value[0] : value) : dateStart,
-          date_end: key === "date_end" ? (Array.isArray(value) ? value[0] : value) : dateEnd,
+          status: key === 'status' ? (Array.isArray(value) ? value[0] : value) : statusFilter,
+          platform: key === 'platform' ? value : platformFilter,
+          date_start: key === 'date_start' ? (Array.isArray(value) ? value[0] : value) : dateStart,
+          date_end: key === 'date_end' ? (Array.isArray(value) ? value[0] : value) : dateEnd,
         });
       }
     };
 
     const handleResetFilters = () => {
-      setSearch("");
-      setStatusFilter("all");
-      setPlatformFilter("all");
-      setDateStart("");
-      setDateEnd("");
-      
+      setSearch('');
+      setStatusFilter('all');
+      setPlatformFilter('all');
+      setDateStart('');
+      setDateEnd('');
+
       if (onResetFilters) {
         onResetFilters();
       }
-      
+
       if (onFilterChange) {
         onFilterChange({
-          status: "all",
-          platform: "all",
-          date_start: "",
-          date_end: "",
-          search: "",
+          status: 'all',
+          platform: 'all',
+          date_start: '',
+          date_end: '',
+          search: '',
         });
       }
     };
 
     return (
-      <div className="overflow-hidden shadow-lg border transition-all duration-300 backdrop-blur-lg bg-white/95 border-gray-100/95 text-gray-900 dark:bg-black/95 dark:border-black/95 dark:text-white">
+      <div className="overflow-hidden border border-gray-100/95 bg-white/95 text-gray-900 shadow-lg backdrop-blur-lg transition-all duration-300 dark:border-black/95 dark:bg-black/95 dark:text-white">
         <HeaderSection
           mode={mode}
           t={t}
@@ -115,7 +115,7 @@ const CampaignList = memo(
           />
         )}
 
-        {mode === "campaigns" ? (
+        {mode === 'campaigns' ? (
           <CampaignTable
             items={items as any}
             key={items.length}
@@ -146,7 +146,7 @@ const CampaignList = memo(
             currentPage={pagination.current_page}
             lastPage={pagination.last_page}
             total={pagination.total}
-            perPage={pagination.per_page}
+            perPage={pagination.per_page || 12}
             onPageChange={onPageChange}
             onPerPageChange={onPerPageChange || (() => {})}
             t={t}

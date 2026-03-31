@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { AlertCircle, CheckCircle, Info } from "lucide-react";
+import VideoValidationAlert from '@/Components/Content/VideoValidationAlert';
 import {
-  validateVideoForPlatform,
   PLATFORM_REQUIREMENTS,
+  validateVideoForPlatform,
   ValidationResult,
-} from "@/Utils/videoValidation";
-import VideoValidationAlert from "@/Components/Content/VideoValidationAlert";
+} from '@/Utils/videoValidation';
+import { Info } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface PlatformVideoSettingsProps {
   platform: string;
@@ -44,11 +44,11 @@ export default function PlatformVideoSettings({
         height: videoMetadata.height,
         aspectRatio: videoMetadata.aspectRatio || videoMetadata.width / videoMetadata.height,
         size: 0,
-        format: "",
+        format: '',
       },
       platform,
       currentType,
-      t
+      t,
     );
 
     setValidation(result);
@@ -60,40 +60,51 @@ export default function PlatformVideoSettings({
     <div className="space-y-4">
       {/* Información de requisitos */}
       {requirements && (
-        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
           <div className="flex items-start gap-3">
-            <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+            <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
             <div className="flex-1">
-              <p className="text-sm font-medium text-blue-800 dark:text-blue-300 mb-2">
-                {t("videoValidation.requirements")}
+              <p className="mb-2 text-sm font-medium text-blue-800 dark:text-blue-300">
+                {t('videoValidation.requirements')}
               </p>
               <div className="space-y-2 text-xs text-blue-700 dark:text-blue-400">
-                {currentType === "short" && requirements.short && (
+                {currentType === 'short' && requirements.short && (
                   <div>
                     <p className="font-medium">YouTube Shorts:</p>
                     <ul className="ml-4 mt-1 space-y-1">
-                      <li>• {t("videoValidation.maxDuration")}: {requirements.short.maxDuration}s</li>
-                      <li>• {t("videoValidation.aspectRatio")}: 9:16 (vertical)</li>
-                      <li>• {t("videoValidation.minResolution")}: 720x1280</li>
+                      <li>
+                        • {t('videoValidation.maxDuration')}: {requirements.short.maxDuration}s
+                      </li>
+                      <li>• {t('videoValidation.aspectRatio')}: 9:16 (vertical)</li>
+                      <li>• {t('videoValidation.minResolution')}: 720x1280</li>
                     </ul>
                   </div>
                 )}
-                {currentType === "reel" && requirements.reel && (
+                {currentType === 'reel' && requirements.reel && (
                   <div>
                     <p className="font-medium">{requirements.name} Reels:</p>
                     <ul className="ml-4 mt-1 space-y-1">
-                      <li>• {t("videoValidation.maxDuration")}: {requirements.reel.maxDuration}s</li>
-                      <li>• {t("videoValidation.aspectRatio")}: 9:16 (vertical)</li>
-                      <li>• {t("videoValidation.minResolution")}: {requirements.reel.resolution.minWidth}x{requirements.reel.resolution.minHeight}</li>
+                      <li>
+                        • {t('videoValidation.maxDuration')}: {requirements.reel.maxDuration}s
+                      </li>
+                      <li>• {t('videoValidation.aspectRatio')}: 9:16 (vertical)</li>
+                      <li>
+                        • {t('videoValidation.minResolution')}:{' '}
+                        {requirements.reel.resolution.minWidth}x
+                        {requirements.reel.resolution.minHeight}
+                      </li>
                     </ul>
                   </div>
                 )}
-                {currentType === "video" && requirements.video && (
+                {currentType === 'video' && requirements.video && (
                   <div>
                     <p className="font-medium">{requirements.name} Video:</p>
                     <ul className="ml-4 mt-1 space-y-1">
-                      <li>• {t("videoValidation.maxDuration")}: {Math.floor(requirements.video.maxDuration / 3600)}h</li>
-                      <li>• {t("videoValidation.anyAspectRatio")}</li>
+                      <li>
+                        • {t('videoValidation.maxDuration')}:{' '}
+                        {Math.floor(requirements.video.maxDuration / 3600)}h
+                      </li>
+                      <li>• {t('videoValidation.anyAspectRatio')}</li>
                     </ul>
                   </div>
                 )}
@@ -115,14 +126,14 @@ export default function PlatformVideoSettings({
 
       {/* Metadatos del video */}
       {videoMetadata && videoMetadata.width && videoMetadata.height && (
-        <div className="p-3 bg-gray-50 dark:bg-neutral-800 rounded-lg">
-          <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
-            {t("videoValidation.videoInfo")}
+        <div className="rounded-lg bg-gray-50 p-3 dark:bg-neutral-800">
+          <p className="mb-2 text-xs font-medium text-gray-700 dark:text-gray-300">
+            {t('videoValidation.videoInfo')}
           </p>
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div>
               <span className="text-gray-500 dark:text-gray-400">
-                {t("videoValidation.duration")}:
+                {t('videoValidation.duration')}:
               </span>
               <span className="ml-1 font-medium text-gray-900 dark:text-white">
                 {videoMetadata.duration}s
@@ -130,7 +141,7 @@ export default function PlatformVideoSettings({
             </div>
             <div>
               <span className="text-gray-500 dark:text-gray-400">
-                {t("videoValidation.resolution")}:
+                {t('videoValidation.resolution')}:
               </span>
               <span className="ml-1 font-medium text-gray-900 dark:text-white">
                 {videoMetadata.width}x{videoMetadata.height}
@@ -138,26 +149,26 @@ export default function PlatformVideoSettings({
             </div>
             <div>
               <span className="text-gray-500 dark:text-gray-400">
-                {t("videoValidation.aspectRatio")}:
+                {t('videoValidation.aspectRatio')}:
               </span>
               <span className="ml-1 font-medium text-gray-900 dark:text-white">
                 {videoMetadata.aspectRatio?.toFixed(2)} (
                 {videoMetadata.aspectRatio && videoMetadata.aspectRatio < 1
-                  ? "9:16"
+                  ? '9:16'
                   : videoMetadata.aspectRatio && Math.abs(videoMetadata.aspectRatio - 1) < 0.1
-                  ? "1:1"
-                  : "16:9"}
+                    ? '1:1'
+                    : '16:9'}
                 )
               </span>
             </div>
             <div>
               <span className="text-gray-500 dark:text-gray-400">
-                {t("videoValidation.orientation")}:
+                {t('videoValidation.orientation')}:
               </span>
               <span className="ml-1 font-medium text-gray-900 dark:text-white">
                 {videoMetadata.aspectRatio && videoMetadata.aspectRatio < 1
-                  ? t("videoValidation.vertical")
-                  : t("videoValidation.horizontal")}
+                  ? t('videoValidation.vertical')
+                  : t('videoValidation.horizontal')}
               </span>
             </div>
           </div>

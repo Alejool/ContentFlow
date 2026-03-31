@@ -1,5 +1,6 @@
 {
   "common": {
+    "locale": "en-US",
     "deleteConfirmTitle": "Confirm deletion",
     "deleteConfirm": "Are you sure you want to delete this item? This action cannot be undone.",
     "deleteSuccess": "Item deleted successfully",
@@ -9,8 +10,16 @@
     "deleting": "Deleting...",
     "select": "Select",
     "more": "More",
+    "active": "Active",
+    "selected": "Selected",
+    "completed": "Completed",
+    "inactive": "Inactive",
+    "available": "Available",
+    "name": "Name",
+    "type": "Type",
     "progress": "Progress",
     "dismiss": "Dismiss",
+    "never": "Never",
     "viewAll": "View all",
     "new": "New",
     "saving": "Saving...",
@@ -28,13 +37,17 @@
     "cancel": "Cancel",
     "continue": "Continue",
     "delete": "Delete",
+    "duplicate": "Duplicate",
     "edit": "Edit",
+    "view": "View",
+    "viewDetails": "View Details",
+    "upgradePlan": "Upgrade Plan",
     "analytics": "Analytics",
     "aiChat": "AI Chat",
     "logout": "Logout",
     "localizationExamples": "Localization Examples",
-    "read_more":"Read more",
-    "show_less":"Show less",
+    "read_more": "Read more",
+    "show_less": "Show less",
     "affected_publications": "Affected publications:",
     "more_items": "more...",
     "today": "Today",
@@ -79,6 +92,11 @@
     "expand": "Expand",
     "error": "Error",
     "next": "Next",
+    "tabs": {
+      "overview": "Overview",
+      "activity": "Activity",
+      "approvals": "Approvals"
+    },
     "previous": "Previous",
     "showing": "Showing",
     "of": "of",
@@ -95,6 +113,7 @@
     "save_changes": "Save Changes",
     "noCreditCard": "No credit card required",
     "unknown": "Unknown",
+    "notSet": "Not set",
     "platformConnect": "Platform",
     "close": "Close",
     "copy": "Copy",
@@ -128,6 +147,10 @@
     "item": "Item",
     "files": "Files",
     "publications": "Publications",
+    "publicationsPerMonth": "publications/month",
+    "socialAccount": "social network",
+    "socialAccounts": "social networks",
+    "storage": "storage",
     "vistas": "Views",
     "clics": "Clicks",
     "engagement": "Engagement",
@@ -137,7 +160,9 @@
     "invalidDate": "Invalid date",
     "filters": {
       "all": "All",
-      "title": "Filters"
+      "title": "Filters",
+      "startDate": "Start",
+      "endDate": "End"
     },
     "status": {
       "active": "Active",
@@ -154,12 +179,12 @@
       "title_asc": "Title (A-Z)",
       "title_desc": "Title (Z-A)"
     },
-    "platform":{
+    "platform": {
       "title": "All platforms"
     },
     "errors": {
-      "checkFormErrors": "Please check the errors in the form",
-      "ffmpeg_load": "Error loading the video processor. Please ensure you have a stable connection and SharedArrayBuffer support.",
+      "checkFormErrors": "Check the errors in the form",
+      "ffmpeg_load": "Error loading the video processor. Ensure you have a stable connection and SharedArrayBuffer support.",
       "processing_failed": "Error processing the video.",
       "no_shared_array_buffer": "Your browser or environment does not support the necessary features to process video locally (SharedArrayBuffer).",
       "video_load": "Error loading the video for processing."
@@ -169,6 +194,49 @@
       "show": "Show",
       "entries": "entries",
       "info": "Showing {{from}} to {{to}} of {{total}} results"
+    },
+    "approvals": {
+      "tabs": {
+        "pending": "Pending",
+        "history": "History"
+      },
+      "locked": {
+        "title": "Basic approvals enabled",
+        "description": "You currently have access to basic approvals. To set up multi-level approval workflows upgrade your plan."
+      },
+      "title": "Approval Workflows",
+      "subtitle": "Define sequential review routes for your publications.",
+      "invite": "Invite",
+      "createWorkflow": "Create Workflow",
+      "noWorkflowsTitle": "No custom workflows",
+      "noWorkflowsDesc": "All publications will use the basic single-signature workflow until you define a new one. Define a chain of command for stricter reviews.",
+      "configureFirstWorkflow": "Configure my first workflow",
+      "levelsConfigured": "levels configured",
+      "activeWorkflowNote": "Note: There can only be one active workflow at a time per workspace. The system will use the first active workflow it finds for all new publications requiring approval.",
+      "createFlow": "Create Workflow",
+      "editFlow": "Edit Workflow",
+      "configureSequence": "Configure the approval sequence.",
+      "workflowName": "Workflow Name",
+      "approvalLevels": "Approval Levels",
+      "newRole": "New Role",
+      "addLevel": "Add Level",
+      "level": "Level",
+      "anyRole": "Any Role",
+      "or": "OR",
+      "anyUser": "Any User",
+      "deleteLevel": "Delete level",
+      "errors": {
+        "fetch": "Error loading workflows",
+        "save": "Error saving workflow",
+        "delete": "Error deleting workflow",
+        "multiLevelEnterprise": "Multi-level workflow is exclusive for Enterprise or Demo plans."
+      },
+      "success": {
+        "created": "Workflow created successfully",
+        "updated": "Workflow updated successfully",
+        "deleted": "Workflow deleted"
+      },
+      "confirmDelete": "Are you sure you want to delete this workflow?"
     },
     "upload": {
       "progress": "Upload progress",
@@ -188,11 +256,11 @@
       "retry": "Retry",
       "dismiss": "Dismiss",
       "retryAttempt": "Retry attempt {{count}} of 3",
-      "maxRetriesReached": "Maximum retry attempts reached. Please check your connection or try uploading a smaller file.",
-      "networkError": "Network error occurred. Please check your connection and try again.",
-      "validationError": "File validation failed. Please check the file and try again.",
-      "uploadFailed": "Upload failed. Please try again.",
-      "processingFailed": "Processing failed. Please try again.",
+      "maxRetriesReached": "Maximum retry attempts reached. Check your connection or try uploading a smaller file.",
+      "networkError": "Network error occurred. Check your connection and try again.",
+      "validationError": "File validation failed. Check the file and try again.",
+      "uploadFailed": "Upload failed. Try again.",
+      "processingFailed": "Processing failed. Try again.",
       "resume_prompt": {
         "title": "Incomplete Uploads Detected",
         "description": "You have {{count}} incomplete upload from a previous session.",
@@ -235,6 +303,42 @@
         "description": "Start creating content to manage and schedule your social media posts.",
         "action": "Create Content"
       }
+    },
+    "frequencies": {
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "yearly": "Yearly"
+    },
+    "units": {
+      "days": "days",
+      "weeks": "weeks",
+      "months": "months",
+      "years": "years"
+    },
+    "days": {
+      "sun": "S",
+      "mon": "M",
+      "tue": "T",
+      "wed": "W",
+      "thu": "T",
+      "fri": "F",
+      "sat": "S"
+    },
+    "videoTypes": {
+      "reel": "Reel",
+      "short": "Short",
+      "standard": "Standard video",
+      "feed": "Feed",
+      "story": "Story",
+      "video": "Video",
+      "tweet": "Tweet",
+      "post": "Post"
+    },
+    "messages": {
+      "checkingSubscription": "Checking subscription...",
+      "loadingPlans": "Loading plans...",
+      "generationInProgress": "A generation is already in progress. Wait."
     }
   }
 }

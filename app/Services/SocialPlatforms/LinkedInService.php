@@ -53,4 +53,22 @@ class LinkedInService extends BaseSocialService
     // LinkedIn service not fully implemented yet
     return [];
   }
+
+  /**
+   * Check if content still exists on LinkedIn
+   *
+   * @param string $postId LinkedIn post URN
+   * @return array ['exists' => bool, 'reason' => string|null, 'metrics' => array|null]
+   */
+  public function checkContentStatus(string $postId): array
+  {
+    // LinkedIn service not fully implemented yet
+    Log::info('LinkedIn checkContentStatus not implemented', ['post_id' => $postId]);
+
+    return [
+      'exists' => true, // Assume exists since we can't verify
+      'reason' => 'LinkedIn verification not implemented',
+    ];
+  }
 }
+

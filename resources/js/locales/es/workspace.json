@@ -1,4 +1,4 @@
-﻿{
+{
   "workspace": {
     "my_workspaces": "Mis Espacios de Trabajo",
     "create_new": "Crear Nuevo Espacio",
@@ -36,16 +36,16 @@
     "danger_zone": "Zona de Peligro",
     "delete_workspace_description": "Acciones irreversibles para este espacio de trabajo",
     "delete_workspace": "Eliminar Espacio",
-    "delete_workspace_warning": "Una vez eliminado, no hay vuelta atrás. Por favor, asegúrate.",
+    "delete_workspace_warning": "Una vez eliminado, no hay vuelta atrás. Asegúrate.",
     "delete_button": "Eliminar Espacio",
     "delete_confirmation_title": "¿Eliminar Espacio?",
     "delete_confirmation_message": "¿Estás seguro de que quieres eliminar este espacio de trabajo? Todos los datos, incluyendo contenido, campañas y miembros del equipo serán eliminados permanentemente. Esta acción no se puede deshacer.",
     "confirm_delete": "Sí, eliminar espacio",
     "general_settings": "Ajustes Generales",
     "manage_workspace": "Gestionar espacio {{name}}",
-    "owners": "Propietarios",
-    "admins": "Administradores",
-    "editors": "Editores",
+    "owners": "Propietario",
+    "admins": "Administrador",
+    "editors": "Editor",
     "creator": "Creador",
     "total_in_workspace": "Total en el espacio",
     "viewers": "Visores",
@@ -67,8 +67,8 @@
       "cancel": "Cancelar",
       "submit": "Invitar Miembro",
       "validation": {
-        "email": "Por favor introduce un correo válido",
-        "role": "Por favor selecciona un rol",
+        "email": "Introduce un correo válido",
+        "role": "Selecciona un rol",
         "nameRequired": "El nombre del espacio es obligatorio"
       },
       "messages": {
@@ -91,7 +91,7 @@
         "success": "Integraciones actualizadas exitosamente",
         "test_success": "Conexión probada exitosamente",
         "test_error": "Error al probar la conexión",
-        "enter_url": "Por favor ingresa una URL de webhook de {{type}} primero."
+        "enter_url": "Ingresa una URL de webhook de {{type}} primero."
       },
       "communication": "Integraciones de Comunicación",
       "communication_description": "Conecta tu espacio con plataformas de comunicación externas",
@@ -126,15 +126,31 @@
     "tabs": {
       "overview": "Vista General",
       "general": "General",
+      "approvals": "Aprobación",
       "members": "Miembros",
       "roles": "Roles",
       "integrations": "Integraciones",
-      "notifications": "Notificaciones"
+      "notifications": "Notificaciones",
+      "white_label": "Marca Blanca",
+      "api": "Acceso API",
+      "support": "Soporte Enterprise"
     },
     "roles_management": {
       "title": "Roles y Permisos",
       "description": "Resumen de roles disponibles y sus permisos asociados en ContentFlow.",
-      "no_permissions": "No hay permisos asignados."
+      "no_permissions": "No hay permisos asignados.",
+      "create_role": "Crear Nuevo Rol",
+      "create_role_subtitle": "Define un nuevo rol y sus permisos para el workspace.",
+      "role_name": "Nombre del Rol",
+      "role_name_placeholder": "Ej: Editor Senior",
+      "role_description": "Descripción",
+      "role_description_placeholder": "Describe las responsabilidades de este rol...",
+      "key_permissions_label": "Permisos Clave",
+      "can_approve_content": "Puede aprobar contenido en flujos de trabajo",
+      "role_created_success": "Rol creado con éxito",
+      "role_created_error": "Error al crear el rol",
+      "name_required": "El nombre es obligatorio",
+      "loading_permissions": "Cargando permisos..."
     },
     "messages": {
       "update_success": "Espacio de trabajo creado exitosamente",
@@ -220,6 +236,132 @@
       "integrations_description": "Conectar aplicaciones y servicios"
     },
     "recent_activity": "Actividad Reciente",
-    "workspace_age": "Antigüedad del Espacio"
+    "workspace_age": "Antigüedad del Espacio",
+    "timezone": {
+      "title": "Zona Horaria del Espacio",
+      "description": "Todas las fechas y horas en este espacio se mostrarán en esta zona horaria. Esto afecta las publicaciones programadas, analíticas y eventos del calendario.",
+      "current": "Zona Horaria Actual",
+      "using_default": "Usando zona horaria UTC por defecto. Configura una zona horaria del espacio a continuación.",
+      "select_label": "Seleccionar Zona Horaria",
+      "unsaved_changes": "Tienes cambios sin guardar",
+      "no_changes": "No hay cambios para guardar",
+      "update_success": "¡Zona horaria actualizada exitosamente! Recargando...",
+      "permission_required": "Solo los propietarios y administradores del espacio pueden cambiar la zona horaria.",
+      "utc": "UTC (Tiempo Universal Coordinado)",
+      "eastern": "Hora del Este (EE.UU. y Canadá)",
+      "central": "Hora Central (EE.UU. y Canadá)",
+      "mountain": "Hora de Montaña (EE.UU. y Canadá)",
+      "pacific": "Hora del Pacífico (EE.UU. y Canadá)",
+      "bogota": "Bogotá, Lima, Quito",
+      "mexico": "Ciudad de México, Monterrey",
+      "buenos_aires": "Buenos Aires",
+      "sao_paulo": "São Paulo, Brasília",
+      "london": "Londres, Dublín, Lisboa",
+      "paris": "París, Madrid, Berlín",
+      "moscow": "Moscú, San Petersburgo",
+      "dubai": "Dubái, Abu Dabi",
+      "mumbai": "Bombay, Calcuta, Nueva Delhi",
+      "beijing": "Pekín, Shanghái, Hong Kong",
+      "tokyo": "Tokio, Osaka, Sapporo",
+      "sydney": "Sídney, Melbourne"
+    },
+    "white_label": {
+      "title": "Marca Blanca (White-label)",
+      "description": "Personaliza la plataforma con tu propio logotipo y colores corporativos.",
+      "logo": "Logotipo del Espacio",
+      "logo_help": "Recomendado: PNG o SVG con fondo transparente.",
+      "favicon": "Favicon",
+      "favicon_help": "Idealmente 32x32px o 64x64px.",
+      "primary_color": "Color Principal de Marca",
+      "color_help": "Este color se usará en botones, enlaces y reportes.",
+      "update_success": "Branding actualizado exitosamente",
+      "update_error": "Error al actualizar el branding",
+      "enterprise_exclusive": "Función Exclusiva Enterprise",
+      "enterprise_description": "Estos ajustes de marca se aplican a todo el espacio de trabajo y serán visibles para todos los miembros y en los reportes generados.",
+      "live_preview": "Vista Previa en Vivo",
+      "buttons_actions": "BOTONES Y ACCIONES",
+      "primary_button": "Botón Principal",
+      "secondary_button": "Botón Secundario",
+      "activity_indicator": "Indicador de actividad",
+      "sidebar_header": "Cabecera del Menú",
+      "workspace_branding": "Marca del Espacio",
+      "impact_notice": "Los cambios se aplican inmediatamente para todos los usuarios de este espacio de trabajo.",
+      "no_logo": "Sin Logo"
+    },
+    "api": {
+      "title": "Tokens de Acceso API",
+      "description": "Genera tokens para autenticar solicitudes a la API de ContentFlow.",
+      "token_name_placeholder": "ej. Automatización de Marketing",
+      "generate": "Generar Token",
+      "no_tokens": "Aún no se han generado tokens de API.",
+      "last_used": "Último uso",
+      "token_generated": "Token Generado Exitosamente",
+      "token_warning": "Copia este token ahora. Por razones de seguridad, no se volverá a mostrar.",
+      "revoke_confirm": "¿Estás seguro de que quieres revocar este token? Dejará de funcionar inmediatamente.",
+      "revoke_success": "Token revocado exitosamente",
+      "revoke_error": "Error al revocar el token",
+      "create_success": "Token de API creado exitosamente",
+      "create_error": "Error al crear el token",
+      "security_notice": "Aviso de Seguridad",
+      "security_help": "Los tokens de API otorgan acceso total a este espacio de trabajo. Nunca los compartas ni los subas a repositorios públicos.",
+      "documentation": {
+        "title": "Documentación de la API",
+        "description": "Descarga la referencia completa de la API Enterprise para integrar ContentFlow en tus sistemas.",
+        "enterprise_guide_title": "Guía Completa Enterprise",
+        "enterprise_guide_description": "Referencia en Markdown con todos los endpoints, ejemplos de request/response y lógica de negocio.",
+        "enterprise_guide_badge": ".md · ~700 líneas",
+        "openapi_title": "Definición OpenAPI 3.0",
+        "openapi_description": "Schema JSON importable directamente en Postman, Insomnia o cualquier cliente API.",
+        "openapi_badge": ".json · OpenAPI 3.0",
+        "pdf_conversion_help": "Para convertir el Markdown a PDF: abre el archivo en VS Code → instala la extensión \"Markdown PDF\" → clic derecho → Export (pdf)."
+      },
+      "usage_info": {
+        "title": "¿Cómo usar tu Token API?",
+        "description": "Envía el token en el encabezado <code>Authorization</code> como un <strong>Bearer token</strong>. Los tokens del dashboard <strong>no expiran automáticamente</strong> — duran hasta que decidas revocarlos manualmente.",
+        "example_title": "Ejemplo de petición:",
+        "refresh_token_help": "¿Necesitas tokens de corta duración con refresh automático? Usa el endpoint programático <code>POST /api/auth/token</code> — ver documentación descargable."
+      },
+      "token_types": {
+        "dashboard": "Dashboard",
+        "dashboard_description": "Creado desde el panel, sin expiración",
+        "api_access": "API · Access",
+        "api_access_description": "24h, requiere refresh",
+        "api_refresh": "API · Refresh",
+        "api_refresh_description": "30 días, para renovar access tokens"
+      },
+      "table": {
+        "refresh_list": "Actualizar lista",
+        "name": "Nombre",
+        "type": "Tipo",
+        "last_used": "Último uso",
+        "expires_status": "Expira / Estado",
+        "created": "Creado",
+        "actions": "Acciones",
+        "never_used": "Nunca",
+        "revoke_token": "Revocar Token",
+        "revoke_error": "Error al revocar el token"
+      }
+    },
+    "enterprise": {
+      "info_title": "Estado del Espacio Enterprise",
+      "priority_queues": "Colas de Publicación Prioritarias",
+      "custom_onboarding": "Sesión de Onboarding Personalizada",
+      "legal_review": "Acuerdo de Procesamiento de Datos (DPA)",
+      "dedicated_support": {
+        "title": "Gestor de Soporte Dedicado",
+        "description": "Como cliente Enterprise, tienes un gestor de cuenta dedicado disponible vía WhatsApp o correo para asistencia prioritaria.",
+        "action": "Contactar Gestor"
+      },
+      "sla": {
+        "title": "Acuerdo de Nivel de Servicio (SLA)",
+        "description": "Tu espacio está cubierto por nuestra garantía de disponibilidad del 99.9%. Proporcionamos informes mensuales bajo petición.",
+        "action": "Ver Términos SLA"
+      },
+      "integrations": {
+        "title": "Integraciones Personalizadas",
+        "description": "¿Necesitas conectar ContentFlow con tu propio CRM o ERP? Nuestro equipo puede construir integraciones a medida.",
+        "action": "Solicitar Integración"
+      }
+    }
   }
 }

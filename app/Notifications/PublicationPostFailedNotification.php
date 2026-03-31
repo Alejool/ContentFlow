@@ -101,7 +101,7 @@ class PublicationPostFailedNotification extends BaseNotification
     }
     
     $description .= "📊 Estado: Fallido\n\n";
-    $description .= "💡 La publicación no pudo completarse en la(s) plataforma(s) seleccionada(s).\n";
+    $description .= " La publicación no pudo completarse en la(s) plataforma(s) seleccionada(s).\n";
     $description .= "Por favor, verifica la configuración de la cuenta o intenta nuevamente.\n";
     $description .= "Si el problema persiste, contacta a soporte.";
 

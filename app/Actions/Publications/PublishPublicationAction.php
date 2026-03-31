@@ -7,9 +7,9 @@ use App\Models\Publications\Publication;
 use App\Models\Social\ScheduledPost;
 use App\Models\Social\SocialAccount;
 use App\Services\Media\MediaProcessingService;
+use App\Services\Validation\PublishValidationService;
 use App\Events\PublicationStatusUpdated;
 use Illuminate\Support\Facades\Log;
-use App\Models\Social\SocialPostLog;
 use App\Services\Publish\PlatformPublishService;
 use App\Helpers\LogHelper;
 
@@ -17,7 +17,8 @@ class PublishPublicationAction
 {
   public function __construct(
     protected MediaProcessingService $mediaService,
-    protected PlatformPublishService $platformPublishService
+    protected PlatformPublishService $platformPublishService,
+    protected PublishValidationService $validationService
   ) {}
 
   public function execute(Publication $publication, array $platformIds, array $options = []): void
@@ -29,11 +30,22 @@ class PublishPublicationAction
       'has_platform_settings' => !empty($options['platform_settings'])
     ]);
 
-    // Verify publication can be published
-    // Note: Permission check should be done in controller before calling this action
-    $hasPublishPermission = auth()->check() && auth()->user()->hasPermission('publish', $publication->workspace_id);
-    
-    if (!$publication->canBePublished($hasPublishPermission)) {
+    // Check if user is owner (can bypass workflow)
+    $isOwner = false;
+    if (auth()->check()) {
+      $userRole = auth()->user()->workspaces()
+        ->where('workspaces.id', $publication->workspace_id)
+        ->first();
+      
+      if ($userRole && $userRole->pivot->role_id) {
+        $role = \App\Models\Role\Role::find($userRole->pivot->role_id);
+        $isOwner = $role && $role->slug === \App\Models\Role\Role::OWNER;
+      }
+    }
+
+    // Verify publication status allows publishing
+    // Note: Permission and workflow checks are done in PublicationPolicy before calling this action
+    if (!$publication->canBePublished($isOwner)) {
       if ($publication->status === 'pending_review') {
         throw new \Exception(__('publications.errors.pending_review') . " Current status: {$publication->status}");
       }
@@ -53,9 +65,65 @@ class PublishPublicationAction
       throw new \Exception("No valid social accounts found for publishing.");
     }
 
+    // VALIDATE PLATFORM COMPATIBILITY BEFORE PUBLISHING
+    // Filter out incompatible platforms and log reasons
+    $validAccounts = collect();
+    $invalidAccounts = collect();
+    
+    // Force fresh load of media files
+    $publication->load('mediaFiles');
+    
+    foreach ($socialAccounts as $account) {
+      $validation = $this->validationService->validatePlatformCompatibility($publication, $account);
+      
+      if ($validation['compatible']) {
+        $validAccounts->push($account);
+      } else {
+        $invalidAccounts->push([
+          'account' => $account,
+          'errors' => $validation['errors'],
+          'warnings' => $validation['warnings']
+        ]);
+        
+        Log::warning('Platform incompatible, skipping', [
+          'publication_id' => $publication->id,
+          'account_id' => $account->id,
+          'platform' => $account->platform,
+          'account_name' => $account->account_name,
+          'errors' => $validation['errors']
+        ]);
+      }
+    }
+    
+    // If no valid accounts remain, throw exception with details
+    if ($validAccounts->isEmpty()) {
+      $errorMessages = $invalidAccounts->map(function ($item) {
+        return "{$item['account']->platform} (@{$item['account']->account_name}): " . implode(', ', $item['errors']);
+      })->implode(' | ');
+      
+      throw new \Exception("Ninguna plataforma es compatible con esta publicación. Razones: {$errorMessages}");
+    }
+    
+    // Log if some platforms were filtered out
+    if ($invalidAccounts->isNotEmpty()) {
+      Log::info('Some platforms filtered out due to incompatibility', [
+        'publication_id' => $publication->id,
+        'total_requested' => $socialAccounts->count(),
+        'valid_accounts' => $validAccounts->count(),
+        'invalid_accounts' => $invalidAccounts->count(),
+        'invalid_details' => $invalidAccounts->map(fn($item) => [
+          'platform' => $item['account']->platform,
+          'errors' => $item['errors']
+        ])->toArray()
+      ]);
+    }
+    
+    // Continue with only valid accounts
+    $socialAccounts = $validAccounts;
+
     // Handle Thumbnails for Publish (if any)
     if (!empty($options['thumbnails'] ?? [])) {
-      LogHelper::publicationInfo('Processing thumbnails in PublishPublicationAction', [
+      LogHelper::publication('Processing thumbnails in PublishPublicationAction', [
         'publication_id' => $publication->id,
         'count' => count($options['thumbnails'])
       ]);
@@ -72,10 +140,39 @@ class PublishPublicationAction
 
     // Update platform settings if provided
     if (!empty($options['platform_settings'])) {
-      $publication->update(['platform_settings' => $options['platform_settings']]);
+      $settings = $options['platform_settings'];
+      if (is_string($settings)) {
+        $settings = json_decode($settings, true) ?? [];
+      }
+
+      // Clean and optimize platform settings to only include relevant data
+      $cleanedSettings = $this->cleanPlatformSettings(
+        $settings,
+        $socialAccounts->pluck('platform')->toArray()
+      );
+      $publication->update(['platform_settings' => $cleanedSettings]);
     }
 
     $publication->logActivity('publishing', ['platforms' => $platformIds]);
+
+    // Determine priority based on workspace plan and queue status
+    $workspace = $publication->workspace;
+    $planSlug = $workspace->getPlanName();
+    $priority = \App\Jobs\Middleware\PlanBasedPriority::getPriorityForPlan($planSlug);
+    
+    // Check queue depth to adjust priority dynamically
+    $queueDepth = \Illuminate\Support\Facades\Redis::llen('queues:publishing');
+    
+    // If queue is empty or very small, boost priority for immediate processing
+    if ($queueDepth < 3) {
+      $priority += 50; // Boost priority when queue is not saturated
+      LogHelper::publication('Boosting priority due to low queue depth', [
+        'publication_id' => $publication->id,
+        'queue_depth' => $queueDepth,
+        'original_priority' => $priority - 50,
+        'boosted_priority' => $priority
+      ]);
+    }
 
     $publication->update([
       'status' => 'publishing',
@@ -96,17 +193,17 @@ class PublishPublicationAction
         'platform' => $acc->platform,
         'account_name' => $acc->account_name
       ])->toArray();
-      
+
       $notification = new \App\Notifications\PublicationProcessingStartedNotification($publication, $accountsData);
-      
+
       // Notify ALL workspace members (including the one who published)
       if ($publication->workspace) {
         $workspaceUsers = $publication->workspace->users()->get();
-        
+
         foreach ($workspaceUsers as $user) {
           $user->notify($notification);
         }
-        
+
         // Also notify workspace directly if it has webhooks configured (Discord/Slack)
         if ($publication->workspace->discord_webhook_url || $publication->workspace->slack_webhook_url) {
           $publication->workspace->notify($notification);
@@ -140,32 +237,62 @@ class PublishPublicationAction
     cache()->forget("publication_{$publication->id}_platforms");
 
     // Obtener información de la cola antes de despachar
-    $queueSize = \Illuminate\Support\Facades\Redis::llen('queues:publishing');
-    $estimatedWaitMinutes = $this->estimateWaitTime($queueSize);
+    $queuePriorityService = app(\App\Services\Queue\QueuePriorityService::class);
+    $planSlug = $publication->workspace->getPlanName();
+    
+    $queueInfo = $queuePriorityService->getQueuePositionForPlan('publishing', $planSlug);
+    $queueSize = $queueInfo['pending_jobs'];
+    $estimatedWaitMinutes = $queueInfo['estimated_wait_minutes'];
+    $effectivePriority = $queueInfo['effective_priority'];
+    
+    // Check queue depth to adjust priority dynamically
+    $queueDepth = \Illuminate\Support\Facades\Redis::llen('queues:publishing');
+    
+    // If queue is empty or very small, boost priority for immediate processing
+    if ($queueDepth < 3) {
+      $effectivePriority += 50; // Boost priority when queue is not saturated
+      LogHelper::publication('Boosting priority due to low queue depth', [
+        'publication_id' => $publication->id,
+        'queue_depth' => $queueDepth,
+        'original_priority' => $queueInfo['effective_priority'],
+        'boosted_priority' => $effectivePriority
+      ]);
+    }
 
-    LogHelper::jobInfo('Dispatching PublishToSocialMedia job', [
+    LogHelper::job('Dispatching PublishToSocialMedia job', [
       'publication_id' => $publication->id,
       'platform_count' => $socialAccounts->count(),
       'platforms' => $socialAccounts->pluck('platform')->toArray(),
+      'plan' => $planSlug,
       'queue_size' => $queueSize,
+      'queue_depth' => $queueDepth,
+      'effective_priority' => $effectivePriority,
+      'estimated_position' => $queueInfo['estimated_position'],
       'estimated_wait_minutes' => $estimatedWaitMinutes
     ]);
 
     // Determinar prioridad basada en el tamaño del archivo
     $priority = $this->determineJobPriority($publication);
-    
+
     $job = PublishToSocialMedia::dispatch(
       $publication->id,
       $socialAccounts->pluck('id')->toArray()
     )->onQueue('publishing');
     
-    // Si el archivo es pequeño, darle mayor prioridad
-    if ($priority === 'high') {
-      Log::info('Small file detected, using high priority', [
-        'publication_id' => $publication->id
-      ]);
-    }
-    
+    // Store priority in Redis for the job to use
+    $jobId = $job->id ?? uniqid('job_', true);
+    \Illuminate\Support\Facades\Redis::setex("job:priority:{$jobId}", 3600, $effectivePriority);
+
+    // Log de prioridad
+    Log::info('Job dispatched with priority', [
+      'publication_id' => $publication->id,
+      'job_id' => $jobId,
+      'plan' => $planSlug,
+      'file_priority' => $priority,
+      'effective_priority' => $effectivePriority,
+      'queue_depth' => $queueDepth
+    ]);
+
     // Notificar al usuario sobre la posición en cola si hay espera
     if ($queueSize > 0) {
       try {
@@ -173,8 +300,9 @@ class PublishPublicationAction
         if ($user) {
           $user->notify(new \App\Notifications\PublicationQueuedNotification(
             $publication,
-            $queueSize + 1,
-            $estimatedWaitMinutes
+            $queueInfo['estimated_position'],
+            $estimatedWaitMinutes,
+            $planSlug
           ));
         }
       } catch (\Exception $e) {
@@ -185,26 +313,7 @@ class PublishPublicationAction
       }
     }
   }
-  
-  /**
-   * Estimar tiempo de espera basado en el tamaño de la cola
-   */
-  private function estimateWaitTime(int $queueSize): int
-  {
-    if ($queueSize === 0) {
-      return 0;
-    }
-    
-    // Estimación: cada job toma aproximadamente 8 minutos en promedio
-    // Con 5 workers simultáneos, dividimos el tiempo
-    $avgJobTimeMinutes = 8;
-    $concurrentWorkers = 5;
-    
-    $estimatedMinutes = ceil(($queueSize * $avgJobTimeMinutes) / $concurrentWorkers);
-    
-    return (int) $estimatedMinutes;
-  }
-  
+
   /**
    * Determinar la prioridad del job basado en el tamaño del archivo
    */
@@ -213,25 +322,81 @@ class PublishPublicationAction
     if (!$publication->media_path) {
       return 'normal';
     }
-    
+
     $filePath = storage_path('app/' . $publication->media_path);
     if (!file_exists($filePath)) {
       return 'normal';
     }
-    
+
     $fileSizeMB = filesize($filePath) / 1024 / 1024;
-    
+
     // Archivos menores a 50MB tienen prioridad alta
     if ($fileSizeMB < 50) {
       return 'high';
     }
-    
+
     // Archivos entre 50-200MB tienen prioridad normal
     if ($fileSizeMB < 200) {
       return 'normal';
     }
-    
+
     // Archivos mayores a 200MB tienen prioridad baja
     return 'low';
+  }
+
+  /**
+   * Clean platform settings to only include relevant platforms and essential data
+   */
+  private function cleanPlatformSettings(array $settings, array $platforms): array
+  {
+    $cleaned = [];
+    $platformsLower = array_map('strtolower', $platforms);
+
+    foreach ($settings as $key => $value) {
+      $keyLower = strtolower($key);
+
+      // Only include settings for platforms that are being published to
+      if (in_array($keyLower, $platformsLower)) {
+        // Remove unnecessary nested data and keep only essential settings
+        if (is_array($value)) {
+          $cleaned[$key] = $this->filterEssentialSettings($value);
+        } else {
+          $cleaned[$key] = $value;
+        }
+      }
+    }
+
+    return $cleaned;
+  }
+
+  /**
+   * Filter out non-essential settings to reduce payload size
+   */
+  private function filterEssentialSettings(array $settings): array
+  {
+    // Define essential keys that should be kept
+    $essentialKeys = [
+      'type',
+      'privacy',
+      'category',
+      'title',
+      'description',
+      'disable_comment',
+      'disable_duet',
+      'disable_stitch',
+      'thread',
+      'article',
+      'poll_options',
+      'poll_duration'
+    ];
+
+    $filtered = [];
+    foreach ($settings as $key => $value) {
+      if (in_array($key, $essentialKeys)) {
+        $filtered[$key] = $value;
+      }
+    }
+
+    return $filtered;
   }
 }

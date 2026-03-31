@@ -1,0 +1,110 @@
+{
+  "admin": {
+    "navigation": {
+      "title": "Administration Panel",
+      "subtitle": "Centralized system management",
+      "dashboard": "Dashboard",
+      "system_settings": "System Settings",
+      "system_notifications": "System Notifications"
+    },
+    "dashboard": {
+      "title": "Administration Panel",
+      "subtitle": "Centralized system management",
+      "quick_actions": "Quick Actions",
+      "recent_activity": "Recent Activity",
+      "system_status": "System Status",
+      "quick_info": "Quick Info",
+      "access": "Access",
+      "metrics": {
+        "total_users": "Total Users",
+        "active_subscriptions": "Active Subscriptions",
+        "publications": "Publications",
+        "system_health": "System Health",
+        "healthy": "Healthy",
+        "review": "Review"
+      },
+      "activity": {
+        "system_started": "System started successfully",
+        "config_loaded": "All configurations loaded",
+        "cache_optimized": "Cache optimized"
+      },
+      "info": {
+        "exclusive_access": "Exclusive Access",
+        "exclusive_description": "Only super administrators can view this panel",
+        "realtime_changes": "Real-time Changes",
+        "realtime_description": "Settings are applied immediately",
+        "full_audit": "Full Audit",
+        "audit_description": "All changes are logged"
+      }
+    },
+    "system_settings": {
+      "page_title": "System Settings",
+      "page_description": "Manage plans, features and system integrations",
+      "save_changes": "Save Changes",
+      "saving": "Saving...",
+      "unsaved_changes": "You have unsaved changes. Click \"Save Changes\" to apply them.",
+      "warning_title": "Warning",
+      "warning_message": "Changes in this configuration affect the entire system. Disabling a plan or feature may impact existing users.",
+      "categories": {
+        "plans": "Plans",
+        "addons": "Add-ons",
+        "features": "Features",
+        "integrations": "Integrations",
+        "payment_methods": "Payment Methods",
+        "general": "General"
+      },
+      "descriptions": {
+        "plans": "Enable or disable subscription plans. Existing users will keep their current plan.",
+        "addons": "Control which types of add-ons users can purchase.",
+        "features": "Activate or deactivate complete system features.",
+        "integrations": "Manage integrations with external services.",
+        "payment_methods": "Enable or disable payment methods available to users.",
+        "general": "General system configuration."
+      },
+      "badges": {
+        "high_impact": "High Impact",
+        "medium_impact": "Medium Impact"
+      },
+      "last_updated": "Last updated: {{date}} by {{user}}",
+      "info_section": {
+        "title": "Important Information",
+        "plans_title": "Subscription Plans",
+        "plans_description": "When disabling a plan, it will no longer appear on the pricing page, but users who already have it will maintain their subscription and access to all features.",
+        "features_title": "Features",
+        "features_description": "Disabling a feature (like AI) will hide and deactivate it throughout the system, regardless of the user's plan. Use with caution.",
+        "addons_title": "Add-ons",
+        "addons_description": "Disabled add-ons will not be available for purchase, but users who already purchased them can continue using them until they run out.",
+        "integrations_title": "Integrations",
+        "integrations_description": "Disabling an integration will prevent new connections, but existing connections will continue to work until the user disconnects them.",
+        "payment_methods_title": "Payment Methods",
+        "payment_methods_description": "When disabling a payment method, it will no longer appear as an option at checkout. Active subscriptions with that method will continue to work normally."
+      }
+    },
+    "system_status": {
+      "title": "Status",
+      "description": "Active configurations",
+      "maintenance_mode": {
+        "title": "Maintenance Mode Active",
+        "description": "Only super admins can access"
+      },
+      "registrations_disabled": {
+        "title": "Registrations Disabled",
+        "description": "New registrations are not allowed"
+      },
+      "categories": {
+        "plans": "Plans",
+        "addons": "Add-ons",
+        "features": "Features",
+        "integrations": "Integrations"
+      },
+      "stats": {
+        "active_features": "Active Features",
+        "available_plans": "Available Plans"
+      }
+    },
+    "system_notifications": {
+      "page_title": "System Notifications",
+      "page_subtitle": "Send global notifications to all system users"
+    }
+  }
+}

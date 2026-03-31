@@ -1,4 +1,4 @@
-import { ReactNode, CSSProperties } from "react";
+import { ReactNode, CSSProperties } from 'react';
 
 interface VirtualListProps<T> {
   items: T[];
@@ -26,7 +26,7 @@ export function VirtualList<T>({
   }
 
   return (
-    <div style={style} className={`overflow-y-auto ${className || ""}`}>
+    <div style={style} className={`overflow-y-auto ${className || ''}`}>
       {header && <div>{header}</div>}
       {items.map((item, index) => {
         const itemKey = (item as any)?.id || index;
@@ -62,8 +62,10 @@ export function VirtualGrid<T>({
   }
 
   return (
-    <div style={style} className={`overflow-y-auto ${className || ""}`}>
-      <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-${columns} gap-6`}>
+    <div style={style} className={`overflow-y-auto ${className}`}>
+      <div
+        className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-${columns} gap-6`}
+      >
         {items.map((item, index) => (
           <div key={index} className={itemClassName}>
             {renderItem(item, index)}

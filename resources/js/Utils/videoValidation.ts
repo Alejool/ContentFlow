@@ -32,6 +32,12 @@ export interface PlatformRequirements {
     aspectRatio: { min: number; max: number };
     resolution: { minWidth: number; minHeight: number };
   };
+  story?: {
+    maxDuration: number;
+    minDuration?: number;
+    aspectRatio: { min: number; max: number };
+    resolution: { minWidth: number; minHeight: number };
+  };
 }
 
 export interface ValidationResult {
@@ -64,6 +70,12 @@ export const PLATFORM_REQUIREMENTS: Record<string, PlatformRequirements> = {
     reel: {
       maxDuration: 90,
       minDuration: 3,
+      aspectRatio: { min: 0.5, max: 1.0 }, // Vertical
+      resolution: { minWidth: 540, minHeight: 960 },
+    },
+    story: {
+      maxDuration: 60,
+      minDuration: 1,
       aspectRatio: { min: 0.5, max: 1.0 }, // Vertical
       resolution: { minWidth: 540, minHeight: 960 },
     },
@@ -103,7 +115,7 @@ export async function getVideoMetadata(file: File): Promise<VideoMetadata> {
   return new Promise((resolve, reject) => {
     const video = document.createElement('video');
     video.preload = 'metadata';
-    
+
     video.onloadedmetadata = () => {
       const metadata: VideoMetadata = {
         duration: Math.floor(video.duration),
@@ -113,16 +125,16 @@ export async function getVideoMetadata(file: File): Promise<VideoMetadata> {
         size: file.size,
         format: file.type,
       };
-      
+
       URL.revokeObjectURL(video.src);
       resolve(metadata);
     };
-    
+
     video.onerror = () => {
       URL.revokeObjectURL(video.src);
       reject(new Error('No se pudo cargar el video'));
     };
-    
+
     video.src = URL.createObjectURL(file);
   });
 }
@@ -134,10 +146,10 @@ export function validateVideoForPlatform(
   metadata: VideoMetadata,
   platform: string,
   type: string,
-  t: (key: string, params?: any) => string
+  t: (key: string, params?: Record<string, unknown>) => string,
 ): ValidationResult {
   const requirements = PLATFORM_REQUIREMENTS[platform];
-  
+
   if (!requirements) {
     return {
       isValid: false,
@@ -198,15 +210,22 @@ export function validateVideoForPlatform(
   return result;
 }
 
+interface PlatformTypeRequirements {
+  maxDuration?: number;
+  minDuration?: number;
+  aspectRatio?: { min: number; max: number };
+  resolution?: { minWidth: number; minHeight: number };
+}
+
 /**
  * Valida metadatos contra requisitos específicos
  */
 function validateAgainstRequirements(
   metadata: VideoMetadata,
-  reqs: any,
+  reqs: PlatformTypeRequirements,
   result: ValidationResult,
   typeName: string,
-  t: (key: string, params?: any) => string
+  t: (key: string, params?: Record<string, unknown>) => string,
 ): void {
   // Validar duración
   if (reqs.maxDuration && metadata.duration > reqs.maxDuration) {
@@ -216,7 +235,7 @@ function validateAgainstRequirements(
         type: typeName,
         max: formatDuration(reqs.maxDuration),
         current: formatDuration(metadata.duration),
-      })
+      }),
     );
   }
 
@@ -227,7 +246,7 @@ function validateAgainstRequirements(
         type: typeName,
         min: formatDuration(reqs.minDuration),
         current: formatDuration(metadata.duration),
-      })
+      }),
     );
   }
 
@@ -241,7 +260,7 @@ function validateAgainstRequirements(
           type: typeName,
           expected: formatAspectRatio(min, max),
           current: formatAspectRatio(metadata.aspectRatio, metadata.aspectRatio),
-        })
+        }),
       );
     }
   }
@@ -255,7 +274,7 @@ function validateAgainstRequirements(
           type: typeName,
           min: `${minWidth}x${minHeight}`,
           current: `${metadata.width}x${metadata.height}`,
-        })
+        }),
       );
     }
   }
@@ -264,7 +283,7 @@ function validateAgainstRequirements(
 /**
  * Verifica si los metadatos cumplen con los requisitos (sin agregar errores)
  */
-function checkRequirements(metadata: VideoMetadata, reqs: any): boolean {
+function checkRequirements(metadata: VideoMetadata, reqs: PlatformTypeRequirements): boolean {
   // Duración
   if (reqs.maxDuration && metadata.duration > reqs.maxDuration) return false;
   if (reqs.minDuration && metadata.duration < reqs.minDuration) return false;
@@ -305,10 +324,7 @@ function formatAspectRatio(min: number, max: number): string {
 /**
  * Determina automáticamente el mejor tipo de publicación para un video
  */
-export function suggestPublicationType(
-  metadata: VideoMetadata,
-  platform: string
-): string | null {
+export function suggestPublicationType(metadata: VideoMetadata, platform: string): string | null {
   const requirements = PLATFORM_REQUIREMENTS[platform];
   if (!requirements) return null;
 

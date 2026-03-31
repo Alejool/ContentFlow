@@ -1,5 +1,5 @@
-import { Brain, Maximize2, Minimize2, X } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { Brain, Maximize2, Minimize2, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ChatHeaderProps {
   isMinimized: boolean;
@@ -7,26 +7,23 @@ interface ChatHeaderProps {
   onClose: () => void;
 }
 
-export default function ChatHeader({
-  isMinimized,
-  onMinimize,
-  onClose,
-}: ChatHeaderProps) {
+export default function ChatHeader({ isMinimized, onMinimize, onClose }: ChatHeaderProps) {
   const { t } = useTranslation();
 
   return (
-    <div
-      className="p-4 flex items-center justify-between text-white shrink-0 cursor-pointer transition-colors bg-gradient-to-r from-primary-600 to-primary-600 dark:from-primary-700 dark:to-primary-900"
+    <button
+      type="button"
+      className="flex w-full shrink-0 cursor-pointer items-center justify-between bg-gradient-to-r from-primary-600 to-primary-600 p-4 text-white transition-colors dark:from-primary-700 dark:to-primary-900"
       onClick={onMinimize}
     >
       <div className="flex items-center gap-3">
-        <div className="p-2 rounded-lg bg-white/20 dark:bg-primary-800/40">
-          <Brain className="w-5 h-5" />
+        <div className="rounded-lg bg-white/20 p-2 dark:bg-primary-800/40">
+          <Brain className="h-5 w-5" />
         </div>
         <div>
-          <span className="font-semibold">{t("aiAssistant.headerTitle")}</span>
+          <span className="font-semibold">{t('aiAssistant.headerTitle')}</span>
           <p className="text-xs text-white/90 dark:text-primary-200/80">
-            {t("aiAssistant.subtitle")}
+            {t('aiAssistant.subtitle')}
           </p>
         </div>
       </div>
@@ -36,24 +33,20 @@ export default function ChatHeader({
             e.stopPropagation();
             onMinimize();
           }}
-          className="p-2 rounded transition-colors hover:bg-white/20 dark:hover:bg-primary-800/40"
+          className="rounded p-2 transition-colors hover:bg-white/20 dark:hover:bg-primary-800/40"
         >
-          {isMinimized ? (
-            <Maximize2 className="w-4 h-4" />
-          ) : (
-            <Minimize2 className="w-4 h-4" />
-          )}
+          {isMinimized ? <Maximize2 className="h-4 w-4" /> : <Minimize2 className="h-4 w-4" />}
         </button>
         <button
           onClick={(e) => {
             e.stopPropagation();
             onClose();
           }}
-          className="p-2 rounded transition-colors hover:bg-white/20 dark:hover:bg-primary-800/40"
+          className="rounded p-2 transition-colors hover:bg-white/20 dark:hover:bg-primary-800/40"
         >
-          <X className="w-4 h-4" />
+          <X className="h-4 w-4" />
         </button>
       </div>
-    </div>
+    </button>
   );
 }

@@ -1,6 +1,6 @@
 /**
  * Skip Link Component
- * 
+ *
  * Provides keyboard users a way to skip to main content
  * WCAG 2.4.1 - Bypass Blocks (Level A)
  */
@@ -12,14 +12,14 @@ interface SkipLinkProps {
   children?: React.ReactNode;
 }
 
-export const SkipLink: React.FC<SkipLinkProps> = ({ 
+export const SkipLink: React.FC<SkipLinkProps> = ({
   href = '#main-content',
-  children = 'Saltar al contenido principal'
+  children = 'Saltar al contenido principal',
 }) => {
   return (
     <a
       href={href}
-      className="skip-link focus-ring"
+      className="focus-ring skip-link"
       onClick={(e) => {
         e.preventDefault();
         const target = document.querySelector(href);

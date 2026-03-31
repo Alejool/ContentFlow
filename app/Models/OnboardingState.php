@@ -9,6 +9,13 @@ class OnboardingState extends Model
 {
     protected $fillable = [
         'user_id',
+        'business_info_completed',
+        'business_name',
+        'business_industry',
+        'business_goals',
+        'business_size',
+        'plan_selected',
+        'selected_plan',
         'tour_completed',
         'tour_skipped',
         'tour_current_step',
@@ -24,6 +31,8 @@ class OnboardingState extends Model
     ];
 
     protected $casts = [
+        'business_info_completed' => 'boolean',
+        'plan_selected' => 'boolean',
         'tour_completed' => 'boolean',
         'tour_skipped' => 'boolean',
         'tour_completed_steps' => 'array',
@@ -42,14 +51,22 @@ class OnboardingState extends Model
 
     public function isComplete(): bool
     {
-        return $this->tour_completed || $this->tour_skipped;
+        return $this->business_info_completed 
+            && $this->plan_selected 
+            && ($this->tour_completed || $this->tour_skipped);
     }
 
     public function getCompletionPercentage(): int
     {
-        $total = 3; // tour, wizard, template
+        $total = 5; // business info, plan selection, tour, wizard, template
         $completed = 0;
         
+        if ($this->business_info_completed) {
+            $completed++;
+        }
+        if ($this->plan_selected) {
+            $completed++;
+        }
         if ($this->tour_completed || $this->tour_skipped) {
             $completed++;
         }

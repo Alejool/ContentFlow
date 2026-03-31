@@ -1,25 +1,25 @@
-import { useEffect, useRef } from "react";
-import { UseFormSetValue } from "react-hook-form";
+import { useEffect, useRef } from 'react';
+import { UseFormSetValue } from 'react-hook-form';
 import {
   getTemplateFromSession,
   clearTemplateFromSession,
   applyTemplateToForm,
-} from "@/Utils/templateUtils";
-import type { PublicationFormData } from "@/schemas/publication";
+} from '@/Utils/templateUtils';
+import type { PublicationFormData } from '@/schemas/publication';
 
 /**
  * Hook that automatically applies a template from session storage
  * when a publication form is opened.
- * 
+ *
  * This hook should be used in the publication form/modal to check
  * if a template was selected during onboarding and apply it automatically.
- * 
+ *
  * @param setValue - React Hook Form setValue function
  * @param isOpen - Whether the form/modal is open
  */
 export function useTemplateAutoApply(
   setValue: UseFormSetValue<PublicationFormData>,
-  isOpen: boolean
+  isOpen: boolean,
 ) {
   const hasApplied = useRef(false);
 

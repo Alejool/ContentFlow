@@ -1,22 +1,22 @@
-import { ErrorBoundary } from "@/Components/common/ui/ErrorBoundary";
-import ThemedToaster from "@/Components/common/ui/ThemedToaster";
-import { ThemeProvider } from "@/Contexts/ThemeContext";
-import { ErrorInterceptor } from "@/Services/ErrorInterceptor";
-import { PageProps } from "@/types";
-import { createInertiaApp } from "@inertiajs/react";
-import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
-import { createRoot } from "react-dom/client";
-import { lazy, Suspense } from "react";
-import { ServiceWorkerUpdate } from "./components/ServiceWorkerUpdate";
-import { AnimatedPage } from "@/Components/common/motion/AnimatedPage";
-import { InertiaProgressIndicator } from "@/Components/common/motion/InertiaProgressIndicator";
-import { FocusVisibleManager } from "@/Utils/FocusVisibleManager";
-import { FocusManager } from "@/Utils/FocusManager";
-import { ariaAnnouncer } from "@/Utils/ARIAAnnouncer";
-import { QueryProvider } from "@/providers/QueryProvider";
-import "../css/app.css";
-import "./bootstrap";
-import "./i18n";
+import { AnimatedPage } from '@/Components/common/motion/AnimatedPage';
+import { InertiaProgressIndicator } from '@/Components/common/motion/InertiaProgressIndicator';
+import { ErrorBoundary } from '@/Components/common/ui/ErrorBoundary';
+import ThemedToaster from '@/Components/common/ui/ThemedToaster';
+import { ThemeProvider } from '@/Contexts/ThemeContext';
+import { ErrorInterceptor } from '@/Services/ErrorInterceptor';
+import { ariaAnnouncer } from '@/Utils/ARIAAnnouncer';
+import { FocusManager } from '@/Utils/FocusManager';
+import { FocusVisibleManager } from '@/Utils/FocusVisibleManager';
+import { QueryProvider } from '@/providers/QueryProvider';
+import { PageProps } from '@/types';
+import { createInertiaApp } from '@inertiajs/react';
+import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import React, { Suspense } from 'react';
+import { createRoot } from 'react-dom/client';
+import '../css/app.css';
+import { ServiceWorkerUpdate } from './Components/ServiceWorkerUpdate';
+import './bootstrap';
+import './i18n';
 
 ErrorInterceptor.initialize();
 
@@ -27,28 +27,25 @@ FocusManager.initialize();
 // Initialize ARIA announcer for screen reader support
 ariaAnnouncer.initialize();
 
-const appName = import.meta.env.VITE_APP_NAME || "contentFlow";
+const appName = import.meta.env.VITE_APP_NAME || 'contentFlow';
 
 // Lazy load i18n
-const loadI18n = () => import("./i18n");
+const loadI18n = () => import('./i18n');
 
 createInertiaApp<PageProps>({
-  title: (title) => `${title} - ${appName}`,
-  resolve: (name) => {
-    const cleanName = name.startsWith("/") ? name.slice(1) : name;
+  title: (title: any) => `${title} - ${appName}`,
+  resolve: (name: string) => {
+    const cleanName = name.startsWith('/') ? name.slice(1) : name;
     // Lazy loading agresivo por rutas
-    return resolvePageComponent(
-      `./Pages/${cleanName}.tsx`,
-      import.meta.glob("./Pages/**/*.tsx")
-    );
+    return resolvePageComponent(`./Pages/${cleanName}.tsx`, import.meta.glob('./Pages/**/*.tsx'));
   },
 
-  setup({ el, App, props }) {
+  setup({ el, App, props }: { el: HTMLElement; App: React.ComponentType<any>; props: any }) {
     const root = createRoot(el);
 
     const user = props.initialPage.props.auth?.user;
     const userLocale = user?.locale;
-    
+
     if (userLocale) {
       loadI18n().then(({ default: i18n }) => {
         i18n.changeLanguage(userLocale);
@@ -60,12 +57,16 @@ createInertiaApp<PageProps>({
         <QueryProvider>
           <ThemeProvider
             isAuthenticated={!!user}
-            initialTheme={user?.theme as "light" | "dark" | undefined}
+            initialTheme={user?.theme === 'light' || user?.theme === 'dark' ? user.theme : undefined}
             workspaceId={user?.current_workspace_id}
           >
-            <Suspense fallback={<div className="flex items-center justify-center min-h-screen">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-            </div>}>
+            <Suspense
+              fallback={
+                <div className="flex min-h-screen items-center justify-center">
+                  <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-primary-600"></div>
+                </div>
+              }
+            >
               <AnimatedPage variant="fade" pageKey={props.initialPage.url}>
                 <App {...props} />
               </AnimatedPage>
@@ -75,7 +76,7 @@ createInertiaApp<PageProps>({
             <InertiaProgressIndicator color="#ad421e" />
           </ThemeProvider>
         </QueryProvider>
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
   },
 });

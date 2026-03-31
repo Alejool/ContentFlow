@@ -6,13 +6,15 @@ use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Publications\Publication;
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
+use App\Services\Publications\ContentTypeValidationService;
+use Illuminate\Contracts\Validation\Validator;
 
 class UpdatePublicationRequest extends FormRequest
 {
   public function authorize(): bool
   {
     $publication = $this->route('publication');
-    
+
     if (!$publication instanceof Publication) {
       $publication = Publication::find($publication);
     }
@@ -42,14 +44,14 @@ class UpdatePublicationRequest extends FormRequest
   protected function failedAuthorization()
   {
     $publication = $this->route('publication');
-    
+
     if (!$publication instanceof Publication) {
       $publication = Publication::find($publication);
     }
 
     if ($publication && $publication->isLockedForEditing()) {
       $message = 'This publication is locked for editing. ';
-      
+
       if ($publication->status === 'pending_review') {
         $message .= 'It is awaiting approval and cannot be modified until it is approved or rejected.';
       } elseif ($publication->status === 'approved') {
@@ -70,7 +72,7 @@ class UpdatePublicationRequest extends FormRequest
     // Handle social_accounts if it comes as JSON string
     if ($this->has('social_accounts')) {
       $socialAccounts = $this->input('social_accounts');
-      
+
       // If it's a string, try to decode it
       if (is_string($socialAccounts)) {
         // Handle empty string
@@ -84,7 +86,28 @@ class UpdatePublicationRequest extends FormRequest
           }
         }
       }
-    } 
+    }
+
+    // Cast is_recurring to actual boolean so validation rules like required_if work seamlessly
+    if ($this->has('is_recurring')) {
+      $this->merge([
+        'is_recurring' => filter_var($this->is_recurring, FILTER_VALIDATE_BOOLEAN)
+      ]);
+    }
+
+    if ($this->has('recurrence_days') && is_string($this->recurrence_days)) {
+      $days = array_filter(explode(',', $this->recurrence_days), 'strlen');
+      $this->merge([
+        'recurrence_days' => array_map('intval', $days)
+      ]);
+    }
+
+    if ($this->has('recurrence_accounts') && is_string($this->recurrence_accounts)) {
+      $accounts = array_filter(explode(',', $this->recurrence_accounts), 'strlen');
+      $this->merge([
+        'recurrence_accounts' => array_map('intval', $accounts)
+      ]);
+    }
   }
 
   public function rules(): array
@@ -93,10 +116,74 @@ class UpdatePublicationRequest extends FormRequest
     if (!$publication instanceof Publication) {
       $publication = Publication::find($publication);
     }
+    
+    // Debug logging para entender qué datos llegan
+    \Log::info('UpdatePublicationRequest validation data', [
+      'publication_id' => $publication?->id,
+      'content_type' => $this->input('content_type'),
+      'scheduled_at' => $this->input('scheduled_at'),
+      'social_accounts' => $this->input('social_accounts'),
+      'social_account_schedules' => $this->input('social_account_schedules'),
+      'use_global_schedule' => $this->input('use_global_schedule'),
+      'all_input' => $this->all()
+    ]);
+    
     return [
       'title' => 'required|string|max:255',
-      'description' => 'required|string',
-      'hashtags' => 'nullable|string',
+      'description' => [
+        'string',
+        function ($attribute, $value, $fail) {
+          $contentType = $this->input('content_type', 'post');
+          
+          // For stories, description is optional
+          if ($contentType === 'story') {
+            return;
+          }
+          
+          // For other content types, description is required
+          if (empty($value) || trim($value) === '') {
+            $fail('Description is required for this content type.');
+            return;
+          }
+        }
+      ],
+      'hashtags' => [
+        'nullable',
+        'string',
+        function ($attribute, $value, $fail) {
+          $contentType = $this->input('content_type', 'post');
+          
+          // For polls and stories, hashtags are optional
+          if ($contentType === 'poll' || $contentType === 'story') {
+            return;
+          }
+          
+          // For other content types, hashtags are required
+          if (empty($value) || trim($value) === '') {
+            $fail('Hashtags are required for this content type.');
+            return;
+          }
+          
+          // Simple validation: just check if there's at least one # character
+          if (!str_contains($value, '#')) {
+            $fail('At least one hashtag is required (must start with #).');
+            return;
+          }
+          
+          // Count hashtags (better separation logic)
+          $hashtags = array_filter(
+            preg_split('/[\s,]+/', $value), 
+            function($tag) {
+              $tag = trim($tag);
+              return !empty($tag) && str_starts_with($tag, '#') && strlen($tag) > 1;
+            }
+          );
+          
+          if (count($hashtags) > 10) {
+            $fail('Maximum 10 hashtags allowed.');
+          }
+        }
+      ],
       'goal' => 'nullable|string',
       'start_date' => 'nullable|date',
       'end_date' => 'nullable|date|after_or_equal:start_date',
@@ -114,7 +201,7 @@ class UpdatePublicationRequest extends FormRequest
               ->where('status', 'published')
               ->exists();
 
-            if ($hasPublishedPosts && $value !== 'published') {
+            if ($hasPublishedPosts && $value !== 'published' && !$this->boolean('is_recurring')) {
               $fail('Cannot change status from published when posts are already published on social media. Unpublish first.');
             }
           }
@@ -124,16 +211,31 @@ class UpdatePublicationRequest extends FormRequest
         'nullable',
         'date',
         function ($attribute, $value, $fail) use ($publication) {
-          if (!$publication) return;
-          $existing = $publication->scheduled_at;
-          if ($value) {
-            $scheduledDate = Carbon::parse($value);
-            $now = Carbon::now();
-            
-            // Check if scheduled date is more than 1 minute in the future
-            if ($scheduledDate->diffInSeconds($now, false) >= -60) {
-              $fail(__('publications.validation.scheduledMinDifference'));
+          if (!$publication || !$value) return;
+
+          // If all selected accounts have individual schedules, skip global schedule validation
+          $selectedAccounts = $this->input('social_accounts', []);
+          $accountSchedules = $this->input('social_account_schedules', []);
+          if (!empty($selectedAccounts) && count($accountSchedules) >= count($selectedAccounts)) {
+            return;
+          }
+
+          $contentType = $this->input('content_type', $publication->content_type ?? 'post');
+          
+          $scheduledDate = Carbon::parse($value);
+          $now = Carbon::now();
+
+          // For polls, be more lenient - just needs to be in the future
+          if ($contentType === 'poll') {
+            if ($scheduledDate->isPast()) {
+              $fail(__('publications.validation.scheduledInPast', ['type' => 'poll']));
             }
+            return;
+          }
+
+          // For other content types, check if scheduled date is at least 1 minute in the future
+          if ($scheduledDate->diffInSeconds($now, false) > -60) {
+            $fail(__('publications.validation.scheduledMinDifference'));
           }
         }
       ],
@@ -147,21 +249,26 @@ class UpdatePublicationRequest extends FormRequest
         function ($attribute, $value, $fail) use ($publication) {
           if (!$publication || !$value) return;
 
+          $contentType = $this->input('content_type', $publication->content_type ?? 'post');
+
           // Extract account ID from attribute name
           preg_match('/(?:social_account_schedules|account_schedules)\.(\d+)/', $attribute, $matches);
           $accountId = $matches[1] ?? null;
 
           if ($accountId) {
-            $existingPost = $publication->scheduled_posts()
-              ->where('social_account_id', $accountId)
-              ->first();
-            $existing = $existingPost?->scheduled_at;
-
             $scheduledDate = Carbon::parse($value);
             $now = Carbon::now();
-            
-            // Check if scheduled date is more than 1 minute in the future
-            if ($scheduledDate->diffInSeconds($now, false) >= -60) {
+
+            // For polls, be more lenient - just needs to be in the future
+            if ($contentType === 'poll') {
+              if ($scheduledDate->isPast()) {
+                $fail(__('publications.validation.scheduledInPast', ['type' => 'poll']));
+              }
+              return;
+            }
+
+            // For other content types, check if scheduled date is at least 1 minute in the future
+            if ($scheduledDate->diffInSeconds($now, false) > -60) {
               $fail(__('publications.validation.scheduledMinDifference'));
             }
           }
@@ -171,23 +278,41 @@ class UpdatePublicationRequest extends FormRequest
         function ($attribute, $value, $fail) use ($publication) {
           if (!$publication) return;
 
+          $contentType = $this->input('content_type', $publication->content_type ?? 'post');
           $accountId = $value;
+          
           // Check if this account has an individual schedule in the request
           $individualSchedule = $this->input("social_account_schedules.{$accountId}");
 
-          // If no individual schedule, it inherits the global scheduled_at
+          // If no individual schedule, check if there's a global schedule in the REQUEST
           if (!$individualSchedule) {
-            $globalSchedule = $this->input('scheduled_at') ?? $publication->scheduled_at;
+            $globalSchedule = $this->input('scheduled_at');
 
+            // Solo validar si hay una fecha global en el REQUEST
+            // No usar la fecha de la publicación existente para validación
             if ($globalSchedule) {
-              $scheduledDate = Carbon::parse($globalSchedule);
-              $now = Carbon::now();
-              
-              // Check if scheduled date is more than 1 minute in the future
-              if ($scheduledDate->diffInSeconds($now, false) >= -60) {
-                $fail(__('publications.validation.scheduledMinDifference'));
+              try {
+                $scheduledDate = Carbon::parse($globalSchedule);
+                $now = Carbon::now();
+
+                // For polls, be more lenient - just needs to be in the future
+                if ($contentType === 'poll') {
+                  if ($scheduledDate->isPast()) {
+                    $fail(__('publications.validation.scheduledInPast', ['type' => 'poll']));
+                  }
+                  return;
+                }
+
+                // For other content types, check if scheduled date is at least 1 minute in the future
+                if ($scheduledDate->diffInSeconds($now, false) > -60) {
+                  $fail(__('publications.validation.scheduledMinDifference'));
+                }
+              } catch (\Exception $e) {
+                $fail('Invalid date format for global schedule.');
               }
             }
+            // Si no hay globalSchedule en el request, no validar nada
+            // Esto permite que las encuestas funcionen sin fecha global
           }
         }
       ],
@@ -211,10 +336,210 @@ class UpdatePublicationRequest extends FormRequest
       'media_keep_ids' => 'nullable|array',
       'removed_media_ids' => 'nullable|array',
       'thumbnails' => 'nullable|array',
-      'thumbnails.*' => 'file|mimes:jpeg,png,jpg|max:5120',
+      'thumbnails.*' => 'file|mimes:jpeg,png,jpg,gif,svg,webp|max:5120',
       'removed_thumbnail_ids' => 'nullable|array',
-      'youtube_thumbnail' => 'nullable|file|mimes:jpeg,png,jpg|max:5120',
+      'youtube_thumbnail' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,webp|max:5120',
       'youtube_thumbnail_video_id' => 'nullable|exists:media_files,id',
+      // Recurrence
+      'is_recurring' => 'nullable|boolean',
+      'recurrence_type' => 'nullable|required_if:is_recurring,true|in:daily,weekly,monthly,yearly',
+      'recurrence_interval' => 'nullable|integer|min:1',
+      'recurrence_days' => 'nullable|array',
+      'recurrence_days.*' => 'integer|min:0|max:6',
+      'recurrence_end_date' => [
+        'nullable',
+        'date',
+        'after_or_equal:now',
+        function ($attribute, $value, $fail) use ($publication) {
+          // If is_recurring is true, end date is REQUIRED
+          if ($this->boolean('is_recurring') && !$value) {
+            $fail(__('publications.modal.validation.recurrenceEndDateRequired') ?? 'End date is required for recurring publications');
+          }
+        }
+      ],
+      'recurrence_accounts' => 'nullable|array',
+      'recurrence_accounts.*' => 'integer|exists:social_accounts,id',
+      // Content type
+      'content_type' => 'nullable|in:post,reel,story,poll,carousel',
+      // Poll fields
+      'poll_options' => 'nullable|array|min:2|max:4',
+      'poll_options.*' => 'nullable|string|max:25',
+      'poll_duration_hours' => 'nullable|integer|min:1|max:168',
+      // Carousel fields
+      'carousel_items' => 'nullable|array',
+      // Content metadata
+      'content_metadata' => 'nullable|array',
+      // Background upload flags
+      'has_uploading_files' => 'nullable',
+      'uploading_files_count' => 'nullable|integer',
     ];
+  }
+
+  /**
+   * Configure the validator instance.
+   */
+  protected function withValidator(Validator $validator): void
+  {
+    $validator->after(function ($validator) {
+      // Get the publication being updated
+      $publication = $this->route('publication');
+      
+      if (!$publication instanceof Publication) {
+        $publication = Publication::find($publication);
+      }
+
+      if (!$publication) {
+        return;
+      }
+
+      // Check if content type validation is needed
+      $contentTypeChanged = $this->has('content_type') && 
+                           $this->input('content_type') !== $publication->content_type;
+      
+      $platformsChanged = $this->has('social_accounts');
+      
+      $mediaChanged = $this->hasFile('media') || 
+                     !empty($this->input('removed_media_ids'));
+
+      // Only validate if relevant fields changed
+      if (!$contentTypeChanged && !$platformsChanged && !$mediaChanged) {
+        return;
+      }
+
+      // Get content type (use existing if not changed)
+      $contentType = $this->input('content_type', $publication->content_type) ?? 'post';
+      
+      // Get social account IDs (use existing if not changed)
+      // Normalize: the frontend may send a JSON-encoded string "[]" or an array of IDs
+      $rawSocialAccounts = $this->has('social_accounts')
+        ? $this->input('social_accounts', [])
+        : $publication->socialAccounts->pluck('id')->toArray();
+
+      if (is_string($rawSocialAccounts)) {
+        $decoded = json_decode($rawSocialAccounts, true);
+        $rawSocialAccounts = is_array($decoded) ? $decoded : [];
+      }
+
+      $socialAccountIds = array_values(array_filter(
+        array_map('intval', (array) $rawSocialAccounts),
+        fn($id) => $id > 0,
+      ));
+      
+      // Get media files - include both UploadedFile instances and metadata arrays
+      $newMediaFiles = collect($this->input('media', []))
+        ->filter(function ($file) {
+          // Accept UploadedFile instances
+          if ($file instanceof UploadedFile) {
+            return true;
+          }
+          // Accept metadata arrays with required fields
+          if (is_array($file) && (isset($file['key']) || isset($file['mime_type']) || isset($file['type']))) {
+            return true;
+          }
+          return false;
+        })
+        ->values()
+        ->toArray();
+
+      // Calculate total media count after update
+      $removedMediaIds = $this->input('removed_media_ids', []);
+      $existingMediaCount = $publication->mediaFiles()
+        ->whereNotIn('media_files.id', $removedMediaIds)
+        ->count();
+      
+      $totalMediaCount = $existingMediaCount + count($newMediaFiles);
+
+      // Check if there are files currently uploading - skip validation if so
+      $hasUploadingFiles = $this->input('has_uploading_files') === '1' || $this->input('has_uploading_files') === true;
+      $uploadingFilesCount = (int) $this->input('uploading_files_count', 0);
+
+      \Log::info('🔍 UpdatePublicationRequest - Checking uploading files', [
+        'has_uploading_files_raw' => $this->input('has_uploading_files'),
+        'has_uploading_files' => $hasUploadingFiles,
+        'uploading_files_count' => $uploadingFilesCount,
+        'publication_id' => $publication->id,
+        'content_type' => $contentType,
+        'all_inputs' => $this->all()
+      ]);
+
+      // If files are uploading, skip ALL validation
+      if ($hasUploadingFiles) {
+        \Log::info('⏭️ Skipping media validation - files are uploading in background', [
+          'publication_id' => $publication->id,
+          'uploading_files_count' => $uploadingFilesCount,
+          'content_type' => $contentType
+        ]);
+        return; // Skip ALL validation
+      }
+
+      // Only proceed with validation if no files are uploading
+      // For validation purposes, create dummy files array representing total count
+      // We only validate count and type for new files
+      $mediaFilesForValidation = $newMediaFiles;
+
+      // If we have new media files, validate them
+      // If we're changing content type, validate total media count
+      if ($contentTypeChanged || !empty($newMediaFiles)) {
+        $validationService = app(ContentTypeValidationService::class);
+        
+        // Validate cross-platform compatibility
+        if (!empty($socialAccountIds)) {
+          $platforms = \App\Models\Social\SocialAccount::whereIn('id', $socialAccountIds)
+            ->pluck('platform')
+            ->unique()
+            ->toArray();
+
+          $crossPlatformResult = $validationService->validateCrossPlatform($contentType, $platforms);
+          
+          if (!$crossPlatformResult->isValid) {
+            foreach ($crossPlatformResult->errors as $error) {
+              $validator->errors()->add('content_type', $error);
+            }
+          }
+        }
+
+        // For media validation, we need to consider the total count after update
+        // Create a representation of all media files that will exist after the update
+        $allMediaFilesAfterUpdate = [];
+        
+        // Add existing media files that won't be removed (including processing ones)
+        $existingMediaFiles = $publication->mediaFiles()
+          ->whereNotIn('media_files.id', $removedMediaIds)
+          ->get();
+        
+        foreach ($existingMediaFiles as $mediaFile) {
+          $allMediaFilesAfterUpdate[] = [
+            'mime_type' => $mediaFile->mime_type,
+            'type' => $mediaFile->mime_type,
+            'status' => $mediaFile->status, // Include status to detect processing files
+          ];
+        }
+        
+        // Add new media files
+        foreach ($newMediaFiles as $file) {
+          $allMediaFilesAfterUpdate[] = $file;
+        }
+
+        // Validate the complete set of media files
+        $mediaResult = $validationService->validateMediaFiles($contentType, $allMediaFilesAfterUpdate);
+        
+        if (!$mediaResult->isValid) {
+          \Log::warning('❌ Media validation failed during publication update', [
+            'publication_id' => $publication->id,
+            'content_type' => $contentType,
+            'total_files_after_update' => count($allMediaFilesAfterUpdate),
+            'existing_files' => $existingMediaCount,
+            'new_files' => count($newMediaFiles),
+            'removed_files' => count($removedMediaIds),
+            'errors' => $mediaResult->errors,
+            'all_files_data' => $allMediaFilesAfterUpdate
+          ]);
+          
+          foreach ($mediaResult->errors as $error) {
+            $validator->errors()->add('media', $error);
+          }
+        }
+      }
+    });
   }
 }

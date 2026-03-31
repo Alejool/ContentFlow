@@ -4,37 +4,53 @@ namespace App\Observers;
 
 use App\Models\User;
 use App\Models\Workspace\Workspace;
-use App\Models\Role\Role;;
+use App\Models\Role\Role;
+use App\Services\SubscriptionTrackingService;
 
 class UserObserver
 {
+    public function __construct(
+        protected SubscriptionTrackingService $subscriptionTracking
+    ) {}
+
     public function created(User $user): void
     {
-        if ($user->workspaces()->count() > 0) {
-            return;
-        }
+        // Create default workspace
+        if ($user->workspaces()->count() === 0) {
+            $workspaceName = $user->name ? $user->name . "'s Workspace" : "Default Workspace";
+            if ($user->locale === 'es') {
+                $workspaceName = $user->name ? "Espacio de " . $user->name : "Mi Espacio";
+            }
 
-        $workspaceName = $user->name ? $user->name . "'s Workspace" : "Default Workspace";
-        if ($user->locale === 'es') {
-            $workspaceName = $user->name ? "Espacio de " . $user->name : "Mi Espacio";
-        }
-
-        $workspace = Workspace::create([
-            'name' => $workspaceName,
-            'created_by' => $user->id,
-            'description' => $user->locale === 'es'
-                ? 'Tu espacio personal para empezar a crear contenido.'
-                : 'Your personal workspace to start creating content.',
-        ]);
-        $ownerRole = Role::where('slug', 'owner')->first();
-
-        if ($ownerRole) {
-            $user->workspaces()->attach($workspace->id, [
-                'role_id' => $ownerRole->id
+            $workspace = Workspace::create([
+                'name' => $workspaceName,
+                'created_by' => $user->id,
+                'description' => $user->locale === 'es'
+                    ? 'Tu espacio personal para empezar a crear contenido.'
+                    : 'Your personal workspace to start creating content.',
             ]);
+            $ownerRole = Role::where('slug', 'owner')->first();
+
+            if ($ownerRole) {
+                $user->workspaces()->attach($workspace->id, [
+                    'role_id' => $ownerRole->id
+                ]);
+            }
+
+            $user->update(['current_workspace_id' => $workspace->id]);
         }
 
-        $user->update(['current_workspace_id' => $workspace->id]);
+        // Create default free subscription
+        $this->subscriptionTracking->recordPlanChange(
+            user: $user,
+            newPlan: 'free',
+            previousPlan: null,
+            stripePriceId: null,
+            price: 0,
+            billingCycle: 'monthly',
+            reason: 'initial_registration',
+            metadata: ['source' => 'user_registration']
+        );
     }
 
     /**

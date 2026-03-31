@@ -1,6 +1,6 @@
 /**
  * Reduced Motion Hook
- * 
+ *
  * Detects user's motion preference for accessibility
  */
 
@@ -11,7 +11,7 @@ export function useReducedMotion(): boolean {
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    
+
     setPrefersReducedMotion(mediaQuery.matches);
 
     const handleChange = (event: MediaQueryListEvent) => {

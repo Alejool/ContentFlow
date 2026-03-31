@@ -6,12 +6,12 @@
 export interface QueuedAction {
   id: string;
   type: string;
-  payload: any;
+  payload: unknown;
   timestamp: number;
   retries: number;
 }
 
-const QUEUE_STORAGE_KEY = "onboarding_offline_queue";
+const QUEUE_STORAGE_KEY = 'onboarding_offline_queue';
 const MAX_RETRIES = 3;
 
 class OfflineQueueManager {
@@ -31,7 +31,7 @@ class OfflineQueueManager {
       if (stored) {
         this.queue = JSON.parse(stored);
       }
-    } catch (error) {
+    } catch {
       this.queue = [];
     }
   }
@@ -42,7 +42,7 @@ class OfflineQueueManager {
   private saveQueue(): void {
     try {
       localStorage.setItem(QUEUE_STORAGE_KEY, JSON.stringify(this.queue));
-    } catch (error) {
+    } catch {
       // Failed to save offline queue
     }
   }
@@ -50,7 +50,7 @@ class OfflineQueueManager {
   /**
    * Add an action to the queue
    */
-  enqueue(type: string, payload: any): string {
+  enqueue(type: string, payload: unknown): string {
     const action: QueuedAction = {
       id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       type,
@@ -99,7 +99,7 @@ class OfflineQueueManager {
    * @param syncFn Function to execute each queued action
    */
   async sync(
-    syncFn: (action: QueuedAction) => Promise<void>
+    syncFn: (action: QueuedAction) => Promise<void>,
   ): Promise<{ success: number; failed: number }> {
     if (this.isSyncing || this.queue.length === 0) {
       return { success: 0, failed: 0 };
@@ -117,11 +117,10 @@ class OfflineQueueManager {
         await syncFn(action);
         this.dequeue(action.id);
         successCount++;
-      } catch (error) {
-        
+      } catch {
         // Increment retry count
         action.retries++;
-        
+
         // Remove if max retries reached
         if (action.retries >= MAX_RETRIES) {
           this.dequeue(action.id);

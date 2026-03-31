@@ -30,6 +30,8 @@
       "engagementTrends": "Tendencias de Engagement",
       "followersByPlatform": "Seguidores por Plataforma",
       "topCampaignPerformance": "Rendimiento de Campañas Principales",
+      "detailedPlatforms": "Análisis Detallado por Plataforma",
+      "detailedPublications": "Rendimiento Detallado de Publicaciones",
       "views": "Vistas",
       "clicks": "Clics",
       "engagement": "Engagement"
@@ -47,6 +49,13 @@
     "emptyState": {
       "title": "No hay datos disponibles",
       "description": "Comienza a crear campañas y conecta tus cuentas de redes sociales para ver tus analíticas aquí."
+    },
+    "advanced": {
+      "locked_title": "Analytics Avanzados",
+      "locked_description": "Obtén análisis detallado por plataforma, rendimiento de publicaciones y reportes exportables con los planes Professional y Enterprise.",
+      "upgrade_cta": "Actualizar Plan",
+      "daily_metrics": "Métricas diarias actualizadas por cron jobs",
+      "platform_breakdown": "Desglose por plataforma y evolución diaria"
     }
   }
 }

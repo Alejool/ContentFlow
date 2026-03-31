@@ -1,6 +1,6 @@
 /**
  * Axios Configuration with Optimistic Updates
- * 
+ *
  * This file sets up axios with the optimistic interceptor.
  * Import and use this configured instance for optimistic updates.
  */
@@ -24,9 +24,9 @@ export default axiosInstance;
 
 /**
  * Example usage:
- * 
+ *
  * import axiosInstance from '@/config/axios';
- * 
+ *
  * // Make an optimistic request
  * const response = await axiosInstance.post('/api/publications', data, {
  *   optimistic: true,

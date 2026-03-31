@@ -1,5 +1,5 @@
 function esFechaValidaMejorada(fecha: string): boolean {
-  if (typeof fecha !== "string") return false;
+  if (typeof fecha !== 'string') return false;
 
   const formatosComunes = [
     /^\d{4}-\d{2}-\d{2}$/,
@@ -17,21 +17,17 @@ function esFechaValidaMejorada(fecha: string): boolean {
 
 export function convertDate(date: string): string {
   if (!esFechaValidaMejorada(date)) {
-    return "";
+    return '';
   }
   const dateObj = new Date(date);
-  const fechaNormalizada = new Date(
-    dateObj.getFullYear(),
-    dateObj.getMonth(),
-    dateObj.getDate(),
-  );
+  const fechaNormalizada = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
   const locale =
-    (window as any).APP_LOCALE ||
+    (window as { APP_LOCALE?: string }).APP_LOCALE ||
     Intl.DateTimeFormat().resolvedOptions().locale ||
-    "es-ES";
+    'es-ES';
   return fechaNormalizada.toLocaleDateString(locale, {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
   });
 }
