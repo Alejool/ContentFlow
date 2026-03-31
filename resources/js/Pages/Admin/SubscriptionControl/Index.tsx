@@ -1,16 +1,9 @@
 import AdminNavigation from '@/Components/Admin/AdminNavigation';
 import AlertCard from '@/Components/common/Modern/AlertCard';
 import Button from '@/Components/common/Modern/Button';
+import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
 import Switch from '@/Components/common/Modern/Switch';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/Components/ui/dialog';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router, useForm } from '@inertiajs/react';
 import { AlertTriangle, Clock, RefreshCw, Save } from 'lucide-react';
@@ -324,30 +317,38 @@ export default function SubscriptionControlIndex({ settings }: Props) {
       </div>
 
       {/* Confirmation Modal */}
-      <Dialog open={!!pendingToggle} onOpenChange={(open) => !open && cancelToggle()}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-amber-500" />
-              Confirmar cambio: {pendingToggle?.label}
-            </DialogTitle>
-            <DialogDescription>{pendingToggle?.warningMessage}</DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="gap-2">
+      <DynamicModal
+        isOpen={!!pendingToggle}
+        onClose={cancelToggle}
+        title={`Confirmar cambio: ${pendingToggle?.label || ''}`}
+        size="md"
+      >
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
+            <AlertTriangle className="h-5 w-5" />
+            <span className="font-medium">Advertencia</span>
+          </div>
+          
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            {pendingToggle?.warningMessage}
+          </p>
+          
+          <div className="flex justify-end gap-2 pt-4">
             <Button variant="secondary" buttonStyle="ghost" onClick={cancelToggle}>
               Cancelar
             </Button>
             <Button
               variant={pendingToggle?.newValue ? 'primary' : 'danger'}
+              buttonStyle='solid'
               onClick={confirmToggle}
               loading={processing}
               loadingText="Aplicando..."
             >
               {pendingToggle?.newValue ? 'Activar' : 'Desactivar'}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </div>
+        </div>
+      </DynamicModal>
     </AuthenticatedLayout>
   );
 }
