@@ -38,23 +38,26 @@ export default function SubscriptionControlIndex({ settings }: Props) {
   });
 
   const [pendingToggle, setPendingToggle] = useState<PendingToggle | null>(null);
-  const [numericErrors, setNumericErrors] = useState<Partial<Record<keyof SubscriptionSettings, string>>>({});
+  const [numericErrors, setNumericErrors] = useState<
+    Partial<Record<keyof SubscriptionSettings, string>>
+  >({});
 
   const handleToggleRequest = (field: 'demo_mode' | 'purchases_enabled', newValue: boolean) => {
-    const messages: Record<'demo_mode' | 'purchases_enabled', { label: string; warning: string }> = {
-      demo_mode: {
-        label: 'Modo Demo',
-        warning: newValue
-          ? 'Activar el modo demo restringirá el sistema al plan gratuito. Los usuarios no podrán iniciar nuevas compras.'
-          : 'Desactivar el modo demo permitirá que los usuarios vuelvan a comprar planes de pago.',
-      },
-      purchases_enabled: {
-        label: 'Compras',
-        warning: newValue
-          ? 'Habilitar las compras permitirá que los usuarios inicien nuevos flujos de pago.'
-          : 'Deshabilitar las compras bloqueará todos los nuevos intentos de pago en el sistema.',
-      },
-    };
+    const messages: Record<'demo_mode' | 'purchases_enabled', { label: string; warning: string }> =
+      {
+        demo_mode: {
+          label: 'Modo Demo',
+          warning: newValue
+            ? 'Activar el modo demo restringirá el sistema al plan gratuito. Los usuarios no podrán iniciar nuevas compras.'
+            : 'Desactivar el modo demo permitirá que los usuarios vuelvan a comprar planes de pago.',
+        },
+        purchases_enabled: {
+          label: 'Compras',
+          warning: newValue
+            ? 'Habilitar las compras permitirá que los usuarios inicien nuevos flujos de pago.'
+            : 'Deshabilitar las compras bloqueará todos los nuevos intentos de pago en el sistema.',
+        },
+      };
 
     setPendingToggle({
       field,
@@ -67,19 +70,23 @@ export default function SubscriptionControlIndex({ settings }: Props) {
   const confirmToggle = () => {
     if (!pendingToggle) return;
     const toggle = pendingToggle;
-    
+
     setPendingToggle(null);
-    
+
     // Update the data and submit
     setData(toggle.field, toggle.newValue);
-    
+
     // Use router.put with explicit data to avoid timing issues
-    router.put('/admin/subscription-control/settings', {
-      ...data,
-      [toggle.field]: toggle.newValue,
-    }, {
-      preserveScroll: true,
-    });
+    router.put(
+      '/admin/subscription-control/settings',
+      {
+        ...data,
+        [toggle.field]: toggle.newValue,
+      },
+      {
+        preserveScroll: true,
+      },
+    );
   };
 
   const cancelToggle = () => {
@@ -102,7 +109,10 @@ export default function SubscriptionControlIndex({ settings }: Props) {
     return null;
   };
 
-  const handleNumericChange = (field: 'grace_period_days' | 'max_retry_attempts' | 'retry_interval_hours', rawValue: string) => {
+  const handleNumericChange = (
+    field: 'grace_period_days' | 'max_retry_attempts' | 'retry_interval_hours',
+    rawValue: string,
+  ) => {
     const parsed = parseInt(rawValue, 10);
     const numValue = isNaN(parsed) ? 0 : parsed;
     setData(field, numValue);
@@ -155,18 +165,25 @@ export default function SubscriptionControlIndex({ settings }: Props) {
 
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <div className="mx-auto max-w-4xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
-
           {/* Status summary */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className={`rounded-xl border p-4 ${isDemoModeActive ? 'border-amber-300 bg-amber-50 dark:border-amber-700 dark:bg-amber-900/20' : 'border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800'}`}>
+            <div
+              className={`rounded-xl border p-4 ${isDemoModeActive ? 'border-amber-300 bg-amber-50 dark:border-amber-700 dark:bg-amber-900/20' : 'border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800'}`}
+            >
               <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Modo Demo</p>
-              <p className={`mt-1 text-lg font-bold ${isDemoModeActive ? 'text-amber-600 dark:text-amber-400' : 'text-green-600 dark:text-green-400'}`}>
+              <p
+                className={`mt-1 text-lg font-bold ${isDemoModeActive ? 'text-amber-600 dark:text-amber-400' : 'text-green-600 dark:text-green-400'}`}
+              >
                 {isDemoModeActive ? 'Activo' : 'Inactivo'}
               </p>
             </div>
-            <div className={`rounded-xl border p-4 ${!isPurchasesEnabled ? 'border-red-300 bg-red-50 dark:border-red-700 dark:bg-red-900/20' : 'border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800'}`}>
+            <div
+              className={`rounded-xl border p-4 ${!isPurchasesEnabled ? 'border-red-300 bg-red-50 dark:border-red-700 dark:bg-red-900/20' : 'border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800'}`}
+            >
               <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Compras</p>
-              <p className={`mt-1 text-lg font-bold ${isPurchasesEnabled ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+              <p
+                className={`mt-1 text-lg font-bold ${isPurchasesEnabled ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
+              >
                 {isPurchasesEnabled ? 'Habilitadas' : 'Deshabilitadas'}
               </p>
             </div>
@@ -207,10 +224,18 @@ export default function SubscriptionControlIndex({ settings }: Props) {
                     Modo Demo
                   </h3>
                   <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                    Restringe el sistema al plan gratuito. Los usuarios con planes de pago activos no se ven afectados.
+                    Restringe el sistema al plan gratuito. Los usuarios con planes de pago activos
+                    no se ven afectados.
                   </p>
                   <p className="mt-2 text-xs font-medium">
-                    Estado: <span className={isDemoModeActive ? 'text-amber-600 dark:text-amber-400' : 'text-green-600 dark:text-green-400'}>
+                    Estado:{' '}
+                    <span
+                      className={
+                        isDemoModeActive
+                          ? 'text-amber-600 dark:text-amber-400'
+                          : 'text-green-600 dark:text-green-400'
+                      }
+                    >
                       Modo Demo: {isDemoModeActive ? 'Activo' : 'Inactivo'}
                     </span>
                   </p>
@@ -231,10 +256,18 @@ export default function SubscriptionControlIndex({ settings }: Props) {
                     Habilitar Compras
                   </h3>
                   <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                    Control de emergencia para deshabilitar todos los flujos de pago. Los planes activos no se interrumpen.
+                    Control de emergencia para deshabilitar todos los flujos de pago. Los planes
+                    activos no se interrumpen.
                   </p>
                   <p className="mt-2 text-xs font-medium">
-                    Estado: <span className={isPurchasesEnabled ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
+                    Estado:{' '}
+                    <span
+                      className={
+                        isPurchasesEnabled
+                          ? 'text-green-600 dark:text-green-400'
+                          : 'text-red-600 dark:text-red-400'
+                      }
+                    >
                       Compras: {isPurchasesEnabled ? 'Habilitadas' : 'Deshabilitadas'}
                     </span>
                   </p>
@@ -328,18 +361,18 @@ export default function SubscriptionControlIndex({ settings }: Props) {
             <AlertTriangle className="h-5 w-5" />
             <span className="font-medium">Advertencia</span>
           </div>
-          
+
           <p className="text-sm text-gray-600 dark:text-gray-400">
             {pendingToggle?.warningMessage}
           </p>
-          
+
           <div className="flex justify-end gap-2 pt-4">
             <Button variant="secondary" buttonStyle="ghost" onClick={cancelToggle}>
               Cancelar
             </Button>
             <Button
               variant={pendingToggle?.newValue ? 'primary' : 'danger'}
-              buttonStyle='solid'
+              buttonStyle="solid"
               onClick={confirmToggle}
               loading={processing}
               loadingText="Aplicando..."
@@ -366,12 +399,26 @@ interface NumericFieldProps {
   unit: string;
 }
 
-function NumericField({ id, label, description, icon, value, onChange, error, min, max, unit }: NumericFieldProps) {
+function NumericField({
+  id,
+  label,
+  description,
+  icon,
+  value,
+  onChange,
+  error,
+  min,
+  max,
+  unit,
+}: NumericFieldProps) {
   return (
     <div className="rounded-xl border border-gray-200 p-5 dark:border-gray-700">
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
-          <label htmlFor={id} className="block text-base font-semibold text-gray-900 dark:text-gray-100">
+          <label
+            htmlFor={id}
+            className="block text-base font-semibold text-gray-900 dark:text-gray-100"
+          >
             {label}
           </label>
           <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{description}</p>
@@ -387,9 +434,7 @@ function NumericField({ id, label, description, icon, value, onChange, error, mi
             value={value}
             onChange={(e) => onChange(e.target.value)}
             className={`w-24 rounded-lg border px-3 py-2 text-right text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-gray-100 ${
-              error
-                ? 'border-red-400 dark:border-red-600'
-                : 'border-gray-300 dark:border-gray-600'
+              error ? 'border-red-400 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
             }`}
           />
           <span className="text-sm text-gray-500 dark:text-gray-400">{unit}</span>

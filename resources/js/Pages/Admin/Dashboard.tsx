@@ -191,7 +191,9 @@ export default function AdminDashboard({ systemStatus, stats, recentActivity = [
     {
       title: t('admin.dashboard.metrics.active_subscriptions'),
       value: stats?.active_subscriptions ?? 0,
-      sub: stats?.trial_subscriptions ? `${stats.trial_subscriptions} ${t('admin.dashboard.status.on_trial')}` : undefined,
+      sub: stats?.trial_subscriptions
+        ? `${stats.trial_subscriptions} ${t('admin.dashboard.status.on_trial')}`
+        : undefined,
       icon: TrendingUp,
       color: 'text-green-600 dark:text-green-400',
       bg: 'bg-green-100 dark:bg-green-900/30',
@@ -254,7 +256,9 @@ export default function AdminDashboard({ systemStatus, stats, recentActivity = [
     {
       title: t('admin.dashboard.metrics.pending_review'),
       value: stats?.pending_review ?? 0,
-      sub: stats?.failed_publications ? `${stats.failed_publications} ${t('admin.dashboard.status.failed')}` : t('admin.dashboard.status.no_failures'),
+      sub: stats?.failed_publications
+        ? `${stats.failed_publications} ${t('admin.dashboard.status.failed')}`
+        : t('admin.dashboard.status.no_failures'),
       icon: Clock,
       color:
         (stats?.pending_review ?? 0) > 0

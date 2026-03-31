@@ -67,8 +67,18 @@ export default function MembersManagement({ roles = [], workspace }: MembersMana
   const handleRemoveMember = async () => {
     if (!canManageMembers || !userToRemove) return;
     removeMember.mutate(userToRemove, {
-      onSuccess: () => toast.success(t('workspace.messages.member_removed', { defaultValue: 'Miembro eliminado correctamente' })),
-      onError: () => toast.error(t('workspace.messages.member_remove_error', { defaultValue: 'Error al eliminar el miembro' })),
+      onSuccess: () =>
+        toast.success(
+          t('workspace.messages.member_removed', {
+            defaultValue: 'Miembro eliminado correctamente',
+          }),
+        ),
+      onError: () =>
+        toast.error(
+          t('workspace.messages.member_remove_error', {
+            defaultValue: 'Error al eliminar el miembro',
+          }),
+        ),
       onSettled: () => setUserToRemove(null),
     });
   };

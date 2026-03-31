@@ -81,9 +81,7 @@ export function useRemoveWorkspaceMember(workspaceId: number) {
 
   return useMutation({
     mutationFn: (userId: number) =>
-      axios.delete<MembersResponse>(
-        `/api/v1/workspaces/${workspaceId}/members/${userId}`
-      ),
+      axios.delete<MembersResponse>(`/api/v1/workspaces/${workspaceId}/members/${userId}`),
     // Optimistic update: remove member immediately
     onMutate: async (userId) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.members.list(workspaceId) });
