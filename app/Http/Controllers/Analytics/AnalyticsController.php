@@ -292,6 +292,75 @@ class AnalyticsController extends Controller
     }
 
     /**
+     * Trigger an on-demand analytics sync for the current workspace.
+     * Rate-limited to once every 15 minutes per workspace.
+     */
+    public function sync(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $user        = Auth::user();
+        $workspaceId = $user->current_workspace_id;
+
+        if (!$workspaceId) {
+            return response()->json(['error' => 'No workspace selected'], 422);
+        }
+
+        $cacheKey = "analytics_sync_lock:workspace:{$workspaceId}";
+        $ttl      = 15 * 60; // 15 minutes
+
+        if (\Illuminate\Support\Facades\Cache::has($cacheKey)) {
+            $remaining = \Illuminate\Support\Facades\Cache::get($cacheKey . ':remaining', $ttl);
+            return response()->json([
+                'error'             => 'Sync already in progress or recently completed.',
+                'retry_after_seconds' => $remaining,
+            ], 429);
+        }
+
+        // Lock for 15 minutes
+        \Illuminate\Support\Facades\Cache::put($cacheKey, true, $ttl);
+        \Illuminate\Support\Facades\Cache::put($cacheKey . ':remaining', $ttl, $ttl);
+
+        $accounts = \App\Models\Social\SocialAccount::where('workspace_id', $workspaceId)
+            ->where('is_active', true)
+            ->get();
+
+        if ($accounts->isEmpty()) {
+            \Illuminate\Support\Facades\Cache::forget($cacheKey);
+            return response()->json(['message' => 'No active social accounts to sync.', 'dispatched' => 0]);
+        }
+
+        $jobs = $accounts->map(fn ($account) => new \App\Jobs\SyncSocialAnalyticsJob($account, 7));
+
+        \Illuminate\Support\Facades\Bus::batch($jobs->toArray())
+            ->name("Manual Sync — Workspace {$workspaceId}")
+            ->allowFailures()
+            ->dispatch();
+
+        return response()->json([
+            'message'    => 'Sync started.',
+            'dispatched' => $accounts->count(),
+            'locked_for_seconds' => $ttl,
+        ]);
+    }
+
+    /**
+     * Return how many seconds until the next manual sync is allowed.
+     */
+    public function syncStatus(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $workspaceId = Auth::user()->current_workspace_id;
+        $cacheKey    = "analytics_sync_lock:workspace:{$workspaceId}";
+
+        $locked = \Illuminate\Support\Facades\Cache::has($cacheKey);
+
+        return response()->json([
+            'locked'              => $locked,
+            'retry_after_seconds' => $locked
+                ? \Illuminate\Support\Facades\Cache::get($cacheKey . ':remaining', 0)
+                : 0,
+        ]);
+    }
+
+    /**
      * Store analytics data (for API integrations)
      */
     public function store(Request $request)

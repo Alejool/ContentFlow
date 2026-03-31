@@ -15,9 +15,10 @@ class Kernel extends ConsoleKernel
       ->everyMinute()
       ->withoutOverlapping();
 
-    // Sincronizar analytics detallados cada 6 horas
+    // Sincronizar analytics detallados diariamente a las 7 AM
     $schedule->command('analytics:sync --days=7')
-      ->everySixHours()
+      ->daily()
+      ->at('07:00')
       ->withoutOverlapping();
 
     // Verificar tokens expirados diariamente
@@ -137,5 +138,14 @@ class Kernel extends ConsoleKernel
       ->daily()
       ->at('01:00')
       ->when(fn() => config('queue.default') === 'database');
+
+    // Agregar analytics antiguos en rollups semanales/mensuales y limpiar datos crudos
+    // Corre los domingos a las 03:30 AM (después del audit:clean)
+    $schedule->command('analytics:rollup')
+      ->weekly()
+      ->sundays()
+      ->at('03:30')
+      ->withoutOverlapping()
+      ->runInBackground();
   }
 }

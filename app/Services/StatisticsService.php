@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Carbon\Carbon;
 
+use App\Models\Analytics\AnalyticsRollup;
 use App\Models\Campaigns\Campaign;
 use App\Models\Campaigns\CampaignAnalytics;
 use App\Models\Publications\Publication;
@@ -238,38 +239,74 @@ class StatisticsService
   }
 
   /**
-   * Get engagement trends over time
+   * Get engagement trends over time.
+   * Uses raw daily data for ranges ≤90 days, weekly rollups up to 1 year,
+   * and monthly rollups beyond that.
    */
   public function getEngagementTrends(int $workspaceId, $startDate, $endDate)
   {
+    $start       = Carbon::parse($startDate);
+    $end         = Carbon::parse($endDate);
+    $rangeDays   = $start->diffInDays($end);
     $publications = Publication::where('workspace_id', $workspaceId)->pluck('id');
 
-    return CampaignAnalytics::whereIn('publication_id', $publications)
-      ->whereBetween('date', [$startDate, $endDate])
-      ->selectRaw('
-                date,
-                SUM(likes) as likes,
-                SUM(comments) as comments,
-                SUM(shares) as shares,
-                SUM(saves) as saves,
-                SUM(views) as views,
-                SUM(clicks) as clicks
-            ')
-      ->groupBy('date')
-      ->orderBy('date')
-      ->get()
-      ->map(function ($item) {
-        return [
-          'date' => $item->date->format('Y-m-d'),
-          'likes' => $item->likes,
-          'comments' => $item->comments,
-          'shares' => $item->shares,
-          'saves' => $item->saves,
-          'views' => $item->views,
-          'clicks' => $item->clicks,
+    // Raw daily data (≤90 days)
+    if ($rangeDays <= 90) {
+      return CampaignAnalytics::whereIn('publication_id', $publications)
+        ->whereBetween('date', [$startDate, $endDate])
+        ->selectRaw('
+          date,
+          SUM(likes) as likes,
+          SUM(comments) as comments,
+          SUM(shares) as shares,
+          SUM(saves) as saves,
+          SUM(views) as views,
+          SUM(clicks) as clicks
+        ')
+        ->groupBy('date')
+        ->orderBy('date')
+        ->get()
+        ->map(fn ($item) => [
+          'date'             => $item->date->format('Y-m-d'),
+          'likes'            => $item->likes,
+          'comments'         => $item->comments,
+          'shares'           => $item->shares,
+          'saves'            => $item->saves,
+          'views'            => $item->views,
+          'clicks'           => $item->clicks,
           'total_engagement' => $item->likes + $item->comments + $item->shares + $item->saves,
-        ];
-      });
+        ]);
+    }
+
+    // Rollup data (>90 days)
+    $periodType = $rangeDays <= 365 ? 'weekly' : 'monthly';
+
+    return AnalyticsRollup::where('entity_type', 'publication')
+      ->whereIn('entity_id', $publications)
+      ->where('period_type', $periodType)
+      ->whereBetween('period_start', [$startDate, $endDate])
+      ->selectRaw('
+        period_start as date,
+        SUM(likes)    as likes,
+        SUM(comments) as comments,
+        SUM(shares)   as shares,
+        SUM(saves)    as saves,
+        SUM(views)    as views,
+        SUM(clicks)   as clicks
+      ')
+      ->groupBy('period_start')
+      ->orderBy('period_start')
+      ->get()
+      ->map(fn ($item) => [
+        'date'             => Carbon::parse($item->date)->format('Y-m-d'),
+        'likes'            => $item->likes,
+        'comments'         => $item->comments,
+        'shares'           => $item->shares,
+        'saves'            => $item->saves,
+        'views'            => $item->views,
+        'clicks'           => $item->clicks,
+        'total_engagement' => $item->likes + $item->comments + $item->shares + $item->saves,
+      ]);
   }
 
   /**
@@ -357,28 +394,46 @@ class StatisticsService
   }
 
   /**
-   * Get platform comparison data
+   * Get platform comparison data.
+   * Uses rollups for ranges >90 days.
    */
   public function getPlatformComparison(int $workspaceId, int $days = 30)
   {
-    $startDate = now()->subDays($days);
+    $startDate   = now()->subDays($days);
     $socialAccounts = SocialAccount::where('workspace_id', $workspaceId)->get();
 
-    return $socialAccounts->map(function ($account) use ($startDate) {
+    return $socialAccounts->map(function ($account) use ($startDate, $days) {
+      // Use rollups for long ranges
+      if ($days > 90) {
+        $periodType = $days <= 365 ? 'weekly' : 'monthly';
+        $rollups = AnalyticsRollup::forEntity('social_account', $account->id)
+          ->period($periodType)
+          ->dateRange($startDate, now())
+          ->get();
+
+        return [
+          'id'                  => $account->id,
+          'platform'            => $account->platform,
+          'account_name'        => $account->account_name,
+          'total_engagement'    => $rollups->sum(fn ($r) => $r->likes + $r->comments + $r->shares + $r->saves),
+          'avg_engagement_rate' => round($rollups->avg('avg_engagement_rate'), 2),
+          'total_reach'         => $rollups->sum('reach'),
+          'follower_growth'     => $rollups->sum('views'), // net growth stored in views
+        ];
+      }
+
       $metrics = $account->metrics()
         ->whereBetween('date', [$startDate, now()])
         ->get();
 
       return [
-        'id' => $account->id,
-        'platform' => $account->platform,
-        'account_name' => $account->account_name,
-        'total_engagement' => $metrics->sum(function ($m) {
-          return $m->total_likes + $m->total_comments + $m->total_shares + $m->total_saves;
-        }),
+        'id'                  => $account->id,
+        'platform'            => $account->platform,
+        'account_name'        => $account->account_name,
+        'total_engagement'    => $metrics->sum(fn ($m) => $m->total_likes + $m->total_comments + $m->total_shares + $m->total_saves),
         'avg_engagement_rate' => round($metrics->avg('engagement_rate'), 2),
-        'total_reach' => $metrics->sum('reach'),
-        'follower_growth' => ($metrics->isNotEmpty())
+        'total_reach'         => $metrics->sum('reach'),
+        'follower_growth'     => $metrics->isNotEmpty()
           ? ($metrics->last()->followers - $metrics->first()->followers)
           : 0,
       ];
@@ -433,64 +488,117 @@ class StatisticsService
   }
 
   /**
-   * Get detailed publication performance
+   * Get detailed publication performance.
+   * Uses raw daily data for ≤90 days, weekly rollups up to 1 year.
    */
   public function getDetailedPublicationPerformance(int $workspaceId, int $days = 30)
   {
     $startDate = now()->subDays($days);
+
     $publications = Publication::where('workspace_id', $workspaceId)
       ->where('status', 'published')
-      ->with(['analytics' => function ($query) use ($startDate) {
-        $query->whereBetween('date', [$startDate, now()]);
-      }])
-      ->get();
+      ->get(['id', 'title', 'published_at']);
 
-    return $publications->map(function ($publication) {
-      $analytics = $publication->analytics;
+    return $publications->map(function ($publication) use ($startDate, $days) {
+      // Raw data for short ranges
+      if ($days <= 90) {
+        $analytics = CampaignAnalytics::where('publication_id', $publication->id)
+          ->whereBetween('date', [$startDate, now()])
+          ->get();
 
-      $platformBreakdown = $analytics->groupBy('platform')->map(function ($platformAnalytics, $platform) {
+        $platformBreakdown = $analytics->groupBy('platform')->map(function ($pa, $platform) {
+          return [
+            'platform'            => $platform,
+            'views'               => $pa->sum('views'),
+            'clicks'              => $pa->sum('clicks'),
+            'conversions'         => $pa->sum('conversions'),
+            'reach'               => $pa->sum('reach'),
+            'impressions'         => $pa->sum('impressions'),
+            'engagement'          => $pa->sum(fn ($a) => $a->likes + $a->comments + $a->shares + $a->saves),
+            'avg_engagement_rate' => round($pa->avg('engagement_rate'), 2),
+          ];
+        })->values();
+
+        $dailyPerformance = $analytics->groupBy(fn ($a) => $a->date->format('Y-m-d'))
+          ->map(function ($dayAnalytics, $date) {
+            return [
+              'date'       => $date,
+              'views'      => $dayAnalytics->sum('views'),
+              'clicks'     => $dayAnalytics->sum('clicks'),
+              'engagement' => $dayAnalytics->sum(fn ($a) => $a->likes + $a->comments + $a->shares + $a->saves),
+              'reach'      => $dayAnalytics->sum('reach'),
+            ];
+          })->values();
+
         return [
-          'platform' => $platform,
-          'views' => $platformAnalytics->sum('views'),
-          'clicks' => $platformAnalytics->sum('clicks'),
-          'conversions' => $platformAnalytics->sum('conversions'),
-          'reach' => $platformAnalytics->sum('reach'),
-          'impressions' => $platformAnalytics->sum('impressions'),
-          'engagement' => $platformAnalytics->sum(function ($a) {
-            return $a->likes + $a->comments + $a->shares + $a->saves;
-          }),
-          'avg_engagement_rate' => round($platformAnalytics->avg('engagement_rate'), 2),
+          'id'                  => $publication->id,
+          'title'               => $publication->title,
+          'published_at'        => $publication->published_at?->format('Y-m-d H:i'),
+          'total_views'         => $analytics->sum('views'),
+          'total_clicks'        => $analytics->sum('clicks'),
+          'total_conversions'   => $analytics->sum('conversions'),
+          'total_engagement'    => $analytics->sum(fn ($a) => $a->likes + $a->comments + $a->shares + $a->saves),
+          'total_reach'         => $analytics->sum('reach'),
+          'avg_engagement_rate' => round($analytics->avg('engagement_rate'), 2),
+          'platform_breakdown'  => $platformBreakdown,
+          'daily_performance'   => $dailyPerformance,
+        ];
+      }
+
+      // Rollup data for longer ranges
+      $periodType = $days <= 365 ? 'weekly' : 'monthly';
+      $rollups = AnalyticsRollup::forEntity('publication', $publication->id)
+        ->period($periodType)
+        ->dateRange($startDate, now())
+        ->get();
+
+      // Also grab any remaining raw data within the 90-day window
+      $recentRaw = CampaignAnalytics::where('publication_id', $publication->id)
+        ->where('date', '>=', now()->subDays(90))
+        ->get();
+
+      $totalViews       = $rollups->sum('views') + $recentRaw->sum('views');
+      $totalClicks      = $rollups->sum('clicks') + $recentRaw->sum('clicks');
+      $totalConversions = $rollups->sum('conversions') + $recentRaw->sum('conversions');
+      $totalReach       = $rollups->sum('reach') + $recentRaw->sum('reach');
+      $totalEngagement  = $rollups->sum(fn ($r) => $r->likes + $r->comments + $r->shares + $r->saves)
+                        + $recentRaw->sum(fn ($a) => $a->likes + $a->comments + $a->shares + $a->saves);
+
+      // Rollup platform breakdown (grouped by platform from raw data only — rollups don't split by platform for social)
+      $platformBreakdown = $recentRaw->groupBy('platform')->map(function ($pa, $platform) {
+        return [
+          'platform'            => $platform,
+          'views'               => $pa->sum('views'),
+          'clicks'              => $pa->sum('clicks'),
+          'conversions'         => $pa->sum('conversions'),
+          'reach'               => $pa->sum('reach'),
+          'impressions'         => $pa->sum('impressions'),
+          'engagement'          => $pa->sum(fn ($a) => $a->likes + $a->comments + $a->shares + $a->saves),
+          'avg_engagement_rate' => round($pa->avg('engagement_rate'), 2),
         ];
       })->values();
 
-      $dailyPerformance = $analytics->groupBy(function ($a) {
-        return $a->date->format('Y-m-d');
-      })->map(function ($dayAnalytics, $date) {
-        return [
-          'date' => $date,
-          'views' => $dayAnalytics->sum('views'),
-          'clicks' => $dayAnalytics->sum('clicks'),
-          'engagement' => $dayAnalytics->sum(function ($a) {
-            return $a->likes + $a->comments + $a->shares + $a->saves;
-          }),
-          'reach' => $dayAnalytics->sum('reach'),
-        ];
-      })->values();
+      // Weekly/monthly trend for the chart
+      $periodPerformance = $rollups->map(fn ($r) => [
+        'date'       => Carbon::parse($r->period_start)->format('Y-m-d'),
+        'views'      => $r->views,
+        'clicks'     => $r->clicks,
+        'engagement' => $r->likes + $r->comments + $r->shares + $r->saves,
+        'reach'      => $r->reach,
+      ])->values()->toArray();
 
       return [
-        'id' => $publication->id,
-        'title' => $publication->title,
-        'published_at' => $publication->published_at?->format('Y-m-d H:i'),
-        'total_views' => $analytics->sum('views'),
-        'total_clicks' => $analytics->sum('clicks'),
-        'total_conversions' => $analytics->sum('conversions'),
-        'total_engagement' => $analytics->sum(function ($a) {
-          return $a->likes + $a->comments + $a->shares + $a->saves;
-        }),
-        'total_reach' => $analytics->sum('reach'),
-        'avg_engagement_rate' => round($analytics->avg('engagement_rate'), 2),
-        'platform_breakdown' => $platformBreakdown,
-        'daily_performance' => $dailyPerformance,
+        'id'                  => $publication->id,
+        'title'               => $publication->title,
+        'published_at'        => $publication->published_at?->format('Y-m-d H:i'),
+        'total_views'         => $totalViews,
+        'total_clicks'        => $totalClicks,
+        'total_conversions'   => $totalConversions,
+        'total_engagement'    => $totalEngagement,
+        'total_reach'         => $totalReach,
+        'avg_engagement_rate' => $rollups->isNotEmpty() ? round($rollups->avg('avg_engagement_rate'), 2) : 0,
+        'platform_breakdown'  => $platformBreakdown,
+        'daily_performance'   => $periodPerformance,
       ];
     });
   }

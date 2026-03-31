@@ -11,4 +11,6 @@ Route::middleware('auth:sanctum')->prefix('analytics')->name('analytics.')->grou
   Route::get('/platform-comparison', [AnalyticsController::class, 'getPlatformComparison'])->name('platform-comparison');
   Route::get('/export', [AnalyticsController::class, 'exportData'])->name('export');
   Route::post('/', [AnalyticsController::class, 'store'])->name('store');
+  Route::post('/sync', [AnalyticsController::class, 'sync'])->name('sync');
+  Route::get('/sync/status', [AnalyticsController::class, 'syncStatus'])->name('sync.status');
 });
