@@ -103,7 +103,7 @@ class FixRecurringInstanceFlag extends Command
         if ($dryRun) {
             $this->line("  Posts that would be fixed: {$totalFixed}");
             $this->newLine();
-            $this->info('💡 Run without --dry-run to apply the fixes');
+            $this->info(' Run without --dry-run to apply the fixes');
         } else {
             $this->line("  Posts fixed: {$totalFixed}");
             $this->newLine();

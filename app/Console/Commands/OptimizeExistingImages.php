@@ -82,7 +82,7 @@ class OptimizeExistingImages extends Command
             ]
         );
 
-        $this->info('💡 Jobs are being processed in the background. Monitor with:');
+        $this->info(' Jobs are being processed in the background. Monitor with:');
         $this->line('   docker-compose logs -f queue');
         $this->line('   or visit /horizon dashboard');
 

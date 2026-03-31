@@ -60,7 +60,7 @@ class DiagnoseReels extends Command
             }
             
             $this->newLine();
-            $this->warn("💡 Ejecuta 'php artisan reels:fix-file-types' para corregir estos archivos");
+            $this->warn(" Ejecuta 'php artisan reels:fix-file-types' para corregir estos archivos");
         }
         $this->newLine();
 

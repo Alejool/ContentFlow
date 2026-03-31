@@ -75,7 +75,7 @@ class ResetPaymentMethodsCommand extends Command
             if ($updated > 0) {
                 $this->newLine();
                 $this->info('✓ Métodos de pago reseteados correctamente');
-                $this->comment('💡 Limpia la caché: php artisan cache:clear');
+                $this->comment(' Limpia la caché: php artisan cache:clear');
             } else {
                 $this->newLine();
                 $this->info('✓ Todos los métodos ya estaban en sus valores por defecto');
