@@ -66,7 +66,7 @@
   },
   "wizard": {
     "title": {
-      "welcome": "Bienvenido a ContentFlow",
+      "welcome": "Bienvenido a Intellipost",
       "platforms": "Conecta tus Cuentas Sociales",
       "success": "¡Todo Listo!"
     },
@@ -90,7 +90,7 @@
     "navigation": "Navegación del asistente",
     "welcome": {
       "heading": "Gestiona Todas tus Redes Sociales en un Solo Lugar",
-      "description": "ContentFlow te ayuda a crear, programar y publicar contenido en múltiples plataformas de redes sociales. Conecta tus cuentas para comenzar con una gestión fluida de redes sociales.",
+      "description": "Intellipost te ayuda a crear, programar y publicar contenido en múltiples plataformas de redes sociales. Conecta tus cuentas para comenzar con una gestión fluida de redes sociales.",
       "features": {
         "schedule": {
           "title": "Programar Publicaciones",

@@ -66,7 +66,7 @@
   },
   "wizard": {
     "title": {
-      "welcome": "Welcome to ContentFlow",
+      "welcome": "Welcome to Intellipost",
       "platforms": "Connect Your Social Accounts",
       "success": "You're All Set!"
     },
@@ -90,7 +90,7 @@
     "navigation": "Wizard navigation",
     "welcome": {
       "heading": "Manage All Your Social Media in One Place",
-      "description": "ContentFlow helps you create, schedule, and publish content across multiple social media platforms. Connect your accounts to get started with seamless social media management.",
+      "description": "Intellipost helps you create, schedule, and publish content across multiple social media platforms. Connect your accounts to get started with seamless social media management.",
       "features": {
         "schedule": {
           "title": "Schedule Posts",

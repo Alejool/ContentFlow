@@ -3,7 +3,7 @@
     "common": {
       "back": "Back",
       "lastUpdated": "Last updated: {{date}}",
-      "team": "ContentFlow Team"
+      "team": "Intellipost Team"
     },
     "privacyPolicy": {
       "title": "Privacy Policy",
@@ -12,7 +12,7 @@
         "intro": {
           "title": "1. Introduction",
           "content": [
-            "Welcome to ContentFlow (\"we\", \"our\", or \"the Platform\"). We are committed to protecting your privacy and ensuring that your personal data is handled securely and transparently. This Privacy Policy describes how we collect, use, disclose, and protect your information when you use our website and services (collectively, the \"Service\").",
+            "Welcome to Intellipost (\"we\", \"our\", or \"the Platform\"). We are committed to protecting your privacy and ensuring that your personal data is handled securely and transparently. This Privacy Policy describes how we collect, use, disclose, and protect your information when you use our website and services (collectively, the \"Service\").",
             "By accessing or using the Service, you agree to the practices described in this policy. If you do not agree with this policy do not use our services."
           ]
         },
@@ -48,7 +48,7 @@
           "title": "3. How We Use Your Information",
           "subtitle": "We use the collected information for the following purposes:",
           "items": [
-            "<strong>Service Provision:</strong> To operate, maintain, and improve the functionalities of ContentFlow.",
+            "<strong>Service Provision:</strong> To operate, maintain, and improve the functionalities of Intellipost.",
             "<strong>Personalization:</strong> To adapt your experience and offer relevant content.",
             "<strong>Communications:</strong> To send you updates, security alerts, and administrative messages.",
             "<strong>Analytics:</strong> To understand how our service is used and improve its performance.",
@@ -101,7 +101,7 @@
       "sections": {
         "acceptance": {
           "title": "1. Acceptance of Terms",
-          "content": "By accessing and using ContentFlow (\"Service\"), you agree to comply with and be bound by the following terms and conditions (\"Terms\"). If you do not agree with any part of these terms, you may not access the Service."
+          "content": "By accessing and using Intellipost (\"Service\"), you agree to comply with and be bound by the following terms and conditions (\"Terms\"). If you do not agree with any part of these terms, you may not access the Service."
         },
         "accounts": {
           "title": "2. Accounts",
@@ -121,11 +121,11 @@
         },
         "intellectualProperty": {
           "title": "4. Intellectual Property",
-          "content": "The Service and its original content (excluding content provided by users), features, and functionality are and will remain the exclusive property of ContentFlow and its licensors. The Service is protected by copyright, trademarks, and other laws."
+          "content": "The Service and its original content (excluding content provided by users), features, and functionality are and will remain the exclusive property of Intellipost and its licensors. The Service is protected by copyright, trademarks, and other laws."
         },
         "links": {
           "title": "5. Links to Other Websites",
-          "content": "Our Service may contain links to third-party websites or services that are not owned or controlled by ContentFlow. We have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party websites or services."
+          "content": "Our Service may contain links to third-party websites or services that are not owned or controlled by Intellipost. We have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party websites or services."
         },
         "termination": {
           "title": "6. Termination",
@@ -133,7 +133,7 @@
         },
         "limitation": {
           "title": "7. Limitation of Liability",
-          "content": "In no event shall ContentFlow, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential, or punitive damages, including, without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access or use or inability to access or use the Service."
+          "content": "In no event shall Intellipost, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential, or punitive damages, including, without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access or use or inability to access or use the Service."
         },
         "changes": {
           "title": "8. Changes",
@@ -151,7 +151,7 @@
       "support": {
         "title": "Support and Suggestions",
         "description": "This is the official channel for you to send us your feedback. You can send us any <strong>suggestions for improvement</strong>, report <strong>application errors</strong>, or ask us about our <strong>policies</strong>.",
-        "note": "Your feedback is fundamental to us; we review every message to keep improving the ContentFlow experience.",
+        "note": "Your feedback is fundamental to us; we review every message to keep improving the Intellipost experience.",
         "writeTo": "Write to us at"
       },
       "footer": "We review all suggestions and reported errors with priority."

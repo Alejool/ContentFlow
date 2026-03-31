@@ -137,7 +137,7 @@
     },
     "roles_management": {
       "title": "Roles y Permisos",
-      "description": "Resumen de roles disponibles y sus permisos asociados en ContentFlow.",
+      "description": "Resumen de roles disponibles y sus permisos asociados en Intellipost.",
       "no_permissions": "No hay permisos asignados.",
       "create_role": "Crear Nuevo Rol",
       "create_role_subtitle": "Define un nuevo rol y sus permisos para el workspace.",
@@ -290,7 +290,7 @@
     },
     "api": {
       "title": "Tokens de Acceso API",
-      "description": "Genera tokens para autenticar solicitudes a la API de ContentFlow.",
+      "description": "Genera tokens para autenticar solicitudes a la API de Intellipost.",
       "token_name_placeholder": "ej. Automatización de Marketing",
       "generate": "Generar Token",
       "no_tokens": "Aún no se han generado tokens de API.",
@@ -306,7 +306,7 @@
       "security_help": "Los tokens de API otorgan acceso total a este espacio de trabajo. Nunca los compartas ni los subas a repositorios públicos.",
       "documentation": {
         "title": "Documentación de la API",
-        "description": "Descarga la referencia completa de la API Enterprise para integrar ContentFlow en tus sistemas.",
+        "description": "Descarga la referencia completa de la API Enterprise para integrar Intellipost en tus sistemas.",
         "enterprise_guide_title": "Guía Completa Enterprise",
         "enterprise_guide_description": "Referencia en Markdown con todos los endpoints, ejemplos de request/response y lógica de negocio.",
         "enterprise_guide_badge": ".md · ~700 líneas",
@@ -359,7 +359,7 @@
       },
       "integrations": {
         "title": "Integraciones Personalizadas",
-        "description": "¿Necesitas conectar ContentFlow con tu propio CRM o ERP? Nuestro equipo puede construir integraciones a medida.",
+        "description": "¿Necesitas conectar Intellipost con tu propio CRM o ERP? Nuestro equipo puede construir integraciones a medida.",
         "action": "Solicitar Integración"
       }
     }

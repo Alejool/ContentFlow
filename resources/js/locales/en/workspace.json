@@ -137,7 +137,7 @@
     },
     "roles_management": {
       "title": "Roles & Permissions",
-      "description": "Summary of available roles and their associated permissions in ContentFlow.",
+      "description": "Summary of available roles and their associated permissions in Intellipost.",
       "no_permissions": "No permissions assigned.",
       "create_role": "Create New Role",
       "create_role_subtitle": "Define a new role and its permissions for the workspace.",
@@ -328,7 +328,7 @@
     },
     "api": {
       "title": "API Access Tokens",
-      "description": "Generate tokens to authenticate requests to the ContentFlow API.",
+      "description": "Generate tokens to authenticate requests to the Intellipost API.",
       "token_name_placeholder": "e.g., Marketing Automation",
       "generate": "Generate Token",
       "no_tokens": "No API tokens generated yet.",
@@ -344,7 +344,7 @@
       "security_help": "API tokens grant full access to this workspace. Never share them or commit them to public repositories.",
       "documentation": {
         "title": "API Documentation",
-        "description": "Download the complete Enterprise API reference to integrate ContentFlow into your systems.",
+        "description": "Download the complete Enterprise API reference to integrate Intellipost into your systems.",
         "enterprise_guide_title": "Complete Enterprise Guide",
         "enterprise_guide_description": "Markdown reference with all endpoints, request/response examples, and business logic.",
         "enterprise_guide_badge": ".md · ~700 lines",
@@ -397,7 +397,7 @@
       },
       "integrations": {
         "title": "Custom Integrations",
-        "description": "Need to connect ContentFlow with your own CRM or ERP? Our team can build custom integrations tailored to your workflow.",
+        "description": "Need to connect Intellipost with your own CRM or ERP? Our team can build custom integrations tailored to your workflow.",
         "action": "Request Integration"
       }
     }
