@@ -123,5 +123,19 @@ class Kernel extends ConsoleKernel
       ->everyFiveMinutes()
       ->withoutOverlapping()
       ->runInBackground();
+
+    // ===== OPTIMIZACIONES PARA DATABASE CACHE (DEMO) =====
+    
+    // Limpiar caché database expirado cada 15 minutos
+    $schedule->command('cache:cleanup-database')
+      ->everyFifteenMinutes()
+      ->withoutOverlapping()
+      ->when(fn() => config('cache.default') === 'database');
+    
+    // Limpiar jobs fallidos antiguos (>48h) diariamente
+    $schedule->command('queue:prune-failed --hours=48')
+      ->daily()
+      ->at('01:00')
+      ->when(fn() => config('queue.default') === 'database');
   }
 }
