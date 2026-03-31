@@ -6,14 +6,14 @@ import { formatDateTimeString } from '@/Utils/dateHelpers';
 import { Head, useForm } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  AlertCircle,
-  Calendar,
-  Check,
-  Info,
-  Loader2,
-  MessageSquare,
-  Share2,
-  X,
+    AlertCircle,
+    Calendar,
+    Check,
+    Info,
+    Loader2,
+    MessageSquare,
+    Share2,
+    X,
 } from 'lucide-react';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -96,7 +96,7 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
   if (isSuccess) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4 dark:bg-zinc-950">
-        <Head title="Contenido Procesado - ContentFlow" />
+        <Head title="Contenido Procesado - Intellipost" />
         <div className="w-full max-w-md rounded-lg border border-gray-100 bg-white p-8 text-center shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
           <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400">
             <Check className="h-8 w-8" />
@@ -108,7 +108,7 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
             Tu respuesta ha sido registrada correctamente para{' '}
             <strong>{publication.workspace?.name}</strong>. Ya puedes cerrar esta ventana.
           </p>
-          <p className="text-sm text-gray-400 dark:text-zinc-500">Gracias por usar ContentFlow.</p>
+          <p className="text-sm text-gray-400 dark:text-zinc-500">Gracias por usar Intellipost.</p>
         </div>
       </div>
     );
@@ -127,7 +127,7 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
             </div>
             <div>
               <span className="block text-lg font-bold leading-none tracking-tight">
-                ContentFlow
+                Intellipost
               </span>
               <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
                 Portal de Clientes
@@ -384,7 +384,7 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
 
         <footer className="mt-12 text-center">
           <p className="text-sm text-gray-400 dark:text-zinc-600">
-            Este es un enlace seguro generado por <strong>ContentFlow</strong> para{' '}
+            Este es un enlace seguro generado por <strong>Intellipost</strong> para{' '}
             <strong>{publication.workspace?.name}</strong>.
           </p>
           <p className="mt-2 text-xs text-gray-300 dark:text-zinc-700">

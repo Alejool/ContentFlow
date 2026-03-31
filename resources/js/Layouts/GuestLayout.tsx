@@ -35,7 +35,7 @@ export default function GuestLayout({ children, section }: GuestLayoutProps) {
           <div className="relative flex h-full flex-col items-center justify-center p-8 text-white">
             <div className="max-w-xl text-center">
               <div className="mb-8">
-                <img src={Logo} alt="ContentFlow logo" className="mx-auto h-36 w-36" />
+                <img src={Logo} alt="Intellipost logo" className="mx-auto h-36 w-36" />
                 <h1 className="mb-4 text-4xl font-bold">
                   {section
                     ? t(`auth.${section}.welcome`, {

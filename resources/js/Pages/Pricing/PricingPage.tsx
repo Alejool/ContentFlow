@@ -90,10 +90,10 @@ export default function PricingPage({
               </CardHeader>
               <CardContent className="pb-8 text-center">
                 <a
-                  href="mailto:support@contentflow.com"
+                  href="mailto:support@Intellipost.com"
                   className="group inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 px-8 py-4 text-lg font-semibold text-white shadow-lg transition-all duration-200 hover:from-primary-600 hover:to-primary-700 hover:shadow-xl"
                 >
-                  <span>support@contentflow.com</span>
+                  <span>support@Intellipost.com</span>
                   <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </a>
               </CardContent>

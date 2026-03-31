@@ -27,7 +27,7 @@ FocusManager.initialize();
 // Initialize ARIA announcer for screen reader support
 ariaAnnouncer.initialize();
 
-const appName = import.meta.env.VITE_APP_NAME || 'contentFlow';
+const appName = import.meta.env.VITE_APP_NAME || 'Intellipost';
 
 // Lazy load i18n
 const loadI18n = () => import('./i18n');

@@ -7,21 +7,21 @@ import { useTheme } from '@/Hooks/useTheme';
 import { Head, Link } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  ArrowRight,
-  BarChart3,
-  Brain,
-  Calendar,
-  CheckCircle2,
-  Globe,
-  Image as ImageIcon,
-  Mail,
-  Rocket,
-  Share2,
-  Shield,
-  Sparkles,
-  Upload,
-  Users,
-  Zap,
+    ArrowRight,
+    BarChart3,
+    Brain,
+    Calendar,
+    CheckCircle2,
+    Globe,
+    Image as ImageIcon,
+    Mail,
+    Rocket,
+    Share2,
+    Shield,
+    Sparkles,
+    Upload,
+    Users,
+    Zap,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -233,7 +233,7 @@ export default function Welcome({
 
   return (
     <>
-      <Head title="ContentFlow - Plataforma de Gestión de Contenido" />
+      <Head title="Intellipost - Plataforma de Gestión de Contenido" />
 
       <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-950">
         <div className="pointer-events-none fixed inset-0 z-0">
@@ -772,7 +772,7 @@ export default function Welcome({
                     {t('welcome.readyToStart') || '¿Listo para transformar tu contenido?'}
                   </h2>
                   <p className="mt-2 text-gray-600 dark:text-gray-300">
-                    {t('welcome.joinNow') || 'Únete a miles de creadores que ya usan ContentFlow'}
+                    {t('welcome.joinNow') || 'Únete a miles de creadores que ya usan Intellipost'}
                   </p>
 
                   <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">

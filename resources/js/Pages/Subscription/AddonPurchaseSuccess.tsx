@@ -1,10 +1,10 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
-import { useTranslation } from 'react-i18next';
-import { CheckCircle, Package, Home, HardDrive, Sparkles, FileText, Users } from 'lucide-react';
+import AddonsSummary from '@/Components/Addons/AddonsSummary';
 import Button from '@/Components/common/Modern/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
-import AddonsSummary from '@/Components/Addons/AddonsSummary';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { Head, Link } from '@inertiajs/react';
+import { CheckCircle, FileText, HardDrive, Home, Package, Sparkles, Users } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface AddonPurchaseData {
   addon_sku: string;
@@ -237,10 +237,10 @@ export default function AddonPurchaseSuccess({ purchase }: Props) {
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 {t('payment.addonPurchaseSuccess.support')}{' '}
                 <a
-                  href="mailto:support@contentflow.com"
+                  href="mailto:support@Intellipost.com"
                   className="font-medium text-primary-600 hover:underline dark:text-primary-400"
                 >
-                  support@contentflow.com
+                  support@Intellipost.com
                 </a>
               </p>
             </div>

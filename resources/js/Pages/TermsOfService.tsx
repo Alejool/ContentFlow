@@ -8,7 +8,7 @@ export default function TermsOfService() {
 
   return (
     <>
-      <Head title={`${t('legal.termsOfService.title')} - ContentFlow`} />
+      <Head title={`${t('legal.termsOfService.title')} - Intellipost`} />
 
       <div className="min-h-screen bg-white px-4 py-12 dark:bg-gray-900 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl">
@@ -91,10 +91,10 @@ export default function TermsOfService() {
                   <p>
                     Email:{' '}
                     <a
-                      href="mailto:legal@contentflow.app"
+                      href="mailto:legal@Intellipost.app"
                       className="text-primary-600 hover:text-primary-500"
                     >
-                      legal@contentflow.app
+                      legal@Intellipost.app
                     </a>
                   </p>
                 </div>

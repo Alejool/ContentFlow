@@ -3,13 +3,13 @@ import type { TourStep } from '@/types/onboarding';
 /**
  * Default tour steps configuration for the onboarding guided tour.
  *
- * These steps highlight key features of the ContentFlow platform
+ * These steps highlight key features of the Intellipost platform
  * and guide new users through the main interface.
  */
 export const defaultTourSteps: TourStep[] = [
   {
     id: 'step-1',
-    title: 'Welcome to ContentFlow',
+    title: 'Welcome to Intellipost',
     description:
       "Let's take a quick tour of the platform. We'll show you the key features to help you get started with social media management.",
     targetSelector: '#dashboard',

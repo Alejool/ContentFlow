@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * CONFIGURACIÓN DE PLANES - ContentFlow
+ * CONFIGURACIÓN DE PLANES - Intellipost
  * ============================================================================
  *
  * Este archivo centraliza toda la configuración de planes de suscripción.

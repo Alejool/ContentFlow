@@ -10,7 +10,7 @@ export default function PrivacyPolicy() {
 
   return (
     <>
-      <Head title={`${t('legal.privacyPolicy.title')} - ContentFlow`} />
+      <Head title={`${t('legal.privacyPolicy.title')} - Intellipost`} />
 
       <div className="min-h-screen bg-white px-4 py-12 dark:bg-gray-900 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl">
@@ -168,10 +168,10 @@ export default function PrivacyPolicy() {
                   <p>
                     Email:{' '}
                     <a
-                      href="mailto:soporte@contentflow.app"
+                      href="mailto:soporte@Intellipost.app"
                       className="text-primary-600 hover:text-primary-500"
                     >
-                      soporte@contentflow.app
+                      soporte@Intellipost.app
                     </a>
                   </p>
                 </div>

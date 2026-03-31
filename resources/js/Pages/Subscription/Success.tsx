@@ -1,10 +1,10 @@
-import { Head, Link, router } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { CheckCircle, ArrowRight, Sparkles } from 'lucide-react';
 import Button from '@/Components/common/Modern/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
-import { useTranslation } from 'react-i18next';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { Head, Link, router } from '@inertiajs/react';
+import { ArrowRight, CheckCircle, Sparkles } from 'lucide-react';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   auth: any;
@@ -164,10 +164,10 @@ export default function Success({ auth, plan, amount, currency }: Props) {
             <p className="text-sm text-gray-600 dark:text-gray-400">
               {t('subscription.success.needHelp')}{' '}
               <a
-                href="mailto:support@contentflow.com"
+                href="mailto:support@Intellipost.com"
                 className="font-medium text-primary-600 hover:underline dark:text-primary-400"
               >
-                support@contentflow.com
+                support@Intellipost.com
               </a>
             </p>
           </div>

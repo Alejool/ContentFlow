@@ -7,7 +7,7 @@ export default function Contact() {
 
   return (
     <>
-      <Head title={`${t('legal.contact.title')} - ContentFlow`} />
+      <Head title={`${t('legal.contact.title')} - Intellipost`} />
 
       <div className="min-h-screen bg-white px-4 py-12 dark:bg-gray-900 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl">
@@ -55,10 +55,10 @@ export default function Contact() {
                     {t('legal.contact.support.writeTo')}
                   </span>
                   <a
-                    href="mailto:soporte@contentflow.app"
+                    href="mailto:soporte@Intellipost.app"
                     className="text-2xl font-bold text-primary-600 transition-all hover:underline dark:text-primary-400"
                   >
-                    soporte@contentflow.app
+                    soporte@Intellipost.app
                   </a>
                 </div>
               </div>

@@ -1,8 +1,8 @@
-import { Head, Link } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { XCircle, ArrowLeft, HelpCircle } from 'lucide-react';
 import Button from '@/Components/common/Modern/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { Head, Link } from '@inertiajs/react';
+import { ArrowLeft, HelpCircle, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
@@ -130,7 +130,7 @@ export default function Cancel({ auth }: Props) {
               {t('subscription.cancel.needHelp')}
             </p>
             <a
-              href="mailto:support@contentflow.com"
+              href="mailto:support@Intellipost.com"
               className="font-medium text-primary-600 hover:underline dark:text-primary-400"
             >
               {t('subscription.cancel.contactSupport')}
