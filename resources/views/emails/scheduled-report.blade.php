@@ -79,7 +79,7 @@
         </div>
 
         <div class="footer">
-            <p>This is an automated report from ContentFlow</p>
+            <p>This is an automated report from Intellipost</p>
             <p>Generated on {{ now()->format('F j, Y g:i A') }}</p>
         </div>
     </div>

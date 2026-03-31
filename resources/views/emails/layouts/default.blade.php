@@ -115,7 +115,7 @@
   <div class="email-wrapper">
     <div class="email-header">
       <!-- Replace with actual logo URL if available, using text for now or a placeholder -->
-      <div style="font-size: 24px; font-weight: 800; color: #FF6D1F;">ContentFlow</div>
+      <div style="font-size: 24px; font-weight: 800; color: #FF6D1F;">Intellipost</div>
     </div>
 
     <div class="email-body">
