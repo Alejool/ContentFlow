@@ -3,6 +3,7 @@ import { CommentsSection } from '@/Components/Content/Publication/comments/Comme
 import ApprovalHistoryCompacto from '@/Components/Content/Publication/common/ApprovalHistoryCompacto';
 import { ContentType } from '@/Components/Content/Publication/common/ContentTypeIconSelector';
 import ContentTypeSelectorBar from '@/Components/Content/Publication/common/ContentTypeSelectorBar';
+import PlatformCharacterValidator from '@/Components/Content/Publication/common/PlatformCharacterValidator';
 import PollFields from '@/Components/Content/Publication/common/PollFields';
 import PublicationStatusTimeline from '@/Components/Content/Publication/common/PublicationStatusTimeline';
 import TimelineCompacto from '@/Components/Content/Publication/common/TimelineCompacto';
@@ -14,6 +15,7 @@ import MediaUploadSkeleton from '@/Components/Content/Publication/common/edit/Me
 import ModalFooter from '@/Components/Content/modals/common/ModalFooter';
 import ModalHeader from '@/Components/Content/modals/common/ModalHeader';
 import ScheduleSection from '@/Components/Content/modals/common/ScheduleSection';
+import VideoValidationAlert from '@/Components/Content/modals/publish/VideoValidationAlert';
 import AlertCard from '@/Components/common/Modern/AlertCard';
 import { useContentType } from '@/Hooks/publication/useContentType';
 import { usePublicationForm } from '@/Hooks/publication/usePublicationForm';
@@ -22,6 +24,7 @@ import { useModalFocusTrap } from '@/Hooks/useModalFocusTrap';
 import { usePublicationCapabilities } from '@/Hooks/usePublicationCapabilities';
 import { usePublicationLock } from '@/Hooks/usePublicationLock';
 import { useSocialAccounts } from '@/Hooks/useSocialAccounts';
+import { useTokenHealth } from '@/Hooks/useTokenHealth';
 import toast from '@/Utils/toast';
 import { queryKeys } from '@/lib/queryKeys';
 import { useCampaignStore } from '@/stores/campaignStore';
@@ -34,9 +37,6 @@ import { Lock, Save } from 'lucide-react';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useWatch } from 'react-hook-form';
 import { Trans } from 'react-i18next';
-import PlatformCharacterValidator from '@/Components/Content/Publication/common/PlatformCharacterValidator';
-import VideoValidationAlert from '@/Components/Content/modals/publish/VideoValidationAlert';
-import { useTokenHealth } from '@/Hooks/useTokenHealth';
 
 const parseUserAgent = (userAgent?: string): string => {
   if (!userAgent) return 'Unknown Device';
@@ -544,23 +544,43 @@ const EditPublicationModal = ({
               })}
             </div>
           }
+          centerElement={
+            <ContentTypeSelectorBar
+              selectedType={content_type}
+              selectedPlatforms={selectedPlatformNames}
+              onChange={(type) => {
+                setValue('content_type', type, { shouldValidate: true });
+                // Reset type-specific fields when changing type
+                if (type !== 'poll') {
+                  setValue('poll_options', null);
+                  setValue('poll_duration_hours', null);
+                }
+              }}
+              t={t}
+              disabled={hasPublishedPlatform || isContentSectionDisabled}
+              mediaFiles={mediaFiles}
+            />
+          }
         />
 
-        <ContentTypeSelectorBar
-          selectedType={content_type}
-          selectedPlatforms={selectedPlatformNames}
-          onChange={(type) => {
-            setValue('content_type', type, { shouldValidate: true });
-            // Reset type-specific fields when changing type
-            if (type !== 'poll') {
-              setValue('poll_options', null);
-              setValue('poll_duration_hours', null);
-            }
-          }}
-          t={t}
-          disabled={hasPublishedPlatform || isContentSectionDisabled}
-          mediaFiles={mediaFiles}
-        />
+        {/* ContentTypeSelectorBar visible solo en pantallas menores a md */}
+        <div className="md:hidden">
+          <ContentTypeSelectorBar
+            selectedType={content_type}
+            selectedPlatforms={selectedPlatformNames}
+            onChange={(type) => {
+              setValue('content_type', type, { shouldValidate: true });
+              // Reset type-specific fields when changing type
+              if (type !== 'poll') {
+                setValue('poll_options', null);
+                setValue('poll_duration_hours', null);
+              }
+            }}
+            t={t}
+            disabled={hasPublishedPlatform || isContentSectionDisabled}
+            mediaFiles={mediaFiles}
+          />
+        </div>
 
         <div className="custom-scrollbar flex-1 overflow-y-auto">
           <form
@@ -830,7 +850,7 @@ const EditPublicationModal = ({
                 </div>
 
                 {/* ==================== SECCIÓN: CONTENIDO DE LA PUBLICACIÓN ==================== */}
-                <div className="space-y-4">
+                <div className="space-y-2 mt-6">
                   <div className="flex items-center gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700">
                     <div className="h-5 w-1 rounded-full bg-primary-500"></div>
                     <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
