@@ -23,21 +23,15 @@ export default function CommandPalette() {
       {isOpen && (
         <Dialog as="div" className="relative z-50" onClose={setIsOpen} open={isOpen}>
           {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-gray-500/25 backdrop-blur-sm dark:bg-black/50"
-          />
+          <div className="fixed inset-0 bg-gray-500/25 backdrop-blur-sm dark:bg-black/50" />
 
           {/* Dialog container */}
           <div className="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-20">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: -20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: -20 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.15, ease: 'easeOut' }}
               className="mx-auto max-w-2xl"
             >
               <DialogPanel className="transform divide-y divide-gray-100 overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black/5 dark:divide-gray-800 dark:bg-gray-900">
@@ -136,12 +130,7 @@ export default function CommandPalette() {
 
                   {/* Empty State */}
                   {query !== '' && !hasResults && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="px-6 py-14 text-center text-sm sm:px-14"
-                    >
+                    <div className="px-6 py-14 text-center text-sm sm:px-14">
                       <Command className="mx-auto h-6 w-6 text-gray-400" aria-hidden="true" />
                       <p className="mt-4 font-semibold text-gray-900 dark:text-white">
                         No se encontraron resultados
@@ -149,7 +138,7 @@ export default function CommandPalette() {
                       <p className="mt-2 text-gray-500">
                         No pudimos encontrar nada para &ldquo;{query}&rdquo;. Intenta con otra cosa.
                       </p>
-                    </motion.div>
+                    </div>
                   )}
 
                   {/* Footer */}
