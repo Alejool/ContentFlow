@@ -14,7 +14,6 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import React, { Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import '../css/app.css';
-import { DevCacheIndicator } from './Components/DevCacheIndicator';
 import { ServiceWorkerUpdate } from './Components/ServiceWorkerUpdate';
 import './bootstrap';
 import './i18n';
@@ -74,7 +73,6 @@ createInertiaApp<PageProps>({
             </Suspense>
             <ThemedToaster />
             <ServiceWorkerUpdate />
-            <DevCacheIndicator />
             <InertiaProgressIndicator color="#ad421e" />
           </ThemeProvider>
         </QueryProvider>

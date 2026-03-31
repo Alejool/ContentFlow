@@ -46,7 +46,7 @@ export function DevCacheIndicator() {
   if (isMinimized) {
     return (
       <div
-        className="fixed bottom-4 right-4 z-[9999] cursor-pointer"
+        className="relative cursor-pointer self-end"
         onClick={() => setIsMinimized(false)}
       >
         <div className={`${getColor(cacheInfo.cache_driver)} rounded-full p-3 shadow-lg hover:scale-110 transition-transform`}>
@@ -57,8 +57,7 @@ export function DevCacheIndicator() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-[9999] max-w-sm">
-      <div className="rounded-lg border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-800">
+    <div className="w-64 rounded-lg border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-800">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-200 px-4 py-2 dark:border-gray-700">
           <div className="flex items-center gap-2">
@@ -152,6 +151,5 @@ export function DevCacheIndicator() {
           </div>
         </div>
       </div>
-    </div>
   );
 }

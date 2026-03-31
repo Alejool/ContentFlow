@@ -153,7 +153,7 @@ export default function GlobalUploadIndicator() {
     return (
       <>
         <div
-          className="fixed bottom-4 right-4 z-[9999] cursor-pointer"
+          className="relative cursor-pointer self-end"
           onClick={() => setIsMinimized(false)}
         >
           <div className={`${circleColor} rounded-full p-3 shadow-lg transition-transform hover:scale-110`}>
@@ -179,7 +179,7 @@ export default function GlobalUploadIndicator() {
 
   return (
     <>
-      <div className="fixed bottom-4 right-4 z-[9999] w-72 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-neutral-700 dark:bg-gray-800">
+      <div className="w-72 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-neutral-700 dark:bg-gray-800">
 
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-200 px-3 py-2 dark:border-neutral-700">

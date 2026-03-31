@@ -24,10 +24,10 @@ import { cssPropertiesManager } from '@/Utils/CSSCustomPropertiesManager';
 import { useNotificationStore } from '@/stores/notificationStore';
 import { useUploadQueue } from '@/stores/uploadQueueStore';
 import type {
-  OnboardingState,
-  PublicationTemplate,
-  SocialPlatform,
-  TourStep,
+    OnboardingState,
+    PublicationTemplate,
+    SocialPlatform,
+    TourStep,
 } from '@/types/onboarding';
 import { usePage } from '@inertiajs/react';
 import { ReactNode, lazy, useEffect, useState } from 'react';
@@ -236,6 +236,11 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
             <CommandPalette />
           </div>
           <GlobalUploadIndicator />
+          {/* Corner widgets: stacked bottom-right. DevMode sits above Upload when both are active */}
+          <div className="fixed bottom-4 right-4 z-[9999] flex flex-col items-end gap-2">
+            <DevCacheIndicator />
+            <GlobalUploadIndicator />
+          </div>
           <ResumeUploadsPrompt />
           <QueueNotificationFloat />
           <KeyboardShortcutsModal
