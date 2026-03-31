@@ -5,7 +5,7 @@ import { useAnalyticsData } from '@/Hooks/useAnalyticsData';
 import { useTheme } from '@/Hooks/useTheme';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { getEmptyStateByKey } from '@/Utils/emptyStateMapper';
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { Eye, Heart, LockKeyhole, MousePointer2, TrendingUp, Users } from 'lucide-react';
 import { Suspense, lazy, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -96,12 +96,6 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
 
   const handlePeriodChange = (days: number) => {
     setSelectedPeriod(days);
-    // Keep Inertia in sync for SSR/bookmarking, but don't wait for it to re-render
-    router.get(
-      route('analytics.index'),
-      { days },
-      { preserveState: true, preserveScroll: true, only: ['period'] },
-    );
   };
 
   return (

@@ -157,6 +157,44 @@ class AnalyticsController extends Controller
     }
 
     /**
+     * JSON endpoint for period-based analytics data (used by frontend without full page reload)
+     */
+    public function data(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $user = Auth::user();
+        $workspaceId = $user->current_workspace_id;
+
+        if (!$workspaceId) {
+            return response()->json(['error' => 'No workspace selected'], 422);
+        }
+
+        $days = (int) $request->input('days', 30);
+
+        $stats = $this->statisticsService->getDashboardStats($workspaceId, $days);
+
+        if (isset($stats['engagement_trends'])) {
+            $stats['engagement_trends'] = collect($stats['engagement_trends'])->map(function ($trend) {
+                return [
+                    'date' => \Carbon\Carbon::parse($trend['date'])->format('M d'),
+                    'views' => $trend['views'],
+                    'clicks' => $trend['clicks'],
+                    'engagement' => $trend['total_engagement'],
+                    'likes' => $trend['likes'] ?? 0,
+                    'comments' => $trend['comments'] ?? 0,
+                    'shares' => $trend['shares'] ?? 0,
+                    'saves' => $trend['saves'] ?? 0,
+                ];
+            })->toArray();
+        }
+
+        return response()->json(array_merge($stats, [
+            'platformComparison' => $this->statisticsService->getPlatformComparison($workspaceId, $days),
+            'detailedPlatforms' => $this->statisticsService->getDetailedPlatformAnalytics($workspaceId, $days),
+            'detailedPublications' => $this->statisticsService->getDetailedPublicationPerformance($workspaceId, $days),
+        ]));
+    }
+
+    /**
      * Get dashboard overview statistics
      */
     public function getDashboardStats(Request $request)

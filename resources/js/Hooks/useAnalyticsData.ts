@@ -29,13 +29,10 @@ export interface AnalyticsData {
 }
 
 async function fetchAnalyticsDataFn(period: number): Promise<AnalyticsData> {
-  const response = await axios.get(route('analytics.index'), {
+  const response = await axios.get(route('analytics.data'), {
     params: { days: period },
-    headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
   });
-  // Inertia returns { component, props } — extract stats from props
-  const props = response.data?.props ?? response.data;
-  return props.stats;
+  return response.data;
 }
 
 /**

@@ -113,6 +113,7 @@ Route::middleware('auth')->group(function () {
 
   Route::get('/dashboard', [AnalyticsController::class, 'dashboard'])->name('dashboard');
   Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
+  Route::get('/analytics/data', [AnalyticsController::class, 'data'])->name('analytics.data');
 
   Route::prefix('profile')->name('profile.')->group(function () {
     Route::get('/', [ProfileController::class, 'edit'])->name('edit');
