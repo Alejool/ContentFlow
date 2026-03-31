@@ -1,8 +1,8 @@
 import { Head } from '@inertiajs/react';
+import axios from 'axios';
 import { CheckCircle, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
 
 interface SuccessProps {
   session: {
@@ -20,7 +20,7 @@ export default function Success({ session }: SuccessProps) {
   const maxAttempts = 10; // Intentar durante 20 segundos (10 intentos x 2 segundos)
 
   useEffect(() => {
-    let pollInterval: NodeJS.Timeout;
+    let pollInterval: ReturnType<typeof setInterval>;
 
     const checkSubscriptionUpdate = async () => {
       try {

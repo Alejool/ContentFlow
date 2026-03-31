@@ -1,12 +1,12 @@
+import { ActiveAddonsCards } from '@/Components/Subscription/ActiveAddonsCards';
+import { AddonsInfoBanner } from '@/Components/Subscription/AddonsInfoBanner';
+import { AddonsPurchaseSection } from '@/Components/Subscription/AddonsPurchaseSection';
+import { PlanUsageCards } from '@/Components/Subscription/PlanUsageCards';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, usePage } from '@inertiajs/react';
-import { useTranslation } from 'react-i18next';
+import { AlertCircle, CheckCircle, Info, XCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { CheckCircle, XCircle, AlertCircle, Info } from 'lucide-react';
-import { PlanUsageCards } from '@/Components/Subscription/PlanUsageCards';
-import { ActiveAddonsCards } from '@/Components/Subscription/ActiveAddonsCards';
-import { AddonsPurchaseSection } from '@/Components/Subscription/AddonsPurchaseSection';
-import { AddonsInfoBanner } from '@/Components/Subscription/AddonsInfoBanner';
+import { useTranslation } from 'react-i18next';
 
 interface AddonPackage {
   sku: string;
@@ -55,6 +55,7 @@ interface PageProps extends Props {
     team_members: boolean;
     publications: boolean;
   };
+  [key: string]: unknown;
 }
 
 export default function Addons({ addons }: Props) {
@@ -136,6 +137,7 @@ export default function Addons({ addons }: Props) {
       }, 10000);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [notification]);
 
   // Validar que addons existe y tiene la estructura correcta

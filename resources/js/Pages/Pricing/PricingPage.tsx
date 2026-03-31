@@ -70,7 +70,7 @@ export default function PricingPage({
           {/* Pricing Plans Section */}
           <PricingPlansSection
             plans={plans}
-            currentPlan={currentPlan}
+            {...(currentPlan !== undefined && { currentPlan })}
             isAuthenticated={!!auth.user}
             showBillingToggle={true}
             showHeader={true}

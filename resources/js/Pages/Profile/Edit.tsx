@@ -152,7 +152,7 @@ export default function Edit({ mustVerifyEmail, status, subscription, usage }: E
           {/* Statistics Section */}
           <div className="">
             <div className="rounded-lg px-6 py-2">
-              <AccountStatistics status={status} />
+              <AccountStatistics status={status ?? null} />
             </div>
           </div>
 
@@ -195,7 +195,7 @@ export default function Edit({ mustVerifyEmail, status, subscription, usage }: E
                 <div>
                   <SubscriptionSection
                     subscription={subscription}
-                    usage={usage}
+                    {...(usage !== undefined && { usage })}
                     currentWorkspace={currentWorkspace}
                   />
                 </div>
