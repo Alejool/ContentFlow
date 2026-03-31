@@ -8,53 +8,48 @@ interface CustomToastOptions extends ToastOptions {
   };
 }
 
+const MAX_TOASTS = 3;
+const activeToastIds: string[] = [];
+
 class ToastServiceClass {
   private defaultDuration = 4000;
-  private maxToasts = 3;
 
-  /**
-   * Show success toast
-   */
+  private track(id: string, duration: number) {
+    activeToastIds.push(id);
+    if (activeToastIds.length > MAX_TOASTS) {
+      const oldest = activeToastIds.shift()!;
+      toast.dismiss(oldest);
+    }
+    setTimeout(() => {
+      const idx = activeToastIds.indexOf(id);
+      if (idx !== -1) activeToastIds.splice(idx, 1);
+    }, duration + 500);
+  }
+
   success(message: string, options?: CustomToastOptions): string {
-    return toast.success(message, {
-      duration: this.defaultDuration,
-      ...options,
-    });
+    const id = toast.success(message, { duration: this.defaultDuration, ...options });
+    this.track(id, options?.duration ?? this.defaultDuration);
+    return id;
   }
 
-  /**
-   * Show error toast
-   */
   error(message: string, options?: CustomToastOptions): string {
-    return toast.error(message, {
-      duration: 6000, // Errors stay longer
-      ...options,
-    });
+    const id = toast.error(message, { duration: 6000, ...options });
+    this.track(id, options?.duration ?? 6000);
+    return id;
   }
 
-  /**
-   * Show warning toast
-   */
   warning(message: string, options?: CustomToastOptions): string {
-    return toast(message, {
-      duration: this.defaultDuration,
-      ...options,
-    });
+    const id = toast(message, { duration: this.defaultDuration, ...options });
+    this.track(id, options?.duration ?? this.defaultDuration);
+    return id;
   }
 
-  /**
-   * Show info toast
-   */
   info(message: string, options?: CustomToastOptions): string {
-    return toast(message, {
-      duration: this.defaultDuration,
-      ...options,
-    });
+    const id = toast(message, { duration: this.defaultDuration, ...options });
+    this.track(id, options?.duration ?? this.defaultDuration);
+    return id;
   }
 
-  /**
-   * Show loading toast with promise
-   */
   loading<T>(
     promise: Promise<T>,
     messages: {
@@ -67,23 +62,14 @@ class ToastServiceClass {
     return toast.promise(promise, messages, options);
   }
 
-  /**
-   * Dismiss a specific toast
-   */
   dismiss(toastId?: string): void {
     toast.dismiss(toastId);
   }
 
-  /**
-   * Dismiss all toasts
-   */
   dismissAll(): void {
     toast.dismiss();
   }
 
-  /**
-   * Show validation errors from Laravel
-   */
   validationErrors(errors: Record<string, string[]>): void {
     Object.entries(errors).forEach(([_field, messages]) => {
       messages.forEach((message) => {
@@ -92,22 +78,11 @@ class ToastServiceClass {
     });
   }
 
-  /**
-   * Show toast from flash message
-   */
   fromFlash(flash: { success?: string; error?: string; warning?: string; info?: string }): void {
-    if (flash.success) {
-      this.success(flash.success);
-    }
-    if (flash.error) {
-      this.error(flash.error);
-    }
-    if (flash.warning) {
-      this.warning(flash.warning);
-    }
-    if (flash.info) {
-      this.info(flash.info);
-    }
+    if (flash.success) this.success(flash.success);
+    if (flash.error) this.error(flash.error);
+    if (flash.warning) this.warning(flash.warning);
+    if (flash.info) this.info(flash.info);
   }
 }
 

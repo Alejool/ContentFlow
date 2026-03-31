@@ -39,6 +39,14 @@ class ErrorInterceptorClass {
       return;
     }
 
+    // Skip Inertia requests — Inertia handles its own error display
+    // axios normalizes headers to lowercase internally
+    const headers = error.config?.headers ?? {};
+    const headerKeys = Object.keys(headers).map((k) => k.toLowerCase());
+    if (headerKeys.includes('x-inertia')) {
+      return;
+    }
+
     // Handle by status code
     switch (status) {
       case 400:
