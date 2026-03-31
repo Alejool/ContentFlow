@@ -28,7 +28,7 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
   selectedDate,
   onChange,
   minDate,
-  showWarningForPastDates = true,
+  showWarningForPastDates: _showWarningForPastDates = true,
   className = '',
 }) => {
   const { t, i18n } = useTranslation();
@@ -55,7 +55,7 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
     if (result.isValid) onChange(d);
   };
 
-  const minCalendarDate = minDate ? dateToCalendarDate(minDate) : undefined;
+  const minCalendarDate = minDate ? dateToCalendarDate(minDate) : null;
 
   return (
     <I18nProvider locale={locale}>

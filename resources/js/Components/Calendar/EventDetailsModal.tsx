@@ -4,14 +4,14 @@ import { formatTime } from '@/Utils/formatDate';
 import type { CalendarEvent } from '@/types/calendar';
 import { format, parseISO } from 'date-fns';
 import {
-    AlertCircle,
-    Calendar,
-    Clock,
-    Edit2,
-    ExternalLink,
-    Link as LinkIcon,
-    Tag,
-    Trash2,
+  AlertCircle,
+  Calendar,
+  Clock,
+  Edit2,
+  ExternalLink,
+  Link as LinkIcon,
+  Tag,
+  Trash2,
 } from 'lucide-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';

@@ -2,13 +2,13 @@ import type { CalendarEvent } from '@/types/calendar';
 import { formatTime } from '@/Utils/formatDate';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import {
-    DndContext,
-    DragOverlay,
-    PointerSensor,
-    useDraggable,
-    useDroppable,
-    useSensor,
-    useSensors,
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  useDraggable,
+  useDroppable,
+  useSensor,
+  useSensors,
 } from '@dnd-kit/core';
 import { format, parseISO } from 'date-fns';
 import { Clock } from 'lucide-react';
@@ -39,7 +39,7 @@ const DraggableDayEvent: React.FC<DraggableDayEventProps> = ({
   isSelected,
   onToggleSelection,
   onEventClick,
-  onDeleteEvent,
+  onDeleteEvent: _onDeleteEvent,
   PlatformIcon,
 }) => {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({

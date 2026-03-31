@@ -2,13 +2,13 @@ import type { CalendarEvent } from '@/types/calendar';
 import { formatTime } from '@/Utils/formatDate';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import {
-    DndContext,
-    DragOverlay,
-    PointerSensor,
-    useDraggable,
-    useDroppable,
-    useSensor,
-    useSensors,
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  useDraggable,
+  useDroppable,
+  useSensor,
+  useSensors,
 } from '@dnd-kit/core';
 import { eachDayOfInterval, endOfWeek, format, isToday, parseISO, startOfWeek } from 'date-fns';
 import { Clock } from 'lucide-react';
