@@ -10,16 +10,16 @@ import { Head, Link, router, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import {
-    BarChart3,
-    Calendar,
-    Eye,
-    FileText,
-    Heart,
-    Mail,
-    MousePointer2,
-    TrendingUp,
-    Users,
-    X,
+  BarChart3,
+  Calendar,
+  Eye,
+  FileText,
+  Heart,
+  Mail,
+  MousePointer2,
+  TrendingUp,
+  Users,
+  X,
 } from 'lucide-react';
 import { Suspense, lazy, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

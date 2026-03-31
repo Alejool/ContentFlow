@@ -3,7 +3,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import axios, { type AxiosError } from 'axios';
 import { RefObject, useRef } from 'react';
 import { useForm as useHookForm } from 'react-hook-form';
-import type { FieldErrors, UseFormHandleSubmit, UseFormRegister, UseFormReset, UseFormSetError } from 'react-hook-form';
+import type {
+  FieldErrors,
+  UseFormHandleSubmit,
+  UseFormRegister,
+  UseFormReset,
+  UseFormSetError,
+} from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 

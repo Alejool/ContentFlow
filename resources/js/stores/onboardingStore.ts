@@ -1,5 +1,10 @@
 import type { OnboardingState } from '@/types/onboarding';
-import { createNetworkError, getErrorMessage, isOnline, retryWithBackoff } from '@/Utils/networkErrorHandler';
+import {
+  createNetworkError,
+  getErrorMessage,
+  isOnline,
+  retryWithBackoff,
+} from '@/Utils/networkErrorHandler';
 import type { RetryOptions } from '@/Utils/networkErrorHandler';
 import { offlineQueue } from '@/Utils/offlineQueue';
 import type { QueuedAction } from '@/Utils/offlineQueue';

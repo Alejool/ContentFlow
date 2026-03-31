@@ -42,7 +42,8 @@ export const getErrorMessage = (
   // 4. Common fallbacks
   if (raw.includes('unique')) return t('validation.unique', 'Ya ha sido registrado.');
   if (raw.includes('required')) return t('validation.required', 'Este campo es obligatorio.');
-  if (raw.includes('email') && raw.includes('valid')) return t('validation.email', 'Debe ser un correo válido.');
+  if (raw.includes('email') && raw.includes('valid'))
+    return t('validation.email', 'Debe ser un correo válido.');
 
   // 5. Strip namespace prefix (e.g. 'passwords.workspace_email_not_found' → try 'workspace_email_not_found')
   if (raw.includes('.')) {

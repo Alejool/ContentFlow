@@ -6,14 +6,14 @@ import { formatDateTimeString } from '@/Utils/dateHelpers';
 import { Head, useForm } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-    AlertCircle,
-    Calendar,
-    Check,
-    Info,
-    Loader2,
-    MessageSquare,
-    Share2,
-    X,
+  AlertCircle,
+  Calendar,
+  Check,
+  Info,
+  Loader2,
+  MessageSquare,
+  Share2,
+  X,
 } from 'lucide-react';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';

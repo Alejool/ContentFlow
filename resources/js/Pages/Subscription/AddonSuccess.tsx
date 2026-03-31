@@ -1,11 +1,11 @@
 import Button from '@/Components/common/Modern/Button';
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
 } from '@/Components/ui/card';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
@@ -104,7 +104,7 @@ export default function AddonSuccess() {
               {/* Info Box */}
               <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
                 <p className="text-sm text-blue-800 dark:text-blue-200">
-                   <strong>Tip:</strong> Los add-ons no expiran y se acumulan si compras múltiples
+                  <strong>Tip:</strong> Los add-ons no expiran y se acumulan si compras múltiples
                   paquetes. Puedes solicitar reembolso dentro de los 7 días si no has usado el
                   add-on.
                 </p>

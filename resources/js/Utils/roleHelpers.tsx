@@ -43,7 +43,8 @@ export const ROLE_CONFIGS: RoleConfig[] = [
     icon: Crown,
     gradient: 'from-amber-500 to-orange-500',
     textColor: 'text-amber-700 dark:text-amber-400',
-    badgeClass: 'bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800/50',
+    badgeClass:
+      'bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800/50',
   },
   {
     slug: 'admin',
@@ -51,7 +52,8 @@ export const ROLE_CONFIGS: RoleConfig[] = [
     icon: ShieldCheck,
     gradient: 'from-primary-500 to-primary-600',
     textColor: 'text-primary-700 dark:text-primary-400',
-    badgeClass: 'bg-primary-50 text-primary-700 border border-primary-200 dark:bg-primary-900/20 dark:text-primary-400 dark:border-primary-800/50',
+    badgeClass:
+      'bg-primary-50 text-primary-700 border border-primary-200 dark:bg-primary-900/20 dark:text-primary-400 dark:border-primary-800/50',
   },
   {
     slug: 'editor',
@@ -59,7 +61,8 @@ export const ROLE_CONFIGS: RoleConfig[] = [
     icon: PencilLine,
     gradient: 'from-indigo-500 to-blue-500',
     textColor: 'text-indigo-700 dark:text-indigo-400',
-    badgeClass: 'bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-800/50',
+    badgeClass:
+      'bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-800/50',
   },
   {
     slug: 'member',
@@ -67,7 +70,8 @@ export const ROLE_CONFIGS: RoleConfig[] = [
     icon: User,
     gradient: 'from-emerald-500 to-green-500',
     textColor: 'text-emerald-700 dark:text-emerald-400',
-    badgeClass: 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800/50',
+    badgeClass:
+      'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800/50',
   },
   {
     slug: 'viewer',
@@ -75,7 +79,8 @@ export const ROLE_CONFIGS: RoleConfig[] = [
     icon: Eye,
     gradient: 'from-slate-500 to-zinc-500',
     textColor: 'text-slate-700 dark:text-slate-400',
-    badgeClass: 'bg-slate-50 text-slate-700 border border-slate-200 dark:bg-slate-900/20 dark:text-slate-400 dark:border-slate-800/50',
+    badgeClass:
+      'bg-slate-50 text-slate-700 border border-slate-200 dark:bg-slate-900/20 dark:text-slate-400 dark:border-slate-800/50',
   },
 ];
 

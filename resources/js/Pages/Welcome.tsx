@@ -7,21 +7,21 @@ import { useTheme } from '@/Hooks/useTheme';
 import { Head, Link } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-    ArrowRight,
-    BarChart3,
-    Brain,
-    Calendar,
-    CheckCircle2,
-    Globe,
-    Image as ImageIcon,
-    Mail,
-    Rocket,
-    Share2,
-    Shield,
-    Sparkles,
-    Upload,
-    Users,
-    Zap,
+  ArrowRight,
+  BarChart3,
+  Brain,
+  Calendar,
+  CheckCircle2,
+  Globe,
+  Image as ImageIcon,
+  Mail,
+  Rocket,
+  Share2,
+  Shield,
+  Sparkles,
+  Upload,
+  Users,
+  Zap,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';

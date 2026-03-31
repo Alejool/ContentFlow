@@ -51,8 +51,7 @@ export default function UpdateProfileInformation({
 }: UpdateProfileInformationProps) {
   const { t } = useTranslation();
 
-  const { register, handleSubmit, errors, isSubmitting, user, control } =
-    useUser(initialUser);
+  const { register, handleSubmit, errors, isSubmitting, user, control } = useUser(initialUser);
 
   return (
     <div className={className}>

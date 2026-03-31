@@ -1,7 +1,7 @@
 import {
-    applyTemplateToForm,
-    clearTemplateFromSession,
-    getTemplateFromSession,
+  applyTemplateToForm,
+  clearTemplateFromSession,
+  getTemplateFromSession,
 } from '@/Utils/templateUtils';
 import type { PublicationFormData } from '@/schemas/publication';
 import { useEffect, useRef } from 'react';

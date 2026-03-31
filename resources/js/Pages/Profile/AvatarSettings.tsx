@@ -34,9 +34,21 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
     }
 
     // Validar tipo
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+    const validTypes = [
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'image/gif',
+      'image/webp',
+      'image/svg+xml',
+    ];
     if (!validTypes.includes(file.type)) {
-      toast.error(t('profile.invalid_file_type', 'Solo se permiten archivos de imagen (JPG, PNG, GIF, WebP, SVG)'));
+      toast.error(
+        t(
+          'profile.invalid_file_type',
+          'Solo se permiten archivos de imagen (JPG, PNG, GIF, WebP, SVG)',
+        ),
+      );
       return;
     }
 
@@ -76,7 +88,7 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
         toast.success(t('profile.avatar_uploaded', 'Foto subida correctamente'));
 
         // Actualizar el estado global de Inertia sin recargar la página
-        router.reload({ 
+        router.reload({
           only: ['auth'],
           preserveScroll: true,
           preserveState: true,
@@ -117,7 +129,7 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
         toast.success(t('profile.avatar_removed', 'Avatar eliminado correctamente'));
 
         // Actualizar el estado global de Inertia sin recargar la página
-        router.reload({ 
+        router.reload({
           only: ['auth'],
           preserveScroll: true,
           preserveState: true,
@@ -223,7 +235,7 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
             <Button
               type="button"
               variant="ghost"
-              buttonStyle='ghost'
+              buttonStyle="ghost"
               size="md"
               icon={X}
               onClick={handleRemovePhoto}
