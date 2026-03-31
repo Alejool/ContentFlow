@@ -34,9 +34,9 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
     }
 
     // Validar tipo
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
     if (!validTypes.includes(file.type)) {
-      toast.error(t('profile.invalid_file_type', 'Solo se permiten archivos de imagen (JPG, PNG, GIF, WebP)'));
+      toast.error(t('profile.invalid_file_type', 'Solo se permiten archivos de imagen (JPG, PNG, GIF, WebP, SVG)'));
       return;
     }
 
@@ -210,7 +210,7 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
       <div className="space-y-3">
         <div className="flex flex-col gap-2">
           <FileUploadButton
-            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/svg+xml"
             onChange={handleFileChange}
             label={t('profile.choose_file', 'Elegir Archivo')}
             loading={processing}
