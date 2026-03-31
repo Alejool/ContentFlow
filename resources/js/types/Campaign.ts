@@ -1,4 +1,4 @@
-import { Publication } from './Publication';
+import type { Publication } from './Publication';
 
 export type Campaign = {
   id: number;

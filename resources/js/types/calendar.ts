@@ -1,4 +1,15 @@
 // Calendar View Types
+
+export interface DataConflict {
+  eventId: string;
+  field: string;
+  localValue: unknown;
+  serverValue: unknown;
+  localTimestamp: Date;
+  serverTimestamp: Date;
+  localUser?: string;
+  serverUser?: string;
+}
 export type CalendarView = 'month' | 'week' | 'day';
 
 export interface ViewConfig {
