@@ -906,8 +906,8 @@ export default function PublishPublicationModal({
                 type="button"
                 onClick={handleCloseModal}
                 disabled={unpublishing !== null}
-                variant="secondary"
-                buttonStyle="solid"
+                variant="ghost"
+                buttonStyle="ghost"
                 size="lg"
                 className="flex-1"
                 rounded="lg"
