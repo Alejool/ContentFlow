@@ -57,7 +57,9 @@ createInertiaApp<PageProps>({
         <QueryProvider>
           <ThemeProvider
             isAuthenticated={!!user}
-            initialTheme={user?.theme === 'light' || user?.theme === 'dark' ? user.theme : undefined}
+            initialTheme={
+              user?.theme === 'light' || user?.theme === 'dark' ? user.theme : undefined
+            }
             workspaceId={user?.current_workspace_id}
           >
             <Suspense

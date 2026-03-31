@@ -25,10 +25,10 @@ import { cssPropertiesManager } from '@/Utils/CSSCustomPropertiesManager';
 import { useNotificationStore } from '@/stores/notificationStore';
 import { useUploadQueue } from '@/stores/uploadQueueStore';
 import type {
-    OnboardingState,
-    PublicationTemplate,
-    SocialPlatform,
-    TourStep,
+  OnboardingState,
+  PublicationTemplate,
+  SocialPlatform,
+  TourStep,
 } from '@/types/onboarding';
 import { usePage } from '@inertiajs/react';
 import { ReactNode, lazy, useEffect, useState } from 'react';

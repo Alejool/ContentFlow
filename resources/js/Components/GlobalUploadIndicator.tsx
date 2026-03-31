@@ -61,7 +61,8 @@ export default function GlobalUploadIndicator() {
   const failedJobs = jobs.filter((j) => j.status === 'failed');
 
   const totalActive = activeUploads.length + activePublications.length + activeJobs.length;
-  const hasErrors = errorUploads.length > 0 || failedPublications.length > 0 || failedJobs.length > 0;
+  const hasErrors =
+    errorUploads.length > 0 || failedPublications.length > 0 || failedJobs.length > 0;
 
   useUploadWarning(activeUploads.length > 0);
 
@@ -87,10 +88,16 @@ export default function GlobalUploadIndicator() {
       type: 'danger',
     });
     if (!ok) return;
-    try { await axios.post(route('api.v1.publications.cancel', id)); } catch {}
+    try {
+      await axios.post(route('api.v1.publications.cancel', id));
+    } catch {}
   };
 
-  const handleCancelPlatform = async (publicationId: number, platformId: number, platformName: string) => {
+  const handleCancelPlatform = async (
+    publicationId: number,
+    platformId: number,
+    platformName: string,
+  ) => {
     const ok = await confirm({
       title: `¿Cancelar ${platformName}?`,
       message: `¿Cancelar la publicación en ${platformName}?`,
@@ -100,8 +107,12 @@ export default function GlobalUploadIndicator() {
     });
     if (!ok) return;
     try {
-      await axios.post(route('api.v1.publications.cancel', publicationId), { platform_ids: [platformId] });
-      window.dispatchEvent(new CustomEvent('publication-cancelled', { detail: { publicationId, platformId } }));
+      await axios.post(route('api.v1.publications.cancel', publicationId), {
+        platform_ids: [platformId],
+      });
+      window.dispatchEvent(
+        new CustomEvent('publication-cancelled', { detail: { publicationId, platformId } }),
+      );
     } catch {}
   };
 
@@ -141,22 +152,25 @@ export default function GlobalUploadIndicator() {
 
   // Colors & icon based on status
   const dotColor = totalActive > 0 ? 'bg-primary-500' : hasErrors ? 'bg-red-500' : 'bg-green-500';
-  const circleColor = totalActive > 0 ? 'bg-primary-500' : hasErrors ? 'bg-red-500' : 'bg-green-500';
-  const statusIcon = totalActive > 0
-    ? <Loader2 className="h-5 w-5 animate-spin text-white" />
-    : hasErrors
-      ? <AlertTriangle className="h-5 w-5 text-white" />
-      : <CheckCircle2 className="h-5 w-5 text-white" />;
+  const circleColor =
+    totalActive > 0 ? 'bg-primary-500' : hasErrors ? 'bg-red-500' : 'bg-green-500';
+  const statusIcon =
+    totalActive > 0 ? (
+      <Loader2 className="h-5 w-5 animate-spin text-white" />
+    ) : hasErrors ? (
+      <AlertTriangle className="h-5 w-5 text-white" />
+    ) : (
+      <CheckCircle2 className="h-5 w-5 text-white" />
+    );
 
   // ── Minimized: just a circle icon, same as DevCacheIndicator ──
   if (isMinimized) {
     return (
       <>
-        <div
-          className="relative cursor-pointer self-end"
-          onClick={() => setIsMinimized(false)}
-        >
-          <div className={`${circleColor} rounded-full p-3 shadow-lg transition-transform hover:scale-110`}>
+        <div className="relative cursor-pointer self-end" onClick={() => setIsMinimized(false)}>
+          <div
+            className={`${circleColor} rounded-full p-3 shadow-lg transition-transform hover:scale-110`}
+          >
             {statusIcon}
             {totalActive > 0 && (
               <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[9px] font-bold text-gray-800 shadow">
@@ -171,24 +185,51 @@ export default function GlobalUploadIndicator() {
   }
 
   // Tabs config — only show tabs that have items
-  const tabs: { id: Tab; icon: React.ReactNode; count: number; activeCount: number; title: string }[] = [
-    { id: 'uploads' as const,      icon: <FileUp className="h-4 w-4" />, count: uploads.length,      activeCount: activeUploads.length,      title: 'Archivos' },
-    { id: 'processing' as const,   icon: <Cpu className="h-4 w-4" />,    count: jobs.length,          activeCount: activeJobs.length,         title: 'Procesando' },
-    { id: 'publications' as const, icon: <Radio className="h-4 w-4" />,  count: publications.length,  activeCount: activePublications.length,  title: 'Plataformas' },
+  const tabs: {
+    id: Tab;
+    icon: React.ReactNode;
+    count: number;
+    activeCount: number;
+    title: string;
+  }[] = [
+    {
+      id: 'uploads' as const,
+      icon: <FileUp className="h-4 w-4" />,
+      count: uploads.length,
+      activeCount: activeUploads.length,
+      title: 'Archivos',
+    },
+    {
+      id: 'processing' as const,
+      icon: <Cpu className="h-4 w-4" />,
+      count: jobs.length,
+      activeCount: activeJobs.length,
+      title: 'Procesando',
+    },
+    {
+      id: 'publications' as const,
+      icon: <Radio className="h-4 w-4" />,
+      count: publications.length,
+      activeCount: activePublications.length,
+      title: 'Plataformas',
+    },
   ].filter((tab) => tab.count > 0);
 
   return (
     <>
       <div className="w-72 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-neutral-700 dark:bg-gray-800">
-
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-200 px-3 py-2 dark:border-neutral-700">
           <div className="flex items-center gap-2">
-            <div className={`h-2 w-2 rounded-full ${dotColor} ${totalActive > 0 ? 'animate-pulse' : ''}`} />
+            <div
+              className={`h-2 w-2 rounded-full ${dotColor} ${totalActive > 0 ? 'animate-pulse' : ''}`}
+            />
             <span className="text-sm font-semibold text-gray-900 dark:text-white">
               {totalActive > 0
                 ? `${totalActive} activo${totalActive > 1 ? 's' : ''}`
-                : hasErrors ? 'Error' : 'Completado'}
+                : hasErrors
+                  ? 'Error'
+                  : 'Completado'}
             </span>
           </div>
           <div className="flex items-center gap-0.5">
@@ -236,7 +277,6 @@ export default function GlobalUploadIndicator() {
 
         {/* Content */}
         <div className="custom-scrollbar max-h-64 overflow-y-auto">
-
           {/* Uploads */}
           {activeTab === 'uploads' && (
             <>
@@ -247,9 +287,15 @@ export default function GlobalUploadIndicator() {
                 </div>
               ) : (
                 uploads.map((upload) => (
-                  <div key={upload.id} className="flex items-start gap-2 border-b border-gray-100 px-3 py-2 last:border-0 dark:border-neutral-700/60">
+                  <div
+                    key={upload.id}
+                    className="flex items-start gap-2 border-b border-gray-100 px-3 py-2 last:border-0 dark:border-neutral-700/60"
+                  >
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-xs font-medium text-gray-800 dark:text-neutral-100" title={upload.file.name}>
+                      <p
+                        className="truncate text-xs font-medium text-gray-800 dark:text-neutral-100"
+                        title={upload.file.name}
+                      >
                         {upload.file.name}
                       </p>
                       <ProgressDisplay
@@ -257,10 +303,26 @@ export default function GlobalUploadIndicator() {
                         eta={upload.stats?.eta}
                         speed={upload.stats?.speed}
                         status={upload.status}
-                        onPause={upload.isPausable && upload.status === 'uploading' ? () => pauseUpload(upload.id) : undefined}
-                        onResume={upload.status === 'paused' ? () => resumeUploadWithLogic(upload.id) : undefined}
-                        onCancel={upload.status === 'uploading' || upload.status === 'paused' ? () => handleCancelUpload(upload.id) : undefined}
-                        onRetry={upload.status === 'error' && upload.canRetry ? () => retryUpload(upload.id) : undefined}
+                        onPause={
+                          upload.isPausable && upload.status === 'uploading'
+                            ? () => pauseUpload(upload.id)
+                            : undefined
+                        }
+                        onResume={
+                          upload.status === 'paused'
+                            ? () => resumeUploadWithLogic(upload.id)
+                            : undefined
+                        }
+                        onCancel={
+                          upload.status === 'uploading' || upload.status === 'paused'
+                            ? () => handleCancelUpload(upload.id)
+                            : undefined
+                        }
+                        onRetry={
+                          upload.status === 'error' && upload.canRetry
+                            ? () => retryUpload(upload.id)
+                            : undefined
+                        }
                         isPausable={upload.isPausable}
                         isPaused={upload.status === 'paused'}
                         error={upload.error}
@@ -294,7 +356,10 @@ export default function GlobalUploadIndicator() {
                 </div>
               ) : (
                 jobs.map((job) => (
-                  <div key={job.id} className="border-b border-gray-100 px-3 py-2 last:border-0 dark:border-neutral-700/60">
+                  <div
+                    key={job.id}
+                    className="border-b border-gray-100 px-3 py-2 last:border-0 dark:border-neutral-700/60"
+                  >
                     <p className="mb-0.5 text-xs font-medium text-gray-800 dark:text-neutral-100">
                       {job.type === 'video_processing' && 'Video Processing'}
                       {job.type === 'reel_generation' && 'Reel Generation'}
@@ -308,8 +373,18 @@ export default function GlobalUploadIndicator() {
                     <ProgressDisplay
                       percentage={job.progress}
                       eta={job.stats?.eta}
-                      status={job.status === 'queued' ? 'pending' : job.status === 'processing' ? 'uploading' : job.status}
-                      onCancel={job.status === 'processing' || job.status === 'queued' ? () => handleCancelJob(job.id) : undefined}
+                      status={
+                        job.status === 'queued'
+                          ? 'pending'
+                          : job.status === 'processing'
+                            ? 'uploading'
+                            : job.status
+                      }
+                      onCancel={
+                        job.status === 'processing' || job.status === 'queued'
+                          ? () => handleCancelJob(job.id)
+                          : undefined
+                      }
                       isPausable={false}
                       isPaused={false}
                       error={job.error}
@@ -341,7 +416,6 @@ export default function GlobalUploadIndicator() {
               )}
             </>
           )}
-
         </div>
       </div>
 

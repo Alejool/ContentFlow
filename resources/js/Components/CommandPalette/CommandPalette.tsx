@@ -1,5 +1,5 @@
-import { useCommandPalette } from '@/Hooks/useCommandPalette';
 import type { CommandItem } from '@/Hooks/useCommandPalette';
+import { useCommandPalette } from '@/Hooks/useCommandPalette';
 import {
   Combobox,
   ComboboxInput,
@@ -10,12 +10,22 @@ import {
 } from '@headlessui/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Command, Search } from 'lucide-react';
-import { Fragment } from 'react';
+import { Fragment, useEffect, useRef } from 'react';
 import { CATEGORY_LABELS, COMMAND_PALETTE_COMMANDS } from './commandPaletteCommands';
 
 export default function CommandPalette() {
   const { isOpen, query, setQuery, groupedCommands, handleSelect, setIsOpen } =
     useCommandPalette(COMMAND_PALETTE_COMMANDS);
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      // defer to let the dialog finish mounting before focusing
+      const id = requestAnimationFrame(() => inputRef.current?.focus());
+      return () => cancelAnimationFrame(id);
+    }
+  }, [isOpen]);
 
   const hasResults = Object.keys(groupedCommands).length > 0;
 
@@ -48,12 +58,12 @@ export default function CommandPalette() {
                       aria-hidden="true"
                     />
                     <ComboboxInput
+                      ref={inputRef}
                       className="h-12 w-full border-0 bg-transparent pl-11 pr-4 text-gray-900 placeholder:text-gray-400 focus:ring-0 dark:text-gray-100 sm:text-sm"
                       placeholder="Escribe un comando o busca..."
                       onChange={(event) => setQuery(event.target.value)}
                       value={query}
                       autoComplete="off"
-                      autoFocus
                     />
                   </div>
 

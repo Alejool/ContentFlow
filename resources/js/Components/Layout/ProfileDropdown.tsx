@@ -155,318 +155,315 @@ export default function ProfileDropdown({ user, isProfileActive = false }: Profi
             transition
             className="absolute right-0 z-50 mt-2 w-72 origin-top-right overflow-hidden rounded-lg border border-white/20 bg-white/95 shadow-2xl backdrop-blur-xl focus:outline-none data-[closed]:scale-95 data-[closed]:opacity-0 data-[enter]:duration-150 data-[leave]:duration-100 data-[enter]:ease-out data-[leave]:ease-in dark:border-neutral-800/90 dark:bg-neutral-900"
           >
-                {/* Header: Avatar + info + color picker */}
-                <div className="px-4 pb-2 pt-4">
-                  <div className="group relative overflow-hidden rounded-lg border border-gray-100 bg-gradient-to-br from-gray-50 to-white p-4 dark:border-neutral-700/50 dark:from-neutral-800 dark:to-neutral-900">
-                    <div className="relative flex items-center gap-4">
-                      <Avatar
-                        src={user?.photo_url ?? null}
-                        defaultIcon={user?.default_avatar_icon ?? null}
-                        {...(user?.name ? { name: user.name } : {})}
-                        size="xl"
-                        showStatus
-                      />
-                      <div className="flex min-w-0 flex-col">
-                        <p className="truncate text-base font-bold text-gray-900 transition-colors group-hover:text-primary-600 dark:text-white dark:group-hover:text-primary-400">
-                          {user?.name || 'User'}
-                        </p>
-                        <p className="truncate text-xs text-gray-500 dark:text-neutral-400">
-                          {user?.email}
-                        </p>
-                        <div className="mt-1.5">
-                          <span className="inline-flex items-center rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
-                            Active
-                          </span>
-                        </div>
-                      </div>
+            {/* Header: Avatar + info + color picker */}
+            <div className="px-4 pb-2 pt-4">
+              <div className="group relative overflow-hidden rounded-lg border border-gray-100 bg-gradient-to-br from-gray-50 to-white p-4 dark:border-neutral-700/50 dark:from-neutral-800 dark:to-neutral-900">
+                <div className="relative flex items-center gap-4">
+                  <Avatar
+                    src={user?.photo_url ?? null}
+                    defaultIcon={user?.default_avatar_icon ?? null}
+                    {...(user?.name ? { name: user.name } : {})}
+                    size="xl"
+                    showStatus
+                  />
+                  <div className="flex min-w-0 flex-col">
+                    <p className="truncate text-base font-bold text-gray-900 transition-colors group-hover:text-primary-600 dark:text-white dark:group-hover:text-primary-400">
+                      {user?.name || 'User'}
+                    </p>
+                    <p className="truncate text-xs text-gray-500 dark:text-neutral-400">
+                      {user?.email}
+                    </p>
+                    <div className="mt-1.5">
+                      <span className="inline-flex items-center rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                        Active
+                      </span>
                     </div>
-
-                    {/* Color picker */}
-                    <RadioGroup
-                      value={currentTheme}
-                      onChange={(val: string) => {
-                        handleColorChange(val);
-                      }}
-                      className="mt-3 flex items-center gap-2 px-1"
-                      aria-label={t('profile.appearance.color') || 'Color'}
-                    >
-                      {colors.map((color) => (
-                        <Radio
-                          key={color.value}
-                          value={color.value}
-                          onClick={(e) => e.stopPropagation()}
-                          className={({ checked }: { checked: boolean }) =>
-                            `relative flex h-6 w-6 cursor-pointer items-center justify-center rounded-full transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
-                              checked
-                                ? 'scale-110 ring-2 ring-primary-500 ring-offset-2 dark:ring-offset-neutral-900'
-                                : 'opacity-70 hover:scale-110 hover:opacity-100'
-                            } ${color.bg}`
-                          }
-                          style={(color as any).isCustom ? { backgroundColor: color.value } : {}}
-                          title={
-                            (color as any).isCustom
-                              ? t('workspace.white_label.title') || 'Marca Blanca'
-                              : t(`colors.${color.name}`) || color.name
-                          }
-                        >
-                          {({ checked }: { checked: boolean }) =>
-                            checked ? <Check className="h-3 w-3 text-white" /> : <></>
-                          }
-                        </Radio>
-                      ))}
-                    </RadioGroup>
                   </div>
                 </div>
 
-                {/* Plan Usage */}
-                {usage && !usageLoading && (
-                  <div className="px-4 pb-3">
-                    <div className="rounded-lg border border-primary-200 bg-gradient-to-br from-primary-50 to-primary-100/50 p-3 dark:border-primary-800/30 dark:from-primary-900/20 dark:to-primary-800/10">
-                      <div className="mb-3 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Zap className="h-4 w-4 text-primary-600 dark:text-primary-400" />
-                          <span className="text-sm font-bold text-primary-900 dark:text-primary-100">
-                            {getPlanDisplayName(usage.plan)}
-                          </span>
+                {/* Color picker */}
+                <RadioGroup
+                  value={currentTheme}
+                  onChange={(val: string) => {
+                    handleColorChange(val);
+                  }}
+                  className="mt-3 flex items-center gap-2 px-1"
+                  aria-label={t('profile.appearance.color') || 'Color'}
+                >
+                  {colors.map((color) => (
+                    <Radio
+                      key={color.value}
+                      value={color.value}
+                      onClick={(e) => e.stopPropagation()}
+                      className={({ checked }: { checked: boolean }) =>
+                        `relative flex h-6 w-6 cursor-pointer items-center justify-center rounded-full transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
+                          checked
+                            ? 'scale-110 ring-2 ring-primary-500 ring-offset-2 dark:ring-offset-neutral-900'
+                            : 'opacity-70 hover:scale-110 hover:opacity-100'
+                        } ${color.bg}`
+                      }
+                      style={(color as any).isCustom ? { backgroundColor: color.value } : {}}
+                      title={
+                        (color as any).isCustom
+                          ? t('workspace.white_label.title') || 'Marca Blanca'
+                          : t(`colors.${color.name}`) || color.name
+                      }
+                    >
+                      {({ checked }: { checked: boolean }) =>
+                        checked ? <Check className="h-3 w-3 text-white" /> : <></>
+                      }
+                    </Radio>
+                  ))}
+                </RadioGroup>
+              </div>
+            </div>
+
+            {/* Plan Usage */}
+            {usage && !usageLoading && (
+              <div className="px-4 pb-3">
+                <div className="rounded-lg border border-primary-200 bg-gradient-to-br from-primary-50 to-primary-100/50 p-3 dark:border-primary-800/30 dark:from-primary-900/20 dark:to-primary-800/10">
+                  <div className="mb-3 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Zap className="h-4 w-4 text-primary-600 dark:text-primary-400" />
+                      <span className="text-sm font-bold text-primary-900 dark:text-primary-100">
+                        {getPlanDisplayName(usage.plan)}
+                      </span>
+                    </div>
+                    {isOwner && (
+                      <Link
+                        href={route('pricing')}
+                        className="text-xs font-medium text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+                      >
+                        {t('subscription.usage.upgradePlan') || 'Actualizar'}
+                      </Link>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    {/* Publications */}
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300">
+                          <FileText className="h-3 w-3" />
+                          <span>{t('subscription.usage.publications') || 'Publicaciones'}</span>
                         </div>
-                        {isOwner && (
-                          <Link
-                            href={route('pricing')}
-                            className="text-xs font-medium text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
-                          >
-                            {t('subscription.usage.upgradePlan') || 'Actualizar'}
-                          </Link>
-                        )}
+                        <span className="text-xs font-semibold text-gray-900 dark:text-white">
+                          {usage.publications.limit === -1
+                            ? `${usage.publications.used} / ∞`
+                            : `${usage.publications.used} / ${usage.publications.total_available || usage.publications.limit}`}
+                        </span>
                       </div>
-
-                      <div className="space-y-2">
-                        {/* Publications */}
-                        <div className="space-y-1">
-                          <div className="flex items-center justify-between text-xs">
-                            <div className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300">
-                              <FileText className="h-3 w-3" />
-                              <span>{t('subscription.usage.publications') || 'Publicaciones'}</span>
-                            </div>
-                            <span className="text-xs font-semibold text-gray-900 dark:text-white">
-                              {usage.publications.limit === -1
-                                ? `${usage.publications.used} / ∞`
-                                : `${usage.publications.used} / ${usage.publications.total_available || usage.publications.limit}`}
-                            </span>
-                          </div>
-                          {usage.publications.limit !== -1 && (
-                            <div className="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
-                              <div
-                                className={`h-full rounded-full transition-all ${
-                                  usage.publications.percentage >= 90
-                                    ? 'bg-red-500'
-                                    : usage.publications.percentage >= 70
-                                      ? 'bg-yellow-500'
-                                      : 'bg-primary-500'
-                                }`}
-                                style={{
-                                  width: `${Math.min(usage.publications.percentage, 100)}%`,
-                                }}
-                              />
-                            </div>
-                          )}
-                          {usage.publications.addon_info &&
-                            usage.publications.addon_info.total > 0 && (
-                              <div className="mt-1 text-xs text-primary-600 dark:text-primary-400">
-                                <span className="font-medium">Plan:</span>{' '}
-                                {usage.publications.limit} +{' '}
-                                <span className="font-medium">Addons:</span>{' '}
-                                {usage.publications.addon_info.remaining}/
-                                {usage.publications.addon_info.total}
-                              </div>
-                            )}
+                      {usage.publications.limit !== -1 && (
+                        <div className="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                          <div
+                            className={`h-full rounded-full transition-all ${
+                              usage.publications.percentage >= 90
+                                ? 'bg-red-500'
+                                : usage.publications.percentage >= 70
+                                  ? 'bg-yellow-500'
+                                  : 'bg-primary-500'
+                            }`}
+                            style={{
+                              width: `${Math.min(usage.publications.percentage, 100)}%`,
+                            }}
+                          />
                         </div>
-
-                        {/* Storage */}
-                        <div className="space-y-1">
-                          <div className="flex items-center justify-between text-xs">
-                            <div className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300">
-                              <HardDrive className="h-3 w-3" />
-                              <span>{t('subscription.usage.storage') || 'Almacenamiento'}</span>
-                            </div>
-                            <span className="font-semibold text-gray-900 dark:text-white">
-                              {usage.storage.limit_gb === -1
-                                ? `${formatBytes(usage.storage.used_bytes)} / ∞`
-                                : `${formatBytes(usage.storage.used_bytes)} / ${usage.storage.total_available_gb || usage.storage.limit_gb} GB`}
-                            </span>
-                          </div>
-                          {usage.storage.limit_gb !== -1 && (
-                            <div className="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
-                              <div
-                                className={`h-full rounded-full transition-all ${
-                                  usage.storage.percentage >= 90
-                                    ? 'bg-red-500'
-                                    : usage.storage.percentage >= 70
-                                      ? 'bg-yellow-500'
-                                      : 'bg-primary-500'
-                                }`}
-                                style={{
-                                  width: `${Math.min(usage.storage.percentage, 100)}%`,
-                                }}
-                              />
-                            </div>
-                          )}
-                          {usage.storage.addon_info && usage.storage.addon_info.total > 0 && (
-                            <div className="mt-1 text-xs text-primary-600 dark:text-primary-400">
-                              <span className="font-medium">Plan:</span> {usage.storage.limit_gb} GB
-                              + <span className="font-medium">Addons:</span>{' '}
-                              {usage.storage.addon_info.remaining}/{usage.storage.addon_info.total}{' '}
-                              GB
-                            </div>
-                          )}
+                      )}
+                      {usage.publications.addon_info && usage.publications.addon_info.total > 0 && (
+                        <div className="mt-1 text-xs text-primary-600 dark:text-primary-400">
+                          <span className="font-medium">Plan:</span> {usage.publications.limit} +{' '}
+                          <span className="font-medium">Addons:</span>{' '}
+                          {usage.publications.addon_info.remaining}/
+                          {usage.publications.addon_info.total}
                         </div>
+                      )}
+                    </div>
+
+                    {/* Storage */}
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300">
+                          <HardDrive className="h-3 w-3" />
+                          <span>{t('subscription.usage.storage') || 'Almacenamiento'}</span>
+                        </div>
+                        <span className="font-semibold text-gray-900 dark:text-white">
+                          {usage.storage.limit_gb === -1
+                            ? `${formatBytes(usage.storage.used_bytes)} / ∞`
+                            : `${formatBytes(usage.storage.used_bytes)} / ${usage.storage.total_available_gb || usage.storage.limit_gb} GB`}
+                        </span>
                       </div>
-
-                      {usage.limits_reached && (
-                        <div className="mt-2 border-t border-primary-200 pt-2 dark:border-primary-800/30">
-                          <Link
-                            href={route('subscription.addons')}
-                            className="group flex items-center justify-between gap-2 rounded-lg bg-gradient-to-r from-primary-500 to-primary-600 px-3 py-2 text-white transition-all hover:from-primary-600 hover:to-primary-700"
-                          >
-                            <div className="flex items-center gap-2">
-                              <Zap className="h-4 w-4" />
-                              <span className="text-xs font-semibold">
-                                {t('subscription.addons.buyCredits') || 'Comprar Créditos'}
-                              </span>
-                            </div>
-                            <ChevronDown className="h-3 w-3 -rotate-90 transition-transform group-hover:translate-x-0.5" />
-                          </Link>
+                      {usage.storage.limit_gb !== -1 && (
+                        <div className="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                          <div
+                            className={`h-full rounded-full transition-all ${
+                              usage.storage.percentage >= 90
+                                ? 'bg-red-500'
+                                : usage.storage.percentage >= 70
+                                  ? 'bg-yellow-500'
+                                  : 'bg-primary-500'
+                            }`}
+                            style={{
+                              width: `${Math.min(usage.storage.percentage, 100)}%`,
+                            }}
+                          />
+                        </div>
+                      )}
+                      {usage.storage.addon_info && usage.storage.addon_info.total > 0 && (
+                        <div className="mt-1 text-xs text-primary-600 dark:text-primary-400">
+                          <span className="font-medium">Plan:</span> {usage.storage.limit_gb} GB +{' '}
+                          <span className="font-medium">Addons:</span>{' '}
+                          {usage.storage.addon_info.remaining}/{usage.storage.addon_info.total} GB
                         </div>
                       )}
                     </div>
                   </div>
-                )}
 
-                {/* Appearance */}
-                <div className="px-4 pb-3">
-                  <div className="mb-2 flex items-center gap-2">
-                    {theme === 'dark' ? (
-                      <Moon className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
-                    ) : theme === 'system' ? (
-                      <Palette className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
-                    ) : (
-                      <Sun className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
-                    )}
-                    <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                      {t('profile.appearance.title') || 'Apariencia'}
-                    </span>
-                  </div>
-                  <RadioGroup
-                    value={theme}
-                    onChange={(val: 'light' | 'dark' | 'system') => handleModeChange(val)}
-                    className="grid grid-cols-3 gap-2"
-                    aria-label={t('profile.appearance.title') || 'Apariencia'}
-                  >
-                    {(['light', 'dark', 'system'] as const).map((mode) => {
-                      const Icon = mode === 'light' ? Sun : mode === 'dark' ? Moon : Palette;
-                      const label =
-                        mode === 'light'
-                          ? t('profile.appearance.light') || 'Claro'
-                          : mode === 'dark'
-                            ? t('profile.appearance.dark') || 'Oscuro'
-                            : t('profile.appearance.system') || 'Sistema';
-                      return (
-                        <Radio
-                          key={mode}
-                          value={mode}
-                          onClick={(e) => e.stopPropagation()}
-                          className={({ checked }: { checked: boolean }) =>
-                            `flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-xs font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
-                              checked
-                                ? 'bg-primary-100 text-primary-700 ring-2 ring-primary-500 dark:bg-primary-900/40 dark:text-primary-400'
-                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-neutral-800 dark:text-gray-400 dark:hover:bg-neutral-700'
-                            }`
-                          }
-                        >
-                          <Icon className="h-4 w-4" />
-                          <span>{label}</span>
-                        </Radio>
-                      );
-                    })}
-                  </RadioGroup>
-                </div>
-
-                {/* Language */}
-                <div className="px-4 pb-3">
-                  <div className="mb-2 flex items-center gap-2">
-                    <Globe className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
-                    <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                      {t('profile.language.title') || 'Idioma'}
-                    </span>
-                  </div>
-                  <RadioGroup
-                    value={currentLangCode}
-                    onChange={(val: string) => handleLanguageChange(val)}
-                    className="flex items-center gap-2"
-                    aria-label={t('profile.language.title') || 'Idioma'}
-                  >
-                    {languages.map((lang) => (
-                      <Radio
-                        key={lang.code}
-                        value={lang.code}
-                        onClick={(e) => e.stopPropagation()}
-                        className={({ checked }: { checked: boolean }) =>
-                          `flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
-                            checked
-                              ? 'bg-primary-100 text-primary-700 ring-2 ring-primary-500 dark:bg-primary-900/40 dark:text-primary-400'
-                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-neutral-800 dark:text-gray-400 dark:hover:bg-neutral-700'
-                          }`
-                        }
+                  {usage.limits_reached && (
+                    <div className="mt-2 border-t border-primary-200 pt-2 dark:border-primary-800/30">
+                      <Link
+                        href={route('subscription.addons')}
+                        className="group flex items-center justify-between gap-2 rounded-lg bg-gradient-to-r from-primary-500 to-primary-600 px-3 py-2 text-white transition-all hover:from-primary-600 hover:to-primary-700"
                       >
-                        <img
-                          src={lang.flag}
-                          alt={lang.name}
-                          className="h-3.5 w-5 rounded-sm object-cover"
-                        />
-                        <span>{lang.name}</span>
-                      </Radio>
-                    ))}
-                  </RadioGroup>
+                        <div className="flex items-center gap-2">
+                          <Zap className="h-4 w-4" />
+                          <span className="text-xs font-semibold">
+                            {t('subscription.addons.buyCredits') || 'Comprar Créditos'}
+                          </span>
+                        </div>
+                        <ChevronDown className="h-3 w-3 -rotate-90 transition-transform group-hover:translate-x-0.5" />
+                      </Link>
+                    </div>
+                  )}
                 </div>
+              </div>
+            )}
 
-                {/* Links */}
-                <div className="space-y-1 px-2 pb-2">
-                  <InertiaLink
-                    href={route('profile.edit')}
-                    className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
-                      isProfileActive
-                        ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400'
-                        : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-neutral-800 dark:hover:text-white'
-                    }`}
-                  >
-                    <div
-                      className={`rounded-md p-1.5 ${
-                        isProfileActive
-                          ? 'bg-primary-100 text-primary-600 dark:bg-primary-900/40 dark:text-primary-400'
-                          : 'bg-gray-100 text-gray-500 dark:bg-neutral-800 dark:text-gray-400'
-                      }`}
+            {/* Appearance */}
+            <div className="px-4 pb-3">
+              <div className="mb-2 flex items-center gap-2">
+                {theme === 'dark' ? (
+                  <Moon className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
+                ) : theme === 'system' ? (
+                  <Palette className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
+                ) : (
+                  <Sun className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
+                )}
+                <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                  {t('profile.appearance.title') || 'Apariencia'}
+                </span>
+              </div>
+              <RadioGroup
+                value={theme}
+                onChange={(val: 'light' | 'dark' | 'system') => handleModeChange(val)}
+                className="grid grid-cols-3 gap-2"
+                aria-label={t('profile.appearance.title') || 'Apariencia'}
+              >
+                {(['light', 'dark', 'system'] as const).map((mode) => {
+                  const Icon = mode === 'light' ? Sun : mode === 'dark' ? Moon : Palette;
+                  const label =
+                    mode === 'light'
+                      ? t('profile.appearance.light') || 'Claro'
+                      : mode === 'dark'
+                        ? t('profile.appearance.dark') || 'Oscuro'
+                        : t('profile.appearance.system') || 'Sistema';
+                  return (
+                    <Radio
+                      key={mode}
+                      value={mode}
+                      onClick={(e) => e.stopPropagation()}
+                      className={({ checked }: { checked: boolean }) =>
+                        `flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-xs font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
+                          checked
+                            ? 'bg-primary-100 text-primary-700 ring-2 ring-primary-500 dark:bg-primary-900/40 dark:text-primary-400'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-neutral-800 dark:text-gray-400 dark:hover:bg-neutral-700'
+                        }`
+                      }
                     >
-                      <User className="h-4 w-4" />
-                    </div>
-                    {t('nav.profile')}
-                    {isProfileActive && (
-                      <div className="ml-auto h-1.5 w-1.5 rounded-full bg-primary-500" />
-                    )}
-                  </InertiaLink>
+                      <Icon className="h-4 w-4" />
+                      <span>{label}</span>
+                    </Radio>
+                  );
+                })}
+              </RadioGroup>
+            </div>
 
-                  <div className="mx-2 h-px bg-gray-100 dark:bg-neutral-800" />
-
-                  <InertiaLink
-                    href={route('logout')}
-                    method="post"
-                    as="button"
-                    className="group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-red-50 hover:text-red-600 dark:text-gray-300 dark:hover:bg-red-900/10 dark:hover:text-red-400"
+            {/* Language */}
+            <div className="px-4 pb-3">
+              <div className="mb-2 flex items-center gap-2">
+                <Globe className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
+                <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                  {t('profile.language.title') || 'Idioma'}
+                </span>
+              </div>
+              <RadioGroup
+                value={currentLangCode}
+                onChange={(val: string) => handleLanguageChange(val)}
+                className="flex items-center gap-2"
+                aria-label={t('profile.language.title') || 'Idioma'}
+              >
+                {languages.map((lang) => (
+                  <Radio
+                    key={lang.code}
+                    value={lang.code}
+                    onClick={(e) => e.stopPropagation()}
+                    className={({ checked }: { checked: boolean }) =>
+                      `flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
+                        checked
+                          ? 'bg-primary-100 text-primary-700 ring-2 ring-primary-500 dark:bg-primary-900/40 dark:text-primary-400'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-neutral-800 dark:text-gray-400 dark:hover:bg-neutral-700'
+                      }`
+                    }
                   >
-                    <div className="rounded-md bg-gray-100 p-1.5 text-gray-500 transition-colors group-hover:bg-red-100 group-hover:text-red-500 dark:bg-neutral-800 dark:text-gray-400 dark:group-hover:bg-red-900/30 dark:group-hover:text-red-400">
-                      <LogOut className="h-4 w-4" />
-                    </div>
-                    {t('nav.logout')}
-                  </InertiaLink>
+                    <img
+                      src={lang.flag}
+                      alt={lang.name}
+                      className="h-3.5 w-5 rounded-sm object-cover"
+                    />
+                    <span>{lang.name}</span>
+                  </Radio>
+                ))}
+              </RadioGroup>
+            </div>
+
+            {/* Links */}
+            <div className="space-y-1 px-2 pb-2">
+              <InertiaLink
+                href={route('profile.edit')}
+                className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                  isProfileActive
+                    ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400'
+                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-neutral-800 dark:hover:text-white'
+                }`}
+              >
+                <div
+                  className={`rounded-md p-1.5 ${
+                    isProfileActive
+                      ? 'bg-primary-100 text-primary-600 dark:bg-primary-900/40 dark:text-primary-400'
+                      : 'bg-gray-100 text-gray-500 dark:bg-neutral-800 dark:text-gray-400'
+                  }`}
+                >
+                  <User className="h-4 w-4" />
                 </div>
+                {t('nav.profile')}
+                {isProfileActive && (
+                  <div className="ml-auto h-1.5 w-1.5 rounded-full bg-primary-500" />
+                )}
+              </InertiaLink>
+
+              <div className="mx-2 h-px bg-gray-100 dark:bg-neutral-800" />
+
+              <InertiaLink
+                href={route('logout')}
+                method="post"
+                as="button"
+                className="group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-red-50 hover:text-red-600 dark:text-gray-300 dark:hover:bg-red-900/10 dark:hover:text-red-400"
+              >
+                <div className="rounded-md bg-gray-100 p-1.5 text-gray-500 transition-colors group-hover:bg-red-100 group-hover:text-red-500 dark:bg-neutral-800 dark:text-gray-400 dark:group-hover:bg-red-900/30 dark:group-hover:text-red-400">
+                  <LogOut className="h-4 w-4" />
+                </div>
+                {t('nav.logout')}
+              </InertiaLink>
+            </div>
           </MenuItems>
         </>
       )}

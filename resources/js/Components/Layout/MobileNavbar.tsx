@@ -217,7 +217,9 @@ export default function MobileNavbar({
                       setShowingNavigationDropdown(false);
                     }}
                     className={`flex items-center space-x-3 rounded-lg px-4 py-3 transition-all duration-300 ${
-                      loadingHref && loadingHref !== item.href ? 'pointer-events-none opacity-50' : ''
+                      loadingHref && loadingHref !== item.href
+                        ? 'pointer-events-none opacity-50'
+                        : ''
                     } ${
                       isActive
                         ? `bg-primary-600 text-white shadow-sm`
