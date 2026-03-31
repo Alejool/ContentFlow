@@ -219,14 +219,15 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
       const retryCount = (upload.retryCount || 0) + 1;
       const maxRetries = 3;
 
+      const { error: _err, ...uploadWithoutError } = upload;
+
       return {
         queue: {
           ...state.queue,
           [id]: {
-            ...upload,
+            ...uploadWithoutError,
             status: 'pending' as const,
-            error: undefined,
-            lastError: upload.error,
+            ...(upload.error !== undefined && { lastError: upload.error }),
             retryCount,
             canRetry: retryCount < maxRetries,
             abortController: new AbortController(),
@@ -242,7 +243,11 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
       return {
         queue: {
           ...state.queue,
-          [id]: { ...item, publicationId, publicationTitle },
+          [id]: {
+            ...item,
+            publicationId,
+            ...(publicationTitle !== undefined && { publicationTitle }),
+          },
         },
       };
     }),
@@ -265,12 +270,12 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
           fileType: upload.file.type,
           progress: upload.progress,
           status: upload.status,
-          s3Key: upload.s3Key,
-          uploadId: upload.uploadId,
-          uploadedParts: upload.uploadedParts,
-          publicationId: upload.publicationId,
-          publicationTitle: upload.publicationTitle,
           timestamp: Date.now(),
+          ...(upload.s3Key !== undefined && { s3Key: upload.s3Key }),
+          ...(upload.uploadId !== undefined && { uploadId: upload.uploadId }),
+          ...(upload.uploadedParts !== undefined && { uploadedParts: upload.uploadedParts }),
+          ...(upload.publicationId !== undefined && { publicationId: upload.publicationId }),
+          ...(upload.publicationTitle !== undefined && { publicationTitle: upload.publicationTitle }),
         };
       }
     });
@@ -325,12 +330,12 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
           id: upload.id,
           progress: upload.progress,
           status: upload.status as QueuedUpload['status'],
-          s3Key: upload.s3Key,
-          uploadId: upload.uploadId,
-          uploadedParts: upload.uploadedParts,
-          publicationId: upload.publicationId,
-          publicationTitle: upload.publicationTitle,
-          isPausable: !!upload.uploadId, // If we have an uploadId, it's pausable
+          isPausable: !!upload.uploadId,
+          ...(upload.s3Key !== undefined && { s3Key: upload.s3Key }),
+          ...(upload.uploadId !== undefined && { uploadId: upload.uploadId }),
+          ...(upload.uploadedParts !== undefined && { uploadedParts: upload.uploadedParts }),
+          ...(upload.publicationId !== undefined && { publicationId: upload.publicationId }),
+          ...(upload.publicationTitle !== undefined && { publicationTitle: upload.publicationTitle }),
         };
       });
 
