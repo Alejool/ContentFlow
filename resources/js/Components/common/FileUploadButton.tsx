@@ -7,62 +7,62 @@ interface FileUploadButtonProps {
    * @example "image/jpeg,image/png,image/webp"
    */
   accept?: string;
-  
+
   /**
    * Permitir selección múltiple de archivos
    */
   multiple?: boolean;
-  
+
   /**
    * Callback cuando se seleccionan archivos
    */
   onChange: (files: FileList | null) => void;
-  
+
   /**
    * Texto del botón
    */
   label?: string;
-  
+
   /**
    * Estado de carga/procesamiento
    */
   loading?: boolean;
-  
+
   /**
    * Texto cuando está cargando
    */
   loadingLabel?: string;
-  
+
   /**
    * Deshabilitar el botón
    */
   disabled?: boolean;
-  
+
   /**
    * ID único para el input (opcional, se genera automáticamente si no se proporciona)
    */
   id?: string;
-  
+
   /**
    * Clases CSS adicionales para el label/botón
    */
   className?: string;
-  
+
   /**
    * Variante del botón
    */
   variant?: 'primary' | 'secondary' | 'ghost';
-  
+
   /**
    * Tamaño del botón
    */
   size?: 'sm' | 'md' | 'lg';
-  
+
   /**
    * Icono personalizado (componente Lucide)
    */
   icon?: React.ComponentType<{ size?: number; className?: string }>;
-  
+
   /**
    * Mostrar icono
    */
@@ -71,7 +71,7 @@ interface FileUploadButtonProps {
 
 /**
  * Componente reutilizable para selección de archivos con estilo consistente
- * 
+ *
  * @example
  * // Uso básico para imágenes
  * <FileUploadButton
@@ -79,7 +79,7 @@ interface FileUploadButtonProps {
  *   onChange={handleFileChange}
  *   label="Elegir Imagen"
  * />
- * 
+ *
  * @example
  * // Con estado de carga
  * <FileUploadButton
@@ -88,7 +88,7 @@ interface FileUploadButtonProps {
  *   loading={isUploading}
  *   loadingLabel="Subiendo..."
  * />
- * 
+ *
  * @example
  * // Múltiples archivos
  * <FileUploadButton
@@ -150,7 +150,9 @@ export default function FileUploadButton({
     ${sizeStyles[size]}
     ${isDisabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}
     ${className}
-  `.trim().replace(/\s+/g, ' ');
+  `
+    .trim()
+    .replace(/\s+/g, ' ');
 
   return (
     <>

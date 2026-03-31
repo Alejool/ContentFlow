@@ -1,4 +1,9 @@
-import { getCountryCallingCode, parsePhoneNumber, isPossiblePhoneNumber, isValidPhoneNumber } from 'libphonenumber-js';
+import {
+  getCountryCallingCode,
+  parsePhoneNumber,
+  isPossiblePhoneNumber,
+  isValidPhoneNumber,
+} from 'libphonenumber-js';
 import type { CountryCode } from 'libphonenumber-js';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -46,8 +51,6 @@ const COUNTRY_NAMES: Record<string, string> = {
   US: 'Estados Unidos',
   ES: 'España',
 };
-
-
 
 export default function PhoneInput({
   value = '',

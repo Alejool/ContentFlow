@@ -156,7 +156,7 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
     return (
       <div className={`${containerClassName}`}>
         {(label || hint) && (
-          <div className="flex justify-between items-center mb-2">
+          <div className="mb-2 flex items-center justify-between">
             {label && (
               <Label
                 htmlFor={id}
@@ -170,9 +170,7 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
                 {label}
               </Label>
             )}
-            {hint && (
-              <span className="text-xs text-gray-500 dark:text-gray-400">{hint}</span>
-            )}
+            {hint && <span className="text-xs text-gray-500 dark:text-gray-400">{hint}</span>}
           </div>
         )}
 

@@ -1,28 +1,28 @@
 import type { DragEndEvent } from '@dnd-kit/core';
 import {
-    DndContext,
-    KeyboardSensor,
-    PointerSensor,
-    closestCenter,
-    useSensor,
-    useSensors,
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
 } from '@dnd-kit/core';
 import {
-    SortableContext,
-    arrayMove,
-    horizontalListSortingStrategy,
-    sortableKeyboardCoordinates,
-    useSortable,
+  SortableContext,
+  arrayMove,
+  horizontalListSortingStrategy,
+  sortableKeyboardCoordinates,
+  useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { LucideIcon } from 'lucide-react';
 import { GripHorizontal } from 'lucide-react';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import {
-    Tab as AriaTab,
-    TabList as AriaTabList,
-    TabPanel as AriaTabPanel,
-    Tabs as AriaTabs,
+  Tab as AriaTab,
+  TabList as AriaTabList,
+  TabPanel as AriaTabPanel,
+  Tabs as AriaTabs,
 } from 'react-aria-components';
 
 export interface TabItem {

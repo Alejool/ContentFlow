@@ -122,8 +122,6 @@ export default function Label({
     }
   };
 
-
-
   const getBadgeStyles = () => {
     const base = `rounded-full font-semibold ${currentSize.badge}`;
 
@@ -199,8 +197,6 @@ export default function Label({
       }
     }
   };
-
-
 
   return (
     <div className={`mb-1 space-y-2 ${containerClassName}`}>

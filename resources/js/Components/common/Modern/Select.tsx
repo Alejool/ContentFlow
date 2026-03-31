@@ -1,6 +1,6 @@
 import Label from '@/Components/common/Modern/Label';
 import { AlertCircle, Check, CheckCircle, ChevronDown, Search, X } from 'lucide-react';
-import { ReactNode, isValidElement, useEffect, useRef, useState } from 'react';
+import { ReactNode, isValidElement, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { FieldValues, Path, UseFormRegister } from 'react-hook-form';
 
@@ -165,7 +165,21 @@ export default function Select<T extends FieldValues>({
 }: SelectProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedLabel, setSelectedLabel] = useState('');
+  const selectedLabel = useMemo(() => {
+    if (multiple && Array.isArray(value)) {
+      if (value.length === 0) return placeholder;
+      if (value.length === 1) {
+        const selected = options.find((option) => option.value === value[0]);
+        return selected?.label || placeholder;
+      }
+      return `${value.length} seleccionadas`;
+    }
+    if (value !== undefined && value !== null && value !== '') {
+      const selected = options.find((option) => option.value === value);
+      return selected?.label || placeholder;
+    }
+    return placeholder;
+  }, [value, options, placeholder, multiple]);
   const [dropdownDirection, setDropdownDirection] = useState<'down' | 'up'>(
     dropdownPosition === 'auto' ? 'down' : dropdownPosition,
   );
@@ -207,24 +221,6 @@ export default function Select<T extends FieldValues>({
           String(option.value).toLowerCase().includes(searchTerm.toLowerCase()),
       )
     : options;
-
-  useEffect(() => {
-    if (multiple && Array.isArray(value)) {
-      if (value.length === 0) {
-        setSelectedLabel(placeholder);
-      } else if (value.length === 1) {
-        const selected = options.find((option) => option.value === value[0]);
-        setSelectedLabel(selected?.label || placeholder);
-      } else {
-        setSelectedLabel(`${value.length} seleccionadas`);
-      }
-    } else if (value !== undefined && value !== null && value !== '') {
-      const selected = options.find((option) => option.value === value);
-      setSelectedLabel(selected?.label || placeholder);
-    } else {
-      setSelectedLabel(placeholder);
-    }
-  }, [value, options, placeholder, multiple]);
 
   useEffect(() => {
     if (isOpen && selectRef.current) {
@@ -347,15 +343,6 @@ export default function Select<T extends FieldValues>({
     return `${base} text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700/80`;
   };
 
-  const getSearchInputStyles = () => {
-    const base = `
-      w-full px-4 py-3 focus:outline-none
-      ${currentSize.search}
-    `;
-
-    return `${base} bg-white dark:bg-neutral-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border-b border-gray-200 dark:border-neutral-700 focus:border-primary-500`;
-  };
-
   const getMessageStyles = (type: 'error' | 'success') => {
     const base = 'flex items-start gap-2 px-3 py-2 rounded-lg mt-1';
 
@@ -388,7 +375,6 @@ export default function Select<T extends FieldValues>({
     if (onChange) {
       onChange(multiple ? [] : '');
     }
-    setSelectedLabel(placeholder);
   };
 
   const handleTriggerClick = () => {
