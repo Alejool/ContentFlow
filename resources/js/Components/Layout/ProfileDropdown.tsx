@@ -9,7 +9,6 @@ import { Menu, MenuButton, MenuItems, Radio, RadioGroup } from '@headlessui/reac
 import { Link as InertiaLink, Link, usePage } from '@inertiajs/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { AnimatePresence, motion } from 'framer-motion';
 import {
   Check,
   ChevronDown,
@@ -137,9 +136,9 @@ export default function ProfileDropdown({ user, isProfileActive = false }: Profi
           <MenuButton className="group inline-flex items-center gap-3 rounded-full border border-gray-200 bg-white py-1.5 pl-2 pr-3 text-gray-700 transition-all duration-300 hover:border-gray-300 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:border-neutral-700 dark:bg-neutral-800/80 dark:text-gray-200 dark:hover:border-neutral-600 dark:hover:bg-neutral-800">
             <div className="relative">
               <Avatar
-                src={user?.photo_url}
-                defaultIcon={user?.default_avatar_icon}
-                name={user?.name}
+                src={user?.photo_url ?? null}
+                defaultIcon={user?.default_avatar_icon ?? null}
+                {...(user?.name ? { name: user.name } : {})}
                 size="sm"
                 showStatus
               />
@@ -152,40 +151,18 @@ export default function ProfileDropdown({ user, isProfileActive = false }: Profi
             />
           </MenuButton>
 
-          <AnimatePresence>
-            {open && (
-              <MenuItems
-                static
-                as={motion.div}
-                variants={{
-                  hidden: { opacity: 0, scale: 0.96, y: -6 },
-                  visible: {
-                    opacity: 1,
-                    scale: 1,
-                    y: 0,
-                    transition: { duration: 0.15, ease: 'easeOut' },
-                  },
-                  exit: {
-                    opacity: 0,
-                    scale: 0.96,
-                    y: -6,
-                    transition: { duration: 0.1, ease: 'easeIn' },
-                  },
-                }}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-                style={{ originX: 1, originY: 0 }}
-                className="absolute right-0 z-50 mt-2 w-72 overflow-hidden rounded-lg border border-white/20 bg-white/95 shadow-2xl backdrop-blur-xl focus:outline-none dark:border-neutral-800/90 dark:bg-neutral-900"
-              >
+          <MenuItems
+            transition
+            className="absolute right-0 z-50 mt-2 w-72 origin-top-right overflow-hidden rounded-lg border border-white/20 bg-white/95 shadow-2xl backdrop-blur-xl focus:outline-none data-[closed]:scale-95 data-[closed]:opacity-0 data-[enter]:duration-150 data-[leave]:duration-100 data-[enter]:ease-out data-[leave]:ease-in dark:border-neutral-800/90 dark:bg-neutral-900"
+          >
                 {/* Header: Avatar + info + color picker */}
                 <div className="px-4 pb-2 pt-4">
                   <div className="group relative overflow-hidden rounded-lg border border-gray-100 bg-gradient-to-br from-gray-50 to-white p-4 dark:border-neutral-700/50 dark:from-neutral-800 dark:to-neutral-900">
                     <div className="relative flex items-center gap-4">
                       <Avatar
-                        src={user?.photo_url}
-                        defaultIcon={user?.default_avatar_icon}
-                        name={user?.name}
+                        src={user?.photo_url ?? null}
+                        defaultIcon={user?.default_avatar_icon ?? null}
+                        {...(user?.name ? { name: user.name } : {})}
                         size="xl"
                         showStatus
                       />
@@ -233,7 +210,7 @@ export default function ProfileDropdown({ user, isProfileActive = false }: Profi
                           }
                         >
                           {({ checked }: { checked: boolean }) =>
-                            checked ? <Check className="h-3 w-3 text-white" /> : null
+                            checked ? <Check className="h-3 w-3 text-white" /> : <></>
                           }
                         </Radio>
                       ))}
@@ -490,9 +467,7 @@ export default function ProfileDropdown({ user, isProfileActive = false }: Profi
                     {t('nav.logout')}
                   </InertiaLink>
                 </div>
-              </MenuItems>
-            )}
-          </AnimatePresence>
+          </MenuItems>
         </>
       )}
     </Menu>

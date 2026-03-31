@@ -116,11 +116,11 @@ class ApiTokenController extends Controller
     $type = $request->query('type', 'markdown');
 
     if ($type === 'openapi') {
-      $filePath = base_path('docs/api_definition.json');
+      $filePath = base_path('docs/api/api_definition.json');
       $fileName = 'ContentFlow_API_OpenAPI.json';
       $mimeType = 'application/json';
     } else {
-      $filePath = base_path('docs/API_ENTERPRISE_V1.md');
+      $filePath = base_path('docs/api/API_ENTERPRISE_V1.md');
       $fileName = 'ContentFlow_API_Enterprise_Guide.md';
       $mimeType = 'text/markdown';
     }
