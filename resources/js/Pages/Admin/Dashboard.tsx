@@ -1,5 +1,28 @@
-import { Card, CardContent } from '@/Components/ui/card';
-import { AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
+import AdminNavigation from '@/Components/Admin/AdminNavigation';
+import SystemStatusCard from '@/Components/Admin/SystemStatusCard';
+import Button from '@/Components/common/Modern/Button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { Head, Link } from '@inertiajs/react';
+import { formatDistanceToNow } from 'date-fns';
+import {
+  AlertTriangle,
+  ArrowRight,
+  Bell,
+  CheckCircle,
+  Clock,
+  Database,
+  FileText,
+  LayoutDashboard,
+  Settings,
+  Share2,
+  TrendingUp,
+  UserCheck,
+  Users,
+  XCircle,
+  Zap,
+} from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface SystemStatus {
   plans: Record<string, boolean>;
@@ -159,7 +182,7 @@ export default function AdminDashboard({ systemStatus, stats, recentActivity = [
     {
       title: t('admin.dashboard.metrics.total_users'),
       value: stats?.total_users ?? 0,
-      sub: `+${stats?.new_users_30d ?? 0} last 30d · +${stats?.new_users_7d ?? 0} last 7d`,
+      sub: `+${stats?.new_users_30d ?? 0} ${t('admin.dashboard.time_periods.last_30d')} · +${stats?.new_users_7d ?? 0} ${t('admin.dashboard.time_periods.last_7d')}`,
       icon: Users,
       color: 'text-blue-600 dark:text-blue-400',
       bg: 'bg-blue-100 dark:bg-blue-900/30',
@@ -168,7 +191,7 @@ export default function AdminDashboard({ systemStatus, stats, recentActivity = [
     {
       title: t('admin.dashboard.metrics.active_subscriptions'),
       value: stats?.active_subscriptions ?? 0,
-      sub: stats?.trial_subscriptions ? `${stats.trial_subscriptions} on trial` : undefined,
+      sub: stats?.trial_subscriptions ? `${stats.trial_subscriptions} ${t('admin.dashboard.status.on_trial')}` : undefined,
       icon: TrendingUp,
       color: 'text-green-600 dark:text-green-400',
       bg: 'bg-green-100 dark:bg-green-900/30',
@@ -177,7 +200,7 @@ export default function AdminDashboard({ systemStatus, stats, recentActivity = [
     {
       title: t('admin.dashboard.metrics.publications'),
       value: stats?.total_publications ?? 0,
-      sub: `${stats?.published_publications ?? 0} published · ${stats?.new_publications_30d ?? 0} new 30d`,
+      sub: `${stats?.published_publications ?? 0} ${t('admin.dashboard.status.published')} · ${stats?.new_publications_30d ?? 0} ${t('admin.dashboard.time_periods.new_30d')}`,
       icon: FileText,
       color: 'text-purple-600 dark:text-purple-400',
       bg: 'bg-purple-100 dark:bg-purple-900/30',
@@ -185,10 +208,10 @@ export default function AdminDashboard({ systemStatus, stats, recentActivity = [
     },
     {
       title: t('admin.dashboard.metrics.system_health'),
-      value: healthCfg.label,
+      value: t(`admin.dashboard.health_status.${health}`),
       sub: stats?.system_health_issues?.length
         ? stats.system_health_issues[0]
-        : 'All systems operational',
+        : t('admin.dashboard.status.all_systems_operational'),
       icon: HealthIcon,
       color: healthCfg.color,
       bg: healthCfg.bg,
@@ -199,25 +222,25 @@ export default function AdminDashboard({ systemStatus, stats, recentActivity = [
   // Second row: secondary metrics
   const secondaryMetrics = [
     {
-      title: 'Workspaces',
+      title: t('admin.dashboard.metrics.workspaces'),
       value: stats?.total_workspaces ?? 0,
-      sub: `${stats?.active_workspaces_30d ?? 0} active last 30d`,
+      sub: `${stats?.active_workspaces_30d ?? 0} ${t('admin.dashboard.time_periods.active_last_30d')}`,
       icon: LayoutDashboard,
       color: 'text-indigo-600 dark:text-indigo-400',
       bg: 'bg-indigo-100 dark:bg-indigo-900/30',
       border: 'border-indigo-200 dark:border-indigo-800',
     },
     {
-      title: 'Verified Users',
+      title: t('admin.dashboard.metrics.verified_users'),
       value: stats?.verified_users ?? 0,
-      sub: `${stats?.unverified_users ?? 0} unverified`,
+      sub: `${stats?.unverified_users ?? 0} ${t('admin.dashboard.status.unverified')}`,
       icon: UserCheck,
       color: 'text-teal-600 dark:text-teal-400',
       bg: 'bg-teal-100 dark:bg-teal-900/30',
       border: 'border-teal-200 dark:border-teal-800',
     },
     {
-      title: 'Social Accounts',
+      title: t('admin.dashboard.metrics.social_accounts'),
       value: stats?.total_social_accounts ?? 0,
       sub:
         Object.entries(stats?.social_accounts_by_platform ?? {})
@@ -229,9 +252,9 @@ export default function AdminDashboard({ systemStatus, stats, recentActivity = [
       border: 'border-pink-200 dark:border-pink-800',
     },
     {
-      title: 'Pending Review',
+      title: t('admin.dashboard.metrics.pending_review'),
       value: stats?.pending_review ?? 0,
-      sub: stats?.failed_publications ? `${stats.failed_publications} failed` : 'No failures',
+      sub: stats?.failed_publications ? `${stats.failed_publications} ${t('admin.dashboard.status.failed')}` : t('admin.dashboard.status.no_failures'),
       icon: Clock,
       color:
         (stats?.pending_review ?? 0) > 0
@@ -290,7 +313,7 @@ export default function AdminDashboard({ systemStatus, stats, recentActivity = [
                   <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-yellow-600 dark:text-yellow-400" />
                   <div>
                     <p className="font-semibold text-yellow-800 dark:text-yellow-300">
-                      System issues detected
+                      {t('admin.dashboard.system_issues.title')}
                     </p>
                     <ul className="mt-1 space-y-0.5 text-sm text-yellow-700 dark:text-yellow-400">
                       {stats!.system_health_issues.map((issue, i) => (
@@ -309,7 +332,7 @@ export default function AdminDashboard({ systemStatus, stats, recentActivity = [
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-base text-gray-900 dark:text-gray-100">
                   <Database className="h-4 w-4 text-green-500" />
-                  Active subscriptions by plan
+                  {t('admin.dashboard.subscriptions_by_plan')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -320,7 +343,7 @@ export default function AdminDashboard({ systemStatus, stats, recentActivity = [
                       className="flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1.5 dark:bg-gray-700"
                     >
                       <span className="text-sm font-medium capitalize text-gray-700 dark:text-gray-300">
-                        {plan}
+                        {t(`admin.dashboard.plans.${plan}`, plan)}
                       </span>
                       <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-bold text-green-700 dark:bg-green-900/40 dark:text-green-400">
                         {count}

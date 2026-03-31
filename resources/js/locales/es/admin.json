@@ -21,7 +21,41 @@
         "publications": "Publicaciones",
         "system_health": "Estado del Sistema",
         "healthy": "Saludable",
-        "review": "Revisar"
+        "review": "Revisar",
+        "workspaces": "Espacios de Trabajo",
+        "verified_users": "Usuarios Verificados",
+        "social_accounts": "Cuentas Sociales",
+        "pending_review": "Pendientes de Revisión"
+      },
+      "time_periods": {
+        "last_30d": "últimos 30d",
+        "last_7d": "últimos 7d",
+        "active_last_30d": "activos últimos 30d",
+        "new_30d": "nuevos 30d"
+      },
+      "status": {
+        "published": "publicados",
+        "unverified": "no verificados",
+        "no_failures": "Sin fallos",
+        "on_trial": "en prueba",
+        "failed": "fallidos",
+        "all_systems_operational": "Todos los sistemas operativos"
+      },
+      "health_status": {
+        "healthy": "Saludable",
+        "warning": "Advertencia",
+        "critical": "Crítico"
+      },
+      "system_issues": {
+        "title": "Problemas del sistema detectados",
+        "unverified_users": "Más del 50% de los usuarios no están verificados ({{count}}/{{total}})"
+      },
+      "subscriptions_by_plan": "Suscripciones activas por plan",
+      "plans": {
+        "free": "Gratuito",
+        "basic": "Básico",
+        "professional": "Profesional",
+        "enterprise": "Empresarial"
       },
       "activity": {
         "system_started": "Sistema iniciado correctamente",

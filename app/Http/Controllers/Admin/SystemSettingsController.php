@@ -194,7 +194,7 @@ class SystemSettingsController extends Controller
         $totalUsers = User::count();
         $unverified = User::whereNull('email_verified_at')->count();
         if ($totalUsers > 0 && ($unverified / $totalUsers) > 0.5) {
-            $issues[] = "More than 50% of users are unverified ({$unverified}/{$totalUsers})";
+            $issues[] = __('admin.dashboard.system_issues.unverified_users', ['count' => $unverified, 'total' => $totalUsers]);
         }
 
         $status = match(true) {
