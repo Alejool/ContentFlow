@@ -1,82 +1,100 @@
-import { CarouselDots, CarouselPagination } from '@/Components/common/CarouselPagination';
 import Button from '@/Components/common/Modern/Button';
+import MediaLightbox from '@/Components/common/ui/MediaLightbox';
+import MediaPreviewButton from '@/Components/common/ui/MediaPreviewButton';
+import CampaignOverviewTab from '@/Components/Content/modals/ViewPublicationModal/CampaignOverviewTab';
+import CreatorInfo from '@/Components/Content/modals/ViewPublicationModal/CreatorInfo';
+import PublicationHeader from '@/Components/Content/modals/ViewPublicationModal/PublicationHeader';
+import ReelsSection from '@/Components/Content/modals/ViewPublicationModal/ReelsSection';
 import { getPlatformConfig } from '@/Constants/socialPlatforms';
 import type { MediaFile, Publication } from '@/types';
-import { formatDateTimeString } from '@/Utils/dateHelpers';
-import { Head, useForm } from '@inertiajs/react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { Head } from '@inertiajs/react';
+import { motion } from 'framer-motion';
 import {
-  AlertCircle,
-  Calendar,
+  Building2,
   Check,
   Info,
   Loader2,
   MessageSquare,
-  Share2,
   X,
 } from 'lucide-react';
-import React, { useState } from 'react';
+import type { FormEvent } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   publication: Publication & { media_files: MediaFile[] };
   token: string;
 }
 
-const ClientPortal: React.FC<Props> = ({ publication, token }) => {
+export default function ClientPortal({ publication, token }: Props) {
+  const { t } = useTranslation();
   const [showRejectReason, setShowRejectReason] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
-
-  const { post, processing, data, setData, errors } = useForm({
-    reason: '',
-  });
+  const [processing, setProcessing] = useState(false);
+  const [reason, setReason] = useState('');
+  const [lightboxMedia, setLightboxMedia] = useState<
+    | {
+        url: string;
+        type: 'image' | 'video';
+        title?: string;
+      }[]
+    | null
+  >(null);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   const mediaFiles = publication.media_files || [];
-  const hasMultipleMedia = mediaFiles.length > 1;
+  const title = publication.title || 'Untitled';
+  const canReview = publication.status === 'pending_review';
 
-  const nextMedia = () => {
-    setCurrentMediaIndex((prev) => (prev + 1) % mediaFiles.length);
-  };
+  // Separate reels from regular media
+  const reels = mediaFiles.filter((m: any) => m.metadata?.original_media_id);
+  const regularMedia = mediaFiles.filter((m: any) => !m.metadata?.original_media_id);
 
-  const prevMedia = () => {
-    setCurrentMediaIndex((prev) => (prev - 1 + mediaFiles.length) % mediaFiles.length);
-  };
-
-  const goToMedia = (index: number) => {
-    setCurrentMediaIndex(index);
-  };
-
-  const handleApprove = () => {
-    if (confirm('¿Estás seguro de que deseas aprobar este contenido?')) {
-      post(route('api.v1.portal.approve', { token }), {
-        onSuccess: () => {
+  const handleApprove = async () => {
+    if (confirm(t('portal.confirm.approve'))) {
+      setProcessing(true);
+      try {
+        const response = await axios.post(route('api.v1.portal.approve', { token }));
+        if (response.data.success) {
           setIsSuccess(true);
-          toast.success('Contenido aprobado correctamente');
-        },
-        onError: () => {
-          toast.error('Error al aprobar el contenido');
-        },
-      });
+          toast.success(t('portal.success.approved'));
+        } else {
+          toast.error(response.data.message || t('portal.error.approve'));
+        }
+      } catch (error: any) {
+        const message = error.response?.data?.message || t('portal.error.approve');
+        toast.error(message);
+        console.error('Approve error:', error);
+      } finally {
+        setProcessing(false);
+      }
     }
   };
 
-  const handleReject = (e: React.FormEvent) => {
+  const handleReject = async (e: FormEvent) => {
     e.preventDefault();
-    if (!data.reason) {
-      toast.error('Por favor, indica un motivo de rechazo');
+    if (!reason.trim()) {
+      toast.error(t('portal.rejection.reasonRequired'));
       return;
     }
 
-    post(route('api.v1.portal.reject', { token }), {
-      onSuccess: () => {
+    setProcessing(true);
+    try {
+      const response = await axios.post(route('api.v1.portal.reject', { token }), { reason });
+      if (response.data.success) {
         setIsSuccess(true);
-        toast.success('Contenido rechazado correctamente');
-      },
-      onError: () => {
-        toast.error('Error al rechazar el contenido');
-      },
-    });
+        toast.success(t('portal.success.rejected'));
+      } else {
+        toast.error(response.data.message || t('portal.error.reject'));
+      }
+    } catch (error: any) {
+      const message = error.response?.data?.message || t('portal.error.reject');
+      toast.error(message);
+      console.error('Reject error:', error);
+    } finally {
+      setProcessing(false);
+    }
   };
 
   // Helper to extract platforms from platform_settings
@@ -95,50 +113,60 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
 
   if (isSuccess) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4 dark:bg-zinc-950">
-        <Head title="Contenido Procesado - Intellipost" />
-        <div className="w-full max-w-md rounded-lg border border-gray-100 bg-white p-8 text-center shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400">
-            <Check className="h-8 w-8" />
-          </div>
-          <h1 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
-            ¡Acción Completada!
+      <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4 dark:from-zinc-950 dark:to-zinc-900">
+        <Head title={`${t('portal.success.title')} - Intellipost`} />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-2xl dark:border-zinc-800 dark:bg-zinc-900"
+        >
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: 'spring' }}
+            className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-green-400 to-green-600 text-white shadow-lg shadow-green-500/30"
+          >
+            <Check className="h-10 w-10" strokeWidth={3} />
+          </motion.div>
+          <h1 className="mb-3 text-3xl font-extrabold text-gray-900 dark:text-white">
+            {t('portal.success.title')}
           </h1>
-          <p className="mb-6 text-gray-500 dark:text-zinc-400">
-            Tu respuesta ha sido registrada correctamente para{' '}
-            <strong>{publication.workspace?.name}</strong>. Ya puedes cerrar esta ventana.
+          <p className="mb-6 text-lg leading-relaxed text-gray-600 dark:text-zinc-400">
+            {t('portal.success.description', { workspace: publication.workspace?.name })}
           </p>
-          <p className="text-sm text-gray-400 dark:text-zinc-500">Gracias por usar Intellipost.</p>
-        </div>
+          <p className="text-sm font-medium text-gray-400 dark:text-zinc-500">
+            {t('portal.success.thanks')}
+          </p>
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-12 font-sans text-gray-900 dark:bg-zinc-950 dark:text-zinc-100">
-      <Head title={`Revisión: ${publication.title} - ${publication.workspace?.name}`} />
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 pb-12 font-sans text-gray-900 dark:from-zinc-950 dark:to-zinc-900 dark:text-zinc-100">
+      <Head title={`${t('portal.title')}: ${publication.title} - ${publication.workspace?.name}`} />
 
       {/* Header */}
-      <header className="sticky top-0 z-10 border-b border-gray-100 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="mx-auto flex h-16 max-w-4xl items-center justify-between px-4">
+      <header className="sticky top-0 z-10 border-b border-gray-200 bg-white/80 shadow-sm backdrop-blur-lg dark:border-zinc-800 dark:bg-zinc-900/80">
+        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
           <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500 to-red-600 text-lg font-bold text-white">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-red-600 text-xl font-bold text-white shadow-lg shadow-orange-500/30">
               C
             </div>
             <div>
-              <span className="block text-lg font-bold leading-none tracking-tight">
+              <span className="block text-lg font-extrabold leading-none tracking-tight">
                 Intellipost
               </span>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                Portal de Clientes
+              <span className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500">
+                {t('portal.clientPortal')}
               </span>
             </div>
           </div>
 
           {publication.workspace && (
-            <div className="flex items-center gap-2 rounded-full border border-gray-100 bg-gray-50 px-3 py-1.5 dark:border-zinc-700 dark:bg-zinc-800">
-              <div className="h-2 w-2 rounded-full bg-orange-500"></div>
-              <span className="text-sm font-bold text-gray-700 dark:text-zinc-200">
+            <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-gradient-to-r from-gray-50 to-white px-3 py-2 shadow-sm dark:border-zinc-700 dark:from-zinc-800 dark:to-zinc-800">
+              <Building2 className="h-4 w-4 text-orange-500" />
+              <span className="text-sm font-bold text-gray-800 dark:text-zinc-200">
                 {publication.workspace.name}
               </span>
             </div>
@@ -146,259 +174,190 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
         </div>
       </header>
 
-      <main className="mx-auto mt-8 max-w-4xl px-4">
-        {/* Why am I here? Info box */}
-        <div className="mb-6 flex items-start gap-3 rounded-lg border border-blue-100 bg-blue-50 p-4 dark:border-blue-800/20 dark:bg-blue-900/10">
-          <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-500" />
-          <div className="text-sm text-blue-800 dark:text-blue-300">
-            <p className="mb-0.5 font-bold">Revisión de Contenido</p>
-            Has recibido este enlace para revisar y aprobar el contenido preparado por{' '}
-            <strong>{publication.user?.name || 'tu gestor'}</strong> para el workspace{' '}
-            <strong>{publication.workspace?.name}</strong>.
+      <main className="mx-auto mt-6 max-w-5xl px-6">
+        {/* Info Banner */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6 flex items-start gap-3 rounded-xl border border-blue-200 bg-gradient-to-r from-blue-50 to-blue-100/50 p-4 shadow-sm dark:border-blue-800/30 dark:from-blue-900/20 dark:to-blue-900/10"
+        >
+          <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
+          <div className="text-sm leading-relaxed text-blue-900 dark:text-blue-200">
+            <p className="mb-1 font-bold">{t('portal.info.title')}</p>
+            <p>
+              {t('portal.info.description', {
+                creator: publication.user?.name || t('common.unknown'),
+                workspace: publication.workspace?.name,
+              })}
+            </p>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-          {/* Status and Meta */}
-          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 bg-gray-50/50 px-6 py-4 dark:border-zinc-800 dark:bg-zinc-900/50">
-            <div className="flex items-center gap-2">
-              <span className="relative flex h-3 w-3">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-400 opacity-75"></span>
-                <span className="relative inline-flex h-3 w-3 rounded-full bg-orange-500"></span>
-              </span>
-              <span className="text-xs font-bold uppercase tracking-wider text-orange-600 dark:text-orange-400">
-                {publication.status === 'pending_review'
-                  ? 'Pendiente de tu revisión'
-                  : publication.status}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-4 text-xs font-medium text-gray-500 dark:text-zinc-400">
-              {publication.scheduled_at && (
-                <div className="flex items-center gap-1.5 rounded bg-white px-2 py-1 shadow-sm dark:bg-zinc-800">
-                  <Calendar className="h-3.5 w-3.5 text-orange-500" />
-                  <span>Programado: {formatDateTimeString(publication.scheduled_at)}</span>
-                </div>
-              )}
-
-              {targetPlatforms.length > 0 && (
-                <div className="flex items-center gap-1.5 rounded bg-white px-2 py-1 shadow-sm dark:bg-zinc-800">
-                  <Share2 className="h-3.5 w-3.5 text-orange-500" />
-                  <div className="flex items-center -space-x-1">
-                    {targetPlatforms.map((p, i) => (
-                      <div
-                        key={i}
-                        title={p.name}
-                        className={`rounded-full border border-gray-100 bg-white p-0.5 dark:border-zinc-800 dark:bg-zinc-900`}
-                      >
-                        <p.icon className={`h-3 w-3 ${p.textColor}`} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="p-6 md:p-10">
-            <h1 className="mb-6 text-3xl font-extrabold leading-tight text-gray-900 dark:text-white">
-              {publication.title}
-            </h1>
-
-            {/* Media Preview with Carousel */}
-            {mediaFiles.length > 0 && (
-              <div className="mb-8 space-y-4">
-                <div className="group relative flex min-h-[300px] items-center justify-center overflow-hidden rounded-lg bg-gray-100 shadow-inner dark:bg-zinc-800">
-                  <AnimatePresence mode="wait" initial={false}>
-                    <motion.div
-                      key={currentMediaIndex}
-                      initial={{ opacity: 0, x: 100 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -100 }}
-                      transition={{
-                        duration: 0.3,
-                        ease: 'easeInOut',
-                      }}
-                      className="flex h-full w-full items-center justify-center"
-                    >
-                      {(() => {
-                        const currentFile = mediaFiles[currentMediaIndex];
-                        if (!currentFile) return null;
-                        return currentFile.file_type.startsWith('image/') ? (
-                          <div className="relative max-h-[600px] max-w-full">
-                            <img
-                              src={currentFile.file_path}
-                              alt={`Preview ${currentMediaIndex + 1}`}
-                              loading="lazy"
-                              className="max-h-[600px] max-w-full object-contain transition-all duration-500 group-hover:scale-[1.02]"
-                              onError={(e) => {
-                                const target = e.currentTarget;
-                                target.style.display = 'none';
-                                const parent = target.parentElement;
-                                if (parent) {
-                                  const fallback = document.createElement('div');
-                                  fallback.className =
-                                    'flex flex-col items-center gap-4 p-12 text-center text-neutral-400';
-                                  fallback.innerHTML = `
-                                  <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                  </svg>
-                                  <p class="text-sm font-medium">Error al cargar la imagen</p>
-                                `;
-                                  parent.appendChild(fallback);
-                                }
-                              }}
-                            />
-                          </div>
-                        ) : currentFile.file_type.startsWith('video/') ? (
-                          <video
-                            src={currentFile.file_path}
-                            controls
-                            preload="metadata"
-                            className="max-h-[600px] max-w-full object-contain"
-                          >
-                            Tu navegador no soporta la reproducción de video.
-                          </video>
-                        ) : (
-                          <div className="flex flex-col items-center gap-4 p-12 text-center">
-                            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 dark:bg-zinc-700">
-                              <AlertCircle className="h-8 w-8 text-gray-400" />
-                            </div>
-                            <div>
-                              <p className="font-bold text-gray-900 dark:text-white">
-                                Vista previa limitada
-                              </p>
-                              <p className="mt-1 text-sm text-gray-400">
-                                Este archivo de tipo "{currentFile.file_type}" se procesará para el
-                                canal final.
-                              </p>
-                            </div>
-                          </div>
-                        );
-                      })()}
-                    </motion.div>
-                  </AnimatePresence>
-
-                  {/* Counter Badge */}
-                  {hasMultipleMedia && (
-                    <div className="absolute right-4 top-4 rounded-full bg-black/70 px-3 py-1.5 text-sm font-medium text-white backdrop-blur-sm">
-                      {currentMediaIndex + 1} / {mediaFiles.length}
-                    </div>
-                  )}
-                </div>
-
-                {/* Carousel Controls */}
-                {hasMultipleMedia && (
-                  <div className="flex flex-col items-center gap-3">
-                    <CarouselPagination
-                      currentSlide={currentMediaIndex}
-                      totalSlides={mediaFiles.length}
-                      onPrevious={prevMedia}
-                      onNext={nextMedia}
-                      className="justify-center"
-                    />
-                    <CarouselDots
-                      totalSlides={mediaFiles.length}
-                      currentSlide={currentMediaIndex}
-                      onDotClick={goToMedia}
-                    />
-                  </div>
-                )}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xl dark:border-zinc-800 dark:bg-zinc-900"
+        >
+          <div className="p-6">
+            {/* Media Preview */}
+            {regularMedia.length > 0 && (
+              <div className="mb-6">
+                <MediaPreviewButton
+                  mediaFiles={regularMedia}
+                  title={title}
+                  onPreview={(
+                    media: { url: string; type: 'image' | 'video'; title?: string }[],
+                    index: number,
+                  ) => {
+                    setLightboxMedia(media);
+                    setLightboxIndex(index);
+                  }}
+                  height="h-80"
+                />
               </div>
             )}
 
-            {/* Content Body */}
-            <div className="mb-10">
-              <h3 className="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-gray-400 dark:text-zinc-500">
-                <MessageSquare className="h-4 w-4" />
-                Cuerpo del Mensaje
-              </h3>
-              <div className="rounded-lg border border-gray-100 bg-gray-50 p-6 dark:border-zinc-800/50 dark:bg-zinc-950/50">
-                <div className="whitespace-pre-wrap text-lg font-medium leading-relaxed text-gray-700 dark:text-zinc-300">
-                  {publication.description}
-                </div>
-              </div>
+            {/* Reels Section */}
+            <ReelsSection reels={reels} />
+
+            {/* Publication Header with Status */}
+            <PublicationHeader 
+              title={title} 
+              description={publication.description || ''} 
+              status={(publication as any).status} 
+            />
+
+            {/* Creator Info */}
+            <div className="mb-6">
+              <CreatorInfo user={publication.user} />
             </div>
 
-            <hr className="mb-10 border-gray-100 dark:border-zinc-800" />
+            {/* Campaign Overview - Shows all details */}
+            <div className="mb-6">
+              <CampaignOverviewTab item={publication} />
+            </div>
+
+            {/* Target Platforms */}
+            {targetPlatforms.length > 0 && (
+              <div className="mb-6">
+                <h3 className="mb-3 text-sm font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-500">
+                  {t('portal.details.targetPlatforms')}
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {targetPlatforms.map((platform, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-2 rounded-lg border border-gray-200 bg-gradient-to-r from-gray-50 to-white px-3 py-2 shadow-sm dark:border-zinc-700 dark:from-zinc-800 dark:to-zinc-800"
+                    >
+                      <platform.icon className={`h-4 w-4 ${platform.textColor}`} />
+                      <span className="text-sm font-bold text-gray-700 dark:text-zinc-300">
+                        {platform.name}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <hr className="mb-6 border-gray-200 dark:border-zinc-800" />
 
             {/* Actions */}
-            {!showRejectReason ? (
-              <div className="flex flex-col gap-4 sm:flex-row">
+            {!canReview ? (
+              <div className="rounded-xl border border-yellow-200 bg-gradient-to-r from-yellow-50 to-yellow-100/50 p-4 text-center dark:border-yellow-800/30 dark:from-yellow-900/20 dark:to-yellow-900/10">
+                <p className="mb-2 text-lg font-bold text-yellow-800 dark:text-yellow-300">
+                  {t('portal.status.' + publication.status, publication.status)}
+                </p>
+                <p className="text-sm text-yellow-700 dark:text-yellow-400">
+                  {['approved', 'rejected'].includes(publication.status || '') 
+                    ? t('portal.status.alreadyReviewed')
+                    : t('portal.status.notPendingReview')
+                  }
+                </p>
+              </div>
+            ) : !showRejectReason ? (
+              <div className="flex flex-col gap-3 sm:flex-row">
                 <Button
                   onClick={handleApprove}
                   disabled={processing}
-                  className="h-16 flex-[2] rounded-lg bg-green-600 text-lg font-bold text-white shadow-lg shadow-green-500/20 transition-all hover:bg-green-700 active:scale-95"
-                  icon={<Check className="h-6 w-6" />}
+                  className="h-12 flex-[2] rounded-lg bg-gradient-to-r from-green-600 to-green-700 text-base font-bold text-white shadow-lg shadow-green-500/20 transition-all hover:from-green-700 hover:to-green-800 hover:shadow-xl hover:shadow-green-500/40 active:scale-95"
+                  icon={processing ? <Loader2 className="h-5 w-5 animate-spin" /> : <Check className="h-5 w-5" />}
                 >
-                  {processing ? <Loader2 className="animate-spin" /> : 'Aprobar Contenido'}
+                  {processing ? t('portal.actions.approving') : t('portal.actions.approve')}
                 </Button>
                 <Button
                   onClick={() => setShowRejectReason(true)}
                   disabled={processing}
                   variant="secondary"
                   buttonStyle="outline"
-                  className="h-16 flex-1 rounded-lg border-gray-200 text-lg font-bold transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-600 active:scale-95 dark:border-zinc-700 dark:hover:bg-red-950/20"
-                  icon={<X className="h-6 w-6" />}
+                  className="h-12 flex-1 rounded-lg border-2 border-gray-300 text-base font-bold transition-all hover:border-red-300 hover:bg-red-50 hover:text-red-600 active:scale-95 dark:border-zinc-700 dark:hover:border-red-800 dark:hover:bg-red-950/20 dark:hover:text-red-400"
+                  icon={<X className="h-5 w-5" />}
                 >
-                  Solicitar Cambios
+                  {t('portal.actions.reject')}
                 </Button>
               </div>
             ) : (
-              <form
+              <motion.form
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
                 onSubmit={handleReject}
-                className="animate-in fade-in slide-in-from-top-4 space-y-4 duration-500"
+                className="space-y-4"
               >
-                <div className="mb-2 flex items-center gap-2 rounded-lg border border-red-100 bg-red-50 p-3 font-bold text-red-600 dark:border-red-800/20 dark:bg-red-900/10 dark:text-red-400">
+                <div className="mb-3 flex items-center gap-3 rounded-xl border border-red-200 bg-gradient-to-r from-red-50 to-red-100/50 p-3 font-bold text-red-700 dark:border-red-800/30 dark:from-red-900/20 dark:to-red-900/10 dark:text-red-400">
                   <MessageSquare className="h-5 w-5" />
-                  ¿Qué cambios necesitas en este contenido?
+                  {t('portal.rejection.title')}
                 </div>
                 <textarea
-                  value={data.reason}
-                  onChange={(e) => setData('reason', e.target.value)}
-                  className="dark:bg-zinc-850 h-40 w-full rounded-lg border-gray-200 p-5 text-lg text-gray-700 shadow-inner transition-all focus:border-red-500 focus:ring-2 focus:ring-red-500 dark:border-zinc-700 dark:text-zinc-200"
-                  placeholder="Por favor, describe detalladamente qué cambios te gustaría ver..."
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  className="h-32 w-full rounded-xl border-2 border-gray-200 bg-white p-4 text-base text-gray-700 shadow-inner transition-all focus:border-red-500 focus:ring-4 focus:ring-red-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:focus:border-red-600"
+                  placeholder={t('portal.rejection.placeholder')}
                   required
                 />
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <Button
                     type="submit"
                     disabled={processing}
-                    className="h-14 flex-[2] rounded-lg bg-red-600 font-bold text-white shadow-lg shadow-red-500/20 hover:bg-red-700"
+                    className="h-11 flex-[2] rounded-lg bg-gradient-to-r from-red-600 to-red-700 text-base font-bold text-white shadow-lg shadow-red-500/30 hover:from-red-700 hover:to-red-800"
                   >
                     {processing ? (
-                      <Loader2 className="animate-spin" />
+                      <Loader2 className="h-5 w-5 animate-spin" />
                     ) : (
-                      'Enviar Comentarios de Rechazo'
+                      t('portal.actions.submitRejection')
                     )}
                   </Button>
                   <Button
                     type="button"
                     variant="ghost"
-                    onClick={() => setShowRejectReason(false)}
-                    className="h-14 flex-1 rounded-lg font-bold hover:bg-gray-100 dark:hover:bg-zinc-800"
+                    onClick={() => {
+                      setShowRejectReason(false);
+                      setReason('');
+                    }}
+                    className="h-11 flex-1 rounded-lg text-base font-bold hover:bg-gray-100 dark:hover:bg-zinc-800"
                   >
-                    Volver
+                    {t('portal.actions.back')}
                   </Button>
                 </div>
-              </form>
+              </motion.form>
             )}
           </div>
-        </div>
+        </motion.div>
 
-        <footer className="mt-12 text-center">
-          <p className="text-sm text-gray-400 dark:text-zinc-600">
-            Este es un enlace seguro generado por <strong>Intellipost</strong> para{' '}
-            <strong>{publication.workspace?.name}</strong>.
+        <footer className="mt-8 text-center">
+          <p className="text-sm text-gray-500 dark:text-zinc-600">
+            {t('portal.footer.secureLink', { app: 'Intellipost', workspace: publication.workspace?.name })}
           </p>
-          <p className="mt-2 text-xs text-gray-300 dark:text-zinc-700">
-            ID de Referencia: {publication.id} • Token: {token.substring(0, 8)}
-            ...
+          <p className="mt-2 text-xs text-gray-400 dark:text-zinc-700">
+            {t('portal.footer.reference', { id: publication.id, token: token.substring(0, 8) })}
           </p>
         </footer>
       </main>
+
+      <MediaLightbox
+        isOpen={!!lightboxMedia}
+        onClose={() => setLightboxMedia(null)}
+        media={lightboxMedia}
+        initialIndex={lightboxIndex}
+      />
     </div>
   );
-};
-
-export default ClientPortal;
+}
