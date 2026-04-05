@@ -165,5 +165,7 @@ fly.toml
 *.example.tsx
 *.examples.tsx
 
+.qodo.yml
+
 
 docker-compose.dev-other-config
