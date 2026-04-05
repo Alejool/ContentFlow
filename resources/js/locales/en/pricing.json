@@ -119,6 +119,7 @@
       "bulkOperations10": "Bulk operations (up to 10)",
       "bulkOperations20": "Bulk operations (up to 20)",
       "bulkOperations50": "Bulk operations (up to 50)",
+      "bulkOperations500": "Bulk operations (up to 500)",
       "customBranding": "Custom branding",
       "whiteLabel": "White-label",
       "apiAccess": "API access",
