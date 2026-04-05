@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Log;
  */
 class PaymentGatewayFactory
 {
-    private static array $gateways = [
+    private array $gateways = [
         'stripe' => StripeGateway::class,
         'mercadopago' => MercadoPagoManualGateway::class, // Usando implementación manual
         'epayco' => EpaycoGateway::class,
@@ -26,23 +26,23 @@ class PaymentGatewayFactory
     /**
      * Obtener gateway según país del usuario
      */
-    public static function getGatewayForCountry(string $countryCode): PaymentGatewayInterface
+    public function getGatewayForCountry(string $countryCode): PaymentGatewayInterface
     {
-        $gatewayName = self::determineGateway($countryCode);
-        return self::make($gatewayName);
+        $gatewayName = $this->determineGateway($countryCode);
+        return $this->make($gatewayName);
     }
 
     /**
      * Crear instancia de gateway específico
      */
-    public static function make(string $gatewayName): PaymentGatewayInterface
+    public function make(string $gatewayName): PaymentGatewayInterface
     {
-        if (!isset(self::$gateways[$gatewayName])) {
+        if (!isset($this->gateways[$gatewayName])) {
             Log::warning("Gateway {$gatewayName} not found, falling back to Stripe");
             $gatewayName = 'stripe';
         }
 
-        $gatewayClass = self::$gateways[$gatewayName];
+        $gatewayClass = $this->gateways[$gatewayName];
         
         try {
             $gateway = app($gatewayClass);
@@ -76,7 +76,7 @@ class PaymentGatewayFactory
     /**
      * Determinar qué gateway usar según el país
      */
-    private static function determineGateway(string $countryCode): string
+    private function determineGateway(string $countryCode): string
     {
         $countryGateways = config('payment.country_gateways', []);
         
@@ -98,11 +98,11 @@ class PaymentGatewayFactory
     /**
      * Obtener todos los gateways disponibles
      */
-    public static function getAvailableGateways(): array
+    public function getAvailableGateways(): array
     {
         $available = [];
         
-        foreach (self::$gateways as $name => $class) {
+        foreach ($this->gateways as $name => $class) {
             $gateway = app($class);
             if ($gateway->isAvailable()) {
                 $available[$name] = $gateway;
@@ -115,15 +115,15 @@ class PaymentGatewayFactory
     /**
      * Obtener gateways disponibles para un país
      */
-    public static function getGatewaysForCountry(string $countryCode): array
+    public function getGatewaysForCountry(string $countryCode): array
     {
         $countryGateways = config('payment.country_gateways_multiple', []);
         
         if (isset($countryGateways[$countryCode])) {
             $gateways = [];
             foreach ($countryGateways[$countryCode] as $gatewayName) {
-                if (isset(self::$gateways[$gatewayName])) {
-                    $gateway = app(self::$gateways[$gatewayName]);
+                if (isset($this->gateways[$gatewayName])) {
+                    $gateway = app($this->gateways[$gatewayName]);
                     if ($gateway->isAvailable()) {
                         $gateways[$gatewayName] = $gateway;
                     }

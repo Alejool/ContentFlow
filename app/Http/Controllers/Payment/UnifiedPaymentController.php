@@ -140,7 +140,7 @@ class UnifiedPaymentController extends Controller
             if ($gatewayName) {
                 // Si se especificó un gateway, intentar ese primero, luego los demás
                 $countryCode = CountryDetection::detectCountry($user, $request->ip());
-                $availableGateways = PaymentGatewayFactory::getGatewaysForCountry($countryCode);
+                $availableGateways = PaymentGateway::getGatewaysForCountry($countryCode);
                 $allGateways = array_keys($availableGateways);
                 
                 // Poner el gateway seleccionado primero
@@ -148,7 +148,7 @@ class UnifiedPaymentController extends Controller
             } else {
                 // Auto-detectar según país y obtener todos los disponibles
                 $countryCode = CountryDetection::detectCountry($user, $request->ip());
-                $availableGateways = PaymentGatewayFactory::getGatewaysForCountry($countryCode);
+                $availableGateways = PaymentGateway::getGatewaysForCountry($countryCode);
                 $gatewaysToTry = array_keys($availableGateways);
             }
 
@@ -261,7 +261,7 @@ class UnifiedPaymentController extends Controller
             if ($gatewayName) {
                 // Si se especificó un gateway, intentar ese primero, luego los demás
                 $countryCode = CountryDetection::detectCountry($user, $request->ip());
-                $availableGateways = PaymentGatewayFactory::getGatewaysForCountry($countryCode);
+                $availableGateways = PaymentGateway::getGatewaysForCountry($countryCode);
                 $allGateways = array_keys($availableGateways);
                 
                 // Poner el gateway seleccionado primero
@@ -269,7 +269,7 @@ class UnifiedPaymentController extends Controller
             } else {
                 // Auto-detectar según país y obtener todos los disponibles
                 $countryCode = CountryDetection::detectCountry($user, $request->ip());
-                $availableGateways = PaymentGatewayFactory::getGatewaysForCountry($countryCode);
+                $availableGateways = PaymentGateway::getGatewaysForCountry($countryCode);
                 $gatewaysToTry = array_keys($availableGateways);
             }
 

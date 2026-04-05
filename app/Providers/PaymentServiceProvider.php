@@ -53,7 +53,8 @@ class PaymentServiceProvider extends ServiceProvider
             $countryCode = $countryDetection->detectCountry($user, $ipAddress);
             
             // Retornar el gateway apropiado para el país
-            return PaymentGatewayFactory::getGatewayForCountry($countryCode);
+            $factory = $app->make(PaymentGatewayFactory::class);
+            return $factory->getGatewayForCountry($countryCode);
         });
     }
 
