@@ -109,30 +109,30 @@ interface Option {
 
 interface SelectProps<T extends FieldValues = FieldValues> {
   id: string;
-  label?: string;
-  error?: string;
-  success?: string;
-  register?: UseFormRegister<T>;
-  name?: Path<T>;
+  label?: string | undefined;
+  error?: string | undefined;
+  success?: string | undefined;
+  register?: UseFormRegister<T> | undefined;
+  name?: Path<T> | undefined;
   options: Option[];
-  placeholder?: string;
-  disabled?: boolean;
-  className?: string;
-  containerClassName?: string;
+  placeholder?: string | undefined;
+  disabled?: boolean | undefined;
+  className?: string | undefined;
+  containerClassName?: string | undefined;
   icon?: any;
-  hint?: string;
-  size?: 'sm' | 'md' | 'lg';
-  variant?: 'default' | 'outlined' | 'filled';
-  required?: boolean;
-  value?: string | number | string[];
-  onChange?: (value: string | number | string[]) => void;
-  searchable?: boolean;
-  clearable?: boolean;
-  loading?: boolean;
-  dropdownPosition?: 'down' | 'up' | 'auto';
-  usePortal?: boolean;
-  activeColor?: string;
-  multiple?: boolean;
+  hint?: string | undefined;
+  size?: 'sm' | 'md' | 'lg' | undefined;
+  variant?: 'default' | 'outlined' | 'filled' | undefined;
+  required?: boolean | undefined;
+  value?: string | number | string[] | undefined;
+  onChange?: ((value: string | number | string[]) => void) | undefined;
+  searchable?: boolean | undefined;
+  clearable?: boolean | undefined;
+  loading?: boolean | undefined;
+  dropdownPosition?: 'down' | 'up' | 'auto' | undefined;
+  usePortal?: boolean | undefined;
+  activeColor?: string | undefined;
+  multiple?: boolean | undefined;
 }
 
 export default function Select<T extends FieldValues>({
