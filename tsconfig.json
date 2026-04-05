@@ -41,9 +41,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["resources/js/*"],
-      "@components/*": ["resources/js/components/*"],
-      "@hooks/*": ["resources/js/hooks/*"],
-      "@utils/*": ["resources/js/utils/*"],
+      "@Components/*": ["resources/js/Components/*"],
+      "@Hooks/*": ["resources/js/Hooks/*"],
+      "@Utils/*": ["resources/js/Utils/*"],
       "ziggy-js": ["./vendor/tightenco/ziggy"]
     }
   },
