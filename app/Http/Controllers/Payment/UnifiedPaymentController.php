@@ -139,7 +139,7 @@ class UnifiedPaymentController extends Controller
             
             if ($gatewayName) {
                 // Si se especificó un gateway, intentar ese primero, luego los demás
-                $countryCode = $this->countryDetection->detectCountry($user, $request->ip());
+                $countryCode = CountryDetection::detectCountry($user, $request->ip());
                 $availableGateways = PaymentGatewayFactory::getGatewaysForCountry($countryCode);
                 $allGateways = array_keys($availableGateways);
                 
@@ -147,7 +147,7 @@ class UnifiedPaymentController extends Controller
                 $gatewaysToTry = array_unique(array_merge([$gatewayName], $allGateways));
             } else {
                 // Auto-detectar según país y obtener todos los disponibles
-                $countryCode = $this->countryDetection->detectCountry($user, $request->ip());
+                $countryCode = CountryDetection::detectCountry($user, $request->ip());
                 $availableGateways = PaymentGatewayFactory::getGatewaysForCountry($countryCode);
                 $gatewaysToTry = array_keys($availableGateways);
             }
@@ -158,7 +158,7 @@ class UnifiedPaymentController extends Controller
             
             foreach ($gatewaysToTry as $gatewayName) {
                 try {
-                    $gateway = $this->gatewayFactory->make($gatewayName);
+                    $gateway = PaymentGateway::make($gatewayName);
                     
                     if (!$gateway->isAvailable()) {
                         Log::info("Gateway {$gatewayName} not available, trying next", [
@@ -260,7 +260,7 @@ class UnifiedPaymentController extends Controller
             
             if ($gatewayName) {
                 // Si se especificó un gateway, intentar ese primero, luego los demás
-                $countryCode = $this->countryDetection->detectCountry($user, $request->ip());
+                $countryCode = CountryDetection::detectCountry($user, $request->ip());
                 $availableGateways = PaymentGatewayFactory::getGatewaysForCountry($countryCode);
                 $allGateways = array_keys($availableGateways);
                 
@@ -268,7 +268,7 @@ class UnifiedPaymentController extends Controller
                 $gatewaysToTry = array_unique(array_merge([$gatewayName], $allGateways));
             } else {
                 // Auto-detectar según país y obtener todos los disponibles
-                $countryCode = $this->countryDetection->detectCountry($user, $request->ip());
+                $countryCode = CountryDetection::detectCountry($user, $request->ip());
                 $availableGateways = PaymentGatewayFactory::getGatewaysForCountry($countryCode);
                 $gatewaysToTry = array_keys($availableGateways);
             }
@@ -279,7 +279,7 @@ class UnifiedPaymentController extends Controller
             
             foreach ($gatewaysToTry as $gatewayName) {
                 try {
-                    $gateway = $this->gatewayFactory->make($gatewayName);
+                    $gateway = PaymentGateway::make($gatewayName);
                     
                     if (!$gateway->isAvailable()) {
                         Log::info("Gateway {$gatewayName} not available, trying next", [

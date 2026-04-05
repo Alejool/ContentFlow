@@ -31,7 +31,9 @@ class PaymentServiceProvider extends ServiceProvider
         $this->app->singleton(CurrencyConversionService::class);
         
         // Gateways individuales como Singletons
-        // Cada gateway mantiene su configuración y conexiones HTTP
+        // NOTA: Los gateways son seguros como Singletons porque solo mantienen
+        // configuración (API keys, HTTP clients) y no estado por request.
+        // Cada método recibe workspace/user como parámetros, no los almacena.
         $this->app->singleton(\App\Services\Payment\Gateways\StripeGateway::class);
         $this->app->singleton(\App\Services\Payment\Gateways\MercadoPagoManualGateway::class);
         $this->app->singleton(\App\Services\Payment\Gateways\WompiGateway::class);
@@ -39,14 +41,15 @@ class PaymentServiceProvider extends ServiceProvider
         $this->app->singleton(\App\Services\Payment\Gateways\EpaycoGateway::class);
         
         // Binding condicional: resolver gateway según contexto del usuario
+        // NOTA: No usar auth() o request() en register() - se resuelve en tiempo de ejecución
         // Esto permite inyectar PaymentGatewayInterface y obtener el gateway correcto
         $this->app->bind(PaymentGatewayInterface::class, function ($app) {
             // Obtener el servicio de detección de país
             $countryDetection = $app->make(CountryDetectionService::class);
             
-            // Detectar país del usuario actual (si existe)
-            $user = auth()->user();
-            $ipAddress = request()->ip();
+            // Detectar país del usuario actual (si existe) - se resuelve en runtime
+            $user = $app->make('auth')->user();
+            $ipAddress = $app->make('request')->ip();
             $countryCode = $countryDetection->detectCountry($user, $ipAddress);
             
             // Retornar el gateway apropiado para el país
