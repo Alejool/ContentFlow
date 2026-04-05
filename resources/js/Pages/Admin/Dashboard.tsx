@@ -113,7 +113,7 @@ function StatCard({
 }: {
   title: string;
   value: string | number;
-  sub?: string;
+  sub?: string | undefined;
   icon: React.ElementType;
   color: string;
   bg: string;
@@ -178,7 +178,15 @@ export default function AdminDashboard({ systemStatus, stats, recentActivity = [
   ];
 
   // Top row: 4 primary KPIs
-  const primaryMetrics = [
+  const primaryMetrics: Array<{
+    title: string;
+    value: string | number;
+    sub?: string | undefined;
+    icon: React.ElementType;
+    color: string;
+    bg: string;
+    border: string;
+  }> = [
     {
       title: t('admin.dashboard.metrics.total_users'),
       value: stats?.total_users ?? 0,
@@ -191,9 +199,9 @@ export default function AdminDashboard({ systemStatus, stats, recentActivity = [
     {
       title: t('admin.dashboard.metrics.active_subscriptions'),
       value: stats?.active_subscriptions ?? 0,
-      sub: stats?.trial_subscriptions
-        ? `${stats.trial_subscriptions} ${t('admin.dashboard.status.on_trial')}`
-        : undefined,
+      ...(stats?.trial_subscriptions && {
+        sub: `${stats.trial_subscriptions} ${t('admin.dashboard.status.on_trial')}`,
+      }),
       icon: TrendingUp,
       color: 'text-green-600 dark:text-green-400',
       bg: 'bg-green-100 dark:bg-green-900/30',
@@ -211,9 +219,9 @@ export default function AdminDashboard({ systemStatus, stats, recentActivity = [
     {
       title: t('admin.dashboard.metrics.system_health'),
       value: t(`admin.dashboard.health_status.${health}`),
-      sub: stats?.system_health_issues?.length
-        ? stats.system_health_issues[0]
-        : t('admin.dashboard.status.all_systems_operational'),
+      ...(stats?.system_health_issues?.length
+        ? { sub: stats.system_health_issues[0] }
+        : { sub: t('admin.dashboard.status.all_systems_operational') }),
       icon: HealthIcon,
       color: healthCfg.color,
       bg: healthCfg.bg,
@@ -241,38 +249,71 @@ export default function AdminDashboard({ systemStatus, stats, recentActivity = [
       bg: 'bg-teal-100 dark:bg-teal-900/30',
       border: 'border-teal-200 dark:border-teal-800',
     },
-    {
-      title: t('admin.dashboard.metrics.social_accounts'),
-      value: stats?.total_social_accounts ?? 0,
-      sub:
-        Object.entries(stats?.social_accounts_by_platform ?? {})
-          .map(([p, n]) => `${p}: ${n}`)
-          .join(' · ') || undefined,
-      icon: Share2,
-      color: 'text-pink-600 dark:text-pink-400',
-      bg: 'bg-pink-100 dark:bg-pink-900/30',
-      border: 'border-pink-200 dark:border-pink-800',
-    },
-    {
-      title: t('admin.dashboard.metrics.pending_review'),
-      value: stats?.pending_review ?? 0,
-      sub: stats?.failed_publications
-        ? `${stats.failed_publications} ${t('admin.dashboard.status.failed')}`
-        : t('admin.dashboard.status.no_failures'),
-      icon: Clock,
-      color:
-        (stats?.pending_review ?? 0) > 0
-          ? 'text-yellow-600 dark:text-yellow-400'
-          : 'text-gray-500 dark:text-gray-400',
-      bg:
-        (stats?.pending_review ?? 0) > 0
-          ? 'bg-yellow-100 dark:bg-yellow-900/30'
-          : 'bg-gray-100 dark:bg-gray-800',
-      border:
-        (stats?.pending_review ?? 0) > 0
-          ? 'border-yellow-200 dark:border-yellow-800'
-          : 'border-gray-200 dark:border-gray-700',
-    },
+    ...(Object.entries(stats?.social_accounts_by_platform ?? {}).length > 0
+      ? [
+          {
+            title: t('admin.dashboard.metrics.social_accounts'),
+            value: stats?.total_social_accounts ?? 0,
+            sub: Object.entries(stats!.social_accounts_by_platform)
+              .map(([p, n]) => `${p}: ${n}`)
+              .join(' · '),
+            icon: Share2,
+            color: 'text-pink-600 dark:text-pink-400',
+            bg: 'bg-pink-100 dark:bg-pink-900/30',
+            border: 'border-pink-200 dark:border-pink-800',
+          },
+        ]
+      : [
+          {
+            title: t('admin.dashboard.metrics.social_accounts'),
+            value: stats?.total_social_accounts ?? 0,
+            icon: Share2,
+            color: 'text-pink-600 dark:text-pink-400',
+            bg: 'bg-pink-100 dark:bg-pink-900/30',
+            border: 'border-pink-200 dark:border-pink-800',
+          },
+        ]),
+    ...(stats?.failed_publications
+      ? [
+          {
+            title: t('admin.dashboard.metrics.pending_review'),
+            value: stats.pending_review ?? 0,
+            sub: `${stats.failed_publications} ${t('admin.dashboard.status.failed')}`,
+            icon: Clock,
+            color:
+              (stats.pending_review ?? 0) > 0
+                ? 'text-yellow-600 dark:text-yellow-400'
+                : 'text-gray-500 dark:text-gray-400',
+            bg:
+              (stats.pending_review ?? 0) > 0
+                ? 'bg-yellow-100 dark:bg-yellow-900/30'
+                : 'bg-gray-100 dark:bg-gray-800',
+            border:
+              (stats.pending_review ?? 0) > 0
+                ? 'border-yellow-200 dark:border-yellow-800'
+                : 'border-gray-200 dark:border-gray-700',
+          },
+        ]
+      : [
+          {
+            title: t('admin.dashboard.metrics.pending_review'),
+            value: stats?.pending_review ?? 0,
+            sub: t('admin.dashboard.status.no_failures'),
+            icon: Clock,
+            color:
+              (stats?.pending_review ?? 0) > 0
+                ? 'text-yellow-600 dark:text-yellow-400'
+                : 'text-gray-500 dark:text-gray-400',
+            bg:
+              (stats?.pending_review ?? 0) > 0
+                ? 'bg-yellow-100 dark:bg-yellow-900/30'
+                : 'bg-gray-100 dark:bg-gray-800',
+            border:
+              (stats?.pending_review ?? 0) > 0
+                ? 'border-yellow-200 dark:border-yellow-800'
+                : 'border-gray-200 dark:border-gray-700',
+          },
+        ]),
   ];
 
   return (
