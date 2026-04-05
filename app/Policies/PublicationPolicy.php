@@ -38,16 +38,18 @@ class PublicationPolicy
             return false;
         }
 
-        // CRÍTICO: Solo usuarios con permiso "publish" pueden enviar a revisión
-        // Admin y Owner siempre pueden (tienen publish implícito)
+        // Usuarios con 'manage-content' O 'publish' pueden enviar a revisión
+        // Admin y Owner siempre pueden (tienen todos los permisos)
         $isAdminOrOwner = in_array($userRole->slug, ['owner', 'admin']);
+        $hasManageContent = $this->roleService->userHasPermission($user, $workspace, 'manage-content');
         $hasPublishPermission = $this->roleService->userHasPermission($user, $workspace, 'publish');
         
-        if (!$isAdminOrOwner && !$hasPublishPermission) {
-            \Log::warning('submitForApproval: User lacks publish permission', [
+        if (!$isAdminOrOwner && !$hasManageContent && !$hasPublishPermission) {
+            \Log::warning('submitForApproval: User lacks manage-content or publish permission', [
                 'user_id' => $user->id,
                 'workspace_id' => $workspace->id,
                 'role' => $userRole->slug,
+                'has_manage_content' => $hasManageContent,
                 'has_publish' => $hasPublishPermission,
             ]);
             return false;
@@ -67,6 +69,7 @@ class PublicationPolicy
             'publication_id' => $publication->id,
             'workspace_id' => $workspace->id,
             'role' => $userRole->slug,
+            'has_manage_content' => $hasManageContent,
             'has_publish' => $hasPublishPermission,
             'is_admin_or_owner' => $isAdminOrOwner,
         ]);
