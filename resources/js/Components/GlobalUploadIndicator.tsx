@@ -82,6 +82,8 @@ export default function GlobalUploadIndicator() {
       }
     };
 
+    // Use 'navigate' event (Inertia v2.0+)
+    // Fires on successful page visits and history navigation
     const unsubscribe = router.on('navigate', handleNavigate);
     return () => {
       unsubscribe();

@@ -1,6 +1,6 @@
-import { useEffect, useCallback } from 'react';
-import { router } from '@inertiajs/react';
 import { useOnboardingNavigationStore } from '@/stores/onboardingNavigationStore';
+import { router } from '@inertiajs/react';
+import { useCallback, useEffect } from 'react';
 
 /**
  * Hook for managing onboarding navigation
@@ -34,8 +34,8 @@ export function useOnboardingNavigation() {
       setCurrentPath(window.location.pathname);
     };
 
-    // Listen to Inertia navigation events
-    const removeListener = router.on('navigate', handleLocationChange);
+    // Listen to Inertia navigation events using 'finish' event
+    const removeListener = router.on('finish', handleLocationChange);
 
     return () => {
       removeListener();
