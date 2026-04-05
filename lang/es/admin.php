@@ -3,7 +3,7 @@
 return [
     'dashboard' => [
         'system_issues' => [
-            'unverified_users' => 'Más del 50% de los usuarios no están verificados (:count/:total)',
+            'unverified_users' => 'Alto porcentaje de usuarios sin verificar: :count de :total (:percent%)',
         ],
     ],
 ];
