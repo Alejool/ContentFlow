@@ -1,5 +1,6 @@
 import react from '@vitejs/plugin-react';
 import laravel from 'laravel-vite-plugin';
+import path from 'path';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import tsconfigPaths from "vite-tsconfig-paths";
