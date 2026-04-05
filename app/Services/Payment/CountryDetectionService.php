@@ -50,6 +50,7 @@ class CountryDetectionService
 
     /**
      * Obtener país desde el perfil del usuario
+     * Prioridad: 1. Usuario, 2. Workspace actual
      */
     private function fromUserProfile(?User $user): ?string
     {
@@ -57,14 +58,28 @@ class CountryDetectionService
             return null;
         }
 
-        // Verificar si el usuario tiene país en su perfil
+        // 1. PRIORIDAD: Verificar si el usuario tiene país en su perfil
         if (!empty($user->country)) {
+            Log::debug('Country from user profile', [
+                'user_id' => $user->id,
+                'country' => $user->country,
+            ]);
             return strtoupper($user->country);
         }
 
-        // Verificar en metadata o configuración del workspace
+        // 2. FALLBACK: Verificar en el workspace actual del usuario
+        // Cargar la relación si no está cargada
+        if (!$user->relationLoaded('currentWorkspace')) {
+            $user->load('currentWorkspace');
+        }
+
         $workspace = $user->currentWorkspace;
         if ($workspace && !empty($workspace->country)) {
+            Log::debug('Country from workspace', [
+                'user_id' => $user->id,
+                'workspace_id' => $workspace->id,
+                'country' => $workspace->country,
+            ]);
             return strtoupper($workspace->country);
         }
 
