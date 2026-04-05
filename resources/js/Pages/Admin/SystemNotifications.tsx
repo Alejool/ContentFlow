@@ -1,10 +1,10 @@
+import AdminNavigation from '@/Components/Admin/AdminNavigation';
 import Button from '@/Components/common/Modern/Button';
 import ModernCard from '@/Components/common/Modern/Card';
 import Input from '@/Components/common/Modern/Input';
 import Select from '@/Components/common/Modern/Select';
 import Textarea from '@/Components/common/Modern/Textarea';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import AdminNavigation from '@/Components/Admin/AdminNavigation';
 import { Head, useForm } from '@inertiajs/react';
 import { AlertTriangle, Bell, CheckCircle, Info, Send, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -19,7 +19,7 @@ export default function SystemNotifications() {
     icon: 'Bell',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     post(route('admin.notifications.send'), {
       onSuccess: () => {
