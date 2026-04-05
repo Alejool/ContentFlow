@@ -49,25 +49,32 @@ return new class extends Migration
             $table->index(['workspace_id', 'provider', 'invoice_date'], 'idx_workspace_provider_date');
         });
         
-        // Migrate existing data from stripe_invoices table
-        DB::statement("
-            INSERT INTO invoices (
-                workspace_id, provider, provider_invoice_id, 
-                provider_customer_id, provider_subscription_id,
-                invoice_number, status, subtotal, tax, total, currency,
-                plan_name, description, invoice_pdf_url, hosted_invoice_url,
-                invoice_date, period_start, period_end,
-                sync_status, last_synced_at, created_at, updated_at
-            )
-            SELECT 
-                workspace_id, 'stripe', stripe_invoice_id,
-                stripe_customer_id, stripe_subscription_id,
-                invoice_number, status, subtotal, tax, total, currency,
-                plan_name, description, invoice_pdf, hosted_invoice_url,
-                invoice_date, period_start, period_end,
-                'completed', updated_at, created_at, updated_at
-            FROM stripe_invoices
-        ");
+        // Migrate existing data from stripe_invoices table if it exists
+        if (Schema::hasTable('stripe_invoices')) {
+            DB::statement("
+                INSERT INTO invoices (
+                    workspace_id, provider, provider_invoice_id, 
+                    provider_customer_id, provider_subscription_id,
+                    invoice_number, status, subtotal, tax, total, currency,
+                    plan_name, description, invoice_pdf_url, hosted_invoice_url,
+                    invoice_date, period_start, period_end,
+                    sync_status, last_synced_at, created_at, updated_at
+                )
+                SELECT 
+                    workspace_id, 'stripe', stripe_invoice_id,
+                    stripe_customer_id, stripe_subscription_id,
+                    invoice_number, status, subtotal, tax, total, currency,
+                    plan_name, description, invoice_pdf, hosted_invoice_url,
+                    invoice_date, period_start, period_end,
+                    'completed', updated_at, created_at, updated_at
+                FROM stripe_invoices
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM invoices 
+                    WHERE invoices.provider = 'stripe' 
+                    AND invoices.provider_invoice_id = stripe_invoices.stripe_invoice_id
+                )
+            ");
+        }
     }
 
     /**
