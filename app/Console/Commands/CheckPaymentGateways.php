@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Services\Payment\PaymentGatewayFactory;
+use App\Facades\PaymentGateway;
 
 class CheckPaymentGateways extends Command
 {
@@ -24,7 +24,7 @@ class CheckPaymentGateways extends Command
 
         foreach ($gateways as $name => $displayName) {
             try {
-                $gateway = PaymentGatewayFactory::make($name);
+                $gateway = PaymentGateway::make($name);
                 $available = $gateway->isAvailable();
                 
                 if ($available) {
@@ -47,7 +47,7 @@ class CheckPaymentGateways extends Command
         $countries = ['CO', 'MX', 'PE', 'AR', 'BR', 'CL', 'US'];
         
         foreach ($countries as $country) {
-            $gateways = PaymentGatewayFactory::getGatewaysForCountry($country);
+            $gateways = PaymentGateway::getGatewaysForCountry($country);
             $gatewayNames = array_keys($gateways);
             $this->line("{$country}: " . implode(', ', $gatewayNames));
         }

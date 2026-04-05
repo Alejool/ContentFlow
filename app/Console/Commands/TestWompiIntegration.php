@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\User;
 use App\Models\Workspace\Workspace;
-use App\Services\Payment\PaymentGatewayFactory;
+use App\Facades\PaymentGateway;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 

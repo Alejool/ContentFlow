@@ -4,6 +4,7 @@ import { useS3Upload } from '@/Hooks/useS3Upload';
 import { useUploadWarning } from '@/Hooks/useUploadWarning';
 import { useProcessingProgress } from '@/stores/processingProgressStore';
 import { useUploadQueue } from '@/stores/uploadQueueStore';
+import { router } from '@inertiajs/react';
 import axios from 'axios';
 import {
   AlertTriangle,
@@ -16,8 +17,7 @@ import {
   Trash2,
   X,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useEffect, useRef, useState } from 'react';
 import { ProgressDisplay } from './Upload/ProgressDisplay';
 import { PublicationItem } from './Upload/PublicationItem';
 
@@ -41,8 +41,8 @@ export default function GlobalUploadIndicator() {
   const [isClosed, setIsClosed] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('uploads');
   const [dismissedIds, setDismissedIds] = useState<number[]>([]);
+  const wasClosedManually = useRef(false);
 
-  const { t } = useTranslation();
   const { confirm, ConfirmDialog } = useConfirm();
 
   const { publications } = usePublicationStatus({ dismissedIds });
@@ -66,10 +66,27 @@ export default function GlobalUploadIndicator() {
 
   useUploadWarning(activeUploads.length > 0);
 
-  // Re-open if new activity arrives after closing
+  // Re-open if new activity arrives after closing (only if not closed manually)
   useEffect(() => {
-    if (totalActive > 0) setIsClosed(false);
+    if (totalActive > 0 && !wasClosedManually.current) {
+      setIsClosed(false);
+    }
   }, [totalActive]);
+
+  // Detect route changes and keep closed state if manually closed
+  useEffect(() => {
+    const handleNavigate = () => {
+      // Don't reopen on navigation if user closed it manually
+      if (wasClosedManually.current) {
+        setIsClosed(true);
+      }
+    };
+
+    const unsubscribe = router.on('navigate', handleNavigate);
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   // Auto-select tab with activity
   useEffect(() => {
@@ -132,7 +149,7 @@ export default function GlobalUploadIndicator() {
       type: 'danger',
     });
     if (!ok) return;
-    await cancelUploadWithCleanup(id);
+    cancelUploadWithCleanup(id);
   };
 
   const handleCancelJob = async (id: string) => {
@@ -145,6 +162,23 @@ export default function GlobalUploadIndicator() {
     });
     if (!ok) return;
     cancelJob(id);
+  };
+
+  // Handle close button - mark as manually closed
+  const handleClose = () => {
+    setIsClosed(true);
+    wasClosedManually.current = true;
+  };
+
+  // Handle minimize button
+  const handleMinimize = () => {
+    setIsMinimized(true);
+  };
+
+  // Handle restore from minimized
+  const handleRestore = () => {
+    setIsMinimized(false);
+    wasClosedManually.current = false;
   };
 
   if (uploads.length === 0 && publications.length === 0 && jobs.length === 0) return null;
@@ -167,7 +201,7 @@ export default function GlobalUploadIndicator() {
   if (isMinimized) {
     return (
       <>
-        <div className="relative cursor-pointer self-end" onClick={() => setIsMinimized(false)}>
+        <div className="relative cursor-pointer self-end" onClick={handleRestore}>
           <div
             className={`${circleColor} rounded-full p-3 shadow-lg transition-transform hover:scale-110`}
           >
@@ -217,9 +251,12 @@ export default function GlobalUploadIndicator() {
 
   return (
     <>
-      <div className="w-72 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-neutral-700 dark:bg-gray-800">
+      <div className="w-72 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-2xl dark:border-neutral-700 dark:bg-gray-800">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-gray-200 px-3 py-2 dark:border-neutral-700">
+        <div
+          className="flex items-center justify-between border-b border-gray-200 px-3 py-2 dark:border-neutral-700"
+          onDoubleClick={handleMinimize}
+        >
           <div className="flex items-center gap-2">
             <div
               className={`h-2 w-2 rounded-full ${dotColor} ${totalActive > 0 ? 'animate-pulse' : ''}`}
@@ -235,7 +272,7 @@ export default function GlobalUploadIndicator() {
           <div className="flex items-center gap-0.5">
             {/* Minimize to circle */}
             <button
-              onClick={() => setIsMinimized(true)}
+              onClick={handleMinimize}
               className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-neutral-700 dark:hover:text-neutral-200"
               title="Minimizar"
             >
@@ -243,7 +280,7 @@ export default function GlobalUploadIndicator() {
             </button>
             {/* Close completely */}
             <button
-              onClick={() => setIsClosed(true)}
+              onClick={handleClose}
               className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-neutral-700 dark:hover:text-neutral-200"
               title="Cerrar"
             >
@@ -300,34 +337,26 @@ export default function GlobalUploadIndicator() {
                       </p>
                       <ProgressDisplay
                         percentage={upload.progress}
-                        eta={upload.stats?.eta}
-                        speed={upload.stats?.speed}
+                        {...(upload.stats?.eta !== undefined ? { eta: upload.stats.eta } : {})}
+                        {...(upload.stats?.speed !== undefined ? { speed: upload.stats.speed } : {})}
                         status={upload.status}
-                        onPause={
-                          upload.isPausable && upload.status === 'uploading'
-                            ? () => pauseUpload(upload.id)
-                            : undefined
-                        }
-                        onResume={
-                          upload.status === 'paused'
-                            ? () => resumeUploadWithLogic(upload.id)
-                            : undefined
-                        }
-                        onCancel={
-                          upload.status === 'uploading' || upload.status === 'paused'
-                            ? () => handleCancelUpload(upload.id)
-                            : undefined
-                        }
-                        onRetry={
-                          upload.status === 'error' && upload.canRetry
-                            ? () => retryUpload(upload.id)
-                            : undefined
-                        }
+                        {...(upload.isPausable && upload.status === 'uploading'
+                          ? { onPause: () => pauseUpload(upload.id) }
+                          : {})}
+                        {...(upload.status === 'paused'
+                          ? { onResume: () => resumeUploadWithLogic(upload.id) }
+                          : {})}
+                        {...(upload.status === 'uploading' || upload.status === 'paused'
+                          ? { onCancel: () => handleCancelUpload(upload.id) }
+                          : {})}
+                        {...(upload.status === 'error' && upload.canRetry
+                          ? { onRetry: () => retryUpload(upload.id) }
+                          : {})}
                         isPausable={upload.isPausable}
                         isPaused={upload.status === 'paused'}
-                        error={upload.error}
-                        retryCount={upload.retryCount}
-                        canRetry={upload.canRetry}
+                        {...(upload.error !== undefined ? { error: upload.error } : {})}
+                        {...(upload.retryCount !== undefined ? { retryCount: upload.retryCount } : {})}
+                        {...(upload.canRetry !== undefined ? { canRetry: upload.canRetry } : {})}
                       />
                     </div>
                     {/* Remove from list */}
@@ -372,22 +401,22 @@ export default function GlobalUploadIndicator() {
                     )}
                     <ProgressDisplay
                       percentage={job.progress}
-                      eta={job.stats?.eta}
+                      {...(job.stats?.eta !== undefined && { eta: job.stats.eta })}
                       status={
                         job.status === 'queued'
                           ? 'pending'
                           : job.status === 'processing'
                             ? 'uploading'
-                            : job.status
+                            : job.status === 'failed'
+                              ? 'error'
+                              : job.status
                       }
-                      onCancel={
-                        job.status === 'processing' || job.status === 'queued'
-                          ? () => handleCancelJob(job.id)
-                          : undefined
-                      }
+                      {...((job.status === 'processing' || job.status === 'queued') && {
+                        onCancel: () => handleCancelJob(job.id),
+                      })}
                       isPausable={false}
                       isPaused={false}
-                      error={job.error}
+                      {...(job.error !== undefined && { error: job.error })}
                     />
                   </div>
                 ))

@@ -1,21 +1,21 @@
+import { formatSpeed, formatTime } from '@/Utils/formatters';
 import { Pause, Play, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { formatSpeed, formatTime } from '@/Utils/formatters';
 
 export interface ProgressDisplayProps {
   percentage: number;
-  eta?: number;
-  speed?: number;
+  eta?: number | undefined;
+  speed?: number | undefined;
   status: 'pending' | 'uploading' | 'paused' | 'completed' | 'error' | 'cancelled' | 'processing';
-  onPause?: () => void;
-  onResume?: () => void;
-  onCancel?: () => void;
-  onRetry?: () => void;
+  onPause?: (() => void) | undefined;
+  onResume?: (() => void) | undefined;
+  onCancel?: (() => void) | undefined;
+  onRetry?: (() => void) | undefined;
   isPausable: boolean;
   isPaused: boolean;
-  error?: string;
-  retryCount?: number;
-  canRetry?: boolean;
+  error?: string | undefined;
+  retryCount?: number | undefined;
+  canRetry?: boolean | undefined;
 }
 
 export function ProgressDisplay({

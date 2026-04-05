@@ -7,7 +7,7 @@ use App\Models\Subscription\Subscription;
 use App\Models\SystemSetting;
 use App\Models\Workspace\Workspace;
 use App\Notifications\Subscription\RenewalFailedNotification;
-use App\Services\Payment\PaymentGatewayFactory;
+use App\Facades\PaymentGateway;
 use App\Services\Subscription\DTOs\RenewalResult;
 use Illuminate\Support\Facades\Log;
 
@@ -71,7 +71,8 @@ class RenewalService
         $gatewayName = $subscription->payment_gateway ?? 'stripe';
 
         try {
-            $gateway = PaymentGatewayFactory::make($gatewayName);
+            // Usar Facade en lugar de llamada estática
+            $gateway = PaymentGateway::make($gatewayName);
 
             if (! $gateway->isAvailable()) {
                 return new RenewalResult(

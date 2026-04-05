@@ -4,21 +4,20 @@ namespace App\Http\Controllers\Payment;
 
 use App\Helpers\AddonHelper;
 use App\Http\Controllers\Controller;
-use App\Services\Payment\PaymentGatewayFactory;
-use App\Services\Payment\CountryDetectionService;
+use App\Facades\PaymentGateway;
+use App\Facades\CountryDetection;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
 /**
  * Controlador unificado para pagos con múltiples gateways
+ * 
+ * REFACTORIZADO: Usa Facades para acceso limpio a servicios Singleton
+ * sin necesidad de inyección de dependencias en el constructor.
  */
 class UnifiedPaymentController extends Controller
 {
-    public function __construct(
-        private CountryDetectionService $countryDetection
-    ) {}
-
     /**
      * Obtener gateways disponibles para el usuario
      */
@@ -27,8 +26,8 @@ class UnifiedPaymentController extends Controller
         $user = $request->user();
         $ipAddress = $request->ip();
 
-        // Detectar país del usuario
-        $countryCode = $this->countryDetection->detectCountry($user, $ipAddress);
+        // Detectar país del usuario usando Facade
+        $countryCode = CountryDetection::detectCountry($user, $ipAddress);
 
         // Obtener métodos de pago habilitados en system_settings para este país
         $enabledMethods = \App\Services\PaymentMethodService::getAvailableMethods($countryCode);
@@ -42,7 +41,7 @@ class UnifiedPaymentController extends Controller
 
             return response()->json([
                 'country' => $countryCode,
-                'currency' => $this->countryDetection->getCurrencyForCountry($countryCode),
+                'currency' => CountryDetection::getCurrencyForCountry($countryCode),
                 'exchange_rate' => 1,
                 'gateways' => [],
                 'default_gateway' => null,
@@ -50,10 +49,11 @@ class UnifiedPaymentController extends Controller
         }
 
         // Obtener instancias de gateways solo para los métodos habilitados
+        // Usando el Factory Singleton via Facade
         $gatewayList = [];
         foreach ($enabledMethods as $methodKey => $methodConfig) {
             try {
-                $gateway = PaymentGatewayFactory::make($methodKey);
+                $gateway = PaymentGateway::make($methodKey);
                 
                 // Verificar que el gateway tenga credenciales configuradas
                 if ($gateway->isAvailable()) {
@@ -89,9 +89,9 @@ class UnifiedPaymentController extends Controller
             return $priorityA <=> $priorityB;
         });
 
-        // Información de moneda y precios
-        $currency = $this->countryDetection->getCurrencyForCountry($countryCode);
-        $exchangeRate = $this->countryDetection->getExchangeRate($currency);
+        // Información de moneda y precios usando Facade
+        $currency = CountryDetection::getCurrencyForCountry($countryCode);
+        $exchangeRate = CountryDetection::getExchangeRate($currency);
 
         Log::info('Available gateways for user', [
             'country' => $countryCode,
@@ -158,7 +158,7 @@ class UnifiedPaymentController extends Controller
             
             foreach ($gatewaysToTry as $gatewayName) {
                 try {
-                    $gateway = PaymentGatewayFactory::make($gatewayName);
+                    $gateway = $this->gatewayFactory->make($gatewayName);
                     
                     if (!$gateway->isAvailable()) {
                         Log::info("Gateway {$gatewayName} not available, trying next", [
@@ -279,7 +279,7 @@ class UnifiedPaymentController extends Controller
             
             foreach ($gatewaysToTry as $gatewayName) {
                 try {
-                    $gateway = PaymentGatewayFactory::make($gatewayName);
+                    $gateway = $this->gatewayFactory->make($gatewayName);
                     
                     if (!$gateway->isAvailable()) {
                         Log::info("Gateway {$gatewayName} not available, trying next", [
@@ -354,8 +354,8 @@ class UnifiedPaymentController extends Controller
     public function getPricing(Request $request): JsonResponse
     {
         $user = $request->user();
-        $countryCode = $this->countryDetection->detectCountry($user, $request->ip());
-        $currency = $this->countryDetection->getCurrencyForCountry($countryCode);
+        $countryCode = CountryDetection::detectCountry($user, $request->ip());
+        $currency = CountryDetection::getCurrencyForCountry($countryCode);
 
         $plans = config('plans');
         $convertedPlans = [];
@@ -365,7 +365,7 @@ class UnifiedPaymentController extends Controller
                 continue;
             }
 
-            $priceInfo = $this->countryDetection->convertPrice($plan['price'], $countryCode);
+            $priceInfo = CountryDetection::convertPrice($plan['price'], $countryCode);
 
             $convertedPlans[$key] = array_merge($plan, [
                 'price_usd' => $priceInfo['usd'],
