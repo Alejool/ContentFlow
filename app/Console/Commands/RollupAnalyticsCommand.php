@@ -43,7 +43,7 @@ class RollupAnalyticsCommand extends Command
             now()->subYear()->startOfDay(),
             'monthly',
             $isDryRun,
-            $cutoffRaw  // only data older than 365 days
+            now()->subDays($keepDays)->startOfDay()  // upper bound: only data older than 365 days
         );
 
         // 3. Rollup social_media_metrics → weekly
@@ -56,7 +56,7 @@ class RollupAnalyticsCommand extends Command
             now()->subYear()->startOfDay(),
             'monthly',
             $isDryRun,
-            $cutoffRaw
+            now()->subDays($keepDays)->startOfDay()  // upper bound: only data older than 365 days
         );
 
         // 5. Prune raw data
@@ -120,7 +120,7 @@ class RollupAnalyticsCommand extends Command
                 SUM(comments)    AS comments,
                 SUM(shares)      AS shares,
                 SUM(saves)       AS saves,
-                AVG(engagement_rate) AS avg_engagement_rate,
+                COALESCE(AVG(engagement_rate), 0) AS avg_engagement_rate,
                 COUNT(*)         AS data_points
             ")
             ->groupByRaw("publication_id, platform, {$truncFn}");
@@ -198,7 +198,7 @@ class RollupAnalyticsCommand extends Command
                 SUM(impressions)    AS impressions,
                 SUM(followers_gained) AS followers_gained,
                 SUM(followers_lost)   AS followers_lost,
-                AVG(engagement_rate)  AS avg_engagement_rate,
+                COALESCE(AVG(engagement_rate), 0)  AS avg_engagement_rate,
                 COUNT(*)              AS data_points
             ")
             ->groupByRaw("social_account_id, {$truncFn}");

@@ -308,16 +308,19 @@ class AnalyticsController extends Controller
         $ttl      = 15 * 60; // 15 minutes
 
         if (\Illuminate\Support\Facades\Cache::has($cacheKey)) {
-            $remaining = \Illuminate\Support\Facades\Cache::get($cacheKey . ':remaining', $ttl);
+            // Get expiration timestamp and compute remaining seconds
+            $expiresAt = \Illuminate\Support\Facades\Cache::get($cacheKey . ':expires_at', now()->timestamp);
+            $remaining = max(0, $expiresAt - now()->timestamp);
             return response()->json([
                 'error'             => 'Sync already in progress or recently completed.',
                 'retry_after_seconds' => $remaining,
             ], 429);
         }
 
-        // Lock for 15 minutes
+        // Lock for 15 minutes and store expiration timestamp
+        $expiresAt = now()->addSeconds($ttl)->timestamp;
         \Illuminate\Support\Facades\Cache::put($cacheKey, true, $ttl);
-        \Illuminate\Support\Facades\Cache::put($cacheKey . ':remaining', $ttl, $ttl);
+        \Illuminate\Support\Facades\Cache::put($cacheKey . ':expires_at', $expiresAt, $ttl);
 
         $accounts = \App\Models\Social\SocialAccount::where('workspace_id', $workspaceId)
             ->where('is_active', true)
@@ -355,7 +358,7 @@ class AnalyticsController extends Controller
         return response()->json([
             'locked'              => $locked,
             'retry_after_seconds' => $locked
-                ? \Illuminate\Support\Facades\Cache::get($cacheKey . ':remaining', 0)
+                ? max(0, \Illuminate\Support\Facades\Cache::get($cacheKey . ':expires_at', now()->timestamp) - now()->timestamp)
                 : 0,
         ]);
     }
