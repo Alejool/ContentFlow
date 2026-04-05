@@ -1,32 +1,28 @@
-import React, { useEffect, useState } from 'react';
-import { Head, router, usePage } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import AlertCard from '@/Components/common/Modern/AlertCard';
 import Button from '@/Components/common/Modern/Button';
-import { Badge } from '@/Components/ui/badge';
-import { Alert, AlertDescription } from '@/Components/ui/alert';
-import { Progress } from '@/Components/ui/progress';
-import {
-  Download,
-  CreditCard,
-  Calendar,
-  DollarSign,
-  ArrowLeft,
-  Info,
-  TrendingUp,
-  FileText,
-  HardDrive,
-  Sparkles,
-  Users,
-  AlertCircle,
-  FileSpreadsheet,
-} from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import { toast } from 'react-hot-toast';
-import axios from 'axios';
-import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
 import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
+import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
+import PlanUsageCard from '@/Components/Subscription/PlanUsageCard';
+import { Badge } from '@/Components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { formatDateString } from '@/Utils/dateHelpers';
+import { Head, router, usePage } from '@inertiajs/react';
+import axios from 'axios';
+import {
+  AlertCircle,
+  ArrowLeft,
+  Calendar,
+  CreditCard,
+  DollarSign,
+  Download,
+  FileSpreadsheet,
+  FileText,
+  TrendingUp
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 declare function route(name: string, params?: any): string;
 
@@ -213,31 +209,6 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
     }
   };
 
-  const getMetricIcon = (type: string) => {
-    switch (type) {
-      case 'publications':
-        return <FileText className="h-4 w-4" />;
-      case 'storage':
-        return <HardDrive className="h-4 w-4" />;
-      case 'ai_requests':
-        return <Sparkles className="h-4 w-4" />;
-      case 'team_members':
-        return <Users className="h-4 w-4" />;
-      default:
-        return <TrendingUp className="h-4 w-4" />;
-    }
-  };
-
-  const getMetricName = (type: string) => {
-    return t(`subscription.usage.${type}`, type);
-  };
-
-  const formatLimit = (limit: number, type: string) => {
-    if (limit === -1) return t('subscription.usage.unlimited', '∞');
-    if (type === 'storage') return `${limit} GB`;
-    return limit.toString();
-  };
-
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case 'active':
@@ -277,7 +248,11 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
         <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
           {/* Header */}
           <div className="mb-8">
-            <Button onClick={handleBack} variant="ghost" icon={ArrowLeft} className="mb-4">
+            <Button onClick={handleBack} 
+            variant="ghost" 
+            buttonStyle='ghost'
+            icon={ArrowLeft} 
+            className="mb-4">
               {t('common.back', 'Volver')}
             </Button>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -289,54 +264,59 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
           </div>
 
           {/* Workspace Note */}
-          <Alert className="mb-6 border-blue-200 bg-blue-50 dark:bg-blue-900/20">
-            <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-            <AlertDescription className="text-blue-800 dark:text-blue-300">
-              {t(
-                'subscription.billing.workspaceNote',
-                'Este plan aplica para todos los miembros de este workspace',
-              )}
-            </AlertDescription>
-          </Alert>
+          <AlertCard
+            type="info"
+            message={t(
+              'subscription.billing.workspaceNote',
+              'This plan applies to all members of this workspace',
+            )}
+            className="mb-6"
+          />
 
           {/* Active Subscription Info */}
           {subscription.plan !== 'free' &&
             subscription.plan !== 'demo' &&
             subscription.stripe_status === 'active' && (
-              <Alert className="mb-6 border-green-200 bg-green-50 dark:bg-green-900/20">
-                <Info className="h-4 w-4 text-green-600 dark:text-green-400" />
-                <AlertDescription className="text-green-800 dark:text-green-300">
-                  {t(
-                    'subscription.billing.activeSubscriptionNote',
-                    'Tienes una suscripción activa. Puedes cambiar a cualquier plan de pago desde la página de Pricing. Para cambiar a Free, primero cancela tu suscripción.',
-                  )}
-                  <Button
-                    className="ml-2 h-auto p-0 text-green-800 underline dark:text-green-300"
-                    onClick={() => router.visit('/pricing')}
-                  >
-                    {t('subscription.billing.changePlan', 'Cambiar Plan')}
-                  </Button>
-                </AlertDescription>
-              </Alert>
+              <AlertCard
+                type="success"
+                message={
+                  <>
+                    {t(
+                      'subscription.billing.activeSubscriptionNote',
+                      'You have an active subscription. You can change to any paid plan from the Pricing page. To change to Free, first cancel your subscription.',
+                    )}{' '}
+                    <Button
+                      className=" mt-4 h-auto p-0 text-green-800 dark:text-green-300"
+                      onClick={() => router.visit('/pricing')}
+                    >
+                      {t('subscription.billing.changePlan', 'Change Plan')}
+                    </Button>
+                  </>
+                }
+                className="mb-6"
+              />
             )}
 
           {/* Free/Demo Plan Alert */}
           {(subscription.plan === 'free' || subscription.plan === 'demo') && (
-            <Alert className="mb-6 border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20">
-              <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
-              <AlertDescription className="text-yellow-800 dark:text-yellow-300">
-                {t(
-                  'subscription.billing.freePlanNote',
-                  'Estás en el plan gratuito. Para acceder al portal de facturación, necesitas suscribirte a un plan de pago.',
-                )}
-                <Button
-                  className="ml-2 h-auto p-0 text-yellow-800 underline dark:text-yellow-300"
-                  onClick={() => router.visit('/pricing')}
-                >
-                  {t('subscription.billing.viewPlans', 'Ver planes disponibles')}
-                </Button>
-              </AlertDescription>
-            </Alert>
+            <AlertCard
+              type="warning"
+              message={
+                <>
+                  {t(
+                    'subscription.billing.freePlanNote',
+                    'Estás en el plan gratuito. Para acceder al portal de facturación, necesitas suscribirte a un plan de pago.',
+                  )}{' '}
+                  <Button
+                    className="ml-2 h-auto p-0 text-yellow-800 underline dark:text-yellow-300"
+                    onClick={() => router.visit('/pricing')}
+                  >
+                    {t('subscription.billing.viewPlans', 'Ver planes disponibles')}
+                  </Button>
+                </>
+              }
+              className="mb-6"
+            />
           )}
 
           {/* Current Plan */}
@@ -420,64 +400,7 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
           </Card>
 
           {/* Current Usage */}
-          {usage && usage.length > 0 && (
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5" />
-                  {t('subscription.usage.currentUsage', 'Uso Actual')}
-                </CardTitle>
-                <CardDescription>
-                  {t(
-                    'subscription.usage.description',
-                    'Monitorea tu uso y gestiona tu suscripción',
-                  )}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-                  {usage.map((metric) => (
-                    <div
-                      key={metric.type}
-                      className="rounded-lg border border-gray-200 p-4 dark:border-gray-700"
-                    >
-                      <div className="mb-2 flex items-center gap-2">
-                        {getMetricIcon(metric.type)}
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                          {getMetricName(metric.type)}
-                        </span>
-                      </div>
-                      <div className="space-y-2">
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                            {metric.current}
-                          </span>
-                          <span className="text-sm text-gray-600 dark:text-gray-400">
-                            / {formatLimit(metric.limit, metric.type)}
-                          </span>
-                        </div>
-                        <Progress
-                          value={Math.min(metric.percentage, 100)}
-                          className={`h-2 ${
-                            metric.percentage >= 100
-                              ? '[&>div]:bg-red-500'
-                              : metric.percentage >= 80
-                                ? '[&>div]:bg-yellow-500'
-                                : '[&>div]:bg-green-500'
-                          }`}
-                        />
-                        <p className="text-xs text-gray-600 dark:text-gray-400">
-                          {metric.remaining === -1
-                            ? t('subscription.usage.unlimited', 'Ilimitado')
-                            : `${metric.remaining} ${t('subscription.usage.remaining', 'restante')}`}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          {usage && usage.length > 0 && <PlanUsageCard usage={usage} className="mb-8" />}
 
           {/* Upcoming Invoice */}
           {upcomingInvoice && (

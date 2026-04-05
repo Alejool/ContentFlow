@@ -1,30 +1,28 @@
 import enFlag from '@/../assets/Icons/Flags/en.svg';
 import esFlag from '@/../assets/Icons/Flags/es.svg';
-import { Avatar } from '@/Components/common/Avatar';
-import { useSubscriptionUsage } from '@/Hooks/useSubscriptionUsage';
-import { useTheme } from '@/Hooks/useTheme';
-import { cssPropertiesManager } from '@/Utils/CSSCustomPropertiesManager';
-import { transitionTheme } from '@/Utils/themeTransition';
+import { Avatar } from '@Components/common/Avatar';
+import { useSubscriptionUsage } from '@Hooks/useSubscriptionUsage';
+import { useTheme } from '@Hooks/useTheme';
+import { cssPropertiesManager } from '@Utils/CSSCustomPropertiesManager';
+import { transitionTheme } from '@Utils/themeTransition';
 import { Menu, MenuButton, MenuItems, Radio, RadioGroup } from '@headlessui/react';
-import { Link as InertiaLink, Link, usePage } from '@inertiajs/react';
+import { Link as InertiaLink, usePage } from '@inertiajs/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import {
   Check,
   ChevronDown,
-  FileText,
   Globe,
-  HardDrive,
   LogOut,
   Moon,
   Palette,
   Sun,
   User,
-  Zap,
 } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import PlanUsageSection from './PlanUsageSection';
 
 interface ProfileDropdownProps {
   user: {
@@ -42,12 +40,12 @@ export default function ProfileDropdown({ user, isProfileActive = false }: Profi
   const { theme, setTheme } = useTheme();
   const { auth } = (usePage().props as any) || {};
   const { usage, loading: usageLoading } = useSubscriptionUsage();
-  const [currentTheme, setCurrentTheme] = useState(user?.theme_color || 'orange');
+  const [currentTheme, setCurrentTheme] = useState(user?.['theme_color'] || 'orange');
 
   const currentWorkspace = auth?.current_workspace;
   const isOwner =
     currentWorkspace &&
-    (Number(currentWorkspace.created_by) === Number(user?.id) ||
+    (Number(currentWorkspace.created_by) === Number(user?.['id']) ||
       currentWorkspace.user_role_slug === 'owner');
 
   const brandingColor = currentWorkspace?.white_label_primary_color;
@@ -74,7 +72,7 @@ export default function ProfileDropdown({ user, isProfileActive = false }: Profi
   ];
 
   const getBaseLang = (lang: string) => lang.split('-')[0];
-  const currentLangCode = getBaseLang(i18n.resolvedLanguage || i18n.language);
+  const currentLangCode = getBaseLang(i18n.resolvedLanguage || i18n.language || 'en') ?? 'en';
 
   const handleModeChange = (newTheme: 'light' | 'dark' | 'system') => {
     transitionTheme(() => setTheme(newTheme));
@@ -109,25 +107,7 @@ export default function ProfileDropdown({ user, isProfileActive = false }: Profi
     }
   };
 
-  const getPlanDisplayName = (planName: string) => {
-    const planNames: Record<string, string> = {
-      free: t('pricing.plans.free.name') || 'Free',
-      starter: t('pricing.plans.starter.name') || 'Starter',
-      growth: t('pricing.plans.growth.name') || 'Growth',
-      professional: t('pricing.plans.professional.name') || 'Professional',
-      enterprise: t('pricing.plans.enterprise.name') || 'Enterprise',
-    };
-    return planNames[planName] || planName;
-  };
 
-  const formatBytes = (bytes: number, decimals = 2) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-  };
 
   return (
     <Menu as="div" className="relative">
@@ -219,124 +199,7 @@ export default function ProfileDropdown({ user, isProfileActive = false }: Profi
             </div>
 
             {/* Plan Usage */}
-            {usage && !usageLoading && (
-              <div className="px-4 pb-3">
-                <div className="rounded-lg border border-primary-200 bg-gradient-to-br from-primary-50 to-primary-100/50 p-3 dark:border-primary-800/30 dark:from-primary-900/20 dark:to-primary-800/10">
-                  <div className="mb-3 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Zap className="h-4 w-4 text-primary-600 dark:text-primary-400" />
-                      <span className="text-sm font-bold text-primary-900 dark:text-primary-100">
-                        {getPlanDisplayName(usage.plan)}
-                      </span>
-                    </div>
-                    {isOwner && (
-                      <Link
-                        href={route('pricing')}
-                        className="text-xs font-medium text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
-                      >
-                        {t('subscription.usage.upgradePlan') || 'Actualizar'}
-                      </Link>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    {/* Publications */}
-                    <div className="space-y-1">
-                      <div className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300">
-                          <FileText className="h-3 w-3" />
-                          <span>{t('subscription.usage.publications') || 'Publicaciones'}</span>
-                        </div>
-                        <span className="text-xs font-semibold text-gray-900 dark:text-white">
-                          {usage.publications.limit === -1
-                            ? `${usage.publications.used} / ∞`
-                            : `${usage.publications.used} / ${usage.publications.total_available || usage.publications.limit}`}
-                        </span>
-                      </div>
-                      {usage.publications.limit !== -1 && (
-                        <div className="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
-                          <div
-                            className={`h-full rounded-full transition-all ${
-                              usage.publications.percentage >= 90
-                                ? 'bg-red-500'
-                                : usage.publications.percentage >= 70
-                                  ? 'bg-yellow-500'
-                                  : 'bg-primary-500'
-                            }`}
-                            style={{
-                              width: `${Math.min(usage.publications.percentage, 100)}%`,
-                            }}
-                          />
-                        </div>
-                      )}
-                      {usage.publications.addon_info && usage.publications.addon_info.total > 0 && (
-                        <div className="mt-1 text-xs text-primary-600 dark:text-primary-400">
-                          <span className="font-medium">Plan:</span> {usage.publications.limit} +{' '}
-                          <span className="font-medium">Addons:</span>{' '}
-                          {usage.publications.addon_info.remaining}/
-                          {usage.publications.addon_info.total}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Storage */}
-                    <div className="space-y-1">
-                      <div className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300">
-                          <HardDrive className="h-3 w-3" />
-                          <span>{t('subscription.usage.storage') || 'Almacenamiento'}</span>
-                        </div>
-                        <span className="font-semibold text-gray-900 dark:text-white">
-                          {usage.storage.limit_gb === -1
-                            ? `${formatBytes(usage.storage.used_bytes)} / ∞`
-                            : `${formatBytes(usage.storage.used_bytes)} / ${usage.storage.total_available_gb || usage.storage.limit_gb} GB`}
-                        </span>
-                      </div>
-                      {usage.storage.limit_gb !== -1 && (
-                        <div className="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
-                          <div
-                            className={`h-full rounded-full transition-all ${
-                              usage.storage.percentage >= 90
-                                ? 'bg-red-500'
-                                : usage.storage.percentage >= 70
-                                  ? 'bg-yellow-500'
-                                  : 'bg-primary-500'
-                            }`}
-                            style={{
-                              width: `${Math.min(usage.storage.percentage, 100)}%`,
-                            }}
-                          />
-                        </div>
-                      )}
-                      {usage.storage.addon_info && usage.storage.addon_info.total > 0 && (
-                        <div className="mt-1 text-xs text-primary-600 dark:text-primary-400">
-                          <span className="font-medium">Plan:</span> {usage.storage.limit_gb} GB +{' '}
-                          <span className="font-medium">Addons:</span>{' '}
-                          {usage.storage.addon_info.remaining}/{usage.storage.addon_info.total} GB
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {usage.limits_reached && (
-                    <div className="mt-2 border-t border-primary-200 pt-2 dark:border-primary-800/30">
-                      <Link
-                        href={route('subscription.addons')}
-                        className="group flex items-center justify-between gap-2 rounded-lg bg-gradient-to-r from-primary-500 to-primary-600 px-3 py-2 text-white transition-all hover:from-primary-600 hover:to-primary-700"
-                      >
-                        <div className="flex items-center gap-2">
-                          <Zap className="h-4 w-4" />
-                          <span className="text-xs font-semibold">
-                            {t('subscription.addons.buyCredits') || 'Comprar Créditos'}
-                          </span>
-                        </div>
-                        <ChevronDown className="h-3 w-3 -rotate-90 transition-transform group-hover:translate-x-0.5" />
-                      </Link>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+            <PlanUsageSection usage={usage} usageLoading={usageLoading} isOwner={isOwner} />
 
             {/* Appearance */}
             <div className="px-4 pb-3">
