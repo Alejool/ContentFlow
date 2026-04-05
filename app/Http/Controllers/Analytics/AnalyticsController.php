@@ -308,8 +308,8 @@ class AnalyticsController extends Controller
         $ttl      = 15 * 60; // 15 minutes
 
         if (\Illuminate\Support\Facades\Cache::has($cacheKey)) {
-            // Get expiration timestamp and compute remaining seconds
-            $expiresAt = \Illuminate\Support\Facades\Cache::get($cacheKey . ':expires_at', now()->timestamp);
+            // Compute remaining seconds dynamically from current time
+            $expiresAt = \Illuminate\Support\Facades\Cache::get($cacheKey, now()->timestamp);
             $remaining = max(0, $expiresAt - now()->timestamp);
             return response()->json([
                 'error'             => 'Sync already in progress or recently completed.',
@@ -317,10 +317,9 @@ class AnalyticsController extends Controller
             ], 429);
         }
 
-        // Lock for 15 minutes and store expiration timestamp
+        // Lock for 15 minutes and store expiration timestamp as the cache value
         $expiresAt = now()->addSeconds($ttl)->timestamp;
-        \Illuminate\Support\Facades\Cache::put($cacheKey, true, $ttl);
-        \Illuminate\Support\Facades\Cache::put($cacheKey . ':expires_at', $expiresAt, $ttl);
+        \Illuminate\Support\Facades\Cache::put($cacheKey, $expiresAt, $ttl);
 
         $accounts = \App\Models\Social\SocialAccount::where('workspace_id', $workspaceId)
             ->where('is_active', true)
@@ -351,14 +350,18 @@ class AnalyticsController extends Controller
     public function syncStatus(Request $request): \Illuminate\Http\JsonResponse
     {
         $workspaceId = Auth::user()->current_workspace_id;
-        $cacheKey    = "analytics_sync_lock:workspace:{$workspaceId}";
 
-        $locked = \Illuminate\Support\Facades\Cache::has($cacheKey);
+        if (!$workspaceId) {
+            return response()->json(['error' => 'No workspace selected'], 422);
+        }
+
+        $cacheKey = "analytics_sync_lock:workspace:{$workspaceId}";
+        $locked   = \Illuminate\Support\Facades\Cache::has($cacheKey);
 
         return response()->json([
             'locked'              => $locked,
             'retry_after_seconds' => $locked
-                ? max(0, \Illuminate\Support\Facades\Cache::get($cacheKey . ':expires_at', now()->timestamp) - now()->timestamp)
+                ? max(0, \Illuminate\Support\Facades\Cache::get($cacheKey, now()->timestamp) - now()->timestamp)
                 : 0,
         ]);
     }
