@@ -4,8 +4,7 @@ namespace App\Services\Billing;
 
 use App\Models\Subscription\Invoice;
 use App\Models\Workspace\Workspace;
-use App\Jobs\Billing\SyncStripeInvoiceJob;
-use App\Jobs\Billing\SyncMercadoPagoInvoiceJob;
+use App\Jobs\SyncStripeInvoiceJob;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -81,7 +80,7 @@ class InvoiceSyncService
     {
         return match ($provider) {
             'stripe' => SyncStripeInvoiceJob::class,
-            'mercadopago' => SyncMercadoPagoInvoiceJob::class,
+            'mercadopago' => throw new \InvalidArgumentException("MercadoPago invoice sync not yet implemented"),
             default => throw new \InvalidArgumentException("Unsupported provider: {$provider}"),
         };
     }
