@@ -35,28 +35,38 @@ class RollupAnalyticsCommand extends Command
         // 1. Rollup campaign_analytics → weekly (data between 90 and 365 days old)
         $this->info('');
         $this->info('→ Rolling up campaign analytics (weekly)...');
-        $campaignWeekly = $this->rollupCampaignAnalytics($cutoffRaw, 'weekly', $isDryRun);
+        $campaignWeekly = $this->rollupCampaignAnalytics(
+            $cutoffRaw,  // olderThan: data older than 90 days (date < 90 days ago)
+            'weekly',
+            $isDryRun,
+            now()->subYear()->startOfDay()  // newerThan: but newer than 1 year (date >= 1 year ago) - so between 90-365 days
+        );
 
         // 2. Rollup campaign_analytics → monthly (data older than 365 days)
         $this->info('→ Rolling up campaign analytics (monthly)...');
         $campaignMonthly = $this->rollupCampaignAnalytics(
-            now()->subYear()->startOfDay(),
+            now()->subYear()->startOfDay(),  // olderThan: data older than 1 year (date < 1 year ago)
             'monthly',
-            $isDryRun,
-            now()->subDays($keepDays)->startOfDay()  // upper bound: only data older than 365 days
+            $isDryRun
+            // newerThan: null - no lower bound, so all data older than 1 year
         );
 
         // 3. Rollup social_media_metrics → weekly
         $this->info('→ Rolling up social media metrics (weekly)...');
-        $socialWeekly = $this->rollupSocialMetrics($cutoffRaw, 'weekly', $isDryRun);
+        $socialWeekly = $this->rollupSocialMetrics(
+            $cutoffRaw,  // olderThan: data older than 90 days (date < 90 days ago)
+            'weekly',
+            $isDryRun,
+            now()->subYear()->startOfDay()  // newerThan: but newer than 1 year (date >= 1 year ago) - so between 90-365 days
+        );
 
         // 4. Rollup social_media_metrics → monthly
         $this->info('→ Rolling up social media metrics (monthly)...');
         $socialMonthly = $this->rollupSocialMetrics(
-            now()->subYear()->startOfDay(),
+            now()->subYear()->startOfDay(),  // olderThan: data older than 1 year (date < 1 year ago)
             'monthly',
-            $isDryRun,
-            now()->subDays($keepDays)->startOfDay()  // upper bound: only data older than 365 days
+            $isDryRun
+            // newerThan: null - no lower bound, so all data older than 1 year
         );
 
         // 5. Prune raw data
