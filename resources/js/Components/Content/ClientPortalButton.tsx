@@ -15,8 +15,8 @@ export default function ClientPortalButton({ publicationId, status }: Props) {
   const [loading, setLoading] = useState(false);
   const [portalUrl, setPortalUrl] = useState<string | null>(null);
 
-  // Solo tiene sentido para publicaciones pendientes de revisión o en draft
-  const validStatuses = ['draft', 'pending_review', 'pending', 'scheduled'];
+  // Solo tiene sentido para publicaciones pendientes de revisión
+  const validStatuses = ['pending_review'];
   if (status && !validStatuses.includes(status)) return null;
 
   const generateLink = async () => {
@@ -25,11 +25,13 @@ export default function ClientPortalButton({ publicationId, status }: Props) {
       const res = await axios.post(
         route('api.v1.publications.portal-token', { publication: publicationId }),
       );
-      const url: string = res.data.data.portal_url;
+      // La respuesta puede venir en res.data.data o directamente en res.data
+      const url: string = res.data.data?.portal_url || res.data.portal_url;
       setPortalUrl(url);
       await navigator.clipboard.writeText(url);
       toast.success(t('portal.linkCopied', 'Link copiado al portapapeles'));
-    } catch {
+    } catch (error) {
+      console.error('Error generating portal link:', error);
       toast.error(t('portal.linkError', 'Error al generar el link'));
     } finally {
       setLoading(false);

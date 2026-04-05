@@ -1,5 +1,6 @@
 import { useTheme } from '@/Hooks/useTheme';
-import { ButtonHTMLAttributes, ComponentType, ReactNode, forwardRef, isValidElement } from 'react';
+import type { ButtonHTMLAttributes, ComponentType, ReactNode } from 'react';
+import { forwardRef, isValidElement } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
@@ -76,16 +77,16 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         hoverTo: 'hover:to-red-700',
       },
       secondary: {
-        bg: 'bg-gray-300',
-        hoverBg: 'hover:bg-gray-400',
-        text: 'text-black dark:text-white',
-        border: 'border-gray-300',
-        hoverText: 'hover:text-gray-800',
-        focusRing: 'focus:ring-gray-500',
-        from: 'from-gray-200',
-        to: 'to-gray-300',
-        hoverFrom: 'hover:from-gray-300',
-        hoverTo: 'hover:to-gray-400',
+        bg: 'bg-gray-200 dark:bg-gray-700',
+        hoverBg: 'hover:bg-gray-300 dark:hover:bg-gray-600',
+        text: 'text-gray-900 dark:text-gray-100',
+        border: 'border-gray-300 dark:border-gray-600',
+        hoverText: 'hover:text-gray-900 dark:hover:text-white',
+        focusRing: 'focus:ring-gray-500 dark:focus:ring-gray-400',
+        from: 'from-gray-200 dark:from-gray-700',
+        to: 'to-gray-300 dark:to-gray-600',
+        hoverFrom: 'hover:from-gray-300 dark:hover:from-gray-600',
+        hoverTo: 'hover:to-gray-400 dark:hover:to-gray-500',
       },
       success: {
         bg: 'bg-green-600',
