@@ -91,8 +91,8 @@ phpunit.xml.dist
 # ============================================
 *.bat
 *.sh
-!docker-switch.sh
-!docker-switch.bat
+!start-dev.sh
+!start-prod.sh
 
 # ============================================
 # ARCHIVOS PHP DE PRUEBA/DEBUG
