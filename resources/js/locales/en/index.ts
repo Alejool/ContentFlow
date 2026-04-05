@@ -21,6 +21,7 @@ import onboarding from './onboarding.json';
 import pagination from './pagination.json';
 import payment from './payment.json';
 import platformSettings from './platformSettings.json';
+import portal from './portal.json';
 import pricing from './pricing.json';
 import profile from './profile.json';
 import publications from './publications.json';
@@ -70,6 +71,7 @@ export default {
   ...videoValidation,
   ...onboarding,
   ...shortcuts,
+  portal,
   twoFactor,
   formats,
 };
