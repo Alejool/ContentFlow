@@ -23,6 +23,10 @@
         "healthy": "Healthy",
         "review": "Review"
       },
+      "system_issues": {
+        "title": "System issues detected",
+        "unverified_users": "High percentage of unverified users: {{count}} of {{total}} ({{percent}}%)"
+      },
       "activity": {
         "system_started": "System started successfully",
         "config_loaded": "All configurations loaded",
