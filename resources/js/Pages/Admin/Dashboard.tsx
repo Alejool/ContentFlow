@@ -1,5 +1,6 @@
 import AdminNavigation from '@/Components/Admin/AdminNavigation';
 import SystemStatusCard from '@/Components/Admin/SystemStatusCard';
+import AlertCard from '@/Components/common/Modern/AlertCard';
 import Button from '@/Components/common/Modern/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
@@ -352,23 +353,17 @@ export default function AdminDashboard({ systemStatus, stats, recentActivity = [
 
           {/* Health issues banner */}
           {(stats?.system_health_issues?.length ?? 0) > 0 && (
-            <Card className="border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-900/20">
-              <CardContent className="pb-4 pt-4">
-                <div className="flex items-start gap-3">
-                  <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-yellow-600 dark:text-yellow-400" />
-                  <div>
-                    <p className="font-semibold text-yellow-800 dark:text-yellow-300">
-                      {t('admin.dashboard.system_issues.title')}
-                    </p>
-                    <ul className="mt-1 space-y-0.5 text-sm text-yellow-700 dark:text-yellow-400">
-                      {stats!.system_health_issues.map((issue, i) => (
-                        <li key={i}>• {issue}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <AlertCard
+              type="warning"
+              title={t('admin.dashboard.system_issues.title')}
+              message={
+                <ul className="space-y-0.5">
+                  {stats!.system_health_issues.map((issue, i) => (
+                    <li key={i}>• {issue}</li>
+                  ))}
+                </ul>
+              }
+            />
           )}
 
           {/* Subscriptions by plan */}
