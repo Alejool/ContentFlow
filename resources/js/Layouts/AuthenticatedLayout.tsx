@@ -8,125 +8,56 @@ import ProfileDropdown from '@/Components/Layout/ProfileDropdown';
 import SearchButton from '@/Components/Layout/SearchButton';
 import Sidebar from '@/Components/Layout/Sidebar';
 import MaintenanceBanner from '@/Components/MaintenanceBanner';
+import OnboardingFlow from '@/Components/Onboarding/OnboardingFlow';
 import QueueNotificationFloat from '@/Components/Queue/QueueNotificationFloat';
 import { ResumeUploadsPrompt } from '@/Components/Upload/ResumeUploadsPrompt';
 import { TimezoneInitializer } from '@/Components/common/TimezoneInitializer';
 import KeyboardShortcutsModal from '@/Components/common/ui/KeyboardShortcutsModal';
 import { AbilityProvider } from '@/Contexts/AbilityContext';
 import { OnboardingProvider } from '@/Contexts/OnboardingContext';
-import { useBranding } from '@/Hooks/useBranding';
 import { useCompletionNotifications } from '@/Hooks/useCompletionNotifications';
 import { useWorkspaceLocks } from '@/Hooks/usePublicationLock';
-import { useRealtimeInit } from '@/Hooks/useRealtimeInit';
 import { useSidebarState } from '@/Hooks/useSidebarState';
 import { useStickyOnScroll } from '@/Hooks/useStickyOnScroll';
 import { useTheme } from '@/Hooks/useTheme';
-import { useUploadQueue } from '@/stores/uploadQueueStore';
-import type {
-  OnboardingState,
-  PublicationTemplate,
-  SocialPlatform,
-  TourStep,
-} from '@/types/onboarding';
+import { shouldDisplayOnboarding } from '@/Layouts/helpers/onboardingHelpers';
+import { useLayoutEffects } from '@/Layouts/hooks/useLayoutEffects';
+import type { AuthenticatedLayoutProps, AuthPageProps } from '@/types/layout';
 import { usePage } from '@inertiajs/react';
-import { ReactNode, lazy, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-
-// Lazy load OnboardingFlow to reduce initial bundle size
-const OnboardingFlow = lazy(() => import('@/Components/Onboarding/OnboardingFlow'));
-
-interface AuthenticatedLayoutProps {
-  header?: ReactNode;
-  children: ReactNode;
-  user?: User;
-}
-
-interface User {
-  name: string;
-  email: string;
-  [key: string]: any;
-}
+import { Suspense, useState } from 'react';
 
 export default function AuthenticatedLayout({ header, children }: AuthenticatedLayoutProps) {
-  const { t } = useTranslation();
-  const { props } = usePage();
-  const auth = props.auth as any;
-  const user = auth?.user as User;
+  const { props } = usePage<AuthPageProps>();
+  const auth = props.auth;
+  const user = auth.user;
 
-  const [showingNavigationDropdown, setShowingNavigationDropdown] = useState<boolean>(false);
+  // ── Hooks (all unconditional — Rules of Hooks) ────────────────────────────
+  const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useSidebarState(true);
-  const [showShortcutsModal, setShowShortcutsModal] = useState<boolean>(false);
+  const [showShortcutsModal, setShowShortcutsModal] = useState(false);
 
-  const { theme, actualTheme } = useTheme();
-  const workspaceBranding = props.auth.current_workspace;
+  useTheme();
   useWorkspaceLocks();
+  useCompletionNotifications();
+  useLayoutEffects({ auth, setShowShortcutsModal });
 
-  // Activar sticky después del 50% del scroll solo en móvil
   const isHeaderSticky = useStickyOnScroll({ threshold: 50, enabled: true });
 
-  // Initialize completion notifications monitoring
-  // Requirements: 8.1, 8.2, 8.3, 8.4, 8.5
-  useCompletionNotifications();
+  // ── Guard (after all hooks) ───────────────────────────────────────────────
+  if (!user) return null;
 
-  // Initialize upload queue store and restore persisted state
-  // Requirements: 7.4, 7.5
-  const initializeStore = useUploadQueue((state) => state.initializeStore);
-
-  useEffect(() => {
-    // Initialize store on mount to restore persisted uploads
-    initializeStore();
-  }, [initializeStore]);
-
-  // Extract onboarding props
-  const onboardingState = props.onboarding as OnboardingState | undefined;
-  const tourSteps = props.tourSteps as TourStep[] | undefined;
-  const availablePlatforms = props.availablePlatforms as SocialPlatform[] | undefined;
-  const connectedAccounts = props.connectedAccounts as
-    | Array<{ platform: string; account_name: string }>
-    | undefined;
-  const templates = props.templates as PublicationTemplate[] | undefined;
-
-  // Determine if onboarding should be shown
-  // Only show onboarding if user was created recently (within 7 days) and hasn't completed it
-  const isRecentUser = user?.created_at
-    ? (new Date().getTime() - new Date(user.created_at).getTime()) / (1000 * 60 * 60 * 24) <= 7
-    : false;
-  const shouldShowOnboarding =
-    user && onboardingState && !onboardingState.completedAt && isRecentUser;
-
-  // Debug logging
-  useEffect(() => {
-    if (user) {
-      const isRecentUser = user?.created_at
-        ? (new Date().getTime() - new Date(user.created_at).getTime()) / (1000 * 60 * 60 * 24) <= 7
-        : false;
-    }
-  }, [user, onboardingState, tourSteps, availablePlatforms, templates, shouldShowOnboarding]);
-
-  useRealtimeInit(user);
-  useBranding(user, workspaceBranding);
-
-  // Keyboard shortcut: Ctrl+/ to toggle shortcuts modal
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if ((event.ctrlKey || event.metaKey) && event.key === '/') {
-        event.preventDefault();
-        setShowShortcutsModal((prev) => !prev);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  // ── Derived ───────────────────────────────────────────────────────────────
+  const showOnboarding = shouldDisplayOnboarding(user, props.onboarding);
 
   return (
     <AbilityProvider>
       <OnboardingProvider>
         <TimezoneInitializer />
 
-        {props['maintenanceMode'] && props['maintenanceBanner'] ? (
-          <MaintenanceBanner message={String(props['maintenanceBanner'])} />
-        ) : null}
+        {props.maintenanceMode && props.maintenanceBanner && (
+          <MaintenanceBanner message={props.maintenanceBanner} />
+        )}
+
         <div className="flex h-screen w-full max-w-full flex-col overflow-hidden">
           <div className="relative flex min-h-0 w-full min-w-0 max-w-full flex-1 overflow-x-hidden">
             <div className="absolute inset-0 bg-white dark:bg-neutral-900" />
@@ -165,9 +96,9 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
                     </div>
                     <div className="flex min-w-0 flex-shrink-0 items-center gap-3">
                       <div className="hidden items-center gap-2 md:flex">
-                        <div className="mx-1 h-6 w-px bg-gray-200 dark:bg-neutral-800"></div>
+                        <div className="mx-1 h-6 w-px bg-gray-200 dark:bg-neutral-800" />
                         <NotificationButton />
-                        <div className="mx-1 h-6 w-px bg-gray-200 dark:bg-neutral-800"></div>
+                        <div className="mx-1 h-6 w-px bg-gray-200 dark:bg-neutral-800" />
                         <ProfileDropdown
                           user={user}
                           isProfileActive={!!route().current('profile.edit')}
@@ -191,48 +122,29 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
 
             <CommandPalette />
           </div>
-          {/* Corner widgets: stacked bottom-right. DevMode sits above Upload when both are active */}
+
           <div className="fixed bottom-4 right-4 z-[9999] flex flex-col items-end gap-2">
             <DevCacheIndicator />
             <GlobalUploadIndicator />
           </div>
+
           <ResumeUploadsPrompt />
           <QueueNotificationFloat />
+
           <KeyboardShortcutsModal
             isOpen={showShortcutsModal}
             onClose={() => setShowShortcutsModal(false)}
           />
 
-          {/* Conditionally render OnboardingFlow for incomplete onboarding */}
-          {/* {shouldShowOnboarding &&
-          tourSteps &&
-          availablePlatforms &&
-          templates && (
+          {showOnboarding && props.tourSteps && props.availablePlatforms && props.templates && (
             <Suspense fallback={null}>
               <OnboardingFlow
-                tourSteps={tourSteps}
-                availablePlatforms={availablePlatforms}
-                connectedAccounts={connectedAccounts || []}
-                templates={templates}
+                tourSteps={props.tourSteps}
+                availablePlatforms={props.availablePlatforms}
+                connectedAccounts={props.connectedAccounts ?? []}
+                templates={props.templates}
               />
             </Suspense>
-          )} */}
-
-          {/* Debug: Show why onboarding is not showing */}
-          {!shouldShowOnboarding && user && (
-            <div style={{ display: 'none' }}>
-              OnboardingFlow not showing: shouldShowOnboarding=
-              {String(shouldShowOnboarding)}
-            </div>
-          )}
-          {shouldShowOnboarding && !tourSteps && (
-            <div style={{ display: 'none' }}>OnboardingFlow not showing: no tourSteps</div>
-          )}
-          {shouldShowOnboarding && !availablePlatforms && (
-            <div style={{ display: 'none' }}>OnboardingFlow not showing: no availablePlatforms</div>
-          )}
-          {shouldShowOnboarding && !templates && (
-            <div style={{ display: 'none' }}>OnboardingFlow not showing: no templates</div>
           )}
         </div>
       </OnboardingProvider>
