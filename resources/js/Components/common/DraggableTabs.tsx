@@ -17,7 +17,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import type { LucideIcon } from 'lucide-react';
 import { GripHorizontal } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 export interface DraggableTab {
   id: string;
@@ -25,8 +25,8 @@ export interface DraggableTab {
   icon?: LucideIcon;
   badge?: number | string;
   enabled?: boolean;
-  locked?: boolean; // No se puede reorganizar
-  planRequired?: string[]; // Planes que requieren este tab
+  locked?: boolean;
+  planRequired?: string[];
 }
 
 interface SortableTabProps {
@@ -39,7 +39,7 @@ interface SortableTabProps {
 const SortableTab = ({ tab, isActive, onTabChange, isDraggable }: SortableTabProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: tab.id,
-    disabled: !isDraggable || tab.locked,
+    disabled: !isDraggable || tab.locked === true,
   });
 
   const style = {
@@ -95,7 +95,7 @@ interface DraggableTabsProps {
   activeTab: string;
   onTabChange: (id: string) => void;
   onTabOrderChange?: (newOrder: string[]) => void;
-  tabOrder?: string[]; // Orden externo de los tabs
+  tabOrder?: string[];
   isDraggable?: boolean;
   currentPlan?: string;
   className?: string;
@@ -131,22 +131,24 @@ export default function DraggableTabs({
     };
   }, []);
 
-  // Estado interno para manejar el orden de los tabs
-  const [orderedTabs, setOrderedTabs] = useState<DraggableTab[]>(() =>
-    getOrderedTabs(initialTabs, tabOrder),
+  const [internalOrder, setInternalOrder] = useState<string[]>(
+    () => tabOrder || initialTabs.map((t) => t.id),
   );
+  const [prevTabOrder, setPrevTabOrder] = useState(tabOrder);
 
-  // Actualizar cuando cambien los tabs externos o el orden
-  useEffect(() => {
-    const newOrderedTabs = getOrderedTabs(initialTabs, tabOrder);
-    // Solo actualizar si realmente cambió el orden
-    const currentIds = orderedTabs.map((t) => t.id).join(',');
-    const newIds = newOrderedTabs.map((t) => t.id).join(',');
-
-    if (currentIds !== newIds) {
-      setOrderedTabs(newOrderedTabs);
+  // Si el padre cambia el tabOrder forzosamente, actualizar el estado local durante el render
+  // (React docs: You might not need an effect - Adjusting some state when a prop changes)
+  if (tabOrder !== prevTabOrder) {
+    setPrevTabOrder(tabOrder);
+    if (tabOrder && tabOrder.length > 0) {
+      setInternalOrder(tabOrder);
     }
-  }, [tabOrder, initialTabs, getOrderedTabs, orderedTabs]);
+  }
+
+  // Siempre calcular los tabs al vuelo para reaccionar a cambios de idioma (labels)
+  const orderedTabs = useMemo(() => {
+    return getOrderedTabs(initialTabs, internalOrder);
+  }, [initialTabs, internalOrder, getOrderedTabs]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -181,18 +183,29 @@ export default function DraggableTabs({
     const newIndex = visibleTabs.findIndex((tab) => tab.id === over.id);
 
     if (oldIndex !== -1 && newIndex !== -1) {
-      // Reordenar todos los tabs (no solo los visibles)
-      const allTabsOldIndex = orderedTabs.findIndex((tab) => tab.id === active.id);
-      const allTabsNewIndex = orderedTabs.findIndex((tab) => tab.id === over.id);
+      // Encontrar los índices en la lista total (no solo visibles)
+      const activeId = active.id.toString();
+      const overId = over.id.toString();
 
-      const newOrderedTabs = arrayMove(orderedTabs, allTabsOldIndex, allTabsNewIndex);
+      const allTabsOldIndex =
+        internalOrder.indexOf(activeId) !== -1
+          ? internalOrder.indexOf(activeId)
+          : orderedTabs.findIndex((t) => t.id === activeId);
 
-      // Actualizar estado interno
-      setOrderedTabs(newOrderedTabs);
+      const allTabsNewIndex =
+        internalOrder.indexOf(overId) !== -1
+          ? internalOrder.indexOf(overId)
+          : orderedTabs.findIndex((t) => t.id === overId);
 
-      // Notificar al padre con el nuevo orden
+      // Si tenemos los IDs en nuestro order array, moverlos
+      const currentOrder = internalOrder.length > 0 ? internalOrder : orderedTabs.map((t) => t.id);
+      const newOrderIds = arrayMove(currentOrder, allTabsOldIndex, allTabsNewIndex);
+
+      // Actualizar estado interno de IDs
+      setInternalOrder(newOrderIds);
+
+      // Notificar al padre
       if (onTabOrderChange) {
-        const newOrderIds = newOrderedTabs.map((tab) => tab.id);
         onTabOrderChange(newOrderIds);
       }
     }
