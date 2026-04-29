@@ -19,8 +19,10 @@ import { useWorkspaceLocks } from '@/Hooks/usePublicationLock';
 import { useSidebarState } from '@/Hooks/useSidebarState';
 import { useStickyOnScroll } from '@/Hooks/useStickyOnScroll';
 import { useTheme } from '@/Hooks/useTheme';
-import { initNotificationRealtime } from '@/Services/notificationRealtime';
-import { cleanupProgressRealtime, initProgressRealtime } from '@/Services/progressRealtime';
+import { useRealtimeInit } from '@/Hooks/useRealtimeInit';
+import { useBranding } from '@/Hooks/useBranding';
+import { cssPropertiesManager } from '@/Utils/CSSCustomPropertiesManager';
+import { useNotificationStore } from '@/stores/notificationStore';
 import { cssPropertiesManager } from '@/Utils/CSSCustomPropertiesManager';
 import { useNotificationStore } from '@/stores/notificationStore';
 import { useUploadQueue } from '@/stores/uploadQueueStore';
@@ -60,6 +62,7 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
   const [showShortcutsModal, setShowShortcutsModal] = useState<boolean>(false);
 
   const { theme, actualTheme } = useTheme();
+  const workspaceBranding = props.auth.current_workspace;
   useWorkspaceLocks();
 
   // Activar sticky después del 50% del scroll solo en móvil
@@ -104,52 +107,8 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
     }
   }, [user, onboardingState, tourSteps, availablePlatforms, templates, shouldShowOnboarding]);
 
-  useEffect(() => {
-    if (user?.id) {
-      initNotificationRealtime(user.id);
-      initProgressRealtime(user.id);
-      useNotificationStore.getState().fetchNotifications();
-    }
-
-    // Cleanup on unmount
-    return () => {
-      if (user?.id) {
-        cleanupProgressRealtime(user.id);
-      }
-    };
-  }, [user?.id]);
-
-  useEffect(() => {
-    const brandingColor = auth?.current_workspace?.white_label_primary_color;
-    // El color de marca es la prioridad salvo que el usuario haya elegido uno manualmente
-    // Para simplificar, si hay marca blanca aplicada, usamos ese color por defecto.
-    const color = user?.theme_color || brandingColor || 'orange';
-
-    cssPropertiesManager.applyPrimaryColor(color);
-
-    // Dynamically update favicon
-    const faviconUrl = auth?.current_workspace?.white_label_favicon_url || '/favicon.ico';
-
-    // Find all icon links (icon, shortcut icon, apple-touch-icon)
-    const existingLinks = document.querySelectorAll("link[rel*='icon']");
-    const timestamp = new Date().getTime();
-    const newHref = `${faviconUrl}?v=${timestamp}`;
-
-    if (existingLinks.length > 0) {
-      existingLinks.forEach((link) => {
-        (link as HTMLLinkElement).href = newHref;
-      });
-    } else {
-      const link = document.createElement('link');
-      link.rel = 'icon';
-      link.href = newHref;
-      document.head.appendChild(link);
-    }
-  }, [
-    user?.theme_color,
-    auth?.current_workspace?.white_label_primary_color,
-    auth?.current_workspace?.white_label_favicon_url,
-  ]);
+  useRealtimeInit(user);
+  useBranding(user, workspaceBranding);
 
   // Keyboard shortcut: Ctrl+/ to toggle shortcuts modal
   useEffect(() => {
@@ -169,11 +128,10 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
       <OnboardingProvider>
         <TimezoneInitializer />
 
-        {/* Banner de mantenimiento para super admins */}
-        {props.maintenanceMode && props.maintenanceBanner ? (
-          <MaintenanceBanner message={String(props.maintenanceBanner)} />
+        {props['maintenanceMode'] && props['maintenanceBanner'] ? (
+          <MaintenanceBanner message={String(props['maintenanceBanner'])} />
         ) : null}
-        <div className="flex w-full max-w-full flex-col overflow-hidden">
+        <div className="flex h-screen w-full max-w-full flex-col overflow-hidden">
           <div className="relative flex min-h-0 w-full min-w-0 max-w-full flex-1 overflow-x-hidden">
             <div className="absolute inset-0 bg-white dark:bg-neutral-900" />
 
@@ -196,6 +154,7 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
                 <header
                   className={`${isHeaderSticky ? 'sticky top-0' : 'relative'} z-40 flex min-w-0 flex-col border-b border-gray-200/50 bg-white/80 backdrop-blur-xl transition-all duration-300 dark:border-neutral-800 dark:bg-black/80 lg:sticky lg:top-0`}
                 >
+                  {/* @ts-expect-error route() is missing zero-argument overload in local types */}
                   {!route().current('workspaces.*') && (
                     <div className="w-full">
                       <ActiveWorkspace />
