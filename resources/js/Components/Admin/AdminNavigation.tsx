@@ -47,7 +47,7 @@ export default function AdminNavigation({ currentRoute }: AdminNavigationProps) 
   };
 
   return (
-    <div className="bg-white shadow-sm dark:bg-gray-800 mx-auto max-w-7xl">
+    <div className="mx-auto max-w-7xl bg-white shadow-sm dark:bg-gray-800">
       <div className="">
         <SettingsTabs
           tabs={navItems.map((item) => ({
