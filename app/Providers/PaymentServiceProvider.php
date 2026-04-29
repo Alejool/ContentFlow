@@ -7,6 +7,11 @@ use App\Services\Payment\PaymentGatewayFactory;
 use App\Services\Payment\PaymentGatewayInterface;
 use App\Services\Payment\CountryDetectionService;
 use App\Services\Payment\CurrencyConversionService;
+use App\Services\Payment\Gateways\StripeGateway;
+use App\Services\Payment\Gateways\MercadoPagoManualGateway;
+use App\Services\Payment\Gateways\WompiGateway;
+use App\Services\Payment\Gateways\PayUGateway;
+use App\Services\Payment\Gateways\EpaycoGateway;
 
 /**
  * Service Provider para servicios de pago
@@ -34,11 +39,11 @@ class PaymentServiceProvider extends ServiceProvider
         // NOTA: Los gateways son seguros como Singletons porque solo mantienen
         // configuración (API keys, HTTP clients) y no estado por request.
         // Cada método recibe workspace/user como parámetros, no los almacena.
-        $this->app->singleton(\App\Services\Payment\Gateways\StripeGateway::class);
-        $this->app->singleton(\App\Services\Payment\Gateways\MercadoPagoManualGateway::class);
-        $this->app->singleton(\App\Services\Payment\Gateways\WompiGateway::class);
-        $this->app->singleton(\App\Services\Payment\Gateways\PayUGateway::class);
-        $this->app->singleton(\App\Services\Payment\Gateways\EpaycoGateway::class);
+        $this->app->singleton(StripeGateway::class);
+        $this->app->singleton(MercadoPagoManualGateway::class);
+        $this->app->singleton(WompiGateway::class);
+        $this->app->singleton(PayUGateway::class);
+        $this->app->singleton(EpaycoGateway::class);
         
         // Binding condicional: resolver gateway según contexto del usuario
         // NOTA: No usar auth() o request() en register() - se resuelve en tiempo de ejecución
