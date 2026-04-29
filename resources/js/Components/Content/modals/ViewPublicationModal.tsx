@@ -183,8 +183,7 @@ export default function ViewPublicationModal({
           </div>
 
           <div className="flex flex-shrink-0 justify-between gap-3 border-t border-gray-100 p-6 dark:border-neutral-700">
-            <div>
-            </div>
+            <div></div>
             <div className="flex gap-3">
               {isActuallyPublication && item.id && (
                 <ClientPortalButton publicationId={item.id} status={(item as any).status} />
