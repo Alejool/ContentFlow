@@ -1,109 +1,86 @@
 import StatCard from '@/Components/Workspace/StatCard';
-import {
-  Activity,
-  Clock,
-  Database,
-  SettingsIcon,
-  Share2,
-  UserPlus,
-  Users,
-  Zap,
-} from 'lucide-react';
-import { useState } from 'react';
-import toast from 'react-hot-toast';
+import { buildQuickActions, buildStats } from '@/Components/Workspace/overviewTab.config';
+import type {
+  OverviewTabProps,
+  QuickAction,
+  StatItem,
+} from '@/Components/Workspace/overviewTab.types';
+import { motion, type Variants } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-interface OverviewTabProps {
-  workspace: any;
-  auth: any;
-  onTabChange: (tab: any) => void;
-}
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 6 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.25, ease: 'easeOut' } },
+};
 
-export default function OverviewTab({ workspace, auth, onTabChange }: OverviewTabProps) {
-  const { t } = useTranslation();
-  const [loading, setLoading] = useState(false);
-
-  const quickActions = [
-    {
-      icon: UserPlus,
-      label: t('workspace.quick_actions.invite_members'),
-      description: t('workspace.quick_actions.invite_members_description'),
-      action: () => onTabChange('members'),
-      color: 'from-blue-500 to-cyan-500',
-    },
-    {
-      icon: Share2,
-      label: t('workspace.quick_actions.share_workspace'),
-      description: t('workspace.quick_actions.share_workspace_description'),
-      action: () => {
-        onTabChange('general');
-        // Scroll to public invites if possible or just show general
-        toast.success(t('workspace.quick_actions.share_workspace_description'));
-      },
-      color: 'from-purple-500 to-pink-500',
-    },
-    {
-      icon: SettingsIcon,
-      label: t('workspace.quick_actions.settings'),
-      description: t('workspace.quick_actions.settings_description'),
-      action: () => onTabChange('general'),
-      color: 'from-emerald-500 to-green-500',
-    },
-    {
-      icon: Zap,
-      label: t('workspace.quick_actions.integrations'),
-      description: t('workspace.quick_actions.integrations_description'),
-      action: () => onTabChange('integrations'),
-      color: 'from-amber-500 to-orange-500',
-    },
-  ];
-
-  const activeIntegrationsCount = [
-    workspace.slack_webhook_url,
-    workspace.discord_webhook_url,
-  ].filter(Boolean).length;
-
-  const workspaceAge = Math.floor(
-    (new Date().getTime() - new Date(workspace.created_at).getTime()) / (1000 * 60 * 60 * 24 * 30),
-  );
-
+function QuickActionCard({ action }: { action: QuickAction }) {
   return (
-    <div className="space-y-8">
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          icon={Users}
-          label={t('workspace.stats.total_members')}
-          value={workspace.users?.length || 0}
-          color="blue"
-        />
-        <StatCard
-          icon={Activity}
-          label={t('workspace.stats.active_integrations')}
-          value={activeIntegrationsCount}
-          color="green"
-        />
+    <motion.button
+      variants={fadeUp}
+      onClick={action.action}
+      className="group flex w-full items-center gap-4 rounded-xl border border-gray-100 bg-white p-4 text-left transition-all duration-200 hover:border-gray-200 hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-neutral-700"
+    >
+      <div
+        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-transform duration-200 group-hover:scale-105 ${action.iconBg}`}
+      >
+        <action.icon className={`h-5 w-5 ${action.iconColor}`} />
       </div>
 
-      <div className="rounded-lg border border-white/70 bg-gradient-to-br from-white/90 to-white/95 p-6 dark:border-black/70 dark:from-black/90 dark:to-black/95">
-        <h3 className="mb-6 text-xl font-bold text-gray-900 dark:text-white">
-          {t('workspace.quick_actions.title')}
-        </h3>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {quickActions.map((action) => (
-            <button
-              key={action.label}
-              onClick={action.action}
-              disabled={loading}
-              className="group rounded-lg border border-gray-200 bg-gradient-to-br from-white to-gray-50 p-5 text-left transition-all duration-300 hover:-translate-y-1 hover:border-primary-300 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800 dark:from-neutral-900 dark:to-neutral-950 dark:hover:border-primary-700"
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-semibold text-gray-900 dark:text-white">
+          {action.label}
+        </p>
+        <p className="truncate text-xs text-gray-500 dark:text-neutral-400">{action.description}</p>
+      </div>
+
+      <ArrowRight className="h-4 w-4 shrink-0 text-gray-300 transition-colors duration-200 group-hover:text-gray-500 dark:text-neutral-600 dark:group-hover:text-neutral-400" />
+    </motion.button>
+  );
+}
+
+export default function OverviewTab({ workspace, onTabChange }: OverviewTabProps) {
+  const { t } = useTranslation();
+
+  const quickActions = buildQuickActions(onTabChange, t);
+  const stats: StatItem[] = buildStats(workspace, t);
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {stats.map((stat, i) => (
+          <motion.div
+            key={stat.key}
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            transition={{ delay: i * 0.06 }}
+          >
+            <StatCard icon={stat.icon} label={stat.label} value={stat.value} color={stat.color} />
+          </motion.div>
+        ))}
+      </div>
+
+      <div className="rounded-xl border border-gray-100 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="border-b border-gray-100 px-5 py-4 dark:border-neutral-800">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+            {t('workspace.quick_actions.title')}
+          </h3>
+        </div>
+
+        <div className="grid grid-cols-1 gap-3 p-5 sm:grid-cols-2">
+          {quickActions.map((action, i) => (
+            <motion.div
+              key={action.key}
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.06 }}
             >
-              <div
-                className={`h-12 w-12 rounded-lg ${action.color} mb-3 flex items-center justify-center transition-transform group-hover:scale-110`}
-              >
-                <action.icon className="h-6 w-6 text-white" />
-              </div>
-              <h4 className="mb-1 font-bold text-gray-900 dark:text-white">{action.label}</h4>
-              <p className="text-sm text-gray-500 dark:text-neutral-500">{action.description}</p>
-            </button>
+              <QuickActionCard action={action} />
+            </motion.div>
           ))}
         </div>
       </div>

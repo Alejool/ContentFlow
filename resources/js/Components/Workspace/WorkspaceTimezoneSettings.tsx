@@ -6,10 +6,14 @@ import { Globe } from 'lucide-react';
 
 interface WorkspaceTimezoneSettingsProps {
   canManage?: boolean;
+  hideButton?: boolean;
+  onTimezoneChange?: (timezone: string) => void;
 }
 
 export const WorkspaceTimezoneSettings: React.FC<WorkspaceTimezoneSettingsProps> = ({
   canManage = false,
+  hideButton = false,
+  onTimezoneChange,
 }) => {
   const { t } = useTranslation();
   const { workspaceTimezone, effectiveTimezone, updateWorkspaceTimezone } = useTimezoneStore();
@@ -17,6 +21,13 @@ export const WorkspaceTimezoneSettings: React.FC<WorkspaceTimezoneSettingsProps>
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  const handleTimezoneChange = (value: string) => {
+    setSelectedTimezone(value);
+    if (onTimezoneChange) {
+      onTimezoneChange(value);
+    }
+  };
 
   // Lista de timezones comunes
   const COMMON_TIMEZONES = [
@@ -110,10 +121,10 @@ export const WorkspaceTimezoneSettings: React.FC<WorkspaceTimezoneSettingsProps>
         <div className="mb-6">
           <Select
             id="workspace-timezone"
-            label={t('workspace.timezone.select_label')}
+            label={hideButton ? undefined : t('workspace.timezone.select_label')}
             options={COMMON_TIMEZONES}
             value={selectedTimezone}
-            onChange={(value) => setSelectedTimezone(value as string)}
+            onChange={(value) => handleTimezoneChange(value as string)}
             disabled={!canManage || isLoading}
             searchable
             icon={Globe}
@@ -144,7 +155,7 @@ export const WorkspaceTimezoneSettings: React.FC<WorkspaceTimezoneSettingsProps>
         )}
 
         {/* Save Button */}
-        {canManage && (
+        {canManage && !hideButton && (
           <div className="flex items-center justify-between border-t border-gray-100 pt-6 dark:border-neutral-800">
             <p className="text-sm text-gray-500 dark:text-gray-400">
               {hasChanges

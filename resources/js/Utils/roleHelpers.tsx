@@ -6,8 +6,8 @@
  * Used by InviteMemberModal, RolesManagementTab, RoleBadge, etc.
  */
 
-import { Crown, Eye, PencilLine, Shield, ShieldCheck, User, UserCog } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { Crown, Eye, PencilLine, Shield, ShieldCheck, User, UserCog } from 'lucide-react';
 
 export interface RoleConfig {
   /** Role slug (e.g. 'owner', 'admin', 'editor') */
@@ -16,19 +16,15 @@ export interface RoleConfig {
   label: string;
   /** Lucide icon component */
   icon: LucideIcon;
-  /**
-   * Tailwind gradient classes for the icon container background.
-   * Format: 'from-X-500 to-Y-500'
-   */
+  /** Tailwind gradient classes for the icon container (from-X to-Y) */
   gradient: string;
-  /**
-   * Tailwind text color classes used in badges / labels.
-   * Format: 'text-X-700 dark:text-X-400'
-   */
+  /** Flat icon bg for flat-style icon containers */
+  iconBg: string;
+  /** Flat icon colour for flat-style icon containers */
+  iconColor: string;
+  /** Tailwind text color classes used in badges / labels */
   textColor: string;
-  /**
-   * Tailwind border + bg classes used in badges.
-   */
+  /** Tailwind classes used in pill badges */
   badgeClass: string;
 }
 
@@ -38,49 +34,64 @@ export interface RoleConfig {
  */
 export const ROLE_CONFIGS: RoleConfig[] = [
   {
+    // ── Owner — amber/gold: highest privilege, stands out immediately
     slug: 'owner',
     label: 'Owner',
     icon: Crown,
-    gradient: 'from-amber-500 to-orange-500',
+    gradient: 'from-amber-400 to-yellow-500',
+    iconBg: 'bg-amber-50 dark:bg-amber-500/10',
+    iconColor: 'text-amber-600 dark:text-amber-400',
     textColor: 'text-amber-700 dark:text-amber-400',
     badgeClass:
-      'bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800/50',
+      'bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/30',
   },
   {
+    // ── Admin — sky blue: trusted, elevated but not owner
     slug: 'admin',
     label: 'Admin',
     icon: ShieldCheck,
-    gradient: 'from-primary-500 to-primary-600',
-    textColor: 'text-primary-700 dark:text-primary-400',
+    gradient: 'from-sky-500 to-blue-600',
+    iconBg: 'bg-sky-50 dark:bg-sky-500/10',
+    iconColor: 'text-sky-600 dark:text-sky-400',
+    textColor: 'text-sky-700 dark:text-sky-400',
     badgeClass:
-      'bg-primary-50 text-primary-700 border border-primary-200 dark:bg-primary-900/20 dark:text-primary-400 dark:border-primary-800/50',
+      'bg-sky-50 text-sky-800 border border-sky-200 dark:bg-sky-500/10 dark:text-sky-400 dark:border-sky-500/30',
   },
   {
+    // ── Editor — violet/indigo: creative, content-focused
     slug: 'editor',
     label: 'Editor',
     icon: PencilLine,
-    gradient: 'from-indigo-500 to-blue-500',
-    textColor: 'text-indigo-700 dark:text-indigo-400',
+    gradient: 'from-violet-500 to-indigo-600',
+    iconBg: 'bg-violet-50 dark:bg-violet-500/10',
+    iconColor: 'text-violet-600 dark:text-violet-400',
+    textColor: 'text-violet-700 dark:text-violet-400',
     badgeClass:
-      'bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-800/50',
+      'bg-violet-50 text-violet-800 border border-violet-200 dark:bg-violet-500/10 dark:text-violet-400 dark:border-violet-500/30',
   },
   {
+    // ── Member — emerald: standard collaborator
     slug: 'member',
     label: 'Member',
     icon: User,
-    gradient: 'from-emerald-500 to-green-500',
+    gradient: 'from-emerald-500 to-teal-600',
+    iconBg: 'bg-emerald-50 dark:bg-emerald-500/10',
+    iconColor: 'text-emerald-600 dark:text-emerald-400',
     textColor: 'text-emerald-700 dark:text-emerald-400',
     badgeClass:
-      'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800/50',
+      'bg-emerald-50 text-emerald-800 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30',
   },
   {
+    // ── Viewer — neutral slate: read-only, minimal prominence
     slug: 'viewer',
     label: 'Viewer',
     icon: Eye,
-    gradient: 'from-slate-500 to-zinc-500',
-    textColor: 'text-slate-700 dark:text-slate-400',
+    gradient: 'from-slate-400 to-gray-500',
+    iconBg: 'bg-slate-50 dark:bg-slate-500/10',
+    iconColor: 'text-slate-500 dark:text-slate-400',
+    textColor: 'text-slate-600 dark:text-slate-400',
     badgeClass:
-      'bg-slate-50 text-slate-700 border border-slate-200 dark:bg-slate-900/20 dark:text-slate-400 dark:border-slate-800/50',
+      'bg-slate-50 text-slate-700 border border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/30',
   },
 ];
 
@@ -89,10 +100,12 @@ const FALLBACK_CONFIG: RoleConfig = {
   slug: 'unknown',
   label: 'Member',
   icon: UserCog,
-  gradient: 'from-slate-400 to-gray-400',
-  textColor: 'text-gray-700 dark:text-gray-400',
+  gradient: 'from-gray-400 to-slate-400',
+  iconBg: 'bg-gray-50 dark:bg-gray-500/10',
+  iconColor: 'text-gray-500 dark:text-gray-400',
+  textColor: 'text-gray-600 dark:text-gray-400',
   badgeClass:
-    'bg-gradient-to-r from-gray-500/20 to-slate-500/20 text-gray-700 dark:text-gray-400 border border-gray-200 dark:border-gray-800/50',
+    'bg-gray-50 text-gray-700 border border-gray-200 dark:bg-gray-500/10 dark:text-gray-400 dark:border-gray-500/30',
 };
 
 /**

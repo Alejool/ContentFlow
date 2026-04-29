@@ -39,7 +39,7 @@ export default function Index({ workspaces, roles }: { workspaces: any[]; roles:
       }
     >
       <Head title={t('workspace.my_workspaces')} />
-      <div className="min-h-screen">
+      <div>
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 p-10 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {workspaces.map((workspace) => (
             <WorkspaceCard

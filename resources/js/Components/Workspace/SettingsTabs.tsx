@@ -1,10 +1,13 @@
-import { TabNavigation } from '@/Components/common/TabNavigation';
 import type { Tab as TabNavigationType } from '@/Components/common/TabNavigation';
+import { TabNavigation } from '@/Components/common/TabNavigation';
+
+import type { SettingsTab } from '@/Pages/Workspace/settings.types';
+import type { LucideIcon } from 'lucide-react';
 
 interface Tab {
   id: string;
   label: string;
-  icon: any;
+  icon: LucideIcon;
   planRequired?: string[];
   locked?: boolean;
   enabled?: boolean;
@@ -14,7 +17,7 @@ interface Tab {
 interface SettingsTabsProps {
   tabs: Tab[];
   activeTab: string;
-  onTabChange: (tab: string) => void;
+  onTabChange: (tab: SettingsTab) => void;
   onTabOrderChange?: (newOrder: string[]) => void;
   tabOrder?: string[];
   isDraggable?: boolean;
@@ -30,7 +33,6 @@ export default function SettingsTabs({
   isDraggable = false,
   currentPlan = 'demo',
 }: SettingsTabsProps) {
-  // Convertir tabs al formato esperado por TabNavigation
   const navigationTabs: TabNavigationType[] = tabs.map((tab) => {
     const navTab: TabNavigationType = {
       key: tab.id,
@@ -51,7 +53,7 @@ export default function SettingsTabs({
       <TabNavigation
         tabs={navigationTabs}
         activeTab={activeTab}
-        onTabChange={onTabChange}
+        onTabChange={(key) => onTabChange(key as SettingsTab)}
         {...(onTabOrderChange && { onTabOrderChange })}
         {...(tabOrder && { tabOrder })}
         isDraggable={isDraggable}

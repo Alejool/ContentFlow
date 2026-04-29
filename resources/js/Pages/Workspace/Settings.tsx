@@ -12,30 +12,21 @@ import WorkspaceSettingsHeader from '@/Components/Workspace/WorkspaceSettingsHea
 import AlertCard from '@/Components/common/Modern/AlertCard';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
-import {
-  CheckCircle,
-  Key,
-  Palette,
-  Settings as SettingsIcon,
-  Share2,
-  Shield,
-  Sparkles,
-  TrendingUp,
-  Users,
-} from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import {
+  buildTabs,
+  loadTabOrder,
+  resolveApprovalAccess,
+  resolveIsOwner,
+  resolvePlanId,
+  resolveUserRole,
+  saveTabOrder,
+} from './settings.helpers';
+import type { SettingsTab, WorkspaceSettingsProps } from './settings.types';
 
-interface WorkspaceSettingsProps {
-  workspace: any;
-  roles: any[];
-  permissions: any[];
-  auth: any;
-  current_workspace?: any;
-}
-
-const EMPTY_ROLES: any[] = [];
-const EMPTY_PERMISSIONS: any[] = [];
+const EMPTY_ROLES: NonNullable<WorkspaceSettingsProps['roles']> = [];
+const EMPTY_PERMISSIONS: NonNullable<WorkspaceSettingsProps['permissions']> = [];
 
 export default function WorkspaceSettings({
   workspace,
@@ -46,196 +37,48 @@ export default function WorkspaceSettings({
 }: WorkspaceSettingsProps) {
   const { t } = useTranslation();
 
-  const current_workspace = workspace || globalWorkspace;
 
-  const params = new URLSearchParams(window.location.search);
-  const initialTab = params.get('tab');
-  const [activeTab, setActiveTab] = useState<
-    | 'general'
-    | 'members'
-    | 'roles'
-    | 'integrations'
-    | 'overview'
-    | 'usage'
-    | 'white-label'
-    | 'api'
-    | 'support'
-    | 'approvals'
-  >((initialTab as any) || 'overview');
+  const current_workspace = workspace ?? globalWorkspace;
 
-  // Cargar el orden de tabs guardado
-  const [tabOrder, setTabOrder] = useState<string[]>(() => {
-    if (typeof window !== 'undefined' && current_workspace?.id) {
-      const saved = localStorage.getItem(`workspace_${current_workspace.id}_tab_order`);
-      return saved ? JSON.parse(saved) : [];
-    }
-    return [];
-  });
+  const initialTab = new URLSearchParams(window.location.search).get('tab') as SettingsTab | null;
+  const [activeTab, setActiveTab] = useState<SettingsTab>(initialTab ?? 'overview');
+  const [tabOrder, setTabOrder] = useState<SettingsTab[]>(() =>
+    current_workspace ? loadTabOrder(current_workspace.id) : [],
+  );
 
   if (!current_workspace || !roles) {
     return (
       <AuthenticatedLayout>
         <Head title={t('workspace.settings')} />
-        <div className="flex min-h-[60vh] flex-col items-center justify-center">
-          <div className="mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-primary-600"></div>
-          <p className="text-lg font-medium text-gray-700 dark:text-neutral-300">
+        <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
+          <div className="h-10 w-10 animate-spin rounded-full border-b-2 border-primary-600" />
+          <p className="text-sm font-medium text-gray-600 dark:text-neutral-400">
             {t('common.loading')}
           </p>
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            Cargando configuración del workspace...
-          </p>
-          <div className="mt-4 rounded-lg bg-yellow-50 p-4 text-sm dark:bg-yellow-900/20">
-            <p>Debug info:</p>
-            <p>Workspace: {current_workspace ? '✓' : '✗'}</p>
-            <p>Roles: {roles ? '✓' : '✗'}</p>
-            <p>Auth: {auth ? '✓' : '✗'}</p>
-          </div>
         </div>
       </AuthenticatedLayout>
     );
   }
 
-  // Encuentra el usuario actual en el workspace
-  const currentUser = current_workspace.users
-    ? Array.isArray(current_workspace.users)
-      ? current_workspace.users.find((u: any) => Number(u.id) === Number(auth.user.id))
-      : Object.values(current_workspace.users).find(
-          (u: any) => Number(u.id) === Number(auth.user.id),
-        )
-    : null;
-
-  const userRole = currentUser?.pivot?.role?.slug || currentUser?.role?.slug || 'member';
-  const isOwner =
-    Number(current_workspace.created_by) === Number(auth.user.id) || userRole === 'owner';
-
+  const userRole = resolveUserRole(current_workspace, auth);
+  const isOwner = resolveIsOwner(current_workspace, auth, userRole);
   const canManageWorkspace = isOwner || userRole === 'admin';
+  const planId = resolvePlanId(current_workspace);
+  const isEnterprise = planId === 'enterprise' || !!current_workspace.features?.white_label;
+  const hasApprovalAccess = resolveApprovalAccess(current_workspace, planId);
 
-  // Get plan ID with multiple fallbacks
-  const planId = (
-    current_workspace.subscription?.plan ||
-    current_workspace.plan ||
-    'demo'
-  ).toLowerCase();
+  const tabs = buildTabs({ t, canManageWorkspace, hasApprovalAccess, isEnterprise, isOwner });
 
-  const isEnterprise = planId === 'enterprise' || current_workspace.features?.white_label;
-
-  const tabs: Array<{
-    id: string;
-    label: string;
-    icon: any;
-    locked?: boolean;
-    planRequired?: string[];
-  }> = [
-    {
-      id: 'overview',
-      label: t('workspace.tabs.overview') || 'Overview',
-      icon: Sparkles,
-      locked: true,
-    },
-    {
-      id: 'usage',
-      label: 'Uso del Plan',
-      icon: TrendingUp,
-    },
-    {
-      id: 'general',
-      label: t('workspace.tabs.general') || 'General',
-      icon: SettingsIcon,
-    },
-    {
-      id: 'members',
-      label: t('workspace.tabs.members') || 'Members',
-      icon: Users,
-    },
-    {
-      id: 'roles',
-      label: t('workspace.tabs.roles') || 'Roles',
-      icon: Shield,
-    },
-    {
-      id: 'integrations',
-      label: t('workspace.tabs.integrations') || 'Integrations',
-      icon: Share2,
-    },
-  ];
-
-  // Obtener características del plan desde el workspace
-  const planFeatures = current_workspace.features || {};
-  const approvalWorkflowFeature = planFeatures.approval_workflows;
-
-  // Determinar si tiene acceso a aprobaciones basado en el plan
-  // SOLO Enterprise tiene acceso a aprobaciones
-  let hasApprovalAccess = false;
-
-  if (approvalWorkflowFeature !== undefined) {
-    // Si tenemos features del backend, solo 'advanced' tiene acceso
-    hasApprovalAccess = approvalWorkflowFeature === 'advanced';
-  } else {
-    // Fallback: SOLO Enterprise tiene acceso
-    hasApprovalAccess = planId === 'enterprise';
-  }
-
-  // Determinar nivel de acceso a aprobaciones (siempre advanced si tiene acceso)
-  const hasAdvancedApprovalAccess = hasApprovalAccess;
-
-  // Debug: verificar qué está llegando
-  console.log('🔍 Settings.tsx - Plan Features Debug:', {
-    workspace_id: current_workspace.id,
-    workspace_name: current_workspace.name,
-    planId,
-    features: current_workspace.features,
-    planFeatures,
-    approvalWorkflowFeature,
-    hasApprovalAccess,
-    hasAdvancedApprovalAccess,
-    subscription: current_workspace.subscription,
-  });
-
-  // Solo mostrar el tab de aprobaciones si es Enterprise
-  if (canManageWorkspace && hasApprovalAccess) {
-    tabs.splice(4, 0, {
-      id: 'approvals',
-      label: t('workspace.tabs.approvals') || 'Aprobaciones',
-      icon: CheckCircle,
-      planRequired: ['enterprise'], // SOLO Enterprise
-    });
-  }
-
-  if (isEnterprise && isOwner) {
-    tabs.push(
-      {
-        id: 'white-label',
-        label: t('workspace.tabs.white_label') || 'White-label',
-        icon: Palette,
-        planRequired: ['enterprise'], // Solo para enterprise
-      },
-      {
-        id: 'api',
-        label: t('workspace.tabs.api') || 'API Access',
-        icon: Key,
-        planRequired: ['enterprise'], // Solo para enterprise
-      },
-      // {
-      //   id: "support",
-      //   label: t("workspace.tabs.support") || "Enterprise Support",
-      //   icon: Layout,
-      //   planRequired: ["enterprise"], // Solo para enterprise
-      // },
-    );
-  }
+  const handleTabChange = (tab: SettingsTab) => setActiveTab(tab);
 
   const renderTabContent = () => {
     switch (activeTab) {
       case 'overview':
-        return (
-          <OverviewTab
-            workspace={current_workspace}
-            auth={auth}
-            onTabChange={(tab: any) => setActiveTab(tab)}
-          />
-        );
+        return <OverviewTab workspace={current_workspace} onTabChange={handleTabChange} />;
+
       case 'usage':
         return <PlanUsageTab workspace={current_workspace} />;
+
       case 'general':
         return (
           <GeneralSettingsTab
@@ -243,8 +86,10 @@ export default function WorkspaceSettings({
             canManageWorkspace={canManageWorkspace}
           />
         );
+
       case 'members':
         return <MembersManagement roles={roles} workspace={current_workspace} />;
+
       case 'roles':
         return (
           <RolesManagementTab
@@ -255,6 +100,7 @@ export default function WorkspaceSettings({
             canManageWorkspace={canManageWorkspace}
           />
         );
+
       case 'integrations':
         return (
           <IntegrationsSettingsTab
@@ -263,6 +109,7 @@ export default function WorkspaceSettings({
             canManageWorkspace={canManageWorkspace}
           />
         );
+
       case 'white-label':
         return (
           <WhiteLabelSettingsTab
@@ -270,61 +117,45 @@ export default function WorkspaceSettings({
             canManageWorkspace={canManageWorkspace}
           />
         );
+
       case 'api':
         return (
           <ApiSettingsTab workspace={current_workspace} canManageWorkspace={canManageWorkspace} />
         );
+
       case 'approvals':
         if (!canManageWorkspace || !hasApprovalAccess) {
-          return (
-            <OverviewTab
-              workspace={current_workspace}
-              auth={auth}
-              onTabChange={(tab: any) => setActiveTab(tab)}
-            />
-          );
+          return <OverviewTab workspace={current_workspace} onTabChange={handleTabChange} />;
         }
         return (
           <ApprovalWorkflowsTab
             workspace={current_workspace}
             roles={roles}
             canManageWorkspace={canManageWorkspace}
-            hasAdvancedAccess={hasAdvancedApprovalAccess}
+            hasAdvancedAccess={hasApprovalAccess}
           />
         );
-      // case "support":
-      //   return <EnterpriseSupportTab />;
+
       default:
-        return (
-          <OverviewTab
-            workspace={current_workspace}
-            auth={auth}
-            onTabChange={(tab: any) => setActiveTab(tab)}
-          />
-        );
+        return <OverviewTab workspace={current_workspace} onTabChange={handleTabChange} />;
     }
   };
 
   return (
     <AuthenticatedLayout header={<WorkspaceSettingsHeader workspace={current_workspace} />}>
-      <Head title={`${current_workspace.name} - ${t('workspace.settings')}`} />
+      <Head title={`${current_workspace.name} — ${t('workspace.settings')}`} />
 
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
         <SettingsTabs
           tabs={tabs}
           activeTab={activeTab}
-          onTabChange={(tab: any) => setActiveTab(tab)}
-          isDraggable={canManageWorkspace} // Solo admins/owners pueden reorganizar
+          onTabChange={handleTabChange}
+          isDraggable={canManageWorkspace}
           currentPlan={planId}
           tabOrder={tabOrder}
           onTabOrderChange={(newOrder) => {
-            // Actualizar estado local
-            setTabOrder(newOrder);
-            // Guardar el nuevo orden en localStorage
-            localStorage.setItem(
-              `workspace_${current_workspace.id}_tab_order`,
-              JSON.stringify(newOrder),
-            );
+            setTabOrder(newOrder as SettingsTab[]);
+            saveTabOrder(current_workspace.id, newOrder as SettingsTab[]);
           }}
         />
 
@@ -337,7 +168,7 @@ export default function WorkspaceSettings({
           />
         )}
 
-        <div className="min-h-screen">{renderTabContent()}</div>
+        <div className="">{renderTabContent()}</div>
       </div>
     </AuthenticatedLayout>
   );

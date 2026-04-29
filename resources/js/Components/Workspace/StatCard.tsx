@@ -1,92 +1,59 @@
-import { useTheme } from '@/Hooks/useTheme';
+import type { LucideIcon } from 'lucide-react';
 
 interface StatCardProps {
-  icon: any;
+  icon: LucideIcon;
   label: string;
   value: string | number;
   trend?: number;
   color?: 'blue' | 'purple' | 'green' | 'orange' | 'primary';
 }
 
-export default function StatCard({
-  icon: Icon,
-  label,
-  value,
-  trend,
-  color = 'blue',
-}: StatCardProps) {
-  const { actualTheme } = useTheme();
-  const isDark = actualTheme === 'dark';
+const COLOR_MAP = {
+  blue: {
+    iconBg: 'bg-blue-50 dark:bg-blue-500/10',
+    iconColor: 'text-blue-600 dark:text-blue-400',
+    border: 'border-blue-100 dark:border-blue-900/40',
+  },
+  purple: {
+    iconBg: 'bg-violet-50 dark:bg-violet-500/10',
+    iconColor: 'text-violet-600 dark:text-violet-400',
+    border: 'border-violet-100 dark:border-violet-900/40',
+  },
+  green: {
+    iconBg: 'bg-emerald-50 dark:bg-emerald-500/10',
+    iconColor: 'text-emerald-600 dark:text-emerald-400',
+    border: 'border-emerald-100 dark:border-emerald-900/40',
+  },
+  orange: {
+    iconBg: 'bg-orange-50 dark:bg-orange-500/10',
+    iconColor: 'text-orange-600 dark:text-orange-400',
+    border: 'border-orange-100 dark:border-orange-900/40',
+  },
+  primary: {
+    iconBg: 'bg-primary-50 dark:bg-primary-500/10',
+    iconColor: 'text-primary-600 dark:text-primary-400',
+    border: 'border-primary-100 dark:border-primary-900/40',
+  },
+} as const;
 
-  const colorMap = {
-    blue: {
-      gradient: isDark ? 'from-blue-600 to-blue-800' : 'from-blue-500 to-blue-600',
-      iconBg: isDark ? 'bg-blue-500/20' : 'bg-blue-50',
-      border: isDark ? 'border-blue-700/50' : 'border-blue-200',
-      text: isDark ? 'text-blue-300' : 'text-blue-600',
-      glow: 'from-blue-600/20',
-    },
-    purple: {
-      gradient: isDark ? 'from-purple-600 to-purple-800' : 'from-purple-500 to-purple-600',
-      iconBg: isDark ? 'bg-purple-500/20' : 'bg-purple-50',
-      border: isDark ? 'border-purple-700/50' : 'border-purple-200',
-      text: isDark ? 'text-purple-300' : 'text-purple-600',
-      glow: 'from-purple-600/20',
-    },
-    green: {
-      gradient: isDark ? 'from-emerald-600 to-emerald-800' : 'from-emerald-500 to-emerald-600',
-      iconBg: isDark ? 'bg-emerald-500/20' : 'bg-emerald-50',
-      border: isDark ? 'border-emerald-700/50' : 'border-emerald-200',
-      text: isDark ? 'text-emerald-300' : 'text-emerald-600',
-      glow: 'from-emerald-600/20',
-    },
-    orange: {
-      gradient: isDark ? 'from-orange-600 to-orange-800' : 'from-orange-500 to-orange-600',
-      iconBg: isDark ? 'bg-orange-500/20' : 'bg-orange-50',
-      border: isDark ? 'border-orange-700/50' : 'border-orange-200',
-      text: isDark ? 'text-orange-300' : 'text-orange-600',
-      glow: 'from-orange-600/20',
-    },
-    primary: {
-      gradient: isDark ? 'from-primary-600 to-primary-800' : 'from-primary-500 to-primary-600',
-      iconBg: isDark ? 'bg-primary-500/20' : 'bg-primary-50',
-      border: isDark ? 'border-primary-700/50' : 'border-primary-200',
-      text: isDark ? 'text-primary-300' : 'text-primary-600',
-      glow: 'from-primary-600/20',
-    },
-  };
-
-  const colors = colorMap[color] || colorMap.blue;
+export default function StatCard({ icon: Icon, label, value, color = 'blue' }: StatCardProps) {
+  const c = COLOR_MAP[color];
 
   return (
     <div
-      className={`group relative overflow-hidden rounded-lg transition-all duration-300 hover:shadow-lg ${
-        isDark
-          ? `border bg-neutral-800/40 backdrop-blur-md ${colors.border} hover:bg-neutral-800/60`
-          : `border bg-white ${colors.border} hover:shadow-xl`
-      }`}
+      className={`flex items-center gap-4 rounded-xl border bg-white p-5 shadow-sm transition-shadow hover:shadow-md ${c.border} dark:bg-neutral-900`}
     >
-      {/* Background Glow Effect */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100">
-        <div
-          className={`absolute -inset-1 bg-gradient-to-r ${colors.glow} opacity-20 blur-xl`}
-        ></div>
+      {/* Icon */}
+      <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${c.iconBg}`}>
+        <Icon className={`h-5 w-5 ${c.iconColor}`} />
       </div>
 
-      <div className="relative z-10 p-5">
-        <div className="flex items-start justify-between">
-          <div>
-            <div
-              className={`h-12 w-12 rounded-lg bg-gradient-to-br ${colors.gradient} mb-4 flex items-center justify-center shadow-lg shadow-black/5 ring-1 ring-black/5`}
-            >
-              <Icon className="h-6 w-6 text-white" />
-            </div>
-            <p className="text-sm font-medium text-gray-500 dark:text-neutral-400">{label}</p>
-            <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
-              {value}
-            </p>
-          </div>
-        </div>
+      {/* Text */}
+      <div className="min-w-0">
+        <p className="truncate text-xs font-medium text-gray-500 dark:text-neutral-400">{label}</p>
+        <p className="mt-0.5 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+          {value}
+        </p>
       </div>
     </div>
   );
