@@ -87,6 +87,7 @@ export default function SystemNotifications() {
                     value={data.title}
                     onChange={(e) => setData('title', e.target.value)}
                     error={errors.title}
+                    sizeType="lg"
                     placeholder={t('notifications.admin.form.title_placeholder')}
                     required
                   />
@@ -98,6 +99,7 @@ export default function SystemNotifications() {
                     onChange={(value: string | number | string[]) =>
                       setData('type', String(Array.isArray(value) ? value[0] : value))
                     }
+                    size="lg"
                     error={errors.type}
                     options={notificationTypes}
                     required
@@ -111,6 +113,7 @@ export default function SystemNotifications() {
                     value={data.icon}
                     onChange={(e) => setData('icon', e.target.value)}
                     error={errors.icon}
+                    sizeType="lg"
                     placeholder={t('notifications.admin.form.icon_placeholder')}
                   />
                 </div>
@@ -122,6 +125,7 @@ export default function SystemNotifications() {
                 value={data.message}
                 onChange={(e) => setData('message', e.target.value)}
                 error={errors.message}
+                size="lg"
                 placeholder={t('notifications.admin.form.message_placeholder')}
                 required
                 rows={3}
@@ -133,6 +137,7 @@ export default function SystemNotifications() {
                 value={data.description}
                 onChange={(e) => setData('description', e.target.value)}
                 error={errors.description}
+                size="lg"
                 placeholder={t('notifications.admin.form.description_placeholder')}
                 rows={4}
               />

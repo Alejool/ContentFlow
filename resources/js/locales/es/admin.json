@@ -48,7 +48,7 @@
       },
       "system_issues": {
         "title": "Problemas del sistema detectados",
-        "unverified_users": "Alto porcentaje de usuarios sin verificar: {{count}} de {{total}} ({{percent}}%)"
+        "unverified_users": "{{count}} de {{total}} usuarios sin verificar ({{percent}}%)"
       },
       "subscriptions_by_plan": "Suscripciones activas por plan",
       "plans": {
