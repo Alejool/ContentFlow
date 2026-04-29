@@ -66,95 +66,107 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
   if (loading || !usage) return null;
 
   // ── Build metric list ─────────────────────────────────────────
-  type MetricEntry = UsageCardProps & { key: string; show: boolean };
+  // key and show are internal list metadata — keep them out of UsageCardProps
+  // so they are never accidentally spread into <UsageCard>.
+  type MetricEntry = { key: string; show: boolean; cardProps: UsageCardProps };
 
   const metrics: MetricEntry[] = [
     {
       key: 'publications',
-      label: t('subscription.addons.publications'),
-      icon: FileText,
-      accent: 'primary',
-      percentage: usage.publications.percentage,
-      used: usage.publications.used,
-      limit: usage.publications.limit,
-      remaining: usage.publications.remaining,
       show: visibleUsageMetrics?.publications !== false,
-      canBuy: systemAddons?.publications !== false,
-      upgradeUrl: '/pricing',
+      cardProps: {
+        label: t('subscription.addons.publications'),
+        icon: FileText,
+        accent: 'primary',
+        percentage: usage.publications.percentage,
+        used: usage.publications.used,
+        limit: usage.publications.limit,
+        remaining: usage.publications.remaining,
+        canBuy: systemAddons?.publications !== false,
+        upgradeUrl: '/pricing',
+      },
     },
     {
       key: 'ai_requests',
-      label: t('subscription.addons.aiCredits'),
-      icon: Sparkles,
-      accent: 'violet',
-      percentage: usage.ai_requests.percentage ?? 0,
-      used: usage.ai_requests.used,
-      limit: usage.ai_requests.limit ?? '∞',
-      total_available: usage.ai_requests.total_available ?? usage.ai_requests.limit ?? '∞',
-      remaining: usage.ai_requests.remaining ?? '∞',
-      addon_info: usage.ai_requests.addon_info,
       show: visibleUsageMetrics?.ai_requests !== false,
-      canBuy:
-        usage.ai_requests.limit !== null &&
-        usage.ai_requests.limit !== -1 &&
-        systemAddons?.ai_credits !== false,
-      addonType: 'ai_credits',
+      cardProps: {
+        label: t('subscription.addons.aiCredits'),
+        icon: Sparkles,
+        accent: 'violet',
+        percentage: usage.ai_requests.percentage ?? 0,
+        used: usage.ai_requests.used,
+        limit: usage.ai_requests.limit ?? '∞',
+        total_available: usage.ai_requests.total_available ?? usage.ai_requests.limit ?? '∞',
+        remaining: usage.ai_requests.remaining ?? '∞',
+        addon_info: usage.ai_requests.addon_info,
+        canBuy:
+          usage.ai_requests.limit !== null &&
+          usage.ai_requests.limit !== -1 &&
+          systemAddons?.ai_credits !== false,
+        addonType: 'ai_credits',
+      },
     },
     {
       key: 'storage',
-      label: t('subscription.usage.storage'),
-      icon: HardDrive,
-      accent: 'teal',
-      percentage: usage.storage.percentage,
-      used: `${usage.storage.used_gb.toFixed(1)} GB`,
-      limit: `${usage.storage.limit_gb} GB`,
-      total_available: `${usage.storage.total_available_gb} GB`,
-      remaining: `${(usage.storage.remaining_bytes / 1024 / 1024 / 1024).toFixed(1)} GB`,
-      addon_info: usage.storage.addon_info,
       show: visibleUsageMetrics?.storage !== false,
-      canBuy: systemAddons?.storage !== false,
-      addonType: 'storage',
+      cardProps: {
+        label: t('subscription.usage.storage'),
+        icon: HardDrive,
+        accent: 'teal',
+        percentage: usage.storage.percentage,
+        used: `${usage.storage.used_gb.toFixed(1)} GB`,
+        limit: `${usage.storage.limit_gb} GB`,
+        total_available: `${usage.storage.total_available_gb} GB`,
+        remaining: `${(usage.storage.remaining_bytes / 1024 / 1024 / 1024).toFixed(1)} GB`,
+        addon_info: usage.storage.addon_info,
+        canBuy: systemAddons?.storage !== false,
+        addonType: 'storage',
+      },
     },
     {
       key: 'social_accounts',
-      label: t('subscription.addons.socialAccounts'),
-      icon: Share2,
-      accent: 'pink',
-      percentage: usage.social_accounts.percentage,
-      used: usage.social_accounts.used,
-      limit: usage.social_accounts.limit === -1 ? '∞' : usage.social_accounts.limit,
-      total_available:
-        usage.social_accounts.total_available === -1
-          ? '∞'
-          : usage.social_accounts.total_available,
-      remaining:
-        usage.social_accounts.remaining === -1 ? '∞' : usage.social_accounts.remaining,
       show: visibleUsageMetrics?.social_accounts !== false,
-      canBuy: false,
-      upgradeUrl: '/pricing',
+      cardProps: {
+        label: t('subscription.addons.socialAccounts'),
+        icon: Share2,
+        accent: 'pink',
+        percentage: usage.social_accounts.percentage,
+        used: usage.social_accounts.used,
+        limit: usage.social_accounts.limit === -1 ? '∞' : usage.social_accounts.limit,
+        total_available:
+          usage.social_accounts.total_available === -1
+            ? '∞'
+            : usage.social_accounts.total_available,
+        remaining:
+          usage.social_accounts.remaining === -1 ? '∞' : usage.social_accounts.remaining,
+        canBuy: false,
+        upgradeUrl: '/pricing',
+      },
     },
     {
       key: 'team_members',
-      label: t('subscription.addons.teamMembers'),
-      icon: Users,
-      accent: 'amber',
-      percentage: usage.team_members?.percentage ?? 0,
-      used: usage.team_members?.used ?? 0,
-      limit:
-        usage.team_members?.limit === -1 || !usage.team_members?.limit
-          ? '∞'
-          : usage.team_members.limit,
-      total_available:
-        usage.team_members?.total_available === -1 || !usage.team_members?.total_available
-          ? '∞'
-          : usage.team_members.total_available,
-      remaining:
-        usage.team_members?.remaining === -1 || usage.team_members?.remaining === null
-          ? '∞'
-          : (usage.team_members?.remaining ?? '∞'),
       show: visibleUsageMetrics?.team_members !== false,
-      canBuy: systemAddons?.team_members !== false,
-      addonType: 'team_members',
+      cardProps: {
+        label: t('subscription.addons.teamMembers'),
+        icon: Users,
+        accent: 'amber',
+        percentage: usage.team_members?.percentage ?? 0,
+        used: usage.team_members?.used ?? 0,
+        limit:
+          usage.team_members?.limit === -1 || !usage.team_members?.limit
+            ? '∞'
+            : usage.team_members.limit,
+        total_available:
+          usage.team_members?.total_available === -1 || !usage.team_members?.total_available
+            ? '∞'
+            : usage.team_members.total_available,
+        remaining:
+          usage.team_members?.remaining === -1 || usage.team_members?.remaining === null
+            ? '∞'
+            : (usage.team_members?.remaining ?? '∞'),
+        canBuy: systemAddons?.team_members !== false,
+        addonType: 'team_members',
+      },
     },
   ];
 
@@ -227,7 +239,7 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
                     initial="hidden"
                     animate="visible"
                   >
-                    <UsageCard {...metric} />
+                    <UsageCard {...metric.cardProps} />
                   </motion.div>
                 ))}
               </motion.div>
@@ -253,7 +265,7 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
               initial="hidden"
               animate="visible"
             >
-              <UsageCard {...metric} />
+              <UsageCard {...metric.cardProps} />
             </motion.div>
           ))}
         </div>

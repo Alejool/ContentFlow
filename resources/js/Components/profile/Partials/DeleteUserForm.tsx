@@ -1,6 +1,6 @@
-import ModernButton from '@/Components/common/Modern/Button';
+import Button from '@/Components/common/Modern/Button';
 import ModernCard from '@/Components/common/Modern/Card';
-import ModernInput from '@/Components/common/Modern/Input';
+import Input from '@/Components/common/Modern/Input';
 import Modal from '@/Components/common/ui/Modal';
 import { deleteUserSchema } from '@/schemas/user';
 import type { DeleteUserFormData } from '@/schemas/user';
@@ -38,7 +38,7 @@ export default function DeleteUserForm({ className = '' }: DeleteUserFormProps) 
       await axios.delete(route('profile.destroy'), {
         data,
       });
-      window.location.href = '/';
+      window.location.assign('/');
     } catch (error: any) {
       if (error.response?.data?.errors) {
         Object.entries(error.response.data.errors).forEach(([key, value]: [any, any]) => {
@@ -76,14 +76,14 @@ export default function DeleteUserForm({ className = '' }: DeleteUserFormProps) 
           </div>
         </div>
 
-        <ModernButton
+        <Button
           variant="danger"
           onClick={confirmUserDeletion}
           icon={Trash2 as any}
           className="rounded-lg font-bold uppercase tracking-wider shadow-lg shadow-primary-500/20 transition-transform active:scale-95"
         >
           {t('profile.delete.deleteButton')}
-        </ModernButton>
+        </Button>
       </div>
 
       <Modal show={confirmingUserDeletion} onClose={closeModal}>
@@ -102,7 +102,7 @@ export default function DeleteUserForm({ className = '' }: DeleteUserFormProps) 
           </p>
 
           <div className="mb-8">
-            <ModernInput
+            <Input
               id="password"
               type="password"
               label={t('profile.delete.passwordLabel')}
@@ -110,22 +110,21 @@ export default function DeleteUserForm({ className = '' }: DeleteUserFormProps) 
               error={errors.password?.message}
               placeholder={t('profile.delete.passwordPlaceholder')}
               showPasswordToggle
-              autoFocus
               variant="filled"
             />
           </div>
 
           <div className="flex flex-col justify-end gap-4 sm:flex-row">
-            <ModernButton
+            <Button
               type="button"
               variant="secondary"
               onClick={closeModal}
               className="w-full rounded-lg font-bold uppercase tracking-wider sm:w-auto"
             >
               {t('profile.delete.cancel')}
-            </ModernButton>
+            </Button>
 
-            <ModernButton
+            <Button
               variant="danger"
               disabled={isSubmitting}
               className={`w-full rounded-lg font-bold uppercase tracking-wider shadow-lg shadow-primary-500/20 sm:w-auto ${
@@ -135,7 +134,7 @@ export default function DeleteUserForm({ className = '' }: DeleteUserFormProps) 
               loading={isSubmitting}
             >
               {t('profile.delete.deleteButton')}
-            </ModernButton>
+            </Button>
           </div>
         </form>
       </Modal>

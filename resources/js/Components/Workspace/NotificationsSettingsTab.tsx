@@ -1,4 +1,4 @@
-import StatCard from '@/Components/Workspace/StatCard';
+import StatCard from '@/Components/common/Modern/StatCard';
 import Button from '@/Components/common/Modern/Button';
 import Select from '@/Components/common/Modern/Select';
 import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';

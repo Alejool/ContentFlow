@@ -1,4 +1,4 @@
-import StatCard from '@/Components/Workspace/StatCard';
+import StatCard from '@/Components/common/Modern/StatCard';
 import { buildQuickActions, buildStats } from '@/Components/Workspace/overviewTab.config';
 import type {
   OverviewTabProps,

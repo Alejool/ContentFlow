@@ -1,5 +1,5 @@
 import FilterSection from '@/Components/Content/common/FilterSection';
-import StatCard from '@/Components/Workspace/StatCard';
+import StatCard from '@/Components/common/Modern/StatCard';
 import Button from '@/Components/common/Modern/Button';
 import Input from '@/Components/common/Modern/Input';
 import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
