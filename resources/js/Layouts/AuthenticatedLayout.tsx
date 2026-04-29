@@ -14,17 +14,13 @@ import { TimezoneInitializer } from '@/Components/common/TimezoneInitializer';
 import KeyboardShortcutsModal from '@/Components/common/ui/KeyboardShortcutsModal';
 import { AbilityProvider } from '@/Contexts/AbilityContext';
 import { OnboardingProvider } from '@/Contexts/OnboardingContext';
+import { useBranding } from '@/Hooks/useBranding';
 import { useCompletionNotifications } from '@/Hooks/useCompletionNotifications';
 import { useWorkspaceLocks } from '@/Hooks/usePublicationLock';
+import { useRealtimeInit } from '@/Hooks/useRealtimeInit';
 import { useSidebarState } from '@/Hooks/useSidebarState';
 import { useStickyOnScroll } from '@/Hooks/useStickyOnScroll';
 import { useTheme } from '@/Hooks/useTheme';
-import { useRealtimeInit } from '@/Hooks/useRealtimeInit';
-import { useBranding } from '@/Hooks/useBranding';
-import { cssPropertiesManager } from '@/Utils/CSSCustomPropertiesManager';
-import { useNotificationStore } from '@/stores/notificationStore';
-import { cssPropertiesManager } from '@/Utils/CSSCustomPropertiesManager';
-import { useNotificationStore } from '@/stores/notificationStore';
 import { useUploadQueue } from '@/stores/uploadQueueStore';
 import type {
   OnboardingState,
