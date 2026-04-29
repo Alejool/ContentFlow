@@ -54,8 +54,25 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
 
   // Initialize state from Inertia props on mount
   useEffect(() => {
+    const userId = (page.props as any).auth?.user?.id;
+    
+    // 1. Prevent state leaking across users on the same browser
+    if (userId) {
+      const storedUserId = localStorage.getItem('onboarding_last_user_id');
+      if (storedUserId && storedUserId !== userId.toString()) {
+        console.log('OnboardingContext: User changed. Clearing stale cache.');
+        store.clearCache();
+        if (onboardingProps) {
+          store.setState(onboardingProps);
+        }
+        localStorage.setItem('onboarding_last_user_id', userId.toString());
+        return; // We fully applied the fresh backend state, no need to merge below
+      }
+      localStorage.setItem('onboarding_last_user_id', userId.toString());
+    }
+
     if (onboardingProps) {
-      // Only update state if it's more recent than our local state
+      // 2. Normal sync: Only update state if backend is more recent than our local state
       // This prevents overwriting local progress during navigation
       const currentStep = store.tourCurrentStep;
       const propsStep = onboardingProps.tourCurrentStep;
@@ -63,18 +80,20 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
       const propsTourCompleted = onboardingProps.tourCompleted;
 
       // Update if:
-      // 1. Backend has a higher step (user progressed on another device)
-      // 2. We don't have local state yet (currentStep === 0)
-      // 3. Tour was completed on backend but not locally
+      // - Backend has a higher step (user progressed on another device)
+      // - We don't have local state yet (currentStep === 0)
+      // - Tour was completed on backend but not locally
+      // - Backend step is 0 but local step is > 0 and NOT completed (safety reset)
       if (
         currentStep === 0 ||
         propsStep > currentStep ||
-        (propsTourCompleted && !currentTourCompleted)
+        (propsTourCompleted && !currentTourCompleted) ||
+        (propsStep === 0 && !propsTourCompleted && currentStep > 0)
       ) {
         store.setState(onboardingProps);
       }
     }
-  }, [onboardingProps]);
+  }, [onboardingProps, page.props]);
 
   // Periodic sync with backend (every 5 minutes)
   useEffect(() => {

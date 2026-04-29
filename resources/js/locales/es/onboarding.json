@@ -153,6 +153,7 @@
   },
   "progress": {
     "title": "Progreso de Configuración",
+    "complete": "Completado",
     "inProgress": "En progreso",
     "stages": {
       "businessInfo": "Información del Negocio",

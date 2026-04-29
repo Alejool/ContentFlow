@@ -82,7 +82,7 @@ export default function BusinessInfoStep({
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div className="space-y-3 text-center">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900/20">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center ">
           <Building2 className="h-8 w-8 text-primary-600" />
         </div>
         <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -101,6 +101,7 @@ export default function BusinessInfoStep({
           error={errors.businessName}
           placeholder={t('businessInfo.placeholders.name')}
           icon={Building2}
+          sizeType="lg"
           required
         />
 
@@ -110,6 +111,8 @@ export default function BusinessInfoStep({
           label={t('businessInfo.fields.industry')}
           value={formData.businessIndustry}
           onChange={(value) => setFormData({ ...formData, businessIndustry: value as string })}
+          searchable={true}
+          size="lg"
           error={errors.businessIndustry}
           placeholder={t('businessInfo.placeholders.industry')}
           icon={Briefcase}

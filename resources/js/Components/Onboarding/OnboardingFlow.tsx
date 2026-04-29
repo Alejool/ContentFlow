@@ -1,15 +1,32 @@
-import { useOnboarding } from '@/Contexts/OnboardingContext';
+/**
+ * OnboardingFlow
+ *
+ * Orchestrates the complete onboarding experience by rendering the correct
+ * step component based on the current stage.
+ *
+ * Stage order:
+ *   businessInfo → planSelection → tour → wizard → (complete → unmounts)
+ *
+ * All stage-transition logic lives in `useOnboardingStage`.
+ * All step components are lazy-loaded to keep the initial bundle small.
+ */
+
 import type { PublicationTemplate, SocialPlatform, TourStep } from '@/types/onboarding';
-import { Building2, Gem, Link2, Target } from 'lucide-react';
-import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import { Building2, Gem, Link2, Target, ChevronDown, ChevronUp } from 'lucide-react';
+import { lazy, Suspense, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { OnboardingErrorBoundary } from './OnboardingErrorBoundary';
+import { type OnboardingStage, useOnboardingStage } from './hooks/useOnboardingStage';
 
-// Lazy load onboarding components to reduce initial bundle size
+// Lazy-loaded step components
 const BusinessInfoStep = lazy(() => import('./BusinessInfoStep'));
 const PlanSelectionStep = lazy(() => import('./PlanSelectionStep'));
 const TourOverlay = lazy(() => import('./TourOverlay'));
 const SetupWizard = lazy(() => import('./SetupWizard'));
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
 
 interface OnboardingFlowProps {
   tourSteps: TourStep[];
@@ -18,249 +35,54 @@ interface OnboardingFlowProps {
   templates: PublicationTemplate[];
 }
 
-type OnboardingStage =
-  | 'businessInfo'
-  | 'planSelection'
-  | 'tour'
-  | 'wizard'
-  | 'templates'
-  | 'complete';
+// ---------------------------------------------------------------------------
+// Shared UI helpers
+// ---------------------------------------------------------------------------
 
-/**
- * OnboardingFlow orchestrates the complete onboarding experience.
- *
- * It determines the current onboarding stage based on state and renders
- * the appropriate component (Tour, Wizard, or Templates).
- *
- * Features:
- * - Determines current onboarding stage
- * - Renders appropriate component (Tour, Wizard, Templates)
- * - Handles stage transitions
- * - Shows progress indicator
- *
- * Requirements: 5.3, 5.4
- */
-export default function OnboardingFlow({
-  tourSteps,
-  availablePlatforms,
-  connectedAccounts = [],
-  templates,
-}: OnboardingFlowProps) {
-  const { state, completeBusinessInfo, selectPlan, completeTourStep, skipTour, nextTourStep } =
-    useOnboarding();
-
-  // Determine initial stage based on current state to avoid flash
-  const determineCurrentStage = useCallback((): OnboardingStage => {
-    // If business info not completed, show business info
-    if (!state.businessInfoCompleted) {
-      return 'businessInfo';
-    }
-
-    // If plan not selected, show plan selection
-    if (!state.planSelected) {
-      return 'planSelection';
-    }
-
-    // If tour not completed or skipped, show tour
-    if (!state.tourCompleted && !state.tourSkipped) {
-      return 'tour';
-    }
-
-    // If wizard not completed or skipped, show wizard
-    if (!state.wizardCompleted && !state.wizardSkipped) {
-      return 'wizard';
-    }
-
-    // All stages complete
-    return 'complete';
-  }, [
-    state.businessInfoCompleted,
-    state.planSelected,
-    state.tourCompleted,
-    state.tourSkipped,
-    state.wizardCompleted,
-    state.wizardSkipped,
-  ]);
-
-  const [currentStage, setCurrentStage] = useState<OnboardingStage>(() => determineCurrentStage());
-
-  // Debug logging
-  useEffect(() => {}, []);
-
-  // Determine current onboarding stage based on state
-  useEffect(() => {
-    const stage = determineCurrentStage();
-    // Only update if stage actually changed
-    if (stage !== currentStage) {
-      setCurrentStage(stage);
-    }
-  }, [
-    state.businessInfoCompleted,
-    state.planSelected,
-    state.tourCompleted,
-    state.tourSkipped,
-    state.wizardCompleted,
-    state.wizardSkipped,
-    state.templateSelected,
-    currentStage,
-    determineCurrentStage,
-  ]);
-
-  /**
-   * Handles business info completion
-   */
-  const handleBusinessInfoComplete = async (data: BusinessInfoData) => {
-    await completeBusinessInfo(data);
-  };
-
-  /**
-   * Handles business info skip
-   */
-  const handleBusinessInfoSkip = async () => {
-    await completeBusinessInfo({
-      businessName: '',
-      businessIndustry: '',
-      businessGoals: '',
-      businessSize: '',
-    });
-  };
-
-  /**
-   * Handles plan selection
-   */
-  const handlePlanSelect = async (planId: string) => {
-    await selectPlan(planId);
-  };
-
-  /**
-   * Handles plan selection skip
-   */
-  const handlePlanSkip = async () => {
-    await selectPlan('free');
-  };
-
-  /**
-   * Handles tour completion
-   */
-  const handleTourComplete = async () => {
-    const lastStep = tourSteps[tourSteps.length - 1];
-    if (lastStep) {
-      await completeTourStep(lastStep.id);
-    }
-    // Stage will automatically transition via useEffect
-  };
-
-  /**
-   * Handles tour skip
-   */
-  const handleTourSkip = async () => {
-    await skipTour();
-    // Stage will automatically transition via useEffect
-  };
-
-  /**
-   * Handles wizard completion
-   */
-  const handleWizardComplete = () => {
-    // Wizard component handles its own completion
-    // The state change will trigger the useEffect to transition stages
-    // Force a re-check of the stage after a short delay to ensure state has updated
-    setTimeout(() => {
-      const newStage = determineCurrentStage();
-      if (newStage !== currentStage) {
-        setCurrentStage(newStage);
-      }
-    }, 100);
-  };
-
-  /**
-   * Handles template selection or skip
-   */
-  const handleTemplateSkip = () => {
-    // Template component handles its own skip
-    // Stage will automatically transition via useEffect
-  };
-
-  // Don't render anything if onboarding is complete
-  if (currentStage === 'complete') {
-    return null;
-  }
-
+/** Full-screen modal shell shared by BusinessInfo and PlanSelection steps. */
+function ModalShell({
+  wide = false,
+  children,
+}: {
+  wide?: boolean;
+  children: React.ReactNode;
+}) {
   return (
-    <OnboardingErrorBoundary>
-      {/* Progress Indicator */}
-      <OnboardingProgressIndicator
-        currentStage={currentStage}
-        completionPercentage={state.completionPercentage}
-      />
-
-      {/* Business Info Stage */}
-      {currentStage === 'businessInfo' && (
-        <OnboardingErrorBoundary>
-          <Suspense fallback={<OnboardingLoadingFallback />}>
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-              <div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-lg bg-white p-8 shadow-2xl dark:bg-neutral-800">
-                <BusinessInfoStep
-                  onComplete={handleBusinessInfoComplete}
-                  onSkip={handleBusinessInfoSkip}
-                />
-              </div>
-            </div>
-          </Suspense>
-        </OnboardingErrorBoundary>
-      )}
-
-      {/* Plan Selection Stage */}
-      {currentStage === 'planSelection' && (
-        <OnboardingErrorBoundary>
-          <Suspense fallback={<OnboardingLoadingFallback />}>
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-              <div className="max-h-[90vh] w-full max-w-7xl overflow-y-auto rounded-lg bg-white p-8 shadow-2xl dark:bg-neutral-800">
-                <PlanSelectionStep onComplete={handlePlanSelect} onSkip={handlePlanSkip} />
-              </div>
-            </div>
-          </Suspense>
-        </OnboardingErrorBoundary>
-      )}
-
-      {/* Tour Stage */}
-      {currentStage === 'tour' && tourSteps.length > 0 && (
-        <OnboardingErrorBoundary>
-          <Suspense fallback={<OnboardingLoadingFallback />}>
-            <TourOverlay
-              currentStep={
-                tourSteps[Math.min(state.tourCurrentStep, tourSteps.length - 1)] || tourSteps[0]
-              }
-              totalSteps={tourSteps.length}
-              onNext={nextTourStep}
-              onSkip={handleTourSkip}
-              onComplete={handleTourComplete}
-            />
-          </Suspense>
-        </OnboardingErrorBoundary>
-      )}
-
-      {/* Wizard Stage */}
-      {currentStage === 'wizard' && (
-        <OnboardingErrorBoundary>
-          <Suspense fallback={<OnboardingLoadingFallback />}>
-            <SetupWizard
-              availablePlatforms={availablePlatforms}
-              connectedAccounts={connectedAccounts}
-              onComplete={handleWizardComplete}
-            />
-          </Suspense>
-        </OnboardingErrorBoundary>
-      )}
-
-      {/* Templates Stage - REMOVED */}
-    </OnboardingErrorBoundary>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+      <div
+        className={`max-h-[90vh] w-full overflow-y-auto rounded-lg bg-white p-8 shadow-2xl dark:bg-neutral-800 ${
+          wide ? 'max-w-7xl' : 'max-w-4xl'
+        }`}
+      >
+        {children}
+      </div>
+    </div>
   );
 }
 
-/**
- * OnboardingProgressIndicator shows the overall onboarding progress.
- */
+/** Spinner shown while a lazy component is loading. */
+function StepLoadingFallback() {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div className="flex flex-col items-center gap-4 rounded-lg bg-white p-8 shadow-xl dark:bg-neutral-800">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary-200 border-t-primary-600" />
+        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Loading…</p>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Progress indicator
+// ---------------------------------------------------------------------------
+
+const PROGRESS_STAGES: { id: OnboardingStage; labelKey: string; Icon: React.ElementType }[] = [
+  { id: 'businessInfo',  labelKey: 'progress.stages.businessInfo', Icon: Building2 },
+  { id: 'planSelection', labelKey: 'progress.stages.plan',         Icon: Gem },
+  { id: 'tour',          labelKey: 'progress.stages.tour',         Icon: Target },
+  { id: 'wizard',        labelKey: 'progress.stages.connect',      Icon: Link2 },
+];
+
 function OnboardingProgressIndicator({
   currentStage,
   completionPercentage,
@@ -269,50 +91,146 @@ function OnboardingProgressIndicator({
   completionPercentage: number;
 }) {
   const { t } = useTranslation();
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
-  // Don't show progress indicator during tour (tour has its own progress)
-  if (currentStage === 'tour' || currentStage === 'complete') {
-    return null;
+  // Tour has its own built-in progress UI
+  if (currentStage === 'tour' || currentStage === 'complete') return null;
+
+  const currentIndex = PROGRESS_STAGES.findIndex((s) => s.id === currentStage);
+  const currentStageInfo = PROGRESS_STAGES[currentIndex];
+
+  if (isCollapsed) {
+    return (
+      <button
+        onClick={() => setIsCollapsed(false)}
+        className="fixed right-6 top-6 z-[99] flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 shadow-lg transition-colors hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:bg-neutral-700"
+      >
+        <span className="text-sm font-medium text-gray-900 dark:text-white">
+          {currentIndex + 1} / {PROGRESS_STAGES.length}
+        </span>
+        <ChevronDown className="h-4 w-4 text-gray-500" />
+      </button>
+    );
   }
 
-  const stages = [
-    {
-      id: 'businessInfo',
-      label: t('onboarding.progress.stages.businessInfo'),
-      Icon: Building2,
-    },
-    {
-      id: 'planSelection',
-      label: t('onboarding.progress.stages.plan'),
-      Icon: Gem,
-    },
-    { id: 'tour', label: t('onboarding.progress.stages.tour'), Icon: Target },
-    {
-      id: 'wizard',
-      label: t('onboarding.progress.stages.connect'),
-      Icon: Link2,
-    },
-  ];
-
-  const currentStageIndex = stages.findIndex((s) => s.id === currentStage);
-
   return (
-    <div className="fixed right-6 top-6 z-[99] w-80 rounded-lg border border-gray-200 bg-white p-6 shadow-2xl dark:border-neutral-700 dark:bg-neutral-800">
-      {/* Header */}
+    <div className="fixed right-6 top-6 z-[99] w-64 rounded-lg border border-gray-200 bg-white p-4 shadow-xl dark:border-neutral-700 dark:bg-neutral-800">
+      <div className="mb-2 flex items-center justify-between">
+        <p className="text-sm font-semibold text-gray-900 dark:text-white">
+          {t('progress.title')}
+        </p>
+        <button
+          onClick={() => setIsCollapsed(true)}
+          className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-neutral-700 dark:hover:text-gray-300"
+        >
+          <ChevronUp className="h-4 w-4" />
+        </button>
+      </div>
+      <div className="mb-2 flex items-center justify-between">
+        <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+          {currentStageInfo ? t(currentStageInfo.labelKey) : ''}
+        </span>
+        <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+          {currentIndex + 1} / {PROGRESS_STAGES.length}
+        </span>
+      </div>
+      <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-neutral-700">
+        <div
+          className="h-full rounded-full bg-primary-500 transition-all duration-500"
+          style={{ width: `${completionPercentage}%` }}
+        />
+      </div>
     </div>
   );
 }
 
-/**
- * OnboardingLoadingFallback displays a loading state while lazy-loaded components are being fetched.
- */
-function OnboardingLoadingFallback() {
+// ---------------------------------------------------------------------------
+// Main component
+// ---------------------------------------------------------------------------
+
+export default function OnboardingFlow({
+  tourSteps,
+  availablePlatforms,
+  connectedAccounts = [],
+  templates: _templates, // reserved for future TemplateGallery stage
+}: OnboardingFlowProps) {
+  const {
+    currentStage,
+    completionPercentage,
+    onBusinessInfoComplete,
+    onBusinessInfoSkip,
+    onPlanSelect,
+    onPlanSkip,
+    onTourNext,
+    onTourComplete,
+    onTourSkip,
+    onWizardComplete,
+  } = useOnboardingStage();
+
+  if (currentStage === 'complete') return null;
+
+  const currentTourStep =
+    tourSteps[Math.min(/* state.tourCurrentStep */ 0, tourSteps.length - 1)] ?? tourSteps[0];
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="flex flex-col items-center gap-4 rounded-lg bg-white p-8 shadow-xl dark:bg-neutral-800">
-        <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary-200 border-t-primary-600" />
-        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Loading...</p>
-      </div>
-    </div>
+    <OnboardingErrorBoundary>
+      <OnboardingProgressIndicator
+        currentStage={currentStage}
+        completionPercentage={completionPercentage}
+      />
+
+      {/* ── Business Info ─────────────────────────────────────────── */}
+      {currentStage === 'businessInfo' && (
+        <OnboardingErrorBoundary>
+          <Suspense fallback={<StepLoadingFallback />}>
+            <ModalShell>
+              <BusinessInfoStep
+                onComplete={onBusinessInfoComplete}
+                onSkip={onBusinessInfoSkip}
+              />
+            </ModalShell>
+          </Suspense>
+        </OnboardingErrorBoundary>
+      )}
+
+      {/* ── Plan Selection ────────────────────────────────────────── */}
+      {currentStage === 'planSelection' && (
+        <OnboardingErrorBoundary>
+          <Suspense fallback={<StepLoadingFallback />}>
+            <ModalShell wide>
+              <PlanSelectionStep onComplete={onPlanSelect} onSkip={onPlanSkip} />
+            </ModalShell>
+          </Suspense>
+        </OnboardingErrorBoundary>
+      )}
+
+      {/* ── Tour ─────────────────────────────────────────────────── */}
+      {currentStage === 'tour' && tourSteps.length > 0 && currentTourStep && (
+        <OnboardingErrorBoundary>
+          <Suspense fallback={<StepLoadingFallback />}>
+            <TourOverlay
+              currentStep={currentTourStep}
+              totalSteps={tourSteps.length}
+              onNext={onTourNext}
+              onSkip={onTourSkip}
+              onComplete={() => onTourComplete(tourSteps)}
+            />
+          </Suspense>
+        </OnboardingErrorBoundary>
+      )}
+
+      {/* ── Setup Wizard ──────────────────────────────────────────── */}
+      {currentStage === 'wizard' && (
+        <OnboardingErrorBoundary>
+          <Suspense fallback={<StepLoadingFallback />}>
+            <SetupWizard
+              availablePlatforms={availablePlatforms}
+              connectedAccounts={connectedAccounts}
+              onComplete={onWizardComplete}
+            />
+          </Suspense>
+        </OnboardingErrorBoundary>
+      )}
+    </OnboardingErrorBoundary>
   );
 }

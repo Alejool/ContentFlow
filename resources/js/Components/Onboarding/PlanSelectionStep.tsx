@@ -149,7 +149,7 @@ export default function PlanSelectionStep({ onComplete, onSkip }: PlanSelectionS
       <PricingPlansSection
         plans={plans}
         currentPlan={undefined}
-        variant={compact}
+        variant="compact"
         isAuthenticated={true}
         showBillingToggle={true}
         showHeader={false}
