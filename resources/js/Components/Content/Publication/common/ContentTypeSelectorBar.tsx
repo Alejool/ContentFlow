@@ -162,7 +162,7 @@ export default function ContentTypeSelectorBar({
   }, [validation, selectedType, t]);
 
   return (
-    <div className="border-b border-gray-200 bg-gradient-to-r from-gray-50 via-white to-gray-50/80 px-6 pb-2 pt-4 dark:border-neutral-700 dark:from-neutral-900 dark:via-neutral-900/95 dark:to-neutral-800/90">
+    <div className="px-2 md:px-0">
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-center gap-4">
           <div className="flex items-center gap-3">

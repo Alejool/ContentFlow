@@ -567,24 +567,6 @@ const EditPublicationModal = ({
           }
         />
 
-        {/* ContentTypeSelectorBar visible solo en pantallas menores a md */}
-        <div className="md:hidden">
-          <ContentTypeSelectorBar
-            selectedType={content_type}
-            selectedPlatforms={selectedPlatformNames}
-            onChange={(type) => {
-              setValue('content_type', type, { shouldValidate: true });
-              // Reset type-specific fields when changing type
-              if (type !== 'poll') {
-                setValue('poll_options', null);
-                setValue('poll_duration_hours', null);
-              }
-            }}
-            t={t}
-            disabled={hasPublishedPlatform || hasPublishingPlatform || isContentSectionDisabled}
-            mediaFiles={mediaFiles}
-          />
-        </div>
 
         <div className="custom-scrollbar flex-1 overflow-y-auto">
           <form

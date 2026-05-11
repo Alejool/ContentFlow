@@ -38,11 +38,10 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({
 
   return (
     <div
-      className="sticky top-0 z-20 bg-gradient-to-r from-gray-50 via-white to-gray-50/80 backdrop-blur-md dark:from-neutral-900 dark:via-neutral-900/95 dark:to-neutral-800/90"
+      className="sticky border-b dark:border-gray-700 top-0 z-20 bg-gradient-to-r from-gray-50 via-white to-gray-50/80 backdrop-blur-md dark:from-neutral-900 dark:via-neutral-900/95 dark:to-neutral-800/90"
       style={style}
     >
       <div className="flex items-center justify-between gap-4 px-6 py-4">
-        {/* Left: Title and subtitle */}
         <div className="flex-shrink-0">
           <h2
             className={`${currentSize.title} flex items-center gap-2 font-bold text-gray-900 dark:text-gray-100`}
@@ -57,12 +56,10 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({
           )}
         </div>
 
-        {/* Center: centerElement (visible only on md+ screens) */}
         {centerElement && <div className="hidden flex-1 md:block">{centerElement}</div>}
 
         {/* Right: rightElement and close button */}
         <div className="flex flex-shrink-0 items-center gap-4">
-          {/* rightElement visible only on screens smaller than md */}
           {rightElement && <div>{rightElement}</div>}
           <button
             onClick={onClose}
@@ -72,6 +69,13 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Center element for mobile */}
+      {centerElement && (
+        <div className=" border-gray-100/50 px-6 py-2 md:hidden dark:border-neutral-800/50">
+          {centerElement}
+        </div>
+      )}
     </div>
   );
 };

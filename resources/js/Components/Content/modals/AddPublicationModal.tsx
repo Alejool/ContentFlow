@@ -340,22 +340,23 @@ export default function AddPublicationModal({
           onClose={handleClose}
           title="publications.modal.add.title"
           subtitle="publications.modal.add.subtitle"
-        />
+          centerElement={
+            <ContentTypeSelectorBar
+              selectedType={content_type}
+              selectedPlatforms={selectedPlatformNames}
+              onChange={(type) => {
+                setValue('content_type', type, { shouldValidate: true });
 
-        <ContentTypeSelectorBar
-          selectedType={content_type}
-          selectedPlatforms={selectedPlatformNames}
-          onChange={(type) => {
-            setValue('content_type', type, { shouldValidate: true });
-
-            // Reset type-specific fields when changing type
-            if (type !== 'poll') {
-              setValue('poll_options', null);
-              setValue('poll_duration_hours', null);
-            }
-          }}
-          t={t}
-          mediaFiles={stabilizedMediaPreviews}
+                // Reset type-specific fields when changing type
+                if (type !== 'poll') {
+                  setValue('poll_options', null);
+                  setValue('poll_duration_hours', null);
+                }
+              }}
+              t={t}
+              mediaFiles={stabilizedMediaPreviews}
+            />
+          }
         />
 
         <main className="custom-scrollbar flex-1 overflow-y-auto">
