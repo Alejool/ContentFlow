@@ -1,15 +1,15 @@
 import Button from '@/Components/common/Modern/Button';
 import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
 import {
-  canDeleteRole,
-  canEditRole,
-  getMemberCount,
-  isProtectedRole,
+    canDeleteRole,
+    canEditRole,
+    getMemberCount,
+    isProtectedRole,
 } from '@/Components/Workspace/rolesManagement.helpers';
 import type {
-  Permission,
-  Role,
-  RolesManagementTabProps,
+    Permission,
+    Role,
+    RolesManagementTabProps,
 } from '@/Components/Workspace/rolesManagement.types';
 import { getRoleConfig } from '@/Utils/roleHelpers';
 import { router } from '@inertiajs/react';
@@ -18,7 +18,7 @@ import { AlertCircle, Edit2, Info, Shield, ShieldAlert, ShieldCheck, Trash2 } fr
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { route } from 'ziggy-js';
+import route from 'ziggy-js';
 
 export default function RolesManagementTab({
   roles,

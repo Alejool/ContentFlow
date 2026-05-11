@@ -80,6 +80,12 @@ export const useOnboardingNavigationStore = create<OnboardingNavigationState>((s
       return;
     }
 
+    // Prevent multiple simultaneous navigations
+    if (state.isNavigating) {
+      console.warn('Navigation already in progress, skipping duplicate navigation to:', path);
+      return;
+    }
+
     // Add to history
     state.addToHistory({
       path,
@@ -103,6 +109,14 @@ export const useOnboardingNavigationStore = create<OnboardingNavigationState>((s
       onError: (_errors) => {
         state.setNavigating(false);
       },
+      onCancelled: () => {
+        // Handle cancelled navigation gracefully
+        state.setNavigating(false);
+      },
+      onFinish: () => {
+        // Ensure navigating state is always reset
+        state.setNavigating(false);
+      },
     });
   },
 
@@ -111,13 +125,34 @@ export const useOnboardingNavigationStore = create<OnboardingNavigationState>((s
     const history = state.navigationHistory;
 
     if (history.length > 1) {
+      // Prevent multiple simultaneous navigations
+      if (state.isNavigating) {
+        console.warn('Navigation already in progress, skipping goBack');
+        return;
+      }
+
       // Get previous entry (skip current)
       const previousEntry = history[history.length - 2];
+
+      // Set navigating state
+      state.setNavigating(true);
 
       // Navigate back
       router.visit(previousEntry.path, {
         preserveState: true,
         preserveScroll: false,
+        onSuccess: () => {
+          state.setNavigating(false);
+        },
+        onError: () => {
+          state.setNavigating(false);
+        },
+        onCancelled: () => {
+          state.setNavigating(false);
+        },
+        onFinish: () => {
+          state.setNavigating(false);
+        },
       });
 
       // Remove last entry from history

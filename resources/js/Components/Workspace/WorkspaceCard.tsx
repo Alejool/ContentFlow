@@ -9,7 +9,6 @@ import {
   UserPlus,
   Users,
 } from 'lucide-react';
-import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 
@@ -27,11 +26,11 @@ interface WorkspaceCardProps {
   auth: AuthPageProps['auth'];
 }
 
-const WorkspaceCard = ({ workspace, roles, currentWorkspaceId, auth }: WorkspaceCardProps) => {
+const WorkspaceCard = ({ workspace, roles, currentWorkspaceId }: WorkspaceCardProps) => {
   const { t } = useTranslation();
-  const [hoveredWorkspace, setHoveredWorkspace] = useState<number | null>(null);
 
-  const userRole = roles.find((r) => r.id === workspace.pivot.role_id);
+  const userRole = roles.find((r) => r.id === workspace.pivot?.role_id);
+  const userRoleSlug = userRole?.slug ?? '';
   const isActive = currentWorkspaceId === workspace.id;
 
   const handleSwitch = (workspaceId: number) => {
@@ -50,14 +49,7 @@ const WorkspaceCard = ({ workspace, roles, currentWorkspaceId, auth }: Workspace
 
   return (
     <div
-      className={`group relative rounded-lg  bg-gradient-to-br from-white/90 to-white/95 p-6 transition-all duration-700 ease-in-out hover:-translate-y-1 hover:border-primary-300 hover:shadow-2xl hover:shadow-primary-600/10 dark:border-black/70 dark:from-black/90 dark:to-black/95 dark:hover:border-primary-500/30 h-92 `}
-      style={{
-        backgroundImage: `radial-gradient(circle at top left, var(--tw-gradient-from), var(--tw-gradient-to))`,
-        transition:
-          'background-color 0.7s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.7s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s ease-out',
-      }}
-      onMouseEnter={() => setHoveredWorkspace(workspace.id)}
-      onMouseLeave={() => setHoveredWorkspace(null)}
+      className={`group relative shadow-lg h-92 rounded-lg bg-[radial-gradient(circle_at_top_left,var(--tw-gradient-from),var(--tw-gradient-to))] bg-gradient-to-br from-white/90 to-white/95 p-6 transition-[background-color,border-color,box-shadow,transform] duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary-600/10 dark:from-black/90 dark:to-black/95`}
     >
       {isActive && (
         <div className="absolute -right-2 -top-2 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 px-3 py-1 text-xs font-bold text-white shadow-lg">
@@ -155,17 +147,17 @@ const WorkspaceCard = ({ workspace, roles, currentWorkspaceId, auth }: Workspace
               trigger={
                 <button
                   className={`rounded-lg p-2.5 outline-none transition-all duration-200 ${
-                    ['owner', 'admin'].includes(userRole?.slug)
+                    ['owner', 'admin'].includes(userRoleSlug)
                       ? 'text-gray-600 hover:bg-gradient-to-r hover:from-primary-50 hover:to-primary-100 hover:text-primary-600 hover:shadow-sm dark:text-neutral-400 dark:hover:from-primary-900/20 dark:hover:to-primary-900/10 dark:hover:text-primary-400'
                       : 'text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:text-neutral-500 dark:hover:bg-neutral-800 dark:hover:text-gray-300'
                   }`}
                   aria-label={
-                    ['owner', 'admin'].includes(userRole?.slug)
+                    ['owner', 'admin'].includes(userRoleSlug)
                       ? t('workspace.tooltips.manage')
                       : t('workspace.tooltips.view')
                   }
                 >
-                  {['owner', 'admin'].includes(userRole?.slug) ? (
+                  {['owner', 'admin'].includes(userRoleSlug) ? (
                     <SettingsIcon className="h-5 w-5" />
                   ) : (
                     <Info className="h-5 w-5" />
@@ -182,7 +174,7 @@ const WorkspaceCard = ({ workspace, roles, currentWorkspaceId, auth }: Workspace
                     },
                   ],
                 },
-                ...(['owner', 'admin'].includes(userRole?.slug)
+                ...(['owner', 'admin'].includes(userRoleSlug)
                   ? [
                       {
                         items: [

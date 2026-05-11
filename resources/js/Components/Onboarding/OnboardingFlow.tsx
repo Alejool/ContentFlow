@@ -11,12 +11,14 @@
  * All step components are lazy-loaded to keep the initial bundle small.
  */
 
+import { useOnboarding } from '@/Contexts/OnboardingContext';
 import type { PublicationTemplate, SocialPlatform, TourStep } from '@/types/onboarding';
-import { Building2, Gem, Link2, Target, ChevronDown, ChevronUp } from 'lucide-react';
+import { Building2, ChevronDown, ChevronUp, Gem, Link2, Target } from 'lucide-react';
 import { lazy, Suspense, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { OnboardingErrorBoundary } from './OnboardingErrorBoundary';
-import { type OnboardingStage, useOnboardingStage } from './hooks/useOnboardingStage';
+import type { OnboardingStage } from './hooks/useOnboardingStage';
+import { useOnboardingStage } from './hooks/useOnboardingStage';
 
 // Lazy-loaded step components
 const BusinessInfoStep = lazy(() => import('./BusinessInfoStep'));
@@ -167,7 +169,10 @@ export default function OnboardingFlow({
     onWizardComplete,
   } = useOnboardingStage();
 
-  if (currentStage === 'complete') return null;
+  const { state } = useOnboarding();
+
+  // Don't render if onboarding is already completed
+  if (currentStage === 'complete' || state.completedAt !== null) return null;
 
   const currentTourStep =
     tourSteps[Math.min(/* state.tourCurrentStep */ 0, tourSteps.length - 1)] ?? tourSteps[0];

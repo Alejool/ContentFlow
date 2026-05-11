@@ -1,7 +1,6 @@
-import Button from '@/Components/common/Modern/Button';
 import { REEL_COMPATIBLE_PLATFORMS } from '@/Constants/contentTypes';
-import { BarChart3, Clock, FileText, Images, Video } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { BarChart3, Clock, FileText, Images, Video } from 'lucide-react';
 import { useMemo } from 'react';
 
 export type ContentType = 'post' | 'reel' | 'story' | 'poll' | 'carousel';
@@ -102,18 +101,15 @@ export default function ContentTypeIconSelector({
 
         return (
           <div key={type.value} className="group relative">
-            <Button
+            <button
               type="button"
               onClick={() => isAvailable && onChange(type.value)}
               disabled={!isAvailable}
-              buttonStyle="icon"
-              size="xl"
-              icon={Icon}
-              className={`!rounded-lg !p-2 transition-all duration-200 ${isSelected ? '!bg-primary-500 !text-white shadow-sm' : ''} ${!isAvailable ? 'cursor-not-allowed opacity-40' : ''} `}
+              className={`flex items-center justify-center rounded-lg p-2 transition-all duration-200 ${isSelected ? 'bg-primary-500 text-white shadow-sm' : 'bg-transparent text-black dark:text-white hover:bg-primary-500/15'} ${!isAvailable ? 'cursor-not-allowed opacity-40' : ''}`}
               title={tooltipMessage}
             >
-              <></>
-            </Button>
+              <Icon className="h-5 w-5" />
+            </button>
 
             {/* Tooltip */}
             <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 hidden -translate-x-1/2 group-hover:block">

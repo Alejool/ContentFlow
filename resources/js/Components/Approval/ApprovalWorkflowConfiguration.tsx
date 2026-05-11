@@ -7,7 +7,7 @@ import { AlertTriangle, ChevronRight, Plus, Save, Settings, Trash2 } from 'lucid
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { route } from 'ziggy-js';
+import route from 'ziggy-js';
 
 interface ApprovalLevel {
   id?: number;

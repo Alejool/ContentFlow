@@ -1,10 +1,11 @@
-import { createContext, ReactNode, useContext, useEffect } from 'react';
-import { usePage } from '@inertiajs/react';
-import { useOnboardingStore } from '@/stores/onboardingStore';
-import type { OnboardingState } from '@/types/onboarding';
+import { ErrorNotification } from '@/Components/Onboarding/ErrorNotification';
 import { OfflineIndicator } from '@/Components/Onboarding/OfflineIndicator';
 import { OnboardingErrorBoundary } from '@/Components/Onboarding/OnboardingErrorBoundary';
-import { ErrorNotification } from '@/Components/Onboarding/ErrorNotification';
+import { useOnboardingStore } from '@/stores/onboardingStore';
+import type { OnboardingState } from '@/types/onboarding';
+import { usePage } from '@inertiajs/react';
+import type { ReactNode } from 'react';
+import { createContext, useContext, useEffect } from 'react';
 
 /**
  * OnboardingContextValue defines the interface for the onboarding context.
@@ -72,7 +73,15 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
     }
 
     if (onboardingProps) {
-      // 2. Normal sync: Only update state if backend is more recent than our local state
+      // 2. CRITICAL: Always trust backend's completedAt status
+      // If backend says onboarding is completed, override local cache
+      if (onboardingProps.completedAt !== null && onboardingProps.completedAt !== store.completedAt) {
+        console.log('OnboardingContext: Backend shows onboarding completed. Syncing local state.');
+        store.setState(onboardingProps);
+        return;
+      }
+
+      // 3. Normal sync: Only update state if backend is more recent than our local state
       // This prevents overwriting local progress during navigation
       const currentStep = store.tourCurrentStep;
       const propsStep = onboardingProps.tourCurrentStep;
