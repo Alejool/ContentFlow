@@ -3,40 +3,74 @@ import { InertiaProgressIndicator } from '@/Components/common/motion/InertiaProg
 import { ErrorBoundary } from '@/Components/common/ui/ErrorBoundary';
 import ThemedToaster from '@/Components/common/ui/ThemedToaster';
 import { ThemeProvider } from '@/Contexts/ThemeContext';
-import { ErrorInterceptor } from '@/Services/ErrorInterceptor';
-import { ariaAnnouncer } from '@/Utils/ARIAAnnouncer';
-import { FocusManager } from '@/Utils/FocusManager';
-import { FocusVisibleManager } from '@/Utils/FocusVisibleManager';
 import { QueryProvider } from '@/providers/QueryProvider';
 import type { PageProps } from '@/types';
-import { createInertiaApp } from '@inertiajs/react';
+import { createInertiaApp, router } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import React, { Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import '../css/app.css';
-import { ServiceWorkerUpdate } from './Components/ServiceWorkerUpdate';
-import './bootstrap';
-import './i18n';
 
-ErrorInterceptor.initialize();
+// ─── Carga diferida de módulos pesados ────────────────────────────────────────
+// bootstrap (Echo + Pusher) y i18n se cargan después del primer render,
+// no bloquean la carga inicial de la UI.
+const initBootstrap = () => import('./bootstrap');
+const initI18n = () => import('./i18n');
 
-// Initialize focus management utilities
-FocusVisibleManager.initialize();
-FocusManager.initialize();
+// ServiceWorkerUpdate no es crítico para el render inicial
+const ServiceWorkerUpdate = React.lazy(() =>
+  import('./Components/ServiceWorkerUpdate').then((m) => ({ default: m.ServiceWorkerUpdate })),
+);
 
-// Initialize ARIA announcer for screen reader support
-ariaAnnouncer.initialize();
+// Utilidades de accesibilidad — se inicializan después del primer render
+const initAccessibility = async () => {
+  const [{ ariaAnnouncer }, { FocusManager }, { FocusVisibleManager }, { ErrorInterceptor }] =
+    await Promise.all([
+      import('@/Utils/ARIAAnnouncer'),
+      import('@/Utils/FocusManager'),
+      import('@/Utils/FocusVisibleManager'),
+      import('@/Services/ErrorInterceptor'),
+    ]);
+  ErrorInterceptor.initialize();
+  FocusVisibleManager.initialize();
+  FocusManager.initialize();
+  ariaAnnouncer.initialize();
+};
+
+// ─── Global error handler for navigation errors ────────────────────────────────
+// Suppress "AbortError: Transition was skipped" warnings in production
+// These are expected when navigations are cancelled (e.g., rapid clicks)
+if (typeof window !== 'undefined') {
+  window.addEventListener('unhandledrejection', (event) => {
+    // Check if it's an AbortError from Inertia navigation
+    if (
+      event.reason?.name === 'AbortError' &&
+      event.reason?.message?.includes('Transition was skipped')
+    ) {
+      // Prevent the error from appearing in console
+      event.preventDefault();
+      
+      // Log in development for debugging
+      if (import.meta.env.DEV) {
+        console.debug('[Inertia] Navigation cancelled (expected behavior):', event.reason.message);
+      }
+    }
+  });
+
+  // Also handle Inertia's cancelled event
+  router.on('cancel', () => {
+    if (import.meta.env.DEV) {
+      console.debug('[Inertia] Navigation cancelled');
+    }
+  });
+}
 
 const appName = import.meta.env['VITE_APP_NAME'] || 'Intellipost';
-
-// Lazy load i18n
-const loadI18n = () => import('./i18n');
 
 createInertiaApp<PageProps>({
   title: (title: any) => `${title} - ${appName}`,
   resolve: (name: string) => {
     const cleanName = name.startsWith('/') ? name.slice(1) : name;
-    // Lazy loading agresivo por rutas
     return resolvePageComponent(`./Pages/${cleanName}.tsx`, import.meta.glob('./Pages/**/*.tsx'));
   },
 
@@ -44,13 +78,15 @@ createInertiaApp<PageProps>({
     const root = createRoot(el);
 
     const user = props.initialPage.props.auth?.user;
-    const userLocale = user?.locale;
 
-    if (userLocale) {
-      loadI18n().then(({ default: i18n }) => {
+    // Inicializar i18n, bootstrap y accesibilidad en paralelo, sin bloquear el render
+    Promise.all([initBootstrap(), initI18n(), initAccessibility()]).then(([, i18nModule]) => {
+      const i18n = i18nModule.default;
+      const userLocale = user?.locale;
+      if (userLocale && i18n.language !== userLocale) {
         i18n.changeLanguage(userLocale);
-      });
-    }
+      }
+    });
 
     root.render(
       <ErrorBoundary>
@@ -74,7 +110,9 @@ createInertiaApp<PageProps>({
               </AnimatedPage>
             </Suspense>
             <ThemedToaster />
-            <ServiceWorkerUpdate />
+            <Suspense fallback={null}>
+              <ServiceWorkerUpdate />
+            </Suspense>
             <InertiaProgressIndicator color="#ad421e" />
           </ThemeProvider>
         </QueryProvider>

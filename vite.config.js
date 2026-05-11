@@ -168,7 +168,52 @@ export default defineConfig({
         },
     },
     optimizeDeps: {
-        include: ['@ffmpeg/ffmpeg'],
+        // Pre-bundlear todas las deps usadas en el critical path.
+        // Con el volumen cf_vite_cache persistente, esto solo corre UNA vez.
+        // Evita que Vite descubra deps on-demand durante la carga → pantalla en blanco.
+        include: [
+            // React core — siempre necesario
+            'react',
+            'react-dom',
+            'react-dom/client',
+            // Inertia
+            '@inertiajs/react',
+            // HTTP + estado
+            'axios',
+            'zustand',
+            '@tanstack/react-query',
+            // UI crítica
+            'framer-motion',
+            'lucide-react',
+            'clsx',
+            'tailwind-merge',
+            'react-hot-toast',
+            // Formularios
+            'react-hook-form',
+            '@hookform/resolvers/zod',
+            'zod',
+            // Fechas
+            'date-fns',
+            // i18n — pesado pero necesario
+            'i18next',
+            'react-i18next',
+            'i18next-browser-languagedetector',
+            // Routing
+            'ziggy-js',
+            // WebSockets — se inicializan en bootstrap
+            'laravel-echo',
+            'pusher-js',
+        ],
+        // Excluir paquetes muy pesados que se cargan lazy o no se usan en runtime
+        exclude: [
+            '@ffmpeg/ffmpeg',
+            '@ffmpeg/util',
+            '@ffmpeg/core',
+            // AWS SDK es enorme — solo se usa en uploads, se carga lazy
+            '@aws-sdk/client-s3',
+        ],
+        // Forzar re-bundle si cambian las deps (útil tras npm install)
+        force: false,
     },
     build: {
         // Code splitting configuration
@@ -273,7 +318,9 @@ export default defineConfig({
     server: isProduction ? {} : {
         host: '0.0.0.0',
         port: 5173,
-        strictPort: true,
+        // strictPort: true causaba crash silencioso cuando el puerto quedaba ocupado
+        // por un proceso zombie tras un reinicio del contenedor
+        strictPort: false,
 
         hmr: {
             host: host,
@@ -283,13 +330,22 @@ export default defineConfig({
         },
 
         watch: {
+            // En Docker con bind mount de Windows, el polling bloquea el event loop.
+            // Usamos polling solo con interval alto para no saturar el sistema.
+            // Los archivos críticos (vendor, node_modules, etc.) están excluidos.
             usePolling: true,
-            interval: 1000,
+            interval: 2000,
+            binaryInterval: 4000,
             ignored: [
                 '**/vendor/**',
                 '**/storage/**',
                 '**/docker/**',
                 '**/node_modules/**',
+                '**/.env*',
+                '**/public/build/**',
+                '**/public/hot',
+                '**/bootstrap/cache/**',
+                '**/.git/**',
             ],
         },
 
