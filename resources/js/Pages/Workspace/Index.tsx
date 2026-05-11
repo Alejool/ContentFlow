@@ -42,7 +42,7 @@ export default function Index({ workspaces, roles }: { workspaces: Workspace[]; 
       <Head title={t('workspace.my_workspaces')} />
       <div className="mx-auto h-screen   max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {workspaces.map((workspace) => (
+          {workspaces.map((workspace) => ( 
             <WorkspaceCard
               key={workspace.id}
               workspace={workspace}

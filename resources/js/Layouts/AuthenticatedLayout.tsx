@@ -1,18 +1,10 @@
-import CommandPalette from '@/Components/CommandPalette/CommandPalette';
-import { DevCacheIndicator } from '@/Components/DevCacheIndicator';
-import GlobalUploadIndicator from '@/Components/GlobalUploadIndicator';
 import ActiveWorkspace from '@/Components/Layout/ActiveWorkspace';
 import MobileNavbar from '@/Components/Layout/MobileNavbar';
 import NotificationButton from '@/Components/Layout/NotificationButton';
 import ProfileDropdown from '@/Components/Layout/ProfileDropdown';
 import SearchButton from '@/Components/Layout/SearchButton';
 import Sidebar from '@/Components/Layout/Sidebar';
-import MaintenanceBanner from '@/Components/MaintenanceBanner';
-import OnboardingFlow from '@/Components/Onboarding/OnboardingFlow';
-import QueueNotificationFloat from '@/Components/Queue/QueueNotificationFloat';
-import { ResumeUploadsPrompt } from '@/Components/Upload/ResumeUploadsPrompt';
 import { TimezoneInitializer } from '@/Components/common/TimezoneInitializer';
-import KeyboardShortcutsModal from '@/Components/common/ui/KeyboardShortcutsModal';
 import { AbilityProvider } from '@/Contexts/AbilityContext';
 import { OnboardingProvider } from '@/Contexts/OnboardingContext';
 import { useCompletionNotifications } from '@/Hooks/useCompletionNotifications';
@@ -24,7 +16,22 @@ import { shouldDisplayOnboarding } from '@/Layouts/helpers/onboardingHelpers';
 import { useLayoutEffects } from '@/Layouts/hooks/useLayoutEffects';
 import type { AuthenticatedLayoutProps, AuthPageProps } from '@/types/layout';
 import { usePage } from '@inertiajs/react';
-import { Suspense, useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
+
+// ─── Lazy: componentes pesados no críticos para el render inicial ─────────────
+const CommandPalette = lazy(() => import('@/Components/CommandPalette/CommandPalette'));
+const GlobalUploadIndicator = lazy(() => import('@/Components/GlobalUploadIndicator'));
+const MaintenanceBanner = lazy(() => import('@/Components/MaintenanceBanner'));
+const OnboardingFlow = lazy(() => import('@/Components/Onboarding/OnboardingFlow'));
+const QueueNotificationFloat = lazy(() => import('@/Components/Queue/QueueNotificationFloat'));
+const ResumeUploadsPrompt = lazy(() =>
+  import('@/Components/Upload/ResumeUploadsPrompt').then((m) => ({
+    default: m.ResumeUploadsPrompt,
+  })),
+);
+const KeyboardShortcutsModal = lazy(
+  () => import('@/Components/common/ui/KeyboardShortcutsModal'),
+);
 
 export default function AuthenticatedLayout({ header, children }: AuthenticatedLayoutProps) {
   const { props } = usePage<AuthPageProps>();
@@ -55,7 +62,9 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
         <TimezoneInitializer />
 
         {props.maintenanceMode && props.maintenanceBanner && (
-          <MaintenanceBanner message={props.maintenanceBanner} />
+          <Suspense fallback={null}>
+            <MaintenanceBanner message={props.maintenanceBanner} />
+          </Suspense>
         )}
 
         <div className="flex w-full max-w-full flex-col overflow-hidden">
@@ -120,21 +129,32 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
               </main>
             </div>
 
-            <CommandPalette />
+            {/* CommandPalette: lazy, no bloquea el render inicial */}
+            <Suspense fallback={null}>
+              <CommandPalette />
+            </Suspense>
           </div>
 
           <div className="fixed bottom-4 right-4 z-[9999] flex flex-col items-end gap-2">
-            {/* <DevCacheIndicator /> */}
-            <GlobalUploadIndicator />
+            <Suspense fallback={null}>
+              <GlobalUploadIndicator />
+            </Suspense>
           </div>
 
-          <ResumeUploadsPrompt />
-          <QueueNotificationFloat />
+          <Suspense fallback={null}>
+            <ResumeUploadsPrompt />
+          </Suspense>
 
-          <KeyboardShortcutsModal
-            isOpen={showShortcutsModal}
-            onClose={() => setShowShortcutsModal(false)}
-          />
+          <Suspense fallback={null}>
+            <QueueNotificationFloat />
+          </Suspense>
+
+          <Suspense fallback={null}>
+            <KeyboardShortcutsModal
+              isOpen={showShortcutsModal}
+              onClose={() => setShowShortcutsModal(false)}
+            />
+          </Suspense>
 
           {showOnboarding && props.tourSteps && props.availablePlatforms && props.templates && (
             <Suspense fallback={null}>

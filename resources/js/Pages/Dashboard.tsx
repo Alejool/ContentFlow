@@ -10,16 +10,16 @@ import { Head, Link, router, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import {
-  BarChart3,
-  Calendar,
-  Eye,
-  FileText,
-  Heart,
-  Mail,
-  MousePointer2,
-  TrendingUp,
-  Users,
-  X,
+    BarChart3,
+    Calendar,
+    Eye,
+    FileText,
+    Heart,
+    Mail,
+    MousePointer2,
+    TrendingUp,
+    Users,
+    X,
 } from 'lucide-react';
 import { Suspense, lazy, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -84,12 +84,25 @@ export default function Dashboard({
   useEffect(() => {
     if (!auth?.user?.id) return;
 
-    const channel = window.Echo.private(`users.${auth.user.id}`);
-    channel.listen('.PublicationStatusUpdated', () => refetchStats());
+    // Wait for Echo to be initialized before subscribing
+    const subscribeToChannel = () => {
+      if (!window.Echo) {
+        // Echo not ready yet, retry in 100ms
+        const timer = setTimeout(subscribeToChannel, 100);
+        return () => clearTimeout(timer);
+      }
 
-    return () => {
-      channel.stopListening('.PublicationStatusUpdated');
+      const channel = window.Echo.private(`users.${auth.user.id}`);
+      channel.listen('.PublicationStatusUpdated', () => refetchStats());
+
+      return () => {
+        if (channel) {
+          channel.stopListening('.PublicationStatusUpdated');
+        }
+      };
     };
+
+    return subscribeToChannel();
   }, [auth?.user?.id, refetchStats]);
 
   // Early return if auth or user is not available (after all hooks)
