@@ -366,18 +366,31 @@ export const useWorkspaceLocks = () => {
 
     fetchLocks();
 
-    const channel = window.Echo.private(`workspace.${workspaceId}`);
-    channel.listen('.publication.lock.changed', handleLockChange);
-    channel.listen('.publication.updated', handlePublicationUpdate);
+    // Wait for Echo to be initialized before subscribing
+    const subscribeToChannel = () => {
+      if (!window.Echo) {
+        // Echo not ready yet, retry in 100ms
+        const timer = setTimeout(subscribeToChannel, 100);
+        return () => clearTimeout(timer);
+      }
 
-    return () => {
-      channel.stopListening('.publication.lock.changed', handleLockChange);
-      channel.stopListening('.publication.updated', handlePublicationUpdate);
-      // We do NOT call window.Echo.leave here because this hook is used in AuthenticatedLayout
-      // If we leave, we might break sub-channels if they depend on this root connection.
-      // But typically leave is okay if it's the intended navigation behavior.
-      // To be safe and stable, we'll just stop listening.
+      const channel = window.Echo.private(`workspace.${workspaceId}`);
+      channel.listen('.publication.lock.changed', handleLockChange);
+      channel.listen('.publication.updated', handlePublicationUpdate);
+
+      return () => {
+        if (channel) {
+          channel.stopListening('.publication.lock.changed', handleLockChange);
+          channel.stopListening('.publication.updated', handlePublicationUpdate);
+        }
+        // We do NOT call window.Echo.leave here because this hook is used in AuthenticatedLayout
+        // If we leave, we might break sub-channels if they depend on this root connection.
+        // But typically leave is okay if it's the intended navigation behavior.
+        // To be safe and stable, we'll just stop listening.
+      };
     };
+
+    return subscribeToChannel();
   }, [workspaceId, wsUserId, handleLockChange, handlePublicationUpdate]);
 
   return { remoteLocks };

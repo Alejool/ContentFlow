@@ -9,12 +9,10 @@ export function useRealtime(userId?: number) {
   useEffect(() => {
     if (!userId) return;
 
-    initPublicationsRealtime(userId, workspaceId);
+    // initPublicationsRealtime now returns a cleanup function
+    // that handles Echo initialization and channel cleanup
+    const cleanup = initPublicationsRealtime(userId, workspaceId);
 
-    return () => {
-      window.Echo.leave(`users.${userId}`);
-      // DO NOT leave workspace channel here, as it may be used by the layout or other hooks
-      // window.Echo.leave(`workspace.${workspaceId}`);
-    };
+    return cleanup;
   }, [userId, workspaceId]);
 }

@@ -1,5 +1,5 @@
 import { router } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export interface CommandItem {
   id: string;
@@ -15,6 +15,7 @@ export interface CommandItem {
 export function useCommandPalette(commands: CommandItem[]) {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const isNavigatingRef = useRef(false);
 
   // Toggle with Cmd+K or Ctrl+K
   useEffect(() => {
@@ -69,7 +70,18 @@ export function useCommandPalette(commands: CommandItem[]) {
     setQuery('');
 
     if (item.href) {
-      router.visit(item.href);
+      // Prevent duplicate navigation
+      if (isNavigatingRef.current) {
+        console.warn('[CommandPalette] Navigation already in progress, skipping');
+        return;
+      }
+
+      isNavigatingRef.current = true;
+      router.visit(item.href, {
+        onFinish: () => {
+          isNavigatingRef.current = false;
+        },
+      });
     } else if (item.action) {
       item.action();
     }
