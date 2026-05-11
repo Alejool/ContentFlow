@@ -48,7 +48,11 @@ class AppServiceProvider extends ServiceProvider
    */
   public function boot(): void
   {
-    Vite::prefetch(concurrency: 3);
+    // Prefetch solo en producción — en dev mode genera cientos de requests
+    // simultáneos que saturan el servidor y causan pantalla en blanco
+    if (app()->isProduction()) {
+      Vite::prefetch(concurrency: 3);
+    }
     if (config('app.url')) {
       URL::forceRootUrl(config('app.url'));
     }
