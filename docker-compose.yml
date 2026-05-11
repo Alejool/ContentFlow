@@ -234,7 +234,7 @@ services:
     image: node:20-alpine
     container_name: contentflow_vite_prod
     working_dir: /var/www/html
-    command: sh -c "[ -d node_modules ] || npm install; npm run dev -- --host 0.0.0.0"
+    command: sh -c "[ -d node_modules ] || npm install; npm run dev"
     ports:
       - "5173:5173"
     volumes:
@@ -242,6 +242,7 @@ services:
       - cf_node_modules_v2:/var/www/html/node_modules
       - cf_public_build:/var/www/html/public/build
     environment:
+      - NODE_ENV=development
       - VITE_HMR_HOST=${VITE_HMR_HOST:-localhost}
     networks:
       - laravel
