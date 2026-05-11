@@ -1,6 +1,8 @@
 // Tipos para el nuevo sistema de aprobaciones simplificado
 
-import type { Publication } from '@/types/Publication';
+import type { Publication } from './Publication';
+import type { Role } from './Role';
+import type { User } from './User';
 
 export interface ApprovalRequest {
   id: number;
@@ -72,19 +74,6 @@ export interface ApprovalWorkflow {
   levels?: ApprovalLevel[];
 }
 
-export interface User {
-  id: number;
-  name: string;
-  email: string;
-  photo_url?: string;
-}
-
-export interface Role {
-  id: number;
-  name: string;
-  display_name: string;
-  slug: string;
-}
 
 // Respuestas de API
 export interface ApprovalHistoryResponse {

@@ -5,7 +5,8 @@
  * Import `User` and `PageProps` from `@/types` — do NOT redeclare them here.
  */
 
-import type { PageProps, User } from '@/types';
+import type { PageProps } from './PageProps';
+import type { User } from './User';
 import type { OnboardingState, PublicationTemplate, SocialPlatform, TourStep } from '@/types/onboarding';
 import type { ReactNode } from 'react';
 
@@ -13,7 +14,7 @@ import type { ReactNode } from 'react';
 // Component props
 // ---------------------------------------------------------------------------
 
-export interface AuthenticatedLayoutProps {
+export type AuthenticatedLayoutProps = {
   /** Optional header content rendered inside the sticky top bar. */
   header?: ReactNode;
   /** Page content rendered in the main scrollable area. */
@@ -30,7 +31,7 @@ export interface AuthenticatedLayoutProps {
  *
  * Extend `PageProps` so the standard `auth` shape is always included.
  */
-export interface AuthPageProps extends PageProps {
+export type AuthPageProps = PageProps & {
   /** Whether the application is in maintenance mode. */
   maintenanceMode?: boolean;
   /**
@@ -51,7 +52,7 @@ export interface AuthPageProps extends PageProps {
 // Supporting types
 // ---------------------------------------------------------------------------
 
-export interface ConnectedAccount {
+export type ConnectedAccount = {
   platform: string;
   account_name: string;
 }
@@ -60,7 +61,7 @@ export interface ConnectedAccount {
  * Resolved auth data extracted from `AuthPageProps['auth']`.
  * Re-exported for convenience so consumers don't need to drill into PageProps.
  */
-export interface ResolvedAuth {
+export type ResolvedAuth = {
   user: User | null;
   current_workspace?: {
     id: number;
