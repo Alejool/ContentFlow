@@ -1,12 +1,11 @@
 import { ICON_MAP } from '@/Components/Notifications/DynamicIcon';
 import { ToastService } from '@/Services/ToastService';
 import { useNotificationStore } from '@/stores/notificationStore';
+import { createEchoSubscription } from '@/Utils/echoHelper';
 import React from 'react';
 
 export function initNotificationRealtime(userId: number) {
-  if (window.Echo) {
-    const channel = window.Echo.private(`users.${userId}`);
-
+  return createEchoSubscription(`users.${userId}`, 'private', (channel) => {
     // Notificaciones generales
     channel.listen('.NotificationCreated', (e: Record<string, unknown>) => {
       // Show toast immediately
@@ -36,7 +35,7 @@ export function initNotificationRealtime(userId: number) {
     channel.notification((notification: any) => {
       handleQueueNotification(notification);
     });
-  }
+  });
 }
 
 function handleQueueNotification(notification: any) {

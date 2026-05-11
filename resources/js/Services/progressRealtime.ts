@@ -1,5 +1,6 @@
 import { useProcessingProgress } from '@/stores/processingProgressStore';
 import { useUploadQueue } from '@/stores/uploadQueueStore';
+import { createEchoSubscription } from '@/Utils/echoHelper';
 import axios from 'axios';
 
 // Polling intervals
@@ -12,6 +13,9 @@ let processingPollInterval: NodeJS.Timeout | null = null;
 
 // Track if WebSocket is available
 let isWebSocketAvailable = false;
+
+// Track cleanup function for Echo subscription
+let echoCleanup: (() => void) | null = null;
 
 interface UploadProgressEvent {
   uploadId: string;
@@ -57,56 +61,48 @@ interface VideoProcessingCancelledEvent {
  * @param userId - The authenticated user's ID
  */
 export function initProgressRealtime(userId: number) {
-  // Check if WebSocket is available
-  isWebSocketAvailable = !!window.Echo;
+  // Set up WebSocket listeners with safe Echo subscription
+  echoCleanup = createEchoSubscription(`users.${userId}`, 'private', (channel) => {
+    isWebSocketAvailable = true;
 
-  if (isWebSocketAvailable) {
-    initWebSocketListeners(userId);
-    // Still start polling as backup in case WebSocket fails
-    initPollingFallback();
-  } else {
-    initPollingFallback();
-  }
+    // Listen for upload progress updates (Requirement 1.3)
+    channel.listen('.UploadProgressUpdated', (event: UploadProgressEvent) => {
+      handleUploadProgressUpdate(event);
+    });
+
+    // Listen for processing progress updates (Requirement 3.3)
+    channel.listen('.ProcessingProgressUpdated', (event: ProcessingProgressEvent) => {
+      handleProcessingProgressUpdate(event);
+    });
+
+    // Listen for video processing completion (Requirements 8.1, 8.2)
+    channel.listen('.VideoProcessingCompleted', (event: VideoProcessingCompletedEvent) => {
+      handleVideoProcessingCompleted(event);
+    });
+
+    // Listen for processing failures
+    channel.listen('.VideoProcessingFailed', (event: VideoProcessingFailedEvent) => {
+      handleVideoProcessingFailed(event);
+    });
+
+    // Listen for processing cancellations
+    channel.listen('.VideoProcessingCancelled', (event: VideoProcessingCancelledEvent) => {
+      handleVideoProcessingCancelled(event);
+    });
+  });
+
+  // Always start polling as backup
+  initPollingFallback();
 }
 
 /**
  * Initialize WebSocket event listeners for real-time updates
+ * @deprecated Use initProgressRealtime instead - this function is no longer used
  */
-function initWebSocketListeners(userId: number) {
-  if (!window.Echo) return;
-
-  const channel = window.Echo.private(`users.${userId}`);
-
-  // Listen for upload progress updates (Requirement 1.3)
-  channel.listen('.UploadProgressUpdated', (event: UploadProgressEvent) => {
-    handleUploadProgressUpdate(event);
-  });
-
-  // Listen for processing progress updates (Requirement 3.3)
-  channel.listen('.ProcessingProgressUpdated', (event: ProcessingProgressEvent) => {
-    handleProcessingProgressUpdate(event);
-  });
-
-  // Listen for video processing completion (Requirements 8.1, 8.2)
-  channel.listen('.VideoProcessingCompleted', (event: VideoProcessingCompletedEvent) => {
-    handleVideoProcessingCompleted(event);
-  });
-
-  // Listen for processing failures
-  channel.listen('.VideoProcessingFailed', (event: VideoProcessingFailedEvent) => {
-    handleVideoProcessingFailed(event);
-  });
-
-  // Listen for processing cancellations
-  channel.listen('.VideoProcessingCancelled', (event: VideoProcessingCancelledEvent) => {
-    handleVideoProcessingCancelled(event);
-  });
-
-  // Handle WebSocket connection errors - fallback to polling
-  channel.error((_error: unknown) => {
-    isWebSocketAvailable = false;
-    initPollingFallback();
-  });
+function initWebSocketListeners(_userId: number) {
+  // This function is now handled by createEchoSubscription in initProgressRealtime
+  // Kept for backward compatibility but should not be called
+  console.warn('initWebSocketListeners is deprecated. Use initProgressRealtime instead.');
 }
 
 /**
@@ -432,16 +428,15 @@ export function stopPolling() {
 /**
  * Cleanup function to stop all listeners and polling
  */
-export function cleanupProgressRealtime(userId: number) {
+export function cleanupProgressRealtime(_userId: number) {
   // Stop polling
   stopPolling();
 
-  // Leave WebSocket channel if available
-  if (window.Echo && isWebSocketAvailable) {
-    try {
-      window.Echo.leave(`users.${userId}`);
-    } catch {
-      // Ignore cleanup errors
-    }
+  // Cleanup Echo subscription if it exists
+  if (echoCleanup) {
+    echoCleanup();
+    echoCleanup = null;
   }
+
+  isWebSocketAvailable = false;
 }
