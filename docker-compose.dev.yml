@@ -15,7 +15,8 @@ services:
       - ./docker/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini
       - cf_vendor_v2:/var/www/html/vendor
       - cf_node_modules_v2:/var/www/html/node_modules
-      - cf_public_build:/var/www/html/public/build
+      # cf_public_build NO se monta en dev: Laravel debe usar public/hot (dev server)
+      # Si se monta un build viejo de producción, Laravel lo usa en lugar del dev server
     env_file:
       - .env.docker
     # ports:
@@ -23,7 +24,7 @@ services:
     environment:
       - LARAVEL_OCTANE=1
       - OCTANE_SERVER=swoole
-    command: php artisan octane:start --server=swoole --host=0.0.0.0 --port=8080 --watch
+    command: php artisan octane:start --server=swoole --host=0.0.0.0 --port=8080
     depends_on:
       pgsql:
         condition: service_healthy
@@ -178,14 +179,32 @@ services:
     image: node:20-alpine
     container_name: contentflow_vite_dev
     working_dir: /var/www/html
-    command: sh -c "npm install --legacy-peer-deps && npm run dev -- --host 0.0.0.0"
+    # Matar cualquier proceso zombie en el puerto 5173 antes de arrancar
+    # strictPort=false en vite.config.js para evitar crash silencioso
+    command: sh -c "fuser -k 5173/tcp 2>/dev/null; npm run dev"
     ports:
       - "5173:5173"
     volumes:
-      - ./:/var/www/html
+      # Solo montar archivos que Vite necesita — evita que el watcher escanee
+      # miles de archivos PHP/vendor que bloquean el event loop en Windows
+      - ./resources:/var/www/html/resources:ro
+      - ./public:/var/www/html/public
+      - ./vite.config.js:/var/www/html/vite.config.js:ro
+      - ./tsconfig.json:/var/www/html/tsconfig.json:ro
+      - ./package.json:/var/www/html/package.json
+      - ./package-lock.json:/var/www/html/package-lock.json
+      - ./tailwind.config.js:/var/www/html/tailwind.config.js:ro
+      - ./postcss.config.js:/var/www/html/postcss.config.js:ro
+      - ./.env.docker:/var/www/html/.env:ro
       - cf_node_modules_v2:/var/www/html/node_modules
-      - cf_public_build:/var/www/html/public/build
+      # Cache de pre-bundle — persiste entre reinicios, evita los 13s de arranque
+      - cf_vite_cache:/var/www/html/node_modules/.vite
+      # NO montar cf_public_build: en dev Vite sirve desde memoria,
+      # el manifest de producción en ese volumen confunde a Laravel
+    env_file:
+      - .env.docker
     environment:
+      - NODE_ENV=development
       - VITE_HMR_HOST=${VITE_HMR_HOST:-localhost}
     networks:
       - laravel
@@ -206,3 +225,5 @@ volumes:
     name: contentflow_node_modules_dev
   cf_public_build:
     name: contentflow_public_build_dev
+  cf_vite_cache:
+    name: contentflow_vite_cache_dev
