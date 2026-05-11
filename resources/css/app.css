@@ -1,8 +1,257 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+
+@import "tailwindcss";
+
+/* ============================================================
+   TAILWIND v4 THEME CONFIGURATION
+   All design tokens defined here replace tailwind.config.js
+   ============================================================ */
+
+@theme {
+  /* ── Dark mode ── */
+  --default-transition-duration: 200ms;
+
+  /* ── Content sources ── */
+  /* Defined via @source directives below */
+
+  /* ── Font families ── */
+  --font-family-heading: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-family-sans: "Roboto", ui-sans-serif, system-ui, sans-serif;
+  --font-family-poppins: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-family-roboto: "Roboto", ui-sans-serif, system-ui, sans-serif;
+  --font-family-display: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-family-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* ── Primary color scale (CSS-variable-driven for runtime theming) ── */
+  /* Note: These reference CSS custom properties set in :root / [data-theme-color] */
+  --color-primary-50:  rgb(var(--primary-50));
+  --color-primary-100: rgb(var(--primary-100));
+  --color-primary-200: rgb(var(--primary-200));
+  --color-primary-300: rgb(var(--primary-300));
+  --color-primary-400: rgb(var(--primary-400));
+  --color-primary-500: rgb(var(--primary-500));
+  --color-primary-600: rgb(var(--primary-600));
+  --color-primary-700: rgb(var(--primary-700));
+  --color-primary-800: rgb(var(--primary-800));
+  --color-primary-900: rgb(var(--primary-900));
+  --color-primary-950: rgb(var(--primary-950));
+
+  /* ── Secondary / Beige scale ── */
+  --color-secondary-50:  #fefaf6;
+  --color-secondary-100: #fdf6f0;
+  --color-secondary-200: #FAF3E1;
+  --color-secondary-300: #f5e7c6;
+  --color-secondary-400: #f0dbb0;
+  --color-secondary-500: #ebcf9a;
+  --color-secondary-600: #e6c384;
+  --color-secondary-700: #e1b76e;
+  --color-secondary-800: #dcab58;
+  --color-secondary-900: #d79f42;
+
+  /* Alias: beige → secondary */
+  --color-beige-50:  var(--color-secondary-50);
+  --color-beige-100: var(--color-secondary-100);
+  --color-beige-200: var(--color-secondary-200);
+  --color-beige-300: var(--color-secondary-300);
+  --color-beige-400: var(--color-secondary-400);
+  --color-beige-500: var(--color-secondary-500);
+
+  /* ── Neutral scale ── */
+  --color-neutral-50:  #fafafa;
+  --color-neutral-100: #f5f5f5;
+  --color-neutral-200: #e5e5e5;
+  --color-neutral-300: #d4d4d4;
+  --color-neutral-400: #a3a3a3;
+  --color-neutral-500: #737373;
+  --color-neutral-600: #525252;
+  --color-neutral-700: #404040;
+  --color-neutral-800: #262626;
+  --color-neutral-900: #171717;
+
+  /* ── Gray scale (same as neutral) ── */
+  --color-gray-50:  #fafafa;
+  --color-gray-100: #f5f5f5;
+  --color-gray-200: #e5e5e5;
+  --color-gray-300: #d4d4d4;
+  --color-gray-400: #a3a3a3;
+  --color-gray-500: #737373;
+  --color-gray-600: #525252;
+  --color-gray-700: #404040;
+  --color-gray-800: #262626;
+  --color-gray-900: #171717;
+
+  /* ── Semantic colors ── */
+  --color-success-50:  #f0fdf4;
+  --color-success-100: #dcfce7;
+  --color-success-500: #22c55e;
+  --color-success-600: #16a34a;
+  --color-success-700: #15803d;
+
+  --color-error-50:  #fef2f2;
+  --color-error-100: #fee2e2;
+  --color-error-500: #ef4444;
+  --color-error-600: #dc2626;
+  --color-error-700: #b91c1c;
+
+  --color-warning-50:  #fff7ed;
+  --color-warning-100: #ffedd5;
+  --color-warning-500: #f97316;
+  --color-warning-600: #ea580c;
+  --color-warning-700: #c2410c;
+
+  --color-info-50:  #eff6ff;
+  --color-info-100: #dbeafe;
+  --color-info-500: #3b82f6;
+  --color-info-600: #2563eb;
+  --color-info-700: #1d4ed8;
+
+  /* ── Accent colors ── */
+  --color-blue-50:  #eff6ff;
+  --color-blue-100: #dbeafe;
+  --color-blue-500: #3b82f6;
+  --color-blue-600: #2563eb;
+  --color-blue-700: #1d4ed8;
+
+  --color-purple-50:  #faf5ff;
+  --color-purple-100: #f3e8ff;
+  --color-purple-500: #a855f7;
+  --color-purple-600: #9333ea;
+  --color-purple-700: #7e22ce;
+
+  --color-green-50:  #f0fdf4;
+  --color-green-100: #dcfce7;
+  --color-green-500: #22c55e;
+  --color-green-600: #16a34a;
+  --color-green-700: #15803d;
+
+  --color-yellow-50:  #fefce8;
+  --color-yellow-100: #fef9c3;
+  --color-yellow-500: #eab308;
+  --color-yellow-600: #ca8a04;
+  --color-yellow-700: #a16207;
+
+  --color-pink-50:  #fdf2f8;
+  --color-pink-100: #fce7f3;
+  --color-pink-500: #ec4899;
+  --color-pink-600: #db2777;
+  --color-pink-700: #be185d;
+
+  /* ── Black / White ── */
+  --color-black: #222222;
+  --color-white: #ffffff;
+
+  /* ── Theme-aware semantic tokens (CSS vars set by JS/dark-mode) ── */
+  --color-theme-bg-primary:   var(--theme-bg-primary);
+  --color-theme-bg-secondary: var(--theme-bg-secondary);
+  --color-theme-bg-tertiary:  var(--theme-bg-tertiary);
+  --color-theme-bg-elevated:  var(--theme-bg-elevated);
+
+  --color-theme-text-primary:   var(--theme-text-primary);
+  --color-theme-text-secondary: var(--theme-text-secondary);
+  --color-theme-text-tertiary:  var(--theme-text-tertiary);
+  --color-theme-text-disabled:  var(--theme-text-disabled);
+
+  --color-theme-border-subtle:  var(--theme-border-subtle);
+  --color-theme-border-default: var(--theme-border-default);
+  --color-theme-border-strong:  var(--theme-border-strong);
+
+  --color-theme-interactive-hover:  var(--theme-interactive-hover);
+  --color-theme-interactive-active: var(--theme-interactive-active);
+  --color-theme-interactive-focus:  var(--theme-interactive-focus);
+
+  /* ── Background images / gradients ── */
+  --background-image-gradient-primary:   linear-gradient(to right, #FF6D1F, #f97316);
+  --background-image-gradient-secondary: linear-gradient(to right, #FAF3E1, #f5e7c6);
+  --background-image-gradient-accent:    linear-gradient(to right, #FF6D1F, #f97316, #fb923c);
+  --background-image-gradient-dark:      linear-gradient(to right, #222222, #404040);
+  --background-image-gradient-light:     linear-gradient(to right, #FAF3E1, #ffffff, #FAF3E1);
+  --background-image-gradient-warm:      linear-gradient(to right, #FAF3E1, #FF6D1F);
+  --background-image-gradient-cool:      linear-gradient(to right, #FAF3E1, #3b82f6);
+
+  /* ── Border radius ── */
+  --radius-none: 0;
+  --radius-sm:   0.125rem;
+  --radius:      0.25rem;
+  --radius-md:   0.375rem;
+  --radius-lg:   0.5rem;
+  --radius-xl:   0.75rem;
+  --radius-2xl:  1rem;
+  --radius-3xl:  1.5rem;
+  --radius-full: 9999px;
+
+  /* ── Spacing (extends default scale) ── */
+  --spacing-0:  0;
+  --spacing-1:  0.25rem;
+  --spacing-2:  0.5rem;
+  --spacing-3:  0.75rem;
+  --spacing-4:  1rem;
+  --spacing-5:  1.25rem;
+  --spacing-6:  1.5rem;
+  --spacing-8:  2rem;
+  --spacing-10: 2.5rem;
+  --spacing-12: 3rem;
+  --spacing-16: 4rem;
+  --spacing-20: 5rem;
+  --spacing-24: 6rem;
+
+  /* ── Transition durations ── */
+  --transition-duration-instant: 0ms;
+  --transition-duration-fast:    150ms;
+  --transition-duration-normal:  250ms;
+  --transition-duration-slow:    350ms;
+  --transition-duration-slower:  500ms;
+
+  /* ── Transition timing functions ── */
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out:    cubic-bezier(0.0, 0, 0.2, 1);
+  --ease-in:     cubic-bezier(0.4, 0, 1, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ── Keyframe animations ── */
+  --animate-shimmer:   shimmer 1.4s infinite;
+  --animate-fade-in:   fade-in 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --animate-slide-in:  slide-in 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --animate-scale-in:  scale-in 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+  @keyframes shimmer {
+    0%   { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  @keyframes fade-in {
+    0%   { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  @keyframes slide-in {
+    0%   { transform: translateX(20px); opacity: 0; }
+    100% { transform: translateX(0);    opacity: 1; }
+  }
+
+  @keyframes scale-in {
+    0%   { transform: scale(0.95); opacity: 0; }
+    100% { transform: scale(1);    opacity: 1; }
+  }
+}
+
+/* ============================================================
+   CONTENT SOURCES  (replaces `content` array in v3 config)
+   ============================================================ */
+@source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
+@source "../../storage/framework/views/*.php";
+@source "../views/**/*.blade.php";
+@source "./**/*.tsx";
+
+
+/* ============================================================
+   DARK MODE  (class strategy — same as v3)
+   ============================================================ */
+@variant dark (&:where(.dark, .dark *));
+
+/* ============================================================
+   RUNTIME PRIMARY COLOR TOKENS
+   (Orange default — overridden by [data-theme-color] attributes)
+   ============================================================ */
 
 :root {
   /*(Orange) */
@@ -155,11 +404,10 @@
 @layer base {
   html {
     font-family:
-      'Inter',
+      'Roboto',
       -apple-system,
       BlinkMacSystemFont,
       'Segoe UI',
-      Roboto,
       'Helvetica Neue',
       Arial,
       sans-serif;
@@ -223,11 +471,10 @@
   main,
   aside {
     font-family:
-      'Inter',
+      'Roboto',
       -apple-system,
       BlinkMacSystemFont,
       'Segoe UI',
-      Roboto,
       sans-serif;
   }
 
@@ -235,11 +482,10 @@
   textarea,
   select {
     font-family:
-      'Inter',
+      'Roboto',
       -apple-system,
       BlinkMacSystemFont,
       'Segoe UI',
-      Roboto,
       sans-serif;
   }
 
@@ -254,13 +500,14 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply rounded-full bg-primary-500;
+    background-color: rgb(var(--primary-500));
+    border-radius: 9999px;
     border: 2px solid transparent;
     background-clip: content-box;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-primary-600;
+    background-color: rgb(var(--primary-600));
   }
 
   /* Firefox */
@@ -471,93 +718,122 @@
 
 @layer components {
   .heading-1 {
-    @apply font-heading text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl;
+    font-family: var(--font-family-heading);
+    font-size: var(--text-4xl);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+  }
+  @media (min-width: 768px) {
+    .heading-1 { font-size: var(--text-5xl); }
+  }
+  @media (min-width: 1024px) {
+    .heading-1 { font-size: var(--text-6xl); }
   }
 
   .heading-2 {
-    @apply font-heading text-3xl font-semibold tracking-tight md:text-4xl;
+    font-family: var(--font-family-heading);
+    font-size: var(--text-3xl);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+  }
+  @media (min-width: 768px) {
+    .heading-2 { font-size: var(--text-4xl); }
   }
 
   .heading-3 {
-    @apply font-heading text-2xl font-semibold md:text-3xl;
+    font-family: var(--font-family-heading);
+    font-size: var(--text-2xl);
+    font-weight: 600;
+  }
+  @media (min-width: 768px) {
+    .heading-3 { font-size: var(--text-3xl); }
   }
 
   .body-lg {
-    @apply font-sans text-lg leading-relaxed;
+    font-family: var(--font-family-sans);
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
   }
 
   .body-md {
-    @apply font-sans text-base leading-relaxed;
+    font-family: var(--font-family-sans);
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
   }
 
   .body-sm {
-    @apply font-sans text-sm leading-normal;
+    font-family: var(--font-family-sans);
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
   }
 
   .btn {
-    @apply font-heading font-medium;
+    font-family: var(--font-family-heading);
+    font-weight: 500;
   }
 
   .btn-primary {
-    @apply font-heading font-semibold;
+    font-family: var(--font-family-heading);
+    font-weight: 600;
   }
 
   .nav-link {
-    @apply font-heading font-medium;
+    font-family: var(--font-family-heading);
+    font-weight: 500;
   }
 
   .card-title {
-    @apply font-heading font-semibold;
+    font-family: var(--font-family-heading);
+    font-weight: 600;
   }
 
   .card-subtitle {
-    @apply font-sans font-medium;
+    font-family: var(--font-family-sans);
+    font-weight: 500;
   }
 
   .stat-number {
-    @apply font-heading font-bold;
+    font-family: var(--font-family-heading);
+    font-weight: 700;
   }
 
   .stat-label {
-    @apply font-sans font-medium uppercase tracking-wide;
+    font-family: var(--font-family-sans);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
   .span-poppins {
-    @apply font-heading;
+    font-family: var(--font-family-heading);
   }
 
   .span-inter {
-    @apply font-sans;
+    font-family: var(--font-family-sans);
   }
 }
 
 @layer utilities {
   .font-poppins {
-    font-family:
-      'Poppins',
-      -apple-system,
-      BlinkMacSystemFont,
-      'Segoe UI',
-      Roboto,
-      sans-serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  .font-roboto {
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
 
   .font-inter {
-    font-family:
-      'Inter',
-      -apple-system,
-      BlinkMacSystemFont,
-      'Segoe UI',
-      Roboto,
-      sans-serif;
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
 
   .span-ui {
-    @apply font-poppins font-medium;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight: 500;
   }
 
   .span-content {
-    @apply font-inter font-normal;
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight: 400;
   }
 }
 
