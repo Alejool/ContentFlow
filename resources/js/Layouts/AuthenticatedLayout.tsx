@@ -58,7 +58,7 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
           <MaintenanceBanner message={props.maintenanceBanner} />
         )}
 
-        <div className="flex h-screen w-full max-w-full flex-col overflow-hidden">
+        <div className="flex w-full max-w-full flex-col overflow-hidden">
           <div className="relative flex min-h-0 w-full min-w-0 max-w-full flex-1 overflow-x-hidden">
             <div className="absolute inset-0 bg-white dark:bg-neutral-900" />
 
@@ -124,7 +124,7 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
           </div>
 
           <div className="fixed bottom-4 right-4 z-[9999] flex flex-col items-end gap-2">
-            <DevCacheIndicator />
+            {/* <DevCacheIndicator /> */}
             <GlobalUploadIndicator />
           </div>
 
