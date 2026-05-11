@@ -8,10 +8,11 @@ import CreateWorkspaceCard from '@/Components/Workspace/CreateWorkspaceCard';
 import CreateWorkspaceModal from '@/Components/Workspace/CreateWorkspaceModal';
 import WorkspaceCard from '@/Components/Workspace/WorkspaceCard';
 import { Plus } from 'lucide-react';
+import type { AuthPageProps, Role, Workspace } from '@/types';
 
-export default function Index({ workspaces, roles }: { workspaces: any[]; roles: any[] }) {
+export default function Index({ workspaces, roles }: { workspaces: Workspace[]; roles: Role[] }) {
   const { t } = useTranslation();
-  const { auth } = usePage().props as any;
+  const { auth } = usePage<AuthPageProps>().props;
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   return (
@@ -39,21 +40,20 @@ export default function Index({ workspaces, roles }: { workspaces: any[]; roles:
       }
     >
       <Head title={t('workspace.my_workspaces')} />
-      <div>
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 p-10 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="mx-auto h-screen   max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {workspaces.map((workspace) => (
             <WorkspaceCard
               key={workspace.id}
               workspace={workspace}
               roles={roles}
-              currentWorkspaceId={auth.user.current_workspace_id}
+              currentWorkspaceId={auth.user?.current_workspace_id ?? 0}
               auth={auth}
             />
           ))}
 
           <CreateWorkspaceCard onClick={() => setShowCreateModal(true)} />
         </div>
-
         <CreateWorkspaceModal
           isOpen={showCreateModal}
           onClose={() => setShowCreateModal(false)}

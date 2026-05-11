@@ -18,11 +18,13 @@ import RoleBadge from '@/Components/Workspace/RoleBadge';
 import Button from '@/Components/common/Modern/Button';
 import { ContextMenu } from '@/Components/common/Modern/ContextMenu';
 
+import type { AuthPageProps, Role, Workspace } from '@/types';
+
 interface WorkspaceCardProps {
-  workspace: any;
-  roles: any[];
+  workspace: Workspace;
+  roles: Role[];
   currentWorkspaceId: number;
-  auth: any;
+  auth: AuthPageProps['auth'];
 }
 
 const WorkspaceCard = ({ workspace, roles, currentWorkspaceId, auth }: WorkspaceCardProps) => {
@@ -48,7 +50,7 @@ const WorkspaceCard = ({ workspace, roles, currentWorkspaceId, auth }: Workspace
 
   return (
     <div
-      className={`group relative rounded-lg border bg-gradient-to-br from-white/90 to-white/95 p-6 transition-all duration-700 ease-in-out hover:-translate-y-1 hover:border-primary-300 hover:shadow-2xl hover:shadow-primary-600/10 dark:border-black/70 dark:from-black/90 dark:to-black/95 dark:hover:border-primary-500/30`}
+      className={`group relative rounded-lg border bg-gradient-to-br from-white/90 to-white/95 p-6 transition-all duration-700 ease-in-out hover:-translate-y-1 hover:border-primary-300 hover:shadow-2xl hover:shadow-primary-600/10 dark:border-black/70 dark:from-black/90 dark:to-black/95 dark:hover:border-primary-500/30 h-92 `}
       style={{
         backgroundImage: `radial-gradient(circle at top left, var(--tw-gradient-from), var(--tw-gradient-to))`,
         transition:

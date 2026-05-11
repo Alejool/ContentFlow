@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
+import type { TFunction } from 'i18next';
 
 import Button from '@/Components/common/Modern/Button';
 import Input from '@/Components/common/Modern/Input';
@@ -15,10 +16,10 @@ import { X } from 'lucide-react';
 interface CreateWorkspaceModalProps {
   isOpen: boolean;
   onClose: () => void;
-  t: any;
+  t: TFunction;
 }
 
-const workspaceSchema = (t: any) =>
+const workspaceSchema = (t: TFunction) =>
   z.object({
     name: z.string().min(1, t('workspace.invite_modal.validation.nameRequired')).max(255),
     description: z.string().max(1000).optional().or(z.literal('')),
@@ -107,7 +108,7 @@ const CreateWorkspaceModal = ({ isOpen, onClose, t }: CreateWorkspaceModalProps)
             register={register}
             error={errors.name?.message}
             placeholder={t('workspace.name_placeholder')}
-            autoFocus
+            
           />
 
           <div className="space-y-1">
