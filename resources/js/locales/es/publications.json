@@ -82,7 +82,7 @@
           "titleRequired": "El título es obligatorio",
           "titleLength": "El título no puede exceder los 70 caracteres",
           "descMin": "La descripción debe tener al menos 10 caracteres",
-          "descMax": "La descripción no puede exceder los 700 caracteres",
+          "descMax": "La descripción no puede exceder los {{max}} caracteres",
           "objRequired": "El objetivo es obligatorio",
           "objMax": "El objetivo no puede exceder los 200 caracteres",
           "hashtagsRequired": "Los hashtags son obligatorios",
@@ -404,7 +404,7 @@
       },
       "validation": {
         "descMin": "descripción debe tener al menos 10 caracteres",
-        "descMax": "descripción debe tener menos de 700 caracteres",
+        "descMax": "La descripción debe tener menos de {{max}} caracteres",
         "objMin": "Objetivo debe tener al menos 5 caracteres",
         "objMax": "Objetivo debe tener menos de 200 caracteres",
         "objRequired": "Objetivo es requerido",

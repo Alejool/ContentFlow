@@ -75,10 +75,16 @@ export const publicationSchema = (
         ? z
             .string()
             .min(rules.descriptionMinLength, t('publications.modal.validation.descMin'))
-            .max(rules.descriptionMaxLength, t('publications.modal.validation.descMax'))
+            .max(
+              rules.descriptionMaxLength,
+              t('publications.modal.validation.descMax', { max: rules.descriptionMaxLength }),
+            )
         : z
             .string()
-            .max(rules.descriptionMaxLength, t('publications.modal.validation.descMax'))
+            .max(
+              rules.descriptionMaxLength,
+              t('publications.modal.validation.descMax', { max: rules.descriptionMaxLength }),
+            )
             .optional()
             .or(z.literal('')),
 
