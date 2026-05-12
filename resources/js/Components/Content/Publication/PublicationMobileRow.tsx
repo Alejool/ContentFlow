@@ -113,7 +113,6 @@ const PublicationMobileRow = memo(function PublicationMobileRow({
     return t(`publications.status.${status || 'draft'}`);
   };
 
-
   return (
     <div className="w-full space-y-3 px-1">
       {items.map((item) => {
@@ -164,10 +163,10 @@ const PublicationMobileRow = memo(function PublicationMobileRow({
                 )}
 
                 <div className="mb-2">
-                  <h3 className="truncate text-base font-bold leading-tight text-gray-900 dark:text-white">
+                  <h3 className="truncate text-base leading-tight font-bold text-gray-900 dark:text-white">
                     {item.title || t('publications.table.untitled')}
                   </h3>
-                  <p className="mt-1 line-clamp-2 break-words text-xs text-gray-600 dark:text-gray-400">
+                  <p className="mt-1 line-clamp-2 text-xs break-words text-gray-600 dark:text-gray-400">
                     {item.description || t('publications.table.noDescription')}
                   </p>
                 </div>
@@ -210,7 +209,7 @@ const PublicationMobileRow = memo(function PublicationMobileRow({
                 {/* Alerts */}
                 {remoteLocks[item.id] && item.status !== 'pending_review' && (
                   <div className="mb-3 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 p-2.5 dark:border-amber-800/30 dark:bg-amber-900/20">
-                    <Lock className="h-4 w-4 flex-shrink-0 text-amber-600 dark:text-amber-400" />
+                    <Lock className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
                     <span className="text-xs font-semibold text-amber-700 dark:text-amber-400">
                       {t('publications.table.editingBy')} {lockedByName}
                     </span>
@@ -218,7 +217,7 @@ const PublicationMobileRow = memo(function PublicationMobileRow({
                 )}
                 {item.status === 'pending_review' && (
                   <div className="mb-3 flex items-center gap-2 rounded-lg border border-yellow-200 bg-yellow-50 p-2.5 dark:border-yellow-800/30 dark:bg-yellow-900/20">
-                    <Clock className="h-4 w-4 flex-shrink-0 text-yellow-600 dark:text-yellow-400" />
+                    <Clock className="h-4 w-4 shrink-0 text-yellow-600 dark:text-yellow-400" />
                     <div className="flex-1">
                       <span className="text-xs font-semibold text-yellow-700 dark:text-yellow-400">
                         {t('publications.table.pendingAdminReview') || 'Pendiente de revisión'}
@@ -246,7 +245,7 @@ const PublicationMobileRow = memo(function PublicationMobileRow({
                       variant="primary"
                       size="sm"
                       icon={Rocket}
-                      className="flex-1 bg-primary-600 hover:bg-primary-700 dark:bg-primary-600 dark:hover:bg-primary-700"
+                      className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-600 dark:hover:bg-primary-700 flex-1"
                     >
                       {t('publications.button.publish')}
                     </Button>
@@ -280,7 +279,7 @@ const PublicationMobileRow = memo(function PublicationMobileRow({
                       variant="primary"
                       size="sm"
                       icon={Edit}
-                      className="flex-1 bg-primary-600 hover:bg-primary-700 dark:bg-primary-600 dark:hover:bg-primary-700"
+                      className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-600 dark:hover:bg-primary-700 flex-1"
                     >
                       {t('common.edit')}
                     </Button>
@@ -293,7 +292,7 @@ const PublicationMobileRow = memo(function PublicationMobileRow({
                       variant="primary"
                       size="sm"
                       icon={Eye}
-                      className="flex-1 bg-primary-600 hover:bg-primary-700 dark:bg-primary-600 dark:hover:bg-primary-700"
+                      className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-600 dark:hover:bg-primary-700 flex-1"
                     >
                       {t('publications.button.view')}
                     </Button>
@@ -301,13 +300,13 @@ const PublicationMobileRow = memo(function PublicationMobileRow({
 
                   {/* More options menu */}
                   <Menu>
-                    <MenuButton className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white p-2 text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:border-neutral-600 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700">
+                    <MenuButton className="focus:ring-primary-500 inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white p-2 text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:border-neutral-600 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700">
                       <MoreVertical className="h-5 w-5" />
                       <span className="sr-only">{t('common.more')}</span>
                     </MenuButton>
                     <MenuItems
                       anchor="bottom end"
-                      className="z-[9999] mt-2 w-56 origin-top-right rounded-xl border border-gray-200 bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:border-neutral-700 dark:bg-neutral-800"
+                      className="ring-opacity-5 z-[9999] mt-2 w-56 origin-top-right rounded-xl border border-gray-200 bg-white shadow-lg ring-1 ring-black focus:outline-none dark:border-neutral-700 dark:bg-neutral-800"
                     >
                       <div className="space-y-1 p-2">
                         <MenuItem>

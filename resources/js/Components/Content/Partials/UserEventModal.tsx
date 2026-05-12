@@ -4,36 +4,16 @@ import DatePickerModern from '@/Components/common/Modern/DatePicker';
 import Input from '@/Components/common/Modern/Input';
 import Textarea from '@/Components/common/Modern/Textarea';
 import Modal from '@/Components/common/ui/Modal';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { usePage } from '@inertiajs/react';
-import axios from 'axios';
-import { isBefore, parseISO, startOfDay } from 'date-fns';
+import { useUserEventForm } from '@/Hooks/Calendar/useUserEventForm';
+import {
+  CALENDAR_COLORS,
+  findColorOption,
+  getGradientStyle,
+} from '@/Utils/Calendar/colorHelpers';
+import { motion } from 'framer-motion';
 import { AlignLeft, Bell, Calendar as CalendarIcon, Globe, Lock, Type } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import toast from 'react-hot-toast';
+import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { z } from 'zod';
-
-const eventSchema = z.object({
-  title: z.string().min(1, 'calendar.userEvents.modal.validation.titleRequired'),
-  description: z.string().optional(),
-  start_date: z
-    .date({
-      required_error: 'calendar.userEvents.modal.validation.startDateRequired',
-    })
-    .refine((date) => {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      return date >= today;
-    }, 'calendar.userEvents.modal.validation.pastDate'),
-  end_date: z.date().nullable().optional(),
-  remind_at: z.date().nullable().optional(),
-  color: z.string().default('#3B82F6'),
-  is_public: z.boolean().default(true),
-});
-
-type EventFormValues = z.infer<typeof eventSchema>;
 
 interface UserEventModalProps {
   show: boolean;
@@ -43,12 +23,6 @@ interface UserEventModalProps {
   onSuccess: () => void;
 }
 
-const getLightColor = (hex: string, opacity: number = 0.1) => {
-  return `${hex}${Math.round(opacity * 255)
-    .toString(16)
-    .padStart(2, '0')}`;
-};
-
 export default function UserEventModal({
   show,
   onClose,
@@ -57,177 +31,60 @@ export default function UserEventModal({
   onSuccess,
 }: UserEventModalProps) {
   const { t } = useTranslation();
-  const { auth } = usePage().props as any;
-  const currentUser = auth.user;
-  const [selectedColor, setSelectedColor] = useState('#3B82F6');
+
+  const {
+    form,
+    selectedColor,
+    setSelectedColor,
+    isReadOnly,
+    onSubmit,
+    getCreatorInfo,
+    setValue,
+    watch,
+  } = useUserEventForm({
+    show,
+    event,
+    ...(selectedDate !== undefined && { selectedDate }),
+    onSuccess,
+    onClose,
+  });
 
   const {
     register,
-    handleSubmit,
-    reset,
     control,
-    setValue,
-    watch,
     formState: { errors, isSubmitting },
-  } = useForm<EventFormValues>({
-    resolver: zodResolver(eventSchema),
-    defaultValues: {
-      title: '',
-      description: '',
-      color: '#3B82F6',
-      start_date: new Date(),
-      is_public: true,
-    },
-  });
+  } = form;
 
-  // Observar cambios en el color
-  const colorValue = watch('color');
-
-  useEffect(() => {
-    if (colorValue) {
-      setSelectedColor(colorValue);
-    }
-  }, [colorValue]);
-
-  useEffect(() => {
-    if (show) {
-      if (event) {
-        const eventColor = event.backgroundColor || event.color || '#3B82F6';
-        reset({
-          title: event.title || '',
-          description: event?.extendedProps?.description || '',
-          start_date: event.start
-            ? typeof event.start === 'string'
-              ? parseISO(event.start)
-              : event.start
-            : new Date(),
-          end_date: event.end
-            ? typeof event.end === 'string'
-              ? parseISO(event.end)
-              : event.end
-            : null,
-          color: eventColor,
-          remind_at: event.extendedProps?.remind_at
-            ? typeof event.extendedProps.remind_at === 'string'
-              ? parseISO(event.extendedProps.remind_at)
-              : event.extendedProps.remind_at
-            : null,
-          is_public: event.extendedProps?.is_public ?? true,
-        });
-        setSelectedColor(eventColor);
-      } else if (selectedDate) {
-        reset({
-          title: '',
-          description: '',
-          start_date: selectedDate,
-          end_date: null,
-          color: '#3B82F6',
-          remind_at: null,
-          is_public: true,
-        });
-        setSelectedColor('#3B82F6');
-      } else {
-        reset({
-          title: '',
-          description: '',
-          start_date: new Date(),
-          end_date: null,
-          color: '#3B82F6',
-          remind_at: null,
-          is_public: true,
-        });
-        setSelectedColor('#3B82F6');
-      }
-    }
-  }, [event, selectedDate, show, reset]);
-
-  const isOwner =
-    !event ||
-    (event.user?.id && Number(event.user.id) === Number(currentUser?.id)) ||
-    (!event.user?.id && event.extendedProps?.user_name === currentUser?.name);
-  const isPast = isBefore(startOfDay(watch('start_date') || new Date()), startOfDay(new Date()));
-  const isReadOnly = !isOwner || (isPast && !event);
-
-  const onSubmit = async (data: EventFormValues) => {
-    try {
-      const payload = {
-        ...data,
-        // Send ISO strings with timezone so backend parses correctly
-        start_date: data.start_date ? new Date(data.start_date).toISOString() : null,
-        end_date: data.end_date ? new Date(data.end_date).toISOString() : null,
-        remind_at: data.remind_at ? new Date(data.remind_at).toISOString() : null,
-      };
-
-      if (event) {
-        const resourceId = event.id.includes('_') ? event.id.split('_')[2] : event.id;
-        await axios.put(`/api/v1/calendar/user-events/${resourceId}`, payload);
-        toast.success(t('calendar.userEvents.modal.messages.successUpdate'));
-      } else {
-        await axios.post('/api/v1/calendar/user-events', payload);
-        toast.success(t('calendar.userEvents.modal.messages.successCreate'));
-      }
-      onSuccess();
-      onClose();
-    } catch (error: any) {
-      toast.error(
-        error.response?.data?.message || t('calendar.userEvents.modal.messages.errorSave'),
-      );
-    }
-  };
-
-  const tailwindColors = [
-    { value: '#3B82F6', name: 'Azul', darkValue: '#1D4ED8' },
-    { value: '#EF4444', name: 'Rojo', darkValue: '#DC2626' },
-    { value: '#10B981', name: 'Verde', darkValue: '#059669' },
-    { value: '#F59E0B', name: 'Ámbar', darkValue: '#D97706' },
-    { value: '#8B5CF6', name: 'Violeta', darkValue: '#7C3AED' },
-    { value: '#EC4899', name: 'Rosa', darkValue: '#DB2777' },
-    { value: '#6366F1', name: 'Índigo', darkValue: '#4F46E5' },
-    { value: '#14B8A6', name: 'Verde azulado', darkValue: '#0D9488' },
-    { value: '#F97316', name: 'Naranja', darkValue: '#EA580C' },
-    { value: '#84CC16', name: 'Lima', darkValue: '#65A30D' },
-  ];
-
-  const currentColor = tailwindColors.find((c) => c.value === selectedColor) || tailwindColors[0];
+  const currentColor = findColorOption(selectedColor);
 
   return (
-    <Modal show={show} onClose={onClose} maxWidth="md">
-      <div
-        className="flex flex-col overflow-hidden rounded-lg border bg-white shadow-2xl transition-colors dark:bg-neutral-900"
-        style={{
-          borderColor: `${selectedColor}40`,
-        }}
-      >
-        <ModalHeader
-          t={t}
-          onClose={onClose}
-          title={
-            event ? 'calendar.userEvents.modal.title.edit' : 'calendar.userEvents.modal.title.new'
-          }
-          subtitle={`${currentColor.name} • Evento${
-            event?.user?.id || event?.extendedProps?.user_name
-              ? ' • ' +
-                t('common.creator') +
-                ': ' +
-                ((event.user?.id && Number(event.user.id) === Number(currentUser?.id)) ||
-                (!event.user?.id && event.extendedProps?.user_name === currentUser?.name)
-                  ? t('common.me') || 'Yo'
-                  : event.user?.name || event.extendedProps?.user_name)
-              : ''
-          }${!isOwner ? ' • ' + (t('common.readOnly') || 'Solo lectura') : ''}`}
-          icon={CalendarIcon}
-          iconColor={`text-[${selectedColor}]`}
-          style={{
-            background: `linear-gradient(135deg, ${selectedColor}25, ${selectedColor}10)`,
-            borderColor: `${selectedColor}50`,
-          }}
-        />
-
-        <form
-          id="user-event-form"
-          onSubmit={handleSubmit(onSubmit)}
-          className="flex-1 space-y-6 overflow-y-auto p-6 md:p-8"
+    <Modal show={show} onClose={onClose} maxWidth="2xl">
+      <div className="flex max-h-[90vh] flex-col">
+        <motion.div
+          key={selectedColor}
+          initial={{ opacity: 0.8 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4, ease: 'easeInOut' }}
         >
+          <ModalHeader
+            t={t}
+            onClose={onClose}
+            title={
+              event ? 'calendar.userEvents.modal.title.edit' : 'calendar.userEvents.modal.title.new'
+            }
+            subtitle={`${currentColor.name} • Evento${getCreatorInfo()}${!isReadOnly ? '' : ' • ' + (t('common.readOnly') || 'Solo lectura')}`}
+            icon={CalendarIcon}
+            iconStyle={{ color: selectedColor }}
+            style={getGradientStyle(selectedColor)}
+          />
+        </motion.div>
+
+        <div className="custom-scrollbar flex-1 overflow-y-auto bg-gray-50 dark:bg-neutral-800/50">
+          <form
+            id="user-event-form"
+            onSubmit={onSubmit}
+            className="space-y-6 p-6 md:p-8"
+          >
           <div className="space-y-4">
             <Input
               id="title"
@@ -251,6 +108,7 @@ export default function UserEventModal({
               label={t('calendar.userEvents.modal.fields.description')}
               placeholder={t('calendar.userEvents.modal.placeholders.description')}
               icon={AlignLeft}
+              size='lg'
               register={register}
               rows={3}
               variant="default"
@@ -274,10 +132,11 @@ export default function UserEventModal({
                   onChange={field.onChange}
                   dateFormat="dd/MM/yyyy HH:mm"
                   showTimeSelect
+                  size='lg'
                   isClearable
                   required
                   minDate={new Date()}
-                  error={errors.start_date?.message ? t(errors.start_date.message) : undefined}
+                  error={errors.start_date?.message ? t(errors.start_date.message) : ''}
                   icon={<CalendarIcon className="h-5 w-5" />}
                   activeColor={selectedColor}
                   disabled={isReadOnly}
@@ -290,12 +149,13 @@ export default function UserEventModal({
               render={({ field }) => (
                 <DatePickerModern
                   label={t('calendar.userEvents.modal.fields.endDate')}
-                  selected={field.value}
+                  selected={field.value ?? null}
                   onChange={field.onChange}
                   dateFormat="dd/MM/yyyy HH:mm"
                   showTimeSelect
+                  size='lg'
                   isClearable
-                  error={errors.end_date?.message ? t(errors.end_date.message) : undefined}
+                  error={errors.end_date?.message ? t(errors.end_date.message) : ''}
                   icon={<CalendarIcon className="h-5 w-5" />}
                   activeColor={selectedColor}
                   disabled={isReadOnly}
@@ -311,12 +171,13 @@ export default function UserEventModal({
               <DatePickerModern
                 label={t('calendar.userEvents.modal.fields.remindAt')}
                 hint={t('calendar.userEvents.modal.placeholders.remindAtHint')}
-                selected={field.value}
+                selected={field.value ?? null}
                 onChange={field.onChange}
                 dateFormat="dd/MM/yyyy HH:mm"
                 showTimeSelect
+                size='lg'
                 isClearable
-                error={errors.remind_at?.message ? t(errors.remind_at.message) : undefined}
+                error={errors.remind_at?.message ? t(errors.remind_at.message) : ''}
                 icon={<Bell className="h-5 w-5" />}
                 activeColor={selectedColor}
                 disabled={isReadOnly}
@@ -391,19 +252,24 @@ export default function UserEventModal({
             </p>
           </div>
 
-          <div
+          <motion.div
+            key={`color-section-${selectedColor}`}
+            initial={{ opacity: 0.8, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4, ease: 'easeInOut' }}
             className="rounded-lg border p-5 backdrop-blur-sm transition-all duration-500"
-            style={{
-              background: `linear-gradient(135deg, ${selectedColor}10, ${selectedColor}05)`,
-              borderColor: `${selectedColor}30`,
-            }}
+            style={getGradientStyle(selectedColor)}
           >
             <div className="mb-4 flex items-center justify-between">
               <label className="ml-1 block text-sm font-bold text-gray-900 dark:text-gray-200">
                 {t('calendar.userEvents.modal.fields.color')}
               </label>
-              <span
-                className="rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-300"
+              <motion.span
+                key={`color-badge-${selectedColor}`}
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+                className="rounded-full px-3 py-1.5 text-xs font-medium"
                 style={{
                   backgroundColor: `${selectedColor}20`,
                   color: selectedColor,
@@ -411,24 +277,33 @@ export default function UserEventModal({
                 }}
               >
                 {selectedColor}
-              </span>
+              </motion.span>
             </div>
             <div
               className={`flex flex-wrap gap-3 ${isReadOnly ? 'pointer-events-none opacity-70' : ''}`}
             >
-              {tailwindColors.map((color) => (
-                <button
+              {CALENDAR_COLORS.map((color, index) => (
+                <motion.button
                   key={color.value}
                   type="button"
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{
+                    duration: 0.3,
+                    delay: index * 0.03,
+                    ease: 'easeOut',
+                  }}
+                  whileHover={{ scale: 1.15, rotate: 5 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => {
                     setValue('color', color.value);
                     setSelectedColor(color.value);
                   }}
-                  className={`border-3 h-9 w-9 transform-gpu rounded-full shadow-md transition-all duration-300 hover:scale-125 hover:shadow-lg active:scale-95 ${
+                  className={`h-9 w-9 rounded-full shadow-md transition-all duration-200 ${
                     selectedColor === color.value
-                      ? 'ring-3 rotate-12 scale-110 border-white ring-offset-2 dark:border-neutral-800'
-                      : 'border-transparent hover:border-white/50 dark:hover:border-neutral-800/50'
-                  } `}
+                      ? 'ring-3 scale-110 border-2 border-white ring-white ring-offset-2 dark:border-neutral-800 dark:ring-neutral-800'
+                      : 'border-2 border-transparent'
+                  }`}
                   style={{ backgroundColor: color.value }}
                   title={`${color.name} (${color.value})`}
                   aria-label={`Seleccionar color ${color.name}`}
@@ -436,15 +311,27 @@ export default function UserEventModal({
                 />
               ))}
             </div>
-          </div>
-          <div
+          </motion.div>
+          
+          <motion.div
+            key={`info-section-${selectedColor}`}
+            initial={{ opacity: 0.8, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: 'easeInOut' }}
             className={`rounded-lg border border-dashed px-6 pb-2 pt-2 text-center transition-all duration-500 ${isReadOnly ? 'opacity-70' : ''}`}
             style={{
               borderColor: `${selectedColor}40`,
               backgroundColor: `${selectedColor}08`,
             }}
           >
-            <p className="text-xs font-bold" style={{ color: selectedColor }}>
+            <motion.p
+              key={`info-text-${selectedColor}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+              className="text-xs font-bold"
+              style={{ color: selectedColor }}
+            >
               {watch('is_public')
                 ? t('calendar.userEvents.modal.visibility.public').toUpperCase() +
                   ': ' +
@@ -452,14 +339,15 @@ export default function UserEventModal({
                 : t('calendar.userEvents.modal.visibility.private').toUpperCase() +
                   ': ' +
                   t('calendar.userEvents.modal.visibility.privateHint')}
-            </p>
+            </motion.p>
             {!event && (
               <p className="mt-1 text-[10px] italic text-gray-500 dark:text-gray-400">
                 {t('calendar.userEvents.modal.footer.note')}
               </p>
             )}
-          </div>
-        </form>
+          </motion.div>
+          </form>
+        </div>
 
         <ModalFooter
           formId="user-event-form"

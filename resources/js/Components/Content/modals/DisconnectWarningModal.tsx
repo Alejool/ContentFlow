@@ -1,8 +1,8 @@
 import { useTheme } from '@/Hooks/Layout/useTheme';
+import { formatDateTimeString } from '@/Utils/formatters';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { AlertTriangle, Calendar, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { formatDateTimeString } from '@/Utils/formatters';
 
 interface DisconnectWarningModalProps {
   isOpen: boolean;
@@ -37,7 +37,7 @@ export default function DisconnectWarningModal({
           }`}
         >
           <div className="flex items-start gap-4">
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
               <div
                 className={`rounded-full p-3 ${
                   theme === 'dark' ? 'bg-primary-900/30' : 'bg-primary-100'
@@ -54,7 +54,7 @@ export default function DisconnectWarningModal({
             <div className="flex-1">
               <DialogTitle
                 as="h3"
-                className={`mb-2 text-lg font-bold leading-6 ${
+                className={`mb-2 text-lg leading-6 font-bold ${
                   theme === 'dark' ? 'text-white' : 'text-gray-900'
                 }`}
               >
@@ -63,7 +63,7 @@ export default function DisconnectWarningModal({
 
               <div className="mt-2 text-sm">
                 <p className={`mb-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                  <span className="font-semibold text-primary-500">
+                  <span className="text-primary-500 font-semibold">
                     {t('manageContent.socialMedia.disconnectModal.warning')}
                   </span>
                   <br />
@@ -109,7 +109,7 @@ export default function DisconnectWarningModal({
 
                           return (
                             <tr key={post.id}>
-                              <td className="whitespace-nowrap px-4 py-2">
+                              <td className="px-4 py-2 whitespace-nowrap">
                                 <div className="flex items-center gap-2">
                                   <Calendar className="h-3 w-3 opacity-60" />
                                   {(() => {
@@ -170,7 +170,7 @@ export default function DisconnectWarningModal({
 
             <button
               onClick={onClose}
-              className={`-mr-2 -mt-2 flex-shrink-0 rounded-full p-2 transition-colors ${
+              className={`-mt-2 -mr-2 shrink-0 rounded-full p-2 transition-colors ${
                 theme === 'dark'
                   ? 'text-gray-400 hover:bg-neutral-700'
                   : 'text-gray-400 hover:bg-gray-100'

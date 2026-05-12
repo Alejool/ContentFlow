@@ -1,14 +1,22 @@
-import React, { useState } from 'react';
-import Label from '@/Components/common/Modern/Label';
-import Switch from '@/Components/common/Modern/Switch';
-import Select from '@/Components/common/Modern/Select';
-import Input from '@/Components/common/Modern/Input';
-import Checkbox from '@/Components/common/Modern/Checkbox'; 
+import Checkbox from '@/Components/common/Modern/Checkbox';
 import DatePickerModern from '@/Components/common/Modern/DatePicker';
-import { AlertCircle, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Clock } from 'lucide-react';
+import Input from '@/Components/common/Modern/Input';
+import Label from '@/Components/common/Modern/Label';
+import Select from '@/Components/common/Modern/Select';
+import Switch from '@/Components/common/Modern/Switch';
 import { useTimezoneStore } from '@/stores/common/timezoneStore';
+import {
+  AlertCircle,
+  Calendar as CalendarIcon,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+} from 'lucide-react';
+import React, { useState } from 'react';
 
-const getPlatformColors = (platform?: string): { bg: string; text: string; border: string; hover: string } => {
+const getPlatformColors = (
+  platform?: string,
+): { bg: string; text: string; border: string; hover: string } => {
   const platformColors: Record<
     string,
     { bg: string; text: string; border: string; hover: string }
@@ -110,11 +118,11 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
       </Label>
 
       {!hasRecurrenceAccess ? (
-        <div className="flex flex-col items-start justify-between gap-3 rounded-lg border border-primary-200 bg-primary-50 p-3 shadow-sm dark:border-primary-800 dark:bg-primary-900/20 sm:flex-row sm:items-center">
+        <div className="border-primary-200 bg-primary-50 dark:border-primary-800 dark:bg-primary-900/20 flex flex-col items-start justify-between gap-3 rounded-lg border p-3 shadow-sm sm:flex-row sm:items-center">
           <div className="flex items-start gap-3">
-            <div className="shrink-0 rounded-full bg-primary-100 p-1.5 dark:bg-primary-900/40">
+            <div className="bg-primary-100 dark:bg-primary-900/40 shrink-0 rounded-full p-1.5">
               <svg
-                className="h-4 w-4 text-primary-600 dark:text-primary-400"
+                className="text-primary-600 dark:text-primary-400 h-4 w-4"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -128,11 +136,11 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
               </svg>
             </div>
             <div>
-              <p className="text-sm font-medium text-primary-800 dark:text-primary-300">
+              <p className="text-primary-800 dark:text-primary-300 text-sm font-medium">
                 {t('publications.modal.schedule.recurrence.locked_title') ||
                   'Recurrencia bloqueada'}
               </p>
-              <p className="mt-0.5 text-xs text-primary-600 dark:text-primary-400">
+              <p className="text-primary-600 dark:text-primary-400 mt-0.5 text-xs">
                 {t('publications.modal.schedule.recurrence.locked_desc') ||
                   'Sube de plan para configurar repeticiones automáticas (cada X días/semanas) en tus publicaciones.'}
               </p>
@@ -141,7 +149,7 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
           <button
             type="button"
             onClick={() => (window.location.href = route('pricing'))}
-            className="shrink-0 whitespace-nowrap rounded-md bg-primary-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors hover:bg-primary-700"
+            className="bg-primary-600 hover:bg-primary-700 shrink-0 rounded-md px-3 py-1.5 text-xs font-medium whitespace-nowrap text-white shadow-sm transition-colors"
           >
             {t('common.upgradePlan') || 'Ver Planes'}
           </button>
@@ -205,7 +213,10 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
                         disabled={disabled}
                       />
                       <div className="flex-1 cursor-pointer">
-                        <label htmlFor="all_accounts_checkbox" className="text-sm font-semibold text-gray-900 dark:text-gray-100 cursor-pointer">
+                        <label
+                          htmlFor="all_accounts_checkbox"
+                          className="cursor-pointer text-sm font-semibold text-gray-900 dark:text-gray-100"
+                        >
                           {t('publications.modal.schedule.recurrence.all_accounts') ||
                             'Aplicar a todas'}
                         </label>
@@ -213,7 +224,7 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
                           {socialAccounts
                             .filter((acc) => allAvailableAccounts.includes(acc.id))
                             .map((account) => {
-                                const colors = getPlatformColors(account.platform);
+                              const colors = getPlatformColors(account.platform);
 
                               return (
                                 <span
@@ -247,7 +258,7 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
                             return (
                               <div
                                 key={account.id}
-                                className={`flex items-center gap-3 rounded-lg border p-3 transition-all ${colors.bg} ${colors.border} ${colors.hover} ${isChecked ? 'ring-2 ring-primary-500 dark:ring-primary-600' : ''}`}
+                                className={`flex items-center gap-3 rounded-lg border p-3 transition-all ${colors.bg} ${colors.border} ${colors.hover} ${isChecked ? 'ring-primary-500 dark:ring-primary-600 ring-2' : ''}`}
                               >
                                 <Checkbox
                                   id={`account_checkbox_${account.id}`}
@@ -282,7 +293,10 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
                                   disabled={disabled}
                                 />
                                 <div className="min-w-0 flex-1">
-                                  <label htmlFor={`account_checkbox_${account.id}`} className="flex cursor-pointer items-center gap-2">
+                                  <label
+                                    htmlFor={`account_checkbox_${account.id}`}
+                                    className="flex cursor-pointer items-center gap-2"
+                                  >
                                     <span className={`text-sm font-bold ${colors.text}`}>
                                       {account.platform}
                                     </span>
@@ -347,7 +361,7 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
                       { value: 'daily', label: t('common.frequencies.daily') || 'Diario' },
                       { value: 'weekly', label: t('common.frequencies.weekly') || 'Semanal' },
                       { value: 'monthly', label: t('common.frequencies.monthly') || 'Mensual' },
-                      { value: 'yearly', label: t('common.frequencies.yearly') || 'Anual' }
+                      { value: 'yearly', label: t('common.frequencies.yearly') || 'Anual' },
                     ]}
                     value={recurrenceType}
                     onChange={(newType) => {
@@ -420,7 +434,7 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
                         disabled={disabled}
                         className={`flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold transition-all ${
                           recurrenceDays.includes(day.value)
-                            ? 'bg-primary-600 text-white shadow-md ring-2 ring-primary-100 dark:ring-primary-900/30'
+                            ? 'bg-primary-600 ring-primary-100 dark:ring-primary-900/30 text-white shadow-md ring-2'
                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-neutral-800 dark:text-gray-400 dark:hover:bg-neutral-700'
                         }`}
                       >
@@ -485,9 +499,9 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
 
               {/* Next Dates Preview - Always show when recurring is enabled */}
               {isRecurring && (
-                <div className="mt-4 rounded-lg border border-primary-100/50 bg-primary-50/70 p-4 dark:border-primary-800/30 dark:bg-primary-900/20">
+                <div className="border-primary-100/50 bg-primary-50/70 dark:border-primary-800/30 dark:bg-primary-900/20 mt-4 rounded-lg border p-4">
                   <div className="mb-3 flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-primary-700 dark:text-primary-400">
+                    <div className="text-primary-700 dark:text-primary-400 flex items-center gap-2">
                       <CalendarIcon className="h-4 w-4" />
                       <span className="text-sm font-semibold">
                         {t('publications.modal.schedule.recurrence.preview_title') ||
@@ -500,11 +514,11 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
                           type="button"
                           onClick={() => setCarouselIndex((prev) => Math.max(0, prev - 1))}
                           disabled={carouselIndex === 0}
-                          className="rounded p-1 transition-colors hover:bg-primary-100 disabled:cursor-not-allowed disabled:opacity-30 dark:hover:bg-primary-900/30"
+                          className="hover:bg-primary-100 dark:hover:bg-primary-900/30 rounded p-1 transition-colors disabled:cursor-not-allowed disabled:opacity-30"
                         >
-                          <ChevronLeft className="h-4 w-4 text-primary-600 dark:text-primary-400" />
+                          <ChevronLeft className="text-primary-600 dark:text-primary-400 h-4 w-4" />
                         </button>
-                        <span className="min-w-[3rem] text-center text-xs font-medium text-primary-600 dark:text-primary-400">
+                        <span className="text-primary-600 dark:text-primary-400 min-w-[3rem] text-center text-xs font-medium">
                           {carouselIndex + 1} / {Object.keys(nextDatesByAccount).length}
                         </span>
                         <button
@@ -515,9 +529,9 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
                             )
                           }
                           disabled={carouselIndex === Object.keys(nextDatesByAccount).length - 1}
-                          className="rounded p-1 transition-colors hover:bg-primary-100 disabled:cursor-not-allowed disabled:opacity-30 dark:hover:bg-primary-900/30"
+                          className="hover:bg-primary-100 dark:hover:bg-primary-900/30 rounded p-1 transition-colors disabled:cursor-not-allowed disabled:opacity-30"
                         >
-                          <ChevronRight className="h-4 w-4 text-primary-600 dark:text-primary-400" />
+                          <ChevronRight className="text-primary-600 dark:text-primary-400 h-4 w-4" />
                         </button>
                       </div>
                     )}
@@ -539,7 +553,7 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
                           const colors = getPlatformColors(account.platform);
 
                           return (
-                            <div key={accountId} className="w-full flex-shrink-0 px-1">
+                            <div key={accountId} className="w-full shrink-0 px-1">
                               <div className="space-y-2">
                                 <div
                                   className={`flex items-center gap-2 border-b pb-2 ${colors.border}`}
@@ -635,7 +649,7 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
                     </div>
                   )}
 
-                  <p className="mt-3 flex items-start gap-1.5 text-[10px] italic text-gray-500 dark:text-gray-400">
+                  <p className="mt-3 flex items-start gap-1.5 text-[10px] text-gray-500 italic dark:text-gray-400">
                     <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" />
                     <span>
                       {t('publications.modal.schedule.recurrence.preview_note') ||

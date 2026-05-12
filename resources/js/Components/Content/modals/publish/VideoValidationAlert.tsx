@@ -1,12 +1,12 @@
 import Button from '@/Components/common/Modern/Button';
 import { getPlatformConfig } from '@/Constants/ConfigSocialMedia/socialPlatforms';
+import type { VideoValidationResult } from '@/Hooks/common/usePlatformCapabilities';
 import {
   formatDurationLimit,
   formatFileSizeLimit,
   getUpgradeMessage,
   useValidateVideo,
 } from '@/Hooks/common/usePlatformCapabilities';
-import type { VideoValidationResult } from '@/Hooks/common/usePlatformCapabilities';
 import { AlertTriangle, CheckCircle, RefreshCw, XCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -146,7 +146,7 @@ export default function VideoValidationAlert({
       {hasErrors && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
           <div className="mb-4 flex items-start gap-3">
-            <XCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600 dark:text-red-400" />
+            <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600 dark:text-red-400" />
             <div className="flex-1">
               <p className="font-bold text-red-900 dark:text-red-100">
                 {t('publications.modal.validation.cannotPublish') ||
@@ -248,7 +248,7 @@ export default function VideoValidationAlert({
       {hasWarnings && !hasErrors && (
         <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
           <div className="mb-4 flex items-start gap-3">
-            <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-600 dark:text-yellow-400" />
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-yellow-600 dark:text-yellow-400" />
             <div className="flex-1">
               <p className="font-bold text-yellow-900 dark:text-yellow-100">
                 {t('publications.modal.validation.warnings') || 'Advertencias'}

@@ -46,7 +46,7 @@ const CampaignSelector: React.FC<CampaignSelectorProps> = ({
   if (loading) {
     return (
       <div className="py-8 text-center text-sm text-gray-500 dark:text-gray-400">
-        <div className="mx-auto mb-2 h-8 w-8 animate-spin rounded-full border-b-2 border-primary-500"></div>
+        <div className="border-primary-500 mx-auto mb-2 h-8 w-8 animate-spin rounded-full border-b-2"></div>
         {t('common.loading') || 'Loading...'}
       </div>
     );
@@ -85,13 +85,13 @@ const CampaignSelector: React.FC<CampaignSelectorProps> = ({
               disabled ? 'cursor-not-allowed opacity-60' : ''
             } ${
               isSelected
-                ? 'border-primary-500 bg-primary-50 shadow-sm ring-2 ring-primary-500/20 dark:bg-primary-900/20'
-                : 'border-gray-200 bg-white hover:border-primary-300 hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:bg-neutral-700/50'
+                ? 'border-primary-500 bg-primary-50 ring-primary-500/20 dark:bg-primary-900/20 shadow-sm ring-2'
+                : 'hover:border-primary-300 border-gray-200 bg-white hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:bg-neutral-700/50'
             }`}
           >
             {/* Icon */}
             <div
-              className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg ${
+              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
                 isSelected
                   ? 'bg-primary-500 text-white'
                   : 'bg-gray-100 text-gray-500 dark:bg-neutral-700 dark:text-gray-400'
@@ -138,8 +138,8 @@ const CampaignSelector: React.FC<CampaignSelectorProps> = ({
 
             {/* Selection indicator */}
             {isSelected && (
-              <div className="flex-shrink-0">
-                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary-500">
+              <div className="shrink-0">
+                <div className="bg-primary-500 flex h-5 w-5 items-center justify-center rounded-full">
                   <svg
                     className="h-3 w-3 text-white"
                     fill="none"

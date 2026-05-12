@@ -27,7 +27,7 @@ export const ThreadsPreview = ({
     >
       {/* Header */}
       <div className="flex items-start gap-3 p-4">
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           <Avatar src={user?.avatar} name={user?.name} size="md" />
         </div>
         <div className="flex-1">
@@ -42,7 +42,7 @@ export const ThreadsPreview = ({
           </div>
 
           {/* Content */}
-          <div className="mt-2 whitespace-pre-wrap text-sm leading-relaxed">{content}</div>
+          <div className="mt-2 text-sm leading-relaxed whitespace-pre-wrap">{content}</div>
 
           {/* Media */}
           {mediaUrls.length > 0 && (

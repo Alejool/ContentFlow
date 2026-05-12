@@ -1,5 +1,5 @@
-import { AlertTriangle, Info } from 'lucide-react';
 import { formatDateTimeString } from '@/Utils/formatters';
+import { AlertTriangle, Info } from 'lucide-react';
 
 interface PlatformStatus {
   platform: string;
@@ -57,7 +57,7 @@ export default function AccountSwitchingWarning({
       {otherAccountPublications.length > 0 && (
         <div className="rounded-r-lg border-l-4 border-amber-500 bg-amber-50 p-4 dark:bg-amber-900/20">
           <div className="flex items-start gap-3">
-            <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600 dark:text-amber-400" />
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
             <div className="flex-1">
               <h4 className="mb-2 text-sm font-bold text-amber-900 dark:text-amber-100">
                 {t('publish.publishedOnDifferentAccount') || 'Publicado en otra cuenta'}
@@ -103,7 +103,7 @@ export default function AccountSwitchingWarning({
       {currentAccountPublication && (
         <div className="rounded-r-lg border-l-4 border-blue-500 bg-blue-50 p-4 dark:bg-blue-900/20">
           <div className="flex items-start gap-3">
-            <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
+            <Info className="mt-0.5 h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400" />
             <div className="flex-1">
               <h4 className="mb-1 text-sm font-bold text-blue-900 dark:text-blue-100">
                 {t('publish.publishedOnCurrentAccount') || 'Publicado en cuenta actual'}
@@ -129,7 +129,7 @@ export default function AccountSwitchingWarning({
       {otherAccountPublications.length > 0 && !currentAccountPublication && (
         <div className="rounded-r-lg border-l-4 border-green-500 bg-green-50 p-4 dark:bg-green-900/20">
           <div className="flex items-start gap-3">
-            <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
+            <Info className="mt-0.5 h-5 w-5 shrink-0 text-green-600 dark:text-green-400" />
             <div className="flex-1">
               <h4 className="mb-1 text-sm font-bold text-green-900 dark:text-green-100">
                 {t('publish.canPublishToNewAccount') || 'Puedes publicar en esta cuenta'}

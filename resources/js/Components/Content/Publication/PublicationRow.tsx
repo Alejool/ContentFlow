@@ -49,7 +49,7 @@ export default function PublicationRow({
       <td className="px-2 py-4 text-center"></td>
       <td className="px-6 py-4">
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800">
             <PublicationThumbnail publication={item} />
           </div>
           <div>
@@ -60,7 +60,7 @@ export default function PublicationRow({
                   title={t('publications.recurring') || 'Recurrente'}
                   className="flex items-center"
                 >
-                  <Repeat className="h-3.5 w-3.5 text-primary-500" />
+                  <Repeat className="text-primary-500 h-3.5 w-3.5" />
                 </span>
               )}
             </h3>

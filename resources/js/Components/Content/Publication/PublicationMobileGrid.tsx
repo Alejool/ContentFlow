@@ -145,7 +145,7 @@ const PublicationMobileGrid = memo(function PublicationMobileGrid({
             {/* Primary Visual/Info Area */}
             <div className="flex-1 p-5">
               <div className="mb-4 flex items-start gap-4">
-                <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-100 bg-gray-50/50 shadow-inner transition-transform duration-300 group-hover:scale-105 dark:border-neutral-800 dark:bg-neutral-800/50">
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-100 bg-gray-50/50 shadow-inner transition-transform duration-300 group-hover:scale-105 dark:border-neutral-800 dark:bg-neutral-800/50">
                   <PublicationThumbnail publication={item} t={t} />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -158,7 +158,7 @@ const PublicationMobileGrid = memo(function PublicationMobileGrid({
                     />
 
                     <span
-                      className={`inline-flex items-center rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase tracking-tight ${getStatusColor(item.status)}`}
+                      className={`inline-flex items-center rounded-lg px-2 py-0.5 text-[10px] font-bold tracking-tight uppercase ${getStatusColor(item.status)}`}
                     >
                       {item.status || 'Draft'}
                     </span>
@@ -170,12 +170,12 @@ const PublicationMobileGrid = memo(function PublicationMobileGrid({
                     )}
                   </div>
                   <h3
-                    className="truncate text-lg font-bold leading-snug text-gray-900 dark:text-white"
+                    className="truncate text-lg leading-snug font-bold text-gray-900 dark:text-white"
                     title={item.title || t('publications.table.untitled')}
                   >
                     {item.title || t('publications.table.untitled')}
                   </h3>
-                  <p className="mt-1 line-clamp-2 text-[11px] font-medium leading-relaxed text-gray-500 dark:text-gray-400">
+                  <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed font-medium text-gray-500 dark:text-gray-400">
                     {item.description || 'Sin descripción'}
                   </p>
                 </div>

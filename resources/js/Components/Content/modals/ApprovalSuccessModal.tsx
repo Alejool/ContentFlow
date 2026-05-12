@@ -42,7 +42,7 @@ export default function ApprovalSuccessModal({
 
           <div className="p-6">
             <div className="mb-6 rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
-              <p className="text-sm font-medium leading-relaxed text-green-800 dark:text-green-300">
+              <p className="text-sm leading-relaxed font-medium text-green-800 dark:text-green-300">
                 {t('approvals.approvalSuccessMessage') ||
                   'La publicación ha sido aprobada exitosamente y está lista para ser publicada.'}
               </p>
@@ -50,7 +50,7 @@ export default function ApprovalSuccessModal({
 
             <div className="space-y-4">
               <div>
-                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                <label className="mb-1.5 block text-xs font-bold tracking-wider text-gray-400 uppercase dark:text-gray-500">
                   {t('common.publication') || 'Publicación'}
                 </label>
                 <p className="text-sm font-bold text-gray-900 dark:text-white">
@@ -59,13 +59,13 @@ export default function ApprovalSuccessModal({
               </div>
 
               <div className="flex items-center gap-4 rounded-lg border border-gray-100 bg-gray-50 p-4 dark:border-neutral-700/30 dark:bg-neutral-900/50">
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full border border-green-200/50 bg-green-100 text-green-600 dark:border-green-800/50 dark:bg-green-900/30 dark:text-green-400">
                     <User className="h-6 w-6" />
                   </div>
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+                  <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase dark:text-gray-500">
                     {t('approvals.approvedBy') || 'Aprobado por'}
                   </p>
                   <p className="text-sm font-bold text-gray-900 dark:text-white">{approverName}</p>

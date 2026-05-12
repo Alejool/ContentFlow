@@ -118,12 +118,12 @@ export default function ViewPublicationModal({
 
       <div className="fixed inset-0 flex items-center justify-center p-4">
         <DialogPanel className="flex max-h-[90vh] w-full max-w-3xl flex-col rounded-lg border border-gray-200/50 bg-gradient-to-br from-white to-gray-50 shadow-2xl dark:border-neutral-800/50 dark:from-neutral-900 dark:to-neutral-950">
-          <div className="flex flex-shrink-0 items-center justify-between border-b border-gray-100 p-6 dark:border-neutral-700">
+          <div className="flex shrink-0 items-center justify-between border-b border-gray-100 p-6 dark:border-neutral-700">
             <DialogTitle className="flex items-center gap-2 text-2xl font-bold text-gray-900 dark:text-white">
               {isActuallyPublication ? (
-                <FileText className="h-6 w-6 text-primary-500" />
+                <FileText className="text-primary-500 h-6 w-6" />
               ) : (
-                <Layers className="h-6 w-6 text-primary-500" />
+                <Layers className="text-primary-500 h-6 w-6" />
               )}
               {isActuallyPublication
                 ? t('publications.modal.show.title')
@@ -172,7 +172,7 @@ export default function ViewPublicationModal({
                   tabs={publicationTabs}
                   activeTab={activeTab}
                   onTabChange={setActiveTab}
-                  className="mb-6 mt-8"
+                  className="mt-8 mb-6"
                 />
               )}
 
@@ -195,7 +195,7 @@ export default function ViewPublicationModal({
             </div>
           </div>
 
-          <div className="flex flex-shrink-0 justify-between gap-3 border-t border-gray-100 p-6 dark:border-neutral-700">
+          <div className="flex shrink-0 justify-between gap-3 border-t border-gray-100 p-6 dark:border-neutral-700">
             <div></div>
             <div className="flex gap-3">
               {isActuallyPublication && item.id && (

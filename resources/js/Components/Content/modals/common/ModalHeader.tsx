@@ -9,6 +9,7 @@ interface ModalHeaderProps {
   subtitle?: string;
   icon?: LucideIcon;
   iconColor?: string;
+  iconStyle?: React.CSSProperties;
   size?: 'sm' | 'md' | 'lg' | 'xl';
   style?: React.CSSProperties;
   rightElement?: React.ReactNode;
@@ -22,6 +23,7 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({
   subtitle,
   icon: Icon = Sparkles,
   iconColor = 'text-primary-500',
+  iconStyle,
   size = 'lg',
   style,
   rightElement,
@@ -38,15 +40,15 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({
 
   return (
     <div
-      className="sticky shadow-md dark:border-gray-700 top-0 z-20 bg-gradient-to-r from-gray-50 via-white to-gray-50/80 backdrop-blur-md dark:from-neutral-900 dark:via-neutral-900/95 dark:to-neutral-800/90"
+      className="sticky top-0 z-20 bg-gradient-to-r from-gray-50 via-white to-gray-50/80 shadow-md backdrop-blur-md dark:border-gray-700 dark:from-neutral-900 dark:via-neutral-900/95 dark:to-neutral-800/90"
       style={style}
     >
       <div className="flex items-center justify-between gap-4 px-6 py-4">
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           <h2
             className={`${currentSize.title} flex items-center gap-2 font-bold text-gray-900 dark:text-gray-100`}
           >
-            <Icon className={`${currentSize.icon} ${iconColor}`} />
+            <Icon className={`${currentSize.icon} ${iconColor}`} style={iconStyle} />
             {t(title) || title}
           </h2>
           {subtitle && (
@@ -59,7 +61,7 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({
         {centerElement && <div className="hidden flex-1 md:block">{centerElement}</div>}
 
         {/* Right: rightElement and close button */}
-        <div className="flex flex-shrink-0 items-center gap-4">
+        <div className="flex shrink-0 items-center gap-4">
           {rightElement && <div>{rightElement}</div>}
           <button
             onClick={onClose}
@@ -72,7 +74,7 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({
 
       {/* Center element for mobile */}
       {centerElement && (
-        <div className=" border-gray-100/50 px-6 py-2 md:hidden dark:border-neutral-800/50">
+        <div className="border-gray-100/50 px-6 py-2 md:hidden dark:border-neutral-800/50">
           {centerElement}
         </div>
       )}

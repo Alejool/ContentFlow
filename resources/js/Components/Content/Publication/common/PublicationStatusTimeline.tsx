@@ -247,7 +247,7 @@ const PublicationStatusTimeline = ({
           const isLast = index === activeSteps.length - 1;
 
           return (
-            <div key={step.key} className="flex flex-shrink-0 items-center gap-2">
+            <div key={step.key} className="flex shrink-0 items-center gap-2">
               <div
                 className={`flex items-center gap-2 rounded-full border px-3 py-1.5 transition-all ${
                   state === 'current'
@@ -266,7 +266,7 @@ const PublicationStatusTimeline = ({
                 ) : (
                   <Circle className="h-3.5 w-3.5" />
                 )}
-                <span className="whitespace-nowrap text-xs">{step.label}</span>
+                <span className="text-xs whitespace-nowrap">{step.label}</span>
               </div>
 
               {!isLast && (
@@ -298,7 +298,7 @@ const PublicationStatusTimeline = ({
             <div className="flex items-start gap-3">
               {/* Icon Circle */}
               <div
-                className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 transition-all ${
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 transition-all ${
                   state === 'current'
                     ? `${step.bgColor} ${step.borderColor} ${step.color} shadow-md`
                     : state === 'completed'
@@ -339,7 +339,7 @@ const PublicationStatusTimeline = ({
                     </span>
                   )}
                   {state === 'completed' && (
-                    <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-bold uppercase text-green-700 dark:bg-green-900/30 dark:text-green-300">
+                    <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-bold text-green-700 uppercase dark:bg-green-900/30 dark:text-green-300">
                       {t('publications.status.completed') || 'Completado'}
                     </span>
                   )}
@@ -372,7 +372,7 @@ const PublicationStatusTimeline = ({
             {/* Connecting line */}
             {!isLast && (
               <div
-                className={`absolute left-5 top-10 -ml-px h-8 w-0.5 ${
+                className={`absolute top-10 left-5 -ml-px h-8 w-0.5 ${
                   state === 'completed'
                     ? 'bg-green-300 dark:bg-green-700'
                     : 'bg-gray-200 dark:bg-gray-700'

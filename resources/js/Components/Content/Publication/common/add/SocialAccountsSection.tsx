@@ -73,7 +73,7 @@ const SocialAccountsSection = memo(
         {publishedAccountIds && publishedAccountIds.length > 0 && (
           <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-900/20">
             <div className="flex items-start gap-2">
-              <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-blue-600 dark:text-blue-400" />
+              <Check className="mt-0.5 h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
               <div className="flex-1">
                 <h4 className="text-xs font-bold text-blue-800 dark:text-blue-200">
                   {t('publications.modal.publish.alreadyPublishedBanner.title') ||

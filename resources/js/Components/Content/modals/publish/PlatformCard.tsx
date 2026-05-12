@@ -1,7 +1,7 @@
 import { getPlatformConfig } from '@/Constants/ConfigSocialMedia/socialPlatforms';
-import { queryKeys } from '@/lib/common/queryKeys';
-import { formatDateTimeStyled } from '@/Utils/formatters';
 import { validateVideoDuration } from '@/Utils/common/validationUtils';
+import { formatDateTimeStyled } from '@/Utils/formatters';
+import { queryKeys } from '@/lib/common/queryKeys';
 import { useQueryClient } from '@tanstack/react-query';
 import { AlertTriangle, Check, CheckCircle, Clock, Loader2, X, XCircle } from 'lucide-react';
 import { memo } from 'react';
@@ -192,21 +192,21 @@ const PlatformCard = memo(
                         : isRemovedPlatform
                           ? 'border-gray-500 bg-gray-50 shadow-md dark:border-gray-600 dark:bg-gray-900/30'
                           : isSelected
-                            ? 'border-primary-600 bg-primary-100 shadow-lg ring-4 ring-primary-300/60 dark:border-primary-400 dark:bg-primary-900/50 dark:ring-primary-600/50'
-                            : 'border-gray-300 bg-white hover:border-primary-400 hover:shadow-md dark:border-neutral-700 dark:bg-neutral-900/30 dark:hover:border-primary-500'
+                            ? 'border-primary-600 bg-primary-100 ring-primary-300/60 dark:border-primary-400 dark:bg-primary-900/50 dark:ring-primary-600/50 shadow-lg ring-4'
+                            : 'hover:border-primary-400 dark:hover:border-primary-500 border-gray-300 bg-white hover:shadow-md dark:border-neutral-700 dark:bg-neutral-900/30'
           }`}
         >
           {/* Publishing Overlay */}
           {(isPublishing || isRetrying) && !isFailed && (
             <div className="animate-in fade-in absolute inset-0 z-30 flex flex-col items-center justify-center rounded-full bg-white/95 backdrop-blur-sm duration-300 dark:bg-neutral-900/95">
               <div className="flex flex-col items-center gap-2">
-                <div className="relative flex-shrink-0">
+                <div className="relative shrink-0">
                   <div className="h-10 w-10 rounded-full border border-yellow-200 dark:border-yellow-900" />
                   <div className="absolute inset-0 h-10 w-10 animate-spin rounded-full border border-yellow-500 border-t-transparent" />
                 </div>
 
                 <div className="flex flex-col items-center gap-0.5">
-                  <span className="text-sm font-bold capitalize tracking-wide text-yellow-800 dark:text-yellow-300">
+                  <span className="text-sm font-bold tracking-wide text-yellow-800 capitalize dark:text-yellow-300">
                     {account.platform}
                   </span>
                   <span className="text-xs font-medium text-yellow-600 dark:text-yellow-400">
@@ -257,7 +257,7 @@ const PlatformCard = memo(
               <div className="flex flex-col items-center gap-2">
                 <XCircle className="h-10 w-10 text-red-600 dark:text-red-400" />
                 <div className="flex flex-col items-center gap-0.5">
-                  <span className="text-sm font-bold capitalize tracking-wide text-red-800 dark:text-red-300">
+                  <span className="text-sm font-bold tracking-wide text-red-800 capitalize dark:text-red-300">
                     {account.platform}
                   </span>
                   <span className="text-xs font-medium text-red-600 dark:text-red-400">
@@ -273,7 +273,7 @@ const PlatformCard = memo(
             <div className="animate-in fade-in absolute inset-0 z-30 flex flex-col items-center justify-center rounded-lg bg-white/95 backdrop-blur-sm duration-300 dark:bg-neutral-900/95">
               <div className="flex flex-col items-center gap-2">
                 <Loader2 className="h-10 w-10 animate-spin text-amber-600 dark:text-amber-400" />
-                <span className="text-xs font-bold uppercase tracking-wide text-amber-600 dark:text-amber-400">
+                <span className="text-xs font-bold tracking-wide text-amber-600 uppercase dark:text-amber-400">
                   {t('publications.modal.publish.unpublishing') || 'Despublicando...'}
                 </span>
               </div>
@@ -284,7 +284,7 @@ const PlatformCard = memo(
           {/* {(isDuplicate || isDuplicateAttempt) && !isPublished && !isScheduled && (
             <div className="animate-in fade-in absolute inset-0 z-30 flex flex-col items-center justify-center rounded-lg bg-orange-50/95 backdrop-blur-sm duration-300 dark:bg-orange-900/30">
               <div className="flex flex-col items-center gap-2">
-                <div className="relative flex-shrink-0">
+                <div className="relative shrink-0">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-900/50">
                     <svg
                       className="h-6 w-6 text-orange-600 dark:text-orange-400"
@@ -311,7 +311,7 @@ const PlatformCard = memo(
               <div className="flex flex-col items-center gap-2 px-3">
                 <AlertTriangle className="h-7 w-7 text-amber-600 dark:text-amber-400" />
                 <div className="flex flex-col items-center gap-0.5">
-                  <span className="text-xs font-bold capitalize tracking-wide text-amber-800 dark:text-amber-300">
+                  <span className="text-xs font-bold tracking-wide text-amber-800 capitalize dark:text-amber-300">
                     {account.platform}
                   </span>
                   <span className="text-center text-xs font-medium text-amber-700 dark:text-amber-400">
@@ -345,7 +345,7 @@ const PlatformCard = memo(
                 <div className="flex flex-col items-center gap-2 px-3">
                   <XCircle className="h-10 w-10 text-red-600 dark:text-red-400" />
                   <div className="flex flex-col items-center gap-0.5">
-                    <span className="text-sm font-bold capitalize tracking-wide text-red-800 dark:text-red-300">
+                    <span className="text-sm font-bold tracking-wide text-red-800 capitalize dark:text-red-300">
                       {account.platform}
                     </span>
                     <span className="text-center text-xs font-medium text-red-700 dark:text-red-400">
@@ -385,7 +385,7 @@ const PlatformCard = memo(
                   <div className="flex flex-col items-center gap-2">
                     <CheckCircle className="h-10 w-10 text-green-600 dark:text-green-400" />
                     <div className="flex flex-col items-center gap-0.5">
-                      <span className="text-sm font-bold capitalize tracking-wide text-green-800 dark:text-green-300">
+                      <span className="text-sm font-bold tracking-wide text-green-800 capitalize dark:text-green-300">
                         {account.platform}
                       </span>
                       <span className="text-xs font-medium text-green-600 dark:text-green-400">
@@ -439,7 +439,7 @@ const PlatformCard = memo(
               if (validation.maxDuration === Infinity || validation.isValid) return null;
 
               return (
-                <div className="absolute left-2 top-2 z-10 flex animate-pulse items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-2 py-1 text-[10px] font-bold text-red-600 shadow-sm dark:border-red-800/30 dark:bg-red-900/30 dark:text-red-400">
+                <div className="absolute top-2 left-2 z-10 flex animate-pulse items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-2 py-1 text-[10px] font-bold text-red-600 shadow-sm dark:border-red-800/30 dark:bg-red-900/30 dark:text-red-400">
                   <XCircle className="h-3 w-3" />
                   <span className="leading-none">MAX {validation.formattedMax}</span>
                 </div>
@@ -457,23 +457,23 @@ const PlatformCard = memo(
 
           {/* Platform Logo and Info */}
           <div className="z-10 flex items-center gap-3">
-            <div className="relative flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg p-1">
+            <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-lg p-1">
               <img src={iconSrc} alt={account.platform} className="h-full w-full object-contain" />
               {/* Check badge for selected platforms */}
               {isSelected && !isPublished && !isScheduled && !isPublishing && (
-                <div className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-lg bg-primary-600 shadow-lg ring-2 ring-white dark:bg-primary-500 dark:ring-neutral-900">
+                <div className="bg-primary-600 dark:bg-primary-500 absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-lg shadow-lg ring-2 ring-white dark:ring-neutral-900">
                   <Check className="h-3 w-3 text-white" />
                 </div>
               )}
             </div>
             <div className="min-w-0 flex-1 text-left">
               <div className="flex items-center gap-2">
-                <div className="truncate text-base font-bold capitalize text-gray-900 dark:text-white">
+                <div className="truncate text-base font-bold text-gray-900 capitalize dark:text-white">
                   {account.platform}
                 </div>
                 {/* Selected badge */}
                 {isSelected && !isPublished && !isScheduled && !isPublishing && (
-                  <span className="flex-shrink-0 rounded-lg bg-primary-600 px-2 py-0.5 text-[10px] font-bold uppercase text-white shadow-sm dark:bg-primary-500">
+                  <span className="bg-primary-600 dark:bg-primary-500 shrink-0 rounded-lg px-2 py-0.5 text-[10px] font-bold text-white uppercase shadow-sm">
                     {t('common.selected') || 'Seleccionado'}
                   </span>
                 )}
@@ -486,7 +486,7 @@ const PlatformCard = memo(
 
           {/* Connected By Info */}
           {account.user?.name && !isPublishing && !isUnpublishing && !isPublished && (
-            <div className="z-10 truncate text-[10px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+            <div className="z-10 truncate text-[10px] font-medium tracking-wide text-gray-500 uppercase dark:text-gray-400">
               {t('manageContent.socialMedia.status.connectedBy') || 'Conectado por'}:{' '}
               {account.user.name}
             </div>
@@ -532,7 +532,7 @@ const PlatformCard = memo(
           !isPublishing &&
           !isUnpublishing &&
           !isRetrying && (
-            <div className="absolute left-2 top-2 z-10">
+            <div className="absolute top-2 left-2 z-10">
               <span className="flex items-center gap-1 rounded-lg border border-red-300 bg-red-100 px-2 py-1 text-[10px] font-bold text-red-700 shadow-sm dark:border-red-800 dark:bg-red-900/40 dark:text-red-400">
                 <XCircle className="h-3 w-3" />
                 {t('publications.modal.publish.failed') || 'Falló'}
@@ -548,7 +548,7 @@ const PlatformCard = memo(
               onUnpublish(account.id, account.platform);
             }}
             disabled={isUnpublishing}
-            className="absolute right-3 top-3 z-30 rounded-lg bg-red-500 p-2 text-white shadow-lg transition-colors hover:bg-red-600 disabled:opacity-50"
+            className="absolute top-3 right-3 z-30 rounded-lg bg-red-500 p-2 text-white shadow-lg transition-colors hover:bg-red-600 disabled:opacity-50"
             title="Despublicar"
           >
             <X className="h-4 w-4" />

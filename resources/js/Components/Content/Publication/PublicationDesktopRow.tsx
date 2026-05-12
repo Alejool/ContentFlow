@@ -128,7 +128,7 @@ const PublicationRow = memo(function PublicationRow({
             {...(onViewDetails && { onViewDetails: () => handleViewDetails(item) })}
             className="relative z-10"
           />
-          <div className="min-w-0 max-w-md">
+          <div className="max-w-md min-w-0">
             <h3
               className="truncate text-sm font-medium text-gray-900 dark:text-white"
               title={item.title || 'Untitled'}
@@ -196,12 +196,12 @@ const PublicationRow = memo(function PublicationRow({
               <div className="animate-in fade-in slide-in-from-top-1 mt-2 flex w-fit items-center gap-2 rounded-lg border border-amber-100 bg-amber-50 p-1.5 dark:border-amber-800/30 dark:bg-amber-900/20">
                 <div className="relative flex h-4 w-4 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-800 dark:text-amber-400">
                   <Lock className="h-2.5 w-2.5" />
-                  <span className="absolute -right-0.5 -top-0.5 flex h-1.5 w-1.5">
+                  <span className="absolute -top-0.5 -right-0.5 flex h-1.5 w-1.5">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75"></span>
                     <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-amber-500"></span>
                   </span>
                 </div>
-                <span className="text-[10px] font-bold uppercase tracking-tight text-amber-700 dark:text-amber-400">
+                <span className="text-[10px] font-bold tracking-tight text-amber-700 uppercase dark:text-amber-400">
                   {t('publications.table.editingBy')} {lockedByName}
                 </span>
               </div>
@@ -212,7 +212,7 @@ const PublicationRow = memo(function PublicationRow({
                   <Clock className="h-2.5 w-2.5" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-bold uppercase tracking-tight text-yellow-700 dark:text-yellow-400">
+                  <span className="text-[10px] font-bold tracking-tight text-yellow-700 uppercase dark:text-yellow-400">
                     {t('publications.table.pendingAdminReview') || 'Pendiente de revisión'}
                   </span>
                   {item.current_approval_step?.name && (
@@ -225,8 +225,8 @@ const PublicationRow = memo(function PublicationRow({
             )}
             {item.status === 'publishing' && item.publisher && (
               <div className="mt-1 flex items-center gap-1.5">
-                <span className="h-2 w-2 flex-shrink-0 animate-pulse rounded-full bg-emerald-500"></span>
-                <span className="text-[10px] font-bold uppercase tracking-tight text-emerald-600 dark:text-emerald-400">
+                <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-emerald-500"></span>
+                <span className="text-[10px] font-bold tracking-tight text-emerald-600 uppercase dark:text-emerald-400">
                   {(() => {
                     const publishingAccounts = connectedAccounts.filter((acc) =>
                       publishingPlatforms.includes(acc.id),
@@ -250,8 +250,8 @@ const PublicationRow = memo(function PublicationRow({
             )}
             {item.status === 'rejected' && item.rejector && (
               <div className="mt-1 flex items-center gap-1.5">
-                <span className="h-2 w-2 flex-shrink-0 rounded-full bg-rose-500"></span>
-                <span className="text-[10px] font-bold uppercase tracking-tight text-rose-600 dark:text-rose-400">
+                <span className="h-2 w-2 shrink-0 rounded-full bg-rose-500"></span>
+                <span className="text-[10px] font-bold tracking-tight text-rose-600 uppercase dark:text-rose-400">
                   {t('publications.table.rejectedBy') || 'Rejected by'} {item.rejector.name}
                 </span>
               </div>
@@ -260,15 +260,15 @@ const PublicationRow = memo(function PublicationRow({
               item.scheduled_at) && (
               <div className="mt-1 flex flex-col gap-0.5">
                 <div className="flex items-center gap-1.5">
-                  <Calendar className="h-3 w-3 text-primary-500" />
-                  <span className="text-[10px] font-bold uppercase tracking-tight text-primary-500">
+                  <Calendar className="text-primary-500 h-3 w-3" />
+                  <span className="text-primary-500 text-[10px] font-bold tracking-tight uppercase">
                     {(item as Publication & { type?: string }).type === 'user_event'
                       ? t('publications.table.manualEvent')
                       : t('publications.table.socialNetworkEvent')}
                   </span>
                 </div>
                 {(item as Publication & { type?: string }).type === 'user_event' && item.user && (
-                  <span className="ml-4 text-[9px] font-medium italic text-gray-500 dark:text-gray-400">
+                  <span className="ml-4 text-[9px] font-medium text-gray-500 italic dark:text-gray-400">
                     {t('publications.table.createdBy')}: {item.user.name}
                   </span>
                 )}
@@ -284,7 +284,7 @@ const PublicationRow = memo(function PublicationRow({
               src={item.user.photo_url}
               name={item.user.name}
               size="md"
-              className="flex-shrink-0"
+              className="shrink-0"
             />
             <div className="ml-3 hidden xl:block">
               <p className="max-w-[100px] truncate text-sm font-medium text-gray-900 dark:text-white">
@@ -330,7 +330,7 @@ const PublicationRow = memo(function PublicationRow({
             </span>
           </div>
         ) : (
-          <span className="text-[10px] italic text-gray-400">{t('common.none') || 'Ninguna'}</span>
+          <span className="text-[10px] text-gray-400 italic">{t('common.none') || 'Ninguna'}</span>
         )}
       </td>
       <td className="max-w-[180px] px-6 py-4">

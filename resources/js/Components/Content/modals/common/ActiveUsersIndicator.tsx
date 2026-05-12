@@ -17,7 +17,7 @@ export const ActiveUsersIndicator = ({ activeUsers, lockInfo }: ActiveUsersIndic
         return (
           <div
             key={user.id}
-            className={`inline-block h-7 w-7 rounded-full ring-2 ${isTheLocker ? 'z-10 ring-amber-500' : 'ring-white dark:ring-neutral-800'} relative flex-shrink-0 bg-gray-200 dark:bg-neutral-700`}
+            className={`inline-block h-7 w-7 rounded-full ring-2 ${isTheLocker ? 'z-10 ring-amber-500' : 'ring-white dark:ring-neutral-800'} relative shrink-0 bg-gray-200 dark:bg-neutral-700`}
             title={user.name + (isTheLocker ? ' (Editando)' : ' (Viendo)')}
           >
             {user.avatar ? (
@@ -41,12 +41,12 @@ export const ActiveUsersIndicator = ({ activeUsers, lockInfo }: ActiveUsersIndic
                 }}
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center text-xs font-bold uppercase text-gray-500">
+              <div className="flex h-full w-full items-center justify-center text-xs font-bold text-gray-500 uppercase">
                 {user.name.charAt(0)}
               </div>
             )}
             {isTheLocker && (
-              <div className="absolute -bottom-0.5 -right-0.5 rounded-full bg-amber-500 p-0.5 shadow-sm">
+              <div className="absolute -right-0.5 -bottom-0.5 rounded-full bg-amber-500 p-0.5 shadow-sm">
                 <Lock className="h-2 w-2 text-white" />
               </div>
             )}

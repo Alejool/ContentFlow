@@ -1,8 +1,6 @@
+import { formatDateTimeString } from '@/Utils/formatters';
 import type { Publication } from '@/types/Publications/Publication';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
-import { formatDateTimeString } from '@/Utils/formatters';
 import { Edit, User, X, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -66,7 +64,7 @@ export default function RejectionDetailsModal({
               </div>
 
               <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3 dark:bg-neutral-900/50">
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400">
                     <User className="h-5 w-5" />
                   </div>
@@ -91,7 +89,7 @@ export default function RejectionDetailsModal({
                   {t('approvals.rejectionReason') || 'Razón del Rechazo'}
                 </label>
                 <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-900">
-                  <p className="whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300">
+                  <p className="text-sm whitespace-pre-wrap text-gray-700 dark:text-gray-300">
                     {publication.rejection_reason ||
                       t('approvals.noReasonProvided') ||
                       'No se proporcionó una razón.'}
@@ -111,7 +109,7 @@ export default function RejectionDetailsModal({
             {onEdit && (
               <button
                 onClick={handleEdit}
-                className="flex items-center gap-2 rounded-lg bg-primary-600 px-6 py-2.5 font-bold text-white shadow-lg shadow-primary-600/20 transition-all hover:bg-primary-700 active:scale-95"
+                className="bg-primary-600 shadow-primary-600/20 hover:bg-primary-700 flex items-center gap-2 rounded-lg px-6 py-2.5 font-bold text-white shadow-lg transition-all active:scale-95"
               >
                 <Edit className="h-4 w-4" />
                 {t('approvals.editPublication') || 'Editar Publicación'}

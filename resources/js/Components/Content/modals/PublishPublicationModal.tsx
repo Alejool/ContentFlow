@@ -1,17 +1,16 @@
-import Button from '@/Components/common/Modern/Button';
-import YouTubeThumbnailUploader from '@/Components/common/ui/YouTubeThumbnailUploader';
+import RejectionReasonModal from '@/Components/Content/modals/RejectionReasonModal';
 import PlatformCard from '@/Components/Content/modals/publish/PlatformCard';
 import VideoValidationAlert from '@/Components/Content/modals/publish/VideoValidationAlert';
-import RejectionReasonModal from '@/Components/Content/modals/RejectionReasonModal';
-import { CONTENT_TYPE_CONFIG } from '@/Constants/Content/contentTypes';
+import Button from '@/Components/common/Modern/Button';
+import YouTubeThumbnailUploader from '@/Components/common/ui/YouTubeThumbnailUploader';
 import { getPlatformConfig } from '@/Constants/ConfigSocialMedia/socialPlatforms';
+import { CONTENT_TYPE_CONFIG } from '@/Constants/Content/contentTypes';
+import { usePublicationCapabilities } from '@/Hooks/Publications/usePublicationCapabilities';
 import { usePublishPublication } from '@/Hooks/Publications/usePublishPublication';
 import { useConfirm } from '@/Hooks/common/useConfirm';
-import { usePublicationCapabilities } from '@/Hooks/Publications/usePublicationCapabilities';
+import { formatDateTimeString, formatDateTimeStyled } from '@/Utils/formatters';
 import { usePublicationStore } from '@/stores/Publications/publicationStore';
 import type { Publication } from '@/types/Publications/Publication';
-import { formatDateTimeStyled } from '@/Utils/formatters';
-import { formatDateTimeString } from '@/Utils/formatters';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { usePage } from '@inertiajs/react';
 import { AlertCircle, CheckCircle, ChevronDown, Clock, Share2, X, XCircle } from 'lucide-react';
@@ -50,13 +49,13 @@ const RecurringPostsSection = ({
   return (
     <div className="mt-3 rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-neutral-800/50">
       <div className="mb-2 flex items-center gap-2">
-        <Clock className="h-3.5 w-3.5 text-primary-600 dark:text-primary-400" />
+        <Clock className="text-primary-600 dark:text-primary-400 h-3.5 w-3.5" />
         <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
           {t('publications.modal.publish.recurringPosts') || 'Publicaciones Recurrentes'}
         </span>
       </div>
 
-      <div className="scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-neutral-600 scrollbar-track-transparent max-h-[200px] space-y-1.5 overflow-y-auto pr-1">
+      <div className="max-h-[200px] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent space-y-1.5 overflow-y-auto pr-1 dark:scrollbar-thumb-neutral-600">
         {uniqueScheduled.map((post: any) => (
           <div
             key={post.id}
@@ -127,7 +126,6 @@ export default function PublishPublicationModal({
   const [platformSettings, setPlatformSettings] = useState<Record<string, any>>({});
   const [rejectionModalOpen, setRejectionModalOpen] = useState(false);
   const [isYouTubeThumbnailExpanded, setIsYouTubeThumbnailExpanded] = useState(true);
-
 
   const {
     capabilities,
@@ -460,7 +458,7 @@ export default function PublishPublicationModal({
               <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
                 <div className="flex items-center gap-2">
                   <div className="rounded-lg p-1.5">
-                    <Share2 className="h-5 w-5 text-primary-500" />
+                    <Share2 className="text-primary-500 h-5 w-5" />
                   </div>
                   {t('publications.modal.publish.title')}
                 </div>
@@ -477,7 +475,7 @@ export default function PublishPublicationModal({
               {isPendingReview && (
                 <div className="mb-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
                   <div className="mb-4 flex items-start gap-3">
-                    <Clock className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-600 dark:text-yellow-400" />
+                    <Clock className="mt-0.5 h-5 w-5 shrink-0 text-yellow-600 dark:text-yellow-400" />
                     <div className="flex-1">
                       <h4 className="text-sm font-bold text-yellow-800 dark:text-yellow-200">
                         {t('publications.modal.publish.pendingReviewBanner.title') ||
@@ -615,7 +613,7 @@ export default function PublishPublicationModal({
                   return (
                     <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
                       <div className="flex items-start gap-3">
-                        <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
+                        <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400" />
                         <div className="flex-1">
                           <h4 className="text-sm font-bold text-blue-800 dark:text-blue-200">
                             {t('publications.modal.publish.alreadyPublishedBanner.title') ||
@@ -692,7 +690,7 @@ export default function PublishPublicationModal({
               {incompatibleAccounts.length > 0 && (
                 <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20">
                   <div className="flex items-start gap-3">
-                    <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600 dark:text-amber-400" />
+                    <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
                     <div className="flex-1">
                       <h4 className="text-sm font-bold text-amber-800 dark:text-amber-200">
                         {t('publications.modal.publish.incompatibleAccountsBanner.title') ||
@@ -765,7 +763,7 @@ export default function PublishPublicationModal({
               <div className="mb-6">
                 {isLoadingAccounts ? (
                   <div className="rounded-lg bg-gray-50 py-12 text-center dark:bg-neutral-900/50">
-                    <div className="mx-auto h-8 w-8 animate-spin rounded-full border-b-2 border-primary-500"></div>
+                    <div className="border-primary-500 mx-auto h-8 w-8 animate-spin rounded-full border-b-2"></div>
                     <p className="mt-3 text-sm text-gray-600 dark:text-gray-400">
                       {t('publications.modal.publish.loadingAccounts') || 'Cargando cuentas...'}
                     </p>
@@ -852,7 +850,7 @@ export default function PublishPublicationModal({
                   <button
                     type="button"
                     onClick={() => setIsYouTubeThumbnailExpanded(!isYouTubeThumbnailExpanded)}
-                    className="mb-3 flex w-full items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 hover:text-primary-600 dark:border-neutral-700 dark:bg-neutral-800/50 dark:text-gray-300 dark:hover:bg-neutral-700 dark:hover:text-primary-400"
+                    className="hover:text-primary-600 dark:hover:text-primary-400 mb-3 flex w-full items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800/50 dark:text-gray-300 dark:hover:bg-neutral-700"
                   >
                     <div className="flex items-center gap-2">
                       <img
@@ -878,7 +876,7 @@ export default function PublishPublicationModal({
                     <div className="animate-in fade-in slide-in-from-top-2 duration-200">
                       {isLoadingThumbnails ? (
                         <div className="py-4 text-center">
-                          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-b-2 border-primary-500"></div>
+                          <div className="border-primary-500 mx-auto h-8 w-8 animate-spin rounded-full border-b-2"></div>
                         </div>
                       ) : (
                         <div className="space-y-4">

@@ -17,15 +17,16 @@ import ModalHeader from '@/Components/Content/modals/common/ModalHeader';
 import ScheduleSection from '@/Components/Content/modals/common/ScheduleSection';
 import VideoValidationAlert from '@/Components/Content/modals/publish/VideoValidationAlert';
 import AlertCard from '@/Components/common/Modern/AlertCard';
-import { useContentType } from '@/Hooks/Publications/useContentType';
-import { usePublicationForm } from '@/Hooks/Publications/usePublicationForm';
-import { usePublishedPlatforms } from '@/Hooks/Publications/usePublicationsList';
-import { useModalFocusTrap } from '@/Hooks/ui/useModalFocusTrap';
-import { usePublicationCapabilities } from '@/Hooks/Publications/usePublicationCapabilities';
-import { usePublicationLock } from '@/Hooks/Publications/usePublicationLock';
 import { useSocialAccounts } from '@/Hooks/ConfigSocialMedia/useSocialAccounts';
 import { useTokenHealth } from '@/Hooks/ConfigSocialMedia/useTokenHealth';
+import { useContentType } from '@/Hooks/Publications/useContentType';
+import { usePublicationCapabilities } from '@/Hooks/Publications/usePublicationCapabilities';
+import { usePublicationForm } from '@/Hooks/Publications/usePublicationForm';
+import { usePublicationLock } from '@/Hooks/Publications/usePublicationLock';
+import { usePublishedPlatforms } from '@/Hooks/Publications/usePublicationsList';
+import { useModalFocusTrap } from '@/Hooks/ui/useModalFocusTrap';
 import toast from '@/Utils/common/toast';
+import { maskIpAddress, parseUserAgent } from '@/Utils/formatters';
 import { queryKeys } from '@/lib/common/queryKeys';
 import { useCampaignStore } from '@/stores/Campaign/campaignStore';
 import { useUploadQueue } from '@/stores/Upload/uploadQueueStore';
@@ -37,7 +38,6 @@ import { Lock, Save } from 'lucide-react';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useWatch } from 'react-hook-form';
 import { Trans } from 'react-i18next';
-import { parseUserAgent, maskIpAddress } from '@/Utils/formatters';
 
 interface EditPublicationModalProps {
   isOpen: boolean;
@@ -459,7 +459,7 @@ const EditPublicationModal = ({
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center text-gray-900 transition-opacity duration-200 dark:text-white sm:p-6 ${isOpen ? 'visible opacity-100' : 'pointer-events-none invisible opacity-0'}`}
+      className={`fixed inset-0 z-50 flex items-center justify-center text-gray-900 transition-opacity duration-200 sm:p-6 dark:text-white ${isOpen ? 'visible opacity-100' : 'pointer-events-none invisible opacity-0'}`}
     >
       <div
         className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm dark:bg-black/70"
@@ -484,7 +484,7 @@ const EditPublicationModal = ({
                 return (
                   <div
                     key={user.id}
-                    className={`inline-block h-7 w-7 rounded-full ring-2 ${isTheLocker ? 'z-10 ring-amber-500' : 'ring-white dark:ring-neutral-800'} relative flex-shrink-0 bg-gray-200 dark:bg-neutral-700`}
+                    className={`inline-block h-7 w-7 rounded-full ring-2 ${isTheLocker ? 'z-10 ring-amber-500' : 'ring-white dark:ring-neutral-800'} relative shrink-0 bg-gray-200 dark:bg-neutral-700`}
                     title={user.name + (isTheLocker ? ' (Editando)' : ' (Viendo)')}
                   >
                     {user.avatar ? (
@@ -508,12 +508,12 @@ const EditPublicationModal = ({
                         }}
                       />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center text-xs font-bold uppercase text-gray-500">
+                      <div className="flex h-full w-full items-center justify-center text-xs font-bold text-gray-500 uppercase">
                         {user.name.charAt(0)}
                       </div>
                     )}
                     {isTheLocker && (
-                      <div className="absolute -bottom-0.5 -right-0.5 rounded-full bg-amber-500 p-0.5 shadow-sm">
+                      <div className="absolute -right-0.5 -bottom-0.5 rounded-full bg-amber-500 p-0.5 shadow-sm">
                         <Lock className="h-2 w-2 text-white" />
                       </div>
                     )}
@@ -540,7 +540,6 @@ const EditPublicationModal = ({
             />
           }
         />
-
 
         <div className="custom-scrollbar flex-1 overflow-y-auto">
           <form
@@ -654,8 +653,8 @@ const EditPublicationModal = ({
 
                       {/* Flujo de Aprobación */}
                       {publication?.current_approval_step?.workflow && (
-                        <div className="animate-in fade-in slide-in-from-top-4 rounded-lg border border-primary-200 bg-gradient-to-br from-primary-50 to-blue-50 p-4 dark:border-primary-800 dark:from-primary-900/20 dark:to-blue-900/20">
-                          <h4 className="mb-3 flex items-center gap-2 text-sm font-bold text-primary-900 dark:text-primary-300">
+                        <div className="animate-in fade-in slide-in-from-top-4 border-primary-200 from-primary-50 dark:border-primary-800 dark:from-primary-900/20 rounded-lg border bg-gradient-to-br to-blue-50 p-4 dark:to-blue-900/20">
+                          <h4 className="text-primary-900 dark:text-primary-300 mb-3 flex items-center gap-2 text-sm font-bold">
                             <svg
                               className="h-4 w-4"
                               fill="none"
@@ -684,7 +683,7 @@ const EditPublicationModal = ({
                                     key={step.id}
                                     className={`flex items-center gap-3 rounded-lg p-2 transition-all ${
                                       isCurrent
-                                        ? 'border border-primary-300 bg-primary-100 dark:border-primary-700 dark:bg-primary-900/40'
+                                        ? 'border-primary-300 bg-primary-100 dark:border-primary-700 dark:bg-primary-900/40 border'
                                         : isPast
                                           ? 'border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20'
                                           : 'border border-gray-200 bg-white/50 dark:border-neutral-700 dark:bg-neutral-800/50'
@@ -710,7 +709,7 @@ const EditPublicationModal = ({
                                       </div>
                                     </div>
                                     {isCurrent && (
-                                      <span className="rounded-full bg-primary-200 px-2 py-0.5 text-[10px] font-bold text-primary-600 dark:bg-primary-800 dark:text-primary-400">
+                                      <span className="bg-primary-200 text-primary-600 dark:bg-primary-800 dark:text-primary-400 rounded-full px-2 py-0.5 text-[10px] font-bold">
                                         {t('approvals.in_progress') || 'En Proceso'}
                                       </span>
                                     )}
@@ -817,8 +816,8 @@ const EditPublicationModal = ({
                 {/* ==================== SECCIÓN: CONTENIDO DE LA PUBLICACIÓN ==================== */}
                 <div className="mt-6 space-y-2">
                   <div className="flex items-center gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700">
-                    <div className="h-5 w-1 rounded-full bg-primary-500"></div>
-                    <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                    <div className="bg-primary-500 h-5 w-1 rounded-full"></div>
+                    <h3 className="text-sm font-semibold tracking-wide text-gray-900 uppercase dark:text-white">
                       {t('publications.modal.edit.contentSection') || 'Contenido'}
                     </h3>
                   </div>
@@ -895,9 +894,9 @@ const EditPublicationModal = ({
                 {/* ==================== SECCIÓN: VISTA PREVIA (Solo si tiene advanced_scheduling) ==================== */}
                 {hasRecurrenceAccess && (
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2 border-b border-gray-200 pb-2 pt-6 dark:border-neutral-700">
-                      <div className="h-5 w-1 rounded-full bg-primary-500"></div>
-                      <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                    <div className="flex items-center gap-2 border-b border-gray-200 pt-6 pb-2 dark:border-neutral-700">
+                      <div className="bg-primary-500 h-5 w-1 rounded-full"></div>
+                      <h3 className="text-sm font-semibold tracking-wide text-gray-900 uppercase dark:text-white">
                         {t('publications.modal.edit.previewSection') || 'Vista Previa'}
                       </h3>
                     </div>
@@ -950,8 +949,8 @@ const EditPublicationModal = ({
                   className={`space-y-4 transition-opacity duration-200 ${!allowConfiguration || isContentSectionDisabled ? 'pointer-events-none opacity-50 grayscale-[0.5]' : ''}`}
                 >
                   <div className="flex items-center gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700">
-                    <div className="h-5 w-1 rounded-full bg-primary-500"></div>
-                    <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                    <div className="bg-primary-500 h-5 w-1 rounded-full"></div>
+                    <h3 className="text-sm font-semibold tracking-wide text-gray-900 uppercase dark:text-white">
                       {t('publications.modal.edit.socialAccountsSection') || 'Redes Sociales'}
                     </h3>
                   </div>
@@ -1029,8 +1028,8 @@ const EditPublicationModal = ({
                     className={`space-y-4 transition-opacity duration-200 ${!allowConfiguration || isContentSectionDisabled ? 'pointer-events-none opacity-50 grayscale-[0.5]' : ''}`}
                   >
                     <div className="flex items-center gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700">
-                      <div className="h-5 w-1 rounded-full bg-primary-500"></div>
-                      <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                      <div className="bg-primary-500 h-5 w-1 rounded-full"></div>
+                      <h3 className="text-sm font-semibold tracking-wide text-gray-900 uppercase dark:text-white">
                         {t('publications.modal.edit.scheduleSection') || 'Programación'}
                       </h3>
                     </div>
@@ -1091,8 +1090,8 @@ const EditPublicationModal = ({
                   /* ==================== SECCIÓN: VISTA PREVIA (Reemplaza programación si NO tiene advanced_scheduling) ==================== */
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700">
-                      <div className="h-5 w-1 rounded-full bg-primary-500"></div>
-                      <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                      <div className="bg-primary-500 h-5 w-1 rounded-full"></div>
+                      <h3 className="text-sm font-semibold tracking-wide text-gray-900 uppercase dark:text-white">
                         {t('publications.modal.edit.previewSection') || 'Vista Previa'}
                       </h3>
                     </div>
@@ -1136,9 +1135,9 @@ const EditPublicationModal = ({
                 {/* ==================== SECCIÓN: COMENTARIOS INTERNOS ==================== */}
                 {publication?.id && (
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2 border-b border-gray-200 pb-2 pt-6 dark:border-neutral-700">
-                      <div className="h-5 w-1 rounded-full bg-primary-500"></div>
-                      <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                    <div className="flex items-center gap-2 border-b border-gray-200 pt-6 pb-2 dark:border-neutral-700">
+                      <div className="bg-primary-500 h-5 w-1 rounded-full"></div>
+                      <h3 className="text-sm font-semibold tracking-wide text-gray-900 uppercase dark:text-white">
                         {t('publications.modal.edit.commentsSection') || 'Comentarios Internos'}
                       </h3>
                     </div>
@@ -1148,9 +1147,9 @@ const EditPublicationModal = ({
 
                 {/* ==================== SECCIÓN: HISTORIAL Y ACTIVIDAD ==================== */}
                 <div className="space-y-4">
-                  <div className="flex items-center gap-2 border-b border-gray-200 pb-2 pt-6 dark:border-neutral-700">
-                    <div className="h-5 w-1 rounded-full bg-primary-500"></div>
-                    <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                  <div className="flex items-center gap-2 border-b border-gray-200 pt-6 pb-2 dark:border-neutral-700">
+                    <div className="bg-primary-500 h-5 w-1 rounded-full"></div>
+                    <h3 className="text-sm font-semibold tracking-wide text-gray-900 uppercase dark:text-white">
                       {t('publications.modal.edit.historySection') || 'Historial'}
                     </h3>
                   </div>

@@ -32,7 +32,7 @@ export const TwitterPreview = ({
       className={`w-full max-w-[500px] rounded-lg border border-gray-200 bg-white p-4 font-sans dark:border-gray-800 dark:bg-black ${className}`}
     >
       <div className="flex gap-3">
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           <Avatar src={user?.avatar} name={user?.name} size="md" />
         </div>
         <div className="min-w-0 flex-1">
@@ -50,8 +50,8 @@ export const TwitterPreview = ({
             </span>
           </div>
 
-          <div className="mt-1 whitespace-pre-wrap break-words text-[15px] leading-normal text-gray-900 dark:text-gray-100">
-            {content || <span className="italic text-gray-400">Start typing to preview...</span>}
+          <div className="mt-1 text-[15px] leading-normal break-words whitespace-pre-wrap text-gray-900 dark:text-gray-100">
+            {content || <span className="text-gray-400 italic">Start typing to preview...</span>}
           </div>
 
           {mediaUrls.length > 0 && contentType !== 'poll' && (

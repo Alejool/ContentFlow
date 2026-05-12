@@ -119,7 +119,7 @@ export default function ContentTypeValidationBanner({
       {incompatibleAccounts.length > 0 && (
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-900/20">
           <div className="flex items-start gap-2">
-            <Info className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600 dark:text-amber-400" />
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
             <div className="flex-1">
               <h4 className="text-sm font-medium text-amber-800 dark:text-amber-200">
                 Platforms not compatible with {contentType}
@@ -157,11 +157,11 @@ export default function ContentTypeValidationBanner({
         >
           <div className="flex items-start gap-2">
             {msg.type === 'error' ? (
-              <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-600 dark:text-red-400" />
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400" />
             ) : msg.type === 'warning' ? (
-              <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600 dark:text-amber-400" />
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
             ) : (
-              <Info className="mt-0.5 h-4 w-4 flex-shrink-0 text-blue-600 dark:text-blue-400" />
+              <Info className="mt-0.5 h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
             )}
             <p
               className={`text-sm ${

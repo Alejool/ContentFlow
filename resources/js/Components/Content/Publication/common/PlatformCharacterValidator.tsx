@@ -129,7 +129,7 @@ export default function PlatformCharacterValidator({
           critical.isOver ? 'text-red-600 dark:text-red-400' : 'text-amber-600 dark:text-amber-400'
         }`}
       >
-        <AlertTriangle className="h-3.5 w-3.5 flex-shrink-0" />
+        <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
         <span>
           {critical.label}: {critical.count}/{critical.limit}
           {critical.isOver && ` (+${critical.over} sobre el límite)`}
