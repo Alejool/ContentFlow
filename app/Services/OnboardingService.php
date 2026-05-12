@@ -192,10 +192,17 @@ class OnboardingService implements OnboardingServiceInterface
         if ($completedCount >= $totalSteps || $isLastStep) {
             $updateData['tour_completed'] = true;
             Log::info("Marking tour as completed for user {$user->id}");
-            $this->checkAndMarkOnboardingComplete($user, $state);
         }
 
         $this->repository->update($user->id, $updateData);
+
+        // Refresh state after update to get the latest data
+        $state = $state->fresh();
+        
+        // Check if onboarding is now complete (only if tour was completed)
+        if ($completedCount >= $totalSteps || $isLastStep) {
+            $this->checkAndMarkOnboardingComplete($user, $state);
+        }
 
         // Record analytics asynchronously
         dispatch(function () use ($user, $stepId, $duration) {
@@ -285,10 +292,17 @@ class OnboardingService implements OnboardingServiceInterface
             $updateData['wizard_completed'] = true;
             $updateData['template_selected'] = true; // Auto-select template when wizard is completed
             $updateData['template_id'] = 'default'; // Use a default template ID
-            $this->checkAndMarkOnboardingComplete($user, $state);
         }
 
         $this->repository->update($user->id, $updateData);
+
+        // Refresh state after update to get the latest data
+        $state = $state->fresh();
+        
+        // Check if onboarding is now complete (only if wizard was completed)
+        if ($stepNumber >= $this->getTotalWizardSteps()) {
+            $this->checkAndMarkOnboardingComplete($user, $state);
+        }
 
         // Record analytics asynchronously
         dispatch(function () use ($user, $stepId, $duration) {
@@ -316,6 +330,9 @@ class OnboardingService implements OnboardingServiceInterface
 
         $this->repository->update($user->id, $updateData);
 
+        // Refresh state after update to get the latest data
+        $state = $state->fresh();
+        
         // Check if onboarding is now complete
         $this->checkAndMarkOnboardingComplete($user, $state);
 
@@ -390,6 +407,8 @@ class OnboardingService implements OnboardingServiceInterface
             $this->analyticsService->recordSkipEvent($user, $currentStep, 'tour');
         })->afterResponse();
 
+        // Refresh state after update to get the latest data
+        $state = $state->fresh();
         $this->checkAndMarkOnboardingComplete($user, $state);
 
         Log::info("Tour skipped for user {$user->id}");
@@ -417,6 +436,8 @@ class OnboardingService implements OnboardingServiceInterface
             $this->analyticsService->recordSkipEvent($user, $currentStep, 'wizard');
         })->afterResponse();
 
+        // Refresh state after update to get the latest data
+        $state = $state->fresh();
         $this->checkAndMarkOnboardingComplete($user, $state);
 
         Log::info("Wizard skipped for user {$user->id}");
