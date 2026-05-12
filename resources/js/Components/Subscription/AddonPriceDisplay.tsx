@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { formatCurrency } from '@/Utils/formatters/number';
 
 interface AddonPriceDisplayProps {
   priceUsd: number;
@@ -44,7 +45,7 @@ export function AddonPriceDisplay({
       {/* Equivalente en USD (si no es USD) */}
       {showUsdEquivalent && currency !== 'USD' && (
         <div className={`${subTextClasses[size]} mt-1 text-gray-500 dark:text-gray-400`}>
-          ≈ USD ${priceUsd.toFixed(2)}
+          ≈ {formatCurrency(priceUsd, 'USD')}
         </div>
       )}
 

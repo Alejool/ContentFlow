@@ -5,6 +5,7 @@ import type { AddonSummary } from '@/types/addon';
 import { Link } from '@inertiajs/react';
 import { HardDrive, Plus, Sparkles } from 'lucide-react';
 import React from 'react';
+import { formatCurrency } from '@/Utils/formatters/number';
 
 interface AddonBalanceWidgetProps {
   summary: AddonSummary | null;
@@ -101,7 +102,7 @@ export const AddonBalanceWidget: React.FC<AddonBalanceWidgetProps> = ({ summary,
         {/* Total Spent */}
         {summary.total_spent > 0 && (
           <div className="text-muted-foreground border-t pt-3 text-xs">
-            Total invertido: ${summary.total_spent.toFixed(2)}
+            Total invertido: {formatCurrency(summary.total_spent)}
           </div>
         )}
       </CardContent>

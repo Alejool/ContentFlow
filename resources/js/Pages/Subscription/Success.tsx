@@ -5,6 +5,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { ArrowRight, CheckCircle, Sparkles } from 'lucide-react';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { formatCurrency } from '@/Utils/formatters/number';
 
 interface Props {
   auth: any;
@@ -79,7 +80,7 @@ export default function Success({ auth, plan, amount, currency }: Props) {
                     {t('subscription.success.amountPaid')}
                   </span>
                   <span className="text-lg font-semibold text-gray-900 dark:text-white">
-                    {currency} ${amount.toFixed(2)}
+                    {formatCurrency(amount, currency)}
                   </span>
                 </div>
 

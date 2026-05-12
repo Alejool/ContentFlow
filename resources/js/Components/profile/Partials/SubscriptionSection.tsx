@@ -3,6 +3,8 @@ import { Badge } from '@/Components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import { useSubscriptionUsage } from '@/Hooks/useSubscriptionUsage';
 import { formatDateString } from '@/Utils/formatters';
+import { formatCurrency } from '@/Utils/formatters/number';
+import { formatBytes } from '@/Utils/formatters/storage';
 import { router, usePage } from '@inertiajs/react';
 import {
     AlertCircle,
@@ -209,10 +211,10 @@ export default function SubscriptionSection({
 
   // Enterprise check: subscription features OR global workspace features OR plan_id
   const hasWhiteLabel =
-    subscription?.features?.white_label ||
-    globalWorkspace?.features?.white_label ||
-    subscription?.plan_id?.toLowerCase() === 'enterprise' ||
-    globalWorkspace?.plan?.toLowerCase() === 'enterprise';
+    subscription?.features?.['white_label'] ||
+    globalWorkspace?.features?.['white_label'] ||
+    subscription?.['plan_id']?.toLowerCase() === 'enterprise' ||
+    globalWorkspace?.['plan']?.toLowerCase() === 'enterprise';
 
   const getPlanIcon = (planId: string) => {
     switch (planId) {
@@ -552,7 +554,7 @@ export default function SubscriptionSection({
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-bold text-gray-900 dark:text-white">
-                      ${invoice.total.toFixed(2)}
+                      {formatCurrency(invoice.total)}
                     </p>
                     <Badge
                       variant="outline"

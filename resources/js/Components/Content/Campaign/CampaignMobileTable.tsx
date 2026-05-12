@@ -2,6 +2,7 @@ import type { Campaign } from '@/types/Campaign';
 import { usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { getDateFnsLocale } from '@/Utils/dateLocales';
+import { formatCurrency } from '@/Utils/formatters/number';
 import { useTranslation } from 'react-i18next';
 import {
   Calendar,
@@ -88,10 +89,7 @@ export default function CampaignMobileTable({
                     <div className="flex items-center gap-1 rounded-md bg-green-50 px-2 py-1 text-xs text-gray-500 dark:bg-green-900/10 dark:text-gray-400">
                       <DollarSign className="h-3 w-3 text-green-600 dark:text-green-400" />
                       <span>
-                        {new Intl.NumberFormat('es-ES', {
-                          style: 'currency',
-                          currency: 'USD',
-                        }).format(item.budget)}
+                      {formatCurrency(item.budget)}
                       </span>
                     </div>
                   )}

@@ -1,6 +1,7 @@
 import { AlertTriangle, Sparkles, X } from 'lucide-react';
 import { Link } from '@inertiajs/react';
 import { useState } from 'react';
+import { formatPercent } from '@/Utils/formatters/number';
 
 interface UsageWarningBannerProps {
   usage: number;
@@ -72,7 +73,7 @@ export function UsageWarningBanner({ usage, limit, type, typeName }: UsageWarnin
             </p>
             <p className={`text-sm ${style.textLight} mt-1`}>
               Has usado <span className="font-semibold">{usage}</span> de{' '}
-              <span className="font-semibold">{limit}</span> ({percentage.toFixed(0)}%)
+              <span className="font-semibold">{limit}</span> ({formatPercent(percentage, 0)})
               {remaining > 0 && (
                 <span className="ml-2">
                   • Solo te quedan <span className="font-semibold">{remaining}</span>

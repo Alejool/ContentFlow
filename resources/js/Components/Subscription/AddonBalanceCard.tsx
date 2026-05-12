@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Progress } from '@/Components/ui/progress';
 import type { AddonBalance } from '@/types/addon';
 import { Sparkles, HardDrive } from 'lucide-react';
+import { formatPercent } from '@/Utils/formatters/number';
 
 interface AddonBalanceCardProps {
   balance: AddonBalance;
@@ -47,7 +48,7 @@ export const AddonBalanceCard: React.FC<AddonBalanceCardProps> = ({ balance, onB
               indicatorClassName={getProgressColor()}
             />
             <p className="text-muted-foreground text-xs">
-              {balance.percentage_used.toFixed(1)}% usado
+              {formatPercent(balance.percentage_used, 1)} usado
             </p>
           </div>
 

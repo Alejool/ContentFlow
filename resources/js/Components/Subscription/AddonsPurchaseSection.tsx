@@ -9,6 +9,7 @@ import { ActiveAddonsCards } from './ActiveAddonsCards';
 import { TabNavigation } from '@/Components/common/TabNavigation';
 import type { Tab } from '@/Components/common/TabNavigation';
 import { AddonPriceDisplay } from './AddonPriceDisplay';
+import { formatCurrency } from '@/Utils/formatters/number';
 
 interface AddonPackage {
   sku: string;
@@ -249,7 +250,7 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
             priceUsd={pkg.price_usd || pkg.price}
             priceLocal={pkg.price_local || pkg.price}
             currency={pkg.currency || 'USD'}
-            formattedPrice={pkg.formatted_price || `$${pkg.price.toFixed(2)}`}
+            formattedPrice={pkg.formatted_price || formatCurrency(pkg.price, pkg.currency)}
             showUsdEquivalent={true}
             size="lg"
           />
@@ -304,7 +305,7 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
               priceUsd={totalPriceUsd}
               priceLocal={totalPriceLocal}
               currency={pkg.currency || 'USD'}
-              formattedPrice={formatPrice(totalPriceLocal, pkg.currency || 'USD')}
+              formattedPrice={formatCurrency(totalPriceLocal, pkg.currency)}
               showUsdEquivalent={true}
               size="md"
             />
@@ -327,33 +328,7 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
     );
   };
 
-  const getCurrencySymbol = (curr: string): string => {
-    const symbols: Record<string, string> = {
-      USD: '$',
-      COP: '$',
-      MXN: '$',
-      ARS: '$',
-      BRL: 'R$',
-      CLP: '$',
-      PEN: 'S/',
-      EUR: '€',
-      GBP: '£',
-      CAD: 'CA$',
-      AUD: 'A$',
-      JPY: '¥',
-      INR: '₹',
-    };
-    return symbols[curr] || curr + ' ';
-  };
 
-  const formatPrice = (price: number, curr: string): string => {
-    const symbol = getCurrencySymbol(curr);
-    // Monedas sin decimales
-    if (['COP', 'CLP', 'JPY'].includes(curr)) {
-      return `${symbol}${Math.round(price).toLocaleString()}`;
-    }
-    return `${symbol}${price.toFixed(2)}`;
-  };
 
   // Detectar si hay precios convertidos
   const firstPackage = currentPackages[0];

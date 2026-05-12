@@ -1,6 +1,9 @@
 import type { ActiveAddon } from '@/Hooks/useActiveAddons';
 import { FileText, HardDrive, Package, Sparkles, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { formatCurrency, formatPercent, formatNumber } from '@/Utils/formatters/number';
+import { formatBytesAsGB, gbToBytes } from '@/Utils/formatters/storage';
+import { formatDate } from '@/Utils/formatters/date';
 
 interface AddonCardProps {
   addon: ActiveAddon;
@@ -99,16 +102,16 @@ export function AddonCard({ addon }: AddonCardProps) {
                   : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'
             }`}
           >
-            {addon.percentage.toFixed(0)}%
+            {formatPercent(addon.percentage, 0)}
           </span>
         </div>
 
         <div className="mb-2 flex items-baseline gap-2">
           <span className="text-2xl font-bold text-gray-900 dark:text-white">
-            {addon.type === 'storage' ? `${addon.used.toFixed(1)} GB` : addon.used.toLocaleString()}
+            {addon.type === 'storage' ? formatBytesAsGB(gbToBytes(addon.used), 1) : formatNumber(addon.used)}
           </span>
           <span className="text-sm text-gray-500 dark:text-gray-400">
-            / {addon.type === 'storage' ? `${addon.amount} GB` : addon.amount.toLocaleString()}
+            / {addon.type === 'storage' ? formatBytesAsGB(gbToBytes(addon.amount), 0) : formatNumber(addon.amount)}
           </span>
         </div>
 
@@ -124,8 +127,8 @@ export function AddonCard({ addon }: AddonCardProps) {
           <span className="font-medium">{t('subscription.addons.remaining', 'Restante')}: </span>
           <span className="font-semibold text-primary-600 dark:text-primary-400">
             {addon.type === 'storage'
-              ? `${addon.remaining.toFixed(1)} GB`
-              : addon.remaining.toLocaleString()}
+              ? formatBytesAsGB(gbToBytes(addon.remaining), 1)
+              : formatNumber(addon.remaining)}
           </span>
         </div>
       </div>
@@ -139,17 +142,17 @@ export function AddonCard({ addon }: AddonCardProps) {
                 count: addon.purchase_count,
               })}
               {' • '}
-              <span className="font-semibold">${addon.total_price?.toFixed(2)}</span>
+              <span className="font-semibold">{formatCurrency(addon.total_price || 0)}</span>
             </>
           ) : (
             <>
               {t('subscription.addons.purchasedOn', 'Comprado el')}:{' '}
               {addon.first_purchased_at
-                ? new Date(addon.first_purchased_at).toLocaleDateString()
+                ? formatDate(addon.first_purchased_at)
                 : 'N/A'}
               {' • '}
               <span className="font-semibold">
-                ${addon.price?.toFixed(2) || addon.total_price?.toFixed(2)}
+                {formatCurrency(addon.price || addon.total_price || 0)}
               </span>
             </>
           )}
@@ -157,7 +160,7 @@ export function AddonCard({ addon }: AddonCardProps) {
         {addon.expires_at && (
           <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
             {t('subscription.addons.expiresOn', 'Expira el')}:{' '}
-            {new Date(addon.expires_at).toLocaleDateString()}
+            {formatDate(addon.expires_at)}
           </div>
         )}
       </div>

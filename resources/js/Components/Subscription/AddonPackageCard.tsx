@@ -11,6 +11,7 @@ import Button from '@/Components/common/Modern/Button';
 import { Badge } from '@/Components/ui/badge';
 import type { AddonPackage } from '@/types/addon';
 import { Sparkles, HardDrive, Minus, Plus } from 'lucide-react';
+import { formatCurrency } from '@/Utils/formatters/number';
 
 interface AddonPackageCardProps {
   package: AddonPackage;
@@ -75,10 +76,10 @@ export const AddonPackageCard: React.FC<AddonPackageCardProps> = ({
 
         {/* Price */}
         <div className="text-center">
-          <div className="text-2xl font-bold">${totalPrice.toFixed(2)}</div>
+          <div className="text-2xl font-bold">{formatCurrency(totalPrice, pkg.currency)}</div>
           {quantity > 1 && (
             <div className="text-muted-foreground text-xs">
-              ${pkg.price.toFixed(2)} × {quantity}
+              {formatCurrency(pkg.price, pkg.currency)} × {quantity}
             </div>
           )}
         </div>

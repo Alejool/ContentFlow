@@ -5,6 +5,8 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import { CheckCircle, FileText, HardDrive, Home, Package, Sparkles, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { formatCurrency } from '@/Utils/formatters/number';
+import { formatDate } from '@/Utils/formatters/date';
 
 interface AddonPurchaseData {
   addon_sku: string;
@@ -126,10 +128,7 @@ export default function AddonPurchaseSuccess({ purchase }: Props) {
                           {t('payment.addonPurchaseSuccess.price')}
                         </span>
                         <span className="text-base font-bold text-green-600 dark:text-green-400">
-                          $
-                          {typeof purchase.price === 'number'
-                            ? purchase.price.toFixed(2)
-                            : parseFloat(purchase.price || '0').toFixed(2)}
+                          {formatCurrency(Number(purchase.price) || 0)}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
@@ -137,11 +136,7 @@ export default function AddonPurchaseSuccess({ purchase }: Props) {
                           {t('payment.addonPurchaseSuccess.date')}
                         </span>
                         <span className="text-sm font-medium text-gray-900 dark:text-white">
-                          {new Date(purchase.purchase_date).toLocaleDateString(undefined, {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                          })}
+                          {formatDate(purchase.purchase_date, 'medium')}
                         </span>
                       </div>
                     </div>

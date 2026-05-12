@@ -9,6 +9,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { FileText, HardDrive, Share2, Sparkles, Users, Zap } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { formatBytesAsGB, gbToBytes } from '@/Utils/formatters/storage';
 
 // ── Props ─────────────────────────────────────────────────────────
 interface PlanUsageCardsProps {
@@ -114,10 +115,10 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
         icon: HardDrive,
         accent: 'teal',
         percentage: usage.storage.percentage,
-        used: `${usage.storage.used_gb.toFixed(1)} GB`,
+        used: formatBytesAsGB(gbToBytes(usage.storage.used_gb), 1),
         limit: `${usage.storage.limit_gb} GB`,
         total_available: `${usage.storage.total_available_gb} GB`,
-        remaining: `${(usage.storage.remaining_bytes / 1024 / 1024 / 1024).toFixed(1)} GB`,
+        remaining: formatBytesAsGB(usage.storage.remaining_bytes, 1),
         addon_info: usage.storage.addon_info,
         canBuy: systemAddons?.storage !== false,
         addonType: 'storage',
