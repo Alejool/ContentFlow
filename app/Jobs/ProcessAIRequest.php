@@ -8,7 +8,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Broadcast;
-use App\Services\AIService;
+use App\Services\AI\AIService;
 
 class ProcessAIRequest implements ShouldQueue
 {

@@ -24,7 +24,7 @@ use App\Services\Log\SocialPostLogService;
 use App\Events\PublicationStatusUpdated;
 use App\Jobs\VerifyYouTubeVideoStatus;
 
-use App\DTOs\SocialPostDTO;
+use App\DTOs\Publications\SocialPostDTO;
 
 
 class PlatformPublishService

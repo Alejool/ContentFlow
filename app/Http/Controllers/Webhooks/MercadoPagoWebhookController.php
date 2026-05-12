@@ -7,7 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\WebhookEvent;
 use App\Models\Workspace\Workspace;
 use App\Models\User;
-use App\Services\SubscriptionTrackingService;
+use App\Services\Subscription\SubscriptionTrackingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 

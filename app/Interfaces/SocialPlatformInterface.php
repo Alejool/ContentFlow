@@ -2,8 +2,8 @@
 
 namespace App\Interfaces;
 
-use App\DTOs\SocialPostDTO;
-use App\DTOs\PostResultDTO;
+use App\DTOs\Publications\SocialPostDTO;
+use App\DTOs\Publications\PostResultDTO;
 
 interface SocialPlatformInterface
 {

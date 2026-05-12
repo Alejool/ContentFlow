@@ -7,7 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\WebhookEvent;
 use App\Models\Workspace\Workspace;
 use App\Models\WorkspaceAddon;
-use App\Services\AddonUsageService;
+use App\Services\Addons\AddonUsageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Stripe\Webhook;

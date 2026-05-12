@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\Log;
 use Stripe\StripeClient;
 use Inertia\Inertia;
 use Inertia\Response;
-use App\Services\SystemConfigService;
-use App\Services\PlanFilterService;
+use App\Services\common\SystemConfigService;
+use App\Services\Pricing\PlanFilterService;
 
 class PricingController extends Controller
 {

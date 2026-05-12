@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ContentApproval\ApproveContentRequest;
 use App\Http\Requests\ContentApproval\RejectContentRequest;
 use App\Models\Publications\Publication;
-use App\Services\ApprovalWorkflowService;
+use App\Services\Approval\ApprovalWorkflowService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

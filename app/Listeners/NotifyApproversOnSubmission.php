@@ -4,7 +4,7 @@ namespace App\Listeners;
 
 use App\Events\ContentSubmittedForApproval;
 use App\Notifications\PublicationAwaitingApprovalNotification;
-use App\Services\RoleService;
+use App\Services\Roles\RoleService;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Log;
 

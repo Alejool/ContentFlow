@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Models\User;
 use App\Models\Workspace\Workspace;
+use App\Services\Subscription\SubscriptionTrackingService;
 
 class SyncStripeSubscription extends Command
 {
@@ -13,7 +14,7 @@ class SyncStripeSubscription extends Command
     protected $description = 'Sincroniza la suscripción local con Stripe y actualiza el plan del usuario';
 
     public function __construct(
-        private \App\Services\SubscriptionTrackingService $subscriptionTracking
+        private SubscriptionTrackingService $subscriptionTracking
     ) {
         parent::__construct();
     }

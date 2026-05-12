@@ -4,7 +4,7 @@ namespace App\Console\Commands\Social;
 
 use Illuminate\Console\Command;
 use App\Models\Social\SocialAccount;
-use App\Services\SocialTokenManager;
+use App\Services\ConfigSocialMedia\SocialTokenManager;
 use App\Helpers\LogHelper;
 
 class RefreshTokensCommand extends Command

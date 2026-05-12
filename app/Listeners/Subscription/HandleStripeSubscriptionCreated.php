@@ -3,7 +3,7 @@
 namespace App\Listeners\Subscription;
 
 use Laravel\Cashier\Events\WebhookReceived;
-use App\Services\SubscriptionTrackingService;
+use App\Services\Subscription\SubscriptionTrackingService;
 use Illuminate\Support\Facades\Log;
 use App\Events\Subscription\SubscriptionUpdated;
 

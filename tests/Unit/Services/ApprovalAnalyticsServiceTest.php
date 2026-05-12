@@ -3,7 +3,7 @@
 namespace Tests\Unit\Services;
 
 use Tests\TestCase;
-use App\Services\ApprovalAnalyticsService;
+use App\Services\Approval\ApprovalAnalyticsService;
 use App\Models\Workspace\Workspace;
 use App\Models\Publications\Publication;
 use App\Models\ApprovalAction;

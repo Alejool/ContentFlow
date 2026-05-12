@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Models\Workspace\Workspace;
 use App\Models\Subscription\Subscription;
-use App\Services\WorkspaceUsageService;
+use App\Services\Workspace\WorkspaceUsageService;
 
 class EnsureWorkspaceSubscriptions extends Command
 {

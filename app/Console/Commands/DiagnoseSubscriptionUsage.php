@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\User;
-use App\Services\SubscriptionTrackingService;
+use App\Services\Subscription\SubscriptionTrackingService;
 use Illuminate\Console\Command;
 
 class DiagnoseSubscriptionUsage extends Command

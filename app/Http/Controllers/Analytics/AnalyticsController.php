@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Analytics;
 
 use App\Models\Analytics;
-use App\Services\StatisticsService;
+use App\Services\Statistics\StatisticsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;

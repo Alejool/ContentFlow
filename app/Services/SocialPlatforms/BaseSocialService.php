@@ -4,7 +4,7 @@ namespace App\Services\SocialPlatforms;
 
 use App\Models\Social\SocialAccount;
 use App\Interfaces\SocialPlatformInterface;
-use App\Services\SocialTokenManager;
+use App\Services\ConfigSocialMedia\SocialTokenManager;
 use GuzzleHttp\Client;
 use App\Helpers\LogHelper;
 use Illuminate\Support\Facades\Log;

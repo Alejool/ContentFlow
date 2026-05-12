@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\User;
-use App\Services\OnboardingService;
+use App\Services\Onboarding\OnboardingService;
 use Illuminate\Support\Facades\Log;
 
 class InitializeMissingOnboarding extends Command

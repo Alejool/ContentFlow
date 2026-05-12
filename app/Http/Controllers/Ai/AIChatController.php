@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Ai;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use App\Services\AIService;
-use App\Services\ContentSanitizerService;
+use App\Services\AI\AIService;
+use App\Services\Content\ContentSanitizerService;
 use App\Http\Controllers\Controller;
 
 use App\Models\Campaign\Campaign;

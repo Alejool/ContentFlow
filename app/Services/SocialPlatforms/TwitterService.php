@@ -10,8 +10,8 @@ use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 
-use App\DTOs\SocialPostDTO;
-use App\DTOs\PostResultDTO;
+use App\DTOs\Publications\SocialPostDTO;
+use App\DTOs\Publications\PostResultDTO;
 use App\Models\Social\SocialAccount;
 
 class TwitterService extends BaseSocialService

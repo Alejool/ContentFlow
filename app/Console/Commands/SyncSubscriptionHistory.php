@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Models\User;
 use App\Models\Workspace\Workspace;
-use App\Services\SubscriptionTrackingService;
+use App\Services\Subscription\SubscriptionTrackingService;
 use Illuminate\Support\Facades\DB;
 
 class SyncSubscriptionHistory extends Command

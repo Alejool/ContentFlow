@@ -4,7 +4,7 @@ namespace App\Listeners;
 
 use App\Models\Role\Role;
 use App\Notifications\MissingApproversNotification;
-use App\Services\RoleService;
+use App\Services\Roles\RoleService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Notification;
 

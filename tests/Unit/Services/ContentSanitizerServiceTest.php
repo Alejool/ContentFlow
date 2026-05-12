@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Services;
 
-use App\Services\ContentSanitizerService;
+use App\Services\Content\ContentSanitizerService;
 use Tests\TestCase;
 
 class ContentSanitizerServiceTest extends TestCase

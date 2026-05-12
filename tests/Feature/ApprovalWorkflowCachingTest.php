@@ -8,7 +8,7 @@ use App\Models\Workspace\Workspace;
 use App\Models\ApprovalWorkflow;
 use App\Models\ApprovalLevel;
 use App\Models\Role\Role;
-use App\Services\ApprovalWorkflowService;
+use App\Services\Approval\ApprovalWorkflowService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 

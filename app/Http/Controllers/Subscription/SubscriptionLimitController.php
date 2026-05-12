@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Subscription;
 use App\Http\Controllers\Controller;
 use App\Services\Subscription\PlanLimitValidator;
 use App\Services\Subscription\PlanMigrationService;
-use App\Services\WorkspaceAddonService;
+use App\Services\Workspace\WorkspaceAddonService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 

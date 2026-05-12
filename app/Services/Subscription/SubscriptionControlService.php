@@ -6,7 +6,7 @@ use App\Events\ConfigurationChanged;
 use App\Models\SystemSetting;
 use App\Models\Workspace\Workspace;
 use App\Services\Subscription\DTOs\PurchaseEligibility;
-use App\Services\SystemConfigService;
+use App\Services\common\SystemConfigService;
 use Illuminate\Support\Facades\Event;
 
 class SubscriptionControlService

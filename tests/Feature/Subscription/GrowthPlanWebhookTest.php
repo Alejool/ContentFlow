@@ -9,7 +9,7 @@ use App\Models\Subscription\Subscription as WorkspaceSubscription;
 use App\Models\SubscriptionHistory;
 use App\Models\UsageMetric;
 use App\Listeners\Subscription\HandleStripeSubscriptionCreated;
-use App\Services\SubscriptionTrackingService;
+use App\Services\Subscription\SubscriptionTrackingService;
 use Laravel\Cashier\Events\WebhookReceived;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;

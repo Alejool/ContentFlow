@@ -18,7 +18,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Services\WorkspaceUsageService;
+use App\Services\Workspace\WorkspaceUsageService;
 
 class ProfileController extends Controller
 {

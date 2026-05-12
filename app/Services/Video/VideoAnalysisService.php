@@ -2,7 +2,7 @@
 
 namespace App\Services\Video;
 
-use App\Services\AIService;
+use App\Services\AI\AIService;
 use App\Helpers\LogHelper;
 use Illuminate\Support\Str;
 

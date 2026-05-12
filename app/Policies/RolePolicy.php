@@ -5,7 +5,7 @@ namespace App\Policies;
 use App\Models\User;
 use App\Models\Role\Role;
 use App\Models\Workspace\Workspace;
-use App\Services\RoleService;
+use App\Services\Roles\RoleService;
 
 class RolePolicy
 {

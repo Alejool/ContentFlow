@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use App\Services\AIService;
+use App\Services\AI\AIService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

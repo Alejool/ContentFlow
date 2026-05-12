@@ -9,7 +9,7 @@ use App\Http\Requests\ApprovalWorkflow\UpdateLevelRequest;
 use App\Models\ApprovalLevel;
 use App\Models\ApprovalWorkflow;
 use App\Models\Workspace\Workspace;
-use App\Services\ApprovalWorkflowService;
+use App\Services\Approval\ApprovalWorkflowService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

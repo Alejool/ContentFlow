@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Workspace\Workspace;
 use App\Models\Subscription\Subscription;
 use App\Services\Usage\UsageTrackingService;
+use App\Services\Subscription\SubscriptionTrackingService;
 use Inertia\Inertia;
 
 class SubscriptionController extends Controller
@@ -17,7 +18,7 @@ class SubscriptionController extends Controller
     public function __construct(
         private UsageTrackingService $usageTracking,
         private \App\Services\PlanManagementService $planManagement,
-        private \App\Services\SubscriptionTrackingService $subscriptionTracking
+        private SubscriptionTrackingService $subscriptionTracking
     ) {}
 
     public function createCheckoutSession(Request $request): JsonResponse

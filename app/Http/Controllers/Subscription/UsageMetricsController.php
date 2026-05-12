@@ -7,12 +7,13 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use App\Services\Usage\UsageTrackingService;
+use App\Services\Subscription\SubscriptionTrackingService;
 
 class UsageMetricsController extends Controller
 {
     public function __construct(
             private UsageTrackingService $usageTracking,
-            private \App\Services\SubscriptionTrackingService $subscriptionTracking
+            private SubscriptionTrackingService $subscriptionTracking
         ) {}
 
     public function index(Request $request): Response

@@ -2,8 +2,8 @@
 
 namespace App\Services\Publish;
 
-use App\DTOs\PlatformConfigurationDTO;
-use App\DTOs\PublicationPreviewDTO;
+use App\DTOs\ConfigSocialMedia\PlatformConfigurationDTO;
+use App\DTOs\Publications\PublicationPreviewDTO;
 use App\Models\Publications\Publication;
 use App\Models\Social\SocialAccount;
 use App\Services\Validation\ContentValidationService;

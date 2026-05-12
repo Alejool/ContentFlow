@@ -2,8 +2,8 @@
 
 namespace App\Services\Validation;
 
-use App\DTOs\ContentValidationResultDTO;
-use App\DTOs\PlatformValidationResultDTO;
+use App\DTOs\Content\ContentValidationResultDTO;
+use App\DTOs\ConfigSocialMedia\PlatformValidationResultDTO;
 use App\Models\Publications\Publication;
 use App\Models\Social\SocialAccount;
 use Illuminate\Support\Facades\Log;

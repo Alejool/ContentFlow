@@ -2,121 +2,501 @@
 
 namespace App\Services\Onboarding;
 
+use App\Interfaces\OnboardingServiceInterface;
 use App\Models\User;
-use App\Models\Workspace\Workspace;
-use App\Models\Role\Role;
-use App\Models\Subscription\Subscription;
-use App\Models\Subscription\UsageMetric;
+use App\Models\OnboardingState;
+use App\Repositories\Onboarding\OnboardingStateRepository;
+use Illuminate\Support\Facades\Log;
 
-class OnboardingService
+class OnboardingService implements OnboardingServiceInterface
 {
-    public function completeInitialSetup(User $user, array $data): Workspace
-    {
-        // Crear workspace inicial
-        $workspace = Workspace::create([
-            'name' => $data['workspace_name'] ?? "{$user->name}'s Workspace",
-            'created_by' => $user->id,
-        ]);
+    protected OnboardingStateRepository $repository;
+    protected OnboardingAnalyticsService $analyticsService;
 
-        // Asignar usuario como owner
-        $ownerRole = Role::where('slug', 'owner')->first();
-        
-        if ($ownerRole) {
-            $workspace->users()->attach($user->id, [
-                'role_id' => $ownerRole->id,
-            ]);
-        }
-
-        // Crear suscripción trial o free
-        $plan = $data['plan'] ?? 'professional';
-        $isTrial = $plan !== 'free';
-
-        $subscription = $workspace->subscription()->create([
-            'plan' => $plan,
-            'status' => $isTrial ? 'trialing' : 'active',
-            'trial_ends_at' => $isTrial ? now()->addDays(14) : null,
-        ]);
-
-        // Inicializar métricas
-        $this->initializeMetrics($workspace, $subscription);
-
-        // Marcar onboarding como completado
-        if ($user->onboardingState) {
-            $user->onboardingState->update([
-                'workspace_created' => true,
-                'trial_started' => $isTrial,
-            ]);
-        }
-
-        return $workspace;
+    public function __construct(
+        OnboardingStateRepository $repository,
+        OnboardingAnalyticsService $analyticsService
+    ) {
+        $this->repository = $repository;
+        $this->analyticsService = $analyticsService;
     }
 
-    private function initializeMetrics(Workspace $workspace, Subscription $subscription): void
+    /**
+     * Complete business info step
+     * 
+     * @param User $user
+     * @param array $data
+     * @return void
+     */
+    public function completeBusinessInfo(User $user, array $data): void
     {
-        $limits = config("plans.{$subscription->plan}.limits", []);
-        
-        $metrics = [
-            'publications' => $limits['publications_per_month'] ?? 0,
-            'storage' => $limits['storage_gb'] ?? 0,
-            'ai_requests' => $limits['ai_requests_per_month'] ?? 0,
+        $state = $this->getOnboardingState($user);
+
+        $updateData = [
+            'business_info_completed' => true,
+            'business_name' => $data['businessName'] ?? null,
+            'business_industry' => $data['businessIndustry'] ?? null,
+            'business_goals' => $data['businessGoals'] ?? null,
+            'business_size' => $data['businessSize'] ?? null,
         ];
 
-        foreach ($metrics as $metricType => $limit) {
-            UsageMetric::create([
-                'workspace_id' => $workspace->id,
-                'metric_type' => $metricType,
-                'current_usage' => 0,
-                'limit' => $limit,
-                'period_start' => now()->startOfMonth(),
-                'period_end' => now()->endOfMonth(),
-            ]);
-        }
+        $this->repository->update($user->id, $updateData);
+
+        // Record analytics asynchronously
+        dispatch(function () use ($user, $data) {
+            $this->analyticsService->recordStepCompletion($user, 'business-info', 'onboarding', null);
+        })->afterResponse();
+
+        Log::info("Business info completed for user {$user->id}");
     }
 
-    public function startTrial(Workspace $workspace, string $plan = 'professional', int $days = 14): void
+    /**
+     * Select a plan
+     * 
+     * @param User $user
+     * @param string $planId
+     * @return void
+     */
+    public function selectPlan(User $user, string $planId): void
     {
-        $subscription = $workspace->subscription;
+        $state = $this->getOnboardingState($user);
 
-        if ($subscription) {
-            $subscription->update([
-                'plan' => $plan,
-                'status' => 'trialing',
-                'trial_ends_at' => now()->addDays($days),
-            ]);
+        $updateData = [
+            'plan_selected' => true,
+            'selected_plan' => $planId,
+        ];
+
+        $this->repository->update($user->id, $updateData);
+
+        // Record analytics asynchronously
+        dispatch(function () use ($user, $planId) {
+            $this->analyticsService->recordStepCompletion($user, 'plan-selection', 'onboarding', null);
+        })->afterResponse();
+
+        Log::info("Plan {$planId} selected for user {$user->id}");
+    }
+
+    /**
+     * Initialize onboarding for a new user
+     * 
+     * @param User $user
+     * @return OnboardingState
+     */
+    public function initializeOnboarding(User $user): OnboardingState
+    {
+        // Check if onboarding already exists
+        $existingState = $this->repository->find($user->id);
+        
+        if ($existingState) {
+            return $existingState;
+        }
+
+        // Create new onboarding state with default values
+        $data = [
+            'business_info_completed' => false,
+            'business_name' => null,
+            'business_industry' => null,
+            'business_goals' => null,
+            'business_size' => null,
+            'plan_selected' => false,
+            'selected_plan' => null,
+            'tour_completed' => false,
+            'tour_skipped' => false,
+            'tour_current_step' => 0,
+            'tour_completed_steps' => [],
+            'wizard_completed' => false,
+            'wizard_skipped' => false,
+            'wizard_current_step' => 0,
+            'template_selected' => false,
+            'template_id' => null,
+            'dismissed_tooltips' => [],
+            'completed_at' => null,
+            'started_at' => now(),
+        ];
+
+        Log::info("Initializing onboarding for user {$user->id}");
+
+        return $this->repository->create($user->id, $data);
+    }
+
+    /**
+     * Get the current onboarding state for a user
+     * 
+     * @param User $user
+     * @return OnboardingState
+     */
+    public function getOnboardingState(User $user): OnboardingState
+    {
+        $state = $this->repository->find($user->id);
+
+        // If no state exists, initialize it
+        if (!$state) {
+            return $this->initializeOnboarding($user);
+        }
+
+        return $state;
+    }
+
+    /**
+     * Mark a tour step as completed
+     * 
+     * @param User $user
+     * @param string $stepId
+     * @return void
+     */
+    public function completeTourStep(User $user, string $stepId): void
+    {
+        $state = $this->getOnboardingState($user);
+
+        // Get current completed steps
+        $completedSteps = $state->tour_completed_steps ?? [];
+
+        // Add step if not already completed
+        if (!in_array($stepId, $completedSteps)) {
+            $completedSteps[] = $stepId;
+        }
+
+        // Calculate duration if this is a new step
+        $duration = null;
+        if (!in_array($stepId, $state->tour_completed_steps ?? [])) {
+            $duration = $this->analyticsService->calculateDuration($state->started_at);
+        }
+
+        // Parse step number from stepId (e.g., "step-1" -> 1)
+        $stepNumber = $this->parseStepNumber($stepId);
+        
+        $totalSteps = $this->getTotalTourSteps();
+        $completedCount = count($completedSteps);
+        
+        // Check if this is the last step (regardless of how many steps were completed)
+        $isLastStep = $stepNumber >= $totalSteps;
+
+        Log::info("Tour step completion check", [
+            'user_id' => $user->id,
+            'step_id' => $stepId,
+            'step_number' => $stepNumber,
+            'completed_steps' => $completedSteps,
+            'completed_count' => $completedCount,
+            'total_steps' => $totalSteps,
+            'is_last_step' => $isLastStep,
+            'should_complete' => $completedCount >= $totalSteps || $isLastStep,
+        ]);
+
+        // Update state
+        $updateData = [
+            'tour_completed_steps' => $completedSteps,
+            'tour_current_step' => $stepNumber, // Update current step
+        ];
+
+        // Check if this was the last step OR if all steps are completed
+        if ($completedCount >= $totalSteps || $isLastStep) {
+            $updateData['tour_completed'] = true;
+            Log::info("Marking tour as completed for user {$user->id}");
+        }
+
+        $this->repository->update($user->id, $updateData);
+
+        // Refresh state after update to get the latest data
+        $state = $state->fresh();
+        
+        // Check if onboarding is now complete (only if tour was completed)
+        if ($completedCount >= $totalSteps || $isLastStep) {
+            $this->checkAndMarkOnboardingComplete($user, $state);
+        }
+
+        // Record analytics asynchronously
+        dispatch(function () use ($user, $stepId, $duration) {
+            $this->analyticsService->recordStepCompletion($user, $stepId, 'tour', $duration);
+        })->afterResponse();
+
+        Log::info("Tour step {$stepId} completed for user {$user->id}");
+    }
+
+    /**
+     * Update current tour step (for navigation tracking)
+     * 
+     * @param User $user
+     * @param int $step
+     * @return void
+     */
+    public function updateTourStep(User $user, int $step): void
+    {
+        $this->repository->update($user->id, [
+            'tour_current_step' => $step,
+        ]);
+
+        Log::info("Tour step updated to {$step} for user {$user->id}");
+    }
+
+    /**
+     * Dismiss a tooltip for a user
+     * 
+     * @param User $user
+     * @param string $tooltipId
+     * @return void
+     */
+    public function dismissTooltip(User $user, string $tooltipId): void
+    {
+        $state = $this->getOnboardingState($user);
+
+        // Get current dismissed tooltips
+        $dismissedTooltips = $state->dismissed_tooltips ?? [];
+
+        // Add tooltip if not already dismissed
+        if (!in_array($tooltipId, $dismissedTooltips)) {
+            $dismissedTooltips[] = $tooltipId;
+        }
+
+        // Update state
+        $this->repository->update($user->id, [
+            'dismissed_tooltips' => $dismissedTooltips,
+        ]);
+
+        // Record analytics asynchronously
+        dispatch(function () use ($user, $tooltipId) {
+            $this->analyticsService->recordTooltipDismissal($user, $tooltipId);
+        })->afterResponse();
+
+        Log::info("Tooltip {$tooltipId} dismissed for user {$user->id}");
+    }
+
+    /**
+     * Complete a wizard step
+     * 
+     * @param User $user
+     * @param string $stepId
+     * @param array $data Additional data for the step
+     * @return void
+     */
+    public function completeWizardStep(User $user, string $stepId, array $data = []): void
+    {
+        $state = $this->getOnboardingState($user);
+
+        // Handle special case for "complete" stepId
+        if ($stepId === 'complete') {
+            $stepNumber = $this->getTotalWizardSteps();
         } else {
-            $subscription = $workspace->subscription()->create([
-                'plan' => $plan,
-                'status' => 'trialing',
-                'trial_ends_at' => now()->addDays($days),
-            ]);
+            // Parse step number from stepId (e.g., "step-1" -> 1)
+            $stepNumber = $this->parseStepNumber($stepId);
         }
 
-        // Actualizar límites
-        $this->updateMetricsLimits($workspace, $subscription);
-    }
+        // Calculate duration
+        $duration = $this->analyticsService->calculateDuration($state->started_at);
 
-    private function updateMetricsLimits(Workspace $workspace, Subscription $subscription): void
-    {
-        $limits = config("plans.{$subscription->plan}.limits", []);
-
-        $metrics = [
-            'publications' => $limits['publications_per_month'] ?? 0,
-            'storage' => $limits['storage_gb'] ?? 0,
-            'ai_requests' => $limits['ai_requests_per_month'] ?? 0,
+        $updateData = [
+            'wizard_current_step' => $stepNumber,
         ];
 
-        foreach ($metrics as $metricType => $limit) {
-            UsageMetric::updateOrCreate(
-                [
-                    'workspace_id' => $workspace->id,
-                    'metric_type' => $metricType,
-                    'period_start' => now()->startOfMonth(),
-                    'period_end' => now()->endOfMonth(),
-                ],
-                [
-                    'limit' => $limit,
-                ]
-            );
+        // Check if this was the last wizard step
+        if ($stepNumber >= $this->getTotalWizardSteps()) {
+            $updateData['wizard_completed'] = true;
+            $updateData['template_selected'] = true; // Auto-select template when wizard is completed
+            $updateData['template_id'] = 'default'; // Use a default template ID
         }
+
+        $this->repository->update($user->id, $updateData);
+
+        // Refresh state after update to get the latest data
+        $state = $state->fresh();
+        
+        // Check if onboarding is now complete (only if wizard was completed)
+        if ($stepNumber >= $this->getTotalWizardSteps()) {
+            $this->checkAndMarkOnboardingComplete($user, $state);
+        }
+
+        // Record analytics asynchronously
+        dispatch(function () use ($user, $stepId, $duration) {
+            $this->analyticsService->recordStepCompletion($user, $stepId, 'wizard', $duration);
+        })->afterResponse();
+
+        Log::info("Wizard step {$stepId} completed for user {$user->id}", $data);
+    }
+
+    /**
+     * Record template selection
+     * 
+     * @param User $user
+     * @param string $templateId
+     * @return void
+     */
+    public function recordTemplateSelection(User $user, string $templateId): void
+    {
+        $state = $this->getOnboardingState($user);
+
+        $updateData = [
+            'template_selected' => true,
+            'template_id' => $templateId,
+        ];
+
+        $this->repository->update($user->id, $updateData);
+
+        // Refresh state after update to get the latest data
+        $state = $state->fresh();
+        
+        // Check if onboarding is now complete
+        $this->checkAndMarkOnboardingComplete($user, $state);
+
+        // Record analytics asynchronously
+        dispatch(function () use ($user, $templateId) {
+            $this->analyticsService->recordTemplateSelection($user, $templateId);
+        })->afterResponse();
+
+        Log::info("Template {$templateId} selected for user {$user->id}");
+    }
+
+    /**
+     * Restart onboarding for a user
+     * 
+     * @param User $user
+     * @return OnboardingState
+     */
+    public function restartOnboarding(User $user): OnboardingState
+    {
+        // Delete existing state
+        $this->repository->delete($user->id);
+
+        // Create new state
+        $newState = $this->initializeOnboarding($user);
+
+        Log::info("Onboarding restarted for user {$user->id}");
+
+        return $newState;
+    }
+
+    /**
+     * Check if onboarding is complete for a user
+     * 
+     * @param User $user
+     * @return bool
+     */
+    public function isOnboardingComplete(User $user): bool
+    {
+        $state = $this->repository->find($user->id);
+
+        if (!$state) {
+            return false;
+        }
+
+        // Onboarding is complete if all stages are done (completed or skipped)
+        $businessInfoDone = $state->business_info_completed ?? false;
+        $planDone = $state->plan_selected ?? false;
+        $tourDone = $state->tour_completed || $state->tour_skipped;
+        $wizardDone = $state->wizard_completed || $state->wizard_skipped;
+        $templateDone = $state->template_selected;
+
+        return $businessInfoDone && $planDone && $tourDone && $wizardDone && $templateDone;
+    }
+
+    /**
+     * Skip the tour
+     * 
+     * @param User $user
+     * @return void
+     */
+    public function skipTour(User $user): void
+    {
+        $state = $this->getOnboardingState($user);
+
+        $this->repository->update($user->id, [
+            'tour_skipped' => true,
+        ]);
+
+        // Record analytics asynchronously
+        dispatch(function () use ($user, $state) {
+            $currentStep = 'tour-step-' . $state->tour_current_step;
+            $this->analyticsService->recordSkipEvent($user, $currentStep, 'tour');
+        })->afterResponse();
+
+        // Refresh state after update to get the latest data
+        $state = $state->fresh();
+        $this->checkAndMarkOnboardingComplete($user, $state);
+
+        Log::info("Tour skipped for user {$user->id}");
+    }
+
+    /**
+     * Skip the wizard
+     * 
+     * @param User $user
+     * @return void
+     */
+    public function skipWizard(User $user): void
+    {
+        $state = $this->getOnboardingState($user);
+
+        $this->repository->update($user->id, [
+            'wizard_skipped' => true,
+            'template_selected' => true, // Auto-select template when wizard is skipped
+            'template_id' => 'default', // Use a default template ID
+        ]);
+
+        // Record analytics asynchronously
+        dispatch(function () use ($user, $state) {
+            $currentStep = 'wizard-step-' . $state->wizard_current_step;
+            $this->analyticsService->recordSkipEvent($user, $currentStep, 'wizard');
+        })->afterResponse();
+
+        // Refresh state after update to get the latest data
+        $state = $state->fresh();
+        $this->checkAndMarkOnboardingComplete($user, $state);
+
+        Log::info("Wizard skipped for user {$user->id}");
+    }
+
+    /**
+     * Check if onboarding should be marked as complete and update if so
+     * 
+     * @param User $user
+     * @param OnboardingState $state
+     * @return void
+     */
+    protected function checkAndMarkOnboardingComplete(User $user, OnboardingState $state): void
+    {
+        // Refresh state to get latest data
+        $state = $state->fresh();
+
+        if ($this->isOnboardingComplete($user) && !$state->completed_at) {
+            $this->repository->update($user->id, [
+                'completed_at' => now(),
+            ]);
+
+            Log::info("Onboarding completed for user {$user->id}");
+        }
+    }
+
+    /**
+     * Get total number of tour steps
+     * This could be configurable or fetched from a configuration
+     * 
+     * @return int
+     */
+    protected function getTotalTourSteps(): int
+    {
+        // Default to 5 steps - this should be configurable
+        return config('onboarding.tour_steps', 5);
+    }
+
+    /**
+     * Get total number of wizard steps
+     * 
+     * @return int
+     */
+    protected function getTotalWizardSteps(): int
+    {
+        // Default to 3 steps - this should be configurable
+        return config('onboarding.wizard_steps', 3);
+    }
+
+    /**
+     * Parse step number from step ID
+     * 
+     * @param string $stepId
+     * @return int
+     */
+    protected function parseStepNumber(string $stepId): int
+    {
+        // Extract number from stepId like "step-1", "wizard-step-2", etc.
+        preg_match('/(\d+)/', $stepId, $matches);
+        return isset($matches[1]) ? (int) $matches[1] : 0;
     }
 }

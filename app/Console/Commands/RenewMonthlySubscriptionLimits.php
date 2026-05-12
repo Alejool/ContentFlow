@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\User;
-use App\Services\PlanManagementService;
+use App\Services\Pricing\PlanManagementService;
 
 class RenewMonthlySubscriptionLimits extends Command
 {

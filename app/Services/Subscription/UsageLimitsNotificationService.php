@@ -5,7 +5,7 @@ namespace App\Services\Subscription;
 use App\Models\Workspace\Workspace;
 use App\Events\Subscription\UsageLimitsUpdated;
 use App\Services\Subscription\PlanLimitValidator;
-use App\Services\WorkspaceAddonService;
+use App\Services\Workspace\WorkspaceAddonService;
 use Illuminate\Support\Facades\Cache;
 use App\Helpers\LogHelper;
 

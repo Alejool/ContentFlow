@@ -3,7 +3,7 @@
 namespace Tests\Unit;
 
 use Tests\TestCase;
-use App\Services\OnboardingAnalyticsService;
+use App\Services\Onboarding\OnboardingAnalyticsService;
 use App\Models\User;
 use App\Models\OnboardingAnalytics;
 use App\Models\OnboardingState;

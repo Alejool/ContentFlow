@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Services\PaymentMethodService;
+use App\Services\Payment\PaymentMethodService;
 use App\Services\Payment\CountryDetectionService;
 use Closure;
 use Illuminate\Http\Request;

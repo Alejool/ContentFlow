@@ -2,7 +2,7 @@
 
 namespace App\Services\Validation;
 
-use App\Constants\ContentTypes;
+use App\Constants\Content\ContentTypes;
 use App\Models\Publications\Publication;
 use App\Models\Social\SocialAccount;
 use Illuminate\Support\Collection;

@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Services\WorkspaceAddonService;
+use App\Services\Workspace\WorkspaceAddonService;
 use Illuminate\Console\Command;
 
 class DeactivateExpiredAddons extends Command

@@ -8,7 +8,7 @@ use App\Http\Requests\Role\RevokeRoleRequest;
 use App\Models\Role\Role;
 use App\Models\User;
 use App\Models\Workspace\Workspace;
-use App\Services\RoleService;
+use App\Services\Roles\RoleService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

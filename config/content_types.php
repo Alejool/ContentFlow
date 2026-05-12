@@ -1,6 +1,6 @@
 <?php
 
-use App\Constants\ContentTypes;
+use App\Constants\Content\ContentTypes;
 
 return [
     /*
@@ -11,7 +11,7 @@ return [
     | This configuration defines the validation rules for each content type
     | including supported platforms and media requirements.
     |
-    | IMPORTANT: Platform compatibility is defined in App\Constants\ContentTypes
+    | IMPORTANT: Platform compatibility is defined in App\Constants\Content\ContentTypes
     | to ensure consistency between frontend and backend.
     |
     */

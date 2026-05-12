@@ -11,10 +11,10 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Role\Role;
 use App\Models\PublicationTemplate;
 
-use App\Services\AIService;
-use App\Services\OnboardingService;
-use App\Services\SystemConfigService;
-use App\Services\PlanFilterService;
+use App\Services\AI\AIService;
+use App\Services\Onboarding\OnboardingService;
+use App\Services\common\SystemConfigService;
+use App\Services\Pricing\PlanFilterService;
 
 class HandleInertiaRequests extends Middleware
 {

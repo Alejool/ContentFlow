@@ -4,8 +4,8 @@ namespace App\Console\Commands;
 
 use App\Models\Publications\Publication;
 use App\Models\Workspace;
-use App\Services\ApprovalReassignmentService;
-use App\Services\ApprovalWorkflowService;
+use App\Services\Approval\ApprovalReassignmentService;
+use App\Services\Approval\ApprovalWorkflowService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;

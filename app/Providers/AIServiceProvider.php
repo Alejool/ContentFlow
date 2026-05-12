@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use App\Services\AIService;
+use App\Services\AI\AIService;
 
 class AIServiceProvider extends ServiceProvider
 {

@@ -5,7 +5,7 @@ namespace App\Observers;
 use App\Models\User;
 use App\Models\Workspace\Workspace;
 use App\Models\Role\Role;
-use App\Services\SubscriptionTrackingService;
+use App\Services\Subscription\SubscriptionTrackingService;
 
 class UserObserver
 {

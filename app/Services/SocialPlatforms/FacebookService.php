@@ -6,8 +6,8 @@ use GuzzleHttp\Exception\ClientException;
 use App\Helpers\LogHelper;
 use Illuminate\Support\Facades\Log;
 
-use App\DTOs\SocialPostDTO;
-use App\DTOs\PostResultDTO;
+use App\DTOs\Publications\SocialPostDTO;
+use App\DTOs\Publications\PostResultDTO;
 
 class FacebookService extends BaseSocialService
 {

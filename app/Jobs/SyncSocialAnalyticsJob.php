@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Social\SocialAccount;
-use App\Services\SocialAnalyticsService;
+use App\Services\Analytics\SocialAnalyticsService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;

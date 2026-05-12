@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\Subscription\Subscription;
-use App\Services\PlanManagementService;
+use App\Services\Pricing\PlanManagementService;
 use Illuminate\Support\Facades\Log;
 
 class CheckExpiredGracePeriods extends Command

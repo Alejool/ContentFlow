@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Social\SocialAccount;
-use App\Services\SocialTokenManager;
+use App\Services\ConfigSocialMedia\SocialTokenManager;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;

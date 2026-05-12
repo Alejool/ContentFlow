@@ -3,7 +3,7 @@
 namespace Tests\Unit\Services;
 
 use Tests\TestCase;
-use App\Services\RoleService;
+use App\Services\Roles\RoleService;
 use App\Models\Role\Role;
 use App\Models\Permission\Permission;
 use App\Models\User;

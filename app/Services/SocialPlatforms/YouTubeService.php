@@ -9,8 +9,8 @@ use App\Models\Publications\Publication;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
 
-use App\DTOs\SocialPostDTO;
-use App\DTOs\PostResultDTO;
+use App\DTOs\Publications\SocialPostDTO;
+use App\DTOs\Publications\PostResultDTO;
 
 class YouTubeService extends BaseSocialService
 {

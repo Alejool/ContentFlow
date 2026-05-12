@@ -3,8 +3,8 @@
 namespace App\Jobs;
 
 use App\Models\Social\SocialPostLog;
-use App\Services\SentimentAnalysisService;
-use App\Services\SocialTokenManager;
+use App\Services\AI\SentimentAnalysisService;
+use App\Services\ConfigSocialMedia\SocialTokenManager;
 use App\Services\SocialPlatforms\SocialPlatformFactory;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

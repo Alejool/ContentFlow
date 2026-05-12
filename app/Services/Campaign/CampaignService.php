@@ -5,8 +5,8 @@ namespace App\Services\Campaign;
 use App\Models\Social\ScheduledPost;
 use Illuminate\Support\Facades\DB;
 use App\Models\Campaigns\Campaign;
-use App\Services\SocialPostService;
-use App\Services\SocialAnalyticsService;
+use App\Services\Publications\SocialPostService;
+use App\Services\Analytics\SocialAnalyticsService;
 
 class CampaignService
 {

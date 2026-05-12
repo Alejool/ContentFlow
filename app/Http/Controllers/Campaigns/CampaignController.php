@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Campaigns;
 
 use App\Http\Controllers\Controller;
-use App\Services\StatisticsService;
+use App\Services\Statistics\StatisticsService;
 use App\Models\Campaigns\Campaign;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;

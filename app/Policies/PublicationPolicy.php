@@ -6,8 +6,8 @@ use App\Models\User;
 use App\Models\Publications\Publication;
 use App\Models\Workspace\Workspace;
 use App\Models\Role\Role;
-use App\Services\RoleService;
-use App\Services\ApprovalWorkflowService;
+use App\Services\Roles\RoleService;
+use App\Services\Approval\ApprovalWorkflowService;
 
 class PublicationPolicy
 {

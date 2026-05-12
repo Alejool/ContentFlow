@@ -2,7 +2,7 @@
 
 namespace App\Services\Publish;
 
-use App\DTOs\PlatformConfigurationDTO;
+use App\DTOs\ConfigSocialMedia\PlatformConfigurationDTO;
 use Illuminate\Support\Facades\Log;
 
 class AutoConfigurationService

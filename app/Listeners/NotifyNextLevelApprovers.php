@@ -4,7 +4,7 @@ namespace App\Listeners;
 
 use App\Events\ApprovalLevelAdvanced;
 use App\Notifications\PublicationAwaitingApprovalNotification;
-use App\Services\RoleService;
+use App\Services\Roles\RoleService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Notification;
 

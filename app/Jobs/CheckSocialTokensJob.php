@@ -10,7 +10,7 @@ use Illuminate\Queue\SerializesModels;
 use App\Models\Social\SocialAccount;
 use App\Models\User;
 use App\Notifications\SocialTokenExpiryNotification;
-use App\Services\SocialTokenManager;
+use App\Services\ConfigSocialMedia\SocialTokenManager;
 use App\Helpers\LogHelper;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;

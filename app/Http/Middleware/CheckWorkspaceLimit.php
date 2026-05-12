@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use App\Exceptions\LimitReachedException;
-use App\Services\WorkspaceUsageService;
+use App\Services\Workspace\WorkspaceUsageService;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckWorkspaceLimit

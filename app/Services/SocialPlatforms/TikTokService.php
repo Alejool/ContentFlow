@@ -5,8 +5,8 @@ namespace App\Services\SocialPlatforms;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Facades\Log;
 
-use App\DTOs\SocialPostDTO;
-use App\DTOs\PostResultDTO;
+use App\DTOs\Publications\SocialPostDTO;
+use App\DTOs\Publications\PostResultDTO;
 
 class TikTokService extends BaseSocialService
 {

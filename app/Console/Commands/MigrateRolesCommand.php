@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Services\RoleMigrationService;
+use App\Services\Roles\RoleMigrationService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
