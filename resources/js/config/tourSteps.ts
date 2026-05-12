@@ -1,4 +1,4 @@
-import type { TourStep } from '@/types/onboarding';
+import type { TourStep } from '@/types/Onboarding/onboarding';
 
 /**
  * Default tour steps configuration for the onboarding guided tour.

@@ -8,9 +8,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/Components/ui/card';
-import { PLAN_FEATURES } from '@/Constants/plans';
-import type { PlanId } from '@/Constants/plans';
-import { cn } from '@/lib/utils';
+import { PLAN_FEATURES } from '@/Constants/Pricing/plans';
+import type { PlanId } from '@/Constants/Pricing/plans';
+import { cn } from '@/lib/common/utils';
 import {
   ArrowRight,
   Award,

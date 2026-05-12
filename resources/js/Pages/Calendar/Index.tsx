@@ -8,11 +8,11 @@ import { WeekView } from '@/Components/Calendar/WeekView';
 import EmptyState from '@/Components/common/EmptyState';
 import Button from '@/Components/common/Modern/Button';
 import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
-import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatformsConfig';
+import { SOCIAL_PLATFORMS } from '@/Constants/ConfigSocialMedia/socialPlatformsConfig';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { useCampaignStore } from '@/stores/campaignStore';
-import type { CalendarEvent } from '@/types/calendar';
-import { getEmptyStateByKey } from '@/Utils/emptyStateMapper';
+import { useCampaignStore } from '@/stores/Campaign/campaignStore';
+import type { CalendarEvent } from '@/types/Calendar/calendar';
+import { getEmptyStateByKey } from '@/Utils/Content/emptyStateMapper';
 import { Head } from '@inertiajs/react';
 import { eachDayOfInterval, endOfMonth, startOfMonth } from 'date-fns';
 import { Calendar as CalendarIcon, Filter } from 'lucide-react';
@@ -42,7 +42,7 @@ const PlatformIcon = ({ platform, className }: { platform?: string; className?: 
 };
 
 import { BulkActionsBar } from '@/Components/Calendar/BulkActionsBar';
-import { useCalendarStore } from '@/stores/calendarStore';
+import { useCalendarStore } from '@/stores/Calendar/calendarStore';
 import { useShallow } from 'zustand/react/shallow';
 
 export default function CalendarIndex({ auth }: { auth: any }) {

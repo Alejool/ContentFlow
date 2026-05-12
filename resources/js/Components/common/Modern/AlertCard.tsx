@@ -1,5 +1,5 @@
 import { Alert, AlertDescription } from '@/Components/ui/alert';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/common/utils';
 import { AlertCircle, AlertTriangle, CheckCircle, Info, XCircle } from 'lucide-react';
 import React from 'react';
 

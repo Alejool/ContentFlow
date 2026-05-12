@@ -1,23 +1,23 @@
-import enFlag from '@/../assets/Icons/Flags/en.svg';
-import esFlag from '@/../assets/Icons/Flags/es.svg';
 import { Avatar } from '@/Components/common/Avatar';
-import { useSubscriptionUsage } from '@/Hooks/Subscription/useSubscriptionUsage';
 import { useTheme } from '@/Hooks/Layout/useTheme';
-import { cssPropertiesManager } from '@/Utils/CSSCustomPropertiesManager';
-import { transitionTheme } from '@/Utils/themeTransition';
+import { useSubscriptionUsage } from '@/Hooks/Subscription/useSubscriptionUsage';
+import { cssPropertiesManager } from '@/Utils/common/CSSCustomPropertiesManager';
+import { transitionTheme } from '@/Utils/common/themeTransition';
+import enFlag from '@assets/Icons/Flags/en.svg';
+import esFlag from '@assets/Icons/Flags/es.svg';
 import { Menu, MenuButton, MenuItems, Radio, RadioGroup } from '@headlessui/react';
 import { Link as InertiaLink, usePage } from '@inertiajs/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import {
-  Check,
-  ChevronDown,
-  Globe,
-  LogOut,
-  Moon,
-  Palette,
-  Sun,
-  User,
+    Check,
+    ChevronDown,
+    Globe,
+    LogOut,
+    Moon,
+    Palette,
+    Sun,
+    User,
 } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';

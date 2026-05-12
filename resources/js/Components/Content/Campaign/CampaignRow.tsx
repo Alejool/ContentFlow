@@ -1,7 +1,7 @@
-import type { Campaign } from '@/types/Campaign';
+import type { Campaign } from '@/types/Campaign/Campaign';
 import { usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { getDateFnsLocale } from '@/Utils/dateLocales';
+import { getDateFnsLocale } from '@/Utils/common/dateLocales';
 import { formatCurrency } from '@/Utils/formatters/number';
 import {
   Calendar,

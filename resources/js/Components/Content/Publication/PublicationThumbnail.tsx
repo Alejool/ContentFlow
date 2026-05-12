@@ -1,4 +1,4 @@
-import type { Publication } from '@/types/Publication';
+import type { Publication } from '@/types/Publications/Publication';
 import { File, Loader2, PlayCircle, Video } from 'lucide-react';
 import { memo } from 'react';
 

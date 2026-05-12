@@ -1,4 +1,4 @@
-import { formatPublicationDate } from '@/Utils/publicationHelpers';
+import { formatPublicationDate } from '@/Utils/Publications/publicationHelpers';
 import { Calendar, Hash, Target } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';

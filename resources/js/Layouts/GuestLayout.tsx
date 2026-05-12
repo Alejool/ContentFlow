@@ -1,9 +1,9 @@
-import Logo from '@/../assets/logo.png';
 import ForgotPasswordSection from '@/Components/Auth/ForgotPasswordSection';
 import LoginSection from '@/Components/Auth/LoginSection';
 import RegisterSection from '@/Components/Auth/RegisterSection';
 import ReturnToLogin from '@/Components/common/ReturnToLogin';
 import ThemeLanguageContainer from '@/Components/common/ThemeLanguageContainer';
+import Logo from '@assets/logo.png';
 import { ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 interface GuestLayoutProps {

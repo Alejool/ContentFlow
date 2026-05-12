@@ -1,5 +1,5 @@
-import { useAbility } from '@/Contexts/AbilityContext';
-import type { Publication } from '@/types/Publication';
+import { useAbility } from '@/Contexts/Auth/AbilityContext';
+import type { Publication } from '@/types/Publications/Publication';
 import { usePage } from '@inertiajs/react';
 import { useMemo } from 'react';
 

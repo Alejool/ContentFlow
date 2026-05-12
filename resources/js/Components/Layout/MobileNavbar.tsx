@@ -1,20 +1,20 @@
-import Logo from '@/../assets/logo.svg';
 import OptimizedImage from '@/Components/common/ui/OptimizedImage';
 import ResponsiveNavLink from '@/Components/common/ui/ResponsiveNavLink';
-import { useStickyOnScroll } from '@/Hooks/ui/useStickyOnScroll';
 import { useTheme } from '@/Hooks/Layout/useTheme';
+import { useStickyOnScroll } from '@/Hooks/ui/useStickyOnScroll';
+import Logo from '@assets/logo.svg';
 import { usePage } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  BarChart3,
-  X as CloseIcon,
-  FileText,
-  Home,
-  Layers,
-  Loader2,
-  LogOut,
-  Menu,
-  User,
+    BarChart3,
+    X as CloseIcon,
+    FileText,
+    Home,
+    Layers,
+    Loader2,
+    LogOut,
+    Menu,
+    User,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

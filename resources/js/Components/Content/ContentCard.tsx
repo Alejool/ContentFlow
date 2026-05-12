@@ -14,7 +14,7 @@ import {
   hasMedia,
   isProcessing,
   isVideoMedia,
-} from '@/Utils/publicationHelpers';
+} from '@/Utils/Publications/publicationHelpers';
 import {
   Calendar,
   Clock,

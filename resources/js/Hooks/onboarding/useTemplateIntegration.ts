@@ -1,11 +1,11 @@
 import { useCallback } from 'react';
 import { router } from '@inertiajs/react';
-import type { PublicationTemplate } from '@/types/onboarding';
-import { useOnboardingStore } from '@/stores/onboardingStore';
+import type { PublicationTemplate } from '@/types/Onboarding/onboarding';
+import { useOnboardingStore } from '@/stores/Onboarding/onboardingStore';
 import {
   storeTemplateInSession,
   applyTemplateToForm as applyTemplateToFormUtil,
-} from '@/Utils/templateUtils';
+} from '@/Utils/Content/templateUtils';
 
 /**
  * Hook for integrating publication templates with the publication editor.

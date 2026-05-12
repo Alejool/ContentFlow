@@ -1,7 +1,7 @@
+import useOptimisticStore from '@/stores/common/optimisticStore';
+import type { OptimisticOptions } from '@/types/common/optimistic';
+import { performanceMetrics } from '@/Utils/common/performanceMetrics';
 import { useMemo } from 'react';
-import useOptimisticStore from '../stores/optimisticStore';
-import type { OptimisticOptions } from '../types/optimistic';
-import { performanceMetrics } from '../Utils/performanceMetrics';
 
 /**
  * Error type detection utilities

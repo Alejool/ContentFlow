@@ -11,14 +11,13 @@ import type {
     Role,
     RolesManagementTabProps,
 } from '@/Components/Workspace/rolesManagement.types';
-import { getRoleConfig } from '@/Utils/roleHelpers';
+import { getRoleConfig } from '@/Utils/Roles/roleHelpers';
 import { router } from '@inertiajs/react';
 import axios from 'axios';
 import { AlertCircle, Edit2, Info, Shield, ShieldAlert, ShieldCheck, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { route } from 'ziggy-js';
 
 export default function RolesManagementTab({
   roles,

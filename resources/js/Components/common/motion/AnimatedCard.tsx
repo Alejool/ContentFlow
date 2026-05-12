@@ -4,7 +4,7 @@
  * Card with hover animations and accessibility features
  */
 
-import { prefersReducedMotion } from '@/Utils/themeTransition';
+import { prefersReducedMotion } from '@/Utils/common/themeTransition';
 import type { MotionProps } from 'framer-motion';
 import { LazyMotion, domAnimation, m } from 'framer-motion';
 import React, { HTMLAttributes } from 'react';

@@ -1,4 +1,4 @@
-import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatformsConfig';
+import { SOCIAL_PLATFORMS } from '@/Constants/ConfigSocialMedia/socialPlatformsConfig';
 import { router } from '@inertiajs/react';
 import axios from 'axios';
 import { CheckCircle, Settings, XCircle } from 'lucide-react';

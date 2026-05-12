@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useTimezoneStore } from '@/stores/timezoneStore';
+import { useTimezoneStore } from '@/stores/common/timezoneStore';
 import { useTranslation } from 'react-i18next';
 import Select from '@/Components/common/Modern/Select';
 import { Globe } from 'lucide-react';

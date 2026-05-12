@@ -2,14 +2,14 @@ import Button from '@/Components/common/Modern/Button';
 import Select from '@/Components/common/Modern/Select';
 import ConfirmDialog from '@/Components/common/ui/ConfirmDialog';
 import InviteMemberModal from '@/Components/Workspace/InviteMemberModal';
-import { getRoleStyle } from '@/Constants/RoleConstants';
-import { getRoleConfig } from '@/Utils/roleHelpers';
+import { getRoleStyle } from '@/Constants/Roles/RoleConstants';
+import { getRoleConfig } from '@/Utils/Roles/roleHelpers';
 import {
   useRemoveWorkspaceMember,
   useUpdateMemberRole,
   useWorkspaceMembers,
 } from '@/Hooks/Workspace/useWorkspaceMembers';
-import { queryKeys } from '@/lib/queryKeys';
+import { queryKeys } from '@/lib/common/queryKeys';
 import { usePage } from '@inertiajs/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Trash2, UserPlus, Users } from 'lucide-react';

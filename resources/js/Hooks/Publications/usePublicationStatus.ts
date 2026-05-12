@@ -1,4 +1,4 @@
-import type { Publication } from '@/types/Publication';
+import type { Publication } from '@/types/Publications/Publication';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { useEffect, useState } from 'react';

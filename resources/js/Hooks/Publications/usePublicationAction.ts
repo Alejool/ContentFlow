@@ -1,6 +1,6 @@
 import PublicationActionService, {
   PublicationActionResponse,
-} from '@/Services/PublicationActionService';
+} from '@/Services/Publications/PublicationActionService';
 import { useEffect, useState } from 'react';
 
 /**

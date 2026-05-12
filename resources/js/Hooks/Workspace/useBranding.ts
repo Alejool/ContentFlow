@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { cssPropertiesManager } from '@/Utils/CSSCustomPropertiesManager';
+import { cssPropertiesManager } from '@/Utils/common/CSSCustomPropertiesManager';
 import { User } from '@/types';
 
 interface WorkspaceBranding {

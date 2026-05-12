@@ -4,12 +4,11 @@
  * Accessible modal with animations, focus trap, and keyboard navigation
  */
 
-import React, { useEffect, useRef } from 'react';
-import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
-import { createPortal } from 'react-dom';
 import { useFocusTrap, useKeyboardNavigation } from '@/Hooks/ui/useKeyboardNavigation';
 import { useReducedMotion } from '@/Hooks/ui/useReducedMotion';
-import { VisuallyHidden } from '../Accessibility/VisuallyHidden';
+import { AnimatePresence, LazyMotion, domAnimation, m } from 'framer-motion';
+import React, { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
 interface AnimatedModalProps {
   isOpen: boolean;

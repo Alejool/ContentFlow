@@ -1,6 +1,6 @@
 import PlatformSettingsModal from '@/Components/ConfigSocialMedia/PlatformSettingsModal';
 import Button from '@/Components/common/Modern/Button';
-import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatformsConfig';
+import { SOCIAL_PLATFORMS } from '@/Constants/ConfigSocialMedia/socialPlatformsConfig';
 import { useKeyboardClick } from '@/Hooks/ui/useKeyboardClick';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';

@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import ReelCardSkeleton from '@/Components/common/ui/skeletons/ReelCardSkeleton';
 import EmptyState from '@/Components/common/EmptyState';
-import { getEmptyStateByKey } from '@/Utils/emptyStateMapper';
+import { getEmptyStateByKey } from '@/Utils/Content/emptyStateMapper';
 
 interface MediaFile {
   id: number;

@@ -1,4 +1,4 @@
-import { queryKeys } from '@/lib/queryKeys';
+import { queryKeys } from '@/lib/common/queryKeys';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 

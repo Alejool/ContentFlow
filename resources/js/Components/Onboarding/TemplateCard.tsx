@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { PublicationTemplate } from '@/types/onboarding';
+import type { PublicationTemplate } from '@/types/Onboarding/onboarding';
 import { Check } from 'lucide-react';
 
 interface TemplateCardProps {

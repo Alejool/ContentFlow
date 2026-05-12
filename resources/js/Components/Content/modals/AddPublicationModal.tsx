@@ -21,7 +21,7 @@ import { useConfirm } from '@/Hooks/common/useConfirm';
 import { useS3Upload } from '@/Hooks/Upload/useS3Upload';
 import { useSocialAccounts } from '@/Hooks/ConfigSocialMedia/useSocialAccounts';
 import { useTokenHealth } from '@/Hooks/ConfigSocialMedia/useTokenHealth';
-import { ToastService } from '@/Services/ToastService';
+import { ToastService } from '@/Services/common/ToastService';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { FileText, Hash, Save, Target } from 'lucide-react';

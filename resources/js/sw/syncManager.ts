@@ -7,7 +7,7 @@
  * Requirements: 5.1, 5.2, 5.3, 5.4
  */
 
-import type { SyncOperation } from '../types/optimistic';
+import type { SyncOperation } from '@/types/common/optimistic';
 
 const DB_NAME = 'background-sync-db';
 const DB_VERSION = 1;

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { router } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
-import type { SocialPlatform } from '@/types/onboarding';
+import type { SocialPlatform } from '@/types/Onboarding/onboarding';
 import { Loader2, Check, AlertCircle } from 'lucide-react';
 
 interface PlatformCardProps {

@@ -1,6 +1,6 @@
 import Button from '@/Components/common/Modern/Button';
-import type { Publication } from '@/types/Publication';
-import { getDateFnsLocale } from '@/Utils/dateLocales';
+import type { Publication } from '@/types/Publications/Publication';
+import { getDateFnsLocale } from '@/Utils/common/dateLocales';
 import { format } from 'date-fns';
 import { Check, CheckCircle, Clock, Info, User, X, XCircle } from 'lucide-react';
 import { useState } from 'react';

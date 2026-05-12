@@ -1,4 +1,4 @@
-import type { SyncError } from '@/types/errors';
+import type { SyncError } from '@/types/common/errors';
 import { AlertCircle, RefreshCw, X } from 'lucide-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';

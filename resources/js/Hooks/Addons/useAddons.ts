@@ -1,4 +1,4 @@
-import type { AddonBalance, AddonPackages, AddonSummary, WorkspaceAddon } from '@/types/addon';
+import type { AddonBalance, AddonPackages, AddonSummary, WorkspaceAddon } from '@/types/Addons/addon';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 

@@ -4,8 +4,8 @@ import {
   useDeleteEvent,
   useUpdateEvent,
 } from '@/Hooks/Calendar/useCalendarEvents';
-import { useCalendarStore } from '@/stores/calendarStore';
-import { useManageContentUIStore } from '@/stores/manageContentUIStore';
+import { useCalendarStore } from '@/stores/Calendar/calendarStore';
+import { useManageContentUIStore } from '@/stores/Content/manageContentUIStore';
 import axios from 'axios';
 import { addMonths, setMonth, setYear, subMonths } from 'date-fns';
 import { useCallback, useMemo } from 'react';

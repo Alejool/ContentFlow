@@ -1,4 +1,4 @@
-import type { ValidationResult } from '@/Utils/videoValidation';
+import type { ValidationResult } from '@/Utils/Content/videoValidation';
 import { AlertCircle, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 

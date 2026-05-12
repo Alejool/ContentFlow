@@ -5,7 +5,7 @@
  * para manejar WebSockets de forma segura con Laravel Echo
  */
 
-import { createEchoSubscription, isEchoReady } from '@/Utils/echoHelper';
+import { createEchoSubscription, isEchoReady } from '@/Utils/common/echoHelper';
 import { useEffect, useState } from 'react';
 
 export function EchoHelperExample() {

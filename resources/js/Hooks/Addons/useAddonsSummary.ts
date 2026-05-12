@@ -1,4 +1,4 @@
-import { useAddonsSummaryStore } from '@/stores/addonsSummaryStore';
+import { useAddonsSummaryStore } from '@/stores/Addons/addonsSummaryStore';
 import { useEffect } from 'react';
 
 /**

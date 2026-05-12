@@ -1,5 +1,5 @@
-import { queryKeys } from '@/lib/queryKeys';
-import type { ApprovalRequest } from '@/types/ApprovalTypes';
+import { queryKeys } from '@/lib/common/queryKeys';
+import type { ApprovalRequest } from '@/types/Approval/ApprovalTypes';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 

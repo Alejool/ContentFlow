@@ -1,5 +1,5 @@
 import Button from '@/Components/common/Modern/Button';
-import { cssPropertiesManager } from '@/Utils/CSSCustomPropertiesManager';
+import { cssPropertiesManager } from '@/Utils/common/CSSCustomPropertiesManager';
 import { router, useForm } from '@inertiajs/react';
 import axios from 'axios';
 import { Check, Crown, Lock, Palette } from 'lucide-react';

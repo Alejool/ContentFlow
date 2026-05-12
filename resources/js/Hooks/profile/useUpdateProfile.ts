@@ -1,6 +1,6 @@
-import { userProfileSchema } from '@/schemas/user';
-import type { UserProfileFormData } from '@/schemas/user';
-import { useUserStore } from '@/stores/userStore';
+import { userProfileSchema } from '@/schemas/Auth/user';
+import type { UserProfileFormData } from '@/schemas/Auth/user';
+import { useUserStore } from '@/stores/Auth/userStore';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
 import { useForm as useHookForm } from 'react-hook-form';

@@ -1,8 +1,8 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { router } from '@inertiajs/react';
-import { useUploadQueue } from '@/stores/uploadQueueStore';
-import { useProcessingProgress } from '@/stores/processingProgressStore';
-import { useNotificationStore } from '@/stores/notificationStore';
+import { useUploadQueue } from '@/stores/Upload/uploadQueueStore';
+import { useProcessingProgress } from '@/stores/Queue/processingProgressStore';
+import { useNotificationStore } from '@/stores/Notifications/notificationStore';
 
 /**
  * Notification preferences interface

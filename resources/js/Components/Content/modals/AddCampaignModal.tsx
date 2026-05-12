@@ -1,4 +1,4 @@
-import { useCampaignStore } from '@/stores/campaignStore';
+import { useCampaignStore } from '@/stores/Campaign/campaignStore';
 import axios from 'axios';
 import { Target } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -17,7 +17,7 @@ import PublicationSelector from '@/Components/Content/Campaign/common/Publicatio
 import { useAddCampaignForm } from '@/Hooks/Campaign/useAddCampaignForm';
 import { usePublicationsForCampaign } from '@/Hooks/Campaign/usePublicationsForCampaign';
 import { useModalFocusTrap } from '@/Hooks/ui/useModalFocusTrap';
-import { useContentPaginationStore } from '@/stores/contentPaginationStore';
+import { useContentPaginationStore } from '@/stores/Content/contentPaginationStore';
 
 import { DollarSign, FileText } from 'lucide-react';
 import ModalFooter from './common/ModalFooter';

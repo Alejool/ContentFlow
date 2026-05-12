@@ -1,5 +1,5 @@
-import { useTimezoneStore } from '@/stores/timezoneStore';
-import { getErrorMessage } from '@/Utils/validation';
+import { useTimezoneStore } from '@/stores/common/timezoneStore';
+import { getErrorMessage } from '@/Utils/common/validation';
 import { useForm } from '@inertiajs/react';
 import axios from 'axios';
 import { useState } from 'react';

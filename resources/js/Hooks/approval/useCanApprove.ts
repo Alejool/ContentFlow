@@ -1,4 +1,4 @@
-import { useAbility } from '@/Contexts/AbilityContext';
+import { useAbility } from '@/Contexts/Auth/AbilityContext';
 import { usePage } from '@inertiajs/react';
 import { useMemo } from 'react';
 

@@ -1,7 +1,7 @@
+import { SectionHeader } from '@/Components/Content/modals/common/SectionHeader';
 import MediaUploadSection from '@/Components/Content/Publication/common/edit/MediaUploadSection';
 import MediaUploadSkeleton from '@/Components/Content/Publication/common/edit/MediaUploadSkeleton';
 import type { TFunction } from 'i18next';
-import { SectionHeader } from '../common/SectionHeader';
 
 interface MediaSectionProps {
   t: TFunction;

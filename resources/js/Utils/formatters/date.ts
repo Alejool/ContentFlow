@@ -1,4 +1,4 @@
-import { useTimezoneStore } from '@/stores/timezoneStore';
+import { useTimezoneStore } from '@/stores/common/timezoneStore';
 import i18n from 'i18next';
 
 /**

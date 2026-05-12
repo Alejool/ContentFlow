@@ -2,8 +2,8 @@ import { DatePicker as DatePickerModern } from '@/Components/common/Modern/DateP
 import Input from '@/Components/common/Modern/Input';
 import Select from '@/Components/common/Modern/Select';
 import ExportButtons from '@/Components/common/ui/ExportButtons';
-import { CONTENT_TYPES } from '@/Constants/contentTypes';
-import { getPlatformOptions } from '@/Constants/socialPlatforms';
+import { CONTENT_TYPES } from '@/Constants/Content/contentTypes';
+import { getPlatformOptions } from '@/Constants/ConfigSocialMedia/socialPlatforms';
 import { format, parseISO } from 'date-fns';
 import { Filter, RotateCcw, Search } from 'lucide-react';
 

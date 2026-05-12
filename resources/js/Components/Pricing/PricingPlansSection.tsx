@@ -2,7 +2,7 @@ import PlanGrid from '@/Components/Pricing/PlanGrid';
 import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
 import { Badge } from '@/Components/ui/badge';
 import { usePricing } from '@/Hooks/Pricing/usePricing';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/common/utils';
 import { AlertTriangle, CheckCircle, Info, RefreshCw, Sparkles, XCircle, Zap } from 'lucide-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';

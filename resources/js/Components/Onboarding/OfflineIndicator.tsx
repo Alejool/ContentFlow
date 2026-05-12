@@ -1,6 +1,6 @@
 import React from 'react';
 import { useOnlineStatus } from '@/Hooks/Offline/useOnlineStatus';
-import { useOnboardingStore } from '@/stores/onboardingStore';
+import { useOnboardingStore } from '@/stores/Onboarding/onboardingStore';
 
 /**
  * OfflineIndicator component

@@ -1,7 +1,7 @@
-import { getPlatformConfig } from '@/Constants/socialPlatforms';
-import { queryKeys } from '@/lib/queryKeys';
+import { getPlatformConfig } from '@/Constants/ConfigSocialMedia/socialPlatforms';
+import { queryKeys } from '@/lib/common/queryKeys';
 import { formatDateTimeStyled } from '@/Utils/formatters';
-import { validateVideoDuration } from '@/Utils/validationUtils';
+import { validateVideoDuration } from '@/Utils/common/validationUtils';
 import { useQueryClient } from '@tanstack/react-query';
 import { AlertTriangle, Check, CheckCircle, Clock, Loader2, X, XCircle } from 'lucide-react';
 import { memo } from 'react';

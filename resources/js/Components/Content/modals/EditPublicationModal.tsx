@@ -25,11 +25,11 @@ import { usePublicationCapabilities } from '@/Hooks/Publications/usePublicationC
 import { usePublicationLock } from '@/Hooks/Publications/usePublicationLock';
 import { useSocialAccounts } from '@/Hooks/ConfigSocialMedia/useSocialAccounts';
 import { useTokenHealth } from '@/Hooks/ConfigSocialMedia/useTokenHealth';
-import toast from '@/Utils/toast';
-import { queryKeys } from '@/lib/queryKeys';
-import { useCampaignStore } from '@/stores/campaignStore';
-import { useUploadQueue } from '@/stores/uploadQueueStore';
-import type { Publication } from '@/types/Publication';
+import toast from '@/Utils/common/toast';
+import { queryKeys } from '@/lib/common/queryKeys';
+import { useCampaignStore } from '@/stores/Campaign/campaignStore';
+import { useUploadQueue } from '@/stores/Upload/uploadQueueStore';
+import type { Publication } from '@/types/Publications/Publication';
 import { usePage } from '@inertiajs/react';
 import { useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';

@@ -1,5 +1,5 @@
-import { cn } from '@/lib/utils';
-import { getPublicationStatusConfig } from '@/Utils/publicationHelpers';
+import { cn } from '@/lib/common/utils';
+import { getPublicationStatusConfig } from '@/Utils/Publications/publicationHelpers';
 import { Popover, Transition } from '@headlessui/react';
 import { motion } from 'framer-motion';
 import { Info } from 'lucide-react';

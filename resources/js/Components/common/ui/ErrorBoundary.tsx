@@ -1,5 +1,5 @@
-import { ErrorLogger } from '@/Services/ErrorLogger';
-import { ToastService } from '@/Services/ToastService';
+import { ErrorLogger } from '@/Services/common/ErrorLogger';
+import { ToastService } from '@/Services/common/ToastService';
 import { Component, ErrorInfo, ReactNode } from 'react';
 
 interface Props {

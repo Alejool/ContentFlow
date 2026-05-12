@@ -6,8 +6,8 @@
  */
 
 import type { BusinessInfoData } from '@/Components/Onboarding/BusinessInfoStep';
-import { useOnboarding } from '@/Contexts/OnboardingContext';
-import type { TourStep } from '@/types/onboarding';
+import { useOnboarding } from '@/Contexts/Onboarding/OnboardingContext';
+import type { TourStep } from '@/types/Onboarding/onboarding';
 import { useCallback, useEffect, useState } from 'react';
 
 // ---------------------------------------------------------------------------

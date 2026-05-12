@@ -2,7 +2,7 @@ import Button from '@/Components/common/Modern/Button';
 import Switch from '@/Components/common/Modern/Switch';
 import YouTubeThumbnailUploader from '@/Components/common/ui/YouTubeThumbnailUploader';
 import { formatDateTimeStyled } from '@/Utils/formatters';
-import { validateVideoDuration } from '@/Utils/validationUtils';
+import { validateVideoDuration } from '@/Utils/common/validationUtils';
 import { AlertTriangle, Check, ChevronDown, Clock, Info, X } from 'lucide-react';
 import React, { memo } from 'react';
 import { isPlatformCompatible } from './helpers';

@@ -1,6 +1,6 @@
-import { passwordSchema } from '@/schemas/user';
-import type { PasswordFormData } from '@/schemas/user';
-import { useUserStore } from '@/stores/userStore';
+import { passwordSchema } from '@/schemas/Auth/user';
+import type { PasswordFormData } from '@/schemas/Auth/user';
+import { useUserStore } from '@/stores/Auth/userStore';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
 import { useState } from 'react';

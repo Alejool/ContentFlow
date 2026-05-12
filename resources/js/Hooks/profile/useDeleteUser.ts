@@ -1,4 +1,4 @@
-import { deleteUserSchema } from '@/schemas/user';
+import { deleteUserSchema } from '@/schemas/Auth/user';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios, { type AxiosError } from 'axios';
 import { RefObject, useRef } from 'react';

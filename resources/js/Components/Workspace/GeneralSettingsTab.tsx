@@ -9,7 +9,7 @@ import type {
   GeneralSettingsTabProps,
   SettingsFormData,
 } from '@/Components/Workspace/generalSettings.types';
-import { useTimezoneStore } from '@/stores/timezoneStore';
+import { useTimezoneStore } from '@/stores/common/timezoneStore';
 import type { PageProps } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router, usePage } from '@inertiajs/react';

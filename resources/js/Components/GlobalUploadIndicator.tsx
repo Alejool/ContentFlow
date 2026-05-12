@@ -2,8 +2,8 @@ import { useConfirm } from '@/Hooks/common/useConfirm';
 import { usePublicationStatus } from '@/Hooks/Publications/usePublicationStatus';
 import { useS3Upload } from '@/Hooks/Upload/useS3Upload';
 import { useUploadWarning } from '@/Hooks/Upload/useUploadWarning';
-import { useProcessingProgress } from '@/stores/processingProgressStore';
-import { useUploadQueue } from '@/stores/uploadQueueStore';
+import { useProcessingProgress } from '@/stores/Queue/processingProgressStore';
+import { useUploadQueue } from '@/stores/Upload/uploadQueueStore';
 import { router } from '@inertiajs/react';
 import axios from 'axios';
 import {

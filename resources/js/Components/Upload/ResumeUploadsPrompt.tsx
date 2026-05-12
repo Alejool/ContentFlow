@@ -1,4 +1,4 @@
-import { useUploadQueue } from '@/stores/uploadQueueStore';
+import { useUploadQueue } from '@/stores/Upload/uploadQueueStore';
 import { AlertCircle, Upload, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { router } from '@inertiajs/react';

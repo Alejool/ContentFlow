@@ -1,5 +1,5 @@
 import { useTheme } from '@/Hooks/Layout/useTheme';
-import { transitionTheme } from '@/Utils/themeTransition';
+import { transitionTheme } from '@/Utils/common/themeTransition';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Monitor, Moon, Sun } from 'lucide-react';
 import { useState } from 'react';

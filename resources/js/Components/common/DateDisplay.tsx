@@ -1,6 +1,6 @@
 import React from 'react';
-import { formatDate, DATE_FORMATS } from '@/Utils/timezoneUtils';
-import { useTimezoneStore } from '@/stores/timezoneStore';
+import { formatDate, DATE_FORMATS } from '@/Utils/common/timezoneUtils';
+import { useTimezoneStore } from '@/stores/common/timezoneStore';
 
 interface DateDisplayProps {
   date: string | null | undefined;

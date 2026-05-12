@@ -1,5 +1,5 @@
-import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatformsConfig';
-import type { CalendarEvent } from '@/types/calendar';
+import { SOCIAL_PLATFORMS } from '@/Constants/ConfigSocialMedia/socialPlatformsConfig';
+import type { CalendarEvent } from '@/types/Calendar/calendar';
 import { formatTimeString } from '@/Utils/formatters';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import {

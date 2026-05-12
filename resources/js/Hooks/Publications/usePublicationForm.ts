@@ -1,20 +1,22 @@
 import type { ContentType } from '@/Components/Content/Publication/common/ContentTypeSelector';
 import { getMediaRulesForContentType } from '@/Components/Content/Publication/common/ContentTypeSelector';
-import { CONTENT_TYPE_DISPLAY } from '@/Constants/contentTypes';
+import { SOCIAL_PLATFORMS } from '@/Constants/ConfigSocialMedia/socialPlatformsConfig';
+import { CONTENT_TYPE_DISPLAY } from '@/Constants/Content/contentTypes';
 import { useContentTypeSuggestion } from '@/Hooks/Publications/useContentTypeSuggestion';
 import {
-  useCreatePublication,
-  useUpdatePublication,
+    useCreatePublication,
+    useUpdatePublication,
 } from '@/Hooks/Publications/usePublicationsList';
 import { useS3Upload } from '@/Hooks/Upload/useS3Upload';
-import { queryKeys } from '@/lib/queryKeys';
-import type { PublicationFormData } from '@/schemas/publication';
-import { publicationSchema } from '@/schemas/publication';
-import { useMediaStore } from '@/stores/mediaStore';
-import { useUploadQueue } from '@/stores/uploadQueueStore';
+import { queryKeys } from '@/lib/common/queryKeys';
+import type { PublicationFormData } from '@/schemas/Publications/publication';
+import { publicationSchema } from '@/schemas/Publications/publication';
+import { useAccountsStore } from '@/stores/ConfigSocialMedia/socialAccountsStore';
+import { useMediaStore } from '@/stores/Upload/mediaStore';
+import { useUploadQueue } from '@/stores/Upload/uploadQueueStore';
 import type { PageProps } from '@/types';
-import type { Publication } from '@/types/Publication';
-import { validateVideoDuration } from '@/Utils/validationUtils';
+import type { Publication } from '@/types/Publications/Publication';
+import { validateVideoDuration } from '@/Utils/common/validationUtils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { usePage } from '@inertiajs/react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -23,8 +25,6 @@ import { startTransition, useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { SOCIAL_PLATFORMS } from '../../Constants/socialPlatformsConfig';
-import { useAccountsStore } from '../../stores/socialAccountsStore';
 
 interface UsePublicationFormProps {
   publication?: Publication | null;

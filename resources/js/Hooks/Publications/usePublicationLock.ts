@@ -1,6 +1,6 @@
-import { useLockStore } from '@/stores/lockStore';
-import { usePublicationStore } from '@/stores/publicationStore';
-import type { Publication } from '@/types/Publication';
+import { useLockStore } from '@/stores/Publications/lockStore';
+import { usePublicationStore } from '@/stores/Publications/publicationStore';
+import type { Publication } from '@/types/Publications/Publication';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -26,7 +26,7 @@ interface User {
 const syncAllUIStores = async (pubId: number, freshData: Publication) => {
   // 1. Sync useContentUIStore
   try {
-    const { useContentUIStore } = await import('@/stores/contentUIStore');
+    const { useContentUIStore } = await import('@/stores/Content/contentUIStore');
     const store = useContentUIStore.getState();
     if (store.selectedItem?.id === pubId) {
       store.setSelectedItem(freshData);
@@ -35,7 +35,7 @@ const syncAllUIStores = async (pubId: number, freshData: Publication) => {
 
   // 2. Sync useManageContentUIStore
   try {
-    const { useManageContentUIStore } = await import('@/stores/manageContentUIStore');
+    const { useManageContentUIStore } = await import('@/stores/Content/manageContentUIStore');
     const store = useManageContentUIStore.getState();
     if (store.selectedItem?.id === pubId) {
       store.setSelectedItem(freshData);
@@ -62,7 +62,7 @@ const refreshPublicationInAllStores = async (pubId: number, providedData?: Publi
 
       // 3. Update Calendar Store if it exists in the grid
       try {
-        const { useCalendarStore } = await import('@/stores/calendarStore');
+        const { useCalendarStore } = await import('@/stores/Calendar/calendarStore');
         const calStore = useCalendarStore.getState();
         const mainMedia = (freshData as any).media_files?.[0];
         const thumb = mainMedia?.thumbnail?.file_path || (freshData as any).image;
@@ -322,7 +322,7 @@ export const useWorkspaceLocks = () => {
         updateLock(pubId, null);
         toast.dismiss(`lock-${pubId}`);
 
-        import('@/stores/publicationStore').then(({ usePublicationStore }) => {
+        import('@/stores/Publications/publicationStore').then(({ usePublicationStore }) => {
           const pub = usePublicationStore.getState().publications.find((p) => p.id === pubId);
           if (pub) {
             toast.success(`"${pub.title}" ya está disponible.`, {

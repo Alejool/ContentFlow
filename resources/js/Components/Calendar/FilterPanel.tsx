@@ -1,6 +1,6 @@
-import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatformsConfig';
-import type { Campaign } from '@/stores/campaignStore';
-import type { CalendarFilters, Platform, PublicationStatus } from '@/types/calendar';
+import { SOCIAL_PLATFORMS } from '@/Constants/ConfigSocialMedia/socialPlatformsConfig';
+import type { Campaign } from '@/stores/Campaign/campaignStore';
+import type { CalendarFilters, Platform, PublicationStatus } from '@/types/Calendar/calendar';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaFilter } from 'react-icons/fa';

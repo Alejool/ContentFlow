@@ -6,13 +6,13 @@ import UserEventModal from '@/Components/Content/Partials/UserEventModal';
 import ModalFooter from '@/Components/Content/modals/common/ModalFooter';
 import ModalHeader from '@/Components/Content/modals/common/ModalHeader';
 import Modal from '@/Components/common/ui/Modal';
-import { getActivePlatformKeys, getPlatformConfig } from '@/Constants/socialPlatforms';
+import { getActivePlatformKeys, getPlatformConfig } from '@/Constants/ConfigSocialMedia/socialPlatforms';
 import { useCalendar } from '@/Hooks/Calendar/useCalendar';
-import { validateDate } from '@/Utils/dateValidation';
+import { validateDate } from '@/Utils/common/dateValidation';
 import { formatDate, formatTimeString } from '@/Utils/formatters';
 
-import { useLockStore } from '@/stores/lockStore';
-import type { CalendarView } from '@/types/calendar';
+import { useLockStore } from '@/stores/Publications/lockStore';
+import type { CalendarView } from '@/types/Calendar/calendar';
 import type { DragEndEvent } from '@dnd-kit/core';
 import {
   DndContext,

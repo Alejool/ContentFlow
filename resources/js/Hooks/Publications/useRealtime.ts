@@ -1,4 +1,4 @@
-import { initPublicationsRealtime } from '@/Services/publicationRealtime';
+import { initPublicationsRealtime } from '@/Services/Publications/publicationRealtime';
 import { usePage } from '@inertiajs/react';
 import { useEffect } from 'react';
 

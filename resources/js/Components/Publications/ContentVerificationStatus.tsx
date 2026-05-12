@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/common/utils';
 import { AlertCircle, CheckCircle, Clock, XCircle } from 'lucide-react';
 
 interface ContentVerificationStatusProps {

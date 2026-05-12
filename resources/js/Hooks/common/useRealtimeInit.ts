@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
-import { initNotificationRealtime } from '@/Services/notificationRealtime';
-import { cleanupProgressRealtime, initProgressRealtime } from '@/Services/progressRealtime';
-import { useNotificationStore } from '@/stores/notificationStore';
+import { initNotificationRealtime } from '@/Services/Notifications/notificationRealtime';
+import { cleanupProgressRealtime, initProgressRealtime } from '@/Services/Queue/progressRealtime';
+import { useNotificationStore } from '@/stores/Notifications/notificationStore';
 import { User } from '@/types';
 
 export function useRealtimeInit(user?: User | null) {

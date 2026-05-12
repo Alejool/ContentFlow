@@ -1,5 +1,5 @@
-import enFlag from '@/../assets/Icons/Flags/en.svg';
-import esFlag from '@/../assets/Icons/Flags/es.svg';
+import enFlag from '@assets/Icons/Flags/en.svg';
+import esFlag from '@assets/Icons/Flags/es.svg';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { AnimatePresence, motion } from 'framer-motion';

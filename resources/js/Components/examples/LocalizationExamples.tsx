@@ -1,5 +1,5 @@
 import { useLocalization } from '@/Hooks/common/useLocalization';
-import { AITranslationService } from '@/Services/AITranslationService';
+import { AITranslationService } from '@/Services/AI/AITranslationService';
 import { useState } from 'react';
 
 /**

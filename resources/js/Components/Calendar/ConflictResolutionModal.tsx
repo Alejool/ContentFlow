@@ -1,4 +1,4 @@
-import type { CalendarEvent, DataConflict } from '@/types/calendar';
+import type { CalendarEvent, DataConflict } from '@/types/Calendar/calendar';
 import { AlertTriangle, Clock, User } from 'lucide-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';

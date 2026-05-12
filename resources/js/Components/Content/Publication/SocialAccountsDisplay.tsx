@@ -1,6 +1,6 @@
-import { getPlatformConfig } from '@/Constants/socialPlatforms';
-import { validateVideoDuration } from '@/Utils/validationUtils';
-import type { Publication } from '@/types/Publication';
+import { getPlatformConfig } from '@/Constants/ConfigSocialMedia/socialPlatforms';
+import { validateVideoDuration } from '@/Utils/common/validationUtils';
+import type { Publication } from '@/types/Publications/Publication';
 import { AlertTriangle } from 'lucide-react';
 import { memo, useMemo } from 'react';
 

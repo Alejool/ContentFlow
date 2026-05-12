@@ -3,8 +3,8 @@
  * Handles caching strategies, LRU eviction, and cache invalidation
  */
 
-import { cacheLogger } from '../Utils/cacheLogger';
-import { errorLogger } from '../Utils/errorLogger';
+import { cacheLogger } from '@/Utils/common/cacheLogger';
+import { errorLogger } from '@/Utils/common/errorLogger';
 
 // Cache configuration
 const CACHE_VERSION = 'v1';

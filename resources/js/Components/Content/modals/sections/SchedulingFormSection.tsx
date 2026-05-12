@@ -1,6 +1,6 @@
 import ScheduleSection from '@/Components/Content/modals/common/ScheduleSection';
+import { SectionHeader } from '@/Components/Content/modals/common/SectionHeader';
 import type { TFunction, i18n } from 'i18next';
-import { SectionHeader } from '../common/SectionHeader';
 
 interface SchedulingFormSectionProps {
   t: TFunction;

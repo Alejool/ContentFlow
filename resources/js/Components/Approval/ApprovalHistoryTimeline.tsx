@@ -1,6 +1,6 @@
 import { usePublicationApprovalHistory } from '@/Hooks/Approval/useApprovalHistory';
-import { getDateFnsLocale } from '@/Utils/dateLocales';
-import type { ApprovalRequest } from '@/types/ApprovalTypes';
+import { getDateFnsLocale } from '@/Utils/common/dateLocales';
+import type { ApprovalRequest } from '@/types/Approval/ApprovalTypes';
 import { format } from 'date-fns';
 import { CheckCircle, Clock, MessageSquare, Send, User, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axios, { type AxiosError } from 'axios';
-import type { ContentValidationResult } from '@/types/validation';
+import type { ContentValidationResult } from '@/types/common/validation';
 
 export function useContentValidation() {
   const [validationResult, setValidationResult] = useState<ContentValidationResult | null>(null);

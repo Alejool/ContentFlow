@@ -1,5 +1,5 @@
-import { queryKeys } from '@/lib/queryKeys';
-import { useContentPaginationStore } from '@/stores/contentPaginationStore';
+import { queryKeys } from '@/lib/common/queryKeys';
+import { useContentPaginationStore } from '@/stores/Content/contentPaginationStore';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 

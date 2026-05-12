@@ -1,5 +1,5 @@
-import SocialMediaLimitsService from '@/Services/SocialMediaLimitsService';
-import type { ValidationResult } from '@/Services/SocialMediaLimitsService';
+import SocialMediaLimitsService from '@/Services/ConfigSocialMedia/SocialMediaLimitsService';
+import type { ValidationResult } from '@/Services/ConfigSocialMedia/SocialMediaLimitsService';
 
 interface ValidationLimitsCardProps {
   result: ValidationResult;

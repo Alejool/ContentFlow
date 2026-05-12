@@ -2,7 +2,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { X, ChevronRight, SkipForward } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Button from '@/Components/common/Modern/Button';
-import type { TourStep } from '@/types/onboarding';
+import type { TourStep } from '@/types/Onboarding/onboarding';
 import { useOnboardingNavigation } from '@/Hooks/Onboarding/useOnboardingNavigation';
 
 interface TourOverlayProps {

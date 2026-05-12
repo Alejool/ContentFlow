@@ -4,15 +4,15 @@ import SimpleContentTypeBadge from '@/Components/Content/common/SimpleContentTyp
 import PublicationThumbnailCard from '@/Components/Content/Publication/PublicationThumbnailCard';
 import SocialAccountsDisplay from '@/Components/Content/Publication/SocialAccountsDisplay';
 import { usePublicationActions } from '@/Hooks/Publications/usePublicationActions';
-import { usePublicationStore } from '@/stores/publicationStore';
-import type { Publication } from '@/types/Publication';
+import { usePublicationStore } from '@/stores/Publications/publicationStore';
+import type { Publication } from '@/types/Publications/Publication';
 import {
   countMediaFiles,
   getLockedByName,
   getMediaUrl,
   hasMedia,
   isVideoMedia,
-} from '@/Utils/publicationHelpers';
+} from '@/Utils/Publications/publicationHelpers';
 import {
   Calendar,
   Clock,

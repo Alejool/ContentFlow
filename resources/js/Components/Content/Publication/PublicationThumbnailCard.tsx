@@ -1,5 +1,5 @@
-import type { Publication } from '@/types/Publication';
-import { hasMedia, isProcessing, prepareMediaForPreview } from '@/Utils/publicationHelpers';
+import type { Publication } from '@/types/Publications/Publication';
+import { hasMedia, isProcessing, prepareMediaForPreview } from '@/Utils/Publications/publicationHelpers';
 import { Calendar, Clock, Image as ImageIcon, Video } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';

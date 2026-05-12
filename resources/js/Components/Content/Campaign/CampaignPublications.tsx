@@ -1,6 +1,6 @@
 import PublicationThumbnail from '@/Components/Content/Publication/PublicationThumbnail';
 import { formatDateString } from '@/Utils/formatters';
-import type { Campaign } from '@/types/Campaign';
+import type { Campaign } from '@/types/Campaign/Campaign';
 import { useTranslation } from 'react-i18next';
 
 interface CampaignPublicationsProps {

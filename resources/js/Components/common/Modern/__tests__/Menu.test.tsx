@@ -1,9 +1,9 @@
+import Menu from '@/Components/common/Modern/Menu';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Edit, Trash } from 'lucide-react';
 import { Button } from 'react-aria-components';
 import { describe, expect, it, vi } from 'vitest';
-import Menu from '../Menu';
 
 describe('Menu Component', () => {
   it('renders trigger button', () => {

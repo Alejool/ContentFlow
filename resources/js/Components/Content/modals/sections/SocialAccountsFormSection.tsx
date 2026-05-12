@@ -1,6 +1,6 @@
+import { SectionHeader } from '@/Components/Content/modals/common/SectionHeader';
 import SocialAccountsSection from '@/Components/Content/Publication/common/add/SocialAccountsSection';
 import type { TFunction } from 'i18next';
-import { SectionHeader } from '../common/SectionHeader';
 
 interface SocialAccountsFormSectionProps {
   t: TFunction;

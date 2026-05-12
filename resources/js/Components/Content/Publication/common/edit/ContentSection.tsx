@@ -3,8 +3,8 @@ import CampaignSelector from '@/Components/Content/Publication/common/CampaignSe
 import type { ContentType } from '@/Components/Content/Publication/common/ContentTypeIconSelector';
 import Input from '@/Components/common/Modern/Input';
 import Textarea from '@/Components/common/Modern/Textarea';
+import { getFieldsConfig, isFieldRequired } from '@/Constants/Content/contentTypes';
 import { useContentType } from '@/Hooks/Publications/useContentType';
-import { getFieldsConfig, isFieldRequired } from '@/constants/contentTypes';
 import { FileText, Hash, HelpCircle, Target } from 'lucide-react';
 import { memo } from 'react';
 import type { FieldErrors, UseFormRegister, UseFormSetValue } from 'react-hook-form';

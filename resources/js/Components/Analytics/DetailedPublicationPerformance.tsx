@@ -1,4 +1,4 @@
-import { SeededRandom } from '@/Utils/stableMock';
+import { SeededRandom } from '@/Utils/common/stableMock';
 import {
   ChevronLeft,
   ChevronRight,

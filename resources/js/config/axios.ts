@@ -5,8 +5,8 @@
  * Import and use this configured instance for optimistic updates.
  */
 
+import { setupOptimisticInterceptor } from '@/plugins/common/optimisticAxios';
 import axios from 'axios';
-import { setupOptimisticInterceptor } from '../plugins/optimisticAxios';
 
 // Create a configured axios instance
 const axiosInstance = axios.create({

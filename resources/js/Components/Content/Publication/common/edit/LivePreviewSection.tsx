@@ -6,8 +6,8 @@ import { ThreadsPreview } from '@/Components/Content/Publication/previews/Thread
 import { TikTokPreview } from '@/Components/Content/Publication/previews/TikTokPreview';
 import { TwitterPreview } from '@/Components/Content/Publication/previews/TwitterPreview';
 import { YouTubePreview } from '@/Components/Content/Publication/previews/YouTubePreview';
-import { REEL_COMPATIBLE_PLATFORMS } from '@/Constants/contentTypes';
-import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatformsConfig';
+import { REEL_COMPATIBLE_PLATFORMS } from '@/Constants/Content/contentTypes';
+import { SOCIAL_PLATFORMS } from '@/Constants/ConfigSocialMedia/socialPlatformsConfig';
 import { AtSign, Facebook, Instagram, Linkedin, Music2, Twitter, Youtube } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

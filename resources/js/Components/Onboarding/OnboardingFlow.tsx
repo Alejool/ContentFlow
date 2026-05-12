@@ -11,8 +11,8 @@
  * All step components are lazy-loaded to keep the initial bundle small.
  */
 
-import { useOnboarding } from '@/Contexts/OnboardingContext';
-import type { PublicationTemplate, SocialPlatform, TourStep } from '@/types/onboarding';
+import { useOnboarding } from '@/Contexts/Onboarding/OnboardingContext';
+import type { PublicationTemplate, SocialPlatform, TourStep } from '@/types/Onboarding/onboarding';
 import { Building2, ChevronDown, ChevronUp, Gem, Link2, Target } from 'lucide-react';
 import { lazy, Suspense, useState } from 'react';
 import { useTranslation } from 'react-i18next';

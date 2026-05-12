@@ -1,4 +1,4 @@
-import { ToastService } from '@/Services/ToastService';
+import { ToastService } from '@/Services/common/ToastService';
 import { usePage } from '@inertiajs/react';
 import { useEffect } from 'react';
 

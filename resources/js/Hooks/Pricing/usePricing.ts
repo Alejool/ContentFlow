@@ -1,4 +1,4 @@
-import { usePricingStore } from '@/stores/pricingStore';
+import { usePricingStore } from '@/stores/Pricing/pricingStore';
 import { router, usePage } from '@inertiajs/react';
 import { useCallback, useEffect, useState } from 'react';
 

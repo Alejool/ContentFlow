@@ -1,5 +1,5 @@
 import Button from '@/Components/common/Modern/Button';
-import { getPlatformConfig } from '@/Constants/socialPlatforms';
+import { getPlatformConfig } from '@/Constants/ConfigSocialMedia/socialPlatforms';
 import {
   formatDurationLimit,
   formatFileSizeLimit,

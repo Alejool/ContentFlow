@@ -2,8 +2,8 @@ import { AnimatedPage } from '@/Components/common/motion/AnimatedPage';
 import { InertiaProgressIndicator } from '@/Components/common/motion/InertiaProgressIndicator';
 import { ErrorBoundary } from '@/Components/common/ui/ErrorBoundary';
 import ThemedToaster from '@/Components/common/ui/ThemedToaster';
-import { ThemeProvider } from '@/Contexts/ThemeContext';
-import { QueryProvider } from '@/providers/QueryProvider';
+import { ThemeProvider } from '@/Contexts/common/ThemeContext';
+import { QueryProvider } from '@/providers/common/QueryProvider';
 import type { PageProps } from '@/types';
 import { createInertiaApp, router } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
@@ -29,10 +29,10 @@ const ServiceWorkerUpdate = React.lazy(() =>
 const initAccessibility = async () => {
   const [{ ariaAnnouncer }, { FocusManager }, { FocusVisibleManager }, { ErrorInterceptor }] =
     await Promise.all([
-      import('@/Utils/ARIAAnnouncer'),
-      import('@/Utils/FocusManager'),
-      import('@/Utils/FocusVisibleManager'),
-      import('@/Services/ErrorInterceptor'),
+      import('@/Utils/common/ARIAAnnouncer'),
+      import('@/Utils/common/FocusManager'),
+      import('@/Utils/common/FocusVisibleManager'),
+      import('@/Services/common/ErrorInterceptor'),
     ]);
   ErrorInterceptor.initialize();
   FocusVisibleManager.initialize();

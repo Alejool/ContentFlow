@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RotateCcw, Info, AlertTriangle } from 'lucide-react';
 import Button from '@/Components/common/Modern/Button';
-import { useOnboardingStore } from '@/stores/onboardingStore';
+import { useOnboardingStore } from '@/stores/Onboarding/onboardingStore';
 
 interface ConfirmationDialogProps {
   isOpen: boolean;

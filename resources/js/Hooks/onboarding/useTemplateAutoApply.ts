@@ -2,8 +2,8 @@ import {
   applyTemplateToForm,
   clearTemplateFromSession,
   getTemplateFromSession,
-} from '@/Utils/templateUtils';
-import type { PublicationFormData } from '@/schemas/publication';
+} from '@/Utils/Content/templateUtils';
+import type { PublicationFormData } from '@/schemas/Publications/publication';
 import { useEffect, useRef } from 'react';
 import type { UseFormSetValue } from 'react-hook-form';
 

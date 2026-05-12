@@ -1,7 +1,7 @@
 import { useTheme } from '@/Hooks/Layout/useTheme';
 import { Moon, Sun, Monitor, Check } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
-import { transitionTheme } from '@/Utils/themeTransition';
+import { transitionTheme } from '@/Utils/common/themeTransition';
 
 type ThemeOption = 'light' | 'dark' | 'system';
 

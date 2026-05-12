@@ -5,7 +5,7 @@ import CampaignOverviewTab from '@/Components/Content/modals/ViewPublicationModa
 import CreatorInfo from '@/Components/Content/modals/ViewPublicationModal/CreatorInfo';
 import PublicationHeader from '@/Components/Content/modals/ViewPublicationModal/PublicationHeader';
 import ReelsSection from '@/Components/Content/modals/ViewPublicationModal/ReelsSection';
-import { getPlatformConfig } from '@/Constants/socialPlatforms';
+import { getPlatformConfig } from '@/Constants/ConfigSocialMedia/socialPlatforms';
 import type { MediaFile, Publication } from '@/types';
 import { Head } from '@inertiajs/react';
 import { motion } from 'framer-motion';

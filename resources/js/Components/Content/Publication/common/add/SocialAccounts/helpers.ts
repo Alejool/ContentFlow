@@ -1,5 +1,5 @@
-import type { ContentType } from '@/Constants/contentTypes';
-import { CONTENT_TYPE_CONFIG } from '@/Constants/contentTypes';
+import type { ContentType } from '@/Constants/Content/contentTypes';
+import { CONTENT_TYPE_CONFIG } from '@/Constants/Content/contentTypes';
 
 /**
  * Check if a platform is compatible with the selected content type

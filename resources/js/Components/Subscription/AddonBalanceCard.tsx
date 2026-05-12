@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Progress } from '@/Components/ui/progress';
-import type { AddonBalance } from '@/types/addon';
+import type { AddonBalance } from '@/types/Addons/addon';
 import { Sparkles, HardDrive } from 'lucide-react';
 import { formatPercent } from '@/Utils/formatters/number';
 

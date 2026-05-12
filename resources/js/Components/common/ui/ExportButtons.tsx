@@ -1,5 +1,5 @@
 import Button from '@/Components/common/Modern/Button';
-import toast from '@/Utils/toast';
+import toast from '@/Utils/common/toast';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { Download, FileSpreadsheet, FileText, Info } from 'lucide-react';

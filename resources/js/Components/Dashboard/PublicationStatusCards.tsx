@@ -1,5 +1,5 @@
-import { cn } from '@/lib/utils';
-import { getAllPublicationStatuses, getPublicationStatusConfig } from '@/Utils/publicationHelpers';
+import { cn } from '@/lib/common/utils';
+import { getAllPublicationStatuses, getPublicationStatusConfig } from '@/Utils/Publications/publicationHelpers';
 import { animate, motion, useMotionValue } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';

@@ -8,7 +8,7 @@ import UpdateProfileInformationForm from '@/Components/profile/Partials/UpdatePr
 import UpdateThemeForm from '@/Components/profile/Partials/UpdateThemeForm';
 
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { useUserStore } from '@/stores/userStore';
+import { useUserStore } from '@/stores/Auth/userStore';
 import { Head, usePage } from '@inertiajs/react';
 import { CreditCard, Lock, Save, User } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';

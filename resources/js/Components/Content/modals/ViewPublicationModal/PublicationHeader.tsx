@@ -1,4 +1,4 @@
-import { getPublicationStatusConfig } from '@/Utils/publicationHelpers';
+import { getPublicationStatusConfig } from '@/Utils/Publications/publicationHelpers';
 import { useTranslation } from 'react-i18next';
 
 interface PublicationHeaderProps {

@@ -10,7 +10,7 @@ import {
   formatList,
   pluralize,
   getUserTimezone,
-} from '@/Utils/i18nHelpers';
+} from '@/Utils/common/i18nHelpers';
 
 /**
  * Hook personalizado para localización con utilidades adicionales

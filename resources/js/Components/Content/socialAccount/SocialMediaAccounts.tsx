@@ -2,9 +2,9 @@ import SocialAccountCardSkeleton from '@/Components/common/ui/skeletons/SocialAc
 import PlatformSettingsModal from '@/Components/ConfigSocialMedia/PlatformSettingsModal';
 import DisconnectBlockerModal from '@/Components/Content/modals/DisconnectBlockerModal';
 import DisconnectWarningModal from '@/Components/Content/modals/DisconnectWarningModal';
-import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatforms';
+import { SOCIAL_PLATFORMS } from '@/Constants/ConfigSocialMedia/socialPlatforms';
 import { useSocialMediaAuth } from '@/Hooks/ConfigSocialMedia/useSocialMediaAuth';
-import { getPlatformSchema } from '@/schemas/platformSettings';
+import { getPlatformSchema } from '@/schemas/ConfigSocialMedia/platformSettings';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import { router, usePage } from '@inertiajs/react';
 import axios from 'axios';

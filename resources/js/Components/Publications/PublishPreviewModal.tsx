@@ -1,8 +1,8 @@
 import { DateTimePicker } from '@/Components/common/DateTimePicker';
 import Modal from '@/Components/common/ui/Modal';
-import SocialMediaLimitsService from '@/Services/SocialMediaLimitsService';
-import type { ValidationResponse } from '@/Services/SocialMediaLimitsService';
-import type { Publication } from '@/types/Publication';
+import SocialMediaLimitsService from '@/Services/ConfigSocialMedia/SocialMediaLimitsService';
+import type { ValidationResponse } from '@/Services/ConfigSocialMedia/SocialMediaLimitsService';
+import type { Publication } from '@/types/Publications/Publication';
 import { formatDateString } from '@/Utils/formatters';
 import axios from 'axios';
 import { useEffect, useState } from 'react';

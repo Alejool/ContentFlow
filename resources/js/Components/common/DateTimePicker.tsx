@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
-import { useTimezoneStore } from '@/stores/timezoneStore';
-import { toLocalDate, toUTC } from '@/Utils/timezoneUtils';
+import { useTimezoneStore } from '@/stores/common/timezoneStore';
+import { toLocalDate, toUTC } from '@/Utils/common/timezoneUtils';
 
 interface DateTimePickerProps {
   value: string | null;

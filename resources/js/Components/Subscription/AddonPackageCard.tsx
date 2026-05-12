@@ -9,7 +9,7 @@ import {
 } from '@/Components/ui/card';
 import Button from '@/Components/common/Modern/Button';
 import { Badge } from '@/Components/ui/badge';
-import type { AddonPackage } from '@/types/addon';
+import type { AddonPackage } from '@/types/Addons/addon';
 import { Sparkles, HardDrive, Minus, Plus } from 'lucide-react';
 import { formatCurrency } from '@/Utils/formatters/number';
 

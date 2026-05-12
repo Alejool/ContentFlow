@@ -1,4 +1,4 @@
-import { SeededRandom } from '@/Utils/stableMock';
+import { SeededRandom } from '@/Utils/common/stableMock';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useRef } from 'react';
 import {

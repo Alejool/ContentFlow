@@ -1,4 +1,4 @@
-import type { ApprovalRequest } from '@/types/ApprovalTypes';
+import type { ApprovalRequest } from '@/types/Approval/ApprovalTypes';
 import { AlertCircle, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 

@@ -1,4 +1,4 @@
-import { useOnboardingNavigationStore } from '@/stores/onboardingNavigationStore';
+import { useOnboardingNavigationStore } from '@/stores/Onboarding/onboardingNavigationStore';
 import { router } from '@inertiajs/react';
 import { useCallback, useEffect } from 'react';
 

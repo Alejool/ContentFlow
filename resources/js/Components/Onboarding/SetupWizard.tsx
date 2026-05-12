@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useOnboarding } from '@/Contexts/OnboardingContext';
-import type { SocialPlatform } from '@/types/onboarding';
-import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatforms';
+import { useOnboarding } from '@/Contexts/Onboarding/OnboardingContext';
+import type { SocialPlatform } from '@/types/Onboarding/onboarding';
+import { SOCIAL_PLATFORMS } from '@/Constants/ConfigSocialMedia/socialPlatforms';
 import PlatformCard from './PlatformCard';
 import { ArrowRight, ArrowLeft, X } from 'lucide-react';
 

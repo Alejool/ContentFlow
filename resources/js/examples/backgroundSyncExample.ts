@@ -5,8 +5,8 @@
  * to queue operations for background synchronization.
  */
 
-import { backgroundSyncManager } from '../sw/syncManager';
-import type { SyncOperation } from '../types/optimistic';
+import { backgroundSyncManager } from '@/sw/syncManager';
+import type { SyncOperation } from '@/types/common/optimistic';
 
 /**
  * Example 1: Register a simple sync operation

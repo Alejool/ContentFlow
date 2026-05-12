@@ -3,13 +3,13 @@ import YouTubeThumbnailUploader from '@/Components/common/ui/YouTubeThumbnailUpl
 import PlatformCard from '@/Components/Content/modals/publish/PlatformCard';
 import VideoValidationAlert from '@/Components/Content/modals/publish/VideoValidationAlert';
 import RejectionReasonModal from '@/Components/Content/modals/RejectionReasonModal';
-import { CONTENT_TYPE_CONFIG } from '@/Constants/contentTypes';
-import { getPlatformConfig } from '@/Constants/socialPlatforms';
+import { CONTENT_TYPE_CONFIG } from '@/Constants/Content/contentTypes';
+import { getPlatformConfig } from '@/Constants/ConfigSocialMedia/socialPlatforms';
 import { usePublishPublication } from '@/Hooks/Publications/usePublishPublication';
 import { useConfirm } from '@/Hooks/common/useConfirm';
 import { usePublicationCapabilities } from '@/Hooks/Publications/usePublicationCapabilities';
-import { usePublicationStore } from '@/stores/publicationStore';
-import type { Publication } from '@/types/Publication';
+import { usePublicationStore } from '@/stores/Publications/publicationStore';
+import type { Publication } from '@/types/Publications/Publication';
 import { formatDateTimeStyled } from '@/Utils/formatters';
 import { formatDateTimeString } from '@/Utils/formatters';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';

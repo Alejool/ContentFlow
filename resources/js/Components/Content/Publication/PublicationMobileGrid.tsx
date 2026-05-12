@@ -2,7 +2,7 @@ import Button from '@/Components/common/Modern/Button';
 import SimpleContentTypeBadge from '@/Components/Content/common/SimpleContentTypeBadge';
 import PublicationThumbnail from '@/Components/Content/Publication/PublicationThumbnail';
 import SocialAccountsDisplay from '@/Components/Content/Publication/SocialAccountsDisplay';
-import type { Publication } from '@/types/Publication';
+import type { Publication } from '@/types/Publications/Publication';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { Clock, Copy, Edit, Eye, Folder, Image, Rocket, Send, Trash2, Video } from 'lucide-react';
@@ -74,8 +74,8 @@ const PublicationMobileGrid = memo(function PublicationMobileGrid({
       // Update stores with fresh data
       const publication = response.data?.data?.content || response.data?.data?.publication;
       if (publication) {
-        const publicationStoreModule = await import('@/stores/publicationStore');
-        const manageContentUIStoreModule = await import('@/stores/manageContentUIStore');
+        const publicationStoreModule = await import('@/stores/Publications/publicationStore');
+        const manageContentUIStoreModule = await import('@/stores/Content/manageContentUIStore');
 
         // CRITICAL: Update immediately with new status
         publicationStoreModule.usePublicationStore.getState().updatePublication(item.id, {

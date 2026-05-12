@@ -6,7 +6,7 @@ import Input from '@/Components/common/Modern/Input';
 import Checkbox from '@/Components/common/Modern/Checkbox'; 
 import DatePickerModern from '@/Components/common/Modern/DatePicker';
 import { AlertCircle, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Clock } from 'lucide-react';
-import { useTimezoneStore } from '@/stores/timezoneStore';
+import { useTimezoneStore } from '@/stores/common/timezoneStore';
 
 const getPlatformColors = (platform?: string): { bg: string; text: string; border: string; hover: string } => {
   const platformColors: Record<

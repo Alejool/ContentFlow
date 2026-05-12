@@ -1,4 +1,4 @@
-import { getRoleBadgeClass, getRoleConfig } from '@/Utils/roleHelpers';
+import { getRoleBadgeClass, getRoleConfig } from '@/Utils/Roles/roleHelpers';
 
 interface RoleBadgeProps {
   role: any;

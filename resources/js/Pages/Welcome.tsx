@@ -1,27 +1,27 @@
-import Logo from '@/../assets/logo.svg';
 import Button from '@/Components/common/Modern/Button';
 import ThemeLanguageContainer from '@/Components/common/ThemeLanguageContainer';
 import OptimizedImage from '@/Components/common/ui/OptimizedImage';
-import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatforms';
+import { SOCIAL_PLATFORMS } from '@/Constants/ConfigSocialMedia/socialPlatforms';
 import { useTheme } from '@/Hooks/Layout/useTheme';
+import Logo from '@assets/logo.svg';
 import { Head, Link } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  ArrowRight,
-  BarChart3,
-  Brain,
-  Calendar,
-  CheckCircle2,
-  Globe,
-  Image as ImageIcon,
-  Mail,
-  Rocket,
-  Share2,
-  Shield,
-  Sparkles,
-  Upload,
-  Users,
-  Zap,
+    ArrowRight,
+    BarChart3,
+    Brain,
+    Calendar,
+    CheckCircle2,
+    Globe,
+    Image as ImageIcon,
+    Mail,
+    Rocket,
+    Share2,
+    Shield,
+    Sparkles,
+    Upload,
+    Users,
+    Zap,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';

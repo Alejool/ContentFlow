@@ -1,4 +1,4 @@
-import { prefersReducedMotion } from '@/Utils/themeTransition';
+import { prefersReducedMotion } from '@/Utils/common/themeTransition';
 import { LazyMotion, domAnimation, m } from 'framer-motion';
 import { ReactNode } from 'react';
 import { Switch as AriaSwitch } from 'react-aria-components';

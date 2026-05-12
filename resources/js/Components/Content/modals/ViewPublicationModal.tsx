@@ -10,9 +10,9 @@ import CampaignOverviewTab from '@/Components/Content/modals/ViewPublicationModa
 import CreatorInfo from '@/Components/Content/modals/ViewPublicationModal/CreatorInfo';
 import PublicationHeader from '@/Components/Content/modals/ViewPublicationModal/PublicationHeader';
 import ReelsSection from '@/Components/Content/modals/ViewPublicationModal/ReelsSection';
-import { usePublicationStore } from '@/stores/publicationStore';
-import type { Campaign } from '@/types/Campaign';
-import type { Publication } from '@/types/Publication';
+import { usePublicationStore } from '@/stores/Publications/publicationStore';
+import type { Campaign } from '@/types/Campaign/Campaign';
+import type { Publication } from '@/types/Publications/Publication';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { usePage } from '@inertiajs/react';
 import { Edit, FileText, Layers, X } from 'lucide-react';

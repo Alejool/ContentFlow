@@ -1,6 +1,6 @@
 import VideoValidationAlert from '@/Components/Content/VideoValidationAlert';
-import type { ValidationResult } from '@/Utils/videoValidation';
-import { PLATFORM_REQUIREMENTS, validateVideoForPlatform } from '@/Utils/videoValidation';
+import type { ValidationResult } from '@/Utils/Content/videoValidation';
+import { PLATFORM_REQUIREMENTS, validateVideoForPlatform } from '@/Utils/Content/videoValidation';
 import { Info } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 

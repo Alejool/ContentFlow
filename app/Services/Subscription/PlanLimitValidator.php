@@ -56,7 +56,7 @@ class PlanLimitValidator
     }
 
     // Get storage addons balance
-    $addonService = app(\App\Services\WorkspaceAddonService::class);
+    $addonService = app(\App\Services\Workspace\WorkspaceAddonService::class);
     $storageAddons = $addonService->getAddonBalance($workspace, 'storage');
     $addonStorageBytes = $storageAddons['remaining'] * 1024 * 1024 * 1024; // Convert GB to bytes
 
@@ -89,7 +89,7 @@ class PlanLimitValidator
     }
 
     // Get storage addons balance
-    $addonService = app(\App\Services\WorkspaceAddonService::class);
+    $addonService = app(\App\Services\Workspace\WorkspaceAddonService::class);
     $storageAddons = $addonService->getAddonBalance($workspace, 'storage');
     $addonStorageBytes = $storageAddons['remaining'] * 1024 * 1024 * 1024; // Convert GB to bytes
 
@@ -205,7 +205,7 @@ class PlanLimitValidator
     }
 
     // Get addon balance using WorkspaceAddonService
-    $addonService = app(\App\Services\WorkspaceAddonService::class);
+    $addonService = app(\App\Services\Workspace\WorkspaceAddonService::class);
     $addonBalance = $addonService->getAddonBalance($workspace, $addonType);
     
     // For storage, convert GB to bytes if needed

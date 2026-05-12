@@ -44,7 +44,7 @@ class WorkspaceUsageService
 
         // Si necesita usar add-ons
         if ($useFromAddons > 0) {
-            $addonService = app(\App\Services\WorkspaceAddonService::class);
+            $addonService = app(\App\Services\Workspace\WorkspaceAddonService::class);
             
             // Mapear metricType a addon type
             $addonTypeMap = [
@@ -331,7 +331,7 @@ class WorkspaceUsageService
             
             // Si excede el plan, verificar si tiene add-ons disponibles
             if ($limitType === 'ai_requests_per_month') {
-                $addonService = app(\App\Services\WorkspaceAddonService::class);
+                $addonService = app(\App\Services\Workspace\WorkspaceAddonService::class);
                 return $addonService->hasSufficientBalance($workspace, 'ai_credits', 1);
             }
             
@@ -348,7 +348,7 @@ class WorkspaceUsageService
             }
             
             // Si excede el plan, verificar si tiene add-ons disponibles
-            $addonService = app(\App\Services\WorkspaceAddonService::class);
+            $addonService = app(\App\Services\Workspace\WorkspaceAddonService::class);
             $addonBalance = $addonService->getAddonBalance($workspace, 'storage');
             
             return ($usageGB - $limit) < $addonBalance['remaining'];

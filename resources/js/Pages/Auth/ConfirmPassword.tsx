@@ -1,7 +1,7 @@
 import Button from '@/Components/common/Modern/Button';
 import Input from '@/Components/common/Modern/Input';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { getErrorMessage } from '@/Utils/validation';
+import { getErrorMessage } from '@/Utils/common/validation';
 import { Head, useForm } from '@inertiajs/react';
 import { CheckCircle, Lock } from 'lucide-react';
 import { FormEventHandler } from 'react';

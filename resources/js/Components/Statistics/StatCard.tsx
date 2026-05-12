@@ -3,7 +3,7 @@ import type { LucideIcon } from 'lucide-react';
 import { Minus, TrendingDown, TrendingUp } from 'lucide-react';
 import React from 'react';
 
-import Skeleton from '../common/ui/Skeleton';
+import Skeleton from '@/Components/common/ui/Skeleton';
 
 interface StatCardProps {
   title: string;

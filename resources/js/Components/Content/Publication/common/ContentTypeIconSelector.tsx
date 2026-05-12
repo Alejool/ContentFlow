@@ -1,4 +1,4 @@
-import { REEL_COMPATIBLE_PLATFORMS } from '@/Constants/contentTypes';
+import { REEL_COMPATIBLE_PLATFORMS } from '@/Constants/Content/contentTypes';
 import type { LucideIcon } from 'lucide-react';
 import { BarChart3, Clock, FileText, Images, Video } from 'lucide-react';
 import { useMemo } from 'react';

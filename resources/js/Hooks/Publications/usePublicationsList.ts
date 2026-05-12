@@ -1,6 +1,6 @@
-import { queryKeys } from '@/lib/queryKeys';
-import { useContentPaginationStore } from '@/stores/contentPaginationStore';
-import type { Publication } from '@/types/Publication';
+import { queryKeys } from '@/lib/common/queryKeys';
+import { useContentPaginationStore } from '@/stores/Content/contentPaginationStore';
+import type { Publication } from '@/types/Publications/Publication';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 

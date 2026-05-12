@@ -1,5 +1,5 @@
-import type { ApprovalLog, ApprovalRequest } from '@/types/ApprovalTypes';
-import type { Publication } from '@/types/Publication';
+import type { ApprovalLog, ApprovalRequest } from '@/types/Approval/ApprovalTypes';
+import type { Publication } from '@/types/Publications/Publication';
 import axios from 'axios';
 import { CheckCircle, Clock, Loader2, XCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';

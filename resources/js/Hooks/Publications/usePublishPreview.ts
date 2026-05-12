@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axios, { type AxiosError } from 'axios';
-import type { PreviewData, PlatformConfiguration, PublishResponse } from '@/types/preview';
+import type { PreviewData, PlatformConfiguration, PublishResponse } from '@/types/Publications/preview';
 
 export function usePublishPreview() {
   const [previewData, setPreviewData] = useState<PreviewData | null>(null);

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import SocialMediaLimitsService from '@/Services/SocialMediaLimitsService';
-import type { ValidationResponse } from '@/Services/SocialMediaLimitsService';
+import SocialMediaLimitsService from '@/Services/ConfigSocialMedia/SocialMediaLimitsService';
+import type { ValidationResponse } from '@/Services/ConfigSocialMedia/SocialMediaLimitsService';
 
 interface QuickValidationIndicatorProps {
   publicationId: number;

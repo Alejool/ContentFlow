@@ -1,4 +1,4 @@
-import { useOnboarding } from '@/Contexts/OnboardingContext';
+import { useOnboarding } from '@/Contexts/Onboarding/OnboardingContext';
 import { useEffect, useState } from 'react';
 
 /**

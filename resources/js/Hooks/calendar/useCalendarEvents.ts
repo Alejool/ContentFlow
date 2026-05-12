@@ -1,4 +1,4 @@
-import type { CalendarFilters } from '@/types/calendar';
+import type { CalendarFilters } from '@/types/Calendar/calendar';
 import { usePage } from '@inertiajs/react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';

@@ -1,4 +1,4 @@
-import { CONTENT_TYPES } from '@/constants/contentTypes';
+import { CONTENT_TYPES } from '@/Constants/Content/contentTypes';
 import { BarChart3, Circle, FileText, Images, TrendingUp, Video } from 'lucide-react';
 import { memo, useMemo } from 'react';
 

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { usePage } from '@inertiajs/react';
-import { useTimezoneStore } from '@/stores/timezoneStore';
+import { useTimezoneStore } from '@/stores/common/timezoneStore';
 
 /**
  * Componente que inicializa el timezone store desde los props de Inertia

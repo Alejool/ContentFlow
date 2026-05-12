@@ -1,5 +1,5 @@
-import { formatDate } from '@/Utils/i18nHelpers'; // Uses locale-specific named format presets (monthYear, dayWeekMonthYear)
-import type { CalendarView } from '@/types/calendar';
+import { formatDate } from '@/Utils/common/i18nHelpers'; // Uses locale-specific named format presets (monthYear, dayWeekMonthYear)
+import type { CalendarView } from '@/types/Calendar/calendar';
 import { format, setMonth, setYear } from 'date-fns';
 import {
   Calendar as CalendarIcon,

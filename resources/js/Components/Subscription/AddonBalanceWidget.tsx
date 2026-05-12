@@ -1,7 +1,7 @@
 import Button from '@/Components/common/Modern/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Progress } from '@/Components/ui/progress';
-import type { AddonSummary } from '@/types/addon';
+import type { AddonSummary } from '@/types/Addons/addon';
 import { Link } from '@inertiajs/react';
 import { HardDrive, Plus, Sparkles } from 'lucide-react';
 import React from 'react';

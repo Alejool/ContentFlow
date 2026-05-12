@@ -1,5 +1,5 @@
-import { queryKeys } from '@/lib/queryKeys';
-import type { SocialAccount } from '@/types/SocialAccount';
+import { queryKeys } from '@/lib/common/queryKeys';
+import type { SocialAccount } from '@/types/ConfigSocialMedia/SocialAccount';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 

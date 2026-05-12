@@ -7,7 +7,7 @@ import Button from '@/Components/common/Modern/Button';
 import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
 import EmptyState from '@/Components/common/ui/EmptyState';
 import { VirtualGrid } from '@/Components/common/ui/VirtualList';
-import { useLockStore } from '@/stores/lockStore';
+import { useLockStore } from '@/stores/Publications/lockStore';
 import { Filter, LayoutGrid, List as ListIcon, RotateCcw } from 'lucide-react';
 import React, { useEffect, useState, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';

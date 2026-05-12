@@ -5,9 +5,9 @@
  * into a calendar view.
  */
 
-import { useCalendarStore } from '@/stores/calendarStore';
-import type { SyncError } from '@/types/errors';
-import { validateDate } from '@/Utils/dateValidation';
+import { useCalendarStore } from '@/stores/Calendar/calendarStore';
+import type { SyncError } from '@/types/common/errors';
+import { validateDate } from '@/Utils/common/dateValidation';
 import React, { useState } from 'react';
 import { CalendarErrorBoundary } from './CalendarErrorBoundary';
 import { ConflictResolutionModal } from './ConflictResolutionModal';

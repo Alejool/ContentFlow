@@ -1,5 +1,5 @@
 import { Avatar } from '@/Components/common/Avatar';
-import type { ApprovalLog as ApprovalLogType } from '@/types/ApprovalTypes';
+import type { ApprovalLog as ApprovalLogType } from '@/types/Approval/ApprovalTypes';
 import { formatDateTimeString } from '@/Utils/formatters';
 import { CheckCircle, Clock, MessageSquare, User, XCircle } from 'lucide-react';
 import React, { useMemo } from 'react';

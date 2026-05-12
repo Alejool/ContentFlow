@@ -1,5 +1,5 @@
 import { useContentManagement } from '@/Hooks/Content/useContentManagement';
-import type { Campaign } from '@/types/Campaign';
+import type { Campaign } from '@/types/Campaign/Campaign';
 import { AlertTriangle, Target } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -13,7 +13,7 @@ import ModalHeader from '@/Components/Content/modals/common/ModalHeader';
 import { useEditCampaignForm } from '@/Hooks/Campaign/useEditCampaignForm';
 import { usePublicationsForCampaignEdit } from '@/Hooks/Campaign/usePublicationsForCampaignEdit';
 import { useModalFocusTrap } from '@/Hooks/ui/useModalFocusTrap';
-import { useContentPaginationStore } from '@/stores/contentPaginationStore';
+import { useContentPaginationStore } from '@/stores/Content/contentPaginationStore';
 import { usePage } from '@inertiajs/react';
 import ModalFooter from './common/ModalFooter';
 

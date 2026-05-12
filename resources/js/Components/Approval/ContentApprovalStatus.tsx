@@ -130,8 +130,8 @@ export default function ContentApprovalStatus({
       // Update stores with fresh data
       const publication = response.data?.data?.content || response.data?.data?.publication;
       if (publication) {
-        const publicationStoreModule = await import('@/stores/publicationStore');
-        const manageContentUIStoreModule = await import('@/stores/manageContentUIStore');
+        const publicationStoreModule = await import('@/stores/Publications/publicationStore');
+        const manageContentUIStoreModule = await import('@/stores/Content/manageContentUIStore');
 
         // CRITICAL: Update immediately with new status
         publicationStoreModule.usePublicationStore.getState().updatePublication(content.id, {

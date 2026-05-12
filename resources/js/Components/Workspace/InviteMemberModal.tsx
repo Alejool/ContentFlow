@@ -2,7 +2,7 @@ import Button from '@/Components/common/Modern/Button';
 import Input from '@/Components/common/Modern/Input';
 import Select from '@/Components/common/Modern/Select';
 import Modal from '@/Components/common/ui/Modal';
-import { getRoleConfig } from '@/Utils/roleHelpers';
+import { getRoleConfig } from '@/Utils/Roles/roleHelpers';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
 import { Mail, UserPlus } from 'lucide-react';

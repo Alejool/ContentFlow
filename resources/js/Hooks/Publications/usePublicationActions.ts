@@ -1,5 +1,5 @@
-import { usePublicationActionsStore } from '@/stores/publicationActionsStore';
-import type { Publication } from '@/types/Publication';
+import { usePublicationActionsStore } from '@/stores/Publications/publicationActionsStore';
+import type { Publication } from '@/types/Publications/Publication';
 import { useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';

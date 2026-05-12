@@ -1,5 +1,5 @@
 import PieChart from '@/Components/Statistics/PieChart';
-import { SeededRandom } from '@/Utils/stableMock';
+import { SeededRandom } from '@/Utils/common/stableMock';
 import { Link } from '@inertiajs/react';
 import { AlertTriangle, ChevronLeft, ChevronRight, Plus, RefreshCw, Share2 } from 'lucide-react';
 import { useRef } from 'react';

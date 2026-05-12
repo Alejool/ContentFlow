@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { useExternalCalendarStore } from '@/stores/externalCalendarStore';
-import type { ExternalCalendarConnection } from '@/stores/externalCalendarStore';
+import { useExternalCalendarStore } from '@/stores/Calendar/externalCalendarStore';
+import type { ExternalCalendarConnection } from '@/stores/Calendar/externalCalendarStore';
 
 interface SyncSettings {
   syncEnabled: boolean;

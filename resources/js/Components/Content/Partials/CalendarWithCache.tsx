@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useCalendarStore } from '@/stores/calendarStore';
+import { useCalendarStore } from '@/stores/Calendar/calendarStore';
 import { useCalendarEvents } from '@/hooks/useCalendarEvents';
 import ModernCalendar from './ModernCalendar';
 import { CalendarSkeleton, LoadingOverlay } from './CalendarSkeleton';

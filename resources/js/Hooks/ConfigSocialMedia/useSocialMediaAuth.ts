@@ -1,6 +1,6 @@
 import { useDisconnectSocialAccount, useSocialAccounts } from '@/Hooks/ConfigSocialMedia/useSocialAccounts';
-import { queryKeys } from '@/lib/queryKeys';
-import { ToastService } from '@/Services/ToastService';
+import { queryKeys } from '@/lib/common/queryKeys';
+import { ToastService } from '@/Services/common/ToastService';
 import { useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 

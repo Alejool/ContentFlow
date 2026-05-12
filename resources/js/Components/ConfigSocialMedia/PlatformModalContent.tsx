@@ -4,7 +4,7 @@ import ThreadsSettings from '@/Components/ConfigSocialMedia/ThreadsSettings';
 import TikTokSettings from '@/Components/ConfigSocialMedia/TikTokSettings';
 import TwitterSettings from '@/Components/ConfigSocialMedia/TwitterSettings';
 import YoutubeSettings from '@/Components/ConfigSocialMedia/YoutubeSettings';
-import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatformsConfig';
+import { SOCIAL_PLATFORMS } from '@/Constants/ConfigSocialMedia/socialPlatformsConfig';
 import { Settings2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 

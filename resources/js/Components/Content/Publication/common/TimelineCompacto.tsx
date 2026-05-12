@@ -1,7 +1,7 @@
 import PublicationTimeline from '@/Components/Content/Publication/common/edit/PublicationTimeline';
 import { ChevronDown, ChevronUp, History } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { PublicationActivity } from '@/types/Publication';
+import type { PublicationActivity } from '@/types/Publications/Publication';
 
 interface TimelineCompactoProps {
   activities: PublicationActivity[];

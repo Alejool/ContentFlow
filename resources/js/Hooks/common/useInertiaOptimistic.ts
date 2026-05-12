@@ -1,7 +1,7 @@
+import type { OptimisticOptions } from '@/types/common/optimistic';
+import { getInertiaPageComponent, isInertiaPage } from '@/Utils/common/inertiaOptimisticSync';
 import { usePage } from '@inertiajs/react';
 import { useMemo } from 'react';
-import type { OptimisticOptions } from '../types/optimistic';
-import { getInertiaPageComponent, isInertiaPage } from '../utils/inertiaOptimisticSync';
 import { useOptimistic } from './useOptimistic';
 
 /**

@@ -6,8 +6,8 @@ import ModalHeader from '@/Components/Content/modals/common/ModalHeader';
 import SocialMediaAccounts from '@/Components/Content/socialAccount/SocialMediaAccounts';
 import Modal from '@/Components/common/ui/Modal';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { useCampaignStore } from '@/stores/campaignStore';
-import { usePublicationStore } from '@/stores/publicationStore';
+import { useCampaignStore } from '@/stores/Campaign/campaignStore';
+import { usePublicationStore } from '@/stores/Publications/publicationStore';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { Head, usePage } from '@inertiajs/react';
 import {
@@ -37,7 +37,7 @@ import { useCanApprove } from '@/Hooks/Approval/useCanApprove';
 import { usePendingApprovals } from '@/Hooks/Approval/usePendingApprovals';
 import type { ContentTab } from '@/Hooks/Publications/usePublications';
 import { usePublications } from '@/Hooks/Publications/usePublications';
-import { useManageContentUIStore } from '@/stores/manageContentUIStore';
+import { useManageContentUIStore } from '@/stores/Content/manageContentUIStore';
 import { useShallow } from 'zustand/react/shallow';
 
 export default function ManageContentPage() {

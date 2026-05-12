@@ -1,6 +1,6 @@
+import type { OfflineOptions, QueuedOperation } from '@/types/common/optimistic';
+import { indexedDBQueue } from '@/Utils/Offline/indexedDBQueue';
 import { useCallback, useEffect, useState } from 'react';
-import type { OfflineOptions, QueuedOperation } from '../types/optimistic';
-import { indexedDBQueue } from '../Utils/indexedDBQueue';
 
 /**
  * useOffline Hook - Manages offline state and operation queue

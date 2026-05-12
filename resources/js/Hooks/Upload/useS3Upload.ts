@@ -1,5 +1,5 @@
-import { useMediaStore } from '@/stores/mediaStore';
-import { useUploadQueue } from '@/stores/uploadQueueStore';
+import { useMediaStore } from '@/stores/Upload/mediaStore';
+import { useUploadQueue } from '@/stores/Upload/uploadQueueStore';
 import { useMutation } from '@tanstack/react-query';
 import axios, { type AxiosError } from 'axios';
 import { useCallback } from 'react';

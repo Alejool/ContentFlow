@@ -1,4 +1,4 @@
-import { formatPublicationDate } from '@/Utils/publicationHelpers';
+import { formatPublicationDate } from '@/Utils/Publications/publicationHelpers';
 import { useTranslation } from 'react-i18next';
 import CampaignInfoGrid from './CampaignInfoGrid';
 import PublishedPostsSection from './PublishedPostsSection';

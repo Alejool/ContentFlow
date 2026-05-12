@@ -1,7 +1,7 @@
 import { usePublishPublication } from '@/Hooks/Publications/usePublishPublication';
-import { useManageContentUIStore } from '@/stores/manageContentUIStore';
-import type { Campaign } from '@/types/Campaign';
-import type { Publication } from '@/types/Publication';
+import { useManageContentUIStore } from '@/stores/Content/manageContentUIStore';
+import type { Campaign } from '@/types/Campaign/Campaign';
+import type { Publication } from '@/types/Publications/Publication';
 import { memo, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -12,7 +12,7 @@ import EditCampaignModal from '@/Components/Content/modals/EditCampaignModal';
 import EditPublicationModal from '@/Components/Content/modals/EditPublicationModal';
 import PublishPublicationModal from '@/Components/Content/modals/PublishPublicationModal';
 import ViewPublicationModal from '@/Components/Content/modals/ViewPublicationModal';
-import { usePublicationStore } from '@/stores/publicationStore';
+import { usePublicationStore } from '@/stores/Publications/publicationStore';
 
 interface ModalManagerProps {
   onRefresh: () => void;

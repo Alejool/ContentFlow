@@ -1,9 +1,9 @@
-import type { Publication } from '@/types/Publication';
+import type { Publication } from '@/types/Publications/Publication';
 import {
   getPublicationStatusConfig,
   getShortStatusLabel,
   getStatusDescription,
-} from '@/Utils/publicationHelpers';
+} from '@/Utils/Publications/publicationHelpers';
 import { AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import { useMemo } from 'react';
 
